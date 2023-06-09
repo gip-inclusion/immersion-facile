@@ -5,6 +5,7 @@ import {
   BeneficiaryRepresentative,
   ConventionDtoBuilder,
 } from "shared";
+import { EmailNotification } from "shared/src/notifications/notifications.dto";
 import { expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated } from "../../../../_testBuilders/emailAssertions";
 import {
   createInMemoryUow,
@@ -13,10 +14,7 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  EmailNotification,
-  makeSaveNotificationAndRelatedEvent,
-} from "../../../generic/notifications/entities/Notification";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyAllActorsThatConventionIsDeprecated } from "./NotifyAllActorsThatConventionIsDeprecated";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {

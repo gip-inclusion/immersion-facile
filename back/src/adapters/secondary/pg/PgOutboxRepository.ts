@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import { differenceWith } from "ramda";
-import { propEq, replaceArrayElement } from "shared";
+import { DateStr, propEq, replaceArrayElement } from "shared";
 import {
   DomainEvent,
   DomainTopic,
@@ -8,7 +8,6 @@ import {
   EventPublication,
 } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { DateStr } from "../../../domain/core/ports/TimeGateway";
 import { counterEventsSavedBeforePublish } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 

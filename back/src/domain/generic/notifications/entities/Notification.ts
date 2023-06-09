@@ -1,52 +1,16 @@
 import {
-  AgencyId,
-  AuthenticatedUserId,
-  ConventionId,
-  Flavor,
-  SiretDto,
-  TemplatedEmail,
-  TemplatedSms,
-} from "shared";
+  Notification,
+  NotificationContent,
+  NotificationId,
+  NotificationKind,
+} from "shared/src/notifications/notifications.dto";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/eventBus/EventBus";
-import { DateStr, TimeGateway } from "../../../core/ports/TimeGateway";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../core/ports/UuidGenerator";
-
-export type NotificationId = Flavor<string, "NotificationId">;
-
-export type FollowedIds = {
-  conventionId?: ConventionId;
-  establishmentSiret?: SiretDto;
-  agencyId?: AgencyId;
-  userId?: AuthenticatedUserId;
-};
-
-export type NotificationKind = (typeof notificationKinds)[number];
-export const notificationKinds = ["email", "sms"] as const;
-
-type GenericNotification<K extends NotificationKind, TemplatedContent> = {
-  kind: K;
-  templatedContent: TemplatedContent;
-};
-
-export type NotificationContent =
-  | GenericNotification<"email", TemplatedEmail>
-  | GenericNotification<"sms", TemplatedSms>;
-
-const _isAssignable = (kind: NotificationKind): NotificationContent["kind"] =>
-  kind;
-
-export type Notification = {
-  id: NotificationId;
-  createdAt: DateStr;
-  followedIds: FollowedIds;
-} & NotificationContent;
-
-export type SmsNotification = Extract<Notification, { kind: "sms" }>;
-export type EmailNotification = Extract<Notification, { kind: "email" }>;
 
 export type WithNotificationIdAndKind = {
   id: NotificationId;

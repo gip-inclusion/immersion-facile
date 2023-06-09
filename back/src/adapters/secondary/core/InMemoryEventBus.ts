@@ -1,4 +1,5 @@
 import { keys, prop } from "ramda";
+import { DateStr } from "shared";
 import {
   EventBus,
   EventCallback,
@@ -10,7 +11,7 @@ import {
   EventPublication,
   SubscriptionId,
 } from "../../../domain/core/eventBus/events";
-import { DateStr, TimeGateway } from "../../../domain/core/ports/TimeGateway";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import {
   counterPublishedEventsError,

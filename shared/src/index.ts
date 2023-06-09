@@ -53,6 +53,7 @@ export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.targets";
 export * from "./naf";
+export * from "./notifications/notifications.dto";
 export * from "./pipeWithValue";
 export * from "./ramdaExtensions/notEqual";
 export * from "./ramdaExtensions/path";

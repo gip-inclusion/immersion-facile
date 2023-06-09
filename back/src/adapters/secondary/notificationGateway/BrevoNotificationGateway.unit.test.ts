@@ -245,19 +245,4 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       },
     });
   });
-
-  it("should NOT be able to retrieve last emails sent", async () => {
-    await notificationGateway.sendEmail({
-      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-      recipients: ["establishment-ceo@gmail.com"],
-      cc: [],
-      params: { editFrontUrl: "plop" },
-    });
-
-    await expect(() => notificationGateway.getLastSentEmailDtos()).toThrow(
-      new Error(
-        "It is not possible de get last sent mails from brevo notification gateway",
-      ),
-    );
-  });
 });

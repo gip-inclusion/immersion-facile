@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { TemplatedEmail, TemplatedSms } from "shared";
+import { Notification } from "shared/src/notifications/notifications.dto";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { Notification } from "../../../domain/generic/notifications/entities/Notification";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
 describe("PgNotificationRepository", () => {

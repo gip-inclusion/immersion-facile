@@ -38,7 +38,6 @@ import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionCo
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
 import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
-import { HybridNotificationGateway } from "../../secondary/notificationGateway/HybridNotificationGateway";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
@@ -213,12 +212,6 @@ const createNotificationGateway = (
   if (config.notificationGateway === "BREVO") {
     return brevoNotificationGateway;
   }
-
-  if (config.notificationGateway === "HYBRID")
-    return new HybridNotificationGateway(
-      brevoNotificationGateway,
-      new InMemoryNotificationGateway(timeGateway, 15),
-    );
 
   return exhaustiveCheck(config.notificationGateway, {
     variableName: "config.notificationGateway",

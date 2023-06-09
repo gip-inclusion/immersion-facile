@@ -4,6 +4,7 @@ import {
   AuthenticatedUserId,
   ContactEstablishmentRequestDto,
   ConventionDto,
+  DateStr,
   EstablishmentJwtPayload,
   Flavor,
   FormEstablishmentDto,
@@ -17,7 +18,6 @@ import { WithNotificationIdAndKind } from "../../generic/notifications/entities/
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
-import type { DateStr } from "../ports/TimeGateway";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 
