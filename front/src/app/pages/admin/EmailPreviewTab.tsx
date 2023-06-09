@@ -381,6 +381,9 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
     potentialBeneficiaryEmail: "POTENTIAL_BENEFICIARY_EMAIL",
+    immersionObject: "IMMERSION_OBJECT",
+    potentialBeneficiaryPhone: "POTENTIAL_BENEFICIARY_PHONE",
+    potentialBeneficiaryCvOrLinkedin: "POTENTIAL_BENEFICIARY_CV_OR_LINKEDIN",
     message: "MESSAGE",
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {

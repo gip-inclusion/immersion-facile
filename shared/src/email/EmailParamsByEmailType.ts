@@ -193,6 +193,9 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
     potentialBeneficiaryEmail: string;
+    potentialBeneficiaryPhone: string;
+    immersionObject: string;
+    potentialBeneficiaryCvOrLinkedin?: string;
     message: string;
   };
   CONTACT_BY_PHONE_INSTRUCTIONS: {
