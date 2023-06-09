@@ -8,14 +8,13 @@ import {
   addressTargets,
   domElementIds,
 } from "shared";
-import { fillSelectRandomly } from "./input";
 import { faker } from "@faker-js/faker/locale/fr";
 
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
 const baseApiRoute = "/api/";
 let currentStep = 1;
 
-export function basicFormConvention() {
+Cypress.Commands.add("submitBasicConventionForm", () => {
   cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
     "featureFlagsRequest",
   );
@@ -45,7 +44,7 @@ export function basicFormConvention() {
 
   cy.wait("@agenciesRequest");
 
-  fillSelectRandomly({
+  cy.fillSelect({
     element: `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
   });
 
@@ -174,7 +173,7 @@ export function basicFormConvention() {
         .should("eq", 200);
       cy.get(".im-submit-confirmation-section").should("exist");
     });
-}
+});
 
 const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
 const getTomorrowDate = () =>

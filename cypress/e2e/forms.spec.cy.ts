@@ -1,16 +1,12 @@
 import { frontRoutes, domElementIds } from "shared";
-
-import { disableNewUrlLog } from "../utils";
-import { basicFormConvention } from "../utils/forms";
-
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
 
 describe("Convention Form (on dev http, prefilled forms false)", () => {
   beforeEach(() => {
-    disableNewUrlLog();
+    cy.disableUrlLogging();
   });
   it("can submit form with basic infos", () => {
-    basicFormConvention();
+    cy.submitBasicConventionForm();
   });
   it.skip("can't submit form if immersion duration exceeds 1 month", () => {});
   it.skip("can submit form with a complex schedule", () => {});
