@@ -170,7 +170,7 @@ export class AppConfig {
   public get notificationGateway() {
     return this.throwIfNotInArray({
       variableName: "NOTIFICATION_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HYBRID", "BREVO"],
+      authorizedValues: ["IN_MEMORY", "BREVO"],
     });
   }
 

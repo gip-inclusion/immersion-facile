@@ -8,7 +8,7 @@ import {
   NotificationId,
   NotificationKind,
   SmsNotification,
-} from "../../../domain/generic/notifications/entities/Notification";
+} from "shared/src/notifications/notifications.dto";
 import { NotificationRepository } from "../../../domain/generic/notifications/ports/NotificationRepository";
 
 export class PgNotificationRepository implements NotificationRepository {
@@ -165,5 +165,10 @@ export class PgNotificationRepository implements NotificationRepository {
       [id],
     );
     return response.rows[0]?.notif;
+  }
+
+  async getLastNotifications(): Promise<any> {
+    await "";
+    throw new Error("not implemented");
   }
 }

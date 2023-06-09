@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { BackOfficeJwt, emailRoute, EmailSentDto } from "shared";
+import { adminTargets, BackOfficeJwt, EmailNotification } from "shared";
 import {
   buildTestApp,
   InMemoryGateways,
@@ -7,7 +7,7 @@ import {
 import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
 import { AppConfig } from "../../config/appConfig";
 
-describe(`/${emailRoute} route`, () => {
+describe(`${adminTargets.getLastNotifications.url} route`, () => {
   let request: SuperTest<Test>;
   let gateways: InMemoryGateways;
   let adminToken: BackOfficeJwt;
@@ -29,7 +29,7 @@ describe(`/${emailRoute} route`, () => {
 
   describe("private route to get last email sent", () => {
     it("Returns Forbidden if no token provided", async () => {
-      const response = await request.get(`/admin/${emailRoute}`);
+      const response = await request.get(adminTargets.getLastNotifications.url);
 
       expect(response.body).toEqual({
         error: "You need to authenticate first",
@@ -51,8 +51,11 @@ describe(`/${emailRoute} route`, () => {
       });
 
       // Getting the application succeeds and shows that it's validated.
-      const expectedDto: EmailSentDto = {
-        templatedEmail: {
+      const expectedDto: EmailNotification = {
+        id: "123",
+        createdAt: dateNow.toISOString(),
+        kind: "email",
+        templatedContent: {
           type: "AGENCY_WAS_ACTIVATED",
           recipients: ["toto@email.com"],
           params: {
@@ -60,10 +63,10 @@ describe(`/${emailRoute} route`, () => {
             agencyLogoUrl: "http://:)",
           },
         },
-        sentAt: dateNow.toISOString(),
+        followedIds: {},
       };
       await request
-        .get(`/admin/${emailRoute}`)
+        .get(adminTargets.getLastNotifications.url)
         .set("Authorization", adminToken)
         .expect(200, [expectedDto]);
     });

@@ -1,4 +1,5 @@
-import { DateStr, TimeGateway } from "../ports/TimeGateway";
+import { DateStr } from "shared";
+import { TimeGateway } from "../ports/TimeGateway";
 import { UuidGenerator } from "../ports/UuidGenerator";
 import type {
   DomainEvent,

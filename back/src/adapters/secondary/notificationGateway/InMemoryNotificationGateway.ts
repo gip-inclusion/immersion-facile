@@ -1,5 +1,5 @@
 import { prop } from "ramda";
-import { EmailSentDto, TemplatedEmail, TemplatedSms } from "shared";
+import { DateStr, TemplatedEmail, TemplatedSms } from "shared";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { createLogger } from "../../../utils/logger";
@@ -12,13 +12,6 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     private readonly timeGateway: TimeGateway = new CustomTimeGateway(),
     private readonly numberOfEmailToKeep: number | null = null,
   ) {}
-  public getLastSentEmailDtos(): EmailSentDto[] {
-    return this.sentEmails.sort((mailA, mailB) =>
-      new Date(mailB.sentAt).getTime() - new Date(mailA.sentAt).getTime() >= 0
-        ? 1
-        : -1,
-    );
-  }
 
   public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
     logger.info(
@@ -59,6 +52,9 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     return this.sentSms;
   }
 
-  private readonly sentEmails: EmailSentDto[] = [];
+  private readonly sentEmails: {
+    templatedEmail: TemplatedEmail;
+    sentAt: DateStr;
+  }[] = [];
   private readonly sentSms: TemplatedSms[] = [];
 }

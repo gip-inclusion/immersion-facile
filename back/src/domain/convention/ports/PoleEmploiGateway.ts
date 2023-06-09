@@ -1,5 +1,4 @@
-import { ConventionStatus } from "shared";
-import { DateStr } from "../../core/ports/TimeGateway";
+import { ConventionStatus, DateStr } from "shared";
 
 // This is an interface contract with Pole Emploi (conventions broadcast).
 // ⚠️ Beware of NOT breaking contract ! ⚠️

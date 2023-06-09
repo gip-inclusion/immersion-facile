@@ -5,6 +5,7 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
+import { EmailNotification } from "shared/src/notifications/notifications.dto";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
@@ -19,7 +20,6 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import {
-  EmailNotification,
   makeSaveNotificationAndRelatedEvent,
   WithNotificationIdAndKind,
 } from "../../../generic/notifications/entities/Notification";

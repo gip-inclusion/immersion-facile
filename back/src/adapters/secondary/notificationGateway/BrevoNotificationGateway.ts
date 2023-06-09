@@ -1,6 +1,5 @@
 import Bottleneck from "bottleneck";
 import {
-  type EmailSentDto,
   emailTemplatesByName,
   immersionFacileContactEmail,
   smsTemplatesByName,
@@ -154,12 +153,6 @@ export class BrevoNotificationGateway implements NotificationGateway {
         );
         throw error;
       });
-  }
-
-  public getLastSentEmailDtos(): EmailSentDto[] {
-    throw new BadRequestError(
-      "It is not possible de get last sent mails from brevo notification gateway",
-    );
   }
 
   private filterAllowListAndConvertToRecipients(

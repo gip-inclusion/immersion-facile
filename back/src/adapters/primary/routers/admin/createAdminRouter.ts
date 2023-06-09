@@ -6,7 +6,6 @@ import {
   AgencyId,
   agencyTargets,
   conventionsRoute,
-  emailRoute,
   ExportDataDto,
   exportRoute,
   featureFlagsRoute,
@@ -116,7 +115,7 @@ export const createAdminRouter = (
 
   // GET admin/emails
   adminRouter
-    .route(`/${emailRoute}`)
+    .route(removeRouterPrefix(adminTargets.getLastNotifications.url))
     .get(async (req, res) =>
       sendHttpResponse(req, res, deps.useCases.getSentEmails.execute),
     );
