@@ -8,7 +8,7 @@ import {
   frontRoutes,
   reasonableSchedule,
 } from "shared";
-import { EmailNotification } from "shared/src/notifications/notifications.dto";
+import { EmailNotification } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   expectEmailFinalValidationConfirmationMatchingConvention,

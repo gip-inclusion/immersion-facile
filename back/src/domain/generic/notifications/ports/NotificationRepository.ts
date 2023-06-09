@@ -1,9 +1,5 @@
 import { EmailNotification, SmsNotification } from "shared";
-import {
-  Notification,
-  NotificationId,
-  NotificationKind,
-} from "shared/src/notifications/notifications.dto";
+import { Notification, NotificationId, NotificationKind } from "shared";
 
 export interface NotificationRepository {
   save: (notification: Notification) => Promise<void>;

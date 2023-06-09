@@ -1,18 +1,21 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { uniq } from "ramda";
-import { exhaustiveCheck } from "shared";
+import { exhaustiveCheck, NotificationsByKind } from "shared";
 import {
   EmailNotification,
   Notification,
   NotificationId,
   NotificationKind,
   SmsNotification,
-} from "shared/src/notifications/notifications.dto";
+} from "shared";
 import { NotificationRepository } from "../../../domain/generic/notifications/ports/NotificationRepository";
 
 export class PgNotificationRepository implements NotificationRepository {
-  constructor(private client: PoolClient) {}
+  constructor(
+    private client: PoolClient,
+    private maxRetrievedNotifications: number = 30,
+  ) {}
 
   async getByIdAndKind(
     id: NotificationId,
@@ -117,20 +120,7 @@ export class PgNotificationRepository implements NotificationRepository {
   ): Promise<SmsNotification> {
     const response = await this.client.query(
       `
-          SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
-          'id', id,
-          'kind', 'sms',
-          'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-          'followedIds', JSON_BUILD_OBJECT(
-            'conventionId', convention_id,
-            'establishmentId', establishment_siret,
-            'agencyId', agency_id),
-          'templatedContent', JSON_BUILD_OBJECT(
-              'kind', sms_kind,
-              'recipientPhone', recipient_phone,
-              'params', params
-            )
-        )) as notif
+          SELECT ${buildSmsNotificationObject} as notif
         FROM notifications_sms
         WHERE id = $1
           `,
@@ -144,14 +134,15 @@ export class PgNotificationRepository implements NotificationRepository {
   ): Promise<EmailNotification> {
     const response = await this.client.query(
       `
-          SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+        SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'id', id,
           'kind', 'email',
           'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
           'followedIds', JSON_BUILD_OBJECT(
             'conventionId', convention_id,
             'establishmentId', establishment_siret,
-            'agencyId', agency_id),
+            'agencyId', agency_id
+          ),
           'templatedContent', JSON_BUILD_OBJECT(
               'type', email_kind,
               'recipients', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = $1 AND recipient_type = 'to'),
@@ -167,8 +158,61 @@ export class PgNotificationRepository implements NotificationRepository {
     return response.rows[0]?.notif;
   }
 
-  async getLastNotifications(): Promise<any> {
-    await "";
-    throw new Error("not implemented");
+  async getLastNotifications(): Promise<NotificationsByKind> {
+    const smsResponse = await this.client.query(
+      `
+        SELECT ${buildSmsNotificationObject} as notif
+        FROM notifications_sms
+        ORDER BY created_at DESC
+        LIMIT $1
+          `,
+      [this.maxRetrievedNotifications],
+    );
+
+    const emailsResponse = await this.client.query(
+      `
+        SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+          'id', id,
+          'kind', 'email',
+          'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+          'followedIds', JSON_BUILD_OBJECT(
+            'conventionId', convention_id,
+            'establishmentId', establishment_siret,
+            'agencyId', agency_id
+          ),
+          'templatedContent', JSON_BUILD_OBJECT(
+              'type', email_kind,
+              'recipients', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = e.id AND recipient_type = 'to'),
+              'cc', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = e.id AND recipient_type = 'cc'),
+              'params', params
+            )
+        )) as notif
+        FROM notifications_email e
+        ORDER BY created_at DESC
+        LIMIT $1
+          `,
+      [this.maxRetrievedNotifications],
+    );
+
+    return {
+      emails: emailsResponse.rows.map((row) => row.notif),
+      sms: smsResponse.rows.map((row) => row.notif),
+    };
   }
 }
+
+const buildSmsNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+          'id', id,
+          'kind', 'sms',
+          'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+          'followedIds', JSON_BUILD_OBJECT(
+            'conventionId', convention_id,
+            'establishmentId', establishment_siret,
+            'agencyId', agency_id
+          ),
+          'templatedContent', JSON_BUILD_OBJECT(
+              'kind', sms_kind,
+              'recipientPhone', recipient_phone,
+              'params', params
+            )
+        ))`;

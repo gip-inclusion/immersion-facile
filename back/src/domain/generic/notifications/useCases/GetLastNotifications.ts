@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { NotificationsByKind } from "shared/src/notifications/notifications.dto";
+import { NotificationsByKind } from "shared";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,

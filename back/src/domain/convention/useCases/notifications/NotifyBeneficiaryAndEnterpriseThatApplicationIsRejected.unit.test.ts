@@ -1,5 +1,5 @@
 import { AgencyDto, AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
-import { EmailNotification } from "shared/src/notifications/notifications.dto";
+import { EmailNotification } from "shared";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../../_testBuilders/emailAssertions";
 import {
   createInMemoryUow,

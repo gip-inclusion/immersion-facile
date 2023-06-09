@@ -1,30 +1,31 @@
 import { SuperTest, Test } from "supertest";
-import { adminTargets, BackOfficeJwt, EmailNotification } from "shared";
 import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
-import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
-import { AppConfig } from "../../config/appConfig";
+  adminTargets,
+  BackOfficeJwt,
+  EmailNotification,
+  SmsNotification,
+} from "shared";
+import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`${adminTargets.getLastNotifications.url} route`, () => {
   let request: SuperTest<Test>;
-  let gateways: InMemoryGateways;
   let adminToken: BackOfficeJwt;
-  let appConfig: AppConfig;
-  let timeGateway: CustomTimeGateway;
+  let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
-    ({ request, gateways, appConfig } = await buildTestApp());
-    timeGateway = gateways.timeGateway;
+    const testDeps = await buildTestApp();
+    ({ request, inMemoryUow } = testDeps);
+    const { generateBackOfficeJwt } = testDeps;
 
-    timeGateway.setNextDate(new Date());
-
-    const response = await request.post("/admin/login").send({
-      user: appConfig.backofficeUsername,
-      password: appConfig.backofficePassword,
+    const iat = new Date().getTime() / 1000;
+    adminToken = generateBackOfficeJwt({
+      role: "backOffice",
+      sub: "admin",
+      iat,
+      exp: iat + 1000,
+      version: 1,
     });
-    adminToken = response.body;
   });
 
   describe("private route to get last email sent", () => {
@@ -37,22 +38,12 @@ describe(`${adminTargets.getLastNotifications.url} route`, () => {
       expect(response.status).toBe(401);
     });
 
-    it("Returns last sent emails", async () => {
+    it("Returns last notifications", async () => {
       // Prepare
       const dateNow = new Date("2022-01-01T12:00:00.000Z");
-      timeGateway.now = () => dateNow;
-      await gateways.notification.sendEmail({
-        type: "AGENCY_WAS_ACTIVATED",
-        recipients: ["toto@email.com"],
-        params: {
-          agencyName: "Agence du Grand Est",
-          agencyLogoUrl: "http://:)",
-        },
-      });
-
-      // Getting the application succeeds and shows that it's validated.
-      const expectedDto: EmailNotification = {
-        id: "123",
+      const emailNotification: EmailNotification = {
+        id: "email-notification-id",
+        followedIds: { agencyId: "my-agency-id" },
         createdAt: dateNow.toISOString(),
         kind: "email",
         templatedContent: {
@@ -63,12 +54,37 @@ describe(`${adminTargets.getLastNotifications.url} route`, () => {
             agencyLogoUrl: "http://:)",
           },
         },
-        followedIds: {},
       };
-      await request
+
+      const smsNotification: SmsNotification = {
+        id: "email-notification-id",
+        followedIds: { agencyId: "my-agency-id" },
+        createdAt: dateNow.toISOString(),
+        kind: "sms",
+        templatedContent: {
+          kind: "FirstReminderForSignatories",
+          params: {
+            shortLink: "https://my-short-link.com",
+          },
+          recipientPhone: "0600000077",
+        },
+      };
+
+      inMemoryUow.notificationRepository.notifications = [
+        emailNotification,
+        smsNotification,
+      ];
+
+      // Getting the application succeeds and shows that it's validated.
+      const response = await request
         .get(adminTargets.getLastNotifications.url)
-        .set("Authorization", adminToken)
-        .expect(200, [expectedDto]);
+        .set("Authorization", adminToken);
+
+      expect(response.body).toEqual({
+        emails: [emailNotification],
+        sms: [smsNotification],
+      });
+      expect(response.status).toBe(200);
     });
   });
 });

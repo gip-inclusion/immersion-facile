@@ -5,7 +5,7 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { EmailNotification } from "shared/src/notifications/notifications.dto";
+import { EmailNotification } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
