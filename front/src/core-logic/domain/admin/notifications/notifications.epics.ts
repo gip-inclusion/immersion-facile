@@ -17,9 +17,7 @@ const getSentEmail: SentEmailEpic = (action$, state$, { adminGateway }) =>
         state$.value.admin.adminAuth.adminToken || "",
       ),
     ),
-    map(({ emails }) =>
-      notificationsSlice.actions.lastSentEmailsSucceeded(emails),
-    ),
+    map(notificationsSlice.actions.lastSentEmailsSucceeded),
     catchEpicError((error) =>
       notificationsSlice.actions.lastSentEmailsFailed(error.message),
     ),

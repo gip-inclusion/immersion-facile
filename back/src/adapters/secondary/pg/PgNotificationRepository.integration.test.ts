@@ -158,7 +158,7 @@ describe("PgNotificationRepository", () => {
         createdAt: new Date("2023-06-10T20:00").toISOString(),
         templatedContent: {
           kind: "FirstReminderForSignatories",
-          recipientPhone: "0610101010",
+          recipientPhone: "33610101010",
           params: { shortLink: "https://short.com" },
         },
         followedIds: {},
