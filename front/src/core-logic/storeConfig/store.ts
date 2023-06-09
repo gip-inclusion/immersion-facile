@@ -10,8 +10,8 @@ import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/da
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { icUsersAdminEpics } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { sentEmailsEpics } from "src/core-logic/domain/admin/sentEmails/sentEmails.epics";
-import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
+import { notificationsEpics } from "src/core-logic/domain/admin/notifications/notifications.epics";
+import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
@@ -41,7 +41,7 @@ import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersio
 
 const allEpics: any[] = [
   ...dashboardUrlsEpics,
-  ...sentEmailsEpics,
+  ...notificationsEpics,
   ...adminAuthEpics,
   ...establishmentBatchEpics,
   ...agenciesEpics,
@@ -79,7 +79,7 @@ const rootReducer = combineReducers({
     [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,
     [adminAuthSlice.name]: adminAuthSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
-    [sentEmailsSlice.name]: sentEmailsSlice.reducer,
+    [notificationsSlice.name]: notificationsSlice.reducer,
   }),
 });
 

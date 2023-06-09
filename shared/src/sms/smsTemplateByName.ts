@@ -1,6 +1,6 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Flavor } from "../typeFlavors";
-import type { ValueOf } from "../utils";
+import type { KeysOfUnion, ValueOf } from "../utils";
 
 export type Phone = Flavor<string, "Phone">;
 
@@ -26,6 +26,8 @@ type SmsParamsBySmsType = {
 export type TemplatedSms = ValueOf<{
   [K in keyof SmsTemplateByName]: GenericTemplatedSms<K, SmsParamsBySmsType[K]>;
 }>;
+
+export type SmsVariables = KeysOfUnion<TemplatedSms["params"]>;
 
 const createSmsTemplates = (templatesByName: {
   [K in keyof SmsParamsBySmsType]: {
