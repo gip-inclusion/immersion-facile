@@ -1,5 +1,5 @@
 import { prop } from "ramda";
-import { DateStr, TemplatedEmail, TemplatedSms } from "shared";
+import { DateIsoString, TemplatedEmail, TemplatedSms } from "shared";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { createLogger } from "../../../utils/logger";
@@ -54,7 +54,7 @@ export class InMemoryNotificationGateway implements NotificationGateway {
 
   private readonly sentEmails: {
     templatedEmail: TemplatedEmail;
-    sentAt: DateStr;
+    sentAt: DateIsoString;
   }[] = [];
   private readonly sentSms: TemplatedSms[] = [];
 }

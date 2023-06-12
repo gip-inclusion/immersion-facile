@@ -1,5 +1,5 @@
 import { keys, prop } from "ramda";
-import { DateStr } from "shared";
+import { DateIsoString } from "shared";
 import {
   EventBus,
   EventCallback,
@@ -82,7 +82,7 @@ export class InMemoryEventBus implements EventBus {
 
   private async _publish(
     event: DomainEvent,
-    publishedAt: DateStr,
+    publishedAt: DateIsoString,
   ): Promise<DomainEvent> {
     // the publication happens here, an event is expected in return,
     // with the publication added to the event
@@ -156,7 +156,7 @@ const isUndefined = (
 
 const publishEventWithNoCallbacks = (
   event: DomainEvent,
-  publishedAt: DateStr,
+  publishedAt: DateIsoString,
 ): DomainEvent => {
   monitorAbsenceOfCallback(event);
 

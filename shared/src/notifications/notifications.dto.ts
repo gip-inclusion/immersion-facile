@@ -5,7 +5,7 @@ import { AuthenticatedUserId } from "../inclusionConnectedAllowed/inclusionConne
 import { SiretDto } from "../siret/siret";
 import { TemplatedSms } from "../sms/smsTemplateByName";
 import { Flavor } from "../typeFlavors";
-import { DateStr } from "../utils/date";
+import { DateIsoString } from "../utils/date";
 
 export type NotificationId = Flavor<string, "NotificationId">;
 
@@ -33,7 +33,7 @@ export type FollowedIds = {
 
 export type NotificationCommonFields = {
   id: NotificationId;
-  createdAt: DateStr;
+  createdAt: DateIsoString;
   followedIds: FollowedIds;
 };
 

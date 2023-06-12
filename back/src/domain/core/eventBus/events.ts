@@ -4,7 +4,7 @@ import {
   AuthenticatedUserId,
   ContactEstablishmentRequestDto,
   ConventionDto,
-  DateStr,
+  DateIsoString,
   EstablishmentJwtPayload,
   Flavor,
   FormEstablishmentDto,
@@ -27,13 +27,13 @@ export type EventFailure = {
 };
 
 export type EventPublication = {
-  publishedAt: DateStr;
+  publishedAt: DateIsoString;
   failures: EventFailure[];
 };
 
 type GenericEvent<T extends string, P> = {
   id: string;
-  occurredAt: DateStr;
+  occurredAt: DateIsoString;
   topic: T;
   payload: P;
   publications: EventPublication[];
