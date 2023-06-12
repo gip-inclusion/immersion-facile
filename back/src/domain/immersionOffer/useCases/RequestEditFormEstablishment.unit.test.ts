@@ -6,13 +6,18 @@ import {
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { makeExpectSavedNotificationsAndEvents } from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "./RequestEditFormEstablishment";
@@ -37,71 +42,60 @@ const setMethodGetContactEmailFromSiret = (
         .build();
 };
 
-const prepareUseCase = () => {
-  const uow = createInMemoryUow();
-  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
+describe("RequestUpdateFormEstablishment", () => {
+  let requestEditFormEstablishment: RequestEditFormEstablishment;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
 
-  const expectSavedNotificationsAndEvents =
-    makeExpectSavedNotificationsAndEvents(
+  beforeEach(() => {
+    uow = createInMemoryUow();
+    const establishmentAggregateRepository =
+      uow.establishmentAggregateRepository;
+
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
     );
+    setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
-  setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
+    timeGateway = new CustomTimeGateway();
+    const uuidGenerator = new UuidV4Generator();
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      uuidGenerator,
+      timeGateway,
+    );
 
-  const timeGateway = new CustomTimeGateway();
-  const uuidGenerator = new UuidV4Generator();
-  const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
-  const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-    uuidGenerator,
-    timeGateway,
-    createNewEvent,
-  );
+    const generateEditFormEstablishmentUrl = (
+      payload: EstablishmentJwtPayload,
+    ) => `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
 
-  const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>
-    `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
+    requestEditFormEstablishment = new RequestEditFormEstablishment(
+      new InMemoryUowPerformer(uow),
+      saveNotificationAndRelatedEvent,
+      timeGateway,
+      generateEditFormEstablishmentUrl,
+    );
+  });
 
-  const useCase = new RequestEditFormEstablishment(
-    new InMemoryUowPerformer(uow),
-    saveNotificationAndRelatedEvent,
-    timeGateway,
-    generateEditFormEstablishmentUrl,
-  );
-
-  return {
-    useCase,
-    establishmentAggregateRepository,
-    notificationRepository: uow.notificationRepository,
-    outboxRepository: uow.outboxRepository,
-    timeGateway,
-    expectSavedNotificationsAndEvents,
-  };
-};
-
-describe("RequestUpdateFormEstablishment", () => {
   it("Throws an error if contact email is unknown", async () => {
     // Prepare
-    const { useCase, establishmentAggregateRepository } = prepareUseCase();
-
-    establishmentAggregateRepository.getEstablishmentAggregateBySiret =
+    uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret =
       //eslint-disable-next-line @typescript-eslint/require-await
       async (_siret: string) =>
         new EstablishmentAggregateBuilder().withoutContact().build();
 
     // Act and assert
     await expectPromiseToFailWithError(
-      useCase.execute(siret),
+      requestEditFormEstablishment.execute(siret),
       Error("Email du contact introuvable."),
     );
   });
 
   describe("If no email has been sent yet.", () => {
     it("Sends an email to the contact of the establishment with eventually email in CC", async () => {
-      // Prepare
-      const { useCase, expectSavedNotificationsAndEvents } = prepareUseCase();
-
       // Act
-      await useCase.execute(siret);
+      await requestEditFormEstablishment.execute(siret);
 
       // Assert
       expectSavedNotificationsAndEvents({
@@ -122,11 +116,9 @@ describe("RequestUpdateFormEstablishment", () => {
   describe("If an email has already been sent for this establishment.", () => {
     it("Throws an error if an email has already been sent to this contact less than 24h ago", async () => {
       // Prepare
-      const { useCase, notificationRepository, timeGateway } = prepareUseCase();
-
       const initialMailDate = new Date("2021-01-01T13:00:00.000");
 
-      notificationRepository.notifications = [
+      uow.notificationRepository.notifications = [
         {
           kind: "email",
           id: "111111111111-1111-4000-1111-111111111111",
@@ -149,7 +141,7 @@ describe("RequestUpdateFormEstablishment", () => {
 
       // Act and assert
       await expectPromiseToFailWithError(
-        useCase.execute(siret),
+        requestEditFormEstablishment.execute(siret),
         new BadRequestError(
           "Un email a déjà été envoyé au contact référent de l'établissement le 01/01/2021",
         ),
@@ -159,14 +151,6 @@ describe("RequestUpdateFormEstablishment", () => {
 
   it("Sends a new email if the edit link in last email has expired", async () => {
     // Prepare
-    const {
-      useCase,
-      outboxRepository,
-      notificationRepository,
-      timeGateway,
-      expectSavedNotificationsAndEvents,
-    } = prepareUseCase();
-
     const initialMailDate = new Date("2021-01-01T13:00:00.000");
 
     const alreadySentEmail: TemplatedEmail = {
@@ -183,7 +167,7 @@ describe("RequestUpdateFormEstablishment", () => {
       templatedContent: alreadySentEmail,
     };
 
-    notificationRepository.notifications = [
+    uow.notificationRepository.notifications = [
       {
         kind: "email",
         id: "111111111111-1111-4000-1111-111111111111",
@@ -192,7 +176,7 @@ describe("RequestUpdateFormEstablishment", () => {
         templatedContent: alreadySentEmail,
       },
     ];
-    await outboxRepository.save({
+    await uow.outboxRepository.save({
       id: "123",
       topic: "NotificationAdded",
       occurredAt: initialMailDate.toISOString(),
@@ -214,7 +198,7 @@ describe("RequestUpdateFormEstablishment", () => {
     timeGateway.setNextDate(newModificationAskedDateMoreThan24hAfterInitial);
 
     // Act
-    await useCase.execute(siret);
+    await requestEditFormEstablishment.execute(siret);
 
     // Assert
     expectSavedNotificationsAndEvents({

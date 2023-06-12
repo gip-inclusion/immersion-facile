@@ -50,7 +50,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
   async getLastNotifications() {
     return {
-      emails: await this.getEmailsByFilters({}),
+      emails: await this.getEmailsByFilters(),
       sms: this.notifications.filter(
         (notification): notification is SmsNotification =>
           notification.kind === "sms",
