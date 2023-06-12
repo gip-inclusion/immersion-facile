@@ -7,8 +7,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       notNull: false,
       default: null,
     },
-    immerssion_objective: { type: "text", notNull: false, default: null },
-    potential_beneficiary_cv_link_or_linkedin: {
+    immersion_objective: {
+      type: "immersion_objectives",
+      notNull: false,
+      default: null,
+    },
+    potential_beneficiary_resume_link: {
       type: "text",
       notNull: false,
       default: null,
@@ -19,7 +23,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumn("discussions", [
     "potential_beneficiary_phone",
-    "immerssion_objective",
-    "potential_beneficiary_cv_link_or_linkedin",
+    "immersion_objective",
+    "potential_beneficiary_resume_link",
   ]);
 }

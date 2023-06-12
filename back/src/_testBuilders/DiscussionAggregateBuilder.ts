@@ -1,5 +1,5 @@
 // TODO : create a DiscussionAggregateBuilder
-import { SiretDto } from "shared";
+import { ImmersionObjective, SiretDto } from "shared";
 import { DiscussionAggregate } from "../domain/immersionOffer/entities/DiscussionAggregate";
 
 // TODO transform this function into a DiscussionAggregateBuilder
@@ -11,16 +11,16 @@ import { DiscussionAggregate } from "../domain/immersionOffer/entities/Discussio
 export const createDiscussionAggregate = ({
   id,
   siret,
-  immerssionObject,
-  potentialBeneficiaryCvOrLinkedin,
+  immersionObjective,
+  potentialBeneficiaryResumeLink,
   potentialBeneficiaryPhone,
   createdAt,
 }: {
   id: string;
   siret: SiretDto;
   potentialBeneficiaryPhone: string;
-  immerssionObject: string;
-  potentialBeneficiaryCvOrLinkedin: string;
+  immersionObjective: ImmersionObjective | null;
+  potentialBeneficiaryResumeLink?: string;
   createdAt: Date;
 }): DiscussionAggregate => ({
   id,
@@ -39,7 +39,7 @@ export const createDiscussionAggregate = ({
       sender: "potentialBeneficiary",
     },
   ],
-  immerssionObject,
+  immersionObjective,
   potentialBeneficiaryPhone,
-  potentialBeneficiaryCvOrLinkedin,
+  potentialBeneficiaryResumeLink,
 });

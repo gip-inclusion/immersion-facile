@@ -34,8 +34,8 @@ export const contactEstablishmentPublicV1ToDomain = (
   if (contactRequest.contactMode === "EMAIL")
     return {
       ...contactRequest,
-      potentialBeneficiaryPhone: "Numéro de téléphone Non communiqué",
-      immersionObjective: "Object non communiqué",
+      potentialBeneficiaryPhone: "Numéro de téléphone non communiqué",
+      immersionObjective: null,
     };
 
   return contactRequest;

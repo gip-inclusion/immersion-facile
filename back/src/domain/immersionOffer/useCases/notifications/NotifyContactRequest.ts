@@ -75,10 +75,10 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               potentialBeneficiaryLastName:
                 payload.potentialBeneficiaryLastName,
               potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
-              immersionObject: payload.immersionObjective,
+              immersionObjective: payload.immersionObjective,
               potentialBeneficiaryPhone: payload.potentialBeneficiaryPhone,
-              potentialBeneficiaryCvOrLinkedin:
-                payload.potentialBeneficiaryCvOrLinkedin,
+              potentialBeneficiaryResumeLink:
+                payload.potentialBeneficiaryResumeLink,
               message: payload.message,
             },
           },

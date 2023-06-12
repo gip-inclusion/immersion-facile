@@ -1,4 +1,4 @@
-import { ContactMethod, Flavor } from "shared";
+import { ContactMethod, Flavor, ImmersionObjective } from "shared";
 
 type ExchangeRole = "establishment" | "potentialBeneficiary";
 
@@ -9,14 +9,14 @@ export type DiscussionAggregate = {
   potentialBeneficiaryFirstName: string;
   potentialBeneficiaryLastName: string;
   potentialBeneficiaryEmail: string;
+  potentialBeneficiaryPhone: string;
+  potentialBeneficiaryResumeLink?: string;
   romeCode: string;
   siret: string;
   contactMode: ContactMethod;
   createdAt: Date;
   exchanges: ExchangeEntity[];
-  potentialBeneficiaryPhone: string;
-  immerssionObject: string;
-  potentialBeneficiaryCvOrLinkedin?: string;
+  immersionObjective: ImmersionObjective | null;
 };
 
 export type ExchangeEntity = {

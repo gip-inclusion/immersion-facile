@@ -83,7 +83,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           sender: "potentialBeneficiary",
         },
       ],
-      immerssionObject: "Confirmer un projet professionnel",
+      immersionObjective: "Confirmer un projet professionnel",
       potentialBeneficiaryPhone: "0654783402",
     });
   });
@@ -114,8 +114,8 @@ describe("Insert discussion aggregate from contact request DTO", () => {
             sentAt: discussionToOldDate,
           },
         ],
-        immerssionObject: "Confirmer un projet professionnel",
-        potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+        immersionObjective: "Confirmer un projet professionnel",
+        potentialBeneficiaryResumeLink: "http://fakelink.com",
         potentialBeneficiaryPhone: "0654678976",
       },
       {
@@ -136,8 +136,8 @@ describe("Insert discussion aggregate from contact request DTO", () => {
             sentAt: discussion1Date,
           },
         ],
-        immerssionObject: "Confirmer un projet professionnel",
-        potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+        immersionObjective: "Confirmer un projet professionnel",
+        potentialBeneficiaryResumeLink: "http://fakelink.com",
         potentialBeneficiaryPhone: "0654678976",
       },
     ];
