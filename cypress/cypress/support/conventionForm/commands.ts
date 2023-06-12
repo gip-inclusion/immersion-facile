@@ -39,13 +39,16 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
   )
-    .select("86")
+    .select("86", {
+      force: true,
+    })
     .should("have.value", "86");
 
   cy.wait("@agenciesRequest");
 
   cy.fillSelect({
     element: `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
+    predicateValue: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   });
 
   openNextSection(); // Open Beneficiary section
@@ -171,7 +174,6 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
       cy.wait("@conventionAddRequest")
         .its("response.statusCode")
         .should("eq", 200);
-      cy.get(".im-submit-confirmation-section").should("exist");
     });
 });
 

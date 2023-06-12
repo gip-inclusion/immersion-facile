@@ -1,6 +1,9 @@
 import { domElementIds } from "../../../../shared/src";
 
+const baseApiRoute = "/api/";
+
 Cypress.Commands.add("connectToAdmin", () => {
+  cy.intercept("POST", `${baseApiRoute}admin/login`).as("loginRequest");
   cy.visit("/admin");
   cy.get(`#${domElementIds.admin.adminPrivateRoute.formLoginUserInput}`).type(
     Cypress.env("ADMIN_USER"),
@@ -11,15 +14,16 @@ Cypress.Commands.add("connectToAdmin", () => {
   cy.get(
     `#${domElementIds.admin.adminPrivateRoute.formLoginSubmitButton}`,
   ).click();
+  cy.wait("@loginRequest").its("response.statusCode").should("eq", 200);
 });
 
-Cypress.Commands.add("openEmailInAdmin", ({ emailType }) => {
-  cy.connectToAdmin();
+Cypress.Commands.add("openEmailInAdmin", ({ emailType, elementIndex = 0 }) => {
   cy.get(".fr-tabs__tab").contains("Emails").click();
-  cy.get(`.fr-accordion__btn:contains(${emailType})`).click();
-  return cy
+  const accordionButton = cy
     .get(`.fr-accordion__btn:contains(${emailType})`)
-    .parents(".fr-accordion");
+    .eq(elementIndex);
+  accordionButton.click();
+  return accordionButton.parents(".fr-accordion");
 });
 
 Cypress.Commands.add("getMagicLinkInEmailWrapper", ($emailWrapper) => {

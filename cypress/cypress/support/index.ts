@@ -18,8 +18,10 @@ declare namespace Cypress {
     }): Chainable<JQuery<HTMLElement>>;
     openEmailInAdmin({
       emailType,
+      elementIndex,
     }: {
       emailType: string;
+      elementIndex: number;
     }): Chainable<JQuery<HTMLElement>>;
     getMagicLinkInEmailWrapper(
       $element: JQuery<HTMLElement>,

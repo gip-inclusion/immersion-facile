@@ -1,9 +1,10 @@
 import { frontRoutes, domElementIds } from "shared";
+import { disableUrlLogging } from "../cypress/utils/log";
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
 
 describe("Convention Form (on dev http, prefilled forms false)", () => {
   beforeEach(() => {
-    cy.disableUrlLogging();
+    disableUrlLogging();
   });
   it("can submit form with basic infos", () => {
     cy.submitBasicConventionForm();
@@ -13,7 +14,9 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
   it.skip("can edit multiple jobs dropdown", () => {});
   it("can edit input date with null / 0 value", () => {
     cy.visit(conventionFormUrl);
+
     cy.get(`#${domElementIds.conventionImmersionRoute.showFormButton}`).click();
+
     // Open place / date section
     cy.get(`#im-convention-form__step-3 .fr-accordion__btn`).click();
     cy.get(

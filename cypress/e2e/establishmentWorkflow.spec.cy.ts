@@ -150,15 +150,13 @@ describe("Establishment creation and modification workflow", () => {
     ).as("addFormEstablishmentRequest");
     requestEstablishmentModification();
     cy.connectToAdmin();
-    // TODO: wrap this in a function (e.g. openEmailInAdmin(emailType, callback))
-    cy.get(".fr-tabs__tab").contains("Emails").click();
-    cy.get(`.fr-accordion__btn:contains("EDIT_FORM_ESTABLISHMENT_LINK")`)
+    cy.openEmailInAdmin({
+      emailType: "EDIT_FORM_ESTABLISHMENT_LINK",
+      elementIndex: 0,
+    })
       .first()
-      .should("exist")
-      .each(($el) => {
-        cy.wrap($el).click();
-        $el
-          .parents(".fr-accordion")
+      .then(($emailWrapper) => {
+        $emailWrapper
           .find("a:contains('Lien vers la page')")
           .each((_, element) => {
             cy.wrap(element).click();
