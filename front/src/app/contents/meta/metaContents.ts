@@ -170,9 +170,9 @@ export const adminMetaContent: Record<AdminTab, MetaContentType> = {
     title: "admin: export de données",
     description: "Page admin: Export de données",
   },
-  emails: {
-    title: "admin: emails",
-    description: "Page admin: Emails",
+  notifications: {
+    title: "admin: notifications",
+    description: "Page admin: Notifications",
   },
   "technical-options": {
     title: "admin: options techniques",

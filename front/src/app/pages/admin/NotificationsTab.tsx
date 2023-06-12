@@ -19,10 +19,10 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 
-export const EmailsTab = () => {
+export const NotificationsTab = () => {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(notificationsSlice.actions.lastSentEmailsRequested());
+    dispatch(notificationsSlice.actions.getLastNotificationsRequested());
   }, []);
   const latestEmails = useAppSelector(adminSelectors.notifications.emails);
   const latestSms = useAppSelector(adminSelectors.notifications.sms);
