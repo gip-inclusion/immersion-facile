@@ -11,15 +11,15 @@ type SentEmailEpic = AppEpic<SentEmailsAction>;
 
 const getSentEmail: SentEmailEpic = (action$, state$, { adminGateway }) =>
   action$.pipe(
-    filter(notificationsSlice.actions.lastSentEmailsRequested.match),
+    filter(notificationsSlice.actions.getLastNotificationsRequested.match),
     switchMap(() =>
       adminGateway.getLastNotifications(
         state$.value.admin.adminAuth.adminToken || "",
       ),
     ),
-    map(notificationsSlice.actions.lastSentEmailsSucceeded),
+    map(notificationsSlice.actions.getLastNotificationsSucceeded),
     catchEpicError((error) =>
-      notificationsSlice.actions.lastSentEmailsFailed(error.message),
+      notificationsSlice.actions.getLastNotificationsFailed(error.message),
     ),
   );
 

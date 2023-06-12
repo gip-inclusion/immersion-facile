@@ -190,10 +190,10 @@ export const ImmersionHeader = () => {
           },
         },
         {
-          text: "Emails",
+          text: "Notifications",
           isActive: false,
           linkProps: {
-            ...routes.adminTab({ tab: "emails" }).link,
+            ...routes.adminTab({ tab: "notifications" }).link,
             id: adminIds.emails,
           },
         },

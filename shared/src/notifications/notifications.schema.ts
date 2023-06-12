@@ -19,6 +19,7 @@ import {
 const notificationIdSchema: z.Schema<NotificationId> = z
   .string()
   .uuid(localization.invalidUuid);
+
 const followedIdsSchema: z.Schema<FollowedIds> = z.object({
   conventionId: conventionIdSchema.optional(),
   establishmentSiret: siretSchema.optional(),

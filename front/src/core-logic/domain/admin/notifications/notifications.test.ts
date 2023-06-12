@@ -22,7 +22,9 @@ describe("notifications slice", () => {
 
   describe("get latest sent emails and sms", () => {
     it("gets the last emails sent from the backend", () => {
-      store.dispatch(notificationsSlice.actions.lastSentEmailsRequested());
+      store.dispatch(
+        notificationsSlice.actions.getLastNotificationsRequested(),
+      );
       expectIsLoadingToBe(true);
       const emails: EmailNotification[] = [
         {
@@ -56,7 +58,9 @@ describe("notifications slice", () => {
     });
 
     it("stores the error when something goes wrong", () => {
-      store.dispatch(notificationsSlice.actions.lastSentEmailsRequested());
+      store.dispatch(
+        notificationsSlice.actions.getLastNotificationsRequested(),
+      );
       expectIsLoadingToBe(true);
       feedSentEmailGatewayWithError(new Error("Something went wrong"));
       expectError("Something went wrong");

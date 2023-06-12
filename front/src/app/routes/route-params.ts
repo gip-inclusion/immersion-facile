@@ -21,7 +21,7 @@ export const adminTabs = [
   "events",
   "agency-validation",
   "exports",
-  "emails",
+  "notifications",
   "technical-options",
   "email-preview",
   "establishment-batch",

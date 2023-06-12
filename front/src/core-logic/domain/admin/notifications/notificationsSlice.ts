@@ -23,10 +23,10 @@ export const notificationsSlice = createSlice({
   name: "notifications",
   initialState: notificationsInitialState,
   reducers: {
-    lastSentEmailsRequested: (state) => {
+    getLastNotificationsRequested: (state) => {
       state.isLoading = true;
     },
-    lastSentEmailsSucceeded: (
+    getLastNotificationsSucceeded: (
       state,
       action: PayloadAction<NotificationsByKind>,
     ) => {
@@ -35,7 +35,7 @@ export const notificationsSlice = createSlice({
       state.error = null;
       state.isLoading = false;
     },
-    lastSentEmailsFailed: (state, action: PayloadAction<string>) => {
+    getLastNotificationsFailed: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.isLoading = false;
     },
