@@ -799,9 +799,9 @@ export const emailTemplatesByName =
         potentialBeneficiaryLastName,
         appellationLabel,
         businessName,
-        immersionObject,
+        immersionObjective: immersionObject,
         potentialBeneficiaryPhone,
-        potentialBeneficiaryCvOrLinkedin,
+        potentialBeneficiaryResumeLink,
         message,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
@@ -809,7 +809,7 @@ export const emailTemplatesByName =
         content: `
         Un candidat souhaite faire une immersion pour ${immersionObject} sur le métier de ${appellationLabel} dans votre entreprise ${businessName}.
 
-        voici son message:
+        Voici son message:
 
       "${message}"
 
@@ -817,8 +817,8 @@ export const emailTemplatesByName =
       ${potentialBeneficiaryLastName}
 
       ${
-        potentialBeneficiaryCvOrLinkedin &&
-        `Plus d'info sur ce candidat: <a href="${potentialBeneficiaryCvOrLinkedin}">${potentialBeneficiaryCvOrLinkedin}</a>`
+        potentialBeneficiaryResumeLink &&
+        `Plus d'info sur ce candidat: <a href="${potentialBeneficiaryResumeLink}">${potentialBeneficiaryResumeLink}</a>`
       }
 
       <strong>Sa candidature vous intéresse ? </strong>

@@ -49,11 +49,11 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
               },
             ]
           : [],
-      immerssionObject:
-        params.contactMode === "EMAIL" ? params.immersionObjective : "",
-      potentialBeneficiaryCvOrLinkedin:
+      immersionObjective:
+        params.contactMode === "EMAIL" ? params.immersionObjective : null,
+      potentialBeneficiaryResumeLink:
         params.contactMode === "EMAIL"
-          ? params.potentialBeneficiaryCvOrLinkedin
+          ? params.potentialBeneficiaryResumeLink
           : "",
       potentialBeneficiaryPhone:
         params.contactMode === "EMAIL" ? params.potentialBeneficiaryPhone : "",

@@ -1,8 +1,17 @@
 import { z } from "zod";
+import {
+  conventionObjectiveOptions,
+  ImmersionObjective,
+} from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
 import { romeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zTrimmedString } from "../zodUtils";
+import {
+  localization,
+  zEnumValidation,
+  zStringPossiblyEmpty,
+  zTrimmedString,
+} from "../zodUtils";
 import {
   ContactEstablishmentByMailDto,
   ContactEstablishmentByPhoneDto,
@@ -28,8 +37,11 @@ export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMa
     contactMode: preferEmailContactSchema,
     message: zTrimmedString,
     potentialBeneficiaryPhone: zTrimmedString,
-    immersionObjective: zTrimmedString,
-    potentialBeneficiaryLinkedinOrCv: zTrimmedString.optional(),
+    immersionObjective: zEnumValidation<ImmersionObjective>(
+      [...conventionObjectiveOptions],
+      localization.invalidImmersionObjective,
+    ).nullable(),
+    potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
   });
 
 export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =

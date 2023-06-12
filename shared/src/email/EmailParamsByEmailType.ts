@@ -1,5 +1,8 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
-import { InternshipKind } from "../convention/convention.dto";
+import {
+  ImmersionObjective,
+  InternshipKind,
+} from "../convention/convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type EmailParamsByEmailType = {
@@ -194,8 +197,8 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryLastName: string;
     potentialBeneficiaryEmail: string;
     potentialBeneficiaryPhone: string;
-    immersionObject: string;
-    potentialBeneficiaryCvOrLinkedin?: string;
+    immersionObjective: ImmersionObjective | null;
+    potentialBeneficiaryResumeLink?: string;
     message: string;
   };
   CONTACT_BY_PHONE_INSTRUCTIONS: {

@@ -1241,8 +1241,8 @@ describe("Postgres implementation of immersion offer repository", () => {
           pgDiscussionRepository.insertDiscussionAggregate(
             createDiscussionAggregate({
               id: "00001111-1111-1111-1111-000000000000",
-              immerssionObject: "Confirmer un projet professionnel",
-              potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+              immersionObjective: "Confirmer un projet professionnel",
+              potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
               siret: siret1,
               createdAt: new Date("2021-01-01T00:00:00.000Z"),
@@ -1252,8 +1252,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             createDiscussionAggregate({
               id: "11111111-1111-1111-1111-000000000000",
               siret: siret2,
-              immerssionObject: "Confirmer un projet professionnel",
-              potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+              immersionObjective: "Confirmer un projet professionnel",
+              potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
               createdAt: new Date("2021-01-11T00:00:00.000Z"),
             }),
@@ -1262,8 +1262,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             createDiscussionAggregate({
               id: "22222222-2222-2222-2222-000000000000",
               siret: siret2,
-              immerssionObject: "Confirmer un projet professionnel",
-              potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+              immersionObjective: "Confirmer un projet professionnel",
+              potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
               createdAt: new Date("2021-01-11T00:00:00.000Z"),
             }),
@@ -1272,8 +1272,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             createDiscussionAggregate({
               id: "33333333-3333-3333-3333-000000000000",
               siret: siret3,
-              immerssionObject: "Confirmer un projet professionnel",
-              potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+              immersionObjective: "Confirmer un projet professionnel",
+              potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
               createdAt: new Date("2021-01-09T00:00:00.000Z"),
             }),
@@ -1282,8 +1282,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             createDiscussionAggregate({
               id: "33333333-8888-3333-3333-000000000000",
               siret: siret3,
-              immerssionObject: "Confirmer un projet professionnel",
-              potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+              immersionObjective: "Confirmer un projet professionnel",
+              potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
               createdAt: new Date("2021-01-01T00:00:00.000Z"),
             }),
@@ -1292,8 +1292,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             createDiscussionAggregate({
               id: "44444444-4444-4444-4444-000000000000",
               siret: siret4,
-              immerssionObject: "Confirmer un projet professionnel",
-              potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+              immersionObjective: "Confirmer un projet professionnel",
+              potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
               createdAt: new Date("2021-01-03T00:00:00.000Z"),
             }),

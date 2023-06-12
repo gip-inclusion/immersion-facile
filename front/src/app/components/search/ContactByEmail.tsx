@@ -9,8 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,
+  conventionObjectiveOptions,
   domElementIds,
-  ImmersionObjective,
   RomeDto,
   SiretDto,
 } from "shared";
@@ -48,8 +48,8 @@ export const ContactByEmail = ({
     potentialBeneficiaryLastName: "",
     potentialBeneficiaryEmail: "",
     message: initialMessage,
-    immersionObjective: "",
-    potentialBeneficiaryCvOrLinkedin: "",
+    immersionObjective: null,
+    potentialBeneficiaryResumeLink: "",
     potentialBeneficiaryPhone: "",
   };
 
@@ -95,7 +95,7 @@ export const ContactByEmail = ({
             className={fr.cx("fr-mt-1w")}
           />
 
-          <h2 className={fr.cx("fr-h6", "fr-pt-3w")}>
+          <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
             Votre email de motivation
           </h2>
 
@@ -136,7 +136,6 @@ export const ContactByEmail = ({
             label="Email *"
             nativeInputProps={{
               ...register("potentialBeneficiaryEmail"),
-              type: "email",
             }}
             {...getFieldError("potentialBeneficiaryEmail")}
           />
@@ -153,8 +152,9 @@ export const ContactByEmail = ({
           <Input
             label="Page LinkedIn ou CV en ligne (facultatif)"
             nativeInputProps={{
-              ...register("potentialBeneficiaryCvOrLinkedin"),
+              ...register("potentialBeneficiaryResumeLink"),
             }}
+            {...getFieldError("potentialBeneficiaryResumeLink")}
           />
 
           <ButtonsGroup
@@ -167,7 +167,7 @@ export const ContactByEmail = ({
                 priority: "secondary",
                 onClick: onClose,
                 nativeButtonProps: {
-                  id: domElementIds.search.contactByMailCloseButton,
+                  id: domElementIds.search.contactByMailCancelButton,
                 },
                 children: "Annuler et revenir à la recherche",
               },
@@ -188,13 +188,7 @@ export const ContactByEmail = ({
   );
 };
 
-const immersionObjective: ImmersionObjective[] = [
-  "Confirmer un projet professionnel",
-  "Découvrir un métier ou un secteur d'activité",
-  "Initier une démarche de recrutement",
-];
-
-export const immersionObjectiveListOfOptions = immersionObjective.map(
+const immersionObjectiveListOfOptions = conventionObjectiveOptions.map(
   (immersionObjective) => ({
     value: immersionObjective,
     label: immersionObjective,

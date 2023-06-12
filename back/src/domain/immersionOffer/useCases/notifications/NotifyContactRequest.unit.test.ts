@@ -104,11 +104,11 @@ describe("NotifyContactRequest", () => {
               payload.potentialBeneficiaryFirstName,
             potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
             potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
-            immersionObject: validEmailPayload.immersionObjective,
+            immersionObjective: validEmailPayload.immersionObjective,
             potentialBeneficiaryPhone:
               validEmailPayload.potentialBeneficiaryPhone,
-            potentialBeneficiaryCvOrLinkedin:
-              validEmailPayload.potentialBeneficiaryCvOrLinkedin,
+            potentialBeneficiaryResumeLink:
+              validEmailPayload.potentialBeneficiaryResumeLink,
             message: validEmailPayload.message,
           },
           cc: contact.copyEmails,

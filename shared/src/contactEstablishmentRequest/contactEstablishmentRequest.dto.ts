@@ -1,3 +1,4 @@
+import { ImmersionObjective } from "../convention/convention.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { RomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
@@ -14,8 +15,8 @@ export type ContactInformations<T extends ContactMethod> = {
 export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {
   message: string;
   potentialBeneficiaryPhone: string;
-  immersionObjective: string;
-  potentialBeneficiaryCvOrLinkedin?: string;
+  immersionObjective: ImmersionObjective | null;
+  potentialBeneficiaryResumeLink?: string;
 };
 
 export type ContactEstablishmentInPersonDto = ContactInformations<"IN_PERSON">;

@@ -22,8 +22,8 @@ export class PgDiscussionAggregateRepository
          potential_beneficiary_last_name, 
          potential_beneficiary_email, 
          potential_beneficiary_phone,
-         immerssion_objective,
-         potential_beneficiary_cv_link_or_linkedin, 
+         immersion_objective,
+         potential_beneficiary_resume_link, 
          created_at 
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
@@ -35,8 +35,8 @@ export class PgDiscussionAggregateRepository
         discussion.potentialBeneficiaryLastName,
         discussion.potentialBeneficiaryEmail,
         discussion.potentialBeneficiaryPhone,
-        discussion.immerssionObject,
-        discussion.potentialBeneficiaryCvOrLinkedin,
+        discussion.immersionObjective,
+        discussion.potentialBeneficiaryResumeLink,
         discussion.createdAt.toISOString(),
       ],
     );
@@ -79,9 +79,9 @@ export class PgDiscussionAggregateRepository
         'potentialBeneficiaryFirstName',  potential_beneficiary_first_name,
         'potentialBeneficiaryLastName',  potential_beneficiary_last_name,
         'potentialBeneficiaryEmail',  potential_beneficiary_email,
-        'immerssionObject', immerssion_objective ,
+        'immersionObject', immersion_objective ,
         'potentialBeneficiaryPhone', potential_beneficiary_phone ,
-        'potentialBeneficiaryCvOrLinkedin', potential_beneficiary_cv_link_or_linkedin ,
+        'potentialBeneficiaryResumeLink', potential_beneficiary_resume_link ,
         'createdAt', created_at,
         'exchanges', exchanges
     ) AS discussion

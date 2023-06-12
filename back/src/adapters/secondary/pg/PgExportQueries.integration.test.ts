@@ -309,8 +309,8 @@ describe("PgExportQueries", () => {
               sender: "potentialBeneficiary",
             },
           ],
-          immerssionObject: "Confirmer un projet professionnel",
-          potentialBeneficiaryCvOrLinkedin: "http://fakelink.com",
+          immersionObjective: "Confirmer un projet professionnel",
+          potentialBeneficiaryResumeLink: "http://fakelink.com",
           potentialBeneficiaryPhone: "0654678976",
         };
         await establishmentAggregateRepository.insertEstablishmentAggregates([
