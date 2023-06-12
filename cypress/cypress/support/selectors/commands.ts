@@ -22,13 +22,8 @@ Cypress.Commands.add("fillSelect", ({ element, predicateValue }) => {
             (option: HTMLOptionElement) => option.value === predicateValue,
           )
       : randomNumber(1, $options.length - 1);
-    return cy
-      .get(selectorOptions)
-      .eq(selectedIndex)
-      .then(($select) => {
-        const label = $select.text();
-        cy.get(selector).select(label);
-        return cy.get(selector);
-      });
+    return cy.get(selector).select(selectedIndex, {
+      force: true,
+    });
   });
 });

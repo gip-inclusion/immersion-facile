@@ -1,93 +1,119 @@
+import { faker } from "@faker-js/faker/locale/fr";
 import {
+  conventionsRoute,
   domElementIds,
   signConventionRoute,
   updateConventionStatusRoute,
 } from "../../shared/src";
+import { disableUrlLogging } from "../cypress/utils/log";
+import { addBusinessDays, format } from "date-fns";
 
 const baseApiRoute = "/api/";
 const selectedAgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+const timeForEventCrawler = 20000;
 
 describe("Convention full workflow", () => {
   const conventionData = {
-    conventionId: null,
     magicLinks: [],
   };
   beforeEach(() => {
-    cy.disableUrlLogging();
+    disableUrlLogging();
   });
   it("creates a new convention", () => {
     cy.submitBasicConventionForm();
-    cy.wait(20000);
+    cy.wait(timeForEventCrawler);
   });
 
   it("get signatories magicLink urls from email", () => {
     const maxEmails = 2;
-    cy.openEmailInAdmin({
-      emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-    }).then(($emailWrapper) => {
-      $emailWrapper.find("span:contains('magicLink')").each((index, $span) => {
-        if (index < maxEmails) {
-          const magicLinkUrl = Cypress.$($span).next().find("a").attr("href");
-          conventionData.magicLinks.push(magicLinkUrl);
-        }
+    cy.connectToAdmin();
+    for (let index = 0; index < maxEmails; index++) {
+      cy.openEmailInAdmin({
+        emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        elementIndex: index,
+      }).then(($emailWrapper) => {
+        $emailWrapper
+          .find("span:contains('magicLink')")
+          .each((index, $span) => {
+            const magicLinkUrl = Cypress.$($span).next().find("a").attr("href");
+            conventionData.magicLinks.push(magicLinkUrl);
+          });
       });
-    });
+    }
   });
   it("signs convention for first signatory and validator requires modification", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}auth/${updateConventionStatusRoute}/${conventionData.conventionId}`,
+      `${baseApiRoute}auth/${updateConventionStatusRoute}/**`,
     ).as("updateConventionRequest");
     signatorySignConvention(conventionData.magicLinks[0]);
+    cy.connectToAdmin();
     cy.openEmailInAdmin({
       emailType: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-    }).then(($emailWrapper) => {
-      conventionData.conventionId = $emailWrapper
-        .find("span:contains('conventionId')")
-        .next()
-        .text();
-      cy.getMagicLinkInEmailWrapper($emailWrapper).click();
-      cy.get(
-        `#${domElementIds.manageConvention.conventionValidationRequestEditButton}`,
-      ).click();
-      cy.get("#draft-modal [name='statusJustification']").type(
-        "Raison de la demande de modification",
-      );
-      cy.get(
-        `#draft-modal #${domElementIds.manageConvention.justificationModalSubmitButton}`,
-      ).click({
-        force: true,
+      elementIndex: 0,
+    })
+      .last()
+      .then(($emailWrapper) => {
+        cy.getMagicLinkInEmailWrapper($emailWrapper).click();
+        cy.get(
+          `#${domElementIds.manageConvention.conventionValidationRequestEditButton}`,
+        ).click();
+        cy.get("#draft-modal [name='statusJustification']").type(
+          "Raison de la demande de modification",
+        );
+        cy.get(
+          `#draft-modal #${domElementIds.manageConvention.justificationModalSubmitButton}`,
+        ).click({
+          force: true,
+        });
+        cy.wait("@updateConventionRequest")
+          .its("response.statusCode")
+          .should("eq", 200);
+        cy.get(".fr-alert--success").should("exist");
       });
-      cy.wait("@updateConventionRequest")
-        .its("response.statusCode")
-        .should("eq", 200);
-      cy.get(".fr-alert--success").should("exist");
-    });
+    cy.wait(timeForEventCrawler);
   });
-  it("signatory edit the convention and submit it", () => {
+  it("signatory edit the convention and re-submit it", () => {
+    cy.connectToAdmin();
     cy.openEmailInAdmin({
       emailType: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+      elementIndex: 0,
     }).then(($emailWrapper) => {
       cy.getMagicLinkInEmailWrapper($emailWrapper).then(($link) => {
         editConventionForm($link.attr("href"));
+        conventionData.magicLinks = [];
       });
     });
   });
   it("signs convention for signatories", () => {
-    cy.intercept(
-      "POST",
-      `${baseApiRoute}auth/${signConventionRoute}/${conventionData.conventionId}`,
-    ).as("signConventionRequest");
-    conventionData.magicLinks.forEach(signatorySignConvention);
+    cy.intercept("POST", `${baseApiRoute}auth/${signConventionRoute}/**`).as(
+      "signConventionRequest",
+    );
+    const maxEmails = 2;
+    cy.connectToAdmin();
+    for (let index = 0; index < maxEmails; index++) {
+      cy.visit("/admin/conventions"); // ensure we're on backoffice
+      cy.openEmailInAdmin({
+        emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        elementIndex: index,
+      }).then(($emailWrapper) => {
+        $emailWrapper.find("span:contains('magicLink')").each((_, $span) => {
+          const magicLinkUrl = Cypress.$($span).next().find("a").attr("href");
+          signatorySignConvention(magicLinkUrl);
+        });
+      });
+    }
   });
   it("reviews and validate convention", () => {
-    cy.wait(10000);
+    cy.wait(timeForEventCrawler);
     cy.intercept(
       "POST",
       `${baseApiRoute}auth/${updateConventionStatusRoute}/**`,
     ).as("reviewConventionRequest");
+    cy.connectToAdmin();
     cy.openEmailInAdmin({
       emailType: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      elementIndex: 0,
     }).then(($emailWrapper) => {
       cy.getMagicLinkInEmailWrapper($emailWrapper).click();
       cy.get(
@@ -117,12 +143,36 @@ const signatorySignConvention = (magicLink) => {
 };
 
 const editConventionForm = (magicLinkUrl) => {
+  cy.intercept("POST", `${baseApiRoute}auth/${conventionsRoute}/**`).as(
+    "conventionEditRequest",
+  );
   cy.visit(magicLinkUrl);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-  ).then(($element) => {
-    cy.get(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-    ).should("have.value", selectedAgencyId);
-  });
+  ).should("have.value", selectedAgencyId);
+  cy.get(`#im-convention-form__step-2 .fr-accordion__btn`).click();
+  cy.get(
+    `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
+  )
+    .clear()
+    .type(faker.name.jobTitle());
+  cy.get(`#im-convention-form__step-3 .fr-accordion__btn`).click();
+  cy.get(`#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`)
+    .clear()
+    .type(format(addBusinessDays(new Date(), 5), "yyyy-MM-dd"));
+  cy.get(
+    `#${domElementIds.conventionImmersionRoute.conventionSection.addHoursButton}`,
+  ).click();
+  cy.get(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
+    .click()
+    .then(() => {
+      cy.get(".im-convention-summary").should("exist");
+      cy.get(
+        `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
+      ).click();
+      cy.wait("@conventionEditRequest")
+        .its("response.statusCode")
+        .should("eq", 200);
+    });
+  cy.wait(timeForEventCrawler);
 };
