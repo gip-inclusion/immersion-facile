@@ -1,5 +1,5 @@
 import { addMilliseconds } from "date-fns";
-import { DateStr } from "shared";
+import { DateIsoString } from "shared";
 import { TimeGateway } from "../../../../domain/core/ports/TimeGateway";
 
 export class CustomTimeGateway implements TimeGateway {
@@ -9,7 +9,7 @@ export class CustomTimeGateway implements TimeGateway {
     return this._nextDate;
   }
 
-  setNextDateStr(dateStr: DateStr) {
+  setNextDateStr(dateStr: DateIsoString) {
     this.setNextDate(new Date(dateStr));
   }
 

@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import { differenceWith } from "ramda";
-import { DateStr, propEq, replaceArrayElement } from "shared";
+import { DateIsoString, propEq, replaceArrayElement } from "shared";
 import {
   DomainEvent,
   DomainTopic,
@@ -141,7 +141,7 @@ export const storedEventRowsToDomainEvent = (
         };
       }
 
-      const publishedAt: DateStr = row.published_at.toISOString();
+      const publishedAt: DateIsoString = row.published_at.toISOString();
 
       const existingPublicationIndex = acc.publications.findIndex(
         propEq("publishedAt", publishedAt),
