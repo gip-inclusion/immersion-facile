@@ -117,7 +117,7 @@ export const createAdminRouter = (
   adminRouter
     .route(removeRouterPrefix(adminTargets.getLastNotifications.url))
     .get(async (req, res) =>
-      sendHttpResponse(req, res, deps.useCases.getSentEmails.execute),
+      sendHttpResponse(req, res, deps.useCases.getLastNotifications.execute),
     );
 
   adminRouter.route(`/${exportRoute}`).post(async (req, res) =>
