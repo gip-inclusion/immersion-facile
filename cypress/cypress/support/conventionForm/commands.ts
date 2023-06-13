@@ -11,7 +11,7 @@ import {
 import { faker } from "@faker-js/faker/locale/fr";
 
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
-const baseApiRoute = "/api/";
+const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
 let currentStep = 1;
 
 Cypress.Commands.add("submitBasicConventionForm", () => {
@@ -39,9 +39,7 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
   )
-    .select("86", {
-      force: true,
-    })
+    .select("86", defaultFieldOptions)
     .should("have.value", "86");
 
   cy.wait("@agenciesRequest");
@@ -134,19 +132,13 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   openNextSection(); // Open immersion details section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.individualProtection} input:first-of-type`,
-  ).check({
-    force: true,
-  });
+  ).check(defaultFieldOptions);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.sanitaryPrevention} input:first-of-type`,
-  ).check({
-    force: true,
-  });
+  ).check(defaultFieldOptions);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionObjective} input:first-of-type`,
-  ).check({
-    force: true, // DSFR, label:before is covering the input
-  });
+  ).check(defaultFieldOptions);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
   ).type(faker.name.jobType());

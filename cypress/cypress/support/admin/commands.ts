@@ -1,6 +1,6 @@
 import { domElementIds } from "../../../../shared/src";
 
-const baseApiRoute = "/api/";
+const { baseApiRoute } = Cypress.env("config");
 
 Cypress.Commands.add("connectToAdmin", () => {
   cy.intercept("POST", `${baseApiRoute}admin/login`).as("loginRequest");

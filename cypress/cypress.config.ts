@@ -8,6 +8,15 @@ const htmlValidateConfig = {
 
 export default defineConfig({
   projectId: "vctxdm",
+  env: {
+    config: {
+      baseApiRoute: "/api/",
+      defaultFieldOptions: {
+        // Temp fix, Cypress seems to report elements as disabled when they are not https://github.com/cypress-io/cypress/issues/5827
+        force: true,
+      },
+    },
+  },
   e2e: {
     specPattern: "e2e/**/*.cy.{js,jsx,ts,tsx}",
     setupNodeEvents(on) {

@@ -1,3 +1,5 @@
+const { defaultFieldOptions } = Cypress.env("config");
+
 Cypress.Commands.add(
   "doIfElementExists",
   (selector: string, callback: () => void) => {
@@ -22,8 +24,6 @@ Cypress.Commands.add("fillSelect", ({ element, predicateValue }) => {
             (option: HTMLOptionElement) => option.value === predicateValue,
           )
       : randomNumber(1, $options.length - 1);
-    return cy.get(selector).select(selectedIndex, {
-      force: true,
-    });
+    return cy.get(selector).select(selectedIndex, defaultFieldOptions);
   });
 });

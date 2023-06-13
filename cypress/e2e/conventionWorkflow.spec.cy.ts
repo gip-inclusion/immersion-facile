@@ -8,7 +8,7 @@ import {
 import { disableUrlLogging } from "../cypress/utils/log";
 import { addBusinessDays, format } from "date-fns";
 
-const baseApiRoute = "/api/";
+const { baseApiRoute } = Cypress.env("config");
 const selectedAgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 const timeForEventCrawler = 20000;
 

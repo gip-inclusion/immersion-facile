@@ -10,7 +10,7 @@ import {
   immersionOffersRoute,
 } from "shared";
 
-const baseApiRoute = "/api/";
+const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
 const providedSiret = "41433740200039";
 const providedLocation = "Tain-l'Hermitage";
 
@@ -75,9 +75,7 @@ describe("Establishment creation and modification workflow", () => {
     ).should("not.have.value", "");
     cy.get(`#${domElementIds.establishment.appellations} .fr-input`).type(
       "boulang",
-      {
-        force: true, // To avoid typing in disabled input (cf. https://github.com/cypress-io/cypress/issues/5827)
-      },
+      defaultFieldOptions,
     );
 
     cy.wait("@autocompleteAppellationRequest");
@@ -92,33 +90,23 @@ describe("Establishment creation and modification workflow", () => {
     );
     cy.get(`#${domElementIds.establishment.businessContact.firstName}`).type(
       faker.name.firstName(),
-      {
-        force: true,
-      },
+      defaultFieldOptions,
     );
     cy.get(`#${domElementIds.establishment.businessContact.lastName}`).type(
       faker.name.lastName(),
-      {
-        force: true,
-      },
+      defaultFieldOptions,
     );
     cy.get(`#${domElementIds.establishment.businessContact.job}`).type(
       faker.name.jobTitle(),
-      {
-        force: true,
-      },
+      defaultFieldOptions,
     );
     cy.get(`#${domElementIds.establishment.businessContact.phone}`).type(
       faker.phone.number("06########"),
-      {
-        force: true,
-      },
+      defaultFieldOptions,
     );
     cy.get(`#${domElementIds.establishment.businessContact.email}`).type(
       faker.internet.email(),
-      {
-        force: true,
-      },
+      defaultFieldOptions,
     );
     cy.get(`#${domElementIds.establishment.submitButton}`).click();
     cy.wait("@addFormEstablishmentRequest")
@@ -225,19 +213,13 @@ const editAndSubmitModifiedEstablishment = () => {
     .should("have.value", providedSiret);
   cy.get(`#${domElementIds.establishment.businessContact.job}`)
     .clear()
-    .type(faker.name.jobTitle(), {
-      force: true,
-    });
+    .type(faker.name.jobTitle(), defaultFieldOptions);
   cy.get(`#${domElementIds.establishment.businessContact.phone}`)
     .clear()
-    .type(faker.phone.number("06########"), {
-      force: true,
-    });
+    .type(faker.phone.number("06########"), defaultFieldOptions);
   cy.get(`#${domElementIds.establishment.businessContact.email}`)
     .clear()
-    .type(faker.internet.email(), {
-      force: true,
-    });
+    .type(faker.internet.email(), defaultFieldOptions);
   cy.get(`#${domElementIds.establishment.submitButton}`).click();
   cy.wait("@addFormEstablishmentRequest")
     .its("response.statusCode")
