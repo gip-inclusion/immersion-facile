@@ -1,11 +1,7 @@
 import * as AWS from "aws-sdk";
-import * as fse from "fs-extra";
-import { promisify } from "util";
 import { StoredFile } from "../../domain/generic/fileManagement/entity/StoredFile";
 import { DocumentGateway } from "../../domain/generic/fileManagement/port/DocumentGateway";
 import { createLogger } from "../../utils/logger";
-
-const readFile = promisify<string, Buffer>(fse.readFile);
 
 const logger = createLogger(__filename);
 
@@ -32,13 +28,12 @@ export class S3DocumentGateway implements DocumentGateway {
   }
 
   async put(file: StoredFile): Promise<void> {
-    const body = await readFile(file.path);
     return new Promise((resolve, reject) => {
       this.s3.putObject(
         {
           Key: file.id,
           Bucket: this.bucketName,
-          Body: body,
+          Body: file.buffer,
           ACL: "public-read",
         },
         (err) => {

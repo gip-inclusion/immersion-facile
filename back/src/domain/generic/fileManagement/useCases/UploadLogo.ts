@@ -9,7 +9,7 @@ type MulterFile = {
   originalname: string;
   encoding: string;
   size: number;
-  path: string;
+  buffer: Buffer;
 };
 
 export class UploadLogo extends TransactionalUseCase<MulterFile, string> {
@@ -31,7 +31,7 @@ export class UploadLogo extends TransactionalUseCase<MulterFile, string> {
       name: multerFile.originalname,
       encoding: multerFile.encoding,
       size: multerFile.size,
-      path: multerFile.path,
+      buffer: multerFile.buffer,
     };
     await this.documentGateway.put(file);
     return this.documentGateway.getFileUrl(file);

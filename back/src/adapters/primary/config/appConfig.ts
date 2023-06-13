@@ -364,11 +364,6 @@ export class AppConfig {
     ) as DomainTopic[];
   }
 
-  // == Storage ==
-  public get storageRoot() {
-    return this.throwIfNotDefined("STORAGE_ROOT");
-  }
-
   // Visible for testing.
   public get configParams() {
     return this.env;
