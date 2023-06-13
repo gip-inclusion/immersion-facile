@@ -1,7 +1,5 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import ovoidSprite from "@gouvfr/dsfr/dist/artwork/background/ovoid.svg";
-import technicalErrorSprite from "@gouvfr/dsfr/dist/artwork/pictograms/system/technical-error.svg";
 import { useStyles } from "tss-react/dsfr";
 import { ManagedErrorKind } from "shared";
 import {
@@ -13,6 +11,9 @@ import {
   HTTPFrontErrorContents,
 } from "src/app/contents/error/types";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
+
+import ovoidSprite from "/dsfr/artwork/background/ovoid.svg";
+import technicalErrorSprite from "/dsfr/artwork/pictograms/system/technical-error.svg";
 
 type ErrorPageContentProps = {
   type?: ManagedErrorKind;
