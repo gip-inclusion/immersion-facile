@@ -24,7 +24,7 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 
 const logger = createLogger(__filename);
 
-export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature extends TransactionalUseCase<ConventionDto> {
+export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly timeGateway: TimeGateway,

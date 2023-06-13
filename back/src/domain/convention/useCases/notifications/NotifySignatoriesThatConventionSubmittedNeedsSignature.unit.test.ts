@@ -23,10 +23,10 @@ import {
   makeSaveNotificationAndRelatedEvent,
   WithNotificationIdAndKind,
 } from "../../../generic/notifications/entities/Notification";
-import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
+import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./NotifySignatoriesThatConventionSubmittedNeedsSignature";
 
-describe("Add Convention Notifications", () => {
-  let useCase: ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature;
+describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
+  let useCase: NotifySignatoriesThatConventionSubmittedNeedsSignature;
   let timeGateway: CustomTimeGateway;
   let validConvention: ConventionDto;
   let agency: AgencyDto;
@@ -60,15 +60,14 @@ describe("Add Convention Notifications", () => {
       uuidGenerator,
       timeGateway,
     );
-    useCase =
-      new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
-        new InMemoryUowPerformer(uow),
-        timeGateway,
-        shortLinkGenerator,
-        fakeGenerateMagicLinkUrlFn,
-        config,
-        saveNotificationAndRelatedEvent,
-      );
+    useCase = new NotifySignatoriesThatConventionSubmittedNeedsSignature(
+      new InMemoryUowPerformer(uow),
+      timeGateway,
+      shortLinkGenerator,
+      fakeGenerateMagicLinkUrlFn,
+      config,
+      saveNotificationAndRelatedEvent,
+    );
   });
 
   it("Sends confirmation email to all signatories", async () => {
