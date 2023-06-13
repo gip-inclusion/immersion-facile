@@ -4,7 +4,8 @@
   "scripts": {
     "open": "CYPRESS_BASE_URL=http://localhost:3000/ CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=password node_modules/.bin/cypress open",
     "install": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=password node_modules/.bin/cypress install",
-    "run-cloud": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=password node_modules/.bin/cypress run --record"
+    "run-cloud": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=password node_modules/.bin/cypress run --record",
+    "open-dev-scalingo": "CYPRESS_BASE_URL=https://dev.immersion-facile.beta.gouv.fr/ CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress open"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",

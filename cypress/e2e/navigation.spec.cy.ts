@@ -1,11 +1,10 @@
 import { domElementIds, frontRoutes } from "shared";
-import { disableNewUrlLog } from "../utils";
-import { connectToAdmin } from "../utils/admin";
+import { disableUrlLogging } from "../cypress/utils/log";
 
 describe("Simple navigation", () => {
   // TODO: do separate test for admin navigation
   it("Go to admin and log in", () => {
-    connectToAdmin();
+    cy.connectToAdmin();
     it("Go to home page", () => {
       goToTab({
         selector: `#${domElementIds.header.navLinks.home}`,
@@ -37,7 +36,7 @@ describe("Simple navigation", () => {
   });
 
   it("Goes to convention page", () => {
-    disableNewUrlLog();
+    disableUrlLogging();
     cy.visit("/");
     goToTab({
       selector: `#${domElementIds.header.navLinks.candidate.formConvention}`,
