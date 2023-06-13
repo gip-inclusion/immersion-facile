@@ -8,7 +8,7 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ContactEstablishmentByMailDto,
-  contactEstablishmentByMailSchema,
+  contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
   RomeDto,
@@ -54,7 +54,7 @@ export const ContactByEmail = ({
   };
 
   const methods = useForm<ContactEstablishmentByMailDto>({
-    resolver: zodResolver(contactEstablishmentByMailSchema),
+    resolver: zodResolver(contactEstablishmentByMailFormSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });

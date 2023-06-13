@@ -31,16 +31,28 @@ export const preferEmailContactSchema = z.literal("EMAIL");
 export const preferPhoneContactSchema = z.literal("PHONE");
 export const preferInPersonContactSchema = z.literal("IN_PERSON");
 
+const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
+  [...conventionObjectiveOptions],
+  localization.invalidImmersionObjective,
+);
+
+export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishmentByMailDto> =
+  z.object({
+    ...commonFields,
+    contactMode: preferEmailContactSchema,
+    message: zTrimmedString,
+    potentialBeneficiaryPhone: zTrimmedString,
+    immersionObjective: immersionObjectiveSchema,
+    potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
+  });
+
 export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailDto> =
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
     message: zTrimmedString,
     potentialBeneficiaryPhone: zTrimmedString,
-    immersionObjective: zEnumValidation<ImmersionObjective>(
-      [...conventionObjectiveOptions],
-      localization.invalidImmersionObjective,
-    ).nullable(),
+    immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
   });
 
