@@ -17,13 +17,14 @@ const adeEstablishmentSchema = z.object({
   tranche_effectif_salarie: z.string().nullable(),
 });
 
-const annuaireDesEntreprisesSiretGatewayResponseSchema = z.object({
-  results: z.array(adeEstablishmentSchema),
-  total_results: z.number(),
-  page: z.number(),
-  per_page: z.number(),
-  total_pages: z.number(),
-});
+const annuaireDesEntreprisesSiretGatewayResponseSchema: z.Schema<AnnuaireDesEntreprisesSiretGatewayResponse> =
+  z.object({
+    results: z.array(adeEstablishmentSchema),
+    total_results: z.number(),
+    page: z.number(),
+    per_page: z.number(),
+    total_pages: z.number(),
+  });
 
 export type AnnuaireDesEntreprisesSiretEstablishment = {
   // cf. https://api.gouv.fr/documentation/api-recherche-entreprises

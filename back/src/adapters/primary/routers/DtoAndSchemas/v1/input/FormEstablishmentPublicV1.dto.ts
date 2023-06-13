@@ -1,12 +1,8 @@
 import {
   defaultMaxContactsPerWeek,
-  Flavor,
   FormEstablishmentDto,
   OmitFromExistingKeys,
 } from "shared";
-
-// prettier-ignore
-export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
 
 export type BusinessContactDtoPublicV1 = {
   lastName: string;

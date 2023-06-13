@@ -29,7 +29,6 @@ const logger = createLogger(__filename);
 export const TEST_NAF_LABEL = "test_naf_label";
 export const TEST_ROME_LABEL = "test_rome_label";
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
-export const TEST_CITY = "test_city";
 export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
 
 export class InMemoryEstablishmentAggregateRepository
