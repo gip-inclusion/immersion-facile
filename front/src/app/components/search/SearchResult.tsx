@@ -2,6 +2,7 @@ import React, { memo, useState } from "react";
 import LinesEllipsis from "react-lines-ellipsis";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { equals } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
   addressDtoToString,
@@ -221,7 +222,10 @@ const SearchResultComponent = ({
   );
 };
 
-export const SearchResult = memo(SearchResultComponent, () => true);
+export const SearchResult = memo(
+  SearchResultComponent,
+  (prevResult, nextResult) => equals(prevResult, nextResult),
+);
 
 type InfoLabelProps = {
   voluntaryToImmersion?: boolean;
