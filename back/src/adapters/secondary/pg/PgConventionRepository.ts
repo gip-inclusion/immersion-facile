@@ -14,6 +14,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
+import { ConflictError } from "../../primary/helpers/httpErrors";
 import { getReadConventionById } from "./pgConventionSql";
 
 export const beneficiaryCurrentEmployerIdColumnName =
@@ -37,6 +38,12 @@ export class PgConventionRepository implements ConventionRepository {
   public async save(
     convention: ConventionDtoWithoutExternalId,
   ): Promise<ConventionExternalId> {
+    const alreadyExistingConvention = await this.getById(convention.id);
+    if (alreadyExistingConvention)
+      throw new ConflictError(
+        `Convention with id ${convention.id} already exists`,
+      );
+
     // prettier-ignore
     const { signatories: { beneficiary, beneficiaryRepresentative, establishmentRepresentative,beneficiaryCurrentEmployer }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions, internshipKind,establishmentTutor,businessAdvantages, statusJustification } =
         convention

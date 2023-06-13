@@ -4,10 +4,7 @@ import {
   conventionWithoutExternalIdSchema,
   WithConventionId,
 } from "shared";
-import {
-  ConflictError,
-  ForbiddenError,
-} from "../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -52,7 +49,6 @@ export class AddConvention extends TransactionalUseCase<
     const externalId = await uow.conventionRepository.save(
       createConventionParams,
     );
-    if (!externalId) throw new ConflictError(createConventionParams.id);
 
     const event = this.createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",

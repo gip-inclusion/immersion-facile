@@ -8,10 +8,12 @@ import {
   ConventionId,
   EstablishmentRepresentative,
   EstablishmentTutor,
+  expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ConflictError } from "../../primary/helpers/httpErrors";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import {
   beneficiaryCurrentEmployerIdColumnName,
@@ -68,6 +70,23 @@ describe("PgConventionRepository", () => {
       externalId: savedExternalId,
     });
     expect(typeof savedExternalId).toBe("string");
+  });
+
+  it("fails to add a convention if it already exits", async () => {
+    const convention = new ConventionDtoBuilder()
+      .withInternshipKind("immersion")
+      .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
+      .withDateStart(new Date("2023-01-02").toISOString())
+      .withDateEnd(new Date("2023-01-06").toISOString())
+      .withSchedule(reasonableSchedule)
+      .build();
+
+    await conventionRepository.save(convention);
+
+    await expectPromiseToFailWithError(
+      conventionRepository.save(convention),
+      new ConflictError(`Convention with id ${convention.id} already exists`),
+    );
   });
 
   it("Adds/Update a new CCI convention", async () => {
