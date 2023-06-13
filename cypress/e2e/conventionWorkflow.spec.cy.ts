@@ -8,9 +8,9 @@ import {
 import { disableUrlLogging } from "../cypress/utils/log";
 import { addBusinessDays, format } from "date-fns";
 
-const { baseApiRoute } = Cypress.env("config");
+const { baseApiRoute, defaultFieldOptions, timeForEventCrawler } =
+  Cypress.env("config");
 const selectedAgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
-const timeForEventCrawler = 20000;
 
 describe("Convention full workflow", () => {
   const conventionData = {
@@ -63,9 +63,7 @@ describe("Convention full workflow", () => {
         );
         cy.get(
           `#draft-modal #${domElementIds.manageConvention.justificationModalSubmitButton}`,
-        ).click({
-          force: true,
-        });
+        ).click(defaultFieldOptions);
         cy.wait("@updateConventionRequest")
           .its("response.statusCode")
           .should("eq", 200);

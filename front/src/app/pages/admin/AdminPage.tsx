@@ -83,7 +83,7 @@ export const AdminPage = ({
           <div className={fr.cx("fr-col-12", "fr-p-2w", "fr-mt-4w")}>
             <Tabs
               selectedTabId={currentTab}
-              tabs={adminTabs.filter((tab) => tab.tabId !== "notifications")}
+              tabs={adminTabs}
               onTabChange={(tab) => {
                 if (isAdminTab(tab))
                   routes
