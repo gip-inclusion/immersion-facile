@@ -12,6 +12,9 @@ export const handleHttpJsonResponseError = (
 
   if (error instanceof HttpError) {
     res.status(error.httpCode);
+    if (error.httpCode === 409) {
+      return unhandledError(error, req, res);
+    }
 
     return res.json({ errors: toValidJSONObjectOrString(error) });
   }

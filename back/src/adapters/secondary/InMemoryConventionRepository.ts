@@ -6,6 +6,7 @@ import {
 } from "shared";
 import { ConventionRepository } from "../../domain/convention/ports/ConventionRepository";
 import { createLogger } from "../../utils/logger";
+import { ConflictError } from "../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
@@ -15,14 +16,16 @@ export class InMemoryConventionRepository implements ConventionRepository {
 
   public async save(
     conventionWithoutExternalId: ConventionDtoWithoutExternalId,
-  ): Promise<ConventionExternalId | undefined> {
+  ): Promise<ConventionExternalId> {
     logger.info({ conventionWithoutExternalId }, "save");
     const convention: ConventionDto = {
       ...conventionWithoutExternalId,
       externalId: this._nextExternalId,
     };
     if (this._conventions[convention.id]) {
-      return undefined;
+      throw new ConflictError(
+        `Convention with id ${convention.id} already exists`,
+      );
     }
     this._conventions[convention.id] = convention;
     return convention.externalId;

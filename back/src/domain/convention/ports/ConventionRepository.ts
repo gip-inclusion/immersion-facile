@@ -8,7 +8,7 @@ import {
 export interface ConventionRepository {
   save: (
     conventionDto: ConventionDtoWithoutExternalId,
-  ) => Promise<ConventionExternalId | undefined>;
+  ) => Promise<ConventionExternalId>;
   getById: (id: ConventionId) => Promise<ConventionDto | undefined>;
   update: (conventionDto: ConventionDto) => Promise<ConventionId | undefined>;
 }

@@ -89,7 +89,9 @@ describe("Add Convention", () => {
 
     await expectPromiseToFailWithError(
       addConvention.execute(validConventionParams),
-      new ConflictError(validConventionParams.id),
+      new ConflictError(
+        `Convention with id ${validConventionParams.id} already exists`,
+      ),
     );
   });
 
