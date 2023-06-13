@@ -227,7 +227,6 @@ export type WithConventionId = {
 
 export type UpdateConventionRequestDto = {
   convention: ConventionDto;
-  id: string;
 };
 
 export type ListConventionsRequestDto = {

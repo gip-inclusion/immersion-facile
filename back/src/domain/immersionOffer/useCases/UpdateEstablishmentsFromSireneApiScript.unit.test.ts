@@ -51,6 +51,7 @@ const findEstablishmentEntityGivenSiret = (
   )?.establishment;
 
 // This use case is kept as inspiration for when we'll need to update establishments from SIREN API (ours not LBB)
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip("Update establishments from Sirene API", () => {
   const now = new Date("2020-01-13T00:00:00");
   const lessThanAWeekAgo = new Date("2020-01-07T00:00:00");

@@ -1,16 +1,14 @@
-import { z } from "zod";
 import {
   AgencyDto,
-  allRoles,
   ConventionDto,
-  conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
   Role,
-  zTrimmedString,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
+import { ConventionRequiresModificationPayload } from "../../../core/eventBus/eventPayload.dto";
+import { conventionRequiresModificationPayloadSchema } from "../../../core/eventBus/eventPayload.schema";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
@@ -22,14 +20,6 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
-
-// prettier-ignore
-export type ConventionRequiresModificationPayload = z.infer<typeof conventionRequiresModificationSchema>
-const conventionRequiresModificationSchema = z.object({
-  convention: conventionSchema,
-  justification: zTrimmedString,
-  roles: z.array(z.enum(allRoles)),
-});
 
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends TransactionalUseCase<ConventionRequiresModificationPayload> {
   constructor(
@@ -43,10 +33,10 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     super(uowPerformer);
   }
 
-  inputSchema = conventionRequiresModificationSchema;
+  protected inputSchema = conventionRequiresModificationPayloadSchema;
 
-  public async _execute(
-    { convention, justification, roles }: ConventionRequiresModificationPayload,
+  protected async _execute(
+    { justification, roles, convention }: ConventionRequiresModificationPayload,
     uow: UnitOfWork,
   ): Promise<void> {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);

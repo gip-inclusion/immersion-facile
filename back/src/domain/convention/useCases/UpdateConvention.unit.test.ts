@@ -60,10 +60,10 @@ describe("Update Convention", () => {
       const updatedConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
         .withBeneficiaryEmail("new@email.fr")
+        .withStatusJustification("justif")
         .build();
 
       const { id } = await updateConvention.execute({
-        id: updatedConvention.id,
         convention: updatedConvention,
       });
       expect(id).toEqual(updatedConvention.id);
@@ -77,11 +77,11 @@ describe("Update Convention", () => {
       const validConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
         .withId(id)
+        .withStatusJustification("justif")
         .build();
 
       await expectPromiseToFailWithError(
         updateConvention.execute({
-          id,
           convention: validConvention,
         }),
         new NotFoundError(`Convention with id ${id} was not found`),
@@ -103,11 +103,11 @@ describe("Update Convention", () => {
       const updatedConvention = new ConventionDtoBuilder()
         .withId(storedConvention.id)
         .withStatus("READY_TO_SIGN")
+        .withStatusJustification("justif")
         .build();
 
       await expectPromiseToFailWithError(
         updateConvention.execute({
-          id: updatedConvention.id,
           convention: updatedConvention,
         }),
         new BadRequestError(
@@ -153,7 +153,6 @@ describe("Update Convention", () => {
         .build();
 
       await updateConvention.execute({
-        id: updatedConvention.id,
         convention: updatedConvention,
       });
       expect(conventionRepository.conventions).toEqual([updatedConvention]);
@@ -184,7 +183,6 @@ describe("Update Convention", () => {
         .build();
 
       await updateConvention.execute({
-        id: updatedConvention.id,
         convention: updatedConvention,
       });
       expect(conventionRepository.conventions).toEqual([updatedConvention]);
@@ -210,7 +208,6 @@ describe("Update Convention", () => {
       expect(
         await updateConvention.execute({
           convention: inReviewConvention,
-          id: inReviewConvention.id,
         }),
       ).toEqual({
         id: inReviewConvention.id,
@@ -231,7 +228,6 @@ describe("Update Convention", () => {
         await expectPromiseToFailWithError(
           updateConvention.execute({
             convention,
-            id: convention.id,
           }),
           new ForbiddenError(
             `Convention ${convention.id} with modifications should have status READY_TO_SIGN`,
@@ -244,11 +240,11 @@ describe("Update Convention", () => {
       const inReviewConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
         .withId(id)
+        .withStatusJustification("updateJustification")
         .build();
 
       const response = await updateConvention.execute({
         convention: inReviewConvention,
-        id: inReviewConvention.id,
       });
 
       expect(outboxRepo.events).toHaveLength(1);
@@ -274,7 +270,6 @@ describe("Update Convention", () => {
       await expectPromiseToFailWithError(
         updateConvention.execute({
           convention: draftConvention,
-          id: draftConvention.id,
         }),
         new ForbiddenError(
           `Convention ${id} with modifications should have status READY_TO_SIGN`,

@@ -13,11 +13,11 @@ import {
   WithConventionId,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
-import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
+import { ConventionRequiresModificationPayload } from "./eventPayload.dto";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 
@@ -51,7 +51,6 @@ export type DomainEvent =
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
-  | GenericEvent<"ConventionSubmittedAfterModification", ConventionDto>
   | GenericEvent<"ImmersionApplicationPartiallySigned", ConventionDto>
   | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>

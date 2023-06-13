@@ -16,20 +16,22 @@ export interface ConventionGateway {
   retrieveFromToken$(
     payload: FetchConventionRequestedPayload,
   ): Observable<ConventionReadDto | undefined>;
-  add$(conventionDto: ConventionDto): Observable<void>;
+  getConventionStatusDashboardUrl$(jwt: string): Observable<AbsoluteUrl>;
 
-  // Get an immersion application through backoffice, password-protected route.
-  getById(id: ConventionId): Promise<ConventionReadDto>;
-
-  update$(conventionDto: ConventionDto, jwt: string): Observable<void>;
-
-  updateStatus$(
+  newConvention$(conventionDto: ConventionDto): Observable<void>;
+  updateConvention$(
+    conventionDto: ConventionDto,
+    jwt: string,
+  ): Observable<void>;
+  updateConventionStatus$(
     params: UpdateConventionStatusRequestDto,
     conventionId: ConventionId,
     jwt: ConventionMagicLinkJwt | BackOfficeJwt,
   ): Observable<void>;
-
   signConvention$(jwt: string): Observable<void>;
+  shareConventionLinkByEmail(
+    shareLinkByEmailDto: ShareLinkByEmailDto,
+  ): Promise<boolean>;
 
   generateMagicLink(
     adminToken: BackOfficeJwt,
@@ -37,11 +39,5 @@ export interface ConventionGateway {
     role: Role,
     expired: boolean,
   ): Promise<string>;
-
   renewMagicLink(expiredJwt: string, originalUrl: string): Promise<void>;
-
-  // shareLinkByEmailDTO
-  shareLinkByEmail(shareLinkByEmailDTO: ShareLinkByEmailDto): Promise<boolean>;
-
-  getConventionStatusDashboardUrl$(jwt: string): Observable<AbsoluteUrl>;
 }

@@ -52,7 +52,7 @@ export const ShareForm = ({
     details: string;
     internshipKind: InternshipKind;
   }) => {
-    const result = await conventionGateway.shareLinkByEmail({
+    const result = await conventionGateway.shareConventionLinkByEmail({
       ...values,
       conventionLink: window.location.href,
     });

@@ -21,8 +21,9 @@ const saveConventionEpic: ConventionEpic = (
     switchMap(({ payload }) => {
       const conventionState = state$.value.convention;
       const { jwt } = conventionState;
-      if (jwt) return conventionGateway.update$(payload, jwt);
-      return conventionGateway.add$(payload);
+      return jwt
+        ? conventionGateway.updateConvention$(payload, jwt)
+        : conventionGateway.newConvention$(payload);
     }),
     map(conventionSlice.actions.saveConventionSucceeded),
     catchEpicError((error: Error) =>
@@ -96,7 +97,7 @@ const conventionStatusChangeEpic: ConventionEpic = (
     filter(conventionSlice.actions.statusChangeRequested.match),
     switchMap(({ payload }) =>
       conventionGateway
-        .updateStatus$(
+        .updateConventionStatus$(
           payload.updateStatusParams,
           payload.conventionId,
           payload.jwt,
@@ -107,7 +108,6 @@ const conventionStatusChangeEpic: ConventionEpic = (
           ),
         ),
     ),
-    // map(conventionSlice.actions.statusChangeSucceeded),
     catchEpicError((error: Error) =>
       conventionSlice.actions.statusChangeFailed(error.message),
     ),
@@ -140,6 +140,7 @@ const getPreselectAgencyId: ConventionEpic = (action$, _, { agencyGateway }) =>
       conventionSlice.actions.preselectedAgencyIdFailed(error.message),
     ),
   );
+
 export const conventionEpics = [
   saveConventionEpic,
   getConventionEpic,

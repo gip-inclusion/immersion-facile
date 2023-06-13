@@ -216,6 +216,7 @@ describe("convention e2e", () => {
         )
           .withBeneficiaryEmail("new@email.fr")
           .withStatus("READY_TO_SIGN")
+          .withStatusJustification("justif")
           .build();
 
         const jwt = generateConventionJwt(
@@ -230,7 +231,9 @@ describe("convention e2e", () => {
         await request
           .post(`/auth/${conventionsRoute}/${convention.id}`)
           .set("Authorization", jwt)
-          .send(updatedConvention)
+          .send({
+            convention: updatedConvention,
+          })
           .expect(200);
 
         // GETting the updated convention succeeds.
