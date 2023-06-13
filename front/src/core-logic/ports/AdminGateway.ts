@@ -7,6 +7,7 @@ import {
   GetDashboardParams,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
+  NotificationsByKind,
   UserAndPassword,
 } from "shared";
 
@@ -27,4 +28,5 @@ export interface AdminGateway {
     params: IcUserRoleForAgencyParams,
     token: BackOfficeJwt,
   ): Observable<void>;
+  getLastNotifications(token: BackOfficeJwt): Observable<NotificationsByKind>;
 }

@@ -84,4 +84,12 @@ export class HttpAdminGateway implements AdminGateway {
         .then(({ responseBody }) => responseBody),
     );
   }
+
+  public getLastNotifications(token: BackOfficeJwt) {
+    return from(
+      this.httpClient
+        .getLastNotifications({ headers: { authorization: token } })
+        .then(({ responseBody }) => responseBody),
+    );
+  }
 }

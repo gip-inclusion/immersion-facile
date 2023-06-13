@@ -8,11 +8,10 @@ import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
-import { EmailsTab } from "src/app/pages/admin/EmailsTab";
+import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab, isAdminTab } from "src/app/routes/route-params";
 import { routes } from "src/app/routes/routes";
-import { ENV } from "src/config/environmentVariables";
 
 type Tab = {
   label: string;
@@ -47,9 +46,9 @@ const adminTabs: Tab[] = [
     content: <TechnicalOptions />,
   },
   {
-    label: "Emails",
-    tabId: "emails",
-    content: <EmailsTab />,
+    label: "Notifications",
+    tabId: "notifications",
+    content: <NotificationsTab />,
   },
   {
     label: "Aperçu email",
@@ -84,9 +83,7 @@ export const AdminPage = ({
           <div className={fr.cx("fr-col-12", "fr-p-2w", "fr-mt-4w")}>
             <Tabs
               selectedTabId={currentTab}
-              tabs={adminTabs.filter(
-                (tab) => tab.tabId !== "emails" || ENV.envType !== "production",
-              )}
+              tabs={adminTabs.filter((tab) => tab.tabId !== "notifications")}
               onTabChange={(tab) => {
                 if (isAdminTab(tab))
                   routes

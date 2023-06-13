@@ -2,7 +2,7 @@ import { adminAuthInitialState } from "src/core-logic/domain/admin/adminAuth/adm
 import { agencyAdminInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardInitialState } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { icUsersAdminInitialState } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { sentEmailInitialState } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
+import { notificationsInitialState } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import { RootState } from "src/core-logic/storeConfig/store";
 
 type AdminState = RootState["admin"];
@@ -12,7 +12,7 @@ export const adminPreloadedState = (
 ): AdminState => ({
   dashboardUrls: dashboardInitialState,
   adminAuth: adminAuthInitialState,
-  sentEmails: sentEmailInitialState,
+  notifications: notificationsInitialState,
   agencyAdmin: agencyAdminInitialState,
   inclusionConnectedUsersAdmin: icUsersAdminInitialState,
   ...state,

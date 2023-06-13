@@ -1015,7 +1015,7 @@ const makeAgencyFirstReminderEmail = ({
   convention: ConventionDto;
   shortLinkUrl: AbsoluteUrl;
 }): TemplatedEmail => ({
-  type: "AGENCY_FIRST_REMINDER",
+  kind: "AGENCY_FIRST_REMINDER",
   recipients: [email],
   params: {
     agencyName: agency.name,
@@ -1037,7 +1037,7 @@ const makeAgencyLastReminderEmail = ({
   convention: ConventionDto;
   shortLinkUrl: AbsoluteUrl;
 }): TemplatedEmail => ({
-  type: "AGENCY_LAST_REMINDER",
+  kind: "AGENCY_LAST_REMINDER",
   recipients: [email],
   params: {
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,
@@ -1057,7 +1057,7 @@ const makeSignatoriesFirstReminderEmail = ({
   timeGateway: TimeGateway;
   shortLinkUrl: AbsoluteUrl | undefined;
 }): TemplatedEmail => ({
-  type: "SIGNATORY_FIRST_REMINDER",
+  kind: "SIGNATORY_FIRST_REMINDER",
   recipients: [actor.email],
   params: {
     actorFirstName: actor.firstName,
@@ -1079,7 +1079,7 @@ const makeSignatoriesLastReminderEmail = ({
   convention: ConventionDto;
   shortlinkUrl: AbsoluteUrl | undefined;
 }): TemplatedEmail => ({
-  type: "SIGNATORY_LAST_REMINDER",
+  kind: "SIGNATORY_LAST_REMINDER",
   recipients: [actor.email],
   params: {
     actorFirstName: actor.firstName,

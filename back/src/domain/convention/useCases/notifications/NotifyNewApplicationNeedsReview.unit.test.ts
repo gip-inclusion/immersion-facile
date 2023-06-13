@@ -123,7 +123,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [counsellorEmails[0]],
             params: {
               internshipKind: conventionInReview.internshipKind,
@@ -139,7 +139,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             },
           },
           {
-            type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [counsellorEmails[1]],
             params: {
               internshipKind: conventionInReview.internshipKind,
@@ -212,7 +212,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [validatorEmails[0]],
             params: {
               internshipKind: conventionInReview.internshipKind,
@@ -228,7 +228,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             },
           },
           {
-            type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [validatorEmails[1]],
             params: {
               internshipKind: conventionInReview.internshipKind,
@@ -313,7 +313,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         expectSavedNotificationsAndEvents({
           emails: [
             {
-              type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+              kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
               recipients: [validatorEmails[0]],
               params: {
                 internshipKind: acceptedByCounsellorConvention.internshipKind,
@@ -331,7 +331,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               },
             },
             {
-              type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+              kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
               recipients: [validatorEmails[1]],
               params: {
                 internshipKind: acceptedByCounsellorConvention.internshipKind,
@@ -401,7 +401,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         expectSavedNotificationsAndEvents({
           emails: [
             {
-              type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+              kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
               recipients: [adminEmail],
               params: {
                 internshipKind: acceptedByValidatorConvention.internshipKind,

@@ -5,17 +5,17 @@ import {
   TemplatedEmail,
   TemplatedSms,
 } from "shared";
-import { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
-import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
-import { NotificationAddedEvent } from "../domain/core/eventBus/events";
 import {
   EmailNotification,
   Notification,
   NotificationKind,
   notificationKinds,
   SmsNotification,
-  WithNotificationIdAndKind,
-} from "../domain/generic/notifications/entities/Notification";
+} from "shared";
+import { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
+import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
+import { NotificationAddedEvent } from "../domain/core/eventBus/events";
+import { WithNotificationIdAndKind } from "../domain/generic/notifications/entities/Notification";
 
 export type ExpectSavedNotificationsAndEvents = ReturnType<
   typeof makeExpectSavedNotificationsAndEvents

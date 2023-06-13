@@ -8,6 +8,7 @@ import {
 } from "../formEstablishment/FormEstablishment.schema";
 import { withValidateHeadersAuthorization } from "../headers";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
+import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { adminLogin } from "../routes/routes";
 import { adminTokenSchema } from "../tokens/token.schema";
 import {
@@ -50,5 +51,11 @@ export const adminTargets = createTargets({
     validateQueryParams: withAgencyRoleSchema.parse,
     ...withValidateHeadersAuthorization,
     validateResponseBody: z.array(inclusionConnectedUserSchema).parse,
+  }),
+  getLastNotifications: createTarget({
+    method: "GET",
+    url: "/admin/notifications",
+    ...withValidateHeadersAuthorization,
+    validateResponseBody: notificationsByKindSchema.parse,
   }),
 });

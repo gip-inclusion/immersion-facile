@@ -21,6 +21,8 @@ import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
+export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
+
 // prettier-ignore
 export type ConventionRequiresModificationPayload = z.infer<typeof conventionRequiresModificationSchema>
 const conventionRequiresModificationSchema = z.object({
@@ -85,7 +87,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
       await this.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
-          type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+          kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
           recipients: [email],
           params: {
             internshipKind: convention.internshipKind,
@@ -126,7 +128,7 @@ const emailByRoleForConventionNeedsModification = (
     `No actor with role ${role} for convention ${convention.id}`,
   );
   const strategy: Record<Role, string | Error> = {
-    backOffice: "admin@immersion-facile.beta.gouv.fr",
+    backOffice: backOfficeEmail,
     "beneficiary-current-employer":
       convention.signatories.beneficiaryCurrentEmployer?.email ??
       missingEmailError,

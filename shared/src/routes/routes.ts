@@ -32,7 +32,6 @@ export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";
 export const conventionShareRoute = "share-immersion-demand";
 export const conventionsRoute = "demandes-immersion";
-export const emailRoute = "emails";
 export const exportRoute = "export";
 
 export const generateMagicLinkRoute = "generate-magic-link";

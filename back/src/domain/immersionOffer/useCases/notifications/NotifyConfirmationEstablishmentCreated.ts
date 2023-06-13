@@ -22,7 +22,7 @@ export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+        kind: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
         recipients: [formEstablishment.businessContact.email],
         cc: formEstablishment.businessContact.copyEmails,
         params: {

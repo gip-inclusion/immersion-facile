@@ -1,4 +1,5 @@
 import { keys, prop } from "ramda";
+import { DateIsoString } from "shared";
 import {
   EventBus,
   EventCallback,
@@ -10,7 +11,7 @@ import {
   EventPublication,
   SubscriptionId,
 } from "../../../domain/core/eventBus/events";
-import { DateStr, TimeGateway } from "../../../domain/core/ports/TimeGateway";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import {
   counterPublishedEventsError,
@@ -81,7 +82,7 @@ export class InMemoryEventBus implements EventBus {
 
   private async _publish(
     event: DomainEvent,
-    publishedAt: DateStr,
+    publishedAt: DateIsoString,
   ): Promise<DomainEvent> {
     // the publication happens here, an event is expected in return,
     // with the publication added to the event
@@ -155,7 +156,7 @@ const isUndefined = (
 
 const publishEventWithNoCallbacks = (
   event: DomainEvent,
-  publishedAt: DateStr,
+  publishedAt: DateIsoString,
 ): DomainEvent => {
   monitorAbsenceOfCallback(event);
 

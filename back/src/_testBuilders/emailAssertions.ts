@@ -72,7 +72,7 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     } = convention.signatories;
 
     expectToEqual(templatedEmail, {
-      type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
       params: {
         internshipKind: convention.internshipKind,
@@ -104,7 +104,7 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
 ) =>
   expectToEqual(templatedEmails, [
     {
-      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
       params: getValidatedConventionFinalConfirmationParams(
         agency,
@@ -122,7 +122,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   agency: AgencyDto,
 ) => {
   expectToEqual(templatedEmail, {
-    type: "REJECTED_CONVENTION_NOTIFICATION",
+    kind: "REJECTED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
       internshipKind: convention.internshipKind,
@@ -144,7 +144,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated = (
   convention: ConventionDto,
 ) => {
   expectToEqual(templatedEmail, {
-    type: "DEPRECATED_CONVENTION_NOTIFICATION",
+    kind: "DEPRECATED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
       internshipKind: convention.internshipKind,

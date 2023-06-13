@@ -25,7 +25,10 @@ import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/sec
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import {
+  backOfficeEmail,
+  NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification,
+} from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
 const convention = new ConventionDtoBuilder()
   .withBeneficiaryRepresentative({
@@ -112,7 +115,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
       ],
       ["counsellor", agency.counsellorEmails[0]],
       ["validator", agency.validatorEmails[0]],
-      ["backOffice", "admin@immersion-facile.beta.gouv.fr"],
+      ["backOffice", backOfficeEmail],
     ])(
       "Notify %s that application needs modification.",
       async (role, expectedRecipient) => {
@@ -147,7 +150,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         expectSavedNotificationsAndEvents({
           emails: [
             {
-              type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+              kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
               recipients: [expectedRecipient!],
               params: {
                 internshipKind: convention.internshipKind,

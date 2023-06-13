@@ -4,6 +4,7 @@ import {
   AuthenticatedUserId,
   ContactEstablishmentRequestDto,
   ConventionDto,
+  DateIsoString,
   EstablishmentJwtPayload,
   Flavor,
   FormEstablishmentDto,
@@ -17,7 +18,6 @@ import { WithNotificationIdAndKind } from "../../generic/notifications/entities/
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
-import type { DateStr } from "../ports/TimeGateway";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 
@@ -27,13 +27,13 @@ export type EventFailure = {
 };
 
 export type EventPublication = {
-  publishedAt: DateStr;
+  publishedAt: DateIsoString;
   failures: EventFailure[];
 };
 
 type GenericEvent<T extends string, P> = {
   id: string;
-  occurredAt: DateStr;
+  occurredAt: DateIsoString;
   topic: T;
   payload: P;
   publications: EventPublication[];

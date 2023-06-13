@@ -1,6 +1,5 @@
 import Bottleneck from "bottleneck";
 import {
-  type EmailSentDto,
   emailTemplatesByName,
   immersionFacileContactEmail,
   smsTemplatesByName,
@@ -92,7 +91,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   public async sendEmail(email: TemplatedEmail) {
     if (email.recipients.length === 0) {
       logger.error(
-        { emailType: email.type, emailParams: email.params },
+        { emailType: email.kind, emailParams: email.params },
         "No recipient for provided email",
       );
       throw new BadRequestError("No recipient for provided email");
@@ -114,18 +113,18 @@ export class BrevoNotificationGateway implements NotificationGateway {
               footer: cciCustomHtmlFooter,
             }
           : { footer: undefined, header: undefined },
-      )(email.type, email.params, this.generateHtmlOptions),
+      )(email.kind, email.params, this.generateHtmlOptions),
       sender: this.sender,
     };
 
     if (emailData.to.length === 0) return;
 
-    const emailType = email.type;
+    const emailType = email.kind;
     counterSendTransactEmailTotal.inc({ emailType });
     logger.info(
       {
         to: emailData.to,
-        type: email.type,
+        type: email.kind,
         subject: emailData.subject,
         cc: emailData.cc,
         params: email.params,
@@ -137,7 +136,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       .then((_response) => {
         counterSendTransactEmailSuccess.inc({ emailType });
         logger.info(
-          { to: emailData.to, type: email.type },
+          { to: emailData.to, type: email.kind },
           "sendTransactEmailSuccess",
         );
       })
@@ -146,7 +145,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
         logger.error(
           {
             to: emailData.to,
-            type: email.type,
+            type: email.kind,
             errorMessage: error.message,
             errorBody: error?.response?.data,
           },
@@ -154,12 +153,6 @@ export class BrevoNotificationGateway implements NotificationGateway {
         );
         throw error;
       });
-  }
-
-  public getLastSentEmailDtos(): EmailSentDto[] {
-    throw new BadRequestError(
-      "It is not possible de get last sent mails from brevo notification gateway",
-    );
   }
 
   private filterAllowListAndConvertToRecipients(

@@ -103,7 +103,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
         return this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
-            type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+            kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
             recipients: [email],
             params: {
               internshipKind: convention.internshipKind,

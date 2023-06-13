@@ -8,6 +8,7 @@ import {
   frontRoutes,
   reasonableSchedule,
 } from "shared";
+import { EmailNotification } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   expectEmailFinalValidationConfirmationMatchingConvention,
@@ -24,10 +25,7 @@ import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGenerat
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
-import {
-  EmailNotification,
-  makeSaveNotificationAndRelatedEvent,
-} from "../../../generic/notifications/entities/Notification";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 

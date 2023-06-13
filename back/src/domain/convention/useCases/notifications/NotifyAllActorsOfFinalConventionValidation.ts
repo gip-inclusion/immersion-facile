@@ -48,7 +48,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+        kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
         recipients: uniq([
           ...Object.values(convention.signatories).map(
             (signatory) => signatory.email,

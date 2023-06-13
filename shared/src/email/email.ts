@@ -1,26 +1,18 @@
-import { ValueOf } from "../utils";
+import { KeysOfUnion, ValueOf } from "../utils";
 import { emailTemplatesByName } from "./emailTemplatesByName";
 
 export type GenericTemplatedEmail<
-  T extends string,
+  K extends string,
   P extends Record<string, unknown>,
 > = {
-  type: T;
+  kind: K;
   params: P;
   recipients: string[];
   cc?: string[];
 };
 
-export type EmailType = TemplatedEmail["type"];
+export type EmailType = TemplatedEmail["kind"];
 
-export type EmailSentDto = {
-  templatedEmail: TemplatedEmail;
-  sentAt: string;
-  error?: string;
-};
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-// https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
 export type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
 
 export type EmailTemplatesByName = typeof emailTemplatesByName;

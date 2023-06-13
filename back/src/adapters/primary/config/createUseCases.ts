@@ -51,7 +51,6 @@ import { ValidateEmail } from "../../../domain/emailValidation/useCases/Validate
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
-import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
@@ -177,7 +176,6 @@ export const createUseCases = (
         () => sleep(config.nodeEnv !== "test" ? 500 : 0),
         gateways.timeGateway,
       ),
-      getSentEmails: new GetSentEmails(gateways.notification),
       exportData: new ExportData(uowPerformer, gateways.exportGateway),
       addFormEstablishmentBatch: new AddFormEstablishmentBatch(
         addFormEstablishment,
@@ -443,6 +441,10 @@ export const createUseCases = (
           }
           return agencyId;
         }),
+      getLastNotifications: (_: void) =>
+        uowPerformer.perform((uow) =>
+          uow.notificationRepository.getLastNotifications(),
+        ),
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };

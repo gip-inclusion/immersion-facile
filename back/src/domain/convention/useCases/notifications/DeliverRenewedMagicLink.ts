@@ -51,7 +51,7 @@ export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLink
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "MAGIC_LINK_RENEWAL",
+        kind: "MAGIC_LINK_RENEWAL",
         recipients: emails,
         params: { internshipKind, magicLink, conventionStatusLink },
       },

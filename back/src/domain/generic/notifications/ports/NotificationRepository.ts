@@ -1,8 +1,5 @@
-import {
-  Notification,
-  NotificationId,
-  NotificationKind,
-} from "../entities/Notification";
+import { EmailNotification, SmsNotification } from "shared";
+import { Notification, NotificationId, NotificationKind } from "shared";
 
 export interface NotificationRepository {
   save: (notification: Notification) => Promise<void>;
@@ -10,4 +7,8 @@ export interface NotificationRepository {
     id: NotificationId,
     kind: NotificationKind,
   ) => Promise<Notification | undefined>;
+  getLastNotifications: () => Promise<{
+    emails: EmailNotification[];
+    sms: SmsNotification[];
+  }>;
 }

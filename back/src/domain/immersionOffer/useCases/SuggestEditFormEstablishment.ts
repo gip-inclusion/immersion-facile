@@ -44,7 +44,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     try {
       await this.notificationGateway.sendEmail({
-        type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+        kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
         recipients: [contact.email],
         cc: contact.copyEmails,
         params: {

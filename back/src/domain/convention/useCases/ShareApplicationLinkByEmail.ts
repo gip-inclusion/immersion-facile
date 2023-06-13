@@ -19,7 +19,7 @@ export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkB
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "SHARE_DRAFT_CONVENTION_BY_LINK",
+        kind: "SHARE_DRAFT_CONVENTION_BY_LINK",
         recipients: [params.email],
         params: {
           internshipKind: params.internshipKind,

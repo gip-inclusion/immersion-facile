@@ -1,8 +1,6 @@
 import { addMilliseconds } from "date-fns";
-import {
-  DateStr,
-  TimeGateway,
-} from "../../../../domain/core/ports/TimeGateway";
+import { DateIsoString } from "shared";
+import { TimeGateway } from "../../../../domain/core/ports/TimeGateway";
 
 export class CustomTimeGateway implements TimeGateway {
   constructor(private _nextDate = new Date("2021-09-01T10:10:00.000Z")) {}
@@ -11,7 +9,7 @@ export class CustomTimeGateway implements TimeGateway {
     return this._nextDate;
   }
 
-  setNextDateStr(dateStr: DateStr) {
+  setNextDateStr(dateStr: DateIsoString) {
     this.setNextDate(new Date(dateStr));
   }
 

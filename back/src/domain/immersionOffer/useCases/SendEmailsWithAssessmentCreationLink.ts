@@ -77,7 +77,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
     await this.notificationGateway.sendEmail({
-      type: "CREATE_IMMERSION_ASSESSMENT",
+      kind: "CREATE_IMMERSION_ASSESSMENT",
       recipients: [convention.establishmentTutor.email],
       params: {
         internshipKind: convention.internshipKind,

@@ -91,7 +91,7 @@ describe("NotifyContactRequest", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "CONTACT_BY_EMAIL_REQUEST",
+          kind: "CONTACT_BY_EMAIL_REQUEST",
           recipients: [contact.email],
           params: {
             businessName: establishment.name,
@@ -135,7 +135,7 @@ describe("NotifyContactRequest", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+          kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
           recipients: [payload.potentialBeneficiaryEmail],
           params: {
             businessName: establishment.name,
@@ -176,7 +176,7 @@ describe("NotifyContactRequest", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+          kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
           recipients: [payload.potentialBeneficiaryEmail],
           params: {
             businessName: establishment.name,
