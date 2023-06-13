@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { ZodError } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { HttpError } from "./httpErrors";
 
 const logger = createLogger(__filename);
 const _message = "Unhandled Error";
@@ -45,6 +46,9 @@ export const unhandledError = (error: any, req: Request, res: Response) => {
     error instanceof Error
       ? logErrorAndNotifyDiscord("Unknown Error", req, {
           constructorName: error.constructor.name,
+          ...((error as HttpError).httpCode
+            ? { httpCode: (error as HttpError).httpCode }
+            : {}),
           name: error.name,
           message: error.message,
           ...(error.cause ? { cause: error.cause } : {}),
@@ -56,7 +60,7 @@ export const unhandledError = (error: any, req: Request, res: Response) => {
         });
   }
 
-  res.status(500);
+  res.status((error as HttpError).httpCode ?? 500);
   return res.json({ errors: toValidJSONObjectOrString(error) });
 };
 
