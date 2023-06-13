@@ -16,7 +16,6 @@ import { InMemoryAuthenticatedUserRepository } from "../../secondary/InMemoryAut
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
-import { InMemoryExportQueries } from "../../secondary/InMemoryExportQueries";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
@@ -36,7 +35,6 @@ import { PgDiscussionAggregateRepository } from "../../secondary/pg/PgDiscussion
 import { PgErrorRepository } from "../../secondary/pg/PgErrorRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "../../secondary/pg/PgEstablishmentGroupRepository";
-import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
 import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
@@ -77,7 +75,6 @@ export const createInMemoryUow = () => {
       new InMemoryEstablishmentAggregateRepository(),
     establishmentGroupRepository: new InMemoryEstablishmentGroupRepository(),
     errorRepository: new InMemoryErrorRepository(),
-    exportQueries: new InMemoryExportQueries(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
@@ -110,7 +107,6 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     ),
     establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
     errorRepository: new PgErrorRepository(client),
-    exportQueries: new PgExportQueries(client),
     featureFlagRepository: new PgFeatureFlagRepository(client),
     formEstablishmentRepository: new PgFormEstablishmentRepository(client),
     immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),

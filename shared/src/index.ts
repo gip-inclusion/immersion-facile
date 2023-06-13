@@ -31,7 +31,6 @@ export * from "./email/validateEmail.dto";
 export * from "./email/validateEmail.schema";
 export * from "./envHelpers";
 export * from "./errors/managedErrors";
-export * from "./exportable";
 export * from "./featureFlags";
 export * from "./federatedIdentities/federatedIdentity.dto";
 export * from "./formEstablishment/FormEstablishment.dto";

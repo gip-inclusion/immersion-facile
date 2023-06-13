@@ -16,7 +16,6 @@ import { InMemoryInclusionConnectGateway } from "../adapters/secondary/Inclusion
 import type { InMemoryNotificationGateway } from "../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplementedDocumentGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import {
@@ -40,7 +39,6 @@ export type InMemoryGateways = {
   documentGateway: NotImplementedDocumentGateway;
   dashboardGateway: StubDashboardGateway;
   addressApi: InMemoryAddressGateway;
-  exportGateway: InMemoryExportGateway;
   timeGateway: CustomTimeGateway;
   emailValidationGateway: InMemoryEmailValidationGateway;
   shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
