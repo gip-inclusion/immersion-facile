@@ -1,5 +1,5 @@
 import { domElementIds, frontRoutes } from "../../shared";
-import { disableNewUrlLog } from "../utils";
+import { disableUrlLogging } from "../cypress/utils/log";
 const selectedRoutes = [
   "/",
   frontRoutes.search,
@@ -23,7 +23,7 @@ describe("Validate a11y with axe on main pages", () => {
     runCheckA11y();
   });
   it(`Axe should pass on convention form`, () => {
-    disableNewUrlLog();
+    disableUrlLogging();
     cy.visit(frontRoutes.conventionImmersionRoute);
     cy.get(`#${domElementIds.conventionImmersionRoute.showFormButton}`).click();
     runCheckA11y();
