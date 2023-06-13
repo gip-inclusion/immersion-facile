@@ -15,6 +15,7 @@ export default defineConfig({
         // Temp fix, Cypress seems to report elements as disabled when they are not https://github.com/cypress-io/cypress/issues/5827
         force: true,
       },
+      timeForEventCrawler: 10000,
     },
   },
   e2e: {

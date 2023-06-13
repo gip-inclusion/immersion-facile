@@ -18,7 +18,7 @@ Cypress.Commands.add("connectToAdmin", () => {
 });
 
 Cypress.Commands.add("openEmailInAdmin", ({ emailType, elementIndex = 0 }) => {
-  cy.get(".fr-tabs__tab").contains("Emails").click();
+  cy.get(".fr-tabs__tab").contains("Notifications").click();
   const accordionButton = cy
     .get(`.fr-accordion__btn:contains(${emailType})`)
     .eq(elementIndex);
