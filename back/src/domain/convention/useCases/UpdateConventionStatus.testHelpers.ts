@@ -25,13 +25,13 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ConventionRequiresModificationPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import {
   makeCreateNewEvent,
   NarrowEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
+import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
 
 type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
 

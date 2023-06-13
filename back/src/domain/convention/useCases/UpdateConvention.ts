@@ -28,10 +28,10 @@ export class UpdateConvention extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = updateConventionRequestSchema;
+  protected inputSchema = updateConventionRequestSchema;
 
-  public async _execute(
-    { id, convention }: UpdateConventionRequestDto,
+  protected async _execute(
+    { convention }: UpdateConventionRequestDto,
     uow: UnitOfWork,
   ): Promise<WithConventionId> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
@@ -41,10 +41,14 @@ export class UpdateConvention extends TransactionalUseCase<
         `Convention ${convention.id} with modifications should have status ${minimalValidStatus}`,
       );
 
-    const conventionFromRepo = await uow.conventionRepository.getById(id);
+    const conventionFromRepo = await uow.conventionRepository.getById(
+      convention.id,
+    );
 
     if (!conventionFromRepo)
-      throw new NotFoundError(`Convention with id ${id} was not found`);
+      throw new NotFoundError(
+        `Convention with id ${convention.id} was not found`,
+      );
     if (conventionFromRepo.status != "DRAFT") {
       throw new BadRequestError(
         `Convention ${conventionFromRepo.id} cannot be modified as it has status ${conventionFromRepo.status}`,
@@ -56,7 +60,7 @@ export class UpdateConvention extends TransactionalUseCase<
       uow.outboxRepository.save(
         this.createNewEvent({
           topic: "ConventionSubmittedAfterModification",
-          payload: convention,
+          payload: { ...convention },
         }),
       ),
     ]);

@@ -304,15 +304,9 @@ export const withConventionIdSchema: z.Schema<WithConventionId> = z.object({
 });
 
 export const updateConventionRequestSchema: z.Schema<UpdateConventionRequestDto> =
-  z
-    .object({
-      convention: conventionSchema,
-      id: conventionIdSchema,
-    })
-    .refine(
-      ({ convention, id }) => id === convention.id,
-      "The ID in the URL path must match the ID in the request body.",
-    );
+  z.object({
+    convention: conventionSchema,
+  });
 
 const justificationSchema = zTrimmedString;
 export const withStatusJustificationSchema: z.Schema<WithStatusJustification> =

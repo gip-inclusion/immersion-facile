@@ -141,7 +141,8 @@ describe("Broadcasts events to pole-emploi", () => {
     );
 
     const peExternalId = "peExternalId";
-    const immersionConventionId: ConventionId = "immersionConventionId";
+    const immersionConventionId: ConventionId =
+      "00000000-0000-0000-0000-000000000000";
 
     // Act
     const convention = new ConventionDtoBuilder()
@@ -168,7 +169,8 @@ describe("Broadcasts events to pole-emploi", () => {
       },
     );
 
-    const immersionConventionId: ConventionId = "immersionConventionId";
+    const immersionConventionId: ConventionId =
+      "00000000-0000-0000-0000-000000000000";
 
     // Act
     const convention = new ConventionDtoBuilder()

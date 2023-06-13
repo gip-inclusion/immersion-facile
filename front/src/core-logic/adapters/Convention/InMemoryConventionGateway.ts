@@ -6,17 +6,12 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
-  ConventionMagicLinkPayload,
   ConventionReadDto,
   Role,
   ShareLinkByEmailDto,
-  SignatoryRole,
-  signConventionDtoWithRole,
   sleep,
   UpdateConventionStatusRequestDto,
-  WithConventionId,
 } from "shared";
-import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
@@ -29,25 +24,9 @@ const CONVENTION_VALIDATED_TEST = new ConventionDtoBuilder()
   .build();
 
 export class InMemoryConventionGateway implements ConventionGateway {
-  private _conventions: { [id: string]: ConventionDto } = {
-    [CONVENTION_DRAFT_TEST.id]: CONVENTION_DRAFT_TEST,
-    [CONVENTION_VALIDATED_TEST.id]: CONVENTION_VALIDATED_TEST,
-  };
-  private _agencies: { [id: string]: AgencyOption } = {};
-
-  public convention$ = new Subject<ConventionReadDto | undefined>();
-  public conventionSignedResult$ = new Subject<void>();
-  public conventionModificationResult$ = new Subject<void>();
-  public addConventionResult$ = new Subject<void>();
-  public updateConventionResult$ = new Subject<void>();
-  public conventionDashboardUrl$ = new Subject<AbsoluteUrl>();
-
-  public addConventionCallCount = 0;
-  public updateConventionCallCount = 0;
-
   public constructor(private simulatedLatency?: number) {}
 
-  retrieveFromToken$(
+  public retrieveFromToken$(
     payload: FetchConventionRequestedPayload,
   ): Observable<ConventionReadDto | undefined> {
     return this.simulatedLatency
@@ -55,19 +34,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
       : this.convention$;
   }
 
-  // not used anymore, kept for inspiration for a simulated gateway
-  private async add(convention: ConventionDto): Promise<ConventionId> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    this._conventions[convention.id] = convention;
-    return convention.id;
-  }
-
-  public add$(_convention: ConventionDto): Observable<void> {
+  public newConvention$(_convention: ConventionDto): Observable<void> {
     this.addConventionCallCount++;
     return this.addConventionResult$;
   }
 
-  public async getById(id: ConventionId): Promise<ConventionReadDto> {
+  public async retreiveById(id: ConventionId): Promise<ConventionReadDto> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     return this.inferConventionReadDto(this._conventions[id]);
   }
@@ -80,20 +52,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.inferConventionReadDto(this._conventions[conventionId]);
   }
 
-  // not used anymore, kept for inspiration for a simulated gateway
-  private async updateMagicLink(
-    convention: ConventionDto,
-    jwt: string,
-  ): Promise<string> {
-    const payload =
-      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
-
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    this._conventions[payload.applicationId] = convention;
-    return convention.id;
-  }
-
-  public update$(
+  public updateConvention$(
     _conventionDto: ConventionDto,
     _jwt: string,
   ): Observable<void> {
@@ -101,22 +60,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.updateConventionResult$;
   }
 
-  // not used anymore, kept for inspiration for a simulated gateway
-  private async updateStatus(
-    updateStatusParams: UpdateConventionStatusRequestDto,
-    jwt: string,
-  ): Promise<WithConventionId> {
-    const payload =
-      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    this._conventions[payload.applicationId] = {
-      ...this._conventions[payload.applicationId],
-      status: updateStatusParams.status,
-    };
-    return { id: payload.applicationId };
-  }
-
-  public updateStatus$(
+  public updateConventionStatus$(
     _params: UpdateConventionStatusRequestDto,
     _conventionId: ConventionId,
     _jwt: string,
@@ -126,20 +70,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public signConvention$(_jwt: string): Observable<void> {
     return this.conventionSignedResult$;
-  }
-
-  // not used anymore, kept for inspiration for a simulated gateway
-  public async signApplication(jwt: string): Promise<WithConventionId> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    const payload =
-      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
-    const convention = this._conventions[payload.applicationId];
-    this._conventions[payload.applicationId] = signConventionDtoWithRole(
-      convention,
-      payload.role as SignatoryRole,
-      new Date().toISOString(),
-    );
-    return { id: payload.applicationId };
   }
 
   public async generateMagicLink(
@@ -160,7 +90,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
-  public async shareLinkByEmail(
+  public async shareConventionLinkByEmail(
     _shareLinkByEmailDTO: ShareLinkByEmailDto,
   ): Promise<boolean> {
     return true;
@@ -177,4 +107,21 @@ export class InMemoryConventionGateway implements ConventionGateway {
       agencyDepartment: "75",
     };
   }
+
+  // For testing purpose
+  public convention$ = new Subject<ConventionReadDto | undefined>();
+  public conventionSignedResult$ = new Subject<void>();
+  public conventionModificationResult$ = new Subject<void>();
+  public addConventionResult$ = new Subject<void>();
+  public updateConventionResult$ = new Subject<void>();
+  public conventionDashboardUrl$ = new Subject<AbsoluteUrl>();
+
+  public addConventionCallCount = 0;
+  public updateConventionCallCount = 0;
+
+  private _conventions: { [id: string]: ConventionDto } = {
+    [CONVENTION_DRAFT_TEST.id]: CONVENTION_DRAFT_TEST,
+    [CONVENTION_VALIDATED_TEST.id]: CONVENTION_VALIDATED_TEST,
+  };
+  private _agencies: { [id: string]: AgencyOption } = {};
 }

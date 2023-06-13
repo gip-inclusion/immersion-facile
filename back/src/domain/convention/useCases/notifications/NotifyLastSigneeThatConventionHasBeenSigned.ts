@@ -36,9 +36,9 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     super(uowPerformer);
   }
 
-  inputSchema = conventionSchema;
+  protected inputSchema = conventionSchema;
 
-  public async _execute(
+  protected async _execute(
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {

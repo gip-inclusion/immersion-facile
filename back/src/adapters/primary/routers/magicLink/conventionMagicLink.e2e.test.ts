@@ -35,6 +35,7 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
       const updatedConvention = conventionBuilder
         .withBeneficiaryFirstName("Merguez")
         .withStatus("READY_TO_SIGN")
+        .withStatusJustification("justif")
         .build();
 
       const backOfficeJwt = generateConventionJwt({
@@ -45,7 +46,9 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
       });
       const response = await request
         .post(`/auth/${conventionsRoute}/${updatedConvention.id}`)
-        .send(updatedConvention)
+        .send({
+          convention: updatedConvention,
+        })
         .set({
           authorization: backOfficeJwt,
         });
@@ -60,6 +63,7 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
       const updatedConvention = conventionBuilder
         .withBeneficiaryFirstName("Merguez")
         .withStatus("READY_TO_SIGN")
+        .withStatusJustification("Justif")
         .build();
 
       const backOfficeJwt = generateBackOfficeJwt({
@@ -69,7 +73,9 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
       });
       const response = await request
         .post(`/auth/${conventionsRoute}/${updatedConvention.id}`)
-        .send(updatedConvention)
+        .send({
+          convention: updatedConvention,
+        })
         .set({
           authorization: backOfficeJwt,
         });

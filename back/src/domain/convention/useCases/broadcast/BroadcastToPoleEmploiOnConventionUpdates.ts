@@ -1,5 +1,4 @@
-import { z } from "zod";
-import { ConventionDto, ImmersionObjective } from "shared";
+import { ConventionDto, conventionSchema, ImmersionObjective } from "shared";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
@@ -26,8 +25,6 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ConventionDto,
   void
 > {
-  inputSchema: z.Schema<ConventionDto> = z.any(); // No need of a validation schema here since this use-case is only called from the our domain
-
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private poleEmploiGateway: PoleEmploiGateway,
@@ -35,8 +32,10 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ) {
     super(uowPerformer);
   }
-  //
-  public async _execute(
+
+  protected inputSchema = conventionSchema;
+
+  protected async _execute(
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
