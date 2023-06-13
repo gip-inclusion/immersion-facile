@@ -6,8 +6,6 @@ import {
   RawRedirectError,
 } from "shared";
 
-export type RedirectError = ManagedRedirectError | RawRedirectError;
-
 type RawRedirectErrorParams = {
   title: string;
   message: string;

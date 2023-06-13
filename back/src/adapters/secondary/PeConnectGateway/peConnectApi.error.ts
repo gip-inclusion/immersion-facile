@@ -145,12 +145,6 @@ export const makeRawRedirectError = (
 ): RawRedirectError =>
   new RawRedirectError(rawRedirectTitle(error), message, error);
 
-export const isTCPWrapperConnectionRefusedError = (error: unknown): boolean =>
-  (error as unknown as { code: string }).code === "ECONNREFUSED";
-
-export const isTCPWrapperConnectionResetError = (error: unknown): boolean =>
-  (error as unknown as { code: string }).code === "ECONNRESET";
-
 export const isAdvisorForbiddenError = (
   error: AxiosError,
   context: PeConnectTargetsKind,
