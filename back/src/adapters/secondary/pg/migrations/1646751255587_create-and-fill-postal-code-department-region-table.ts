@@ -1,9 +1,9 @@
-import * as fse from "fs-extra";
+import * as fs from "fs";
 import type { MigrationBuilder } from "node-pg-migrate";
 
 export const up = async (pgm: MigrationBuilder) => {
   pgm.sql(
-    fse
+    fs
       .readFileSync(
         `${__dirname}/../staticData/postal_code_department_region.sql`,
       )

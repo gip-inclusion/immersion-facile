@@ -1,6 +1,5 @@
 import { Router } from "express";
 import multer from "multer";
-import * as path from "path";
 import {
   featureFlagsRoute,
   renewMagicLinkRoute,
@@ -31,7 +30,7 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, deps.useCases.getFeatureFlags.execute),
     );
 
-  const upload = multer({ dest: path.join(deps.config.storageRoot, "tmp") });
+  const upload = multer({ storage: multer.memoryStorage() });
 
   technicalRouter
     .route(`/${uploadFileRoute}`)
