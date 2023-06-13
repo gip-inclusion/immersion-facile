@@ -71,13 +71,6 @@ export class AppConfig {
     });
   }
 
-  public get reporting() {
-    return this.throwIfNotInArray({
-      variableName: "REPORTING_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "EXCEL"],
-    });
-  }
-
   public get nodeEnv() {
     return this.throwIfNotInArray({
       variableName: "NODE_ENV",

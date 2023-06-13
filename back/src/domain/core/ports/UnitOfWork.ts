@@ -1,5 +1,4 @@
 import { ApiConsumerRepository } from "../../auth/ports/ApiConsumerRepository";
-import { ExportQueries } from "../../backoffice/ports/ExportQueries";
 import { AgencyRepository } from "../../convention/ports/AgencyRepository";
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
@@ -33,7 +32,6 @@ export type UnitOfWork = {
   errorRepository: ErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   establishmentGroupRepository: EstablishmentGroupRepository;
-  exportQueries: ExportQueries;
   featureFlagRepository: FeatureFlagRepository;
   formEstablishmentRepository: FormEstablishmentRepository;
   immersionAssessmentRepository: ImmersionAssessmentRepository;
