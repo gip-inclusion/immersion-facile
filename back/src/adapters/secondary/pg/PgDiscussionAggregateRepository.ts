@@ -79,7 +79,7 @@ export class PgDiscussionAggregateRepository
         'potentialBeneficiaryFirstName',  potential_beneficiary_first_name,
         'potentialBeneficiaryLastName',  potential_beneficiary_last_name,
         'potentialBeneficiaryEmail',  potential_beneficiary_email,
-        'immersionObject', immersion_objective ,
+        'immersionObjective', immersion_objective ,
         'potentialBeneficiaryPhone', potential_beneficiary_phone ,
         'potentialBeneficiaryResumeLink', potential_beneficiary_resume_link ,
         'createdAt', created_at,
