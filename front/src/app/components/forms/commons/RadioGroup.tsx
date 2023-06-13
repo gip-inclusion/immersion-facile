@@ -1,63 +1,6 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { useField } from "formik";
 import { cleanStringToHTMLAttribute } from "shared";
-
-type BoolRadioProps = {
-  name: string;
-  label: string;
-  disabled?: boolean;
-};
-
-// Like MyRadioGroup, but backs a boolean value.
-export const BoolRadioGroup = ({ name, label, disabled }: BoolRadioProps) => {
-  const [field, meta, { setValue }] = useField<boolean>({ name });
-  const error = meta.touched && meta.error;
-
-  return (
-    <RadioGroup
-      id={name}
-      currentValue={field.value}
-      setCurrentValue={setValue}
-      groupLabel={label}
-      error={error}
-      disabled={disabled}
-      options={[
-        { label: "Oui", value: true },
-        { label: "Non", value: false },
-      ]}
-    />
-  );
-};
-
-type RadioGroupForFieldProps = {
-  name: string;
-  label: string;
-  options: Array<{ value: string | string[]; label?: string }>;
-  disabled?: boolean;
-};
-
-export const RadioGroupForField = ({
-  name,
-  label,
-  options,
-  disabled,
-}: RadioGroupForFieldProps) => {
-  const [field, meta, { setValue }] = useField({ name });
-  const error = meta.touched && meta.error;
-
-  return (
-    <RadioGroup
-      id={name}
-      groupLabel={label}
-      options={options}
-      currentValue={field.value}
-      error={error}
-      setCurrentValue={setValue}
-      disabled={disabled}
-    />
-  );
-};
 
 type ValueAndLabel<T> = {
   value: T;

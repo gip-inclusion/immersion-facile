@@ -8,8 +8,6 @@ import {
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../domain/auth/jwt";
-import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
-import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
 import { ListAgenciesByFilter } from "../../../domain/convention/useCases/agencies/ListAgenciesByFilter";
@@ -49,6 +47,7 @@ import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGatewa
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
+import { SetFeatureFlag } from "../../../domain/generic/featureFlag/SetFeatureFlag";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
@@ -176,7 +175,6 @@ export const createUseCases = (
         () => sleep(config.nodeEnv !== "test" ? 500 : 0),
         gateways.timeGateway,
       ),
-      exportData: new ExportData(uowPerformer, gateways.exportGateway),
       addFormEstablishmentBatch: new AddFormEstablishmentBatch(
         addFormEstablishment,
         uowPerformer,

@@ -43,8 +43,6 @@ import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDoc
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/peConnectApi.targets";
-import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
-import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
@@ -120,10 +118,7 @@ export const createGateways = async (config: AppConfig) => {
     documentGateway: createDocumentGateway(config),
     notification: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
-    exportGateway:
-      config.reporting === "EXCEL"
-        ? new ExcelExportGateway()
-        : new InMemoryExportGateway(),
+
     inclusionConnectGateway: createInclusionConnectGateway(config),
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"

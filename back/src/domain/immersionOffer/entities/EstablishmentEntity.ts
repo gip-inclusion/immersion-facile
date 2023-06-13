@@ -32,10 +32,6 @@ export type EstablishmentEntity = {
   maxContactsPerWeek: number;
 };
 
-export type AnnotatedEstablishmentEntityV2 = EstablishmentEntity & {
-  nafLabel: string;
-};
-
 export type EstablishmentAggregate = {
   establishment: EstablishmentEntity;
   immersionOffers: ImmersionOfferEntityV2[];

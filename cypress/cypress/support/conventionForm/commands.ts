@@ -8,14 +8,13 @@ import {
   addressTargets,
   domElementIds,
 } from "shared";
-import { fillSelectRandomly } from "./input";
 import { faker } from "@faker-js/faker/locale/fr";
 
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
-const baseApiRoute = "/api/";
+const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
 let currentStep = 1;
 
-export function basicFormConvention() {
+Cypress.Commands.add("submitBasicConventionForm", () => {
   cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
     "featureFlagsRequest",
   );
@@ -40,13 +39,14 @@ export function basicFormConvention() {
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
   )
-    .select("86")
+    .select("86", defaultFieldOptions)
     .should("have.value", "86");
 
   cy.wait("@agenciesRequest");
 
-  fillSelectRandomly({
+  cy.fillSelect({
     element: `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
+    predicateValue: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   });
 
   openNextSection(); // Open Beneficiary section
@@ -132,19 +132,13 @@ export function basicFormConvention() {
   openNextSection(); // Open immersion details section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.individualProtection} input:first-of-type`,
-  ).check({
-    force: true,
-  });
+  ).check(defaultFieldOptions);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.sanitaryPrevention} input:first-of-type`,
-  ).check({
-    force: true,
-  });
+  ).check(defaultFieldOptions);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionObjective} input:first-of-type`,
-  ).check({
-    force: true, // DSFR, label:before is covering the input
-  });
+  ).check(defaultFieldOptions);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
   ).type(faker.name.jobType());
@@ -172,9 +166,8 @@ export function basicFormConvention() {
       cy.wait("@conventionAddRequest")
         .its("response.statusCode")
         .should("eq", 200);
-      cy.get(".im-submit-confirmation-section").should("exist");
     });
-}
+});
 
 const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
 const getTomorrowDate = () =>

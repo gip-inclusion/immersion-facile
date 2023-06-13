@@ -95,22 +95,6 @@ export const exchangeCodeForAccessTokenCounter = makeCounters(
   "exchangeCodeForAccessToken",
 );
 
-// LBB
-export const counterSearchImmersionLBBRequestsTotal = new Counter({
-  name: "search_immersion_lbb_requests_total",
-  help: "The total count of LBB request made in the search immersions use case",
-});
-
-export const counterSearchImmersionLBBRequestsError = new Counter({
-  name: "search_immersion_lbb_requests_error",
-  help: "The total count of failed LBB request made in the search immersions use case",
-});
-
-export const counterSearchImmersionLBBRequestsSkipped = new Counter({
-  name: "search_immersion_lbb_requests_skipped",
-  help: "The total count of skipped LBB request made in the search immersions use case",
-});
-
 // IMMERSION SEARCH HISTOGRAM
 export const histogramSearchImmersionStoredCount = new Histogram({
   name: "search_immersion_stored_result_count",

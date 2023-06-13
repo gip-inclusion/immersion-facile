@@ -24,10 +24,6 @@ import { ConventionInUrl } from "src/app/routes/route-params";
 import { deviceRepository } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 
-export const isConventionFrozen = (
-  status: ConventionStatus | undefined,
-): boolean => status !== "DRAFT";
-
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;
 

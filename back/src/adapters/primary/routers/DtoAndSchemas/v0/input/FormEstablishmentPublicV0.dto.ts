@@ -1,12 +1,8 @@
 import {
   defaultMaxContactsPerWeek,
-  Flavor,
   FormEstablishmentDto,
   OmitFromExistingKeys,
 } from "shared";
-
-// prettier-ignore
-export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
 
 export type ProfessionDtoPublicV0 = {
   romeCodeMetier: string; // 5 characters respecting regex : /[A-N]\d{4}/

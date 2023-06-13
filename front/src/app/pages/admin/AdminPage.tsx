@@ -6,7 +6,6 @@ import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
 import { AddEstablishmentByBatchTab } from "src/app/pages/admin/AddEstablishmentByBatchTab";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
-import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
@@ -34,11 +33,6 @@ const adminTabs: Tab[] = [
     label: "Agences",
     tabId: "agency-validation",
     content: <AgencyTab />,
-  },
-  {
-    label: "Export de données",
-    tabId: "exports",
-    content: <DataExportTab />,
   },
   {
     label: "Options techniques",
@@ -83,7 +77,7 @@ export const AdminPage = ({
           <div className={fr.cx("fr-col-12", "fr-p-2w", "fr-mt-4w")}>
             <Tabs
               selectedTabId={currentTab}
-              tabs={adminTabs.filter((tab) => tab.tabId !== "notifications")}
+              tabs={adminTabs}
               onTabChange={(tab) => {
                 if (isAdminTab(tab))
                   routes

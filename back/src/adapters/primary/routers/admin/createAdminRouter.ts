@@ -6,8 +6,6 @@ import {
   AgencyId,
   agencyTargets,
   conventionsRoute,
-  ExportDataDto,
-  exportRoute,
   featureFlagsRoute,
   generateMagicLinkRoute,
   GetDashboardParams,
@@ -19,7 +17,6 @@ import {
 } from "../../createRemoveRouterPrefix";
 import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
-import { sendZipResponse } from "../../helpers/sendZipResponse";
 
 export const createAdminRouter = (
   deps: AppDependencies,
@@ -119,16 +116,6 @@ export const createAdminRouter = (
     .get(async (req, res) =>
       sendHttpResponse(req, res, deps.useCases.getLastNotifications.execute),
     );
-
-  adminRouter.route(`/${exportRoute}`).post(async (req, res) =>
-    sendZipResponse(req, res, async () => {
-      const exportDataParams: ExportDataDto = req.body;
-      const archivePath = await deps.useCases.exportData.execute(
-        exportDataParams,
-      );
-      return archivePath;
-    }),
-  );
 
   // POST admin/feature-flags
   adminRouter

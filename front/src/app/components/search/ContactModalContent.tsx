@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
+import { ContactInPerson } from "./ContactInPerson";
 
 export type ContactModalContentProps = {
   contactMethod?: ContactMethod;
@@ -35,7 +36,7 @@ export const ModalContactContent = ({
       );
     case "IN_PERSON":
       return (
-        <ContactByEmail siret={siret} offer={offer} onSuccess={onSuccess} />
+        <ContactInPerson siret={siret} offer={offer} onSuccess={onSuccess} />
       );
     default:
       return <AdvisesForContact data={searchResultData} />;

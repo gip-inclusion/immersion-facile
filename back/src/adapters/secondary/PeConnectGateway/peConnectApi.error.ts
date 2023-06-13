@@ -1,14 +1,21 @@
 import { AxiosError } from "axios";
-import {
-  ConnectionRefusedError,
-  HTTP_STATUS,
-  ManagedRedirectError,
-  RawRedirectError,
-} from "shared";
+import { HTTP_STATUS, ManagedRedirectError, RawRedirectError } from "shared";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
 import { PeConnectExternalTargets } from "./peConnectApi.targets";
 
 type PeConnectTargetsKind = keyof PeConnectExternalTargets;
+
+class ConnectionRefusedError extends Error {
+  constructor(
+    public override readonly message: string = "Could not connect to server",
+    public override readonly cause?: Error,
+  ) {
+    super();
+    // Error.captureStackTrace(this, this.constructor);
+    this.name = this.constructor.name;
+    this.message = message;
+  }
+}
 
 // ! In a map the highest priority is given to the lasted entry
 export const peConnectErrorStrategy = (
@@ -137,12 +144,6 @@ export const makeRawRedirectError = (
   error: AxiosError<any, any>,
 ): RawRedirectError =>
   new RawRedirectError(rawRedirectTitle(error), message, error);
-
-export const isTCPWrapperConnectionRefusedError = (error: unknown): boolean =>
-  (error as unknown as { code: string }).code === "ECONNREFUSED";
-
-export const isTCPWrapperConnectionResetError = (error: unknown): boolean =>
-  (error as unknown as { code: string }).code === "ECONNRESET";
 
 export const isAdvisorForbiddenError = (
   error: AxiosError,
