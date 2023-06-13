@@ -20,7 +20,6 @@ import { CreateImmersionAssessment } from "../../../domain/convention/useCases/C
 import { GenerateConventionMagicLinkUseCase } from "../../../domain/convention/useCases/GenerateConventionMagicLinkUseCase";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
-import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
@@ -30,6 +29,7 @@ import { NotifyConventionReminder } from "../../../domain/convention/useCases/no
 import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightChanged";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
@@ -316,8 +316,8 @@ export const createUseCases = (
       // METABASE
       ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
       // notifications
-      confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature:
-        new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
+      notifySignatoriesThatConventionSubmittedNeedsSignature:
+        new NotifySignatoriesThatConventionSubmittedNeedsSignature(
           uowPerformer,
           gateways.timeGateway,
           gateways.shortLinkGenerator,

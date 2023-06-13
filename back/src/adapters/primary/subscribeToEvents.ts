@@ -28,18 +28,16 @@ const getUseCasesByTopics = (
   // ImmersionApplication Federated Identities
   FederatedIdentityBoundToConvention: [
     useCases.notifyToAgencyConventionSubmitted,
-    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
+    useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   FederatedIdentityNotBoundToConvention: [
     useCases.notifyToAgencyConventionSubmitted,
-    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
+    useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
-
   ConventionSubmittedAfterModification: [
-    // useCases.notifyToAgencyConventionSubmitted,
-    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
+    useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationPartiallySigned: [
