@@ -99,7 +99,10 @@ describe("HttpPeConnectGateway", () => {
         });
         await expectPromiseToFailWithError(
           peConnectGateway.getAccessToken(""),
-          new ManagedRedirectError("peConnectInvalidGrant", new Error()),
+          new ManagedRedirectError(
+            "peConnectInvalidGrant",
+            new Error("Request failed with status code 400"),
+          ),
         );
       });
       it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
@@ -237,7 +240,10 @@ describe("HttpPeConnectGateway", () => {
             .abortRequest();
           await expectPromiseToFailWithError(
             peConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError("peConnectConnectionAborted", new Error()),
+            new ManagedRedirectError(
+              "peConnectConnectionAborted",
+              new Error("Request aborted"),
+            ),
           );
         });
         it(`Network error -> RawRedirectError`, async () => {
@@ -265,7 +271,7 @@ describe("HttpPeConnectGateway", () => {
             peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectGetUserInfoForbiddenAccess",
-              new Error(),
+              new Error("Request failed with status code 401"),
             ),
           );
         });
@@ -469,7 +475,10 @@ describe("HttpPeConnectGateway", () => {
             .abortRequest();
           await expectPromiseToFailWithError(
             peConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError("peConnectConnectionAborted", new Error()),
+            new ManagedRedirectError(
+              "peConnectConnectionAborted",
+              new Error("Request aborted"),
+            ),
           );
         });
         it(`Network error -> RawRedirectError`, async () => {
@@ -501,7 +510,7 @@ describe("HttpPeConnectGateway", () => {
             peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectGetUserStatusInfoForbiddenAccess",
-              new Error(),
+              new Error("Request failed with status code 401"),
             ),
           );
         });
