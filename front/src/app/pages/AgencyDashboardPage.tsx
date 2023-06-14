@@ -29,37 +29,30 @@ export const AgencyDashboardPage = () => {
     content: JSX.Element;
   };
 
-  const agencyDashboardTabs: (
+  const agencyDashboardTabs = (
     dashboardUrl: AbsoluteUrl,
     conventionErrorUrl?: AbsoluteUrl,
-  ) => AgencyDashboardTab[] = (dashboardUrl, conventionErrorUrl) => {
-    if (conventionErrorUrl)
-      return [
-        {
-          label: "Tableau de bord agence",
-          content: (
-            <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
-          ),
-        },
-        {
-          label: "Conventions en erreur",
-          content: (
-            <MetabaseView
-              title="Tableau de bord agence"
-              url={conventionErrorUrl}
-            />
-          ),
-        },
-      ];
-    return [
-      {
-        label: "Tableau de bord agence",
-        content: (
-          <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
-        ),
-      },
-    ];
-  };
+  ): AgencyDashboardTab[] => [
+    {
+      label: "Tableau de bord agence",
+      content: (
+        <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+      ),
+    },
+    ...(conventionErrorUrl
+      ? [
+          {
+            label: "Conventions en erreur",
+            content: (
+              <MetabaseView
+                title="Tableau de bord agence"
+                url={conventionErrorUrl}
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
 
   useEffect(() => {
     dispatch(inclusionConnectedSlice.actions.currentUserFetchRequested());
@@ -108,13 +101,6 @@ export const AgencyDashboardPage = () => {
         .with(
           {
             currentUser: {
-              agencyRights: [
-                {
-                  agency: {
-                    kind: P.when((agencyKind) => agencyKind === "pole-emploi"),
-                  },
-                },
-              ],
               dashboardUrl: P.select(
                 "dashboardUrl",
                 P.when((dashboardUrl) => dashboardUrl !== undefined),
