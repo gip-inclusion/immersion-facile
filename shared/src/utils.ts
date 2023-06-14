@@ -128,3 +128,9 @@ export const calculateDurationInSecondsFrom = (start: Date): number => {
   const end = new Date();
   return (end.getTime() - start.getTime()) / 1000;
 };
+
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {
+  //
+};
