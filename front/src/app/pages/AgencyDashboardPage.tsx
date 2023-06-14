@@ -3,9 +3,10 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { all } from "ramda";
 import { match, P } from "ts-pattern";
-import { AgencyRight } from "shared";
+import { AbsoluteUrl, AgencyRight } from "shared";
 import { Loader } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
@@ -22,6 +23,43 @@ export const AgencyDashboardPage = () => {
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
 
   const dispatch = useDispatch();
+
+  type AgencyDashboardTab = {
+    label: string;
+    content: JSX.Element;
+  };
+
+  const agencyDashboardTabs: (
+    dashboardUrl: AbsoluteUrl,
+    conventionErrorUrl?: AbsoluteUrl,
+  ) => AgencyDashboardTab[] = (dashboardUrl, conventionErrorUrl) => {
+    if (conventionErrorUrl)
+      return [
+        {
+          label: "Tableau de bord agence",
+          content: (
+            <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+          ),
+        },
+        {
+          label: "Conventions en erreur",
+          content: (
+            <MetabaseView
+              title="Tableau de bord agence"
+              url={conventionErrorUrl}
+            />
+          ),
+        },
+      ];
+    return [
+      {
+        label: "Tableau de bord agence",
+        content: (
+          <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+        ),
+      },
+    ];
+  };
 
   useEffect(() => {
     dispatch(inclusionConnectedSlice.actions.currentUserFetchRequested());
@@ -70,14 +108,46 @@ export const AgencyDashboardPage = () => {
         .with(
           {
             currentUser: {
+              agencyRights: [
+                {
+                  agency: {
+                    kind: P.when((agencyKind) => agencyKind === "pole-emploi"),
+                  },
+                },
+              ],
+              dashboardUrl: P.select(
+                "dashboardUrl",
+                P.when((dashboardUrl) => dashboardUrl !== undefined),
+              ),
+              erroredConventionsDashboardUrl: P.select(
+                "erroredConventionsDashboardUrl",
+                P.when(
+                  (erroredConventionsDashboardUrl) =>
+                    erroredConventionsDashboardUrl !== undefined,
+                ),
+              ),
+            },
+          },
+          ({ dashboardUrl, erroredConventionsDashboardUrl }) =>
+            dashboardUrl &&
+            erroredConventionsDashboardUrl && (
+              <Tabs
+                tabs={agencyDashboardTabs(
+                  dashboardUrl,
+                  erroredConventionsDashboardUrl,
+                )}
+              />
+            ),
+        )
+        .with(
+          {
+            currentUser: {
               dashboardUrl: P.select(
                 P.when((dashboardUrl) => dashboardUrl !== undefined),
               ),
             },
           },
-          (dashboardUrl) => (
-            <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
-          ),
+          (dashboardUrl) => <Tabs tabs={agencyDashboardTabs(dashboardUrl)} />,
         )
         .with(
           {

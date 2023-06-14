@@ -16,6 +16,7 @@ export const dashboardInitialState: DashboardsState = {
     conventions: null,
     agency: null,
     events: null,
+    erroredConventions: null,
   },
   errorMessage: null,
 };

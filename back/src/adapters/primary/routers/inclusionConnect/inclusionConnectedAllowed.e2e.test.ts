@@ -91,6 +91,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
       expect(response.body).toEqual({
         ...inclusionConnectedUser,
         dashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
+        erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency.id}`,
       });
       expect(response.status).toBe(200);
     });

@@ -48,6 +48,11 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
               agencyIdsWithEnoughPrivileges,
               this.timeGateway.now(),
             ),
+            erroredConventionsDashboardUrl:
+              await this.dashboardGateway.getErroredConventionsDashboardUrl(
+                agencyIdsWithEnoughPrivileges,
+                this.timeGateway.now(),
+              ),
           }),
     };
   }

@@ -11,5 +11,9 @@ export interface DashboardGateway {
     now: Date,
   ) => AbsoluteUrl;
   getAgencyUserUrl: (agencyIds: AgencyId[], now: Date) => AbsoluteUrl;
+  getErroredConventionsDashboardUrl: (
+    agencyIds: AgencyId[],
+    now: Date,
+  ) => AbsoluteUrl;
   getConventionStatusUrl: (id: ConventionId, now: Date) => AbsoluteUrl;
 }

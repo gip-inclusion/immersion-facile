@@ -31,6 +31,7 @@ type WithAgencyRights = {
 
 type WithDashboardUrl = {
   dashboardUrl?: AbsoluteUrl;
+  erroredConventionsDashboardUrl?: AbsoluteUrl;
 };
 
 export type InclusionConnectedUser = AuthenticatedUser &
