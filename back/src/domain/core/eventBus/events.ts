@@ -51,6 +51,7 @@ export type DomainEvent =
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
+  | GenericEvent<"ConventionSubmittedAfterModification", ConventionDto>
   | GenericEvent<"ImmersionApplicationPartiallySigned", ConventionDto>
   | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>

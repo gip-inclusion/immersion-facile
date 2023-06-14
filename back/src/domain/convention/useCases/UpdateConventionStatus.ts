@@ -60,50 +60,42 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     { conventionId, role }: UpdateConventionStatusPayload,
   ): Promise<WithConventionId> {
-    const { status } = params;
-    logger.debug({ status, conventionId, role });
+    logger.debug({ status: params.status, conventionId, role });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();
+
+    const statusJustification =
+      params.status === "CANCELLED" ||
+      params.status === "REJECTED" ||
+      params.status === "DRAFT" ||
+      params.status === "DEPRECATED"
+        ? params.statusJustification
+        : undefined;
 
     const conventionBuilder = new ConventionDtoBuilder(
       await makeGetStoredConventionOrThrowIfNotAllowed(
         uow.conventionRepository,
-      )(status, role, conventionId),
+      )(params.status, role, conventionId),
     )
-      .withStatus(status)
+      .withStatus(params.status)
       .withDateValidation(
-        validatedConventionStatuses.includes(status)
+        validatedConventionStatuses.includes(params.status)
           ? conventionUpdatedAt
           : undefined,
       )
-      .withStatusJustification(
-        status === "CANCELLED" ||
-          status === "REJECTED" ||
-          status === "DEPRECATED"
-          ? params.statusJustification
-          : undefined,
-      );
+      .withStatusJustification(statusJustification);
 
-    if (status === "DRAFT") conventionBuilder.notSigned();
+    if (params.status === "DRAFT") conventionBuilder.notSigned();
 
     const updatedDto: ConventionDto = conventionBuilder.build();
 
     const updatedId = await uow.conventionRepository.update(updatedDto);
     if (!updatedId) throw new NotFoundError(updatedId);
 
-    const domainTopic = domainTopicByTargetStatusMap[status];
+    const domainTopic = domainTopicByTargetStatusMap[params.status];
     if (domainTopic)
       await uow.outboxRepository.save({
-        ...this.createEvent(
-          updatedDto,
-          domainTopic,
-          role,
-          params.status === "REJECTED" ||
-            params.status === "DRAFT" ||
-            params.status === "DEPRECATED"
-            ? params.statusJustification
-            : undefined,
-        ),
+        ...this.createEvent(updatedDto, domainTopic, role, statusJustification),
         occurredAt: conventionUpdatedAt,
       });
 

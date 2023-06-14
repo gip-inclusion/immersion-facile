@@ -373,6 +373,18 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     agencyLogoUrl: defaultEmailPreviewUrl,
   },
+  NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
+    agencyLogoUrl: defaultEmailPreviewUrl,
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    conventionId: "CONVENTION_ID",
+    conventionSignShortlink: "http://www.google.fr",
+    internshipKind: "immersion",
+    justification: "REASON",
+    signatoryFirstName: "SIGNATORY_FIRST_NAME",
+    signatoryLastName: "SIGNATORY_LAST_NAME",
+  },
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: "BUSINESS_NAME",
     contactFirstName: "CONTACT_FIRST_NAME",

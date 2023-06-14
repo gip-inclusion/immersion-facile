@@ -1,6 +1,8 @@
 import {
+  AgencyDto,
   ConventionDto,
   ConventionId,
+  ConventionReadDto,
   ConventionStatus,
   Role,
   statusTransitionConfigs,
@@ -10,6 +12,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { UnitOfWork } from "../../core/ports/UnitOfWork";
 import { ConventionRepository } from "../ports/ConventionRepository";
 
 const throwIfStatusTransitionNotPossible = ({
@@ -75,3 +78,27 @@ export const makeGetStoredConventionOrThrowIfNotAllowed =
 
     return convention;
   };
+
+export async function retrieveConventionWithAgency(
+  uow: UnitOfWork,
+  conventionEvent: ConventionDto,
+): Promise<{
+  agency: AgencyDto;
+  convention: ConventionReadDto;
+}> {
+  const convention = await uow.conventionQueries.getConventionById(
+    conventionEvent.id,
+  );
+  if (!convention)
+    throw new NotFoundError(conventionMissingMessage(conventionEvent));
+  const agency = (
+    await uow.agencyRepository.getByIds([convention.agencyId])
+  ).at(0);
+  if (!agency) throw new NotFoundError(agencyMissingMessage(convention));
+  return { agency, convention };
+}
+
+export const conventionMissingMessage = (convention: ConventionDto): string =>
+  `Convention with id '${convention.id}' missing.`;
+export const agencyMissingMessage = (convention: ConventionDto): string =>
+  `Agency with id '${convention.agencyId}' missing.`;
