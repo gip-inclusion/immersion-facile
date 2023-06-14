@@ -82,7 +82,6 @@ describe("GetUserAgencyDashboardUrl", () => {
         ...john,
         agencyRights: [{ agency, role: agencyUserRole }],
         dashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
-        erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency.id}`,
       }); // coming from StubDashboardGateway
     },
   );
@@ -110,7 +109,10 @@ describe("GetUserAgencyDashboardUrl", () => {
 
   it("the dashboard url should not include the agency ids where role is 'toReview'", async () => {
     const agencyBuilder = new AgencyDtoBuilder();
-    const agency1 = agencyBuilder.withId("1111").build();
+    const agency1 = agencyBuilder
+      .withId("1111")
+      .withKind("pole-emploi")
+      .build();
     const agency2 = agencyBuilder.withId("2222").build();
     const agency3 = agencyBuilder.withId("3333").build();
     const agency4 = agencyBuilder.withId("4444").build();
@@ -142,6 +144,30 @@ describe("GetUserAgencyDashboardUrl", () => {
       // dashboardUrl is coming from StubDashboardGateway
       dashboardUrl: `http://stubAgencyDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
       erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
+    });
+  });
+  it("doesn't return errored convention dashboard url when user has no agency of kind PE", async () => {
+    const agencyBuilder = new AgencyDtoBuilder();
+    const agency1 = agencyBuilder.withId("1111").withKind("cci").build();
+
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      {
+        ...john,
+        agencyRights: [{ agency: agency1, role: "counsellor" }],
+      },
+    ]);
+    const url = await getInclusionConnectedUser.execute(
+      undefined,
+      inclusionConnectJwtPayload,
+    );
+
+    expect(url.erroredConventionsDashboardUrl).toBeUndefined();
+
+    expectToEqual(url, {
+      ...john,
+      agencyRights: [{ agency: agency1, role: "counsellor" }],
+      // dashboardUrl is coming from StubDashboardGateway
+      dashboardUrl: `http://stubAgencyDashboard/${agency1.id}`,
     });
   });
 });
