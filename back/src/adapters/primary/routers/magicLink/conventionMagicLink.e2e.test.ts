@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { ConventionDtoBuilder, conventionsRoute } from "shared";
+import { ConventionDtoBuilder, conventionsRoute, expectToEqual } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import {
   GenerateBackOfficeJwt,
@@ -53,8 +53,11 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
           authorization: backOfficeJwt,
         });
 
-      expect(response.body).toEqual({ id: updatedConvention.id });
-      expect(response.status).toBe(200);
+      expectToEqual(response.body, { id: updatedConvention.id });
+      expectToEqual(response.status, 200);
+      expectToEqual(inMemoryUow.conventionRepository.conventions, [
+        updatedConvention,
+      ]);
     });
   });
 
@@ -80,8 +83,11 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
           authorization: backOfficeJwt,
         });
 
-      expect(response.body).toEqual({ id: updatedConvention.id });
-      expect(response.status).toBe(200);
+      expectToEqual(response.body, { id: updatedConvention.id });
+      expectToEqual(response.status, 200);
+      expectToEqual(inMemoryUow.conventionRepository.conventions, [
+        updatedConvention,
+      ]);
     });
   });
 });
