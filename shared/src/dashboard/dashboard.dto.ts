@@ -7,7 +7,11 @@ export type DashboardName =
 
 export type AdminDashboardName = (typeof dashboardNames)[number];
 export const simpleDashboardNames = ["conventions", "events"] as const;
-export const dashboardNames = [...simpleDashboardNames, "agency"] as const;
+export const dashboardNames = [
+  ...simpleDashboardNames,
+  "agency",
+  "erroredConventions",
+] as const;
 
 export type ConventionMagicLinkDashboardName =
   (typeof conventionMagicLinkDashboardNames)[number];
@@ -25,7 +29,9 @@ export type GetDashboardParams =
 
 export type GetAdminDashboardParams =
   | GenericGetDashboardParams<"events" | "conventions">
-  | (GenericGetDashboardParams<"agency"> & { agencyId: AgencyId });
+  | (GenericGetDashboardParams<"agency" | "erroredConventions"> & {
+      agencyId: AgencyId;
+    });
 
 export type GetConventionMagicLinkDashboardParams =
   | GenericGetDashboardParams<"conventionStatus"> & {

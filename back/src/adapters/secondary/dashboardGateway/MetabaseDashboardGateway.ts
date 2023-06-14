@@ -12,6 +12,7 @@ type MetabaseDashboard = {
 const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
   agency: { kind: "dashboard", id: 4 },
   conventions: { kind: "dashboard", id: 5 },
+  erroredConventions: { kind: "dashboard", id: 101 },
   conventionStatus: { kind: "dashboard", id: 45 },
   events: { kind: "question", id: 330 },
 };
@@ -40,6 +41,19 @@ export class MetabaseDashboardGateway implements DashboardGateway {
 
   public getAgencyUserUrl(agencyIds: AgencyId[], now: Date): AbsoluteUrl {
     const dashboard = dashboardByName.agency;
+    const token = this.createToken({
+      dashboard,
+      params: { filtrer_par_structure: agencyIds },
+      now,
+    });
+    return this.makeUrl(token, dashboard);
+  }
+
+  public getErroredConventionsDashboardUrl(
+    agencyIds: AgencyId[],
+    now: Date,
+  ): AbsoluteUrl {
+    const dashboard = dashboardByName.erroredConventions;
     const token = this.createToken({
       dashboard,
       params: { filtrer_par_structure: agencyIds },

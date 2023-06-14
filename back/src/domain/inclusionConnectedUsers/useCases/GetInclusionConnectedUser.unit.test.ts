@@ -82,6 +82,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         ...john,
         agencyRights: [{ agency, role: agencyUserRole }],
         dashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
+        erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency.id}`,
       }); // coming from StubDashboardGateway
     },
   );
@@ -140,6 +141,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       ],
       // dashboardUrl is coming from StubDashboardGateway
       dashboardUrl: `http://stubAgencyDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
+      erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
     });
   });
 });

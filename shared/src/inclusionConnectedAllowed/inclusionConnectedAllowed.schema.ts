@@ -28,4 +28,5 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     lastName: zString,
     agencyRights: z.array(agencyRightSchema),
     dashboardUrl: absoluteUrlSchema.optional(),
+    erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
   });

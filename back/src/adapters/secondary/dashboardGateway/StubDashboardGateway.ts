@@ -15,6 +15,11 @@ export class StubDashboardGateway implements DashboardGateway {
     return `http://stubAgencyDashboard/${agencyIds.join("_")}`;
   }
 
+  getErroredConventionsDashboardUrl(agencyIds: AgencyId[]): AbsoluteUrl {
+    logger.warn("Dashboard gateway not implemented, getAgencyUrl method");
+    return `http://stubErroredConventionDashboard/${agencyIds.join("_")}`;
+  }
+
   getDashboardUrl(dashboardName: AdminDashboardName): AbsoluteUrl {
     logger.warn("Dashboard gateway not implemented, getDashboardUrl method");
     return `http://stubDashboard/${dashboardName}`;
