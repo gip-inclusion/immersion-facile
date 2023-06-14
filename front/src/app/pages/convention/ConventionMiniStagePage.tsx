@@ -2,8 +2,8 @@ import React from "react";
 import { Route } from "type-route";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
-import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { conventionInitialValuesFromUrl } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 
 export type ConventionMiniStagePageRoute = Route<

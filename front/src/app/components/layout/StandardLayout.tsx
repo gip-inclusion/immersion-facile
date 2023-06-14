@@ -4,7 +4,7 @@ import { Route } from "type-route";
 import { MainWrapper } from "react-design-system";
 import { renderContent } from "html-templates/src/components/email";
 import { getStandardContents } from "src/app/contents/standard/textSetup";
-import { StandardPageSlugs } from "src/app/routes/route-params";
+import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { routes } from "src/app/routes/routes";
 import { HeaderFooterLayout } from "./HeaderFooterLayout";
 

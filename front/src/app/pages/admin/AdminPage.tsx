@@ -9,7 +9,7 @@ import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
-import { AdminTab, isAdminTab } from "src/app/routes/route-params";
+import { AdminTab, isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
 
 type Tab = {

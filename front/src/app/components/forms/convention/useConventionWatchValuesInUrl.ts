@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { ConventionInUrl } from "src/app/routes/route-params";
+import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { routes, useRoute } from "src/app/routes/routes";
 
 export const useConventionWatchValuesInUrl = (
-  watchedValues: ConventionInUrl,
+  watchedValues: ConventionParamsInUrl,
 ) => {
   const {
     schedule,

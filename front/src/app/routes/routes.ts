@@ -1,11 +1,9 @@
 import { createRouter, defineRoute, param } from "type-route";
 import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
-import {
-  adminTabSerializer,
-  conventionValuesFromUrl,
-  groupsSerializer,
-  standardPagesSerializer,
-} from "./route-params";
+import { adminTabSerializer } from "./routeParams/adminTabs";
+import { conventionValuesFromUrl } from "./routeParams/convention";
+import { groupsSerializer } from "./routeParams/establishmentGroups";
+import { standardPagesSerializer } from "./routeParams/standardPage";
 
 const createInclusionConnectedParams = <
   T extends Record<keyof AuthenticatedUserQueryParams, unknown>,

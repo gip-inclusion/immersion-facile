@@ -1,4 +1,4 @@
-import { ConventionInUrl } from "src/app/routes/route-params";
+import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
 type GenericPair<K extends string, Payload> = {
@@ -7,7 +7,7 @@ type GenericPair<K extends string, Payload> = {
 };
 
 type StoredPair =
-  | GenericPair<"partialConventionInUrl", Partial<ConventionInUrl>>
+  | GenericPair<"partialConventionInUrl", Partial<ConventionParamsInUrl>>
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>;
 

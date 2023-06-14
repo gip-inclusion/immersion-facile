@@ -13,7 +13,7 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { AuthorizedGroupSlugs } from "src/app/routes/route-params";
+import { AuthorizedGroupSlugs } from "src/app/routes/routeParams/establishmentGroups";
 import { routes } from "src/app/routes/routes";
 import { immersionSearchGateway } from "src/config/dependencies";
 import { GroupListResults } from "./GroupListResults";

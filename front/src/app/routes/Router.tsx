@@ -26,14 +26,15 @@ import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormP
 import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
+import { AdminTab, adminTabs } from "./routeParams/adminTabs";
 import {
-  AdminTab,
-  adminTabs,
   AuthorizedGroupSlugs,
   authorizedGroupSlugs,
+} from "./routeParams/establishmentGroups";
+import {
   StandardPageSlugs,
   standardPageSlugs,
-} from "./route-params";
+} from "./routeParams/standardPage";
 import { routes, useRoute } from "./routes";
 
 type Routes = typeof routes;

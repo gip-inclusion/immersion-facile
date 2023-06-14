@@ -1,8 +1,6 @@
-import {
-  AdminTab,
-  AuthorizedGroupSlugs,
-  StandardPageSlugs,
-} from "src/app/routes/route-params";
+import { AdminTab } from "src/app/routes/routeParams/adminTabs";
+import { AuthorizedGroupSlugs } from "src/app/routes/routeParams/establishmentGroups";
+import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { routes } from "src/app/routes/routes";
 
 export type MetaContentType = {
