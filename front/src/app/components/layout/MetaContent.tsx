@@ -9,10 +9,8 @@ import {
   MetaContentType,
   standardMetaContent,
 } from "src/app/contents/meta/metaContents";
-import {
-  AuthorizedGroupSlugs,
-  StandardPageSlugs,
-} from "src/app/routes/route-params";
+import { AuthorizedGroupSlugs } from "src/app/routes/routeParams/establishmentGroups";
+import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { routes, useRoute } from "src/app/routes/routes";
 
 export const MetaContent = (): JSX.Element => {

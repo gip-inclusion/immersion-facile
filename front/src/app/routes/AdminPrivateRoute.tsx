@@ -12,7 +12,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
-import { AdminTab } from "./route-params";
+import { AdminTab } from "./routeParams/adminTabs";
 import { routes } from "./routes";
 
 export const AdminPrivateRoute = ({

@@ -9,7 +9,6 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
 import { ConventionReadDto, domElementIds, toDotNotation } from "shared";
 import { ErrorNotifications } from "react-design-system";
-import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import {
   formConventionFieldsLabels,
@@ -22,6 +21,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { makeValuesToWatchInUrl } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
