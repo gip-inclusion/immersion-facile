@@ -39,7 +39,7 @@ jobs:
   run-cypress-on-dev:
     name: Run Cypress on dev
     needs: deploy-dev
-    uses: ./.github/workflows/run-and-record-cypress.yml
+    uses: ./.github/workflows/cypress-run.yml
     with:
       environment: dev
       tag: "v${{ github.run_number }}"
