@@ -22,7 +22,7 @@ jobs:
       - name: Send Discord notification
         run: |
           curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "Les tests Cypress sont lancés, le report est dispo sur : https://cloud.cypress.io/projects/vctxdm/runs",
+            "content": "Les tests Cypress sont lancés, le report est dispo sur : https://cloud.cypress.io/projects/vctxdm/runs"
           }' ${{ secrets.DISCORD_WEBHOOK_URL }}
       - name: Checkout
         uses: actions/checkout@v3
