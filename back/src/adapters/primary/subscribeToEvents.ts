@@ -37,7 +37,7 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ConventionSubmittedAfterModification: [
-    useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,
+    useCases.notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationPartiallySigned: [

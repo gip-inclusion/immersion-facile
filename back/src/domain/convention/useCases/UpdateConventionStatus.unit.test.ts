@@ -28,7 +28,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
       updatedFields: {
-        statusJustification: undefined,
+        statusJustification: "test justification",
         establishmentRepresentativeSignedAt: undefined,
         beneficiarySignedAt: undefined,
       },

@@ -60,7 +60,7 @@ export class UpdateConvention extends TransactionalUseCase<
       uow.outboxRepository.save(
         this.createNewEvent({
           topic: "ConventionSubmittedAfterModification",
-          payload: { ...convention },
+          payload: convention,
         }),
       ),
     ]);

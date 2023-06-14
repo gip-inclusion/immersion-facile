@@ -1,5 +1,6 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import {
+  ConventionId,
   ImmersionObjective,
   InternshipKind,
 } from "../convention/convention.dto";
@@ -187,6 +188,18 @@ export type EmailParamsByEmailType = {
     conventionStatusLink: string;
     businessName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
+  };
+  NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
+    agencyLogoUrl: AbsoluteUrl | undefined;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    conventionId: ConventionId;
+    conventionSignShortlink: AbsoluteUrl;
+    internshipKind: InternshipKind;
+    justification: string;
+    signatoryFirstName: string;
+    signatoryLastName: string;
   };
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: string;

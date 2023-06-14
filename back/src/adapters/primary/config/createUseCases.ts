@@ -30,6 +30,7 @@ import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCa
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
+import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
@@ -324,6 +325,15 @@ export const createUseCases = (
           generateConventionMagicLinkUrl,
           config,
           saveNotificationAndRelatedEvent,
+        ),
+      notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification:
+        new NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification(
+          uowPerformer,
+          gateways.timeGateway,
+          gateways.shortLinkGenerator,
+          config,
+          saveNotificationAndRelatedEvent,
+          generateConventionMagicLinkUrl,
         ),
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(

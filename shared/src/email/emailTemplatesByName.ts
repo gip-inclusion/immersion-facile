@@ -788,6 +788,49 @@ export const emailTemplatesByName =
         agencyLogoUrl,
       }),
     },
+    NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
+      niceName:
+        "Demande de signature pour confirmation de convention après modification",
+      tags: ["demande signature demande de convention après modification"],
+      createEmailVariables: ({
+        agencyLogoUrl,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        conventionSignShortlink,
+        internshipKind,
+        justification: reason,
+        signatoryFirstName,
+        signatoryLastName,
+      }) => ({
+        subject:
+          internshipKind === "immersion"
+            ? "Pour action : demande de convention modifiée, signez la nouvelle version"
+            : "Pour action : demande de mini stage modifiée, signez la nouvelle version",
+        greetings: `
+        <strong>Identifiant de la convention : ${conventionId}</strong>
+        
+        Bonjour ${signatoryFirstName} ${signatoryLastName},`,
+        content: `La demande de convention pour ${
+          internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+        }
+        de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de ${businessName} vient d'être modifiée 
+        pour la raison suivante : "${reason}". Votre signature sur la première demande de convention a donc été annulée.
+        
+        Action attendue : cliquez sur le bouton ci-dessous, puis vérifiez dans l’écran qui s’ouvre si ce qui a été modifié vous convient :
+        - Si c'est la cas, confirmez votre accord en signant de nouveau cette demande (bouton “Valider la demande”).
+        - Si la modification ne vous convient pas, vous pouvez relancer des modifications (bouton “Annuler les signatures et recevoir un lien de modification”).`,
+        buttons: [
+          {
+            url: conventionSignShortlink,
+            label: "Relire et signer la demande de convention",
+          },
+        ],
+        subContent: defaultSignature(internshipKind),
+        agencyLogoUrl,
+      }),
+    },
     CONTACT_BY_EMAIL_REQUEST: {
       niceName: "Mise en relation par mail",
       tags: ["mise en relation mail"],
