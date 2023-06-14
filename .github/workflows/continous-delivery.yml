@@ -36,6 +36,17 @@ jobs:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
+  run-cypress-on-dev:
+    name: Run Cypress on dev
+    needs: deploy-dev
+    uses: ./.github/workflows/cypress-run.yml
+    with:
+      environment: dev
+      tag: "v${{ github.run_number }}"
+    secrets:
+      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
   deploy-staging:
     name: Deploy staging
     needs: deploy-dev
