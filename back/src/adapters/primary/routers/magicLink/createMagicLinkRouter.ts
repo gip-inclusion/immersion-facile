@@ -46,10 +46,9 @@ export const createMagicLinkRouter = (
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (req.payloads?.backOffice || req.payloads?.convention) {
-          return deps.useCases.updateConvention.execute(req.body);
-        }
-        throw new UnauthorizedError();
+        if (!(req.payloads?.backOffice || req.payloads?.convention))
+          throw new UnauthorizedError();
+        return deps.useCases.updateConvention.execute(req.body);
       }),
     );
 
