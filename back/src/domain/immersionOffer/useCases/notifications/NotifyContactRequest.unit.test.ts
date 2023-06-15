@@ -110,6 +110,7 @@ describe("NotifyContactRequest", () => {
             potentialBeneficiaryResumeLink:
               validEmailPayload.potentialBeneficiaryResumeLink,
             message: validEmailPayload.message,
+            businessAddress: addressDtoToString(establishment.address),
           },
           cc: contact.copyEmails,
         },

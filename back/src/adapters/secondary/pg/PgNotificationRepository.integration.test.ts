@@ -36,7 +36,11 @@ const emailNotifications: EmailNotification[] = [
       kind: "EDIT_FORM_ESTABLISHMENT_LINK",
       recipients: ["lulu@mail.com"],
       cc: ["bob@mail.com"],
-      params: { editFrontUrl: "http://edit-link.com" },
+      params: {
+        editFrontUrl: "http://edit-link.com",
+        businessAddress: "24 rue des boucher 67000 strasbourg",
+        businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+      },
     },
   },
   {

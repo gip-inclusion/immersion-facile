@@ -1,5 +1,6 @@
 import subDays from "date-fns/subDays";
 import {
+  addressDtoToString,
   createEstablishmentMagicLinkPayload,
   Email,
   SiretDto,
@@ -26,11 +27,14 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
-    const contact = (
+    const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
-      )
-    )?.contact;
+      );
+
+    if (!establishmentAggregate) throw Error("Etablissement introuvable.");
+
+    const { contact, establishment } = establishmentAggregate;
 
     if (!contact) throw Error("Email du contact introuvable.");
 
@@ -56,7 +60,11 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
         kind: "EDIT_FORM_ESTABLISHMENT_LINK",
         recipients: [contact.email],
         cc: contact.copyEmails,
-        params: { editFrontUrl },
+        params: {
+          editFrontUrl,
+          businessName: establishment.customizedName ?? establishment.name,
+          businessAddress: addressDtoToString(establishment.address),
+        },
       },
       followedIds: {
         establishmentSiret: siret,

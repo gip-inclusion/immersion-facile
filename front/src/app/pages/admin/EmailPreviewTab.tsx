@@ -404,6 +404,7 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
     potentialBeneficiaryPhone: "POTENTIAL_BENEFICIARY_PHONE",
     potentialBeneficiaryResumeLink: "POTENTIAL_BENEFICIARY_CV_OR_LINKEDIN",
+    businessAddress: "BUSINESS_ADDRESS",
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: "BUSINESS_NAME",
@@ -432,14 +433,19 @@ export const defaultEmailValueByEmailKind: {
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     editFrontUrl: "EDIT_FRONT_URL",
+    businessAddress: "BUSINESS_ADDRESS",
+    businessName: "BUSINESS_NAME",
   },
   EDIT_FORM_ESTABLISHMENT_LINK: {
     editFrontUrl: "EDIT_FRONT_URL",
+    businessAddress: "BUSINESS_ADDRESS",
+    businessName: "BUSINESS_NAME",
   },
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
     contactFirstName: "CONTACT_FIRST_NAME",
     contactLastName: "CONTACT_LAST_NAME",
     businessName: "BUSINESS_NAME",
+    businessAddress: "BUSINESS_ADDRESS",
   },
   CREATE_IMMERSION_ASSESSMENT: {
     agencyLogoUrl: defaultEmailPreviewUrl,

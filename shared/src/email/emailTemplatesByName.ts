@@ -872,13 +872,14 @@ export const emailTemplatesByName =
         potentialBeneficiaryEmail,
         potentialBeneficiaryFirstName,
         potentialBeneficiaryLastName,
+        businessAddress,
         potentialBeneficiaryPhone,
         potentialBeneficiaryResumeLink,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
         content: `
-        Un candidat souhaite faire une immersion pour ${immersionObject} sur le métier de ${appellationLabel} dans votre entreprise ${businessName}.
+        Un candidat souhaite faire une immersion pour ${immersionObject} sur le métier de ${appellationLabel} dans votre entreprise ${businessName} (${businessAddress}).
 
         Voici son message:
 
@@ -993,11 +994,15 @@ export const emailTemplatesByName =
     SUGGEST_EDIT_FORM_ESTABLISHMENT: {
       niceName: "Suggestion de mise à jour d'établissement",
       tags: ["mise à jour fiche entreprise"],
-      createEmailVariables: ({ editFrontUrl }) => ({
+      createEmailVariables: ({
+        editFrontUrl,
+        businessName,
+        businessAddress,
+      }) => ({
         subject:
           "Mettez à jour votre fiche entreprise sur le site Immersion Facilitée",
         greetings: "Bonjour,",
-        content: `Votre entreprise est inscrite dans l'annuaire des entreprises accueillantes d'Immersion Facilitée depuis au moins 6 mois. Merci !
+        content: `Votre entreprise: ${businessName} (${businessAddress}) est inscrite dans l'annuaire des entreprises accueillantes d'Immersion Facilitée depuis au moins 6 mois. Merci !
 
       Vous pouvez mettre à jour, si vous le souhaitez, les informations saisies au moment du référencement.
       
@@ -1029,12 +1034,16 @@ export const emailTemplatesByName =
     EDIT_FORM_ESTABLISHMENT_LINK: {
       niceName: "Lien d'édition du formulaire d'établissement",
       tags: ["modification établissement"],
-      createEmailVariables: ({ editFrontUrl }) => ({
+      createEmailVariables: ({
+        editFrontUrl,
+        businessName,
+        businessAddress,
+      }) => ({
         subject:
           "Immersion Facilitée - Modification de la fiche de votre entreprise",
         greetings: "Bonjour,",
         content: `
-      Vous avez demandé à modifier les informations concernant votre entreprise. 
+      Vous avez demandé à modifier les informations concernant votre entreprise: ${businessName} (${businessAddress}). 
 
       Vous pouvez ajouter ou supprimer des métiers, modifier l'adresse de l'entreprise,  les coordonnées du référent “Immersion” dans votre entreprise ou le mode de contact souhaité, etc.  
       `,
@@ -1050,6 +1059,7 @@ export const emailTemplatesByName =
       tags: ["confirmation enregistrement entreprise"],
       createEmailVariables: ({
         businessName,
+        businessAddress,
         contactFirstName,
         contactLastName,
       }) => ({
@@ -1058,7 +1068,7 @@ export const emailTemplatesByName =
         content: `
       <strong>Félicitations !</strong>
 
-      Vous venez d'enregistrer votre établissement ${businessName} pour accueillir des immersions professionnelles.      
+      Vous venez d'enregistrer votre établissement ${businessName} (${businessAddress}) pour accueillir des immersions professionnelles.      
 
       ${contactFirstName} ${contactLastName} recevra bien les demandes d'immersion.      
 
