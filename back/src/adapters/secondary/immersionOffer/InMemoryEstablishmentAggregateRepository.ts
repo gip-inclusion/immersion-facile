@@ -38,6 +38,11 @@ export class InMemoryEstablishmentAggregateRepository
     private _establishmentAggregates: EstablishmentAggregate[] = [],
   ) {}
 
+  getSiretOfEstablishmentsToSuggestUpdate(): Promise<SiretDto[]> {
+    throw new Error(
+      "Method not implemented : getSiretOfEstablishmentsToSuggestUpdate, you can use PG implementation instead",
+    );
+  }
   async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(): Promise<number> {
     // not implemented because this method is used only in a script,
     // and the use case consists only in a PG query

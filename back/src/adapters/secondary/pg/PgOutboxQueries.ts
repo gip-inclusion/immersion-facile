@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import { groupBy, map, prop, values } from "ramda";
-import { EstablishmentJwtPayload, pipeWithValue } from "shared";
+import { pipeWithValue } from "shared";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
 import { storedEventRowsToDomainEvent } from "./PgOutboxRepository";
@@ -74,18 +74,6 @@ export class PgOutboxQueries implements OutboxQueries {
     `);
 
     return convertRowsToDomainEvents(rows);
-  }
-
-  async getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
-    siret: string,
-  ): Promise<EstablishmentJwtPayload | undefined> {
-    const pgResult = await this.client.query(
-      `SELECT payload FROM outbox 
-       WHERE topic='FormEstablishmentEditLinkSent' AND payload ->> 'siret' = $1
-       ORDER BY occurred_at DESC LIMIT 1`,
-      [siret],
-    );
-    return pgResult.rows[0]?.payload;
   }
 }
 

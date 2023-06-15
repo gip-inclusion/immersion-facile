@@ -14,3 +14,4 @@ cypress/cypress/videos
 cypress/cypress/screenshots
 .turbo
 storage
+logs
