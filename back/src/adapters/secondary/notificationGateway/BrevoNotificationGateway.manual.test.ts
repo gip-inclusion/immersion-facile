@@ -23,6 +23,7 @@ describe("BrevoNotificationGateway manual", () => {
       kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: ["recette@immersion-facile.beta.gouv.fr"],
       params: {
+        conventionId: "CONVENTION_ID",
         internshipKind: "immersion",
         magicLink: "www.google.com",
         conventionStatusLink: "www.google.com",

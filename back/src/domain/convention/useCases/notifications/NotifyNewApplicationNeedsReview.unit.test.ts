@@ -95,29 +95,28 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           email: counsellorEmails[0],
           now: timeGateway.now(),
           role: "counsellor",
-          targetRoute: frontRoutes.manageConvention,
+          targetRoute: frontRoutes.conventionStatusDashboard,
         }),
         [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
           email: counsellorEmails[1],
           now: timeGateway.now(),
           role: "counsellor",
-          targetRoute: frontRoutes.manageConvention,
+          targetRoute: frontRoutes.conventionStatusDashboard,
         }),
         [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
           email: counsellorEmails[0],
           now: timeGateway.now(),
           role: "counsellor",
-          targetRoute: frontRoutes.conventionStatusDashboard,
+          targetRoute: frontRoutes.manageConvention,
         }),
-
         [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
           email: counsellorEmails[1],
           now: timeGateway.now(),
           role: "counsellor",
-          targetRoute: frontRoutes.conventionStatusDashboard,
+          targetRoute: frontRoutes.manageConvention,
         }),
       });
       expectSavedNotificationsAndEvents({
@@ -126,14 +125,15 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [counsellorEmails[0]],
             params: {
+              conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
               beneficiaryFirstName:
                 conventionInReview.signatories.beneficiary.firstName,
               beneficiaryLastName:
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+              magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl: agency.logoUrl,
             },
@@ -142,14 +142,15 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [counsellorEmails[1]],
             params: {
+              conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
               beneficiaryFirstName:
                 conventionInReview.signatories.beneficiary.firstName,
               beneficiaryLastName:
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+              magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl: agency.logoUrl,
             },
@@ -183,29 +184,28 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           email: validatorEmails[0],
           now: timeGateway.now(),
           role: "validator",
-          targetRoute: frontRoutes.manageConvention,
+          targetRoute: frontRoutes.conventionStatusDashboard,
         }),
         [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
           email: validatorEmails[1],
           now: timeGateway.now(),
           role: "validator",
-          targetRoute: frontRoutes.manageConvention,
+          targetRoute: frontRoutes.conventionStatusDashboard,
         }),
         [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
           email: validatorEmails[0],
           now: timeGateway.now(),
           role: "validator",
-          targetRoute: frontRoutes.conventionStatusDashboard,
+          targetRoute: frontRoutes.manageConvention,
         }),
-
         [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
           email: validatorEmails[1],
           now: timeGateway.now(),
           role: "validator",
-          targetRoute: frontRoutes.conventionStatusDashboard,
+          targetRoute: frontRoutes.manageConvention,
         }),
       });
 
@@ -215,14 +215,15 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [validatorEmails[0]],
             params: {
+              conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
               beneficiaryFirstName:
                 conventionInReview.signatories.beneficiary.firstName,
               beneficiaryLastName:
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+              magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agency.logoUrl,
             },
@@ -231,14 +232,15 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [validatorEmails[1]],
             params: {
+              conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
               beneficiaryFirstName:
                 conventionInReview.signatories.beneficiary.firstName,
               beneficiaryLastName:
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+              magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agency.logoUrl,
             },
@@ -284,21 +286,21 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             email: validatorEmails[0],
             now: timeGateway.now(),
             role: "validator",
-            targetRoute: frontRoutes.manageConvention,
+            targetRoute: frontRoutes.conventionStatusDashboard,
           }),
           [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
             id: acceptedByCounsellorConvention.id,
             email: validatorEmails[1],
             now: timeGateway.now(),
             role: "validator",
-            targetRoute: frontRoutes.manageConvention,
+            targetRoute: frontRoutes.conventionStatusDashboard,
           }),
           [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
             id: acceptedByCounsellorConvention.id,
             email: validatorEmails[0],
             now: timeGateway.now(),
             role: "validator",
-            targetRoute: frontRoutes.conventionStatusDashboard,
+            targetRoute: frontRoutes.manageConvention,
           }),
 
           [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
@@ -306,7 +308,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             email: validatorEmails[1],
             now: timeGateway.now(),
             role: "validator",
-            targetRoute: frontRoutes.conventionStatusDashboard,
+            targetRoute: frontRoutes.manageConvention,
           }),
         });
 
@@ -316,6 +318,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
               recipients: [validatorEmails[0]],
               params: {
+                conventionId: acceptedByCounsellorConvention.id,
                 internshipKind: acceptedByCounsellorConvention.internshipKind,
                 beneficiaryFirstName:
                   acceptedByCounsellorConvention.signatories.beneficiary
@@ -324,8 +327,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
                   acceptedByCounsellorConvention.signatories.beneficiary
                     .lastName,
                 businessName: acceptedByCounsellorConvention.businessName,
-                magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+                magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
+                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
                 possibleRoleAction: "en considérer la validation",
                 agencyLogoUrl: agency.logoUrl,
               },
@@ -334,6 +337,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
               recipients: [validatorEmails[1]],
               params: {
+                conventionId: acceptedByCounsellorConvention.id,
                 internshipKind: acceptedByCounsellorConvention.internshipKind,
                 beneficiaryFirstName:
                   acceptedByCounsellorConvention.signatories.beneficiary
@@ -342,8 +346,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
                   acceptedByCounsellorConvention.signatories.beneficiary
                     .lastName,
                 businessName: acceptedByCounsellorConvention.businessName,
-                magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+                magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
+                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
                 possibleRoleAction: "en considérer la validation",
                 agencyLogoUrl: agency.logoUrl,
               },
@@ -387,14 +391,14 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             email: adminEmail,
             now: timeGateway.now(),
             role: "backOffice",
-            targetRoute: frontRoutes.manageConvention,
+            targetRoute: frontRoutes.conventionStatusDashboard,
           }),
           [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
             id: acceptedByValidatorConvention.id,
             email: adminEmail,
             now: timeGateway.now(),
             role: "backOffice",
-            targetRoute: frontRoutes.conventionStatusDashboard,
+            targetRoute: frontRoutes.manageConvention,
           }),
         });
 
@@ -404,6 +408,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
               recipients: [adminEmail],
               params: {
+                conventionId: acceptedByValidatorConvention.id,
                 internshipKind: acceptedByValidatorConvention.internshipKind,
                 beneficiaryFirstName:
                   acceptedByValidatorConvention.signatories.beneficiary
@@ -412,8 +417,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
                   acceptedByValidatorConvention.signatories.beneficiary
                     .lastName,
                 businessName: acceptedByValidatorConvention.businessName,
-                magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+                magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
                 possibleRoleAction: "en considérer la validation",
                 agencyLogoUrl: agency.logoUrl,
               },

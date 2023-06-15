@@ -88,16 +88,17 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
           immersionApplicationEndingTomorrow.establishmentTutor.email,
         ],
         params: {
-          internshipKind: immersionApplicationEndingTomorrow.internshipKind,
-          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/immersion-ending-tommorow-id/establishment/2021-05-15T08:00:00.000Z/establishment@example.com`,
-          establishmentTutorName: "Tom Cruise",
+          agencyLogoUrl: expectedAgency.logoUrl,
+          agencyValidatorEmail: expectedAgency.validatorEmails[0],
           beneficiaryFirstName:
             immersionApplicationEndingTomorrow.signatories.beneficiary
               .firstName,
           beneficiaryLastName:
             immersionApplicationEndingTomorrow.signatories.beneficiary.lastName,
-          agencyLogoUrl: expectedAgency.logoUrl,
-          agencyValidatorEmail: expectedAgency.validatorEmails[0],
+          conventionId: immersionApplicationEndingTomorrow.id,
+          establishmentTutorName: "Tom Cruise",
+          internshipKind: immersionApplicationEndingTomorrow.internshipKind,
+          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/immersion-ending-tommorow-id/establishment/2021-05-15T08:00:00.000Z/establishment@example.com`,
         },
       },
     ]);

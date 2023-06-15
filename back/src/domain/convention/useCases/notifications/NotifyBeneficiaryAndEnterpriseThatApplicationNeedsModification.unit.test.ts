@@ -153,13 +153,13 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
               kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
               recipients: [expectedRecipient!],
               params: {
+                conventionId: convention.id,
                 internshipKind: convention.internshipKind,
                 beneficiaryFirstName:
                   convention.signatories.beneficiary.firstName,
                 beneficiaryLastName:
                   convention.signatories.beneficiary.lastName,
                 businessName: convention.businessName,
-                immersionAppellation: convention.immersionAppellation,
                 justification,
                 magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
                 conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),

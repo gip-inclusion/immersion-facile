@@ -101,19 +101,17 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
     });
 
     return {
+      conventionId: convention.id,
       internshipKind: convention.internshipKind,
-
       beneficiaryFirstName: beneficiary.firstName,
       beneficiaryLastName: beneficiary.lastName,
       beneficiaryBirthdate: beneficiary.birthdate,
-
       dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
       dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
       establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
       businessName: convention.businessName,
       immersionAppellationLabel:
         convention.immersionAppellation.appellationLabel,
-
       emergencyContactInfos: displayEmergencyContactInfos({
         beneficiaryRepresentative,
         beneficiary,

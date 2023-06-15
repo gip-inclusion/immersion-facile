@@ -80,7 +80,12 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
       kind: "CREATE_IMMERSION_ASSESSMENT",
       recipients: [convention.establishmentTutor.email],
       params: {
-        internshipKind: convention.internshipKind,
+        agencyLogoUrl: agency.logoUrl,
+        agencyValidatorEmail: agency.validatorEmails[0],
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        conventionId: convention.id,
+        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
         immersionAssessmentCreationLink: this.generateConventionMagicLinkUrl({
           id: convention.id,
           email: convention.establishmentTutor.email,
@@ -88,14 +93,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
           targetRoute: frontRoutes.immersionAssessment,
           now: this.timeGateway.now(),
         }),
-        establishmentTutorName:
-          convention.establishmentTutor.firstName +
-          " " +
-          convention.establishmentTutor.lastName,
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
-        agencyLogoUrl: agency.logoUrl,
-        agencyValidatorEmail: agency.validatorEmails[0],
+        internshipKind: convention.internshipKind,
       },
     });
 

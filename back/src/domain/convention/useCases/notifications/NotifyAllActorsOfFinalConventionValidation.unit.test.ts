@@ -333,22 +333,17 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           shortLinkId,
         ),
         {
+          conventionId: convention.id,
           internshipKind: convention.internshipKind,
-
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
-
           beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
-
           dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
           dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
           establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-
           businessName: convention.businessName,
-
           immersionAppellationLabel:
             convention.immersionAppellation.appellationLabel,
-
           emergencyContactInfos: displayEmergencyContactInfos({
             ...convention.signatories,
           }),
@@ -382,21 +377,17 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           shortLinkId,
         ),
         {
+          conventionId: convention.id,
           internshipKind: convention.internshipKind,
-
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
           beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
-
           dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
           dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
           establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-
           businessName: convention.businessName,
-
           immersionAppellationLabel:
             convention.immersionAppellation.appellationLabel,
-
           emergencyContactInfos: displayEmergencyContactInfos({
             ...convention.signatories,
           }),

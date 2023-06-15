@@ -94,6 +94,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
           kind: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
           recipients: [advisor.email],
           params: {
+            conventionId,
             advisorFirstName: advisor.firstName,
             advisorLastName: advisor.lastName,
             immersionAddress: conventionDtoFromEvent.immersionAddress!,

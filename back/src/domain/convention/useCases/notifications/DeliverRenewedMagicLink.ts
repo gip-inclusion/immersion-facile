@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  ConventionId,
   conventionIdSchema,
   InternshipKind,
   internshipKindSchema,
@@ -17,8 +18,9 @@ export type RenewMagicLinkPayload  = {
   emails:string[]
   magicLink:string,
   conventionStatusLink: string,
-  conventionId?: string,
+  conventionId?: ConventionId,
 }
+
 export const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> =
   z.object({
     internshipKind: internshipKindSchema,
@@ -53,7 +55,12 @@ export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLink
       templatedContent: {
         kind: "MAGIC_LINK_RENEWAL",
         recipients: emails,
-        params: { internshipKind, magicLink, conventionStatusLink },
+        params: {
+          internshipKind,
+          magicLink,
+          conventionStatusLink,
+          conventionId,
+        },
       },
       followedIds: {
         conventionId,

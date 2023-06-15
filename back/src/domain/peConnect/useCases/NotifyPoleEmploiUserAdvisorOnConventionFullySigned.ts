@@ -41,12 +41,14 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
           params: {
             advisorFirstName: conventionPeAdvisor.advisor.firstName,
             advisorLastName: conventionPeAdvisor.advisor.lastName,
-            businessName: convention.businessName,
-            dateEnd: convention.dateEnd,
-            dateStart: convention.dateStart,
+            agencyLogoUrl: agency.logoUrl,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             beneficiaryEmail: convention.signatories.beneficiary.email,
+            businessName: convention.businessName,
+            conventionId: convention.id,
+            dateEnd: convention.dateEnd,
+            dateStart: convention.dateStart,
             immersionAddress: convention.immersionAddress,
             magicLink: this.generateConventionMagicLinkUrl({
               id: convention.id,
@@ -55,7 +57,6 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
               email: conventionPeAdvisor.advisor.email,
               now: this.timeGateway.now(),
             }),
-            agencyLogoUrl: agency.logoUrl,
           },
         },
         followedIds: {

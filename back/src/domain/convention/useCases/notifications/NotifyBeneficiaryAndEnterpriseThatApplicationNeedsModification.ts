@@ -80,13 +80,13 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
           recipients: [email],
           params: {
+            conventionId: convention.id,
             internshipKind: convention.internshipKind,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,
             justification,
             signature: agency.signature,
-            immersionAppellation: convention.immersionAppellation,
             magicLink: await makeShortMagicLink(
               frontRoutes.conventionImmersionRoute,
             ),

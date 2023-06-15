@@ -50,6 +50,7 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
         kind: "DEPRECATED_CONVENTION_NOTIFICATION",
         recipients,
         params: {
+          conventionId: convention.id,
           internshipKind: convention.internshipKind,
           beneficiaryFirstName: beneficiary.firstName,
           beneficiaryLastName: beneficiary.lastName,

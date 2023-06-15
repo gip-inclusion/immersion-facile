@@ -1018,6 +1018,7 @@ const makeAgencyFirstReminderEmail = ({
   kind: "AGENCY_FIRST_REMINDER",
   recipients: [email],
   params: {
+    conventionId: convention.id,
     agencyName: agency.name,
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,
     beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -1040,6 +1041,7 @@ const makeAgencyLastReminderEmail = ({
   kind: "AGENCY_LAST_REMINDER",
   recipients: [email],
   params: {
+    conventionId: convention.id,
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,
     beneficiaryLastName: convention.signatories.beneficiary.lastName,
     businessName: convention.businessName,
@@ -1060,6 +1062,7 @@ const makeSignatoriesFirstReminderEmail = ({
   kind: "SIGNATORY_FIRST_REMINDER",
   recipients: [actor.email],
   params: {
+    conventionId: convention.id,
     actorFirstName: actor.firstName,
     actorLastName: actor.lastName,
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,
@@ -1082,6 +1085,7 @@ const makeSignatoriesLastReminderEmail = ({
   kind: "SIGNATORY_LAST_REMINDER",
   recipients: [actor.email],
   params: {
+    conventionId: convention.id,
     actorFirstName: actor.firstName,
     actorLastName: actor.lastName,
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,

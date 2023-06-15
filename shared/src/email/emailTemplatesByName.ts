@@ -1,5 +1,5 @@
 import { createTemplatesByName, EmailButtonProps } from "html-templates";
-import { InternshipKind } from "../convention/convention.dto";
+import { ConventionId, InternshipKind } from "../convention/convention.dto";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
@@ -35,12 +35,16 @@ export const emailTemplatesByName =
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
-        signatoriesSummary,
+        conventionId,
         magicLinkUrl,
+        signatoriesSummary,
       }) => ({
         subject:
           "RAPPEL - La convention démarrant d'ici 3 jours n'est pas complètement signée",
-        greetings: `Bonjour ${actorFirstName} ${actorLastName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${actorFirstName} ${actorLastName}`,
+        ),
         content: `
       Certains signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
       
@@ -69,12 +73,16 @@ export const emailTemplatesByName =
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
-        signatoriesSummary,
+        conventionId,
         magicLinkUrl,
+        signatoriesSummary,
       }) => ({
         subject:
           "RAPPEL URGENT - La convention démarrant dans moins de 24h n'est pas complètement signée",
-        greetings: `Bonjour ${actorFirstName} ${actorLastName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${actorFirstName} ${actorLastName}`,
+        ),
         content: `
       Certains signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
       
@@ -99,16 +107,17 @@ export const emailTemplatesByName =
       tags: ["relance vérification manquante"],
       createEmailVariables: ({
         agencyMagicLinkUrl,
+        agencyName,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
-        agencyName,
-        dateStart,
+        conventionId,
         dateEnd,
+        dateStart,
       }) => ({
         subject:
           "RAPPEL - Une demande de convention d'immersion démarrant d'ici 3 jours ouvrés doit être vérifiée",
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       Merci de ne pas oublier de traiter la demande de convention d'immersion qui concerne :
 
@@ -141,10 +150,11 @@ export const emailTemplatesByName =
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
+        conventionId,
       }) => ({
         subject:
           "RAPPEL URGENT - Une demande de convention d'immersion démarrant demain doit être vérifiée",
-        greetings: "Urgent !",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       L'immersion demandée par Bénéficiaire <strong>${beneficiaryFirstName} ${beneficiaryLastName}</strong> au sein de l'entreprise <strong>${businessName}</strong> doit démarrer demain.
 
@@ -182,21 +192,23 @@ export const emailTemplatesByName =
       niceName: "Confirmation bénéficiaire nouvelle convention",
       tags: ["demande signature bénéficiaire"],
       createEmailVariables: ({
-        firstName,
-        lastName,
-        internshipKind,
-        conventionId,
         agencyLogoUrl,
+        conventionId,
+        firstName,
+        internshipKind,
+        lastName,
       }) => ({
         subject: `${
           internshipKind === "immersion"
             ? "Votre confirmation pour votre demande de convention est enregistrée"
             : "Mini Stage - Votre confirmation pour votre demande de mini stage est enregistrée"
         }`,
-        greetings: `Bonjour ${firstName} ${lastName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${firstName} ${lastName}`,
+        ),
         content: `
         Merci d'avoir confirmé votre demande de convention. Elle va être transmise à votre conseiller référent.
-        La convention est enregistrée avec le numéro: ${conventionId}.
 
         Il vous informera par mail de la validation ou non ${
           internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
@@ -220,20 +232,22 @@ export const emailTemplatesByName =
       niceName: "Confirmation tuteur nouvelle convention",
       tags: ["confirmation tuteur enregistrée"],
       createEmailVariables: ({
-        establishmentTutorName,
+        agencyLogoUrl,
         beneficiaryFirstName,
         beneficiaryLastName,
-        internshipKind,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         conventionId,
-        agencyLogoUrl,
+        establishmentTutorName,
+        internshipKind,
       }) => ({
         subject: `${
           internshipKind === "immersion"
             ? "Demande de convention confirmée"
             : "Mini Stage - Demande de mini stage confirmée"
         }`,
-        greetings: `Bonjour ${establishmentTutorName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          establishmentTutorName,
+        ),
         content: `
       Vous venez de confirmer la demande ${
         internshipKind === "immersion"
@@ -263,25 +277,24 @@ export const emailTemplatesByName =
       niceName: "Notification agence nouvelle convention",
       tags: ["notification conseiller création demande d’immersion"],
       createEmailVariables: ({
-        magicLink,
-        conventionStatusLink,
-        dateStart,
-        dateEnd,
-        firstName,
-        lastName,
-        businessName,
-        agencyName,
-        internshipKind,
-        warning,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        conventionId,
         agencyLogoUrl,
+        agencyName,
+        businessName,
+        conventionId,
+        conventionStatusLink,
+        dateEnd,
+        dateStart,
+        firstName,
+        internshipKind,
+        lastName,
+        magicLink,
+        warning,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? `Une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`
             : `Mini Stage - une demande de convention de mini stage est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       <strong>Une nouvelle demande ${
         internshipKind === "immersion"
@@ -330,24 +343,25 @@ export const emailTemplatesByName =
       niceName: "Convention finale validée",
       tags: ["envoi convention"],
       createEmailVariables: ({
+        agencyLogoUrl,
+        beneficiaryBirthdate,
         beneficiaryFirstName,
         beneficiaryLastName,
-        dateStart,
-        dateEnd,
         businessName,
+        conventionId,
+        dateEnd,
+        dateStart,
         emergencyContactInfos,
         establishmentTutorName,
         immersionAppellationLabel,
-        beneficiaryBirthdate,
         internshipKind,
-        agencyLogoUrl,
         magicLink,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? `Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`
             : `Mini Stage - Validation et convention du mini stage pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       Bonne nouvelle ! 
 
@@ -399,20 +413,24 @@ export const emailTemplatesByName =
         "Notification de convention signée au conseiller pole-emploi lié",
       tags: ["immersion à étudier (mail conseiller)"],
       createEmailVariables: ({
+        advisorFirstName,
+        advisorLastName,
+        agencyLogoUrl,
         beneficiaryEmail,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
-        advisorFirstName,
-        advisorLastName,
-        magicLink,
+        conventionId,
         dateEnd,
         dateStart,
+        magicLink,
         immersionAddress,
-        agencyLogoUrl,
       }) => ({
         subject: `Pour action : la demande de convention d'immersion envoyée par ${beneficiaryFirstName} ${beneficiaryLastName} est totalement signée. À vous de la valider !`,
-        greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${advisorFirstName} ${advisorLastName}`,
+        ),
         content: `
       <strong>La demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} est signée. 
       À vous de l'étudier !</strong>`,
@@ -451,18 +469,22 @@ export const emailTemplatesByName =
       createEmailVariables: ({
         advisorFirstName,
         advisorLastName,
-        magicLink,
-        dateStart,
-        dateEnd,
+        agencyLogoUrl,
         beneficiaryEmail,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
+        conventionId,
+        dateEnd,
+        dateStart,
         immersionAddress,
-        agencyLogoUrl,
+        magicLink,
       }) => ({
         subject: `Une demande de convention d'immersion vous est directement adressée par: ${beneficiaryFirstName} ${beneficiaryLastName}`,
-        greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${advisorFirstName} ${advisorLastName}`,
+        ),
         content: `
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>
 
@@ -512,29 +534,30 @@ export const emailTemplatesByName =
       niceName: "Notification de convention rejetée",
       tags: ["refus demande d'immersion"],
       createEmailVariables: ({
-        immersionProfession,
+        agencyLogoUrl,
+        agencyName,
         beneficiaryFirstName,
         beneficiaryLastName,
-        rejectionReason,
-        agency,
         businessName,
-        signature,
+        conventionId,
+        immersionProfession,
         internshipKind,
-        agencyLogoUrl,
+        rejectionReason,
+        signature,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? `Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`
             : `Mini Stage - Refus de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       Nous vous informons que la demande ${
         internshipKind === "immersion"
           ? "d'immersion professionnelle"
           : "de mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agency}.
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agencyName}.
       
-      Les raisons en sont ${rejectionReason} par ${agency}.       
+      Les raisons sont : ${rejectionReason}       
       
       Vous pouvez vous rapprocher de votre conseiller${
         internshipKind === "immersion"
@@ -552,23 +575,22 @@ export const emailTemplatesByName =
       niceName: "Requête demande de modification de convention",
       tags: ["demande de modifications"],
       createEmailVariables: ({
-        justification,
+        agencyLogoUrl,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
-        magicLink,
+        conventionId,
         conventionStatusLink,
-        signature,
         internshipKind,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        immersionAppellation,
-        agencyLogoUrl,
+        justification,
+        magicLink,
+        signature,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? "Pour action : veuillez modifier cette demande d'immersion professionnelle"
             : "Pour action : mini Stage - veuillez modifier cette demande de mini stage",
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `Vous avez fait une demande de modification concernant la demande ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
         } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} pour la raison suivante :
@@ -595,20 +617,21 @@ export const emailTemplatesByName =
       niceName: "Examen de la convention",
       tags: ["notification conseiller demande d’immersion signée à valider"],
       createEmailVariables: ({
+        agencyLogoUrl,
         beneficiaryFirstName,
         beneficiaryLastName,
-        possibleRoleAction,
         businessName,
-        magicLink,
+        conventionId,
         conventionStatusLink,
         internshipKind,
-        agencyLogoUrl,
+        magicLink,
+        possibleRoleAction,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? `Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`
             : `Mini Stage - Demande de mini stage à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       <strong>Une nouvelle demande ${
         internshipKind === "immersion" ? "d'immersion" : "de mini stage"
@@ -642,15 +665,18 @@ export const emailTemplatesByName =
       niceName: "Renouvellement de lien magique",
       tags: ["renouvellement de lien"],
       createEmailVariables: ({
-        magicLink,
+        conventionId,
         conventionStatusLink,
         internshipKind,
+        magicLink,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? "Voici votre nouveau lien magique pour accéder à la demande d'immersion"
             : `Mini Stage - Voici votre nouveau lien magique pour accéder à la demande de mini stage`,
-        greetings: "Bonjour,",
+        greetings: conventionId
+          ? greetingsWithConventionId(conventionId)
+          : "Bonjour ,",
         content: `
       Vous venez de demander le renouvellement d'un lien pour accéder à une demande ${
         internshipKind === "immersion" ? "d'immersion" : "de mini stage"
@@ -674,22 +700,23 @@ export const emailTemplatesByName =
       niceName: "Notification de signature de l'autre signataire",
       tags: ["confirmation nécessaire après confirmation de l’autre partie"],
       createEmailVariables: ({
+        agencyLogoUrl,
         beneficiaryFirstName,
         beneficiaryLastName,
-        immersionProfession,
         businessName,
+        conventionId,
+        conventionStatusLink,
         establishmentRepresentativeName,
         existingSignatureName,
-        magicLink,
-        conventionStatusLink,
+        immersionProfession,
         internshipKind,
-        agencyLogoUrl,
+        magicLink,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? "Pour action : à vous de signer votre demande de convention"
             : "Pour action : à vous de confirmer votre demande de mini stage",
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       La demande de convention pour ${
         internshipKind === "immersion" ? "l'immersion" : "le mini stage"
@@ -719,23 +746,24 @@ export const emailTemplatesByName =
       niceName: "Demande de signature pour confirmation de convention",
       tags: ["demande signature demande de convention"],
       createEmailVariables: ({
-        signatoryName,
-        beneficiaryName,
-        businessName,
-        establishmentTutorName,
-        establishmentRepresentativeName,
-        beneficiaryRepresentativeName,
-        beneficiaryCurrentEmployerName,
-        magicLink,
-        conventionStatusLink,
-        internshipKind,
         agencyLogoUrl,
+        beneficiaryCurrentEmployerName,
+        beneficiaryName,
+        beneficiaryRepresentativeName,
+        businessName,
+        conventionId,
+        conventionStatusLink,
+        establishmentRepresentativeName,
+        establishmentTutorName,
+        internshipKind,
+        magicLink,
+        signatoryName,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? "Pour action : signez votre demande de convention"
             : "Pour action : signez votre demande de mini stage",
-        greetings: `Bonjour ${signatoryName},`,
+        greetings: greetingsWithConventionId(conventionId, signatoryName),
         content: `Une demande de convention ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
         } vient d'être enregistrée. Vous devez maintenant la confirmer.
@@ -835,17 +863,17 @@ export const emailTemplatesByName =
       niceName: "Mise en relation par mail",
       tags: ["mise en relation mail"],
       createEmailVariables: ({
+        appellationLabel,
+        businessName,
         contactFirstName,
         contactLastName,
+        immersionObjective: immersionObject,
+        message,
         potentialBeneficiaryEmail,
         potentialBeneficiaryFirstName,
         potentialBeneficiaryLastName,
-        appellationLabel,
-        businessName,
-        immersionObjective: immersionObject,
         potentialBeneficiaryPhone,
         potentialBeneficiaryResumeLink,
-        message,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
@@ -915,12 +943,12 @@ export const emailTemplatesByName =
       niceName: "Instructions de mise en contact en personne",
       tags: ["mise en relation en personne"],
       createEmailVariables: ({
-        potentialBeneficiaryFirstName,
-        potentialBeneficiaryLastName,
-        contactFirstName,
-        contactLastName,
         businessAddress,
         businessName,
+        contactFirstName,
+        contactLastName,
+        potentialBeneficiaryFirstName,
+        potentialBeneficiaryLastName,
       }) => ({
         subject:
           "Coordonnées de l'entreprise pour faire votre demande d'immersion",
@@ -1053,19 +1081,23 @@ export const emailTemplatesByName =
       niceName: "Lien de creation du bilan",
       tags: ["notification entreprise fin de l’immersion"],
       createEmailVariables: ({
-        establishmentTutorName,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        immersionAssessmentCreationLink,
-        internshipKind,
         agencyLogoUrl,
         agencyValidatorEmail,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        conventionId,
+        establishmentTutorName,
+        immersionAssessmentCreationLink,
+        internshipKind,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? "Comment s'est déroulée l'immersion ?"
             : "Mini Stage - Comment s'est déroulée le mini stage ?",
-        greetings: `Bonjour ${establishmentTutorName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          establishmentTutorName,
+        ),
         content: `
       ${
         internshipKind === "immersion"
@@ -1110,25 +1142,14 @@ export const emailTemplatesByName =
       niceName: "Preview email complet (tous les blocs)",
       tags: ["aperçu pour tests"],
       createEmailVariables: ({
+        agencyLogoUrl,
         beneficiaryName,
+        conventionId,
         conventionStatusLink,
         internshipKind,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        businessName,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        establishmentRepresentativeName,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        magicLink,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        signatoryName,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        beneficiaryCurrentEmployerName,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        beneficiaryRepresentativeName,
-        agencyLogoUrl,
       }) => ({
         subject: "Test contenant toutes les blocs email",
-        greetings: `Bonjour ${beneficiaryName}`,
+        greetings: greetingsWithConventionId(conventionId, beneficiaryName),
         content: `Merci d'avoir confirmé votre demande ${
           internshipKind ? "d'immersion" : "de mini stage"
         }. Elle va être transmise à votre ${
@@ -1162,23 +1183,23 @@ export const emailTemplatesByName =
     SIGNEE_HAS_SIGNED_CONVENTION: {
       niceName: "Confirmation de signature de l'immersion",
       createEmailVariables: ({
+        agencyLogoUrl,
         conventionId,
-        signedAt,
         conventionStatusLink,
         internshipKind,
-        agencyLogoUrl,
+        signedAt,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? `Confirmation de signature de l'immersion - ${conventionId}`
             : `Mini Stage - Confirmation de signature du mini stage - ${conventionId}`,
-        greetings: `Bonjour,`,
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       Nous confirmons que vous avez signé ${
         internshipKind === "immersion"
           ? "la convention d'immersion professionnelle"
-          : "le mini stage dont la référence est :"
-      } ${conventionId} le ${
+          : "la convention de mini stage "
+      } le ${
           isStringDate(signedAt)
             ? toDisplayedDate(new Date(signedAt), true)
             : "DATE INVALIDE"
@@ -1224,20 +1245,21 @@ export const emailTemplatesByName =
       niceName: "Notification de convention obsolète",
       tags: ["dépreciation demande d'immersion"],
       createEmailVariables: ({
-        immersionProfession,
         beneficiaryFirstName,
         beneficiaryLastName,
-        deprecationReason,
         businessName,
-        internshipKind,
-        dateStart,
+        conventionId,
         dateEnd,
+        dateStart,
+        deprecationReason,
+        immersionProfession,
+        internshipKind,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? `Demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName} obsolète`
             : `Mini Stage - Demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName} obsolète`,
-        greetings: "Bonjour,",
+        greetings: greetingsWithConventionId(conventionId),
         content: `
       Nous vous informons que la demande ${
         internshipKind === "immersion"
@@ -1265,3 +1287,11 @@ export const emailTemplatesByName =
       }),
     },
   });
+
+const greetingsWithConventionId = (
+  conventionId: ConventionId,
+  actor?: string,
+): string =>
+  `<strong>Identifiant de la convention : ${conventionId}</strong>
+        
+Bonjour ${actor ?? ""},`;
