@@ -89,7 +89,7 @@ handleEndOfScriptNotification(
       `Total of immersion ending tomorrow : ${numberOfSuccess}`,
       `Number of successfully sent Assessments : ${numberOfSuccess}`,
       `Number of failures : ${numberOfFailures}`,
-      ...(numberOfFailures > 0 ? [`Failures : ${errorsAsString}`] : [""]),
+      ...(numberOfFailures > 0 ? [`Failures : ${errorsAsString}`] : []),
     ].join("\n");
   },
   logger,

@@ -30,6 +30,17 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  public withEstablishmentUpdatedAt(updatedAt: Date) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withUpdatedAt(updatedAt)
+        .build(),
+    });
+  }
+
   public withImmersionOffers(immersionOffers: ImmersionOfferEntityV2[]) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,

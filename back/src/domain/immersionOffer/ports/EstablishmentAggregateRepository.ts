@@ -53,4 +53,8 @@ export interface EstablishmentAggregateRepository {
   markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
     fromDate: Date,
   ) => Promise<number>;
+
+  getSiretOfEstablishmentsToSuggestUpdate: (
+    before: Date,
+  ) => Promise<SiretDto[]>;
 }

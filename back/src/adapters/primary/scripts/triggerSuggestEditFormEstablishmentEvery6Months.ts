@@ -1,26 +1,16 @@
-import { addMonths } from "date-fns";
 import { Pool } from "pg";
-import { immersionFacileContactEmail, SiretDto } from "shared";
-import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { SiretDto } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
-import { createLogger } from "../../../utils/logger";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
+import { SuggestEditEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditEstablishment";
+import { SuggestEditEstablishmentsScript } from "../../../domain/immersionOffer/useCases/SuggestEditEstablishmentsScript";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
-import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
-import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
-import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
+import { AppConfig } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { createPgUow } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
-
-const NB_MONTHS_BEFORE_SUGGEST = 6;
-
-const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
 
@@ -29,105 +19,42 @@ type Report = {
   errors?: Record<SiretDto, any>;
 };
 
-const triggerSuggestEditFormEstablishmentEvery6Months =
-  async (): Promise<Report> => {
-    logger.info(
-      `[triggerSuggestEditFormEstablishmentEvery6Months] Script started.`,
-    );
+const startScript = async (): Promise<Report> => {
+  const timeGateway = new RealTimeGateway();
+  const uuidGenerator = new UuidV4Generator();
+  const pool = new Pool({
+    connectionString: config.pgImmersionDbUrl,
+  });
+  const uowPerformer = new PgUowPerformer(pool, createPgUow);
 
-    const dbUrl = config.pgImmersionDbUrl;
-    const pool = new Pool({
-      connectionString: dbUrl,
-    });
-    const client = await pool.connect();
-    const timeGateway = new RealTimeGateway();
+  const generateEditEstablishmentJwt =
+    makeGenerateJwtES256<"editEstablishment">(config.jwtPrivateKey, 3600 * 24);
 
-    const since = addMonths(timeGateway.now(), -NB_MONTHS_BEFORE_SUGGEST);
+  const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+    uuidGenerator,
+    timeGateway,
+  );
 
-    const establishmentsToContact = (
-      await client.query(
-        `SELECT DISTINCT siret FROM establishments WHERE update_date < $1 
-          AND siret NOT IN (
-            SELECT payload ->> 'siret' as siret  FROM outbox WHERE topic='FormEstablishmentEditLinkSent' 
-            AND occurred_at > $2)`,
-        [since, since],
-      )
-    ).rows.map(({ siret }) => siret);
+  const suggestEditEstablishment = new SuggestEditEstablishment(
+    uowPerformer,
+    saveNotificationAndRelatedEvent,
+    timeGateway,
+    makeGenerateEditFormEstablishmentUrl(config, generateEditEstablishmentJwt),
+  );
 
-    if (establishmentsToContact.length === 0)
-      return { numberOfEstablishmentsToContact: 0 };
-
-    logger.info(
-      `[triggerSuggestEditFormEstablishmentEvery6Months] Found ${
-        establishmentsToContact.length
-      } establishments not updated since ${since} to contact, with siret : ${establishmentsToContact.join(
-        ", ",
-      )}`,
-    );
-
-    const testPool = getTestPgPool();
-    const pgUowPerformer = new PgUowPerformer(testPool, createPgUow);
-
-    const notificationGateway =
-      config.notificationGateway === "BREVO"
-        ? new BrevoNotificationGateway(
-            configureCreateHttpClientForExternalApi()(
-              brevoNotificationGatewayTargets,
-            ),
-            makeEmailAllowListPredicate({
-              skipEmailAllowList: config.skipEmailAllowlist,
-              emailAllowList: config.emailAllowList,
-            }),
-            config.apiKeyBrevo,
-            {
-              name: "Immersion Facilitée",
-              email: immersionFacileContactEmail,
-            },
-          )
-        : new InMemoryNotificationGateway(timeGateway);
-
-    const generateEditEstablishmentJwt =
-      makeGenerateJwtES256<"editEstablishment">(
-        config.jwtPrivateKey,
-        3600 * 24,
-      );
-    const suggestEditFormEstablishment = new SuggestEditFormEstablishment(
-      pgUowPerformer,
-      notificationGateway,
-      timeGateway,
-      makeGenerateEditFormEstablishmentUrl(
-        config,
-        generateEditEstablishmentJwt,
-      ),
-      makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new UuidV4Generator(),
-      }),
-    );
-
-    const errors: Record<SiretDto, any> = {};
-
-    await Promise.all(
-      establishmentsToContact.map(async (siret) => {
-        await suggestEditFormEstablishment
-          .execute(siret)
-          .catch((error: any) => {
-            errors[siret] = error;
-          });
-      }),
-    );
-
-    return {
-      numberOfEstablishmentsToContact: establishmentsToContact.length,
-      errors,
-    };
-  };
+  const suggestEditEstablishmentsScript = new SuggestEditEstablishmentsScript(
+    uowPerformer,
+    suggestEditEstablishment,
+    timeGateway,
+  );
+  return suggestEditEstablishmentsScript.execute();
+};
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
   "triggerSuggestEditFormEstablishmentEvery6Months",
   config,
-  triggerSuggestEditFormEstablishmentEvery6Months,
+  startScript,
   ({ numberOfEstablishmentsToContact, errors = {} }) => {
     const nSiretFailed = Object.keys(errors).length;
     const nSiretSuccess = numberOfEstablishmentsToContact - nSiretFailed;

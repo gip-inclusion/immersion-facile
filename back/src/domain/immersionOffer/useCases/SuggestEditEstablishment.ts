@@ -5,21 +5,19 @@ import {
 } from "shared";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
-export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
+export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private timeGateway: TimeGateway,
     private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
-    private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
@@ -31,7 +29,8 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
       )
     )?.contact;
 
-    if (!contact) throw Error("Email du contact introuvable.");
+    if (!contact)
+      throw Error(`Email du contact introuvable, pour le siret : ${siret}`);
 
     const now = this.timeGateway.now();
 
@@ -43,20 +42,20 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {
-      await this.notificationGateway.sendEmail({
-        kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-        recipients: [contact.email],
-        cc: contact.copyEmails,
-        params: {
-          editFrontUrl,
+      await this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+          recipients: [contact.email],
+          cc: contact.copyEmails,
+          params: {
+            editFrontUrl,
+          },
+        },
+        followedIds: {
+          establishmentSiret: siret,
         },
       });
-
-      const event = this.createNewEvent({
-        topic: "FormEstablishmentEditLinkSent",
-        payload,
-      });
-      await uow.outboxRepository.save(event);
     } catch (error) {
       notifyObjectDiscord(error);
     }

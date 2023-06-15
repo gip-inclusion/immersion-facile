@@ -734,6 +734,33 @@ export class PgEstablishmentAggregateRepository
 
     return result.rowCount;
   }
+
+  public async getSiretOfEstablishmentsToSuggestUpdate(
+    before: Date,
+  ): Promise<SiretDto[]> {
+    const response = await this.client.query(
+      `SELECT DISTINCT e.siret 
+       FROM establishments e
+       WHERE e.update_date < $1 
+       AND NOT EXISTS (
+          SELECT 1 
+          FROM outbox o
+          WHERE o.topic='FormEstablishmentEditLinkSent' 
+          AND o.occurred_at > $1
+          AND o.payload ->> 'siret' = e.siret
+       )
+       AND NOT EXISTS (
+          SELECT 1 
+          FROM notifications_email n
+          WHERE n.email_kind='SUGGEST_EDIT_FORM_ESTABLISHMENT' 
+          AND n.created_at > $1
+          AND n.establishment_siret = e.siret
+       )`,
+      [before],
+    );
+
+    return response.rows.map(({ siret }) => siret);
+  }
 }
 
 const convertPositionToStGeography = ({ lat, lon }: GeoPositionDto) =>

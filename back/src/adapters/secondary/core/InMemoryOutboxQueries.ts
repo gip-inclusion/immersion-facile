@@ -1,4 +1,3 @@
-import { EstablishmentJwtPayload } from "shared";
 import {
   DomainEvent,
   eventsToDebugInfo,
@@ -43,14 +42,5 @@ export class InMemoryOutboxQueries implements OutboxQueries {
       if (!lastPublication) return false;
       return lastPublication.failures.length > 0;
     });
-  }
-  public async getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
-    siret: string,
-  ): Promise<EstablishmentJwtPayload | undefined> {
-    return this.outboxRepository.events.find((event) => {
-      if (event.topic !== "FormEstablishmentEditLinkSent") return false;
-      const payload = event.payload as EstablishmentJwtPayload;
-      return payload.siret === siret;
-    })?.payload as EstablishmentJwtPayload;
   }
 }
