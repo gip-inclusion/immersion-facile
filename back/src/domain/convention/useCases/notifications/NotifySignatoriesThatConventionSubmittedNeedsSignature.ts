@@ -86,6 +86,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
         beneficiary,
         beneficiaryRepresentative,
         establishmentRepresentative,
+        beneficiaryCurrentEmployer,
       },
     } = convention;
 
@@ -109,6 +110,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
       kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [signatory.email],
       params: {
+        conventionId: convention.id,
         internshipKind: convention.internshipKind,
         signatoryName: `${signatory.firstName} ${signatory.lastName}`,
         beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
@@ -117,6 +119,9 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
         beneficiaryRepresentativeName:
           beneficiaryRepresentative &&
           `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
+        beneficiaryCurrentEmployerName:
+          beneficiaryCurrentEmployer &&
+          `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
         magicLink: await makeMagicShortLink(frontRoutes.conventionToSign),
         conventionStatusLink: await makeMagicShortLink(
           frontRoutes.conventionStatusDashboard,

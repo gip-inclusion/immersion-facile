@@ -21,18 +21,16 @@ export const getValidatedConventionFinalConfirmationParams = (
 ): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
   const { beneficiary, beneficiaryRepresentative } = convention.signatories;
   return {
+    conventionId: convention.id,
     internshipKind: convention.internshipKind,
-
     beneficiaryFirstName: beneficiary.firstName,
     beneficiaryLastName: beneficiary.lastName,
     beneficiaryBirthdate: beneficiary.birthdate,
-
     dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
     dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
     establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
     businessName: convention.businessName,
     immersionAppellationLabel: convention.immersionAppellation.appellationLabel,
-
     emergencyContactInfos: displayEmergencyContactInfos({
       beneficiaryRepresentative,
       beneficiary,
@@ -75,6 +73,7 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
       kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
       params: {
+        conventionId: convention.id,
         internshipKind: convention.internshipKind,
         signatoryName: `${signatory.firstName} ${signatory.lastName}`,
         beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
@@ -125,13 +124,14 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
     kind: "REJECTED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
+      agencyName: agency.name,
+      conventionId: convention.id,
       internshipKind: convention.internshipKind,
       beneficiaryFirstName: convention.signatories.beneficiary.firstName,
       beneficiaryLastName: convention.signatories.beneficiary.lastName,
       businessName: convention.businessName,
       rejectionReason: convention.statusJustification || "",
       signature: agency.signature,
-      agency: agency.name,
       immersionProfession: convention.immersionAppellation.appellationLabel,
       agencyLogoUrl: agency.logoUrl,
     },
@@ -147,6 +147,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated = (
     kind: "DEPRECATED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
+      conventionId: convention.id,
       internshipKind: convention.internshipKind,
       beneficiaryFirstName: convention.signatories.beneficiary.firstName,
       beneficiaryLastName: convention.signatories.beneficiary.lastName,

@@ -92,19 +92,20 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
           kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [recipientEmail],
           params: {
-            internshipKind: convention.internshipKind,
+            agencyLogoUrl: agency.logoUrl,
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,
-            magicLink: await makeShortMagicLink(frontRoutes.manageConvention),
+            conventionId: convention.id,
             conventionStatusLink: await makeShortMagicLink(
               frontRoutes.conventionStatusDashboard,
             ),
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            internshipKind: convention.internshipKind,
+            magicLink: await makeShortMagicLink(frontRoutes.manageConvention),
             possibleRoleAction:
               recipients.role === "counsellor"
                 ? "en vérifier l'éligibilité"
                 : "en considérer la validation",
-            agencyLogoUrl: agency.logoUrl,
           },
         };
       }),

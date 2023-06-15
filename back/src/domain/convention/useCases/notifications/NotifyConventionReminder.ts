@@ -245,6 +245,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             kind: "AGENCY_FIRST_REMINDER",
             recipients: [email],
             params: {
+              conventionId: convention.id,
               agencyName: agency.name,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
@@ -261,6 +262,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             kind: "AGENCY_LAST_REMINDER",
             recipients: [email],
             params: {
+              conventionId: convention.id,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -316,6 +318,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         businessName: convention.businessName,
+        conventionId: convention.id,
         signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
         magicLinkUrl: isSignatoryRole(role)
           ? await makeShortMagicLink(frontRoutes.conventionToSign)
