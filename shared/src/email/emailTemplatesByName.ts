@@ -56,7 +56,7 @@ export const emailTemplatesByName =
             url: `${magicLinkUrl}`,
           },
         ],
-        subContent: `Bonne journée,
+        subContent: `Bonne journée à tous,
       L'équipe Immersion Facilitée`,
       }),
     },
