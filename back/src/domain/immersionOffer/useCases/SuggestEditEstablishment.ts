@@ -1,4 +1,5 @@
 import {
+  addressDtoToString,
   createEstablishmentMagicLinkPayload,
   SiretDto,
   siretSchema,
@@ -23,11 +24,13 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
-    const contact = (
+    const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
-      )
-    )?.contact;
+      );
+    if (!establishmentAggregate) throw Error("Etablissement introuvable.");
+
+    const { contact, establishment } = establishmentAggregate;
 
     if (!contact)
       throw Error(`Email du contact introuvable, pour le siret : ${siret}`);
@@ -50,6 +53,8 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
           cc: contact.copyEmails,
           params: {
             editFrontUrl,
+            businessName: establishment.customizedName ?? establishment.name,
+            businessAddress: addressDtoToString(establishment.address),
           },
         },
         followedIds: {

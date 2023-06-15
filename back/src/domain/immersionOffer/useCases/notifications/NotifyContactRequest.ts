@@ -48,6 +48,8 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       establishmentAggregate.establishment.customizedName ??
       establishmentAggregate.establishment.name;
 
+    const businessAddress = establishmentAggregate.establishment.address;
+
     const followedIds = {
       establishmentSiret: siret,
     };
@@ -80,6 +82,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               potentialBeneficiaryResumeLink:
                 payload.potentialBeneficiaryResumeLink,
               message: payload.message,
+              businessAddress: addressDtoToString(businessAddress),
             },
           },
           followedIds,

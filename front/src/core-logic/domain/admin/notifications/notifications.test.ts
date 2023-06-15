@@ -35,7 +35,11 @@ describe("notifications slice", () => {
           templatedContent: {
             kind: "EDIT_FORM_ESTABLISHMENT_LINK",
             recipients: ["bob@mail.com"],
-            params: { editFrontUrl: "my-url" },
+            params: {
+              editFrontUrl: "my-url",
+              businessAddress: "24 rue des boucher 67000 strasbourg",
+              businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+            },
           },
         },
       ];

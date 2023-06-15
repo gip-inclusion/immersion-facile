@@ -215,6 +215,7 @@ export type EmailParamsByEmailType = {
   };
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: string;
+    businessAddress: string;
     contactFirstName: string;
     contactLastName: string;
     appellationLabel: string;
@@ -253,14 +254,19 @@ export type EmailParamsByEmailType = {
   };
   EDIT_FORM_ESTABLISHMENT_LINK: {
     editFrontUrl: string;
+    businessName: string;
+    businessAddress: string;
   };
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     editFrontUrl: string;
+    businessName: string;
+    businessAddress: string;
   };
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
     contactFirstName: string;
     contactLastName: string;
     businessName: string;
+    businessAddress: string;
   };
   CREATE_IMMERSION_ASSESSMENT: {
     agencyLogoUrl: AbsoluteUrl | undefined;
