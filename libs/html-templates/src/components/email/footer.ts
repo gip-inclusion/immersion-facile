@@ -5,14 +5,13 @@ export const renderFooter = (
   customFooter
     ? customFooter(contactEmail)
     : defaultImmersionFooter(contactEmail);
+
 const defaultImmersionFooter = (contactEmail: string) => `<table>
   <tr>
     <td height="30"></td>
   </tr>
   <tr>
     <td width="600" style="background-color: #F5F5FE; text-align: center; padding: 20px 50px; ">
-      <p style="margin-bottom: .5rem; font-weight: bold; font-size: 18px;">L'immersion facilitée - Une startup d’Etat du Groupement d’Intérêt Public - La plateforme de l’inclusion</p>
-      <p style="font-size: 18px; margin-top: 0;">20 avenue de Ségur, 75007, Paris</p>
       <p style="font-size: 14px;">Vous avez reçu cet email car vous l'avez renseigné lors de votre demande de convention d'immersion. Si vous n'êtes pas le destinataire de cette notification, merci de nous prévenir à <a href="mailto:${contactEmail}">${contactEmail}</a></p>
     </td>
   </tr>
@@ -29,8 +28,6 @@ export const cciCustomHtmlFooter = (contactEmail: string) => `<table>
   </tr>
   <tr>
     <td width="600" style="background-color: #F5F5FE; text-align: center; padding: 20px 50px; ">
-      <p style="margin-bottom: .5rem; font-weight: bold; font-size: 18px;">L'immersion facilitée - Une startup d’Etat du Groupement d’Intérêt Public - La plateforme de l’inclusion</p>
-      <p style="font-size: 18px; margin-top: 0;">20 avenue de Ségur, 75007, Paris</p>
       <p style="font-size: 14px;">Vous avez reçu cet email car vous l'avez renseigné lors de votre demande de convention d'immersion. Si vous n'êtes pas le destinataire de cette notification, merci de nous prévenir à <a href="mailto:${contactEmail}">${contactEmail}</a></p>
     </td>
   </tr>
