@@ -89,7 +89,11 @@ describe("PgScriptsQueries", () => {
         templatedContent: {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
           recipients: ["joe@mail.com"],
-          params: { editFrontUrl: "http://edit-front.com" },
+          params: {
+            editFrontUrl: "http://edit-front.com",
+            businessAddress: "24 rue des boucher 67000 strasbourg",
+            businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+          },
         },
         createdAt: subDays(before, 1).toISOString(),
       });
@@ -111,7 +115,11 @@ describe("PgScriptsQueries", () => {
         templatedContent: {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
           recipients: ["jack@mail.com"],
-          params: { editFrontUrl: "http://edit-jack-front.com" },
+          params: {
+            editFrontUrl: "http://edit-jack-front.com",
+            businessAddress: "24 rue des boucher 67000 strasbourg",
+            businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+          },
         },
         createdAt: addDays(before, 1).toISOString(),
       });
