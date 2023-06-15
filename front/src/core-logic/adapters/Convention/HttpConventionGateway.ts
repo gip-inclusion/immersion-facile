@@ -61,7 +61,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return conventionReadSchema.parse(data);
   }
 
-  public newConvention$(conventionDto: ConventionDto): Observable<void> {
+  public createConvention$(conventionDto: ConventionDto): Observable<void> {
     return fromPromise(this.newConvention(conventionDto).then(() => undefined));
   }
 

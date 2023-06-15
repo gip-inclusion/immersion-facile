@@ -34,7 +34,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
       : this.convention$;
   }
 
-  public newConvention$(_convention: ConventionDto): Observable<void> {
+  public createConvention$(_convention: ConventionDto): Observable<void> {
     this.addConventionCallCount++;
     return this.addConventionResult$;
   }
