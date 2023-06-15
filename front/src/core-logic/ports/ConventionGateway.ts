@@ -18,7 +18,7 @@ export interface ConventionGateway {
   ): Observable<ConventionReadDto | undefined>;
   getConventionStatusDashboardUrl$(jwt: string): Observable<AbsoluteUrl>;
 
-  newConvention$(conventionDto: ConventionDto): Observable<void>;
+  createConvention$(conventionDto: ConventionDto): Observable<void>;
   updateConvention$(
     conventionDto: ConventionDto,
     jwt: string,
