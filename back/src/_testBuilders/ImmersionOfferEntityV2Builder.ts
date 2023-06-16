@@ -3,6 +3,8 @@ import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/Immers
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
   romeCode: "B1805",
+  appellationLabel: "Styliste",
+  appellationCode: "19540",
   score: 4.5,
   createdAt: new Date("2022-05-15T12:00:00.000"),
 };
@@ -23,13 +25,13 @@ export class ImmersionOfferEntityV2Builder
     });
   }
 
-  withAppellationCode(appellationCode: string | undefined) {
+  withAppellationCode(appellationCode: string) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
       appellationCode,
     });
   }
-  withAppellationLabel(appellationLabel: string | undefined) {
+  withAppellationLabel(appellationLabel: string) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
       appellationLabel,

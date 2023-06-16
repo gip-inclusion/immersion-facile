@@ -11,7 +11,7 @@ import {
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
-  RomeDto,
+  RomeCode,
   SiretDto,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -20,7 +20,7 @@ import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
   siret: SiretDto;
-  offer: RomeDto;
+  romeCode: RomeCode;
   onSuccess: () => void;
   onClose: () => void;
 };
@@ -36,13 +36,13 @@ En vous remerciant,`;
 
 export const ContactByEmail = ({
   siret,
-  offer,
+  romeCode,
   onSuccess,
   onClose,
 }: ContactByEmailProps) => {
   const initialValues: ContactEstablishmentByMailDto = {
     siret,
-    offer,
+    romeCode,
     contactMode: "EMAIL",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

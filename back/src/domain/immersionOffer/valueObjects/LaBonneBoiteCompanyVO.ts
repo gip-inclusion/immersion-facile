@@ -1,17 +1,5 @@
-import {
-  addressStringToDto,
-  defaultMaxContactsPerWeek,
-  NafDto,
-  NumberEmployeesRange,
-  SearchImmersionResultDto,
-  SiretDto,
-} from "shared";
+import { addressStringToDto, SearchImmersionResultDto, SiretDto } from "shared";
 import { createLogger } from "../../../utils/logger";
-import { TimeGateway } from "../../core/ports/TimeGateway";
-import {
-  EstablishmentAggregate,
-  EstablishmentEntity,
-} from "../entities/EstablishmentEntity";
 
 const logger = createLogger(__filename);
 
@@ -71,46 +59,6 @@ export class LaBonneBoiteCompanyVO {
       urlOfPartner: this.props.url,
       voluntaryToImmersion: false,
       website: "",
-    };
-  }
-
-  // to be deleted in next commit :
-  public toEstablishmentAggregate(
-    timeGateway: TimeGateway,
-    extraData?: {
-      nafDto?: NafDto;
-      numberEmployeesRange?: NumberEmployeesRange;
-    },
-  ): EstablishmentAggregate {
-    const establishment: EstablishmentEntity = {
-      address: addressStringToDto(this.props.address),
-      position: {
-        lat: this.props.lat,
-        lon: this.props.lon,
-      },
-      nafDto: extraData?.nafDto ?? { code: this.props.naf, nomenclature: "" }, // Unknown nomenclature (would required to call sirene API)
-      sourceProvider: "api_labonneboite",
-      name: this.props.name,
-      siret: this.props.siret,
-      voluntaryToImmersion: false,
-      numberEmployeesRange: extraData?.numberEmployeesRange ?? "",
-      isActive: true,
-      updatedAt: undefined,
-      isSearchable: true,
-      additionalInformation: "",
-      website: this.props.website ?? this.props.url,
-      maxContactsPerWeek: defaultMaxContactsPerWeek,
-    };
-
-    return {
-      establishment,
-      immersionOffers: [
-        {
-          romeCode: this.props.matched_rome_code,
-          score: this.props.stars,
-          createdAt: timeGateway.now(),
-        },
-      ],
     };
   }
 

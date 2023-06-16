@@ -1064,7 +1064,6 @@ describe("Postgres implementation of immersion offer repository", () => {
         .withEstablishmentSiret(existingSiret)
         .withImmersionOffers([
           new ImmersionOfferEntityV2Builder() // Offer with code A1402 without an appellation
-            .withAppellationCode(undefined)
             .withRomeCode("A1402")
             .build(),
           new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation

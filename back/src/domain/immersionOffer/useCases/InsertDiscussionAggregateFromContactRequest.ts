@@ -34,7 +34,7 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
       potentialBeneficiaryFirstName: params.potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName: params.potentialBeneficiaryLastName,
       potentialBeneficiaryEmail: params.potentialBeneficiaryEmail,
-      romeCode: params.offer.romeCode,
+      romeCode: params.romeCode,
       siret: params.siret,
       contactMode: params.contactMode,
       createdAt: now,
