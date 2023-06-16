@@ -1,126 +1,142 @@
-// import { addDays } from "date-fns";
+import subDays from "date-fns/subDays";
+import { keys } from "ramda";
 import { z } from "zod";
-import { AddressAndPosition, SiretDto } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { createLogger } from "../../../utils/logger";
+import { SiretDto, SiretEstablishmentDto } from "shared";
 import { TimeGateway } from "../../core/ports/TimeGateway";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UseCase } from "../../core/UseCase";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
-import { getSiretEstablishmentFromApi } from "../../sirene/service/getSirenEstablishmentFromApi";
-import { AddressGateway } from "../ports/AddressGateway";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
+import {
+  UpdateEstablishmentsWithInseeDataParams,
+  ValuesToUpdateFromInseeApi,
+} from "../ports/EstablishmentAggregateRepository";
 
-// const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
+type Report = {
+  numberOfEstablishmentsToUpdate: number;
+  establishmentWithNewData: number;
+  callsToInseeApi: number;
+  errors?: Record<SiretDto, any>;
+};
 
-const logger = createLogger(__filename);
+type BatchReport = {
+  numberOfEstablishmentsToUpdateInBatch: number;
+  establishmentWithNewDataInBatch: number;
+};
 
-// This use case is kept as inspiration for when we'll need to update establishments from SIREN API (ours not LBB)
 export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
   void,
-  number
+  Report
 > {
+  private callsToInseeApi = 0;
+
   constructor(
-    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
+    private uowPerformer: UnitOfWorkPerformer,
     private readonly siretGateway: SiretGateway,
-    private readonly addressAPI: AddressGateway,
     private readonly timeGateway: TimeGateway,
+    private readonly maxEstablishmentsPerBatch: number = 1000,
+    private readonly maxEstablishmentsPerFullRun: number = 5000,
   ) {
     super();
   }
 
   inputSchema = z.void();
 
-  public async _execute() {
-    // const since = addDays(
-    //   this.timeGateway.now(),
-    //   -SIRENE_NB_DAYS_BEFORE_REFRESH,
-    // );
-    const establishmentSiretsToUpdate: SiretDto[] = [];
-    // await this.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
-    //   since,
-    // );
+  public async _execute(_: void): Promise<Report> {
+    this.callsToInseeApi = 0;
+    const now = this.timeGateway.now();
+    const since = subDays(now, 30);
 
-    logger.info(
-      `Found ${establishmentSiretsToUpdate.length} establishments to update`,
-    );
+    let offset = 0;
+    let numberOfEstablishmentsToUpdate = 0;
+    let establishmentWithNewData = 0;
 
-    // TODO parallelize this using Promise.all once we know it works :)
-    for (const siret of establishmentSiretsToUpdate) {
-      try {
-        await this.updateEstablishmentWithSiret(siret);
-      } catch (error) {
-        logger.warn(
-          "Accountered an error when updating establishment with siret :",
-          siret,
-          error,
-        );
-      }
+    while (this.maxEstablishmentsPerFullRun > offset) {
+      const {
+        numberOfEstablishmentsToUpdateInBatch,
+        establishmentWithNewDataInBatch,
+      } = await this.processOneBatch(now, since);
+
+      numberOfEstablishmentsToUpdate += numberOfEstablishmentsToUpdateInBatch;
+      establishmentWithNewData += establishmentWithNewDataInBatch;
+
+      offset += this.maxEstablishmentsPerBatch;
     }
 
-    return establishmentSiretsToUpdate.length;
+    return {
+      numberOfEstablishmentsToUpdate,
+      establishmentWithNewData,
+      callsToInseeApi: this.callsToInseeApi,
+    };
   }
 
-  private async updateEstablishmentWithSiret(siret: string) {
-    const siretEstablishmentDto = await getSiretEstablishmentFromApi(
-      { siret, includeClosedEstablishments: false },
-      this.siretGateway,
-    ).catch(async (error) => {
-      if (error instanceof NotFoundError) {
-        await this.establishmentAggregateRepository.updateEstablishment({
-          siret,
-          updatedAt: this.timeGateway.now(),
-          isActive: false,
-        });
-        return;
-      }
-      throw error;
-    });
-    if (!siretEstablishmentDto) return;
+  private processOneBatch = async (
+    now: Date,
+    since: Date,
+    // offset: number,
+  ): Promise<BatchReport> => {
+    const establishmentSiretsToUpdate: SiretDto[] =
+      await this.uowPerformer.perform(async (uow: UnitOfWork) =>
+        uow.establishmentAggregateRepository.getSiretsOfEstablishmentsNotCheckedAtInseeSince(
+          since,
+          this.maxEstablishmentsPerBatch,
+        ),
+      );
 
-    const { nafDto, numberEmployeesRange, businessAddress } =
-      siretEstablishmentDto;
+    const siretEstablishmentsWithChanges =
+      await this.getEstablishmentsUpdatesFromInsee(
+        since,
+        establishmentSiretsToUpdate,
+      );
 
-    const positionAndAddress = await this.getPositionAndAddressIfNeeded(
-      siret,
-      businessAddress,
+    const paramsToUpdate: UpdateEstablishmentsWithInseeDataParams =
+      establishmentSiretsToUpdate.reduce(
+        (acc, siret): UpdateEstablishmentsWithInseeDataParams => ({
+          ...acc,
+          [siret]: siretEstablishmentToValuesToUpdateInEstablishment(
+            siretEstablishmentsWithChanges[siret],
+          ),
+        }),
+        {} satisfies UpdateEstablishmentsWithInseeDataParams,
+      );
+
+    await this.uowPerformer.perform(async (uow: UnitOfWork) =>
+      uow.establishmentAggregateRepository.updateEstablishmentsWithInseeData(
+        now,
+        paramsToUpdate,
+      ),
     );
 
-    await this.establishmentAggregateRepository.updateEstablishment({
-      siret,
-      updatedAt: this.timeGateway.now(),
-      nafDto,
-      numberEmployeesRange,
-      ...(positionAndAddress ? positionAndAddress : {}),
-    });
-  }
+    return {
+      numberOfEstablishmentsToUpdateInBatch: establishmentSiretsToUpdate.length,
+      establishmentWithNewDataInBatch: keys(siretEstablishmentsWithChanges)
+        .length,
+    };
+  };
 
-  private async getPositionAndAddressIfNeeded(
-    siret: string,
-    formattedAddress: string,
-  ): Promise<AddressAndPosition | undefined> {
-    const establishmentAggregate =
-      await this.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
+  private async getEstablishmentsUpdatesFromInsee(
+    since: Date,
+    establishmentSiretsToUpdate: SiretDto[],
+  ): Promise<Partial<Record<SiretDto, SiretEstablishmentDto>>> {
+    if (establishmentSiretsToUpdate.length > 0) {
+      const results = await this.siretGateway.getEstablishmentUpdatedSince(
+        since,
+        establishmentSiretsToUpdate,
       );
+      this.callsToInseeApi++;
+      return results;
+    }
 
-    const hasNeverBeenUpdated =
-      !establishmentAggregate?.establishment?.updatedAt;
-
-    if (hasNeverBeenUpdated)
-      return (await this.addressAPI.lookupStreetAddress(formattedAddress)).at(
-        0,
-      );
-
-    const cityInAggregate = establishmentAggregate?.establishment?.address.city
-      .trim()
-      .toLowerCase();
-
-    if (
-      cityInAggregate &&
-      formattedAddress.toLowerCase().includes(cityInAggregate)
-    )
-      return;
-
-    return (await this.addressAPI.lookupStreetAddress(formattedAddress)).at(0);
+    return {};
   }
 }
+
+const siretEstablishmentToValuesToUpdateInEstablishment = (
+  params: Partial<SiretEstablishmentDto> = {},
+): Partial<ValuesToUpdateFromInseeApi> => ({
+  ...(params.nafDto !== undefined ? { nafDto: params.nafDto } : {}),
+  ...(params.businessName !== undefined ? { name: params.businessName } : {}),
+  ...(params.isOpen !== undefined ? { isActive: params.isOpen } : {}),
+  ...(params.numberEmployeesRange !== undefined
+    ? { numberEmployeesRange: params.numberEmployeesRange }
+    : {}),
+});

@@ -57,4 +57,33 @@ export interface EstablishmentAggregateRepository {
   getSiretOfEstablishmentsToSuggestUpdate: (
     before: Date,
   ) => Promise<SiretDto[]>;
+
+  getSiretsOfEstablishmentsNotCheckedAtInseeSince: (
+    checkDate: Date,
+    maxResults: number,
+  ) => Promise<SiretDto[]>;
+
+  updateEstablishmentsWithInseeData: (
+    inseeCheckDate: Date,
+    params: UpdateEstablishmentsWithInseeDataParams,
+  ) => Promise<void>;
 }
+
+// export type ValuesToUpdateFromInseeApi = Partial<
+//   Pick<
+//     SiretEstablishmentDto,
+//     "nafDto" | "numberEmployeesRange" | "businessName" | "isOpen"
+//   >
+// >;
+
+export type ValuesToUpdateFromInseeApi = Partial<
+  Pick<
+    EstablishmentEntity,
+    "name" | "numberEmployeesRange" | "isActive" | "nafDto"
+  >
+>;
+
+export type UpdateEstablishmentsWithInseeDataParams = Record<
+  SiretDto,
+  ValuesToUpdateFromInseeApi
+>;

@@ -56,7 +56,7 @@ export class InseeSiretGateway implements SiretGateway {
   public async getEstablishmentUpdatedSince(
     date: Date,
     sirets: SiretDto[],
-  ): Promise<SiretEstablishmentDto[]> {
+  ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
       const axios = this.createAxiosInstance();
@@ -93,8 +93,15 @@ export class InseeSiretGateway implements SiretGateway {
         },
       });
 
-      return response.data.etablissements.map(
-        convertSirenRawEstablishmentToSirenEstablishmentDto,
+      return (
+        response.data.etablissements as InseeApiRawEstablishment[]
+      ).reduce(
+        (acc, establishment) => ({
+          ...acc,
+          [establishment.siret]:
+            convertSirenRawEstablishmentToSirenEstablishmentDto(establishment),
+        }),
+        {} satisfies Record<SiretDto, SiretEstablishmentDto>,
       );
     } catch (error: any) {
       throw error?.response.data;

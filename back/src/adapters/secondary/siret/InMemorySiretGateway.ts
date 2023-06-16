@@ -79,6 +79,23 @@ export class InMemorySiretGateway implements SiretGateway {
     [TEST_ESTABLISHMENT4.siret]: TEST_ESTABLISHMENT4,
   };
 
+  public async getEstablishmentUpdatedSince(
+    _date: Date,
+    sirets: SiretDto[],
+  ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
+    return this.siretEstablishmentsUpdateSince
+      .filter((siretEstablishmentDto) =>
+        sirets.includes(siretEstablishmentDto.siret),
+      )
+      .reduce(
+        (acc, siretEstablishmentDto) => ({
+          ...acc,
+          [siretEstablishmentDto.siret]: siretEstablishmentDto,
+        }),
+        {} as Record<SiretDto, SiretEstablishmentDto>,
+      );
+  }
+
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
@@ -125,4 +142,6 @@ export class InMemorySiretGateway implements SiretGateway {
   public setError(error: any) {
     this._error = error;
   }
+
+  public siretEstablishmentsUpdateSince: SiretEstablishmentDto[] = [];
 }
