@@ -50,6 +50,12 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
     if (includeClosedEstablishments) return formattedResult;
     if (formattedResult.isOpen) return formattedResult;
   }
+
+  getEstablishmentUpdatedSince(): Promise<
+    Record<SiretDto, SiretEstablishmentDto>
+  > {
+    throw new Error("Method not implemented. Use insee version please.");
+  }
 }
 
 export const convertAdeEstablishmentToSirenEstablishmentDto = (

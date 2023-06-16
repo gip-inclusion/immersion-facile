@@ -23,6 +23,7 @@ export type EstablishmentEntity = {
   nafDto: NafDto;
   numberEmployeesRange: NumberEmployeesRange;
   updatedAt?: Date;
+  lastInseeCheck?: Date;
   isActive: boolean;
   isSearchable: boolean;
   isCommited?: boolean;

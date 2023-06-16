@@ -5,4 +5,8 @@ export interface SiretGateway {
     siret: SiretDto,
     includeClosedEstablishments?: boolean,
   ): Promise<SiretEstablishmentDto | undefined>;
+  getEstablishmentUpdatedSince(
+    date: Date,
+    sirets: SiretDto[],
+  ): Promise<Partial<Record<SiretDto, SiretEstablishmentDto>>>;
 }

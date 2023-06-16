@@ -3,18 +3,15 @@ import { random, sleep } from "shared";
 import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
-import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
-import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
-import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
+import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
@@ -46,41 +43,47 @@ const main = async () => {
     retryStrategy,
   );
 
-  const addressAPI = new HttpAddressGateway(
-    configureCreateHttpClientForExternalApi()(addressesExternalTargets),
-    config.apiKeyOpenCageDataGeocoding,
-    config.apiKeyOpenCageDataGeosearch,
-  );
-
+  const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
-    connectionString: config.pgImmersionDbUrl,
+    connectionString: dbUrl,
   });
-  const client = await pool.connect();
 
-  const establishmentAggregateRepository =
-    new PgEstablishmentAggregateRepository(client);
+  const { uowPerformer } = createUowPerformer(config, () => pool);
 
   const updateEstablishmentsFromSirenAPI =
     new UpdateEstablishmentsFromSirenApiScript(
-      establishmentAggregateRepository,
+      uowPerformer,
       siretGateway,
-      addressAPI,
       new RealTimeGateway(),
     );
 
   stats.stopTimer("total_runtime");
-  const numberOfEstablishmentsToUpdate =
-    await updateEstablishmentsFromSirenAPI.execute();
-  client.release();
-  return { numberOfEstablishmentsToUpdate };
+  const report = await updateEstablishmentsFromSirenAPI.execute();
+  await pool.end();
+
+  return report;
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
-  "update-establishments-from-sirene",
+  "update-establishments-from-insee-api",
   config,
   main,
-  ({ numberOfEstablishmentsToUpdate }) =>
-    `Script finished with success. Updated ${numberOfEstablishmentsToUpdate} establishments`,
+  ({
+    numberOfEstablishmentsToUpdate,
+    establishmentWithNewData,
+    errors = {},
+  }) => {
+    const nSiretFailed = Object.keys(errors).length;
+    const errorsAsString = Object.keys(errors)
+      .map((siret) => `For siret ${siret} : ${errors[siret]} `)
+      .join("\n");
+
+    return [
+      `Updating ${numberOfEstablishmentsToUpdate} establishments for Insee Api`,
+      `A which ${establishmentWithNewData} had new data`,
+      ...(nSiretFailed > 0 ? [`Errors were: ${errorsAsString}`] : []),
+    ].join("\n");
+  },
   logger,
 );

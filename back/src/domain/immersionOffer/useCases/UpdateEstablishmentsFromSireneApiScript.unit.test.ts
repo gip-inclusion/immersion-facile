@@ -1,318 +1,315 @@
-import { AddressDto, pathEq } from "shared";
+import subDays from "date-fns/subDays";
+import { expectToEqual, SiretEstablishmentDto } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
-
-const prepareUseCase = () => {
-  const siretGateway = new InMemorySiretGateway();
-  const uow = createInMemoryUow();
-  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
-  const timeGateway = new CustomTimeGateway();
-  const addressAPI = new InMemoryAddressGateway();
-  const useCase = new UpdateEstablishmentsFromSirenApiScript(
-    establishmentAggregateRepository,
-    siretGateway,
-    addressAPI,
-    timeGateway,
-  );
-
-  return {
-    siretGateway,
-    establishmentAggregateRepository,
-    addressAPI,
-    timeGateway,
-    useCase,
-  };
-};
-
-const makeEstablishmentWithUpdatedAt = (siret: string, updatedAt: Date) =>
-  new EstablishmentAggregateBuilder()
-    .withEstablishment(
-      new EstablishmentEntityBuilder()
-        .withSiret(siret)
-        .withUpdatedAt(updatedAt)
-        .build(),
-    )
-    .build();
-
-const findEstablishmentEntityGivenSiret = (
-  establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository,
-  siret: string,
-): EstablishmentEntity | undefined =>
-  establishmentAggregateRepository.establishmentAggregates.find(
-    pathEq("establishment.siret", siret),
-  )?.establishment;
 
 // This use case is kept as inspiration for when we'll need to update establishments from SIREN API (ours not LBB)
 // eslint-disable-next-line jest/no-disabled-tests
-describe.skip("Update establishments from Sirene API", () => {
-  const now = new Date("2020-01-13T00:00:00");
-  const lessThanAWeekAgo = new Date("2020-01-07T00:00:00");
-  const moreThanAWeekAgo = new Date("2020-01-06T00:00:00");
 
-  it("Should update modification date of establishments that have not been modified since one week", async () => {
-    const {
-      timeGateway,
+const maxEstablishmentsPerBatch = 1;
+const maxEstablishmentsPerFullRun = 2;
+const now = new Date("2023-06-16");
+
+describe("Update establishments from Sirene API", () => {
+  let updateEstablishmentsScript: UpdateEstablishmentsFromSirenApiScript;
+  let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
+  let siretGateway: InMemorySiretGateway;
+
+  beforeEach(() => {
+    siretGateway = new InMemorySiretGateway();
+    uow = createInMemoryUow();
+    const uowPerformer = new InMemoryUowPerformer(uow);
+    timeGateway = new CustomTimeGateway();
+    timeGateway.setNextDate(now);
+    updateEstablishmentsScript = new UpdateEstablishmentsFromSirenApiScript(
+      uowPerformer,
       siretGateway,
-      establishmentAggregateRepository,
-      useCase,
-    } = prepareUseCase();
-    // Prepare
-    establishmentAggregateRepository.establishmentAggregates = [
-      makeEstablishmentWithUpdatedAt("oldSiret", moreThanAWeekAgo),
-      makeEstablishmentWithUpdatedAt("recentSiret", lessThanAWeekAgo),
-    ];
-    siretGateway.setSirenEstablishment(
-      new SirenEstablishmentDtoBuilder().withSiret("recentSiret").build(),
-    );
-    timeGateway.setNextDate(now);
-
-    // Act
-    await useCase.execute();
-
-    // Assert old establishments only have been updated
-    expect(
-      findEstablishmentEntityGivenSiret(
-        establishmentAggregateRepository,
-        "oldSiret",
-      )?.updatedAt,
-    ).toEqual(now);
-    expect(
-      findEstablishmentEntityGivenSiret(
-        establishmentAggregateRepository,
-        "recentSiret",
-      )?.updatedAt,
-    ).toEqual(lessThanAWeekAgo);
-  });
-
-  it("Should close establishments that are not longer referenced in Sirene API", async () => {
-    // Prepare
-    const { timeGateway, establishmentAggregateRepository, useCase } =
-      prepareUseCase();
-    establishmentAggregateRepository.establishmentAggregates = [
-      makeEstablishmentWithUpdatedAt(
-        "closedEstablishmentSiret", // This siret is not referenced in siretGateway
-        moreThanAWeekAgo,
-      ),
-    ];
-    timeGateway.setNextDate(now);
-
-    // Act
-    await useCase.execute();
-
-    // Assert
-    expectEstablishmentToMatch(
-      findEstablishmentEntityGivenSiret(
-        establishmentAggregateRepository,
-        "closedEstablishmentSiret",
-      ),
-      { isActive: false, updatedAt: now },
-    );
-  });
-  it("Should update naf code and number of employee range of establishment based on Sirene answer", async () => {
-    // Prepare
-    const {
       timeGateway,
-      siretGateway,
-      establishmentAggregateRepository,
-      useCase,
-    } = prepareUseCase();
-    establishmentAggregateRepository.establishmentAggregates = [
-      makeEstablishmentWithUpdatedAt("establishmentToUpdate", moreThanAWeekAgo),
-    ];
-    siretGateway.setSirenEstablishment(
-      new SirenEstablishmentDtoBuilder()
-        .withSiret("establishmentToUpdate")
-        .withNafDto({ code: "8559A", nomenclature: "nafNom" })
-        .withNumberEmployeesRange("1-2")
-        .build(),
-    );
-
-    timeGateway.setNextDate(now);
-
-    // Act
-    await useCase.execute();
-
-    // Assert
-    expectEstablishmentToMatch(
-      findEstablishmentEntityGivenSiret(
-        establishmentAggregateRepository,
-        "establishmentToUpdate",
-      ),
-      {
-        updatedAt: now,
-        nafDto: { code: "8559A", nomenclature: "nafNom" },
-        numberEmployeesRange: "1-2",
-      },
+      maxEstablishmentsPerBatch,
+      maxEstablishmentsPerFullRun,
     );
   });
 
-  describe("Should update establishment address and position based on sirene and address API", () => {
-    it("When address API succeeds, it should update address and coordinates", async () => {
-      // Prepare
-      const {
-        timeGateway,
-        siretGateway,
-        establishmentAggregateRepository,
-        addressAPI,
-        useCase,
-      } = prepareUseCase();
-      establishmentAggregateRepository.establishmentAggregates = [
-        makeEstablishmentWithUpdatedAt(
-          "establishmentToUpdate",
-          moreThanAWeekAgo,
-        ),
-      ];
-      siretGateway.setSirenEstablishment(
-        new SirenEstablishmentDtoBuilder()
-          .withSiret("establishmentToUpdate")
-          .withBusinessAddress("25 rue du Premier Film 69008 Lyon")
-          .build(),
-      );
-      const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
+  it("when there is no establishment which needs an update", async () => {
+    const establishmentAggregate = makeEstablishmentWithLastInseeCheck(
+      "11110000111100",
+      subDays(now, 29),
+    );
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishmentAggregate,
+    ];
 
-      const newAddressFromSirenApi: AddressDto = {
-        streetNumberAndAddress: "25 Rue du Premier Film",
-        city: "Lyon",
-        departmentCode: "69",
-        postcode: "69008",
-      };
+    const report = await updateEstablishmentsScript.execute();
 
-      addressAPI.setAddressAndPosition([
-        {
-          address: newAddressFromSirenApi,
-          position: newEstablishmentPosition,
-        },
-      ]);
+    expectToEqual(report, {
+      numberOfEstablishmentsToUpdate: 0,
+      establishmentWithNewData: 0,
+      callsToInseeApi: 0,
+    });
+    expectToEqual(
+      uow.establishmentAggregateRepository.establishmentAggregates,
+      [establishmentAggregate],
+    );
+  });
 
-      timeGateway.setNextDate(now);
+  describe("when there is an establishment which needs an update", () => {
+    describe("when insee returns no update", () => {
+      it("establishment has never been updated with insee data", async () => {
+        const establishmentAggregate = makeEstablishmentWithLastInseeCheck(
+          "11110000111100",
+          undefined,
+        );
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishmentAggregate,
+        ];
+        siretGateway.siretEstablishmentsUpdateSince = [];
 
-      // Act
-      await useCase.execute();
+        const report = await updateEstablishmentsScript.execute();
 
-      // Assert
-      expectEstablishmentToMatch(
-        findEstablishmentEntityGivenSiret(
-          establishmentAggregateRepository,
-          "establishmentToUpdate",
-        ),
-        {
-          updatedAt: now,
-          address: newAddressFromSirenApi,
-          position: newEstablishmentPosition,
-        },
-      );
+        expectToEqual(report, {
+          numberOfEstablishmentsToUpdate: 1,
+          establishmentWithNewData: 0,
+          callsToInseeApi: 1,
+        });
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            makeEstablishmentWithLastInseeCheck(
+              establishmentAggregate.establishment.siret,
+              now,
+            ),
+          ],
+        );
+      });
+
+      it("establishment has been updated with insee data long ago", async () => {
+        const establishmentAggregate = makeEstablishmentWithLastInseeCheck(
+          "11110000111100",
+          subDays(now, 31),
+        );
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishmentAggregate,
+        ];
+        siretGateway.siretEstablishmentsUpdateSince = [];
+
+        const report = await updateEstablishmentsScript.execute();
+
+        expectToEqual(report, {
+          numberOfEstablishmentsToUpdate: 1,
+          establishmentWithNewData: 0,
+          callsToInseeApi: 1,
+        });
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            makeEstablishmentWithLastInseeCheck(
+              establishmentAggregate.establishment.siret,
+              now,
+            ),
+          ],
+        );
+      });
     });
 
-    it("When api succeeds but establishment as already been updated and new address is in the same city, it should not update", async () => {
-      // Prepare
-      const {
-        timeGateway,
-        siretGateway,
-        establishmentAggregateRepository,
-        addressAPI,
-        useCase,
-      } = prepareUseCase();
-      const initialEstablishmentAggregate = makeEstablishmentWithUpdatedAt(
-        "establishmentToUpdate",
-        moreThanAWeekAgo,
-      );
-      establishmentAggregateRepository.establishmentAggregates = [
-        initialEstablishmentAggregate,
-      ];
-      siretGateway.setSirenEstablishment(
-        new SirenEstablishmentDtoBuilder()
-          .withSiret("establishmentToUpdate")
-          .withBusinessAddress("7 rue Guillaume Tell 75017 Paris")
-          .build(),
-      );
-      const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
+    describe("When insee returns updated data", () => {
+      it("establishment has been updated with insee data long ago", async () => {
+        const establishmentSiret = "11110000111100";
 
-      const newAddressFromSirenApi: AddressDto = {
-        streetNumberAndAddress: "7 RUE GUILLAUME TELL",
-        city: "PARIS",
-        departmentCode: "75",
-        postcode: "75017",
-      };
+        const initialEstablishmentAggregate =
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(establishmentSiret)
+                .withLastInseeCheck(subDays(now, 31))
+                .withNafDto({ code: "999", nomenclature: "Old" })
+                .withName("My old Business")
+                .withCustomizedName("This is my custom name")
+                .withIsActive(true)
 
-      addressAPI.setAddressAndPosition([
-        {
-          address: newAddressFromSirenApi,
-          position: newEstablishmentPosition,
-        },
-      ]);
+                .build(),
+            )
+            .build();
 
-      timeGateway.setNextDate(now);
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          initialEstablishmentAggregate,
+        ];
+        const siretEstablishmentDto = {
+          siret: establishmentSiret,
+          isOpen: false,
+          numberEmployeesRange: "10-19",
+          businessName: "My updated Business",
+          nafDto: { code: "123", nomenclature: "Yo" },
+          businessAddress: "Address which should not be updated",
+        } satisfies SiretEstablishmentDto;
+        siretGateway.siretEstablishmentsUpdateSince = [siretEstablishmentDto];
 
-      // Act
-      await useCase.execute();
+        const report = await updateEstablishmentsScript.execute();
 
-      // Assert
-      expectEstablishmentToMatch(
-        findEstablishmentEntityGivenSiret(
-          establishmentAggregateRepository,
-          "establishmentToUpdate",
-        ),
-        {
-          updatedAt: now,
-          address: initialEstablishmentAggregate.establishment.address,
-          position: initialEstablishmentAggregate.establishment.position,
-        },
-      );
-    });
+        expectToEqual(report, {
+          numberOfEstablishmentsToUpdate: 1,
+          establishmentWithNewData: 1,
+          callsToInseeApi: 1,
+        });
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            new EstablishmentAggregateBuilder(initialEstablishmentAggregate)
+              .withEstablishment(
+                new EstablishmentEntityBuilder(
+                  initialEstablishmentAggregate.establishment,
+                )
+                  .withIsActive(siretEstablishmentDto.isOpen)
+                  .withName(siretEstablishmentDto.businessName)
+                  .withNafDto(siretEstablishmentDto.nafDto)
+                  .withNumberOfEmployeeRange(
+                    siretEstablishmentDto.numberEmployeesRange,
+                  )
+                  .withLastInseeCheck(now)
+                  .build(),
+              )
+              .build(),
+          ],
+        );
+      });
 
-    it("If adresse API fails, it should not change the address and position", async () => {
-      // Prepare
-      const {
-        timeGateway,
-        siretGateway,
-        establishmentAggregateRepository,
-        addressAPI,
-        useCase,
-      } = prepareUseCase();
-      const establishmentToUpdate = makeEstablishmentWithUpdatedAt(
-        "establishmentToUpdate",
-        moreThanAWeekAgo,
-      );
-      establishmentAggregateRepository.establishmentAggregates = [
-        establishmentToUpdate,
-      ];
-      siretGateway.setSirenEstablishment(
-        new SirenEstablishmentDtoBuilder()
-          .withSiret("establishmentToUpdate")
-          .withBusinessAddress("75007 PARIS")
-          .build(),
-      );
-      addressAPI.setNextPosition(undefined);
-      timeGateway.setNextDate(now);
+      it("updates only number of establishment up to the maximum provided", async () => {
+        const establishmentSiret = "11110000111100";
 
-      // Act
-      await useCase.execute();
+        const initialEstablishmentAggregate =
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(establishmentSiret)
+                .withLastInseeCheck(subDays(now, 31))
+                .withNafDto({ code: "999", nomenclature: "Old" })
+                .withName("My old Business")
+                .withCustomizedName("This is my custom name")
+                .withIsActive(true)
 
-      // Assert
-      expectEstablishmentToMatch(
-        findEstablishmentEntityGivenSiret(
-          establishmentAggregateRepository,
-          "establishmentToUpdate",
-        ),
-        {
-          updatedAt: now, // still, updated !
-          address: establishmentToUpdate.establishment.address, // unchanged
-          position: establishmentToUpdate.establishment.position, // unchanged
-        },
-      );
+                .build(),
+            )
+            .build();
+
+        const establishmentSiret2 = "22220000222200";
+
+        const initialEstablishmentAggregate2 =
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(establishmentSiret2)
+                .withLastInseeCheck(subDays(now, 31))
+                .withNafDto({ code: "999", nomenclature: "Old" })
+                .withName("My old Business")
+                .withCustomizedName("This is my custom name")
+                .withIsActive(true)
+
+                .build(),
+            )
+            .build();
+
+        const establishmentSiret3 = "33330000333300";
+
+        const initialEstablishmentAggregate3 =
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(establishmentSiret3)
+                .withLastInseeCheck(subDays(now, 31))
+                .withNafDto({ code: "999", nomenclature: "Old" })
+                .withName("My old Business")
+                .withCustomizedName("This is my custom name")
+                .withIsActive(true)
+
+                .build(),
+            )
+            .build();
+
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          initialEstablishmentAggregate,
+          initialEstablishmentAggregate2,
+          initialEstablishmentAggregate3,
+        ];
+
+        const siretEstablishmentDto = {
+          siret: establishmentSiret,
+          isOpen: false,
+          numberEmployeesRange: "10-19",
+          businessName: "My updated Business",
+          nafDto: { code: "123", nomenclature: "Yo" },
+          businessAddress: "Address which should not be updated",
+        } satisfies SiretEstablishmentDto;
+        siretGateway.siretEstablishmentsUpdateSince = [
+          siretEstablishmentDto,
+          { ...siretEstablishmentDto, siret: establishmentSiret2 },
+        ];
+
+        const report = await updateEstablishmentsScript.execute();
+
+        expectToEqual(report, {
+          numberOfEstablishmentsToUpdate: 2,
+          establishmentWithNewData: 2,
+          callsToInseeApi: 2,
+        });
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            new EstablishmentAggregateBuilder(initialEstablishmentAggregate)
+              .withEstablishment(
+                new EstablishmentEntityBuilder(
+                  initialEstablishmentAggregate.establishment,
+                )
+                  .withIsActive(siretEstablishmentDto.isOpen)
+                  .withName(siretEstablishmentDto.businessName)
+                  .withNafDto(siretEstablishmentDto.nafDto)
+                  .withNumberOfEmployeeRange(
+                    siretEstablishmentDto.numberEmployeesRange,
+                  )
+                  .withLastInseeCheck(now)
+                  .build(),
+              )
+              .build(),
+            new EstablishmentAggregateBuilder(initialEstablishmentAggregate2)
+              .withEstablishment(
+                new EstablishmentEntityBuilder(
+                  initialEstablishmentAggregate2.establishment,
+                )
+                  .withIsActive(siretEstablishmentDto.isOpen)
+                  .withName(siretEstablishmentDto.businessName)
+                  .withNafDto(siretEstablishmentDto.nafDto)
+                  .withNumberOfEmployeeRange(
+                    siretEstablishmentDto.numberEmployeesRange,
+                  )
+                  .withLastInseeCheck(now)
+                  .build(),
+              )
+              .build(),
+            initialEstablishmentAggregate3,
+          ],
+        );
+      });
     });
   });
 });
 
-const expectEstablishmentToMatch = (
-  actualEstablishment: undefined | EstablishmentEntity,
-  expected: Partial<EstablishmentEntity>,
-) => expect(actualEstablishment).toMatchObject(expected);
+const makeEstablishmentWithLastInseeCheck = (
+  siret: string,
+  lastInseeCheck: Date | undefined,
+) =>
+  new EstablishmentAggregateBuilder()
+    .withEstablishment(
+      new EstablishmentEntityBuilder()
+        .withSiret(siret)
+        .withLastInseeCheck(lastInseeCheck)
+        .build(),
+    )
+    .build();

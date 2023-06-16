@@ -18,6 +18,7 @@ import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEn
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
+  UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { createLogger } from "../../../utils/logger";
 import { NotFoundError } from "../../primary/helpers/httpErrors";
@@ -760,6 +761,19 @@ export class PgEstablishmentAggregateRepository
     );
 
     return response.rows.map(({ siret }) => siret);
+  }
+
+  getSiretsOfEstablishmentsNotCheckedAtInseeSince(
+    _checkDate: Date,
+  ): Promise<SiretDto[]> {
+    throw new Error("Method not implemented. Todo : implement it");
+  }
+
+  updateEstablishmentsWithInseeData(
+    _inseeCheckDate: Date,
+    _params: UpdateEstablishmentsWithInseeDataParams,
+  ): Promise<void> {
+    throw new Error("Method not implemented. Todo : implement it");
   }
 }
 

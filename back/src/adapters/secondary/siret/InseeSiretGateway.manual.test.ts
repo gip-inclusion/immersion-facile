@@ -56,8 +56,8 @@ describe("HttpSirenGateway", () => {
     );
 
     expect(response).toHaveLength(1);
-    expectToEqual(response, [
-      {
+    expectToEqual(response, {
+      [testSiret]: {
         siret: testSiret,
         businessName: "RHUM DE SAINT MAURICE",
         businessAddress: "LD ST MAURICE 97320 SAINT-LAURENT-DU-MARONI",
@@ -68,6 +68,6 @@ describe("HttpSirenGateway", () => {
         },
         numberEmployeesRange: "20-49",
       },
-    ]);
+    });
   });
 });

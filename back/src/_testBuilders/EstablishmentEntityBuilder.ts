@@ -78,10 +78,10 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  notActive() {
+  withIsActive(isActive: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      isActive: false,
+      isActive,
     });
   }
 
@@ -101,6 +101,10 @@ export class EstablishmentEntityBuilder
 
   withUpdatedAt(updatedAt: Date) {
     return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
+  }
+
+  withLastInseeCheck(lastInseeCheck: Date | undefined) {
+    return new EstablishmentEntityBuilder({ ...this.entity, lastInseeCheck });
   }
 
   withMaxContactsPerWeek(maxContactsPerWeek: number) {

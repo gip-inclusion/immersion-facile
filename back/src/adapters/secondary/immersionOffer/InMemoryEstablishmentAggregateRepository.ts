@@ -19,6 +19,7 @@ import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEn
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
+  UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { createLogger } from "../../../utils/logger";
@@ -233,6 +234,43 @@ export class InMemoryEstablishmentAggregateRepository
     establishmentAggregates: EstablishmentAggregate[],
   ) {
     this._establishmentAggregates = establishmentAggregates;
+  }
+
+  public async getSiretsOfEstablishmentsNotCheckedAtInseeSince(
+    checkDate: Date,
+    maxResults: number,
+  ): Promise<SiretDto[]> {
+    return this._establishmentAggregates
+      .filter(
+        (establishmentAggregate) =>
+          !establishmentAggregate.establishment.lastInseeCheck ||
+          establishmentAggregate.establishment.lastInseeCheck < checkDate,
+      )
+      .map(({ establishment }) => establishment.siret)
+      .slice(0, maxResults);
+  }
+
+  public async updateEstablishmentsWithInseeData(
+    inseeCheckDate: Date,
+    params: UpdateEstablishmentsWithInseeDataParams,
+  ): Promise<void> {
+    this._establishmentAggregates = this._establishmentAggregates.map(
+      (aggregate) => {
+        const newValues = params[aggregate.establishment.siret];
+
+        if (newValues)
+          return {
+            ...aggregate,
+            establishment: {
+              ...aggregate.establishment,
+              ...newValues,
+              lastInseeCheck: inseeCheckDate,
+            },
+          };
+
+        return aggregate;
+      },
+    );
   }
 }
 
