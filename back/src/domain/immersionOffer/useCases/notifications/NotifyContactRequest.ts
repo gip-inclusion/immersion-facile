@@ -24,7 +24,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     payload: ContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const { siret, offer: rome } = payload;
+    const { siret } = payload;
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
@@ -59,6 +59,10 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         const cc = contact.copyEmails.filter(
           (email) => email !== contact.email,
         );
+        const immersionOffer = establishmentAggregate.immersionOffers.at(0);
+
+        if (!immersionOffer) throw new Error("No immesion offer found");
+
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
@@ -69,9 +73,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               businessName,
               contactFirstName: contact.firstName,
               contactLastName: contact.lastName,
-              appellationLabel:
-                establishmentAggregate.immersionOffers.at(0)
-                  ?.appellationLabel ?? rome.romeLabel,
+              appellationLabel: immersionOffer.appellationLabel,
               potentialBeneficiaryFirstName:
                 payload.potentialBeneficiaryFirstName,
               potentialBeneficiaryLastName:

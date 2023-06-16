@@ -24,9 +24,14 @@ const offerFromFormScore = 10;
 
 const appelationToImmersionOfferEntity =
   (timeGateway: TimeGateway) =>
-  ({ romeCode, appellationCode }: AppellationDto): ImmersionOfferEntityV2 => ({
+  ({
     romeCode,
     appellationCode,
+    appellationLabel,
+  }: AppellationDto): ImmersionOfferEntityV2 => ({
+    romeCode,
+    appellationCode,
+    appellationLabel,
     score: offerFromFormScore,
     createdAt: timeGateway.now(),
   });

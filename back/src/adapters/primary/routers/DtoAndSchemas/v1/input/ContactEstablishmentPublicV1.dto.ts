@@ -18,9 +18,11 @@ export type ContactEstablishmentByMailPublicV1Dto =
   ContactInformationPublicV1<"EMAIL"> & {
     message: string;
   };
-type ContactEstablishmentInPersonPublicV1Dto =
+
+export type ContactEstablishmentInPersonPublicV1Dto =
   ContactInformationPublicV1<"IN_PERSON">;
-type ContactEstablishmentByPhonePublicV1Dto =
+
+export type ContactEstablishmentByPhonePublicV1Dto =
   ContactInformationPublicV1<"PHONE">;
 
 export type ContactEstablishmentPublicV1Dto =
@@ -31,12 +33,24 @@ export type ContactEstablishmentPublicV1Dto =
 export const contactEstablishmentPublicV1ToDomain = (
   contactRequest: ContactEstablishmentPublicV1Dto,
 ): ContactEstablishmentRequestDto => {
+  // const {
+  //   contactMode,
+  //   potentialBeneficiaryEmail,
+  //   offer,
+  //   potentialBeneficiaryFirstName,
+  //   potentialBeneficiaryLastName,
+  //   siret,
+  // } = contactRequest;
   if (contactRequest.contactMode === "EMAIL")
     return {
       ...contactRequest,
+      romeCode: contactRequest.offer.romeCode,
       potentialBeneficiaryPhone: "Numéro de téléphone non communiqué",
       immersionObjective: null,
     };
 
-  return contactRequest;
+  return {
+    ...contactRequest,
+    romeCode: contactRequest.offer.romeCode,
+  };
 };

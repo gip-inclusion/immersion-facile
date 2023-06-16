@@ -1,15 +1,17 @@
 import { z } from "zod";
 import {
-  contactEstablishmentByPhoneSchema,
-  contactEstablishmentInPersonSchema,
   emailSchema,
   preferEmailContactSchema,
+  preferInPersonContactSchema,
+  preferPhoneContactSchema,
   romeSchema,
   siretSchema,
   zTrimmedString,
 } from "shared";
 import {
   ContactEstablishmentByMailPublicV1Dto,
+  ContactEstablishmentByPhonePublicV1Dto,
+  ContactEstablishmentInPersonPublicV1Dto,
   ContactEstablishmentPublicV1Dto,
 } from "./ContactEstablishmentPublicV1.dto";
 
@@ -28,11 +30,22 @@ const contactEstablishmentByMailSchemaV1: z.Schema<ContactEstablishmentByMailPub
     message: zTrimmedString,
   });
 
+const contactEstablishmentByPhoneSchemaV1: z.Schema<ContactEstablishmentByPhonePublicV1Dto> =
+  z.object({
+    ...commonFields,
+    contactMode: preferPhoneContactSchema,
+  });
+const contactEstablishmentInPersonSchemaV1: z.Schema<ContactEstablishmentInPersonPublicV1Dto> =
+  z.object({
+    ...commonFields,
+    contactMode: preferInPersonContactSchema,
+  });
+
 const contactEstablishmentRequestSchemaV1: z.Schema<ContactEstablishmentPublicV1Dto> =
   z.union([
     contactEstablishmentByMailSchemaV1,
-    contactEstablishmentByPhoneSchema,
-    contactEstablishmentInPersonSchema,
+    contactEstablishmentByPhoneSchemaV1,
+    contactEstablishmentInPersonSchemaV1,
   ]);
 
 export const contactEstablishmentPublicV1Schema: z.Schema<ContactEstablishmentPublicV1Dto> =

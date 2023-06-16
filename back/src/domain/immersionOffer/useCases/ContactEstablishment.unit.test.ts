@@ -23,7 +23,7 @@ const siret = "11112222333344";
 const contactId = "theContactId";
 
 const validRequest: ContactEstablishmentRequestDto = {
-  offer: { romeLabel: "my rome label", romeCode: "B1805" },
+  romeCode: "B1805",
   siret,
   contactMode: "PHONE",
   potentialBeneficiaryFirstName: "potential_beneficiary_first_name",

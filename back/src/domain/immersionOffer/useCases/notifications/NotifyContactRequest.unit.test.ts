@@ -18,7 +18,9 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
-const immersionOffer = new ImmersionOfferEntityV2Builder().build();
+const immersionOffer = new ImmersionOfferEntityV2Builder()
+  .withAppellationLabel(TEST_ROME_LABEL)
+  .build();
 
 const siret = "11112222333344";
 const contactId = "theContactId";
@@ -26,7 +28,7 @@ const TEST_ROME_CODE = "B9112";
 
 const payload: ContactEstablishmentRequestDto = {
   siret,
-  offer: { romeCode: TEST_ROME_CODE, romeLabel: TEST_ROME_LABEL },
+  romeCode: TEST_ROME_CODE,
   contactMode: "PHONE",
   potentialBeneficiaryFirstName: "potential_beneficiary_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",

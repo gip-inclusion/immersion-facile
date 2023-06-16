@@ -7,7 +7,7 @@ import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
   domElementIds,
-  RomeDto,
+  RomeCode,
   SiretDto,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -15,18 +15,18 @@ import { immersionSearchGateway } from "src/config/dependencies";
 
 type ContactByPhoneProps = {
   siret: SiretDto;
-  offer: RomeDto;
+  romeCode: RomeCode;
   onSuccess: () => void;
 };
 
 export const ContactByPhone = ({
   siret,
-  offer,
+  romeCode,
   onSuccess,
 }: ContactByPhoneProps) => {
   const initialValues: ContactEstablishmentByPhoneDto = {
     siret,
-    offer,
+    romeCode,
     contactMode: "PHONE",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

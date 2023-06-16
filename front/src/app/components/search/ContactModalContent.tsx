@@ -2,7 +2,7 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import {
   ContactMethod,
-  RomeDto,
+  RomeCode,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
@@ -13,7 +13,7 @@ import { ContactInPerson } from "./ContactInPerson";
 export type ContactModalContentProps = {
   contactMethod?: ContactMethod;
   siret: SiretDto;
-  offer: RomeDto;
+  romeCode: RomeCode;
   searchResultData?: SearchImmersionResultDto;
   onSuccess: () => void;
   onClose: () => void;
@@ -22,7 +22,7 @@ export type ContactModalContentProps = {
 export const ModalContactContent = ({
   contactMethod,
   siret,
-  offer,
+  romeCode,
   onSuccess,
   searchResultData,
   onClose,
@@ -32,18 +32,26 @@ export const ModalContactContent = ({
       return (
         <ContactByEmail
           siret={siret}
-          offer={offer}
+          romeCode={romeCode}
           onSuccess={onSuccess}
           onClose={onClose}
         />
       );
     case "PHONE":
       return (
-        <ContactByPhone siret={siret} offer={offer} onSuccess={onSuccess} />
+        <ContactByPhone
+          siret={siret}
+          romeCode={romeCode}
+          onSuccess={onSuccess}
+        />
       );
     case "IN_PERSON":
       return (
-        <ContactInPerson siret={siret} offer={offer} onSuccess={onSuccess} />
+        <ContactInPerson
+          siret={siret}
+          romeCode={romeCode}
+          onSuccess={onSuccess}
+        />
       );
     default:
       return <AdvisesForContact data={searchResultData} />;

@@ -7,7 +7,7 @@ import {
   ContactEstablishmentInPersonDto,
   contactEstablishmentInPersonSchema,
   domElementIds,
-  RomeDto,
+  RomeCode,
   SiretDto,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -15,18 +15,18 @@ import { immersionSearchGateway } from "src/config/dependencies";
 
 type ContactInPersonProps = {
   siret: SiretDto;
-  offer: RomeDto;
+  romeCode: RomeCode;
   onSuccess: () => void;
 };
 
 export const ContactInPerson = ({
   siret,
-  offer,
+  romeCode,
   onSuccess,
 }: ContactInPersonProps) => {
   const initialValues: ContactEstablishmentInPersonDto = {
     siret,
-    offer,
+    romeCode,
     contactMode: "IN_PERSON",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

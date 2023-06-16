@@ -4,7 +4,7 @@ import {
   ImmersionObjective,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
-import { romeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
@@ -20,7 +20,7 @@ import {
 } from "./contactEstablishmentRequest.dto";
 
 const commonFields = {
-  offer: romeSchema,
+  romeCode: romeCodeSchema,
   siret: siretSchema,
   potentialBeneficiaryFirstName: zTrimmedString,
   potentialBeneficiaryLastName: zTrimmedString,

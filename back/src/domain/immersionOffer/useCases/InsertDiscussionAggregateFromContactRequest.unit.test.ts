@@ -52,7 +52,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
 
     // Act
     const contactRequestDto: ContactEstablishmentRequestDto = {
-      offer: { romeCode: "A1289", romeLabel: "Guitariste" },
+      romeCode: "A1289",
       siret: "01234567891011",
       potentialBeneficiaryFirstName: "Antoine",
       potentialBeneficiaryLastName: "Tourasse",
@@ -144,7 +144,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
 
     uuidGenerator.setNextUuid("discussion2");
     const secondContactRequestDto: ContactEstablishmentRequestDto = {
-      offer: { romeCode: "A1289", romeLabel: "Guitariste" },
+      romeCode: "A1289",
       siret,
       potentialBeneficiaryFirstName: "Bob",
       potentialBeneficiaryLastName: "Marley",
