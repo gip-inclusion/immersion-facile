@@ -56,7 +56,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     const dashboard = dashboardByName.erroredConventions;
     const token = this.createToken({
       dashboard,
-      params: { filtrer_par_structure: agencyIds },
+      params: { idstructure: agencyIds },
       now,
     });
     return this.makeUrl(token, dashboard);
