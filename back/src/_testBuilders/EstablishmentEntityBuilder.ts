@@ -104,7 +104,10 @@ export class EstablishmentEntityBuilder
   }
 
   withLastInseeCheck(lastInseeCheck: Date | undefined) {
-    return new EstablishmentEntityBuilder({ ...this.entity, lastInseeCheck });
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      lastInseeCheckDate: lastInseeCheck,
+    });
   }
 
   withMaxContactsPerWeek(maxContactsPerWeek: number) {

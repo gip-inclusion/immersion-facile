@@ -41,6 +41,19 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  public withEstablishmentLastInseeCheckDate(
+    lastInseeCheckDate: Date | undefined,
+  ) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withLastInseeCheck(lastInseeCheckDate)
+        .build(),
+    });
+  }
+
   public withImmersionOffers(immersionOffers: ImmersionOfferEntityV2[]) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,

@@ -243,8 +243,8 @@ export class InMemoryEstablishmentAggregateRepository
     return this._establishmentAggregates
       .filter(
         (establishmentAggregate) =>
-          !establishmentAggregate.establishment.lastInseeCheck ||
-          establishmentAggregate.establishment.lastInseeCheck < checkDate,
+          !establishmentAggregate.establishment.lastInseeCheckDate ||
+          establishmentAggregate.establishment.lastInseeCheckDate < checkDate,
       )
       .map(({ establishment }) => establishment.siret)
       .slice(0, maxResults);
@@ -264,7 +264,7 @@ export class InMemoryEstablishmentAggregateRepository
             establishment: {
               ...aggregate.establishment,
               ...newValues,
-              lastInseeCheck: inseeCheckDate,
+              lastInseeCheckDate: inseeCheckDate,
             },
           };
 
