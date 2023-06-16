@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { equals } from "ramda";
+import { equals, keys } from "ramda";
 import {
   AppellationDto,
   GeoPositionDto,
@@ -21,7 +21,10 @@ import {
   UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { createLogger } from "../../../utils/logger";
-import { NotFoundError } from "../../primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../primary/helpers/httpErrors";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
@@ -146,6 +149,9 @@ export class PgEstablishmentAggregateRepository
       establishment.isCommited,
       establishment.fitForDisabledWorkers,
       establishment.maxContactsPerWeek,
+      establishment.lastInseeCheckDate
+        ? establishment.lastInseeCheckDate.toISOString()
+        : null,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -154,7 +160,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week 
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -663,6 +669,9 @@ export class PgEstablishmentAggregateRepository
                 'updatedAt', to_char(
                   e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
+                'lastInseeCheckDate', to_char(
+                  e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                ), 
                 'isActive', e.is_active, 
                 'isSearchable', e.is_searchable, 
                 'isCommited', e.is_commited, 
@@ -695,6 +704,12 @@ export class PgEstablishmentAggregateRepository
           ...aggregateWithStringDates.establishment,
           updatedAt: aggregateWithStringDates.establishment.updatedAt
             ? new Date(aggregateWithStringDates.establishment.updatedAt)
+            : undefined,
+          lastInseeCheckDate: aggregateWithStringDates.establishment
+            .lastInseeCheckDate
+            ? new Date(
+                aggregateWithStringDates.establishment.lastInseeCheckDate,
+              )
             : undefined,
           voluntaryToImmersion: true,
         },
@@ -763,17 +778,57 @@ export class PgEstablishmentAggregateRepository
     return response.rows.map(({ siret }) => siret);
   }
 
-  getSiretsOfEstablishmentsNotCheckedAtInseeSince(
-    _checkDate: Date,
+  public async getSiretsOfEstablishmentsNotCheckedAtInseeSince(
+    checkDate: Date,
+    maxResults: number,
   ): Promise<SiretDto[]> {
-    throw new Error("Method not implemented. Todo : implement it");
+    if (maxResults > 1000)
+      throw new BadRequestError(
+        "Querying getSiretsOfEstablishmentsNotCheckedAtInseeSince, maxResults must be <= 1000",
+      );
+
+    const result = await this.client.query(
+      `
+        SELECT siret
+        FROM establishments
+        WHERE last_insee_check_date IS NULL OR last_insee_check_date < $1
+        LIMIT $2
+    `,
+      [checkDate.toISOString(), maxResults],
+    );
+
+    return result.rows.map(({ siret }) => siret);
   }
 
-  updateEstablishmentsWithInseeData(
-    _inseeCheckDate: Date,
-    _params: UpdateEstablishmentsWithInseeDataParams,
+  public async updateEstablishmentsWithInseeData(
+    inseeCheckDate: Date,
+    params: UpdateEstablishmentsWithInseeDataParams,
   ): Promise<void> {
-    throw new Error("Method not implemented. Todo : implement it");
+    const queries = keys(params).map((siret) => {
+      const values = params[siret];
+      return format(
+        `
+            UPDATE establishments
+            SET last_insee_check_date = %1$L 
+              ${values?.isActive !== undefined ? ", is_active=%3$L" : ""}
+              ${values?.nafDto ? ", naf_code=%4$L" : ""}
+              ${values?.nafDto ? ", naf_nomenclature=%5$L" : ""}
+              ${values?.name ? ", name=%6$L" : ""}
+              ${values?.numberEmployeesRange ? ", number_employees=%7$L" : ""}
+            WHERE siret = %2$L;`,
+        inseeCheckDate.toISOString(),
+        siret,
+        ...[
+          values?.isActive,
+          values?.nafDto?.code,
+          values?.nafDto?.nomenclature,
+          values?.name,
+          values?.numberEmployeesRange,
+        ],
+      );
+    });
+
+    await this.client.query(queries.join("\n"));
   }
 }
 

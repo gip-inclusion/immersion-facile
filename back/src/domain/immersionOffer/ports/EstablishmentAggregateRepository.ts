@@ -69,13 +69,6 @@ export interface EstablishmentAggregateRepository {
   ) => Promise<void>;
 }
 
-// export type ValuesToUpdateFromInseeApi = Partial<
-//   Pick<
-//     SiretEstablishmentDto,
-//     "nafDto" | "numberEmployeesRange" | "businessName" | "isOpen"
-//   >
-// >;
-
 export type ValuesToUpdateFromInseeApi = Partial<
   Pick<
     EstablishmentEntity,
@@ -83,7 +76,6 @@ export type ValuesToUpdateFromInseeApi = Partial<
   >
 >;
 
-export type UpdateEstablishmentsWithInseeDataParams = Record<
-  SiretDto,
-  ValuesToUpdateFromInseeApi
+export type UpdateEstablishmentsWithInseeDataParams = Partial<
+  Record<SiretDto, ValuesToUpdateFromInseeApi>
 >;

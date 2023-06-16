@@ -1,3 +1,5 @@
+import { addDays } from "date-fns";
+import subDays from "date-fns/subDays";
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
 import {
@@ -30,6 +32,7 @@ import {
   EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+import { UpdateEstablishmentsWithInseeDataParams } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
@@ -580,6 +583,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         // Prepare
         const establishmentToInsert = new EstablishmentEntityBuilder()
           .withMaxContactsPerWeek(7)
+          .withLastInseeCheck(new Date("2020-04-14T12:00:00.000"))
           .build();
 
         // Act;
@@ -606,6 +610,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           update_date: establishmentToInsert.updatedAt,
           is_active: establishmentToInsert.isActive,
           max_contacts_per_week: establishmentToInsert.maxContactsPerWeek,
+          last_insee_check_date: establishmentToInsert.lastInseeCheckDate,
         };
         const actualEstablishmentRows = await getAllEstablishmentsRows();
         expect(actualEstablishmentRows).toHaveLength(1);
@@ -1328,6 +1333,251 @@ describe("Postgres implementation of immersion offer repository", () => {
         await expectEstablishmentToHaveIsSearchable(siret4, false);
       });
     });
+
+    describe("getSiretsOfEstablishmentsNotCheckedAtInseeSince", () => {
+      it("gets only the siret where last insee check date is to old or null", async () => {
+        const siret1 = "11110000111100";
+        const siret2 = "22220000222200";
+        const siret3 = "33330000333300";
+        const checkDate = new Date("2023-06-16T00:00:00.000Z");
+
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+          new EstablishmentAggregateBuilder()
+            .withContactId("11111111-1111-4000-1111-111111111111")
+            .withEstablishmentSiret(siret1)
+            .withEstablishmentLastInseeCheckDate(subDays(checkDate, 1))
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withContactId("22222222-2222-4000-2222-222222222222")
+            .withEstablishmentSiret(siret2)
+            .withEstablishmentLastInseeCheckDate(addDays(checkDate, 1))
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withContactId("33333333-3333-4000-3333-333333333333")
+            .withEstablishmentSiret(siret3)
+            .withEstablishmentLastInseeCheckDate(undefined)
+            .build(),
+        ]);
+
+        const siretsToUpdate =
+          await pgEstablishmentAggregateRepository.getSiretsOfEstablishmentsNotCheckedAtInseeSince(
+            checkDate,
+            10,
+          );
+
+        expectToEqual(siretsToUpdate, [siret1, siret3]);
+      });
+    });
+
+    describe("updateEstablishmentsWithInseeData", () => {
+      it("updates the establishments corresponding to the given sirets, with the given params", async () => {
+        const siret1 = "11110000111100";
+        const siret2 = "22220000222200";
+        const siret3 = "33330000333300";
+        const checkDate = new Date("2023-06-16T00:00:00.000Z");
+
+        const establishment1 = new EstablishmentAggregateBuilder()
+          .withContactId("11111111-1111-4000-1111-111111111111")
+          .withEstablishmentSiret(siret1)
+          .withEstablishmentLastInseeCheckDate(subDays(checkDate, 1))
+          .build();
+        const establishment2 = new EstablishmentAggregateBuilder()
+          .withContactId("22222222-2222-4000-2222-222222222222")
+          .withEstablishmentSiret(siret2)
+          .withEstablishmentLastInseeCheckDate(addDays(checkDate, 1))
+          .build();
+        const establishment3 = new EstablishmentAggregateBuilder()
+          .withContactId("33333333-3333-4000-3333-333333333333")
+          .withEstablishmentSiret(siret3)
+          .withEstablishmentLastInseeCheckDate(undefined)
+          .build();
+
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+          establishment1,
+          establishment2,
+          establishment3,
+        ]);
+
+        const inseeCheckDate = new Date("2023-07-16T00:00:00.000Z");
+
+        const updateFromInseeParams: UpdateEstablishmentsWithInseeDataParams = {
+          [siret1]: {
+            isActive: false,
+            name: "The new business name",
+            nafDto: { code: "12345", nomenclature: "Naf nomenclature yolo" },
+            numberEmployeesRange: "3-5",
+          },
+          [siret2]: {
+            isActive: true,
+            nafDto: { code: "22222", nomenclature: "Naf nomenclature yolo" },
+            numberEmployeesRange: "3-5",
+          },
+        };
+
+        await pgEstablishmentAggregateRepository.updateEstablishmentsWithInseeData(
+          inseeCheckDate,
+          updateFromInseeParams,
+        );
+
+        const updatedEstablishment1 =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret1,
+          );
+
+        expectToEqual(
+          updatedEstablishment1!.establishment,
+          new EstablishmentEntityBuilder(establishment1.establishment)
+            .withIsActive(updateFromInseeParams[siret1]!.isActive!)
+            .withName(updateFromInseeParams[siret1]!.name!)
+            .withNafDto(updateFromInseeParams[siret1]!.nafDto!)
+            .withNumberOfEmployeeRange(
+              updateFromInseeParams[siret1]!.numberEmployeesRange!,
+            )
+            .withLastInseeCheck(inseeCheckDate)
+            .build(),
+        );
+
+        const updatedEstablishment2 =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret2,
+          );
+
+        expectToEqual(
+          updatedEstablishment2!.establishment,
+          new EstablishmentEntityBuilder(establishment2.establishment)
+            .withIsActive(updateFromInseeParams[siret2]!.isActive!)
+            .withNafDto(updateFromInseeParams[siret2]!.nafDto!)
+            .withNumberOfEmployeeRange(
+              updateFromInseeParams[siret2]!.numberEmployeesRange!,
+            )
+            .withLastInseeCheck(inseeCheckDate)
+            .build(),
+        );
+
+        const updatedEstablishment3 =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret3,
+          );
+
+        expectToEqual(
+          updatedEstablishment3!.establishment,
+          establishment3.establishment,
+        );
+      });
+
+      it("updates the establishments corresponding to the given sirets, event with 1000 establishments to update", async () => {
+        const checkDate = new Date("2023-06-16T00:00:00.000Z");
+        const {
+          updateData,
+          aggregates,
+        }: {
+          updateData: UpdateEstablishmentsWithInseeDataParams;
+          aggregates: EstablishmentAggregate[];
+        } = Array.from({ length: 1000 }).reduce(
+          (
+            acc: {
+              updateData: UpdateEstablishmentsWithInseeDataParams;
+              aggregates: EstablishmentAggregate[];
+            },
+            _,
+            index,
+          ) => {
+            const paddedId = `${index}`.padStart(12, "0");
+            const siret = `00${paddedId}`;
+
+            return {
+              updateData: {
+                ...acc.updateData,
+                [siret]: {
+                  // eslint-disable-next-line jest/no-if
+                  ...(index < 2
+                    ? {
+                        isActive: false,
+                        name: "The new business name",
+                        nafDto: {
+                          code: "12345",
+                          nomenclature: "Naf nomenclature yolo",
+                        },
+                        numberEmployeesRange: "3-5",
+                      }
+                    : {}),
+                },
+              },
+              aggregates: [
+                ...acc.aggregates,
+                new EstablishmentAggregateBuilder()
+                  .withContactId("11111111-1111-4000-0000-" + paddedId)
+                  .withEstablishmentSiret(siret)
+                  .withEstablishmentLastInseeCheckDate(subDays(checkDate, 1))
+                  .build(),
+              ],
+            };
+          },
+          {
+            updateData: {} satisfies UpdateEstablishmentsWithInseeDataParams,
+            aggregates: [],
+          } satisfies {
+            updateData: UpdateEstablishmentsWithInseeDataParams;
+            aggregates: EstablishmentAggregate[];
+          },
+        );
+
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates(
+          aggregates,
+        );
+
+        const inseeCheckDate = new Date("2023-07-16T00:00:00.000Z");
+
+        await pgEstablishmentAggregateRepository.updateEstablishmentsWithInseeData(
+          inseeCheckDate,
+          updateData,
+        );
+
+        const updatedEstablishment1 =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            aggregates[0].establishment.siret,
+          );
+
+        const updatedEstablishment1Params =
+          updateData[aggregates[0].establishment.siret];
+
+        expectToEqual(
+          updatedEstablishment1!.establishment,
+          new EstablishmentEntityBuilder(aggregates[0].establishment)
+            .withIsActive(updatedEstablishment1Params!.isActive!)
+            .withName(updatedEstablishment1Params!.name!)
+            .withNafDto(updatedEstablishment1Params!.nafDto!)
+            .withNumberOfEmployeeRange(
+              updatedEstablishment1Params!.numberEmployeesRange!,
+            )
+            .withLastInseeCheck(inseeCheckDate)
+            .build(),
+        );
+
+        const updatedEstablishment3 =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            aggregates[2].establishment.siret,
+          );
+
+        const updatedEstablishment3Params =
+          updateData[aggregates[2].establishment.siret];
+
+        expectToEqual(updatedEstablishment3Params, {});
+
+        expectToEqual(
+          updatedEstablishment3!.establishment,
+          new EstablishmentEntityBuilder(aggregates[2].establishment)
+            .withIsActive(aggregates[2]!.establishment.isActive!)
+            .withName(aggregates[2]!.establishment.name!)
+            .withNafDto(aggregates[2]!.establishment.nafDto!)
+            .withNumberOfEmployeeRange(
+              aggregates[2]!.establishment.numberEmployeesRange!,
+            )
+            .withLastInseeCheck(inseeCheckDate)
+            .build(),
+        );
+      });
+    });
   });
 
   type PgEstablishmentRow = {
@@ -1347,6 +1597,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     is_commited?: boolean | null;
     fit_for_disabled_workers: boolean | null;
     max_contacts_per_week: number;
+    last_insee_check_date?: Date;
   };
 
   const getAllEstablishmentsRows = async (): Promise<PgEstablishmentRow[]> =>
