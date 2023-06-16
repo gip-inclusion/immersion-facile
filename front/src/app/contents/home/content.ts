@@ -39,7 +39,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   },
   establishment: {
     title:
-      "Rencontrer des candidats motivés ? C’est possible avec l'immersion professionelle !",
+      "Rencontrer des candidats motivés ? C’est possible avec l'immersion professionnelle !",
     displayName: "Entreprise",
     illustration: heroHeaderEstablishmentIllustration,
     icon: "fr-icon-building-line",
