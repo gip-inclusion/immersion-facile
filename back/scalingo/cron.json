@@ -17,6 +17,10 @@
       "size": "M"
     },
     {
+      "command": "03 2 * * * pnpm back trigger-update-establishments-from-sirene",
+      "size": "M"
+    },
+    {
       "command": "15 05 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     }
