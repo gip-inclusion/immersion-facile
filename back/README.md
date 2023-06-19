@@ -21,51 +21,52 @@ cp ../.env.sample ./env
 pnpm fullcheck
 ```
 
-You can run in watch mode individually :
+You can run in watch mode individually :  
+
 Unit tests :
 
 ```
 pnpm test:unit
 ```
 
-You can run create some data in the database with :
+Integration tests :
+
+1. Ensure that you have a docker daemon/agent running on your machine.
+
+2. Clear out any old data to ensure you initialize the database with the latest schema and test data.
+
+   ```sh
+   immersion-facile$ rm -rf docker-data/
+   ```
+
+3. At the very least you will need to run the `postgres` container as well as the `back` container which initializes the database at startup:
+   ```sh
+   immersion-facile$ docker-compose -f docker-compose.resources.yml up --build
+   ```
+   Observe the log output to ensure the database has been properly initialized.
+4. Run DB migration :
+
+   ```sh
+   pnpm run migrate up
+   ```
+
+5. You can run create some data in the database with :
 You will than have the correct featureFlags and an agency in Paris.
 
 ```
 pnpm seed
 ```
 
-Integration tests :
-
-1. Ensure that you have a docker daemon/agent running on your machine.
-
-1. Clear out any old data to ensure you initialize the database with the latest schema and test data.
-
-   ```sh
-   immersion-facile$ rm -rf docker-data/
-   ```
-
-1. At the very least you will need to run the `postgres` container as well as the `back` container which initializes the database at startup:
-   ```sh
-   immersion-facile$ docker-compose -f docker-compose.resources.yml up --build
-   ```
-   Observe the log output to ensure the database has been properly initialized.
-1. Run DB migration :
-
-   ```sh
-   npm run migrate up
-   ```
-
-1. Execute the integration tests in a separate shell"
+6. Execute the integration tests in a separate shell"
    ```
    immersion-facile$ cd back
-   back$ npm run test:integration
+   back$ pnpm run test:integration
    ```
 
 End to end tests :
 
 ```
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 # Running local back-end instances
@@ -74,7 +75,7 @@ The simplest way to get a back-end up and running is using the command:
 
 ```sh
 immersion-facile$ cd back/
-back$ npm start
+back$ pnpm start
 ```
 
 If you're using PG repositories and you're running locally, you need to set DATABASE_URL host to `localhost` (see commented lines in .env.sample file)
@@ -120,19 +121,19 @@ The back-end behaviour is controlled by environment variables. They can be speci
   JWT_PRIVATE_KEY=...
   JWT_PUBLIC_KEY=...
 
-  back$ npm run
+  back$ pnpm run
   ```
 
-- prefixed to the `npm start` command
+- prefixed to the `pnpm start` command
 
   ```sh
-  back$ REPOSITORIES=PG npm start
+  back$ REPOSITORIES=PG pnpm start
   ```
 
 - persistently in your shell (least recommended)
   ```sh
   back$ export REPOSITORIES=PG
-  back$ npm start
+  back$ pnpm start
   ```
 
 ### Controlling the log output
@@ -144,7 +145,7 @@ See [logger.ts](./src/utils/logger.ts) for the full logger configuration.
 Example:
 
 ```sh
-back$ LOG_LEVEL=debug npm start
+back$ LOG_LEVEL=debug pnpm start
 ```
 
 By default, every log statement is printed on a single line. Setting `LOGGER_MULTI_LINE=yes` will **pretty-print JSON** using indentation and line breaks.
@@ -152,7 +153,7 @@ By default, every log statement is printed on a single line. Setting `LOGGER_MUL
 Example:
 
 ```sh
-back$ LOGGER_MULTI_LINE=yes npm start
+back$ LOGGER_MULTI_LINE=yes pnpm start
 [2021-10-19 06:07:54.610] INFO (startServer.ts):
     featureFlags: {
       "enableAdminUi": false,
@@ -163,8 +164,8 @@ back$ LOGGER_MULTI_LINE=yes npm start
 **SIDE NOTE:** This also works during test execution, e.g.
 
 ```sh
-back$ LOG_LEVEL=debug npm run test:unit
-back$ LOGGER_MULTI_LINE=yes npm run test:all
+back$ LOG_LEVEL=debug pnpm run test:unit
+back$ LOGGER_MULTI_LINE=yes pnpm run test:all
 ```
 
 ### Adding new metrics (aka prometheus counters)
@@ -321,10 +322,10 @@ Each pipeline has its own log file, to which log output will be appended by ever
 
 ## Running a pipeline locally
 
-Each pipeline has its own `npm start` script with which it can be started:
+Each pipeline has its own `pnpm start` script with which it can be started:
 
 ```
-back$ npm run start-update-establishments-from-sirene
+back$ pnpm run start-update-establishments-from-sirene
 ```
 
 As with the back-end, we use environment variables for parametrization.
