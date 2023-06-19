@@ -1412,6 +1412,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             nafDto: { code: "22222", nomenclature: "Naf nomenclature yolo" },
             numberEmployeesRange: "3-5",
           },
+          [siret3]: {},
         };
 
         await pgEstablishmentAggregateRepository.updateEstablishmentsWithInseeData(
@@ -1461,7 +1462,9 @@ describe("Postgres implementation of immersion offer repository", () => {
 
         expectToEqual(
           updatedEstablishment3!.establishment,
-          establishment3.establishment,
+          new EstablishmentEntityBuilder(establishment3.establishment)
+            .withLastInseeCheck(inseeCheckDate)
+            .build(),
         );
       });
 

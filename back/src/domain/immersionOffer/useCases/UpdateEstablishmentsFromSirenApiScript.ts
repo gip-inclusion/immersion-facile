@@ -15,7 +15,6 @@ type Report = {
   numberOfEstablishmentsToUpdate: number;
   establishmentWithNewData: number;
   callsToInseeApi: number;
-  errors?: Record<SiretDto, any>;
 };
 
 type BatchReport = {
