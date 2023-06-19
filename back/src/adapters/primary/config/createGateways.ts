@@ -5,6 +5,7 @@ import {
   immersionFacileContactEmail,
   pipeWithValue,
 } from "shared";
+import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
@@ -15,35 +16,33 @@ import { createLogger } from "../../../utils/logger";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
 import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
-import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
+import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
+import { NotImplementedDocumentGateway } from "../../secondary/documentGateway/NotImplementedDocumentGateway";
+import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGateway";
 import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
 import { emailableValidationTargets } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.targets";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
-import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { createLbbTargets } from "../../secondary/immersionOffer/laBonneBoite/LaBonneBoiteTargets";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
-import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
-import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../secondary/immersionOffer/poleEmploi/PoleEmploi.targets";
-import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionConnectGateway/inclusionConnectExternal.targets";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
 import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
-import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/peConnectApi.targets";
-import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
+import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
+import { InMemoryPoleEmploiGateway } from "../../secondary/poleEmploi/InMemoryPoleEmploiGateway";
+import { createPoleEmploiTargets } from "../../secondary/poleEmploi/PoleEmploi.targets";
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
@@ -95,22 +94,26 @@ export const createGateways = async (config: AppConfig) => {
     apiAddress: config.apiAddress,
   });
 
-  const cachingAccessTokenGateway = [
-    config.laBonneBoiteGateway,
-    config.poleEmploiGateway,
-  ].includes("HTTPS")
-    ? new CachingAccessTokenGateway(
-        new PoleEmploiAccessTokenGateway(
-          config.poleEmploiAccessTokenConfig,
-          noRetries,
-        ),
-      )
-    : new InMemoryAccessTokenGateway();
-
   const timeGateway =
     config.timeGateway === "CUSTOM"
       ? new CustomTimeGateway()
       : new RealTimeGateway();
+
+  const poleEmploiGateway =
+    config.poleEmploiGateway === "HTTPS"
+      ? new HttpPoleEmploiGateway(
+          configureCreateHttpClientForExternalApi(
+            axios.create({ timeout: config.externalAxiosTimeout }),
+          )(createPoleEmploiTargets(config.peApiUrl)),
+          new InMemoryCachingGateway<GetAccessTokenResponse>(
+            timeGateway,
+            "expires_in",
+          ),
+          config.peApiUrl,
+          config.poleEmploiAccessTokenConfig,
+          noRetries,
+        )
+      : new InMemoryPoleEmploiGateway();
 
   return {
     addressApi: createAddressGateway(config),
@@ -128,7 +131,7 @@ export const createGateways = async (config: AppConfig) => {
                 timeout: config.externalAxiosTimeout,
               }),
             )(createLbbTargets(config.peApiUrl)),
-            cachingAccessTokenGateway,
+            poleEmploiGateway,
             config.poleEmploiClientId,
           )
         : new InMemoryLaBonneBoiteAPI(),
@@ -137,16 +140,7 @@ export const createGateways = async (config: AppConfig) => {
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
         : new InMemoryPassEmploiGateway(),
     peConnectGateway: createPoleEmploiConnectGateway(config),
-    poleEmploiGateway:
-      config.poleEmploiGateway === "HTTPS"
-        ? new HttpPoleEmploiGateway(
-            configureCreateHttpClientForExternalApi(
-              axios.create({ timeout: config.externalAxiosTimeout }),
-            )(createPoleEmploiTargets(config.peApiUrl)),
-            config.peApiUrl,
-            cachingAccessTokenGateway,
-          )
-        : new InMemoryPoleEmploiGateway(),
+    poleEmploiGateway,
     timeGateway,
     siret: getSiretGateway(config.siretGateway, config, timeGateway),
     shortLinkGenerator:

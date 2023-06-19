@@ -1,6 +1,6 @@
 import { AbsoluteUrl, withValidateHeadersAuthorization } from "shared";
 import { createTarget, createTargets } from "http-client";
-import { PoleEmploiConvention } from "../../../../domain/convention/ports/PoleEmploiGateway";
+import { PoleEmploiConvention } from "../../../domain/convention/ports/PoleEmploiGateway";
 
 export const getPeTestPrefix = (peApiUrl: AbsoluteUrl) =>
   ["https://api.peio.pe-qvr.fr", "https://api-r.es-qvr.fr"].includes(peApiUrl)

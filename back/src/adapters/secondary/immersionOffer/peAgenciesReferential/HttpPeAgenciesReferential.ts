@@ -1,6 +1,6 @@
 import type { AxiosInstance } from "axios";
 import { AbsoluteUrl } from "shared";
-import { AccessTokenGateway } from "../../../../domain/core/ports/AccessTokenGateway";
+import { PoleEmploiGateway } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
@@ -16,7 +16,7 @@ export class HttpPeAgenciesReferential implements PeAgenciesReferential {
 
   constructor(
     peApiUrl: AbsoluteUrl,
-    private readonly accessTokenGateway: AccessTokenGateway,
+    private readonly poleEmploiGateway: PoleEmploiGateway,
     private readonly poleEmploiClientId: string,
   ) {
     this.axios = createAxiosInstance(logger);
@@ -24,7 +24,7 @@ export class HttpPeAgenciesReferential implements PeAgenciesReferential {
   }
 
   async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
-    const accessToken = await this.accessTokenGateway.getAccessToken(
+    const accessToken = await this.poleEmploiGateway.getAccessToken(
       `application_${this.poleEmploiClientId} api_referentielagencesv1 organisationpe`,
     );
 

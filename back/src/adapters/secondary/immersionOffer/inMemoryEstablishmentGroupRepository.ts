@@ -45,7 +45,7 @@ export class InMemoryEstablishmentGroupRepository
   public set groups(groups: EstablishmentGroupEntity[]) {
     this.groupsByName = groups.reduce(
       (acc, group) => ({ ...acc, [group.name]: group }),
-      {} as Record<string, EstablishmentGroupEntity>,
+      {} satisfies Record<string, EstablishmentGroupEntity>,
     );
   }
 

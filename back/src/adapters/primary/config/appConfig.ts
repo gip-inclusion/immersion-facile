@@ -13,8 +13,8 @@ import {
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
+import { S3Params } from "../../secondary/documentGateway/S3DocumentGateway";
 import { EmailableApiKey } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.dto";
-import { S3Params } from "../../secondary/S3DocumentGateway";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
@@ -296,9 +296,7 @@ export class AppConfig {
       peAuthCandidatUrl: this.peAuthCandidatUrl,
       peEnterpriseUrl: this.peEnterpriseUrl,
       clientId: this.poleEmploiClientId,
-      clientSecret: this.throwIfNotDefinedOrDefault(
-        "POLE_EMPLOI_CLIENT_SECRET",
-      ),
+      clientSecret: this.poleEmploiClientSecret,
     };
   }
 

@@ -1,17 +1,30 @@
+import axios from "axios";
+import { GetAccessTokenResponse } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { AppConfig } from "../../../primary/config/appConfig";
-import { PoleEmploiAccessTokenGateway } from "../PoleEmploiAccessTokenGateway";
+import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
+import { InMemoryCachingGateway } from "../../core/InMemoryCachingGateway";
+import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
+import { HttpPoleEmploiGateway } from "../../poleEmploi/HttpPoleEmploiGateway";
+import { createPoleEmploiTargets } from "../../poleEmploi/PoleEmploi.targets";
 import { HttpPeAgenciesReferential } from "./HttpPeAgenciesReferential";
 
 const config = AppConfig.createFromEnv();
-const accessTokenGateway = new PoleEmploiAccessTokenGateway(
-  config.poleEmploiAccessTokenConfig,
-  noRetries,
-);
 
 const referencielAgencesPE = new HttpPeAgenciesReferential(
   config.peApiUrl,
-  accessTokenGateway,
+  new HttpPoleEmploiGateway(
+    configureCreateHttpClientForExternalApi(
+      axios.create({ timeout: config.externalAxiosTimeout }),
+    )(createPoleEmploiTargets(config.peApiUrl)),
+    new InMemoryCachingGateway<GetAccessTokenResponse>(
+      new RealTimeGateway(),
+      "expires_in",
+    ),
+    config.peApiUrl,
+    config.poleEmploiAccessTokenConfig,
+    noRetries,
+  ),
   config.poleEmploiClientId,
 );
 
