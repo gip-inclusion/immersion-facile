@@ -72,8 +72,16 @@ export const isBroadcastResponseOk = (
 ): response is PeBroadcastSuccessResponse =>
   [200, 201].includes(response.status);
 
+// https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
+export type GetAccessTokenResponse = {
+  access_token: string;
+  expires_in: number;
+};
+
 export interface PoleEmploiGateway {
   notifyOnConventionUpdated: (
     poleEmploiConvention: PoleEmploiConvention,
   ) => Promise<PoleEmploiBroadcastResponse>;
+
+  getAccessToken: (scope: string) => Promise<GetAccessTokenResponse>;
 }

@@ -1,29 +1,34 @@
 import { expectToEqual } from "shared";
 import {
+  GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
-} from "../../../../domain/convention/ports/PoleEmploiGateway";
-import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
-import { AppConfig } from "../../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
-import { PoleEmploiAccessTokenGateway } from "../PoleEmploiAccessTokenGateway";
+} from "../../../domain/convention/ports/PoleEmploiGateway";
+import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { AppConfig } from "../../primary/config/appConfig";
+import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
+import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";
+import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
 import { createPoleEmploiTargets } from "./PoleEmploi.targets";
 
 const config = AppConfig.createFromEnv();
-const accessTokenGateway = new PoleEmploiAccessTokenGateway(
-  config.poleEmploiAccessTokenConfig,
-  noRetries,
+const cachingGateway = new InMemoryCachingGateway<GetAccessTokenResponse>(
+  new RealTimeGateway(),
+  "expires_in",
 );
 
 const getAPI = () => {
   const httpClient = configureCreateHttpClientForExternalApi()(
     createPoleEmploiTargets(config.peApiUrl),
   );
+
   return new HttpPoleEmploiGateway(
     httpClient,
+    cachingGateway,
     config.peApiUrl,
-    accessTokenGateway,
+    config.poleEmploiAccessTokenConfig,
+    noRetries,
   );
 };
 

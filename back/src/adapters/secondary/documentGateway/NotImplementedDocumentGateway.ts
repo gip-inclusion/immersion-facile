@@ -1,6 +1,6 @@
-import { StoredFile } from "../../domain/generic/fileManagement/entity/StoredFile";
-import { DocumentGateway } from "../../domain/generic/fileManagement/port/DocumentGateway";
-import { createLogger } from "../../utils/logger";
+import { StoredFile } from "../../../domain/generic/fileManagement/entity/StoredFile";
+import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
+import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 

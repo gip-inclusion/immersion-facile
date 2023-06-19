@@ -1,26 +1,38 @@
+import axios from "axios";
 import { Pool } from "pg";
+import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/agencies/UpdateAllPeAgencies";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
 import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
+import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";
-import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
+import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
+import { createPoleEmploiTargets } from "../../secondary/poleEmploi/PoleEmploi.targets";
 import { AppConfig } from "../config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createUowPerformer } from "../config/uowConfig";
 
 const updateAllPeAgenciesScript = async () => {
   const config = AppConfig.createFromEnv();
-  const accessTokenGateway = new PoleEmploiAccessTokenGateway(
-    config.poleEmploiAccessTokenConfig,
-    noRetries,
-  );
 
   const httpPeAgenciesReferential = new HttpPeAgenciesReferential(
     config.peApiUrl,
-    accessTokenGateway,
+    new HttpPoleEmploiGateway(
+      configureCreateHttpClientForExternalApi(
+        axios.create({ timeout: config.externalAxiosTimeout }),
+      )(createPoleEmploiTargets(config.peApiUrl)),
+      new InMemoryCachingGateway<GetAccessTokenResponse>(
+        new RealTimeGateway(),
+        "expires_in",
+      ),
+      config.peApiUrl,
+      config.poleEmploiAccessTokenConfig,
+      noRetries,
+    ),
     config.poleEmploiClientId,
   );
 

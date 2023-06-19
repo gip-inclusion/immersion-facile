@@ -2,6 +2,7 @@ import { addBusinessDays, differenceInBusinessDays } from "date-fns";
 import {
   ConventionDto,
   ConventionDtoBuilder,
+  ConventionId,
   ConventionStatus,
   conventionStatuses,
   expectToEqual,
@@ -325,5 +326,5 @@ const makeOneConventionOfEachStatuses = ({
 const toConventionRepoRecord = (conventions: ConventionDto[]) =>
   conventions.reduce(
     (acc, item) => ({ ...acc, [item["id"]]: item }),
-    {} as Record<string, ConventionDto>,
+    {} satisfies Record<ConventionId, ConventionDto>,
   );

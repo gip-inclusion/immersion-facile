@@ -1,6 +1,6 @@
 import Bottleneck from "bottleneck";
 import { HttpClient } from "http-client";
-import { AccessTokenGateway } from "../../../../domain/core/ports/AccessTokenGateway";
+import { PoleEmploiGateway } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import {
   LaBonneBoiteAPI,
   LaBonneBoiteRequestParams,
@@ -19,7 +19,7 @@ const lbbMaxQueryPerSeconds = 1;
 export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   constructor(
     private readonly httpClient: HttpClient<LaBonneBoiteTargets>,
-    private readonly accessTokenGateway: AccessTokenGateway,
+    private readonly poleEmploiGateway: PoleEmploiGateway,
     private readonly poleEmploiClientId: string,
   ) {}
 
@@ -27,7 +27,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     searchParams: LaBonneBoiteRequestParams,
   ): Promise<LaBonneBoiteCompanyVO[]> {
     const { responseBody } = await this.limiter.schedule(async () => {
-      const accessToken = await this.accessTokenGateway.getAccessToken(
+      const accessToken = await this.poleEmploiGateway.getAccessToken(
         `application_${this.poleEmploiClientId} api_labonneboitev1`,
       );
 

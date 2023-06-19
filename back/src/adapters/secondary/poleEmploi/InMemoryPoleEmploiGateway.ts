@@ -1,8 +1,9 @@
 import {
+  GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
-} from "../../../../domain/convention/ports/PoleEmploiGateway";
+} from "../../../domain/convention/ports/PoleEmploiGateway";
 
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
   constructor(public notifications: PoleEmploiConvention[] = []) {}
@@ -16,7 +17,16 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
     return this.nextResponse;
   }
 
-  setNextResponse(response: PoleEmploiBroadcastResponse) {
+  public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
+    return {
+      access_token: `fake_access_token_for_scope_${scope}`,
+      expires_in: 600,
+    };
+  }
+
+  //For testing purpose
+
+  public setNextResponse(response: PoleEmploiBroadcastResponse) {
     this.nextResponse = response;
   }
 }

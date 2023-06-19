@@ -1,23 +1,35 @@
+import axios from "axios";
+import { GetAccessTokenResponse } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { AppConfig } from "../../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
-import { PoleEmploiAccessTokenGateway } from "../PoleEmploiAccessTokenGateway";
+import { InMemoryCachingGateway } from "../../core/InMemoryCachingGateway";
+import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
+import { HttpPoleEmploiGateway } from "../../poleEmploi/HttpPoleEmploiGateway";
+import { createPoleEmploiTargets } from "../../poleEmploi/PoleEmploi.targets";
 import { HttpLaBonneBoiteAPI } from "./HttpLaBonneBoiteAPI";
 import { createLbbTargets } from "./LaBonneBoiteTargets";
 
 const config = AppConfig.createFromEnv();
-const accessTokenGateway = new PoleEmploiAccessTokenGateway(
-  config.poleEmploiAccessTokenConfig,
-  noRetries,
-);
 
 const getAPI = () =>
   new HttpLaBonneBoiteAPI(
     configureCreateHttpClientForExternalApi()(
       createLbbTargets(config.peApiUrl),
     ),
-    accessTokenGateway,
+    new HttpPoleEmploiGateway(
+      configureCreateHttpClientForExternalApi(
+        axios.create({ timeout: config.externalAxiosTimeout }),
+      )(createPoleEmploiTargets(config.peApiUrl)),
+      new InMemoryCachingGateway<GetAccessTokenResponse>(
+        new RealTimeGateway(),
+        "expires_in",
+      ),
+      config.peApiUrl,
+      config.poleEmploiAccessTokenConfig,
+      noRetries,
+    ),
     config.poleEmploiClientId,
   );
 
