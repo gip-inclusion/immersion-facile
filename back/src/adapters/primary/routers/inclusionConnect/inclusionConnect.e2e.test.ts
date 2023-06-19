@@ -32,6 +32,7 @@ describe("inclusion connection flow", () => {
     it("does successfully the complete inclusion connect flow", async () => {
       testAppAndDeps = await buildTestApp(
         new AppConfigBuilder({
+          INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
           INCLUSION_CONNECT_CLIENT_SECRET: clientSecret,
           INCLUSION_CONNECT_CLIENT_ID: clientId,
           INCLUSION_CONNECT_BASE_URI: inclusionConnectBaseUri,
