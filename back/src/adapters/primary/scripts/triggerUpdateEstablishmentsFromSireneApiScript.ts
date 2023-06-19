@@ -2,7 +2,6 @@ import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
-import { PipelineStats } from "../../../utils/pipelineStats";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
@@ -16,15 +15,10 @@ import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
 
-const stats: PipelineStats = new PipelineStats(
-  "startUpdateEstablishmentsFromSirene",
-);
-
 const config = AppConfig.createFromEnv();
 
 const main = async () => {
   logger.info(`Executing pipeline: update-establishments-from-sirene`);
-  stats.startTimer("total_runtime");
 
   const timeGateway = new RealTimeGateway();
 
@@ -59,7 +53,6 @@ const main = async () => {
       config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerFullRun,
     );
 
-  stats.stopTimer("total_runtime");
   const report = await updateEstablishmentsFromSirenAPI.execute();
   await pool.end();
 
@@ -83,7 +76,7 @@ handleEndOfScriptNotification(
 
     return [
       `Updating ${numberOfEstablishmentsToUpdate} establishments for Insee Api`,
-      `A which ${establishmentWithNewData} had new data`,
+      `Of which ${establishmentWithNewData} had new data`,
       ...(nSiretFailed > 0 ? [`Errors were: ${errorsAsString}`] : []),
     ].join("\n");
   },
