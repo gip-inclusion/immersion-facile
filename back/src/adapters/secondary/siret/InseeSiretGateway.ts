@@ -104,6 +104,10 @@ export class InseeSiretGateway implements SiretGateway {
         {} satisfies Record<SiretDto, SiretEstablishmentDto>,
       );
     } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) return {};
+      }
+
       throw error?.response.data;
     }
   }
