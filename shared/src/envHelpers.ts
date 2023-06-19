@@ -26,7 +26,7 @@ export const makeThrowIfNotInArray =
     return value;
   };
 
-export const makeThrowIfNotDefined =
+export const makeThrowIfNotDefinedOrDefault =
   (processEnv: ProcessEnv) => (variableName: string, defaultValue?: string) => {
     const value = processEnv[variableName] || defaultValue;
     if (!value) throw new Error(`Expected ${variableName} to be Defined`);

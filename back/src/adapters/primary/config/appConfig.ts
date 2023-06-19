@@ -6,7 +6,7 @@ import {
   inclusionConnectImmersionTargets,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
-  makeThrowIfNotDefined,
+  makeThrowIfNotDefinedOrDefault,
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
   ProcessEnv,
@@ -34,10 +34,11 @@ export type AxiosConfig = {
 
 export class AppConfig {
   private readonly throwIfNotInArray;
-  private readonly throwIfNotDefined;
+  private readonly throwIfNotDefinedOrDefault;
   private readonly throwIfNotAbsoluteUrl;
   private readonly getBooleanVariable;
   private readonly throwIfNotGeosearchApiKey;
+
   public static createFromEnv(
     readDotEnv = true,
     configParams = process.env,
@@ -48,7 +49,7 @@ export class AppConfig {
 
   private constructor(readonly env: ProcessEnv) {
     this.throwIfNotInArray = makeThrowIfNotInArray(env);
-    this.throwIfNotDefined = makeThrowIfNotDefined(env);
+    this.throwIfNotDefinedOrDefault = makeThrowIfNotDefinedOrDefault(env);
     this.throwIfNotAbsoluteUrl = makeThrowIfNotAbsoluteUrl(env);
     this.getBooleanVariable = makeGetBooleanVariable(env);
     this.throwIfNotGeosearchApiKey = makeThrowIfNotOpenCageGeosearchKey(env);
@@ -56,12 +57,14 @@ export class AppConfig {
 
   public get nodeProcessReportInterval(): number {
     return parseInt(
-      this.throwIfNotDefined("NODE_PROCESS_REPORT_INTERVAL", "30000"),
+      this.throwIfNotDefinedOrDefault("NODE_PROCESS_REPORT_INTERVAL", "30000"),
     );
   }
 
   public get externalAxiosTimeout(): number {
-    return parseInt(this.throwIfNotDefined("EXTERNAL_AXIOS_TIMEOUT", "10000"));
+    return parseInt(
+      this.throwIfNotDefinedOrDefault("EXTERNAL_AXIOS_TIMEOUT", "10000"),
+    );
   }
 
   public get shortLinkIdGeneratorGateway() {
@@ -97,7 +100,7 @@ export class AppConfig {
   }
 
   public get pgImmersionDbUrl() {
-    return this.throwIfNotDefined("DATABASE_URL");
+    return this.throwIfNotDefinedOrDefault("DATABASE_URL");
   }
 
   // == Sirene repository ==
@@ -130,11 +133,11 @@ export class AppConfig {
   }
 
   public get passEmploiUrl() {
-    return this.throwIfNotDefined("PASS_EMPLOI_URL");
+    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_URL");
   }
 
   public get passEmploiKey() {
-    return this.throwIfNotDefined("PASS_EMPLOI_KEY");
+    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_KEY");
   }
 
   public get poleEmploiGateway() {
@@ -146,8 +149,8 @@ export class AppConfig {
 
   public get inseeHttpConfig(): AxiosConfig {
     return {
-      endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),
-      bearerToken: this.throwIfNotDefined("SIRENE_BEARER_TOKEN"),
+      endpoint: this.throwIfNotDefinedOrDefault("SIRENE_ENDPOINT"),
+      bearerToken: this.throwIfNotDefinedOrDefault("SIRENE_BEARER_TOKEN"),
     };
   }
 
@@ -169,7 +172,7 @@ export class AppConfig {
 
   // == Notification gateway provider api keys ==
   public get apiKeyBrevo() {
-    return this.throwIfNotDefined("BREVO_API_KEY");
+    return this.throwIfNotDefinedOrDefault("BREVO_API_KEY");
   }
 
   // == Email validation gateway ==
@@ -183,7 +186,7 @@ export class AppConfig {
 
   // == Email gateway provider api keys ==
   public get emailableApiKey(): EmailableApiKey {
-    return this.throwIfNotDefined("EMAILABLE_API_KEY");
+    return this.throwIfNotDefinedOrDefault("EMAILABLE_API_KEY");
   }
 
   // == PE Connect gateway ==
@@ -207,8 +210,10 @@ export class AppConfig {
   public get inclusionConnectConfig(): InclusionConnectConfig {
     return this.inclusionConnectGateway === "HTTPS"
       ? {
-          clientId: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_ID"),
-          clientSecret: this.throwIfNotDefined(
+          clientId: this.throwIfNotDefinedOrDefault(
+            "INCLUSION_CONNECT_CLIENT_ID",
+          ),
+          clientSecret: this.throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_SECRET",
           ),
           immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
@@ -218,16 +223,16 @@ export class AppConfig {
           scope: "openid profile email",
         }
       : {
-          clientId: this.throwIfNotDefined(
+          clientId: this.throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_ID",
             "fake id",
           ),
-          clientSecret: this.throwIfNotDefined(
+          clientSecret: this.throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_SECRET",
             "fake secret",
           ),
           immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
-          inclusionConnectBaseUri: this.throwIfNotDefined(
+          inclusionConnectBaseUri: this.throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_BASE_URI",
             "https://fake.url",
           ) as AbsoluteUrl,
@@ -246,7 +251,7 @@ export class AppConfig {
   }
 
   public get apiKeyOpenCageDataGeocoding() {
-    return this.throwIfNotDefined("API_KEY_OPEN_CAGE_DATA_GEOCODING");
+    return this.throwIfNotDefinedOrDefault("API_KEY_OPEN_CAGE_DATA_GEOCODING");
   }
 
   public get apiKeyOpenCageDataGeosearch() {
@@ -264,11 +269,11 @@ export class AppConfig {
   }
 
   public get poleEmploiClientId() {
-    return this.throwIfNotDefined("POLE_EMPLOI_CLIENT_ID");
+    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_ID");
   }
 
   public get poleEmploiClientSecret() {
-    return this.throwIfNotDefined("POLE_EMPLOI_CLIENT_SECRET");
+    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_SECRET");
   }
 
   public get peApiUrl(): AbsoluteUrl {
@@ -291,7 +296,9 @@ export class AppConfig {
       peAuthCandidatUrl: this.peAuthCandidatUrl,
       peEnterpriseUrl: this.peEnterpriseUrl,
       clientId: this.poleEmploiClientId,
-      clientSecret: this.throwIfNotDefined("POLE_EMPLOI_CLIENT_SECRET"),
+      clientSecret: this.throwIfNotDefinedOrDefault(
+        "POLE_EMPLOI_CLIENT_SECRET",
+      ),
     };
   }
 
@@ -306,34 +313,36 @@ export class AppConfig {
 
   public get metabase() {
     return {
-      metabaseUrl: this.throwIfNotDefined("METABASE_URL") as AbsoluteUrl,
-      metabaseApiKey: this.throwIfNotDefined("METABASE_API_KEY"),
+      metabaseUrl: this.throwIfNotDefinedOrDefault(
+        "METABASE_URL",
+      ) as AbsoluteUrl,
+      metabaseApiKey: this.throwIfNotDefinedOrDefault("METABASE_API_KEY"),
     };
   }
 
   // == Magic links ==
 
   public get immersionFacileBaseUrl(): AbsoluteUrl {
-    const domain = this.throwIfNotDefined("DOMAIN");
+    const domain = this.throwIfNotDefinedOrDefault("DOMAIN");
     return domain.includes("localhost")
       ? `http://${domain}`
       : `https://${domain}`;
   }
 
   public get apiJwtPublicKey() {
-    return this.throwIfNotDefined("API_JWT_PUBLIC_KEY");
+    return this.throwIfNotDefinedOrDefault("API_JWT_PUBLIC_KEY");
   }
 
   public get apiJwtPrivateKey() {
-    return this.throwIfNotDefined("API_JWT_PRIVATE_KEY");
+    return this.throwIfNotDefinedOrDefault("API_JWT_PRIVATE_KEY");
   }
 
   public get jwtPublicKey() {
-    return this.throwIfNotDefined("JWT_PUBLIC_KEY");
+    return this.throwIfNotDefinedOrDefault("JWT_PUBLIC_KEY");
   }
 
   public get jwtPrivateKey() {
-    return this.throwIfNotDefined("JWT_PRIVATE_KEY");
+    return this.throwIfNotDefinedOrDefault("JWT_PRIVATE_KEY");
   }
 
   public get previousJwtPublicKey() {
@@ -347,10 +356,10 @@ export class AppConfig {
   // == Backoffice ==
 
   public get backofficeUsername() {
-    return this.throwIfNotDefined("BACKOFFICE_USERNAME");
+    return this.throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
   }
   public get backofficePassword() {
-    return this.throwIfNotDefined("BACKOFFICE_PASSWORD");
+    return this.throwIfNotDefinedOrDefault("BACKOFFICE_PASSWORD");
   }
 
   // == Email notifications ==
@@ -383,6 +392,20 @@ export class AppConfig {
     ) as DomainTopic[];
   }
 
+  public get updateEstablishmentFromInseeConfig() {
+    return {
+      maxEstablishmentsPerBatch: parseInt(
+        this.throwIfNotDefinedOrDefault("MAX_ESTABLISHMENTS_PER_BATCH", "1000"),
+      ),
+      maxEstablishmentsPerFullRun: parseInt(
+        this.throwIfNotDefinedOrDefault(
+          "MAX_ESTABLISHMENTS_PER_FULL_RUN",
+          "5000",
+        ),
+      ),
+    };
+  }
+
   // Visible for testing.
   public get configParams() {
     return this.env;
@@ -399,10 +422,12 @@ export class AppConfig {
   public get cellarS3Params(): S3Params | undefined {
     if (this.documentGateway === "S3") {
       return {
-        endPoint: this.throwIfNotDefined("CELLAR_ADDON_HOST"),
-        accessKeyId: this.throwIfNotDefined("CELLAR_ADDON_KEY_ID"),
-        secretAccessKey: this.throwIfNotDefined("CELLAR_ADDON_KEY_SECRET"),
-        bucketName: this.throwIfNotDefined("CELLAR_BUCKET"),
+        endPoint: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_HOST"),
+        accessKeyId: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_KEY_ID"),
+        secretAccessKey: this.throwIfNotDefinedOrDefault(
+          "CELLAR_ADDON_KEY_SECRET",
+        ),
+        bucketName: this.throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
       };
     }
   }

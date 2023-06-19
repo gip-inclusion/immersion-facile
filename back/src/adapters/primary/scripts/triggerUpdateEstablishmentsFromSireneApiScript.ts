@@ -55,6 +55,8 @@ const main = async () => {
       uowPerformer,
       siretGateway,
       new RealTimeGateway(),
+      config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerBatch,
+      config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerFullRun,
     );
 
   stats.stopTimer("total_runtime");
