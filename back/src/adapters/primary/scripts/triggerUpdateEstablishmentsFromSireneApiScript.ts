@@ -64,21 +64,10 @@ handleEndOfScriptNotification(
   "update-establishments-from-insee-api",
   config,
   main,
-  ({
-    numberOfEstablishmentsToUpdate,
-    establishmentWithNewData,
-    errors = {},
-  }) => {
-    const nSiretFailed = Object.keys(errors).length;
-    const errorsAsString = Object.keys(errors)
-      .map((siret) => `For siret ${siret} : ${errors[siret]} `)
-      .join("\n");
-
-    return [
+  ({ numberOfEstablishmentsToUpdate, establishmentWithNewData }) =>
+    [
       `Updating ${numberOfEstablishmentsToUpdate} establishments for Insee Api`,
       `Of which ${establishmentWithNewData} had new data`,
-      ...(nSiretFailed > 0 ? [`Errors were: ${errorsAsString}`] : []),
-    ].join("\n");
-  },
+    ].join("\n"),
   logger,
 );
