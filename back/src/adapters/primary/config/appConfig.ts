@@ -205,15 +205,34 @@ export class AppConfig {
   }
 
   public get inclusionConnectConfig(): InclusionConnectConfig {
-    return {
-      clientId: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_ID"),
-      clientSecret: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_SECRET"),
-      immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
-      inclusionConnectBaseUri: this.throwIfNotAbsoluteUrl(
-        "INCLUSION_CONNECT_BASE_URI",
-      ),
-      scope: "openid profile email",
-    };
+    return this.inclusionConnectGateway === "HTTPS"
+      ? {
+          clientId: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_ID"),
+          clientSecret: this.throwIfNotDefined(
+            "INCLUSION_CONNECT_CLIENT_SECRET",
+          ),
+          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
+          inclusionConnectBaseUri: this.throwIfNotAbsoluteUrl(
+            "INCLUSION_CONNECT_BASE_URI",
+          ),
+          scope: "openid profile email",
+        }
+      : {
+          clientId: this.throwIfNotDefined(
+            "INCLUSION_CONNECT_CLIENT_ID",
+            "fake id",
+          ),
+          clientSecret: this.throwIfNotDefined(
+            "INCLUSION_CONNECT_CLIENT_SECRET",
+            "fake secret",
+          ),
+          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
+          inclusionConnectBaseUri: this.throwIfNotDefined(
+            "INCLUSION_CONNECT_BASE_URI",
+            "https://fake.url",
+          ) as AbsoluteUrl,
+          scope: "openid profile email",
+        };
   }
 
   // == Address Api gateway choice between 2 providers ==
