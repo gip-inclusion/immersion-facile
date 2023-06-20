@@ -53,17 +53,19 @@ export class InseeSiretGateway implements SiretGateway {
     });
   }
 
-  public async getEstablishmentUpdatedSince(
-    date: Date,
+  public async getEstablishmentUpdatedBetween(
+    fromDate: Date,
+    toDate: Date,
     sirets: SiretDto[],
   ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
     try {
-      const formattedDate = format(date, "yyyy-MM-dd");
+      const formattedFromDate = format(fromDate, "yyyy-MM-dd");
+      const formattedToDate = format(toDate, "yyyy-MM-dd");
       const axios = this.createAxiosInstance();
 
       const requestBody = queryParamsAsString({
         q: [
-          `dateDernierTraitementEtablissement:${formattedDate}`,
+          `dateDernierTraitementEtablissement:[${formattedFromDate} TO ${formattedToDate}]`,
           `(${sirets.map((siret) => `siret:${siret}`).join(" OR ")})`,
         ].join(" AND "),
         champs: [
