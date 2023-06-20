@@ -32,6 +32,7 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
     private uowPerformer: UnitOfWorkPerformer,
     private readonly siretGateway: SiretGateway,
     private readonly timeGateway: TimeGateway,
+    private readonly numberOfDaysAgoToCheckForInseeUpdates: number = 30,
     private readonly maxEstablishmentsPerBatch: number = 1000,
     private readonly maxEstablishmentsPerFullRun: number = 5000,
   ) {
@@ -43,7 +44,7 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
   public async _execute(_: void): Promise<Report> {
     this.callsToInseeApi = 0;
     const now = this.timeGateway.now();
-    const since = subDays(now, 30);
+    const since = subDays(now, this.numberOfDaysAgoToCheckForInseeUpdates);
 
     let offset = 0;
     let numberOfEstablishmentsToUpdate = 0;

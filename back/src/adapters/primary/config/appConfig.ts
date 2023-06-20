@@ -403,6 +403,12 @@ export class AppConfig {
           "5000",
         ),
       ),
+      numberOfDaysAgoToCheckForInseeUpdates: parseInt(
+        this.throwIfNotDefinedOrDefault(
+          "NUMBER_OF_DAYS_AGO_TO_CHECK_FOR_INSEE_UPDATES",
+          "30",
+        ),
+      ),
     };
   }
 
