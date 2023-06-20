@@ -1,4 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/browser";
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/config/dependencies";
@@ -88,6 +89,7 @@ const rootEpic: Epic = (action$, store$, dependencies) =>
     catchError((error, source) => {
       //eslint-disable-next-line no-console
       console.error("combineEpic", error);
+      Sentry.captureException(error);
       return source;
     }),
   );

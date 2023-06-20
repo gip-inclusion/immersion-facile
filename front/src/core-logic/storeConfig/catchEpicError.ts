@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/browser";
 import { catchError, merge, Observable, of } from "rxjs";
 
 export const catchEpicError =
@@ -8,4 +9,9 @@ export const catchEpicError =
     cb: (error: Error) => OutputAction,
   ) =>
   (inputObs: Observable<InputAction>): Observable<OutputAction | InputAction> =>
-    inputObs.pipe(catchError((error, caught) => merge(of(cb(error)), caught)));
+    inputObs.pipe(
+      catchError((error, caught) => {
+        Sentry.captureException(error);
+        return merge(of(cb(error)), caught);
+      }),
+    );

@@ -33,6 +33,7 @@
     "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.11.8",
     "@reduxjs/toolkit": "^1.8.1",
+    "@sentry/browser": "^7.56.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^18.13.0",
     "@types/papaparse": "^5.3.7",
