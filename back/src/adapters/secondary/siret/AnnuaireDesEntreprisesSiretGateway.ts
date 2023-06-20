@@ -51,7 +51,7 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
     if (formattedResult.isOpen) return formattedResult;
   }
 
-  getEstablishmentUpdatedSince(): Promise<
+  getEstablishmentUpdatedBetween(): Promise<
     Record<SiretDto, SiretEstablishmentDto>
   > {
     throw new Error("Method not implemented. Use insee version please.");

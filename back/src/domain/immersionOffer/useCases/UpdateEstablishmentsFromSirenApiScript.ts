@@ -59,7 +59,12 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
       numberOfEstablishmentsToUpdate += numberOfEstablishmentsToUpdateInBatch;
       establishmentWithNewData += establishmentWithNewDataInBatch;
 
-      offset += this.maxEstablishmentsPerBatch;
+      const areThereMoreEstablishmentsToUpdate =
+        numberOfEstablishmentsToUpdate === this.maxEstablishmentsPerBatch;
+
+      offset = areThereMoreEstablishmentsToUpdate
+        ? offset + this.maxEstablishmentsPerBatch
+        : this.maxEstablishmentsPerFullRun;
     }
 
     return {
@@ -85,6 +90,7 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
     const siretEstablishmentsWithChanges =
       await this.getEstablishmentsUpdatesFromInsee(
         since,
+        now,
         establishmentSiretsToUpdate,
       );
 
@@ -115,11 +121,13 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
 
   private async getEstablishmentsUpdatesFromInsee(
     since: Date,
+    now: Date,
     establishmentSiretsToUpdate: SiretDto[],
   ): Promise<Partial<Record<SiretDto, SiretEstablishmentDto>>> {
     if (establishmentSiretsToUpdate.length > 0) {
-      const results = await this.siretGateway.getEstablishmentUpdatedSince(
+      const results = await this.siretGateway.getEstablishmentUpdatedBetween(
         since,
+        now,
         establishmentSiretsToUpdate,
       );
       this.callsToInseeApi++;

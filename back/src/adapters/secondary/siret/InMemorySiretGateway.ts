@@ -79,8 +79,9 @@ export class InMemorySiretGateway implements SiretGateway {
     [TEST_ESTABLISHMENT4.siret]: TEST_ESTABLISHMENT4,
   };
 
-  public async getEstablishmentUpdatedSince(
-    _date: Date,
+  public async getEstablishmentUpdatedBetween(
+    _fromDate: Date,
+    _toDate: Date,
     sirets: SiretDto[],
   ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
     return this.siretEstablishmentsUpdateSince
