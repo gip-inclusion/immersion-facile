@@ -16,6 +16,7 @@ import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFr
 
 const maxEstablishmentsPerBatch = 1;
 const maxEstablishmentsPerFullRun = 2;
+const numberOfDaysAgoToCheckForInseeUpdates = 30;
 const now = new Date("2023-06-16");
 
 describe("Update establishments from Sirene API", () => {
@@ -34,6 +35,7 @@ describe("Update establishments from Sirene API", () => {
       uowPerformer,
       siretGateway,
       timeGateway,
+      numberOfDaysAgoToCheckForInseeUpdates,
       maxEstablishmentsPerBatch,
       maxEstablishmentsPerFullRun,
     );

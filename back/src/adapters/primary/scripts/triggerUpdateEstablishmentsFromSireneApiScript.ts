@@ -49,6 +49,7 @@ const main = async () => {
       uowPerformer,
       siretGateway,
       new RealTimeGateway(),
+      config.updateEstablishmentFromInseeConfig.numberOfDaysAgoToCheckForInseeUpdates,
       config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerBatch,
       config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerFullRun,
     );
