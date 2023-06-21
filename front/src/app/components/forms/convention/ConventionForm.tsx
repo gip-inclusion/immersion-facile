@@ -164,6 +164,9 @@ export const ConventionForm = ({
         }),
       );
     }
+    return () => {
+      dispatch(conventionSlice.actions.clearFetchedConvention());
+    };
   }, []);
 
   useEffect(() => {
