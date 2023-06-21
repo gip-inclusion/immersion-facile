@@ -71,6 +71,7 @@ describe("PgDiscussionAggregateRepository", () => {
       immersionObjective,
       potentialBeneficiaryPhone,
       potentialBeneficiaryResumeLink,
+      potentialBeneficiaryEmailUuid: "11111111-1111-4000-1111-111111111111",
       appellationCode: styliste.appellationCode,
       createdAt,
     });

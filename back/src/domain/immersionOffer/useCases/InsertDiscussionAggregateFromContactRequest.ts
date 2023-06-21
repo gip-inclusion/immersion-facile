@@ -10,10 +10,7 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 
-export class InsertDiscussionAggregateFromContactRequest extends TransactionalUseCase<
-  ContactEstablishmentRequestDto,
-  void
-> {
+export class InsertDiscussionAggregateFromContactRequest extends TransactionalUseCase<ContactEstablishmentRequestDto> {
   inputSchema = contactEstablishmentRequestSchema;
 
   constructor(
@@ -37,6 +34,7 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
       immersionObjective:
         params.contactMode === "EMAIL" ? params.immersionObjective : null,
       potentialBeneficiary: {
+        emailUuid: this.uuidGenerator.new(),
         firstName: params.potentialBeneficiaryFirstName,
         lastName: params.potentialBeneficiaryLastName,
         email: params.potentialBeneficiaryEmail,

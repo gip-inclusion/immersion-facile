@@ -16,6 +16,7 @@ export const createDiscussionAggregate = ({
   potentialBeneficiaryResumeLink,
   potentialBeneficiaryPhone,
   appellationCode,
+  potentialBeneficiaryEmailUuid,
   createdAt,
 }: {
   id: string;
@@ -24,6 +25,7 @@ export const createDiscussionAggregate = ({
   immersionObjective: ImmersionObjective | null;
   appellationCode: ApplicationCode;
   potentialBeneficiaryResumeLink?: string;
+  potentialBeneficiaryEmailUuid?: string;
   createdAt: Date;
 }): DiscussionAggregate => ({
   id,
@@ -32,6 +34,7 @@ export const createDiscussionAggregate = ({
   createdAt,
   immersionObjective,
   potentialBeneficiary: {
+    emailUuid: potentialBeneficiaryEmailUuid ?? "default-email-uuid",
     firstName: "Claire",
     lastName: "Bertrand",
     email: "claire.bertrand@email.fr",
