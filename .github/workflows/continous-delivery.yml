@@ -13,6 +13,7 @@ jobs:
     uses: ./.github/workflows/build-front-artefact.yml
     with:
       tag: "v${{ github.run_number }}"
+    secrets:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
   build-back-artefact:
