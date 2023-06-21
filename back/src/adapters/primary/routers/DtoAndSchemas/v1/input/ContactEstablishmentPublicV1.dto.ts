@@ -33,14 +33,6 @@ export type ContactEstablishmentPublicV1Dto =
 export const contactEstablishmentPublicV1ToDomain = (
   contactRequest: ContactEstablishmentPublicV1Dto,
 ): ContactEstablishmentRequestDto => {
-  // const {
-  //   contactMode,
-  //   potentialBeneficiaryEmail,
-  //   offer,
-  //   potentialBeneficiaryFirstName,
-  //   potentialBeneficiaryLastName,
-  //   siret,
-  // } = contactRequest;
   if (contactRequest.contactMode === "EMAIL")
     return {
       ...contactRequest,

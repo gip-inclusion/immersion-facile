@@ -21,6 +21,7 @@ import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter";
 import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
+import { createApiKeyAuthRouterV2 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishment/createEstablishmentRouter";
 import { createValidateEmailRouter } from "./routers/emailValidation/createValidateEmailRouter";
@@ -82,6 +83,7 @@ export const createApp = async (
   app.use(...createMagicLinkRouter(deps));
   app.use(...createAdminRouter(deps));
   app.use("/v1", createApiKeyAuthRouterV1(deps));
+  app.use("/v2", createApiKeyAuthRouterV2(deps));
   app.use(...createInclusionConnectedAllowedRouter(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
