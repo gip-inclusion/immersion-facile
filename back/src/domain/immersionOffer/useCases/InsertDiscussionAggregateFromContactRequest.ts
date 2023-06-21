@@ -31,13 +31,27 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
     const now = this.timeGateway.now();
     const discussion: DiscussionAggregate = {
       id: this.uuidGenerator.new(),
-      potentialBeneficiaryFirstName: params.potentialBeneficiaryFirstName,
-      potentialBeneficiaryLastName: params.potentialBeneficiaryLastName,
-      potentialBeneficiaryEmail: params.potentialBeneficiaryEmail,
       appellationCode: params.appellationCode,
       siret: params.siret,
-      contactMode: params.contactMode,
       createdAt: now,
+      immersionObjective:
+        params.contactMode === "EMAIL" ? params.immersionObjective : null,
+      potentialBeneficiary: {
+        firstName: params.potentialBeneficiaryFirstName,
+        lastName: params.potentialBeneficiaryLastName,
+        email: params.potentialBeneficiaryEmail,
+        phone:
+          params.contactMode === "EMAIL"
+            ? params.potentialBeneficiaryPhone
+            : "",
+        resumeLink:
+          params.contactMode === "EMAIL"
+            ? params.potentialBeneficiaryResumeLink
+            : "",
+      },
+      establishmentContact: {
+        contactMode: params.contactMode,
+      },
       exchanges:
         params.contactMode === "EMAIL"
           ? [
@@ -49,14 +63,6 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
               },
             ]
           : [],
-      immersionObjective:
-        params.contactMode === "EMAIL" ? params.immersionObjective : null,
-      potentialBeneficiaryResumeLink:
-        params.contactMode === "EMAIL"
-          ? params.potentialBeneficiaryResumeLink
-          : "",
-      potentialBeneficiaryPhone:
-        params.contactMode === "EMAIL" ? params.potentialBeneficiaryPhone : "",
     };
 
     await uow.discussionAggregateRepository.insertDiscussionAggregate(

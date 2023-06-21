@@ -1,5 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto } from "shared";
+import { expectToEqual } from "shared";
 import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
@@ -81,7 +82,7 @@ describe("PgDiscussionAggregateRepository", () => {
       await pgDiscussionAggregateRepository.retrieveDiscussionAggregate(
         discussionAggregate.id,
       );
-    expect(retrievedDiscussionAggregate).toEqual(discussionAggregate);
+    expectToEqual(retrievedDiscussionAggregate, discussionAggregate);
   });
 
   it("Methode getDiscussionsBySiretSince", async () => {

@@ -70,11 +70,17 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       id: discussionId,
       appellationCode: "12898",
       siret: "01234567891011",
-      potentialBeneficiaryFirstName: "Antoine",
-      potentialBeneficiaryLastName: "Tourasse",
-      potentialBeneficiaryEmail: "antoine.tourasse@email.com",
-      contactMode: "EMAIL",
+      potentialBeneficiary: {
+        firstName: "Antoine",
+        lastName: "Tourasse",
+        email: "antoine.tourasse@email.com",
+        phone: "0654783402",
+      },
+      establishmentContact: {
+        contactMode: "EMAIL",
+      },
       createdAt: connectionDate,
+      immersionObjective: "Confirmer un projet professionnel",
       exchanges: [
         {
           sentAt: connectionDate,
@@ -83,8 +89,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           sender: "potentialBeneficiary",
         },
       ],
-      immersionObjective: "Confirmer un projet professionnel",
-      potentialBeneficiaryPhone: "0654783402",
     });
   });
 
@@ -101,10 +105,17 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         id: "discussionToOld",
         appellationCode: "12898",
         siret,
-        potentialBeneficiaryFirstName: "Antoine",
-        potentialBeneficiaryLastName: "Tourasse",
-        potentialBeneficiaryEmail: "antoine.tourasse@email.com",
-        contactMode: "EMAIL",
+        immersionObjective: "Confirmer un projet professionnel",
+        potentialBeneficiary: {
+          firstName: "Antoine",
+          lastName: "Tourasse",
+          email: "antoine.tourasse@email.com",
+          phone: "0654678976",
+          resumeLink: "http://fakelink.com",
+        },
+        establishmentContact: {
+          contactMode: "EMAIL",
+        },
         createdAt: discussionToOldDate,
         exchanges: [
           {
@@ -114,19 +125,22 @@ describe("Insert discussion aggregate from contact request DTO", () => {
             sentAt: discussionToOldDate,
           },
         ],
-        immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiaryResumeLink: "http://fakelink.com",
-        potentialBeneficiaryPhone: "0654678976",
       },
       {
         id: "discussion1",
         appellationCode: "12898",
-        siret,
-        potentialBeneficiaryFirstName: "Antoine",
-        potentialBeneficiaryLastName: "Tourasse",
-        potentialBeneficiaryEmail: "antoine.tourasse@email.com",
-        contactMode: "EMAIL",
         createdAt: discussion1Date,
+        siret,
+        potentialBeneficiary: {
+          firstName: "Antoine",
+          lastName: "Tourasse",
+          email: "antoine.tourasse@email.com",
+          phone: "0654678976",
+          resumeLink: "http://fakelink.com",
+        },
+        establishmentContact: {
+          contactMode: "EMAIL",
+        },
         exchanges: [
           {
             message:
@@ -137,8 +151,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           },
         ],
         immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiaryResumeLink: "http://fakelink.com",
-        potentialBeneficiaryPhone: "0654678976",
       },
     ];
 

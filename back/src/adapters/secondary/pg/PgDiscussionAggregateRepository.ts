@@ -28,15 +28,15 @@ export class PgDiscussionAggregateRepository
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
         discussion.id,
-        discussion.contactMode,
+        discussion.establishmentContact.contactMode,
         discussion.siret,
         discussion.appellationCode,
-        discussion.potentialBeneficiaryFirstName,
-        discussion.potentialBeneficiaryLastName,
-        discussion.potentialBeneficiaryEmail,
-        discussion.potentialBeneficiaryPhone,
+        discussion.potentialBeneficiary.firstName,
+        discussion.potentialBeneficiary.lastName,
+        discussion.potentialBeneficiary.email,
+        discussion.potentialBeneficiary.phone,
         discussion.immersionObjective,
-        discussion.potentialBeneficiaryResumeLink,
+        discussion.potentialBeneficiary.resumeLink,
         discussion.createdAt.toISOString(),
       ],
     );
@@ -71,20 +71,24 @@ export class PgDiscussionAggregateRepository
       GROUP BY discussion_id
     )
     SELECT 
-      JSON_BUILD_OBJECT(
+      JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
         'id', id, 
-        'contactMode', contact_mode, 
-        'siret', siret,
-        'appellationCode', appellation_code::text, 
-        'potentialBeneficiaryFirstName',  potential_beneficiary_first_name,
-        'potentialBeneficiaryLastName',  potential_beneficiary_last_name,
-        'potentialBeneficiaryEmail',  potential_beneficiary_email,
-        'immersionObjective', immersion_objective ,
-        'potentialBeneficiaryPhone', potential_beneficiary_phone ,
-        'potentialBeneficiaryResumeLink', potential_beneficiary_resume_link ,
         'createdAt', created_at,
+        'siret', siret,
+        'appellationCode', appellation_code::text,
+        'immersionObjective', immersion_objective,
+        'potentialBeneficiary', JSON_BUILD_OBJECT(
+          'firstName',  potential_beneficiary_first_name,
+          'lastName',  potential_beneficiary_last_name,
+          'email',  potential_beneficiary_email,
+          'phone', potential_beneficiary_phone,
+          'resumeLink', potential_beneficiary_resume_link
+        ),
+        'establishmentContact', JSON_BUILD_OBJECT(
+          'contactMode', contact_mode
+        ),
         'exchanges', exchanges
-    ) AS discussion
+    )) AS discussion
     FROM discussions 
     LEFT JOIN exchanges_by_id ON exchanges_by_id.discussion_id = discussions.id
     WHERE id = $1

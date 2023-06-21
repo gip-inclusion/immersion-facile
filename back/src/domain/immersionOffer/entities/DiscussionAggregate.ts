@@ -11,17 +11,28 @@ export type DiscussionId = Flavor<string, "DiscussionId">;
 
 export type DiscussionAggregate = {
   id: DiscussionId;
-  potentialBeneficiaryFirstName: string;
-  potentialBeneficiaryLastName: string;
-  potentialBeneficiaryEmail: string;
-  potentialBeneficiaryPhone: string;
-  potentialBeneficiaryResumeLink?: string;
-  appellationCode: AppellationCode;
-  siret: string;
-  contactMode: ContactMethod;
   createdAt: Date;
-  exchanges: ExchangeEntity[];
+  siret: string;
+  appellationCode: AppellationCode;
   immersionObjective: ImmersionObjective | null;
+  exchanges: ExchangeEntity[];
+  potentialBeneficiary: {
+    // emailUuid: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    resumeLink?: string;
+  };
+  establishmentContact: {
+    // emailUuid: string;
+    // firstName: string;
+    // lastName: string;
+    // email: string;
+    // phone: string;
+    // job: string;
+    contactMode: ContactMethod;
+  };
 };
 
 export type ExchangeEntity = {

@@ -29,11 +29,18 @@ export const createDiscussionAggregate = ({
   id,
   appellationCode,
   siret,
-  contactMode: "EMAIL",
   createdAt,
-  potentialBeneficiaryFirstName: "Claire",
-  potentialBeneficiaryLastName: "Bertrand",
-  potentialBeneficiaryEmail: "claire.bertrand@email.fr",
+  immersionObjective,
+  potentialBeneficiary: {
+    firstName: "Claire",
+    lastName: "Bertrand",
+    email: "claire.bertrand@email.fr",
+    phone: potentialBeneficiaryPhone,
+    resumeLink: potentialBeneficiaryResumeLink,
+  },
+  establishmentContact: {
+    contactMode: "EMAIL",
+  },
   exchanges: [
     {
       sentAt: createdAt,
@@ -42,7 +49,4 @@ export const createDiscussionAggregate = ({
       sender: "potentialBeneficiary",
     },
   ],
-  immersionObjective,
-  potentialBeneficiaryPhone,
-  potentialBeneficiaryResumeLink,
 });
