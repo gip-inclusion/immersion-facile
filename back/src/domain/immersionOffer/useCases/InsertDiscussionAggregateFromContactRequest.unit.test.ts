@@ -9,6 +9,14 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { InsertDiscussionAggregateFromContactRequest } from "./InsertDiscussionAggregateFromContactRequest";
 
 const siret = "01234567891011";
+const searchableEstablishmentAggregate = new EstablishmentAggregateBuilder()
+  .withEstablishmentSiret(siret)
+  .withMaxContactsPerWeek(2)
+  .withIsSearchable(true)
+  .build();
+const establishmentAddress =
+  searchableEstablishmentAggregate.establishment.address;
+const establishmentContact = searchableEstablishmentAggregate.contact!;
 
 describe("Insert discussion aggregate from contact request DTO", () => {
   let insertDiscussionAggregate: InsertDiscussionAggregateFromContactRequest;
@@ -32,11 +40,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       uuidGenerator,
     );
 
-    const searchableEstablishmentAggregate = new EstablishmentAggregateBuilder()
-      .withEstablishmentSiret(siret)
-      .withMaxContactsPerWeek(2)
-      .withIsSearchable(true)
-      .build();
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       searchableEstablishmentAggregate,
     ]);
@@ -78,6 +81,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       id: discussionId,
       appellationCode: "12898",
       siret: "01234567891011",
+      address: establishmentAddress,
       potentialBeneficiary: {
         emailUuid: potentialBeneficiaryEmailUuid,
         firstName: "Antoine",
@@ -86,7 +90,14 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         phone: "0654783402",
       },
       establishmentContact: {
+        emailUuid: establishmentContactEmailUuid,
         contactMode: "EMAIL",
+        email: establishmentContact.email,
+        firstName: establishmentContact.firstName,
+        lastName: establishmentContact.lastName,
+        phone: establishmentContact.phone,
+        job: establishmentContact.job,
+        copyEmails: establishmentContact.copyEmails,
       },
       createdAt: connectionDate,
       immersionObjective: "Confirmer un projet professionnel",
@@ -114,9 +125,10 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         id: "discussionToOld",
         appellationCode: "12898",
         siret,
+        address: establishmentAddress,
         immersionObjective: "Confirmer un projet professionnel",
         potentialBeneficiary: {
-          emailUuid: "any-thing",
+          emailUuid: "email-uuid-beneficiary",
           firstName: "Antoine",
           lastName: "Tourasse",
           email: "antoine.tourasse@email.com",
@@ -124,7 +136,14 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
+          emailUuid: "email-uuid-establishment",
           contactMode: "EMAIL",
+          email: establishmentContact.email,
+          firstName: establishmentContact.firstName,
+          lastName: establishmentContact.lastName,
+          phone: establishmentContact.phone,
+          job: establishmentContact.job,
+          copyEmails: establishmentContact.copyEmails,
         },
         createdAt: discussionToOldDate,
         exchanges: [
@@ -141,6 +160,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         appellationCode: "12898",
         createdAt: discussion1Date,
         siret,
+        address: establishmentAddress,
         potentialBeneficiary: {
           emailUuid: "email-uuid-beneficiary",
           firstName: "Antoine",
@@ -150,7 +170,14 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
+          emailUuid: "email-uuid-establishment",
           contactMode: "EMAIL",
+          email: establishmentContact.email,
+          firstName: establishmentContact.firstName,
+          lastName: establishmentContact.lastName,
+          phone: establishmentContact.phone,
+          job: establishmentContact.job,
+          copyEmails: establishmentContact.copyEmails,
         },
         exchanges: [
           {
