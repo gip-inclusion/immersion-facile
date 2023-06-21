@@ -224,7 +224,8 @@ export const conventionSlice = createSlice({
     },
 
     clearFetchedConvention: (state) => {
-      state.convention = null;
+      state.convention = initialConventionState.convention;
+      state.formUi = initialConventionState.formUi;
     },
 
     jwtProvided: (state, action: PayloadAction<string>) => {

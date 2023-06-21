@@ -959,11 +959,11 @@ describe("Convention slice", () => {
       convention: {
         formUi: {
           preselectedAgencyId: null,
-          isMinor: false,
+          isMinor: true,
           isTutorEstablishmentRepresentative: true,
-          hasCurrentEmployer: false,
-          currentStep: 1,
-          agencyDepartment: null,
+          hasCurrentEmployer: true,
+          currentStep: 3,
+          agencyDepartment: "87",
           showSummary: false,
         },
         jwt: null,
@@ -977,7 +977,10 @@ describe("Convention slice", () => {
     }));
     expectConventionState({ convention });
     store.dispatch(conventionSlice.actions.clearFetchedConvention());
-    expectConventionState({ convention: null });
+    expectConventionState({
+      convention: initialConventionState.convention,
+      formUi: initialConventionState.formUi,
+    });
   });
 
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
