@@ -995,7 +995,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       expectToEqual(actualSearchResultDto, {
         rome: "H2102",
         romeLabel: "Conduite d'équipement de production alimentaire",
-        appellationLabels: [],
+        appellationLabels: ["Styliste"],
         naf: establishment.nafDto.code,
         nafLabel: "Fabrication de pain et de pâtisserie fraîche",
         siret,
