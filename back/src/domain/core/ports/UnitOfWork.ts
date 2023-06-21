@@ -2,6 +2,7 @@ import { ApiConsumerRepository } from "../../auth/ports/ApiConsumerRepository";
 import { AgencyRepository } from "../../convention/ports/AgencyRepository";
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
+import { ConventionToSyncRepository } from "../../convention/ports/ConventionToSyncRepository";
 import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
@@ -44,6 +45,7 @@ export type UnitOfWork = {
   searchMadeRepository: SearchMadeRepository;
   shortLinkQuery: ShortLinkQuery;
   shortLinkRepository: ShortLinkRepository;
+  conventionToSyncRepository: ConventionToSyncRepository;
 };
 
 export interface UnitOfWorkPerformer {
