@@ -1,6 +1,6 @@
 // TODO : create a DiscussionAggregateBuilder
 import { ApplicationCode } from "aws-sdk/clients/kinesisanalytics";
-import { ImmersionObjective, SiretDto } from "shared";
+import { AddressDto, Email, ImmersionObjective, SiretDto } from "shared";
 import { DiscussionAggregate } from "../domain/immersionOffer/entities/DiscussionAggregate";
 
 // TODO transform this function into a DiscussionAggregateBuilder
@@ -17,6 +17,8 @@ export const createDiscussionAggregate = ({
   potentialBeneficiaryPhone,
   appellationCode,
   potentialBeneficiaryEmailUuid,
+  establishmentContact = {},
+  address,
   createdAt,
 }: {
   id: string;
@@ -26,6 +28,16 @@ export const createDiscussionAggregate = ({
   appellationCode: ApplicationCode;
   potentialBeneficiaryResumeLink?: string;
   potentialBeneficiaryEmailUuid?: string;
+  address?: AddressDto;
+  establishmentContact?: Partial<{
+    emailUuid: string;
+    email: Email;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    job: string;
+    copyEmails: string[];
+  }>;
   createdAt: Date;
 }): DiscussionAggregate => ({
   id,
@@ -33,8 +45,15 @@ export const createDiscussionAggregate = ({
   siret,
   createdAt,
   immersionObjective,
+  address: address ?? {
+    streetNumberAndAddress: "1 rue de la Paix",
+    postcode: "75001",
+    departmentCode: "75",
+    city: "Paris",
+  },
   potentialBeneficiary: {
-    emailUuid: potentialBeneficiaryEmailUuid ?? "default-email-uuid",
+    emailUuid:
+      potentialBeneficiaryEmailUuid ?? "default-beneficiary-email-uuid",
     firstName: "Claire",
     lastName: "Bertrand",
     email: "claire.bertrand@email.fr",
@@ -43,6 +62,14 @@ export const createDiscussionAggregate = ({
   },
   establishmentContact: {
     contactMode: "EMAIL",
+    emailUuid:
+      establishmentContact.emailUuid ?? "default-establishment-email-uuid",
+    email: establishmentContact.email ?? "establishment@mail.com",
+    firstName: establishmentContact.firstName ?? "Jean",
+    lastName: establishmentContact.lastName ?? "Dupont",
+    phone: establishmentContact.phone ?? "0123456789",
+    job: establishmentContact.job ?? "Directeur",
+    copyEmails: establishmentContact.copyEmails ?? [],
   },
   exchanges: [
     {

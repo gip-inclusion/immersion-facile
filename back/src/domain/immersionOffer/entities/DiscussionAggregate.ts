@@ -1,4 +1,5 @@
 import {
+  AddressDto,
   AppellationCode,
   ContactMethod,
   Flavor,
@@ -15,6 +16,7 @@ export type DiscussionAggregate = {
   siret: string;
   appellationCode: AppellationCode;
   immersionObjective: ImmersionObjective | null;
+  address: AddressDto;
   exchanges: ExchangeEntity[];
   potentialBeneficiary: {
     emailUuid: string;
@@ -25,12 +27,13 @@ export type DiscussionAggregate = {
     resumeLink?: string;
   };
   establishmentContact: {
-    // emailUuid: string;
-    // email: string;
-    // firstName: string;
-    // lastName: string;
-    // phone: string;
-    // job: string;
+    emailUuid: string;
+    email: string;
+    copyEmails: string[];
+    firstName: string;
+    lastName: string;
+    phone: string;
+    job: string;
     contactMode: ContactMethod;
   };
 };

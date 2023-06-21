@@ -26,6 +26,21 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
     uow: UnitOfWork,
   ): Promise<void> {
     const now = this.timeGateway.now();
+    const establishmentAggregate =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        params.siret,
+      );
+    if (!establishmentAggregate)
+      throw new NotFoundError(
+        `No establishment found with siret n°${params.siret}`,
+      );
+
+    const establishmentContact = establishmentAggregate.contact;
+    if (!establishmentContact)
+      throw new NotFoundError(
+        `No contact found for establishment with siret n°${params.siret}`,
+      );
+
     const discussion: DiscussionAggregate = {
       id: this.uuidGenerator.new(),
       appellationCode: params.appellationCode,
@@ -33,6 +48,7 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
       createdAt: now,
       immersionObjective:
         params.contactMode === "EMAIL" ? params.immersionObjective : null,
+      address: establishmentAggregate.establishment.address,
       potentialBeneficiary: {
         emailUuid: this.uuidGenerator.new(),
         firstName: params.potentialBeneficiaryFirstName,
@@ -48,7 +64,14 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
             : "",
       },
       establishmentContact: {
+        emailUuid: this.uuidGenerator.new(),
         contactMode: params.contactMode,
+        email: establishmentContact.email,
+        firstName: establishmentContact.firstName,
+        lastName: establishmentContact.lastName,
+        phone: establishmentContact.phone,
+        job: establishmentContact.job,
+        copyEmails: establishmentContact.copyEmails,
       },
       exchanges:
         params.contactMode === "EMAIL"
@@ -66,15 +89,6 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
     await uow.discussionAggregateRepository.insertDiscussionAggregate(
       discussion,
     );
-    const establishmentAggregate =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        params.siret,
-      );
-
-    if (!establishmentAggregate)
-      throw new NotFoundError(
-        `No establishment found with siret n°${params.siret}`,
-      );
 
     const maxContactsPerWeekForEstablishment =
       establishmentAggregate.establishment.maxContactsPerWeek;
