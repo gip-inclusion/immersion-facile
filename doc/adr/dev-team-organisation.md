@@ -20,7 +20,8 @@
 ### Le pair programming
 
 - 2023-02-16 - On essaye de bosser autant que possible en pair programming. Il y a une certaine flexibilité mais c'est une méthode de travail qui permet d'avoir un regard croisé sur les features, et est plus efficace que les reviews à postériori.
-- 2023-02-16 - Pas une règle absolue, mais il faut conserver cette objectif de pair autant que possible. Si pas possible, une review est nécessaire, et éventuellement une discussion _a posteriori_.
+- 2023-02-16 - Pas une règle absolue, mais il faut conserver cette objectif de pair autant que possible.
+- 2023-06-20 - Quoi qu'il arrive, une review est nécessaire par un dev qui n'a pas participé au dev, et éventuellement une discussion _a posteriori_.
 
 ## Le role de développeur
 
