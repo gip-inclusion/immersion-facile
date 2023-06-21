@@ -12,6 +12,7 @@ import { RouteProvider } from "./routes/routes";
 Sentry.init({
   dsn: "https://c2909f1d7f384d17bde3e75e250f2828@sentry.gip-inclusion.cloud-ed.fr/2",
   integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
+  release: import.meta.env.VITE_RELEASE_TAG,
   environment: ENV.envType,
   tracesSampleRate: 0.01,
   replaysOnErrorSampleRate: 1.0,

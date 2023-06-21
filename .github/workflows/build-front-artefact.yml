@@ -6,6 +6,9 @@ on:
       tag:
         type: string
         required: true
+    secrets:
+      SENTRY_AUTH_TOKEN:
+        required: true
 
 jobs:
   build-front-artefact:
@@ -23,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build front
-        run: pnpm front build-scalingo
+        run: VITE_RELEASE_TAG=${{ inputs.tag }} SENTRY_AUTH_TOKEN=${{ inputs.SENTRY_AUTH_TOKEN }} pnpm front build-scalingo
       - name: Archive build
         uses: actions/upload-artifact@v3
         with:
