@@ -17,18 +17,18 @@ export type DiscussionAggregate = {
   immersionObjective: ImmersionObjective | null;
   exchanges: ExchangeEntity[];
   potentialBeneficiary: {
-    // emailUuid: string;
+    emailUuid: string;
+    email: string;
     firstName: string;
     lastName: string;
-    email: string;
     phone: string;
     resumeLink?: string;
   };
   establishmentContact: {
     // emailUuid: string;
+    // email: string;
     // firstName: string;
     // lastName: string;
-    // email: string;
     // phone: string;
     // job: string;
     contactMode: ContactMethod;

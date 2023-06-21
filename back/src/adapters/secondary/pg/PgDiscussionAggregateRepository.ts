@@ -24,8 +24,9 @@ export class PgDiscussionAggregateRepository
          potential_beneficiary_phone,
          immersion_objective,
          potential_beneficiary_resume_link, 
-         created_at 
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+         created_at,
+         potential_beneficiary_email_uuid
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [
         discussion.id,
         discussion.establishmentContact.contactMode,
@@ -38,6 +39,7 @@ export class PgDiscussionAggregateRepository
         discussion.immersionObjective,
         discussion.potentialBeneficiary.resumeLink,
         discussion.createdAt.toISOString(),
+        discussion.potentialBeneficiary.emailUuid,
       ],
     );
     await Promise.all(
@@ -78,6 +80,7 @@ export class PgDiscussionAggregateRepository
         'appellationCode', appellation_code::text,
         'immersionObjective', immersion_objective,
         'potentialBeneficiary', JSON_BUILD_OBJECT(
+          'emailUuid',  potential_beneficiary_email_uuid,
           'firstName',  potential_beneficiary_first_name,
           'lastName',  potential_beneficiary_last_name,
           'email',  potential_beneficiary_email,

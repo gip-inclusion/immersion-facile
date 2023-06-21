@@ -41,6 +41,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       searchableEstablishmentAggregate,
     ]);
   });
+
   it("Converts the contact request DTO into a discussion aggregate and adds in to repo", async () => {
     // Prepare
 
@@ -48,7 +49,14 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     timeGateway.setNextDate(connectionDate);
 
     const discussionId = "someDiscussionUuid";
-    uuidGenerator.setNextUuid(discussionId);
+    const potentialBeneficiaryEmailUuid = "potentialBeneficiaryEmailUuid";
+    const establishmentContactEmailUuid = "establishmentContactEmailUuid";
+
+    uuidGenerator.setNextUuids([
+      discussionId,
+      potentialBeneficiaryEmailUuid,
+      establishmentContactEmailUuid,
+    ]);
 
     // Act
     const contactRequestDto: ContactEstablishmentRequestDto = {
@@ -71,6 +79,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       appellationCode: "12898",
       siret: "01234567891011",
       potentialBeneficiary: {
+        emailUuid: potentialBeneficiaryEmailUuid,
         firstName: "Antoine",
         lastName: "Tourasse",
         email: "antoine.tourasse@email.com",
@@ -107,6 +116,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         siret,
         immersionObjective: "Confirmer un projet professionnel",
         potentialBeneficiary: {
+          emailUuid: "any-thing",
           firstName: "Antoine",
           lastName: "Tourasse",
           email: "antoine.tourasse@email.com",
@@ -132,6 +142,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         createdAt: discussion1Date,
         siret,
         potentialBeneficiary: {
+          emailUuid: "email-uuid-beneficiary",
           firstName: "Antoine",
           lastName: "Tourasse",
           email: "antoine.tourasse@email.com",
