@@ -1,4 +1,5 @@
 import { ConventionDto, conventionSchema, ImmersionObjective } from "shared";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
@@ -29,6 +30,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     uowPerformer: UnitOfWorkPerformer,
     private poleEmploiGateway: PoleEmploiGateway,
     private timeGateway: TimeGateway,
+    private resyncMode: boolean,
   ) {
     super(uowPerformer);
   }
@@ -42,10 +44,30 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     const { enablePeConventionBroadcast } =
       await uow.featureFlagRepository.getAll();
 
-    if (!enablePeConventionBroadcast) return;
+    if (!enablePeConventionBroadcast)
+      return this.resyncMode
+        ? uow.conventionToSyncRepository.save({
+            id: convention.id,
+            status: "SKIP",
+            processDate: this.timeGateway.now(),
+            reason: "Feature flag enablePeConventionBroadcast not enabled",
+          })
+        : undefined;
 
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (!agency || agency.kind !== "pole-emploi") return;
+    if (!agency)
+      throw new NotFoundError(
+        `Agency with id ${convention.agencyId} missing in agencyRepository`,
+      );
+    if (agency.kind !== "pole-emploi")
+      return this.resyncMode
+        ? uow.conventionToSyncRepository.save({
+            id: convention.id,
+            status: "SKIP",
+            processDate: this.timeGateway.now(),
+            reason: "Agency is not of kind pole-emploi",
+          })
+        : undefined;
 
     const { beneficiary, establishmentRepresentative } = convention.signatories;
 
@@ -92,6 +114,13 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     const response = await this.poleEmploiGateway.notifyOnConventionUpdated(
       poleEmploiConvention,
     );
+
+    if (this.resyncMode)
+      await uow.conventionToSyncRepository.save({
+        id: convention.id,
+        status: "SUCCESS",
+        processDate: this.timeGateway.now(),
+      });
 
     if (!isBroadcastResponseOk(response)) {
       await uow.errorRepository.save({
