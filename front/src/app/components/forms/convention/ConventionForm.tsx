@@ -164,10 +164,14 @@ export const ConventionForm = ({
         }),
       );
     }
-    return () => {
-      dispatch(conventionSlice.actions.clearFetchedConvention());
-    };
   }, []);
+
+  useEffect(
+    () => () => {
+      dispatch(conventionSlice.actions.clearFetchedConvention());
+    },
+    [],
+  );
 
   useEffect(() => {
     if (fetchedConvention) {
