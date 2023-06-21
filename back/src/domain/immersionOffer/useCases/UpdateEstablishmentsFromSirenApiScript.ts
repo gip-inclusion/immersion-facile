@@ -60,7 +60,8 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
       establishmentWithNewData += establishmentWithNewDataInBatch;
 
       const areThereMoreEstablishmentsToUpdate =
-        numberOfEstablishmentsToUpdate === this.maxEstablishmentsPerBatch;
+        numberOfEstablishmentsToUpdateInBatch ===
+        this.maxEstablishmentsPerBatch;
 
       offset = areThereMoreEstablishmentsToUpdate
         ? offset + this.maxEstablishmentsPerBatch
