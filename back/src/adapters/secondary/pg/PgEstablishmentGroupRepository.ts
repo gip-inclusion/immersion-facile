@@ -13,6 +13,7 @@ const buildAppellationsArray = `JSON_AGG(
       'appellationCode', ogr_appellation::text,
       'appellationLabel', libelle_appellation_long
     )
+    ORDER BY ogr_appellation
   )`;
 
 export class PgEstablishmentGroupRepository

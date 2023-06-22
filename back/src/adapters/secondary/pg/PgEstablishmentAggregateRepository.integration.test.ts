@@ -354,11 +354,11 @@ describe("Postgres implementation of immersion offer repository", () => {
         rome: informationGeographiqueRome,
         romeLabel: "Information géographique",
         appellations: [
-          { appellationLabel: "Cartographe", appellationCode: "11704" },
           {
             appellationLabel: "Analyste en géomatique",
             appellationCode: "10946",
           },
+          { appellationLabel: "Cartographe", appellationCode: "11704" },
         ],
         siret: siretMatchingToSearch,
         distance_m: 0,

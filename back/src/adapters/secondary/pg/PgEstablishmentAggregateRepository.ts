@@ -61,6 +61,7 @@ const buildAppellationsArray = `JSON_AGG(
       'appellationCode', ogr_appellation::text,
       'appellationLabel', libelle_appellation_long
     )
+    ORDER BY ogr_appellation
   )`;
 
 export class PgEstablishmentAggregateRepository
@@ -640,6 +641,7 @@ export class PgEstablishmentAggregateRepository
                   created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 )
               )
+              ORDER BY appellation_code
             ) as immersionOffers 
           FROM 
             immersion_offers
