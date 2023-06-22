@@ -93,12 +93,15 @@ export const ConventionSignForm = ({
       }),
     );
   };
+  if (alreadySigned) {
+    return <Alert {...t.conventionAlreadySigned} severity="success" />;
+  }
   return (
     <FormProvider {...methods}>
       <Alert
+        {...t.conventionReadyToBeSigned}
         severity="info"
-        title={"La convention est prête à être signée !"}
-        description={t.sign.summary}
+        className={fr.cx("fr-mb-4w")}
       />
       <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
       <form>
@@ -109,25 +112,16 @@ export const ConventionSignForm = ({
           signatories={methods.getValues().signatories}
         />
         {currentSignatory && (
-          <>
-            {alreadySigned ? (
-              <p>{t.conventionAlreadySigned}</p>
-            ) : (
-              <SignatureActions
-                internshipKind={convention.internshipKind}
-                alreadySigned={false}
-                signatory={currentSignatory}
-                onSubmitClick={methods.handleSubmit(
-                  onSignFormSubmit,
-                  (errors) => {
-                    // eslint-disable-next-line no-console
-                    console.error(methods.getValues(), errors);
-                  },
-                )}
-                onModificationRequired={askFormModificationWithMessageForm}
-              />
-            )}
-          </>
+          <SignatureActions
+            internshipKind={convention.internshipKind}
+            alreadySigned={false}
+            signatory={currentSignatory}
+            onSubmitClick={methods.handleSubmit(onSignFormSubmit, (errors) => {
+              // eslint-disable-next-line no-console
+              console.error(methods.getValues(), errors);
+            })}
+            onModificationRequired={askFormModificationWithMessageForm}
+          />
         )}
       </form>
     </FormProvider>
