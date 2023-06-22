@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useDebounce } from "src/app/hooks/useDebounce";
 import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { routes, useRoute } from "src/app/routes/routes";
 
@@ -12,6 +13,12 @@ export const useConventionWatchValuesInUrl = (
   } = watchedValues;
 
   const route = useRoute();
+  const valuesToWatch = [
+    ...Object.values(watchedValuesExceptScheduleAndAppellation),
+    JSON.stringify(schedule),
+    JSON.stringify(immersionAppellation),
+  ];
+
   useEffect(() => {
     if (
       (route.name !== "conventionImmersion" &&
@@ -38,9 +45,5 @@ export const useConventionWatchValuesInUrl = (
         })
         .replace();
     }
-  }, [
-    ...Object.values(watchedValuesExceptScheduleAndAppellation),
-    JSON.stringify(schedule),
-    JSON.stringify(immersionAppellation),
-  ]);
+  }, useDebounce(valuesToWatch, 500));
 };
