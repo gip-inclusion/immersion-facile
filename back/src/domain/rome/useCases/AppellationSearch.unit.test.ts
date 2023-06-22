@@ -64,7 +64,7 @@ describe("AppellationSearch", () => {
       getFullAppellationsFromCodes: mockGetFullAppellationsFromCodes,
     };
 
-    const response = await createUseCase().execute("la");
+    const response = await createUseCase().execute("l");
     expect(mockSearchMetierFn.mock.calls).toHaveLength(0);
     expect(mockSearchAppellationFn.mock.calls).toHaveLength(0);
     expect(response).toEqual([]);
