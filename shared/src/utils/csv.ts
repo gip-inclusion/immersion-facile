@@ -1,8 +1,8 @@
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export const establishmentAppellationsFromCSVToDto = (
   appellationsRow: string,
-): AppellationDto[] =>
+): AppellationAndRomeDto[] =>
   appellationsRow
     .replaceAll(" ", "")
     .split(",")

@@ -2,20 +2,20 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { useStyles } from "tss-react/dsfr";
-import { AppellationDto } from "shared";
+import { AppellationAndRomeDto } from "shared";
 import { AppellationAutocomplete } from "../autocomplete/AppellationAutocomplete";
 
 type MultipleAppellationInputProps = {
   name: string;
   label?: string;
-  currentAppellations: AppellationDto[];
-  onAppellationAdd: (appellation: AppellationDto, index: number) => void;
+  currentAppellations: AppellationAndRomeDto[];
+  onAppellationAdd: (appellation: AppellationAndRomeDto, index: number) => void;
   onAppellationDelete: (index: number) => void;
   error?: string;
   id: string;
 };
 
-export const emptyAppellation: AppellationDto = {
+export const emptyAppellation: AppellationAndRomeDto = {
   romeCode: "",
   appellationCode: "",
   romeLabel: "",

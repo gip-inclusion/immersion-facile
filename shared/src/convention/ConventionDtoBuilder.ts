@@ -1,7 +1,7 @@
 import { AgencyId } from "../agency/agency.dto";
 import { Builder } from "../Builder";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import {
@@ -476,7 +476,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withImmersionAppelation(
-    immersionAppellation: AppellationDto,
+    immersionAppellation: AppellationAndRomeDto,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,

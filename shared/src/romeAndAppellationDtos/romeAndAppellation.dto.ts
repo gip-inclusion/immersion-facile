@@ -1,7 +1,7 @@
 import { Flavor } from "../typeFlavors";
 
 export type RomeCode = Flavor<string, "CodeRome">;
-export type AppellationCode = Flavor<string, "CodeRome">;
+export type AppellationCode = Flavor<string, "AppellationCode">;
 
 export const ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH = 2;
 
@@ -14,10 +14,12 @@ export type RomeDto = {
   romeCode: RomeCode;
 };
 
-export type AppellationDto = RomeDto & {
+export type AppellationDto_To_Rename = {
   appellationLabel: string;
   appellationCode: AppellationCode;
 };
+
+export type AppellationAndRomeDto = RomeDto & AppellationDto_To_Rename;
 
 export type MatchRangeDto = {
   startIndexInclusive: number;
@@ -25,6 +27,6 @@ export type MatchRangeDto = {
 };
 
 export type AppellationMatchDto = {
-  appellation: AppellationDto;
+  appellation: AppellationAndRomeDto;
   matchRanges: MatchRangeDto[];
 };

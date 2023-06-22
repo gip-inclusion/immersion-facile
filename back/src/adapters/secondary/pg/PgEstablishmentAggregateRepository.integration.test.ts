@@ -4,7 +4,7 @@ import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
 import {
   AddressDto,
-  AppellationDto,
+  AppellationAndRomeDto,
   ContactMethod,
   defaultMaxContactsPerWeek,
   expectArraysToEqualIgnoringOrder,
@@ -865,7 +865,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ).toHaveLength(0);
     });
     it("returns a list with offers from offers as AppellationDto of given siret", async () => {
-      const expectedOffersAsAppelationDto: AppellationDto[] = [
+      const expectedOffersAsAppelationDto: AppellationAndRomeDto[] = [
         {
           romeCode: offers[0].romeCode,
           romeLabel: "Conduite d'engins agricoles et forestiers",

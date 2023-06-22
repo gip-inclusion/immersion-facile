@@ -2,7 +2,7 @@ import { PoolClient } from "pg";
 import format from "pg-format";
 import { equals, keys } from "ramda";
 import {
-  AppellationDto,
+  AppellationAndRomeDto,
   GeoPositionDto,
   SearchImmersionResultDto,
   SearchSortedBy,
@@ -513,7 +513,7 @@ export class PgEstablishmentAggregateRepository
 
   public async getOffersAsAppellationDtoEstablishment(
     siret: string,
-  ): Promise<AppellationDto[]> {
+  ): Promise<AppellationAndRomeDto[]> {
     const pgResult = await this.client.query(
       `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
        FROM immersion_offers io

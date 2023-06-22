@@ -1,4 +1,8 @@
-import { AppellationDto, SearchImmersionResultDto, SiretDto } from "shared";
+import {
+  AppellationAndRomeDto,
+  SearchImmersionResultDto,
+  SiretDto,
+} from "shared";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
@@ -43,7 +47,7 @@ export interface EstablishmentAggregateRepository {
 
   getOffersAsAppellationDtoEstablishment: (
     siret: string,
-  ) => Promise<AppellationDto[]>;
+  ) => Promise<AppellationAndRomeDto[]>;
   getSearchImmersionResultDtoBySiretAndRome: (
     siret: SiretDto,
     rome: string,

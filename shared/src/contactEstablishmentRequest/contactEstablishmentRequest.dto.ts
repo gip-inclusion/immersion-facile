@@ -1,10 +1,10 @@
 import { ImmersionObjective } from "../convention/convention.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 
 export type ContactInformations<T extends ContactMethod> = {
-  romeCode: RomeCode;
+  appellationCode: AppellationCode;
   siret: SiretDto;
   potentialBeneficiaryFirstName: string;
   potentialBeneficiaryLastName: string;

@@ -93,7 +93,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: 3.0858455, lat: 50.6210299 },
     romeLabel: "Design industriel",
-    appellationLabels: ["Designer industriel / Designeuse industrielle"],
+    appellations: [
+      {
+        appellationLabel: "Designer industriel / Designeuse industrielle",
+        appellationCode: "14000",
+      },
+    ],
     naf: "6820B",
     nafLabel: "Location et exploitation de biens immobiliers propres ou loués",
     address: {
@@ -118,7 +123,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: -3.8558397, lat: 48.5777403 },
     romeLabel: "Éducation en activités sportives",
-    appellationLabels: ["Conseiller sportif / Conseillère sportive"],
+    appellations: [
+      {
+        appellationLabel: "Conseiller sportif / Conseillère sportive",
+        appellationCode: "13480",
+      },
+    ],
     naf: "4764Z",
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
@@ -142,7 +152,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: 2.5984269, lat: 48.7758459 },
     romeLabel: "Vente en articles de sport et loisirs",
-    appellationLabels: ["Vendeur / Vendeuse en articles de sport"],
+    appellations: [
+      {
+        appellationLabel: "Vendeur / Vendeuse en articles de sport",
+        appellationCode: "20552",
+      },
+    ],
     naf: "4764Z",
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
@@ -166,7 +181,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: 4.800488, lat: 46.274576 },
     romeLabel: "Vente en articles de sport et loisirs",
-    appellationLabels: ["Vendeur / Vendeuse en articles de sport"],
+    appellations: [
+      {
+        appellationLabel: "Vendeur / Vendeuse en articles de sport",
+        appellationCode: "20552",
+      },
+    ],
     naf: "4764Z",
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
@@ -190,7 +210,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: -1.1882893, lat: 47.3735584 },
     romeLabel: "Vente en articles de sport et loisirs",
-    appellationLabels: ["Vendeur / Vendeuse en articles de sport"],
+    appellations: [
+      {
+        appellationLabel: "Vendeur / Vendeuse en articles de sport",
+        appellationCode: "20552",
+      },
+    ],
     naf: "4764Z",
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
@@ -214,7 +239,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: -1.1882893, lat: 47.3735584 },
     romeLabel: "Personnel de caisse",
-    appellationLabels: ["Hôte / Hôtesse de caisse services clients"],
+    appellations: [
+      {
+        appellationLabel: "Hôte / Hôtesse de caisse services clients",
+        appellationCode: "38655",
+      },
+    ],
     naf: "4764Z",
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
@@ -238,7 +268,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: -1.78808797973392, lat: 46.51365235 },
     romeLabel: "Vente en articles de sport et loisirs",
-    appellationLabels: ["Vendeur / Vendeuse en articles de sport"],
+    appellations: [
+      {
+        appellationLabel: "Vendeur / Vendeuse en articles de sport",
+        appellationCode: "20552",
+      },
+    ],
     naf: "4764Z",
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
@@ -263,7 +298,12 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: 2.427141, lat: 48.630773 },
     romeLabel: "Vente en articles de sport et loisirs",
-    appellationLabels: ["Vendeur / Vendeuse en articles de sport"],
+    appellations: [
+      {
+        appellationLabel: "Vendeur / Vendeuse en articles de sport",
+        appellationCode: "20552",
+      },
+    ],
     naf: "4764Z",
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
@@ -288,11 +328,23 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: false,
     position: { lon: 7.3079948, lat: 47.8053861 },
     romeLabel: "Magasinage et préparation de commandes",
-    appellationLabels: [
-      "Aide-magasinier / Aide-magasinière",
-      "Magasinier / Magasinière",
-      "Magasinier / Magasinière cariste",
-      "Préparateur / Préparatrice de commandes",
+    appellations: [
+      {
+        appellationLabel: "Aide-magasinier / Aide-magasinière",
+        appellationCode: "10880",
+      },
+      {
+        appellationLabel: "Magasinier / Magasinière",
+        appellationCode: "16276",
+      },
+      {
+        appellationLabel: "Magasinier / Magasinière cariste",
+        appellationCode: "16277",
+      },
+      {
+        appellationLabel: "Préparateur / Préparatrice de commandes",
+        appellationCode: "17993",
+      },
     ],
     naf: "5210B",
     nafLabel: "Entreposage et stockage",
@@ -318,7 +370,16 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     address: defaultAddress,
     contactMode: "PHONE",
     romeLabel: "Super métier",
-    appellationLabels: ["Facteur", "Développeuse"],
+    appellations: [
+      {
+        appellationLabel: "Facteur / Factrice",
+        appellationCode: "15044",
+      },
+      {
+        appellationLabel: "Développeur / Développeuse web",
+        appellationCode: "14156",
+      },
+    ],
     nafLabel: "Métallurgie",
     website: "www.corp.com/job",
     additionalInformation:
@@ -336,7 +397,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     address: defaultAddress,
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
-    appellationLabels: [],
+    appellations: [],
     nafLabel: "Accueil et Restauration",
     numberOfEmployeeRange: "11-49",
     website: "www.mega-corp.com/job",
@@ -356,7 +417,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     contactMode: "PHONE",
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
-    appellationLabels: [],
+    appellations: [],
     nafLabel: "Accueil et Restauration",
     numberOfEmployeeRange: "200-1000",
     website: "www.coolitude-inc.com/job",
@@ -382,7 +443,16 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     address: defaultAddress,
     contactMode: "IN_PERSON",
     romeLabel: "Hyper métier",
-    appellationLabels: ["Hyper", "Méga"],
+    appellations: [
+      {
+        appellationLabel: "Facteur / Factrice",
+        appellationCode: "15044",
+      },
+      {
+        appellationLabel: "Développeur / Développeuse web",
+        appellationCode: "14156",
+      },
+    ],
     nafLabel: "",
     distance_m: 100,
   },
@@ -396,7 +466,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     address: defaultAddress,
     contactMode: undefined,
     romeLabel: "Giga métier",
-    appellationLabels: [],
+    appellations: [],
     nafLabel: "",
     website: "https://www.example.com",
   },
@@ -417,7 +487,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 7086.36203317,
     customizedName: "SASU",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -440,7 +512,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 2002.71463904,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "Test avec description courte",
     numberOfEmployeeRange: "20-49",
@@ -463,7 +540,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 2891.57824012,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -486,7 +565,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 8913.7826737,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -508,7 +592,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3792.74103994,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
@@ -531,7 +620,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4988.30541237,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
@@ -553,7 +644,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 4738.4779907,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -575,8 +668,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 4431.1329398,
     contactMode: "PHONE",
-    appellationLabels: [
-      "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
+    appellations: [
+      {
+        appellationLabel:
+          "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
+        appellationCode: "11575",
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -600,7 +697,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4561.58112591,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -622,7 +724,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 4839.42843775,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -644,7 +748,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3211.61983088,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -667,7 +776,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 3310.42849054,
     contactMode: "EMAIL",
     customizedName: "EI",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -690,7 +804,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4895.15434177,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -713,7 +832,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 3310.42849054,
     contactMode: "EMAIL",
     customizedName: "EURL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
@@ -735,7 +859,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3109.76403522,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -757,7 +883,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 5599.19303686,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -780,7 +911,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 2261.23388227,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -803,7 +936,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 7832.92220994,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -826,7 +961,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4631.76289701,
     contactMode: "EMAIL",
     customizedName: "EI",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -848,7 +985,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3146.05292448,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -870,7 +1012,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 5342.41516288,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
@@ -893,7 +1040,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 3701.23529781,
     contactMode: "EMAIL",
     customizedName: "SASU",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -916,7 +1065,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 2552.77509246,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -939,7 +1090,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4332.59128374,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -961,7 +1114,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 5843.64091263,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
@@ -983,7 +1138,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3660.04835307,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -1006,7 +1163,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 8389.31076306,
     contactMode: "EMAIL",
     customizedName: "EI",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -1029,7 +1188,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 6267.91772871,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1052,7 +1216,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 7858.97858526,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -1074,7 +1243,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 6902.11262242,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -1096,7 +1267,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3624.09145976,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
@@ -1119,7 +1295,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 9240.50942889,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1141,7 +1322,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 5035.87465645,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1164,9 +1347,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4326.55122943,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: [
-      "Boulanger / Boulangère",
-      "Boulanger-pâtissier / Boulangère-pâtissière",
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1189,7 +1375,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 627.10161148,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
@@ -1212,7 +1403,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 5251.04350313,
     contactMode: "EMAIL",
     customizedName: "SASU",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1234,7 +1430,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 1070.19516661,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "100-199",
@@ -1257,7 +1455,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 7051.66379498,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
@@ -1280,7 +1480,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 6162.94190077,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -1303,7 +1505,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 1807.66129169,
     contactMode: "EMAIL",
     customizedName: "EURL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -1326,7 +1530,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 5436.48824298,
     contactMode: "PHONE",
     customizedName: "sas",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
@@ -1349,7 +1558,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 3314.8542011,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -1372,7 +1583,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 2269.93773842,
     contactMode: "EMAIL",
     customizedName: "SASU",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1395,7 +1608,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 2599.52005756,
     contactMode: "EMAIL",
     customizedName: "EURL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
@@ -1417,7 +1632,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 2867.69681386,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -1440,7 +1657,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4735.97515873,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
@@ -1463,7 +1685,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 2212.43673473,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1486,7 +1713,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4109.8070843,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1508,7 +1737,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3366.43910556,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1531,7 +1765,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3278.35339437,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1553,7 +1789,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 7167.8706682,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1576,7 +1817,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4137.90668944,
     contactMode: "EMAIL",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -1598,8 +1844,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 3034.2509751,
     contactMode: "EMAIL",
-    appellationLabels: [
-      "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
+    appellations: [
+      {
+        appellationLabel:
+          "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
+        appellationCode: "11575",
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1623,7 +1873,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 4812.97222357,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1646,7 +1898,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 9779.62495309,
     contactMode: "EMAIL",
     customizedName: "SARL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1668,7 +1922,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 2112.0127168,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1690,7 +1949,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 6525.51289164,
     contactMode: "IN_PERSON",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
@@ -1713,7 +1977,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 4379.7912238,
     contactMode: "EMAIL",
     customizedName: "EURL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
@@ -1735,7 +2004,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 4029.35737599,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
@@ -1759,7 +2033,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 2835.6388695,
     contactMode: "PHONE",
     customizedName: "SAS",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
@@ -1781,7 +2060,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 4164.25129854,
     contactMode: "EMAIL",
-    appellationLabels: ["Boulanger / Boulangère"],
+    appellations: [
+      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
@@ -1804,7 +2085,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     distance_m: 3178.9096891,
     contactMode: "EMAIL",
     customizedName: "EURL",
-    appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
+    appellations: [
+      {
+        appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellationCode: "11574",
+      },
+    ],
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",

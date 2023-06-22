@@ -7,11 +7,11 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  AppellationDto_To_Rename,
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
-  RomeCode,
   SiretDto,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -20,7 +20,7 @@ import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
   siret: SiretDto;
-  romeCode: RomeCode;
+  appellations: AppellationDto_To_Rename[];
   onSuccess: () => void;
   onClose: () => void;
 };
@@ -36,13 +36,14 @@ En vous remerciant,`;
 
 export const ContactByEmail = ({
   siret,
-  romeCode,
+  appellations,
   onSuccess,
   onClose,
 }: ContactByEmailProps) => {
   const initialValues: ContactEstablishmentByMailDto = {
     siret,
-    romeCode,
+    appellationCode:
+      appellations.length > 1 ? "" : appellations[0].appellationCode,
     contactMode: "EMAIL",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",
@@ -52,6 +53,11 @@ export const ContactByEmail = ({
     potentialBeneficiaryResumeLink: "",
     potentialBeneficiaryPhone: "",
   };
+
+  const appellationListOfOptions = appellations.map((appellation) => ({
+    value: appellation.appellationCode,
+    label: appellation.appellationLabel,
+  }));
 
   const methods = useForm<ContactEstablishmentByMailDto>({
     resolver: zodResolver(contactEstablishmentByMailFormSchema),
@@ -110,6 +116,18 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("immersionObjective")}
           />
+
+          {appellations.length > 1 && (
+            <Select
+              label={"Métier sur lequel porte la demande d'immersion *"}
+              options={appellationListOfOptions}
+              placeholder={"Sélectionnez un métier"}
+              nativeSelectProps={{
+                ...register("appellationCode"),
+              }}
+              {...getFieldError("appellationCode")}
+            />
+          )}
 
           <Input
             label="Votre message à l’entreprise *"

@@ -1,4 +1,9 @@
-import { ContactMethod, Flavor, ImmersionObjective } from "shared";
+import {
+  AppellationCode,
+  ContactMethod,
+  Flavor,
+  ImmersionObjective,
+} from "shared";
 
 type ExchangeRole = "establishment" | "potentialBeneficiary";
 
@@ -11,7 +16,7 @@ export type DiscussionAggregate = {
   potentialBeneficiaryEmail: string;
   potentialBeneficiaryPhone: string;
   potentialBeneficiaryResumeLink?: string;
-  romeCode: string;
+  appellationCode: AppellationCode;
   siret: string;
   contactMode: ContactMethod;
   createdAt: Date;
