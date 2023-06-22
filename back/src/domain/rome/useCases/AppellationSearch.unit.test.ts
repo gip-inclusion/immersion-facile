@@ -61,7 +61,8 @@ describe("AppellationSearch", () => {
       searchRome: mockSearchMetierFn,
       searchAppellation: mockSearchAppellationFn,
       appellationToCodeMetier: mockAppellationToCodeMetier,
-      getFullAppellationsFromCodes: mockGetFullAppellationsFromCodes,
+      getAppellationAndRomeDtosFromAppellationCodes:
+        mockGetFullAppellationsFromCodes,
     };
 
     const response = await createUseCase().execute("l");

@@ -45,13 +45,8 @@ const domainToContactDetailsV0 = (
 export const domainToSearchImmersionResultPublicV0 = (
   domain: SearchImmersionResultDto,
 ): SearchImmersionResultPublicV0 => {
-  const {
-    appellationLabels,
-    position,
-    website,
-    additionalInformation,
-    ...rest
-  } = domain;
+  const { appellations, position, website, additionalInformation, ...rest } =
+    domain;
   return {
     ...rest,
     id: `${rest.siret}-${rest.rome}`,

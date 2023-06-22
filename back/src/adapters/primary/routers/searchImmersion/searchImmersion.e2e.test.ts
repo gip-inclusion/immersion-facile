@@ -57,7 +57,12 @@ describe("search-immersion route", () => {
             name: "Company inside repository",
             rome: "A1000",
             romeLabel: "test_rome_label",
-            appellationLabels: ["test_appellation_label"],
+            appellations: [
+              {
+                appellationLabel: "test_appellation_label",
+                appellationCode: "12345",
+              },
+            ],
             siret: "78000403200019",
             voluntaryToImmersion: true,
             contactMode: "EMAIL",

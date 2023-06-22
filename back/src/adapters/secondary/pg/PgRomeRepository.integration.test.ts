@@ -31,7 +31,10 @@ describe("Postgres implementation of Rome Gateway", () => {
   describe("getFullAppellationsFromCodes", () => {
     it("gets Appellations DTOs when providing the codes", async () => {
       expectToEqual(
-        await pgRomeRepository.getFullAppellationsFromCodes(["10868", "12694"]),
+        await pgRomeRepository.getAppellationAndRomeDtosFromAppellationCodes([
+          "10868",
+          "12694",
+        ]),
         [
           {
             appellationCode: "10868",

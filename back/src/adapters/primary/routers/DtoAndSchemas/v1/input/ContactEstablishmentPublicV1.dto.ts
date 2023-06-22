@@ -4,6 +4,8 @@ import {
   RomeCode,
   SiretDto,
 } from "shared";
+import { UnitOfWork } from "../../../../../../domain/core/ports/UnitOfWork";
+import { NotFoundError } from "../../../../helpers/httpErrors";
 
 type ContactInformationPublicV1<T extends ContactMethod> = {
   offer: { romeLabel: string; romeCode: RomeCode };
@@ -30,19 +32,40 @@ export type ContactEstablishmentPublicV1Dto =
   | ContactEstablishmentInPersonPublicV1Dto
   | ContactEstablishmentByMailPublicV1Dto;
 
-export const contactEstablishmentPublicV1ToDomain = (
+export const contactEstablishmentPublicV1ToDomain = async (
+  uow: UnitOfWork,
   contactRequest: ContactEstablishmentPublicV1Dto,
-): ContactEstablishmentRequestDto => {
+): Promise<ContactEstablishmentRequestDto> => {
+  const establishmentAggregate =
+    await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+      contactRequest.siret,
+    );
+  if (!establishmentAggregate)
+    throw new NotFoundError(
+      `establishment with siret ${contactRequest.siret} not found`,
+    );
+
+  const firstOfferMatchingRome = establishmentAggregate.immersionOffers.find(
+    (offer) => offer.romeCode === contactRequest.offer.romeCode,
+  );
+
+  if (!firstOfferMatchingRome)
+    throw new NotFoundError(
+      `Offer with rome code ${contactRequest.offer.romeCode} not found for establishment with siret ${contactRequest.siret}`,
+    );
+
   if (contactRequest.contactMode === "EMAIL")
     return {
       ...contactRequest,
-      romeCode: contactRequest.offer.romeCode,
       potentialBeneficiaryPhone: "Numéro de téléphone non communiqué",
       immersionObjective: null,
+      appellationCode:
+        firstOfferMatchingRome.appellationCode,
     };
 
   return {
     ...contactRequest,
-    romeCode: contactRequest.offer.romeCode,
+    appellationCode:
+      firstOfferMatchingRome.appellationCode,
   };
 };

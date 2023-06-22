@@ -40,7 +40,7 @@ export class LaBonneBoiteCompanyVO {
       name: this.props.name,
       address: addressStringToDto(this.props.address),
       additionalInformation: "",
-      appellationLabels: [],
+      appellations: [],
       customizedName: "",
       distance_m: this.props.distance * 1000,
       fitForDisabledWorkers: false,

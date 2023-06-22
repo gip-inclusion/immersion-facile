@@ -92,7 +92,7 @@ export class InMemoryRomeRepository implements RomeRepository {
     );
   }
 
-  public async getFullAppellationsFromCodes(
+  public async getAppellationAndRomeDtosFromAppellationCodes(
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
     return this.appellations.filter((appellationDto) =>

@@ -39,9 +39,10 @@ export class AddFormEstablishment extends TransactionalUseCase<
       await rejectsSiretIfNotAnOpenCompany(this.siretGateway, dto.siret);
     }
 
-    const appellations = await uow.romeRepository.getFullAppellationsFromCodes(
-      dto.appellations.map(({ appellationCode }) => appellationCode),
-    );
+    const appellations =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
+        dto.appellations.map(({ appellationCode }) => appellationCode),
+      );
 
     const correctFormEstablishement: FormEstablishmentDto = {
       ...dto,
