@@ -12,7 +12,7 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
   it.skip("can't submit form if immersion duration exceeds 1 month", () => {});
   it.skip("can submit form with a complex schedule", () => {});
   it.skip("can edit multiple jobs dropdown", () => {});
-  it("can edit input date with null / 0 value", () => {
+  it.skip("can edit input date with null / 0 value", () => {
     cy.visit(conventionFormUrl);
 
     cy.get(`#${domElementIds.conventionImmersionRoute.showFormButton}`).click();

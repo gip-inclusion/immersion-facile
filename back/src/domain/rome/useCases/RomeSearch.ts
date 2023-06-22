@@ -1,8 +1,10 @@
-import { RomeDto, zTrimmedString } from "shared";
+import {
+  ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
+  RomeDto,
+  zTrimmedString,
+} from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-
-const MIN_SEARCH_TEXT_LENGTH = 3;
 
 export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
   constructor(uowPerformer: UnitOfWorkPerformer) {
@@ -15,7 +17,8 @@ export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
     searchText: string,
     uow: UnitOfWork,
   ): Promise<RomeDto[]> {
-    if (searchText.length < MIN_SEARCH_TEXT_LENGTH) return [];
+    if (searchText.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH)
+      return [];
     return uow.romeRepository.searchRome(searchText);
   }
 }

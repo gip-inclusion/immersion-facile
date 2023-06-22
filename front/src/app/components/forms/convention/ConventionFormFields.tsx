@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { get, type SubmitHandler, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -62,6 +62,7 @@ export const ConventionFormFields = ({
   const preselectedAgencyId = useAppSelector(
     conventionSelectors.preselectedAgencyId,
   );
+  const accordionsRef = useRef<Array<HTMLDivElement | null>>([]);
   const route = useRoute();
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const [stepsStatus, setStepsStatus] = useState<Record<
@@ -101,8 +102,16 @@ export const ConventionFormFields = ({
     (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
 
   const makeAccordionProps = (step: NumberOfSteps) => ({
+    ref: (element: HTMLDivElement) =>
+      (accordionsRef.current[step - 1] = element),
     onExpandedChange: async () => {
       await validateSteps();
+      setTimeout(() => {
+        // we need to wait for the accordion to shrink / expand before scrolling (otherwise the scroll is not accurate)
+        accordionsRef.current[step - 1]?.scrollIntoView({
+          behavior: "smooth",
+        });
+      }, 400);
       dispatch(conventionSlice.actions.setCurrentStep(step));
     },
     expanded: currentStep === step,
