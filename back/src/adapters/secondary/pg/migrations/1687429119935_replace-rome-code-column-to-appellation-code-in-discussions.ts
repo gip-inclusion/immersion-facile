@@ -35,6 +35,24 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   });
 
   pgm.dropColumn(discussionTable, romeCodeColumn);
+
+  pgm.sql(`
+    CREATE MATERIALIZED VIEW ${viewContactRequestName} AS (
+      SELECT discussions.created_at AS "Date de la mise en relation",
+        discussions.contact_mode AS "Type de mise en relation",
+        discussions.potential_beneficiary_email AS "Email",
+        discussions.siret AS "Siret",
+        discussions.${appellationCodeColumn} AS "Code Appellation",
+        a.libelle_appellation_long AS "Appellation",
+        a.code_rome AS "Code Rome",
+        r.libelle_rome AS "Libellé Rome",
+        e.department_name AS "Département",
+        e.region_name AS "Région"
+      FROM discussions
+        LEFT JOIN view_siret_with_department_region e ON e.siret = discussions.siret
+        LEFT JOIN public_appellations_data a ON a.ogr_appellation = discussions.appellation_code
+        LEFT JOIN public_romes_data r ON r.code_rome = a.code_rome
+    );`);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
@@ -70,8 +88,8 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
         prd.libelle_rome AS "Métier",
         e.department_name AS "Département",
         e.region_name AS "Région"
-       FROM ((discussions
-         LEFT JOIN public_romes_data prd ON ((prd.code_rome = discussions.rome_code)))
-         LEFT JOIN view_siret_with_department_region e ON ((e.siret = discussions.siret)))
+       FROM discussions
+         LEFT JOIN public_romes_data prd ON prd.code_rome = discussions.rome_code
+         LEFT JOIN view_siret_with_department_region e ON e.siret = discussions.siret
     );`);
 }
