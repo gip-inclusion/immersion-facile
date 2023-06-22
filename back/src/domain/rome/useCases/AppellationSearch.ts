@@ -1,12 +1,14 @@
-import { AppellationMatchDto, zTrimmedString } from "shared";
+import {
+  AppellationMatchDto,
+  ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
+  zTrimmedString,
+} from "shared";
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
-
-const MIN_SEARCH_TEXT_LENGTH = 2;
 
 export class AppellationSearch extends TransactionalUseCase<
   string,
@@ -22,7 +24,8 @@ export class AppellationSearch extends TransactionalUseCase<
     searchText: string,
     uow: UnitOfWork,
   ): Promise<AppellationMatchDto[]> {
-    if (searchText.length <= MIN_SEARCH_TEXT_LENGTH) return [];
+    if (searchText.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH)
+      return [];
 
     const appellations = await uow.romeRepository.searchAppellation(searchText);
 

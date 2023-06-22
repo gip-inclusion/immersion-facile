@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
-import { AppellationDto, AppellationMatchDto } from "shared";
+import {
+  AppellationDto,
+  AppellationMatchDto,
+  ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
+} from "shared";
 import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
 import { useDebounce } from "src/app/hooks/useDebounce";
@@ -70,7 +74,13 @@ export const AppellationAutocomplete = ({
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       const sanitizedTerm = debounceSearchTerm.trim();
-      if (!sanitizedTerm) return [];
+      if (
+        !sanitizedTerm ||
+        sanitizedTerm.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH
+      ) {
+        setOptions([]);
+        return [];
+      }
       try {
         setIsSearching(true);
         const romeOptions =
@@ -108,7 +118,11 @@ export const AppellationAutocomplete = ({
         defaultValue={initialOption}
         inputValue={inputHasChanged ? searchTerm : initialOption?.description}
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
-        getOptionLabel={(option: Option) => option.value.appellationLabel}
+        getOptionLabel={(option: Option | undefined) =>
+          option
+            ? option.value.appellationLabel
+            : "missing option.value.appellationLabel"
+        }
         id={id}
         renderOption={(props, option) => (
           <li {...props}>
