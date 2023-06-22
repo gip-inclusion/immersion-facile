@@ -104,7 +104,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     conventionQueries: new PgConventionQueries(client),
     conventionPoleEmploiAdvisorRepository:
       new PgConventionPoleEmploiAdvisorRepository(client),
-    conventionToSyncRepository: new PgConventionToSyncRepository(),
+    conventionToSyncRepository: new PgConventionToSyncRepository(client),
     discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       client,
