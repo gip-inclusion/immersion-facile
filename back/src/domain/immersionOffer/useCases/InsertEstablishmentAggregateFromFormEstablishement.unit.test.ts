@@ -1,5 +1,5 @@
 import {
-  AppellationDto,
+  AppellationAndRomeDto,
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
   NafDto,
@@ -94,7 +94,7 @@ describe("Insert Establishment aggregate from form data", () => {
 
   it("Converts Form Establishment in search format", async () => {
     // Prepare
-    const professions: AppellationDto[] = [
+    const professions: AppellationAndRomeDto[] = [
       {
         romeCode: "A1101",
         appellationCode: "11717",

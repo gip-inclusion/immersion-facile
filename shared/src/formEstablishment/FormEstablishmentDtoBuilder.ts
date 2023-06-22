@@ -1,5 +1,5 @@
 import { Builder } from "../Builder";
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
   BusinessContactDto,
@@ -122,7 +122,7 @@ export class FormEstablishmentDtoBuilder
   public withBusinessName(businessName: string) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, businessName });
   }
-  public withAppellations(appellations: AppellationDto[]) {
+  public withAppellations(appellations: AppellationAndRomeDto[]) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
       appellations,

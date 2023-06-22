@@ -1,7 +1,7 @@
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { Email } from "../email/email.dto";
 import { NafDto } from "../naf";
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 
@@ -39,7 +39,7 @@ export type FormEstablishmentDto = {
   isEngagedEnterprise?: boolean;
   fitForDisabledWorkers?: boolean;
   naf?: NafDto; // { code: string, nomenclature: string }
-  appellations: AppellationDto[]; // at least one
+  appellations: AppellationAndRomeDto[]; // at least one
   businessContact: BusinessContactDto;
   website?: string;
   additionalInformation?: string;

@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
 import {
-  AppellationDto,
+  AppellationAndRomeDto,
   AppellationMatchDto,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
 } from "shared";
@@ -23,17 +23,17 @@ const romeSearchMatchToProposal = ({
 
 type AppellationAutocompleteProps = {
   label: string;
-  initialValue?: AppellationDto | undefined;
-  onAppellationSelected: (p: AppellationDto) => void;
+  initialValue?: AppellationAndRomeDto | undefined;
+  onAppellationSelected: (p: AppellationAndRomeDto) => void;
   onInputClear?: () => void;
   className?: string;
-  selectedAppellations?: AppellationDto[];
+  selectedAppellations?: AppellationAndRomeDto[];
   description?: string;
   placeholder?: string;
   id?: string;
 };
 
-type Option = Proposal<AppellationDto>;
+type Option = Proposal<AppellationAndRomeDto>;
 
 export const AppellationAutocomplete = ({
   initialValue,

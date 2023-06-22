@@ -17,9 +17,7 @@ const establishmentToSearchResultPreview = ({
 }: FormEstablishmentDto): SearchImmersionResultDto => ({
   rome: appellations.length > 0 ? appellations[0].romeCode : "",
   romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
-  appellationLabels: appellations.map(
-    (appellation) => appellation.appellationLabel,
-  ),
+  appellations,
   nafLabel: "",
   naf: naf?.code || "",
   name: businessNameCustomized || businessName || "Mon entreprise",

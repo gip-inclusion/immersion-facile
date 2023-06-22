@@ -43,7 +43,7 @@ const SearchResultComponent = ({
     numberOfEmployeeRange,
     nafLabel,
     romeLabel,
-    appellationLabels,
+    appellations,
     voluntaryToImmersion,
     website,
     fitForDisabledWorkers,
@@ -102,8 +102,10 @@ const SearchResultComponent = ({
             <h3 className={fr.cx("fr-card__title")}>{establismentName}</h3>
             <p className={fr.cx("fr-card__desc")}>
               {" "}
-              {appellationLabels.length > 0
-                ? appellationLabels.join(", ")
+              {appellations.length > 0
+                ? appellations
+                    .map((appellation) => appellation.appellationLabel)
+                    .join(", ")
                 : romeLabel}
             </p>
             <ul className={fr.cx("fr-card__desc", "fr-text--xs")}>

@@ -1,6 +1,6 @@
 import {
   AddressDto,
-  AppellationDto,
+  AppellationAndRomeDto,
   FormEstablishmentDto,
   GeoPositionDto,
   NafDto,
@@ -28,7 +28,7 @@ const appelationToImmersionOfferEntity =
     romeCode,
     appellationCode,
     appellationLabel,
-  }: AppellationDto): ImmersionOfferEntityV2 => ({
+  }: AppellationAndRomeDto): ImmersionOfferEntityV2 => ({
     romeCode,
     appellationCode,
     appellationLabel,

@@ -9,7 +9,7 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import {
-  AppellationDto,
+  AppellationAndRomeDto,
   defaultMaxContactsPerWeek,
   domElementIds,
   FormEstablishmentDto,
@@ -204,7 +204,7 @@ export const EstablishmentForm = ({
             }}
             onAppellationDelete={(appellationIndex) => {
               const appellationsToUpdate = getValues("appellations");
-              const newAppellations: AppellationDto[] =
+              const newAppellations: AppellationAndRomeDto[] =
                 appellationIndex === 0 && appellationsToUpdate.length === 1
                   ? [emptyAppellation]
                   : removeAtIndex(getValues("appellations"), appellationIndex);

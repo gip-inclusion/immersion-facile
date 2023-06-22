@@ -71,7 +71,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
               onButtonClick={() => {
                 setModalContent({
                   siret: searchResult.siret,
-                  romeCode: searchResult.rome,
+                  appellations: searchResult.appellations,
                   contactMethod: searchResult.contactMode,
                   searchResultData: searchResult,
                   onClose: () => closeContactModal(),

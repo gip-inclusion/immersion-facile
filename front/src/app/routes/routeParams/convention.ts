@@ -2,7 +2,7 @@ import { addDays, startOfToday } from "date-fns";
 import { param, ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import {
-  AppellationDto,
+  AppellationAndRomeDto,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -269,7 +269,7 @@ const scheduleSerializer: ValueSerializer<ScheduleDto> = {
   stringify: (schedule) => JSON.stringify(schedule),
 };
 
-const appellationDtoSerializer: ValueSerializer<AppellationDto> = {
+const appellationDtoSerializer: ValueSerializer<AppellationAndRomeDto> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (appellationDto) => JSON.stringify(appellationDto),
 };

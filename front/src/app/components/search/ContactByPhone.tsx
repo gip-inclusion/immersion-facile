@@ -2,12 +2,13 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  AppellationDto_To_Rename,
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
   domElementIds,
-  RomeCode,
   SiretDto,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -15,23 +16,29 @@ import { immersionSearchGateway } from "src/config/dependencies";
 
 type ContactByPhoneProps = {
   siret: SiretDto;
-  romeCode: RomeCode;
+  appellations: AppellationDto_To_Rename[];
   onSuccess: () => void;
 };
 
 export const ContactByPhone = ({
   siret,
-  romeCode,
+  appellations,
   onSuccess,
 }: ContactByPhoneProps) => {
   const initialValues: ContactEstablishmentByPhoneDto = {
     siret,
-    romeCode,
+    appellationCode:
+      appellations.length > 1 ? "" : appellations[0].appellationCode,
     contactMode: "PHONE",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",
     potentialBeneficiaryEmail: "",
   };
+
+  const appellationListOfOptions = appellations.map((appellation) => ({
+    value: appellation.appellationCode,
+    label: appellation.appellationLabel,
+  }));
 
   const methods = useForm<ContactEstablishmentByPhoneDto>({
     resolver: zodResolver(contactEstablishmentByPhoneSchema),
@@ -69,6 +76,17 @@ export const ContactByPhone = ({
           Ces informations sont personnelles et confidentielles. Elles ne
           peuvent pas être communiquées à d’autres personnes. Merci !
         </p>
+        {appellations.length > 1 && (
+          <Select
+            label={"Métier sur lequel porte la demande d'immersion *"}
+            options={appellationListOfOptions}
+            placeholder={"Sélectionnez un métier"}
+            nativeSelectProps={{
+              ...register("appellationCode"),
+            }}
+            {...getFieldError("appellationCode")}
+          />
+        )}
         <Input
           label="Votre email *"
           nativeInputProps={{

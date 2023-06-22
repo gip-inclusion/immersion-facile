@@ -1,11 +1,16 @@
-import { AppellationCode, AppellationDto, RomeCode, RomeDto } from "shared";
+import {
+  AppellationAndRomeDto,
+  AppellationCode,
+  RomeCode,
+  RomeDto,
+} from "shared";
 import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../utils/logger";
 import { normalize } from "../../utils/textSearch";
 
 const logger = createLogger(__filename);
 
-const defaultAppellations: AppellationDto[] = [
+const defaultAppellations: AppellationAndRomeDto[] = [
   {
     appellationCode: "12694",
     appellationLabel: "Coiffeur / Coiffeuse mixte",
@@ -53,7 +58,7 @@ const defaultAppellations: AppellationDto[] = [
 const appellationDtoToRomeDto = ({
   romeCode,
   romeLabel,
-}: AppellationDto): RomeDto => ({
+}: AppellationAndRomeDto): RomeDto => ({
   romeCode,
   romeLabel,
 });
@@ -77,7 +82,9 @@ export class InMemoryRomeRepository implements RomeRepository {
       .map(appellationDtoToRomeDto);
   }
 
-  public async searchAppellation(query: string): Promise<AppellationDto[]> {
+  public async searchAppellation(
+    query: string,
+  ): Promise<AppellationAndRomeDto[]> {
     logger.info({ query }, "searchAppellation");
     const normalizedQuery = normalize(query);
     return this.appellations.filter((appellation) =>
@@ -87,11 +94,11 @@ export class InMemoryRomeRepository implements RomeRepository {
 
   public async getFullAppellationsFromCodes(
     codes: AppellationCode[],
-  ): Promise<AppellationDto[]> {
+  ): Promise<AppellationAndRomeDto[]> {
     return this.appellations.filter((appellationDto) =>
       codes.includes(appellationDto.appellationCode),
     );
   }
 
-  public appellations: AppellationDto[] = defaultAppellations;
+  public appellations: AppellationAndRomeDto[] = defaultAppellations;
 }

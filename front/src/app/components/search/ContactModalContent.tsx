@@ -1,8 +1,8 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import {
+  AppellationDto_To_Rename,
   ContactMethod,
-  RomeCode,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
@@ -13,7 +13,7 @@ import { ContactInPerson } from "./ContactInPerson";
 export type ContactModalContentProps = {
   contactMethod?: ContactMethod;
   siret: SiretDto;
-  romeCode: RomeCode;
+  appellations: AppellationDto_To_Rename[];
   searchResultData?: SearchImmersionResultDto;
   onSuccess: () => void;
   onClose: () => void;
@@ -22,7 +22,7 @@ export type ContactModalContentProps = {
 export const ModalContactContent = ({
   contactMethod,
   siret,
-  romeCode,
+  appellations,
   onSuccess,
   searchResultData,
   onClose,
@@ -32,7 +32,7 @@ export const ModalContactContent = ({
       return (
         <ContactByEmail
           siret={siret}
-          romeCode={romeCode}
+          appellations={appellations}
           onSuccess={onSuccess}
           onClose={onClose}
         />
@@ -41,7 +41,7 @@ export const ModalContactContent = ({
       return (
         <ContactByPhone
           siret={siret}
-          romeCode={romeCode}
+          appellations={appellations}
           onSuccess={onSuccess}
         />
       );
@@ -49,7 +49,7 @@ export const ModalContactContent = ({
       return (
         <ContactInPerson
           siret={siret}
-          romeCode={romeCode}
+          appellations={appellations}
           onSuccess={onSuccess}
         />
       );

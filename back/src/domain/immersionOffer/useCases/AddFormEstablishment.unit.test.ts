@@ -1,5 +1,5 @@
 import {
-  AppellationDto,
+  AppellationAndRomeDto,
   defaultValidFormEstablishment,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -82,7 +82,7 @@ describe("Add FormEstablishment", () => {
   });
 
   it("considers appellation_code as a reference, and ignores the labels, and rome (it fetches the one matching the appellation code anyways)", async () => {
-    const weirdAppellationDto: AppellationDto = {
+    const weirdAppellationDto: AppellationAndRomeDto = {
       appellationCode: "12694", // le bon code
       appellationLabel:
         "une boulette, ca devrait être 'Coiffeur / Coiffeuse mixte'",
@@ -98,7 +98,7 @@ describe("Add FormEstablishment", () => {
     const formEstablishmentWithWeirdAppellationDto =
       formEstablishmentBuilder.build();
 
-    const correctAppellationDto: AppellationDto = {
+    const correctAppellationDto: AppellationAndRomeDto = {
       appellationCode: "12694",
       appellationLabel: "Coiffeur / Coiffeuse mixte",
       romeCode: "D1202",

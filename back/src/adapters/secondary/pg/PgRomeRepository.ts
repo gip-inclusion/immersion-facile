@@ -1,5 +1,5 @@
 import { PoolClient } from "pg";
-import { AppellationCode, AppellationDto, RomeDto } from "shared";
+import { AppellationAndRomeDto, AppellationCode, RomeDto } from "shared";
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../utils/logger";
 
@@ -72,7 +72,9 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 
-  public async searchAppellation(query: string): Promise<AppellationDto[]> {
+  public async searchAppellation(
+    query: string,
+  ): Promise<AppellationAndRomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
 
     return this.client
@@ -95,7 +97,7 @@ export class PgRomeRepository implements RomeRepository {
 
   public async getFullAppellationsFromCodes(
     codes: AppellationCode[],
-  ): Promise<AppellationDto[]> {
+  ): Promise<AppellationAndRomeDto[]> {
     const { rows } = await this.client.query(
       `
         SELECT ogr_appellation, libelle_appellation_long, appellations.code_rome, libelle_rome
@@ -109,7 +111,7 @@ export class PgRomeRepository implements RomeRepository {
   }
 }
 
-const convertRowToAppellationDto = (row: any): AppellationDto => ({
+const convertRowToAppellationDto = (row: any): AppellationAndRomeDto => ({
   appellationCode: row.ogr_appellation?.toString(),
   romeCode: row.code_rome,
   appellationLabel: row.libelle_appellation_long,

@@ -1,5 +1,5 @@
 import {
-  AppellationDto,
+  AppellationAndRomeDto,
   conflictErrorSiret,
   path,
   pathEq,
@@ -177,7 +177,7 @@ export class InMemoryEstablishmentAggregateRepository
 
   public async getOffersAsAppellationDtoEstablishment(
     siret: string,
-  ): Promise<AppellationDto[]> {
+  ): Promise<AppellationAndRomeDto[]> {
     return (
       this.establishmentAggregates
         .find(pathEq("establishment.siret", siret))

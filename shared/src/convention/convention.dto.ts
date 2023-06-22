@@ -1,7 +1,7 @@
 import { AgencyId } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
 import { Role } from "../tokens/token.dto";
@@ -100,7 +100,7 @@ export type ConventionCommon = {
   sanitaryPreventionDescription: string;
   immersionAddress: string;
   immersionObjective: ImmersionObjective;
-  immersionAppellation: AppellationDto;
+  immersionAppellation: AppellationAndRomeDto;
   immersionActivities: string;
   immersionSkills: string;
   establishmentTutor: EstablishmentTutor;

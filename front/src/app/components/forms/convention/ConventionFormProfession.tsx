@@ -2,7 +2,11 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { AppellationDto, ConventionReadDto, domElementIds } from "shared";
+import {
+  AppellationAndRomeDto,
+  ConventionReadDto,
+  domElementIds,
+} from "shared";
 import { TextInputError } from "react-design-system";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 
@@ -10,7 +14,7 @@ type ConventionFormProfessionProps = {
   label: string;
   description?: string;
   disabled?: boolean;
-  initialFieldValue: AppellationDto;
+  initialFieldValue: AppellationAndRomeDto;
 };
 
 export const ConventionFormProfession = ({
@@ -27,7 +31,8 @@ export const ConventionFormProfession = ({
 
   const error =
     touchedFields.immersionAppellation &&
-    (errors.immersionAppellation as Partial<AppellationDto>)?.appellationLabel;
+    (errors.immersionAppellation as Partial<AppellationAndRomeDto>)
+      ?.appellationLabel;
 
   if (disabled)
     return (

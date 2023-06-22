@@ -2,8 +2,8 @@
 import { z } from "zod";
 import { zTrimmedString } from "../zodUtils";
 import type {
+  AppellationAndRomeDto,
   AppellationCode,
-  AppellationDto,
   AppellationMatchDto,
   MatchRangeDto,
   RomeCode,
@@ -17,11 +17,11 @@ export const codeRomeSchema: z.Schema<RomeCode> = z
   .regex(codeRomeRegex, "Code ROME incorrect");
 
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
-const codeAppellationSchema: z.Schema<AppellationCode> = z
+export const codeAppellationSchema: z.Schema<AppellationCode> = z
   .string()
   .regex(codeAppellationRegex, "Code ROME incorrect");
 
-export const appellationDtoSchema: z.Schema<AppellationDto> = z.object({
+export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
   romeCode: codeRomeSchema,
   romeLabel: zTrimmedString,
   appellationCode: codeAppellationSchema,
