@@ -8,6 +8,13 @@ import {
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
+const buildAppellationsArray = `JSON_AGG(
+    JSON_BUILD_OBJECT(
+      'appellationCode', ogr_appellation::text,
+      'appellationLabel', libelle_appellation_long
+    )
+  )`;
+
 export class PgEstablishmentGroupRepository
   implements EstablishmentGroupRepository
 {
@@ -50,7 +57,7 @@ export class PgEstablishmentGroupRepository
         'fitForDisabledWorkers', e.fit_for_disabled_workers,
         'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
         'romeLabel', r.libelle_rome,
-        'appellationLabels',  COALESCE(JSON_AGG(DISTINCT ap.libelle_appellation_long) FILTER (WHERE ap.libelle_appellation_long IS NOT NULL), '[]'),
+        'appellations',  ${buildAppellationsArray},
         'naf', e.naf_code,
         'nafLabel', public_naf_classes_2008.class_label,
         'address', JSON_BUILD_OBJECT(

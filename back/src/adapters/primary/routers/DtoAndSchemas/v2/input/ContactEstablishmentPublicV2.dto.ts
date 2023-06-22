@@ -1,13 +1,13 @@
 import {
+  AppellationCode,
   ContactEstablishmentRequestDto,
   ContactMethod,
   ImmersionObjective,
-  RomeCode,
   SiretDto,
 } from "shared";
 
 type ContactInformationPublicV2<T extends ContactMethod> = {
-  romeCode: RomeCode;
+  appellationCode: AppellationCode;
   siret: SiretDto;
   potentialBeneficiaryFirstName: string;
   potentialBeneficiaryLastName: string;

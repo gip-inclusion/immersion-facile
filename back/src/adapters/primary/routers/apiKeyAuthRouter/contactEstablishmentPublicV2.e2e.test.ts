@@ -17,7 +17,7 @@ const contactEstablishment: ContactEstablishmentPublicV2Dto = {
   contactMode: "EMAIL",
   message: "Salut !",
   siret: "11112222333344",
-  romeCode: "A0000",
+  appellationCode: "11111",
   potentialBeneficiaryEmail: "john.doe@mail.com",
   potentialBeneficiaryFirstName: "John",
   potentialBeneficiaryLastName: "Doe",
@@ -79,7 +79,7 @@ describe("POST contact-establishment public V2 route", () => {
         )
         .withImmersionOffers([
           new ImmersionOfferEntityV2Builder()
-            .withRomeCode(contactEstablishment.romeCode)
+            .withAppellationCode(contactEstablishment.appellationCode)
             .build(),
         ])
         .build(),

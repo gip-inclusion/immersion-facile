@@ -1,14 +1,12 @@
 import { Builder, RomeCode } from "shared";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 
-const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
+export const defaultValidImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
   romeCode: "B1805",
   appellationLabel: "Styliste",
   appellationCode: "19540",
   score: 4.5,
   createdAt: new Date("2022-05-15T12:00:00.000"),
-  appellationCode: "10001",
-  appellationLabel: "Appellation label",
 };
 
 export class ImmersionOfferEntityV2Builder
@@ -16,7 +14,7 @@ export class ImmersionOfferEntityV2Builder
 {
   constructor(
     private readonly entity: ImmersionOfferEntityV2 = {
-      ...validImmersionOfferEntityV2,
+      ...defaultValidImmersionOfferEntityV2,
     },
   ) {}
 

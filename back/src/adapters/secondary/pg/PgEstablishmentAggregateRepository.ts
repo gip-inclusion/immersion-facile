@@ -56,6 +56,13 @@ const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
   return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
 };
 
+const buildAppellationsArray = `JSON_AGG(
+    JSON_BUILD_OBJECT(
+      'appellationCode', ogr_appellation::text,
+      'appellationLabel', libelle_appellation_long
+    )
+  )`;
+
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
@@ -345,7 +352,6 @@ export class PgEstablishmentAggregateRepository
     maxResults?: number;
   }): Promise<SearchImmersionResultDto[]> {
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
-
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
         (SELECT siret, fit_for_disabled_workers, gps
@@ -353,7 +359,7 @@ export class PgEstablishmentAggregateRepository
         matching_offers AS (
           SELECT 
             aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-            COALESCE(JSON_AGG(DISTINCT libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels,
+            ${buildAppellationsArray} AS appellations,
             MAX(created_at) AS max_created_at, 
             fit_for_disabled_workers
           FROM active_establishments_within_area aewa 
@@ -538,8 +544,7 @@ export class PgEstablishmentAggregateRepository
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, COALESCE(json_agg(pad.libelle_appellation_long)
-        FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels, null AS distance_m, 1 AS row_number
+        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
         FROM immersion_offers AS io
         LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.rome_appellation 
         LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
@@ -580,7 +585,7 @@ export class PgEstablishmentAggregateRepository
     selectedOffersSubQuery: string,
     selectedOffersSubQueryParams: any[],
   ): Promise<SearchImmersionResultDto[]> {
-    // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellation_labels and distance_m),
+    // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
     const pgResult = await this.client.query(
       makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -854,7 +859,7 @@ const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
   }
 };
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
-  selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellation_labels and distance_m
+  selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
 ) => `
       WITH unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ), 
            match_immersion_offer AS (${selectedOffersSubQuery})
@@ -871,7 +876,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'fitForDisabledWorkers', e.fit_for_disabled_workers,
       'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
       'romeLabel', io.rome_label,
-      'appellationLabels',  io.appellation_labels,
+      'appellations',  io.appellations,
       'naf', e.naf_code,
       'nafLabel', public_naf_classes_2008.class_label,
       'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 

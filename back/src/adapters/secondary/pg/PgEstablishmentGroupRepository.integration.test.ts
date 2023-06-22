@@ -178,12 +178,12 @@ describe("PgEstablishmentGroupRepository", () => {
         romeLabel: "Boulangerie - viennoiserie",
         appellations: [
           {
-            appellationLabel: "Aide-boulanger / Aide-boulangère",
-            appellationCode: "10868",
-          },
-          {
             appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
             appellationCode: "11574",
+          },
+          {
+            appellationLabel: "Aide-boulanger / Aide-boulangère",
+            appellationCode: "10868",
           },
         ],
       }),
