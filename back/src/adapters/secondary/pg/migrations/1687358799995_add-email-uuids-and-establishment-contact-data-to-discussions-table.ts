@@ -1,9 +1,7 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
 const discussionsTable = "discussions";
-const potentialBeneficiaryEmailUuidColumn = "potential_beneficiary_email_uuid";
 const establishmentColumns = {
-  emailUuid: "establishment_contact_email_uuid",
   email: "establishment_contact_email",
   firstName: "establishment_contact_first_name",
   lastName: "establishment_contact_last_name",
@@ -20,33 +18,18 @@ const addressColumns = {
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumns(discussionsTable, {
-    [potentialBeneficiaryEmailUuidColumn]: {
-      type: "uuid",
-      notNull: true,
-      default: pgm.func("gen_random_uuid()"),
-    },
-    [establishmentColumns.emailUuid]: {
-      type: "uuid",
-      notNull: true,
-      default: pgm.func("gen_random_uuid()"),
-    },
     [establishmentColumns.email]: { type: "text" },
     [establishmentColumns.firstName]: { type: "text" },
     [establishmentColumns.lastName]: { type: "text" },
     [establishmentColumns.phone]: { type: "text", notNull: false }, // this is the only column that is nullable
     [establishmentColumns.job]: { type: "text" },
-    [establishmentColumns.copyEmails]: {
-      type: "jsonb",
-      default: "[]",
-      notNull: true,
-    },
+    [establishmentColumns.copyEmails]: { type: "jsonb" },
     [addressColumns.streetNumberAndAddress]: { type: "text" },
     [addressColumns.postcode]: { type: "text" },
     [addressColumns.departmentCode]: { type: "text" },
     [addressColumns.city]: { type: "text" },
   });
 
-  // migrate data
   pgm.sql(`
     WITH data_to_update AS (
       SELECT e.siret, c.email, c.firstname, c.lastname, c.phone, c.job, c.copy_emails, e.street_number_and_address, e.post_code, e.department_code, e.city
@@ -69,7 +52,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         WHERE d.siret = data_to_update.siret
     `);
 
-  // TODO add not null constraint
   pgm.alterColumn(discussionsTable, establishmentColumns.email, {
     notNull: true,
   });
@@ -85,6 +67,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.alterColumn(discussionsTable, establishmentColumns.job, {
     notNull: true,
   });
+  pgm.alterColumn(discussionsTable, establishmentColumns.copyEmails, {
+    notNull: true,
+  });
   pgm.alterColumn(discussionsTable, addressColumns.streetNumberAndAddress, {
     notNull: true,
   });
@@ -97,20 +82,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.alterColumn(discussionsTable, addressColumns.city, {
     notNull: true,
   });
-
-  // we want to force new entries to provide a valid uuid
-  pgm.alterColumn(discussionsTable, potentialBeneficiaryEmailUuidColumn, {
-    default: null,
-  });
-  pgm.alterColumn(discussionsTable, establishmentColumns.emailUuid, {
-    default: null,
-  });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumns(discussionsTable, [
-    potentialBeneficiaryEmailUuidColumn,
-    establishmentColumns.emailUuid,
     establishmentColumns.email,
     establishmentColumns.firstName,
     establishmentColumns.lastName,

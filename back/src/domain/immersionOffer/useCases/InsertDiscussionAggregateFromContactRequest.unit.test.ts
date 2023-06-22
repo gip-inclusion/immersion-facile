@@ -52,14 +52,8 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     timeGateway.setNextDate(connectionDate);
 
     const discussionId = "someDiscussionUuid";
-    const potentialBeneficiaryEmailUuid = "potentialBeneficiaryEmailUuid";
-    const establishmentContactEmailUuid = "establishmentContactEmailUuid";
 
-    uuidGenerator.setNextUuids([
-      discussionId,
-      potentialBeneficiaryEmailUuid,
-      establishmentContactEmailUuid,
-    ]);
+    uuidGenerator.setNextUuid(discussionId);
 
     // Act
     const contactRequestDto: ContactEstablishmentRequestDto = {
@@ -83,14 +77,12 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       siret: "01234567891011",
       address: establishmentAddress,
       potentialBeneficiary: {
-        emailUuid: potentialBeneficiaryEmailUuid,
         firstName: "Antoine",
         lastName: "Tourasse",
         email: "antoine.tourasse@email.com",
         phone: "0654783402",
       },
       establishmentContact: {
-        emailUuid: establishmentContactEmailUuid,
         contactMode: "EMAIL",
         email: establishmentContact.email,
         firstName: establishmentContact.firstName,
@@ -128,7 +120,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         address: establishmentAddress,
         immersionObjective: "Confirmer un projet professionnel",
         potentialBeneficiary: {
-          emailUuid: "email-uuid-beneficiary",
           firstName: "Antoine",
           lastName: "Tourasse",
           email: "antoine.tourasse@email.com",
@@ -136,7 +127,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
-          emailUuid: "email-uuid-establishment",
           contactMode: "EMAIL",
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
@@ -162,7 +152,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         siret,
         address: establishmentAddress,
         potentialBeneficiary: {
-          emailUuid: "email-uuid-beneficiary",
           firstName: "Antoine",
           lastName: "Tourasse",
           email: "antoine.tourasse@email.com",
@@ -170,7 +159,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
-          emailUuid: "email-uuid-establishment",
           contactMode: "EMAIL",
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
