@@ -150,14 +150,22 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     validationText:
       "Une fois le formulaire envoyé, vous allez recevoir une demande de confirmation par mail et l'entreprise également",
   },
-  conventionAlreadySigned:
-    internshipKind === "immersion"
-      ? "Vous avez signé cette convention."
-      : "Vous avez signé cette demande de stage.",
-  conventionReadyToBeSigned:
-    internshipKind === "immersion"
-      ? "Cette demande d'immersion est prête à être signée."
-      : "Cette demande de stage est prête à être signée.",
+  conventionAlreadySigned: {
+    title:
+      internshipKind === "immersion"
+        ? "Vous avez signé cette convention."
+        : "Vous avez signé cette demande de stage.",
+    description:
+      "Vous recevrez un e-mail de confirmation lorsque toutes les parties auront signé et validé la convention.",
+  },
+  conventionReadyToBeSigned: {
+    title:
+      internshipKind === "immersion"
+        ? "Cette demande d'immersion est prête à être signée."
+        : "Cette demande de stage est prête à être signée.",
+    description:
+      "Veuillez vérifier les informations de la convention. Vous pourrez ensuite la signer ou la renvoyer pour modification.",
+  },
   conventionToSignOrAskForChanges:
     "Veuillez la signer ou la renvoyer pour modification.",
   conventionNotEditable:

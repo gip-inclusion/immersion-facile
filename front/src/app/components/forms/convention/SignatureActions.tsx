@@ -88,8 +88,14 @@ export const SignatureActions = ({
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const { fieldName, signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(signatory);
-  const { setValue, formState, register } = useFormContext();
+  const { getValues, setValue, formState, register } = useFormContext();
   const getFieldError = makeFieldError(formState);
+  const isSubmitButtonDisabled =
+    keys(formState.errors).length > 0 ||
+    isLoading ||
+    submitFeedback.kind !== "idle" ||
+    !getValues(fieldName);
+
   return (
     <>
       <Checkbox
@@ -139,10 +145,7 @@ export const SignatureActions = ({
           {
             priority: "primary",
             children: "Confirmer et signer",
-            disabled:
-              keys(formState.errors).length > 0 ||
-              isLoading ||
-              submitFeedback.kind !== "idle",
+            disabled: isSubmitButtonDisabled,
             onClick: onSubmitClick,
             type: "button",
             iconId: "fr-icon-checkbox-circle-line",

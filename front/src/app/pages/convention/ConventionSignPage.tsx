@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { match, P } from "ts-pattern";
 import { Route } from "type-route";
 import {
   ConventionMagicLinkPayload,
@@ -93,7 +94,6 @@ const ConventionSignPageContent = ({
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
   const { convention, fetchConventionError, submitFeedback, isLoading } =
     useConvention({ jwt, conventionId });
-
   useEffect(() => {
     dispatch(
       conventionSlice.actions.currentSignatoryRoleChanged(extractRole(jwt)),
@@ -102,69 +102,107 @@ const ConventionSignPageContent = ({
 
   useExistingSiret(convention?.siret);
 
-  if (isLoading) return <Loader />;
-  if (fetchConventionError)
-    return (
-      <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={fetchConventionError}
-        jwt={jwt}
-      />
-    );
-  if (submitFeedback.kind === "signedSuccessfully")
-    return (
-      <MainWrapper layout="boxed">
-        <Alert
-          severity="success"
-          title="Convention signée"
-          description="Votre convention a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée, vous la recevrez par email."
-        />
-      </MainWrapper>
-    );
-
-  if (!convention) return <p>{commonContent.conventionNotFound}</p>;
-
-  const t = useConventionTexts(convention.internshipKind);
-
+  const t = convention
+    ? useConventionTexts(convention.internshipKind)
+    : useConventionTexts("immersion");
   return (
-    <MainWrapper
-      layout={"default"}
-      pageHeader={
-        <PageHeader title={t.intro.conventionSignTitle} theme="candidate" />
-      }
-    >
-      <>
-        {convention.status === "REJECTED" && (
+    <>
+      {match({
+        convention,
+        isLoading,
+        fetchConventionError,
+        submitFeedback,
+      })
+        .with(
+          {
+            convention: null,
+            isLoading: false,
+            fetchConventionError: null,
+            submitFeedback: { kind: "idle" },
+          },
+          () => <Loader />,
+        )
+        .with({ isLoading: true }, () => <Loader />)
+        .with(
+          { fetchConventionError: P.string },
+          ({ fetchConventionError }) => (
+            <ShowErrorOrRedirectToRenewMagicLink
+              errorMessage={fetchConventionError}
+              jwt={jwt}
+            />
+          ),
+        )
+        .with({ submitFeedback: { kind: "signedSuccessfully" } }, () => (
+          <MainWrapper layout="boxed">
+            <Alert
+              severity="success"
+              {...t.conventionAlreadySigned}
+              title="Convention signée"
+              description="Votre convention a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée, vous la recevrez par email."
+            />
+          </MainWrapper>
+        ))
+        .with({ convention: undefined }, () => (
           <Alert
             severity="error"
-            title={t.sign.rejected.title}
-            description={
+            title="Convention introuvable"
+            description={commonContent.conventionNotFound}
+          />
+        ))
+        .with(
+          {
+            convention: P.not(null),
+          },
+          ({ convention }) => (
+            <MainWrapper
+              layout={"default"}
+              pageHeader={
+                <PageHeader
+                  title={t.intro.conventionSignTitle}
+                  theme="candidate"
+                />
+              }
+            >
               <>
-                <p className={fr.cx("fr-mt-1w")}>{t.sign.rejected.detail}</p>
-                <p>{t.sign.rejected.contact}</p>
+                {convention.status === "REJECTED" && (
+                  <Alert
+                    severity="error"
+                    title={t.sign.rejected.title}
+                    description={
+                      <>
+                        <p className={fr.cx("fr-mt-1w")}>
+                          {t.sign.rejected.detail}
+                        </p>
+                        <p>{t.sign.rejected.contact}</p>
+                      </>
+                    }
+                  />
+                )}
+                {convention.status === "DRAFT" && (
+                  <Alert
+                    severity="info"
+                    title={t.sign.needsModification.title}
+                    description={
+                      <p className={fr.cx("fr-mt-1w")}>
+                        {t.sign.needsModification.detail}
+                      </p>
+                    }
+                  />
+                )}
+                {convention.status !== "DRAFT" &&
+                  convention.status !== "REJECTED" && (
+                    <ConventionSignForm
+                      convention={convention}
+                      jwt={jwt}
+                      submitFeedback={submitFeedback}
+                    />
+                  )}
               </>
-            }
-          />
-        )}
-        {convention.status === "DRAFT" && (
-          <Alert
-            severity="info"
-            title={t.sign.needsModification.title}
-            description={
-              <p className={fr.cx("fr-mt-1w")}>
-                {t.sign.needsModification.detail}
-              </p>
-            }
-          />
-        )}
-        {convention.status !== "DRAFT" && convention.status !== "REJECTED" && (
-          <ConventionSignForm
-            convention={convention}
-            jwt={jwt}
-            submitFeedback={submitFeedback}
-          />
-        )}
-      </>
-    </MainWrapper>
+            </MainWrapper>
+          ),
+        )
+        .exhaustive()}
+    </>
   );
 };
 
