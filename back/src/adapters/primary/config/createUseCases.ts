@@ -76,6 +76,7 @@ import { UpdateIcUserRoleForAgency } from "../../../domain/inclusionConnectedUse
 import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/useCases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
+import { ConvertContactEstablishmentPublicV1ToDomain } from "../../../domain/publicApi/useCases/ConvertContactEstablishmentPublicV1ToDomain";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
@@ -121,6 +122,8 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
+      convertContactEstablishmentPublicV1ToDomain:
+        new ConvertContactEstablishmentPublicV1ToDomain(uowPerformer),
       sendNotification: new SendNotification(
         uowPerformer,
         gateways.notification,

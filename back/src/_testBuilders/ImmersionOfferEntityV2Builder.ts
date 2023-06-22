@@ -7,6 +7,8 @@ const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
   appellationCode: "19540",
   score: 4.5,
   createdAt: new Date("2022-05-15T12:00:00.000"),
+  appellationCode: "10001",
+  appellationLabel: "Appellation label",
 };
 
 export class ImmersionOfferEntityV2Builder

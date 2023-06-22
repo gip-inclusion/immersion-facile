@@ -36,10 +36,14 @@ export type SearchImmersionResultPublicV1 = {
   additionalInformation?: string;
 };
 
-export const domainToSearchImmersionResultPublicV1 = (
-  domain: SearchImmersionResultDto,
-): SearchImmersionResultPublicV1 => ({
+export const domainToSearchImmersionResultPublicV1 = ({
+  appellations,
+  ...domain
+}: SearchImmersionResultDto): SearchImmersionResultPublicV1 => ({
   ...domain,
+  appellationLabels: appellations.map(
+    (appellation) => appellation.appellationLabel,
+  ),
   address: addressDtoToString(domain.address),
   city: domain.address.city,
 });

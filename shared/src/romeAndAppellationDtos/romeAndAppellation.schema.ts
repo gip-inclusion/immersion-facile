@@ -19,7 +19,7 @@ export const codeRomeSchema: z.Schema<RomeCode> = z
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
 export const codeAppellationSchema: z.Schema<AppellationCode> = z
   .string()
-  .regex(codeAppellationRegex, "Code ROME incorrect");
+  .regex(codeAppellationRegex, "Code Appellation incorrect");
 
 export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
   romeCode: codeRomeSchema,
@@ -28,11 +28,11 @@ export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
   appellationLabel: zTrimmedString,
 });
 
-export const romeSchema: z.Schema<RomeDto> = z.object({
+export const romeDtoSchema: z.Schema<RomeDto> = z.object({
   romeCode: codeRomeSchema,
   romeLabel: zTrimmedString,
 });
-export const romeListSchema: z.Schema<RomeDto[]> = z.array(romeSchema);
+export const romeListSchema: z.Schema<RomeDto[]> = z.array(romeDtoSchema);
 
 export const romeAutocompleteInputSchema: z.Schema<RomeSearchInput> = z.object({
   searchText: zTrimmedString,

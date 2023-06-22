@@ -14,8 +14,6 @@ import {
   validateAndParseZodSchema,
 } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
-import { contactEstablishmentPublicV1ToDomain } from "../DtoAndSchemas/v1/input/ContactEstablishmentPublicV1.dto";
-import { contactEstablishmentPublicV1Schema } from "../DtoAndSchemas/v1/input/ContactEstablishmentPublicV1.schema";
 import { formEstablishmentDtoPublicV1ToDomain } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 import { formEstablishmentPublicV1Schema } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.schema";
 import { domainToSearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
@@ -92,15 +90,12 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     );
 
   publicV1Router.route(`/${contactEstablishmentRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, () => {
+    sendHttpResponse(req, res, async () => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
       return pipeWithValue(
-        validateAndParseZodSchema(
-          contactEstablishmentPublicV1Schema,
+        await deps.useCases.convertContactEstablishmentPublicV1ToDomain.execute(
           req.body,
-          logger,
         ),
-        contactEstablishmentPublicV1ToDomain,
         (contactRequest) =>
           deps.useCases.contactEstablishment.execute(contactRequest),
       );

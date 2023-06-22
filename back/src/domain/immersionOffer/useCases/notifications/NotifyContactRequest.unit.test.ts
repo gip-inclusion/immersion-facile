@@ -12,19 +12,20 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   InMemoryEstablishmentAggregateRepository,
-  TEST_ROME_LABEL,
+  TEST_APPELLATION_CODE,
+  TEST_APPELLATION_LABEL,
 } from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder()
-  .withAppellationLabel(TEST_ROME_LABEL)
+  .withAppellationCode(TEST_APPELLATION_CODE)
+  .withAppellationLabel(TEST_APPELLATION_LABEL)
   .build();
 
 const siret = "11112222333344";
 const contactId = "theContactId";
-const TEST_APPELLATION_CODE = "12346";
 
 const payload: ContactEstablishmentRequestDto = {
   siret,
@@ -101,7 +102,7 @@ describe("NotifyContactRequest", () => {
             businessName: establishment.name,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
-            appellationLabel: TEST_ROME_LABEL,
+            appellationLabel: TEST_APPELLATION_LABEL,
             potentialBeneficiaryFirstName:
               payload.potentialBeneficiaryFirstName,
             potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,

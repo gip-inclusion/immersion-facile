@@ -1,4 +1,5 @@
 import { SuperTest, Test } from "supertest";
+import { AppellationAndRomeDto } from "shared";
 import {
   rueSaintHonore,
   rueSaintHonoreDto,
@@ -14,7 +15,6 @@ import {
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
-  TEST_APPELLATION_LABEL,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
@@ -23,7 +23,12 @@ import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerR
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
-const immersionOfferRome = "B1805";
+const styliste: AppellationAndRomeDto = {
+  romeCode: "B1805",
+  romeLabel: "Stylisme",
+  appellationCode: "19540",
+  appellationLabel: "Styliste",
+};
 const immersionOfferSiret = "78000403200019";
 
 describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersion-offers/:siret/:rome`, () => {
@@ -58,7 +63,9 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
           )
           .withImmersionOffers([
             new ImmersionOfferEntityV2Builder()
-              .withRomeCode(immersionOfferRome)
+              .withRomeCode(styliste.romeCode)
+              .withAppellationCode(styliste.appellationCode)
+              .withAppellationLabel(styliste.appellationLabel)
               .build(),
           ])
           .build(),
@@ -68,14 +75,14 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
 
   it("rejects unauthenticated requests", async () => {
     await request
-      .get(`/v1/immersion-offers/${immersionOfferSiret}/${immersionOfferRome}`)
+      .get(`/v1/immersion-offers/${immersionOfferSiret}/${styliste.romeCode}`)
       .expect(401);
   });
 
   it("accepts valid authenticated requests", async () => {
     // /!\ Those fields come from Builder (should probably not.)
     const expectedResult: SearchImmersionResultPublicV1 = {
-      rome: immersionOfferRome,
+      rome: styliste.romeCode,
       naf: defaultNafCode,
       siret: "78000403200019",
       name: "Company inside repository",
@@ -85,24 +92,26 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
       address: rueSaintHonore,
       contactMode: "EMAIL",
       romeLabel: TEST_ROME_LABEL,
-      appellationLabels: [TEST_APPELLATION_LABEL],
+      appellationLabels: [styliste.appellationLabel],
       nafLabel: TEST_NAF_LABEL,
       city: rueSaintHonoreDto.city,
     };
 
-    await request
-      .get(`/v1/immersion-offers/${immersionOfferSiret}/${immersionOfferRome}`)
-      .set("Authorization", authToken)
-      .expect(200, expectedResult);
+    const response = await request
+      .get(`/v1/immersion-offers/${immersionOfferSiret}/${styliste.romeCode}`)
+      .set("Authorization", authToken);
+
+    expect(response.body).toEqual(expectedResult);
+    expect(response.status).toBe(200);
   });
   it("returns 404 if no offer can be found with such siret & rome", async () => {
     const siretNotInDB = "11000403200019";
     await request
-      .get(`/v1/immersion-offers/${siretNotInDB}/${immersionOfferRome}`)
+      .get(`/v1/immersion-offers/${siretNotInDB}/${styliste.romeCode}`)
       .set("Authorization", authToken)
       .expect(
         404,
-        `{"errors":"No offer found for siret ${siretNotInDB} and rome ${immersionOfferRome}"}`,
+        `{"errors":"No offer found for siret ${siretNotInDB} and rome ${styliste.romeCode}"}`,
       );
   });
 });
