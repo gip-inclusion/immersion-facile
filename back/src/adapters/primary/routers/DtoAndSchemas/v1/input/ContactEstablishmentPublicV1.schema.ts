@@ -4,8 +4,8 @@ import {
   preferEmailContactSchema,
   preferInPersonContactSchema,
   preferPhoneContactSchema,
-  romeSchema,
   siretSchema,
+  romeDtoSchema,
   zTrimmedString,
 } from "shared";
 import {
@@ -16,7 +16,7 @@ import {
 } from "./ContactEstablishmentPublicV1.dto";
 
 const commonFields = {
-  offer: romeSchema,
+  offer: romeDtoSchema,
   siret: siretSchema,
   potentialBeneficiaryFirstName: zTrimmedString,
   potentialBeneficiaryLastName: zTrimmedString,

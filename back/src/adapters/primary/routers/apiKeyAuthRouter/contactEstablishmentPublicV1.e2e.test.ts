@@ -1,4 +1,5 @@
 import { SuperTest, Test } from "supertest";
+import { AppellationAndRomeDto } from "shared";
 import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -13,11 +14,18 @@ import {
 import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
 import { ContactEstablishmentPublicV1Dto } from "../DtoAndSchemas/v1/input/ContactEstablishmentPublicV1.dto";
 
+const designer: AppellationAndRomeDto = {
+  romeCode: "E1205",
+  romeLabel: "Desgin",
+  appellationCode: "13999",
+  appellationLabel: "Designer / Designeuse graphique",
+};
+
 const contactEstablishment: ContactEstablishmentPublicV1Dto = {
   contactMode: "EMAIL",
   message: "Salut !",
   siret: "11112222333344",
-  offer: { romeCode: "A0000", romeLabel: "Un métier" },
+  offer: { romeCode: "E1205", romeLabel: "Un métier" },
   potentialBeneficiaryEmail: "john.doe@mail.com",
   potentialBeneficiaryFirstName: "John",
   potentialBeneficiaryLastName: "Doe",
@@ -77,7 +85,9 @@ describe("POST contact-establishment public V1 route", () => {
         )
         .withImmersionOffers([
           new ImmersionOfferEntityV2Builder()
-            .withRomeCode(contactEstablishment.offer.romeCode)
+            .withRomeCode(designer.romeCode)
+            .withAppellationCode(designer.appellationCode)
+            .withAppellationLabel(designer.appellationLabel)
             .build(),
         ])
         .build(),
@@ -88,7 +98,7 @@ describe("POST contact-establishment public V1 route", () => {
       .set("Authorization", authToken)
       .send(contactEstablishment);
 
-    expect(response.status).toBe(200);
     expect(response.body).toBe("");
+    expect(response.status).toBe(200);
   });
 });
