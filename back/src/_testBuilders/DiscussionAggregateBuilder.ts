@@ -16,7 +16,6 @@ export const createDiscussionAggregate = ({
   potentialBeneficiaryResumeLink,
   potentialBeneficiaryPhone,
   appellationCode,
-  potentialBeneficiaryEmailUuid,
   establishmentContact = {},
   address,
   createdAt,
@@ -27,10 +26,8 @@ export const createDiscussionAggregate = ({
   immersionObjective: ImmersionObjective | null;
   appellationCode: ApplicationCode;
   potentialBeneficiaryResumeLink?: string;
-  potentialBeneficiaryEmailUuid?: string;
   address?: AddressDto;
   establishmentContact?: Partial<{
-    emailUuid: string;
     email: Email;
     firstName: string;
     lastName: string;
@@ -52,8 +49,6 @@ export const createDiscussionAggregate = ({
     city: "Paris",
   },
   potentialBeneficiary: {
-    emailUuid:
-      potentialBeneficiaryEmailUuid ?? "default-beneficiary-email-uuid",
     firstName: "Claire",
     lastName: "Bertrand",
     email: "claire.bertrand@email.fr",
@@ -62,8 +57,6 @@ export const createDiscussionAggregate = ({
   },
   establishmentContact: {
     contactMode: "EMAIL",
-    emailUuid:
-      establishmentContact.emailUuid ?? "default-establishment-email-uuid",
     email: establishmentContact.email ?? "establishment@mail.com",
     firstName: establishmentContact.firstName ?? "Jean",
     lastName: establishmentContact.lastName ?? "Dupont",

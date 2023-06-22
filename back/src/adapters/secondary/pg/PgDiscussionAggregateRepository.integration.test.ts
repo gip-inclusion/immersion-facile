@@ -71,9 +71,7 @@ describe("PgDiscussionAggregateRepository", () => {
       immersionObjective,
       potentialBeneficiaryPhone,
       potentialBeneficiaryResumeLink,
-      potentialBeneficiaryEmailUuid: "11111111-1111-4000-1111-111111111111",
       establishmentContact: {
-        emailUuid: "22222222-2222-4000-2222-222222222222",
         copyEmails: ["yolo@mail.com"],
       },
       appellationCode: styliste.appellationCode,
@@ -116,10 +114,6 @@ describe("PgDiscussionAggregateRepository", () => {
       potentialBeneficiaryResumeLink,
       appellationCode: styliste.appellationCode,
       createdAt: new Date("2023-03-05"),
-      establishmentContact: {
-        emailUuid: "11111111-1111-4000-1111-111111111111",
-      },
-      potentialBeneficiaryEmailUuid: "11111111-1111-4000-0000-111111111111",
     });
 
     const discussionAggregate2 = createDiscussionAggregate({
@@ -130,10 +124,6 @@ describe("PgDiscussionAggregateRepository", () => {
       potentialBeneficiaryResumeLink,
       appellationCode: styliste.appellationCode,
       createdAt: new Date("2023-03-07"),
-      establishmentContact: {
-        emailUuid: "22222222-2222-4000-2222-222222222222",
-      },
-      potentialBeneficiaryEmailUuid: "22222222-2222-4000-0000-222222222222",
     });
 
     const discussionAggregateToOld = createDiscussionAggregate({
@@ -144,10 +134,6 @@ describe("PgDiscussionAggregateRepository", () => {
       potentialBeneficiaryResumeLink,
       appellationCode: styliste.appellationCode,
       createdAt: new Date("2023-03-04"),
-      establishmentContact: {
-        emailUuid: "33333333-3333-4000-3333-333333333333",
-      },
-      potentialBeneficiaryEmailUuid: "33333333-3333-4000-0000-333333333333",
     });
 
     await Promise.all([

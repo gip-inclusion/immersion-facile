@@ -50,7 +50,6 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
         params.contactMode === "EMAIL" ? params.immersionObjective : null,
       address: establishmentAggregate.establishment.address,
       potentialBeneficiary: {
-        emailUuid: this.uuidGenerator.new(),
         firstName: params.potentialBeneficiaryFirstName,
         lastName: params.potentialBeneficiaryLastName,
         email: params.potentialBeneficiaryEmail,
@@ -64,7 +63,6 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
             : "",
       },
       establishmentContact: {
-        emailUuid: this.uuidGenerator.new(),
         contactMode: params.contactMode,
         email: establishmentContact.email,
         firstName: establishmentContact.firstName,

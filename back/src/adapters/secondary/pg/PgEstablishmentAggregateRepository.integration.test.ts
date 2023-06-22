@@ -1270,11 +1270,6 @@ describe("Postgres implementation of immersion offer repository", () => {
               immersionObjective: "Confirmer un projet professionnel",
               potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
-              potentialBeneficiaryEmailUuid:
-                "10001111-1111-4000-1111-111111111000",
-              establishmentContact: {
-                emailUuid: "10001111-1111-4000-1111-111100001111",
-              },
               siret: siret1,
               appellationCode:
                 defaultValidImmersionOfferEntityV2.appellationCode,
@@ -1291,11 +1286,6 @@ describe("Postgres implementation of immersion offer repository", () => {
               appellationCode:
                 defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-11T00:00:00.000Z"),
-              potentialBeneficiaryEmailUuid:
-                "10001111-1111-4000-2222-222222221000",
-              establishmentContact: {
-                emailUuid: "00002222-2222-4000-2222-222200002222",
-              },
             }),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
@@ -1308,11 +1298,6 @@ describe("Postgres implementation of immersion offer repository", () => {
               appellationCode:
                 defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-11T00:00:00.000Z"),
-              potentialBeneficiaryEmailUuid:
-                "10001111-1111-4000-3333-333333331000",
-              establishmentContact: {
-                emailUuid: "10003333-3333-4000-3333-333300003333",
-              },
             }),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
@@ -1325,11 +1310,6 @@ describe("Postgres implementation of immersion offer repository", () => {
               appellationCode:
                 defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-09T00:00:00.000Z"),
-              potentialBeneficiaryEmailUuid:
-                "10001111-1111-4000-4444-444444441000",
-              establishmentContact: {
-                emailUuid: "10004444-4444-4000-4444-444400004444",
-              },
             }),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
@@ -1342,11 +1322,6 @@ describe("Postgres implementation of immersion offer repository", () => {
               appellationCode:
                 defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-01T00:00:00.000Z"),
-              potentialBeneficiaryEmailUuid:
-                "10001111-1111-4000-5555-555555551000",
-              establishmentContact: {
-                emailUuid: "10005555-5555-4000-5555-555500005555",
-              },
             }),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
@@ -1359,11 +1334,6 @@ describe("Postgres implementation of immersion offer repository", () => {
               appellationCode:
                 defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-03T00:00:00.000Z"),
-              potentialBeneficiaryEmailUuid:
-                "10001111-1111-4000-6666-666666661000",
-              establishmentContact: {
-                emailUuid: "10006666-6666-4000-6666-666600006666",
-              },
             }),
           ),
         ]);

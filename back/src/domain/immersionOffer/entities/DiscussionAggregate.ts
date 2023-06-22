@@ -19,7 +19,6 @@ export type DiscussionAggregate = {
   address: AddressDto;
   exchanges: ExchangeEntity[];
   potentialBeneficiary: {
-    emailUuid: string;
     email: string;
     firstName: string;
     lastName: string;
@@ -27,7 +26,6 @@ export type DiscussionAggregate = {
     resumeLink?: string;
   };
   establishmentContact: {
-    emailUuid: string;
     email: string;
     copyEmails: string[];
     firstName: string;
