@@ -1,4 +1,5 @@
 // TODO : create a DiscussionAggregateBuilder
+import { ApplicationCode } from "aws-sdk/clients/kinesisanalytics";
 import { ImmersionObjective, SiretDto } from "shared";
 import { DiscussionAggregate } from "../domain/immersionOffer/entities/DiscussionAggregate";
 
@@ -14,17 +15,19 @@ export const createDiscussionAggregate = ({
   immersionObjective,
   potentialBeneficiaryResumeLink,
   potentialBeneficiaryPhone,
+  appellationCode,
   createdAt,
 }: {
   id: string;
   siret: SiretDto;
   potentialBeneficiaryPhone: string;
   immersionObjective: ImmersionObjective | null;
+  appellationCode: ApplicationCode;
   potentialBeneficiaryResumeLink?: string;
   createdAt: Date;
 }): DiscussionAggregate => ({
   id,
-  appellationCode: "21607",
+  appellationCode,
   siret,
   contactMode: "EMAIL",
   createdAt,

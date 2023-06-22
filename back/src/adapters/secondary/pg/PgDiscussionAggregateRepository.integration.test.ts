@@ -1,9 +1,24 @@
 import { Pool, PoolClient } from "pg";
+import { AppellationAndRomeDto } from "shared";
 import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
+
+const styliste: AppellationAndRomeDto = {
+  romeCode: "B1805",
+  romeLabel: "Stylisme",
+  appellationCode: "19540",
+  appellationLabel: "Styliste",
+};
+
+const offer = new ImmersionOfferEntityV2Builder()
+  .withRomeCode(styliste.romeCode)
+  .withAppellationCode(styliste.appellationCode)
+  .withAppellationLabel(styliste.appellationLabel)
+  .build();
 
 describe("PgDiscussionAggregateRepository", () => {
   let pool: Pool;
@@ -43,6 +58,7 @@ describe("PgDiscussionAggregateRepository", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siret)
         .withContactId("12345678-1111-2222-3333-444444444444")
+        .withImmersionOffers([offer])
         .build(),
     ]);
 
@@ -54,6 +70,7 @@ describe("PgDiscussionAggregateRepository", () => {
       immersionObjective,
       potentialBeneficiaryPhone,
       potentialBeneficiaryResumeLink,
+      appellationCode: styliste.appellationCode,
       createdAt,
     });
 
@@ -81,6 +98,7 @@ describe("PgDiscussionAggregateRepository", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siret)
         .withContactId("12345678-1111-2222-3333-444444444444")
+        .withImmersionOffers([offer])
         .build(),
     ]);
 
@@ -90,6 +108,7 @@ describe("PgDiscussionAggregateRepository", () => {
       immersionObjective,
       potentialBeneficiaryPhone,
       potentialBeneficiaryResumeLink,
+      appellationCode: styliste.appellationCode,
       createdAt: new Date("2023-03-05"),
     });
 
@@ -99,6 +118,7 @@ describe("PgDiscussionAggregateRepository", () => {
       immersionObjective,
       potentialBeneficiaryPhone,
       potentialBeneficiaryResumeLink,
+      appellationCode: styliste.appellationCode,
       createdAt: new Date("2023-03-07"),
     });
 
@@ -108,6 +128,7 @@ describe("PgDiscussionAggregateRepository", () => {
       immersionObjective,
       potentialBeneficiaryPhone,
       potentialBeneficiaryResumeLink,
+      appellationCode: styliste.appellationCode,
       createdAt: new Date("2023-03-04"),
     });
 

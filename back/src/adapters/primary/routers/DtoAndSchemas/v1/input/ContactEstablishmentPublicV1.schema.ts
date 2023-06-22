@@ -4,8 +4,8 @@ import {
   preferEmailContactSchema,
   preferInPersonContactSchema,
   preferPhoneContactSchema,
-  siretSchema,
   romeDtoSchema,
+  siretSchema,
   zTrimmedString,
 } from "shared";
 import {

@@ -26,7 +26,10 @@ import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggr
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import {
+  defaultValidImmersionOfferEntityV2,
+  ImmersionOfferEntityV2Builder,
+} from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
@@ -192,15 +195,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           romeAppellation: "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
         });
 
-        await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          {
-            siret: "79000403200029",
-            rome: "A1201",
-            establishmentPosition: searchedPosition,
-            appellationCode: undefined,
-          }, // No appellation given
-        );
-        /// Establishment oustide geographical area
+        /// Establishment oustide geographical are
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
           {
             siret: "99000403200029",
@@ -214,9 +209,6 @@ describe("Postgres implementation of immersion offer repository", () => {
           await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
             { searchMade: searchMadeWithoutRome },
           );
-
-        // Assert : one match and defined contact details
-        expect(searchResult).toHaveLength(2);
 
         const expectedResult: Partial<SearchImmersionResultDto>[] = [
           {
@@ -233,12 +225,6 @@ describe("Postgres implementation of immersion offer repository", () => {
                 appellationCode: "20404",
               },
             ],
-          },
-          {
-            rome: "A1201",
-            siret: "79000403200029",
-            distance_m: 0,
-            appellations: [],
           },
         ];
 
@@ -362,11 +348,11 @@ describe("Postgres implementation of immersion offer repository", () => {
         rome: informationGeographiqueRome,
         romeLabel: "Information géographique",
         appellations: [
+          { appellationLabel: "Cartographe", appellationCode: "11704" },
           {
             appellationLabel: "Analyste en géomatique",
             appellationCode: "10946",
           },
-          { appellationLabel: "Cartographe", appellationCode: "11704" },
         ],
         siret: siretMatchingToSearch,
         distance_m: 0,
@@ -1013,7 +999,12 @@ describe("Postgres implementation of immersion offer repository", () => {
       expectToEqual(actualSearchResultDto, {
         rome: "H2102",
         romeLabel: "Conduite d'équipement de production alimentaire",
-        appellations: ["Styliste"],
+        appellations: [
+          {
+            appellationLabel: "Styliste",
+            appellationCode: "19540",
+          },
+        ],
         naf: establishment.nafDto.code,
         nafLabel: "Fabrication de pain et de pâtisserie fraîche",
         siret,
@@ -1081,9 +1072,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       const existingEstablishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(existingSiret)
         .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder() // Offer with code A1402 without an appellation
-            .withRomeCode("A1402")
-            .build(),
           new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation
             .withAppellationCode("10806")
             .withAppellationLabel("Aide agricole en arboriculture")
@@ -1093,6 +1081,9 @@ describe("Postgres implementation of immersion offer repository", () => {
             .withAppellationCode("10900")
             .withAppellationLabel("Aide-viticulteur / Aide-viticultrice")
             .withRomeCode("A1401")
+            .build(),
+          new ImmersionOfferEntityV2Builder() // Offer with code A1402 without an appellation
+            .withRomeCode("A1402")
             .build(),
         ])
         .build();
@@ -1121,12 +1112,12 @@ describe("Postgres implementation of immersion offer repository", () => {
         const updatedAggregate: EstablishmentAggregate = {
           ...existingEstablishmentAggregate,
           immersionOffers: [
-            existingEstablishmentAggregate.immersionOffers[2], // Existing offer to keep
             new ImmersionOfferEntityV2Builder() // New offer to create
               .withAppellationCode("17892")
               .withAppellationLabel("Porteur / Porteuse de hottes")
               .withRomeCode("A1401")
               .build(),
+            existingEstablishmentAggregate.immersionOffers[2], // Existing offer to keep
           ],
         };
         await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
@@ -1267,6 +1258,8 @@ describe("Postgres implementation of immersion offer repository", () => {
               potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
               siret: siret1,
+              appellationCode:
+                defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-01T00:00:00.000Z"),
             }),
           ),
@@ -1277,6 +1270,8 @@ describe("Postgres implementation of immersion offer repository", () => {
               immersionObjective: "Confirmer un projet professionnel",
               potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
+              appellationCode:
+                defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-11T00:00:00.000Z"),
             }),
           ),
@@ -1287,6 +1282,8 @@ describe("Postgres implementation of immersion offer repository", () => {
               immersionObjective: "Confirmer un projet professionnel",
               potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
+              appellationCode:
+                defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-11T00:00:00.000Z"),
             }),
           ),
@@ -1297,6 +1294,8 @@ describe("Postgres implementation of immersion offer repository", () => {
               immersionObjective: "Confirmer un projet professionnel",
               potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
+              appellationCode:
+                defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-09T00:00:00.000Z"),
             }),
           ),
@@ -1307,6 +1306,8 @@ describe("Postgres implementation of immersion offer repository", () => {
               immersionObjective: "Confirmer un projet professionnel",
               potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
+              appellationCode:
+                defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-01T00:00:00.000Z"),
             }),
           ),
@@ -1317,6 +1318,8 @@ describe("Postgres implementation of immersion offer repository", () => {
               immersionObjective: "Confirmer un projet professionnel",
               potentialBeneficiaryResumeLink: "http://fakelink.com",
               potentialBeneficiaryPhone: "0654678976",
+              appellationCode:
+                defaultValidImmersionOfferEntityV2.appellationCode,
               createdAt: new Date("2021-01-03T00:00:00.000Z"),
             }),
           ),

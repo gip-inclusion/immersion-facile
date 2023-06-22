@@ -75,7 +75,7 @@ export class PgDiscussionAggregateRepository
         'id', id, 
         'contactMode', contact_mode, 
         'siret', siret,
-        'appellationCode', appellation_code, 
+        'appellationCode', appellation_code::text, 
         'potentialBeneficiaryFirstName',  potential_beneficiary_first_name,
         'potentialBeneficiaryLastName',  potential_beneficiary_last_name,
         'potentialBeneficiaryEmail',  potential_beneficiary_email,
