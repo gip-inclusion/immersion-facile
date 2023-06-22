@@ -263,7 +263,7 @@ export class PgEstablishmentAggregateRepository
       await this.client.query(
         format(
           `INSERT INTO immersion_offers (
-            rome_code, rome_appellation, score, created_at, siret
+            rome_code, appellation_code, score, created_at, siret
           ) VALUES %L`,
           offersToAdd.map((offerToAdd) => [
             offerToAdd.romeCode,
@@ -287,7 +287,7 @@ export class PgEstablishmentAggregateRepository
 
     if (offersToRemoveByRomeCode.length > 0) {
       const queryToRemoveOffersFromRome = format(
-        `DELETE FROM immersion_offers WHERE siret = '%s' AND rome_appellation IS NULL AND rome_code IN (%L); `,
+        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code IS NULL AND rome_code IN (%L); `,
         siret,
         offersToRemoveByRomeCode,
       );
@@ -300,7 +300,7 @@ export class PgEstablishmentAggregateRepository
 
     if (offersToRemoveByRomeAppellation.length > 0) {
       const queryToRemoveOffersFromAppellationCode = format(
-        `DELETE FROM immersion_offers WHERE siret = '%s' AND rome_appellation::text IN (%L); `,
+        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code::text IN (%L); `,
         siret,
         offersToRemoveByRomeAppellation,
       );
@@ -364,7 +364,7 @@ export class PgEstablishmentAggregateRepository
             fit_for_disabled_workers
           FROM active_establishments_within_area aewa 
             LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-            LEFT JOIN public_appellations_data pad ON io.rome_appellation = pad.ogr_appellation
+            LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
             LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
             ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
             GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
@@ -524,7 +524,7 @@ export class PgEstablishmentAggregateRepository
       `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
        FROM immersion_offers io
        JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
-       LEFT JOIN public_appellations_data pad on io.rome_appellation = pad.ogr_appellation
+       LEFT JOIN public_appellations_data pad on io.appellation_code = pad.ogr_appellation
        WHERE siret = $1;`,
       [siret],
     );
@@ -546,7 +546,7 @@ export class PgEstablishmentAggregateRepository
         `
         SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
         FROM immersion_offers AS io
-        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.rome_appellation 
+        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
         LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
         WHERE io.siret = $1 AND io.rome_code = $2
         GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
@@ -574,7 +574,7 @@ export class PgEstablishmentAggregateRepository
     );
     const query = format(
       `INSERT INTO immersion_offers (
-          rome_code, rome_appellation, siret, score, created_at
+          rome_code, appellation_code, siret, score, created_at
         ) VALUES %L`,
       immersionOfferFields,
     );
@@ -633,7 +633,7 @@ export class PgEstablishmentAggregateRepository
               JSON_BUILD_OBJECT(
                 'romeCode', rome_code, 
                 'score', score, 
-                'appellationCode', rome_appellation::text, 
+                'appellationCode', appellation_code::text, 
                 'appellationLabel', pad.libelle_appellation_long::text,
                 'createdAt', 
                 to_char(
@@ -643,7 +643,7 @@ export class PgEstablishmentAggregateRepository
             ) as immersionOffers 
           FROM 
             immersion_offers
-          LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.rome_appellation
+          LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.appellation_code
           WHERE 
             siret = $1 
           GROUP BY 

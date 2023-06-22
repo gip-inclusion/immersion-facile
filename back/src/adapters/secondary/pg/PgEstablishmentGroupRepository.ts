@@ -75,7 +75,7 @@ export class PgEstablishmentGroupRepository
       LEFT JOIN "immersion_offers" io ON io.siret = e.siret
       LEFT JOIN "establishments__immersion_contacts" AS eic ON eic.establishment_siret = e.siret
       LEFT JOIN "immersion_contacts" AS ic ON ic.uuid = eic.contact_uuid
-      LEFT JOIN "public_appellations_data" ap ON ap.ogr_appellation = io.rome_appellation
+      LEFT JOIN "public_appellations_data" ap ON ap.ogr_appellation = io.appellation_code
       LEFT JOIN "public_romes_data" r ON io.rome_code = r.code_rome
       LEFT JOIN "public_naf_classes_2008" ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       WHERE establishment_groups__sirets.group_slug = $1 AND e.is_active AND e.is_searchable

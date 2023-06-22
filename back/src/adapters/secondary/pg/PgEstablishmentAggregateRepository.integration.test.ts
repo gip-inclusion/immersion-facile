@@ -77,6 +77,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     const farFromSearchedPosition = { lat: 32, lon: 89 };
     const searchMadeWithRome: SearchMade = {
       rome: informationGeographiqueRome,
+      appellationCode: "11704",
       ...searchedPosition,
       distance_km: 30,
       sortedBy: "distance",
@@ -112,7 +113,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       siret: string;
       rome: string;
       establishmentPosition: GeoPositionDto;
-      appellationCode?: string;
+      appellationCode: string;
       offerContactUid?: string;
       sourceProvider?: FormEstablishmentSource;
       address?: AddressDto;
@@ -140,7 +141,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       await insertImmersionOffer({
         siret,
         romeCode: rome,
-        romeAppellation: appellationCode,
+        appellationCode,
         offerCreatedAt,
       });
     };
@@ -153,6 +154,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             siret: "78000403200029",
             rome: "A1101",
             establishmentPosition: searchedPosition,
+            appellationCode: "11987",
           }, // Position matching
         );
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
@@ -160,6 +162,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             siret: "79000403200029",
             rome: "A1201",
             establishmentPosition: searchedPosition,
+            appellationCode: "12755",
           }, // Position matching
         );
 
@@ -192,7 +195,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         await insertImmersionOffer({
           romeCode: "A1101", // Same rome and establishment as offer
           siret: "78000403200029",
-          romeAppellation: "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
+          appellationCode: "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
         });
 
         /// Establishment oustide geographical are
@@ -201,6 +204,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             siret: "99000403200029",
             rome: "A1101",
             establishmentPosition: farFromSearchedPosition,
+            appellationCode: "12862",
           }, // Position not matching
         );
 
@@ -245,13 +249,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       await insertImmersionOffer({
         romeCode: informationGeographiqueRome,
-        romeAppellation: undefined, // Appellation
+        appellationCode: "15504", // Appellation
         siret: notActiveSiret,
       });
 
       await insertImmersionOffer({
         romeCode: informationGeographiqueRome,
-        romeAppellation: undefined, // Appellation
+        appellationCode: "11704", // Appellation
         siret: notActiveSiret,
       });
 
@@ -275,13 +279,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       await insertImmersionOffer({
         romeCode: informationGeographiqueRome,
-        romeAppellation: undefined, // Appellation
+        appellationCode: "15504", // Appellation
         siret: notSearchableSiret,
       });
 
       await insertImmersionOffer({
         romeCode: informationGeographiqueRome,
-        romeAppellation: undefined, // Appellation
+        appellationCode: "11704", // Appellation
         siret: notSearchableSiret,
       });
 
@@ -318,7 +322,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       await insertImmersionOffer({
         siret: siretMatchingToSearch,
         romeCode: informationGeographiqueRome,
-        romeAppellation: analysteEnGeomatiqueAppellation,
+        appellationCode: analysteEnGeomatiqueAppellation,
       });
 
       /// Establishment with offer inside geographical area but an other rome
@@ -326,6 +330,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: "88000403200029",
         rome: notMatchingRome,
         establishmentPosition: searchedPosition,
+        appellationCode: "19540",
       });
 
       // Establishment with offer with searched rome but oustide geographical area
@@ -333,6 +338,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: "99000403200029",
         rome: informationGeographiqueRome,
         establishmentPosition: farFromSearchedPosition,
+        appellationCode: "10946",
       });
 
       // Act
@@ -387,10 +393,12 @@ describe("Postgres implementation of immersion offer repository", () => {
       await insertImmersionOffer({
         romeCode: searchMadeWithRome.rome!,
         siret: closeSiret,
+        appellationCode: searchMadeWithRome.appellationCode!,
       });
       await insertImmersionOffer({
         romeCode: searchMadeWithRome.rome!,
         siret: farSiret,
+        appellationCode: searchMadeWithRome.appellationCode!,
       });
       // Act
       const searchResult =
@@ -423,11 +431,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       await Promise.all([
         insertImmersionOffer({
           romeCode: searchMadeWithRome.rome!,
+          appellationCode: searchMadeWithRome.appellationCode!,
           siret: recentOfferSiret,
           offerCreatedAt: new Date("2022-05-05"),
         }),
         insertImmersionOffer({
           romeCode: searchMadeWithRome.rome!,
+          appellationCode: searchMadeWithRome.appellationCode!,
           siret: oldOfferSiret,
           offerCreatedAt: new Date("2022-05-02"),
         }),
@@ -455,7 +465,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: siretMatchingToSearch,
         rome: informationGeographiqueRome,
         establishmentPosition: searchedPosition,
-        appellationCode: undefined,
+        appellationCode: "11704",
         offerContactUid: contactUidOfOfferMatchingSearch,
       });
 
@@ -797,14 +807,17 @@ describe("Postgres implementation of immersion offer repository", () => {
       await Promise.all([
         insertImmersionOffer({
           romeCode: "A1401",
+          appellationCode: "10806",
           siret: siretToRemove,
         }),
         insertImmersionOffer({
           romeCode: "A1405",
+          appellationCode: "12112",
           siret: siretToRemove,
         }),
         insertImmersionOffer({
           romeCode: "A1405",
+          appellationCode: "17044",
           siret: siretToKeep,
         }),
       ]);
@@ -1720,11 +1733,11 @@ describe("Postgres implementation of immersion offer repository", () => {
   const insertImmersionOffer = async (props: {
     romeCode: string;
     siret: string;
-    romeAppellation?: string;
+    appellationCode: string;
     offerCreatedAt?: Date;
   }) => {
     const insertQuery = `INSERT INTO immersion_offers (
-    rome_code, siret, score, rome_appellation, created_at
+    rome_code, siret, score, appellation_code, created_at
     ) VALUES
      ($1, $2, $3, $4, $5)`;
     const defaultScore = 4;
@@ -1734,7 +1747,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.romeCode,
       props.siret,
       defaultScore,
-      props.romeAppellation ?? null,
+      props.appellationCode ?? null,
       props.offerCreatedAt ?? defaultOfferCreatedAt,
     ]);
   };
