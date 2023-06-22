@@ -108,16 +108,16 @@ const ConventionSignPageContent = ({
   return (
     <>
       {match({
-        convention,
+        hasConvention: convention !== null, // to avoid Type instantiation is excessively deep and possibly infinite error
         isLoading,
         fetchConventionError,
         submitFeedback,
       })
         .with(
           {
-            convention: null,
-            isLoading: false,
+            hasConvention: false,
             fetchConventionError: null,
+            isLoading: false,
             submitFeedback: { kind: "idle" },
           },
           () => <Loader />,
@@ -142,7 +142,7 @@ const ConventionSignPageContent = ({
             />
           </MainWrapper>
         ))
-        .with({ convention: undefined }, () => (
+        .with({ hasConvention: false }, () => (
           <Alert
             severity="error"
             title="Convention introuvable"
@@ -151,9 +151,9 @@ const ConventionSignPageContent = ({
         ))
         .with(
           {
-            convention: P.not(null),
+            hasConvention: true,
           },
-          ({ convention }) => (
+          () => (
             <MainWrapper
               layout={"default"}
               pageHeader={
@@ -163,41 +163,43 @@ const ConventionSignPageContent = ({
                 />
               }
             >
-              <>
-                {convention.status === "REJECTED" && (
-                  <Alert
-                    severity="error"
-                    title={t.sign.rejected.title}
-                    description={
-                      <>
-                        <p className={fr.cx("fr-mt-1w")}>
-                          {t.sign.rejected.detail}
-                        </p>
-                        <p>{t.sign.rejected.contact}</p>
-                      </>
-                    }
-                  />
-                )}
-                {convention.status === "DRAFT" && (
-                  <Alert
-                    severity="info"
-                    title={t.sign.needsModification.title}
-                    description={
-                      <p className={fr.cx("fr-mt-1w")}>
-                        {t.sign.needsModification.detail}
-                      </p>
-                    }
-                  />
-                )}
-                {convention.status !== "DRAFT" &&
-                  convention.status !== "REJECTED" && (
-                    <ConventionSignForm
-                      convention={convention}
-                      jwt={jwt}
-                      submitFeedback={submitFeedback}
+              {convention && (
+                <>
+                  {convention.status === "REJECTED" && (
+                    <Alert
+                      severity="error"
+                      title={t.sign.rejected.title}
+                      description={
+                        <>
+                          <p className={fr.cx("fr-mt-1w")}>
+                            {t.sign.rejected.detail}
+                          </p>
+                          <p>{t.sign.rejected.contact}</p>
+                        </>
+                      }
                     />
                   )}
-              </>
+                  {convention.status === "DRAFT" && (
+                    <Alert
+                      severity="info"
+                      title={t.sign.needsModification.title}
+                      description={
+                        <p className={fr.cx("fr-mt-1w")}>
+                          {t.sign.needsModification.detail}
+                        </p>
+                      }
+                    />
+                  )}
+                  {convention.status !== "DRAFT" &&
+                    convention.status !== "REJECTED" && (
+                      <ConventionSignForm
+                        convention={convention}
+                        jwt={jwt}
+                        submitFeedback={submitFeedback}
+                      />
+                    )}
+                </>
+              )}
             </MainWrapper>
           ),
         )
