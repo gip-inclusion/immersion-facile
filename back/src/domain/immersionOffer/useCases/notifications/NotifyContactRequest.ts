@@ -24,7 +24,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     payload: ContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const { siret } = payload;
+    const { siret, appellationCode } = payload;
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
@@ -73,7 +73,10 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               businessName,
               contactFirstName: contact.firstName,
               contactLastName: contact.lastName,
-              appellationLabel: immersionOffer.appellationLabel,
+              appellationLabel:
+                establishmentAggregate.immersionOffers.find(
+                  (offer) => offer.appellationCode === appellationCode,
+                )?.appellationLabel ?? "métier non trouvé",
               potentialBeneficiaryFirstName:
                 payload.potentialBeneficiaryFirstName,
               potentialBeneficiaryLastName:

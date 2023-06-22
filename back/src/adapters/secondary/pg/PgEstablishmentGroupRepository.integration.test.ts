@@ -1,5 +1,9 @@
 import { Pool, PoolClient } from "pg";
-import { expectToEqual, SearchImmersionResultDto } from "shared";
+import {
+  AppellationDto_To_Rename,
+  expectToEqual,
+  SearchImmersionResultDto,
+} from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
@@ -133,14 +137,14 @@ describe("PgEstablishmentGroupRepository", () => {
       establishment,
       rome,
       romeLabel,
-      appellationLabels,
+      appellations,
     }: {
       establishment: EstablishmentEntity;
-      appellationLabels: string[];
+      appellations: AppellationDto_To_Rename[];
       rome: string;
       romeLabel: string;
     }): SearchImmersionResultDto => ({
-      appellationLabels,
+      appellations,
       romeLabel,
       rome,
       additionalInformation: establishment.additionalInformation,
@@ -164,22 +168,35 @@ describe("PgEstablishmentGroupRepository", () => {
         establishment: establishment1,
         rome: "D1101",
         romeLabel: "Boucherie",
-        appellationLabels: ["Boucher / Bouchère"],
+        appellations: [
+          { appellationLabel: "Boucher / Bouchère", appellationCode: "11564" },
+        ],
       }),
       createSearchResult({
         establishment: establishment1,
         rome: "D1102",
         romeLabel: "Boulangerie - viennoiserie",
-        appellationLabels: [
-          "Aide-boulanger / Aide-boulangère",
-          "Boulanger-pâtissier / Boulangère-pâtissière",
+        appellations: [
+          {
+            appellationLabel: "Aide-boulanger / Aide-boulangère",
+            appellationCode: "10868",
+          },
+          {
+            appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+            appellationCode: "11574",
+          },
         ],
       }),
       createSearchResult({
         establishment: establishment2,
         rome: "D1106",
         romeLabel: "Vente en alimentation",
-        appellationLabels: ["Vendeur / Vendeuse en alimentation générale"],
+        appellations: [
+          {
+            appellationLabel: "Vendeur / Vendeuse en alimentation générale",
+            appellationCode: "20540",
+          },
+        ],
       }),
     ]);
   });

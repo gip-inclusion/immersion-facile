@@ -24,7 +24,7 @@ export const createDiscussionAggregate = ({
   createdAt: Date;
 }): DiscussionAggregate => ({
   id,
-  romeCode: "M1607",
+  appellationCode: "21607",
   siret,
   contactMode: "EMAIL",
   createdAt,

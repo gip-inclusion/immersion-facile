@@ -95,7 +95,7 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 
-  public async getFullAppellationsFromCodes(
+  public async getAppellationAndRomeDtosFromAppellationCodes(
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
     const { rows } = await this.client.query(

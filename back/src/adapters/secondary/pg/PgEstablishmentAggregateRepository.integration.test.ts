@@ -223,16 +223,22 @@ describe("Postgres implementation of immersion offer repository", () => {
             rome: "A1101",
             siret: "78000403200029",
             distance_m: 0,
-            appellationLabels: [
-              "Pilote de machines d'abattage",
-              "Tractoriste agricole",
+            appellations: [
+              {
+                appellationLabel: "Pilote de machines d'abattage",
+                appellationCode: "17751",
+              },
+              {
+                appellationLabel: "Tractoriste agricole",
+                appellationCode: "20404",
+              },
             ],
           },
           {
             rome: "A1201",
             siret: "79000403200029",
             distance_m: 0,
-            appellationLabels: [],
+            appellations: [],
           },
         ];
 
@@ -355,7 +361,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       const expectedResult: Partial<SearchImmersionResultDto> = {
         rome: informationGeographiqueRome,
         romeLabel: "Information géographique",
-        appellationLabels: ["Analyste en géomatique", "Cartographe"],
+        appellations: [
+          {
+            appellationLabel: "Analyste en géomatique",
+            appellationCode: "10946",
+          },
+          { appellationLabel: "Cartographe", appellationCode: "11704" },
+        ],
         siret: siretMatchingToSearch,
         distance_m: 0,
         voluntaryToImmersion: true,
@@ -943,9 +955,15 @@ describe("Postgres implementation of immersion offer repository", () => {
       expectToEqual(actualSearchResultDto, {
         rome: boulangerRome,
         romeLabel: "Boulangerie - viennoiserie",
-        appellationLabels: [
-          "Aide-boulanger / Aide-boulangère",
-          "Chef boulanger / boulangère",
+        appellations: [
+          {
+            appellationLabel: "Aide-boulanger / Aide-boulangère",
+            appellationCode: "10868",
+          },
+          {
+            appellationLabel: "Chef boulanger / boulangère",
+            appellationCode: "12006",
+          },
         ],
         naf: establishment.nafDto.code,
         nafLabel: "Fabrication de pain et de pâtisserie fraîche",
@@ -995,7 +1013,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       expectToEqual(actualSearchResultDto, {
         rome: "H2102",
         romeLabel: "Conduite d'équipement de production alimentaire",
-        appellationLabels: ["Styliste"],
+        appellations: ["Styliste"],
         naf: establishment.nafDto.code,
         nafLabel: "Fabrication de pain et de pâtisserie fraîche",
         siret,

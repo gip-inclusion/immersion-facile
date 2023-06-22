@@ -52,7 +52,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
 
     // Act
     const contactRequestDto: ContactEstablishmentRequestDto = {
-      romeCode: "A1289",
+      appellationCode: "12898",
       siret: "01234567891011",
       potentialBeneficiaryFirstName: "Antoine",
       potentialBeneficiaryLastName: "Tourasse",
@@ -68,7 +68,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     expect(discussionAggregateRepository.discussionAggregates).toHaveLength(1);
     expectToEqual(discussionAggregateRepository.discussionAggregates[0], {
       id: discussionId,
-      romeCode: "A1289",
+      appellationCode: "12898",
       siret: "01234567891011",
       potentialBeneficiaryFirstName: "Antoine",
       potentialBeneficiaryLastName: "Tourasse",
@@ -99,7 +99,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     discussionAggregateRepository.discussionAggregates = [
       {
         id: "discussionToOld",
-        romeCode: "A1289",
+        appellationCode: "12898",
         siret,
         potentialBeneficiaryFirstName: "Antoine",
         potentialBeneficiaryLastName: "Tourasse",
@@ -120,7 +120,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       },
       {
         id: "discussion1",
-        romeCode: "A1289",
+        appellationCode: "12898",
         siret,
         potentialBeneficiaryFirstName: "Antoine",
         potentialBeneficiaryLastName: "Tourasse",
@@ -144,7 +144,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
 
     uuidGenerator.setNextUuid("discussion2");
     const secondContactRequestDto: ContactEstablishmentRequestDto = {
-      romeCode: "A1289",
+      appellationCode: "12347",
       siret,
       potentialBeneficiaryFirstName: "Bob",
       potentialBeneficiaryLastName: "Marley",

@@ -17,6 +17,7 @@ import { LaBonneBoiteCompanyVOBuilder } from "../../../_testBuilders/LaBonneBoit
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
+  TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
   TEST_NAF_LABEL,
   TEST_POSITION,
@@ -192,7 +193,12 @@ describe("SearchImmersionUseCase", () => {
           postcode: "75001",
           streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
         },
-        appellationLabels: ["test_appellation_label"],
+        appellations: [
+          {
+            appellationLabel: TEST_APPELLATION_LABEL,
+            appellationCode: TEST_APPELLATION_CODE,
+          },
+        ],
         contactMode: "EMAIL",
         customizedName: undefined,
         distance_m: 606885,
@@ -216,7 +222,7 @@ describe("SearchImmersionUseCase", () => {
           streetNumberAndAddress:
             "Service des ressources humaines,  IMPASSE FENDERIE",
         },
-        appellationLabels: [],
+        appellations: [],
         customizedName: "",
         distance_m: 1000,
         fitForDisabledWorkers: false,
@@ -337,7 +343,12 @@ describe("SearchImmersionUseCase", () => {
           distance_m: 606885,
           nafLabel: TEST_NAF_LABEL,
           romeLabel: TEST_ROME_LABEL,
-          appellationLabels: [TEST_APPELLATION_LABEL],
+          appellations: [
+            {
+              appellationLabel: TEST_APPELLATION_LABEL,
+              appellationCode: "12345",
+            },
+          ],
           numberOfEmployeeRange: "20-49",
         },
       ]);
@@ -367,7 +378,12 @@ describe("SearchImmersionUseCase", () => {
           distance_m: 606885,
           nafLabel: TEST_NAF_LABEL,
           romeLabel: TEST_ROME_LABEL,
-          appellationLabels: [TEST_APPELLATION_LABEL],
+          appellations: [
+            {
+              appellationLabel: TEST_APPELLATION_LABEL,
+              appellationCode: TEST_APPELLATION_CODE,
+            },
+          ],
         },
       ]);
       expect(unauthenticatedResponse[0].contactDetails).toBeUndefined();

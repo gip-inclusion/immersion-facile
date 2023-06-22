@@ -30,6 +30,7 @@ const logger = createLogger(__filename);
 export const TEST_NAF_LABEL = "test_naf_label";
 export const TEST_ROME_LABEL = "test_rome_label";
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
+export const TEST_APPELLATION_CODE = "12345";
 export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
 
 export class InMemoryEstablishmentAggregateRepository
@@ -200,9 +201,12 @@ export class InMemoryEstablishmentAggregateRepository
     return {
       rome,
       romeLabel: TEST_ROME_LABEL,
-      appellationLabels: aggregate.immersionOffers
+      appellations: aggregate.immersionOffers
         .filter(propEq("romeCode", rome))
-        .map(() => TEST_APPELLATION_LABEL),
+        .map((offer) => ({
+          appellationLabel: offer.appellationLabel ?? TEST_APPELLATION_LABEL,
+          appellationCode: offer.appellationCode ?? TEST_APPELLATION_CODE,
+        })),
       naf: aggregate.establishment.nafDto.code,
       nafLabel: TEST_NAF_LABEL,
       siret,
@@ -288,7 +292,12 @@ const buildSearchImmersionResultDto = (
   customizedName: establishment.customizedName,
   rome: immersionOffer.romeCode,
   romeLabel: TEST_ROME_LABEL,
-  appellationLabels: [TEST_APPELLATION_LABEL],
+  appellations: [
+    {
+      appellationLabel: TEST_APPELLATION_LABEL,
+      appellationCode: TEST_APPELLATION_CODE,
+    },
+  ],
   siret: establishment.siret,
   voluntaryToImmersion: establishment.voluntaryToImmersion,
   contactMode: contact?.contactMethod,
