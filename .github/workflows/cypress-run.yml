@@ -2,8 +2,6 @@ name: Run Cypress on dev
 on:
   workflow_call:
     secrets:
-      CYPRESS_RECORD_KEY:
-        required: true
       DISCORD_WEBHOOK_URL:
         required: true
     inputs:
@@ -22,7 +20,7 @@ jobs:
       - name: Send Discord notification
         run: |
           curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "Les tests Cypress sont lancés, le report est dispo sur : https://cloud.cypress.io/projects/vctxdm/runs"
+            "content": "Les tests Cypress sont lancés, le report est dispo dans les logs de l'action Github"
           }' ${{ secrets.DISCORD_WEBHOOK_URL }}
       - name: Checkout
         uses: actions/checkout@v3
@@ -40,10 +38,7 @@ jobs:
         continue-on-error: true
         run: |
           pnpm cypress run-e2e \
-            --key ${{ secrets.CYPRESS_RECORD_KEY }} \
             --tag "dev,${{ inputs.tag }}" \
             --parallel \
-            --ci-build-id ${{ inputs.tag }} \
             --browser chrome \
             --headless \
-            --quiet \

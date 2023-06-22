@@ -46,7 +46,6 @@ jobs:
       environment: dev
       tag: "v${{ github.run_number }}"
     secrets:
-      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   deploy-staging:
