@@ -1,7 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import {
-  AppellationDto_To_Rename,
+  AppellationDto,
   ContactMethod,
   SearchImmersionResultDto,
   SiretDto,
@@ -13,7 +13,7 @@ import { ContactInPerson } from "./ContactInPerson";
 export type ContactModalContentProps = {
   contactMethod?: ContactMethod;
   siret: SiretDto;
-  appellations: AppellationDto_To_Rename[];
+  appellations: AppellationDto[];
   searchResultData?: SearchImmersionResultDto;
   onSuccess: () => void;
   onClose: () => void;

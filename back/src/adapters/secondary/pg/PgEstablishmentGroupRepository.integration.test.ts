@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import {
-  AppellationDto_To_Rename,
+  AppellationDto,
   expectToEqual,
   SearchImmersionResultDto,
 } from "shared";
@@ -140,7 +140,7 @@ describe("PgEstablishmentGroupRepository", () => {
       appellations,
     }: {
       establishment: EstablishmentEntity;
-      appellations: AppellationDto_To_Rename[];
+      appellations: AppellationDto[];
       rome: string;
       romeLabel: string;
     }): SearchImmersionResultDto => ({
