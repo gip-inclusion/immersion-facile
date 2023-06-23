@@ -2,11 +2,13 @@ import {
   addressTargets,
   adminTargets,
   agencyTargets,
+  conventionMagicLinkTargets,
   createManagedAxiosInstance,
   establishmentTargets,
   inclusionConnectedAllowedTargets,
   searchTargets,
   siretTargets,
+  unauthenticatedConventionTargets,
   validateEmailsTargets,
 } from "shared";
 import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
@@ -40,7 +42,10 @@ export const createHttpDependencies = (): Dependencies => {
     establishmentGateway: new HttpEstablishmentGateway(
       createHttpClient(establishmentTargets),
     ),
-    conventionGateway: new HttpConventionGateway(axiosOnSlashApi),
+    conventionGateway: new HttpConventionGateway(
+      createHttpClient(conventionMagicLinkTargets),
+      createHttpClient(unauthenticatedConventionTargets),
+    ),
     immersionAssessmentGateway: new HttpImmersionAssessmentGateway(
       axiosOnSlashApi,
     ),

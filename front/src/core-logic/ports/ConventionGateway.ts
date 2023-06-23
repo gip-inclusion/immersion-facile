@@ -6,7 +6,6 @@ import {
   ConventionId,
   ConventionMagicLinkJwt,
   ConventionReadDto,
-  Role,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -32,12 +31,5 @@ export interface ConventionGateway {
   shareConventionLinkByEmail(
     shareLinkByEmailDto: ShareLinkByEmailDto,
   ): Promise<boolean>;
-
-  generateMagicLink(
-    adminToken: BackOfficeJwt,
-    applicationId: ConventionId,
-    role: Role,
-    expired: boolean,
-  ): Promise<string>;
   renewMagicLink(expiredJwt: string, originalUrl: string): Promise<void>;
 }

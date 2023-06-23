@@ -24,15 +24,10 @@ export const frontRoutes = {
   standard: "pages",
 };
 
-export const getConventionStatusDashboard = "status-convention";
-export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
 export const adminLogin = "login";
 export const agenciesRoute = "agencies";
 export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";
-export const conventionShareRoute = "share-immersion-demand";
-export const conventionsRoute = "demandes-immersion";
-
 export const generateMagicLinkRoute = "generate-magic-link";
 export const featureFlagsRoute = "feature-flags";
 export const getImmersionOfferByIdRoute__v0 = "get-immersion-by-id"; // Will be removed.
@@ -45,7 +40,5 @@ export const renewMagicLinkRoute = "renew-magic-link";
 export const requestEmailToUpdateFormRoute = "request-email-to-update-form";
 export const romeRoute = "rome";
 export const searchImmersionRoute__v0 = "search-immersion"; // Becomes GET /immersion-offers?rome=A100&position.lon=2.2315&position.lat=48.8531
-export const signConventionRoute = "sign-application";
-export const updateConventionStatusRoute = "update-application-status";
 export const uploadFileRoute = "upload-file";
 export const shortLinkRoute = "to";

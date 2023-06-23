@@ -1,13 +1,10 @@
 import { Router } from "express";
-import {
-  conventionsRoute,
-  getConventionStatusDashboard,
-  immersionAssessmentRoute,
-  signConventionRoute,
-  updateConventionStatusRoute,
-} from "shared";
+import { conventionMagicLinkTargets, immersionAssessmentRoute } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
-import { RelativeUrl } from "../../createRemoveRouterPrefix";
+import {
+  createRemoveRouterPrefix,
+  RelativeUrl,
+} from "../../createRemoveRouterPrefix";
 import { UnauthorizedError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -15,6 +12,9 @@ export const createMagicLinkRouter = (
   deps: AppDependencies,
 ): [RelativeUrl, Router] => {
   const authenticatedRouter = Router({ mergeParams: true });
+
+  const { removeRouterPrefix, routerPrefix } =
+    createRemoveRouterPrefix("/auth");
 
   authenticatedRouter.use(deps.applicationMagicLinkAuthMiddleware);
 
@@ -30,7 +30,7 @@ export const createMagicLinkRouter = (
     );
 
   authenticatedRouter
-    .route(`/${conventionsRoute}/:conventionId`)
+    .route(removeRouterPrefix(conventionMagicLinkTargets.getConvention.url))
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
         if (req.payloads?.backOffice) {
@@ -53,7 +53,9 @@ export const createMagicLinkRouter = (
     );
 
   authenticatedRouter
-    .route(`/${updateConventionStatusRoute}/:conventionId`)
+    .route(
+      removeRouterPrefix(conventionMagicLinkTargets.updateConventionStatus.url),
+    )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (req.payloads?.backOffice)
@@ -72,7 +74,7 @@ export const createMagicLinkRouter = (
     );
 
   authenticatedRouter
-    .route(`/${signConventionRoute}/:jwt`)
+    .route(removeRouterPrefix(conventionMagicLinkTargets.signConvention.url))
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req?.payloads?.convention) throw new UnauthorizedError();
@@ -84,7 +86,11 @@ export const createMagicLinkRouter = (
     );
 
   authenticatedRouter
-    .route(`/${getConventionStatusDashboard}`)
+    .route(
+      removeRouterPrefix(
+        conventionMagicLinkTargets.getConventionStatusDashboard.url,
+      ),
+    )
     .get((req, res) =>
       // eslint-disable-next-line @typescript-eslint/require-await
       sendHttpResponse(req, res, async () => {
@@ -96,5 +102,5 @@ export const createMagicLinkRouter = (
       }),
     );
 
-  return ["/auth", authenticatedRouter];
+  return [routerPrefix, authenticatedRouter];
 };

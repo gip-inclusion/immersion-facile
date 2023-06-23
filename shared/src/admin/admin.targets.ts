@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTarget, createTargets } from "http-client";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAgencyIdSchema } from "../agency/agency.schema";
+import { conventionReadSchema } from "../convention/convention.schema";
 import {
   establishmentBatchReportSchema,
   formEstablishmentBatchSchema,
@@ -57,5 +58,11 @@ export const adminTargets = createTargets({
     url: "/admin/notifications",
     ...withValidateHeadersAuthorization,
     validateResponseBody: notificationsByKindSchema.parse,
+  }),
+  getConventionById: createTarget({
+    url: "/admin/conventions/:id", // todo rename param to :conventionId
+    method: "GET",
+    ...withValidateHeadersAuthorization,
+    validateResponseBody: conventionReadSchema.parse,
   }),
 });

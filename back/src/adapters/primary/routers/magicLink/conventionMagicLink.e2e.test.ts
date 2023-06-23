@@ -1,5 +1,9 @@
 import { SuperTest, Test } from "supertest";
-import { ConventionDtoBuilder, conventionsRoute, expectToEqual } from "shared";
+import {
+  ConventionDtoBuilder,
+  conventionMagicLinkTargets,
+  expectToEqual,
+} from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import {
   GenerateBackOfficeJwt,
@@ -45,7 +49,12 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
         applicationId: updatedConvention.id,
       });
       const response = await request
-        .post(`/auth/${conventionsRoute}/${updatedConvention.id}`)
+        .post(
+          conventionMagicLinkTargets.updateConvention.url.replace(
+            ":conventionId",
+            updatedConvention.id,
+          ),
+        )
         .send({
           convention: updatedConvention,
         })
@@ -75,7 +84,12 @@ describe("POST /auth/demande-immersion/:conventionId", () => {
         sub: "admin",
       });
       const response = await request
-        .post(`/auth/${conventionsRoute}/${updatedConvention.id}`)
+        .post(
+          conventionMagicLinkTargets.updateConvention.url.replace(
+            ":conventionId",
+            updatedConvention.id,
+          ),
+        )
         .send({
           convention: updatedConvention,
         })

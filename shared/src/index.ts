@@ -16,6 +16,7 @@ export * from "./contactEstablishmentRequest/contactEstablishmentRequest.schema"
 export * from "./convention/convention";
 export * from "./convention/convention.dto";
 export * from "./convention/convention.schema";
+export * from "./convention/convention.targets";
 export * from "./convention/ConventionDtoBuilder";
 export * from "./convention/conventionStatusTransitions";
 export * from "./dashboard/dashboard.dto";

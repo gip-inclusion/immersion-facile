@@ -1,64 +1,53 @@
-import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
 import { fromPromise } from "rxjs/internal/observable/innerFrom";
 import {
   AbsoluteUrl,
-  absoluteUrlSchema,
-  BackOfficeJwt,
   ConventionDto,
   ConventionId,
+  ConventionMagicLinkTargets,
   ConventionReadDto,
-  conventionReadSchema,
-  conventionShareRoute,
-  conventionsRoute,
-  generateMagicLinkRoute,
-  getConventionStatusDashboard,
-  jwtSchema,
-  queryParamsAsString,
-  RenewMagicLinkRequestDto,
-  renewMagicLinkRoute,
-  Role,
   ShareLinkByEmailDto,
-  signConventionRoute,
+  UnauthenticatedConventionTargets,
   UpdateConventionStatusRequestDto,
-  updateConventionStatusRoute,
   WithConventionId,
-  withConventionIdSchema,
 } from "shared";
+import { HttpClient } from "http-client";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 export class HttpConventionGateway implements ConventionGateway {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly magicLinkHttpClient: HttpClient<ConventionMagicLinkTargets>,
+    private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionTargets>,
+  ) {}
 
   public getConventionStatusDashboardUrl$(
     jwt: string,
   ): Observable<AbsoluteUrl> {
     return from(
-      this.httpClient
-        .get<unknown>(`/auth/${getConventionStatusDashboard}`, {
+      this.magicLinkHttpClient
+        .getConventionStatusDashboard({
           headers: { authorization: jwt },
         })
-        .then(({ data }) => absoluteUrlSchema.parse(data)),
+        .then(({ responseBody }) => responseBody),
     );
   }
 
   public retrieveFromToken$(
     payload: FetchConventionRequestedPayload,
   ): Observable<ConventionReadDto | undefined> {
-    return from(this.retreiveFromToken(payload));
+    return from(this.retrieveFromToken(payload));
   }
 
-  private async retreiveFromToken(
+  private async retrieveFromToken(
     payload: FetchConventionRequestedPayload,
   ): Promise<ConventionReadDto> {
-    const { data } = await this.httpClient.get<unknown>(
-      `/auth/${conventionsRoute}/${payload.conventionId}`,
-      {
-        headers: { Authorization: payload.jwt },
-      },
-    );
-    return conventionReadSchema.parse(data);
+    return this.magicLinkHttpClient
+      .getConvention({
+        headers: { authorization: payload.jwt },
+        urlParams: { conventionId: payload.conventionId },
+      })
+      .then(({ responseBody }) => responseBody);
   }
 
   public createConvention$(conventionDto: ConventionDto): Observable<void> {
@@ -66,11 +55,11 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   private async newConvention(conventionDto: ConventionDto): Promise<string> {
-    const { data } = await this.httpClient.post<unknown>(
-      `/${conventionsRoute}`,
-      conventionDto,
-    );
-    return withConventionIdSchema.parse(data).id;
+    return this.unauthenticatedHttpClient
+      .createConvention({
+        body: conventionDto,
+      })
+      .then(({ responseBody }) => responseBody.id);
   }
 
   public updateConvention$(
@@ -86,12 +75,13 @@ export class HttpConventionGateway implements ConventionGateway {
     convention: ConventionDto,
     jwt: string,
   ): Promise<string> {
-    const { data } = await this.httpClient.post(
-      `/auth/${conventionsRoute}/${convention.id}`,
-      { convention },
-      { headers: { authorization: jwt } },
-    );
-    return withConventionIdSchema.parse(data).id;
+    return this.magicLinkHttpClient
+      .updateConvention({
+        body: { convention },
+        urlParams: { conventionId: convention.id },
+        headers: { authorization: jwt },
+      })
+      .then(({ responseBody }) => responseBody.id);
   }
 
   public updateConventionStatus$(
@@ -109,12 +99,13 @@ export class HttpConventionGateway implements ConventionGateway {
     conventionId: ConventionId,
     jwt: string,
   ): Promise<WithConventionId> {
-    const { data } = await this.httpClient.post(
-      `/auth/${updateConventionStatusRoute}/${conventionId}`,
-      params,
-      { headers: { Authorization: jwt } },
-    );
-    return withConventionIdSchema.parse(data);
+    return this.magicLinkHttpClient
+      .updateConventionStatus({
+        body: params,
+        urlParams: { conventionId },
+        headers: { authorization: jwt },
+      })
+      .then(({ responseBody }) => responseBody);
   }
 
   public signConvention$(jwt: string): Observable<void> {
@@ -122,53 +113,33 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   private async signConvention(jwt: string): Promise<WithConventionId> {
-    const { data } = await this.httpClient.post<unknown>(
-      `/auth/${signConventionRoute}/${jwt}`,
-      undefined,
-      { headers: { authorization: jwt } },
-    );
-
-    return withConventionIdSchema.parse(data);
-  }
-
-  public async generateMagicLink(
-    adminToken: BackOfficeJwt,
-    applicationId: ConventionId,
-    role: Role,
-    expired: boolean,
-  ): Promise<string> {
-    const { data } = await this.httpClient.get<unknown>(
-      `/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}&expired=${expired}`,
-      { headers: { authorization: adminToken } },
-    );
-    return jwtSchema.parse(data).jwt;
+    return this.magicLinkHttpClient
+      .signConvention({
+        headers: { authorization: jwt },
+        urlParams: { conventionId: jwt }, // todo change this to conventionId,
+      })
+      .then(({ responseBody }) => responseBody);
   }
 
   public async renewMagicLink(
     expiredJwt: string,
     originalUrl: string,
   ): Promise<void> {
-    const queryParams = queryParamsAsString<RenewMagicLinkRequestDto>({
-      expiredJwt,
-      originalUrl: encodeURIComponent(originalUrl),
+    await this.unauthenticatedHttpClient.renewMagicLink({
+      queryParams: {
+        expiredJwt,
+        originalUrl: encodeURIComponent(originalUrl),
+      },
     });
-    await this.httpClient.get(`/${renewMagicLinkRoute}?${queryParams}`);
   }
 
   public async shareConventionLinkByEmail(
     conventionDto: ShareLinkByEmailDto,
   ): Promise<boolean> {
-    const httpResponse = await this.httpClient.post(
-      `/${conventionShareRoute}`,
-      conventionDto,
-    );
-    return httpResponse.status === 200;
-  }
-
-  public async retreiveById(id: string): Promise<ConventionReadDto> {
-    const { data } = await this.httpClient.get<unknown>(
-      `/${conventionsRoute}/${id}`,
-    );
-    return conventionReadSchema.parse(data);
+    return this.unauthenticatedHttpClient
+      .shareConvention({
+        body: conventionDto,
+      })
+      .then(({ status }) => status === 200);
   }
 }
