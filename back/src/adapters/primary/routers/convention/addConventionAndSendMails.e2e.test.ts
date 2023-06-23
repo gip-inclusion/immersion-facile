@@ -3,15 +3,14 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  conventionsRoute,
+  conventionMagicLinkTargets,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectToEqual,
   Signatories,
-  signConventionRoute,
   TemplatedEmail,
+  unauthenticatedConventionTargets,
   UpdateConventionStatusRequestDto,
-  updateConventionStatusRoute,
   VALID_EMAILS,
 } from "shared";
 import {
@@ -52,7 +51,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     ]);
 
     const res = await request
-      .post(`/${conventionsRoute}`)
+      .post(unauthenticatedConventionTargets.createConvention.url)
       .send(validConventionParams);
 
     expectResponseBody(res, { id: validConvention.id });
@@ -183,7 +182,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   ]);
   const { externalId, ...createConventionParams } = convention;
   const result = await request
-    .post(`/${conventionsRoute}`)
+    .post(unauthenticatedConventionTargets.createConvention.url)
     .send(createConventionParams);
 
   expect(result.status).toBe(200);
@@ -249,7 +248,12 @@ const beneficiarySignsApplication = async (
   gateways.timeGateway.setNextDate(beneficiarySignDate);
 
   const response = await request
-    .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
+    .post(
+      conventionMagicLinkTargets.signConvention.url.replace(
+        ":conventionId",
+        initialConvention.id,
+      ),
+    )
     .set("Authorization", beneficiarySignJwt);
 
   expect(response.status).toBe(200);
@@ -279,7 +283,12 @@ const establishmentSignsApplication = async (
   gateways.timeGateway.setNextDate(establishmentRepresentativeSignDate);
 
   await request
-    .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
+    .post(
+      conventionMagicLinkTargets.signConvention.url.replace(
+        ":conventionId",
+        initialConvention.id,
+      ),
+    )
     .set("Authorization", establishmentSignJwt)
     .expect(200);
 
@@ -337,7 +346,12 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   gateways.shortLinkGenerator.addMoreShortLinkIds(["shortlinkId"]);
 
   await request
-    .post(`/auth/${updateConventionStatusRoute}/${initialConvention.id}`)
+    .post(
+      conventionMagicLinkTargets.updateConventionStatus.url.replace(
+        ":conventionId",
+        initialConvention.id,
+      ),
+    )
     .set("Authorization", validatorReviewJwt)
     .send(params)
     .expect(200);

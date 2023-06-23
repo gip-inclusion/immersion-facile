@@ -2,12 +2,10 @@ import { from, Observable, Subject } from "rxjs";
 import {
   AbsoluteUrl,
   AgencyOption,
-  BackOfficeJwt,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
-  Role,
   ShareLinkByEmailDto,
   sleep,
   UpdateConventionStatusRequestDto,
@@ -70,14 +68,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public signConvention$(_jwt: string): Observable<void> {
     return this.conventionSignedResult$;
-  }
-
-  public async generateMagicLink(
-    _: BackOfficeJwt,
-    _convention: ConventionId,
-    role: Role,
-  ): Promise<string> {
-    return `magic/link/with/role/${role}`;
   }
 
   public async renewMagicLink(

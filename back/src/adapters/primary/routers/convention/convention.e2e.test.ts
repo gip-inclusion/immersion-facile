@@ -1,17 +1,19 @@
 import { SuperTest, Test } from "supertest";
 import {
+  adminTargets,
   AgencyDtoBuilder,
   BackOfficeJwt,
   BackOfficeJwtPayload,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionMagicLinkPayload,
-  conventionsRoute,
+  conventionMagicLinkTargets,
   createConventionMagicLinkPayload,
   currentJwtVersions,
   expectToEqual,
   stringToMd5,
-  updateConventionStatusRoute,
+  unauthenticatedConventionTargets,
+  UpdateConventionRequestDto,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
@@ -91,7 +93,7 @@ describe("convention e2e", () => {
 
       it("Creating an invalid convention fails", async () => {
         await request
-          .post(`/${conventionsRoute}`)
+          .post(unauthenticatedConventionTargets.createConvention.url)
           .send({ invalid_params: true })
           .expect(400);
       });
@@ -103,13 +105,13 @@ describe("convention e2e", () => {
 
         // POSTing a valid convention succeeds.
         await request
-          .post(`/${conventionsRoute}`)
+          .post(unauthenticatedConventionTargets.createConvention.url)
           .send(createConventionParams)
           .expect(200, { id: convention.id });
 
         // GETting the created convention succeeds.
         await request
-          .get(`/admin/${conventionsRoute}/${convention.id}`)
+          .get(adminTargets.getConventionById.url.replace(":id", convention.id))
           .set("Authorization", adminToken)
           .expect(200, {
             ...convention,
@@ -129,7 +131,7 @@ describe("convention e2e", () => {
 
           // POSTing a valid convention succeeds.
           await request
-            .post(`/${conventionsRoute}`)
+            .post(unauthenticatedConventionTargets.createConvention.url)
             .send(createConventionParams)
             .expect(200, { id: convention.id });
         });
@@ -147,7 +149,12 @@ describe("convention e2e", () => {
 
           // GETting the created convention succeeds.
           await request
-            .get(`/auth/${conventionsRoute}/OSEF`)
+            .get(
+              conventionMagicLinkTargets.getConvention.url.replace(
+                ":conventionId",
+                "OSEF",
+              ),
+            )
             .set("Authorization", jwt)
             .expect(200, {
               ...convention,
@@ -167,7 +174,12 @@ describe("convention e2e", () => {
 
           // GETting the created convention succeeds.
           const response = await request
-            .get(`/auth/${conventionsRoute}/${convention.id}`)
+            .get(
+              conventionMagicLinkTargets.getConvention.url.replace(
+                ":conventionId",
+                convention.id,
+              ),
+            )
             .set("Authorization", jwt);
 
           expectToEqual(response.body, {
@@ -191,7 +203,12 @@ describe("convention e2e", () => {
 
           // GETting the created convention 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
           await request
-            .get(`/auth/${conventionsRoute}/${convention.id}`)
+            .get(
+              conventionMagicLinkTargets.getConvention.url.replace(
+                ":conventionId",
+                convention.id,
+              ),
+            )
             .set("Authorization", jwt)
             .expect(403, {
               message: "Le lien magique est périmé",
@@ -206,7 +223,7 @@ describe("convention e2e", () => {
 
         // POSTing a valid convention succeeds.
         await request
-          .post(`/${conventionsRoute}`)
+          .post(unauthenticatedConventionTargets.createConvention.url)
           .send(createConventionParams)
           .expect(200, { id: convention.id });
 
@@ -229,7 +246,12 @@ describe("convention e2e", () => {
         );
 
         await request
-          .post(`/auth/${conventionsRoute}/${convention.id}`)
+          .post(
+            conventionMagicLinkTargets.updateConvention.url.replace(
+              ":conventionId",
+              convention.id,
+            ),
+          )
           .set("Authorization", jwt)
           .send({
             convention: updatedConvention,
@@ -238,7 +260,7 @@ describe("convention e2e", () => {
 
         // GETting the updated convention succeeds.
         const result = await request
-          .get(`/admin/${conventionsRoute}/${convention.id}`)
+          .get(adminTargets.getConventionById.url.replace(":id", convention.id))
           .set("Authorization", adminToken);
 
         expect(result.body).toEqual({
@@ -260,20 +282,26 @@ describe("convention e2e", () => {
           }),
         );
         await request
-          .get(`/${conventionsRoute}/anything`)
+          .get(
+            conventionMagicLinkTargets.getConvention.url.replace(
+              ":conventionId",
+              "anything",
+            ),
+          )
           .set("Authorization", jwt)
           .expect(404);
 
         await request
-          .get(`/admin/${conventionsRoute}/${unknownId}`)
+          .get(adminTargets.getConventionById.url.replace(":id", unknownId))
           .set("Authorization", adminToken)
           .expect(404);
       });
 
       it("Updating an unknown convention IDs fails with 404 Not Found", async () => {
-        const unknownId = "unknown-demande-immersion-id";
+        const unknownId = "40400000-0000-4000-0000-000000000404";
         const conventionWithUnknownId = new ConventionDtoBuilder()
           .withId(unknownId)
+          .withStatus("READY_TO_SIGN")
           .build();
         const { externalId, ...createConventionParams } =
           conventionWithUnknownId;
@@ -287,11 +315,24 @@ describe("convention e2e", () => {
           }),
         );
 
-        await request
-          .post(`/${conventionsRoute}/${unknownId}`)
+        const updatedConvention: UpdateConventionRequestDto = {
+          convention: { ...createConventionParams, externalId: "0001" },
+        };
+
+        const response = await request
+          .post(
+            conventionMagicLinkTargets.updateConvention.url.replace(
+              ":conventionId",
+              unknownId,
+            ),
+          )
           .set("Authorization", jwt)
-          .send(createConventionParams)
-          .expect(404);
+          .send(updatedConvention);
+
+        expectToEqual(response.body, {
+          errors: `Convention with id ${unknownId} was not found`,
+        });
+        expect(response.status).toBe(404);
       });
 
       it("Creating an convention with an existing ID fails with 409 Conflict", async () => {
@@ -300,13 +341,13 @@ describe("convention e2e", () => {
 
         // POSTing a valid convention succeeds.
         await request
-          .post(`/${conventionsRoute}`)
+          .post(unauthenticatedConventionTargets.createConvention.url)
           .send(createConventionParams)
           .expect(200, { id: convention.id });
 
         // POSTing a another valid convention with the same ID fails.
         await request
-          .post(`/${conventionsRoute}`)
+          .post(unauthenticatedConventionTargets.createConvention.url)
           .send({
             ...createConventionParams,
             email: "another@email.fr",
@@ -334,7 +375,12 @@ describe("convention e2e", () => {
         }),
       );
       await request
-        .post(`/auth/${updateConventionStatusRoute}/${counsellorJwt}`)
+        .post(
+          conventionMagicLinkTargets.updateConventionStatus.url.replace(
+            ":conventionId",
+            counsellorJwt,
+          ),
+        )
         .set("Authorization", counsellorJwt)
         .send({ status: "REJECTED", statusJustification: "test-justification" })
         .expect(200);
@@ -356,7 +402,12 @@ describe("convention e2e", () => {
       };
       const backOfficeJwt = generateBackOfficeJwt(payload);
       await request
-        .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
+        .post(
+          conventionMagicLinkTargets.updateConventionStatus.url.replace(
+            ":conventionId",
+            conventionId,
+          ),
+        )
         .set("Authorization", backOfficeJwt)
         .send({ status: "REJECTED", statusJustification: "test-justification" })
         .expect(200);
@@ -364,7 +415,12 @@ describe("convention e2e", () => {
 
     it("Returns error 401 if no JWT", async () => {
       await request
-        .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
+        .post(
+          conventionMagicLinkTargets.updateConventionStatus.url.replace(
+            ":conventionId",
+            conventionId,
+          ),
+        )
         .send({ status: "ACCEPTED_BY_VALIDATOR" })
         .expect(401);
     });
@@ -380,7 +436,12 @@ describe("convention e2e", () => {
         }),
       );
       await request
-        .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
+        .post(
+          conventionMagicLinkTargets.updateConventionStatus.url.replace(
+            ":conventionId",
+            conventionId,
+          ),
+        )
         .set("Authorization", tutorJwt)
         .send({ status: "ACCEPTED_BY_VALIDATOR" })
         .expect(403);
@@ -396,7 +457,12 @@ describe("convention e2e", () => {
         }),
       );
       await request
-        .post(`/auth/${updateConventionStatusRoute}/unknown_application_id`)
+        .post(
+          conventionMagicLinkTargets.updateConventionStatus.url.replace(
+            ":conventionId",
+            "unknown_application_id",
+          ),
+        )
         .set("Authorization", counsellorJwt)
         .send({ status: "ACCEPTED_BY_COUNSELLOR" })
         .expect(404); // Not found

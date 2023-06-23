@@ -5,7 +5,6 @@ import {
   AgencyDto,
   AgencyId,
   agencyTargets,
-  conventionsRoute,
   featureFlagsRoute,
   generateMagicLinkRoute,
   GetDashboardParams,
@@ -46,7 +45,7 @@ export const createAdminRouter = (
   );
 
   adminRouter
-    .route(`/${conventionsRoute}/:id`)
+    .route(removeRouterPrefix(adminTargets.getConventionById.url))
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getConvention.execute(req.params),

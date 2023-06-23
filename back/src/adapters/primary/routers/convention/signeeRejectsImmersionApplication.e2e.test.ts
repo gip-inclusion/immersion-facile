@@ -1,14 +1,14 @@
 import {
   ConventionDtoBuilder,
   ConventionDtoWithoutExternalId,
-  conventionsRoute,
+  conventionMagicLinkTargets,
   ConventionStatus,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectsToMatch,
   expectToEqual,
+  unauthenticatedConventionTargets,
   UpdateConventionStatusRequestDto,
-  updateConventionStatusRoute,
 } from "shared";
 import {
   buildTestApp,
@@ -64,7 +64,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   createConventionParams: ConventionDtoWithoutExternalId,
 ) => {
   await request
-    .post(`/${conventionsRoute}`)
+    .post(unauthenticatedConventionTargets.createConvention.url)
     .send(createConventionParams)
     .expect(200);
 
@@ -125,7 +125,12 @@ const expectEstablishmentRequiresChanges = async (
   params: UpdateConventionStatusRequestDto,
 ) => {
   await request
-    .post(`/auth/${updateConventionStatusRoute}/${immersionApplicationId}`)
+    .post(
+      conventionMagicLinkTargets.updateConventionStatus.url.replace(
+        ":conventionId",
+        immersionApplicationId,
+      ),
+    )
     .set("Authorization", establishmentJwt)
     .send(params);
 
