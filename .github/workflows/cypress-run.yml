@@ -36,9 +36,4 @@ jobs:
         run: pnpm install
       - name: Cypress run
         continue-on-error: true
-        run: |
-          pnpm cypress run-e2e \
-            --tag "dev,${{ inputs.tag }}" \
-            --parallel \
-            --browser chrome \
-            --headless \
+        run: pnpm cypress run-e2e
