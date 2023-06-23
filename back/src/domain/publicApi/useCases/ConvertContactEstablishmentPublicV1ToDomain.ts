@@ -16,7 +16,7 @@ export class ConvertContactEstablishmentPublicV1ToDomain extends TransactionalUs
   inputSchema = contactEstablishmentPublicV1Schema;
 
   protected async _execute(
-    contactRequest: ContactEstablishmentPublicV1Dto,
+    { offer, ...contactRequest }: ContactEstablishmentPublicV1Dto,
     uow: UnitOfWork,
   ): Promise<ContactEstablishmentRequestDto> {
     const establishmentAggregate =
@@ -29,12 +29,12 @@ export class ConvertContactEstablishmentPublicV1ToDomain extends TransactionalUs
       );
 
     const firstOfferMatchingRome = establishmentAggregate.immersionOffers.find(
-      (offer) => offer.romeCode === contactRequest.offer.romeCode,
+      ({ romeCode }) => offer.romeCode === romeCode,
     );
 
     if (!firstOfferMatchingRome)
       throw new NotFoundError(
-        `Offer with rome code ${contactRequest.offer.romeCode} not found for establishment with siret ${contactRequest.siret}`,
+        `Offer with rome code ${offer.romeCode} not found for establishment with siret ${contactRequest.siret}`,
       );
 
     if (contactRequest.contactMode === "EMAIL")
@@ -42,16 +42,12 @@ export class ConvertContactEstablishmentPublicV1ToDomain extends TransactionalUs
         ...contactRequest,
         potentialBeneficiaryPhone: "Numéro de téléphone non communiqué",
         immersionObjective: null,
-        appellationCode:
-          firstOfferMatchingRome.appellationCode ??
-          "TODO Remove when mandatory in type",
+        appellationCode: firstOfferMatchingRome.appellationCode,
       };
 
     return {
       ...contactRequest,
-      appellationCode:
-        firstOfferMatchingRome.appellationCode ??
-        "TODO Remove when mandatory in type",
+      appellationCode: firstOfferMatchingRome.appellationCode,
     };
   }
 }
