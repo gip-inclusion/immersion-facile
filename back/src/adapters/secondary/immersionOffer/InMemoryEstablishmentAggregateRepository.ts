@@ -204,8 +204,8 @@ export class InMemoryEstablishmentAggregateRepository
       appellations: aggregate.immersionOffers
         .filter(propEq("romeCode", rome))
         .map((offer) => ({
-          appellationLabel: offer.appellationLabel ?? TEST_APPELLATION_LABEL,
-          appellationCode: offer.appellationCode ?? TEST_APPELLATION_CODE,
+          appellationLabel: offer.appellationLabel,
+          appellationCode: offer.appellationCode,
         })),
       naf: aggregate.establishment.nafDto.code,
       nafLabel: TEST_NAF_LABEL,
@@ -294,8 +294,8 @@ const buildSearchImmersionResultDto = (
   romeLabel: TEST_ROME_LABEL,
   appellations: [
     {
-      appellationLabel: TEST_APPELLATION_LABEL,
-      appellationCode: TEST_APPELLATION_CODE,
+      appellationLabel: immersionOffer.appellationLabel,
+      appellationCode: immersionOffer.appellationCode,
     },
   ],
   siret: establishment.siret,

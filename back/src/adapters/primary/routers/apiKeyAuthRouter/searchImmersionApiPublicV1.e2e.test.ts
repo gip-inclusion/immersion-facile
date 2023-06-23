@@ -54,12 +54,13 @@ describe("search-immersion route", () => {
     });
     describe("authenficated consumer", () => {
       it("with given rome and position", async () => {
+        const immersionOffer = new ImmersionOfferEntityV2Builder()
+          .withRomeCode("A1000")
+          .build();
         // Prepare
         await establishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
-            .withImmersionOffers([
-              new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
-            ])
+            .withImmersionOffers([immersionOffer])
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withPosition({
@@ -83,7 +84,7 @@ describe("search-immersion route", () => {
             additionalInformation: "",
             rome: "A1000",
             romeLabel: "test_rome_label",
-            appellationLabels: ["test_appellation_label"],
+            appellationLabels: [immersionOffer.appellationLabel],
             siret: "78000403200019",
             voluntaryToImmersion: true,
             contactMode: "EMAIL",

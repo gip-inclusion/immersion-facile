@@ -30,12 +30,13 @@ describe("search-immersion route", () => {
   describe(`from front - /${immersionOffersRoute}`, () => {
     describe("accepts valid requests", () => {
       it("with given rome and position", async () => {
+        const immersionOffer = new ImmersionOfferEntityV2Builder()
+          .withRomeCode("A1000")
+          .build();
         // Prepare
         await establishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
-            .withImmersionOffers([
-              new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
-            ])
+            .withImmersionOffers([immersionOffer])
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withPosition({
@@ -59,8 +60,8 @@ describe("search-immersion route", () => {
             romeLabel: "test_rome_label",
             appellations: [
               {
-                appellationLabel: "test_appellation_label",
-                appellationCode: "12345",
+                appellationLabel: immersionOffer.appellationLabel,
+                appellationCode: immersionOffer.appellationCode,
               },
             ],
             siret: "78000403200019",
