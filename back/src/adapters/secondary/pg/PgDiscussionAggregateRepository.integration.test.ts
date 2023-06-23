@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto } from "shared";
 import { expectToEqual } from "shared";
-import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
+import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
@@ -25,6 +25,7 @@ describe("PgDiscussionAggregateRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let pgDiscussionAggregateRepository: PgDiscussionAggregateRepository;
+  let establishmentAggregateRepo: PgEstablishmentAggregateRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -39,6 +40,7 @@ describe("PgDiscussionAggregateRepository", () => {
     pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(
       client,
     );
+    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(client);
   });
 
   afterAll(async () => {
@@ -47,14 +49,8 @@ describe("PgDiscussionAggregateRepository", () => {
   });
 
   it("Methode insertDiscussionAggregate", async () => {
-    // Prepare
     const siret = "01234567891011";
-    const immersionObjective = "Confirmer un projet professionnel";
-    const potentialBeneficiaryResumeLink = "http://fakelink.com";
-    const potentialBeneficiaryPhone = "0654678976";
-    const establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
-      client,
-    );
+
     await establishmentAggregateRepo.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siret)
@@ -63,20 +59,9 @@ describe("PgDiscussionAggregateRepository", () => {
         .build(),
     ]);
 
-    // Act
-    const createdAt = new Date("2022-01-01T11:00:00.000Z");
-    const discussionAggregate = createDiscussionAggregate({
-      id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
-      siret,
-      immersionObjective,
-      potentialBeneficiaryPhone,
-      potentialBeneficiaryResumeLink,
-      establishmentContact: {
-        copyEmails: ["yolo@mail.com"],
-      },
-      appellationCode: styliste.appellationCode,
-      createdAt,
-    });
+    const discussionAggregate = new DiscussionAggregateBuilder()
+      .withSiret(siret)
+      .build();
 
     await pgDiscussionAggregateRepository.insertDiscussionAggregate(
       discussionAggregate,
@@ -91,13 +76,7 @@ describe("PgDiscussionAggregateRepository", () => {
   it("Methode getDiscussionsBySiretSince", async () => {
     const siret = "11112222333344";
     const since = new Date("2023-03-05");
-    const immersionObjective = null;
-    const potentialBeneficiaryResumeLink = "";
-    const potentialBeneficiaryPhone = "";
 
-    const establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
-      client,
-    );
     await establishmentAggregateRepo.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siret)
@@ -106,35 +85,23 @@ describe("PgDiscussionAggregateRepository", () => {
         .build(),
     ]);
 
-    const discussionAggregate1 = createDiscussionAggregate({
-      id: "bbbbbd2c-6f02-11ec-90d6-0242ac120003",
-      siret,
-      immersionObjective,
-      potentialBeneficiaryPhone,
-      potentialBeneficiaryResumeLink,
-      appellationCode: styliste.appellationCode,
-      createdAt: new Date("2023-03-05"),
-    });
+    const discussionAggregate1 = new DiscussionAggregateBuilder()
+      .withSiret(siret)
+      .withId("bbbbbd2c-6f02-11ec-90d6-0242ac120003")
+      .withCreatedAt(new Date("2023-03-05"))
+      .build();
 
-    const discussionAggregate2 = createDiscussionAggregate({
-      id: "cccccd2c-6f02-11ec-90d6-0242ac120003",
-      siret,
-      immersionObjective,
-      potentialBeneficiaryPhone,
-      potentialBeneficiaryResumeLink,
-      appellationCode: styliste.appellationCode,
-      createdAt: new Date("2023-03-07"),
-    });
+    const discussionAggregate2 = new DiscussionAggregateBuilder()
+      .withSiret(siret)
+      .withId("cccccd2c-6f02-11ec-90d6-0242ac120003")
+      .withCreatedAt(new Date("2023-03-07"))
+      .build();
 
-    const discussionAggregateToOld = createDiscussionAggregate({
-      id: "aaaaad2c-6f02-11ec-90d6-0242ac120003",
-      siret,
-      immersionObjective,
-      potentialBeneficiaryPhone,
-      potentialBeneficiaryResumeLink,
-      appellationCode: styliste.appellationCode,
-      createdAt: new Date("2023-03-04"),
-    });
+    const discussionAggregateToOld = new DiscussionAggregateBuilder()
+      .withSiret(siret)
+      .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
+      .withCreatedAt(new Date("2023-03-04"))
+      .build();
 
     await Promise.all([
       pgDiscussionAggregateRepository.insertDiscussionAggregate(
