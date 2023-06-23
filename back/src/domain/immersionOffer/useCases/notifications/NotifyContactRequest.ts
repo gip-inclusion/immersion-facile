@@ -3,6 +3,7 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared";
+import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -24,17 +25,16 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     payload: ContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const { siret, appellationCode } = payload;
-
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
+        payload.siret,
       );
     if (!establishmentAggregate)
-      throw new Error(`Missing establishment: siret=${siret}`);
+      throw new Error(`Missing establishment: siret=${payload.siret}`);
 
     const contact = establishmentAggregate.contact;
-    if (!contact) throw new Error(`Missing contact details for siret=${siret}`);
+    if (!contact)
+      throw new Error(`Missing contact details for siret=${payload.siret}`);
 
     if (contact.contactMethod !== payload.contactMode) {
       throw new Error(
@@ -51,17 +51,23 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     const businessAddress = establishmentAggregate.establishment.address;
 
     const followedIds = {
-      establishmentSiret: siret,
+      establishmentSiret: payload.siret,
     };
+
+    const appellationLabel = establishmentAggregate.immersionOffers.find(
+      (offer) => offer.appellationCode === payload.appellationCode,
+    )?.appellationLabel;
+
+    if (!appellationLabel)
+      throw new BadRequestError(
+        `Establishment don't have immersion offers with appelation code '${payload.appellationCode}'.`,
+      );
 
     switch (payload.contactMode) {
       case "EMAIL": {
         const cc = contact.copyEmails.filter(
           (email) => email !== contact.email,
         );
-        const immersionOffer = establishmentAggregate.immersionOffers.at(0);
-
-        if (!immersionOffer) throw new Error("No immesion offer found");
 
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
@@ -73,10 +79,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               businessName,
               contactFirstName: contact.firstName,
               contactLastName: contact.lastName,
-              appellationLabel:
-                establishmentAggregate.immersionOffers.find(
-                  (offer) => offer.appellationCode === appellationCode,
-                )?.appellationLabel ?? "métier non trouvé",
+              appellationLabel,
               potentialBeneficiaryFirstName:
                 payload.potentialBeneficiaryFirstName,
               potentialBeneficiaryLastName:

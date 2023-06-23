@@ -61,7 +61,7 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withContact(contact: ContactEntity) {
+  public withContact(contact: ContactEntity | undefined) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact,
