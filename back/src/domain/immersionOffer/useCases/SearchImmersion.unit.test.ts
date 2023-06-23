@@ -17,8 +17,6 @@ import { LaBonneBoiteCompanyVOBuilder } from "../../../_testBuilders/LaBonneBoit
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
-  TEST_APPELLATION_CODE,
-  TEST_APPELLATION_LABEL,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
@@ -81,10 +79,14 @@ const prepareSearchableData = async () => {
 
   const secretariatImmersionOffer = new ImmersionOfferEntityV2Builder()
     .withRomeCode(secretariatRome)
+    .withAppellationLabel("Secrétaire")
+    .withAppellationCode("19364")
     .build();
 
-  const boulangerInMetzImmersionOffer = new ImmersionOfferEntityV2Builder()
+  const boulangerImmersionOffer = new ImmersionOfferEntityV2Builder()
     .withRomeCode(boulangerRome)
+    .withAppellationLabel("Boulanger / Boulangère")
+    .withAppellationCode("11573")
     .build();
 
   const contact = new ContactEntityBuilder().withContactMethod("EMAIL").build();
@@ -100,7 +102,7 @@ const prepareSearchableData = async () => {
     new EstablishmentAggregateBuilder()
       .withEstablishment(establishment)
       .withContact(contact)
-      .withImmersionOffers([boulangerInMetzImmersionOffer])
+      .withImmersionOffers([boulangerImmersionOffer])
       .build();
 
   await establishmentAggregateRepository.insertEstablishmentAggregates([
@@ -114,6 +116,8 @@ const prepareSearchableData = async () => {
     establishmentAggregateRepository,
     uuidGenerator,
     laBonneBoiteAPI,
+    boulangerImmersionOffer,
+    secretariatImmersionOffer,
   };
 };
 
@@ -174,7 +178,8 @@ describe("SearchImmersionUseCase", () => {
   });
 
   it("gets both form and LBB establishments if voluntaryToImmersion is not provided", async () => {
-    const { searchImmersion } = await prepareSearchableData();
+    const { searchImmersion, secretariatImmersionOffer } =
+      await prepareSearchableData();
 
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
@@ -195,8 +200,8 @@ describe("SearchImmersionUseCase", () => {
         },
         appellations: [
           {
-            appellationLabel: TEST_APPELLATION_LABEL,
-            appellationCode: TEST_APPELLATION_CODE,
+            appellationLabel: secretariatImmersionOffer.appellationLabel,
+            appellationCode: secretariatImmersionOffer.appellationCode,
           },
         ],
         contactMode: "EMAIL",
@@ -323,7 +328,8 @@ describe("SearchImmersionUseCase", () => {
 
   describe("authenticated with api key", () => {
     it("Search immersion, and DO NOT provide contact details", async () => {
-      const { searchImmersion } = await prepareSearchableData();
+      const { searchImmersion, secretariatImmersionOffer } =
+        await prepareSearchableData();
 
       const authenticatedResponse = await searchImmersion.execute(
         { ...searchSecretariatInMetzRequestDto, voluntaryToImmersion: true },
@@ -345,8 +351,8 @@ describe("SearchImmersionUseCase", () => {
           romeLabel: TEST_ROME_LABEL,
           appellations: [
             {
-              appellationLabel: TEST_APPELLATION_LABEL,
-              appellationCode: "12345",
+              appellationLabel: secretariatImmersionOffer.appellationLabel,
+              appellationCode: secretariatImmersionOffer.appellationCode,
             },
           ],
           numberOfEmployeeRange: "20-49",
@@ -358,7 +364,8 @@ describe("SearchImmersionUseCase", () => {
 
   describe("Not authenticated with api key", () => {
     it("Search immersion, and do NOT provide contact details", async () => {
-      const { searchImmersion } = await prepareSearchableData();
+      const { searchImmersion, secretariatImmersionOffer } =
+        await prepareSearchableData();
 
       const unauthenticatedResponse = await searchImmersion.execute({
         ...searchSecretariatInMetzRequestDto,
@@ -380,8 +387,8 @@ describe("SearchImmersionUseCase", () => {
           romeLabel: TEST_ROME_LABEL,
           appellations: [
             {
-              appellationLabel: TEST_APPELLATION_LABEL,
-              appellationCode: TEST_APPELLATION_CODE,
+              appellationLabel: secretariatImmersionOffer.appellationLabel,
+              appellationCode: secretariatImmersionOffer.appellationCode,
             },
           ],
         },

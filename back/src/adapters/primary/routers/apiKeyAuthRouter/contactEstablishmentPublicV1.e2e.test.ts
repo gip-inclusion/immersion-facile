@@ -25,7 +25,7 @@ const contactEstablishment: ContactEstablishmentPublicV1Dto = {
   contactMode: "EMAIL",
   message: "Salut !",
   siret: "11112222333344",
-  offer: { romeCode: "E1205", romeLabel: "Un métier" },
+  offer: { romeCode: designer.romeCode, romeLabel: designer.romeLabel },
   potentialBeneficiaryEmail: "john.doe@mail.com",
   potentialBeneficiaryFirstName: "John",
   potentialBeneficiaryLastName: "Doe",
