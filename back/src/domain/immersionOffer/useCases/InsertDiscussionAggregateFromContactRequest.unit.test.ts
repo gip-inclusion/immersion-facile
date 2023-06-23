@@ -1,4 +1,5 @@
 import { ContactEstablishmentRequestDto, expectToEqual } from "shared";
+import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -24,6 +25,17 @@ describe("Insert discussion aggregate from contact request DTO", () => {
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
+  const contactRequestDto: ContactEstablishmentRequestDto = {
+    appellationCode: "12898",
+    siret: "01234567891011",
+    potentialBeneficiaryFirstName: "Antoine",
+    potentialBeneficiaryLastName: "Tourasse",
+    potentialBeneficiaryEmail: "antoine.tourasse@email.com",
+    contactMode: "EMAIL",
+    message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
+    immersionObjective: "Confirmer un projet professionnel",
+    potentialBeneficiaryPhone: "0654783402",
+  };
 
   beforeEach(async () => {
     const uow = createInMemoryUow();
@@ -56,52 +68,54 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     uuidGenerator.setNextUuid(discussionId);
 
     // Act
-    const contactRequestDto: ContactEstablishmentRequestDto = {
-      appellationCode: "12898",
-      siret: "01234567891011",
-      potentialBeneficiaryFirstName: "Antoine",
-      potentialBeneficiaryLastName: "Tourasse",
-      potentialBeneficiaryEmail: "antoine.tourasse@email.com",
-      contactMode: "EMAIL",
-      message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
-      immersionObjective: "Confirmer un projet professionnel",
-      potentialBeneficiaryPhone: "0654783402",
-    };
+
     await insertDiscussionAggregate.execute(contactRequestDto);
 
     // Assert
     expect(discussionAggregateRepository.discussionAggregates).toHaveLength(1);
-    expectToEqual(discussionAggregateRepository.discussionAggregates[0], {
-      id: discussionId,
-      appellationCode: "12898",
-      siret: "01234567891011",
-      address: establishmentAddress,
-      potentialBeneficiary: {
-        firstName: "Antoine",
-        lastName: "Tourasse",
-        email: "antoine.tourasse@email.com",
-        phone: "0654783402",
-      },
-      establishmentContact: {
-        contactMode: "EMAIL",
-        email: establishmentContact.email,
-        firstName: establishmentContact.firstName,
-        lastName: establishmentContact.lastName,
-        phone: establishmentContact.phone,
-        job: establishmentContact.job,
-        copyEmails: establishmentContact.copyEmails,
-      },
-      createdAt: connectionDate,
-      immersionObjective: "Confirmer un projet professionnel",
-      exchanges: [
-        {
-          sentAt: connectionDate,
-          message: contactRequestDto.message,
-          recipient: "establishment",
-          sender: "potentialBeneficiary",
-        },
-      ],
-    });
+    expectToEqual(
+      discussionAggregateRepository.discussionAggregates[0],
+      new DiscussionAggregateBuilder()
+        .withId(discussionId)
+        .withAppellationCode(contactRequestDto.appellationCode)
+        .withPotentialBeneficiaryFirstName(
+          contactRequestDto.potentialBeneficiaryFirstName,
+        )
+        .withPotentialBeneficiaryLastName(
+          contactRequestDto.potentialBeneficiaryLastName,
+        )
+        .withPotentialBeneficiaryPhone(
+          contactRequestDto.potentialBeneficiaryPhone,
+        )
+        .withPotentialBeneficiaryEmail(
+          contactRequestDto.potentialBeneficiaryEmail,
+        )
+        .withContactMode(contactRequestDto.contactMode)
+        .withImmersionObjective(contactRequestDto.immersionObjective)
+        .withExchanges([
+          {
+            sentAt: connectionDate,
+            message: contactRequestDto.message,
+            recipient: "establishment",
+            sender: "potentialBeneficiary",
+          },
+        ])
+        .withCreatedAt(connectionDate)
+        .withSiret(contactRequestDto.siret)
+        .withEstablishementContact(
+          {
+            contactMode: "EMAIL",
+            email: establishmentContact.email,
+            firstName: establishmentContact.firstName,
+            lastName: establishmentContact.lastName,
+            phone: establishmentContact.phone,
+            job: establishmentContact.job,
+            copyEmails: establishmentContact.copyEmails,
+          }
+        )
+        .withAddress(establishmentAddress)
+        .build(),
+    );
   });
 
   it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
@@ -113,20 +127,25 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     const discussion1Date = new Date("2022-01-09T12:00:00.000");
     const discussionToOldDate = new Date("2022-01-02T12:00:00.000");
     discussionAggregateRepository.discussionAggregates = [
-      {
-        id: "discussionToOld",
-        appellationCode: "12898",
-        siret,
-        address: establishmentAddress,
-        immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiary: {
-          firstName: "Antoine",
-          lastName: "Tourasse",
-          email: "antoine.tourasse@email.com",
-          phone: "0654678976",
-          resumeLink: "http://fakelink.com",
-        },
-        establishmentContact: {
+      new DiscussionAggregateBuilder()
+        .withId("discussionToOld")
+        .withAppellationCode("12898")
+        .withSiret(siret)
+        .withPotentialBeneficiaryFirstName(
+          contactRequestDto.potentialBeneficiaryFirstName,
+        )
+        .withPotentialBeneficiaryLastName(
+          contactRequestDto.potentialBeneficiaryLastName,
+        )
+        .withPotentialBeneficiaryEmail(
+          contactRequestDto.potentialBeneficiaryEmail,
+        )
+        .withPotentialBeneficiaryPhone(
+          contactRequestDto.potentialBeneficiaryPhone,
+        )
+        .withImmersionObjective(contactRequestDto.immersionObjective)
+        .withContactMode(contactRequestDto.contactMode)
+        .withEstablishment({
           contactMode: "EMAIL",
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
@@ -134,31 +153,38 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           phone: establishmentContact.phone,
           job: establishmentContact.job,
           copyEmails: establishmentContact.copyEmails,
-        },
-        createdAt: discussionToOldDate,
-        exchanges: [
+        })
+        .withAddress(establishmentAddress)
+        .withExchanges([
           {
-            message: "Bonjour, c'est une vieille disucssion",
+            message: "Bonjour, c'est une vieille discussion",
             recipient: "establishment",
             sender: "potentialBeneficiary",
             sentAt: discussionToOldDate,
           },
-        ],
-      },
-      {
-        id: "discussion1",
-        appellationCode: "12898",
-        createdAt: discussion1Date,
-        siret,
-        address: establishmentAddress,
-        potentialBeneficiary: {
-          firstName: "Antoine",
-          lastName: "Tourasse",
-          email: "antoine.tourasse@email.com",
-          phone: "0654678976",
-          resumeLink: "http://fakelink.com",
-        },
-        establishmentContact: {
+        ])
+        .withCreatedAt(discussionToOldDate)
+        .build(),
+      new DiscussionAggregateBuilder()
+        .withId("discussion1")
+        .withAppellationCode("12898")
+        .withSiret(siret)
+        .withPotentialBeneficiaryFirstName(
+          contactRequestDto.potentialBeneficiaryFirstName,
+        )
+        .withPotentialBeneficiaryLastName(
+          contactRequestDto.potentialBeneficiaryLastName,
+        )
+        .withPotentialBeneficiaryEmail(
+          contactRequestDto.potentialBeneficiaryEmail,
+        )
+        .withPotentialBeneficiaryPhone(
+          contactRequestDto.potentialBeneficiaryPhone,
+        )
+        .withImmersionObjective(contactRequestDto.immersionObjective)
+        .withContactMode(contactRequestDto.contactMode)
+        .withAddress(establishmentAddress)
+        .withEstablishment({
           contactMode: "EMAIL",
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
@@ -166,8 +192,8 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           phone: establishmentContact.phone,
           job: establishmentContact.job,
           copyEmails: establishmentContact.copyEmails,
-        },
-        exchanges: [
+        })
+        .withExchanges([
           {
             message:
               "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
@@ -175,9 +201,9 @@ describe("Insert discussion aggregate from contact request DTO", () => {
             sender: "potentialBeneficiary",
             sentAt: discussion1Date,
           },
-        ],
-        immersionObjective: "Confirmer un projet professionnel",
-      },
+        ])
+        .withCreatedAt(discussion1Date)
+        .build(),
     ];
 
     uuidGenerator.setNextUuid("discussion2");

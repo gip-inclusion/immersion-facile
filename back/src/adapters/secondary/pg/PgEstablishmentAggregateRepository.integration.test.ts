@@ -22,7 +22,7 @@ import {
   rueJacquardDto,
 } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
+import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
@@ -1265,76 +1265,48 @@ describe("Postgres implementation of immersion offer repository", () => {
 
         await Promise.all([
           pgDiscussionRepository.insertDiscussionAggregate(
-            createDiscussionAggregate({
-              id: "00001111-1111-1111-1111-000000000000",
-              immersionObjective: "Confirmer un projet professionnel",
-              potentialBeneficiaryResumeLink: "http://fakelink.com",
-              potentialBeneficiaryPhone: "0654678976",
-              siret: siret1,
-              appellationCode:
-                defaultValidImmersionOfferEntityV2.appellationCode,
-              createdAt: new Date("2021-01-01T00:00:00.000Z"),
-            }),
+            new DiscussionAggregateBuilder()
+              .withId("00001111-1111-1111-1111-000000000000")
+              .withImmersionObjective("Confirmer un projet professionnel")
+              .withSiret(siret1)
+              .withCreatedAt(new Date("2021-01-01T00:00:00.000Z"))
+              .build(),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
-            createDiscussionAggregate({
-              id: "11111111-1111-1111-1111-000000000000",
-              siret: siret2,
-              immersionObjective: "Confirmer un projet professionnel",
-              potentialBeneficiaryResumeLink: "http://fakelink.com",
-              potentialBeneficiaryPhone: "0654678976",
-              appellationCode:
-                defaultValidImmersionOfferEntityV2.appellationCode,
-              createdAt: new Date("2021-01-11T00:00:00.000Z"),
-            }),
+            new DiscussionAggregateBuilder()
+              .withId("11111111-1111-1111-1111-000000000000")
+              .withImmersionObjective("Confirmer un projet professionnel")
+              .withSiret(siret2)
+              .withCreatedAt(new Date("2021-01-11T00:00:00.000Z"))
+              .build(),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
-            createDiscussionAggregate({
-              id: "22222222-2222-2222-2222-000000000000",
-              siret: siret2,
-              immersionObjective: "Confirmer un projet professionnel",
-              potentialBeneficiaryResumeLink: "http://fakelink.com",
-              potentialBeneficiaryPhone: "0654678976",
-              appellationCode:
-                defaultValidImmersionOfferEntityV2.appellationCode,
-              createdAt: new Date("2021-01-11T00:00:00.000Z"),
-            }),
+            new DiscussionAggregateBuilder()
+              .withId("22222222-2222-2222-2222-000000000000")
+              .withImmersionObjective("Confirmer un projet professionnel")
+              .withSiret(siret2)
+              .withCreatedAt(new Date("2021-01-11T00:00:00.000Z"))
+              .build(),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
-            createDiscussionAggregate({
-              id: "33333333-3333-3333-3333-000000000000",
-              siret: siret3,
-              immersionObjective: "Confirmer un projet professionnel",
-              potentialBeneficiaryResumeLink: "http://fakelink.com",
-              potentialBeneficiaryPhone: "0654678976",
-              appellationCode:
+            new DiscussionAggregateBuilder()
+              .withId("33333333-8888-3333-3333-000000000000")
+              .withSiret(siret3)
+              .withAppellationCode(
                 defaultValidImmersionOfferEntityV2.appellationCode,
-              createdAt: new Date("2021-01-09T00:00:00.000Z"),
-            }),
+              )
+              .withCreatedAt(new Date("2021-01-01T00:00:00.000Z"))
+              .build(),
           ),
           pgDiscussionRepository.insertDiscussionAggregate(
-            createDiscussionAggregate({
-              id: "33333333-8888-3333-3333-000000000000",
-              siret: siret3,
-              immersionObjective: "Confirmer un projet professionnel",
-              potentialBeneficiaryResumeLink: "http://fakelink.com",
-              potentialBeneficiaryPhone: "0654678976",
-              appellationCode:
+            new DiscussionAggregateBuilder()
+              .withId("44444444-4444-4444-4444-000000000000")
+              .withSiret(siret4)
+              .withAppellationCode(
                 defaultValidImmersionOfferEntityV2.appellationCode,
-              createdAt: new Date("2021-01-01T00:00:00.000Z"),
-            }),
-          ),
-          pgDiscussionRepository.insertDiscussionAggregate(
-            createDiscussionAggregate({
-              id: "44444444-4444-4444-4444-000000000000",
-              siret: siret4,
-              immersionObjective: "Confirmer un projet professionnel",
-              potentialBeneficiaryResumeLink: "http://fakelink.com",
-              potentialBeneficiaryPhone: "0654678976",
-              appellationCode:
-                defaultValidImmersionOfferEntityV2.appellationCode,
-              createdAt: new Date("2021-01-03T00:00:00.000Z"),
-            }),
+              )
+              .withCreatedAt(new Date("2021-01-03T00:00:00.000Z"))
+              .build(),
           ),
         ]);
       });
