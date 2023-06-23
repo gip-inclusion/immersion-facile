@@ -11,8 +11,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumn(discussionTable, {
     [appellationCodeColumn]: {
       type: "integer",
+      references: { name: "public_appellations_data" },
     },
   });
+
+  pgm.dropConstraint("discussions", "fk_siret");
 
   const subquery = `
     SELECT DISTINCT ON (discussions.rome_code) io.rome_appellation as appellation_code, discussions.rome_code as rome_code
@@ -56,10 +59,22 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.dropMaterializedView(viewContactRequestName);
   pgm.addColumn(discussionTable, {
     [romeCodeColumn]: {
       type: "char(5)",
     },
+  });
+
+  // recreate the foreign key constraint
+  pgm.addConstraint("discussions", "fk_siret", {
+    foreignKeys: [
+      {
+        columns: "siret",
+        references: "establishments",
+        referencesConstraintName: "fk_siret",
+      },
+    ],
   });
 
   pgm.sql(`
