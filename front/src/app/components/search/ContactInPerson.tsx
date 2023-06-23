@@ -5,7 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  AppellationDto_To_Rename,
+  AppellationDto,
   ContactEstablishmentInPersonDto,
   contactEstablishmentInPersonSchema,
   domElementIds,
@@ -16,7 +16,7 @@ import { immersionSearchGateway } from "src/config/dependencies";
 
 type ContactInPersonProps = {
   siret: SiretDto;
-  appellations: AppellationDto_To_Rename[];
+  appellations: AppellationDto[];
   onSuccess: () => void;
 };
 

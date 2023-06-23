@@ -7,7 +7,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  AppellationDto_To_Rename,
+  AppellationDto,
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
@@ -20,7 +20,7 @@ import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
   siret: SiretDto;
-  appellations: AppellationDto_To_Rename[];
+  appellations: AppellationDto[];
   onSuccess: () => void;
   onClose: () => void;
 };
