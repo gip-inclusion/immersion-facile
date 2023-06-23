@@ -11,6 +11,8 @@ import {
   getDepartmentCodeFromDepartmentNameOrCity,
   LookupSearchResult,
   lookupSearchResultsSchema,
+  lookupStreetAddressQueryMinLength,
+  lookupStreetAddressSpecialCharsRegex,
   OpenCageGeoSearchKey,
   Postcode,
   StreetNumberAndAddress,
@@ -70,10 +72,16 @@ export class HttpAddressGateway implements AddressGateway {
     query: string,
   ): Promise<AddressAndPosition[]> {
     const startDate = new Date();
-    const queryMinLength = 2;
     try {
-      if (query.length < queryMinLength)
-        throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
+      if (
+        query.replace(lookupStreetAddressSpecialCharsRegex, "").length <
+        lookupStreetAddressQueryMinLength
+      )
+        throw new Error(
+          errorMessage.minimumCharErrorMessage(
+            lookupStreetAddressQueryMinLength,
+          ),
+        );
       const { responseBody } = await this.limiter.schedule(() =>
         this.httpClient.geocoding({
           queryParams: {

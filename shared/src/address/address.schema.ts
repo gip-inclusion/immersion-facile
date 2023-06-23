@@ -35,9 +35,21 @@ export const addressAndPositionListSchema: z.ZodSchema<AddressAndPosition[]> =
 export const lookupSearchResultsSchema: z.ZodSchema<LookupSearchResult[]> =
   z.array(lookupSearchResultSchema);
 
+export const lookupStreetAddressQueryMinLength = 2;
+export const lookupStreetAddressSpecialCharsRegex =
+  /[&/\\#,+()&$~%€.":`*?<>{}]/g;
 export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddressQueryParams> =
   z.object({
-    lookup: z.string(),
+    lookup: z
+      .string()
+      .min(lookupStreetAddressQueryMinLength)
+      .trim()
+      .refine(
+        (arg) =>
+          arg.replace(lookupStreetAddressSpecialCharsRegex, "").length >=
+          lookupStreetAddressQueryMinLength,
+        "String must contain at least 2 character(s), excluding special chars",
+      ),
   });
 
 export const withLookupLocationInputQueryParamsSchema: z.Schema<WithLookupLocationInputQueryParams> =

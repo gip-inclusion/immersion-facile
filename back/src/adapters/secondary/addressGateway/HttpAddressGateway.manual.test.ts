@@ -261,6 +261,12 @@ describe("HttpOpenCageDataAddressGateway", () => {
         new Error(errorMessage.minimumCharErrorMessage(2)),
       );
     });
+    it("Should not support lookup address with two chars including one special char.", async () => {
+      await expectPromiseToFailWithError(
+        httpAddressGateway.lookupStreetAddress("R,"),
+        new Error(errorMessage.minimumCharErrorMessage(2)),
+      );
+    });
     it("Should support lookup address with two char.", async () => {
       const resultPreviousNotFoundWithAddresseAPI =
         await httpAddressGateway.lookupStreetAddress("Ro");

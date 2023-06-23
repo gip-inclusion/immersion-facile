@@ -6,6 +6,7 @@ import {
   LookupLocationInput,
   LookupSearchResult,
   lookupSearchResultsSchema,
+  withLookupStreetAddressQueryParamsSchema,
 } from "shared";
 import { HttpClient } from "http-client";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
@@ -34,9 +35,9 @@ export class HttpAddressGateway implements AddressGateway {
     lookup: string,
   ): Promise<AddressAndPosition[]> {
     const response = await this.httpClient.lookupStreetAddress({
-      queryParams: {
+      queryParams: withLookupStreetAddressQueryParamsSchema.parse({
         lookup,
-      },
+      }),
     });
     return addressAndPositionListSchema.parse(response.responseBody);
   }

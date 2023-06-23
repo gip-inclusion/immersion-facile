@@ -1,4 +1,5 @@
 import { SuperTest, Test } from "supertest";
+import { ZodError } from "zod";
 import {
   addressTargets,
   LookupAddress,
@@ -32,7 +33,7 @@ describe("addressRouter", () => {
   });
 
   describe(`${addressTargets.lookupStreetAddress.url} route`, () => {
-    it(`GET ${lookupStreetAddressUrl(query8bdduportLookup)}`, async () => {
+    it(`GET 200 ${lookupStreetAddressUrl(query8bdduportLookup)}`, async () => {
       addressGateway.setAddressAndPosition(
         expected8bdduportAddressAndPositions,
       );
@@ -41,6 +42,54 @@ describe("addressRouter", () => {
       );
       expect(response.body).toEqual(expected8bdduportAddressAndPositions);
       expect(response.status).toBe(200);
+    });
+
+    describe("bad queries", () => {
+      it(`GET 400 '${lookupStreetAddressUrl("1")}'`, async () => {
+        const response = await request.get(
+          `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=1`,
+        );
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+          errors: `Error: ${new ZodError([
+            {
+              code: "too_small",
+              minimum: 2,
+              type: "string",
+              inclusive: true,
+              exact: false,
+              message: "String must contain at least 2 character(s)",
+              path: ["lookup"],
+            },
+            {
+              code: "custom",
+              message:
+                "String must contain at least 2 character(s), excluding special chars",
+              path: ["lookup"],
+            },
+          ]).toString()}`,
+        });
+      });
+
+      it.each(["1,", "1, ", "⠀  , 125 ", " )),$,#                  "])(
+        `GET 400 '${lookupStreetAddressUrl("%s")}'`,
+        async () => {
+          const response = await request.get(
+            `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=1,`,
+          );
+          expect(response.status).toBe(400);
+          expect(response.body).toEqual({
+            errors: `Error: ${new ZodError([
+              {
+                code: "custom",
+                message:
+                  "String must contain at least 2 character(s), excluding special chars",
+                path: ["lookup"],
+              },
+            ]).toString()}`,
+          });
+        },
+      );
     });
   });
 
