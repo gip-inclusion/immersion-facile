@@ -36,6 +36,8 @@ export const lookupSearchResultsSchema: z.ZodSchema<LookupSearchResult[]> =
   z.array(lookupSearchResultSchema);
 
 export const lookupStreetAddressQueryMinLength = 2;
+export const lookupStreetAddressQueryMaxWordLength = 18;
+
 export const lookupStreetAddressSpecialCharsRegex =
   /[&/\\#,+()&$~%€.":`*?<>{}]/g;
 export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddressQueryParams> =
@@ -49,6 +51,10 @@ export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddres
           arg.replace(lookupStreetAddressSpecialCharsRegex, "").length >=
           lookupStreetAddressQueryMinLength,
         "String must contain at least 2 character(s), excluding special chars",
+      )
+      .refine(
+        (arg) => arg.split(" ").length <= lookupStreetAddressQueryMaxWordLength,
+        "String must contain a maximum of 18 words",
       ),
   });
 

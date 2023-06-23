@@ -261,6 +261,16 @@ describe("HttpOpenCageDataAddressGateway", () => {
         new Error(errorMessage.minimumCharErrorMessage(2)),
       );
     });
+
+    it("Query too long with +18 words", async () => {
+      await expectPromiseToFailWithError(
+        httpAddressGateway.lookupStreetAddress(
+          "a A d S E a a a a a a a a a a a a a a",
+        ),
+        new Error("Request failed with status code 400"),
+      );
+    });
+
     it("Should not support lookup address with two chars including one special char.", async () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress("R,"),

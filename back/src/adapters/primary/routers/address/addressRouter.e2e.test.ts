@@ -71,6 +71,24 @@ describe("addressRouter", () => {
         });
       });
 
+      it(`GET 400 '${lookupStreetAddressUrl(
+        "a a a a a a a a a a a a a a a a a a a",
+      )}'`, async () => {
+        const response = await request.get(
+          `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=a a a a a a a a a a a a a a a a a a a`,
+        );
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+          errors: `Error: ${new ZodError([
+            {
+              code: "custom",
+              message: "String must contain a maximum of 18 words",
+              path: ["lookup"],
+            },
+          ]).toString()}`,
+        });
+      });
+
       it.each(["1,", "1, ", "⠀  , 125 ", " )),$,#                  "])(
         `GET 400 '${lookupStreetAddressUrl("%s")}'`,
         async () => {
