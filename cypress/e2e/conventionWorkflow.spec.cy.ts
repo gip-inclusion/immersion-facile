@@ -1,10 +1,5 @@
 import { faker } from "@faker-js/faker/locale/fr";
-import {
-  conventionsRoute,
-  domElementIds,
-  signConventionRoute,
-  updateConventionStatusRoute,
-} from "../../shared/src";
+import { conventionMagicLinkTargets, domElementIds } from "shared";
 import { disableUrlLogging } from "../cypress/utils/log";
 import { addBusinessDays, format } from "date-fns";
 
@@ -44,7 +39,10 @@ describe("Convention full workflow", () => {
   it("signs convention for first signatory and validator requires modification", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}auth/${updateConventionStatusRoute}/**`,
+      `${baseApiRoute}${conventionMagicLinkTargets.updateConventionStatus.url.replace(
+        ":conventionId",
+        "**",
+      )}`,
     ).as("updateConventionRequest");
     signatorySignConvention(conventionData.magicLinks[0]);
     cy.connectToAdmin();
@@ -84,9 +82,13 @@ describe("Convention full workflow", () => {
     });
   });
   it("signs convention for signatories", () => {
-    cy.intercept("POST", `${baseApiRoute}auth/${signConventionRoute}/**`).as(
-      "signConventionRequest",
-    );
+    cy.intercept(
+      "POST",
+      `${baseApiRoute}${conventionMagicLinkTargets.signConvention.url.replace(
+        ":conventionId",
+        "**",
+      )}`,
+    ).as("signConventionRequest");
     const maxEmails = 2;
     cy.connectToAdmin();
     for (let index = 0; index < maxEmails; index++) {
@@ -106,7 +108,10 @@ describe("Convention full workflow", () => {
     cy.wait(timeForEventCrawler);
     cy.intercept(
       "POST",
-      `${baseApiRoute}auth/${updateConventionStatusRoute}/**`,
+      `${baseApiRoute}${conventionMagicLinkTargets.updateConventionStatus.url.replace(
+        ":conventionId",
+        "**",
+      )}`,
     ).as("reviewConventionRequest");
     cy.connectToAdmin();
     cy.openEmailInAdmin({
@@ -126,10 +131,22 @@ describe("Convention full workflow", () => {
 });
 
 const signatorySignConvention = (magicLink) => {
-  cy.intercept("POST", `${baseApiRoute}auth/${signConventionRoute}/**`).as(
-    "signConventionRequest",
-  );
+  cy.intercept(
+    "POST",
+    `${baseApiRoute}${conventionMagicLinkTargets.signConvention.url.replace(
+      ":conventionId",
+      "**",
+    )}`,
+  ).as("signConventionRequest");
+  cy.intercept(
+    "GET",
+    `${baseApiRoute}${conventionMagicLinkTargets.getConvention.url.replace(
+      ":conventionId",
+      "**",
+    )}`,
+  ).as("getConventionByIdRequest");
   cy.visit(magicLink);
+  cy.wait("@getConventionByIdRequest");
   cy.get(".im-signature-actions__checkbox input").not(":checked").check();
   cy.get(`#${domElementIds.conventionToSign.submitButton}`).should(
     "not.be.disabled",
@@ -141,9 +158,13 @@ const signatorySignConvention = (magicLink) => {
 };
 
 const editConventionForm = (magicLinkUrl) => {
-  cy.intercept("POST", `${baseApiRoute}auth/${conventionsRoute}/**`).as(
-    "conventionEditRequest",
-  );
+  cy.intercept(
+    "POST",
+    `${baseApiRoute}${conventionMagicLinkTargets.updateConvention.url.replace(
+      ":conventionId",
+      "**",
+    )}`,
+  ).as("conventionEditRequest");
   cy.visit(magicLinkUrl);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,

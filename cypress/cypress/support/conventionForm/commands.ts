@@ -41,8 +41,8 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
   )
-    .select("86", defaultFieldOptions)
-    .should("have.value", "86");
+    .select("75", defaultFieldOptions)
+    .should("have.value", "75");
 
   cy.wait("@agenciesRequest");
 
