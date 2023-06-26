@@ -16,7 +16,7 @@ import { InMemoryAuthenticatedUserRepository } from "../../secondary/InMemoryAut
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
-import { InMemoryConventionToSyncRepository } from "../../secondary/InMemoryConventionToSyncRepository";
+import { InMemoryConventionsToSyncRepository } from "../../secondary/InMemoryConventionsToSyncRepository";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
@@ -32,7 +32,7 @@ import { PgAuthenticatedUserRepository } from "../../secondary/pg/PgAuthenticate
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
-import { PgConventionToSyncRepository } from "../../secondary/pg/PgConventionToSyncRepository";
+import { PgConventionsToSyncRepository } from "../../secondary/pg/PgConventionsToSyncRepository";
 import { PgDiscussionAggregateRepository } from "../../secondary/pg/PgDiscussionAggregateRepository";
 import { PgErrorRepository } from "../../secondary/pg/PgErrorRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
@@ -72,7 +72,7 @@ export const createInMemoryUow = () => {
     conventionRepository,
     conventionPoleEmploiAdvisorRepository:
       new InMemoryConventionPoleEmploiAdvisorRepository(),
-    conventionToSyncRepository: new InMemoryConventionToSyncRepository(),
+    conventionsToSyncRepository: new InMemoryConventionsToSyncRepository(),
     discussionAggregateRepository: new InMemoryDiscussionAggregateRepository(),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
@@ -104,7 +104,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     conventionQueries: new PgConventionQueries(client),
     conventionPoleEmploiAdvisorRepository:
       new PgConventionPoleEmploiAdvisorRepository(client),
-    conventionToSyncRepository: new PgConventionToSyncRepository(client),
+    conventionsToSyncRepository: new PgConventionsToSyncRepository(client),
     discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       client,

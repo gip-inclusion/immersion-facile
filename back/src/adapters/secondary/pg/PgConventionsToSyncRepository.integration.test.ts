@@ -1,14 +1,14 @@
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { ConventionToSync } from "../../../domain/convention/ports/ConventionToSyncRepository";
+import { ConventionToSync } from "../../../domain/convention/ports/ConventionsToSyncRepository";
 import {
-  conventionToSyncTableName,
-  PgConventionToSyncRepository,
-} from "./PgConventionToSyncRepository";
+  conventionsToSyncTableName,
+  PgConventionsToSyncRepository,
+} from "./PgConventionsToSyncRepository";
 
-describe("PgConventionRepository", () => {
-  const conventionToSyncs: ConventionToSync[] = [
+describe("PgConventionsRepository", () => {
+  const conventionsToSync: ConventionToSync[] = [
     {
       id: "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaa1",
       status: "TO_PROCESS",
@@ -34,7 +34,7 @@ describe("PgConventionRepository", () => {
 
   let pool: Pool;
   let client: PoolClient;
-  let conventionRepositoryToSyncRepository: PgConventionToSyncRepository;
+  let conventionsToSyncRepository: PgConventionsToSyncRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -48,24 +48,23 @@ describe("PgConventionRepository", () => {
 
   beforeEach(async () => {
     await client.query(`DELETE
-                        FROM ${conventionToSyncTableName}`);
-    conventionRepositoryToSyncRepository = new PgConventionToSyncRepository(
-      client,
-    );
+                        FROM ${conventionsToSyncTableName}`);
+    conventionsToSyncRepository = new PgConventionsToSyncRepository(client);
   });
 
-  it.each(conventionToSyncs)(
+  it.each(conventionsToSync)(
     `save and getById convention with status '$status'`,
     async (conventionToSync) => {
       expectToEqual(
-        await conventionRepositoryToSyncRepository.getById(conventionToSync.id),
+        await conventionsToSyncRepository.getById(conventionToSync.id),
         undefined,
       );
 
-      await conventionRepositoryToSyncRepository.save(conventionToSync);
+      await conventionsToSyncRepository.save(conventionToSync);
 
-      const syncedConvention =
-        await conventionRepositoryToSyncRepository.getById(conventionToSync.id);
+      const syncedConvention = await conventionsToSyncRepository.getById(
+        conventionToSync.id,
+      );
       expectToEqual(syncedConvention, conventionToSync);
     },
   );
@@ -73,30 +72,28 @@ describe("PgConventionRepository", () => {
   describe("getNotProcessedAndErrored", () => {
     beforeEach(() =>
       Promise.all(
-        conventionToSyncs.map((conventionToSync) =>
-          conventionRepositoryToSyncRepository.save(conventionToSync),
+        conventionsToSync.map((conventionToSync) =>
+          conventionsToSyncRepository.save(conventionToSync),
         ),
       ),
     );
 
     it("only TO_PROCESS and ERROR", async () => {
       const conventionsToSyncNotProcessedAndErrored =
-        await conventionRepositoryToSyncRepository.getNotProcessedAndErrored(
-          10000,
-        );
+        await conventionsToSyncRepository.getToProcessOrError(10000);
 
       expectToEqual(conventionsToSyncNotProcessedAndErrored, [
-        conventionToSyncs[0],
-        conventionToSyncs[2],
+        conventionsToSync[0],
+        conventionsToSync[2],
       ]);
     });
 
     it("with limit 1", async () => {
       const conventionsToSyncNotProcessedAndErrored =
-        await conventionRepositoryToSyncRepository.getNotProcessedAndErrored(1);
+        await conventionsToSyncRepository.getToProcessOrError(1);
 
       expectToEqual(conventionsToSyncNotProcessedAndErrored, [
-        conventionToSyncs[0],
+        conventionsToSync[0],
       ]);
     });
   });

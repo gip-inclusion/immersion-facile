@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
 
-const tableName = "convention_to_sync_with_pe";
+const tableName = "conventions_to_sync_with_pe";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(tableName, {

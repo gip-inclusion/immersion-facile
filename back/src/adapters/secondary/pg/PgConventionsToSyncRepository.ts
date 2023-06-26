@@ -1,22 +1,22 @@
 import { PoolClient } from "pg";
 import { ConventionId } from "shared";
 import {
+  ConventionsToSyncRepository,
   ConventionToSync,
-  ConventionToSyncRepository,
-} from "../../../domain/convention/ports/ConventionToSyncRepository";
+} from "../../../domain/convention/ports/ConventionsToSyncRepository";
 
-export const conventionToSyncTableName = "convention_to_sync_with_pe";
+export const conventionsToSyncTableName = "conventions_to_sync_with_pe";
 
-export class PgConventionToSyncRepository
-  implements ConventionToSyncRepository
+export class PgConventionsToSyncRepository
+  implements ConventionsToSyncRepository
 {
   constructor(private client: PoolClient) {}
 
-  async getNotProcessedAndErrored(limit: number): Promise<ConventionToSync[]> {
+  async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
     const queryResult = await this.client.query<PgConventionToSync>(
       `
           SELECT id, status, process_date, reason
-          FROM ${conventionToSyncTableName}
+          FROM ${conventionsToSyncTableName}
           WHERE status = 'TO_PROCESS'
              OR status = 'ERROR'
               LIMIT $1
@@ -31,10 +31,10 @@ export class PgConventionToSyncRepository
   async save(conventionToSync: ConventionToSync): Promise<void> {
     await this.client.query(
       `
-          INSERT INTO ${conventionToSyncTableName} (id,
-                                                    status,
-                                                    process_date,
-                                                    reason)
+          INSERT INTO ${conventionsToSyncTableName} (id,
+                                                     status,
+                                                     process_date,
+                                                     reason)
           VALUES ($1, $2, $3, $4)
       `,
       [
@@ -55,7 +55,7 @@ export class PgConventionToSyncRepository
     const queryResult = await this.client.query<PgConventionToSync>(
       `
           SELECT id, status, process_date, reason
-          FROM ${conventionToSyncTableName}
+          FROM ${conventionsToSyncTableName}
           WHERE id = $1
       `,
       [id],

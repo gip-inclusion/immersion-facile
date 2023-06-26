@@ -46,7 +46,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
 
     if (!enablePeConventionBroadcast)
       return this.options.resyncMode
-        ? uow.conventionToSyncRepository.save({
+        ? uow.conventionsToSyncRepository.save({
             id: convention.id,
             status: "SKIP",
             processDate: this.timeGateway.now(),
@@ -61,7 +61,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       );
     if (agency.kind !== "pole-emploi")
       return this.options.resyncMode
-        ? uow.conventionToSyncRepository.save({
+        ? uow.conventionsToSyncRepository.save({
             id: convention.id,
             status: "SKIP",
             processDate: this.timeGateway.now(),
@@ -116,7 +116,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     );
 
     if (this.options.resyncMode)
-      await uow.conventionToSyncRepository.save({
+      await uow.conventionsToSyncRepository.save({
         id: convention.id,
         status: "SUCCESS",
         processDate: this.timeGateway.now(),
