@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import { keys } from "ramda";
-import { AgencyDtoBuilder, FeatureFlags } from "shared";
+import { AgencyDtoBuilder, FeatureFlags, peParisAgencyId } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
@@ -36,7 +36,7 @@ const featureFlagsSeed = async (client: PoolClient) => {
     enableMaintenance: false,
     enableMaxContactPerWeek: true,
     enablePeConnectApi: true,
-    enablePeConventionBroadcast: true,
+    enablePeConventionBroadcast: false,
     enableTemporaryOperation: false,
   };
 
@@ -56,6 +56,7 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
   await client.query("DELETE FROM conventions");
   await client.query("DELETE FROM agencies");
   const peParisAgency = new AgencyDtoBuilder()
+    .withId(peParisAgencyId)
     .withName("Agence Pôle Emploi Paris")
     .withQuestionnaireUrl("https://questionnaire.seed")
     .withSignature("Seed signature")
