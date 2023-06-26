@@ -85,7 +85,10 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
         beneficiaryCurrentEmployerName:
           beneficiaryCurrentEmployer &&
           `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
-        magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
+        conventionSignShortlink: makeShortLinkUrl(
+          config,
+          conventionToSignLinkId,
+        ),
         conventionStatusLink: makeShortLinkUrl(config, conventionStatusLinkId),
         businessName,
         agencyLogoUrl: agency.logoUrl,

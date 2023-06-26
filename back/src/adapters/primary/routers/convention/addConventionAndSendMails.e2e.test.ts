@@ -220,12 +220,12 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   );
 
   const beneficiarySignLink = await shortLinkRedirectToLinkWithValidation(
-    beneficiaryShortLinkSignEmail.params.magicLink,
+    beneficiaryShortLinkSignEmail.params.conventionSignShortlink,
     request,
   );
 
   const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
-    establishmentShortLinkSignEmail.params.magicLink,
+    establishmentShortLinkSignEmail.params.conventionSignShortlink,
     request,
   );
 

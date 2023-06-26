@@ -1,11 +1,15 @@
 import { faker } from "@faker-js/faker/locale/fr";
-import { conventionMagicLinkTargets, domElementIds } from "shared";
+import {
+  agencyTargets,
+  conventionMagicLinkTargets,
+  domElementIds,
+  peParisAgencyId,
+} from "shared";
 import { disableUrlLogging } from "../cypress/utils/log";
 import { addBusinessDays, format } from "date-fns";
 
 const { baseApiRoute, defaultFieldOptions, timeForEventCrawler } =
   Cypress.env("config");
-const selectedAgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
 describe("Convention full workflow", () => {
   const conventionData = {
@@ -28,7 +32,7 @@ describe("Convention full workflow", () => {
         elementIndex: index,
       }).then(($emailWrapper) => {
         $emailWrapper
-          .find("span:contains('magicLink')")
+          .find("span:contains('conventionSignShortlink')")
           .each((index, $span) => {
             const magicLinkUrl = Cypress.$($span).next().find("a").attr("href");
             conventionData.magicLinks.push(magicLinkUrl);
@@ -89,20 +93,31 @@ describe("Convention full workflow", () => {
         "**",
       )}`,
     ).as("signConventionRequest");
-    const maxEmails = 2;
     cy.connectToAdmin();
-    for (let index = 0; index < maxEmails; index++) {
-      cy.visit("/admin/conventions"); // ensure we're on backoffice
-      cy.openEmailInAdmin({
-        emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-        elementIndex: index,
-      }).then(($emailWrapper) => {
-        $emailWrapper.find("span:contains('magicLink')").each((_, $span) => {
+    cy.visit("/admin/conventions"); // ensure we're on backoffice
+    cy.openEmailInAdmin({
+      emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      elementIndex: 0,
+    }).then(($emailWrapper) => {
+      $emailWrapper
+        .find("span:contains('conventionSignShortlink')")
+        .each((_, $span) => {
           const magicLinkUrl = Cypress.$($span).next().find("a").attr("href");
           signatorySignConvention(magicLinkUrl);
         });
-      });
-    }
+    });
+    cy.visit("/admin/conventions"); // ensure we're on backoffice
+    cy.openEmailInAdmin({
+      emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      elementIndex: 1,
+    }).then(($emailWrapper) => {
+      $emailWrapper
+        .find("span:contains('conventionSignShortlink')")
+        .each((_, $span) => {
+          const magicLinkUrl = Cypress.$($span).next().find("a").attr("href");
+          signatorySignConvention(magicLinkUrl);
+        });
+    });
   });
   it("reviews and validate convention", () => {
     cy.wait(timeForEventCrawler);
@@ -145,13 +160,22 @@ const signatorySignConvention = (magicLink) => {
       "**",
     )}`,
   ).as("getConventionByIdRequest");
+  cy.intercept(
+    "GET",
+    `${baseApiRoute}${agencyTargets.getAgencyPublicInfoById.url}?agencyId=${peParisAgencyId}`,
+  ).as("getAgencyPublicInfoByIdRequest");
   cy.visit(magicLink);
   cy.wait("@getConventionByIdRequest");
-  cy.get(".im-signature-actions__checkbox input").not(":checked").check();
+  cy.wait("@getAgencyPublicInfoByIdRequest");
+  cy.get(".im-signature-actions__checkbox input")
+    .not(":checked")
+    .check({ force: true });
   cy.get(`#${domElementIds.conventionToSign.submitButton}`).should(
     "not.be.disabled",
   );
-  cy.get(`#${domElementIds.conventionToSign.submitButton}`).click();
+  cy.get(`#${domElementIds.conventionToSign.submitButton}`).click({
+    force: true,
+  });
   cy.wait("@signConventionRequest")
     .its("response.statusCode")
     .should("eq", 200);
@@ -168,7 +192,7 @@ const editConventionForm = (magicLinkUrl) => {
   cy.visit(magicLinkUrl);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-  ).should("have.value", selectedAgencyId);
+  ).should("have.value", peParisAgencyId);
   cy.get(`#im-convention-form__step-2 .fr-accordion__btn`).click();
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,

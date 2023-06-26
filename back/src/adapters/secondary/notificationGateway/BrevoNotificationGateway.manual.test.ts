@@ -25,7 +25,7 @@ describe("BrevoNotificationGateway manual", () => {
       params: {
         conventionId: "CONVENTION_ID",
         internshipKind: "immersion",
-        magicLink: "www.google.com",
+        conventionSignShortlink: "www.google.com",
         conventionStatusLink: "www.google.com",
         businessName: "Super Corp",
         establishmentRepresentativeName: "Stéphane Le Rep",
