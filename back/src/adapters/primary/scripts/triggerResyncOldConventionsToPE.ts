@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Pool } from "pg";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
-import { ResyncOldConventionToPe } from "../../../domain/convention/useCases/ResyncOldConventionsToPe";
+import { ResyncOldConventionsToPe } from "../../../domain/convention/useCases/ResyncOldConventionsToPe";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { createLogger } from "../../../utils/logger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
@@ -41,7 +41,7 @@ const executeUsecase = async () => {
       }),
   );
 
-  const resyncOldConventionToPEUsecase = new ResyncOldConventionToPe(
+  const resyncOldConventionToPEUsecase = new ResyncOldConventionsToPe(
     uowPerformer,
     httpPoleEmploiGateway,
     timeGateway,

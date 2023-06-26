@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { z } from "zod";
 import { ConventionId } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
@@ -14,7 +15,7 @@ type ResyncOldConventionToPeReport = {
   errors: Record<ConventionId, Error>;
 };
 
-export class ResyncOldConventionToPe extends TransactionalUseCase<
+export class ResyncOldConventionsToPe extends TransactionalUseCase<
   void,
   ResyncOldConventionToPeReport
 > {
@@ -48,68 +49,48 @@ export class ResyncOldConventionToPe extends TransactionalUseCase<
 
   private async handleConventionToSync(
     uow: UnitOfWork,
-    conventionToSync: ConventionToSync,
+    payload: ConventionToSync,
   ) {
     try {
-      await this.resync(uow, conventionToSync);
+      await this.resync(uow, payload);
       const updatedConventionToSync =
-        await uow.conventionToSyncRepository.getById(conventionToSync.id);
-      if (updatedConventionToSync === undefined) {
-        this.report.errors[conventionToSync.id] = new Error(
-          "Convention not found or no status",
-        );
-        return;
-      }
-      if (updatedConventionToSync.status === "TO_PROCESS") {
-        this.report.errors[conventionToSync.id] = new Error(
-          "Convention still have status TO_PROCESS",
-        );
-      }
-      if (updatedConventionToSync.status === "SUCCESS")
-        this.report.success += 1;
-      if (updatedConventionToSync.status === "SKIP") {
-        this.report.skips[conventionToSync.id] = updatedConventionToSync.reason;
-      }
-      if (updatedConventionToSync.status === "ERROR") {
-        this.report.errors[conventionToSync.id] = new Error(
-          updatedConventionToSync.reason,
-        );
-      }
-      // const strategy: {
-      //   [K in ConventionToSync["status"]]: (
-      //     conventionCase: Extract<ConventionToSync, { status: K }>,
-      //   ) => void;
-      // } = {
-      //   SUCCESS: () => {
-      //     this.report.success += 1;
-      //   },
-      //   TO_PROCESS: () => {
-      //     this.report.errors[conventionToSync.id] = new Error(
-      //       "Convention still have status TO_PROCESS",
-      //     );
-      //   },
-      //   SKIP: (conventionCase) => {
-      //     this.report.skips[conventionToSync.id] = conventionCase.reason;
-      //   },
-      //   ERROR: (conventionCase) => {
-      //     this.report.errors[conventionToSync.id] = new Error(
-      //       conventionCase.reason,
-      //     );
-      //   },
-      // };
-      // strategy[updatedConventionToSync.status](updatedConventionToSync);
+        await uow.conventionToSyncRepository.getById(payload.id);
+
+      match(updatedConventionToSync)
+        .with(undefined, () => {
+          this.report.errors[payload.id] = new Error(
+            "Convention not found or no status",
+          );
+        })
+        .with({ status: "SUCCESS" }, () => {
+          this.report.success += 1;
+        })
+        .with({ status: "TO_PROCESS" }, (conventionToSync) => {
+          this.report.errors[conventionToSync.id] = new Error(
+            "Convention still have status TO_PROCESS",
+          );
+        })
+        .with({ status: "ERROR" }, (conventionToSync) => {
+          this.report.errors[conventionToSync.id] = new Error(
+            conventionToSync.reason,
+          );
+        })
+        .with({ status: "SKIP" }, (conventionToSync) => {
+          this.report.skips[conventionToSync.id] = conventionToSync.reason;
+        })
+        .exhaustive();
     } catch (error) {
       const anError =
         error instanceof Error
           ? error
           : new Error("Not an Error: " + JSON.stringify(error));
       await uow.conventionToSyncRepository.save({
-        id: conventionToSync.id,
+        id: payload.id,
         status: "ERROR",
         processDate: this.timeGateway.now(),
         reason: anError.message,
       });
-      this.report.errors[conventionToSync.id] = anError;
+      this.report.errors[payload.id] = anError;
     }
   }
 
@@ -128,7 +109,7 @@ export class ResyncOldConventionToPe extends TransactionalUseCase<
       this.uowPerform,
       this.poleEmploiGateway,
       this.timeGateway,
-      true,
+      { resyncMode: true },
     ).execute(convention);
   }
 

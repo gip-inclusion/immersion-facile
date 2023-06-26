@@ -414,7 +414,7 @@ export const createUseCases = (
           uowPerformer,
           gateways.poleEmploiGateway,
           gateways.timeGateway,
-          false,
+          { resyncMode: false },
         ),
       shareConventionByEmail: new ShareApplicationLinkByEmail(
         uowPerformer,
