@@ -2,11 +2,12 @@ import { addBusinessDays, format } from "date-fns";
 import {
   frontRoutes,
   agenciesRoute,
-  conventionsRoute,
   featureFlagsRoute,
   appellationRoute,
   addressTargets,
   domElementIds,
+  unauthenticatedConventionTargets,
+  peParisAgencyId,
 } from "shared";
 import { faker } from "@faker-js/faker/locale/fr";
 
@@ -28,9 +29,10 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   cy.intercept("GET", `${baseApiRoute}${appellationRoute}?**`).as(
     "autocompleteAppellationRequest",
   );
-  cy.intercept("POST", `${baseApiRoute}${conventionsRoute}`).as(
-    "conventionAddRequest",
-  );
+  cy.intercept(
+    "POST",
+    `${baseApiRoute}${unauthenticatedConventionTargets.createConvention.url}`,
+  ).as("conventionAddRequest");
 
   cy.visit(conventionFormUrl);
   cy.wait("@featureFlagsRequest");
@@ -46,7 +48,7 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
 
   cy.fillSelect({
     element: `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-    predicateValue: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    predicateValue: peParisAgencyId,
   });
 
   openNextSection(); // Open Beneficiary section

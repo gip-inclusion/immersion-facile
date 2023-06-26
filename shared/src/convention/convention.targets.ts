@@ -53,7 +53,7 @@ export type UnauthenticatedConventionTargets =
   typeof unauthenticatedConventionTargets;
 export const unauthenticatedConventionTargets = createTargets({
   createConvention: createTarget({
-    url: "/conventions",
+    url: "/demandes-immersion",
     method: "POST",
     validateRequestBody: conventionWithoutExternalIdSchema.parse,
     validateResponseBody: withConventionIdSchema.parse,

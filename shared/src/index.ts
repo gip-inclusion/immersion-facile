@@ -77,6 +77,7 @@ export * from "./searchImmersion/SearchImmersionQueryParams.dto";
 export * from "./searchImmersion/SearchImmersionQueryParams.schema";
 export * from "./searchImmersion/SearchImmersionResult.dto";
 export * from "./searchImmersion/SearchImmersionResult.schema";
+export * from "./seedSharedData";
 export * from "./ShareLinkByEmailDto";
 export * from "./siret/siret";
 export * from "./siret/siret.schema";
