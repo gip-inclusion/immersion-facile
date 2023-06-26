@@ -16,6 +16,7 @@
     "trigger-sending-emails-with-assessment-creation-link": "ts-node src/adapters/primary/scripts/triggerSendingEmailsWithAssessmentCreationLink.ts",
     "trigger-refresh-materialized-views": "ts-node src/adapters/primary/scripts/triggerRefreshMaterializedViews.ts",
     "trigger-convention-reminder": "ts-node src/adapters/primary/scripts/triggerConventionReminder.ts",
+    "trigger-resync-old-conventions-to-pe": "ts-node src/adapters/primary/scripts/triggerResyncOldConventionsToPE.ts",
     "seed": "NODE_ENV=local ts-node src/adapters/primary/scripts/seed.ts",
     "generate-api-key": "ts-node src/adapters/primary/scripts/generateApiKey.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",

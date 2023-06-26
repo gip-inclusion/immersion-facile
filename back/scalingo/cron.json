@@ -21,6 +21,10 @@
       "size": "M"
     },
     {
+      "command": "02 3 * * * pnpm back run trigger-resync-old-conventions-to-pe",
+      "size": "M"
+    },
+    {
       "command": "15 05 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     }
