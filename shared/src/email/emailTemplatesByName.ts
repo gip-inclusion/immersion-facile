@@ -756,7 +756,7 @@ export const emailTemplatesByName =
         establishmentRepresentativeName,
         establishmentTutorName,
         internshipKind,
-        magicLink,
+        conventionSignShortlink,
         signatoryName,
       }) => ({
         subject:
@@ -791,7 +791,7 @@ export const emailTemplatesByName =
         - Si les informations sont correctes, cochez la case "Je soussigné..." tout en bas du formulaire et cliquez sur le bouton "Confirmer et signer".
         - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander des modifications".`,
         buttons: [
-          { url: magicLink, label: "Ouvrir ma demande" },
+          { url: conventionSignShortlink, label: "Ouvrir ma demande" },
           createConventionStatusButton(conventionStatusLink),
         ],
         highlight: {

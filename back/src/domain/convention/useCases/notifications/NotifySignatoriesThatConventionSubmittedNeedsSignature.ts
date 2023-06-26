@@ -122,7 +122,9 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
         beneficiaryCurrentEmployerName:
           beneficiaryCurrentEmployer &&
           `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
-        magicLink: await makeMagicShortLink(frontRoutes.conventionToSign),
+        conventionSignShortlink: await makeMagicShortLink(
+          frontRoutes.conventionToSign,
+        ),
         conventionStatusLink: await makeMagicShortLink(
           frontRoutes.conventionStatusDashboard,
         ),

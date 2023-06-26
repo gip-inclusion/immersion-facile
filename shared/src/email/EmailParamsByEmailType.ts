@@ -198,7 +198,7 @@ export type EmailParamsByEmailType = {
     establishmentRepresentativeName: string;
     establishmentTutorName: string;
     internshipKind: InternshipKind;
-    magicLink: string;
+    conventionSignShortlink: string;
     signatoryName: string;
   };
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {

@@ -377,7 +377,7 @@ export const defaultEmailValueByEmailKind: {
     establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     internshipKind: "immersion",
-    magicLink: "MAGIC_LINK",
+    conventionSignShortlink: "CONVENTION_SIGN_MAGIC_LINK",
     signatoryName: "SIGNATORY_NAME",
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {

@@ -164,6 +164,7 @@ const Email = ({ email }: { email: EmailNotification }) => (
               "editFrontUrl",
               "immersionAssessmentCreationLink",
               "magicLink",
+              "conventionSignShortlink",
             ];
 
             return (
