@@ -1,11 +1,11 @@
 import { ConventionId } from "shared";
 import {
+  ConventionsToSyncRepository,
   ConventionToSync,
-  ConventionToSyncRepository,
-} from "../../domain/convention/ports/ConventionToSyncRepository";
+} from "../../domain/convention/ports/ConventionsToSyncRepository";
 
-export class InMemoryConventionToSyncRepository
-  implements ConventionToSyncRepository
+export class InMemoryConventionsToSyncRepository
+  implements ConventionsToSyncRepository
 {
   public async getById(
     id: ConventionId,
@@ -13,9 +13,7 @@ export class InMemoryConventionToSyncRepository
     return this.conventionsToSync.find((convention) => convention.id === id);
   }
 
-  public async getNotProcessedAndErrored(
-    limit: number,
-  ): Promise<ConventionToSync[]> {
+  public async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
     return this.conventionsToSync
       .filter(({ status }) => status === "ERROR" || status === "TO_PROCESS")
       .slice(0, limit);

@@ -41,14 +41,14 @@ const executeUsecase = async () => {
       }),
   );
 
-  const resyncOldConventionToPEUsecase = new ResyncOldConventionsToPe(
+  const resyncOldConventionsToPeUsecase = new ResyncOldConventionsToPe(
     uowPerformer,
     httpPoleEmploiGateway,
     timeGateway,
     50,
   );
 
-  return resyncOldConventionToPEUsecase.execute();
+  return resyncOldConventionsToPeUsecase.execute();
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */

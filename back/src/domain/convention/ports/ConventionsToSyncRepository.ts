@@ -22,10 +22,10 @@ export type ConventionToSync = {
     }
 );
 
-export interface ConventionToSyncRepository {
+export interface ConventionsToSyncRepository {
   getById(id: ConventionId): Promise<ConventionToSync | undefined>;
 
-  getNotProcessedAndErrored(limit: number): Promise<ConventionToSync[]>;
+  getToProcessOrError(limit: number): Promise<ConventionToSync[]>;
 
   save(filledConvention: ConventionToSync): Promise<void>;
 }

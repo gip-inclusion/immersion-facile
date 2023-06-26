@@ -63,7 +63,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         [conventionToSync1.id]: conventionToSync1,
         [conventionToSync2.id]: conventionToSync2,
       });
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
           status: "TO_PROCESS",
@@ -81,7 +81,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         conventionToSync1,
         conventionToSync2,
       ]);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync1.id,
           status: "SUCCESS",
@@ -108,7 +108,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
       });
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
           status: "TO_PROCESS",
@@ -119,7 +119,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       const report = await useCase.execute();
 
       expectToEqual(uow.conventionRepository.conventions, [conventionToSync1]);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync1.id,
           status: "SUCCESS",
@@ -136,13 +136,13 @@ describe("ResyncOldConventionsToPe use case", () => {
       });
     });
     it("no convention to sync", async () => {
-      uow.conventionToSyncRepository.setForTesting([]);
+      uow.conventionsToSyncRepository.setForTesting([]);
       expectToEqual(peGateway.notifications, []);
 
       const report = await useCase.execute();
 
       expectToEqual(uow.conventionRepository.conventions, []);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, []);
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, []);
       expectToEqual(peGateway.notifications, []);
       expectToEqual(report, {
         success: 0,
@@ -159,7 +159,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       uow.conventionRepository.setConventions({
         [conventionToSync.id]: conventionToSync,
       });
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync.id,
           status: "TO_PROCESS",
@@ -170,7 +170,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       const report = await useCase.execute();
 
       expectToEqual(uow.conventionRepository.conventions, [conventionToSync]);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync.id,
           status: "SKIP",
@@ -196,7 +196,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
       });
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
           status: "TO_PROCESS",
@@ -207,7 +207,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       const report = await useCase.execute();
 
       expectToEqual(uow.conventionRepository.conventions, [conventionToSync1]);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync1.id,
           status: "SKIP",
@@ -233,7 +233,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         [conventionToSync3.id]: conventionToSync3,
         [conventionToSync4.id]: conventionToSync4,
       });
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
           status: "TO_PROCESS",
@@ -266,7 +266,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         conventionToSync3,
         conventionToSync4,
       ]);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync1.id,
           status: "SUCCESS",
@@ -305,7 +305,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         [conventionToSync1.id]: conventionToSync1,
         [conventionToSync2.id]: conventionToSync2,
       });
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
           status: "TO_PROCESS",
@@ -328,7 +328,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         conventionToSync1,
         conventionToSync2,
       ]);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync1.id,
           status: "SUCCESS",
@@ -353,7 +353,7 @@ describe("ResyncOldConventionsToPe use case", () => {
   describe("Wrong paths", () => {
     it("when no convention in conventionRepository should not sync convention", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
           status: "TO_PROCESS",
@@ -364,7 +364,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       const report = await useCase.execute();
 
       expectToEqual(uow.conventionRepository.conventions, []);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync1.id,
           status: "ERROR",
@@ -387,7 +387,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
       });
-      uow.conventionToSyncRepository.setForTesting([
+      uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
           status: "TO_PROCESS",
@@ -398,7 +398,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       const report = await useCase.execute();
 
       expectToEqual(uow.conventionRepository.conventions, [conventionToSync1]);
-      expectToEqual(uow.conventionToSyncRepository.conventionsToSync, [
+      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
         {
           id: conventionToSync1.id,
           status: "ERROR",
