@@ -17,9 +17,9 @@ import {
   conventionStatusToPoleEmploiStatus,
   PoleEmploiConvention,
 } from "../ports/PoleEmploiGateway";
-import { ResyncOldConventionToPe } from "./ResyncOldConventionsToPe";
+import { ResyncOldConventionsToPe } from "./ResyncOldConventionsToPe";
 
-describe("RenewConventionMagicLink use case", () => {
+describe("ResyncOldConventionsToPe use case", () => {
   const agencyPE = new AgencyDtoBuilder().withKind("pole-emploi").build();
   const conventionToSync1 = new ConventionDtoBuilder()
     .withId("6f59c7b7-c2c9-4a31-a3eb-377ea83ae08b")
@@ -39,7 +39,7 @@ describe("RenewConventionMagicLink use case", () => {
     .build();
 
   let uow: InMemoryUnitOfWork;
-  let useCase: ResyncOldConventionToPe;
+  let useCase: ResyncOldConventionsToPe;
   let timeGateway: CustomTimeGateway;
   let peGateway: InMemoryPoleEmploiGateway;
 
@@ -48,7 +48,7 @@ describe("RenewConventionMagicLink use case", () => {
 
     timeGateway = new CustomTimeGateway();
     peGateway = new InMemoryPoleEmploiGateway();
-    useCase = new ResyncOldConventionToPe(
+    useCase = new ResyncOldConventionsToPe(
       new InMemoryUowPerformer(uow),
       peGateway,
       timeGateway,
@@ -317,7 +317,7 @@ describe("RenewConventionMagicLink use case", () => {
       ]);
       expectToEqual(peGateway.notifications, []);
 
-      const report = await new ResyncOldConventionToPe(
+      const report = await new ResyncOldConventionsToPe(
         new InMemoryUowPerformer(uow),
         peGateway,
         timeGateway,

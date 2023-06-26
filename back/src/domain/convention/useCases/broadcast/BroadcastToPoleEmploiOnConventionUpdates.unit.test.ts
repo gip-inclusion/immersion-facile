@@ -28,7 +28,7 @@ const prepareUseCase = async ({
     new InMemoryUowPerformer(uow),
     poleEmploiGateWay,
     timeGateway,
-    false,
+    { resyncMode: false },
   );
 
   const agencyRepository = uow.agencyRepository;

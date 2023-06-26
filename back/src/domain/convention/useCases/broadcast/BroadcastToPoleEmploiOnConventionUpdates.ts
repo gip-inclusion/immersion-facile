@@ -26,16 +26,16 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ConventionDto,
   void
 > {
+  protected inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private poleEmploiGateway: PoleEmploiGateway,
     private timeGateway: TimeGateway,
-    private resyncMode: boolean,
+    private options: { resyncMode: boolean },
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = conventionSchema;
 
   protected async _execute(
     convention: ConventionDto,
@@ -45,7 +45,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       await uow.featureFlagRepository.getAll();
 
     if (!enablePeConventionBroadcast)
-      return this.resyncMode
+      return this.options.resyncMode
         ? uow.conventionToSyncRepository.save({
             id: convention.id,
             status: "SKIP",
@@ -60,7 +60,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
         `Agency with id ${convention.agencyId} missing in agencyRepository`,
       );
     if (agency.kind !== "pole-emploi")
-      return this.resyncMode
+      return this.options.resyncMode
         ? uow.conventionToSyncRepository.save({
             id: convention.id,
             status: "SKIP",
@@ -115,7 +115,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       poleEmploiConvention,
     );
 
-    if (this.resyncMode)
+    if (this.options.resyncMode)
       await uow.conventionToSyncRepository.save({
         id: convention.id,
         status: "SUCCESS",
