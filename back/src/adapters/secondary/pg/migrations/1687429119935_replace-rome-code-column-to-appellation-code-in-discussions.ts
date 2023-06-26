@@ -8,6 +8,7 @@ const viewContactRequestName = "view_contact_requests";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.dropMaterializedView(viewContactRequestName);
+  pgm.dropConstraint("discussions", "fk_siret");
   pgm.addColumn(discussionTable, {
     [appellationCodeColumn]: {
       type: "integer",
@@ -15,10 +16,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     },
   });
 
-  pgm.dropConstraint("discussions", "fk_siret");
-
   const subquery = `
-    SELECT DISTINCT ON (discussions.rome_code) io.rome_appellation as appellation_code, discussions.rome_code as rome_code
+    SELECT DISTINCT ON (discussions.rome_code, e.siret) io.rome_appellation as appellation_code, discussions.rome_code as rome_code, e.siret
     FROM discussions
     LEFT JOIN establishments e ON e.siret = discussions.siret
     LEFT JOIN immersion_offers io ON e.siret = io.siret
@@ -30,8 +29,21 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       UPDATE discussions
       SET appellation_code = subquery.appellation_code
       FROM subquery
-      WHERE discussions.rome_code = subquery.rome_code;
+      WHERE discussions.rome_code = subquery.rome_code AND discussions.siret = subquery.siret;
     `);
+
+  pgm.sql(`
+    WITH d AS (SELECT id, rome_code FROM "discussions" WHERE appellation_code IS NULL)
+    UPDATE discussions 
+    SET appellation_code = (
+      SELECT ogr_appellation
+      FROM public_appellations_data
+      WHERE public_appellations_data.code_rome = d.rome_code
+      LIMIT 1
+    )
+    FROM d
+    WHERE discussions.id = d.id;
+  `);
 
   pgm.alterColumn(discussionTable, appellationCodeColumn, {
     notNull: true,
