@@ -557,7 +557,8 @@ export const emailTemplatesByName =
           : "de mini stage"
       } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agencyName}.
       
-      Les raisons sont : ${rejectionReason}       
+      <strong>Les raisons sont&nbsp;:</strong>
+      ${rejectionReason}       
       
       Vous pouvez vous rapprocher de votre conseiller${
         internshipKind === "immersion"
@@ -593,8 +594,10 @@ export const emailTemplatesByName =
         greetings: greetingsWithConventionId(conventionId),
         content: `Vous avez fait une demande de modification concernant la demande ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} pour la raison suivante :
-      ${justification}`,
+        } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}.
+         
+         <strong>Les raisons sont&nbsp;:</strong>
+        ${justification}`,
         buttons: [
           {
             url: magicLink,
@@ -843,8 +846,12 @@ export const emailTemplatesByName =
         content: `La demande de convention pour ${
           internshipKind === "immersion" ? "l'immersion" : "le mini stage"
         }
-        de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de ${businessName} vient d'être modifiée 
-        pour la raison suivante : "${reason}". Votre signature sur la première demande de convention a donc été annulée.
+        de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de ${businessName} vient d'être modifiée.
+        
+        <strong>Les raisons sont&nbsp;:</strong>
+        ${reason}
+        
+        Votre signature sur la première demande de convention a donc été annulée.
         
         Action attendue : cliquez sur le bouton ci-dessous, puis vérifiez dans l’écran qui s’ouvre si ce qui a été modifié vous convient :
         - Si c'est la cas, confirmez votre accord en signant de nouveau cette demande (bouton “Valider la demande”).
