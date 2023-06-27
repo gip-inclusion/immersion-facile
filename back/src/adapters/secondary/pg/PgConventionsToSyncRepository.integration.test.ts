@@ -69,6 +69,23 @@ describe("PgConventionsRepository", () => {
     },
   );
 
+  it(`save updated conventionToSync`, async () => {
+    const initialConventionToSync: ConventionToSync = conventionsToSync[0];
+    await conventionsToSyncRepository.save(initialConventionToSync);
+
+    const updatedConventionToSync: ConventionToSync = {
+      ...conventionsToSync[0],
+      status: "SUCCESS",
+      processDate: new Date(),
+    };
+    await conventionsToSyncRepository.save(updatedConventionToSync);
+
+    expectToEqual(
+      await conventionsToSyncRepository.getById(initialConventionToSync.id),
+      updatedConventionToSync,
+    );
+  });
+
   describe("getNotProcessedAndErrored", () => {
     beforeEach(() =>
       Promise.all(
