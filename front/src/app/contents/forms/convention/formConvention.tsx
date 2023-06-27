@@ -60,7 +60,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     label:
       internshipKind === "immersion"
         ? "Votre structure d'accompagnement"
-        : "Choisissez le Point Orientation de la chambre de commerce et d’industrie près de chez vous !",
+        : "Choisissez le Point Orientation de la chambre de commerce et d’industrie proche de votre entreprise !",
     id: conventionSectionIds.agencyId,
     required: true,
     placeholder:
