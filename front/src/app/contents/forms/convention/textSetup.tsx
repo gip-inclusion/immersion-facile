@@ -70,19 +70,20 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
         </>
       ) : (
         <>
-          <strong>
-            Attention, le formulaire de demande de convention est déployé
-            uniquement en Bretagne, Pays de Loire, Occitanie et Nouvelle
-            Aquitaine
-          </strong>
-          <br />
+          <p>
+            <strong>
+              Attention, le formulaire de demande de convention est déployé
+              uniquement en Bretagne, Pays de Loire, Occitanie et Nouvelle
+              Aquitaine
+            </strong>
+          </p>
           <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
             La convention doit être établie, signée par toutes les parties et
             visée par la Chambre de Commerce et d’Industrie <u>avant</u> le
             démarrage de la période d’observation en milieu professionnel. Sans
             visa, la convention ne pourra être exécutée.
-            <br />
-            <br />
+          </p>
+          <p className={fr.cx("fr-text--xs", "fr-mt-2w")}>
             Cette convention est établie en application des dispositions des
             articles L124-3-1, L332-3-1 et L332-3-2 du code de l’éducation et de
             l’article L.4153-1 du code du travail, offrant la possibilité:
@@ -94,6 +95,22 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
             périodes d’observation en entreprise d’une durée maximale de 5
             jours, en dehors des semaines réservées aux cours et au contrôle de
             connaissances.
+          </p>
+          <p className={fr.cx("fr-text--xs", "fr-mt-2w")}>
+            <em>
+              Ce dispositif n’est pas ouvert aux alternants (apprentissage ou
+              professionnalisation), ni aux jeunes inscrits dans des
+              établissements à l’étranger hors écoles et établissements français
+              homologués par&nbsp;
+              <a
+                href="https://www.legifrance.gouv.fr/loda/id/JORFTEXT000041939072"
+                target="_blank"
+                rel="noreferrer"
+              >
+                l’arrêté du 20 mai 2020
+              </a>
+              .
+            </em>
           </p>
         </>
       ),
