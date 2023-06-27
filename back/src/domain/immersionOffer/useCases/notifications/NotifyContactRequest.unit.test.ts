@@ -318,7 +318,7 @@ describe("NotifyContactRequest", () => {
       await expectPromiseToFailWithError(
         notifyContactRequest.execute(payload),
         new BadRequestError(
-          `Establishment don't have immersion offers with appelation code '${payload.appellationCode}'.`,
+          `Establishment with siret '${payload.siret}' doesn't have an immersion offer with appellation code '${payload.appellationCode}'.`,
         ),
       );
     });

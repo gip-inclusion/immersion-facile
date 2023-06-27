@@ -60,7 +60,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
 
     if (!appellationLabel)
       throw new BadRequestError(
-        `Establishment don't have immersion offers with appelation code '${payload.appellationCode}'.`,
+        `Establishment with siret '${payload.siret}' doesn't have an immersion offer with appellation code '${payload.appellationCode}'.`,
       );
 
     switch (payload.contactMode) {
