@@ -55,22 +55,21 @@ type PgConventionToSync = {
   reason: string | null;
 };
 
-function pgResultToConventionToSync(
+const pgResultToConventionToSync = (
   pgConventionToSync: PgConventionToSync,
-): ConventionToSync {
-  return {
+): ConventionToSync =>
+  ({
     id: pgConventionToSync.id,
     status: pgConventionToSync.status,
     processDate: pgConventionToSync.process_date ?? undefined,
     reason: pgConventionToSync.reason ?? undefined,
-  } as ConventionToSync;
-}
+  } as ConventionToSync);
 
-async function isConventionToSyncAlreadyExists(
+const isConventionToSyncAlreadyExists = async (
   client: PoolClient,
   conventionId: ConventionId,
-): Promise<boolean> {
-  return (
+): Promise<boolean> =>
+  (
     await client.query(
       `SELECT EXISTS(SELECT 1
                      FROM ${conventionsToSyncTableName}
@@ -78,12 +77,11 @@ async function isConventionToSyncAlreadyExists(
       [conventionId],
     )
   ).rows.at(0).exists;
-}
 
-async function updateConventionToSync(
+const updateConventionToSync = async (
   client: PoolClient,
   conventionToSync: ConventionToSync,
-): Promise<void> {
+): Promise<void> => {
   await client.query(
     `
         UPDATE ${conventionsToSyncTableName}
@@ -103,12 +101,12 @@ async function updateConventionToSync(
         : null,
     ],
   );
-}
+};
 
-async function insertConventionToSync(
+const insertConventionToSync = async (
   client: PoolClient,
   conventionToSync: ConventionToSync,
-): Promise<void> {
+): Promise<void> => {
   await client.query(
     `
         INSERT INTO ${conventionsToSyncTableName} (id,
@@ -128,20 +126,19 @@ async function insertConventionToSync(
         : null,
     ],
   );
-}
+};
 
-async function selectConventionToSyncById(
+const selectConventionToSyncById = async (
   client: PoolClient,
   conventionId: ConventionId,
-): Promise<PgConventionToSync | undefined> {
-  return (
+): Promise<PgConventionToSync | undefined> =>
+  (
     await client.query<PgConventionToSync>(
       `
-        SELECT id, status, process_date, reason
-        FROM ${conventionsToSyncTableName}
-        WHERE id = $1
-    `,
+          SELECT id, status, process_date, reason
+          FROM ${conventionsToSyncTableName}
+          WHERE id = $1
+      `,
       [conventionId],
     )
   ).rows.at(0);
-}
