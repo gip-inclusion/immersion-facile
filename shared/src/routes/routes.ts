@@ -42,3 +42,4 @@ export const romeRoute = "rome";
 export const searchImmersionRoute__v0 = "search-immersion"; // Becomes GET /immersion-offers?rome=A100&position.lon=2.2315&position.lat=48.8531
 export const uploadFileRoute = "upload-file";
 export const shortLinkRoute = "to";
+export const inboundEmailParsingRoute = "inbound-email-parsing";
