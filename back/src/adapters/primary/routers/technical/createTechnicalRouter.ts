@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import {
   featureFlagsRoute,
+  inboundEmailParsingRoute,
   renewMagicLinkRoute,
   shortLinkRoute,
   uploadFileRoute,
@@ -51,6 +52,14 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
         deps.useCases.getLink.execute(req.params.shortLinkId),
       ),
     );
+
+  technicalRouter.route(`/${inboundEmailParsingRoute}`).get(async (req, res) =>
+    sendHttpResponse(req, res, () => {
+      // eslint-disable-next-line no-console
+      console.log("REACHED INBOUND EMAIL PARSING : ", req.body);
+      return Promise.resolve(res.status(200).json({ success: true }));
+    }),
+  );
 
   return technicalRouter;
 };
