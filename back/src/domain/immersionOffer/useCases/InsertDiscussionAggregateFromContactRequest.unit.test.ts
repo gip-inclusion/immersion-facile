@@ -78,19 +78,21 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       new DiscussionAggregateBuilder()
         .withId(discussionId)
         .withAppellationCode(contactRequestDto.appellationCode)
-        .withPotentialBeneficiaryFirstName(
-          contactRequestDto.potentialBeneficiaryFirstName,
-        )
-        .withPotentialBeneficiaryLastName(
-          contactRequestDto.potentialBeneficiaryLastName,
-        )
-        .withPotentialBeneficiaryPhone(
-          contactRequestDto.potentialBeneficiaryPhone,
-        )
-        .withPotentialBeneficiaryEmail(
-          contactRequestDto.potentialBeneficiaryEmail,
-        )
-        .withContactMode(contactRequestDto.contactMode)
+        .withPotentialBeneficiary({
+          firstName: contactRequestDto.potentialBeneficiaryFirstName,
+          lastName: contactRequestDto.potentialBeneficiaryLastName,
+          email: contactRequestDto.potentialBeneficiaryEmail,
+          phone: contactRequestDto.potentialBeneficiaryPhone,
+        })
+        .withEstablishmentContact({
+          contactMode: "EMAIL",
+          email: establishmentContact.email,
+          firstName: establishmentContact.firstName,
+          lastName: establishmentContact.lastName,
+          phone: establishmentContact.phone,
+          job: establishmentContact.job,
+          copyEmails: establishmentContact.copyEmails,
+        })
         .withImmersionObjective(contactRequestDto.immersionObjective)
         .withExchanges([
           {
@@ -102,17 +104,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         ])
         .withCreatedAt(connectionDate)
         .withSiret(contactRequestDto.siret)
-        .withEstablishementContact(
-          {
-            contactMode: "EMAIL",
-            email: establishmentContact.email,
-            firstName: establishmentContact.firstName,
-            lastName: establishmentContact.lastName,
-            phone: establishmentContact.phone,
-            job: establishmentContact.job,
-            copyEmails: establishmentContact.copyEmails,
-          }
-        )
         .withAddress(establishmentAddress)
         .build(),
     );
@@ -128,25 +119,20 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     const discussionToOldDate = new Date("2022-01-02T12:00:00.000");
     discussionAggregateRepository.discussionAggregates = [
       new DiscussionAggregateBuilder()
+        .withCreatedAt(discussionToOldDate)
         .withId("discussionToOld")
         .withAppellationCode("12898")
         .withSiret(siret)
-        .withPotentialBeneficiaryFirstName(
-          contactRequestDto.potentialBeneficiaryFirstName,
-        )
-        .withPotentialBeneficiaryLastName(
-          contactRequestDto.potentialBeneficiaryLastName,
-        )
-        .withPotentialBeneficiaryEmail(
-          contactRequestDto.potentialBeneficiaryEmail,
-        )
-        .withPotentialBeneficiaryPhone(
-          contactRequestDto.potentialBeneficiaryPhone,
-        )
         .withImmersionObjective(contactRequestDto.immersionObjective)
-        .withContactMode(contactRequestDto.contactMode)
-        .withEstablishment({
-          contactMode: "EMAIL",
+        .withAddress(establishmentAddress)
+        .withPotentialBeneficiary({
+          firstName: contactRequestDto.potentialBeneficiaryFirstName,
+          lastName: contactRequestDto.potentialBeneficiaryLastName,
+          email: contactRequestDto.potentialBeneficiaryEmail,
+          phone: contactRequestDto.potentialBeneficiaryPhone,
+        })
+        .withEstablishmentContact({
+          contactMode: establishmentContact.contactMethod,
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
           lastName: establishmentContact.lastName,
@@ -154,7 +140,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           job: establishmentContact.job,
           copyEmails: establishmentContact.copyEmails,
         })
-        .withAddress(establishmentAddress)
         .withExchanges([
           {
             message: "Bonjour, c'est une vieille discussion",
@@ -163,29 +148,21 @@ describe("Insert discussion aggregate from contact request DTO", () => {
             sentAt: discussionToOldDate,
           },
         ])
-        .withCreatedAt(discussionToOldDate)
         .build(),
       new DiscussionAggregateBuilder()
+        .withCreatedAt(discussion1Date)
         .withId("discussion1")
         .withAppellationCode("12898")
         .withSiret(siret)
-        .withPotentialBeneficiaryFirstName(
-          contactRequestDto.potentialBeneficiaryFirstName,
-        )
-        .withPotentialBeneficiaryLastName(
-          contactRequestDto.potentialBeneficiaryLastName,
-        )
-        .withPotentialBeneficiaryEmail(
-          contactRequestDto.potentialBeneficiaryEmail,
-        )
-        .withPotentialBeneficiaryPhone(
-          contactRequestDto.potentialBeneficiaryPhone,
-        )
         .withImmersionObjective(contactRequestDto.immersionObjective)
-        .withContactMode(contactRequestDto.contactMode)
-        .withAddress(establishmentAddress)
-        .withEstablishment({
-          contactMode: "EMAIL",
+        .withPotentialBeneficiary({
+          firstName: contactRequestDto.potentialBeneficiaryFirstName,
+          lastName: contactRequestDto.potentialBeneficiaryLastName,
+          email: contactRequestDto.potentialBeneficiaryEmail,
+          phone: contactRequestDto.potentialBeneficiaryPhone,
+        })
+        .withEstablishmentContact({
+          contactMode: establishmentContact.contactMethod,
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
           lastName: establishmentContact.lastName,
@@ -193,6 +170,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
           job: establishmentContact.job,
           copyEmails: establishmentContact.copyEmails,
         })
+        .withAddress(establishmentAddress)
         .withExchanges([
           {
             message:
@@ -202,7 +180,6 @@ describe("Insert discussion aggregate from contact request DTO", () => {
             sentAt: discussion1Date,
           },
         ])
-        .withCreatedAt(discussion1Date)
         .build(),
     ];
 
