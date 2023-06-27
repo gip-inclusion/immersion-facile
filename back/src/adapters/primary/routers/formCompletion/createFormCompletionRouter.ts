@@ -5,6 +5,7 @@ import {
   romeRoute,
   siretTargets,
 } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { validateAndParseZodSchema } from "../../helpers/httpErrors";
@@ -34,21 +35,22 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
     }),
   );
 
-  formCompletionRouter
-    .route(siretTargets.getSiretInfo.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getSiret.execute(req.params),
-      ),
-    );
+  const formCompletionRouterSR = createExpressSharedRouter(
+    siretTargets,
+    formCompletionRouter,
+  );
 
-  formCompletionRouter
-    .route(siretTargets.getSiretInfoIfNotAlreadySaved.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.getSiretIfNotAlreadySaved.execute(req.params),
-      ),
-    );
+  formCompletionRouterSR.getSiretInfo((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getSiret.execute(req.params),
+    ),
+  );
+
+  formCompletionRouterSR.getSiretInfoIfNotAlreadySaved(async (req, res) =>
+    sendHttpResponse(req, res, async () =>
+      deps.useCases.getSiretIfNotAlreadySaved.execute(req.params),
+    ),
+  );
 
   return formCompletionRouter;
 };

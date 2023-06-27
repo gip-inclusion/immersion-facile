@@ -1,24 +1,24 @@
-import { createTarget, createTargets } from "http-client";
+import { defineRoute, defineRoutes } from "shared-routes";
 import {
   getSiretInfoSchema,
   isSiretExistResponseSchema,
 } from "../siret/siret.schema";
 
 export type SiretTargets = typeof siretTargets;
-export const siretTargets = createTargets({
-  isSiretAlreadySaved: createTarget({
-    method: "GET",
+export const siretTargets = defineRoutes({
+  isSiretAlreadySaved: defineRoute({
+    method: "get",
     url: "/form-already-exists/:siret",
-    validateResponseBody: isSiretExistResponseSchema.parse,
+    responseBodySchema: isSiretExistResponseSchema,
   }),
-  getSiretInfo: createTarget({
-    method: "GET",
+  getSiretInfo: defineRoute({
+    method: "get",
     url: `/siret/:siret`,
-    validateResponseBody: getSiretInfoSchema.parse,
+    responseBodySchema: getSiretInfoSchema,
   }),
-  getSiretInfoIfNotAlreadySaved: createTarget({
-    method: "GET",
+  getSiretInfoIfNotAlreadySaved: defineRoute({
+    method: "get",
     url: `/siret-if-not-saved/:siret`,
-    validateResponseBody: getSiretInfoSchema.parse,
+    responseBodySchema: getSiretInfoSchema,
   }),
 });

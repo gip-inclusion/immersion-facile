@@ -9,7 +9,7 @@ import {
   SiretTargets,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
@@ -19,7 +19,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .isSiretAlreadySaved({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody),
+        .then(({ body }) => body),
     );
   }
 
@@ -29,7 +29,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .getSiretInfo({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody)
+        .then(({ body }) => body)
         .catch(handleSiretApiError),
     );
   }
@@ -40,7 +40,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .getSiretInfoIfNotAlreadySaved({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody)
+        .then(({ body }) => body)
         .catch(handleSiretApiError),
     );
   }

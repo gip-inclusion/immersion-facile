@@ -11,6 +11,7 @@ import {
   unauthenticatedConventionTargets,
   validateEmailsTargets,
 } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
@@ -54,7 +55,7 @@ export const createHttpDependencies = (): Dependencies => {
     ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(
-      createHttpClient(siretTargets),
+      createAxiosSharedClient(siretTargets, axiosOnSlashApi),
     ),
     technicalGateway: new HttpTechnicalGateway(axiosOnSlashApi),
     emailValidationGateway: new HttpEmailValidationGateway(

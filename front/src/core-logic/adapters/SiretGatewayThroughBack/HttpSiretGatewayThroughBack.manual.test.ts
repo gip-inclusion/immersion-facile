@@ -8,7 +8,7 @@ import {
   siretTargets,
   tooManySirenRequestsSiret,
 } from "shared";
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
 import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
@@ -45,12 +45,8 @@ const axiosInstance = createManagedAxiosInstance({
   baseURL: "http://localhost:1234",
 });
 
-const createHttpClient = configureHttpClient(
-  createAxiosHandlerCreator(axiosInstance),
-);
-
 const siretGateway = new HttpSiretGatewayThroughBack(
-  createHttpClient(siretTargets),
+  createAxiosSharedClient(siretTargets, axiosInstance),
 );
 
 const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [
