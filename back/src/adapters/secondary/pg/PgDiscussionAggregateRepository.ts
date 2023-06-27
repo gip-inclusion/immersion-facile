@@ -132,6 +132,7 @@ export class PgDiscussionAggregateRepository
     return {
       ...discussion,
       createdAt: new Date(discussion.createdAt),
+      immersionObjective: discussion.immersionObjective ?? null,
       exchanges: discussion.exchanges.map((exchange) => ({
         ...exchange,
         sentAt: new Date(exchange.sentAt),
