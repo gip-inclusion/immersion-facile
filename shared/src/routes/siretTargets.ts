@@ -9,16 +9,16 @@ export const siretTargets = defineRoutes({
   isSiretAlreadySaved: defineRoute({
     method: "get",
     url: "/form-already-exists/:siret",
-    responseBodySchema: isSiretExistResponseSchema,
+    responses: { 200: isSiretExistResponseSchema },
   }),
   getSiretInfo: defineRoute({
     method: "get",
     url: `/siret/:siret`,
-    responseBodySchema: getSiretInfoSchema,
+    responses: { 200: getSiretInfoSchema },
   }),
   getSiretInfoIfNotAlreadySaved: defineRoute({
     method: "get",
     url: `/siret-if-not-saved/:siret`,
-    responseBodySchema: getSiretInfoSchema,
+    responses: { 200: getSiretInfoSchema },
   }),
 });
