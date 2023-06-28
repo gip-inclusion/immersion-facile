@@ -1,8 +1,10 @@
 import { PoolClient } from "pg";
+import format from "pg-format";
 import { SiretDto } from "shared";
 import {
   DiscussionAggregate,
   DiscussionId,
+  ExchangeEntity,
 } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
 
@@ -60,23 +62,61 @@ export class PgDiscussionAggregateRepository
         discussion.address.city,
       ],
     );
-    await Promise.all(
-      discussion.exchanges.map((exchange) =>
-        this.client.query(
-          `
-      INSERT INTO exchanges (
-        discussion_id, message, sender, recipient, sent_at
-      ) VALUES ($1, $2, $3, $4, $5)`,
-          [
-            discussion.id,
-            exchange.message,
-            exchange.sender,
-            exchange.recipient,
-            exchange.sentAt.toISOString(),
-          ],
-        ),
-      ),
+
+    await this.insertAllExchanges(discussion.id, discussion.exchanges);
+  }
+
+  async update(discussion: DiscussionAggregate) {
+    await this.client.query(
+      `UPDATE discussions SET
+         contact_mode = $1,
+         siret = $2,
+         appellation_code = $3,
+         potential_beneficiary_first_name = $4,
+         potential_beneficiary_last_name = $5,
+         potential_beneficiary_email = $6,
+         potential_beneficiary_phone = $7,
+         immersion_objective = $8,
+         potential_beneficiary_resume_link = $9,
+         created_at = $10,
+         establishment_contact_email = $11,
+         establishment_contact_first_name = $12,
+         establishment_contact_last_name = $13,
+         establishment_contact_phone = $14,
+         establishment_contact_job = $15,
+         establishment_contact_copy_emails = $16,
+         street_number_and_address = $17,
+         postcode = $18,
+         department_code = $19,
+         city = $20
+       WHERE id = $21`,
+      [
+        discussion.establishmentContact.contactMode,
+        discussion.siret,
+        discussion.appellationCode,
+        discussion.potentialBeneficiary.firstName,
+        discussion.potentialBeneficiary.lastName,
+        discussion.potentialBeneficiary.email,
+        discussion.potentialBeneficiary.phone,
+        discussion.immersionObjective,
+        discussion.potentialBeneficiary.resumeLink,
+        discussion.createdAt.toISOString(),
+        discussion.establishmentContact.email,
+        discussion.establishmentContact.firstName,
+        discussion.establishmentContact.lastName,
+        discussion.establishmentContact.phone,
+        discussion.establishmentContact.job,
+        JSON.stringify(discussion.establishmentContact.copyEmails),
+        discussion.address.streetNumberAndAddress,
+        discussion.address.postcode,
+        discussion.address.departmentCode,
+        discussion.address.city,
+        discussion.id,
+      ],
     );
+
+    await this.clearAllExistingExchanges(discussion);
+    await this.insertAllExchanges(discussion.id, discussion.exchanges);
   }
 
   async getById(
@@ -152,5 +192,32 @@ export class PgDiscussionAggregateRepository
     );
 
     return parseInt(pgResult.rows[0].count);
+  }
+
+  private async insertAllExchanges(
+    discussionId: DiscussionId,
+    exchanges: ExchangeEntity[],
+  ) {
+    const sql = format(
+      `
+    INSERT INTO exchanges (discussion_id, message, sender, recipient, sent_at)
+    VALUES %L
+    `,
+      exchanges.map((exchange) => [
+        discussionId,
+        exchange.message,
+        exchange.sender,
+        exchange.recipient,
+        exchange.sentAt.toISOString(),
+      ]),
+    );
+
+    await this.client.query(sql);
+  }
+
+  private async clearAllExistingExchanges(discussion: DiscussionAggregate) {
+    await this.client.query("DELETE FROM exchanges WHERE discussion_id = $1", [
+      discussion.id,
+    ]);
   }
 }

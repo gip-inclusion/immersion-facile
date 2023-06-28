@@ -1,12 +1,12 @@
 import { Pool, PoolClient } from "pg";
-import { AppellationAndRomeDto } from "shared";
-import { expectToEqual } from "shared";
+import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import {ImmersionOfferEntityV2Builder} from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
-import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import {PgEstablishmentAggregateRepository} from "./PgEstablishmentAggregateRepository";
 
 const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
@@ -33,10 +33,8 @@ describe("PgDiscussionAggregateRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_offers");
-    await client.query("DELETE FROM immersion_contacts");
     await client.query("DELETE FROM discussions");
-    await client.query("DELETE FROM establishments");
+    await client.query("DELETE FROM exchanges");
     pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(
       client,
     );
@@ -48,7 +46,7 @@ describe("PgDiscussionAggregateRepository", () => {
     await pool.end();
   });
 
-  it("Methode insertDiscussionAggregate", async () => {
+  it("Methode insert and update", async () => {
     const siret = "01234567891011";
 
     await establishmentAggregateRepo.insertEstablishmentAggregates([
@@ -64,12 +62,33 @@ describe("PgDiscussionAggregateRepository", () => {
       .build();
 
     await pgDiscussionAggregateRepository.insert(discussionAggregate);
-    const retrievedDiscussionAggregate =
-      await pgDiscussionAggregateRepository.getById(discussionAggregate.id);
-    expect(retrievedDiscussionAggregate).toEqual(discussionAggregate);
+
+    expectToEqual(
+      await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+      discussionAggregate,
+    );
+
+    const updatedDiscussionAggregate: DiscussionAggregate = {
+      ...discussionAggregate,
+      immersionObjective: "Initier une démarche de recrutement",
+      exchanges: [
+        ...discussionAggregate.exchanges,
+        {
+          message: "mon nouveau message",
+          recipient: "potentialBeneficiary",
+          sentAt: new Date(),
+          sender: "establishment",
+        },
+      ],
+    };
+    await pgDiscussionAggregateRepository.update(updatedDiscussionAggregate);
+    expectToEqual(
+      await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+      updatedDiscussionAggregate,
+    );
   });
 
-  it("Methode getDiscussionsBySiretSince", async () => {
+  it("Methode getById", async () => {
     const siret = "11112222333344";
     const since = new Date("2023-03-05");
 
