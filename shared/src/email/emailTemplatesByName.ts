@@ -26,6 +26,37 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
+    DISCUSSION_EXCHANGE: {
+      niceName: "Échange entre établissement et potentiel bénéficiaire",
+      tags: ["échange établissement potentiel bénéficiaire"],
+      createEmailVariables: ({
+        from,
+        htmlContent,
+        establishmentContactLastName,
+        establishmentContactFirstName,
+        establishmentName,
+        establishmentAddress,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        appellationLabel,
+      }) => ({
+        subject: "Mise en relation via Immersion Facilitée",
+        greetings: `Bonjour ${
+          from === "establishment"
+            ? `${beneficiaryFirstName} ${beneficiaryLastName}`
+            : `${establishmentContactFirstName} ${establishmentContactLastName}`
+        },`,
+        content:
+          from === "establishment"
+            ? `Vous avez reçu un message de la part de l'établissement '${establishmentName}', (Adresse: ${establishmentAddress}) sur Immersion Facilitée.
+               Cela concerne le métier suivant : ${appellationLabel}.
+               Voici le contenu du message :`
+            : `Vous avez reçu un message de la part du candidat ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier ${appellationLabel} sur Immersion Facilitée.
+               Cela concerne l'établissement : '${establishmentName}', (Adresse: ${establishmentAddress})
+               Voici le contenu du message :`,
+        subContent: htmlContent,
+      }),
+    },
     SIGNATORY_FIRST_REMINDER: {
       niceName: "Signataire - Premier rappel",
       tags: ["relance signatures manquantes"],

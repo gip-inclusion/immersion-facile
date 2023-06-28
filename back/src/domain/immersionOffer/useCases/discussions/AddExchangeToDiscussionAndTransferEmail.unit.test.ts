@@ -1,11 +1,22 @@
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
+import {
+  addressDtoToString,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryDiscussionAggregateRepository } from "../../../../adapters/secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { DiscussionAggregate } from "../../entities/DiscussionAggregate";
 import {
   AddExchangeToDiscussionAndTransferEmail,
@@ -15,17 +26,34 @@ import {
 describe("AddExchangeToDiscussionAndTransferEmail", () => {
   let discussionAggregateRepository: InMemoryDiscussionAggregateRepository;
   let addExchangeToDiscussionAndTransferEmail: AddExchangeToDiscussionAndTransferEmail;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     discussionAggregateRepository = uow.discussionAggregateRepository;
     const uowPerformer = new InMemoryUowPerformer(uow);
+
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+    const uuidGenerator = new UuidV4Generator();
+    timeGateway = new CustomTimeGateway();
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      uuidGenerator,
+      timeGateway,
+    );
+
     addExchangeToDiscussionAndTransferEmail =
-      new AddExchangeToDiscussionAndTransferEmail(uowPerformer);
+      new AddExchangeToDiscussionAndTransferEmail(
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
+      );
   });
 
   describe("right paths", () => {
-    it("saves the new exchange in the discussion", async () => {
+    it("saves the new exchange in the discussion and sends the email to the right recipient (response from establishment to potential beneficiary)", async () => {
       const discussionId = "my-discussion-id";
       const brevoResponse = createBrevoResponse(
         `${discussionId}_b@reply-dev.immersion-facile.beta.gouv.fr`,
@@ -80,8 +108,36 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           recipient: "potentialBeneficiary",
         },
       ]);
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "DISCUSSION_EXCHANGE",
+            params: {
+              htmlContent:
+                brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---",
+              from: "establishment",
+              establishmentAddress: addressDtoToString(discussion.address),
+              establishmentName: "TODO -> get establishment name from siret",
+              appellationLabel:
+                discussion.appellationCode + " -> aller chercher le libellé",
+              beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+              beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+              establishmentContactFirstName:
+                discussion.establishmentContact.firstName,
+              establishmentContactLastName:
+                discussion.establishmentContact.lastName,
+            },
+            recipients: [discussion.potentialBeneficiary.email],
+            replyTo: {
+              email: `${discussionId}_b@reply-dev.immersion-facile.beta.gouv.fr`,
+              name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - TODO add establishment name`,
+            },
+            cc: [],
+          },
+        ],
+      });
     });
-    // it("sends the email to the right recipient", () => {});
   });
   describe("wrong paths", () => {
     it("throws an error if the email does not have the right format", async () => {

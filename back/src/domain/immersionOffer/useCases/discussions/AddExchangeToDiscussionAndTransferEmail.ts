@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { addressDtoToString, ExchangeRole } from "shared";
 import {
   BadRequestError,
   NotFoundError,
@@ -8,11 +9,11 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   addExchangeToDiscussion,
   DiscussionId,
   ExchangeEntity,
-  ExchangeRole,
 } from "../../entities/DiscussionAggregate";
 
 type BrevoAttachment = {
@@ -78,8 +79,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
   inputSchema = z.any();
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    // private readonly timeGateway: TimeGateway,
-    // private readonly uuidGenerator: UuidGenerator,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent, // private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -97,19 +97,59 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     if (!discussion)
       throw new NotFoundError(`Discussion ${discussionId} not found`);
 
+    const sender =
+      recipientKind === "establishment"
+        ? "potentialBeneficiary"
+        : "establishment";
+
     const exchange: ExchangeEntity = {
       message: brevoResponse.items[0].RawHtmlBody || "",
       sentAt: new Date(brevoResponse.items[0].SentAtDate),
       recipient: recipientKind,
-      sender:
-        recipientKind === "establishment"
-          ? "potentialBeneficiary"
-          : "establishment",
+      sender,
     };
 
     await uow.discussionAggregateRepository.update(
       addExchangeToDiscussion(discussion, exchange),
     );
+
+    await this.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "DISCUSSION_EXCHANGE",
+        params: {
+          from: sender,
+          establishmentContactFirstName:
+            discussion.establishmentContact.firstName,
+          establishmentContactLastName:
+            discussion.establishmentContact.lastName,
+          establishmentName: "TODO get name when migration is done",
+          establishmentAddress: addressDtoToString(discussion.address),
+          appellationLabel: discussion.appellationCode, // TODO fetch label,
+          beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+          beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+          htmlContent: exchange.message,
+        },
+        recipients: [
+          recipientKind === "establishment"
+            ? discussion.establishmentContact.email
+            : discussion.potentialBeneficiary.email,
+        ],
+        cc:
+          recipientKind === "establishment"
+            ? discussion.establishmentContact.copyEmails
+            : [],
+        replyTo: {
+          email: `${discussionId}_${
+            recipientKind === "establishment" ? "e" : "b"
+          }@reply-dev.immersion-facile.beta.gouv.fr`,
+          name: `TODO`,
+        },
+      },
+      followedIds: {
+        establishmentSiret: discussion.siret,
+      },
+    });
   }
 }
 

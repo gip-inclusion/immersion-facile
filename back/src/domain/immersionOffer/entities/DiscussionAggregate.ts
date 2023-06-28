@@ -2,11 +2,10 @@ import {
   AddressDto,
   AppellationCode,
   ContactMethod,
+  ExchangeRole,
   Flavor,
   ImmersionObjective,
 } from "shared";
-
-export type ExchangeRole = "establishment" | "potentialBeneficiary";
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 
