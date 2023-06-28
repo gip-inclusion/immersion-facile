@@ -45,7 +45,7 @@ const executeUsecase = async () => {
     uowPerformer,
     httpPoleEmploiGateway,
     timeGateway,
-    50,
+    config.maxConventionsToSyncWithPe,
   );
 
   return resyncOldConventionsToPeUsecase.execute();
