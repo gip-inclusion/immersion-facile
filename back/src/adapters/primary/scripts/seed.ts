@@ -1,6 +1,11 @@
 import { PoolClient } from "pg";
 import { keys } from "ramda";
-import { AgencyDtoBuilder, FeatureFlags, peParisAgencyId } from "shared";
+import {
+  AgencyDtoBuilder,
+  cciAgencyId,
+  FeatureFlags,
+  peParisAgencyId,
+} from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
@@ -44,7 +49,8 @@ const featureFlagsSeed = async (client: PoolClient) => {
     keys(featureFlags).map((flagName) => {
       const isFlagActive = featureFlags[flagName];
       return client.query(
-        `INSERT INTO feature_flags (flag_name, is_active) VALUES ('${flagName}', ${isFlagActive});`,
+        `INSERT INTO feature_flags (flag_name, is_active)
+         VALUES ('${flagName}', ${isFlagActive});`,
       );
     }),
   );
@@ -70,7 +76,25 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
     })
     .build();
 
-  await uow.agencyRepository.insert(peParisAgency);
+  const cciAgency = new AgencyDtoBuilder()
+    .withId(cciAgencyId)
+    .withName("CCI Bordeaux")
+    .withQuestionnaireUrl("https://questionnaire.seed")
+    .withSignature("Seed signature")
+    .withKind("cci")
+    .withStatus("active")
+    .withAddress({
+      city: "Paris",
+      departmentCode: "75",
+      postcode: "75001",
+      streetNumberAndAddress: "1 rue de Rivoli",
+    })
+    .build();
+
+  await Promise.all([
+    uow.agencyRepository.insert(peParisAgency),
+    uow.agencyRepository.insert(cciAgency),
+  ]);
   console.log("done");
 };
 
