@@ -3,6 +3,7 @@ import { keys } from "ramda";
 import {
   AgencyDtoBuilder,
   cciAgencyId,
+  ConventionDtoBuilder,
   FeatureFlags,
   peParisAgencyId,
 } from "shared";
@@ -26,6 +27,7 @@ const seed = async () => {
     await featureFlagsSeed(client);
     await agencySeed(uow, client);
     await establishmentAggregateSeed(uow, client);
+    await conventionSeed(uow);
   });
 
   client.release();
@@ -126,6 +128,35 @@ const establishmentAggregateSeed = async (
   await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
     franceMerguez,
   ]);
+  console.log("done");
+};
+
+const conventionSeed = async (uow: UnitOfWork) => {
+  console.log("seeding conventions...");
+
+  const peConvention = new ConventionDtoBuilder()
+    .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
+    .withInternshipKind("immersion")
+    .withDateStart(new Date("2023-03-27").toISOString())
+    .withDateEnd(new Date("2023-03-28").toISOString())
+    .withStatus("READY_TO_SIGN")
+    .withAgencyId(peParisAgencyId)
+    .build();
+
+  const cciConvention = new ConventionDtoBuilder()
+    .withId("4d7f9ded-fa25-462a-a290-caeaa192c555")
+    .withInternshipKind("mini-stage-cci")
+    .withDateStart(new Date("2023-05-01").toISOString())
+    .withDateEnd(new Date("2023-05-03").toISOString())
+    .withStatus("READY_TO_SIGN")
+    .withAgencyId(cciAgencyId)
+    .build();
+
+  await Promise.all([
+    uow.conventionRepository.save(peConvention),
+    uow.conventionRepository.save(cciConvention),
+  ]);
+
   console.log("done");
 };
 
