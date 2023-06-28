@@ -23,6 +23,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
     addExchangeToDiscussionAndTransferEmail =
       new AddExchangeToDiscussionAndTransferEmail(uowPerformer);
   });
+
   describe("right paths", () => {
     it("saves the new exchange in the discussion", async () => {
       const discussionId = "my-discussion-id";
