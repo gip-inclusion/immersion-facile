@@ -40,6 +40,7 @@ const brevoMaxSmsRequestsPerHours = 200;
 const ONE_SECOND_MS = 1_000;
 const ONE_HOUR_MS = ONE_SECOND_MS * 3_600;
 
+// documentation https://developers.brevo.com/reference/sendtransacemail
 export class BrevoNotificationGateway implements NotificationGateway {
   constructor(
     private readonly httpClient: HttpClient<BrevoNotificationGatewayTargets>,
@@ -100,6 +101,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
     const emailData: SendTransactEmailRequestBody = {
       to: this.filterAllowListAndConvertToRecipients(email.recipients),
+      ...(email.replyTo ? { replyTo: email.replyTo } : {}),
       ...(cc.length ? { cc } : {}),
       ...configureGenerateHtmlFromTemplate(
         emailTemplatesByName,

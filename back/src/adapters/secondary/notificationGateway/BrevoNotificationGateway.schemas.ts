@@ -43,6 +43,7 @@ const attachementSchema: z.Schema<Attachement> = z.object({
 export type SendTransactEmailRequestBody = {
   to: RecipientOrSender[];
   cc?: RecipientOrSender[];
+  replyTo?: RecipientOrSender;
   htmlContent: string;
   sender: RecipientOrSender;
   subject: string;
@@ -53,6 +54,7 @@ export type SendTransactEmailRequestBody = {
 export const sendTransactEmailRequestBodySchema: z.Schema<SendTransactEmailRequestBody> =
   z.object({
     to: z.array(recipientOrSenderSchema),
+    replyTo: recipientOrSenderSchema.optional(),
     cc: z.array(recipientOrSenderSchema).optional(),
     htmlContent: z.string(),
     sender: recipientOrSenderSchema,
