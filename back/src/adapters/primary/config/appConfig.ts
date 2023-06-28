@@ -89,6 +89,12 @@ export class AppConfig {
     });
   }
 
+  public get maxConventionsToSyncWithPe() {
+    return parseInt(
+      this.throwIfNotDefinedOrDefault("MAX_CONVENTIONS_TO_SYNC_WITH_PE", "50"),
+    );
+  }
+
   // == Data repositories ==
 
   public get repositories() {
@@ -285,6 +291,7 @@ export class AppConfig {
       "POLE_EMPLOI_AUTHENTIFICATION_CANDIDAT_URL",
     );
   }
+
   public get peEnterpriseUrl(): AbsoluteUrl {
     return this.throwIfNotAbsoluteUrl("POLE_EMPLOI_ENTREPRISE_URL");
   }
@@ -356,6 +363,7 @@ export class AppConfig {
   public get backofficeUsername() {
     return this.throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
   }
+
   public get backofficePassword() {
     return this.throwIfNotDefinedOrDefault("BACKOFFICE_PASSWORD");
   }
