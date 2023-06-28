@@ -16,14 +16,19 @@ export class InMemoryDiscussionAggregateRepository
 {
   constructor(private _discussionAggregates: DiscussionsById = {}) {}
 
-  public async insertDiscussionAggregate(
-    discussionAggregate: DiscussionAggregate,
-  ) {
+  public async insert(discussionAggregate: DiscussionAggregate) {
     logger.info(discussionAggregate, "insertDiscussionAggregate");
     this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
   }
 
-  public async retrieveDiscussionAggregate(discussionId: DiscussionId) {
+  public async update(discussionAggregate: DiscussionAggregate) {
+    logger.info(discussionAggregate, "updateDiscussionAggregate");
+    if (!this._discussionAggregates[discussionAggregate.id])
+      throw new Error("DiscussionAggregate not found");
+    this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
+  }
+
+  public async getById(discussionId: DiscussionId) {
     return this._discussionAggregates[discussionId];
   }
 

@@ -11,7 +11,7 @@ export class PgDiscussionAggregateRepository
 {
   constructor(private client: PoolClient) {}
 
-  async insertDiscussionAggregate(discussion: DiscussionAggregate) {
+  async insert(discussion: DiscussionAggregate) {
     await this.client.query(
       `INSERT INTO discussions (
          id, 
@@ -79,7 +79,7 @@ export class PgDiscussionAggregateRepository
     );
   }
 
-  async retrieveDiscussionAggregate(
+  async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionAggregate | undefined> {
     const pgResult = await this.client.query(

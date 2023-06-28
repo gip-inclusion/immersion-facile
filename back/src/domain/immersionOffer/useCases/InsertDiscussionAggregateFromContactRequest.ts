@@ -84,9 +84,7 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
           : [],
     };
 
-    await uow.discussionAggregateRepository.insertDiscussionAggregate(
-      discussion,
-    );
+    await uow.discussionAggregateRepository.insert(discussion);
 
     const maxContactsPerWeekForEstablishment =
       establishmentAggregate.establishment.maxContactsPerWeek;

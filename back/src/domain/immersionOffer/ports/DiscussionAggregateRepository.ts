@@ -5,10 +5,9 @@ import {
 } from "../entities/DiscussionAggregate";
 
 export interface DiscussionAggregateRepository {
-  insertDiscussionAggregate: (
-    discussionAggregate: DiscussionAggregate,
-  ) => Promise<void>;
-  retrieveDiscussionAggregate: (
+  insert: (discussionAggregate: DiscussionAggregate) => Promise<void>;
+  update: (discussionAggregate: DiscussionAggregate) => Promise<void>;
+  getById: (
     discussionId: DiscussionId,
   ) => Promise<DiscussionAggregate | undefined>;
   countDiscussionsForSiretSince: (
