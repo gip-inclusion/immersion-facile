@@ -6,7 +6,7 @@ import {
   ImmersionObjective,
 } from "shared";
 
-type ExchangeRole = "establishment" | "potentialBeneficiary";
+export type ExchangeRole = "establishment" | "potentialBeneficiary";
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 
@@ -46,3 +46,11 @@ export type ExchangeEntity = {
   recipient: ExchangeRole;
   sentAt: Date;
 };
+
+export const addExchangeToDiscussion = (
+  discussion: DiscussionAggregate,
+  newExchange: ExchangeEntity,
+): DiscussionAggregate => ({
+  ...discussion,
+  exchanges: [...discussion.exchanges, newExchange],
+});

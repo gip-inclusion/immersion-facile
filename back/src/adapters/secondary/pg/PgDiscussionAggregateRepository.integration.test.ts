@@ -63,14 +63,10 @@ describe("PgDiscussionAggregateRepository", () => {
       .withSiret(siret)
       .build();
 
-    await pgDiscussionAggregateRepository.insertDiscussionAggregate(
-      discussionAggregate,
-    );
+    await pgDiscussionAggregateRepository.insert(discussionAggregate);
     const retrievedDiscussionAggregate =
-      await pgDiscussionAggregateRepository.retrieveDiscussionAggregate(
-        discussionAggregate.id,
-      );
-    expectToEqual(retrievedDiscussionAggregate, discussionAggregate);
+      await pgDiscussionAggregateRepository.getById(discussionAggregate.id);
+    expect(retrievedDiscussionAggregate).toEqual(discussionAggregate);
   });
 
   it("Methode getDiscussionsBySiretSince", async () => {
@@ -104,15 +100,9 @@ describe("PgDiscussionAggregateRepository", () => {
       .build();
 
     await Promise.all([
-      pgDiscussionAggregateRepository.insertDiscussionAggregate(
-        discussionAggregate1,
-      ),
-      pgDiscussionAggregateRepository.insertDiscussionAggregate(
-        discussionAggregate2,
-      ),
-      pgDiscussionAggregateRepository.insertDiscussionAggregate(
-        discussionAggregateToOld,
-      ),
+      pgDiscussionAggregateRepository.insert(discussionAggregate1),
+      pgDiscussionAggregateRepository.insert(discussionAggregate2),
+      pgDiscussionAggregateRepository.insert(discussionAggregateToOld),
     ]);
 
     const numberOfDiscussions =
