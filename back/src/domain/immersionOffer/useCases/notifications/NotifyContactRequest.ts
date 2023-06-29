@@ -1,7 +1,7 @@
 import {
   addressDtoToString,
-  ContactEstablishmentRequestDto,
-  contactEstablishmentRequestSchema,
+  ContactEstablishmentEventPayload,
+  contactEstablishmentEventPayloadSchema,
 } from "shared";
 import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
@@ -10,19 +10,23 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
+import { createOpaqueEmail } from "../../entities/DiscussionAggregate";
 
-export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentRequestDto> {
+export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
+  private readonly replyDomain: string;
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    domain: string,
   ) {
     super(uowPerformer);
+    this.replyDomain = `reply.${domain}`;
   }
 
-  inputSchema = contactEstablishmentRequestSchema;
+  inputSchema = contactEstablishmentEventPayloadSchema;
 
   public async _execute(
-    payload: ContactEstablishmentRequestDto,
+    payload: ContactEstablishmentEventPayload,
     uow: UnitOfWork,
   ): Promise<void> {
     const establishmentAggregate =
@@ -74,6 +78,14 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           templatedContent: {
             kind: "CONTACT_BY_EMAIL_REQUEST",
             recipients: [contact.email],
+            replyTo: {
+              email: createOpaqueEmail(
+                payload.discussionId,
+                "potentialBeneficiary",
+                this.replyDomain,
+              ),
+              name: `${payload.potentialBeneficiaryFirstName} ${payload.potentialBeneficiaryLastName} - via Immersion Facilitée`,
+            },
             cc,
             params: {
               businessName,

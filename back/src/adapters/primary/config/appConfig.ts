@@ -328,10 +328,13 @@ export class AppConfig {
   // == Magic links ==
 
   public get immersionFacileBaseUrl(): AbsoluteUrl {
-    const domain = this.throwIfNotDefinedOrDefault("DOMAIN");
-    return domain.includes("localhost")
-      ? `http://${domain}`
-      : `https://${domain}`;
+    return this.immersionFacileDomain.includes("localhost")
+      ? `http://${this.immersionFacileDomain}`
+      : `https://${this.immersionFacileDomain}`;
+  }
+
+  public get immersionFacileDomain(): string {
+    return this.throwIfNotDefinedOrDefault("DOMAIN");
   }
 
   public get apiJwtPublicKey() {

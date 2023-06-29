@@ -396,6 +396,7 @@ export const createUseCases = (
       notifyContactRequest: new NotifyContactRequest(
         uowPerformer,
         saveNotificationAndRelatedEvent,
+        config.immersionFacileDomain,
       ),
       notifyPoleEmploiUserAdvisorOnConventionFullySigned:
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
