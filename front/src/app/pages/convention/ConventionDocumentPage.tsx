@@ -10,8 +10,7 @@ import {
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
-import { Loader, MainWrapper } from "react-design-system";
-import { ConventionDocument } from "react-design-system";
+import { ConventionDocument, Loader, MainWrapper } from "react-design-system";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
@@ -664,31 +663,34 @@ export const ConventionDocumentPage = ({
                 <p className={fr.cx("fr-text--xs")}>
                   Article 9 – Durée La présente convention est signée pour la
                   durée de la période d’observation en milieu professionnel, qui
-                  ne peut dépasser 5 jours. Article 10 - Protection des données
-                  personnelles Les données personnelles recueillies via ce
-                  formulaire font l'objet, par le Responsable de traitement
-                  représenté par la Chambre de Commerce et d’Industrie, d'un
-                  traitement informatisé et/ou papier destiné à l’établissement
-                  de la convention de stage et à des fins statistiques, et sont
-                  conservées pendant une durée de cinq ans. Aucune information
-                  personnelle n'est cédée à quelconque tiers. Conformément à la
-                  loi "Informatique et Libertés" du 6 janvier 1978 modifiée et
-                  au Règlement Général sur la Protection des Données, vous
-                  pouvez accéder aux données à caractère personnel vous
-                  concernant, les faire rectifier ou effacer après le délai de
-                  prescription de la fin de la convention. Vous disposez
-                  également du droit de limitation, de portabilité, et le cas
-                  échéant, d’opposition du traitement de vos données. Pour
-                  exercer vos droits, vous pouvez contacter le DPO (Délégué à la
-                  Protection des données personnelles) de la Chambre de Commerce
-                  et d’Industrie concernée par mail en précisant la mention «
-                  Mini-Stage ». La politique de protection des données
-                  personnelles de la CCI est détaillée dans sa charte sur son
-                  site internet. TITRE II - DISPOSITIONS PARTICULIÈRES La durée
-                  de la présence hebdomadaire des jeunes en milieu professionnel
-                  ne peut excéder 30 heures pour les jeunes de moins de 15 ans
-                  (6 heures par jour) et 35 heures pour les jeunes de 15 ans et
-                  plus répartis sur 5 jours (7 heures par jour).
+                  ne peut dépasser 5 jours.
+                </p>
+                <p className={fr.cx("fr-text--xs")}>
+                  Article 10 - Protection des données personnelles Les données
+                  personnelles recueillies via ce formulaire font l'objet, par
+                  le Responsable de traitement représenté par la Chambre de
+                  Commerce et d’Industrie, d'un traitement informatisé et/ou
+                  papier destiné à l’établissement de la convention de stage et
+                  à des fins statistiques, et sont conservées pendant une durée
+                  de cinq ans. Aucune information personnelle n'est cédée à
+                  quelconque tiers. Conformément à la loi "Informatique et
+                  Libertés" du 6 janvier 1978 modifiée et au Règlement Général
+                  sur la Protection des Données, vous pouvez accéder aux données
+                  à caractère personnel vous concernant, les faire rectifier ou
+                  effacer après le délai de prescription de la fin de la
+                  convention. Vous disposez également du droit de limitation, de
+                  portabilité, et le cas échéant, d’opposition du traitement de
+                  vos données. Pour exercer vos droits, vous pouvez contacter le
+                  DPO (Délégué à la Protection des données personnelles) de la
+                  Chambre de Commerce et d’Industrie concernée par mail en
+                  précisant la mention « Mini-Stage ». La politique de
+                  protection des données personnelles de la CCI est détaillée
+                  dans sa charte sur son site internet. TITRE II - DISPOSITIONS
+                  PARTICULIÈRES La durée de la présence hebdomadaire des jeunes
+                  en milieu professionnel ne peut excéder 30 heures pour les
+                  jeunes de moins de 15 ans (6 heures par jour) et 35 heures
+                  pour les jeunes de 15 ans et plus répartis sur 5 jours (7
+                  heures par jour).
                 </p>
               </>
             )}
