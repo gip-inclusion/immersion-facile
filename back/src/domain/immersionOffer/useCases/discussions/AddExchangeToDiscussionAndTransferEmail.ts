@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ExchangeRole } from "shared";
+import { DiscussionId, ExchangeRole } from "shared";
 import {
   BadRequestError,
   NotFoundError,
@@ -12,7 +12,6 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   addExchangeToDiscussion,
-  DiscussionId,
   ExchangeEntity,
 } from "../../entities/DiscussionAggregate";
 

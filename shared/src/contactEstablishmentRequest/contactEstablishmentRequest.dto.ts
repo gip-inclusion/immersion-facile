@@ -1,4 +1,5 @@
 import { ImmersionObjective } from "../convention/convention.dto";
+import { DiscussionId } from "../discussion/discussion.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
@@ -27,3 +28,8 @@ export type ContactEstablishmentRequestDto =
   | ContactEstablishmentByPhoneDto
   | ContactEstablishmentInPersonDto
   | ContactEstablishmentByMailDto;
+
+export type ContactEstablishmentEventPayload =
+  ContactEstablishmentRequestDto & {
+    discussionId: DiscussionId;
+  };

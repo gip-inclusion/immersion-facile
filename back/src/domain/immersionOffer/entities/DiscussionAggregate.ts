@@ -2,12 +2,10 @@ import {
   AddressDto,
   AppellationCode,
   ContactMethod,
+  DiscussionId,
   ExchangeRole,
-  Flavor,
   ImmersionObjective,
 } from "shared";
-
-export type DiscussionId = Flavor<string, "DiscussionId">;
 
 export type DiscussionPotentialBeneficiary = {
   email: string;

@@ -1,8 +1,5 @@
-import { SiretDto } from "shared";
-import {
-  DiscussionAggregate,
-  DiscussionId,
-} from "../entities/DiscussionAggregate";
+import { DiscussionId, SiretDto } from "shared";
+import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 
 export interface DiscussionAggregateRepository {
   insert: (discussionAggregate: DiscussionAggregate) => Promise<void>;

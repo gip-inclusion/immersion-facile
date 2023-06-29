@@ -36,6 +36,7 @@ describe(`/${contactEstablishmentRoute} route`, () => {
   let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
   let inMemoryUow: InMemoryUnitOfWork;
+  // let uuidGenerator: Cust
 
   beforeEach(async () => {
     ({ request, gateways, eventCrawler, inMemoryUow } = await buildTestApp());
@@ -69,7 +70,7 @@ describe(`/${contactEstablishmentRoute} route`, () => {
     expectArraysToMatch(inMemoryUow.outboxRepository.events, [
       {
         topic: "ContactRequestedByBeneficiary",
-        payload: validRequest,
+        payload: { ...validRequest, discussionId: expect.any(String) },
       },
     ]);
 

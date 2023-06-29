@@ -59,7 +59,6 @@ import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/E
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { GetImmersionOfferBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
 import { GetOffersByGroupSlug } from "../../../domain/immersionOffer/useCases/GetOffersByGroupSlug";
-import { InsertDiscussionAggregateFromContactRequest } from "../../../domain/immersionOffer/useCases/InsertDiscussionAggregateFromContactRequest";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
@@ -273,13 +272,9 @@ export const createUseCases = (
       contactEstablishment: new ContactEstablishment(
         uowPerformer,
         createNewEvent,
+        uuidGenerator,
+        gateways.timeGateway,
       ),
-      insertDiscussionAggregateFromContactRequest:
-        new InsertDiscussionAggregateFromContactRequest(
-          uowPerformer,
-          gateways.timeGateway,
-          uuidGenerator,
-        ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,
         saveNotificationAndRelatedEvent,
