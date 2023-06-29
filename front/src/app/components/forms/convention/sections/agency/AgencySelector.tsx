@@ -12,6 +12,7 @@ import {
   isPeConnectIdentity,
   keys,
   miniStageRestrictedDepartments,
+  sortByProperty,
 } from "shared";
 import { Loader } from "react-design-system";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -54,7 +55,7 @@ export const AgencySelector = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const dispatch = useDispatch();
-  const [agencies, setAgencies] = useState([
+  const [agencies, setAgencies] = useState<AgencyOption[]>([
     {
       id: "",
       name: agencyDepartmentField.placeholder ?? "",
@@ -79,14 +80,14 @@ export const AgencySelector = ({
       departmentCode: agencyDepartment,
       federatedIdentity,
     })
-      .then((agencies) => {
-        setAgencies(agencies);
+      .then((retrievedAgencies) => {
+        setAgencies(sortByProperty("name")(retrievedAgencies));
         if (
           defaultAgencyId &&
           isDefaultAgencyOnAgenciesAndEnabled(
             disabled,
             defaultAgencyId,
-            agencies,
+            retrievedAgencies,
           )
         )
           setValue(agencyIdName, defaultAgencyId);
