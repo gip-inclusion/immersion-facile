@@ -91,6 +91,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           resumeLink: "http://fakelink.com",
         },
         siret: "01234567891011",
+        businessName: "France Merguez Distribution",
       };
       discussionAggregateRepository.discussionAggregates = [discussion];
       await addExchangeToDiscussionAndTransferEmail.execute(brevoResponse);
@@ -119,7 +120,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
               email: `${discussionId}_e@reply-dev.immersion-facile.beta.gouv.fr`,
-              name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - TODO add establishment name`,
+              name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
             },
             cc: [],
           },

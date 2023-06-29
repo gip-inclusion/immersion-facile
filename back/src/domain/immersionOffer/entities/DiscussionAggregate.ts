@@ -31,6 +31,7 @@ export type DiscussionAggregate = {
   id: DiscussionId;
   createdAt: Date;
   siret: string;
+  businessName: string;
   appellationCode: AppellationCode;
   immersionObjective: ImmersionObjective | null;
   address: AddressDto;
