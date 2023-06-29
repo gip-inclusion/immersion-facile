@@ -25,9 +25,11 @@ type ContactByEmailProps = {
   onClose: () => void;
 };
 
+const motivationPlaceholder =
+  "***Rédigez ici votre email de motivation en suivant nos conseils.***";
 const initialMessage = `Bonjour, \n\n\
 J’ai trouvé votre entreprise sur le site https://immersion-facile.beta.gouv.fr\n\
-***Rédigez ici votre email de motivation en suivant nos conseils.***\n\
+${motivationPlaceholder}
   \n\
 Pourriez-vous me contacter par mail ou par téléphone pour me proposer un rendez-vous ? \n\
 Je pourrais alors vous expliquer directement mon projet. \n\
@@ -74,7 +76,10 @@ export const ContactByEmail = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
-    await immersionSearchGateway.contactEstablishment(values);
+    await immersionSearchGateway.contactEstablishment({
+      ...values,
+      message: removeMotivationPlaceholder(values.message),
+    });
     onSuccess();
   };
   return (
@@ -212,3 +217,5 @@ const immersionObjectiveListOfOptions = conventionObjectiveOptions.map(
     label: immersionObjective,
   }),
 );
+const removeMotivationPlaceholder = (message: string) =>
+  message.replace(`\n${motivationPlaceholder}`, "");
