@@ -1,6 +1,7 @@
 import { EmailButtonProps } from "./components/email";
 
 type CreateEmailVariable<P> = (params: P) => {
+  bypassLayout?: boolean;
   subject: string;
   greetings?: string;
   content?: string;

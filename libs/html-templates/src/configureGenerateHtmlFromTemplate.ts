@@ -54,13 +54,16 @@ export const configureGenerateHtmlFromTemplate =
       subContent,
       legals,
       attachmentUrls,
+      bypassLayout,
     } = createEmailVariables(params as any);
 
     const doctype =
       '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 
-    const htmlContent = ignoreTabs(
-      `${options.skipHead ? "" : doctype}
+    const htmlContent = bypassLayout
+      ? ignoreTabs(content ?? "no content")
+      : ignoreTabs(
+          `${options.skipHead ? "" : doctype}
         <html lang="fr">${options.skipHead ? "" : renderHead(subject)}
           <body>
             <table width="600" align="center" style="margin-top: 20px">
@@ -80,7 +83,7 @@ export const configureGenerateHtmlFromTemplate =
           </body>
         </html>
       `,
-    );
+        );
 
     const emailSupportedHtmlConcent = htmlContent
       .replaceAll("href=", "\nhref=")
