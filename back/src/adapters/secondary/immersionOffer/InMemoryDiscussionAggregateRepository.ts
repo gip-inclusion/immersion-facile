@@ -1,9 +1,6 @@
 import isAfter from "date-fns/isAfter";
-import { SiretDto } from "shared";
-import {
-  DiscussionAggregate,
-  DiscussionId,
-} from "../../../domain/immersionOffer/entities/DiscussionAggregate";
+import { DiscussionId, SiretDto } from "shared";
+import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
 import { createLogger } from "../../../utils/logger";
 

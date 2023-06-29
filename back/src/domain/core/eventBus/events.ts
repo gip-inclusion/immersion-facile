@@ -2,7 +2,7 @@ import {
   AgencyDto,
   AgencyId,
   AuthenticatedUserId,
-  ContactEstablishmentRequestDto,
+  ContactEstablishmentEventPayload,
   ConventionDto,
   DateIsoString,
   EstablishmentJwtPayload,
@@ -70,7 +70,7 @@ export type DomainEvent =
   // FORM ESTABLISHMENT RELATED
   | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>
   | GenericEvent<"FormEstablishmentEdited", FormEstablishmentDto>
-  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentRequestDto>
+  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload>
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>
 

@@ -1,9 +1,8 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { SiretDto } from "shared";
+import { DiscussionId, SiretDto } from "shared";
 import {
   DiscussionAggregate,
-  DiscussionId,
   ExchangeEntity,
 } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
