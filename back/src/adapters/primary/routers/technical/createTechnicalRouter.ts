@@ -7,7 +7,6 @@ import {
   shortLinkRoute,
   uploadFileRoute,
 } from "shared";
-import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
   BadRequestError,
@@ -54,16 +53,13 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
       ),
     );
 
-  technicalRouter.route(`/${inboundEmailParsingRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, () => {
-      // eslint-disable-next-line no-console
-      console.log(
-        `REACHED INBOUND EMAIL PARSING : ${JSON.stringify(req.body)}`,
-      );
-      notifyObjectDiscord(req.body);
-      return Promise.resolve({ success: true });
-    }),
-  );
+  technicalRouter
+    .route(`/${inboundEmailParsingRoute}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.addExchangeToDiscussionAndSendEmail.execute(req.body),
+      ),
+    );
 
   return technicalRouter;
 };

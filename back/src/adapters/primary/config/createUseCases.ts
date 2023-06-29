@@ -55,6 +55,7 @@ import { SendNotification } from "../../../domain/generic/notifications/useCases
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
+import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { GetImmersionOfferBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
