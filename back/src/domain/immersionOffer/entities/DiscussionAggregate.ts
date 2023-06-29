@@ -40,6 +40,7 @@ export type DiscussionAggregate = {
 };
 
 export type ExchangeEntity = {
+  // subject: string;
   message: string;
   sender: ExchangeRole;
   recipient: ExchangeRole;
