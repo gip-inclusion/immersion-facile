@@ -96,12 +96,13 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         .withImmersionObjective(contactRequestDto.immersionObjective)
         .withExchanges([
           {
-            sentAt: connectionDate,
-            message: contactRequestDto.message,
-            recipient: "establishment",
-            sender: "potentialBeneficiary",
-          },
-        ])
+            subject: "Demande de contact initiée par le bénéficiaire",
+          sentAt: connectionDate,
+          message: contactRequestDto.message,
+          recipient: "establishment",
+          sender: "potentialBeneficiary",
+        },
+      ])
         .withCreatedAt(connectionDate)
         .withSiret(contactRequestDto.siret)
         .withAddress(establishmentAddress)
@@ -142,6 +143,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         })
         .withExchanges([
           {
+            subject: "Demande de contact initiée par le bénéficiaire",
             message: "Bonjour, c'est une vieille discussion",
             recipient: "establishment",
             sender: "potentialBeneficiary",
@@ -173,6 +175,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
         .withAddress(establishmentAddress)
         .withExchanges([
           {
+            subject: "Demande de contact initiée par le bénéficiaire",
             message:
               "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
             recipient: "establishment",

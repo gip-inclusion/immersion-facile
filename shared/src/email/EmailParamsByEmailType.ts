@@ -4,7 +4,6 @@ import {
   ImmersionObjective,
   InternshipKind,
 } from "../convention/convention.dto";
-import { ExchangeRole } from "../discussion/discussion.dto";
 
 export type EmailParamsByEmailType = {
   AGENCY_FIRST_REMINDER: {
@@ -105,14 +104,7 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
   };
   DISCUSSION_EXCHANGE: {
-    appellationLabel: string;
-    from: ExchangeRole;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    establishmentContactFirstName: string;
-    establishmentContactLastName: string;
-    establishmentName: string;
-    establishmentAddress: string;
+    subject: string;
     htmlContent: string;
   };
   EDIT_FORM_ESTABLISHMENT_LINK: {

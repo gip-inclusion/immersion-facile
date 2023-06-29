@@ -29,33 +29,10 @@ export const emailTemplatesByName =
     DISCUSSION_EXCHANGE: {
       niceName: "Échange entre établissement et potentiel bénéficiaire",
       tags: ["échange établissement potentiel bénéficiaire"],
-      createEmailVariables: ({
-        htmlContent,
-        // from,
-        // establishmentContactLastName,
-        // establishmentContactFirstName,
-        // establishmentName,
-        // establishmentAddress,
-        // beneficiaryFirstName,
-        // beneficiaryLastName,
-        // appellationLabel,
-      }) => ({
-        bypassTemplate: true,
-        subject: "Mise en relation via Immersion Facilitée",
-        // greetings: `Bonjour ${
-        //   from === "establishment"
-        //     ? `${beneficiaryFirstName} ${beneficiaryLastName}`
-        //     : `${establishmentContactFirstName} ${establishmentContactLastName}`
-        // },`,
-        // content:
-        //   from === "establishment"
-        //     ? `Vous avez reçu un message de la part de l'établissement '${establishmentName}', (Adresse: ${establishmentAddress}) sur Immersion Facilitée.
-        //        Cela concerne le métier suivant : ${appellationLabel}.
-        //        Voici le contenu du message :`
-        //     : `Vous avez reçu un message de la part du candidat ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier ${appellationLabel} sur Immersion Facilitée.
-        //        Cela concerne l'établissement : '${establishmentName}', (Adresse: ${establishmentAddress})
-        //        Voici le contenu du message :`,
-        subContent: htmlContent,
+      createEmailVariables: ({ subject, htmlContent }) => ({
+        bypassLayout: true,
+        subject,
+        content: htmlContent,
       }),
     },
     SIGNATORY_FIRST_REMINDER: {

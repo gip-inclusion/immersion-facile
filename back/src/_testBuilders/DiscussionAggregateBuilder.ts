@@ -45,6 +45,7 @@ const defaultDiscussionAggregateV2: DiscussionAggregate = {
   },
   exchanges: [
     {
+      subject: "Sujet de discussion",
       sentAt: createdAt,
       sender: "potentialBeneficiary",
       message: "default message",
