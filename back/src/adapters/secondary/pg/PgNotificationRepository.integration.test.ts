@@ -18,6 +18,7 @@ const emailNotifications: EmailNotification[] = [
     createdAt: new Date("2023-06-09T19:00").toISOString(),
     followedIds: { agencyId },
     templatedContent: {
+      replyTo: { email: "yolo@mail.com", name: "Yolo" },
       kind: "AGENCY_WAS_ACTIVATED",
       recipients: ["bob@mail.com"],
       cc: [],

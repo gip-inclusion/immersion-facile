@@ -121,6 +121,12 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
+      addExchangeToDiscussionAndSendEmail:
+        new AddExchangeToDiscussionAndTransferEmail(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
+          config.immersionFacileDomain,
+        ),
       convertContactEstablishmentPublicV1ToDomain:
         new ConvertContactEstablishmentPublicV1ToDomain(uowPerformer),
       sendNotification: new SendNotification(

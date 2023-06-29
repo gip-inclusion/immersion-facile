@@ -12,6 +12,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   addExchangeToDiscussion,
+  createOpaqueEmail,
   ExchangeEntity,
 } from "../../entities/DiscussionAggregate";
 
@@ -47,16 +48,17 @@ export type BrevoInboundResponse = {
   items: BrevoEmailItem[];
 };
 
-export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<
-  BrevoInboundResponse,
-  void
-> {
+export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundResponse> {
   inputSchema = z.any();
+
+  private readonly replyDomain: string;
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent, // private readonly timeGateway: TimeGateway,
+    domain: string,
   ) {
     super(uowPerformer);
+    this.replyDomain = `reply.${domain}`;
   }
 
   protected async _execute(
@@ -110,9 +112,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
             ? discussion.establishmentContact.copyEmails
             : [],
         replyTo: {
-          email: `${discussionId}_${
-            sender === "establishment" ? "e" : "b"
-          }@reply-dev.immersion-facile.beta.gouv.fr`,
+          email: createOpaqueEmail(discussion.id, sender, this.replyDomain),
           name:
             sender === "establishment"
               ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
