@@ -1,8 +1,4 @@
-import {
-  addressDtoToString,
-  expectPromiseToFailWithError,
-  expectToEqual,
-} from "shared";
+import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -62,6 +58,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         id: discussionId,
         exchanges: [
           {
+            subject: "My subject",
             message: "Hello",
             sender: "potentialBeneficiary",
             sentAt: new Date(),
@@ -106,6 +103,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           sender: "establishment",
           sentAt: new Date("2023-06-28T08:06:52.000Z"),
           recipient: "potentialBeneficiary",
+          subject: brevoResponse.items[0].Subject,
         },
       ]);
 
@@ -116,21 +114,11 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             params: {
               htmlContent:
                 brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---",
-              from: "establishment",
-              establishmentAddress: addressDtoToString(discussion.address),
-              establishmentName: "TODO -> get establishment name from siret",
-              appellationLabel:
-                discussion.appellationCode + " -> aller chercher le libellé",
-              beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-              beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-              establishmentContactFirstName:
-                discussion.establishmentContact.firstName,
-              establishmentContactLastName:
-                discussion.establishmentContact.lastName,
+              subject: brevoResponse.items[0].Subject,
             },
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussionId}_b@reply-dev.immersion-facile.beta.gouv.fr`,
+              email: `${discussionId}_e@reply-dev.immersion-facile.beta.gouv.fr`,
               name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - TODO add establishment name`,
             },
             cc: [],

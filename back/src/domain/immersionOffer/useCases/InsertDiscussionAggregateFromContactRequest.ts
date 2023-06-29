@@ -22,48 +22,50 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
   }
 
   public async _execute(
-    params: ContactEstablishmentRequestDto,
+    contactRequest: ContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const now = this.timeGateway.now();
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        params.siret,
+        contactRequest.siret,
       );
     if (!establishmentAggregate)
       throw new NotFoundError(
-        `No establishment found with siret n°${params.siret}`,
+        `No establishment found with siret n°${contactRequest.siret}`,
       );
 
     const establishmentContact = establishmentAggregate.contact;
     if (!establishmentContact)
       throw new NotFoundError(
-        `No contact found for establishment with siret n°${params.siret}`,
+        `No contact found for establishment with siret n°${contactRequest.siret}`,
       );
 
     const discussion: DiscussionAggregate = {
       id: this.uuidGenerator.new(),
-      appellationCode: params.appellationCode,
-      siret: params.siret,
+      appellationCode: contactRequest.appellationCode,
+      siret: contactRequest.siret,
       createdAt: now,
       immersionObjective:
-        params.contactMode === "EMAIL" ? params.immersionObjective : null,
+        contactRequest.contactMode === "EMAIL"
+          ? contactRequest.immersionObjective
+          : null,
       address: establishmentAggregate.establishment.address,
       potentialBeneficiary: {
-        firstName: params.potentialBeneficiaryFirstName,
-        lastName: params.potentialBeneficiaryLastName,
-        email: params.potentialBeneficiaryEmail,
+        firstName: contactRequest.potentialBeneficiaryFirstName,
+        lastName: contactRequest.potentialBeneficiaryLastName,
+        email: contactRequest.potentialBeneficiaryEmail,
         phone:
-          params.contactMode === "EMAIL"
-            ? params.potentialBeneficiaryPhone
+          contactRequest.contactMode === "EMAIL"
+            ? contactRequest.potentialBeneficiaryPhone
             : "",
         resumeLink:
-          params.contactMode === "EMAIL"
-            ? params.potentialBeneficiaryResumeLink
+          contactRequest.contactMode === "EMAIL"
+            ? contactRequest.potentialBeneficiaryResumeLink
             : "",
       },
       establishmentContact: {
-        contactMode: params.contactMode,
+        contactMode: contactRequest.contactMode,
         email: establishmentContact.email,
         firstName: establishmentContact.firstName,
         lastName: establishmentContact.lastName,
@@ -72,11 +74,12 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
         copyEmails: establishmentContact.copyEmails,
       },
       exchanges:
-        params.contactMode === "EMAIL"
+        contactRequest.contactMode === "EMAIL"
           ? [
               {
+                subject: "Demande de contact initiée par le bénéficiaire",
                 sentAt: now,
-                message: params.message,
+                message: contactRequest.message,
                 recipient: "establishment",
                 sender: "potentialBeneficiary",
               },
@@ -91,7 +94,7 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
 
     const numberOfDiscussionsOfPast7Days =
       await uow.discussionAggregateRepository.countDiscussionsForSiretSince(
-        params.siret,
+        contactRequest.siret,
         subDays(now, 7),
       );
 

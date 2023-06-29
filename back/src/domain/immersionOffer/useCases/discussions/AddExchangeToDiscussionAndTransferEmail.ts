@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { addressDtoToString, ExchangeRole } from "shared";
+import { ExchangeRole } from "shared";
 import {
   BadRequestError,
   NotFoundError,
@@ -103,6 +103,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
         : "establishment";
 
     const exchange: ExchangeEntity = {
+      subject: brevoResponse.items[0].Subject,
       message: brevoResponse.items[0].RawHtmlBody || "",
       sentAt: new Date(brevoResponse.items[0].SentAtDate),
       recipient: recipientKind,
@@ -118,16 +119,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       templatedContent: {
         kind: "DISCUSSION_EXCHANGE",
         params: {
-          from: sender,
-          establishmentContactFirstName:
-            discussion.establishmentContact.firstName,
-          establishmentContactLastName:
-            discussion.establishmentContact.lastName,
-          establishmentName: "TODO get name when migration is done",
-          establishmentAddress: addressDtoToString(discussion.address),
-          appellationLabel: discussion.appellationCode, // TODO fetch label,
-          beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-          beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+          subject: exchange.subject,
           htmlContent: exchange.message,
         },
         recipients: [
@@ -141,9 +133,12 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
             : [],
         replyTo: {
           email: `${discussionId}_${
-            recipientKind === "establishment" ? "e" : "b"
+            sender === "establishment" ? "e" : "b"
           }@reply-dev.immersion-facile.beta.gouv.fr`,
-          name: `TODO`,
+          name:
+            sender === "establishment"
+              ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - TODO`
+              : `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
         },
       },
       followedIds: {

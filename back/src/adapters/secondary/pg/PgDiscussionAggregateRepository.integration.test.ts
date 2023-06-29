@@ -74,6 +74,7 @@ describe("PgDiscussionAggregateRepository", () => {
       exchanges: [
         ...discussionAggregate.exchanges,
         {
+          subject: "mon nouveau sujet",
           message: "mon nouveau message",
           recipient: "potentialBeneficiary",
           sentAt: new Date(),
