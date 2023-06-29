@@ -68,6 +68,10 @@ describe("SendNotification UseCase", () => {
       params: { agencyName: "My agency", agencyLogoUrl: undefined },
       recipients: ["bob@mail.com"],
       cc: [],
+      replyTo: {
+        email: "yolo@mail.com",
+        name: "Yolo",
+      },
     };
 
     const id = "notif-123";

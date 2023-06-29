@@ -45,6 +45,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       new AddExchangeToDiscussionAndTransferEmail(
         uowPerformer,
         saveNotificationAndRelatedEvent,
+        "my-domain.com",
       );
   });
 
@@ -181,7 +182,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             },
             recipients: [discussion1.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussionId1}_e@reply-dev.immersion-facile.beta.gouv.fr`,
+              email: `${discussionId1}_e@reply.my-domain.com`,
               name: `${discussion1.establishmentContact.firstName} ${discussion1.establishmentContact.lastName} - ${discussion1.businessName}`,
             },
             cc: [],
@@ -195,7 +196,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             },
             recipients: [discussion2.establishmentContact.email],
             replyTo: {
-              email: `${discussionId2}_b@reply-dev.immersion-facile.beta.gouv.fr`,
+              email: `${discussionId2}_b@reply.my-domain.com`,
               name: `${discussion2.potentialBeneficiary.firstName} ${discussion2.potentialBeneficiary.lastName}`,
             },
             cc: discussion2.establishmentContact.copyEmails,
