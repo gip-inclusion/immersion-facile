@@ -1146,16 +1146,25 @@ export const emailTemplatesByName =
             }`,
             url: immersionAssessmentCreationLink,
           },
+          {
+            label: "Télécharger la fiche bilan",
+            url: `${
+              internshipKind === "immersion"
+                ? "https://immersion.cellar-c2.services.clever-cloud.com/PMSMP_Bilan.pdf"
+                : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
+            }`,
+          },
         ],
+        highlight: {
+          kind: "info",
+          content: `${
+            internshipKind === "immersion"
+              ? `À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée avec ${beneficiaryFirstName} ${beneficiaryLastName}, `
+              : `À la fin du mini stage, nous vous remercions de compléter la fiche bilan du mini stage, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée avec ${beneficiaryFirstName} ${beneficiaryLastName}, `
+          } puis envoyée à <a href= "mailto:${agencyValidatorEmail}" target="_blank">${agencyValidatorEmail}</a>.`,
+        },
         subContent: `
-      Cette information est importante pour la suite de son parcours professionnel. 
-
-      N'oubliez pas non plus de compléter avec ${beneficiaryFirstName} ${beneficiaryLastName} le ${
-          internshipKind === "immersion"
-            ? `<a href="https://immersion.cellar-c2.services.clever-cloud.com/PMSMP_Bilan.pdf">bilan de l'immersion en PDF</a>`
-            : `<a href="https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf">bilan du mini stage en PDF</a>`
-        }.
-      Envoyez-le à <a href= "mailto:${agencyValidatorEmail}" target="_blank">${agencyValidatorEmail}</a> 
+      Ces informations sont importantes pour la suite de son parcours professionnel. 
 
       En cas de difficulté, prévenez au plus vite la structure d’accompagnement pour que vous soyez conseillé au mieux.
        
