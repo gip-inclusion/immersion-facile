@@ -24,26 +24,6 @@ type BrevoAttachment = {
   DownloadToken: string;
 };
 
-type BrevoEmailHeaders = {
-  Received: string;
-  "DKIM-Signature": string;
-  "X-Google-DKIM-Signature": string;
-  "X-Gm-Message-State": string;
-  "X-Google-Smtp-Source": string;
-  "X-Received": string;
-  "MIME-Version": string;
-  References: string;
-  "In-Reply-To": string;
-  From: string;
-  Date: string;
-  "Message-ID": string;
-  Subject: string;
-  To: string;
-  Cc: string;
-  "Content-Type": string;
-  Bcc: string;
-};
-
 type BrevoRecipient = {
   Name: string | null;
   Address: string;
@@ -60,10 +40,6 @@ type BrevoEmailItem = {
   SentAtDate: string;
   Subject: string;
   Attachments: BrevoAttachment[];
-  Headers: BrevoEmailHeaders;
-  SpamScore: number;
-  ExtractedMarkdownMessage: string;
-  ExtractedMarkdownSignature: string | null;
   RawHtmlBody: string | null;
   RawTextBody: string | null;
 };
@@ -88,9 +64,12 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     brevoResponse: BrevoInboundResponse,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [discussionId, recipientKind] = getDiscussionParamsFromEmail(
-      brevoResponse.items[0],
+    await Promise.all(
+      brevoResponse.items.map((item) => this.processBrevoItem(uow, item)),
     );
+  }
+  private async processBrevoItem(uow: UnitOfWork, item: BrevoEmailItem) {
+    const [discussionId, recipientKind] = getDiscussionParamsFromEmail(item);
     const discussion = await uow.discussionAggregateRepository.getById(
       discussionId,
     );
@@ -103,9 +82,9 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
         : "establishment";
 
     const exchange: ExchangeEntity = {
-      subject: brevoResponse.items[0].Subject,
-      message: brevoResponse.items[0].RawHtmlBody || "",
-      sentAt: new Date(brevoResponse.items[0].SentAtDate),
+      subject: item.Subject,
+      message: item.RawHtmlBody || "",
+      sentAt: new Date(item.SentAtDate),
       recipient: recipientKind,
       sender,
     };
