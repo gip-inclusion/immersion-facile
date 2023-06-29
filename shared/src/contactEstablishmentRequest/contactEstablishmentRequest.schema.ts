@@ -15,6 +15,7 @@ import {
 import {
   ContactEstablishmentByMailDto,
   ContactEstablishmentByPhoneDto,
+  ContactEstablishmentEventPayload,
   ContactEstablishmentInPersonDto,
   ContactEstablishmentRequestDto,
 } from "./contactEstablishmentRequest.dto";
@@ -73,4 +74,12 @@ export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentReq
     contactEstablishmentByMailSchema,
     contactEstablishmentByPhoneSchema,
     contactEstablishmentInPersonSchema,
+  ]);
+
+const withDiscussionId = z.object({ discussionId: z.string() });
+export const contactEstablishmentEventPayloadSchema: z.Schema<ContactEstablishmentEventPayload> =
+  z.union([
+    contactEstablishmentByMailSchema.and(withDiscussionId),
+    contactEstablishmentByPhoneSchema.and(withDiscussionId),
+    contactEstablishmentInPersonSchema.and(withDiscussionId),
   ]);

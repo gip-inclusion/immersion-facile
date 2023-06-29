@@ -53,3 +53,13 @@ export const addExchangeToDiscussion = (
   ...discussion,
   exchanges: [...discussion.exchanges, newExchange],
 });
+
+export const createOpaqueEmail = (
+  discussionId: DiscussionId,
+  recipientKind: ExchangeRole,
+  replyDomain: string,
+) => {
+  const recipientLetter = recipientKind === "establishment" ? "e" : "b";
+
+  return `${discussionId}_${recipientLetter}@${replyDomain}`;
+};

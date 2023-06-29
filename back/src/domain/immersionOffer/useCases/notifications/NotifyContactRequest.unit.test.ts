@@ -1,6 +1,6 @@
 import {
   addressDtoToString,
-  ContactEstablishmentRequestDto,
+  ContactEstablishmentEventPayload,
   expectPromiseToFailWithError,
 } from "shared";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
@@ -34,9 +34,11 @@ const immersionOffer = new ImmersionOfferEntityV2Builder()
 
 const siret = "11112222333344";
 const contactId = "theContactId";
+const discussionId = "discussion-id";
 
-const payload: ContactEstablishmentRequestDto = {
+const payload: ContactEstablishmentEventPayload = {
   siret,
+  discussionId,
   appellationCode: TEST_APPELLATION_CODE,
   contactMode: "PHONE",
   potentialBeneficiaryFirstName: "potential_beneficiary_name",
@@ -71,12 +73,13 @@ describe("NotifyContactRequest", () => {
     notifyContactRequest = new NotifyContactRequest(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
+      "reply.domain.com",
     );
   });
 
   describe("Right paths", () => {
     it("Sends ContactByEmailRequest email to establishment", async () => {
-      const validEmailPayload: ContactEstablishmentRequestDto = {
+      const validEmailPayload: ContactEstablishmentEventPayload = {
         ...payload,
         contactMode: "EMAIL",
         message: "message_to_send",
@@ -107,6 +110,10 @@ describe("NotifyContactRequest", () => {
           {
             kind: "CONTACT_BY_EMAIL_REQUEST",
             recipients: [contact.email],
+            replyTo: {
+              email: "discussion-id_b@reply.reply.domain.com",
+              name: "potential_beneficiary_name potential_beneficiary_last_name - via Immersion Facilitée",
+            },
             params: {
               businessName: establishment.name,
               contactFirstName: contact.firstName,
@@ -132,7 +139,7 @@ describe("NotifyContactRequest", () => {
     });
 
     it("Sends ContactByPhoneRequest email to potential beneficiary", async () => {
-      const validPhonePayload: ContactEstablishmentRequestDto = {
+      const validPhonePayload: ContactEstablishmentEventPayload = {
         ...payload,
         contactMode: "PHONE",
       };
@@ -174,7 +181,7 @@ describe("NotifyContactRequest", () => {
     });
 
     it("Sends ContactInPersonRequest email to potential beneficiary", async () => {
-      const validInPersonPayload: ContactEstablishmentRequestDto = {
+      const validInPersonPayload: ContactEstablishmentEventPayload = {
         ...payload,
         contactMode: "IN_PERSON",
       };
@@ -218,7 +225,7 @@ describe("NotifyContactRequest", () => {
 
   describe("wrong paths", () => {
     it("Missing establishment", async () => {
-      const validInPersonPayload: ContactEstablishmentRequestDto = {
+      const validInPersonPayload: ContactEstablishmentEventPayload = {
         ...payload,
         contactMode: "IN_PERSON",
       };
@@ -230,7 +237,7 @@ describe("NotifyContactRequest", () => {
     });
 
     it("Missing establishment contact details", async () => {
-      const validInPersonPayload: ContactEstablishmentRequestDto = {
+      const validInPersonPayload: ContactEstablishmentEventPayload = {
         ...payload,
         contactMode: "IN_PERSON",
       };
@@ -254,7 +261,7 @@ describe("NotifyContactRequest", () => {
     });
 
     it("Bad contact method", async () => {
-      const validInPersonPayload: ContactEstablishmentRequestDto = {
+      const validInPersonPayload: ContactEstablishmentEventPayload = {
         ...payload,
         contactMode: "IN_PERSON",
       };
@@ -283,7 +290,7 @@ describe("NotifyContactRequest", () => {
       );
     });
 
-    it.each<ContactEstablishmentRequestDto>([
+    it.each<ContactEstablishmentEventPayload>([
       {
         ...payload,
         contactMode: "IN_PERSON",
