@@ -137,7 +137,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
           }@reply-dev.immersion-facile.beta.gouv.fr`,
           name:
             sender === "establishment"
-              ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - TODO`
+              ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
               : `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
         },
       },

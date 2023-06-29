@@ -45,6 +45,9 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
       id: this.uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
+      businessName:
+        establishmentAggregate.establishment.customizedName ??
+        establishmentAggregate.establishment.name,
       createdAt: now,
       immersionObjective:
         contactRequest.contactMode === "EMAIL"
