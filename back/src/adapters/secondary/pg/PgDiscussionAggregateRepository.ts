@@ -36,8 +36,9 @@ export class PgDiscussionAggregateRepository
          street_number_and_address,
          postcode,
          department_code,
-         city
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
+         city,
+         business_name
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`,
       [
         discussion.id,
         discussion.establishmentContact.contactMode,
@@ -60,6 +61,7 @@ export class PgDiscussionAggregateRepository
         discussion.address.postcode,
         discussion.address.departmentCode,
         discussion.address.city,
+        discussion.businessName,
       ],
     );
 
@@ -88,7 +90,8 @@ export class PgDiscussionAggregateRepository
          street_number_and_address = $17,
          postcode = $18,
          department_code = $19,
-         city = $20
+         city = $20,
+         business_name = $22
        WHERE id = $21`,
       [
         discussion.establishmentContact.contactMode,
@@ -112,6 +115,7 @@ export class PgDiscussionAggregateRepository
         discussion.address.departmentCode,
         discussion.address.city,
         discussion.id,
+        discussion.businessName,
       ],
     );
 
@@ -126,7 +130,14 @@ export class PgDiscussionAggregateRepository
       `
     WITH exchanges_by_id AS (
       SELECT discussion_id, 
-      ARRAY_AGG(JSON_BUILD_OBJECT('message', message, 'recipient', recipient, 'sender', sender, 'sentAt', sent_at) ) AS exchanges
+      ARRAY_AGG(
+        JSON_BUILD_OBJECT(
+          'message', message,
+          'recipient', recipient,
+          'sender', sender,
+          'sentAt', sent_at,
+          'subject', subject
+        ) ) AS exchanges
       FROM exchanges 
       GROUP BY discussion_id
     )
@@ -135,6 +146,7 @@ export class PgDiscussionAggregateRepository
         'id', id, 
         'createdAt', created_at,
         'siret', siret,
+        'businessName', business_name,
         'appellationCode', appellation_code::text,
         'immersionObjective', immersion_objective,
         'potentialBeneficiary', JSON_BUILD_OBJECT(
@@ -200,7 +212,7 @@ export class PgDiscussionAggregateRepository
   ) {
     const sql = format(
       `
-    INSERT INTO exchanges (discussion_id, message, sender, recipient, sent_at)
+    INSERT INTO exchanges (discussion_id, message, sender, recipient, sent_at, subject)
     VALUES %L
     `,
       exchanges.map((exchange) => [
@@ -209,6 +221,7 @@ export class PgDiscussionAggregateRepository
         exchange.sender,
         exchange.recipient,
         exchange.sentAt.toISOString(),
+        exchange.subject,
       ]),
     );
 

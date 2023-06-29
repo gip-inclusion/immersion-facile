@@ -3,6 +3,26 @@ import { MigrationBuilder } from "node-pg-migrate";
 const constraintName = "exchanges_discussion_id_unique";
 const exchangesTable = "exchanges";
 const viewContactRequestName = "view_contact_requests";
+const subjectColumn = "subject";
+
+export async function up(pgm: MigrationBuilder): Promise<void> {
+  // add uniq constraint on dicussion_id and sent_at
+  pgm.addConstraint(exchangesTable, constraintName, {
+    unique: ["discussion_id", "sent_at"],
+  });
+  pgm.addColumn(exchangesTable, {
+    [subjectColumn]: { type: "text", notNull: true, default: "NOT_PROVIDED" },
+  });
+  pgm.dropMaterializedView(viewContactRequestName);
+  pgm.sql(createContactRequestView("up"));
+}
+
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.dropConstraint(exchangesTable, constraintName);
+  pgm.dropColumn(exchangesTable, subjectColumn);
+  pgm.dropMaterializedView(viewContactRequestName);
+  pgm.sql(createContactRequestView("down"));
+}
 
 const createContactRequestView = (mode: "up" | "down") => `
     CREATE MATERIALIZED VIEW ${viewContactRequestName} AS (
@@ -35,19 +55,3 @@ const createContactRequestView = (mode: "up" | "down") => `
         LEFT JOIN public_appellations_data a ON a.ogr_appellation = discussions.appellation_code
         LEFT JOIN public_romes_data r ON r.code_rome = a.code_rome
     );`;
-
-export async function up(pgm: MigrationBuilder): Promise<void> {
-  // add uniq constraint on dicussion_id and sent_at
-  pgm.addConstraint(exchangesTable, constraintName, {
-    unique: ["discussion_id", "sent_at"],
-  });
-
-  pgm.dropMaterializedView(viewContactRequestName);
-  pgm.sql(createContactRequestView("up"));
-}
-
-export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropConstraint(exchangesTable, constraintName);
-  pgm.dropMaterializedView(viewContactRequestName);
-  pgm.sql(createContactRequestView("down"));
-}

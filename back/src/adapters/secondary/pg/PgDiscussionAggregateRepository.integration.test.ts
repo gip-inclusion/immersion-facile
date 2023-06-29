@@ -46,7 +46,7 @@ describe("PgDiscussionAggregateRepository", () => {
     await pool.end();
   });
 
-  it("Methode insert and update", async () => {
+  it("Methode insert, update and getById", async () => {
     const siret = "01234567891011";
 
     await establishmentAggregateRepo.insertEstablishmentAggregates([
@@ -89,7 +89,7 @@ describe("PgDiscussionAggregateRepository", () => {
     );
   });
 
-  it("Methode getById", async () => {
+  it("Methode countDiscussionsForSiretSince", async () => {
     const siret = "11112222333344";
     const since = new Date("2023-03-05");
 
