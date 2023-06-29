@@ -896,7 +896,7 @@ export const emailTemplatesByName =
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
         content: `
-        Un candidat souhaite faire une immersion pour ${immersionObject} sur le métier de ${appellationLabel} dans votre entreprise ${businessName} (${businessAddress}).
+        Un candidat souhaite faire une immersion pour "${immersionObject?.toLowerCase()}" sur le métier de ${appellationLabel} dans votre entreprise ${businessName} (${businessAddress}).
 
         Voici son message:
 
