@@ -37,9 +37,7 @@ export const BeneficiaryFormSection = ({
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
   );
-  const isSuccessfullyPeConnected = useAppSelector(
-    authSelectors.isSuccessfullyPeConnected,
-  );
+  const isSuccessfullyPeConnected = useAppSelector(authSelectors.isPeConnected);
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
   const { register, getValues, setValue, formState } =
