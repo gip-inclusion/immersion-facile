@@ -895,7 +895,6 @@ export const emailTemplatesByName =
         contactLastName,
         immersionObjective: immersionObject,
         message,
-        potentialBeneficiaryEmail,
         potentialBeneficiaryFirstName,
         potentialBeneficiaryLastName,
         businessAddress,
@@ -918,22 +917,16 @@ export const emailTemplatesByName =
         potentialBeneficiaryResumeLink &&
         `Plus d'info sur ce candidat: <a href="${potentialBeneficiaryResumeLink}">${potentialBeneficiaryResumeLink}</a>`
       }
-
-      <strong>Sa candidature vous intéresse ? </strong>
-
-      Prenez contact avec le candidat par email ou par téléphone:
       
       `,
-        buttons: [
-          {
-            label: `${potentialBeneficiaryEmail}`,
-            url: `mailto:${potentialBeneficiaryEmail}?subject=Suite à votre demande d'immersion chez ${businessName}`,
-          },
-          {
-            label: `${potentialBeneficiaryPhone}`,
-            url: `tel:${potentialBeneficiaryPhone}`,
-          },
-        ],
+        highlight: {
+          content: `
+          Ce candidat attend une réponse, vous pouvez :
+
+          - répondre directement à cet email, il lui sera transmis
+
+          - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
+        },
         subContent: `Vous pouvez préparer votre échange grâce à notre <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
         ${defaultSignature("immersion")}`,
       }),

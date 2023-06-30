@@ -123,7 +123,6 @@ describe("NotifyContactRequest", () => {
                 payload.potentialBeneficiaryFirstName,
               potentialBeneficiaryLastName:
                 payload.potentialBeneficiaryLastName,
-              potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
               immersionObjective: validEmailPayload.immersionObjective,
               potentialBeneficiaryPhone:
                 validEmailPayload.potentialBeneficiaryPhone,

@@ -48,7 +48,6 @@ export type EmailParamsByEmailType = {
     appellationLabel: string;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
-    potentialBeneficiaryEmail: string;
     potentialBeneficiaryPhone: string;
     immersionObjective: ImmersionObjective | null;
     potentialBeneficiaryResumeLink?: string;

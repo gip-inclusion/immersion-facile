@@ -1,3 +1,5 @@
+import { ignoreTabs } from "../../helpers/formatters";
+
 export const renderHighlight = (
   props:
     | {
@@ -19,7 +21,7 @@ export const renderHighlight = (
       </td>
       <td>
        <p style="color: #000093; font-weight: bold; margin-top: 1rem;">
-        ${props.content}
+       ${ignoreTabs(props.content).split("\n").join("<br/>")}
        </p>
       </td>
     </tr>
