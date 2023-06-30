@@ -403,7 +403,6 @@ export const defaultEmailValueByEmailKind: {
     contactLastName: "CONTACT_LAST_NAME",
     immersionObjective: "Découvrir un métier ou un secteur d'activité",
     message: "MESSAGE",
-    potentialBeneficiaryEmail: "POTENTIAL_BENEFICIARY_EMAIL",
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
     potentialBeneficiaryPhone: "POTENTIAL_BENEFICIARY_PHONE",
