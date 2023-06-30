@@ -7,7 +7,7 @@ const currentFederatedIdentity = createRootSelector(
   (state) => state.auth.federatedIdentityWithUser,
 );
 
-const isSuccessfullyPeConnected = createSelector(
+const isPeConnected = createSelector(
   currentFederatedIdentity,
   (federatedIdentity) =>
     federatedIdentity?.provider === "peConnect" &&
@@ -45,7 +45,7 @@ const connectedUser = createSelector(
 
 export const authSelectors = {
   federatedIdentity: currentFederatedIdentity,
-  isSuccessfullyPeConnected,
+  isPeConnected,
   isInclusionConnected,
   inclusionConnectToken,
   connectedUser,

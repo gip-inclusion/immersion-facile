@@ -14,6 +14,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
@@ -43,6 +45,7 @@ export const ImmersionHeader = () => {
   } = domElementIds.header.navLinks;
 
   const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
+  const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
   if (isAdminConnected) {
     tools.push({
@@ -50,6 +53,16 @@ export const ImmersionHeader = () => {
       text: "Se déconnecter",
       buttonProps: {
         onClick: () => dispatch(adminAuthSlice.actions.logoutRequested()),
+      },
+    });
+  }
+  if (isPeConnected) {
+    tools.push({
+      iconId: "fr-icon-lock-line",
+      text: "Se déconnecter (PE Connect)",
+      buttonProps: {
+        onClick: () =>
+          dispatch(authSlice.actions.federatedIdentityDeletionTriggered),
       },
     });
   }
