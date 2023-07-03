@@ -44,12 +44,57 @@ type BrevoEmailItem = {
   RawTextBody: string | null;
 };
 
-export type BrevoInboundResponse = {
+export type BrevoInboundBody = {
   items: BrevoEmailItem[];
 };
 
-export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundResponse> {
-  inputSchema = z.any();
+const brevoInboundBodySchema: z.Schema<BrevoInboundBody> = z.object({
+  items: z.array(
+    z.object({
+      Uuid: z.array(z.string()),
+      MessageId: z.string(),
+      InReplyTo: z.string().nullable(),
+      From: z.object({
+        Name: z.string().nullable(),
+        Address: z.string(),
+      }),
+      To: z.array(
+        z.object({
+          Name: z.string().nullable(),
+          Address: z.string(),
+        }),
+      ),
+      Cc: z.array(
+        z.object({
+          Name: z.string().nullable(),
+          Address: z.string(),
+        }),
+      ),
+      ReplyTo: z
+        .object({
+          Name: z.string().nullable(),
+          Address: z.string(),
+        })
+        .nullable(),
+      SentAtDate: z.string(),
+      Subject: z.string(),
+      Attachments: z.array(
+        z.object({
+          Name: z.string(),
+          ContentType: z.string(),
+          ContentLength: z.number(),
+          ContentID: z.string(),
+          DownloadToken: z.string(),
+        }),
+      ),
+      RawHtmlBody: z.string().nullable(),
+      RawTextBody: z.string().nullable(),
+    }),
+  ),
+});
+
+export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundBody> {
+  inputSchema = brevoInboundBodySchema;
 
   private readonly replyDomain: string;
   constructor(
@@ -62,7 +107,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
   }
 
   protected async _execute(
-    brevoResponse: BrevoInboundResponse,
+    brevoResponse: BrevoInboundBody,
     uow: UnitOfWork,
   ): Promise<void> {
     await Promise.all(

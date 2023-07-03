@@ -72,6 +72,9 @@ importers:
       express:
         specifier: ^4.17.3
         version: 4.18.2
+      express-ipfilter:
+        specifier: ^1.3.1
+        version: 1.3.1
       express-prometheus-middleware:
         specifier: ^1.2.0
         version: 1.2.0(express@4.18.2)(prom-client@14.1.1)
@@ -9622,6 +9625,16 @@ packages:
       jest-util: 29.5.0
     dev: true
 
+  /express-ipfilter@1.3.1:
+    resolution: {integrity: sha512-9WZC8wGkI6I6ygZNzuZ2MbFJiGoDXs1dM+E8LKtSP13pdgqrnkonWlgvvbxG3YZpa7Haz7Ndum9/J6qkj52OqA==}
+    engines: {node: '>=8.9.0'}
+    dependencies:
+      ip: 1.1.8
+      lodash: 4.17.21
+      proxy-addr: 2.0.7
+      range_check: 2.0.4
+    dev: false
+
   /express-prometheus-middleware@1.2.0(express@4.18.2)(prom-client@14.1.1):
     resolution: {integrity: sha512-efSwft67rdtiW40D0im1f7Rz1TCGHGzPj6lfK0MxZDcPj6z4f/Ab5VNkWPYZEjvLqZiZ7fbS00CYzpigO8tS+g==}
     peerDependencies:
@@ -10525,6 +10538,15 @@ packages:
     dependencies:
       loose-envify: 1.4.0
     dev: true
+
+  /ip6@0.2.10:
+    resolution: {integrity: sha512-1LdpyKjhvepd6EbAU6rW4g14vuYtx5TnJX9TfZZBhsM6DsyPQLNzW12rtbUqXBMwqFrLVV/Gcxv0GNFvJp2cYA==}
+    hasBin: true
+    dev: false
+
+  /ip@1.1.8:
+    resolution: {integrity: sha512-PuExPYUiu6qMBQb4l06ecm6T6ujzhmh+MeJcW9wa89PoAz5pvd4zPgN5WJV104mb6S2T1AwNIAaB70JNrLQWhg==}
+    dev: false
 
   /ip@2.0.0:
     resolution: {integrity: sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==}
@@ -13229,6 +13251,14 @@ packages:
   /range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
+
+  /range_check@2.0.4:
+    resolution: {integrity: sha512-aed0ocXXj+SIiNNN9b+mZWA3Ow2GXHtftOGk2xQwshK5GbEZAvUcPWNQBLTx/lPcdFRIUFlFCRtHTQNIFMqynQ==}
+    engines: {node: '>=10.0.0'}
+    dependencies:
+      ip6: 0.2.10
+      ipaddr.js: 1.9.1
+    dev: false
 
   /raw-body@2.5.1:
     resolution: {integrity: sha512-qqJBtEyVgS0ZmPGdCFPWJ3FreoqvG4MVQln/kCgF7Olq95IbOp0/BWyMwbdtn4VTvkM8Y7khCQ2Xgk/tcrCXig==}

@@ -204,6 +204,12 @@ export class AppConfig {
     });
   }
 
+  public get inboundEmailAllowedIps() {
+    return parseStringList(
+      this.throwIfNotDefinedOrDefault("INBOUND_EMAIL_ALLOWED_IPS"),
+    );
+  }
+
   // == Inclusion Connect gateway ==
   public get inclusionConnectGateway() {
     return this.throwIfNotInArray({
