@@ -62,7 +62,7 @@ export const ImmersionHeader = () => {
       text: "Se déconnecter (PE Connect)",
       buttonProps: {
         onClick: () =>
-          dispatch(authSlice.actions.federatedIdentityDeletionTriggered),
+          dispatch(authSlice.actions.federatedIdentityDeletionTriggered()),
       },
     });
   }
