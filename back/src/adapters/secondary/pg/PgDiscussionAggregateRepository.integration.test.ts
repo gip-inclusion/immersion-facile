@@ -1,12 +1,12 @@
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import {ImmersionOfferEntityV2Builder} from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import {PgEstablishmentAggregateRepository} from "./PgEstablishmentAggregateRepository";
+import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
 const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
@@ -33,6 +33,8 @@ describe("PgDiscussionAggregateRepository", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM immersion_contacts");
+    await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM discussions");
     await client.query("DELETE FROM exchanges");
     pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(

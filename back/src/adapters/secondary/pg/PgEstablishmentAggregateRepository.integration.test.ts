@@ -1307,8 +1307,7 @@ describe("Postgres implementation of immersion offer repository", () => {
               )
 
               .withCreatedAt(new Date("2021-01-03T00:00:00.000Z"))
-              .build()
-
+              .build(),
           ),
         ]);
       });

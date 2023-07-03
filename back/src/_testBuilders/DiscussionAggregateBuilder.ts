@@ -2,13 +2,13 @@ import {
   AddressDto,
   AppellationCode,
   Builder,
+  DiscussionId,
   ImmersionObjective,
   SiretDto,
 } from "shared";
 import {
   DiscussionAggregate,
   DiscussionEstablishmentContact,
-  DiscussionId,
   DiscussionPotentialBeneficiary,
   ExchangeEntity,
 } from "../domain/immersionOffer/entities/DiscussionAggregate";
@@ -21,6 +21,7 @@ const defaultDiscussionAggregateV2: DiscussionAggregate = {
   siret: "12345671234567",
   createdAt,
   immersionObjective: null,
+  businessName: "My default business name",
   address: {
     streetNumberAndAddress: "1 rue de la Paix",
     postcode: "75001",
