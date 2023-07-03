@@ -79,12 +79,12 @@ describe("Postgres implementation of immersion offer repository", () => {
       rome: informationGeographiqueRome,
       appellationCode: "11704",
       ...searchedPosition,
-      distance_km: 30,
+      distanceKm: 30,
       sortedBy: "distance",
     };
     const searchMadeWithoutRome: SearchMade = {
       ...searchedPosition,
-      distance_km: 30,
+      distanceKm: 30,
       sortedBy: "distance",
     };
     it("returns empty list when repo is empty", async () => {

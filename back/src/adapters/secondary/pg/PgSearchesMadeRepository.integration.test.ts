@@ -30,7 +30,7 @@ describe("PgSearchesMadeRepository", () => {
       id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
       rome: "M1607",
       appellationCode: "19365",
-      distance_km: 30,
+      distanceKm: 30,
       lat: 48.119146,
       lon: 4.17602,
       needsToBeSearched: true,
@@ -91,7 +91,7 @@ describe("PgSearchesMadeRepository", () => {
     return {
       id: res.rows[0].id,
       rome: optional(res.rows[0].rome),
-      distance_km: res.rows[0].distance,
+      distanceKm: res.rows[0].distance,
       lat: res.rows[0].lat,
       lon: res.rows[0].lon,
       sortedBy: res.rows[0].sorted_by,

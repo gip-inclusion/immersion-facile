@@ -5,6 +5,7 @@ import { EstablishmentAggregate } from "../domain/immersionOffer/entities/Establ
 export const establishmentToSearchResultByRome = (
   establishmentAggregate: EstablishmentAggregate,
   romeCode: RomeCode,
+  withContactDetails: boolean,
 ): SearchImmersionResultDto => ({
   rome: romeCode,
   naf: establishmentAggregate.establishment.nafDto.code,
@@ -29,4 +30,15 @@ export const establishmentToSearchResultByRome = (
       appellationCode: immersionOffer.appellationCode,
       appellationLabel: immersionOffer.appellationLabel,
     })),
+  contactDetails:
+    withContactDetails && establishmentAggregate.contact
+      ? {
+          id: establishmentAggregate.contact.id,
+          email: establishmentAggregate.contact.email,
+          firstName: establishmentAggregate.contact.firstName,
+          lastName: establishmentAggregate.contact.lastName,
+          job: establishmentAggregate.contact.job,
+          phone: establishmentAggregate.contact.phone,
+        }
+      : undefined,
 });

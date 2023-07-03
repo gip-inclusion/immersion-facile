@@ -1,8 +1,4 @@
-import {
-  GeoPositionDto,
-  RomeCode,
-  SearchImmersionQueryParamsDto,
-} from "shared";
+import { GeoPositionDto, RomeCode, SearchImmersionParamsDto } from "shared";
 
 export type SearchImmersionRequestPublicV0 = {
   rome?: RomeCode;
@@ -12,7 +8,7 @@ export type SearchImmersionRequestPublicV0 = {
 
 export const searchImmersionRequestPublicV0ToDomain = (
   publicV0: SearchImmersionRequestPublicV0,
-): SearchImmersionQueryParamsDto => {
+): SearchImmersionParamsDto => {
   const { location, distance_km, ...rest } = publicV0;
   return {
     ...rest,
