@@ -57,20 +57,22 @@ describe("search-immersion route", () => {
         const immersionOffer = new ImmersionOfferEntityV2Builder()
           .withRomeCode("A1000")
           .build();
+        const establishmentAgg = new EstablishmentAggregateBuilder()
+          .withImmersionOffers([immersionOffer])
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withPosition({
+                lat: 48.8531,
+                lon: 2.34999,
+              })
+              .withWebsite("www.jobs.fr")
+              .build(),
+          )
+          .build();
+
         // Prepare
         await establishmentAggregateRepository.insertEstablishmentAggregates([
-          new EstablishmentAggregateBuilder()
-            .withImmersionOffers([immersionOffer])
-            .withEstablishment(
-              new EstablishmentEntityBuilder()
-                .withPosition({
-                  lat: 48.8531,
-                  lon: 2.34999,
-                })
-                .withWebsite("www.jobs.fr")
-                .build(),
-            )
-            .build(),
+          establishmentAgg,
         ]);
 
         // Act and assert
@@ -78,7 +80,7 @@ describe("search-immersion route", () => {
           {
             address: avenueChampsElysees,
             naf: defaultNafCode,
-            nafLabel: "test_naf_label",
+            nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
             name: "Company inside repository",
             website: "www.jobs.fr",
             additionalInformation: "",

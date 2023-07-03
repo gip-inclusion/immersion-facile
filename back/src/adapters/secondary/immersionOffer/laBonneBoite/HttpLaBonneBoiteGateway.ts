@@ -1,14 +1,15 @@
 import Bottleneck from "bottleneck";
+import { SearchImmersionResultDto } from "shared";
 import { HttpClient } from "http-client";
 import { PoleEmploiGateway } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import {
-  LaBonneBoiteAPI,
+  LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
-} from "../../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
+} from "../../../../domain/immersionOffer/ports/LaBonneBoiteGateway";
 import {
-  LaBonneBoiteCompanyProps,
-  LaBonneBoiteCompanyVO,
-} from "../../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
+  LaBonneBoiteApiResultProps,
+  LaBonneBoiteCompanyDto,
+} from "./LaBonneBoiteCompanyDto";
 import { LaBonneBoiteTargets } from "./LaBonneBoiteTargets";
 
 const MAX_PAGE_SIZE = 100;
@@ -16,16 +17,19 @@ const MAX_DISTANCE_IN_KM = 100;
 
 const lbbMaxQueryPerSeconds = 1;
 
-export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
+export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   constructor(
     private readonly httpClient: HttpClient<LaBonneBoiteTargets>,
     private readonly poleEmploiGateway: PoleEmploiGateway,
     private readonly poleEmploiClientId: string,
   ) {}
 
-  public async searchCompanies(
-    searchParams: LaBonneBoiteRequestParams,
-  ): Promise<LaBonneBoiteCompanyVO[]> {
+  public async searchCompanies({
+    distanceKm,
+    lat,
+    lon,
+    rome,
+  }: LaBonneBoiteRequestParams): Promise<SearchImmersionResultDto[]> {
     const { responseBody } = await this.limiter.schedule(async () => {
       const accessToken = await this.poleEmploiGateway.getAccessToken(
         `application_${this.poleEmploiClientId} api_labonneboitev1`,
@@ -37,19 +41,26 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
         },
         queryParams: {
           distance: MAX_DISTANCE_IN_KM,
-          longitude: searchParams.lon,
-          latitude: searchParams.lat,
+          longitude: lon,
+          latitude: lat,
           page: 1,
           page_size: MAX_PAGE_SIZE,
-          rome_codes: searchParams.rome,
+          rome_codes: rome,
           sort: "distance",
         },
       });
     });
 
-    return responseBody.companies.map(
-      (props: LaBonneBoiteCompanyProps) => new LaBonneBoiteCompanyVO(props),
-    );
+    return responseBody.companies
+      .map(
+        (props: LaBonneBoiteApiResultProps) =>
+          new LaBonneBoiteCompanyDto(props),
+      )
+      .filter(
+        (result) =>
+          result.props.distance <= distanceKm && result.isCompanyRelevant(),
+      )
+      .map((result) => result.toSearchResult());
   }
 
   private limiter = new Bottleneck({

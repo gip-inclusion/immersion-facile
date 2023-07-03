@@ -21,9 +21,6 @@ export interface EstablishmentAggregateRepository {
     establishmentAggregate: EstablishmentAggregate,
     updatedAt: Date,
   ) => Promise<void>;
-  createImmersionOffersToEstablishments: (
-    offersWithSiret: OfferWithSiret[],
-  ) => Promise<void>;
 
   getSearchImmersionResultDtoFromSearchMade: (props: {
     searchMade: SearchMade;

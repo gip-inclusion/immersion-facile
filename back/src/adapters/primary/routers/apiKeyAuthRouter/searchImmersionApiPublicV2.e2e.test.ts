@@ -76,7 +76,7 @@ describe("search-immersion route", () => {
           {
             address: avenueChampsElyseesDto,
             naf: defaultNafCode,
-            nafLabel: "test_naf_label",
+            nafLabel: "NAFRev2",
             name: "Company inside repository",
             website: "www.jobs.fr",
             additionalInformation: "",

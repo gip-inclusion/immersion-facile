@@ -10,7 +10,7 @@ import { CustomTimeGateway } from "../adapters/secondary/core/TimeGateway/Custom
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/documentGateway/NotImplementedDocumentGateway";
 import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationGateway";
-import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
+import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import type { InMemoryNotificationGateway } from "../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
@@ -32,7 +32,7 @@ export type InMemoryGateways = {
   notification: InMemoryNotificationGateway;
   peConnectGateway: InMemoryPeConnectGateway;
   siret: InMemorySiretGateway;
-  laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
+  laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
   inclusionConnectGateway: InMemoryInclusionConnectGateway;

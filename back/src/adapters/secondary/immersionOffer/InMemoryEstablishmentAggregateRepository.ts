@@ -19,14 +19,10 @@ import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
-  OfferWithSiret,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
-import { createLogger } from "../../../utils/logger";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
-
-const logger = createLogger(__filename);
 
 export const TEST_NAF_LABEL = "test_naf_label";
 export const TEST_ROME_LABEL = "test_rome_label";
@@ -37,30 +33,32 @@ export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
 export class InMemoryEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
-  public constructor(
+  constructor(
     private _establishmentAggregates: EstablishmentAggregate[] = [],
   ) {}
 
-  getSiretOfEstablishmentsToSuggestUpdate(): Promise<SiretDto[]> {
+  public getSiretOfEstablishmentsToSuggestUpdate(): Promise<SiretDto[]> {
     throw new Error(
       "Method not implemented : getSiretOfEstablishmentsToSuggestUpdate, you can use PG implementation instead",
     );
   }
-  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(): Promise<number> {
+
+  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(): Promise<number> {
     // not implemented because this method is used only in a script,
     // and the use case consists only in a PG query
     throw new Error("NOT implemented");
   }
 
-  async insertEstablishmentAggregates(aggregates: EstablishmentAggregate[]) {
-    logger.info({ aggregates }, "insertEstablishmentAggregates");
+  public async insertEstablishmentAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
     this._establishmentAggregates = [
       ...this._establishmentAggregates,
       ...aggregates,
     ];
   }
-  async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
-    logger.info({ aggregate }, "updateEstablishmentAggregate");
+
+  public async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
     const aggregateIndex = this._establishmentAggregates.findIndex(
       pathEq("establishment.siret", aggregate.establishment.siret),
     );
@@ -72,25 +70,6 @@ export class InMemoryEstablishmentAggregateRepository
       this._establishmentAggregates,
       aggregateIndex,
       aggregate,
-    );
-  }
-  async createImmersionOffersToEstablishments(
-    offersWithSirets: OfferWithSiret[],
-  ) {
-    logger.info({ offersWithSirets }, "addImmersionOffersToEstablishments");
-
-    this._establishmentAggregates = this._establishmentAggregates.map(
-      (existingAggregate) => {
-        const matchOfferToAddWithSiret = offersWithSirets.find(
-          propEq("siret", existingAggregate.establishment.siret),
-        );
-        if (!matchOfferToAddWithSiret) return existingAggregate;
-        const { siret, ...offerToAdd } = matchOfferToAddWithSiret;
-        return {
-          ...existingAggregate,
-          immersionOffers: [...existingAggregate.immersionOffers, offerToAdd],
-        };
-      },
     );
   }
 
@@ -110,7 +89,6 @@ export class InMemoryEstablishmentAggregateRepository
     withContactDetails?: boolean;
     maxResults?: number;
   }): Promise<SearchImmersionResultDto[]> {
-    logger.info({ searchMade, withContactDetails }, "getFromSearch");
     return this._establishmentAggregates
       .filter((aggregate) =>
         searchMade.voluntaryToImmersion === undefined
@@ -198,27 +176,29 @@ export class InMemoryEstablishmentAggregateRepository
     const aggregate = this.establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );
-    if (!aggregate) return;
-    return {
-      rome,
-      romeLabel: TEST_ROME_LABEL,
-      appellations: aggregate.immersionOffers
-        .filter(propEq("romeCode", rome))
-        .map((offer) => ({
-          appellationLabel: offer.appellationLabel,
-          appellationCode: offer.appellationCode,
-        })),
-      naf: aggregate.establishment.nafDto.code,
-      nafLabel: TEST_NAF_LABEL,
-      siret,
-      name: aggregate?.establishment.name,
-      customizedName: aggregate?.establishment.customizedName,
-      voluntaryToImmersion: aggregate?.establishment.voluntaryToImmersion,
-      numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
-      position: aggregate?.establishment.position,
-      address: aggregate.establishment.address,
-      contactMode: aggregate.contact?.contactMethod,
-    };
+
+    return (
+      aggregate && {
+        rome,
+        romeLabel: TEST_ROME_LABEL,
+        appellations: aggregate.immersionOffers
+          .filter(propEq("romeCode", rome))
+          .map((offer) => ({
+            appellationLabel: offer.appellationLabel,
+            appellationCode: offer.appellationCode,
+          })),
+        naf: aggregate.establishment.nafDto.code,
+        nafLabel: aggregate.establishment.nafDto.nomenclature,
+        siret,
+        name: aggregate.establishment.name,
+        customizedName: aggregate.establishment.customizedName,
+        voluntaryToImmersion: aggregate.establishment.voluntaryToImmersion,
+        numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
+        position: aggregate.establishment.position,
+        address: aggregate.establishment.address,
+        contactMode: aggregate.contact?.contactMethod,
+      }
+    );
   }
 
   public async getSearchImmersionResultDtoBySiretAndAppellationCode(
@@ -243,13 +223,13 @@ export class InMemoryEstablishmentAggregateRepository
         },
       ],
       naf: aggregate.establishment.nafDto.code,
-      nafLabel: TEST_NAF_LABEL,
+      nafLabel: aggregate.establishment.nafDto.nomenclature,
       siret,
-      name: aggregate?.establishment.name,
-      customizedName: aggregate?.establishment.customizedName,
-      voluntaryToImmersion: aggregate?.establishment.voluntaryToImmersion,
+      name: aggregate.establishment.name,
+      customizedName: aggregate.establishment.customizedName,
+      voluntaryToImmersion: aggregate.establishment.voluntaryToImmersion,
       numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
-      position: aggregate?.establishment.position,
+      position: aggregate.establishment.position,
       address: aggregate.establishment.address,
       contactMode: aggregate.contact?.contactMethod,
     };
@@ -264,16 +244,6 @@ export class InMemoryEstablishmentAggregateRepository
           !!aggregate.immersionOffers.find((offer) => offer.romeCode === rome),
       )
       .map(path("establishment.siret"));
-  }
-
-  // for test purposes only :
-  get establishmentAggregates() {
-    return this._establishmentAggregates;
-  }
-  set establishmentAggregates(
-    establishmentAggregates: EstablishmentAggregate[],
-  ) {
-    this._establishmentAggregates = establishmentAggregates;
   }
 
   public async getSiretsOfEstablishmentsNotCheckedAtInseeSince(
@@ -297,20 +267,29 @@ export class InMemoryEstablishmentAggregateRepository
     this._establishmentAggregates = this._establishmentAggregates.map(
       (aggregate) => {
         const newValues = params[aggregate.establishment.siret];
-
-        if (newValues)
-          return {
-            ...aggregate,
-            establishment: {
-              ...aggregate.establishment,
-              ...newValues,
-              lastInseeCheckDate: inseeCheckDate,
-            },
-          };
-
-        return aggregate;
+        return newValues
+          ? {
+              ...aggregate,
+              establishment: {
+                ...aggregate.establishment,
+                ...newValues,
+                lastInseeCheckDate: inseeCheckDate,
+              },
+            }
+          : aggregate;
       },
     );
+  }
+
+  // for test purposes only :
+  get establishmentAggregates() {
+    return this._establishmentAggregates;
+  }
+
+  set establishmentAggregates(
+    establishmentAggregates: EstablishmentAggregate[],
+  ) {
+    this._establishmentAggregates = establishmentAggregates;
   }
 }
 
@@ -323,7 +302,7 @@ const buildSearchImmersionResultDto = (
 ): SearchImmersionResultDto => ({
   address: establishment.address,
   naf: establishment.nafDto.code,
-  nafLabel: TEST_NAF_LABEL,
+  nafLabel: establishment.nafDto.nomenclature,
   name: establishment.name,
   customizedName: establishment.customizedName,
   rome: immersionOffer.romeCode,

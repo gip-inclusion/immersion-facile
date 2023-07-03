@@ -26,8 +26,8 @@ import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGat
 import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
 import { emailableValidationTargets } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.targets";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
-import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
-import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
+import { HttpLaBonneBoiteGateway } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteGateway";
+import { InMemoryLaBonneBoiteGateway } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { createLbbTargets } from "../../secondary/immersionOffer/laBonneBoite/LaBonneBoiteTargets";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
@@ -123,9 +123,9 @@ export const createGateways = async (config: AppConfig) => {
     emailValidationGateway: createEmailValidationGateway(config),
 
     inclusionConnectGateway: createInclusionConnectGateway(config),
-    laBonneBoiteAPI:
+    laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
-        ? new HttpLaBonneBoiteAPI(
+        ? new HttpLaBonneBoiteGateway(
             configureCreateHttpClientForExternalApi(
               axios.create({
                 timeout: config.externalAxiosTimeout,
@@ -134,7 +134,7 @@ export const createGateways = async (config: AppConfig) => {
             poleEmploiGateway,
             config.poleEmploiClientId,
           )
-        : new InMemoryLaBonneBoiteAPI(),
+        : new InMemoryLaBonneBoiteGateway(),
     passEmploiGateway:
       config.passEmploiGateway === "HTTPS"
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)

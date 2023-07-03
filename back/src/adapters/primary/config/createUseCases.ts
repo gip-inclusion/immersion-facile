@@ -251,7 +251,7 @@ export const createUseCases = (
       // immersionOffer
       searchImmersion: new SearchImmersion(
         uowPerformer,
-        gateways.laBonneBoiteAPI,
+        gateways.laBonneBoiteGateway,
         uuidGenerator,
       ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
