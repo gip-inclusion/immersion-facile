@@ -60,11 +60,17 @@ export const configureGenerateHtmlFromTemplate =
     const doctype =
       '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 
+    const replyHeaderStyle =
+      "color: #b5b5b5; font-size: 12px; margin-bottom: 12px;";
+    const replyHeader = `
+        <p style="${replyHeaderStyle}">##- Veuillez répondre au-dessus de cette ligne -##</p>
+        <p style="${replyHeaderStyle}">Cet email vous a été envoyé via le service Immersion Facilitée, vous pouvez répondre à directement à cet email, il sera transmis à votre interlocuteur.</p>
+        <p style="${replyHeaderStyle}">-----------------------------</p>`;
+
     const htmlContent = bypassLayout
       ? ignoreTabs(`
-        <p style="color: #b5b5b5; font-size: 12px; margin-bottom: 12px;">##- Veuillez répondre au-dessus de cette ligne -##</p>
-        <p style="font-size: 12px; margin-bottom: 12px;">Cet email vous a été envoyé via le service Immersion Facilitée, vous pouvez répondre à directement à cet email, il sera transmis à votre interlocuteur.</p>
-
+        ${replyHeader}
+        
         ${content ?? "Pas de contenu"}
       `)
       : ignoreTabs(
