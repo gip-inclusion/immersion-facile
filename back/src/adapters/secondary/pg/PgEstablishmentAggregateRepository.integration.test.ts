@@ -772,24 +772,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ]);
     });
   });
-  describe("Pg implementation of method createImmersionOffersToEstablishments", () => {
-    it("Creates offer related to an establishment siret", async () => {
-      // Prepare : create establishment
-      const siret = "1234567890123";
-      const newOffer = new ImmersionOfferEntityV2Builder().build();
-      await insertEstablishment({ siret });
-      // Act
-      await pgEstablishmentAggregateRepository.createImmersionOffersToEstablishments(
-        [{ ...newOffer, siret }],
-      );
-      // Assert : establishment aggregate has a new offer
-      const updatedAggregate =
-        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
-          siret,
-        );
-      expect(updatedAggregate?.immersionOffers).toEqual([newOffer]);
-    });
-  });
+
   describe("Pg implementation of method removeEstablishmentAndOffersWithSiret", () => {
     it("Removes only establishment with given siret and its offers", async () => {
       // Prepare

@@ -8,10 +8,7 @@ import {
 import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import {
-  defaultNafCode,
-  EstablishmentEntityBuilder,
-} from "../../../../_testBuilders/EstablishmentEntityBuilder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
@@ -33,28 +30,30 @@ describe("search-immersion route", () => {
         const immersionOffer = new ImmersionOfferEntityV2Builder()
           .withRomeCode("A1000")
           .build();
+        const establishmentAgg = new EstablishmentAggregateBuilder()
+          .withImmersionOffers([immersionOffer])
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withPosition({
+                lat: 48.8531,
+                lon: 2.34999,
+              })
+              .withWebsite("www.jobs.fr")
+              .build(),
+          )
+          .build();
+
         // Prepare
         await establishmentAggregateRepository.insertEstablishmentAggregates([
-          new EstablishmentAggregateBuilder()
-            .withImmersionOffers([immersionOffer])
-            .withEstablishment(
-              new EstablishmentEntityBuilder()
-                .withPosition({
-                  lat: 48.8531,
-                  lon: 2.34999,
-                })
-                .withWebsite("www.jobs.fr")
-                .build(),
-            )
-            .build(),
+          establishmentAgg,
         ]);
 
         // Act and assert
         const expectedResult: SearchImmersionResultDto[] = [
           {
             address: avenueChampsElyseesDto,
-            naf: defaultNafCode,
-            nafLabel: "test_naf_label",
+            naf: establishmentAgg.establishment.nafDto.code,
+            nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
             name: "Company inside repository",
             rome: "A1000",
             romeLabel: "test_rome_label",

@@ -1,9 +1,6 @@
 import { addressStringToDto, SearchImmersionResultDto, SiretDto } from "shared";
-import { createLogger } from "../../../utils/logger";
 
-const logger = createLogger(__filename);
-
-export type LaBonneBoiteCompanyProps = {
+export type LaBonneBoiteApiResultProps = {
   address: string;
   city: string;
   lat: number;
@@ -27,8 +24,8 @@ export type LaBonneBoiteCompanyProps = {
 };
 
 // Careful, value objects should be immutable
-export class LaBonneBoiteCompanyVO {
-  constructor(public readonly props: LaBonneBoiteCompanyProps) {}
+export class LaBonneBoiteCompanyDto {
+  constructor(public readonly props: LaBonneBoiteApiResultProps) {}
 
   public get siret() {
     return this.props.siret;
@@ -96,12 +93,6 @@ export class LaBonneBoiteCompanyVO {
       isNafRestaurationRapideWithRomeBoulangerie ||
       isRomeIgnoredForPublicAdministration;
 
-    if (establishmentShouldBeIgnored) {
-      logger.info({ company: companyNaf }, "Not relevant, discarding.");
-      return false;
-    } else {
-      logger.debug({ company: companyNaf }, "Relevant.");
-      return true;
-    }
+    return !establishmentShouldBeIgnored;
   }
 }

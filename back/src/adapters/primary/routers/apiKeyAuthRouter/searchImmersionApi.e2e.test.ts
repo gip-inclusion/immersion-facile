@@ -6,13 +6,24 @@ import {
 } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import {
-  defaultNafCode,
-  EstablishmentEntityBuilder,
-} from "../../../../_testBuilders/EstablishmentEntityBuilder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { SearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
+
+const establishmentAgg = new EstablishmentAggregateBuilder()
+  .withImmersionOffers([
+    new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
+  ])
+  .withEstablishment(
+    new EstablishmentEntityBuilder()
+      .withPosition({
+        lat: 48.8531,
+        lon: 2.34999,
+      })
+      .build(),
+  )
+  .build();
 
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;
@@ -30,44 +41,35 @@ describe("search-immersion route", () => {
       it("with given rome and location", async () => {
         // Prepare
         await establishmentAggregateRepository.insertEstablishmentAggregates([
-          new EstablishmentAggregateBuilder()
-            .withImmersionOffers([
-              new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
-            ])
-            .withEstablishment(
-              new EstablishmentEntityBuilder()
-                .withPosition({
-                  lat: 48.8531,
-                  lon: 2.34999,
-                })
-                .build(),
-            )
-            .build(),
+          establishmentAgg,
         ]);
+
+        const romeCode = "A1000";
 
         // Act and assert
         const expectedResult: SearchImmersionResultPublicV0[] = [
           {
             address: avenueChampsElysees,
-            naf: defaultNafCode,
-            nafLabel: "test_naf_label",
-            name: "Company inside repository",
-            rome: "A1000",
+            naf: establishmentAgg.establishment.nafDto.code,
+            nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+            name: establishmentAgg.establishment.name,
+            rome: romeCode,
             romeLabel: "test_rome_label",
-            siret: "78000403200019",
+            siret: establishmentAgg.establishment.siret,
             voluntaryToImmersion: true,
             contactMode: "EMAIL",
-            numberOfEmployeeRange: "10-19",
+            numberOfEmployeeRange:
+              establishmentAgg.establishment.numberEmployeesRange,
             distance_m: 719436,
             location: { lat: 43.8666, lon: 8.3333 },
             city: avenueChampsElyseesDto.city,
-            id: "78000403200019-A1000",
+            id: `${establishmentAgg.establishment.siret}-${romeCode}`,
           },
         ];
         await request
           .post(`/${searchImmersionRoute__v0}`)
           .send({
-            rome: "A1000",
+            rome: romeCode,
             location: {
               lat: 48.8531,
               lon: 2.34999,

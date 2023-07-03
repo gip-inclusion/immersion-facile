@@ -1,21 +1,14 @@
 import { SuperTest, Test } from "supertest";
-import { AppellationAndRomeDto } from "shared";
-import {
-  rueSaintHonore,
-  rueSaintHonoreDto,
-} from "../../../../_testBuilders/addressDtos";
+import { addressDtoToString, AppellationAndRomeDto } from "shared";
+import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import {
-  defaultNafCode,
-  EstablishmentEntityBuilder,
-} from "../../../../_testBuilders/EstablishmentEntityBuilder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
-  TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -30,6 +23,24 @@ const styliste: AppellationAndRomeDto = {
   appellationLabel: "Styliste",
 };
 const immersionOfferSiret = "78000403200019";
+const establishmentAggregate = new EstablishmentAggregateBuilder()
+  .withEstablishment(
+    new EstablishmentEntityBuilder()
+      .withSiret(immersionOfferSiret)
+      .withPosition(TEST_POSITION)
+      .withNumberOfEmployeeRange("10-19")
+      .withAddress(rueSaintHonoreDto)
+      .build(),
+  )
+  .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
+  .withImmersionOffers([
+    new ImmersionOfferEntityV2Builder()
+      .withRomeCode(styliste.romeCode)
+      .withAppellationCode(styliste.appellationCode)
+      .withAppellationLabel(styliste.appellationLabel)
+      .build(),
+  ])
+  .build();
 
 describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersion-offers/:siret/:rome`, () => {
   let request: SuperTest<Test>;
@@ -48,28 +59,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
     });
 
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withSiret(immersionOfferSiret)
-              .withPosition(TEST_POSITION)
-              .withNumberOfEmployeeRange("10-19")
-              .withAddress(rueSaintHonoreDto)
-              .build(),
-          )
-          .withContact(
-            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-          )
-          .withImmersionOffers([
-            new ImmersionOfferEntityV2Builder()
-              .withRomeCode(styliste.romeCode)
-              .withAppellationCode(styliste.appellationCode)
-              .withAppellationLabel(styliste.appellationLabel)
-              .build(),
-          ])
-          .build(),
-      ],
+      [establishmentAggregate],
     );
   });
 
@@ -83,18 +73,18 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
     // /!\ Those fields come from Builder (should probably not.)
     const expectedResult: SearchImmersionResultPublicV1 = {
       rome: styliste.romeCode,
-      naf: defaultNafCode,
-      siret: "78000403200019",
-      name: "Company inside repository",
+      siret: establishmentAggregate.establishment.siret,
+      name: establishmentAggregate.establishment.name,
       voluntaryToImmersion: true,
-      position: TEST_POSITION,
+      position: establishmentAggregate.establishment.position,
       numberOfEmployeeRange: "10-19",
-      address: rueSaintHonore,
+      address: addressDtoToString(establishmentAggregate.establishment.address),
       contactMode: "EMAIL",
       romeLabel: TEST_ROME_LABEL,
       appellationLabels: [styliste.appellationLabel],
-      nafLabel: TEST_NAF_LABEL,
-      city: rueSaintHonoreDto.city,
+      naf: establishmentAggregate.establishment.nafDto.code,
+      nafLabel: establishmentAggregate.establishment.nafDto.nomenclature,
+      city: establishmentAggregate.establishment.address.city,
     };
 
     const response = await request

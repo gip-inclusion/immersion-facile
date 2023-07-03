@@ -30,41 +30,6 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
-const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
-  // Only compare romeCode and appellationCode
-  a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
-
-const objectsDeepEqual = <T>(a: T, b: T) =>
-  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
-
-const establishmentsEqual = (
-  a: EstablishmentEntity,
-  b: EstablishmentEntity,
-) => {
-  // Ignore key updatedAt
-  const { updatedAt: _unusedUpdatedAtA, ...establishmentAWithoutUpdatedAt } = a;
-  const { updatedAt: _unusedUpdatedAtB, ...establishmentBWithoutUpdatedAt } = b;
-
-  return objectsDeepEqual(
-    establishmentAWithoutUpdatedAt,
-    establishmentBWithoutUpdatedAt,
-  );
-};
-const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
-  // Ignore key id
-  const { id: _unusedIdA, ...contactAWithoutId } = a;
-  const { id: _unusedIdB, ...contactBWithoutId } = b;
-  return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
-};
-
-const buildAppellationsArray = `JSON_AGG(
-    JSON_BUILD_OBJECT(
-      'appellationCode', ogr_appellation::text,
-      'appellationLabel', libelle_appellation_long
-    )
-    ORDER BY ogr_appellation
-  )`;
-
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
@@ -73,22 +38,20 @@ export class PgEstablishmentAggregateRepository
   public async insertEstablishmentAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
-    await this._upsertEstablishmentsFromAggregates(aggregates);
-    await this._insertContactsFromAggregates(aggregates);
-
-    const offersWithSiret: OfferWithSiret[] = aggregates.reduce(
-      (offersWithSiret, aggregate) => [
-        ...offersWithSiret,
-        ...aggregate.immersionOffers.map((immersionOffer) => ({
-          siret: aggregate.establishment.siret,
-          ...immersionOffer,
-        })),
-      ],
-      [] as OfferWithSiret[],
+    await this.upsertEstablishmentsFromAggregates(aggregates);
+    await this.insertContactsFromAggregates(aggregates);
+    await this.createImmersionOffersToEstablishments(
+      aggregates.reduce<OfferWithSiret[]>(
+        (offersWithSiret, aggregate) => [
+          ...offersWithSiret,
+          ...aggregate.immersionOffers.map((immersionOffer) => ({
+            siret: aggregate.establishment.siret,
+            ...immersionOffer,
+          })),
+        ],
+        [],
+      ),
     );
-    await this.createImmersionOffersToEstablishments(offersWithSiret);
-
-    return;
   }
 
   public async updateEstablishmentAggregate(
@@ -122,7 +85,7 @@ export class PgEstablishmentAggregateRepository
 
     // Create contact if it does'not exist
     if (!existingAggregate.contact) {
-      await this._insertContactsFromAggregates([updatedAggregate]);
+      await this.insertContactsFromAggregates([updatedAggregate]);
     } else {
       // Update contact if it has changed
       await this._updateContactFromAggregates(
@@ -132,7 +95,7 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  private async _upsertEstablishmentsFromAggregates(
+  private async upsertEstablishmentsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
     const establishmentFields = aggregates.map(({ establishment }) => [
@@ -196,7 +159,7 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  private async _insertContactsFromAggregates(
+  private async insertContactsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
     const aggregatesWithContact = aggregates.filter(
@@ -575,9 +538,10 @@ export class PgEstablishmentAggregateRepository
         GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
         [siret, appellationCode],
       );
-    if (!immersionSearchResultDtos.length) return;
+    const immersionSearchResultDto = immersionSearchResultDtos.at(0);
+    if (!immersionSearchResultDto) return;
     const { contactDetails, ...searchResultWithoutContactDetails } =
-      immersionSearchResultDtos[0];
+      immersionSearchResultDto;
     return searchResultWithoutContactDetails;
   }
 
@@ -918,3 +882,38 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
       LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
       ORDER BY row_number ASC; `;
+
+const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
+  // Only compare romeCode and appellationCode
+  a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
+
+const objectsDeepEqual = <T>(a: T, b: T) =>
+  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
+
+const establishmentsEqual = (
+  a: EstablishmentEntity,
+  b: EstablishmentEntity,
+) => {
+  // Ignore key updatedAt
+  const { updatedAt: _unusedUpdatedAtA, ...establishmentAWithoutUpdatedAt } = a;
+  const { updatedAt: _unusedUpdatedAtB, ...establishmentBWithoutUpdatedAt } = b;
+
+  return objectsDeepEqual(
+    establishmentAWithoutUpdatedAt,
+    establishmentBWithoutUpdatedAt,
+  );
+};
+const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
+  // Ignore key id
+  const { id: _unusedIdA, ...contactAWithoutId } = a;
+  const { id: _unusedIdB, ...contactBWithoutId } = b;
+  return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
+};
+
+const buildAppellationsArray = `JSON_AGG(
+  JSON_BUILD_OBJECT(
+    'appellationCode', ogr_appellation::text,
+    'appellationLabel', libelle_appellation_long
+  )
+  ORDER BY ogr_appellation
+)`;

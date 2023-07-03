@@ -13,7 +13,6 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 import { InMemoryUnitOfWork } from "../../../adapters/primary/config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../../../adapters/primary/routers/DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
-  TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -97,7 +96,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
           appellationCode: styliste.appellationCode,
         },
       ],
-      nafLabel: TEST_NAF_LABEL,
+      nafLabel: "NAFRev2",
     };
 
     const response = await request
