@@ -93,8 +93,8 @@ export const createApp = async (
   app.use(createAgenciesRouter(deps));
   app.use(createPeConnectRouter(deps));
   app.use(createInclusionConnectRouter(deps));
-  app.use(createApiKeyAuthRouter(deps));
   app.use(createValidateEmailRouter(deps));
+  app.use(createApiKeyAuthRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));
 

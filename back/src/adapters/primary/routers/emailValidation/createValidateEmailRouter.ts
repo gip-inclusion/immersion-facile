@@ -13,5 +13,6 @@ export const createValidateEmailRouter = (deps: AppDependencies) => {
         deps.useCases.validateEmail.execute(req.query as any),
       ),
     );
+
   return emailValidationRouter;
 };
