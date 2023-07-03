@@ -28,7 +28,7 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
       this._searchesMadeEntities.map((entity) => entity.id),
     );
     return searchesToReturn.map((searchMadeEntity) => ({
-      distance_km: searchMadeEntity.distance_km,
+      distance_km: searchMadeEntity.distanceKm,
       lat: searchMadeEntity.lat,
       lon: searchMadeEntity.lon,
       rome: searchMadeEntity.rome,

@@ -19,6 +19,8 @@ import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEn
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
+  SearchImmersionParams,
+  SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { createLogger } from "../../../utils/logger";
@@ -34,6 +36,12 @@ export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
   constructor(private client: PoolClient) {}
+
+  searchImmersionResults(
+    _searchImmersionParams: SearchImmersionParams,
+  ): Promise<SearchImmersionResult[]> {
+    throw new Error("Not Implemented");
+  }
 
   public async insertEstablishmentAggregates(
     aggregates: EstablishmentAggregate[],
@@ -343,7 +351,7 @@ export class PgEstablishmentAggregateRepository
         selectedOffersSubQuery,
         [
           `POINT(${searchMade.lon} ${searchMade.lat})`,
-          searchMade.distance_km * 1000, // Formats parameters $1, $2
+          searchMade.distanceKm * 1000, // Formats parameters $1, $2
           maxResults,
         ],
       );

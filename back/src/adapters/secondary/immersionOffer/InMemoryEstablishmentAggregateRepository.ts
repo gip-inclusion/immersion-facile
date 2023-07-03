@@ -19,6 +19,8 @@ import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
+  SearchImmersionParams,
+  SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
@@ -80,22 +82,13 @@ export class InMemoryEstablishmentAggregateRepository
       pathEq("establishment.siret", siret),
     );
   }
-  public async getSearchImmersionResultDtoFromSearchMade({
+  public async searchImmersionResults({
     searchMade,
     withContactDetails = false,
     maxResults,
-  }: {
-    searchMade: SearchMade;
-    withContactDetails?: boolean;
-    maxResults?: number;
-  }): Promise<SearchImmersionResultDto[]> {
+  }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this._establishmentAggregates
-      .filter((aggregate) =>
-        searchMade.voluntaryToImmersion === undefined
-          ? true
-          : aggregate.establishment.voluntaryToImmersion ==
-            searchMade.voluntaryToImmersion,
-      )
+      .filter((aggregate) => aggregate.establishment.isActive)
       .flatMap((aggregate) =>
         aggregate.immersionOffers
           .filter(
@@ -299,7 +292,7 @@ const buildSearchImmersionResultDto = (
   contact: ContactEntity | undefined,
   searchMade: SearchMade,
   withContactDetails: boolean,
-): SearchImmersionResultDto => ({
+): SearchImmersionResult => ({
   address: establishment.address,
   naf: establishment.nafDto.code,
   nafLabel: establishment.nafDto.nomenclature,
@@ -337,4 +330,5 @@ const buildSearchImmersionResultDto = (
         job: contact.job,
       },
     }),
+  isSearchable: establishment.isSearchable,
 });

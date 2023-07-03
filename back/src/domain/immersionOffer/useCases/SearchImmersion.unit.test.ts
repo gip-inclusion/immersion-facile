@@ -1,7 +1,6 @@
 import {
   addressStringToDto,
   ApiConsumer,
-  expectArraysToMatch,
   expectToEqual,
   SearchImmersionParamsDto,
   SearchImmersionResultDto,
@@ -55,7 +54,7 @@ describe("SearchImmersionUseCase", () => {
   let searchImmersionUseCase: SearchImmersion;
   let laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     uow = createInMemoryUow();
     laBonneBoiteGateway = new InMemoryLaBonneBoiteGateway();
     uuidGenerator = new TestUuidGenerator();
@@ -64,11 +63,6 @@ describe("SearchImmersionUseCase", () => {
       laBonneBoiteGateway,
       uuidGenerator,
     );
-
-    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
-      establishment,
-    ]);
   });
 
   it("stores searches made", async () => {
@@ -82,7 +76,7 @@ describe("SearchImmersionUseCase", () => {
         rome: secretariatImmersionOffer.romeCode,
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
-        distance_km: searchInMetzParams.distanceKm,
+        distanceKm: searchInMetzParams.distanceKm,
         needsToBeSearched: true,
         sortedBy: "distance",
       },
@@ -90,21 +84,33 @@ describe("SearchImmersionUseCase", () => {
   });
 
   it("gets all results around if no rome is provided", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
     const response = await searchImmersionUseCase.execute(searchInMetzParams);
 
     expectToEqual(response, [
       establishmentToSearchResultByRome(
         establishment,
         secretariatImmersionOffer.romeCode,
+        false,
       ),
       establishmentToSearchResultByRome(
         establishment,
         boulangerImmersionOffer.romeCode,
+        false,
       ),
     ]);
   });
 
   it("gets both form and LBB establishments if voluntaryToImmersion is not provided", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
     const response = await searchImmersionUseCase.execute({
       ...searchInMetzParams,
       sortedBy: "distance",
@@ -115,24 +121,43 @@ describe("SearchImmersionUseCase", () => {
       establishmentToSearchResultByRome(
         establishment,
         secretariatImmersionOffer.romeCode,
+        false,
       ),
       lbbToSearchResult(lbbCompanyVO),
     ]);
   });
 
   it("gets only form establishments if voluntaryToImmersion is true", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
     const response = await searchImmersionUseCase.execute({
       ...searchInMetzParams,
       voluntaryToImmersion: true,
       sortedBy: "distance",
     });
 
-    expect(response).toHaveLength(2);
-    expect(response[0].voluntaryToImmersion).toBe(true);
-    expect(response[1].voluntaryToImmersion).toBe(true);
+    expectToEqual(response, [
+      establishmentToSearchResultByRome(
+        establishment,
+        secretariatImmersionOffer.romeCode,
+        false,
+      ),
+      establishmentToSearchResultByRome(
+        establishment,
+        boulangerImmersionOffer.romeCode,
+        false,
+      ),
+    ]);
   });
 
   it("gets only the closest LBB establishments if voluntaryToImmersion is false, and do not query results from DB", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+
     const range = 10;
     const companyInRange = new LaBonneBoiteCompanyDtoBuilder()
       .withSiret("22220000000022")
@@ -170,14 +195,17 @@ describe("SearchImmersionUseCase", () => {
       distanceKm: range,
     });
 
-    expect(response).toHaveLength(2);
-    expectArraysToMatch(
-      response.map(({ siret }) => siret),
-      [companyInRange.siret, companyJustInRange.siret],
-    );
+    expectToEqual(response, [
+      lbbToSearchResult(companyInRange),
+      lbbToSearchResult(companyJustInRange),
+    ]);
   });
 
   it("gets only the form result if a company with same siret is also in LBB results", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+
     const lbbCompanyWithSameSiret = new LaBonneBoiteCompanyDtoBuilder()
       .withSiret(establishment.establishment.siret)
       .withRome(secretariatImmersionOffer.romeCode)
@@ -191,39 +219,108 @@ describe("SearchImmersionUseCase", () => {
       sortedBy: "distance",
     });
 
-    expect(response).toHaveLength(1);
-    expect(response[0].voluntaryToImmersion).toBe(true);
+    expectToEqual(response, [
+      establishmentToSearchResultByRome(
+        establishment,
+        secretariatImmersionOffer.romeCode,
+        false,
+      ),
+    ]);
   });
 
-  describe("authenticated with api key", () => {
-    it("Search immersion, and DO NOT provide contact details", async () => {
-      const authenticatedResponse = await searchImmersionUseCase.execute(
-        { ...searchSecretariatInMetzRequestDto, voluntaryToImmersion: true },
-        authenticatedApiConsumerPayload,
-      );
+  describe("No result when a company is one internal & LBB results and the company is not searchable", () => {
+    const notSearchableEstablishment = new EstablishmentAggregateBuilder(
+      establishment,
+    )
+      .withIsSearchable(false)
+      .build();
 
-      expectToEqual(authenticatedResponse, [
-        establishmentToSearchResultByRome(
-          establishment,
-          secretariatImmersionOffer.romeCode,
-        ),
+    beforeEach(() => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        notSearchableEstablishment,
+      ];
+
+      laBonneBoiteGateway.setNextResults([
+        new LaBonneBoiteCompanyDtoBuilder()
+          .withSiret(notSearchableEstablishment.establishment.siret)
+          .withRome(secretariatImmersionOffer.romeCode)
+          .build(),
       ]);
+    });
+
+    it("Without voluntary to immersion", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        rome: secretariatImmersionOffer.romeCode,
+        sortedBy: "distance",
+      });
+      expectToEqual(response, []);
+    });
+
+    it("With voluntary to immersion false", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        rome: secretariatImmersionOffer.romeCode,
+        sortedBy: "distance",
+        voluntaryToImmersion: false,
+      });
+      expectToEqual(response, []);
+    });
+
+    it("With voluntary to immersion true", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        rome: secretariatImmersionOffer.romeCode,
+        sortedBy: "distance",
+        voluntaryToImmersion: true,
+      });
+      expectToEqual(response, []);
     });
   });
 
-  describe("Not authenticated with api key", () => {
-    it("Search immersion, and do NOT provide contact details", async () => {
-      const unauthenticatedResponse = await searchImmersionUseCase.execute({
-        ...searchSecretariatInMetzRequestDto,
-        voluntaryToImmersion: true,
-      });
-
-      expectToEqual(unauthenticatedResponse, [
-        establishmentToSearchResultByRome(
+  describe("handle authentication", () => {
+    describe("authenticated with api key", () => {
+      it("Search immersion, and DO NOT provide contact details", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
           establishment,
-          secretariatImmersionOffer.romeCode,
-        ),
-      ]);
+        ];
+        laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+        const authenticatedResponse = await searchImmersionUseCase.execute(
+          { ...searchSecretariatInMetzRequestDto, voluntaryToImmersion: true },
+          authenticatedApiConsumerPayload,
+        );
+
+        expectToEqual(authenticatedResponse, [
+          establishmentToSearchResultByRome(
+            establishment,
+            secretariatImmersionOffer.romeCode,
+            false,
+          ),
+        ]);
+      });
+    });
+
+    describe("Not authenticated with api key", () => {
+      it("Search immersion, and do NOT provide contact details", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishment,
+        ];
+        laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+        const unauthenticatedResponse = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          voluntaryToImmersion: true,
+        });
+
+        expectToEqual(unauthenticatedResponse, [
+          establishmentToSearchResultByRome(
+            establishment,
+            secretariatImmersionOffer.romeCode,
+            false,
+          ),
+        ]);
+      });
     });
   });
 });
@@ -261,7 +358,7 @@ const lbbToSearchResult = (
   address: addressStringToDto(lbb.props.address),
   appellations: [],
   customizedName: "",
-  distance_m: 1000,
+  distance_m: lbb.props.distance * 1000,
   fitForDisabledWorkers: false,
   naf: lbb.props.naf,
   nafLabel: "",

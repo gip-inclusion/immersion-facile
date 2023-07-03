@@ -19,7 +19,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         searchMade.rome,
         searchMade.lat,
         searchMade.lon,
-        searchMade.distance_km,
+        searchMade.distanceKm,
         searchMade.needsToBeSearched,
         `POINT(${searchMade.lon} ${searchMade.lat})`,
         searchMade.voluntaryToImmersion,
@@ -38,7 +38,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     return requestResult.rows.map(
       (row): SearchMadeEntity => ({
         id: row.id,
-        distance_km: row.distance,
+        distanceKm: row.distance,
         lat: row.lat,
         lon: row.lon,
         rome: optional(row.rome),
