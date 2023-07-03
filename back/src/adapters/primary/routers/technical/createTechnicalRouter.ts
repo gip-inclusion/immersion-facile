@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import {
   featureFlagsRoute,
@@ -15,7 +16,10 @@ import {
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
 
-export const createTechnicalRouter = (deps: AppDependencies) => {
+export const createTechnicalRouter = (
+  deps: AppDependencies,
+  inboundEmailAllowIps: string[],
+) => {
   const technicalRouter = Router();
   technicalRouter
     .route(`/${renewMagicLinkRoute}`)
@@ -55,10 +59,12 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
 
   technicalRouter
     .route(`/${inboundEmailParsingRoute}`)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.addExchangeToDiscussionAndSendEmail.execute(req.body),
-      ),
+    .post(
+      IpFilter(inboundEmailAllowIps, { mode: "allow", logLevel: "deny" }),
+      async (req, res) =>
+        sendHttpResponse(req, res, () =>
+          deps.useCases.addExchangeToDiscussionAndSendEmail.execute(req.body),
+        ),
     );
 
   return technicalRouter;

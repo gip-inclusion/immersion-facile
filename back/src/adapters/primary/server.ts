@@ -87,7 +87,7 @@ export const createApp = async (
   app.use(...createInclusionConnectedAllowedRouter(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
-  app.use(createTechnicalRouter(deps));
+  app.use(createTechnicalRouter(deps, config.inboundEmailAllowedIps));
   app.use(createAddressRouter(deps));
   app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));

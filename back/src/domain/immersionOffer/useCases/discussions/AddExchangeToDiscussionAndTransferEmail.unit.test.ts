@@ -16,7 +16,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notificati
 import { DiscussionAggregate } from "../../entities/DiscussionAggregate";
 import {
   AddExchangeToDiscussionAndTransferEmail,
-  BrevoInboundResponse,
+  BrevoInboundBody,
 } from "./AddExchangeToDiscussionAndTransferEmail";
 
 describe("AddExchangeToDiscussionAndTransferEmail", () => {
@@ -243,7 +243,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
   });
 });
 
-const createBrevoResponse = (toAddresses: string[]): BrevoInboundResponse => ({
+const createBrevoResponse = (toAddresses: string[]): BrevoInboundBody => ({
   items: toAddresses.map((address) => ({
     Uuid: ["8d79f2b1-20ae-4939-8d0b-d2517331a9e5"],
     MessageId:
