@@ -62,11 +62,6 @@ export interface EstablishmentAggregateRepository {
     siret: string,
   ) => Promise<AppellationAndRomeDto[]>;
 
-  getSearchImmersionResultDtoBySiretAndRome: (
-    siret: SiretDto,
-    rome: string,
-  ) => Promise<SearchImmersionResultDto | undefined>;
-
   getSearchImmersionResultDtoBySiretAndAppellationCode: (
     siret: SiretDto,
     appellationCode: AppellationCode,
@@ -82,6 +77,11 @@ export interface EstablishmentAggregateRepository {
     checkDate: Date,
     maxResults: number,
   ) => Promise<SiretDto[]>;
+
+  getSearchImmersionResultDtoBySiretAndRome: (
+    siret: SiretDto,
+    rome: string,
+  ) => Promise<SearchImmersionResult | undefined>;
 
   searchImmersionResults: (
     searchImmersionParams: SearchImmersionParams,

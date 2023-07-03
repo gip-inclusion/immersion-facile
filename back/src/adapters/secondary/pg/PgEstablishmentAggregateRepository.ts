@@ -19,7 +19,6 @@ import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEn
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
-  SearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
@@ -36,12 +35,6 @@ export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
   constructor(private client: PoolClient) {}
-
-  searchImmersionResults(
-    _searchImmersionParams: SearchImmersionParams,
-  ): Promise<SearchImmersionResult[]> {
-    throw new Error("Not Implemented");
-  }
 
   public async insertEstablishmentAggregates(
     aggregates: EstablishmentAggregate[],
@@ -315,7 +308,7 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  async getSearchImmersionResultDtoFromSearchMade({
+  async searchImmersionResults({
     searchMade,
     withContactDetails = false,
     maxResults,
@@ -323,12 +316,14 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     withContactDetails?: boolean;
     maxResults?: number;
-  }): Promise<SearchImmersionResultDto[]> {
+  }): Promise<SearchImmersionResult[]> {
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
         (SELECT siret, fit_for_disabled_workers, gps
-         FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
+         FROM establishments 
+         WHERE is_active 
+         AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
         matching_offers AS (
           SELECT 
             aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
@@ -513,7 +508,7 @@ export class PgEstablishmentAggregateRepository
   public async getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
     rome: string,
-  ): Promise<SearchImmersionResultDto | undefined> {
+  ): Promise<SearchImmersionResult | undefined> {
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
@@ -548,9 +543,8 @@ export class PgEstablishmentAggregateRepository
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
     if (!immersionSearchResultDto) return;
-    const { contactDetails, ...searchResultWithoutContactDetails } =
-      immersionSearchResultDto;
-    return searchResultWithoutContactDetails;
+    const { contactDetails, isSearchable, ...rest } = immersionSearchResultDto;
+    return rest;
   }
 
   public async createImmersionOffersToEstablishments(
@@ -579,7 +573,7 @@ export class PgEstablishmentAggregateRepository
   private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
     selectedOffersSubQuery: string,
     selectedOffersSubQueryParams: any[],
-  ): Promise<SearchImmersionResultDto[]> {
+  ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
     const pgResult = await this.client.query(
@@ -588,8 +582,9 @@ export class PgEstablishmentAggregateRepository
       ),
       selectedOffersSubQueryParams,
     );
+
     return pgResult.rows.map(
-      (row): SearchImmersionResultDto => ({
+      (row): SearchImmersionResult => ({
         ...row.search_immersion_result,
         // TODO : find a way to return 'undefined' instead of 'null' from query
         customizedName: optional(row.search_immersion_result.customizedName),
@@ -605,6 +600,7 @@ export class PgEstablishmentAggregateRepository
           row.search_immersion_result.fitForDisabledWorkers,
         ),
         voluntaryToImmersion: true,
+        isSearchable: row.search_immersion_result.isSearchable,
       }),
     );
   }
@@ -863,26 +859,27 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       SELECT 
       row_number,
       JSONB_BUILD_OBJECT(
-      'rome', io.rome_code, 
-      'siret', io.siret, 
-      'distance_m', io.distance_m, 
-      'name', e.name, 
-      'website', e.website, 
-      'additionalInformation', e.additional_information, 
-      'customizedName', e.customized_name, 
-      'fitForDisabledWorkers', e.fit_for_disabled_workers,
-      'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-      'romeLabel', io.rome_label,
-      'appellations',  io.appellations,
-      'naf', e.naf_code,
-      'nafLabel', public_naf_classes_2008.class_label,
-      'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
-                                    'postcode', e.post_code,
-                                    'city', e.city,
-                                    'departmentCode', e.department_code),
-      'contactMode', ic.contact_mode,
-      'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'job', ic.job, 'phone', ic.phone ),
-      'numberOfEmployeeRange', e.number_employees 
+        'rome', io.rome_code, 
+        'siret', io.siret, 
+        'distance_m', io.distance_m, 
+        'isSearchable',e.is_searchable,
+        'name', e.name, 
+        'website', e.website, 
+        'additionalInformation', e.additional_information, 
+        'customizedName', e.customized_name, 
+        'fitForDisabledWorkers', e.fit_for_disabled_workers,
+        'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+        'romeLabel', io.rome_label,
+        'appellations',  io.appellations,
+        'naf', e.naf_code,
+        'nafLabel', public_naf_classes_2008.class_label,
+        'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
+                                      'postcode', e.post_code,
+                                      'city', e.city,
+                                      'departmentCode', e.department_code),
+        'contactMode', ic.contact_mode,
+        'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'job', ic.job, 'phone', ic.phone ),
+        'numberOfEmployeeRange', e.number_employees 
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 
       LEFT JOIN establishments AS e ON e.siret = io.siret  

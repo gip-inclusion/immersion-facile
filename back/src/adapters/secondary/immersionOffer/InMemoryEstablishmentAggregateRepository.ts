@@ -7,7 +7,6 @@ import {
   pathNotEq,
   propEq,
   replaceArrayElement,
-  SearchImmersionResultDto,
   SiretDto,
 } from "shared";
 import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
@@ -165,7 +164,7 @@ export class InMemoryEstablishmentAggregateRepository
   public async getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
     rome: string,
-  ): Promise<SearchImmersionResultDto | undefined> {
+  ): Promise<SearchImmersionResult | undefined> {
     const aggregate = this.establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );
@@ -190,6 +189,7 @@ export class InMemoryEstablishmentAggregateRepository
         position: aggregate.establishment.position,
         address: aggregate.establishment.address,
         contactMode: aggregate.contact?.contactMethod,
+        isSearchable: aggregate.establishment.isSearchable,
       }
     );
   }
