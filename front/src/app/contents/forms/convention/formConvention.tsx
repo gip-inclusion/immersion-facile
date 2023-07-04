@@ -16,7 +16,8 @@ export type FormFieldKeys =
   | ConventionFieldWithoutPostalCode
   | "isCurrentEmployer"
   | "isEstablishmentTutorIsEstablishmentRepresentative"
-  | "isMinor";
+  | "isMinor"
+  | "agencyKind";
 
 export type FormConventionFieldsLabels = FormFieldsObjectForContent<
   Record<FormFieldKeys, FormFieldAttributesForContent>
@@ -55,6 +56,11 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     id: conventionSectionIds.agencyDepartment,
     required: true,
     placeholder: "Veuillez sélectionner un département",
+  },
+  agencyKind: {
+    label: "Votre type de structure d'accompagnement",
+    id: conventionSectionIds.agencyKind,
+    required: false,
   },
   agencyId: {
     label:

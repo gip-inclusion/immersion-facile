@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import { uniqBy } from "ramda";
 import {
   AgencyOption,
   ConventionReadDto,
@@ -15,6 +16,10 @@ import {
   sortByProperty,
 } from "shared";
 import { Loader } from "react-design-system";
+import {
+  agencyKindToLabel,
+  AllowedAgencyKindToAdd,
+} from "src/app/components/forms/agency/agencyKindToLabel";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -31,6 +36,8 @@ type AgencySelectorProps = {
   shouldListAll: boolean;
 };
 
+type AgencyKindForSelector = AllowedAgencyKindToAdd | "all";
+
 export const AgencySelector = ({
   internshipKind,
   disabled,
@@ -40,8 +47,11 @@ export const AgencySelector = ({
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(internshipKind),
   );
-  const { agencyId: agencyIdField, agencyDepartment: agencyDepartmentField } =
-    getFormFields();
+  const {
+    agencyId: agencyIdField,
+    agencyDepartment: agencyDepartmentField,
+    agencyKind: agencyKindField,
+  } = getFormFields();
   const {
     register,
     getValues,
@@ -53,6 +63,7 @@ export const AgencySelector = ({
   );
   const agencyDepartment = getValues("agencyDepartment");
   const [isLoading, setIsLoading] = useState(false);
+  const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
   const [loadingError, setLoadingError] = useState(false);
   const dispatch = useDispatch();
   const [agencies, setAgencies] = useState<AgencyOption[]>([
@@ -62,6 +73,20 @@ export const AgencySelector = ({
       kind: "autre",
     },
   ]);
+
+  const agencyKindOptions = uniqBy(
+    (agencyOption) => agencyOption.kind,
+    agencies,
+  )
+    .map((agencyOption) => agencyOption.kind)
+    .filter(
+      (kind): kind is AllowedAgencyKindToAdd => kind !== "immersion-facile",
+    )
+    .map((agencyKind): { label: string; value: AgencyKindForSelector } => ({
+      label: agencyKindToLabel[agencyKind],
+      value: agencyKind,
+    }));
+
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const agencyIdName = agencyIdField.name as keyof ConventionReadDto;
   const agencyDepartmentName =
@@ -116,6 +141,7 @@ export const AgencySelector = ({
   const touched = touchedFields[agencyIdName];
   const userError = touched && error;
   const showError = userError || loadingError;
+
   return (
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
@@ -139,10 +165,38 @@ export const AgencySelector = ({
         }}
       />
 
+      {internshipKind === "immersion" && (
+        <Select
+          label={agencyKindField.label}
+          hint={agencyKindField.hintText}
+          options={[
+            {
+              label: "Toutes les structures d'accompagnement",
+              value: "all",
+            },
+            ...agencyKindOptions,
+          ]}
+          placeholder={agencyDepartmentField.placeholder}
+          nativeSelectProps={{
+            ...agencyKindField,
+            value: agencyKind,
+            onChange: (event) =>
+              setAgencyKind(event.currentTarget.value as AgencyKindForSelector),
+          }}
+        />
+      )}
+
       <Select
         label={agencyIdField.label}
         hint={agencyIdField.hintText}
-        options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
+        options={agencies
+          .filter(({ kind }) =>
+            agencyKind === "all" ? true : kind === agencyKind,
+          )
+          .map(({ id, name }) => ({
+            label: name,
+            value: id,
+          }))}
         placeholder={
           agencyDepartment
             ? "Veuillez sélectionner une structure"
