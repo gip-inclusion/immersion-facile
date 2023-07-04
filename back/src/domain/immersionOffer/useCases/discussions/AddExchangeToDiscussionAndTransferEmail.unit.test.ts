@@ -1,4 +1,5 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
+import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -13,11 +14,13 @@ import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGenerat
 import { InMemoryDiscussionAggregateRepository } from "../../../../adapters/secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import { DiscussionAggregate } from "../../entities/DiscussionAggregate";
 import {
   AddExchangeToDiscussionAndTransferEmail,
   BrevoInboundBody,
 } from "./AddExchangeToDiscussionAndTransferEmail";
+
+const domain = "my-domain.com";
+const replyDomain = `reply.${domain}`;
 
 describe("AddExchangeToDiscussionAndTransferEmail", () => {
   let discussionAggregateRepository: InMemoryDiscussionAggregateRepository;
@@ -45,7 +48,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       new AddExchangeToDiscussionAndTransferEmail(
         uowPerformer,
         saveNotificationAndRelatedEvent,
-        "my-domain.com",
+        domain,
       );
   });
 
@@ -54,90 +57,35 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       const discussionId1 = "my-discussion-id-1";
       const discussionId2 = "my-discussion-id-2";
       const brevoResponse = createBrevoResponse([
-        `${discussionId1}_b@reply-dev.immersion-facile.beta.gouv.fr`,
-        `${discussionId2}_e@reply.immersion-facile.beta.gouv.fr`,
+        `${discussionId1}_b@${replyDomain}`,
+        `${discussionId2}_e@${replyDomain}`,
       ]);
-      const discussion1: DiscussionAggregate = {
-        id: discussionId1,
-        exchanges: [
+
+      const discussion1 = new DiscussionAggregateBuilder()
+        .withId(discussionId1)
+        .withExchanges([
           {
-            subject: "My subject",
+            subject: "My subject - discussion 1",
             message: "Hello",
             sender: "potentialBeneficiary",
             sentAt: new Date(),
             recipient: "establishment",
           },
-        ],
-        createdAt: new Date(),
-        appellationCode: "19540",
-        address: {
-          city: "Paris",
-          departmentCode: "75",
-          postcode: "75001",
-          streetNumberAndAddress: "12 Rue de la Paix",
-        },
-        establishmentContact: {
-          copyEmails: [],
-          contactMode: "EMAIL",
-          email: "establishment-discussion-1@immersion-facile.beta.gouv.fr",
-          firstName: "Roger",
-          lastName: "Rabbit",
-          phone: "0123456789",
-          job: "Directeur",
-        },
-        immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiary: {
-          email: "potential-benef-discussion-1@immersion-facile.beta.gouv.fr",
-          firstName: "Baby",
-          lastName: "Herman",
-          phone: "0123456754",
-          resumeLink: "http://fakelink.com",
-        },
-        siret: "01234567891011",
-        businessName: "France Merguez Distribution",
-      };
-      const discussion2: DiscussionAggregate = {
-        id: discussionId2,
-        exchanges: [
+        ])
+        .build();
+
+      const discussion2 = new DiscussionAggregateBuilder()
+        .withId(discussionId2)
+        .withExchanges([
           {
-            subject: "My subject",
+            subject: "My subject - discussion 2",
             message: "Hello",
             sender: "potentialBeneficiary",
             sentAt: new Date(),
             recipient: "establishment",
           },
-        ],
-        createdAt: new Date(),
-        appellationCode: "19540",
-        address: {
-          city: "Paris",
-          departmentCode: "75",
-          postcode: "75001",
-          streetNumberAndAddress: "12 Rue de la Paix",
-        },
-        establishmentContact: {
-          copyEmails: [
-            "copy1@gmail.com",
-            "copy2_e@dev.immersion-facile.beta.gouv.fr",
-          ],
-          contactMode: "EMAIL",
-          email: "establishment-discussion-2@immersion-facile.beta.gouv.fr",
-          firstName: "Roger",
-          lastName: "Rabbit",
-          phone: "0123456789",
-          job: "Directeur",
-        },
-        immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiary: {
-          email: "potential-benef-discussion-2@immersion-facile.beta.gouv.fr",
-          firstName: "Baby",
-          lastName: "Herman",
-          phone: "0123456754",
-          resumeLink: "http://fakelink.com",
-        },
-        siret: "01234567891011",
-        businessName: "France Merguez Distribution",
-      };
+        ])
+        .build();
 
       discussionAggregateRepository.discussionAggregates = [
         discussion1,
@@ -149,25 +97,32 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
 
       expect(discussionsInRepository).toHaveLength(2);
 
-      expectToEqual(discussionsInRepository[0].exchanges, [
-        ...discussion1.exchanges,
+      expectToEqual(discussionAggregateRepository.discussionAggregates, [
         {
-          message: brevoResponse.items[0].RawHtmlBody,
-          sender: "establishment",
-          sentAt: new Date("2023-06-28T08:06:52.000Z"),
-          recipient: "potentialBeneficiary",
-          subject: brevoResponse.items[0].Subject,
+          ...discussion1,
+          exchanges: [
+            ...discussion1.exchanges,
+            {
+              message: brevoResponse.items[0].RawHtmlBody,
+              sender: "establishment",
+              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              recipient: "potentialBeneficiary",
+              subject: brevoResponse.items[0].Subject,
+            },
+          ],
         },
-      ]);
-
-      expectToEqual(discussionsInRepository[1].exchanges, [
-        ...discussion1.exchanges,
         {
-          message: brevoResponse.items[1].RawHtmlBody,
-          recipient: "establishment",
-          sentAt: new Date("2023-06-28T08:06:52.000Z"),
-          sender: "potentialBeneficiary",
-          subject: brevoResponse.items[1].Subject,
+          ...discussion2,
+          exchanges: [
+            ...discussion2.exchanges,
+            {
+              message: brevoResponse.items[1].RawHtmlBody,
+              sender: "potentialBeneficiary",
+              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              recipient: "establishment",
+              subject: brevoResponse.items[1].Subject,
+            },
+          ],
         },
       ]);
 
@@ -205,6 +160,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       });
     });
   });
+
   describe("wrong paths", () => {
     it("throws an error if the email does not have the right format", async () => {
       await expectPromiseToFailWithError(
@@ -222,9 +178,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
     it("throws an error if the email does not have the right recipient kind", async () => {
       await expectPromiseToFailWithError(
         addExchangeToDiscussionAndTransferEmail.execute(
-          createBrevoResponse([
-            "iozeuroiu897654654_bob@reply-dev.immersion-facile.beta.gouv.fr",
-          ]),
+          createBrevoResponse([`iozeuroiu897654654_bob@${replyDomain}`]),
         ),
         new BadRequestError(`Email does not have the right format kind : bob`),
       );
@@ -233,7 +187,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
     it("throws an error if the discussion does not exist", async () => {
       const discussionId = "my-discussion-id";
       const brevoResponse = createBrevoResponse([
-        `${discussionId}_e@reply-dev.immersion-facile.beta.gouv.fr`,
+        `${discussionId}_e@${replyDomain}`,
       ]);
       await expectPromiseToFailWithError(
         addExchangeToDiscussionAndTransferEmail.execute(brevoResponse),

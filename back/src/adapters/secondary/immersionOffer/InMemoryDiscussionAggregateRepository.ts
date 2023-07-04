@@ -2,9 +2,6 @@ import isAfter from "date-fns/isAfter";
 import { DiscussionId, SiretDto } from "shared";
 import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
-import { createLogger } from "../../../utils/logger";
-
-const logger = createLogger(__filename);
 
 type DiscussionsById = Record<DiscussionId, DiscussionAggregate>;
 
@@ -14,12 +11,10 @@ export class InMemoryDiscussionAggregateRepository
   constructor(private _discussionAggregates: DiscussionsById = {}) {}
 
   public async insert(discussionAggregate: DiscussionAggregate) {
-    logger.info(discussionAggregate, "insertDiscussionAggregate");
     this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
   }
 
   public async update(discussionAggregate: DiscussionAggregate) {
-    logger.info(discussionAggregate, "updateDiscussionAggregate");
     if (!this._discussionAggregates[discussionAggregate.id])
       throw new Error("DiscussionAggregate not found");
     this._discussionAggregates[discussionAggregate.id] = discussionAggregate;

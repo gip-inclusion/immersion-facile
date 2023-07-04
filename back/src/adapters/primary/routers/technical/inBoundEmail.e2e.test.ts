@@ -2,14 +2,17 @@ import { inboundEmailParsingRoute } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
+import { BrevoInboundBody } from "../../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 
 const discussionId = "my-discussion-id";
+const domain = "immersion-facile.beta.gouv.fr";
 
 describe("Inbound Email", () => {
   describe("IP filtering", () => {
     it("should return 403 when IP is not allowed", async () => {
       const config = new AppConfigBuilder({
         INBOUND_EMAIL_ALLOWED_IPS: "130.10.10.10",
+        DOMAIN: domain,
       }).build();
       const { request } = await buildTestApp(config);
       const response = await request
@@ -22,6 +25,7 @@ describe("Inbound Email", () => {
     it("should return 400, if IP is allowed (and body is wrong)", async () => {
       const config = new AppConfigBuilder({
         INBOUND_EMAIL_ALLOWED_IPS: "::ffff:127.0.0.1",
+        DOMAIN: domain,
       }).build();
       const { request } = await buildTestApp(config);
       const response = await request.post(`/${inboundEmailParsingRoute}`).send({
@@ -34,6 +38,7 @@ describe("Inbound Email", () => {
     it("should return 200, if IP is allowed (and body is correct)", async () => {
       const config = new AppConfigBuilder({
         INBOUND_EMAIL_ALLOWED_IPS: "::ffff:127.0.0.1",
+        DOMAIN: domain,
       }).build();
       const { request, inMemoryUow } = await buildTestApp(config);
       inMemoryUow.discussionAggregateRepository.discussionAggregates = [
@@ -44,12 +49,13 @@ describe("Inbound Email", () => {
         .post(`/${inboundEmailParsingRoute}`)
         .send(correctBrevoResponse);
 
+      expect(response.body).toBe("");
       expect(response.status).toBe(200);
     });
   });
 });
 
-const correctBrevoResponse = {
+const correctBrevoResponse: BrevoInboundBody = {
   items: [
     {
       Uuid: ["8d79f2b1-20ae-4939-8d0b-d2517331a9e5"],
@@ -64,7 +70,7 @@ const correctBrevoResponse = {
       To: [
         {
           Name: null,
-          Address: `${discussionId}_b@immersion-facile.beta.gouv.fr`,
+          Address: `${discussionId}_b@reply.${domain}`,
         },
       ],
       Cc: [

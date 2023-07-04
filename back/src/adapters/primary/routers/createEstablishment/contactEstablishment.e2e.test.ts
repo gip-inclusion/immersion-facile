@@ -67,10 +67,16 @@ describe(`/${contactEstablishmentRoute} route`, () => {
       .send(validRequest)
       .expect(200);
 
+    const discussions =
+      inMemoryUow.discussionAggregateRepository.discussionAggregates;
+
+    expect(discussions).toHaveLength(1);
+    const discussionId = discussions[0].id;
+
     expectArraysToMatch(inMemoryUow.outboxRepository.events, [
       {
         topic: "ContactRequestedByBeneficiary",
-        payload: { ...validRequest, discussionId: expect.any(String) },
+        payload: { ...validRequest, discussionId },
       },
     ]);
 
