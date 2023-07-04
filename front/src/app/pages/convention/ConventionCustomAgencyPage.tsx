@@ -4,7 +4,6 @@ import { Route } from "type-route";
 import { MainWrapper } from "react-design-system";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { conventionInitialValuesFromUrl } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 
@@ -25,11 +24,8 @@ export const ConventionCustomAgencyPage = ({
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
         <ConventionForm
-          conventionProperties={conventionInitialValuesFromUrl({
-            route,
-            internshipKind: "immersion",
-          })}
-          routeParams={route.params}
+          internshipKind="immersion"
+          route={route}
           mode="create"
         />
       </MainWrapper>

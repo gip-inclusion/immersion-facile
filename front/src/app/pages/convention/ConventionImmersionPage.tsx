@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
+import { match } from "ts-pattern";
 import { Route } from "type-route";
 import { FederatedIdentityProvider, isPeConnectIdentity } from "shared";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
@@ -10,7 +11,6 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { conventionInitialValuesFromUrl } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -70,42 +70,36 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     );
   }, [enablePeConnectApi, federatedIdentity]);
 
-  if (isLoading) return <Loader />;
-
-  if (mode === "edit")
-    return (
-      <ConventionForm
-        conventionProperties={conventionInitialValuesFromUrl({
-          route,
-          internshipKind: "immersion",
-        })}
-        routeParams={route.params}
-        mode={mode}
+  return match({
+    isLoading,
+    mode,
+    shouldShowForm,
+  })
+    .with({ isLoading: true }, () => <Loader />)
+    .with({ shouldShowForm: false }, () => (
+      <InitiateConventionCard
+        title={
+          isSharedConvention
+            ? "Une demande de convention d'immersion a été partagée avec vous."
+            : "Remplir la demande de convention"
+        }
+        peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
+        otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
+        showFormButtonLabel="Ouvrir le formulaire"
+        onNotPeConnectButtonClick={() => setShouldShowForm(true)}
       />
-    );
-
-  return shouldShowForm ? (
-    <ConventionForm
-      conventionProperties={conventionInitialValuesFromUrl({
-        route,
-        internshipKind: "immersion",
-      })}
-      routeParams={route.params}
-      mode={isSharedConvention ? "edit" : mode}
-    />
-  ) : (
-    <InitiateConventionCard
-      title={
-        isSharedConvention
-          ? "Une demande de convention d'immersion a été partagée avec vous."
-          : "Remplir la demande de convention"
-      }
-      peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
-      otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
-      showFormButtonLabel="Ouvrir le formulaire"
-      onNotPeConnectButtonClick={() => setShouldShowForm(true)}
-    />
-  );
+    ))
+    .with({ mode: "edit" }, () => (
+      <ConventionForm internshipKind="immersion" route={route} mode={mode} />
+    ))
+    .with({ shouldShowForm: true }, () => (
+      <ConventionForm
+        internshipKind="immersion"
+        route={route}
+        mode={isSharedConvention ? "edit" : mode}
+      />
+    ))
+    .exhaustive();
 };
 
 const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
