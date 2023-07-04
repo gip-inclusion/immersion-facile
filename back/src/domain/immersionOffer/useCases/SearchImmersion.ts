@@ -47,7 +47,7 @@ export class SearchImmersion extends TransactionalUseCase<
       rome: params.rome,
       lat: params.latitude,
       lon: params.longitude,
-      distance_km: params.distance_km,
+      distance_km: params.distanceKm,
       sortedBy: params.sortedBy,
       voluntaryToImmersion: params.voluntaryToImmersion,
       place: params.place,
@@ -70,7 +70,7 @@ export class SearchImmersion extends TransactionalUseCase<
           rome: params.rome,
           lat: params.latitude,
           lon: params.longitude,
-          distanceKm: params.distance_km,
+          distanceKm: params.distanceKm,
         })
       : [];
 

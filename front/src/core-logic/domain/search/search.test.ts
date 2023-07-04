@@ -32,7 +32,7 @@ describe("search epic", () => {
 
       store.dispatch(
         searchSlice.actions.searchRequested({
-          distance_km: 10,
+          distanceKm: 10,
           longitude: 0,
           latitude: 0,
           rome: "A1000",
@@ -55,7 +55,7 @@ describe("search epic", () => {
     it("without extra fetch if enough results in initial fetch", () => {
       store.dispatch(
         searchSlice.actions.searchRequested({
-          distance_km: 10,
+          distanceKm: 10,
           longitude: 0,
           latitude: 0,
           rome: "A1000",
@@ -73,7 +73,7 @@ describe("search epic", () => {
     it("displays message when there are no results", () => {
       store.dispatch(
         searchSlice.actions.searchRequested({
-          distance_km: 10,
+          distanceKm: 10,
           longitude: 0,
           latitude: 0,
           rome: "A1000",

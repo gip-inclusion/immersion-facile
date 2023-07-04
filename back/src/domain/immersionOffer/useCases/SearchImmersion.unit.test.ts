@@ -30,7 +30,7 @@ const secretariatRome = "M1607";
 const boulangerRome = "D1102";
 
 const searchInMetzParams: SearchImmersionQueryParamsDto = {
-  distance_km: 30,
+  distanceKm: 30,
   longitude: 6.17602,
   latitude: 49.119146,
   sortedBy: "distance",
@@ -148,7 +148,7 @@ describe("SearchImmersionUseCase", () => {
         rome: secretariatRome,
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
-        distance_km: searchInMetzParams.distance_km,
+        distance_km: searchInMetzParams.distanceKm,
         needsToBeSearched: true,
         sortedBy: "distance",
       },
@@ -297,7 +297,7 @@ describe("SearchImmersionUseCase", () => {
       rome: secretariatRome,
       sortedBy: "distance",
       voluntaryToImmersion: false,
-      distance_km: range,
+      distanceKm: range,
     });
 
     expect(response).toHaveLength(2);

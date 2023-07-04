@@ -9,7 +9,7 @@ export type SearchImmersionQueryParamsDto = {
   latitude: number;
   rome?: RomeCode;
   appellationCode?: AppellationCode;
-  distance_km: number;
+  distanceKm: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
   place?: string;
