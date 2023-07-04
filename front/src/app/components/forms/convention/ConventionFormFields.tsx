@@ -9,7 +9,6 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
 import { ConventionReadDto, domElementIds, toDotNotation } from "shared";
 import { ErrorNotifications } from "react-design-system";
-import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import {
   formConventionFieldsLabels,
   formUiSections,
@@ -21,7 +20,6 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { makeValuesToWatchInUrl } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -58,6 +56,10 @@ export const ConventionFormFields = ({
   } = useFormContext<ConventionReadDto>();
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionValues = getValues();
+  const { enablePeConnectApi } = useFeatureFlags();
+  const { getFormFields, getFormErrors } = useFormContents(
+    formConventionFieldsLabels(conventionValues.internshipKind),
+  );
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
   const preselectedAgencyId = useAppSelector(
     conventionSelectors.preselectedAgencyId,
@@ -88,12 +90,6 @@ export const ConventionFormFields = ({
     }
   }, [preselectedAgencyId]);
 
-  const { enablePeConnectApi } = useFeatureFlags();
-  const watchedValues = makeValuesToWatchInUrl(conventionValues);
-  useConventionWatchValuesInUrl(watchedValues);
-  const { getFormFields, getFormErrors } = useFormContents(
-    formConventionFieldsLabels(conventionValues.internshipKind),
-  );
   const dispatch = useDispatch();
   const formContents = getFormFields();
   const t = useConventionTexts(conventionValues.internshipKind);

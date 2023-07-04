@@ -46,23 +46,17 @@ import { type ConventionImmersionPageRoute } from "src/app/pages/convention/Conv
 import { type ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import { type ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
-import { conventionInitialValuesFromUrl } from "src/app/routes/routeParams/convention";
+import {
+  conventionInitialValuesFromUrl,
+  makeValuesToWatchInUrl,
+} from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionSummary } from "./ConventionSummary";
 import { ShareConventionLink } from "./ShareConventionLink";
-
-const useClearConventionSubmitFeedbackOnUnmount = () => {
-  const dispatch = useDispatch();
-  useEffect(
-    () => () => {
-      dispatch(conventionSlice.actions.clearFeedbackTriggered());
-    },
-    [],
-  );
-};
+import { useUpdateConventionValuesInUrl } from "./useUpdateConventionValuesInUrl";
 
 const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
   initialValues: ConventionPresentation,
@@ -141,6 +135,7 @@ export const ConventionForm = ({
     if (mode === "create") return initialValues;
     return fetchedConvention || initialValues;
   };
+
   const methods = useForm<ConventionReadDto>({
     defaultValues: getInitialFormValues(mode),
     resolver: zodResolver(conventionWithoutExternalIdSchema),
@@ -150,8 +145,8 @@ export const ConventionForm = ({
 
   const formSuccessfullySubmitted = submitFeedback.kind === "justSubmitted";
 
+  useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(getValues()));
   useMatomo(conventionProperties.internshipKind);
-
   useScrollToTop(formSuccessfullySubmitted);
 
   useEffect(() => {
@@ -162,7 +157,6 @@ export const ConventionForm = ({
           showSummary: false,
         }),
       );
-      return;
     }
 
     if (mode === "edit" && route.params.jwt) {
@@ -178,14 +172,12 @@ export const ConventionForm = ({
         }),
       );
     }
-  }, []);
 
-  useEffect(
-    () => () => {
+    return () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
-    },
-    [],
-  );
+      dispatch(conventionSlice.actions.clearFeedbackTriggered());
+    };
+  }, []);
 
   useEffect(() => {
     if (fetchedConvention) {
@@ -217,8 +209,6 @@ export const ConventionForm = ({
   };
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeFormikInitialisation(initialValues);
-
-  useClearConventionSubmitFeedbackOnUnmount();
 
   const t = useConventionTexts(initialValues.internshipKind);
 
