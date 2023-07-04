@@ -1,5 +1,6 @@
 import {
   AppellationAndRomeDto,
+  AppellationCode,
   conflictErrorSiret,
   path,
   pathEq,
@@ -219,6 +220,41 @@ export class InMemoryEstablishmentAggregateRepository
       contactMode: aggregate.contact?.contactMethod,
     };
   }
+
+  public async getSearchImmersionResultDtoBySiretAndAppellationCode(
+    siret: SiretDto,
+    appellationCode: AppellationCode,
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const aggregate = this.establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret === siret,
+    );
+    if (!aggregate) return;
+    const immersionOffer = aggregate.immersionOffers.find(
+      (offer) => offer.appellationCode === appellationCode,
+    );
+    if (!immersionOffer) return;
+    return {
+      rome: immersionOffer.romeCode,
+      romeLabel: TEST_ROME_LABEL,
+      appellations: [
+        {
+          appellationCode: immersionOffer.appellationCode,
+          appellationLabel: immersionOffer.appellationLabel,
+        },
+      ],
+      naf: aggregate.establishment.nafDto.code,
+      nafLabel: TEST_NAF_LABEL,
+      siret,
+      name: aggregate?.establishment.name,
+      customizedName: aggregate?.establishment.customizedName,
+      voluntaryToImmersion: aggregate?.establishment.voluntaryToImmersion,
+      numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
+      position: aggregate?.establishment.position,
+      address: aggregate.establishment.address,
+      contactMode: aggregate.contact?.contactMethod,
+    };
+  }
+
   async getSiretsOfEstablishmentsWithRomeCode(
     rome: string,
   ): Promise<SiretDto[]> {

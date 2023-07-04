@@ -1,15 +1,15 @@
 import {
   ApiConsumer,
   SearchImmersionResultDto,
-  SiretAndRomeDto,
-  siretAndRomeSchema,
+  SiretAndAppellationDto,
+  siretAndAppellationSchema,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class GetImmersionOfferBySiretAndRome extends TransactionalUseCase<
-  SiretAndRomeDto,
+export class GetImmersionOfferBySiretAndAppellationCode extends TransactionalUseCase<
+  SiretAndAppellationDto,
   SearchImmersionResultDto,
   ApiConsumer
 > {
@@ -17,23 +17,23 @@ export class GetImmersionOfferBySiretAndRome extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = siretAndRomeSchema;
+  inputSchema = siretAndAppellationSchema;
 
   public async _execute(
-    siretAndRomeDto: SiretAndRomeDto,
+    siretAndAppellationDto: SiretAndAppellationDto,
     uow: UnitOfWork,
   ): Promise<SearchImmersionResultDto> {
-    const { siret, rome } = siretAndRomeDto;
+    const { siret, appellationCode } = siretAndAppellationDto;
 
     const searchImmersionResultDto =
-      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
+      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndAppellationCode(
         siret,
-        rome,
+        appellationCode,
       );
 
     if (!searchImmersionResultDto)
       throw new NotFoundError(
-        `No offer found for siret ${siret} and rome ${rome}`,
+        `No offer found for siret ${siret} and appellation code ${appellationCode}`,
       );
     return searchImmersionResultDto;
   }

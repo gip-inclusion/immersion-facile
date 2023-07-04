@@ -900,6 +900,90 @@ describe("Postgres implementation of immersion offer repository", () => {
       );
     });
   });
+
+  describe("Pg implementation of method getSearchImmersionResultDtoBySiretAndAppellation", () => {
+    it("Returns undefined when no matching establishment or appellation code", async () => {
+      const siretNotInTable = "11111111111111";
+
+      expect(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndAppellationCode(
+          siretNotInTable,
+          "14012",
+        ),
+      ).toBeUndefined();
+    });
+    it("Returns reconstructed SearchImmersionResultDto for given siret and appellationCode", async () => {
+      // Prepare
+      const siret = "12345678901234";
+      const boulangerRome = "D1102";
+      const establishment = new EstablishmentEntityBuilder()
+        .withSiret(siret)
+        .withCustomizedName("La boulangerie de Lucie")
+        .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
+        .withAddress(rueJacquardDto)
+        .build();
+      const boulangerOffer1 = new ImmersionOfferEntityV2Builder()
+        .withRomeCode(boulangerRome)
+        .withAppellationCode("10868") // Aide-boulanger / Aide-boulangère
+        .build();
+      const boulangerOffer2 = new ImmersionOfferEntityV2Builder()
+        .withRomeCode(boulangerRome)
+        .withAppellationCode("12006") // Chef boulanger / boulangère
+        .build();
+      const otherOffer = new ImmersionOfferEntityV2Builder()
+        .withRomeCode("H2102")
+        .build();
+      const contact = new ContactEntityBuilder()
+        .withGeneratedContactId()
+        .build();
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(establishment)
+          .withImmersionOffers([boulangerOffer1, boulangerOffer2, otherOffer])
+          .withContact(contact)
+          .build(),
+      ]);
+
+      // Act
+      const actualSearchResultDto =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndAppellationCode(
+          siret,
+          "12006",
+        );
+      // Assert
+      expectToEqual(actualSearchResultDto, {
+        rome: boulangerRome,
+        romeLabel: "Boulangerie - viennoiserie",
+        appellations: [
+          // {
+          //   appellationLabel: "Aide-boulanger / Aide-boulangère",
+          //   appellationCode: "10868",
+          // },
+          {
+            appellationLabel: "Chef boulanger / boulangère",
+            appellationCode: "12006",
+          },
+        ],
+        naf: establishment.nafDto.code,
+        nafLabel: "Fabrication de pain et de pâtisserie fraîche",
+        siret,
+        name: establishment.name,
+        customizedName: establishment.customizedName,
+        website: establishment.website,
+        additionalInformation: establishment.additionalInformation,
+        voluntaryToImmersion: establishment.voluntaryToImmersion,
+        fitForDisabledWorkers: establishment.fitForDisabledWorkers,
+        position: establishment.position,
+        address: establishment.address,
+        numberOfEmployeeRange: establishment.numberEmployeesRange,
+        contactMode: contact.contactMethod,
+        distance_m: undefined,
+        // contactDetails: undefined,
+      });
+    });
+  });
+
   describe("Pg implementation of method getSearchImmersionResultDtoBySiretAndRome", () => {
     it("Returns undefined when no matching establishment", async () => {
       const siretNotInTable = "11111111111111";

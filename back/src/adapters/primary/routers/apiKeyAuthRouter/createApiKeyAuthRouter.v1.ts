@@ -4,7 +4,7 @@ import {
   establishmentTargets,
   immersionOffersRoute,
   pipeWithValue,
-  SiretAndRomeDto,
+  SiretAndAppellationDto,
 } from "shared";
 import { counterFormEstablishmentCallerV1 } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
@@ -82,18 +82,18 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
       sendHttpResponse(req, res, async () => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
 
-        // const appellationCode =
-        //   await deps.useCases.convertRomeToAppellationForEstablishment.execute({
-        //     siret: req.params.siret,
-        //     rome: req.params.rome,
-        //   });
+        const appellationCode =
+          await deps.useCases.convertRomeToAppellationForEstablishment.execute({
+            siret: req.params.siret,
+            rome: req.params.rome,
+          });
 
         return domainToSearchImmersionResultPublicV1(
-          await deps.useCases.getImmersionOfferBySiretAndRome.execute(
+          await deps.useCases.getImmersionOfferBySiretAndAppellationCode.execute(
             {
               siret: req.params.siret,
-              rome: req.params.rome,
-            } as SiretAndRomeDto,
+              appellationCode,
+            } as SiretAndAppellationDto,
             req.apiConsumer,
           ),
         );
