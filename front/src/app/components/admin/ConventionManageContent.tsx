@@ -50,24 +50,18 @@ export const ConventionManageContent = ({
           .push();
   }
 
+  if (!isLoading) return <Loader />;
+  if (!convention) return <p>Pas de conventions correspondante trouvée</p>;
   return (
     <>
-      {isLoading ? (
-        <Loader />
-      ) : !convention ? (
-        <p>Pas de conventions correspondante trouvée</p>
-      ) : (
-        <>
-          <ConventionValidation convention={convention} />
-          <ConventionManageActions
-            jwt={jwt}
-            convention={convention}
-            role={role}
-            submitFeedback={submitFeedback}
-          />
-          <NpsSection convention={convention} role={role} />
-        </>
-      )}
+      <ConventionValidation convention={convention} />
+      <ConventionManageActions
+        jwt={jwt}
+        convention={convention}
+        role={role}
+        submitFeedback={submitFeedback}
+      />
+      <NpsSection convention={convention} role={role} />
     </>
   );
 };

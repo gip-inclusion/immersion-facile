@@ -99,27 +99,20 @@ export class PgConventionRepository implements ConventionRepository {
       id,
       establishmentTutor,
     );
-    const beneficiaryCurrentEmployerId = beneficiaryCurrentEmployer
-      ? (await this.getBeneficiaryCurrentEmployerId(id)) === null
-        ? await this.insertBeneficiaryCurrentEmployer(
-            beneficiaryCurrentEmployer,
-          )
-        : await this.updateBeneficiaryCurrentEmployer(
-            id,
-            beneficiaryCurrentEmployer,
-          )
-      : null;
+
+    const beneficiaryCurrentEmployerId =
+      await this.insertOrUpdateBeneficiaryCurrentEmployerIfExists(
+        beneficiaryCurrentEmployer,
+        id,
+      );
 
     await this.updateBeneficiary(id, beneficiary);
 
-    const beneficiaryRepresentativeId = beneficiaryRepresentative
-      ? (await this.getBeneficiaryRepresentativeId(id)) === null
-        ? await this.insertBeneficiaryRepresentative(beneficiaryRepresentative)
-        : await this.updateBeneficiaryRepresentative(
-            id,
-            beneficiaryRepresentative,
-          )
-      : null;
+    const beneficiaryRepresentativeId =
+      await this.insertOrUpdateBeneficiaryRepresentativeIfExists(
+        beneficiaryRepresentative,
+        id,
+      );
 
     await this.updateConvention({
       convention,
@@ -416,6 +409,7 @@ export class PgConventionRepository implements ConventionRepository {
     if (result) return result.id;
     throw new Error(missingReturningRowError(insertReturn));
   }
+
   private async updateBeneficiaryCurrentEmployer(
     id: ConventionId,
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
@@ -445,6 +439,40 @@ export class PgConventionRepository implements ConventionRepository {
     const result = updateReturn.rows.at(0);
     if (result) return result.id;
     throw new Error(missingReturningRowError(updateReturn));
+  }
+
+  private async insertOrUpdateBeneficiaryCurrentEmployerIfExists(
+    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
+    conventionId: ConventionId,
+  ): Promise<number | null> {
+    if (!beneficiaryCurrentEmployer) return null;
+
+    const beneficiaryCurrentEmployerIdInDb =
+      await this.getBeneficiaryCurrentEmployerId(conventionId);
+
+    return beneficiaryCurrentEmployerIdInDb === null
+      ? this.insertBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+      : this.updateBeneficiaryCurrentEmployer(
+          conventionId,
+          beneficiaryCurrentEmployer,
+        );
+  }
+
+  private async insertOrUpdateBeneficiaryRepresentativeIfExists(
+    beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
+    conventionId: ConventionId,
+  ): Promise<number | null> {
+    if (!beneficiaryRepresentative) return null;
+
+    const beneficiaryRepresentativeId =
+      await this.getBeneficiaryRepresentativeId(conventionId);
+
+    return beneficiaryRepresentativeId === null
+      ? this.insertBeneficiaryRepresentative(beneficiaryRepresentative)
+      : this.updateBeneficiaryRepresentative(
+          conventionId,
+          beneficiaryRepresentative,
+        );
   }
 }
 const missingReturningRowError = (updateReturn: QueryResult<any>): string =>
