@@ -67,7 +67,7 @@ handleEndOfScriptNotification(
 
     return [
       `Total of convention to sync : ${
-        report.success + errors.length + errors.length
+        report.success + errors.length + skips.length
       }`,
       `Number of successfully sync convention : ${report.success}`,
       `Number of failures : ${errors.length}`,
