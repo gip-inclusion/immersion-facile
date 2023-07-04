@@ -90,12 +90,11 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
       />
     ))
     .with({ mode: "edit" }, () => (
-      <ConventionForm internshipKind="immersion" route={route} mode={mode} />
+      <ConventionForm internshipKind="immersion" mode={mode} />
     ))
     .with({ shouldShowForm: true }, () => (
       <ConventionForm
         internshipKind="immersion"
-        route={route}
         mode={isSharedConvention ? "edit" : mode}
       />
     ))

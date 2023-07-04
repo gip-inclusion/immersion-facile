@@ -50,6 +50,7 @@ import {
   conventionInitialValuesFromUrl,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
+import { useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -88,23 +89,25 @@ export type ConventionFormMode = "create" | "edit";
 
 type ConventionFormProps = {
   internshipKind: InternshipKind;
-  route:
-    | ConventionImmersionPageRoute
-    | ConventionMiniStagePageRoute
-    | ConventionCustomAgencyPageRoute
-    | ConventionImmersionForExternalsRoute;
   mode: ConventionFormMode;
 };
 
+type SupportedRoutes =
+  | ConventionImmersionPageRoute
+  | ConventionMiniStagePageRoute
+  | ConventionCustomAgencyPageRoute
+  | ConventionImmersionForExternalsRoute;
+
 export const ConventionForm = ({
   internshipKind,
-  route,
   mode,
 }: ConventionFormProps) => {
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const showSummary = useAppSelector(conventionSelectors.showSummary);
+
+  const route = useRoute() as SupportedRoutes;
   const conventionProperties = conventionInitialValuesFromUrl({
     route,
     internshipKind,
