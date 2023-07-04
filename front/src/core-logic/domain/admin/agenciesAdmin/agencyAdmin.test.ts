@@ -45,7 +45,7 @@ describe("agencyAdmin", () => {
       });
       it("after fetch agencies options are fetched", () => {
         const expectedAgencies: AgencyOption[] = [
-          { id: "my-id", name: "My expected agency" },
+          { id: "my-id", name: "My expected agency", kind: "mission-locale" },
         ];
 
         store.dispatch(
@@ -98,10 +98,12 @@ describe("agencyAdmin", () => {
             {
               id: AGENCY_NEEDING_REVIEW_1.id,
               name: AGENCY_NEEDING_REVIEW_1.name,
+              kind: AGENCY_NEEDING_REVIEW_1.kind,
             },
             {
               id: AGENCY_NEEDING_REVIEW_2.id,
               name: AGENCY_NEEDING_REVIEW_2.name,
+              kind: AGENCY_NEEDING_REVIEW_2.kind,
             },
           ],
           agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
@@ -141,6 +143,7 @@ describe("agencyAdmin", () => {
               {
                 id: AGENCY_NEEDING_REVIEW_1.id,
                 name: AGENCY_NEEDING_REVIEW_1.name,
+                kind: AGENCY_NEEDING_REVIEW_1.kind,
               },
             ],
             agencyNeedingReview: null,
@@ -158,10 +161,12 @@ describe("agencyAdmin", () => {
               {
                 id: AGENCY_NEEDING_REVIEW_1.id,
                 name: AGENCY_NEEDING_REVIEW_1.name,
+                kind: AGENCY_NEEDING_REVIEW_1.kind,
               },
               {
                 id: AGENCY_NEEDING_REVIEW_2.id,
                 name: AGENCY_NEEDING_REVIEW_2.name,
+                kind: AGENCY_NEEDING_REVIEW_2.kind,
               },
             ],
             agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
@@ -191,7 +196,9 @@ describe("agencyAdmin", () => {
         expectIsSearchingToBe(true);
         fastForwardObservables();
         expectIsSearchingToBe(true);
-        const agencies: AgencyOption[] = [{ id: "my-id", name: "My agency" }];
+        const agencies: AgencyOption[] = [
+          { id: "my-id", name: "My agency", kind: "cap-emploi" },
+        ];
         feedWithAgencyOptions(agencies);
         expectAgencyAdminStateToMatch({
           agencySearchText: searchedText,
@@ -204,8 +211,8 @@ describe("agencyAdmin", () => {
         const agencySearchText = "My ";
         const agencyDto = new AgencyDtoBuilder().build();
         const agencyOptions: AgencyOption[] = [
-          { id: agencyDto.id, name: agencyDto.name },
-          { id: "456", name: "My other agency" },
+          { id: agencyDto.id, name: agencyDto.name, kind: "pole-emploi" },
+          { id: "456", name: "My other agency", kind: "cci" },
         ];
 
         ({ store, dependencies } = createTestStore({
@@ -279,7 +286,7 @@ describe("agencyAdmin", () => {
     it("clears feedback and agency on agency selection", () => {
       const agencyDto1 = new AgencyDtoBuilder().withId("1").build();
       const agencyOptions: AgencyOption[] = [
-        { id: agencyDto1.id, name: agencyDto1.name },
+        { id: agencyDto1.id, name: agencyDto1.name, kind: "autre" },
       ];
       ({ store, dependencies } = createTestStore({
         admin: adminPreloadedState({

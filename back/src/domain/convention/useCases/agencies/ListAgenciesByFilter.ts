@@ -15,11 +15,11 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
   ListAgenciesRequestDto,
   AgencyOption[]
 > {
+  inputSchema = listAgenciesRequestSchema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = listAgenciesRequestSchema;
 
   public async _execute(
     { departmentCode, nameIncludes, kind }: ListAgenciesRequestDto,
@@ -41,4 +41,5 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
 export const toAgencyOption = (agency: AgencyDto): AgencyOption => ({
   id: agency.id,
   name: agency.name,
+  kind: agency.kind,
 });

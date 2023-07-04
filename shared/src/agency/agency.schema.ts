@@ -41,18 +41,19 @@ export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
 export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
   agencyIdSchema.optional();
 
+const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
+  agencyKindList,
+  "Ce type de structure n'est pas supporté",
+);
+
 export const agencyIdAndNameSchema: z.ZodSchema<AgencyOption> = z.object({
   id: agencyIdSchema,
   name: z.string(),
+  kind: agencyKindSchema,
 });
 
 export const agenciesIdAndNameSchema: z.ZodSchema<AgencyOption[]> = z.array(
   agencyIdAndNameSchema,
-);
-
-const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
-  agencyKindList,
-  "Ce type de structure n'est pas supporté",
 );
 
 export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =

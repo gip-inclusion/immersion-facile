@@ -59,6 +59,7 @@ export const AgencySelector = ({
     {
       id: "",
       name: agencyDepartmentField.placeholder ?? "",
+      kind: "autre",
     },
   ]);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);

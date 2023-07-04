@@ -74,6 +74,7 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .build();
 
 export class InMemoryAgencyGateway implements AgencyGateway {
+  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
   private _agencies: Record<string, AgencyDto> = {
     [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
     [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
@@ -81,8 +82,6 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     [AGENCY_NEEDING_REVIEW_2.id]: AGENCY_NEEDING_REVIEW_2,
     [CCI_ACTIVE.id]: CCI_ACTIVE,
   };
-
-  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
 
   updateAgency$(): Observable<void> {
     return of(undefined);
@@ -174,7 +173,11 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     return of(
       values(this._agencies)
         .filter((agency) => agency.status === "needsReview")
-        .map((agency) => ({ id: agency.id, name: agency.name })),
+        .map((agency) => ({
+          id: agency.id,
+          name: agency.name,
+          kind: agency.kind,
+        })),
     );
   }
 
@@ -183,6 +186,10 @@ export class InMemoryAgencyGateway implements AgencyGateway {
   ): Promise<AgencyOption[]> {
     return values(this._agencies)
       .filter((agency) => filter.status?.includes(agency.status) ?? true)
-      .map((agency) => ({ id: agency.id, name: agency.name }));
+      .map((agency) => ({
+        id: agency.id,
+        name: agency.name,
+        kind: agency.kind,
+      }));
   }
 }

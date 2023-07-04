@@ -15,11 +15,11 @@ export class PrivateListAgencies extends TransactionalUseCase<
   PrivateListAgenciesRequestDto,
   AgencyOption[]
 > {
+  inputSchema = privateListAgenciesRequestSchema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = privateListAgenciesRequestSchema;
 
   public async _execute(
     { status }: PrivateListAgenciesRequestDto,
@@ -29,6 +29,10 @@ export class PrivateListAgencies extends TransactionalUseCase<
       .getAgencies({
         filters: { status: status && [status] },
       })
-      .then(map(({ id, name }: AgencyDto): AgencyOption => ({ id, name })));
+      .then(
+        map(
+          ({ id, name, kind }: AgencyDto): AgencyOption => ({ id, name, kind }),
+        ),
+      );
   }
 }
