@@ -1,6 +1,7 @@
 module.exports = {
   "arrow-body-style": ["error", "as-needed"],
   "object-shorthand": ["error", "always"],
+  "no-nested-ternary": "error",
   "no-return-await": "off",
   "require-await": "off",
   "no-console": "error",
@@ -201,7 +202,6 @@ const toAdd = {
   "no-multi-assign": "error",
   "no-multi-str": "error",
   "no-negated-condition": "error",
-  "no-nested-ternary": "error",
   "no-new": "error",
   "no-new-func": "error",
   "no-new-object": "error",
