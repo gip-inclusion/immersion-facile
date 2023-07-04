@@ -54,7 +54,7 @@ export const SearchPage = ({
   const initialValues: SearchPageParams = {
     latitude: 0,
     longitude: 0,
-    distance_km: 10,
+    distanceKm: 10,
     place: "",
     sortedBy: "distance",
     appellationCode: undefined,
@@ -181,7 +181,7 @@ export const SearchPage = ({
                 placeholder="Distance"
                 options={radiusOptions}
                 nativeSelectProps={{
-                  ...register("distance_km"),
+                  ...register("distanceKm"),
                   id: domElementIds.search.distanceSelect,
                 }}
               />
