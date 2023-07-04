@@ -3,7 +3,7 @@ import { useDebounce } from "src/app/hooks/useDebounce";
 import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { routes, useRoute } from "src/app/routes/routes";
 
-export const useConventionWatchValuesInUrl = (
+export const useUpdateConventionValuesInUrl = (
   watchedValues: ConventionParamsInUrl,
 ) => {
   const {
