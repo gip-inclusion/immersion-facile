@@ -19,6 +19,7 @@ type MultipleAgencyInputProps = {
 const placeholderOption: AgencyOption = {
   id: "",
   name: "",
+  kind: "autre",
 };
 
 export const MultipleAgencyInput = ({

@@ -50,6 +50,7 @@ export const agencyKindList = [
 export type AgencyOption = {
   id: AgencyId;
   name: string;
+  kind: AgencyKind;
 };
 
 export type AgencyKind = (typeof agencyKindList)[number];

@@ -36,6 +36,7 @@ describe("PrivateListAgencies use case", () => {
     expectToEqual(fetchedAgencies[0], {
       id: expectedAgency.id,
       name: expectedAgency.name,
+      kind: expectedAgency.kind,
     });
   });
 });

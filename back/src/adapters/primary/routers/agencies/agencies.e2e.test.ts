@@ -84,10 +84,12 @@ describe(`/${agenciesRoute} route`, () => {
         {
           id: agency1ActiveNearBy.id,
           name: agency1ActiveNearBy.name,
+          kind: agency1ActiveNearBy.kind,
         },
         {
           id: agency2ActiveNearBy.id,
           name: agency2ActiveNearBy.name,
+          kind: agency2ActiveNearBy.kind,
         },
       ]);
     });
@@ -116,7 +118,11 @@ describe(`/${agenciesRoute} route`, () => {
         .get(`/admin/${agenciesRoute}?status=needsReview`)
         .set("Authorization", adminToken)
         .expect(200, [
-          { id: agency4NeedsReview.id, name: agency4NeedsReview.name },
+          {
+            id: agency4NeedsReview.id,
+            name: agency4NeedsReview.name,
+            kind: agency4NeedsReview.kind,
+          },
         ]);
     });
   });
