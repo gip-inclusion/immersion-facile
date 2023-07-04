@@ -9,13 +9,7 @@ export type ConventionMiniStagePageRoute = Route<
   typeof routes.conventionMiniStage
 >;
 
-interface ConventionMiniStagePageProps {
-  route: ConventionMiniStagePageRoute;
-}
-
-export const ConventionMiniStagePage = ({
-  route,
-}: ConventionMiniStagePageProps) => {
+export const ConventionMiniStagePage = () => {
   const t = useConventionTexts("mini-stage-cci");
   return (
     <MainWrapper
@@ -24,11 +18,7 @@ export const ConventionMiniStagePage = ({
         <PageHeader title={t.intro.conventionTitle} theme="candidate" />
       }
     >
-      <ConventionForm
-        internshipKind="mini-stage-cci"
-        route={route}
-        mode="create"
-      />
+      <ConventionForm internshipKind="mini-stage-cci" mode="create" />
     </MainWrapper>
   );
 };

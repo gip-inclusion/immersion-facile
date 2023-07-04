@@ -57,15 +57,13 @@ const getPageByRouteName: {
       <AgencyDashboardPage />
     </InclusionConnectedPrivateRoute>
   ),
-  conventionCustomAgency: (route) => (
-    <ConventionCustomAgencyPage route={route} />
-  ),
+  conventionCustomAgency: () => <ConventionCustomAgencyPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
   conventionImmersionForExternals: (route) => (
     <ConventionPageForExternals route={route} />
   ),
   conventionDocument: (route) => <ConventionDocumentPage route={route} />,
-  conventionMiniStage: (route) => <ConventionMiniStagePage route={route} />,
+  conventionMiniStage: () => <ConventionMiniStagePage />,
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />
   ),

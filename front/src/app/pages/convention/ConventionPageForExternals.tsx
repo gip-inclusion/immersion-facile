@@ -30,15 +30,11 @@ export const ConventionPageForExternals = ({
   }
 
   return externalConsumer.isIframe ? (
-    <ConventionForm internshipKind="immersion" route={route} mode="create" />
+    <ConventionForm internshipKind="immersion" mode="create" />
   ) : (
     <HeaderFooterLayout>
       <MainWrapper layout="default">
-        <ConventionForm
-          internshipKind="immersion"
-          route={route}
-          mode="create"
-        />
+        <ConventionForm internshipKind="immersion" mode="create" />
       </MainWrapper>
     </HeaderFooterLayout>
   );

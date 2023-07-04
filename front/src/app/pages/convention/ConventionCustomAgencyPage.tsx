@@ -11,11 +11,7 @@ export type ConventionCustomAgencyPageRoute = Route<
   typeof routes.conventionCustomAgency
 >;
 
-export const ConventionCustomAgencyPage = ({
-  route,
-}: {
-  route: ConventionCustomAgencyPageRoute;
-}) => {
+export const ConventionCustomAgencyPage = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
@@ -23,11 +19,7 @@ export const ConventionCustomAgencyPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
-        <ConventionForm
-          internshipKind="immersion"
-          route={route}
-          mode="create"
-        />
+        <ConventionForm internshipKind="immersion" mode="create" />
       </MainWrapper>
     </HeaderFooterLayout>
   );
