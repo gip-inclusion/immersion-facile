@@ -3,7 +3,6 @@ import { Route } from "type-route";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import { conventionInitialValuesFromUrl } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 
 export type ConventionMiniStagePageRoute = Route<
@@ -26,11 +25,8 @@ export const ConventionMiniStagePage = ({
       }
     >
       <ConventionForm
-        conventionProperties={conventionInitialValuesFromUrl({
-          route,
-          internshipKind: "mini-stage-cci",
-        })}
-        routeParams={route.params}
+        internshipKind="mini-stage-cci"
+        route={route}
         mode="create"
       />
     </MainWrapper>

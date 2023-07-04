@@ -16,6 +16,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   hasBeneficiaryCurrentEmployer,
+  InternshipKind,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
@@ -40,7 +41,12 @@ import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { useMatomo } from "src/app/hooks/useMatomo";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
+import { type ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
+import { type ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
+import { type ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
+import { type ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { conventionInitialValuesFromUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -87,20 +93,28 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
 export type ConventionFormMode = "create" | "edit";
 
 type ConventionFormProps = {
-  conventionProperties: ConventionPresentation;
-  routeParams?: { jwt?: string };
+  internshipKind: InternshipKind;
+  route:
+    | ConventionImmersionPageRoute
+    | ConventionMiniStagePageRoute
+    | ConventionCustomAgencyPageRoute
+    | ConventionImmersionForExternalsRoute;
   mode: ConventionFormMode;
 };
 
 export const ConventionForm = ({
-  conventionProperties,
-  routeParams = {},
+  internshipKind,
+  route,
   mode,
 }: ConventionFormProps) => {
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const showSummary = useAppSelector(conventionSelectors.showSummary);
+  const conventionProperties = conventionInitialValuesFromUrl({
+    route,
+    internshipKind,
+  });
   const sidebarContent = sidebarStepContent(
     conventionProperties?.internshipKind ?? "immersion",
   );
@@ -151,15 +165,15 @@ export const ConventionForm = ({
       return;
     }
 
-    if (mode === "edit" && routeParams.jwt) {
-      dispatch(conventionSlice.actions.jwtProvided(routeParams.jwt));
+    if (mode === "edit" && route.params.jwt) {
+      dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
       const { applicationId: conventionId } =
         decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
-          routeParams.jwt,
+          route.params.jwt,
         );
       dispatch(
         conventionSlice.actions.fetchConventionRequested({
-          jwt: routeParams.jwt,
+          jwt: route.params.jwt,
           conventionId,
         }),
       );
@@ -217,15 +231,15 @@ export const ConventionForm = ({
         showSummary,
         reduxFormUiReady,
         formSuccessfullySubmitted,
-        shouldRedirectToError: !!(routeParams.jwt && fetchConventionError),
+        shouldRedirectToError: !!(route.params.jwt && fetchConventionError),
       })
         .with({ reduxFormUiReady: false }, () => null)
         .with({ shouldRedirectToError: true }, () => (
           <>
-            {routeParams.jwt && fetchConventionError && (
+            {route.params.jwt && fetchConventionError && (
               <ShowErrorOrRedirectToRenewMagicLink
                 errorMessage={fetchConventionError}
-                jwt={routeParams.jwt}
+                jwt={route.params.jwt}
               />
             )}
           </>
