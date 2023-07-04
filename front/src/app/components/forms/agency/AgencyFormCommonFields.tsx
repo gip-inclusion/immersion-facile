@@ -5,11 +5,14 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import {
   AddressDto,
   addressDtoToString,
-  AgencyKind,
   agencyKindList,
   CreateAgencyDto,
   emailSchema,
 } from "shared";
+import {
+  agencyKindToLabel,
+  AllowedAgencyKindToAdd,
+} from "src/app/components/forms/agency/agencyKindToLabel";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
@@ -184,20 +187,6 @@ export const AgencyLogoUpload = () => {
       )}
     </>
   );
-};
-
-type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
-
-const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
-  "mission-locale": "Mission Locale",
-  "pole-emploi": "Pole Emploi",
-  "cap-emploi": "Cap Emploi",
-  "conseil-departemental": "Conseil Départemental",
-  "prepa-apprentissage": "Prépa Apprentissage",
-  cci: "Chambres de Commerce et d'Industrie",
-  "structure-IAE": "Structure IAE",
-  "operateur-cep": "Opérateur du CEP",
-  autre: "Autre",
 };
 
 export const agencyListOfOptions = agencyKindList
