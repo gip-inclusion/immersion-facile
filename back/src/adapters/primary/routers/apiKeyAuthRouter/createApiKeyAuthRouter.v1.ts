@@ -16,6 +16,7 @@ import {
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { formEstablishmentDtoPublicV1ToDomain } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 import { formEstablishmentPublicV1Schema } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.schema";
+import { searchImmersionRequestPublicV1ToDomain } from "../DtoAndSchemas/v1/input/SearchImmersionRequestPublicV1dto";
 import { domainToSearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
 const logger = createLogger(__filename);
@@ -61,9 +62,12 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   // Immersion offers routes
   publicV1Router.route(`/${immersionOffersRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
+      const searchImmersionRequest = searchImmersionRequestPublicV1ToDomain(
+        req.query as any,
+      );
       const searchImmersionResultDtos =
         await deps.useCases.searchImmersion.execute(
-          req.query as any,
+          searchImmersionRequest,
           req.apiConsumer,
         );
       return searchImmersionResultDtos.map(
