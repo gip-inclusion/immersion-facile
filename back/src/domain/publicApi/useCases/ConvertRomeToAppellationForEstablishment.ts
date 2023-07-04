@@ -22,7 +22,9 @@ export class convertRomeToAppellationForEstablishment extends TransactionalUseCa
         siret,
       );
     if (!establishmentAggregate)
-      throw new NotFoundError(`establishment with siret ${siret} not found`);
+      throw new NotFoundError(
+        `No offer found for siret ${siret} and rome ${rome}`,
+      );
 
     const firstOfferMatchingRome = establishmentAggregate.immersionOffers.find(
       ({ romeCode }) => romeCode === rome,

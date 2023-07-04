@@ -82,6 +82,8 @@ export * from "./seedSharedData";
 export * from "./ShareLinkByEmailDto";
 export * from "./siret/siret";
 export * from "./siret/siret.schema";
+export * from "./siretAndAppellation/SiretAndAppellation.dto";
+export * from "./siretAndAppellation/SiretAndAppellation.schema";
 export * from "./siretAndRome/SiretAndRome.dto";
 export * from "./siretAndRome/SiretAndRome.schema";
 export * from "./sms/sms.schema";

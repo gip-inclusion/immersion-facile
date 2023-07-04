@@ -58,7 +58,7 @@ import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/Co
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
-import { GetImmersionOfferBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
+import { GetImmersionOfferBySiretAndAppellationCode } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndAppellationCode";
 import { GetOffersByGroupSlug } from "../../../domain/immersionOffer/useCases/GetOffersByGroupSlug";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
@@ -251,9 +251,8 @@ export const createUseCases = (
       ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
-      getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
-        uowPerformer,
-      ),
+      getImmersionOfferBySiretAndAppellationCode:
+        new GetImmersionOfferBySiretAndAppellationCode(uowPerformer),
 
       addFormEstablishment,
 

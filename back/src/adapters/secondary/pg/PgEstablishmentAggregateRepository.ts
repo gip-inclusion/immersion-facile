@@ -3,6 +3,7 @@ import format from "pg-format";
 import { equals, keys } from "ramda";
 import {
   AppellationAndRomeDto,
+  AppellationCode,
   GeoPositionDto,
   SearchImmersionResultDto,
   SearchSortedBy,
@@ -552,6 +553,27 @@ export class PgEstablishmentAggregateRepository
         WHERE io.siret = $1 AND io.rome_code = $2
         GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
         [siret, rome],
+      );
+    if (!immersionSearchResultDtos.length) return;
+    const { contactDetails, ...searchResultWithoutContactDetails } =
+      immersionSearchResultDtos[0];
+    return searchResultWithoutContactDetails;
+  }
+
+  public async getSearchImmersionResultDtoBySiretAndAppellationCode(
+    siret: SiretDto,
+    appellationCode: AppellationCode,
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const immersionSearchResultDtos =
+      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        `
+        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
+        FROM immersion_offers AS io
+        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
+        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+        WHERE io.siret = $1 AND io.appellation_code = $2
+        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
+        [siret, appellationCode],
       );
     if (!immersionSearchResultDtos.length) return;
     const { contactDetails, ...searchResultWithoutContactDetails } =

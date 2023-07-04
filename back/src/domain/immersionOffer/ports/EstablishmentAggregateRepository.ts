@@ -1,5 +1,6 @@
 import {
   AppellationAndRomeDto,
+  AppellationCode,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
@@ -48,10 +49,17 @@ export interface EstablishmentAggregateRepository {
   getOffersAsAppellationDtoEstablishment: (
     siret: string,
   ) => Promise<AppellationAndRomeDto[]>;
+
   getSearchImmersionResultDtoBySiretAndRome: (
     siret: SiretDto,
     rome: string,
   ) => Promise<SearchImmersionResultDto | undefined>;
+
+  getSearchImmersionResultDtoBySiretAndAppellationCode: (
+    siret: SiretDto,
+    appellationCode: AppellationCode,
+  ) => Promise<SearchImmersionResultDto | undefined>;
+
   getSiretsOfEstablishmentsWithRomeCode: (rome: string) => Promise<SiretDto[]>;
 
   markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
