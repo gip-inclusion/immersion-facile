@@ -1,5 +1,5 @@
 import { expectToEqual } from "./test.helpers";
-import { sortByProperty } from "./utils";
+import { sortByPropertyCaseInsensitive } from "./utils";
 
 describe("utils", () => {
   it("sortByProperty", () => {
@@ -9,7 +9,7 @@ describe("utils", () => {
       { month: "mars" },
     ];
 
-    const sortedList = sortByProperty("month")(list);
+    const sortedList = sortByPropertyCaseInsensitive("month")(list);
 
     expectToEqual(sortedList, [
       { month: "février" },

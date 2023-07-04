@@ -13,7 +13,7 @@ import {
   isPeConnectIdentity,
   keys,
   miniStageRestrictedDepartments,
-  sortByProperty,
+  sortByPropertyCaseInsensitive,
 } from "shared";
 import { Loader } from "react-design-system";
 import {
@@ -107,7 +107,7 @@ export const AgencySelector = ({
       federatedIdentity,
     })
       .then((retrievedAgencies) => {
-        setAgencies(sortByProperty("name")(retrievedAgencies));
+        setAgencies(sortByPropertyCaseInsensitive("name")(retrievedAgencies));
         if (
           defaultAgencyId &&
           isDefaultAgencyOnAgenciesAndEnabled(
