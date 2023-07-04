@@ -63,6 +63,11 @@ describe("PgDiscussionAggregateRepository", () => {
       .withSiret(siret)
       .build();
 
+    expectToEqual(
+      await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+      undefined,
+    );
+
     await pgDiscussionAggregateRepository.insert(discussionAggregate);
 
     expectToEqual(

@@ -20,8 +20,6 @@ import {
 } from "../entities/EstablishmentEntity";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
-  inputSchema = contactEstablishmentRequestSchema;
-
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -30,6 +28,8 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   ) {
     super(uowPerformer);
   }
+
+  inputSchema = contactEstablishmentRequestSchema;
 
   public async _execute(
     contactRequest: ContactEstablishmentRequestDto,
@@ -60,15 +60,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       now,
     });
 
-    const event = this.createNewEvent({
-      topic: "ContactRequestedByBeneficiary",
-      payload: { ...contactRequest, discussionId: discussion.id },
-    });
-
-    await Promise.all([
-      uow.discussionAggregateRepository.insert(discussion),
-      uow.outboxRepository.save(event),
-    ]);
+    await uow.discussionAggregateRepository.insert(discussion);
 
     await this.markEstablishmentAsNotSearchableIfLimitReached({
       uow,
@@ -76,6 +68,13 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       contactRequest,
       now,
     });
+
+    await uow.outboxRepository.save(
+      this.createNewEvent({
+        topic: "ContactRequestedByBeneficiary",
+        payload: { ...contactRequest, discussionId: discussion.id },
+      }),
+    );
   }
 
   private createDiscussion({
@@ -88,8 +87,8 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     contact: ContactEntity;
     establishment: EstablishmentEntity;
     now: Date;
-  }) {
-    const discussion: DiscussionAggregate = {
+  }): DiscussionAggregate {
+    return {
       id: this.uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
@@ -135,7 +134,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
             ]
           : [],
     };
-    return discussion;
   }
 
   private async markEstablishmentAsNotSearchableIfLimitReached({

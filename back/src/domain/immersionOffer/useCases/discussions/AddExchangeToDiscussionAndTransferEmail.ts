@@ -94,17 +94,17 @@ const brevoInboundBodySchema: z.Schema<BrevoInboundBody> = z.object({
 });
 
 export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundBody> {
-  inputSchema = brevoInboundBodySchema;
-
   private readonly replyDomain: string;
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent, // private readonly timeGateway: TimeGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     domain: string,
   ) {
     super(uowPerformer);
     this.replyDomain = `reply.${domain}`;
   }
+
+  inputSchema = brevoInboundBodySchema;
 
   protected async _execute(
     brevoResponse: BrevoInboundBody,
@@ -114,8 +114,12 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       brevoResponse.items.map((item) => this.processBrevoItem(uow, item)),
     );
   }
-  private async processBrevoItem(uow: UnitOfWork, item: BrevoEmailItem) {
-    const [discussionId, recipientKind] = getDiscussionParamsFromEmail(item);
+  private async processBrevoItem(
+    uow: UnitOfWork,
+    item: BrevoEmailItem,
+  ): Promise<void> {
+    const [discussionId, recipientKind] =
+      this.getDiscussionParamsFromEmail(item);
     const discussion = await uow.discussionAggregateRepository.getById(
       discussionId,
     );
@@ -169,25 +173,25 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       },
     });
   }
+  private getDiscussionParamsFromEmail(
+    email: BrevoEmailItem,
+  ): [DiscussionId, ExchangeRole] {
+    const recipient = email.To.find((recipent) => {
+      const regex = new RegExp(`.*_.*@${this.replyDomain}$`);
+      return recipent.Address?.match(regex);
+    });
+    if (!recipient)
+      throw new BadRequestError(
+        `Email does not have the right format email to : ${email.To.map(
+          (recipient) => recipient.Address,
+        ).join(", ")}`,
+      );
+    const [id, rawKind] = recipient.Address.split("@")[0].split("_");
+    if (!["e", "b"].includes(rawKind))
+      throw new BadRequestError(
+        `Email does not have the right format kind : ${rawKind}`,
+      );
+    const kind = rawKind === "e" ? "establishment" : "potentialBeneficiary";
+    return [id, kind];
+  }
 }
-
-const getDiscussionParamsFromEmail = (
-  email: BrevoEmailItem,
-): [DiscussionId, ExchangeRole] => {
-  const recipient = email.To.find((recipent) =>
-    recipent.Address?.match(/.*_.*@.*immersion-facile.beta.gouv.fr$/),
-  );
-  if (!recipient)
-    throw new BadRequestError(
-      `Email does not have the right format email to : ${email.To.map(
-        (recipient) => recipient.Address,
-      ).join(", ")}`,
-    );
-  const [id, rawKind] = recipient.Address.split("@")[0].split("_");
-  if (!["e", "b"].includes(rawKind))
-    throw new BadRequestError(
-      `Email does not have the right format kind : ${rawKind}`,
-    );
-  const kind = rawKind === "e" ? "establishment" : "potentialBeneficiary";
-  return [id, kind];
-};
