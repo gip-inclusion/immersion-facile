@@ -1,6 +1,6 @@
 // TODO: find the standard for gouv.fr phone verification
 
-import { prop, sortBy } from "ramda";
+import { pipe, prop, sortBy, toLower } from "ramda";
 
 export const phoneRegExp = /^\+?[0-9]+$/;
 export const stringOfNumbers = /^\+?[0-9]+$/;
@@ -137,5 +137,5 @@ export type Prettify<T> = {
   //
 };
 
-export const sortByProperty = (propertyName: string) =>
-  sortBy(prop(propertyName));
+export const sortByPropertyCaseInsensitive = (propertyName: string) =>
+  sortBy(pipe(prop(propertyName), toLower));
