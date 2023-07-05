@@ -4,7 +4,7 @@ import {
   OmitFromExistingKeys,
 } from "shared";
 
-export type ProfessionDtoPublicV0 = {
+type ProfessionDtoPublicV0 = {
   romeCodeMetier: string; // 5 characters respecting regex : /[A-N]\d{4}/
   romeCodeAppellation?: string; // 5 digits (regex : /\d{5}/  )
   description: string;
@@ -18,7 +18,7 @@ export type BusinessContactDtoPublicV0 = {
   email: string; // a valid email
 };
 
-export type ContactMethodPublicV0 = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
+type ContactMethodPublicV0 = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
 
 export type FormEstablishmentDtoPublicV0 = {
   siret: string; // 14 characters string

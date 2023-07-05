@@ -3,7 +3,7 @@ import { expectToEqual, siretTargets } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { TEST_ESTABLISHMENT1 } from "../../../secondary/siret/InMemorySiretGateway";
+import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("/siret route", () => {
@@ -21,7 +21,7 @@ describe("/siret route", () => {
     const response = await request.get(
       siretTargets.getSiretInfo.url.replace(
         ":siret",
-        TEST_ESTABLISHMENT1.siret,
+        TEST_OPEN_ESTABLISHMENT_1.siret,
       ),
     );
 

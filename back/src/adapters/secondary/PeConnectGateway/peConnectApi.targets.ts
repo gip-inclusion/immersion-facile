@@ -14,15 +14,7 @@ import {
 } from "./peConnectApi.dto";
 import { peConnectHeadersSchema } from "./peConnectApi.schema";
 
-// export const makePeConnectHttpClient = (
-//   handlerCreator: HandlerCreator,
-//   peConnectConfig: PeConnectTargetsConfig,
-// ): HttpClient<PeConnectTargets> =>
-//   configureHttpClient(handlerCreator)<PeConnectTargets>(
-//     createPeConnectTargets(peConnectConfig),
-//   );
-
-export const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
+const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
   [
     `application_${clientId}`,
     "api_peconnect-individuv1",
@@ -90,7 +82,7 @@ export const makePeConnectLoginPageUrl = (appConfig: AppConfig): AbsoluteUrl =>
     scope: peConnectNeededScopesForAllUsedApi(appConfig.poleEmploiClientId),
   });
 
-export const makeOauthGetAuthorizationCodeRedirectUrl = (
+const makeOauthGetAuthorizationCodeRedirectUrl = (
   peAuthCandidatUrl: AbsoluteUrl,
   authorizationCodePayload: ExternalPeConnectOAuthGrantPayload,
 ): AbsoluteUrl =>

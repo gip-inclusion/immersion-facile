@@ -38,7 +38,7 @@ export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut
 const peAdvisorKindSchema: z.Schema<PeConnectAdvisorsKind> =
   z.enum(peAdvisorKinds);
 
-export const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
+const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
   z.object({
     nom: zTrimmedString,
     prenom: zTrimmedString,

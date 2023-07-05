@@ -50,7 +50,7 @@ export type PeConnectHeaders = {
   Authorization: BearerToken;
 };
 
-export type PeConnectAccessTokenHeaders = {
+type PeConnectAccessTokenHeaders = {
   "Content-Type": "application/x-www-form-urlencoded";
 };
 export const peConnectAccessTokenHeadersSchema: z.Schema<PeConnectAccessTokenHeaders> =

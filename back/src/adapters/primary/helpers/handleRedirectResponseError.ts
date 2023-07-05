@@ -11,7 +11,7 @@ type RawRedirectErrorParams = {
   message: string;
 };
 
-export const toRawRedirectErrorParams = (
+const toRawRedirectErrorParams = (
   error: RawRedirectError,
 ): RawRedirectErrorParams => ({
   title: error.title,

@@ -17,7 +17,7 @@ import {
   FormEstablishmentDtoPublicV0,
 } from "./FormEstablishmentPublicV0.dto";
 
-export const businessContactSchemaPublicV0: z.Schema<BusinessContactDtoPublicV0> =
+const businessContactSchemaPublicV0: z.Schema<BusinessContactDtoPublicV0> =
   z.object({
     lastName: zTrimmedString,
     firstName: zTrimmedString,
@@ -26,25 +26,24 @@ export const businessContactSchemaPublicV0: z.Schema<BusinessContactDtoPublicV0>
     email: emailSchema,
   });
 
-export type ContactMethodPublicV0 = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
+type ContactMethodPublicV0 = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
 const validContactMethodsV0: NotEmptyArray<ContactMethodPublicV0> = [
   "EMAIL",
   "PHONE",
   "IN_PERSON",
 ];
 
-export type ProfessionDtoPublicV0 = {
+type ProfessionDtoPublicV0 = {
   romeCodeMetier: string; // 5 characters respecting regex : /[A-N]\d{4}/
   romeCodeAppellation?: string; // 5 digits (regex : /\d{5}/  )
   description: string;
 };
 
-export const professionSchemaPublicV0: z.Schema<ProfessionDtoPublicV0> =
-  z.object({
-    romeCodeMetier: romeCodeSchema,
-    romeCodeAppellation: appellationSchema.optional(),
-    description: zTrimmedString,
-  });
+const professionSchemaPublicV0: z.Schema<ProfessionDtoPublicV0> = z.object({
+  romeCodeMetier: romeCodeSchema,
+  romeCodeAppellation: appellationSchema.optional(),
+  description: zTrimmedString,
+});
 
 export const formEstablishmentSchemaPublicV0: z.Schema<FormEstablishmentDtoPublicV0> =
   z.object(

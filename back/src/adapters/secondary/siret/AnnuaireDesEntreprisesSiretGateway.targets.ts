@@ -39,7 +39,7 @@ export type AnnuaireDesEntreprisesSiretEstablishment = {
   tranche_effectif_salarie: string | null;
 };
 
-export type AnnuaireDesEntreprisesSiretGatewayResponse = {
+type AnnuaireDesEntreprisesSiretGatewayResponse = {
   results: AnnuaireDesEntreprisesSiretEstablishment[];
   total_results: number;
   page: number;

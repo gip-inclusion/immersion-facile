@@ -7,7 +7,7 @@ import {
 } from "shared";
 import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
 
-export type SearchContactDto = {
+type SearchContactDto = {
   id: string;
   lastName: string;
   firstName: string;

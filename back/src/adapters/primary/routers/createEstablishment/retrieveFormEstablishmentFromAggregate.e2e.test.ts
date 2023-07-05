@@ -9,7 +9,7 @@ import {
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/siret/InMemorySiretGateway";
+import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   it("Throws 401 if not authenticated", async () => {
@@ -29,13 +29,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     // Prepare
     const { request, generateEditEstablishmentJwt, inMemoryUow } =
       await buildTestApp();
-    const siret = TEST_ESTABLISHMENT1_SIRET;
+
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [
         new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder()
-              .withSiret(siret)
+              .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
               .withAddress(rueSaintHonoreDto)
               .build(),
           )
@@ -46,7 +46,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     // Act
     const validJwt = generateEditEstablishmentJwt(
       createEstablishmentMagicLinkPayload({
-        siret,
+        siret: TEST_OPEN_ESTABLISHMENT_1.siret,
         durationDays: 1,
         now: new Date(),
       }),
@@ -54,13 +54,16 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     const response = await request
       .get(
-        establishmentTargets.getFormEstablishment.url.replace(":siret", siret),
+        establishmentTargets.getFormEstablishment.url.replace(
+          ":siret",
+          TEST_OPEN_ESTABLISHMENT_1.siret,
+        ),
       )
       .set("Authorization", validJwt);
 
     // Assert
     expect(response.body).toMatchObject({
-      siret,
+      siret: TEST_OPEN_ESTABLISHMENT_1.siret,
       source: "immersion-facile",
       businessAddress: rueSaintHonore,
     });

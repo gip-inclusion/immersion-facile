@@ -8,7 +8,7 @@ import {
   SiretDto,
 } from "shared";
 
-export type ContactDetailsPublicV0 = {
+type ContactDetailsPublicV0 = {
   id: ImmersionContactInEstablishmentId;
   lastName: string;
   firstName: string;

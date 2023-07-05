@@ -12,13 +12,8 @@ import {
 
 const logger = createLogger(__filename);
 
-export const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
-export const TEST_ESTABLISHMENT2_SIRET = "20006765000016";
-export const TEST_ESTABLISHMENT3_SIRET = "77561959600155";
-export const TEST_ESTABLISHMENT4_SIRET = "24570135400111";
-
-export const TEST_ESTABLISHMENT1: SiretEstablishmentDto = {
-  siret: TEST_ESTABLISHMENT1_SIRET,
+export const TEST_OPEN_ESTABLISHMENT_1: SiretEstablishmentDto = {
+  siret: "12345678901234",
   businessName: "MA P'TITE BOITE",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
   nafDto: {
@@ -29,8 +24,32 @@ export const TEST_ESTABLISHMENT1: SiretEstablishmentDto = {
   isOpen: true,
 };
 
-export const TEST_ESTABLISHMENT2: SiretEstablishmentDto = {
-  siret: TEST_ESTABLISHMENT2_SIRET,
+export const TEST_OPEN_ESTABLISHMENT_2: SiretEstablishmentDto = {
+  siret: "77561959600155",
+  businessName: "MA P'TITE BOITE 2",
+  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+  nafDto: {
+    code: "8559A",
+    nomenclature: "Ref2",
+  },
+  numberEmployeesRange: "3-5",
+  isOpen: true,
+};
+
+const TEST_OPEN_ESTABLISHMENT_3: SiretEstablishmentDto = {
+  siret: "24570135400111",
+  businessName: "MA P'TITE BOITE 2",
+  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+  nafDto: {
+    code: "8559A",
+    nomenclature: "Ref2",
+  },
+  numberEmployeesRange: "3-5",
+  isOpen: true,
+};
+
+const TEST_CLOSED_ESTABLISHMENT_1: SiretEstablishmentDto = {
+  siret: "20006765000016",
   businessName: "MA P'TITE BOITE 2",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
   nafDto: {
@@ -41,31 +60,7 @@ export const TEST_ESTABLISHMENT2: SiretEstablishmentDto = {
   isOpen: false,
 };
 
-export const TEST_ESTABLISHMENT3: SiretEstablishmentDto = {
-  siret: TEST_ESTABLISHMENT3_SIRET,
-  businessName: "MA P'TITE BOITE 2",
-  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-  nafDto: {
-    code: "8559A",
-    nomenclature: "Ref2",
-  },
-  numberEmployeesRange: "3-5",
-  isOpen: true,
-};
-
-export const TEST_ESTABLISHMENT4: SiretEstablishmentDto = {
-  siret: TEST_ESTABLISHMENT4_SIRET,
-  businessName: "MA P'TITE BOITE 2",
-  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-  nafDto: {
-    code: "8559A",
-    nomenclature: "Ref2",
-  },
-  numberEmployeesRange: "3-5",
-  isOpen: true,
-};
-
-export const apiSirenUnexpectedError = "apiSirenUnexpectedError";
+const apiSirenUnexpectedError = "apiSirenUnexpectedError";
 
 type EstablishmentBySiret = { [siret: string]: SiretEstablishmentDto };
 
@@ -73,10 +68,10 @@ export class InMemorySiretGateway implements SiretGateway {
   private _error: any = null;
 
   private readonly _repo: EstablishmentBySiret = {
-    [TEST_ESTABLISHMENT1.siret]: TEST_ESTABLISHMENT1,
-    [TEST_ESTABLISHMENT2.siret]: TEST_ESTABLISHMENT2,
-    [TEST_ESTABLISHMENT3.siret]: TEST_ESTABLISHMENT3,
-    [TEST_ESTABLISHMENT4.siret]: TEST_ESTABLISHMENT4,
+    [TEST_OPEN_ESTABLISHMENT_1.siret]: TEST_OPEN_ESTABLISHMENT_1,
+    [TEST_OPEN_ESTABLISHMENT_2.siret]: TEST_OPEN_ESTABLISHMENT_2,
+    [TEST_OPEN_ESTABLISHMENT_3.siret]: TEST_OPEN_ESTABLISHMENT_3,
+    [TEST_CLOSED_ESTABLISHMENT_1.siret]: TEST_CLOSED_ESTABLISHMENT_1,
   };
 
   public async getEstablishmentUpdatedBetween(

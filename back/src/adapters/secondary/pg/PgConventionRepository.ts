@@ -20,8 +20,7 @@ import { getReadConventionById } from "./pgConventionSql";
 export const beneficiaryCurrentEmployerIdColumnName =
   "beneficiary_current_employer_id";
 
-export const beneficiaryRepresentativeIdColumnName =
-  "beneficiary_representative_id";
+const beneficiaryRepresentativeIdColumnName = "beneficiary_representative_id";
 
 export class PgConventionRepository implements ConventionRepository {
   constructor(private client: PoolClient) {}

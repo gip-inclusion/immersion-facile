@@ -4,7 +4,10 @@ import { ConventionStatus, DateIsoString } from "shared";
 // ⚠️ Beware of NOT breaking contract ! ⚠️
 // Doc is here : https://pad.incubateur.net/6p38o0mNRfmc8WuJ77Xr0w?view
 
-export const conventionStatusToPoleEmploiStatus = {
+export const conventionStatusToPoleEmploiStatus: Record<
+  ConventionStatus,
+  string
+> = {
   READY_TO_SIGN: "DEMANDE_A_SIGNER",
   PARTIALLY_SIGNED: "PARTIELLEMENT_SIGNÉ",
   IN_REVIEW: "DEMANDE_A_ETUDIER",
@@ -22,7 +25,7 @@ export const conventionStatusToPoleEmploiStatus = {
   // // à venir potentiellement
   // ABANDONNED: "ABANDONNÉ",
   // CONVENTION_SENT: "CONVENTION_ENVOYÉE",
-} as const satisfies Record<ConventionStatus, string>;
+} as const;
 
 type ConventionStatusToPeStatus = typeof conventionStatusToPoleEmploiStatus;
 type PeConventionStatus =

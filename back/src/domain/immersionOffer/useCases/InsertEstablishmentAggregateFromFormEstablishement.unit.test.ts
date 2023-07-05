@@ -23,7 +23,7 @@ import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/seco
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemorySiretGateway,
-  TEST_ESTABLISHMENT1,
+  TEST_OPEN_ESTABLISHMENT_1,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
@@ -42,7 +42,7 @@ const prepareSirenGateway = (
   numberEmployeesRange: NumberEmployeesRange = "",
 ) => {
   const siretEstablishmentFromAPI: SiretEstablishmentDto = {
-    ...TEST_ESTABLISHMENT1,
+    ...TEST_OPEN_ESTABLISHMENT_1,
     siret,
     nafDto: {
       code: "8559A",

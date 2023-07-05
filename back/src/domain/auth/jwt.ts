@@ -51,7 +51,7 @@ type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
 type EditEstablishmentJwt = Flavor<string, "EditEstablishmentJwt">;
 type AuthenticatedUserJwt = Flavor<string, "AuthenticatedUserJwt">;
 
-export type GenerateJwtFn<K extends JwtKind> = (
+type GenerateJwtFn<K extends JwtKind> = (
   payload: Extract<JwtMap, { kind: K }>["payload"],
   expiresInSeconds?: number,
 ) => Extract<JwtMap, { kind: K }>["token"];
@@ -72,7 +72,7 @@ export const makeGenerateJwtES256 =
       //noTimestamp: true, //Remove iat on payload
     }) as any;
 
-export type VerifyJwtFn<K extends JwtKind> = (
+type VerifyJwtFn<K extends JwtKind> = (
   jwt: Extract<JwtMap, { kind: K }>["token"],
 ) => JwtPayloadCommonFields & Extract<JwtMap, { kind: K }>["payload"];
 

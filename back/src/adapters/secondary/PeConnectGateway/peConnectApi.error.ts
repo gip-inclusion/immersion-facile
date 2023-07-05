@@ -101,7 +101,7 @@ export const peConnectErrorStrategy = (
     ],
   ]);
 
-export const isInvalidGrantError = (
+const isInvalidGrantError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
@@ -109,70 +109,70 @@ export const isInvalidGrantError = (
   error.response?.status === HTTP_STATUS.BAD_REQUEST &&
   error.response?.data.error === "invalid_grant";
 
-export const hasNoErrorIdentifier = (error: AxiosError) =>
+const hasNoErrorIdentifier = (error: AxiosError) =>
   !error.response?.status && !error.code;
 
 const rawRedirectTitle = (error: AxiosError) =>
   `Une erreur est survenue - ${error.response?.status ?? error.code}`;
 
-export const isGetUserInfoServerInternalError = (
+const isGetUserInfoServerInternalError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getUserInfo" &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
-export const isGetUserStatusInfoServerInternalError = (
+const isGetUserStatusInfoServerInternalError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getUserStatutInfo" &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
-export const isAdvisorsServerInternalError = (
+const isAdvisorsServerInternalError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getAdvisorsInfo" &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
-export const makeUnknownError = (error: AxiosError) =>
+const makeUnknownError = (error: AxiosError) =>
   new UnhandledError("Code erreur inconnu", error);
 
-export const makeRawRedirectError = (
+const makeRawRedirectError = (
   message: string,
   error: AxiosError<any, any>,
 ): RawRedirectError =>
   new RawRedirectError(rawRedirectTitle(error), message, error);
 
-export const isAdvisorForbiddenError = (
+const isAdvisorForbiddenError = (
   error: AxiosError,
   context: PeConnectTargetsKind,
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getAdvisorsInfo";
 
-export const isGetUserInfoForbiddenError = (
+const isGetUserInfoForbiddenError = (
   error: AxiosError<any, any>,
   context: PeConnectTargetsKind,
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserInfo";
 
-export const isGetUserStatusInfoForbiddenError = (
+const isGetUserStatusInfoForbiddenError = (
   error: AxiosError<any, any>,
   context: PeConnectTargetsKind,
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserStatutInfo";
 
-export const isHttpServerError5XX = (error: AxiosError): boolean =>
+const isHttpServerError5XX = (error: AxiosError): boolean =>
   !!error &&
   !!error.response &&
   !!error.response.status &&
   error.response.status.toString().startsWith("5");
 
-export const isHttpClientError4XX = (error: AxiosError): boolean =>
+const isHttpClientError4XX = (error: AxiosError): boolean =>
   !!error &&
   !!error.response &&
   !!error.response.status &&

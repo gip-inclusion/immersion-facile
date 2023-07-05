@@ -21,14 +21,13 @@ export type RenewMagicLinkPayload  = {
   conventionId?: ConventionId,
 }
 
-export const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> =
-  z.object({
-    internshipKind: internshipKindSchema,
-    emails: z.array(z.string()),
-    magicLink: z.string(),
-    conventionStatusLink: z.string(),
-    conventionId: conventionIdSchema.optional(),
-  });
+const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> = z.object({
+  internshipKind: internshipKindSchema,
+  emails: z.array(z.string()),
+  magicLink: z.string(),
+  conventionStatusLink: z.string(),
+  conventionId: conventionIdSchema.optional(),
+});
 
 export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLinkPayload> {
   constructor(

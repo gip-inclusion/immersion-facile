@@ -20,7 +20,7 @@ import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRome
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemorySiretGateway,
-  TEST_ESTABLISHMENT1,
+  TEST_OPEN_ESTABLISHMENT_1,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { AddFormEstablishment } from "./AddFormEstablishment";
@@ -40,7 +40,7 @@ describe("Add FormEstablishment", () => {
     outboxRepo = uow.outboxRepository;
     romeRepository = uow.romeRepository;
     siretGateway.setSirenEstablishment({
-      ...TEST_ESTABLISHMENT1,
+      ...TEST_OPEN_ESTABLISHMENT_1,
       siret: defaultValidFormEstablishment.siret,
     });
     romeRepository.appellations = defaultValidFormEstablishment.appellations;
@@ -162,7 +162,7 @@ describe("Add FormEstablishment", () => {
 
   describe("SIRET validation", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withSiret(TEST_ESTABLISHMENT1.siret)
+      .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
       .build();
 
     const siretRawInactiveEstablishment = new SirenEstablishmentDtoBuilder()
@@ -182,7 +182,7 @@ describe("Add FormEstablishment", () => {
           featureFlagRepository,
         });
         siretGateway.setSirenEstablishment({
-          ...TEST_ESTABLISHMENT1,
+          ...TEST_OPEN_ESTABLISHMENT_1,
           nafDto: { code: "78.3Z", nomenclature: "Ref2" },
           businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
           isOpen: true,

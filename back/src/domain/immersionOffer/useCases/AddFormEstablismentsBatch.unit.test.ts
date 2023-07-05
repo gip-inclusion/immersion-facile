@@ -19,8 +19,8 @@ import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemorySiretGateway,
-  TEST_ESTABLISHMENT1,
-  TEST_ESTABLISHMENT3,
+  TEST_OPEN_ESTABLISHMENT_1,
+  TEST_OPEN_ESTABLISHMENT_2,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { AddFormEstablishment } from "./AddFormEstablishment";
@@ -29,12 +29,12 @@ import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
 const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
   const formEstablishment1: FormEstablishmentDto =
     FormEstablishmentDtoBuilder.valid()
-      .withSiret(TEST_ESTABLISHMENT1.siret)
+      .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
       .build();
 
   const formEstablishment2: FormEstablishmentDto =
     FormEstablishmentDtoBuilder.valid()
-      .withSiret(TEST_ESTABLISHMENT3.siret)
+      .withSiret(TEST_OPEN_ESTABLISHMENT_2.siret)
       .withBusinessName("michelin")
       .build();
 
