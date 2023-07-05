@@ -28,6 +28,7 @@
     "prettier": "pnpm -w prettier:glob --write ./back/src",
     "format:check": "pnpm -w prettier:glob --check ./back/src",
     "includecheck": "./check_includes.sh",
+    "deadcode": "ts-prune --ignore 'src/adapters/secondary/pg/migrations'",
     "lint": "pnpm -w lintconfig:glob ./back/src",
     "typecheck": "tsc --noEmit",
     "migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
@@ -92,6 +93,7 @@
     "jest": "^29.5.0",
     "supertest": "^6.2.2",
     "ts-node-dev": "^2.0.0",
+    "ts-prune": "^0.10.3",
     "typescript": "^5.1.3"
   }
 }
