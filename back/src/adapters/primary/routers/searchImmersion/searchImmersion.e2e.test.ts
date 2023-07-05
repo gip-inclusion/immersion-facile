@@ -101,7 +101,7 @@ describe("search-immersion route", () => {
     it("rejects invalid requests with error code 400", async () => {
       await request
         .get(
-          `/${immersionOffersRoute}?rome=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
+          `/${immersionOffersRoute}?appellationCode=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
         )
         .expect(400, /Code ROME incorrect/);
     });

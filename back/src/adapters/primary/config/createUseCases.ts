@@ -55,6 +55,7 @@ import { SendNotification } from "../../../domain/generic/notifications/useCases
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
+import { ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto } from "../../../domain/immersionOffer/useCases/ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto";
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
@@ -128,6 +129,10 @@ export const createUseCases = (
           uowPerformer,
           saveNotificationAndRelatedEvent,
           config.immersionFacileDomain,
+        ),
+      convertSearchimmersionQueryParamsToSearchImmerssionParamsDto:
+        new ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto(
+          uowPerformer,
         ),
       convertContactEstablishmentPublicV1ToDomain:
         new ConvertContactEstablishmentPublicV1ToDomain(uowPerformer),
