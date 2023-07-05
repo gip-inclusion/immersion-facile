@@ -106,7 +106,7 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withMail(email: string) {
+  public withBusinessContactEmail(email: string) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
       businessContact: { ...this.dto.businessContact, email },
