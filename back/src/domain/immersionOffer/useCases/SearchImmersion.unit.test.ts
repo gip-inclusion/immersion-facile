@@ -9,6 +9,7 @@ import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilde
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import {
+  boulangerAssistantImmersionOffer,
   boulangerImmersionOffer,
   secretariatImmersionOffer,
 } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
@@ -45,7 +46,11 @@ const establishment = new EstablishmentAggregateBuilder()
       .build(),
   )
   .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
-  .withImmersionOffers([secretariatImmersionOffer, boulangerImmersionOffer])
+  .withImmersionOffers([
+    secretariatImmersionOffer,
+    boulangerImmersionOffer,
+    boulangerAssistantImmersionOffer,
+  ])
   .build();
 
 describe("SearchImmersionUseCase", () => {
