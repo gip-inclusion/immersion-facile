@@ -3,7 +3,7 @@ import {
   ApiConsumer,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
-  SearchImmersionQueryParamsDto,
+  SearchImmersionParamsDto,
   SearchImmersionResultDto,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
@@ -29,7 +29,7 @@ import { SearchImmersion } from "./SearchImmersion";
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";
 
-const searchInMetzParams: SearchImmersionQueryParamsDto = {
+const searchInMetzParams: SearchImmersionParamsDto = {
   distanceKm: 30,
   longitude: 6.17602,
   latitude: 49.119146,
@@ -121,7 +121,7 @@ const prepareSearchableData = async () => {
   };
 };
 
-const searchSecretariatInMetzRequestDto: SearchImmersionQueryParamsDto = {
+const searchSecretariatInMetzRequestDto: SearchImmersionParamsDto = {
   rome: secretariatRome,
   ...searchInMetzParams,
   sortedBy: "distance",

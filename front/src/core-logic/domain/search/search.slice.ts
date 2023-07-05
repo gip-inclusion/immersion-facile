@@ -2,12 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   AppellationAndRomeDto,
   OmitFromExistingKeys,
-  SearchImmersionQueryParamsDto,
+  SearchImmersionParamsDto,
   SearchImmersionResultDto,
 } from "shared";
 
 export type SearchParams = OmitFromExistingKeys<
-  SearchImmersionQueryParamsDto,
+  SearchImmersionParamsDto,
   "voluntaryToImmersion"
 > &
   Partial<AppellationAndRomeDto>;

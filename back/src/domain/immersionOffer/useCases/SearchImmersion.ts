@@ -2,8 +2,8 @@ import { filter, map, prop } from "ramda";
 import {
   ApiConsumer,
   pipeWithValue,
-  SearchImmersionQueryParamsDto,
-  searchImmersionQueryParamsSchema,
+  SearchImmersionParamsDto,
+  searchImmersionParamsSchema,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
@@ -22,7 +22,7 @@ import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 const logger = createLogger(__filename);
 
 export class SearchImmersion extends TransactionalUseCase<
-  SearchImmersionQueryParamsDto,
+  SearchImmersionParamsDto,
   SearchImmersionResultDto[],
   ApiConsumer
 > {
@@ -34,10 +34,10 @@ export class SearchImmersion extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = searchImmersionQueryParamsSchema;
+  inputSchema = searchImmersionParamsSchema;
 
   public async _execute(
-    params: SearchImmersionQueryParamsDto,
+    params: SearchImmersionParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
