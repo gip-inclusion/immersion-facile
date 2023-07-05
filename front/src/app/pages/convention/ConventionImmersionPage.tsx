@@ -4,7 +4,10 @@ import { match } from "ts-pattern";
 import { Route } from "type-route";
 import { FederatedIdentityProvider, isPeConnectIdentity } from "shared";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
-import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
+import {
+  ConventionForm,
+  ConventionFormMode,
+} from "src/app/components/forms/convention/ConventionForm";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -59,7 +62,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     () => Object.keys(route.params).length > 0,
     [],
   );
-  const mode = "jwt" in route.params ? "edit" : "create";
+  const mode: ConventionFormMode = "jwt" in route.params ? "edit" : "create";
   useFederatedIdentityFromUrl(route);
   useScrollToTop(shouldShowForm);
   useEffect(() => {
@@ -76,7 +79,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     shouldShowForm,
   })
     .with({ isLoading: true }, () => <Loader />)
-    .with({ shouldShowForm: false }, () => (
+    .with({ mode: "create", shouldShowForm: false }, () => (
       <InitiateConventionCard
         title={
           isSharedConvention
@@ -89,7 +92,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
         onNotPeConnectButtonClick={() => setShouldShowForm(true)}
       />
     ))
-    .with({ mode: "edit" }, () => (
+    .with({ mode: "edit", shouldShowForm: false }, () => (
       <ConventionForm internshipKind="immersion" mode={mode} />
     ))
     .with({ shouldShowForm: true }, () => (
