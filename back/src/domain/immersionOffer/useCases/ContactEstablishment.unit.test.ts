@@ -9,7 +9,10 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -388,7 +391,7 @@ describe("ContactEstablishment", () => {
     );
   });
 
-  it("throws BadRequestError immersion offer without contact id", async () => {
+  it("throws NotFoundError without contact id", async () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
@@ -404,7 +407,46 @@ describe("ContactEstablishment", () => {
         ...validRequest,
         contactMode: "PHONE",
       }),
-      new BadRequestError(`No contact for establishment: 11112222333344`),
+      new NotFoundError(
+        `No contact found for establishment with siret: 11112222333344`,
+      ),
+    );
+  });
+
+  it("throws NotFoundError when no establishments found with given siret", async () => {
+    await expectPromiseToFailWithError(
+      contactEstablishment.execute({
+        ...validRequest,
+        contactMode: "PHONE",
+      }),
+      new NotFoundError(`No establishment found with siret: 11112222333344`),
+    );
+  });
+
+  it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
+        )
+        .withContact(
+          new ContactEntityBuilder()
+            .withId("wrong_contact_id")
+            .withContactMethod("PHONE")
+            .build(),
+        )
+        .withImmersionOffers([immersionOffer])
+        .build(),
+    ]);
+
+    await expectPromiseToFailWithError(
+      contactEstablishment.execute({
+        ...validRequest,
+        contactMode: "PHONE",
+      }),
+      new BadRequestError(
+        `Establishment with siret '${validRequest.siret}' doesn't have an immersion offer with appellation code '${validRequest.appellationCode}'.`,
+      ),
     );
   });
 });

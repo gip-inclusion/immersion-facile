@@ -29,7 +29,7 @@ export type ContactEstablishmentRequestDto =
   | ContactEstablishmentInPersonDto
   | ContactEstablishmentByMailDto;
 
-export type ContactEstablishmentEventPayload =
-  ContactEstablishmentRequestDto & {
-    discussionId: DiscussionId;
-  };
+export type ContactEstablishmentEventPayload = {
+  discussionId: DiscussionId;
+  message: string;
+};

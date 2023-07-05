@@ -7,6 +7,7 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -42,16 +43,37 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
-    if (!establishmentAggregate) throw new NotFoundError(siret);
+    if (!establishmentAggregate)
+      throw new NotFoundError(`No establishment found with siret: ${siret}`);
 
     const establishmentContact = establishmentAggregate.contact;
     if (!establishmentContact)
-      throw new BadRequestError(`No contact for establishment: ${siret}`);
+      throw new NotFoundError(
+        `No contact found for establishment with siret: ${siret}`,
+      );
 
     if (contactMode !== establishmentContact.contactMethod)
       throw new BadRequestError(
         `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentContact.contactMethod}`,
       );
+
+    const appellationLabel = establishmentAggregate.immersionOffers.find(
+      (offer) => offer.appellationCode === contactRequest.appellationCode,
+    )?.appellationLabel;
+
+    if (!appellationLabel) {
+      notifyAndThrowErrorDiscord(
+        new BadRequestError(
+          `Establishment with siret '${contactRequest.siret}' doesn't have an immersion offer with appellation code '${contactRequest.appellationCode}'.`,
+        ),
+      );
+
+      // we keep discord notification for now, but we will remove it when the bug is confirmed and fixed
+      // Than it will just be :
+      // throw new BadRequestError(
+      //   `Establishment with siret '${contactRequest.siret}' doesn't have an immersion offer with appellation code '${contactRequest.appellationCode}'.`,
+      // );
+    }
 
     const discussion = this.createDiscussion({
       contactRequest,

@@ -3,7 +3,10 @@ import {
   ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
 } from "shared";
-import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../../adapters/primary/helpers/httpErrors";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -29,79 +32,62 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     payload: ContactEstablishmentEventPayload,
     uow: UnitOfWork,
   ): Promise<void> {
-    const establishmentAggregate =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        payload.siret,
+    const discussion = await uow.discussionAggregateRepository.getById(
+      payload.discussionId,
+    );
+    if (!discussion)
+      throw new NotFoundError(
+        `No discussion found with id: ${payload.discussionId}`,
       );
-    if (!establishmentAggregate)
-      throw new Error(`Missing establishment: siret=${payload.siret}`);
-
-    const contact = establishmentAggregate.contact;
-    if (!contact)
-      throw new Error(`Missing contact details for siret=${payload.siret}`);
-
-    if (contact.contactMethod !== payload.contactMode) {
-      throw new Error(
-        `Contact mode mismatch: ` +
-          `establishment.contactMethod=${contact.contactMethod}, ` +
-          `payload.contactMode=${payload.contactMode}`,
-      );
-    }
-
-    const businessName =
-      establishmentAggregate.establishment.customizedName ??
-      establishmentAggregate.establishment.name;
-
-    const businessAddress = establishmentAggregate.establishment.address;
 
     const followedIds = {
-      establishmentSiret: payload.siret,
+      establishmentSiret: discussion.siret,
     };
 
-    const appellationLabel = establishmentAggregate.immersionOffers.find(
-      (offer) => offer.appellationCode === payload.appellationCode,
-    )?.appellationLabel;
+    const { establishmentContact, potentialBeneficiary } = discussion;
 
-    if (!appellationLabel)
-      throw new BadRequestError(
-        `Establishment with siret '${payload.siret}' doesn't have an immersion offer with appellation code '${payload.appellationCode}'.`,
-      );
-
-    switch (payload.contactMode) {
+    switch (establishmentContact.contactMode) {
       case "EMAIL": {
-        const cc = contact.copyEmails.filter(
-          (email) => email !== contact.email,
+        const appellationAndRomeDtos =
+          await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
+            [discussion.appellationCode],
+          );
+        const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
+
+        if (!appellationLabel)
+          throw new BadRequestError(
+            `No appellationLabel found for appellationCode: ${discussion.appellationCode}`,
+          );
+        const cc = establishmentContact.copyEmails.filter(
+          (email) => email !== establishmentContact.email,
         );
 
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "CONTACT_BY_EMAIL_REQUEST",
-            recipients: [contact.email],
+            recipients: [establishmentContact.email],
             replyTo: {
               email: createOpaqueEmail(
                 payload.discussionId,
                 "potentialBeneficiary",
                 this.replyDomain,
               ),
-              name: `${payload.potentialBeneficiaryFirstName} ${payload.potentialBeneficiaryLastName} - via Immersion Facilitée`,
+              name: `${potentialBeneficiary.firstName} ${potentialBeneficiary.lastName} - via Immersion Facilitée`,
             },
             cc,
             params: {
-              businessName,
-              contactFirstName: contact.firstName,
-              contactLastName: contact.lastName,
+              businessName: discussion.businessName,
+              contactFirstName: establishmentContact.firstName,
+              contactLastName: establishmentContact.lastName,
               appellationLabel,
-              potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
-              potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
-              immersionObjective: payload.immersionObjective,
-              potentialBeneficiaryPhone: payload.potentialBeneficiaryPhone,
-              potentialBeneficiaryResumeLink:
-                payload.potentialBeneficiaryResumeLink,
+              potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
+              potentialBeneficiaryLastName: potentialBeneficiary.lastName,
+              immersionObjective: discussion.immersionObjective,
+              potentialBeneficiaryPhone: potentialBeneficiary.phone,
+              potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,
               message: payload.message,
-              businessAddress: addressDtoToString(businessAddress),
+              businessAddress: addressDtoToString(discussion.address),
             },
           },
           followedIds,
@@ -114,16 +100,14 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           kind: "email",
           templatedContent: {
             kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
-            recipients: [payload.potentialBeneficiaryEmail],
+            recipients: [potentialBeneficiary.email],
             params: {
-              businessName,
-              contactFirstName: contact.firstName,
-              contactLastName: contact.lastName,
-              contactPhone: contact.phone,
-              potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
-              potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
+              businessName: discussion.businessName,
+              contactFirstName: establishmentContact.firstName,
+              contactLastName: establishmentContact.lastName,
+              contactPhone: establishmentContact.phone,
+              potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
+              potentialBeneficiaryLastName: potentialBeneficiary.lastName,
             },
           },
           followedIds,
@@ -135,18 +119,14 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           kind: "email",
           templatedContent: {
             kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
-            recipients: [payload.potentialBeneficiaryEmail],
+            recipients: [potentialBeneficiary.email],
             params: {
-              businessName,
-              contactFirstName: contact.firstName,
-              contactLastName: contact.lastName,
-              businessAddress: addressDtoToString(
-                establishmentAggregate.establishment.address,
-              ),
-              potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
-              potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
+              businessName: discussion.businessName,
+              contactFirstName: establishmentContact.firstName,
+              contactLastName: establishmentContact.lastName,
+              businessAddress: addressDtoToString(discussion.address),
+              potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
+              potentialBeneficiaryLastName: potentialBeneficiary.lastName,
             },
           },
           followedIds,
