@@ -1,21 +1,21 @@
+import { uniq } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
   conflictErrorSiret,
+  GeoPositionDto,
   path,
   pathEq,
   pathNotEq,
-  propEq,
   replaceArrayElement,
+  RomeCode,
+  SearchImmersionResultDto,
   SiretDto,
 } from "shared";
-import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
   SearchImmersionParams,
@@ -81,31 +81,50 @@ export class InMemoryEstablishmentAggregateRepository
       pathEq("establishment.siret", siret),
     );
   }
+
   public async searchImmersionResults({
-    searchMade,
+    searchMade: { lat, lon, rome },
     withContactDetails = false,
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this._establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isActive)
       .flatMap((aggregate) =>
-        aggregate.immersionOffers
-          .filter(
-            (immersionOffer) =>
-              !searchMade.rome || immersionOffer.romeCode === searchMade.rome,
-          )
-          .map((immersionOffer) =>
-            buildSearchImmersionResultDto(
-              immersionOffer,
-              aggregate.establishment,
-              aggregate.contact,
-              searchMade,
+        uniq(aggregate.immersionOffers.map((offer) => offer.romeCode))
+          .filter((appelationRome) => !rome || appelationRome === rome)
+          .map((searchRome) =>
+            buildSearchImmersionResultDtoForOneEstablishmentAndOneRome(
+              aggregate,
               withContactDetails,
+              searchRome,
+              {
+                lat,
+                lon,
+              },
             ),
           ),
       )
-
       .slice(0, maxResults);
+  }
+
+  public async getSearchImmersionResultDtoBySiretAndRome(
+    siret: SiretDto,
+    rome: string,
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const aggregate = this.establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret === siret,
+    );
+    if (!aggregate) return undefined;
+    const {
+      contactDetails,
+      isSearchable,
+      ...buildSearchImmersionResultWithoutContactDetailsAndIsSearchable
+    } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome(
+      aggregate,
+      false,
+      rome,
+    );
+    return buildSearchImmersionResultWithoutContactDetailsAndIsSearchable;
   }
 
   public async updateEstablishment(
@@ -159,38 +178,6 @@ export class InMemoryEstablishmentAggregateRepository
           romeLabel: TEST_ROME_LABEL,
           appellationLabel: TEST_APPELLATION_LABEL,
         })) ?? []
-    );
-  }
-  public async getSearchImmersionResultDtoBySiretAndRome(
-    siret: SiretDto,
-    rome: string,
-  ): Promise<SearchImmersionResult | undefined> {
-    const aggregate = this.establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret === siret,
-    );
-
-    return (
-      aggregate && {
-        rome,
-        romeLabel: TEST_ROME_LABEL,
-        appellations: aggregate.immersionOffers
-          .filter(propEq("romeCode", rome))
-          .map((offer) => ({
-            appellationLabel: offer.appellationLabel,
-            appellationCode: offer.appellationCode,
-          })),
-        naf: aggregate.establishment.nafDto.code,
-        nafLabel: aggregate.establishment.nafDto.nomenclature,
-        siret,
-        name: aggregate.establishment.name,
-        customizedName: aggregate.establishment.customizedName,
-        voluntaryToImmersion: aggregate.establishment.voluntaryToImmersion,
-        numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
-        position: aggregate.establishment.position,
-        address: aggregate.establishment.address,
-        contactMode: aggregate.contact?.contactMethod,
-        isSearchable: aggregate.establishment.isSearchable,
-      }
     );
   }
 
@@ -286,49 +273,50 @@ export class InMemoryEstablishmentAggregateRepository
   }
 }
 
-const buildSearchImmersionResultDto = (
-  immersionOffer: ImmersionOfferEntityV2,
-  establishment: EstablishmentEntity,
-  contact: ContactEntity | undefined,
-  searchMade: SearchMade,
+const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = (
+  establishmentAgg: EstablishmentAggregate,
   withContactDetails: boolean,
+  searchedRome: RomeCode,
+  position?: GeoPositionDto,
 ): SearchImmersionResult => ({
-  address: establishment.address,
-  naf: establishment.nafDto.code,
-  nafLabel: establishment.nafDto.nomenclature,
-  name: establishment.name,
-  customizedName: establishment.customizedName,
-  rome: immersionOffer.romeCode,
+  address: establishmentAgg.establishment.address,
+  naf: establishmentAgg.establishment.nafDto.code,
+  nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+  name: establishmentAgg.establishment.name,
+  customizedName: establishmentAgg.establishment.customizedName,
+  rome: searchedRome,
   romeLabel: TEST_ROME_LABEL,
-  appellations: [
-    {
+  appellations: establishmentAgg.immersionOffers
+    .filter((immersionOffer) => immersionOffer.romeCode === searchedRome)
+    .map((immersionOffer) => ({
       appellationLabel: immersionOffer.appellationLabel,
       appellationCode: immersionOffer.appellationCode,
-    },
-  ],
-  siret: establishment.siret,
-  voluntaryToImmersion: establishment.voluntaryToImmersion,
-  contactMode: contact?.contactMethod,
-  numberOfEmployeeRange: establishment.numberEmployeesRange,
-  website: establishment?.website,
-  additionalInformation: establishment?.additionalInformation,
-  distance_m: distanceBetweenCoordinatesInMeters(
-    TEST_POSITION.lat,
-    TEST_POSITION.lon,
-    searchMade.lat,
-    searchMade.lon,
-  ),
-  position: TEST_POSITION,
+    })),
+  siret: establishmentAgg.establishment.siret,
+  voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
+  contactMode: establishmentAgg.contact?.contactMethod,
+  numberOfEmployeeRange: establishmentAgg.establishment.numberEmployeesRange,
+  website: establishmentAgg.establishment?.website,
+  additionalInformation: establishmentAgg.establishment?.additionalInformation,
+  distance_m: position
+    ? distanceBetweenCoordinatesInMeters(
+        establishmentAgg.establishment.position.lat,
+        establishmentAgg.establishment.position.lon,
+        position.lat,
+        position.lon,
+      )
+    : undefined,
+  position: establishmentAgg.establishment.position,
   ...(withContactDetails &&
-    contact && {
+    establishmentAgg.contact && {
       contactDetails: {
-        id: contact.id,
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        email: contact.email,
-        phone: contact.phone,
-        job: contact.job,
+        id: establishmentAgg.contact.id,
+        firstName: establishmentAgg.contact.firstName,
+        lastName: establishmentAgg.contact.lastName,
+        email: establishmentAgg.contact.email,
+        phone: establishmentAgg.contact.phone,
+        job: establishmentAgg.contact.job,
       },
     }),
-  isSearchable: establishment.isSearchable,
+  isSearchable: establishmentAgg.establishment.isSearchable,
 });

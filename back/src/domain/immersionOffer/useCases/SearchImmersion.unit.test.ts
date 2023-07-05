@@ -96,11 +96,13 @@ describe("SearchImmersionUseCase", () => {
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
+        606885,
       ),
       establishmentToSearchResultByRome(
         establishment,
         boulangerImmersionOffer.romeCode,
         false,
+        606885,
       ),
     ]);
   });
@@ -122,6 +124,7 @@ describe("SearchImmersionUseCase", () => {
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
+        606885,
       ),
       lbbToSearchResult(lbbCompanyVO),
     ]);
@@ -144,11 +147,13 @@ describe("SearchImmersionUseCase", () => {
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
+        606885,
       ),
       establishmentToSearchResultByRome(
         establishment,
         boulangerImmersionOffer.romeCode,
         false,
+        606885,
       ),
     ]);
   });
@@ -224,6 +229,7 @@ describe("SearchImmersionUseCase", () => {
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
+        606885,
       ),
     ]);
   });
@@ -296,6 +302,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatImmersionOffer.romeCode,
             false,
+            606885,
           ),
         ]);
       });
@@ -318,6 +325,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatImmersionOffer.romeCode,
             false,
+            606885,
           ),
         ]);
       });

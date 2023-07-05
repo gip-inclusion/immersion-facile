@@ -508,7 +508,7 @@ export class PgEstablishmentAggregateRepository
   public async getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
     rome: string,
-  ): Promise<SearchImmersionResult | undefined> {
+  ): Promise<SearchImmersionResultDto | undefined> {
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
@@ -520,10 +520,15 @@ export class PgEstablishmentAggregateRepository
         GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
         [siret, rome],
       );
-    if (!immersionSearchResultDtos.length) return;
-    const { contactDetails, ...searchResultWithoutContactDetails } =
-      immersionSearchResultDtos[0];
-    return searchResultWithoutContactDetails;
+
+    const result = immersionSearchResultDtos.at(0);
+    if (!result) return;
+    const {
+      contactDetails,
+      isSearchable,
+      ...searchResultWithoutContactDetailsAndIsSearchable
+    } = result;
+    return searchResultWithoutContactDetailsAndIsSearchable;
   }
 
   public async getSearchImmersionResultDtoBySiretAndAppellationCode(

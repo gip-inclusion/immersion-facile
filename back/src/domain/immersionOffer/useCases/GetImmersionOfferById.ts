@@ -1,17 +1,29 @@
+import { z } from "zod";
 import {
   ApiConsumer,
   RomeCode,
+  romeCodeSchema,
   SearchImmersionResultDto,
   SiretDto,
-  zString,
+  siretSchema,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-type LegacyImmersionOfferId = `${SiretDto}-${RomeCode}`;
+const legacyImmersionOfferIdSchema: z.Schema<GetImmersionOfferByIdPayload> =
+  z.object({
+    siret: siretSchema,
+    rome: romeCodeSchema,
+  });
+
+export type GetImmersionOfferByIdPayload = {
+  siret: SiretDto;
+  rome: RomeCode;
+};
+
 export class GetImmersionOfferById extends TransactionalUseCase<
-  string,
+  GetImmersionOfferByIdPayload,
   SearchImmersionResultDto,
   ApiConsumer
 > {
@@ -19,22 +31,21 @@ export class GetImmersionOfferById extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = zString;
+  inputSchema = legacyImmersionOfferIdSchema;
 
   public async _execute(
-    immersionOfferId: LegacyImmersionOfferId,
+    { rome, siret }: GetImmersionOfferByIdPayload,
     uow: UnitOfWork,
     _apiConsumer?: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
-    const [siret, romeCode] = immersionOfferId.split("-");
     const searchImmersionResultDto =
       await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
         siret,
-        romeCode,
+        rome,
       );
     if (!searchImmersionResultDto)
       throw new NotFoundError(
-        `No offer found for siret ${siret} and rome ${romeCode}`,
+        `No offer found for siret ${siret} and rome ${rome}`,
       );
 
     return searchImmersionResultDto;

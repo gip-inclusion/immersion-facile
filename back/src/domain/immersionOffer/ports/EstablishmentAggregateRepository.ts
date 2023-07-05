@@ -81,7 +81,7 @@ export interface EstablishmentAggregateRepository {
   getSearchImmersionResultDtoBySiretAndRome: (
     siret: SiretDto,
     rome: string,
-  ) => Promise<SearchImmersionResult | undefined>;
+  ) => Promise<SearchImmersionResultDto | undefined>;
 
   searchImmersionResults: (
     searchImmersionParams: SearchImmersionParams,

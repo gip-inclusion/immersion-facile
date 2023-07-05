@@ -1,5 +1,12 @@
 import { AbsoluteUrl, frontRoutes } from "shared";
-import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
+import {
+  GenerateApiConsumerJwt,
+  GenerateAuthenticatedUserJwt,
+  GenerateBackOfficeJwt,
+  GenerateConventionJwt,
+  GenerateEditFormEstablishmentJwt,
+  makeGenerateJwtES256,
+} from "../../../domain/auth/jwt";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
@@ -37,36 +44,34 @@ export const createAppDependencies = async (config: AppConfig) => {
     uowPerformer,
     config.nodeEnv === "test",
   );
-  const generateApiJwt = makeGenerateJwtES256<"apiConsumer">(
-    config.apiJwtPrivateKey,
-    undefined, // no expiration
-  );
+
   const oneHourInSeconds = 3600;
   const oneDayInSecond = oneHourInSeconds * 24;
   const onYearInSeconds = oneDayInSecond * 365;
   const thirtyDaysInSecond = oneDayInSecond * 30;
 
-  const generateEditEstablishmentJwt =
+  const generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt =
     makeGenerateJwtES256<"editEstablishment">(
       config.jwtPrivateKey,
       oneDayInSecond,
     );
-
-  const generateBackOfficeJwt = makeGenerateJwtES256<"backOffice">(
-    config.jwtPrivateKey,
-    onYearInSeconds,
-  );
-
-  const generateAuthenticatedUserToken =
+  const generateApiConsumerJwt: GenerateApiConsumerJwt =
+    makeGenerateJwtES256<"apiConsumer">(
+      config.apiJwtPrivateKey,
+      undefined, // no expiration
+    );
+  const generateBackOfficeJwt: GenerateBackOfficeJwt =
+    makeGenerateJwtES256<"backOffice">(config.jwtPrivateKey, onYearInSeconds);
+  const generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt =
     makeGenerateJwtES256<"authenticatedUser">(
       config.jwtPrivateKey,
       oneHourInSeconds,
     );
-
-  const generateConventionJwt = makeGenerateJwtES256<"convention">(
-    config.jwtPrivateKey,
-    thirtyDaysInSecond,
-  );
+  const generateConventionJwt: GenerateConventionJwt =
+    makeGenerateJwtES256<"convention">(
+      config.jwtPrivateKey,
+      thirtyDaysInSecond,
+    );
 
   const redirectErrorUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.error}`;
   const errorHandlers = {
@@ -82,7 +87,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateBackOfficeJwt,
-    generateAuthenticatedUserToken,
+    generateAuthenticatedUserJwt,
     uowPerformer,
     uuidGenerator,
   );
@@ -116,8 +121,8 @@ export const createAppDependencies = async (config: AppConfig) => {
     ),
     generateEditEstablishmentJwt,
     generateConventionJwt,
-    generateApiJwt,
-    generateAuthenticatedUserToken,
+    generateApiConsumerJwt,
+    generateAuthenticatedUserJwt,
     generateBackOfficeJwt,
     eventBus,
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),

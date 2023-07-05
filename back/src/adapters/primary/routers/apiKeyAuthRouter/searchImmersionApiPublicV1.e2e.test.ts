@@ -1,4 +1,5 @@
 import { SuperTest, Test } from "supertest";
+import { expectToEqual } from "shared";
 import {
   avenueChampsElysees,
   avenueChampsElyseesDto,
@@ -10,26 +11,18 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
-import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;
-  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
-
-  let generateApiJwt: GenerateApiConsumerJwt;
+  let inMemoryUow: InMemoryUnitOfWork;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
-    const {
-      request: testAppRequest,
-      generateApiJwt: testAppGenerateApiJwt,
-      inMemoryUow,
-    } = await buildTestApp();
-    request = testAppRequest;
-    establishmentAggregateRepository =
-      inMemoryUow.establishmentAggregateRepository;
-    generateApiJwt = testAppGenerateApiJwt;
+    ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
   });
 
   describe(`v1 - /v1/immersion-offers`, () => {
@@ -46,7 +39,10 @@ describe("search-immersion route", () => {
           .get(
             `/v1/immersion-offers?rome=XXXXX&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-unauthorized-id" }))
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({ id: "my-unauthorized-id" }),
+          )
           .expect(403, {
             error: "forbidden: unauthorised consumer Id",
           });
@@ -71,12 +67,20 @@ describe("search-immersion route", () => {
           .build();
 
         // Prepare
-        await establishmentAggregateRepository.insertEstablishmentAggregates([
-          establishmentAgg,
-        ]);
+        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+          [establishmentAgg],
+        );
 
         // Act and assert
-        const expectedResult: SearchImmersionResultPublicV1[] = [
+        const response = await request
+          .get(
+            `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+          )
+          .set(
+            "Authorization",
+            generateApiConsumerJwt(validApiConsumerJwtPayload),
+          );
+        expectToEqual(response.body, [
           {
             address: avenueChampsElysees,
             naf: defaultNafCode,
@@ -91,17 +95,11 @@ describe("search-immersion route", () => {
             voluntaryToImmersion: true,
             contactMode: "EMAIL",
             numberOfEmployeeRange: "10-19",
-            distance_m: 719436,
-            position: { lat: 43.8666, lon: 8.3333 },
+            distance_m: 0,
+            position: { lat: 48.8531, lon: 2.34999 },
             city: avenueChampsElyseesDto.city,
           },
-        ];
-        const response = await request
-          .get(
-            `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
-          )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }));
-        expect(response.body).toEqual(expectedResult);
+        ] satisfies SearchImmersionResultPublicV1[]);
         expect(response.status).toBe(200);
       });
       it("accept address with only city", async () => {
@@ -109,7 +107,10 @@ describe("search-immersion route", () => {
           .get(
             `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }));
+          .set(
+            "Authorization",
+            generateApiConsumerJwt(validApiConsumerJwtPayload),
+          );
         expect(response.status).toBe(200);
       });
       it("with no specified rome", async () => {
@@ -117,7 +118,10 @@ describe("search-immersion route", () => {
           .get(
             `/v1/immersion-offers?distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
+          .set(
+            "Authorization",
+            generateApiConsumerJwt(validApiConsumerJwtPayload),
+          )
           .expect(200, []);
       });
       it("with filter voluntaryToImmersion", async () => {
@@ -125,7 +129,10 @@ describe("search-immersion route", () => {
           .get(
             `/v1/immersion-offers?distance_km=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
+          .set(
+            "Authorization",
+            generateApiConsumerJwt(validApiConsumerJwtPayload),
+          )
           .expect(200, []);
       });
     });
@@ -137,7 +144,10 @@ describe("search-immersion route", () => {
         .get(
           `/v1/immersion-offers?rome=XXXXX&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
         )
-        .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
+        .set(
+          "Authorization",
+          generateApiConsumerJwt(validApiConsumerJwtPayload),
+        )
         .expect(400, /Code ROME incorrect/);
     });
   });

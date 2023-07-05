@@ -1,3 +1,4 @@
+import { SuperTest, Test } from "supertest";
 import {
   defaultValidFormEstablishment,
   establishmentTargets,
@@ -9,16 +10,24 @@ import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
+import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { FormEstablishmentDtoPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 
 describe("Add form establishment", () => {
+  let request: SuperTest<Test>;
+  let inMemoryUow: InMemoryUnitOfWork;
+
+  beforeEach(async () => {
+    ({ request, inMemoryUow } = await buildTestApp());
+  });
+
   describe("Route to post form establishments from front (hence, without API key)", () => {
     // from front
     it("support posting valid establishment from front", async () => {
-      const { request, inMemoryUow } = await buildTestApp();
       inMemoryUow.romeRepository.appellations =
         defaultValidFormEstablishment.appellations;
 
@@ -100,7 +109,8 @@ describe("Add form establishment", () => {
       });
 
       it("support adding establishment from known api consumer", async () => {
-        const { request, generateApiJwt } = await buildTestApp();
+        const { request, generateApiConsumerJwt: generateApiJwt } =
+          await buildTestApp();
 
         const formEstablishmentDtoPublicV0: FormEstablishmentDtoPublicV0 = {
           businessAddress: "1 Rue du Moulin 12345 Quelque Part",
@@ -138,7 +148,7 @@ describe("Add form establishment", () => {
           ],
         };
 
-        const jwt = generateApiJwt({ id: "my-authorized-id" });
+        const jwt = generateApiJwt(validApiConsumerJwtPayload);
 
         const response = await request
           .post(`/immersion-offers`)
@@ -172,7 +182,8 @@ describe("Add form establishment", () => {
       });
 
       it("forbids adding establishment from unauthorized api consumer", async () => {
-        const { request, generateApiJwt } = await buildTestApp();
+        const { request, generateApiConsumerJwt: generateApiJwt } =
+          await buildTestApp();
         const jwt = generateApiJwt({ id: "my-unknown-id" });
         const response = await request
           .post(consumerv1FormEstablishmentsRoute)
@@ -186,7 +197,8 @@ describe("Add form establishment", () => {
       });
 
       it("forbids access to route if id is unauthorized", async () => {
-        const { request, generateApiJwt } = await buildTestApp();
+        const { request, generateApiConsumerJwt: generateApiJwt } =
+          await buildTestApp();
         const jwt = generateApiJwt({ id: "my-unauthorized-id" });
         const response = await request
           .post(consumerv1FormEstablishmentsRoute)
@@ -199,7 +211,11 @@ describe("Add form establishment", () => {
       });
 
       it("forbids access to route if token has expired", async () => {
-        const { request, generateApiJwt, gateways } = await buildTestApp();
+        const {
+          request,
+          generateApiConsumerJwt: generateApiJwt,
+          gateways,
+        } = await buildTestApp();
         gateways.timeGateway.setNextDate(new Date());
         const jwt = generateApiJwt({ id: "my-outdated-id" });
         const response = await request
@@ -213,7 +229,8 @@ describe("Add form establishment", () => {
       });
 
       it("support adding establishment from known api consumer (for exemple Un Jeune Une Solution)", async () => {
-        const { request, generateApiJwt } = await buildTestApp();
+        const { request, generateApiConsumerJwt: generateApiJwt } =
+          await buildTestApp();
         const formEstablishmentDto = FormEstablishmentDtoBuilder.valid()
           .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
           .build();
@@ -224,7 +241,7 @@ describe("Add form establishment", () => {
           businessAddress: avenueChampsElysees,
         };
 
-        const jwt = generateApiJwt({ id: "my-authorized-id" });
+        const jwt = generateApiJwt(validApiConsumerJwtPayload);
 
         const response = await request
           .post(consumerv1FormEstablishmentsRoute)

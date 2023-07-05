@@ -6,6 +6,7 @@ export const establishmentToSearchResultByRome = (
   establishmentAggregate: EstablishmentAggregate,
   romeCode: RomeCode,
   withContactDetails: boolean,
+  distance_m?: number,
 ): SearchImmersionResultDto => ({
   rome: romeCode,
   naf: establishmentAggregate.establishment.nafDto.code,
@@ -21,7 +22,7 @@ export const establishmentToSearchResultByRome = (
   position: establishmentAggregate.establishment.position,
   address: establishmentAggregate.establishment.address,
   contactMode: establishmentAggregate.contact?.contactMethod,
-  distance_m: 606885,
+  distance_m,
   romeLabel: TEST_ROME_LABEL,
   website: establishmentAggregate.establishment.website,
   appellations: establishmentAggregate.immersionOffers
@@ -30,15 +31,16 @@ export const establishmentToSearchResultByRome = (
       appellationCode: immersionOffer.appellationCode,
       appellationLabel: immersionOffer.appellationLabel,
     })),
-  contactDetails:
-    withContactDetails && establishmentAggregate.contact
-      ? {
+  ...(withContactDetails && establishmentAggregate.contact
+    ? {
+        contactDetails: {
           id: establishmentAggregate.contact.id,
           email: establishmentAggregate.contact.email,
           firstName: establishmentAggregate.contact.firstName,
           lastName: establishmentAggregate.contact.lastName,
           job: establishmentAggregate.contact.job,
           phone: establishmentAggregate.contact.phone,
-        }
-      : undefined,
+        },
+      }
+    : undefined),
 });
