@@ -57,15 +57,24 @@ export const createTechnicalRouter = (
       ),
     );
 
-  technicalRouter
-    .route(`/${inboundEmailParsingRoute}`)
-    .post(
-      IpFilter(inboundEmailAllowIps, { mode: "allow", logLevel: "deny" }),
-      async (req, res) =>
-        sendHttpResponse(req, res, () =>
-          deps.useCases.addExchangeToDiscussionAndSendEmail.execute(req.body),
-        ),
-    );
+  technicalRouter.route(`/${inboundEmailParsingRoute}`).post(
+    IpFilter(inboundEmailAllowIps, {
+      mode: "allow",
+      logLevel: "deny",
+      detectIp: (req) => {
+        const rawHeaders = req.headers["x-forwarded-for"];
+        if (!rawHeaders) return "";
+        if (typeof rawHeaders === "string") {
+          return rawHeaders.split(",")[0];
+        }
+        return rawHeaders[0];
+      },
+    }),
+    async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.addExchangeToDiscussionAndSendEmail.execute(req.body),
+      ),
+  );
 
   return technicalRouter;
 };
