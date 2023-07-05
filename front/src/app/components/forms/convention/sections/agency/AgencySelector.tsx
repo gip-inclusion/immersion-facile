@@ -66,13 +66,7 @@ export const AgencySelector = ({
   const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
   const [loadingError, setLoadingError] = useState(false);
   const dispatch = useDispatch();
-  const [agencies, setAgencies] = useState<AgencyOption[]>([
-    {
-      id: "",
-      name: agencyDepartmentField.placeholder ?? "",
-      kind: "autre",
-    },
-  ]);
+  const [agencies, setAgencies] = useState<AgencyOption[]>([]);
 
   const agencyKindOptions = uniqBy(
     (agencyOption) => agencyOption.kind,
@@ -142,6 +136,24 @@ export const AgencySelector = ({
   const userError = touched && error;
   const showError = userError || loadingError;
 
+  const agencyPlaceholder = getAgencyPlaceholder(
+    agencyDepartment,
+    agencies.length,
+  );
+
+  const agencyOptionsInSelector = agencies
+    .filter(({ kind }) => (agencyKind === "all" ? true : kind === agencyKind))
+    .map(({ id, name }) => ({
+      label: name,
+      value: id,
+    }));
+
+  const isAgencySelectionDisabled =
+    disabled ||
+    isLoading ||
+    !agencyDepartment ||
+    agencyOptionsInSelector.length === 0;
+
   return (
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
@@ -187,26 +199,15 @@ export const AgencySelector = ({
       )}
 
       <Select
+        disabled={isAgencySelectionDisabled}
         label={agencyIdField.label}
         hint={agencyIdField.hintText}
-        options={agencies
-          .filter(({ kind }) =>
-            agencyKind === "all" ? true : kind === agencyKind,
-          )
-          .map(({ id, name }) => ({
-            label: name,
-            value: id,
-          }))}
-        placeholder={
-          agencyDepartment
-            ? "Veuillez sélectionner une structure"
-            : "Veuillez sélectionner un département"
-        }
+        options={agencyOptionsInSelector}
+        placeholder={agencyPlaceholder}
         nativeSelectProps={{
           ...agencyIdField,
           ...register(agencyIdName),
           value: getValues(agencyIdName) as string,
-          disabled: disabled || isLoading || !agencyDepartment,
         }}
       />
       {showError && (
@@ -251,4 +252,13 @@ const agenciesRetriever = ({
   return federatedIdentity && isPeConnectIdentity(federatedIdentity)
     ? agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
     : agencyGateway.listImmersionAgencies(departmentCode);
+};
+
+const getAgencyPlaceholder = (
+  agencyDepartment: string,
+  numberOfAgencies: number,
+) => {
+  if (!agencyDepartment) return "Veuillez sélectionner un département";
+  if (numberOfAgencies === 0) return "Aucune agence dans ce département";
+  return "Veuillez sélectionner une structure";
 };
