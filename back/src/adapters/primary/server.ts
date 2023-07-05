@@ -47,7 +47,7 @@ type CreateAppProperties = {
   app: Express;
   gateways: Gateways;
   eventCrawler: EventCrawler;
-  generateApiJwt: GenerateApiConsumerJwt;
+  generateApiConsumerJwt: GenerateApiConsumerJwt;
   generateConventionJwt: GenerateConventionJwt;
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
@@ -104,13 +104,13 @@ export const createApp = async (
   return {
     app,
     gateways: deps.gateways,
+    inMemoryUow: deps.inMemoryUow,
     eventCrawler: deps.eventCrawler,
-    generateApiJwt: deps.generateApiJwt,
+    generateApiConsumerJwt: deps.generateApiConsumerJwt,
     generateConventionJwt: deps.generateConventionJwt,
     generateEditEstablishmentJwt: deps.generateEditEstablishmentJwt,
-    generateAuthenticatedUserJwt: deps.generateAuthenticatedUserToken,
+    generateAuthenticatedUserJwt: deps.generateAuthenticatedUserJwt,
     generateBackOfficeJwt: deps.generateBackOfficeJwt,
     uuidGenerator: deps.uuidGenerator,
-    inMemoryUow: deps.inMemoryUow,
   };
 };

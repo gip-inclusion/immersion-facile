@@ -53,7 +53,7 @@ export type TestAppAndDeps = {
   gateways: InMemoryGateways;
   eventCrawler: BasicEventCrawler;
   appConfig: AppConfig;
-  generateApiJwt: GenerateApiConsumerJwt;
+  generateApiConsumerJwt: GenerateApiConsumerJwt;
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateConventionJwt: GenerateConventionJwt;
   generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
@@ -106,7 +106,7 @@ export const buildTestApp = async (
     app,
     gateways,
     eventCrawler: rawEventCrawler,
-    generateApiJwt,
+    generateApiConsumerJwt,
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt,
@@ -128,7 +128,7 @@ export const buildTestApp = async (
     gateways: gateways as InMemoryGateways,
     eventCrawler,
     appConfig,
-    generateApiJwt,
+    generateApiConsumerJwt,
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt,

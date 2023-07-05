@@ -1,5 +1,9 @@
 import { SuperTest, Test } from "supertest";
-import { addressDtoToString, AppellationAndRomeDto } from "shared";
+import {
+  addressDtoToString,
+  AppellationAndRomeDto,
+  expectToEqual,
+} from "shared";
 import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -7,6 +11,7 @@ import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBui
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   TEST_POSITION,
@@ -45,18 +50,15 @@ const establishmentAggregate = new EstablishmentAggregateBuilder()
 describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersion-offers/:siret/:rome`, () => {
   let request: SuperTest<Test>;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateApiJwt: GenerateApiConsumerJwt;
-  let authToken: string;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
-    const config = new AppConfigBuilder()
-      .withRepositories("IN_MEMORY")
-      .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
-      .build();
-    ({ request, inMemoryUow, generateApiJwt } = await buildTestApp(config));
-    authToken = generateApiJwt({
-      id: validAuthorizedApiKeyId,
-    });
+    ({ request, inMemoryUow, generateApiConsumerJwt } = await buildTestApp(
+      new AppConfigBuilder()
+        .withRepositories("IN_MEMORY")
+        .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
+        .build(),
+    ));
 
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [establishmentAggregate],
@@ -70,8 +72,11 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
   });
 
   it("accepts valid authenticated requests", async () => {
-    // /!\ Those fields come from Builder (should probably not.)
-    const expectedResult: SearchImmersionResultPublicV1 = {
+    const response = await request
+      .get(`/v1/immersion-offers/${immersionOfferSiret}/${styliste.romeCode}`)
+      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload));
+
+    expectToEqual(response.body, {
       rome: styliste.romeCode,
       siret: establishmentAggregate.establishment.siret,
       name: establishmentAggregate.establishment.name,
@@ -85,20 +90,16 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
       naf: establishmentAggregate.establishment.nafDto.code,
       nafLabel: establishmentAggregate.establishment.nafDto.nomenclature,
       city: establishmentAggregate.establishment.address.city,
-    };
-
-    const response = await request
-      .get(`/v1/immersion-offers/${immersionOfferSiret}/${styliste.romeCode}`)
-      .set("Authorization", authToken);
-
-    expect(response.body).toEqual(expectedResult);
+      website: establishmentAggregate.establishment.website,
+      additionalInformation: "",
+    } satisfies SearchImmersionResultPublicV1);
     expect(response.status).toBe(200);
   });
   it("returns 404 if no offer can be found with such siret & rome", async () => {
     const siretNotInDB = "11000403200019";
     await request
       .get(`/v1/immersion-offers/${siretNotInDB}/${styliste.romeCode}`)
-      .set("Authorization", authToken)
+      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload))
       .expect(
         404,
         `{"errors":"No offer found for siret ${siretNotInDB} and rome ${styliste.romeCode}"}`,

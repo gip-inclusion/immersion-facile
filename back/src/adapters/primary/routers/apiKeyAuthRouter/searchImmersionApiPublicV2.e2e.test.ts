@@ -8,25 +8,16 @@ import {
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
-import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;
-  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
-
-  let generateApiJwt: GenerateApiConsumerJwt;
+  let inMemoryUow: InMemoryUnitOfWork;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
-    const {
-      request: testAppRequest,
-      generateApiJwt: testAppGenerateApiJwt,
-      inMemoryUow,
-    } = await buildTestApp();
-    request = testAppRequest;
-    establishmentAggregateRepository =
-      inMemoryUow.establishmentAggregateRepository;
-    generateApiJwt = testAppGenerateApiJwt;
+    ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
   });
 
   describe(`v2 - /v2/immersion-offers`, () => {
@@ -43,7 +34,10 @@ describe("search-immersion route", () => {
           .get(
             `/v2/immersion-offers?rome=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-unauthorized-id" }))
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({ id: "my-unauthorized-id" }),
+          )
           .expect(403, {
             error: "forbidden: unauthorised consumer Id",
           });
@@ -56,20 +50,22 @@ describe("search-immersion route", () => {
           .withAppellationCode("11704")
           .build();
         // Prepare
-        await establishmentAggregateRepository.insertEstablishmentAggregates([
-          new EstablishmentAggregateBuilder()
-            .withImmersionOffers([immersionOffer])
-            .withEstablishment(
-              new EstablishmentEntityBuilder()
-                .withPosition({
-                  lat: 48.8531,
-                  lon: 2.34999,
-                })
-                .withWebsite("www.jobs.fr")
-                .build(),
-            )
-            .build(),
-        ]);
+        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+          [
+            new EstablishmentAggregateBuilder()
+              .withImmersionOffers([immersionOffer])
+              .withEstablishment(
+                new EstablishmentEntityBuilder()
+                  .withPosition({
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  })
+                  .withWebsite("www.jobs.fr")
+                  .build(),
+              )
+              .build(),
+          ],
+        );
 
         // Act and assert
         const expectedResult: SearchImmersionResultPublicV2[] = [
@@ -100,7 +96,10 @@ describe("search-immersion route", () => {
           .get(
             `/v2/immersion-offers?appellationCode=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }));
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({ id: "my-authorized-id" }),
+          );
         expect(response.body).toEqual(expectedResult);
         expect(response.status).toBe(200);
       });
@@ -110,7 +109,10 @@ describe("search-immersion route", () => {
           .get(
             `/v2/immersion-offers?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }));
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({ id: "my-authorized-id" }),
+          );
         expect(response.status).toBe(200);
       });
       it("with no specified appellation code", async () => {
@@ -118,7 +120,10 @@ describe("search-immersion route", () => {
           .get(
             `/v2/immersion-offers?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({ id: "my-authorized-id" }),
+          )
           .expect(200, []);
       });
 
@@ -127,7 +132,10 @@ describe("search-immersion route", () => {
           .get(
             `/v2/immersion-offers?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({ id: "my-authorized-id" }),
+          )
           .expect(200, []);
       });
     });
@@ -137,7 +145,10 @@ describe("search-immersion route", () => {
         .get(
           `/v2/immersion-offers?rome=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
         )
-        .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
+        .set(
+          "Authorization",
+          generateApiConsumerJwt({ id: "my-authorized-id" }),
+        )
         .expect(400, /Code ROME incorrect/);
     });
   });

@@ -86,7 +86,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     await pool.end();
   });
 
-  describe("Pg implementation of method getSearchImmersionResultDtoFromSearchMade", () => {
+  describe("Pg implementation of method searchImmersionResults", () => {
     const searchedPosition = { lat: 49, lon: 6 };
     const notMatchingRome = "B1805";
     const farFromSearchedPosition = { lat: 32, lon: 89 };
@@ -150,6 +150,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         expect(searchResult).toHaveLength(1);
       });
     });
+
     describe("if no rome code is given", () => {
       it("returns all establishments within geographical area", async () => {
         // Prepare
@@ -1061,7 +1062,6 @@ describe("Postgres implementation of immersion offer repository", () => {
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         contactMode: contact.contactMethod,
         distance_m: undefined,
-        isSearchable: true,
         // contactDetails: undefined,
       });
     });
@@ -1117,7 +1117,6 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactMode: undefined,
         distance_m: undefined,
         contactDetails: undefined,
-        isSearchable: true,
       });
     });
 
