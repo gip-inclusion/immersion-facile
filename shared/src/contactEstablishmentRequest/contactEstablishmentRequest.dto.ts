@@ -31,5 +31,4 @@ export type ContactEstablishmentRequestDto =
 
 export type ContactEstablishmentEventPayload = {
   discussionId: DiscussionId;
-  message: string;
 };

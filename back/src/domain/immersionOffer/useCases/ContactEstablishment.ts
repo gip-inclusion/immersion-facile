@@ -43,8 +43,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
-    if (!establishmentAggregate)
-      throw new NotFoundError(`No establishment found with siret: ${siret}`);
+    if (!establishmentAggregate) throw new NotFoundError(siret);
 
     const establishmentContact = establishmentAggregate.contact;
     if (!establishmentContact)

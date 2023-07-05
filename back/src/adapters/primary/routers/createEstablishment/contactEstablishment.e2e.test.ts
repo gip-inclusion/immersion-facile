@@ -52,6 +52,15 @@ describe(`/${contactEstablishmentRoute} route`, () => {
       .build();
     const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
+    inMemoryUow.romeRepository.appellations = [
+      {
+        appellationCode: immersionOffer.appellationCode,
+        appellationLabel: immersionOffer.appellationLabel,
+        romeCode: immersionOffer.romeCode,
+        romeLabel: "some label",
+      },
+    ];
+
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [
         new EstablishmentAggregateBuilder()

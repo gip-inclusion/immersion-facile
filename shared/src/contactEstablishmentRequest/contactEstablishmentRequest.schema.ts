@@ -76,10 +76,5 @@ export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentReq
     contactEstablishmentInPersonSchema,
   ]);
 
-const withDiscussionId = z.object({ discussionId: z.string() });
 export const contactEstablishmentEventPayloadSchema: z.Schema<ContactEstablishmentEventPayload> =
-  z.union([
-    contactEstablishmentByMailSchema.and(withDiscussionId),
-    contactEstablishmentByPhoneSchema.and(withDiscussionId),
-    contactEstablishmentInPersonSchema.and(withDiscussionId),
-  ]);
+  z.object({ discussionId: z.string() });
