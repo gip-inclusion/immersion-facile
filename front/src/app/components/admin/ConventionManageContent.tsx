@@ -49,8 +49,7 @@ export const ConventionManageContent = ({
           })
           .push();
   }
-
-  if (!isLoading) return <Loader />;
+  if (isLoading) return <Loader />;
   if (!convention) return <p>Pas de conventions correspondante trouvée</p>;
   return (
     <>
