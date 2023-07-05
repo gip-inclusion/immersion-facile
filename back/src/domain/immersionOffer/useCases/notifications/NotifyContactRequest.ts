@@ -1,3 +1,4 @@
+import { ascend, prop, sort } from "ramda";
 import {
   addressDtoToString,
   ContactEstablishmentEventPayload,
@@ -86,7 +87,8 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               immersionObjective: discussion.immersionObjective,
               potentialBeneficiaryPhone: potentialBeneficiary.phone,
               potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,
-              message: payload.message,
+              message: sort(ascend(prop("sentAt")), discussion.exchanges)[0]
+                .message,
               businessAddress: addressDtoToString(discussion.address),
             },
           },

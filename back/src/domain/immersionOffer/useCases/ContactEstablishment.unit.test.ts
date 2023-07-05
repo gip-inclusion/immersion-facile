@@ -1,4 +1,5 @@
 import {
+  AppellationAndRomeDto,
   ContactEstablishmentRequestDto,
   expectArraysToEqual,
   expectPromiseToFailWithError,
@@ -8,22 +9,21 @@ import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilde
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryDiscussionAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { ContactEstablishment } from "./ContactEstablishment";
 
-const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 const siret = "11112222333344";
 const contactId = "theContactId";
 
@@ -35,6 +35,19 @@ const validRequest: ContactEstablishmentRequestDto = {
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
   potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
 };
+
+const appellationAndRome: AppellationAndRomeDto = {
+  appellationCode: validRequest.appellationCode,
+  appellationLabel: "My appellation label",
+  romeCode: "A0000",
+  romeLabel: "Rome de test",
+};
+
+const immersionOffer = new ImmersionOfferEntityV2Builder()
+  .withRomeCode(appellationAndRome.romeCode)
+  .withAppellationCode(validRequest.appellationCode)
+  .withAppellationLabel(appellationAndRome.appellationLabel)
+  .build();
 
 const validEmailRequest: ContactEstablishmentRequestDto = {
   ...validRequest,
@@ -59,21 +72,17 @@ const establishmentAggregateWithEmailContact =
 
 describe("ContactEstablishment", () => {
   let contactEstablishment: ContactEstablishment;
-  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
-  let outboxRepository: InMemoryOutboxRepository;
-  let discussionAggregateRepository: InMemoryDiscussionAggregateRepository;
   let uowPerformer: UnitOfWorkPerformer;
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    establishmentAggregateRepository = uow.establishmentAggregateRepository;
-    outboxRepository = uow.outboxRepository;
-    discussionAggregateRepository = uow.discussionAggregateRepository;
+    uow = createInMemoryUow();
     uowPerformer = new InMemoryUowPerformer(uow);
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
+    uow.romeRepository.appellations = [appellationAndRome];
     const createNewEvent = makeCreateNewEvent({
       timeGateway,
       uuidGenerator,
@@ -88,7 +97,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid EMAIL contact request", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       establishmentAggregateWithEmailContact.build(),
     ]);
 
@@ -101,7 +110,7 @@ describe("ContactEstablishment", () => {
 
     await contactEstablishment.execute(validEmailRequest);
 
-    expectArraysToEqual(outboxRepository.events, [
+    expectArraysToEqual(uow.outboxRepository.events, [
       {
         id: eventId,
         occurredAt: now.toISOString(),
@@ -114,7 +123,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid PHONE contact request", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -142,7 +151,7 @@ describe("ContactEstablishment", () => {
     };
     await contactEstablishment.execute(validPhoneRequest);
 
-    expectArraysToEqual(outboxRepository.events, [
+    expectArraysToEqual(uow.outboxRepository.events, [
       {
         id: eventId,
         occurredAt: now.toISOString(),
@@ -155,7 +164,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid IN_PERSON contact requests", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -183,7 +192,7 @@ describe("ContactEstablishment", () => {
     };
     await contactEstablishment.execute(validInPersonRequest);
 
-    expectArraysToEqual(outboxRepository.events, [
+    expectArraysToEqual(uow.outboxRepository.events, [
       {
         id: eventId,
         occurredAt: now.toISOString(),
@@ -199,7 +208,7 @@ describe("ContactEstablishment", () => {
     // Prepare
     const establishmentAggregate =
       establishmentAggregateWithEmailContact.build();
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       establishmentAggregate,
     ]);
     const establishment = establishmentAggregate.establishment;
@@ -214,7 +223,7 @@ describe("ContactEstablishment", () => {
     await contactEstablishment.execute(validEmailRequest);
 
     // Assert
-    expectToEqual(discussionAggregateRepository.discussionAggregates, [
+    expectToEqual(uow.discussionAggregateRepository.discussionAggregates, [
       {
         id: discussionId,
         appellationCode: "12898",
@@ -257,8 +266,9 @@ describe("ContactEstablishment", () => {
     const establishmentAggregate = establishmentAggregateWithEmailContact
       .withIsSearchable(true)
       .withMaxContactsPerWeek(2)
+      .withImmersionOffers([immersionOffer])
       .build();
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       establishmentAggregate,
     ]);
     const establishment = establishmentAggregate.establishment;
@@ -269,10 +279,10 @@ describe("ContactEstablishment", () => {
 
     const discussion1Date = new Date("2022-01-09T12:00:00.000");
     const discussionToOldDate = new Date("2022-01-02T12:00:00.000");
-    discussionAggregateRepository.discussionAggregates = [
+    uow.discussionAggregateRepository.discussionAggregates = [
       {
         id: "discussionToOld",
-        appellationCode: "12898",
+        appellationCode: appellationAndRome.appellationCode,
         siret,
         businessName: "Entreprise 1",
         address: establishment.address,
@@ -306,7 +316,7 @@ describe("ContactEstablishment", () => {
       },
       {
         id: "discussion1",
-        appellationCode: "12898",
+        appellationCode: appellationAndRome.appellationCode,
         createdAt: discussion1Date,
         siret,
         businessName: "Entreprise 2",
@@ -343,7 +353,7 @@ describe("ContactEstablishment", () => {
 
     uuidGenerator.setNextUuid("discussion2");
     const secondContactRequestDto: ContactEstablishmentRequestDto = {
-      appellationCode: "12347",
+      appellationCode: appellationAndRome.appellationCode,
       siret,
       potentialBeneficiaryFirstName: "Bob",
       potentialBeneficiaryLastName: "Marley",
@@ -356,16 +366,18 @@ describe("ContactEstablishment", () => {
     await contactEstablishment.execute(secondContactRequestDto);
 
     const establishmentAggregateAfterSecondContact =
-      establishmentAggregateRepository.establishmentAggregates[0];
+      uow.establishmentAggregateRepository.establishmentAggregates[0];
 
-    expect(discussionAggregateRepository.discussionAggregates).toHaveLength(3);
+    expect(uow.discussionAggregateRepository.discussionAggregates).toHaveLength(
+      3,
+    );
     expect(
       establishmentAggregateAfterSecondContact.establishment.isSearchable,
     ).toBe(false);
   });
 
   it("throws BadRequestError for contact mode mismatch", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -392,7 +404,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("throws NotFoundError without contact id", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -419,12 +431,12 @@ describe("ContactEstablishment", () => {
         ...validRequest,
         contactMode: "PHONE",
       }),
-      new NotFoundError(`No establishment found with siret: 11112222333344`),
+      new NotFoundError(`11112222333344`),
     );
   });
 
   it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -435,7 +447,11 @@ describe("ContactEstablishment", () => {
             .withContactMethod("PHONE")
             .build(),
         )
-        .withImmersionOffers([immersionOffer])
+        .withImmersionOffers([
+          new ImmersionOfferEntityV2Builder()
+            .withAppellationCode("wrong")
+            .build(),
+        ])
         .build(),
     ]);
 

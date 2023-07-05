@@ -28,17 +28,6 @@ import { NotifyContactRequest } from "./NotifyContactRequest";
 
 const siret = "11112222333344";
 const discussionId = "discussion-id";
-
-const payload: ContactEstablishmentEventPayload = {
-  siret,
-  discussionId,
-  appellationCode: TEST_APPELLATION_CODE,
-  contactMode: "PHONE",
-  potentialBeneficiaryFirstName: "potential_beneficiary_name",
-  potentialBeneficiaryLastName: "potential_beneficiary_last_name",
-  potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
-};
-
 const allowedContactEmail = "toto@gmail.com";
 const allowedCopyEmail = "copy@gmail.com";
 
@@ -75,7 +64,7 @@ describe("NotifyContactRequest", () => {
   const prepareDiscussionInRepository = (contactMethod: ContactMethod) => {
     romeRepository.appellations = [
       {
-        appellationCode: payload.appellationCode,
+        appellationCode: TEST_APPELLATION_CODE,
         appellationLabel: TEST_APPELLATION_LABEL,
         romeCode: "A0000",
         romeLabel: "Rome de test",
@@ -99,15 +88,10 @@ describe("NotifyContactRequest", () => {
 
   describe("Right paths", () => {
     it("Sends ContactByEmailRequest email to establishment", async () => {
-      const validEmailPayload: ContactEstablishmentEventPayload = {
-        ...payload,
-        contactMode: "EMAIL",
-        message: "message_to_send",
-        immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiaryPhone: "0654783402",
-      };
-
       const discussion = await prepareDiscussionInRepository("EMAIL");
+      const validEmailPayload: ContactEstablishmentEventPayload = {
+        discussionId: discussion.id,
+      };
 
       await notifyContactRequest.execute(validEmailPayload);
 
@@ -120,7 +104,7 @@ describe("NotifyContactRequest", () => {
             recipients: [establishmentContact.email],
             replyTo: {
               email: "discussion-id_b@reply.reply.domain.com",
-              name: "potential_beneficiary_name potential_beneficiary_last_name - via Immersion Facilitée",
+              name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName} - via Immersion Facilitée`,
             },
             params: {
               businessName: discussion.businessName,
@@ -128,15 +112,14 @@ describe("NotifyContactRequest", () => {
               contactLastName: establishmentContact.lastName,
               appellationLabel: TEST_APPELLATION_LABEL,
               potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
+                discussion.potentialBeneficiary.firstName,
               potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
-              immersionObjective: validEmailPayload.immersionObjective,
-              potentialBeneficiaryPhone:
-                validEmailPayload.potentialBeneficiaryPhone,
+                discussion.potentialBeneficiary.lastName,
+              immersionObjective: discussion.immersionObjective,
+              potentialBeneficiaryPhone: discussion.potentialBeneficiary.phone,
               potentialBeneficiaryResumeLink:
-                validEmailPayload.potentialBeneficiaryResumeLink,
-              message: validEmailPayload.message,
+                discussion.potentialBeneficiary.resumeLink,
+              message: discussion.exchanges[0].message,
               businessAddress: addressDtoToString(discussion.address),
             },
             cc: establishmentContact.copyEmails,
@@ -146,11 +129,10 @@ describe("NotifyContactRequest", () => {
     });
 
     it("Sends ContactByPhoneRequest email to potential beneficiary", async () => {
-      const validPhonePayload: ContactEstablishmentEventPayload = {
-        ...payload,
-        contactMode: "PHONE",
-      };
       const discussion = await prepareDiscussionInRepository("PHONE");
+      const validPhonePayload: ContactEstablishmentEventPayload = {
+        discussionId: discussion.id,
+      };
 
       await notifyContactRequest.execute(validPhonePayload);
 
@@ -158,16 +140,16 @@ describe("NotifyContactRequest", () => {
         emails: [
           {
             kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
-            recipients: [payload.potentialBeneficiaryEmail],
+            recipients: [discussion.potentialBeneficiary.email],
             params: {
               businessName: discussion.businessName,
               contactFirstName: discussion.establishmentContact.firstName,
               contactLastName: discussion.establishmentContact.lastName,
               contactPhone: discussion.establishmentContact.phone,
               potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
+                discussion.potentialBeneficiary.firstName,
               potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
+                discussion.potentialBeneficiary.lastName,
             },
           },
         ],
@@ -175,11 +157,10 @@ describe("NotifyContactRequest", () => {
     });
 
     it("Sends ContactInPersonRequest email to potential beneficiary", async () => {
-      const validInPersonPayload: ContactEstablishmentEventPayload = {
-        ...payload,
-        contactMode: "IN_PERSON",
-      };
       const discussion = await prepareDiscussionInRepository("IN_PERSON");
+      const validInPersonPayload: ContactEstablishmentEventPayload = {
+        discussionId: discussion.id,
+      };
 
       await notifyContactRequest.execute(validInPersonPayload);
 
@@ -187,16 +168,16 @@ describe("NotifyContactRequest", () => {
         emails: [
           {
             kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
-            recipients: [payload.potentialBeneficiaryEmail],
+            recipients: [discussion.potentialBeneficiary.email],
             params: {
               businessName: discussion.businessName,
               contactFirstName: discussion.establishmentContact.firstName,
               contactLastName: discussion.establishmentContact.lastName,
               businessAddress: addressDtoToString(discussion.address),
               potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
+                discussion.potentialBeneficiary.firstName,
               potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
+                discussion.potentialBeneficiary.lastName,
             },
           },
         ],
@@ -207,8 +188,7 @@ describe("NotifyContactRequest", () => {
   describe("wrong paths", () => {
     it("Missing discussion", async () => {
       const validInPersonPayload: ContactEstablishmentEventPayload = {
-        ...payload,
-        contactMode: "IN_PERSON",
+        discussionId,
       };
 
       await expectPromiseToFailWithError(
@@ -220,21 +200,17 @@ describe("NotifyContactRequest", () => {
     });
 
     it("Bad immersion offer with contactMode $contactMode", async () => {
+      const discussion = await prepareDiscussionInRepository("EMAIL");
       const validContactRequestByMail: ContactEstablishmentEventPayload = {
-        ...payload,
-        contactMode: "EMAIL",
-        message: "message_to_send",
-        immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiaryPhone: "0654783402",
+        discussionId: discussion.id,
       };
 
-      await prepareDiscussionInRepository(payload.contactMode);
       romeRepository.appellations = [];
 
       await expectPromiseToFailWithError(
         notifyContactRequest.execute(validContactRequestByMail),
         new BadRequestError(
-          `No appellationLabel found for appellationCode: ${payload.appellationCode}`,
+          `No appellationLabel found for appellationCode: ${discussion.appellationCode}`,
         ),
       );
     });
