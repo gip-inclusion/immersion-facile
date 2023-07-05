@@ -11,7 +11,7 @@ import { EstablishmentEntity } from "../domain/immersionOffer/entities/Establish
 import { avenueChampsElyseesDto } from "./addressDtos";
 
 export const defaultNafCode = "7820Z";
-export const validEstablishmentEntityV2: EstablishmentEntity = {
+const validEstablishmentEntityV2: EstablishmentEntity = {
   siret: "78000403200019",
   name: "Company inside repository",
   address: avenueChampsElyseesDto,

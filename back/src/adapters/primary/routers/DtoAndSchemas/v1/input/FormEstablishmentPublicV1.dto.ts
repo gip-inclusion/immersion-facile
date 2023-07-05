@@ -4,7 +4,7 @@ import {
   OmitFromExistingKeys,
 } from "shared";
 
-export type BusinessContactDtoPublicV1 = {
+type BusinessContactDtoPublicV1 = {
   lastName: string;
   firstName: string;
   job: string;
@@ -14,9 +14,9 @@ export type BusinessContactDtoPublicV1 = {
   copyEmails: string[];
 };
 
-export type ContactMethodPublicV1 = "EMAIL" | "PHONE" | "IN_PERSON";
+type ContactMethodPublicV1 = "EMAIL" | "PHONE" | "IN_PERSON";
 
-export type AppellationDtoPublicV1 = {
+type AppellationDtoPublicV1 = {
   romeLabel: string;
   romeCode: string;
   appellationLabel: string;

@@ -137,7 +137,7 @@ type TestAcceptNewStatusParams = {
   initialStatus: ConventionStatus;
 };
 
-export type UpdatedFields = Partial<
+type UpdatedFields = Partial<
   ConventionDto & {
     establishmentRepresentativeSignedAt: string | undefined;
     beneficiarySignedAt: string | undefined;

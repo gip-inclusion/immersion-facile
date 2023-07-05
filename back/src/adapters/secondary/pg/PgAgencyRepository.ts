@@ -41,7 +41,7 @@ type AgencyColumns =
   | "street_number_and_address"
   | "validator_emails";
 
-export type PersistenceAgency = Record<AgencyColumns, any>;
+type PersistenceAgency = Record<AgencyColumns, any>;
 
 const makeAgencyKindFiterSQL = (
   agencyKindFilter?: AgencyKindFilter,
@@ -243,9 +243,7 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.address?.departmentCode,
 ];
 
-export const persistenceAgencyToAgencyDto = (
-  params: PersistenceAgency,
-): AgencyDto =>
+const persistenceAgencyToAgencyDto = (params: PersistenceAgency): AgencyDto =>
   validateAndParseZodSchema(
     agencySchema,
     {
@@ -272,7 +270,7 @@ export const persistenceAgencyToAgencyDto = (
     logger,
   );
 
-export const parseGeoJson = (raw: string): GeoPositionDto => {
+const parseGeoJson = (raw: string): GeoPositionDto => {
   const json = JSON.parse(raw);
   return {
     lat: json.coordinates[1],

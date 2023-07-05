@@ -94,7 +94,7 @@ export type DomainEvent =
 
 export type DomainTopic = DomainEvent["topic"];
 
-export const eventToDebugInfo = (event: DomainEvent) => {
+const eventToDebugInfo = (event: DomainEvent) => {
   const publishCount = event.publications.length;
   const lastPublication = event.publications[publishCount - 1];
 

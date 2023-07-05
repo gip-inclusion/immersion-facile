@@ -217,7 +217,7 @@ export type InseeApiRawEstablishment = {
   >;
 };
 
-export type SirenGatewayAnswer = {
+type SirenGatewayAnswer = {
   header: {
     statut: number;
     message: string;

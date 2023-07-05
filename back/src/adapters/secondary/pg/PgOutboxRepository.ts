@@ -195,9 +195,7 @@ export const storedEventRowsToDomainEvent = (
     { publications: [] } as unknown as DomainEvent,
   );
 
-export const storedEventOutboxToDomainEvent = (
-  row: StoredEventRow,
-): DomainEvent => ({
+const storedEventOutboxToDomainEvent = (row: StoredEventRow): DomainEvent => ({
   id: row.id,
   topic: row.topic as any, //this is to avoid the error due to : https://github.com/microsoft/TypeScript/issues/42518
   occurredAt: row.occurred_at.toISOString(),

@@ -5,7 +5,7 @@ import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
 import { storedEventRowsToDomainEvent } from "./PgOutboxRepository";
 
-export type StoredEventRow = {
+type StoredEventRow = {
   id: string;
   topic: DomainTopic;
   payload: any;

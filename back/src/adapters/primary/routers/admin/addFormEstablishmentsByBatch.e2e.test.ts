@@ -11,7 +11,7 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
-import { TEST_ESTABLISHMENT1 } from "../../../secondary/siret/InMemorySiretGateway";
+import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 
 const addFormEstablishmentBatchUrl = adminTargets.addFormEstablishmentBatch.url;
 
@@ -49,7 +49,7 @@ describe("POST /add-form-establishment-batch", () => {
       FormEstablishmentDtoBuilder.valid().build();
 
     gateways.siret.setSirenEstablishment({
-      ...TEST_ESTABLISHMENT1,
+      ...TEST_OPEN_ESTABLISHMENT_1,
       siret: formEstablishment1.siret,
     });
 

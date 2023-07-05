@@ -328,7 +328,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   }
 }
 
-export const managePeConnectError = (
+const managePeConnectError = (
   error: unknown,
   targetKind: keyof PeConnectExternalTargets,
   context: Record<string, string>,

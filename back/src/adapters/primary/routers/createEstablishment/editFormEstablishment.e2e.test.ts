@@ -7,7 +7,7 @@ import {
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { makeGenerateJwtES256 } from "../../../../domain/auth/jwt";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/siret/InMemorySiretGateway";
+import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 
 describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to post edited form establishments`, () => {
   it("Throws 401 if not authenticated", async () => {
@@ -89,20 +89,20 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
 
     const validJwt = generateEditEstablishmentJwt(
       createEstablishmentMagicLinkPayload({
-        siret: TEST_ESTABLISHMENT1_SIRET,
+        siret: TEST_OPEN_ESTABLISHMENT_1.siret,
         durationDays: 1,
         now: new Date(),
       }),
     );
     await inMemoryUow.formEstablishmentRepository.create(
       FormEstablishmentDtoBuilder.valid()
-        .withSiret(TEST_ESTABLISHMENT1_SIRET)
+        .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
         .build(),
     );
 
     // Act
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withSiret(TEST_ESTABLISHMENT1_SIRET)
+      .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
       .build();
     const response = await request
       .put(establishmentTargets.updateFormEstablishment.url)

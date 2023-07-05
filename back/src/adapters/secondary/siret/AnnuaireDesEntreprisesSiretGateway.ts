@@ -79,7 +79,7 @@ export const convertAdeEstablishmentToSirenEstablishmentDto = (
     adeEstablishment.matching_etablissements[0].etat_administratif === "A",
 });
 
-export const numberEmployeesRanges = [
+const numberEmployeesRanges = [
   "",
   "0",
   "1-2",

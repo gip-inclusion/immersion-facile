@@ -10,7 +10,7 @@ import { ContactEntity } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 
 type ApiSource = "api_labonneboite";
-export type SourceProvider = FormEstablishmentSource | ApiSource;
+type SourceProvider = FormEstablishmentSource | ApiSource;
 
 export type EstablishmentEntity = {
   siret: SiretDto;

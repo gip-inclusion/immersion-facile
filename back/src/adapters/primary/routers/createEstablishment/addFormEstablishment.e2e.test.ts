@@ -10,7 +10,7 @@ import {
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/siret/InMemorySiretGateway";
+import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { FormEstablishmentDtoPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 
@@ -23,7 +23,7 @@ describe("Add form establishment", () => {
         defaultValidFormEstablishment.appellations;
 
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withSiret(TEST_ESTABLISHMENT1_SIRET)
+        .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
         .build();
 
       const response = await request
@@ -61,7 +61,7 @@ describe("Add form establishment", () => {
 
       const formEstablishment: FormEstablishmentDto =
         FormEstablishmentDtoBuilder.valid()
-          .withSiret(TEST_ESTABLISHMENT1_SIRET)
+          .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
           .build();
       const formEstablishmentWithBusinessContact: FormEstablishmentDto = {
         ...formEstablishment,
@@ -118,7 +118,7 @@ describe("Add form establishment", () => {
           businessName: "Mon entreprise",
           businessNameCustomized: "Ma belle enseigne du quartier",
           isEngagedEnterprise: false,
-          siret: TEST_ESTABLISHMENT1_SIRET,
+          siret: TEST_OPEN_ESTABLISHMENT_1.siret,
           professions: [
             {
               romeCodeMetier: "A1111",
@@ -215,7 +215,7 @@ describe("Add form establishment", () => {
       it("support adding establishment from known api consumer (for exemple Un Jeune Une Solution)", async () => {
         const { request, generateApiJwt } = await buildTestApp();
         const formEstablishmentDto = FormEstablishmentDtoBuilder.valid()
-          .withSiret(TEST_ESTABLISHMENT1_SIRET)
+          .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
           .build();
 
         const formEstablishmentDtoPublicV1: FormEstablishmentDtoPublicV1 = {

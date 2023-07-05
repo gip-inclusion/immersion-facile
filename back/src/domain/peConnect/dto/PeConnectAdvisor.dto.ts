@@ -1,6 +1,6 @@
 import { NotEmptyArray } from "shared";
 
-export const peAdvisorImmersionKinds = ["PLACEMENT", "CAPEMPLOI"] as const;
+const peAdvisorImmersionKinds = ["PLACEMENT", "CAPEMPLOI"] as const;
 export const peAdvisorKinds = [
   ...peAdvisorImmersionKinds,
   "INDEMNISATION",
@@ -14,8 +14,7 @@ export const isPeAdvisorImmersionKind = (
 export const immersionPoleEmploiAdvisors: NotEmptyArray<PeConnectImmersionAdvisorsKind> =
   ["PLACEMENT", "CAPEMPLOI"];
 
-export type PeConnectImmersionAdvisorsKind =
-  (typeof peAdvisorImmersionKinds)[number];
+type PeConnectImmersionAdvisorsKind = (typeof peAdvisorImmersionKinds)[number];
 
 export type PeConnectImmersionAdvisorDto = {
   email: string;
