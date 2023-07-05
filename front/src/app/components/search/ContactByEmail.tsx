@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
@@ -66,12 +66,19 @@ export const ContactByEmail = ({
     mode: "onTouched",
     defaultValues: initialValues,
   });
+
   const {
     register,
     handleSubmit,
     formState,
     formState: { isSubmitting },
+    getValues,
+    reset,
   } = methods;
+
+  useEffect(() => {
+    reset({ ...getValues(), appellationCode: initialValues.appellationCode });
+  }, [appellations]);
 
   const getFieldError = makeFieldError(formState);
 
@@ -82,6 +89,7 @@ export const ContactByEmail = ({
     });
     onSuccess();
   };
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onFormValid)}>
@@ -122,17 +130,16 @@ export const ContactByEmail = ({
             {...getFieldError("immersionObjective")}
           />
 
-          {appellations.length > 1 && (
-            <Select
-              label={"Métier sur lequel porte la demande d'immersion *"}
-              options={appellationListOfOptions}
-              placeholder={"Sélectionnez un métier"}
-              nativeSelectProps={{
-                ...register("appellationCode"),
-              }}
-              {...getFieldError("appellationCode")}
-            />
-          )}
+          <Select
+            disabled={appellations.length === 1}
+            label={"Métier sur lequel porte la demande d'immersion *"}
+            options={appellationListOfOptions}
+            placeholder={"Sélectionnez un métier"}
+            nativeSelectProps={{
+              ...register("appellationCode"),
+            }}
+            {...getFieldError("appellationCode")}
+          />
 
           <Input
             label="Votre message à l’entreprise *"
