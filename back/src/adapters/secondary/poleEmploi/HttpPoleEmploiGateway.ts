@@ -45,14 +45,52 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   public async notifyOnConventionUpdated(
     poleEmploiConvention: PoleEmploiConvention,
   ): Promise<PoleEmploiBroadcastResponse> {
+    logger.info({
+      _title: "PeBroadcast",
+      status: "start",
+      peConvention: {
+        peId: poleEmploiConvention.id,
+        originalId: poleEmploiConvention.originalId,
+      },
+    });
     return this.postPoleEmploiConvention(poleEmploiConvention)
-      .then((response) => ({ status: response.status as 200 | 201 }))
+      .then((response) => {
+        logger.info({
+          _title: "PeBroadcast",
+          status: "success",
+          httpStatus: response.status,
+          peConvention: {
+            peId: poleEmploiConvention.id,
+            originalId: poleEmploiConvention.originalId,
+          },
+        });
+        return { status: response.status as 200 | 201 };
+      })
       .catch((error) => {
         if (!axios.isAxiosError(error) || !error.response) {
+          logger.error({
+            _title: "PeBroadcast",
+            status: "notAxiosErrorOrNoResponse",
+            error,
+            peConvention: {
+              peId: poleEmploiConvention.id,
+              originalId: poleEmploiConvention.originalId,
+            },
+          });
           throw error;
         }
 
         if (error.response.status === 404) {
+          logger.error({
+            _title: "PeBroadcast",
+            status: "notFoundOrMismatch",
+            httpStatus: error.response.status,
+            message: error.response.data?.message,
+            peConvention: {
+              peId: poleEmploiConvention.id,
+              originalId: poleEmploiConvention.originalId,
+            },
+          });
           return {
             status: 404,
             message: error.response.data?.message,
@@ -60,11 +98,15 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         }
 
         const errorObject = {
-          _title: "PeBroadcastError",
-          status: "errored",
+          _title: "PeBroadcast",
+          status: "unknownAxiosError",
           httpStatus: error.response.status,
           message: error.message,
           axiosBody: error.response.data,
+          peConvention: {
+            peId: poleEmploiConvention.id,
+            originalId: poleEmploiConvention.originalId,
+          },
         };
         logger.error(errorObject);
         notifyObjectDiscord(errorObject);
