@@ -10,6 +10,7 @@ const domain = "immersion-facile.beta.gouv.fr";
 describe("Inbound Email", () => {
   describe("IP filtering", () => {
     it("should return 403 when IP is not allowed", async () => {
+      const unallowedIp = "245.10.12.54";
       const config = new AppConfigBuilder({
         INBOUND_EMAIL_ALLOWED_IPS: "130.10.10.10",
         DOMAIN: domain,
@@ -17,7 +18,8 @@ describe("Inbound Email", () => {
       const { request } = await buildTestApp(config);
       const response = await request
         .post(`/${inboundEmailParsingRoute}`)
-        .send({});
+        .send({})
+        .set("X-Forwarded-For", unallowedIp);
 
       expect(response.status).toBe(403);
     });
@@ -28,9 +30,12 @@ describe("Inbound Email", () => {
         DOMAIN: domain,
       }).build();
       const { request } = await buildTestApp(config);
-      const response = await request.post(`/${inboundEmailParsingRoute}`).send({
-        yolo: "wrong body",
-      });
+      const response = await request
+        .post(`/${inboundEmailParsingRoute}`)
+        .send({
+          yolo: "wrong body",
+        })
+        .set("X-Forwarded-For", config.inboundEmailAllowedIps[0]);
 
       expect(response.status).toBe(400);
     });
@@ -47,7 +52,8 @@ describe("Inbound Email", () => {
 
       const response = await request
         .post(`/${inboundEmailParsingRoute}`)
-        .send(correctBrevoResponse);
+        .send(correctBrevoResponse)
+        .set("X-Forwarded-For", config.inboundEmailAllowedIps[0]);
 
       expect(response.body).toBe("");
       expect(response.status).toBe(200);

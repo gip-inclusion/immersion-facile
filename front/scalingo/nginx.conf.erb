@@ -10,5 +10,6 @@ location ~* .(woff|woff2)$ {
 
 location /api {
   rewrite /api/(.*) /$1 break;
+  real_ip_header X-Forwarded-For;
   proxy_pass https://<%= ENV['APP'].gsub("front", "back") %>.<%= ENV['REGION_NAME'] %>.scalingo.io;
 }
