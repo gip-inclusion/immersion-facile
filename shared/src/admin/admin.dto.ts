@@ -1,4 +1,5 @@
 import { AgencyId } from "../agency/agency.dto";
+import { ConventionId } from "../convention/convention.dto";
 import {
   AgencyRole,
   AuthenticatedUserId,
@@ -17,4 +18,8 @@ export type IcUserRoleForAgencyParams = {
 
 export type WithAgencyRole = {
   agencyRole: AgencyRole;
+};
+
+export type ManageConventionAdminForm = {
+  conventionId: ConventionId;
 };

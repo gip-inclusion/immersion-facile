@@ -7,7 +7,6 @@ import {
   Role,
 } from "shared";
 import { Loader } from "react-design-system";
-import { ConventionValidation } from "src/app/components/admin/ConventionValidation";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -16,8 +15,9 @@ import {
   FetchConventionRequestedPayload,
 } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { NpsSection } from "../nps/NpsSection";
+import { NpsSection } from "../../nps/NpsSection";
 import { ConventionManageActions } from "./ConventionManageActions";
+import { ConventionValidation } from "./ConventionValidation";
 
 export const ConventionManageContent = ({
   conventionId,

@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "tss-react/dsfr";
-import { AddEstablishmentsByBatch } from "src/app/components/establishments/AddEstablishmentsByBatch";
+import { AddEstablishmentsByBatch } from "src/app/components/admin/establishments/AddEstablishmentsByBatch";
 
 export const EstablishmentsTab = () => {
   const { cx } = useStyles();

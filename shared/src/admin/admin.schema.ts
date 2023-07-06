@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
+import { conventionIdSchema } from "../convention/convention.schema";
 import {
   agencyRoleSchema,
   authenticatedUserIdSchema,
@@ -7,6 +8,7 @@ import {
 import { zTrimmedString } from "../zodUtils";
 import {
   IcUserRoleForAgencyParams,
+  ManageConventionAdminForm,
   UserAndPassword,
   WithAgencyRole,
 } from "./admin.dto";
@@ -26,3 +28,8 @@ export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams
 export const withAgencyRoleSchema: z.Schema<WithAgencyRole> = z.object({
   agencyRole: agencyRoleSchema,
 });
+
+export const manageConventionAdminFormSchema: z.Schema<ManageConventionAdminForm> =
+  z.object({
+    conventionId: conventionIdSchema,
+  });
