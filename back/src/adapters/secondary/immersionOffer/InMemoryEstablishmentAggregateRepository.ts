@@ -74,7 +74,7 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  async getEstablishmentAggregateBySiret(
+  public async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
     return this._establishmentAggregates.find(
