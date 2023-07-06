@@ -11,7 +11,6 @@ import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { makeStyles } from "tss-react/dsfr";
 import { domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { defaultFormEstablishmentParams } from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
@@ -71,8 +70,7 @@ export const ImmersionHeader = () => {
     currentRoute.name === routes.search().name ||
     currentRoute.name === routes.homeCandidates().name;
   const isEstablishmentRoute =
-    currentRoute.name ===
-      routes.formEstablishment(defaultFormEstablishmentParams).name ||
+    currentRoute.name === routes.formEstablishment().name ||
     currentRoute.name === routes.homeEstablishments().name;
   const isAgencyRoute =
     currentRoute.name === routes.addAgency().name ||
@@ -132,12 +130,10 @@ export const ImmersionHeader = () => {
         },
         {
           text: "Référencer mon entreprise",
-          isActive:
-            currentRoute.name ===
-            routes.formEstablishment(defaultFormEstablishmentParams).name,
+          isActive: currentRoute.name === routes.formEstablishment().name,
 
           linkProps: {
-            ...routes.formEstablishment(defaultFormEstablishmentParams).link,
+            ...routes.formEstablishment().link,
             id: establishmentIds.addEstablishmentForm,
           },
         },

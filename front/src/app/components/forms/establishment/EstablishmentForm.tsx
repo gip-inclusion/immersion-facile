@@ -12,7 +12,7 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { keys } from "ramda";
+import { keys, values } from "ramda";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
 import {
@@ -27,7 +27,6 @@ import {
   FormEstablishmentSource,
   immersionFacileContactEmail,
   noContactPerWeek,
-  OmitFromExistingKeys,
   removeAtIndex,
   SiretDto,
   toDotNotation,
@@ -43,7 +42,13 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useInitialSiret, useSiretFetcher } from "src/app/hooks/siret.hooks";
+import { useDebounce } from "src/app/hooks/useDebounce";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import {
+  formEstablishmentDtoToFormEstablishmentQueryParams,
+  type FormEstablishmentParamsInUrl,
+  formEstablishmentQueryParamsToFormEstablishmentDto,
+} from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
 import { establishmentGateway } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
@@ -54,8 +59,15 @@ import {
 } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
 
+type RouteByMode = {
+  create: Route<typeof routes.formEstablishment>;
+  edit: Route<typeof routes.editFormEstablishment>;
+};
+
+type Mode = keyof RouteByMode;
+
 type EstablishmentFormProps = {
-  mode: "create" | "edit";
+  mode: Mode;
 };
 
 const getErrorsFromResponseData = (
@@ -64,18 +76,14 @@ const getErrorsFromResponseData = (
   !!error && !!(error as any)?.response?.data?.errors;
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
-  const route = useRoute() as
-    | Route<typeof routes.formEstablishment>
-    | Route<typeof routes.editFormEstablishment>;
+  const route = useRoute() as RouteByMode[Mode];
   const jwt = route.name !== "formEstablishment" ? route.params.jwt : "";
+  const isEstablishmentCreation =
+    route.name === "formEstablishment" && mode === "create";
   const siret =
-    route.name === "formEstablishment" && route.params.siret
-      ? route.params.siret
-      : "";
+    isEstablishmentCreation && route.params.siret ? route.params.siret : "";
   const source =
-    route.name === "formEstablishment" && route.params.source
-      ? route.params.source
-      : "";
+    isEstablishmentCreation && route.params.source ? route.params.source : "";
   const [isLoading, setIsLoading] = useState(mode === "edit");
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<Error | null>(null);
@@ -83,7 +91,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     formEstablishmentFieldsLabels,
   );
   const initialValues = {
-    ...creationInitialValuesWithoutSourceAndSearchable(siret),
+    ...(isEstablishmentCreation
+      ? createInitialFormValues(route.params)
+      : defaultInitialValue()),
     source: (source === ""
       ? "immersion-facile"
       : source) as FormEstablishmentSource,
@@ -113,28 +123,39 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   useInitialSiret(siret);
   useEffect(() => {
-    const formEstablishmentFromJwtRequest =
-      establishmentGateway.getFormEstablishmentFromJwt(
-        decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(jwt)
-          .siret,
-        jwt,
-      );
-    formEstablishmentFromJwtRequest
-      .then((formEstablishment) => {
-        reset(formEstablishment);
-      })
-      .catch((error) =>
-        routes
-          .errorRedirect({
-            kind: error.kind,
-            message: error.message,
-            title:
-              "Problème lors de la récupération des données de l'entreprise",
-          })
-          .push(),
-      )
-      .finally(() => setIsLoading(false));
+    if (!isEstablishmentCreation) {
+      const formEstablishmentFromJwtRequest =
+        establishmentGateway.getFormEstablishmentFromJwt(
+          decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(jwt)
+            .siret,
+          jwt,
+        );
+      formEstablishmentFromJwtRequest
+        .then((formEstablishment) => {
+          reset(formEstablishment);
+        })
+        .catch((error) =>
+          routes
+            .errorRedirect({
+              kind: error.kind,
+              message: error.message,
+              title:
+                "Problème lors de la récupération des données de l'entreprise",
+            })
+            .push(),
+        )
+        .finally(() => setIsLoading(false));
+    }
   }, []);
+  useEffect(() => {
+    if (isEstablishmentCreation) {
+      routes
+        .formEstablishment(
+          formEstablishmentDtoToFormEstablishmentQueryParams(formValues),
+        )
+        .replace();
+    }
+  }, useDebounce(values(formValues), 500));
 
   if (getErrorsFromResponseData(submitError)) {
     errorMessage = submitError["response"]["data"]["errors"];
@@ -145,7 +166,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     setIsSuccess(false);
     setSubmitError(null);
     return (
-      mode === "create"
+      isEstablishmentCreation
         ? establishmentGateway.addFormEstablishment(data)
         : establishmentGateway.updateFormEstablishment({ ...data }, jwt)
     )
@@ -163,7 +184,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         setIsLoading(false);
       });
   };
-
   if (isLoading) {
     return <Loader />;
   }
@@ -290,7 +310,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           />
           <BusinessContact />
 
-          {mode && (
+          {mode === "edit" && (
             <Checkbox
               hintText={`${
                 isSearchable
@@ -333,7 +353,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             />
           )}
 
-          {mode && (
+          {mode === "edit" && (
             <>
               <p>
                 Vous pouvez demander la suppression définitive de votre
@@ -400,45 +420,48 @@ const mailtoHref = (siret: SiretDto) =>
   )}`;
 
 // Should be handled by Unit Test Suites
-const creationInitialValuesWithoutSourceAndSearchable = (
-  siret?: SiretDto,
-): OmitFromExistingKeys<FormEstablishmentDto, "source"> =>
-  !ENV.prefilledForms
-    ? defaultInitialValue(siret)
-    : {
-        siret: "1234567890123",
-        website: "www@boucherie.fr/immersions",
-        additionalInformation: "Végétariens, s'abstenir !",
-        businessName: "My business name, replaced by result from API",
-        businessNameCustomized:
-          "My Customized Business name, not replaced by API",
-        businessAddress: "My business address, replaced by result from API",
-        isEngagedEnterprise: true,
-        maxContactsPerWeek: defaultMaxContactsPerWeek,
-        appellations: [
-          {
-            appellationCode: "11573",
-            romeCode: "D1102",
-            romeLabel: "Boulangerie",
-            appellationLabel: "Boulanger - Boulangère",
-          },
-          {
-            appellationCode: "11564",
-            romeCode: "D1101",
-            romeLabel: "Boucherie",
-            appellationLabel: "Boucher - Bouchère",
-          },
-        ],
-        businessContact: {
-          firstName: "John",
-          lastName: "Doe",
-          job: "super job",
-          phone: "02837",
-          email: "joe@mail.com",
-          contactMethod: "EMAIL",
-          copyEmails: ["recrutement@boucherie.net"],
+const createInitialFormValues = (
+  routeParams: FormEstablishmentParamsInUrl,
+): FormEstablishmentDto => {
+  if (ENV.prefilledForms) {
+    return {
+      source: "immersion-facile",
+      siret: "1234567890123",
+      website: "www@boucherie.fr/immersions",
+      additionalInformation: "Végétariens, s'abstenir !",
+      businessName: "My business name, replaced by result from API",
+      businessNameCustomized:
+        "My Customized Business name, not replaced by API",
+      businessAddress: "My business address, replaced by result from API",
+      isEngagedEnterprise: true,
+      maxContactsPerWeek: defaultMaxContactsPerWeek,
+      appellations: [
+        {
+          appellationCode: "11573",
+          romeCode: "D1102",
+          romeLabel: "Boulangerie",
+          appellationLabel: "Boulanger - Boulangère",
         },
-      };
+        {
+          appellationCode: "11564",
+          romeCode: "D1101",
+          romeLabel: "Boucherie",
+          appellationLabel: "Boucher - Bouchère",
+        },
+      ],
+      businessContact: {
+        firstName: "John",
+        lastName: "Doe",
+        job: "super job",
+        phone: "02837",
+        email: "joe@mail.com",
+        contactMethod: "EMAIL",
+        copyEmails: ["recrutement@boucherie.net"],
+      },
+    };
+  }
+  return formEstablishmentQueryParamsToFormEstablishmentDto(routeParams);
+};
 
 const CreationSiretRelatedInputs = () => {
   const {

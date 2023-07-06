@@ -1,5 +1,4 @@
 import { domElementIds } from "shared";
-import { defaultFormEstablishmentParams } from "src/app/routes/routeParams/formEstablishment";
 import { routes } from "src/app/routes/routes";
 
 // TODO replace with react dsfr link props type
@@ -59,7 +58,7 @@ const siteMapLinks: SiteMapLink[] = [
   {
     text: "Référencer une entreprise",
     linkProps: {
-      ...routes.formEstablishment(defaultFormEstablishmentParams).link,
+      ...routes.formEstablishment().link,
       id: siteMapIds.establishmentForm,
     },
   },
