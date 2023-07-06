@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { searchImmersionRoute__v0 } from "shared";
+import { expectToEqual, searchImmersionRoute__v0 } from "shared";
 import {
   avenueChampsElysees,
   avenueChampsElyseesDto,
@@ -93,17 +93,26 @@ describe("search-immersion route", () => {
     // TODO add test which actually recovers data (and one with token, one without)
 
     it("rejects invalid requests with error code 400", async () => {
-      await request
-        .post(`/${searchImmersionRoute__v0}`)
-        .send({
-          rome: "XXXXX", // not a valid rome code
-          location: {
-            lat: 48.8531,
-            lon: 2.34999,
+      const response = await request.post(`/${searchImmersionRoute__v0}`).send({
+        rome: "XXXXX", // not a valid rome code
+        location: {
+          lat: 48.8531,
+          lon: 2.34999,
+        },
+        distance_km: 30,
+      });
+
+      expectToEqual(response.body, {
+        errors: [
+          {
+            code: "invalid_string",
+            message: "Code ROME incorrect",
+            path: ["rome"],
+            validation: "regex",
           },
-          distance_km: 30,
-        })
-        .expect(400, /Code ROME incorrect/);
+        ],
+      });
+      expectToEqual(response.statusCode, 400);
     });
   });
 });
