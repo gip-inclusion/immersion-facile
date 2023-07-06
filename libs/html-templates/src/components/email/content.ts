@@ -9,5 +9,7 @@ export const renderContent = (
     .split("\n")
     .join("<br/>")}</p>`;
 
-  return options ? wrapElements(formattedContent) : formattedContent;
+  return options.wrapInTable
+    ? wrapElements(formattedContent)
+    : formattedContent;
 };
