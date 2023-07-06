@@ -329,4 +329,5 @@ export const domElementIds = {
   agencyDashboard: {},
   manageConventionAdmin: {},
   manageConventionInclusionConnected: {},
+  manageEstablishmentAdmin: {},
 } satisfies DomElementIds;
