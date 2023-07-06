@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -51,7 +51,13 @@ export const ContactByPhone = ({
     handleSubmit,
     formState,
     formState: { isSubmitting },
+    reset,
+    getValues,
   } = methods;
+
+  useEffect(() => {
+    reset({ ...getValues(), appellationCode: initialValues.appellationCode });
+  }, [appellations]);
 
   const getFieldError = makeFieldError(formState);
 
