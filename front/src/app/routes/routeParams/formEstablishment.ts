@@ -1,70 +1,112 @@
-import { param } from "type-route";
+import { param, ValueSerializer } from "type-route";
 import {
   AppellationAndRomeDto,
   ContactMethod,
+  defaultMaxContactsPerWeek,
   Email,
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "shared";
-import { appellationDtoSerializer } from "src/app/routes/routeParams/utils";
+
+type NewType = typeof formEstablishmentParamsInUrl;
+
+export type FormEstablishmentParamsInUrl = Partial<{
+  [K in FormEstablishmentKeysInUrl]: NewType[K]["~internal"]["valueSerializer"] extends ValueSerializer<
+    infer T
+  >
+    ? T
+    : never;
+}>;
+
+const appellationsDtoSerializer: ValueSerializer<AppellationAndRomeDto[]> = {
+  parse: (raw) => JSON.parse(raw),
+  stringify: (appellationDto) => JSON.stringify(appellationDto),
+};
+
+const copyEmailsSerializer: ValueSerializer<Email[]> = {
+  parse: (raw) => JSON.parse(raw),
+  stringify: (emails: Email[]) => JSON.stringify(emails),
+};
 
 export const formEstablishmentParamsInUrl = {
   source: param.query.optional.string,
-  siret: param.query.string,
-  bName: param.query.string,
+  siret: param.query.optional.string,
+  bName: param.query.optional.string,
   bNameCustomized: param.query.optional.string,
-  bAddress: param.query.string,
+  bAddress: param.query.optional.string,
   isEngagedEnterprise: param.query.optional.boolean,
   fitForDisabledWorkers: param.query.optional.boolean,
-  maxContactsPerWeek: param.query.number,
+  maxContactsPerWeek: param.query.optional.number,
   nafCode: param.query.optional.string,
   nafNomenclature: param.query.optional.string,
-  bcLastName: param.query.string,
-  bcFirstName: param.query.string,
-  bcJob: param.query.string,
-  bcPhone: param.query.string,
-  bcEmail: param.query.string,
-  bcContactMethod: param.query.string,
+  bcLastName: param.query.optional.string,
+  bcFirstName: param.query.optional.string,
+  bcJob: param.query.optional.string,
+  bcPhone: param.query.optional.string,
+  bcEmail: param.query.optional.string,
+  bcContactMethod: param.query.optional.string,
   website: param.query.optional.string,
   additionalInformation: param.query.optional.string,
-  appellations: param.query.array.ofType(appellationDtoSerializer),
-  bcCopyEmails: param.query.array.string,
+  appellations: param.query.optional.ofType(appellationsDtoSerializer),
+  bcCopyEmails: param.query.optional.ofType(copyEmailsSerializer),
 };
 
 export type FormEstablishmentKeysInUrl =
   keyof typeof formEstablishmentParamsInUrl;
 
-// const mapFormEstablishmentToQueryParam = (formEstablishment: FormEstablishmentDto): FormEstablishmentParamsInUrl:  => {
-//
-// }
-
-const _formEstablishmentQueryParamsToFormEstablishmentDto = (
-  params: Record<FormEstablishmentKeysInUrl, string>,
+export const formEstablishmentQueryParamsToFormEstablishmentDto = (
+  params: FormEstablishmentParamsInUrl,
 ): FormEstablishmentDto => ({
-  source: params.source as FormEstablishmentSource,
-  siret: params.siret,
-  businessName: params.bName,
+  source: (params.source ?? "immersion-facile") as FormEstablishmentSource,
+  siret: params.siret ?? "",
+  businessName: params.bName ?? "",
   businessNameCustomized: params.bNameCustomized,
-  businessAddress: params.bAddress,
+  businessAddress: params.bAddress ?? "",
   isEngagedEnterprise: Boolean(params.isEngagedEnterprise),
   fitForDisabledWorkers: Boolean(params.fitForDisabledWorkers),
-  maxContactsPerWeek: parseInt(params.maxContactsPerWeek),
+  maxContactsPerWeek: params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
   naf: {
-    code: params.nafCode,
-    nomenclature: params.nafNomenclature,
+    code: params.nafCode ?? "",
+    nomenclature: params.nafNomenclature ?? "",
   },
   businessContact: {
-    lastName: params.bcLastName,
-    firstName: params.bcFirstName,
-    job: params.bcJob,
-    phone: params.bcPhone,
-    email: params.bcEmail,
+    lastName: params.bcLastName ?? "",
+    firstName: params.bcFirstName ?? "",
+    job: params.bcJob ?? "",
+    phone: params.bcPhone ?? "",
+    email: params.bcEmail ?? "",
     contactMethod: params.bcContactMethod as ContactMethod,
-    copyEmails: JSON.parse(params.bcCopyEmails) as Email[],
+    copyEmails: params.bcCopyEmails ?? [],
   },
   website: params.website,
   additionalInformation: params.additionalInformation,
-  appellations: JSON.parse(params.appellations) as AppellationAndRomeDto[],
+  appellations: params.appellations ?? [],
+});
+
+export const formEstablishmentDtoToFormEstablishmentQueryParams = (
+  formEstablishmentDto: FormEstablishmentDto,
+): FormEstablishmentParamsInUrl => ({
+  source: formEstablishmentDto.source,
+  siret: formEstablishmentDto.siret,
+  bName: formEstablishmentDto.businessName,
+  bNameCustomized: formEstablishmentDto.businessNameCustomized,
+  bAddress: formEstablishmentDto.businessAddress,
+  isEngagedEnterprise: formEstablishmentDto.isEngagedEnterprise,
+  fitForDisabledWorkers: formEstablishmentDto.fitForDisabledWorkers,
+  maxContactsPerWeek:
+    formEstablishmentDto.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
+  nafCode: formEstablishmentDto.naf?.code ?? "",
+  nafNomenclature: formEstablishmentDto.naf?.nomenclature ?? "",
+  bcLastName: formEstablishmentDto.businessContact.lastName,
+  bcFirstName: formEstablishmentDto.businessContact.firstName,
+  bcJob: formEstablishmentDto.businessContact.job,
+  bcPhone: formEstablishmentDto.businessContact.phone,
+  bcEmail: formEstablishmentDto.businessContact.email,
+  bcContactMethod: formEstablishmentDto.businessContact.contactMethod ?? "",
+  website: formEstablishmentDto.website,
+  additionalInformation: formEstablishmentDto.additionalInformation,
+  appellations: formEstablishmentDto.appellations,
+  bcCopyEmails: formEstablishmentDto.businessContact.copyEmails,
 });
 
 export const defaultFormEstablishmentParams = {

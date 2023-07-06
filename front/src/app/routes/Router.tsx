@@ -69,11 +69,9 @@ const getPageByRouteName: {
   ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
-  editFormEstablishment: (route) => (
-    <EstablishmentEditionFormPage route={route} />
-  ),
+  editFormEstablishment: () => <EstablishmentEditionFormPage />,
   errorRedirect: (route) => <ErrorRedirectPage route={route} />,
-  formEstablishment: (route) => <EstablishmentFormPage route={route} />,
+  formEstablishment: () => <EstablishmentFormPage />,
   formEstablishmentForExternals: (route) => (
     <EstablishmentFormPageForExternals route={route} />
   ),

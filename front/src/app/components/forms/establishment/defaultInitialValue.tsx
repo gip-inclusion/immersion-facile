@@ -1,14 +1,14 @@
 import {
   defaultMaxContactsPerWeek as defaultMaxContactsPerWeek,
   FormEstablishmentDto,
-  OmitFromExistingKeys,
   SiretDto,
 } from "shared";
 import { emptyAppellation } from "./MultipleAppellationInput";
 
 export const defaultInitialValue = (
   siret?: SiretDto,
-): OmitFromExistingKeys<FormEstablishmentDto, "source"> => ({
+): FormEstablishmentDto => ({
+  source: "immersion-facile",
   siret: siret || "",
   businessName: "",
   businessAddress: "",
