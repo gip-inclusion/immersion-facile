@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DiscussionId, ExchangeRole } from "shared";
+import { renderContent } from "html-templates/src/components/email";
 import {
   BadRequestError,
   NotFoundError,
@@ -133,7 +134,11 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
 
     const exchange: ExchangeEntity = {
       subject: item.Subject,
-      message: item.RawHtmlBody || "",
+      message:
+        item.RawHtmlBody ||
+        (item.RawTextBody &&
+          renderContent(item.RawTextBody, { wrapInTable: false })) ||
+        "Pas de contenu",
       sentAt: new Date(item.SentAtDate),
       recipient: recipientKind,
       sender,

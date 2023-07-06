@@ -2,12 +2,12 @@ import { ignoreTabs, wrapElements } from "../../helpers/formatters";
 
 export const renderContent = (
   content: string | undefined,
-  wrap = true,
+  options: { wrapInTable: boolean } = { wrapInTable: true },
 ): string | undefined => {
   if (!content) return;
   const formattedContent = `<p>${ignoreTabs(content)
     .split("\n")
     .join("<br/>")}</p>`;
 
-  return wrap ? wrapElements(formattedContent) : formattedContent;
+  return options ? wrapElements(formattedContent) : formattedContent;
 };
