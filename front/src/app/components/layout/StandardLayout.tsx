@@ -23,7 +23,7 @@ export const StandardLayout = ({ route }: StandardLayoutProps) => {
         <h1 className={fr.cx("fr-h2")}>{title}</h1>
         <div
           dangerouslySetInnerHTML={{
-            __html: renderContent(content, false) || "",
+            __html: renderContent(content, { wrapInTable: false }) || "",
           }}
         ></div>
       </MainWrapper>
