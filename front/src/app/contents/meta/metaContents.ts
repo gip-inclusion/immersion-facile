@@ -153,35 +153,31 @@ export const groupMetaContent = (
 
 export const adminMetaContent: Record<AdminTab, MetaContentType> = {
   conventions: {
-    title: "admin: conventions",
+    title: "Admin: conventions",
     description: "Page admin: Conventions",
   },
   events: {
-    title: "admin: évenement",
+    title: "Admin: évenement",
     description: "Page admin: Evenement",
   },
-  "agency-validation": {
-    title: "admin: validation d'agence",
+  agencies: {
+    title: "Admin: validation d'agence",
     description: "Page admin: Validation d'agence",
   },
-  exports: {
-    title: "admin: export de données",
-    description: "Page admin: Export de données",
-  },
   notifications: {
-    title: "admin: notifications",
+    title: "Admin: notifications",
     description: "Page admin: Notifications",
   },
   "technical-options": {
-    title: "admin: options techniques",
+    title: "Admin: options techniques",
     description: "Page admin: Options techniques",
   },
   "email-preview": {
-    title: "admin: aperçus email",
+    title: "Admin: aperçus email",
     description: "Page admin: Aperçus email",
   },
-  "establishment-batch": {
-    title: "admin: ajout d'établissements groupés",
-    description: "Page admin: Ajout d'établissements groupés",
+  establishments: {
+    title: "Admin: établissements",
+    description: "Page admin: Établissements",
   },
 };

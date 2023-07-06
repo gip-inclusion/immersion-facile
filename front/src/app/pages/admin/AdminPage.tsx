@@ -3,10 +3,10 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { Route } from "type-route";
 import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
-import { AddEstablishmentByBatchTab } from "src/app/pages/admin/AddEstablishmentByBatchTab";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
+import { EstablishmentsTab } from "src/app/pages/admin/EstablishmentsTab";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab, isAdminTab } from "src/app/routes/routeParams/adminTabs";
@@ -31,13 +31,13 @@ const adminTabs: Tab[] = [
   },
   {
     label: "Agences",
-    tabId: "agency-validation",
+    tabId: "agencies",
     content: <AgencyTab />,
   },
   {
-    label: "Options techniques",
-    tabId: "technical-options",
-    content: <TechnicalOptions />,
+    label: "Établissements",
+    tabId: "establishments",
+    content: <EstablishmentsTab />,
   },
   {
     label: "Notifications",
@@ -50,9 +50,9 @@ const adminTabs: Tab[] = [
     content: <EmailPreviewTab />,
   },
   {
-    label: "Ajout d'établissements groupés",
-    tabId: "establishment-batch",
-    content: <AddEstablishmentByBatchTab />,
+    label: "Options techniques",
+    tabId: "technical-options",
+    content: <TechnicalOptions />,
   },
 ];
 

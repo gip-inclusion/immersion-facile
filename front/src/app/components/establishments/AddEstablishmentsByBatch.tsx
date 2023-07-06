@@ -23,7 +23,7 @@ type AddEstablishmentByBatchTabForm = {
   inputFile: FileList;
 };
 
-export const AddEstablishmentByBatchTab = () => {
+export const AddEstablishmentsByBatch = () => {
   const {
     register,
     handleSubmit,
@@ -159,7 +159,7 @@ export const AddEstablishmentByBatchTab = () => {
     setFormSubmitted(false);
   };
   return (
-    <div className={cx("admin-tab__import-batch-establishment")}>
+    <>
       {isLoading && <Loader />}
       <DsfrTitle level={5} text="Import en masse d'entreprises" />
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -319,7 +319,7 @@ export const AddEstablishmentByBatchTab = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

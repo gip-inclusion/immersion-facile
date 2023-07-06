@@ -3,12 +3,11 @@ import { ValueSerializer } from "type-route";
 export const adminTabs = [
   "conventions",
   "events",
-  "agency-validation",
-  "exports",
+  "agencies",
+  "establishments",
   "notifications",
-  "technical-options",
   "email-preview",
-  "establishment-batch",
+  "technical-options",
 ] as const;
 
 export type AdminTab = (typeof adminTabs)[number];
