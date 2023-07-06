@@ -1,9 +1,7 @@
 import { z } from "zod";
-import { conventionIdSchema } from "../convention/convention.schema";
 import {
   GetAdminDashboardParams,
   GetConventionMagicLinkDashboardParams,
-  ManageConventionAdminForm,
   simpleDashboardNames,
 } from "./dashboard.dto";
 
@@ -28,8 +26,3 @@ export const getDashboardParams = z.union([
   getAdminDashboardParamsSchema,
   getConventionMagicLinkDashboardParamsSchema,
 ]);
-
-export const manageConventionAdminFormSchema: z.Schema<ManageConventionAdminForm> =
-  z.object({
-    conventionId: conventionIdSchema,
-  });

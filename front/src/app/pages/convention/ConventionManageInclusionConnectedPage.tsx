@@ -2,11 +2,11 @@ import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Route } from "type-route";
 import { MainWrapper } from "react-design-system";
+import { ConventionManageContent } from "src/app/components/admin/conventions/ConventionManageContent";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { ConventionManageContent } from "../../components/admin/ConventionManageContent";
 
 type ConventionManageAdminPageProps = {
   route: Route<typeof routes.manageConventionInclusionConnected>;

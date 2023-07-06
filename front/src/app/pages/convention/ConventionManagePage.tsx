@@ -7,7 +7,7 @@ import {
 import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
-import { ConventionManageContent } from "../../components/admin/ConventionManageContent";
+import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 
 type ConventionManagePageProps = {
   route: Route<typeof routes.manageConvention>;

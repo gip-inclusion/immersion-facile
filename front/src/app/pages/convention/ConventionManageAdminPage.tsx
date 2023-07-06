@@ -5,7 +5,7 @@ import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { routes } from "src/app/routes/routes";
-import { ConventionManageContent } from "../../components/admin/ConventionManageContent";
+import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 
 type ConventionManageAdminPageProps = {
   route: Route<typeof routes.manageConventionAdmin>;

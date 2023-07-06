@@ -37,7 +37,3 @@ export type GetConventionMagicLinkDashboardParams =
   | GenericGetDashboardParams<"conventionStatus"> & {
       conventionId: ConventionId;
     };
-
-export type ManageConventionAdminForm = {
-  conventionId: ConventionId;
-};
