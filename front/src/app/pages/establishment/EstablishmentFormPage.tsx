@@ -1,15 +1,9 @@
 import React from "react";
-import { Route } from "type-route";
 import { MainWrapper, PageHeader } from "react-design-system";
-import { EstablishmentCreationForm } from "src/app/components/forms/establishment/EstablishmentCreationForm";
+import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes } from "src/app/routes/routes";
 
-export const EstablishmentFormPage = ({
-  route,
-}: {
-  route: Route<typeof routes.formEstablishment>;
-}) => (
+export const EstablishmentFormPage = () => (
   <HeaderFooterLayout>
     <MainWrapper
       layout="boxed"
@@ -21,10 +15,7 @@ export const EstablishmentFormPage = ({
         />
       }
     >
-      <EstablishmentCreationForm
-        source="immersion-facile"
-        siret={route.params.siret}
-      />
+      <EstablishmentForm mode="create" />
     </MainWrapper>
   </HeaderFooterLayout>
 );
