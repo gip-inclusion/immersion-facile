@@ -5,10 +5,12 @@ import {
   agencyRoleSchema,
   authenticatedUserIdSchema,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
+import { siretSchema } from "../siret/siret.schema";
 import { zTrimmedString } from "../zodUtils";
 import {
   IcUserRoleForAgencyParams,
   ManageConventionAdminForm,
+  ManageEstablishmentAdminForm,
   UserAndPassword,
   WithAgencyRole,
 } from "./admin.dto";
@@ -32,4 +34,9 @@ export const withAgencyRoleSchema: z.Schema<WithAgencyRole> = z.object({
 export const manageConventionAdminFormSchema: z.Schema<ManageConventionAdminForm> =
   z.object({
     conventionId: conventionIdSchema,
+  });
+
+export const manageEstablishmentAdminFormSchema: z.Schema<ManageEstablishmentAdminForm> =
+  z.object({
+    siret: siretSchema,
   });

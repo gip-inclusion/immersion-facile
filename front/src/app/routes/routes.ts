@@ -115,6 +115,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { conventionId: param.query.string },
     () => `/${frontRoutes.manageConventionInclusionConnected}`,
   ),
+  manageEstablishmentAdmin: defineRoute(
+    { siret: param.query.string },
+    () => `/${frontRoutes.manageEstablishmentAdmin}`,
+  ),
   openApiDoc: defineRoute("/doc-api"),
   renewConventionMagicLink: defineRoute(
     { expiredJwt: param.query.string, originalURL: param.query.string },

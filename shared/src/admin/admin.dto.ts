@@ -4,6 +4,7 @@ import {
   AgencyRole,
   AuthenticatedUserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import { SiretDto } from "../siret/siret";
 
 export type UserAndPassword = {
   user: string;
@@ -22,4 +23,8 @@ export type WithAgencyRole = {
 
 export type ManageConventionAdminForm = {
   conventionId: ConventionId;
+};
+
+export type ManageEstablishmentAdminForm = {
+  siret: SiretDto;
 };
