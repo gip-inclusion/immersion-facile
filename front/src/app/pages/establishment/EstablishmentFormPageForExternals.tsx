@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Route } from "type-route";
 import { FormEstablishmentSource } from "shared";
 import { MainWrapper } from "react-design-system";
-import { EstablishmentCreationForm } from "src/app/components/forms/establishment/EstablishmentCreationForm";
+import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 
@@ -43,13 +43,12 @@ export const EstablishmentFormPageForExternals = ({
       </HeaderFooterLayout>
     );
 
-  if (consumerConfig.isIframe)
-    return <EstablishmentCreationForm source={consumer} />;
+  if (consumerConfig.isIframe) return <EstablishmentForm mode="create" />;
 
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
-        <EstablishmentCreationForm source={consumer} />
+        <EstablishmentForm mode="create" />
       </MainWrapper>
     </HeaderFooterLayout>
   );

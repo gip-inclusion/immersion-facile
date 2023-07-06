@@ -1,5 +1,6 @@
 import { createRouter, defineRoute, param } from "type-route";
 import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
+import { formEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { adminTabSerializer } from "./routeParams/adminTabs";
 import { conventionValuesFromUrl } from "./routeParams/convention";
 import { groupsSerializer } from "./routeParams/establishmentGroups";
@@ -77,7 +78,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.error}`,
   ),
   formEstablishment: defineRoute(
-    { siret: param.query.optional.string },
+    formEstablishmentParamsInUrl,
     () => `/${frontRoutes.establishment}`,
   ),
   formEstablishmentForExternals: defineRoute(

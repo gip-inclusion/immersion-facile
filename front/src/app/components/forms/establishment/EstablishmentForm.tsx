@@ -1,5 +1,10 @@
-import React, { useState } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import {
+  FormProvider,
+  SubmitHandler,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -8,19 +13,28 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
+import { match } from "ts-pattern";
+import { Route } from "type-route";
 import {
+  addressDtoToString,
   AppellationAndRomeDto,
+  decodeMagicLinkJwtWithoutSignatureCheck,
   defaultMaxContactsPerWeek,
   domElementIds,
+  EstablishmentJwtPayload,
   FormEstablishmentDto,
   formEstablishmentSchema,
+  FormEstablishmentSource,
   immersionFacileContactEmail,
   noContactPerWeek,
+  OmitFromExistingKeys,
   removeAtIndex,
   SiretDto,
   toDotNotation,
 } from "shared";
-import { ErrorNotifications } from "react-design-system";
+import { ErrorNotifications, Loader } from "react-design-system";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { defaultInitialValue } from "src/app/components/forms/establishment/defaultInitialValue";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
@@ -28,7 +42,11 @@ import {
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
+import { useInitialSiret, useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { routes, useRoute } from "src/app/routes/routes";
+import { establishmentGateway } from "src/config/dependencies";
+import { ENV } from "src/config/environmentVariables";
 import { BusinessContact } from "./BusinessContact";
 import {
   emptyAppellation,
@@ -37,10 +55,7 @@ import {
 import { SearchResultPreview } from "./SearchResultPreview";
 
 type EstablishmentFormProps = {
-  initialValues: FormEstablishmentDto;
-  saveForm: (establishment: FormEstablishmentDto) => Promise<void>;
-  isEditing?: boolean;
-  children: React.ReactNode;
+  mode: "create" | "edit";
 };
 
 const getErrorsFromResponseData = (
@@ -48,47 +63,92 @@ const getErrorsFromResponseData = (
 ): error is Error & { response: { data: { errors: string } } } =>
   !!error && !!(error as any)?.response?.data?.errors;
 
-export const EstablishmentForm = ({
-  initialValues,
-  saveForm,
-  children,
-  isEditing,
-}: EstablishmentFormProps) => {
+export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
+  const route = useRoute() as
+    | Route<typeof routes.formEstablishment>
+    | Route<typeof routes.editFormEstablishment>;
+  const jwt = route.name !== "formEstablishment" ? route.params.jwt : "";
+  const siret =
+    route.name === "formEstablishment" && route.params.siret
+      ? route.params.siret
+      : "";
+  const source =
+    route.name === "formEstablishment" && route.params.source
+      ? route.params.source
+      : "";
+  const [isLoading, setIsLoading] = useState(mode === "edit");
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<Error | null>(null);
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
   );
-  const [isSearchable, setIsSearchable] = useState(
-    initialValues.maxContactsPerWeek > noContactPerWeek,
-  );
-  const formContents = getFormFields();
-  let errorMessage = submitError?.message;
-  const { enableMaxContactPerWeek } = useFeatureFlags();
-
-  if (getErrorsFromResponseData(submitError)) {
-    errorMessage = submitError["response"]["data"]["errors"];
-  }
+  const initialValues = {
+    ...creationInitialValuesWithoutSourceAndSearchable(siret),
+    source: (source === ""
+      ? "immersion-facile"
+      : source) as FormEstablishmentSource,
+    isSearchable: true,
+  };
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: initialValues,
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
-
   const {
     handleSubmit,
     register,
     setValue,
     getValues,
     formState: { errors, submitCount, isSubmitting, touchedFields },
+    reset,
   } = methods;
-
+  const [isSearchable, setIsSearchable] = useState(
+    initialValues.maxContactsPerWeek > noContactPerWeek,
+  );
+  const formContents = getFormFields();
+  const { enableMaxContactPerWeek } = useFeatureFlags();
+  const formValues = getValues();
   const getFieldError = makeFieldError(methods.formState);
+  let errorMessage = submitError?.message;
+
+  useInitialSiret(siret);
+  useEffect(() => {
+    const formEstablishmentFromJwtRequest =
+      establishmentGateway.getFormEstablishmentFromJwt(
+        decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(jwt)
+          .siret,
+        jwt,
+      );
+    formEstablishmentFromJwtRequest
+      .then((formEstablishment) => {
+        reset(formEstablishment);
+      })
+      .catch((error) =>
+        routes
+          .errorRedirect({
+            kind: error.kind,
+            message: error.message,
+            title:
+              "Problème lors de la récupération des données de l'entreprise",
+          })
+          .push(),
+      )
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  if (getErrorsFromResponseData(submitError)) {
+    errorMessage = submitError["response"]["data"]["errors"];
+  }
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = async (data) => {
+    setIsLoading(true);
     setIsSuccess(false);
     setSubmitError(null);
-    return saveForm(data)
+    return (
+      mode === "create"
+        ? establishmentGateway.addFormEstablishment(data)
+        : establishmentGateway.updateFormEstablishment({ ...data }, jwt)
+    )
       .then(() => {
         setIsSuccess(true);
         setSubmitError(null);
@@ -98,8 +158,15 @@ export const EstablishmentForm = ({
         console.error("onSubmit", error);
         setIsSuccess(false);
         setSubmitError(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
   return (
     <>
       <p>
@@ -131,7 +198,15 @@ export const EstablishmentForm = ({
           <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
             Votre établissement
           </h2>
-          {children}
+          {match(mode)
+            .with("create", () => <CreationSiretRelatedInputs />)
+            .with("edit", () => (
+              <EditionSiretRelatedInputs
+                businessAddress={formValues.businessAddress}
+              />
+            ))
+            .exhaustive()}
+
           <RadioButtons
             {...formContents["isEngagedEnterprise"]}
             legend={formContents["isEngagedEnterprise"].label}
@@ -141,7 +216,7 @@ export const EstablishmentForm = ({
                 ...option.nativeInputProps,
                 checked:
                   Boolean(option.nativeInputProps.value) ===
-                  getValues()["isEngagedEnterprise"],
+                  formValues["isEngagedEnterprise"],
                 onChange: () => {
                   setValue(
                     "isEngagedEnterprise",
@@ -161,7 +236,7 @@ export const EstablishmentForm = ({
                 ...option.nativeInputProps,
                 checked:
                   Boolean(option.nativeInputProps.value) ===
-                  getValues()["fitForDisabledWorkers"],
+                  formValues["fitForDisabledWorkers"],
                 onChange: () => {
                   setValue(
                     "fitForDisabledWorkers",
@@ -198,24 +273,24 @@ export const EstablishmentForm = ({
           <MultipleAppellationInput
             {...formContents.appellations}
             onAppellationAdd={(appellation, index) => {
-              const appellationsToUpdate = getValues("appellations");
+              const appellationsToUpdate = formValues.appellations;
               appellationsToUpdate[index] = appellation;
               setValue("appellations", appellationsToUpdate);
             }}
             onAppellationDelete={(appellationIndex) => {
-              const appellationsToUpdate = getValues("appellations");
+              const appellationsToUpdate = formValues.appellations;
               const newAppellations: AppellationAndRomeDto[] =
                 appellationIndex === 0 && appellationsToUpdate.length === 1
                   ? [emptyAppellation]
-                  : removeAtIndex(getValues("appellations"), appellationIndex);
+                  : removeAtIndex(formValues.appellations, appellationIndex);
               setValue("appellations", newAppellations);
             }}
-            currentAppellations={getValues("appellations")}
+            currentAppellations={formValues.appellations}
             error={errors?.appellations?.message}
           />
           <BusinessContact />
 
-          {isEditing && (
+          {mode && (
             <Checkbox
               hintText={`${
                 isSearchable
@@ -258,12 +333,12 @@ export const EstablishmentForm = ({
             />
           )}
 
-          {isEditing && (
+          {mode && (
             <>
               <p>
                 Vous pouvez demander la suppression définitive de votre
                 entreprise{" "}
-                <a href={mailtoHref(initialValues.siret)}>en cliquant ici</a>
+                <a href={mailtoHref(getValues().siret)}>en cliquant ici</a>
               </p>
               <p>
                 Si vous avez besoin d'aide, envoyez-nous un email: <br />
@@ -272,7 +347,7 @@ export const EstablishmentForm = ({
             </>
           )}
           {keys(errors).length === 0 && keys(touchedFields).length > 0 && (
-            <SearchResultPreview establishment={getValues()} />
+            <SearchResultPreview establishment={formValues} />
           )}
           <ErrorNotifications
             labels={getFormErrors()}
@@ -323,3 +398,211 @@ const mailtoHref = (siret: SiretDto) =>
   `mailto:${immersionFacileContactEmail}?subject=${deleteEstablishmentSubject}&body=${deleteEstablishmentBody(
     siret,
   )}`;
+
+// Should be handled by Unit Test Suites
+const creationInitialValuesWithoutSourceAndSearchable = (
+  siret?: SiretDto,
+): OmitFromExistingKeys<FormEstablishmentDto, "source"> =>
+  !ENV.prefilledForms
+    ? defaultInitialValue(siret)
+    : {
+        siret: "1234567890123",
+        website: "www@boucherie.fr/immersions",
+        additionalInformation: "Végétariens, s'abstenir !",
+        businessName: "My business name, replaced by result from API",
+        businessNameCustomized:
+          "My Customized Business name, not replaced by API",
+        businessAddress: "My business address, replaced by result from API",
+        isEngagedEnterprise: true,
+        maxContactsPerWeek: defaultMaxContactsPerWeek,
+        appellations: [
+          {
+            appellationCode: "11573",
+            romeCode: "D1102",
+            romeLabel: "Boulangerie",
+            appellationLabel: "Boulanger - Boulangère",
+          },
+          {
+            appellationCode: "11564",
+            romeCode: "D1101",
+            romeLabel: "Boucherie",
+            appellationLabel: "Boucher - Bouchère",
+          },
+        ],
+        businessContact: {
+          firstName: "John",
+          lastName: "Doe",
+          job: "super job",
+          phone: "02837",
+          email: "joe@mail.com",
+          contactMethod: "EMAIL",
+          copyEmails: ["recrutement@boucherie.net"],
+        },
+      };
+
+const CreationSiretRelatedInputs = () => {
+  const {
+    currentSiret,
+    establishmentInfos,
+    isFetchingSiret,
+    siretErrorToDisplay,
+    siretRawError,
+    updateSiret,
+  } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
+  const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
+    useState(false);
+  const {
+    setValue,
+    register,
+    formState: { touchedFields },
+  } = useFormContext<FormEstablishmentDto>();
+  const [requestEmailToEditFormError, setRequestEmailToEditFormError] =
+    useState<string | null>(null);
+  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const formContents = getFormFields();
+
+  useEffect(() => {
+    if (isFetchingSiret) return;
+    setValue(
+      "businessName",
+      establishmentInfos ? establishmentInfos.businessName : "",
+    );
+    setValue(
+      "businessAddress",
+      establishmentInfos ? establishmentInfos.businessAddress : "",
+    );
+    setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
+  }, [establishmentInfos]);
+
+  const featureFlags = useFeatureFlags();
+
+  return (
+    <>
+      <Input
+        label={formContents.siret.label}
+        hintText={formContents.siret.hintText}
+        nativeInputProps={{
+          ...formContents.siret,
+          ...register("siret"),
+          onChange: (event) => {
+            updateSiret(event.target.value);
+            setValue("siret", event.target.value);
+          },
+        }}
+        state={siretErrorToDisplay && touchedFields.siret ? "error" : "default"}
+        stateRelatedMessage={
+          touchedFields.siret && siretErrorToDisplay ? siretErrorToDisplay : ""
+        }
+        disabled={isFetchingSiret}
+      />
+      {siretRawError === "Establishment with this siret is already in our DB" &&
+        !requestEmailToEditFormSucceed && (
+          <div>
+            Cette entreprise a déjà été référencée.
+            <Button
+              onClick={() => {
+                establishmentGateway
+                  .requestEstablishmentModification(currentSiret)
+                  .then(() => {
+                    setRequestEmailToEditFormSucceed(true);
+                  })
+                  .catch((err) => {
+                    setRequestEmailToEditFormError(err.response.data.errors);
+                  });
+              }}
+              nativeButtonProps={{
+                disabled: requestEmailToEditFormSucceed,
+                id: domElementIds.establishment.errorSiretAlreadyExistButton,
+              }}
+            >
+              Demande de modification du formulaire de référencement
+            </Button>
+          </div>
+        )}
+      {requestEmailToEditFormSucceed && (
+        <Alert
+          severity="success"
+          title="Succès de la demande"
+          description="Succès. Un mail a été envoyé au référent de cet établissement avec un
+        lien permettant la mise à jour des informations."
+        />
+      )}
+      {requestEmailToEditFormError && (
+        <Alert
+          severity="info"
+          title="La demande de modification n'a pas aboutie."
+          description={requestEmailToEditFormError}
+        />
+      )}
+      <Input
+        label={formContents.businessName.label}
+        hintText={formContents.businessName.hintText}
+        nativeInputProps={{
+          ...formContents.businessName,
+          ...register("businessName"),
+          readOnly: featureFlags.enableInseeApi,
+        }}
+      />
+      <Input
+        label={formContents.businessNameCustomized.label}
+        hintText={formContents.businessNameCustomized.hintText}
+        nativeInputProps={{
+          ...formContents.businessNameCustomized,
+          ...register("businessNameCustomized"),
+          readOnly: isFetchingSiret,
+        }}
+      />
+      <AddressAutocomplete
+        initialSearchTerm={establishmentInfos?.businessAddress}
+        {...formContents.businessAddress}
+        setFormValue={({ address }) =>
+          setValue("businessAddress", addressDtoToString(address))
+        }
+        id={domElementIds.establishment.establishmentFormAddressAutocomplete}
+        disabled={isFetchingSiret}
+      />
+    </>
+  );
+};
+
+const EditionSiretRelatedInputs = ({
+  businessAddress,
+}: {
+  businessAddress: string;
+}) => {
+  const featureFlags = useFeatureFlags();
+  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const formContents = getFormFields();
+  const { register, setValue } = useFormContext();
+  return (
+    <>
+      <Input
+        {...formContents.siret}
+        disabled={true}
+        nativeInputProps={{
+          ...register("siret"),
+        }}
+      />
+      <Input
+        {...formContents.businessName}
+        nativeInputProps={{
+          ...register("businessName"),
+          readOnly: featureFlags.enableInseeApi,
+        }}
+      />
+      <Input
+        {...formContents.businessNameCustomized}
+        nativeInputProps={{
+          ...register("businessNameCustomized"),
+        }}
+      />
+      <AddressAutocomplete
+        initialSearchTerm={businessAddress}
+        {...formContents.businessAddress}
+        setFormValue={({ address }) =>
+          setValue("businessAddress", addressDtoToString(address))
+        }
+      />
+    </>
+  );
+};
