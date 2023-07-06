@@ -28,17 +28,14 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
   authenticatedRouter
     .route(`/${searchImmersionRoute__v0}`)
     .post(async (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const searchImmersionRequest = searchImmersionRequestPublicV0ToDomain(
-          req.body,
-        );
-        return (
+      sendHttpResponse(req, res, async () =>
+        (
           await deps.useCases.searchImmersion.execute(
-            searchImmersionRequest,
+            searchImmersionRequestPublicV0ToDomain(req.body),
             req.apiConsumer,
           )
-        ).map(domainToSearchImmersionResultPublicV0);
-      }),
+        ).map(domainToSearchImmersionResultPublicV0),
+      ),
     );
 
   authenticatedRouter
