@@ -20,6 +20,7 @@ export const SiretFetcherInput = ({
     isSiretAlreadySaved,
     updateSiret,
     modifyLinkWasSent,
+    sendLinkFeedback,
     sendModifyEstablishmentLink,
   } = useEstablishmentSiret({
     shouldFetchEvenIfAlreadySaved: false,
@@ -42,6 +43,11 @@ export const SiretFetcherInput = ({
         />
       )}
       {modifyLinkWasSent && <ModifyEstablishmentRequestNotification />}
+      {sendLinkFeedback.kind === "errored" && (
+        <p className={fr.cx("fr-error-text")}>
+          {sendLinkFeedback.errorMessage}
+        </p>
+      )}
     </>
   );
 };
