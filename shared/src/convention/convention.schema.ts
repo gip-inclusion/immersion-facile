@@ -47,6 +47,7 @@ import {
   InternshipKind,
   internshipKinds,
   levelsOfEducation,
+  MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   RenewMagicLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
@@ -278,6 +279,16 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       )
         addIssue(
           `L'âge minimum du bénéficiaire est de ${IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT}ans`,
+          getConventionFieldName("signatories.beneficiary.birthdate"),
+        );
+
+      if (
+        convention.internshipKind === "mini-stage-cci" &&
+        beneficiaryAgeAtConventionStart <
+          MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT
+      )
+        addIssue(
+          `L'âge minimum du bénéficiaire est de ${MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT}ans`,
           getConventionFieldName("signatories.beneficiary.birthdate"),
         );
     })
