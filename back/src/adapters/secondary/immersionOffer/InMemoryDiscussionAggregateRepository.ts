@@ -1,5 +1,5 @@
 import isAfter from "date-fns/isAfter";
-import { DiscussionId, SiretDto } from "shared";
+import { AppellationCode, DiscussionId, Email, SiretDto } from "shared";
 import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
 
@@ -29,6 +29,26 @@ export class InMemoryDiscussionAggregateRepository
       (discussion) =>
         discussion.siret === siret && isAfter(discussion.createdAt, since),
     ).length;
+  }
+
+  public async hasDiscussionMatching({
+    siret,
+    appellationCode,
+    potentialBeneficiaryEmail,
+    since,
+  }: {
+    potentialBeneficiaryEmail: Email;
+    appellationCode: AppellationCode;
+    siret: SiretDto;
+    since: Date;
+  }): Promise<boolean> {
+    return this.discussionAggregates.some(
+      (discussion) =>
+        discussion.siret === siret &&
+        discussion.appellationCode === appellationCode &&
+        discussion.potentialBeneficiary.email === potentialBeneficiaryEmail &&
+        discussion.createdAt >= since,
+    );
   }
 
   // For test purposes

@@ -289,6 +289,7 @@ export const createUseCases = (
         createNewEvent,
         uuidGenerator,
         gateways.timeGateway,
+        config.minimumNumberOfDaysBetweenSimilarContactRequests,
       ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,

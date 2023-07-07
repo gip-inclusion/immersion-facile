@@ -55,6 +55,15 @@ export class AppConfig {
     this.throwIfNotGeosearchApiKey = makeThrowIfNotOpenCageGeosearchKey(env);
   }
 
+  public get minimumNumberOfDaysBetweenSimilarContactRequests(): number {
+    return parseInt(
+      this.throwIfNotDefinedOrDefault(
+        "MINIMUM_NUMBER_OF_DAYS_BETWEEN_SIMILAR_CONTACT_REQUESTS",
+        "3",
+      ),
+    );
+  }
+
   public get nodeProcessReportInterval(): number {
     return parseInt(
       this.throwIfNotDefinedOrDefault("NODE_PROCESS_REPORT_INTERVAL", "30000"),
