@@ -1,19 +1,23 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { uniq } from "ramda";
-import { exhaustiveCheck, NotificationsByKind } from "shared";
 import {
   EmailNotification,
+  exhaustiveCheck,
   Notification,
   NotificationId,
   NotificationKind,
+  NotificationsByKind,
   SmsNotification,
+  TemplatedEmail,
 } from "shared";
 import {
   EmailNotificationFilters,
   NotificationRepository,
 } from "../../../domain/generic/notifications/ports/NotificationRepository";
+import { createLogger } from "../../../utils/logger";
 
+const logger = createLogger(__filename);
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private client: PoolClient,
@@ -90,19 +94,15 @@ export class PgNotificationRepository implements NotificationRepository {
         return this.saveSmsNotification(notification);
       case "email": {
         const recipients = uniq(notification.templatedContent.recipients);
-        const cc = uniq(notification.templatedContent.cc ?? []).filter(
-          (ccEmail) => !recipients.includes(ccEmail),
-        );
-
-        const templatedContent = {
-          ...notification.templatedContent,
-          recipients,
-          cc,
-        };
-
         return this.saveEmailNotification({
           ...notification,
-          templatedContent,
+          templatedContent: {
+            ...notification.templatedContent,
+            recipients,
+            cc: uniq(notification.templatedContent.cc ?? []).filter(
+              (ccEmail) => !recipients.includes(ccEmail),
+            ),
+          },
         });
       }
       default:
@@ -134,34 +134,46 @@ export class PgNotificationRepository implements NotificationRepository {
   }
 
   private async saveEmailNotification(notification: EmailNotification) {
-    const {
-      id,
-      createdAt,
-      followedIds,
-      templatedContent: { kind, recipients, cc, replyTo, params },
-    } = notification;
+    await this.insertNotificationEmail(notification);
+    await this.insertEmailRecipients("to", notification);
+    await this.insertEmailRecipients("cc", notification);
+  }
 
-    await this.client.query(
-      `
-      INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    `,
-      // prettier-ignore
-      [ id, kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params, replyTo?.name, replyTo?.email],
-    );
-
-    const addRecipientsToQuery = format(
-      `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L`,
-      recipients.map((recipient) => [id, recipient, "to"]),
-    );
-    await this.client.query(addRecipientsToQuery);
-
-    if (cc && cc.length > 0) {
-      const addRecipientsCcQuery = format(
-        `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L`,
-        cc.map((recipient) => [id, recipient, "cc"]),
+  private async insertNotificationEmail({
+    id,
+    createdAt,
+    followedIds,
+    templatedContent,
+  }: EmailNotification) {
+    const query = `
+    INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+  `;
+    // prettier-ignore
+    const values = [id, templatedContent.kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, templatedContent.params, templatedContent.replyTo?.name, templatedContent.replyTo?.email];
+    await this.client.query(query, values).catch((error) => {
+      logger.error(
+        { query, values, error },
+        "PgNotificationRepository_insertNotificationEmail_QueryErrored",
       );
-      await this.client.query(addRecipientsCcQuery);
+      throw error;
+    });
+  }
+
+  private async insertEmailRecipients(
+    recipientKind: "to" | "cc",
+    { id, templatedContent }: EmailNotification,
+  ) {
+    const values = recipientsByKind(id, recipientKind, templatedContent);
+    if (values.length > 0) {
+      const query = `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L`;
+      await this.client.query(format(query, values)).catch((error) => {
+        logger.error(
+          { query, values, error },
+          `PgNotificationRepository_insertEmailRecipients_${recipientKind}_QueryErrored`,
+        );
+        throw error;
+      });
     }
   }
 
@@ -251,3 +263,15 @@ const buildEmailNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
               'params', params
             )
         ))`;
+
+const recipientsByKind = (
+  id: NotificationId,
+  recipientKind: "to" | "cc",
+  { recipients, cc }: TemplatedEmail,
+): [id: NotificationId, recipient: string, recipientkind: "to" | "cc"][] => {
+  if (recipientKind === "to")
+    return recipients.map((recipient) => [id, recipient, recipientKind]);
+  if (recipientKind === "cc" && cc)
+    return cc.map((ccRecipient) => [id, ccRecipient, recipientKind]);
+  return [];
+};

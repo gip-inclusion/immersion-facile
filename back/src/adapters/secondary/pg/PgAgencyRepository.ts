@@ -146,16 +146,21 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    const query = format(
-      `SELECT id, name, status, kind, counsellor_emails, validator_emails,
-        admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
-        street_number_and_address, post_code, city, department_code, agency_siret, code_safir
-      FROM agencies
-      WHERE id IN (%L)`,
-      ids,
-    );
+    const query = `SELECT id, name, status, kind, counsellor_emails, validator_emails,
+    admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
+    street_number_and_address, post_code, city, department_code, agency_siret, code_safir
+  FROM agencies
+  WHERE id IN (%L)`;
 
-    const pgResult = await this.client.query(query);
+    const pgResult = await this.client
+      .query(format(query, ids))
+      .catch((error) => {
+        logger.error(
+          { query, values: ids, error },
+          "PgAgencyRepository_getByIds_QueryErrored",
+        );
+        throw error;
+      });
 
     if (pgResult.rows.length === 0) return [];
     return pgResult.rows.map(persistenceAgencyToAgencyDto);
