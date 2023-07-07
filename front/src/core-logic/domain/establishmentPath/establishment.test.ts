@@ -1,4 +1,9 @@
-import { expectObjectsToMatch, SiretDto, SiretEstablishmentDto } from "shared";
+import {
+  expectObjectsToMatch,
+  LegacyHttpClientError,
+  SiretDto,
+  SiretEstablishmentDto,
+} from "shared";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
@@ -47,6 +52,7 @@ describe("Establishment", () => {
       establishment: {
         status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
         isLoading: false,
+        feedback: { kind: "idle" },
       },
     }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
@@ -61,6 +67,7 @@ describe("Establishment", () => {
       establishment: {
         status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
         isLoading: false,
+        feedback: { kind: "idle" },
       },
       featureFlags: {
         ...makeStubFeatureFlags({ enableInseeApi: false }),
@@ -75,7 +82,11 @@ describe("Establishment", () => {
   });
 
   it("send modification link", () => {
-    expectEstablishmentStateToMatch({ isLoading: false, status: "IDLE" });
+    expectEstablishmentStateToMatch({
+      isLoading: false,
+      status: "IDLE",
+      feedback: { kind: "idle" },
+    });
     store.dispatch(
       establishmentSlice.actions.sendModificationLinkRequested("siret-123"),
     );
@@ -86,9 +97,36 @@ describe("Establishment", () => {
     expectEstablishmentStateToMatch({
       isLoading: false,
       status: "LINK_SENT",
+      feedback: { kind: "success" },
     });
-    expect(establishmentSelectors.wasModifyLinkSent(store.getState())).toBe(
+    expect(establishmentSelectors.sendLinkSucceeded(store.getState())).toBe(
       true,
+    );
+  });
+
+  it("handle send modification link error", () => {
+    const errorMessage = "Error sending modification link";
+    expectEstablishmentStateToMatch({
+      isLoading: false,
+      status: "IDLE",
+      feedback: { kind: "idle" },
+    });
+    store.dispatch(
+      establishmentSlice.actions.sendModificationLinkRequested("siret-123"),
+    );
+    expectEstablishmentStateToMatch({ isLoading: true });
+    dependencies.establishmentGateway.establishmentModificationResponse$.error(
+      new LegacyHttpClientError(errorMessage, new Error(), 400, {
+        errors: errorMessage,
+      }),
+    );
+    expectEstablishmentStateToMatch({
+      isLoading: false,
+      status: "ERRORED",
+      feedback: { kind: "errored", errorMessage },
+    });
+    expect(establishmentSelectors.sendLinkSucceeded(store.getState())).toBe(
+      false,
     );
   });
 

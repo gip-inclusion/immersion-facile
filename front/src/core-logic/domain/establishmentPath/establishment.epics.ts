@@ -1,9 +1,11 @@
 import { filter, map, switchMap, tap } from "rxjs";
+import { LegacyHttpClientError } from "shared";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import {
   SiretAction,
   siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -22,6 +24,11 @@ const requestEstablishmentModification: AppEpic<EstablishmentAction> = (
       establishmentGateway.requestEstablishmentModification$(action.payload),
     ),
     map(establishmentSlice.actions.sendModificationLinkSucceeded),
+    catchEpicError((error) =>
+      establishmentSlice.actions.sendModificationLinkFailed(
+        (error as LegacyHttpClientError).data.errors,
+      ),
+    ),
   );
 
 const redirectToEstablishmentFormPageEpic: AppEpic<

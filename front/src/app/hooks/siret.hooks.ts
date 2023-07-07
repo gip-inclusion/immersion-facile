@@ -105,7 +105,10 @@ export const useEstablishmentSiret = (
   const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
 
   const modifyLinkWasSent = useAppSelector(
-    establishmentSelectors.wasModifyLinkSent,
+    establishmentSelectors.sendLinkSucceeded,
+  );
+  const sendLinkFeedback = useAppSelector(
+    establishmentSelectors.sendLinkFeedback,
   );
   return {
     currentSiret,
@@ -116,5 +119,6 @@ export const useEstablishmentSiret = (
     updateSiret,
     sendModifyEstablishmentLink,
     modifyLinkWasSent,
+    sendLinkFeedback,
   };
 };
