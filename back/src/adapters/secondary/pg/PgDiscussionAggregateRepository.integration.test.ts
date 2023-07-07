@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
@@ -12,6 +13,7 @@ const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
   romeLabel: "Stylisme",
   appellationCode: "19540",
+
   appellationLabel: "Styliste",
 };
 
@@ -50,10 +52,14 @@ describe("PgDiscussionAggregateRepository", () => {
     await pool.end();
   });
 
+  const discussionCreatedAt = new Date("2023-07-07");
+
   it.each([
     {
       discussionAggregate: new DiscussionAggregateBuilder()
         .withSiret(siret)
+        .withCreatedAt(discussionCreatedAt)
+
         .build(),
       testName: "discussion with exchange",
     },
@@ -61,11 +67,12 @@ describe("PgDiscussionAggregateRepository", () => {
       discussionAggregate: new DiscussionAggregateBuilder()
         .withSiret(siret)
         .withExchanges([])
+        .withCreatedAt(discussionCreatedAt)
         .build(),
       testName: "discussion without exchange",
     },
   ])(
-    "Methode insert, update and getById, $testName",
+    "Methode insert, update, getById and hasDiscussionMatching $testName",
     async ({ discussionAggregate }) => {
       expectToEqual(
         await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
@@ -106,6 +113,26 @@ describe("PgDiscussionAggregateRepository", () => {
         await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
         updatedDiscussionAggregate2,
       );
+
+      expect(
+        await pgDiscussionAggregateRepository.hasDiscussionMatching({
+          siret: discussionAggregate.siret,
+          appellationCode: discussionAggregate.appellationCode,
+          potentialBeneficiaryEmail:
+          discussionAggregate.potentialBeneficiary.email,
+          since: discussionCreatedAt,
+        }),
+      ).toBe(true);
+
+      expect(
+        await pgDiscussionAggregateRepository.hasDiscussionMatching({
+          siret: discussionAggregate.siret,
+          appellationCode: discussionAggregate.appellationCode,
+          potentialBeneficiaryEmail:
+          discussionAggregate.potentialBeneficiary.email,
+          since: addDays(discussionCreatedAt, 1),
+        }),
+      ).toBe(false);
     },
   );
 

@@ -1,6 +1,13 @@
 import { AppellationCode, DiscussionId, Email, SiretDto } from "shared";
 import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 
+export type HasDiscussionMatchingParams = {
+  siret: SiretDto;
+  appellationCode: AppellationCode;
+  potentialBeneficiaryEmail: Email;
+  since: Date;
+};
+
 export interface DiscussionAggregateRepository {
   insert: (discussionAggregate: DiscussionAggregate) => Promise<void>;
   update: (discussionAggregate: DiscussionAggregate) => Promise<void>;
@@ -11,10 +18,7 @@ export interface DiscussionAggregateRepository {
     siret: SiretDto,
     since: Date,
   ) => Promise<number>;
-  hasDiscussionMatching: (params: {
-    potentialBeneficiaryEmail: Email;
-    appellationCode: AppellationCode;
-    siret: SiretDto;
-    since: Date;
-  }) => Promise<boolean>;
+  hasDiscussionMatching: (
+    params: HasDiscussionMatchingParams,
+  ) => Promise<boolean>;
 }
