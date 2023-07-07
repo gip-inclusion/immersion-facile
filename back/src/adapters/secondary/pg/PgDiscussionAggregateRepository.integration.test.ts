@@ -119,7 +119,7 @@ describe("PgDiscussionAggregateRepository", () => {
           siret: discussionAggregate.siret,
           appellationCode: discussionAggregate.appellationCode,
           potentialBeneficiaryEmail:
-          discussionAggregate.potentialBeneficiary.email,
+            discussionAggregate.potentialBeneficiary.email,
           since: discussionCreatedAt,
         }),
       ).toBe(true);
@@ -129,7 +129,7 @@ describe("PgDiscussionAggregateRepository", () => {
           siret: discussionAggregate.siret,
           appellationCode: discussionAggregate.appellationCode,
           potentialBeneficiaryEmail:
-          discussionAggregate.potentialBeneficiary.email,
+            discussionAggregate.potentialBeneficiary.email,
           since: addDays(discussionCreatedAt, 1),
         }),
       ).toBe(false);
