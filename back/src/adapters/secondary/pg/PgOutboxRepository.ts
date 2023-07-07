@@ -77,14 +77,14 @@ export class PgOutboxRepository implements OutboxRepository {
     const query = `INSERT INTO outbox(
         id, occurred_at, was_quarantined, topic, payload
       ) VALUES($1, $2, $3, $4, $5)`;
-
-    await this.client.query(query, [
-      id,
-      occurredAt,
-      wasQuarantined,
-      topic,
-      payload,
-    ]);
+    const values = [id, occurredAt, wasQuarantined, topic, payload];
+    await this.client.query(query, values).catch((error) => {
+      logger.error(
+        { query, values, error },
+        "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
+      );
+      throw error;
+    });
 
     return { ...event, publications: [] }; // publications will be added after in process
   }
