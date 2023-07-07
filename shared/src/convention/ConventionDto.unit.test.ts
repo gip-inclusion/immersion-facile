@@ -417,26 +417,51 @@ describe("conventionDtoSchema", () => {
     });
   });
 
-  it("rejects when beneficiary age is under 16yr with internship kind 'immersion'", () => {
-    const immersionStartDate = new Date("2022-01-01");
-    const beneficiary: Beneficiary<"immersion"> = {
-      birthdate: addDays(subYears(immersionStartDate, 16), 1).toISOString(),
-      email: "a@a.com",
-      firstName: "sdfgf",
-      lastName: "sdfs",
-      phone: "0011223344",
-      role: "beneficiary",
-      isRqth: false,
-    };
+  describe("when beneficiary is too young", () => {
+    it('rejects when beneficiary age is under 16yr with internship kind "immersion"', () => {
+      const immersionStartDate = new Date("2022-01-01");
+      const beneficiary: Beneficiary<"immersion"> = {
+        birthdate: addDays(subYears(immersionStartDate, 16), 1).toISOString(),
+        email: "a@a.com",
+        firstName: "sdfgf",
+        lastName: "sdfs",
+        phone: "0011223344",
+        role: "beneficiary",
+        isRqth: false,
+      };
 
-    const convention = new ConventionDtoBuilder()
-      .withInternshipKind("immersion")
-      .withDateStart(immersionStartDate.toISOString())
-      .withDateEnd(new Date("2022-01-02").toISOString())
-      .withBeneficiary(beneficiary)
-      .build();
+      const convention = new ConventionDtoBuilder()
+        .withInternshipKind("immersion")
+        .withDateStart(immersionStartDate.toISOString())
+        .withDateEnd(new Date("2022-01-02").toISOString())
+        .withBeneficiary(beneficiary)
+        .build();
 
-    expectConventionDtoToBeInvalid(convention);
+      expectConventionDtoToBeInvalid(convention);
+    });
+
+    it('rejects when beneficiary age is under 14yr with internship kind "mini-stage-cci"', () => {
+      const immersionStartDate = new Date("2022-01-01");
+      const beneficiary: Beneficiary<"mini-stage-cci"> = {
+        levelOfEducation: "Terminale",
+        birthdate: addDays(subYears(immersionStartDate, 14), 1).toISOString(),
+        email: "a@a.com",
+        firstName: "sdfgf",
+        lastName: "sdfs",
+        phone: "0011223344",
+        role: "beneficiary",
+      };
+
+      const convention = new ConventionDtoBuilder()
+        .withInternshipKind("mini-stage-cci")
+        .withDateStart(immersionStartDate.toISOString())
+        .withDateEnd(new Date("2022-01-02").toISOString())
+        .withSchedule(reasonableSchedule)
+        .withBeneficiary(beneficiary)
+        .build();
+
+      expectConventionDtoToBeInvalid(convention);
+    });
   });
 });
 
