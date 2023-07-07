@@ -20,7 +20,10 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../../adapters/primary/helpers/httpErrors";
 import {
   ConventionReminderPayload,
   conventionReminderPayloadSchema,
@@ -103,7 +106,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(conventionRead.status))
-      throw new Error(forbiddenUnsupportedStatusMessage(conventionRead, kind));
+      throw new ForbiddenError(
+        forbiddenUnsupportedStatusMessage(conventionRead, kind),
+      );
 
     const signatories = Object.values(conventionRead.signatories);
 
@@ -188,7 +193,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (conventionRead.status !== "IN_REVIEW")
-      throw new Error(
+      throw new ForbiddenError(
         forbiddenUnsupportedStatusMessage(conventionRead, reminderKind),
       );
     await Promise.all(

@@ -56,7 +56,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
         ? `Found only : ${agencies.map((agency) => agency.id).join(", ")}.`
         : "No agencies found.";
 
-      throw new BadRequestError(
+      throw new NotFoundError(
         [
           `Some agencies not found with ids : ${agencyIds.join(", ")}. `,
           agenciesFoundMessage,
