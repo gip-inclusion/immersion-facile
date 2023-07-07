@@ -43,8 +43,14 @@ export const createEstablishmentMagicLinkPayload = ({
   };
 };
 
-export const stringToMd5 = (str: string) =>
-  crypto.createHash("md5").update(str).digest("hex");
+export const stringToMd5 = (str: string) => {
+  try {
+    return crypto.createHash("md5").update(str).digest("hex");
+  } catch (error) {
+    Error.captureStackTrace(error as Error);
+    throw error;
+  }
+};
 
 export type CreateConventionMagicLinkPayloadProperties = {
   id: ConventionId;
