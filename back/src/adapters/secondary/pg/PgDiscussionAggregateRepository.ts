@@ -5,7 +5,10 @@ import {
   DiscussionAggregate,
   ExchangeEntity,
 } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
-import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
+import {
+  DiscussionAggregateRepository,
+  HasDiscussionMatchingParams,
+} from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -147,6 +150,25 @@ export class PgDiscussionAggregateRepository
     return parseInt(pgResult.rows[0].count);
   }
 
+  public async hasDiscussionMatching({
+    siret,
+    appellationCode,
+    potentialBeneficiaryEmail,
+    since,
+  }: HasDiscussionMatchingParams): Promise<boolean> {
+    const result = await this.client.query(
+      `
+        SELECT EXISTS (SELECT 1 FROM discussions 
+            WHERE siret = $1
+                AND appellation_code = $2
+                AND potential_beneficiary_email = $3
+                AND created_at >= $4)`,
+      [siret, appellationCode, potentialBeneficiaryEmail, since.toISOString()],
+    );
+
+    return result.rows[0].exists;
+  }
+
   private async insertAllExchanges(
     discussionId: DiscussionId,
     exchanges: ExchangeEntity[],
@@ -164,7 +186,7 @@ export class PgDiscussionAggregateRepository
     `;
     // prettier-ignore
     const values = exchanges.map(
-      ({ message, recipient, sender, sentAt, subject }) => 
+      ({ message, recipient, sender, sentAt, subject }) =>
       [ discussionId, message, sender, recipient, sentAt.toISOString(), subject],
     );
     await this.executeQuery("insertAllExchanges", format(query, values));
