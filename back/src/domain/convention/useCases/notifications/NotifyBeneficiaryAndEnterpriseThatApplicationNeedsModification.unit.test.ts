@@ -1,4 +1,5 @@
 import {
+  AbsoluteUrl,
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   CreateConventionMagicLinkPayloadProperties,
@@ -22,6 +23,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
@@ -30,18 +32,21 @@ import {
   NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification,
 } from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
+const beneficiaryCurrentEmployerEmail = "current@employer.com";
+const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
+
 const convention = new ConventionDtoBuilder()
   .withBeneficiaryRepresentative({
     firstName: "Tom",
     lastName: "Cruise",
     phone: "0665454271",
     role: "beneficiary-representative",
-    email: "beneficiary@representative.fr",
+    email: beneficiaryRepresentativeEmail,
   })
   .withBeneficiaryCurrentEmployer({
     businessName: "boss",
     role: "beneficiary-current-employer",
-    email: "current@employer.com",
+    email: beneficiaryCurrentEmployerEmail,
     phone: "001223344",
     firstName: "Harry",
     lastName: "Potter",
@@ -51,7 +56,11 @@ const convention = new ConventionDtoBuilder()
   })
   .build();
 
-const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
+const agency = new AgencyDtoBuilder()
+  .withCounsellorEmails(["a@a.com", "b@b.com"])
+  .withValidatorEmails(["c@c.com", "d@d.com"])
+  .withId(convention.agencyId)
+  .build();
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {
   let usecase: NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification;
@@ -91,44 +100,32 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   });
 
   describe("Right paths", () => {
-    it.each<[Role, string | undefined]>([
-      ["beneficiary", convention.signatories.beneficiary.email],
+    it.each<[Role, string[]]>([
+      ["beneficiary", [convention.signatories.beneficiary.email]],
       [
         "establishment",
-        convention.signatories.establishmentRepresentative.email,
+        [convention.signatories.establishmentRepresentative.email],
       ],
       [
         "establishment-representative",
-        convention.signatories.establishmentRepresentative.email,
+        [convention.signatories.establishmentRepresentative.email],
       ],
-      [
-        "beneficiary-current-employer",
-        convention.signatories.beneficiaryCurrentEmployer?.email,
-      ],
-      [
-        "beneficiary-representative",
-        convention.signatories.beneficiaryRepresentative?.email,
-      ],
-      [
-        "legal-representative",
-        convention.signatories.beneficiaryRepresentative?.email,
-      ],
-      ["counsellor", agency.counsellorEmails[0]],
-      ["validator", agency.validatorEmails[0]],
-      ["backOffice", backOfficeEmail],
+      ["beneficiary-current-employer", [beneficiaryCurrentEmployerEmail]],
+      ["beneficiary-representative", [beneficiaryRepresentativeEmail]],
+      ["legal-representative", [beneficiaryRepresentativeEmail]],
+      ["counsellor", agency.counsellorEmails],
+      ["validator", agency.validatorEmails],
+      ["backOffice", [backOfficeEmail]],
     ])(
       "Notify %s that application needs modification.",
-      async (role, expectedRecipient) => {
-        const shortLinkIds = ["shortLinkId1", "shortLinkId2"];
-        shortLinkIdGateway.addMoreShortLinkIds(shortLinkIds);
+      async (role, expectedRecipients) => {
+        shortLinkIdGateway.addMoreShortLinkIds(
+          expectedRecipients.flatMap((expectedRecipient) => [
+            `shortLinkId_${expectedRecipient}_1`,
+            `shortLinkId_${expectedRecipient}_2`,
+          ]),
+        );
         const justification = "Change required.";
-        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
-          {
-            id: convention.id,
-            role,
-            email: expectedRecipient!,
-            now: timeGateway.now(),
-          };
 
         await usecase.execute({
           convention,
@@ -136,38 +133,55 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
           roles: [role],
         });
 
-        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionImmersionRoute,
-          }),
-          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionStatusDashboard,
-          }),
-        });
+        const shortLinks = expectedRecipients.reduce<
+          Partial<Record<ShortLinkId, AbsoluteUrl>>
+        >((prev, expectedRecipient, _) => {
+          const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+            {
+              id: convention.id,
+              role,
+              email: expectedRecipient,
+              now: timeGateway.now(),
+            };
+          return {
+            ...prev,
+            [`shortLinkId_${expectedRecipient}_1`]: fakeGenerateMagicLinkUrlFn({
+              ...magicLinkCommonFields,
+              targetRoute: frontRoutes.conventionImmersionRoute,
+            }),
+            [`shortLinkId_${expectedRecipient}_2`]: fakeGenerateMagicLinkUrlFn({
+              ...magicLinkCommonFields,
+              targetRoute: frontRoutes.conventionStatusDashboard,
+            }),
+          };
+        }, {});
+
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), shortLinks);
 
         expectSavedNotificationsAndEvents({
-          emails: [
-            {
-              kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-              recipients: [expectedRecipient!],
-              params: {
-                conventionId: convention.id,
-                internshipKind: convention.internshipKind,
-                beneficiaryFirstName:
-                  convention.signatories.beneficiary.firstName,
-                beneficiaryLastName:
-                  convention.signatories.beneficiary.lastName,
-                businessName: convention.businessName,
-                justification,
-                magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
-                signature: agency.signature,
-                agencyLogoUrl: agency.logoUrl,
-              },
+          emails: expectedRecipients.map((expectedRecipient) => ({
+            kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+            recipients: [expectedRecipient],
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              businessName: convention.businessName,
+              justification,
+              magicLink: makeShortLinkUrl(
+                config,
+                `shortLinkId_${expectedRecipient}_1`,
+              ),
+              conventionStatusLink: makeShortLinkUrl(
+                config,
+                `shortLinkId_${expectedRecipient}_2`,
+              ),
+              signature: agency.signature,
+              agencyLogoUrl: agency.logoUrl,
             },
-          ],
+          })),
         });
       },
     );
@@ -184,9 +198,42 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
             justification,
             roles: [role],
           }),
-          `Unsupported role for beneficiary/enterprise modification request notification: ${role}`,
+          `Unsupported role ${role}`,
         );
       },
     );
+    it("Agency without counsellors", async () => {
+      const role: Role = "counsellor";
+      const agencyWithoutCounsellors = new AgencyDtoBuilder(agency)
+        .withCounsellorEmails([])
+        .build();
+      uow.agencyRepository.setAgencies([agencyWithoutCounsellors]);
+
+      await expectPromiseToFailWith(
+        usecase.execute({
+          convention,
+          justification: "OSEF",
+          roles: [role],
+        }),
+        `No actor with role ${role} for agency ${agencyWithoutCounsellors.id}`,
+      );
+    });
+
+    it("Agency without validators", async () => {
+      const role: Role = "validator";
+      const agencyWithoutValidators = new AgencyDtoBuilder(agency)
+        .withValidatorEmails([])
+        .build();
+      uow.agencyRepository.setAgencies([agencyWithoutValidators]);
+
+      await expectPromiseToFailWith(
+        usecase.execute({
+          convention,
+          justification: "OSEF",
+          roles: [role],
+        }),
+        `No actor with role ${role} for agency ${agencyWithoutValidators.id}`,
+      );
+    });
   });
 });
