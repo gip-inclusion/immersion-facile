@@ -1,3 +1,4 @@
+import subDays from "date-fns/subDays";
 import {
   AppellationAndRomeDto,
   ContactEstablishmentRequestDto,
@@ -6,6 +7,7 @@ import {
   expectToEqual,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
+import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
@@ -15,6 +17,7 @@ import {
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
+  ConflictError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -93,6 +96,7 @@ describe("ContactEstablishment", () => {
       createNewEvent,
       uuidGenerator,
       timeGateway,
+      3,
     );
   });
 
@@ -376,93 +380,128 @@ describe("ContactEstablishment", () => {
     ).toBe(false);
   });
 
-  it("throws BadRequestError for contact mode mismatch", async () => {
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder().withSiret(siret).build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId("wrong_contact_id")
-            .withContactMethod("EMAIL")
-            .build(),
-        )
-        .withImmersionOffers([immersionOffer])
-        .build(),
-    ]);
+  describe("Wrong paths", () => {
+    it("throws ConflictError if a recent contact requests already exists for the same potential beneficiary email, siret and appellation", async () => {
+      const establishmentAggregate = establishmentAggregateWithEmailContact
+        .withEstablishmentSiret(validEmailRequest.siret)
+        .build();
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+        establishmentAggregate,
+      ]);
 
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validRequest,
-        contactMode: "IN_PERSON",
-      }),
-      new BadRequestError(
-        "Contact mode mismatch: IN_PERSON in params. In contact (fetched with siret) : EMAIL",
-      ),
-    );
-  });
+      const contactDate = new Date("2022-01-01T12:00:00.000Z");
+      timeGateway.setNextDate(contactDate);
 
-  it("throws NotFoundError without contact id", async () => {
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder().withSiret(siret).build(),
-        )
-        .withoutContact() // no contact
-        .withImmersionOffers([immersionOffer])
-        .build(),
-    ]);
+      uow.discussionAggregateRepository.discussionAggregates = [
+        new DiscussionAggregateBuilder()
+          .withAppellationCode(validEmailRequest.appellationCode)
+          .withSiret(validEmailRequest.siret)
+          .withPotentialBeneficiary({
+            email: validEmailRequest.potentialBeneficiaryEmail,
+          })
+          .withCreatedAt(subDays(contactDate, 2))
+          .build(),
+      ];
 
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validRequest,
-        contactMode: "PHONE",
-      }),
-      new NotFoundError(
-        `No contact found for establishment with siret: 11112222333344`,
-      ),
-    );
-  });
+      const discussionId = "someDiscussionUuid";
+      uuidGenerator.setNextUuid(discussionId);
 
-  it("throws NotFoundError when no establishments found with given siret", async () => {
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validRequest,
-        contactMode: "PHONE",
-      }),
-      new NotFoundError(`11112222333344`),
-    );
-  });
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute(validEmailRequest),
+        new ConflictError(
+          `A contact request already exists for siret ${validEmailRequest.siret} and appellation ${validEmailRequest.appellationCode}, and this potential beneficiary email.`,
+        ),
+      );
+    });
 
-  it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder().withSiret(siret).build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId("wrong_contact_id")
-            .withContactMethod("PHONE")
-            .build(),
-        )
-        .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder()
-            .withAppellationCode("wrong")
-            .build(),
-        ])
-        .build(),
-    ]);
+    it("throws BadRequestError for contact mode mismatch", async () => {
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder().withSiret(siret).build(),
+          )
+          .withContact(
+            new ContactEntityBuilder()
+              .withId("wrong_contact_id")
+              .withContactMethod("EMAIL")
+              .build(),
+          )
+          .withImmersionOffers([immersionOffer])
+          .build(),
+      ]);
 
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validRequest,
-        contactMode: "PHONE",
-      }),
-      new BadRequestError(
-        `Establishment with siret '${validRequest.siret}' doesn't have an immersion offer with appellation code '${validRequest.appellationCode}'.`,
-      ),
-    );
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validRequest,
+          contactMode: "IN_PERSON",
+        }),
+        new BadRequestError(
+          "Contact mode mismatch: IN_PERSON in params. In contact (fetched with siret) : EMAIL",
+        ),
+      );
+    });
+
+    it("throws NotFoundError without contact id", async () => {
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder().withSiret(siret).build(),
+          )
+          .withoutContact() // no contact
+          .withImmersionOffers([immersionOffer])
+          .build(),
+      ]);
+
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validRequest,
+          contactMode: "PHONE",
+        }),
+        new NotFoundError(
+          `No contact found for establishment with siret: 11112222333344`,
+        ),
+      );
+    });
+
+    it("throws NotFoundError when no establishments found with given siret", async () => {
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validRequest,
+          contactMode: "PHONE",
+        }),
+        new NotFoundError(`11112222333344`),
+      );
+    });
+
+    it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder().withSiret(siret).build(),
+          )
+          .withContact(
+            new ContactEntityBuilder()
+              .withId("wrong_contact_id")
+              .withContactMethod("PHONE")
+              .build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withAppellationCode("wrong")
+              .build(),
+          ])
+          .build(),
+      ]);
+
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validRequest,
+          contactMode: "PHONE",
+        }),
+        new BadRequestError(
+          `Establishment with siret '${validRequest.siret}' doesn't have an immersion offer with appellation code '${validRequest.appellationCode}'.`,
+        ),
+      );
+    });
   });
 });

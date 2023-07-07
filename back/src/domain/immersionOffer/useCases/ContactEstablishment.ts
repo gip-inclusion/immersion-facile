@@ -5,6 +5,7 @@ import {
 } from "shared";
 import {
   BadRequestError,
+  ConflictError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
@@ -26,6 +27,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     private readonly createNewEvent: CreateNewEvent,
     private readonly uuidGenerator: UuidGenerator,
     private readonly timeGateway: TimeGateway,
+    private readonly minimumNumberOfDaysBetweenSimilarContactRequests: number,
   ) {
     super(uowPerformer);
   }
@@ -54,6 +56,22 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     if (contactMode !== establishmentContact.contactMethod)
       throw new BadRequestError(
         `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentContact.contactMethod}`,
+      );
+
+    const similarDiscussionAlreadyExits =
+      await uow.discussionAggregateRepository.hasDiscussionMatching({
+        siret: contactRequest.siret,
+        appellationCode: contactRequest.appellationCode,
+        potentialBeneficiaryEmail: contactRequest.potentialBeneficiaryEmail,
+        since: subDays(
+          now,
+          this.minimumNumberOfDaysBetweenSimilarContactRequests,
+        ),
+      });
+
+    if (similarDiscussionAlreadyExits)
+      throw new ConflictError(
+        `A contact request already exists for siret ${contactRequest.siret} and appellation ${contactRequest.appellationCode}, and this potential beneficiary email.`,
       );
 
     const appellationLabel = establishmentAggregate.immersionOffers.find(
