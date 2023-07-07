@@ -4,6 +4,7 @@ import {
   CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
   Role,
+  TemplatedEmail,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -47,94 +48,114 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     }
 
     for (const role of roles) {
-      const email = emailByRoleForConventionNeedsModification(
-        role,
-        convention,
-        agency,
-      );
-      if (email instanceof Error) throw email;
-
-      const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
-        {
-          id: convention.id,
-          role,
-          email,
-          now: this.timeGateway.now(),
-          // UGLY : need to rework, handling of JWT payloads
-          ...(role === "backOffice"
-            ? { sub: this.config.backofficeUsername }
-            : {}),
-        };
-
-      const makeShortMagicLink = prepareMagicShortLinkMaker({
-        config: this.config,
-        conventionMagicLinkPayload,
-        generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-        shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
-        uow,
-      });
-
-      await this.saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: {
-          kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-          recipients: [email],
-          params: {
-            conventionId: convention.id,
-            internshipKind: convention.internshipKind,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            businessName: convention.businessName,
+      const recipientsOrError = recipientsByRole(role, convention, agency);
+      if (recipientsOrError instanceof Error) throw recipientsOrError;
+      for (const recipient of recipientsOrError) {
+        await this.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: await this.prepareEmail(
+            convention,
+            role,
+            recipient,
+            uow,
             justification,
-            signature: agency.signature,
-            magicLink: await makeShortMagicLink(
-              frontRoutes.conventionImmersionRoute,
-            ),
-            conventionStatusLink: await makeShortMagicLink(
-              frontRoutes.conventionStatusDashboard,
-            ),
-            agencyLogoUrl: agency.logoUrl,
+            agency,
+          ),
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
           },
-        },
-        followedIds: {
-          conventionId: convention.id,
-          agencyId: convention.agencyId,
-          establishmentSiret: convention.siret,
-        },
-      });
+        });
+      }
     }
+  }
+
+  private async prepareEmail(
+    convention: ConventionDto,
+    role: Role,
+    recipient: string,
+    uow: UnitOfWork,
+    justification: string,
+    agency: AgencyDto,
+  ): Promise<TemplatedEmail> {
+    const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
+      {
+        id: convention.id,
+        role,
+        email: recipient,
+        now: this.timeGateway.now(),
+        // UGLY : need to rework, handling of JWT payloads
+        ...(role === "backOffice"
+          ? { sub: this.config.backofficeUsername }
+          : {}),
+      };
+
+    const makeShortMagicLink = prepareMagicShortLinkMaker({
+      config: this.config,
+      conventionMagicLinkPayload,
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      uow,
+    });
+
+    return {
+      kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+      recipients: [recipient],
+      params: {
+        conventionId: convention.id,
+        internshipKind: convention.internshipKind,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        businessName: convention.businessName,
+        justification,
+        signature: agency.signature,
+        magicLink: await makeShortMagicLink(
+          frontRoutes.conventionImmersionRoute,
+        ),
+        conventionStatusLink: await makeShortMagicLink(
+          frontRoutes.conventionStatusDashboard,
+        ),
+        agencyLogoUrl: agency.logoUrl,
+      },
+    };
   }
 }
 
-const emailByRoleForConventionNeedsModification = (
+const recipientsByRole = (
   role: Role,
   convention: ConventionDto,
   agency: AgencyDto,
-): string | Error => {
-  const error = new Error(
-    `Unsupported role for beneficiary/enterprise modification request notification: ${role}`,
-  );
-  const missingEmailError = new Error(
-    `No actor with role ${role} for convention ${convention.id}`,
-  );
-  const strategy: Record<Role, string | Error> = {
-    backOffice: backOfficeEmail,
+): string[] | Error => {
+  const unsupportedErrorMessage = `Unsupported role ${role}`;
+  const missingActorConventionErrorMessage = `No actor with role ${role} for convention ${convention.id}`;
+  const missingActorAgencyErrorMessage = `No actor with role ${role} for agency ${agency.id}`;
+
+  const strategy: Record<Role, string | string[] | Error> = {
     "beneficiary-current-employer":
       convention.signatories.beneficiaryCurrentEmployer?.email ??
-      missingEmailError,
+      new Error(missingActorConventionErrorMessage),
     "beneficiary-representative":
       convention.signatories.beneficiaryRepresentative?.email ??
-      missingEmailError,
-    "establishment-tutor": error,
+      new Error(missingActorConventionErrorMessage),
+    "establishment-tutor": new Error(unsupportedErrorMessage),
     "legal-representative":
       convention.signatories.beneficiaryRepresentative?.email ??
-      missingEmailError,
-    counsellor: agency.counsellorEmails[0],
-    validator: agency.validatorEmails[0],
+      new Error(missingActorConventionErrorMessage),
     "establishment-representative":
       convention.signatories.establishmentRepresentative.email,
     establishment: convention.signatories.establishmentRepresentative.email,
     beneficiary: convention.signatories.beneficiary.email,
+    counsellor:
+      agency.counsellorEmails.length > 0
+        ? agency.counsellorEmails
+        : new Error(missingActorAgencyErrorMessage),
+    validator:
+      agency.validatorEmails.length > 0
+        ? agency.validatorEmails
+        : new Error(missingActorAgencyErrorMessage),
+    backOffice: backOfficeEmail,
   };
-  return strategy[role];
+  const result = strategy[role];
+  return Array.isArray(result) || result instanceof Error ? result : [result];
 };
