@@ -681,7 +681,8 @@ export class PgEstablishmentAggregateRepository
                 ), 
                 'isActive', e.is_active, 
                 'isSearchable', e.is_searchable, 
-                'isCommited', e.is_commited, 
+                'isCommited', e.is_commited,
+                'fitForDisabledWorkers', e.fit_for_disabled_workers,
                 'maxContactsPerWeek', e.max_contacts_per_week
               ), 
               'immersionOffers', io.immersionOffers, 

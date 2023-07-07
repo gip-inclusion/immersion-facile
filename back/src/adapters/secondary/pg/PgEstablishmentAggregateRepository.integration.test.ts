@@ -1053,6 +1053,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withSiret(siret)
+              .withFitForDisabledWorkers(true)
               .withUpdatedAt(new Date("2020-01-05T23:00:00"))
               .build(),
           )
@@ -1065,6 +1066,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             new ImmersionOfferEntityV2Builder().withRomeCode("A1402").build(), // No appellation
           ])
           .build();
+
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           establishmentAggregate,
         ]);
