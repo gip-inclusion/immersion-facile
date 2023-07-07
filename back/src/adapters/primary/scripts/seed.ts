@@ -80,16 +80,16 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
 
   const cciAgency = new AgencyDtoBuilder()
     .withId(cciAgencyId)
-    .withName("CCI Bordeaux")
+    .withName("CCI Carnac")
     .withQuestionnaireUrl("https://questionnaire.seed")
     .withSignature("Seed signature")
     .withKind("cci")
     .withStatus("active")
     .withAddress({
-      city: "Paris",
-      departmentCode: "75",
-      postcode: "75001",
-      streetNumberAndAddress: "1 rue de Rivoli",
+      city: "Plouharnel",
+      departmentCode: "56",
+      postcode: "56340",
+      streetNumberAndAddress: "5 Kerhueno",
     })
     .build();
 
