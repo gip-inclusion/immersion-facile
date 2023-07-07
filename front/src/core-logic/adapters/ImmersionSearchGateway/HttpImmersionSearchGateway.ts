@@ -6,8 +6,11 @@ import {
   SearchImmersionResultDto,
   SearchTargets,
 } from "shared";
-import { HttpClient } from "http-client";
-import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
+import { HttpClient, HttpResponse } from "http-client";
+import {
+  ContactErrorKind,
+  ImmersionSearchGateway,
+} from "src/core-logic/ports/ImmersionSearchGateway";
 
 export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   constructor(private readonly httpClient: HttpClient<SearchTargets>) {}
@@ -26,10 +29,19 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
 
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
-  ): Promise<void> {
-    await this.httpClient.contactEstablishment({
-      body: params,
-    });
+  ): Promise<void | ContactErrorKind> {
+    const response = await this.httpClient
+      .contactEstablishment({
+        body: params,
+      })
+      .catch((error): HttpResponse<string> | never => {
+        if (error.httpStatusCode) {
+          return { responseBody: error.message, status: error.httpStatusCode };
+        }
+        throw error;
+      });
+
+    if (response.status === 409) return "alreadyContactedRecently";
   }
 
   public async getGroupOffersBySlug(

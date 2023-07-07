@@ -6,13 +6,15 @@ import {
   SearchImmersionResultDto,
 } from "shared";
 
+export type ContactErrorKind = "alreadyContactedRecently";
+
 export interface ImmersionSearchGateway {
   search(
     searchParams: SearchImmersionQueryParamsDto,
   ): Observable<SearchImmersionResultDto[]>;
   contactEstablishment: (
     params: ContactEstablishmentRequestDto,
-  ) => Promise<void>;
+  ) => Promise<void | ContactErrorKind>;
   getGroupOffersBySlug(
     groupSlug: EstablishmentGroupSlug,
   ): Promise<SearchImmersionResultDto[]>;

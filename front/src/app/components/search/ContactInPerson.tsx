@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
@@ -11,6 +12,7 @@ import {
   domElementIds,
   SiretDto,
 } from "shared";
+import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { immersionSearchGateway } from "src/config/dependencies";
@@ -26,6 +28,7 @@ export const ContactInPerson = ({
   appellations,
   onSuccess,
 }: ContactInPersonProps) => {
+  const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const initialValues: ContactEstablishmentInPersonDto = {
     siret,
     appellationCode:
@@ -58,9 +61,11 @@ export const ContactInPerson = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentInPersonDto) => {
-    await immersionSearchGateway.contactEstablishment(values);
+    const errorKind = await immersionSearchGateway.contactEstablishment(values);
+    if (errorKind) return setActiveErrorKind(errorKind);
     onSuccess();
   };
+
   return (
     <form onSubmit={handleSubmit(onFormValid)}>
       <>
@@ -109,13 +114,21 @@ export const ContactInPerson = ({
         <Button
           priority="secondary"
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || activeError.isActive}
           nativeButtonProps={{
             id: domElementIds.search.contactInPersonButton,
           }}
         >
           Envoyer
         </Button>
+
+        {activeError.isActive && (
+          <Alert
+            severity="error"
+            title={activeError.title}
+            description={activeError.description}
+          />
+        )}
       </>
     </form>
   );

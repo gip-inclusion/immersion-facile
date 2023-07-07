@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
@@ -11,6 +12,7 @@ import {
   domElementIds,
   SiretDto,
 } from "shared";
+import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { immersionSearchGateway } from "src/config/dependencies";
@@ -26,6 +28,7 @@ export const ContactByPhone = ({
   appellations,
   onSuccess,
 }: ContactByPhoneProps) => {
+  const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const initialValues: ContactEstablishmentByPhoneDto = {
     siret,
     appellationCode:
@@ -59,7 +62,8 @@ export const ContactByPhone = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByPhoneDto) => {
-    await immersionSearchGateway.contactEstablishment(values);
+    const errorKind = await immersionSearchGateway.contactEstablishment(values);
+    if (errorKind) return setActiveErrorKind(errorKind);
     onSuccess();
   };
 
@@ -112,13 +116,21 @@ export const ContactByPhone = ({
         <Button
           priority="secondary"
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || activeError.isActive}
           nativeButtonProps={{
             id: domElementIds.search.contactByPhoneButton,
           }}
         >
           Envoyer
         </Button>
+
+        {activeError.isActive && (
+          <Alert
+            severity="error"
+            title={activeError.title}
+            description={activeError.description}
+          />
+        )}
       </>
     </form>
   );

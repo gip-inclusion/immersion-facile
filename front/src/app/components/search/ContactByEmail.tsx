@@ -14,6 +14,7 @@ import {
   domElementIds,
   SiretDto,
 } from "shared";
+import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { immersionSearchGateway } from "src/config/dependencies";
@@ -43,6 +44,8 @@ export const ContactByEmail = ({
   onSuccess,
   onClose,
 }: ContactByEmailProps) => {
+  const { activeError, setActiveErrorKind } = useContactEstablishmentError();
+
   const initialValues: ContactEstablishmentByMailDto = {
     siret,
     appellationCode:
@@ -80,10 +83,11 @@ export const ContactByEmail = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
-    await immersionSearchGateway.contactEstablishment({
+    const errorKind = await immersionSearchGateway.contactEstablishment({
       ...values,
       message: removeMotivationPlaceholder(values.message),
     });
+    if (errorKind) return setActiveErrorKind(errorKind);
     onSuccess();
   };
 
@@ -201,7 +205,7 @@ export const ContactByEmail = ({
               {
                 type: "submit",
                 priority: "primary",
-                disabled: isSubmitting,
+                disabled: isSubmitting || activeError.isActive,
                 nativeButtonProps: {
                   id: domElementIds.search.contactByMailButton,
                 },
@@ -209,6 +213,14 @@ export const ContactByEmail = ({
               },
             ]}
           />
+
+          {activeError.isActive && (
+            <Alert
+              severity="error"
+              title={activeError.title}
+              description={activeError.description}
+            />
+          )}
         </>
       </form>
     </FormProvider>

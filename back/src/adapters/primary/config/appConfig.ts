@@ -59,7 +59,7 @@ export class AppConfig {
     return parseInt(
       this.throwIfNotDefinedOrDefault(
         "MINIMUM_NUMBER_OF_DAYS_BETWEEN_SIMILAR_CONTACT_REQUESTS",
-        "3",
+        "7",
       ),
     );
   }
