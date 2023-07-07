@@ -78,6 +78,13 @@ export class EstablishmentEntityBuilder
     });
   }
 
+  withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      fitForDisabledWorkers,
+    });
+  }
+
   withIsActive(isActive: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
