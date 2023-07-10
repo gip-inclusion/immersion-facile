@@ -73,6 +73,8 @@ const establishmentAggregateWithEmailContact =
     )
     .withImmersionOffers([immersionOffer]);
 
+const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
+
 describe("ContactEstablishment", () => {
   let contactEstablishment: ContactEstablishment;
   let uowPerformer: UnitOfWorkPerformer;
@@ -96,7 +98,7 @@ describe("ContactEstablishment", () => {
       createNewEvent,
       uuidGenerator,
       timeGateway,
-      3,
+      minimumNumberOfDaysBetweenSimilarContactRequests,
     );
   });
 
@@ -409,7 +411,10 @@ describe("ContactEstablishment", () => {
       await expectPromiseToFailWithError(
         contactEstablishment.execute(validEmailRequest),
         new ConflictError(
-          `A contact request already exists for siret ${validEmailRequest.siret} and appellation ${validEmailRequest.appellationCode}, and this potential beneficiary email.`,
+          [
+            `A contact request already exists for siret ${validEmailRequest.siret} and appellation ${validEmailRequest.appellationCode}, and this potential beneficiary email.`,
+            `Minimum ${minimumNumberOfDaysBetweenSimilarContactRequests} days between two similar contact requests.`,
+          ].join("\n"),
         ),
       );
     });
