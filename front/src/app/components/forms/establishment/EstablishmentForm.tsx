@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  FormProvider,
-  SubmitHandler,
-  useForm,
-  useFormContext,
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -16,7 +11,6 @@ import { keys, values } from "ramda";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
 import {
-  addressDtoToString,
   AppellationAndRomeDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   defaultMaxContactsPerWeek,
@@ -28,30 +22,31 @@ import {
   immersionFacileContactEmail,
   noContactPerWeek,
   removeAtIndex,
-  SiretDto,
   toDotNotation,
 } from "shared";
 import { ErrorNotifications, Loader } from "react-design-system";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { defaultInitialValue } from "src/app/components/forms/establishment/defaultInitialValue";
+import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
+import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
-import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import {
+  formEstablishmentFieldsLabels,
+  mailtoHref,
+} from "src/app/contents/forms/establishment/formEstablishment";
 import {
   formErrorsToFlatErrors,
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
-import { useInitialSiret, useSiretFetcher } from "src/app/hooks/siret.hooks";
+import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {
+  createInitialFormValues,
+  defaultInitialValue,
   formEstablishmentDtoToFormEstablishmentQueryParams,
-  type FormEstablishmentParamsInUrl,
-  formEstablishmentQueryParamsToFormEstablishmentDto,
 } from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
 import { establishmentGateway } from "src/config/dependencies";
-import { ENV } from "src/config/environmentVariables";
 import { BusinessContact } from "./BusinessContact";
 import {
   emptyAppellation,
@@ -77,9 +72,8 @@ const getErrorsFromResponseData = (
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const route = useRoute() as RouteByMode[Mode];
-  const jwt = route.name !== "formEstablishment" ? route.params.jwt : "";
-  const isEstablishmentCreation =
-    route.name === "formEstablishment" && mode === "create";
+  const isEstablishmentCreation = route.name === "formEstablishment";
+  const jwt = !isEstablishmentCreation ? route.params.jwt : "";
   const siret =
     isEstablishmentCreation && route.params.siret ? route.params.siret : "";
   const source =
@@ -124,16 +118,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   useInitialSiret(siret);
   useEffect(() => {
     if (!isEstablishmentCreation) {
-      const formEstablishmentFromJwtRequest =
-        establishmentGateway.getFormEstablishmentFromJwt(
+      establishmentGateway
+        .getFormEstablishmentFromJwt(
           decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(jwt)
             .siret,
           jwt,
-        );
-      formEstablishmentFromJwtRequest
-        .then((formEstablishment) => {
-          reset(formEstablishment);
-        })
+        )
+        .then((formEstablishment) => reset(formEstablishment))
         .catch((error) =>
           routes
             .errorRedirect({
@@ -168,7 +159,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return (
       isEstablishmentCreation
         ? establishmentGateway.addFormEstablishment(data)
-        : establishmentGateway.updateFormEstablishment({ ...data }, jwt)
+        : establishmentGateway.updateFormEstablishment(data, jwt)
     )
       .then(() => {
         setIsSuccess(true);
@@ -358,7 +349,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               <p>
                 Vous pouvez demander la suppression définitive de votre
                 entreprise{" "}
-                <a href={mailtoHref(getValues().siret)}>en cliquant ici</a>
+                <a href={mailtoHref(formValues.siret)}>en cliquant ici</a>
               </p>
               <p>
                 Si vous avez besoin d'aide, envoyez-nous un email: <br />
@@ -406,226 +397,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           )}
         </form>
       </FormProvider>
-    </>
-  );
-};
-
-const lineBreak = "%0D%0A";
-const deleteEstablishmentSubject = "Demande de suppression d'entreprise";
-const deleteEstablishmentBody = (siret: SiretDto) =>
-  `Bonjour,${lineBreak}Je souhaite supprimer les données de mon entreprise dont le numéro de SIRET est ${siret}.${lineBreak}Cordialement.`;
-const mailtoHref = (siret: SiretDto) =>
-  `mailto:${immersionFacileContactEmail}?subject=${deleteEstablishmentSubject}&body=${deleteEstablishmentBody(
-    siret,
-  )}`;
-
-// Should be handled by Unit Test Suites
-const createInitialFormValues = (
-  routeParams: FormEstablishmentParamsInUrl,
-): FormEstablishmentDto => {
-  if (ENV.prefilledForms) {
-    return {
-      source: "immersion-facile",
-      siret: "1234567890123",
-      website: "www@boucherie.fr/immersions",
-      additionalInformation: "Végétariens, s'abstenir !",
-      businessName: "My business name, replaced by result from API",
-      businessNameCustomized:
-        "My Customized Business name, not replaced by API",
-      businessAddress: "My business address, replaced by result from API",
-      isEngagedEnterprise: true,
-      maxContactsPerWeek: defaultMaxContactsPerWeek,
-      appellations: [
-        {
-          appellationCode: "11573",
-          romeCode: "D1102",
-          romeLabel: "Boulangerie",
-          appellationLabel: "Boulanger - Boulangère",
-        },
-        {
-          appellationCode: "11564",
-          romeCode: "D1101",
-          romeLabel: "Boucherie",
-          appellationLabel: "Boucher - Bouchère",
-        },
-      ],
-      businessContact: {
-        firstName: "John",
-        lastName: "Doe",
-        job: "super job",
-        phone: "02837",
-        email: "joe@mail.com",
-        contactMethod: "EMAIL",
-        copyEmails: ["recrutement@boucherie.net"],
-      },
-    };
-  }
-  return formEstablishmentQueryParamsToFormEstablishmentDto(routeParams);
-};
-
-const CreationSiretRelatedInputs = () => {
-  const {
-    currentSiret,
-    establishmentInfos,
-    isFetchingSiret,
-    siretErrorToDisplay,
-    siretRawError,
-    updateSiret,
-  } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
-  const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
-    useState(false);
-  const {
-    setValue,
-    register,
-    formState: { touchedFields },
-  } = useFormContext<FormEstablishmentDto>();
-  const [requestEmailToEditFormError, setRequestEmailToEditFormError] =
-    useState<string | null>(null);
-  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
-  const formContents = getFormFields();
-
-  useEffect(() => {
-    if (isFetchingSiret) return;
-    setValue(
-      "businessName",
-      establishmentInfos ? establishmentInfos.businessName : "",
-    );
-    setValue(
-      "businessAddress",
-      establishmentInfos ? establishmentInfos.businessAddress : "",
-    );
-    setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
-  }, [establishmentInfos]);
-
-  const featureFlags = useFeatureFlags();
-
-  return (
-    <>
-      <Input
-        label={formContents.siret.label}
-        hintText={formContents.siret.hintText}
-        nativeInputProps={{
-          ...formContents.siret,
-          ...register("siret"),
-          onChange: (event) => {
-            updateSiret(event.target.value);
-            setValue("siret", event.target.value);
-          },
-        }}
-        state={siretErrorToDisplay && touchedFields.siret ? "error" : "default"}
-        stateRelatedMessage={
-          touchedFields.siret && siretErrorToDisplay ? siretErrorToDisplay : ""
-        }
-        disabled={isFetchingSiret}
-      />
-      {siretRawError === "Establishment with this siret is already in our DB" &&
-        !requestEmailToEditFormSucceed && (
-          <div>
-            Cette entreprise a déjà été référencée.
-            <Button
-              onClick={() => {
-                establishmentGateway
-                  .requestEstablishmentModification(currentSiret)
-                  .then(() => {
-                    setRequestEmailToEditFormSucceed(true);
-                  })
-                  .catch((err) => {
-                    setRequestEmailToEditFormError(err.response.data.errors);
-                  });
-              }}
-              nativeButtonProps={{
-                disabled: requestEmailToEditFormSucceed,
-                id: domElementIds.establishment.errorSiretAlreadyExistButton,
-              }}
-            >
-              Demande de modification du formulaire de référencement
-            </Button>
-          </div>
-        )}
-      {requestEmailToEditFormSucceed && (
-        <Alert
-          severity="success"
-          title="Succès de la demande"
-          description="Succès. Un mail a été envoyé au référent de cet établissement avec un
-        lien permettant la mise à jour des informations."
-        />
-      )}
-      {requestEmailToEditFormError && (
-        <Alert
-          severity="info"
-          title="La demande de modification n'a pas aboutie."
-          description={requestEmailToEditFormError}
-        />
-      )}
-      <Input
-        label={formContents.businessName.label}
-        hintText={formContents.businessName.hintText}
-        nativeInputProps={{
-          ...formContents.businessName,
-          ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi,
-        }}
-      />
-      <Input
-        label={formContents.businessNameCustomized.label}
-        hintText={formContents.businessNameCustomized.hintText}
-        nativeInputProps={{
-          ...formContents.businessNameCustomized,
-          ...register("businessNameCustomized"),
-          readOnly: isFetchingSiret,
-        }}
-      />
-      <AddressAutocomplete
-        initialSearchTerm={establishmentInfos?.businessAddress}
-        {...formContents.businessAddress}
-        setFormValue={({ address }) =>
-          setValue("businessAddress", addressDtoToString(address))
-        }
-        id={domElementIds.establishment.establishmentFormAddressAutocomplete}
-        disabled={isFetchingSiret}
-      />
-    </>
-  );
-};
-
-const EditionSiretRelatedInputs = ({
-  businessAddress,
-}: {
-  businessAddress: string;
-}) => {
-  const featureFlags = useFeatureFlags();
-  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
-  const formContents = getFormFields();
-  const { register, setValue } = useFormContext();
-  return (
-    <>
-      <Input
-        {...formContents.siret}
-        disabled={true}
-        nativeInputProps={{
-          ...register("siret"),
-        }}
-      />
-      <Input
-        {...formContents.businessName}
-        nativeInputProps={{
-          ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi,
-        }}
-      />
-      <Input
-        {...formContents.businessNameCustomized}
-        nativeInputProps={{
-          ...register("businessNameCustomized"),
-        }}
-      />
-      <AddressAutocomplete
-        initialSearchTerm={businessAddress}
-        {...formContents.businessAddress}
-        setFormValue={({ address }) =>
-          setValue("businessAddress", addressDtoToString(address))
-        }
-      />
     </>
   );
 };

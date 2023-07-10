@@ -42,8 +42,8 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
     ),
     filter(
       () =>
-        state$.value.establishment.status ===
-        "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+        state$.value.establishment.feedback.kind ===
+        "readyForLinkRequestOrRedirection",
     ),
     tap(() =>
       navigationGateway.navigateToEstablishmentForm(

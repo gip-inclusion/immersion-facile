@@ -1,20 +1,26 @@
-import { createRootSelector } from "src/core-logic/storeConfig/store";
+import { createSelector } from "@reduxjs/toolkit";
+import { RootState } from "src/core-logic/storeConfig/store";
 
-const sendLinkSucceeded = createRootSelector(
-  (state) => state.establishment.status === "LINK_SENT",
+const establishmentState = (state: RootState) => state.establishment;
+
+const sendModifyLinkSucceeded = createSelector(
+  establishmentState,
+  (establishment) => establishment.feedback.kind === "success",
 );
 
-const isReadyForLinkRequestOrRedirection = createRootSelector(
-  (state) =>
-    state.establishment.status === "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+const isReadyForLinkRequestOrRedirection = createSelector(
+  establishmentState,
+  (establishment) =>
+    establishment.feedback.kind === "readyForLinkRequestOrRedirection",
 );
 
-const sendLinkFeedback = createRootSelector(
-  (state) => state.establishment.feedback,
+const sendModifyLinkFeedback = createSelector(
+  establishmentState,
+  (establishment) => establishment.feedback,
 );
 
 export const establishmentSelectors = {
-  sendLinkSucceeded,
-  sendLinkFeedback,
+  sendModifyLinkSucceeded,
+  sendModifyLinkFeedback,
   isReadyForLinkRequestOrRedirection,
 };

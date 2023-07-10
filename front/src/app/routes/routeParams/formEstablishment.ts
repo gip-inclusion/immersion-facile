@@ -6,12 +6,13 @@ import {
   Email,
   FormEstablishmentDto,
   FormEstablishmentSource,
+  SiretDto,
 } from "shared";
-
-type NewType = typeof formEstablishmentParamsInUrl;
+import { emptyAppellation } from "src/app/components/forms/establishment/MultipleAppellationInput";
+import { ENV } from "src/config/environmentVariables";
 
 export type FormEstablishmentParamsInUrl = Partial<{
-  [K in FormEstablishmentKeysInUrl]: NewType[K]["~internal"]["valueSerializer"] extends ValueSerializer<
+  [K in FormEstablishmentKeysInUrl]: (typeof formEstablishmentParamsInUrl)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
   >
     ? T
@@ -20,7 +21,7 @@ export type FormEstablishmentParamsInUrl = Partial<{
 
 const appellationsDtoSerializer: ValueSerializer<AppellationAndRomeDto[]> = {
   parse: (raw) => JSON.parse(raw),
-  stringify: (appellationDto) => JSON.stringify(appellationDto),
+  stringify: (appellationsDto) => JSON.stringify(appellationsDto),
 };
 
 const copyEmailsSerializer: ValueSerializer<Email[]> = {
@@ -109,18 +110,67 @@ export const formEstablishmentDtoToFormEstablishmentQueryParams = (
   bcCopyEmails: formEstablishmentDto.businessContact.copyEmails,
 });
 
-export const defaultFormEstablishmentParams = {
-  source: "immersion-facile",
-  siret: "",
-  bName: "",
-  bAddress: "",
-  maxContactsPerWeek: 0,
-  bcLastName: "",
-  bcFirstName: "",
-  bcJob: "",
-  bcPhone: "",
-  bcEmail: "",
-  bcContactMethod: "",
-  appellations: [],
-  bcCopyEmails: [],
+export const createInitialFormValues = (
+  routeParams: FormEstablishmentParamsInUrl,
+): FormEstablishmentDto => {
+  if (ENV.prefilledForms) {
+    return {
+      source: "immersion-facile",
+      siret: "1234567890123",
+      website: "www@boucherie.fr/immersions",
+      additionalInformation: "Végétariens, s'abstenir !",
+      businessName: "My business name, replaced by result from API",
+      businessNameCustomized:
+        "My Customized Business name, not replaced by API",
+      businessAddress: "My business address, replaced by result from API",
+      isEngagedEnterprise: true,
+      maxContactsPerWeek: defaultMaxContactsPerWeek,
+      appellations: [
+        {
+          appellationCode: "11573",
+          romeCode: "D1102",
+          romeLabel: "Boulangerie",
+          appellationLabel: "Boulanger - Boulangère",
+        },
+        {
+          appellationCode: "11564",
+          romeCode: "D1101",
+          romeLabel: "Boucherie",
+          appellationLabel: "Boucher - Bouchère",
+        },
+      ],
+      businessContact: {
+        firstName: "John",
+        lastName: "Doe",
+        job: "super job",
+        phone: "02837",
+        email: "joe@mail.com",
+        contactMethod: "EMAIL",
+        copyEmails: ["recrutement@boucherie.net"],
+      },
+    };
+  }
+  return formEstablishmentQueryParamsToFormEstablishmentDto(routeParams);
 };
+
+export const defaultInitialValue = (
+  siret?: SiretDto,
+): FormEstablishmentDto => ({
+  source: "immersion-facile",
+  siret: siret || "",
+  businessName: "",
+  businessAddress: "",
+  appellations: [emptyAppellation],
+  businessContact: {
+    firstName: "",
+    lastName: "",
+    job: "",
+    phone: "",
+    email: "",
+    contactMethod: "EMAIL",
+    copyEmails: [],
+  },
+  website: "",
+  additionalInformation: "",
+  maxContactsPerWeek: defaultMaxContactsPerWeek,
+});

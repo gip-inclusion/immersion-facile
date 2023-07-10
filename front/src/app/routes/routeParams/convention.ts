@@ -2,6 +2,7 @@ import { addDays, startOfToday } from "date-fns";
 import { param, ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import {
+  AppellationAndRomeDto,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -20,7 +21,6 @@ import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/Conven
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import { appellationDtoSerializer } from "src/app/routes/routeParams/utils";
 import { deviceRepository } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 
@@ -267,6 +267,11 @@ export const makeValuesToWatchInUrl = (convention: ConventionPresentation) => {
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (schedule) => JSON.stringify(schedule),
+};
+
+const appellationDtoSerializer: ValueSerializer<AppellationAndRomeDto> = {
+  parse: (raw) => JSON.parse(raw),
+  stringify: (appellationDto) => JSON.stringify(appellationDto),
 };
 
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
