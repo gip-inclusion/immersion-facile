@@ -149,6 +149,13 @@ export class PgDiscussionAggregateRepository
     discussionId: DiscussionId,
     exchanges: ExchangeEntity[],
   ) {
+    if (exchanges.length === 0) {
+      logger.info(
+        { discussionId },
+        "PgDiscussionAggregateRepository_insertAllExchanges_SkipNoExchanges",
+      );
+      return;
+    }
     const query = `
     INSERT INTO exchanges (discussion_id, message, sender, recipient, sent_at, subject)
     VALUES %L
