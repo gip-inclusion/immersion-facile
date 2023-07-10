@@ -45,5 +45,5 @@ export const useUpdateConventionValuesInUrl = (
         })
         .replace();
     }
-  }, useDebounce(valuesToWatch, 500));
+  }, useDebounce(valuesToWatch));
 };

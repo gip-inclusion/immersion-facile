@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { equals } from "ramda";
 
+const defaultDebounceTimeMs = 500;
 // taken from : https://usehooks.com/useDebounce/
 
-export const useDebounce = <T>(value: T, delay: number) => {
+export const useDebounce = <T>(
+  value: T,
+  delay: number = defaultDebounceTimeMs,
+) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(

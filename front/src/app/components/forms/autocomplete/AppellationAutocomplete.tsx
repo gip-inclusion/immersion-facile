@@ -64,7 +64,7 @@ export const AppellationAutocomplete = ({
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [inputHasChanged, setInputHasChanged] = useState(false);
-  const debounceSearchTerm = useDebounce(searchTerm, 300);
+  const debounceSearchTerm = useDebounce(searchTerm);
   useEffect(() => {
     if (initialOption && selectedOption === null) {
       setSelectedOption(initialOption);

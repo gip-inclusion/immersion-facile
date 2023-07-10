@@ -146,7 +146,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         )
         .replace();
     }
-  }, useDebounce(values(formValues), 500));
+  }, useDebounce(values(formValues)));
 
   if (getErrorsFromResponseData(submitError)) {
     errorMessage = submitError["response"]["data"]["errors"];
