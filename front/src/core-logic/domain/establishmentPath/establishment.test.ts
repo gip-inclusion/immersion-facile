@@ -33,9 +33,12 @@ describe("Establishment", () => {
 
   it("reflects when user wants to input siret", () => {
     store.dispatch(establishmentSlice.actions.gotReady());
-    expectEstablishmentStateToMatch({
-      status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
-    });
+
+    expect(
+      establishmentSelectors.isReadyForLinkRequestOrRedirection(
+        store.getState(),
+      ),
+    ).toBe(true);
   });
 
   it("does not trigger navigation when siret is requested if status is not 'READY_FOR_LINK_REQUEST_OR_REDIRECTION'", () => {
@@ -50,9 +53,8 @@ describe("Establishment", () => {
   it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION'", () => {
     ({ store, dependencies } = createTestStore({
       establishment: {
-        status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
         isLoading: false,
-        feedback: { kind: "idle" },
+        feedback: { kind: "readyForLinkRequestOrRedirection" },
       },
     }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
@@ -65,9 +67,8 @@ describe("Establishment", () => {
   it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION', event if insee feature flag is OFF", () => {
     ({ store, dependencies } = createTestStore({
       establishment: {
-        status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
         isLoading: false,
-        feedback: { kind: "idle" },
+        feedback: { kind: "readyForLinkRequestOrRedirection" },
       },
       featureFlags: {
         ...makeStubFeatureFlags({ enableInseeApi: false }),
@@ -84,7 +85,6 @@ describe("Establishment", () => {
   it("send modification link", () => {
     expectEstablishmentStateToMatch({
       isLoading: false,
-      status: "IDLE",
       feedback: { kind: "idle" },
     });
     store.dispatch(
@@ -96,19 +96,17 @@ describe("Establishment", () => {
     );
     expectEstablishmentStateToMatch({
       isLoading: false,
-      status: "LINK_SENT",
       feedback: { kind: "success" },
     });
-    expect(establishmentSelectors.sendLinkSucceeded(store.getState())).toBe(
-      true,
-    );
+    expect(
+      establishmentSelectors.sendModifyLinkSucceeded(store.getState()),
+    ).toBe(true);
   });
 
   it("handle send modification link error", () => {
     const errorMessage = "Error sending modification link";
     expectEstablishmentStateToMatch({
       isLoading: false,
-      status: "IDLE",
       feedback: { kind: "idle" },
     });
     store.dispatch(
@@ -122,12 +120,11 @@ describe("Establishment", () => {
     );
     expectEstablishmentStateToMatch({
       isLoading: false,
-      status: "ERRORED",
       feedback: { kind: "errored", errorMessage },
     });
-    expect(establishmentSelectors.sendLinkSucceeded(store.getState())).toBe(
-      false,
-    );
+    expect(
+      establishmentSelectors.sendModifyLinkSucceeded(store.getState()),
+    ).toBe(false);
   });
 
   const expectEstablishmentStateToMatch = (

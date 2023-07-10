@@ -2,6 +2,8 @@ import {
   BusinessContactDto,
   domElementIds,
   FormEstablishmentDto,
+  immersionFacileContactEmail,
+  SiretDto,
 } from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
@@ -116,4 +118,15 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     required: true,
     id: domElementIds.establishment.maxContactsPerWeek,
   },
+};
+
+export const mailtoHref = (siret: SiretDto) => {
+  const lineBreak = "%0D%0A";
+  const deleteEstablishmentSubject = "Demande de suppression d'entreprise";
+  const deleteEstablishmentBody = (siret: SiretDto) =>
+    `Bonjour,${lineBreak}Je souhaite supprimer les données de mon entreprise dont le numéro de SIRET est ${siret}.${lineBreak}Cordialement.`;
+
+  return `mailto:${immersionFacileContactEmail}?subject=${deleteEstablishmentSubject}&body=${deleteEstablishmentBody(
+    siret,
+  )}`;
 };
