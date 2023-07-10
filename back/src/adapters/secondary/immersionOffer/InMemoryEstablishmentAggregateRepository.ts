@@ -91,12 +91,12 @@ export class InMemoryEstablishmentAggregateRepository
       .filter((aggregate) => aggregate.establishment.isActive)
       .flatMap((aggregate) =>
         uniq(aggregate.immersionOffers.map((offer) => offer.romeCode))
-          .filter((appelationRome) => !rome || appelationRome === rome)
-          .map((searchRome) =>
+          .filter((uniqRome) => !rome || rome === uniqRome)
+          .map((matchedRome) =>
             buildSearchImmersionResultDtoForOneEstablishmentAndOneRome(
               aggregate,
               withContactDetails,
-              searchRome,
+              matchedRome,
               {
                 lat,
                 lon,

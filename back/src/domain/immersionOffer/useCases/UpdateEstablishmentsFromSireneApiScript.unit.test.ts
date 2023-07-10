@@ -1,6 +1,6 @@
 import subDays from "date-fns/subDays";
 import { expectToEqual, SiretEstablishmentDto } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import {
   createInMemoryUow,

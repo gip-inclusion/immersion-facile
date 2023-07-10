@@ -43,9 +43,9 @@ export const insertImmersionOffer = async (
   },
 ): Promise<void> => {
   const insertQuery = `INSERT INTO immersion_offers (
-    rome_code, siret, score, appellation_code, created_at
-    ) VALUES
-     ($1, $2, $3, $4, $5)`;
+      rome_code, siret, score, appellation_code, created_at
+      ) VALUES
+       ($1, $2, $3, $4, $5)`;
   const defaultScore = 4;
   const defaultOfferCreatedAt = new Date("2022-01-08");
 

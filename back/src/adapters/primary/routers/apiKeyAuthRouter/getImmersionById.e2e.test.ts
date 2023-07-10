@@ -1,5 +1,10 @@
 import { SuperTest, Test } from "supertest";
-import { getImmersionOfferByIdRoute__v0, RomeCode, SiretDto } from "shared";
+import {
+  expectToEqual,
+  getImmersionOfferByIdRoute__v0,
+  RomeCode,
+  SiretDto,
+} from "shared";
 import {
   rueSaintHonore,
   rueSaintHonoreDto,
@@ -7,7 +12,7 @@ import {
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
@@ -62,70 +67,77 @@ describe("Route to get immersion offer by id", () => {
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [establishmentAgg],
     );
-    await request
-      .get(`/${getImmersionOfferByIdRoute__v0}/${immersionOfferId}`)
-      .expect(200, {
-        // /!\ Those fields come from Builder (should probably not.)
-        id: immersionOfferId,
-        rome: immersionOfferRome,
-        siret,
-        name: "Company inside repository",
-        voluntaryToImmersion: true,
-        location: TEST_POSITION,
-        address: rueSaintHonore,
-        romeLabel: TEST_ROME_LABEL,
-        naf: establishmentAgg.establishment.nafDto.code,
-        nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
-        city: rueSaintHonoreDto.city,
-        contactMode: "EMAIL",
-        numberOfEmployeeRange: "10-19",
-      } satisfies SearchImmersionResultPublicV0);
+
+    const response = await request.get(
+      `/${getImmersionOfferByIdRoute__v0}/${immersionOfferId}`,
+    );
+
+    expectToEqual(response.body, {
+      id: immersionOfferId,
+      rome: immersionOfferRome,
+      siret,
+      name: "Company inside repository",
+      voluntaryToImmersion: true,
+      location: TEST_POSITION,
+      address: rueSaintHonore,
+      romeLabel: TEST_ROME_LABEL,
+      naf: establishmentAgg.establishment.nafDto.code,
+      nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+      city: rueSaintHonoreDto.city,
+      contactMode: "EMAIL",
+      numberOfEmployeeRange: "10-19",
+    } satisfies SearchImmersionResultPublicV0);
+    expectToEqual(response.statusCode, 200);
   });
 
   it("accepts valid authenticated requests", async () => {
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [establishmentAgg],
     );
-    const authToken = generateApiConsumerJwt(validApiConsumerJwtPayload);
-    await request
+
+    const response = await request
       .get(`/${getImmersionOfferByIdRoute__v0}/${immersionOfferId}`)
-      .set("Authorization", authToken)
-      .expect(200, {
-        id: immersionOfferId,
-        rome: immersionOfferRome,
-        siret,
-        name: "Company inside repository",
-        voluntaryToImmersion: true,
-        location: TEST_POSITION,
-        address: rueSaintHonore,
-        contactMode: "EMAIL",
-        numberOfEmployeeRange: "10-19",
-        romeLabel: TEST_ROME_LABEL,
-        naf: establishmentAgg.establishment.nafDto.code,
-        nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
-        city: rueSaintHonoreDto.city,
-      } satisfies SearchImmersionResultPublicV0);
+      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload));
+
+    expectToEqual(response.body, {
+      id: immersionOfferId,
+      rome: immersionOfferRome,
+      siret,
+      name: "Company inside repository",
+      voluntaryToImmersion: true,
+      location: TEST_POSITION,
+      address: rueSaintHonore,
+      contactMode: "EMAIL",
+      numberOfEmployeeRange: "10-19",
+      romeLabel: TEST_ROME_LABEL,
+      naf: establishmentAgg.establishment.nafDto.code,
+      nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+      city: rueSaintHonoreDto.city,
+    } satisfies SearchImmersionResultPublicV0);
+    expectToEqual(response.statusCode, 200);
   });
 
   it("rejects requests with wrong format id", async () => {
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [establishmentAgg],
     );
-    const authToken = generateApiConsumerJwt(validApiConsumerJwtPayload);
-    await request
+
+    const response = await request
       .get(`/${getImmersionOfferByIdRoute__v0}/sfdfdsdf`)
-      .set("Authorization", authToken)
-      .expect(400);
+      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload));
+
+    expectToEqual(response.statusCode, 400);
   });
 
   it("rejects requests with missing immersion offer", async () => {
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [],
     );
-    const authToken = generateApiConsumerJwt(validApiConsumerJwtPayload);
-    await request
+
+    const response = await request
       .get(`/${getImmersionOfferByIdRoute__v0}/${immersionOfferId}`)
-      .set("Authorization", authToken)
-      .expect(404);
+      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload));
+
+    expectToEqual(response.statusCode, 404);
   });
 });

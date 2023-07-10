@@ -19,7 +19,7 @@ import { searchImmersionRequestPublicV0ToDomain } from "../DtoAndSchemas/v0/inpu
 import {
   domainToSearchImmersionResultPublicV0,
   LegacyImmersionOfferId,
-  toGetImmersionOfferByIdPayload,
+  toGetSearchImmersionResultBySiretAndRomePayload,
 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const logger = createLogger(__filename);
@@ -47,8 +47,8 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         domainToSearchImmersionResultPublicV0(
-          await deps.useCases.getImmersionOfferById.execute(
-            toGetImmersionOfferByIdPayload(
+          await deps.useCases.getSearchImmersionResultBySiretAndRome.execute(
+            toGetSearchImmersionResultBySiretAndRomePayload(
               req.params.id as LegacyImmersionOfferId,
             ),
             req.apiConsumer,

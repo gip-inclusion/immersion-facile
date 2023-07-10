@@ -5,7 +5,7 @@ import {
   avenueChampsElyseesDto,
 } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";

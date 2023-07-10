@@ -1,5 +1,5 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";

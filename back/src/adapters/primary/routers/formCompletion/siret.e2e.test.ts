@@ -1,7 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import { expectToEqual, siretTargets } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";

@@ -9,7 +9,7 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
