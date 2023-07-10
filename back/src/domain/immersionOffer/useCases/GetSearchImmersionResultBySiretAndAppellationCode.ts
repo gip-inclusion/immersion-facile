@@ -8,7 +8,7 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class GetImmersionOfferBySiretAndAppellationCode extends TransactionalUseCase<
+export class GetSearchImmersionResultBySiretAndAppellationCode extends TransactionalUseCase<
   SiretAndAppellationDto,
   SearchImmersionResultDto,
   ApiConsumer

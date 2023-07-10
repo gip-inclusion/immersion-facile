@@ -19,6 +19,4 @@ export type SearchImmersionRequestPublicV2 = {
 
 export const searchImmersionRequestPublicV2ToDomain = (
   publicV2: SearchImmersionRequestPublicV2,
-): SearchImmersionQueryParamsDto => ({
-  ...publicV2,
-});
+): SearchImmersionQueryParamsDto => publicV2;

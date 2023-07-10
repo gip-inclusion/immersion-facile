@@ -55,12 +55,12 @@ import { SendNotification } from "../../../domain/generic/notifications/useCases
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
-import { ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto } from "../../../domain/immersionOffer/useCases/ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto";
+import { ConvertSearchImmersionQueryParamsToSearchImmerssionParamsDto } from "../../../domain/immersionOffer/useCases/ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto";
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
-import { GetImmersionOfferBySiretAndAppellationCode } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndAppellationCode";
 import { GetOffersByGroupSlug } from "../../../domain/immersionOffer/useCases/GetOffersByGroupSlug";
+import { GetSearchImmersionResultBySiretAndAppellationCode } from "../../../domain/immersionOffer/useCases/GetSearchImmersionResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
@@ -78,7 +78,7 @@ import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/use
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { ConvertContactEstablishmentPublicV1ToDomain } from "../../../domain/publicApi/useCases/ConvertContactEstablishmentPublicV1ToDomain";
-import { convertRomeToAppellationForEstablishment } from "../../../domain/publicApi/useCases/ConvertRomeToAppellationForEstablishment";
+import { ConvertRomeToAppellationForEstablishment } from "../../../domain/publicApi/useCases/ConvertRomeToAppellationForEstablishment";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
@@ -130,8 +130,8 @@ export const createUseCases = (
           saveNotificationAndRelatedEvent,
           config.immersionFacileDomain,
         ),
-      convertSearchimmersionQueryParamsToSearchImmerssionParamsDto:
-        new ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto(
+      convertSearchImmersionQueryParamsToSearchImmersionParamsDto:
+        new ConvertSearchImmersionQueryParamsToSearchImmerssionParamsDto(
           uowPerformer,
         ),
       convertContactEstablishmentPublicV1ToDomain:
@@ -141,7 +141,7 @@ export const createUseCases = (
         gateways.notification,
       ),
       convertRomeToAppellationForEstablishment:
-        new convertRomeToAppellationForEstablishment(uowPerformer),
+        new ConvertRomeToAppellationForEstablishment(uowPerformer),
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
       updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(
@@ -256,8 +256,8 @@ export const createUseCases = (
       ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
-      getImmersionOfferBySiretAndAppellationCode:
-        new GetImmersionOfferBySiretAndAppellationCode(uowPerformer),
+      getSearchImmersionResultBySiretAndAppellationCode:
+        new GetSearchImmersionResultBySiretAndAppellationCode(uowPerformer),
 
       addFormEstablishment,
 

@@ -46,7 +46,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       sendHttpResponse(req, res, async () => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
         return domainToSearchImmersionResultPublicV2(
-          await deps.useCases.getImmersionOfferBySiretAndAppellationCode.execute(
+          await deps.useCases.getSearchImmersionResultBySiretAndAppellationCode.execute(
             {
               siret: req.params.siret,
               appellationCode: req.params.appellationCode,

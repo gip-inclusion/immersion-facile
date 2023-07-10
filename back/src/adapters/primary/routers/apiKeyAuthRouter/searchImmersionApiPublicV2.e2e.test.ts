@@ -1,8 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import {
-  avenueChampsElysees,
-  avenueChampsElyseesDto,
-} from "../../../../_testBuilders/addressDtos";
+import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import {
@@ -77,7 +74,7 @@ describe("search-immersion route", () => {
         // Act and assert
         const expectedResult: SearchImmersionResultPublicV2[] = [
           {
-            address: avenueChampsElysees,
+            address: avenueChampsElyseesDto,
             naf: defaultNafCode,
             nafLabel: "test_naf_label",
             name: "Company inside repository",
@@ -85,14 +82,18 @@ describe("search-immersion route", () => {
             additionalInformation: "",
             rome: "M1808",
             romeLabel: "test_rome_label",
-            appellationLabels: [immersionOffer.appellationLabel],
+            appellations: [
+              {
+                appellationLabel: immersionOffer.appellationLabel,
+                appellationCode: immersionOffer.appellationCode,
+              },
+            ],
             siret: "78000403200019",
             voluntaryToImmersion: true,
             contactMode: "EMAIL",
             numberOfEmployeeRange: "10-19",
             distance_m: 719436,
             position: { lat: 43.8666, lon: 8.3333 },
-            city: avenueChampsElyseesDto.city,
           },
         ];
         const response = await request

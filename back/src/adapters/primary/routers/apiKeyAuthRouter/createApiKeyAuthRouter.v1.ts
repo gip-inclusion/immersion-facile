@@ -89,7 +89,7 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
           });
 
         return domainToSearchImmersionResultPublicV1(
-          await deps.useCases.getImmersionOfferBySiretAndAppellationCode.execute(
+          await deps.useCases.getSearchImmersionResultBySiretAndAppellationCode.execute(
             {
               siret: req.params.siret,
               appellationCode,

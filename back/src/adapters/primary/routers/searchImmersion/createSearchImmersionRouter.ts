@@ -11,7 +11,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
         const query =
-          await deps.useCases.convertSearchimmersionQueryParamsToSearchImmerssionParamsDto.execute(
+          await deps.useCases.convertSearchImmersionQueryParamsToSearchImmersionParamsDto.execute(
             req.query as any,
           );
 
