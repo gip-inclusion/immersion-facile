@@ -1,4 +1,5 @@
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
+import budgetContent from "./budget";
 import cguContent from "./cgu";
 import accessibilityContent from "./declaration-accessibilite";
 import legalsContent from "./mentions-legales";
@@ -18,6 +19,7 @@ const mappedContents: Record<StandardPageSlugs, StandardPageContent> = {
   "declaration-accessibilite": accessibilityContent,
   "plan-du-site": siteMapContent,
   "obligations-des-parties": obligationsContent,
+  budget: budgetContent,
 };
 
 export const getStandardContents = (path: StandardPageSlugs) =>

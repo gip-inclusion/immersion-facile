@@ -9,6 +9,7 @@ export const standardPageSlugs = [
   "declaration-accessibilite",
   "plan-du-site",
   "obligations-des-parties",
+  "budget",
 ] as const;
 
 export const standardPagesSerializer: ValueSerializer<StandardPageSlugs> = {
