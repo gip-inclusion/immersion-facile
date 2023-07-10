@@ -142,6 +142,10 @@ export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
     title: "Obligations des parties",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
+  budget: {
+    title: "Budget",
+    description: "Présentation du budget d'Immersion Facilitée",
+  },
 };
 
 export const groupMetaContent = (
