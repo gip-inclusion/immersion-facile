@@ -1,15 +1,17 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import {
+  EstablishmentAggregateBuilder,
+  establishmentAggregateToSearchResultByRome,
+} from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { establishmentToSearchResultByRome } from "../../../_testBuilders/searchImmersionResult";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { GetImmersionOfferById } from "./GetImmersionOfferById";
+import { GetSearchImmersionResultBySiretAndRome } from "./GetImmersionOfferById";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 const establishmentAgg = new EstablishmentAggregateBuilder()
@@ -26,12 +28,12 @@ const establishmentAgg = new EstablishmentAggregateBuilder()
   .build();
 
 describe("GetImmersionOfferById", () => {
-  let getImmersionOfferById: GetImmersionOfferById;
+  let getImmersionOfferById: GetSearchImmersionResultBySiretAndRome;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getImmersionOfferById = new GetImmersionOfferById(
+    getImmersionOfferById = new GetSearchImmersionResultBySiretAndRome(
       new InMemoryUowPerformer(uow),
     );
   });
@@ -49,7 +51,7 @@ describe("GetImmersionOfferById", () => {
 
       expectToEqual(
         result,
-        establishmentToSearchResultByRome(
+        establishmentAggregateToSearchResultByRome(
           establishmentAgg,
           immersionOffer.romeCode,
           false,
@@ -74,7 +76,7 @@ describe("GetImmersionOfferById", () => {
 
       expectToEqual(
         result,
-        establishmentToSearchResultByRome(
+        establishmentAggregateToSearchResultByRome(
           notSearchableEstablishmentAgg,
           immersionOffer.romeCode,
           false,

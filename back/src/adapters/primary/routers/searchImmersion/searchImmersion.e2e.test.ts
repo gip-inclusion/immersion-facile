@@ -1,10 +1,12 @@
 import { SuperTest, Test } from "supertest";
 import { expectToEqual, immersionOffersRoute, searchTargets } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import {
+  EstablishmentAggregateBuilder,
+  establishmentAggregateToSearchResultByRome,
+} from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { establishmentToSearchResultByRome } from "../../../../_testBuilders/searchImmersionResult";
 import { stubSearchResult } from "../../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
@@ -45,7 +47,7 @@ describe("search-immersion route", () => {
           `/${immersionOffersRoute}?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
         );
         expectToEqual(result.body, [
-          establishmentToSearchResultByRome(
+          establishmentAggregateToSearchResultByRome(
             establishmentAgg,
             immersionOffer.romeCode,
             false,

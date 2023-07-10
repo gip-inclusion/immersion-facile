@@ -6,14 +6,16 @@ import {
   SearchImmersionResultDto,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import {
+  EstablishmentAggregateBuilder,
+  establishmentAggregateToSearchResultByRome,
+} from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import {
   boulangerAssistantImmersionOffer,
   boulangerImmersionOffer,
   secretariatImmersionOffer,
 } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { establishmentToSearchResultByRome } from "../../../_testBuilders/searchImmersionResult";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -97,13 +99,13 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersionUseCase.execute(searchInMetzParams);
 
     expectToEqual(response, [
-      establishmentToSearchResultByRome(
+      establishmentAggregateToSearchResultByRome(
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
         606885,
       ),
-      establishmentToSearchResultByRome(
+      establishmentAggregateToSearchResultByRome(
         establishment,
         boulangerImmersionOffer.romeCode,
         false,
@@ -125,7 +127,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentToSearchResultByRome(
+      establishmentAggregateToSearchResultByRome(
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
@@ -148,13 +150,13 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentToSearchResultByRome(
+      establishmentAggregateToSearchResultByRome(
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
         606885,
       ),
-      establishmentToSearchResultByRome(
+      establishmentAggregateToSearchResultByRome(
         establishment,
         boulangerImmersionOffer.romeCode,
         false,
@@ -230,7 +232,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentToSearchResultByRome(
+      establishmentAggregateToSearchResultByRome(
         establishment,
         secretariatImmersionOffer.romeCode,
         false,
@@ -303,7 +305,7 @@ describe("SearchImmersionUseCase", () => {
         );
 
         expectToEqual(authenticatedResponse, [
-          establishmentToSearchResultByRome(
+          establishmentAggregateToSearchResultByRome(
             establishment,
             secretariatImmersionOffer.romeCode,
             false,
@@ -326,7 +328,7 @@ describe("SearchImmersionUseCase", () => {
         });
 
         expectToEqual(unauthenticatedResponse, [
-          establishmentToSearchResultByRome(
+          establishmentAggregateToSearchResultByRome(
             establishment,
             secretariatImmersionOffer.romeCode,
             false,

@@ -4,7 +4,7 @@ import {
   expectToEqual,
   SearchImmersionResultDto,
 } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";

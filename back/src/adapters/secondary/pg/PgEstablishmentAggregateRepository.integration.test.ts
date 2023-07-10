@@ -16,7 +16,7 @@ import {
 } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import {
@@ -45,7 +45,7 @@ import {
   PgEstablishmentRowWithGeo,
   PgImmersionContactWithSiretRow,
   retrieveEstablishmentWithSiret,
-} from "./PgEstablishmentAggregateRepository.helpers";
+} from "./PgEstablishmentAggregateRepository.test.helpers";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
 const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";
@@ -61,7 +61,7 @@ const analysteEnGeomatiqueImmersionOffer = new ImmersionOfferEntityV2Builder()
   .withRomeCode("M1808")
   .build();
 
-describe("Postgres implementation of immersion offer repository", () => {
+describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;

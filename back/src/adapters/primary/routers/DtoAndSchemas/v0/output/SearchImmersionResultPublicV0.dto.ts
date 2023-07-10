@@ -7,7 +7,7 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
-import { GetImmersionOfferByIdPayload } from "../../../../../../domain/immersionOffer/useCases/GetImmersionOfferById";
+import { GetSearchImmersionResultBySiretAndRomePayload } from "../../../../../../domain/immersionOffer/useCases/GetImmersionOfferById";
 
 export type LegacyImmersionOfferId = `${SiretDto}-${RomeCode}`;
 
@@ -16,9 +16,9 @@ export const toLegacyImmersionOfferId = (
   rome: RomeCode,
 ): LegacyImmersionOfferId => `${siret}-${rome}`;
 
-export const toGetImmersionOfferByIdPayload = (
+export const toGetSearchImmersionResultBySiretAndRomePayload = (
   id: LegacyImmersionOfferId,
-): GetImmersionOfferByIdPayload => {
+): GetSearchImmersionResultBySiretAndRomePayload => {
   const [siret, rome] = id.split("-");
   return {
     rome,

@@ -11,19 +11,19 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-const legacyImmersionOfferIdSchema: z.Schema<GetImmersionOfferByIdPayload> =
+const getSearchImmersionResultBySiretAndRomeSchema: z.Schema<GetSearchImmersionResultBySiretAndRomePayload> =
   z.object({
     siret: siretSchema,
     rome: romeCodeSchema,
   });
 
-export type GetImmersionOfferByIdPayload = {
+export type GetSearchImmersionResultBySiretAndRomePayload = {
   siret: SiretDto;
   rome: RomeCode;
 };
 
-export class GetImmersionOfferById extends TransactionalUseCase<
-  GetImmersionOfferByIdPayload,
+export class GetSearchImmersionResultBySiretAndRome extends TransactionalUseCase<
+  GetSearchImmersionResultBySiretAndRomePayload,
   SearchImmersionResultDto,
   ApiConsumer
 > {
@@ -31,10 +31,10 @@ export class GetImmersionOfferById extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = legacyImmersionOfferIdSchema;
+  inputSchema = getSearchImmersionResultBySiretAndRomeSchema;
 
   public async _execute(
-    { rome, siret }: GetImmersionOfferByIdPayload,
+    { rome, siret }: GetSearchImmersionResultBySiretAndRomePayload,
     uow: UnitOfWork,
     _apiConsumer?: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
