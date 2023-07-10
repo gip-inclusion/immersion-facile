@@ -47,7 +47,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
 
     const { establishmentContact, potentialBeneficiary } = discussion;
 
-    switch (establishmentContact.contactMode) {
+    switch (establishmentContact.contactMethod) {
       case "EMAIL": {
         const appellationAndRomeDtos =
           await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
@@ -85,7 +85,8 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
               potentialBeneficiaryLastName: potentialBeneficiary.lastName,
               immersionObjective: discussion.immersionObjective,
-              potentialBeneficiaryPhone: potentialBeneficiary.phone,
+              potentialBeneficiaryPhone:
+                potentialBeneficiary.phone ?? "pas de téléphone fourni",
               potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,
               message: sort(ascend(prop("sentAt")), discussion.exchanges)[0]
                 .message,

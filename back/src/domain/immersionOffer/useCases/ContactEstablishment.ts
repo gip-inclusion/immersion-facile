@@ -127,14 +127,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         phone:
           contactRequest.contactMode === "EMAIL"
             ? contactRequest.potentialBeneficiaryPhone
-            : "",
+            : undefined,
         resumeLink:
           contactRequest.contactMode === "EMAIL"
             ? contactRequest.potentialBeneficiaryResumeLink
-            : "",
+            : undefined,
       },
       establishmentContact: {
-        contactMode: contactRequest.contactMode,
+        contactMethod: contactRequest.contactMode,
         email: contact.email,
         firstName: contact.firstName,
         lastName: contact.lastName,

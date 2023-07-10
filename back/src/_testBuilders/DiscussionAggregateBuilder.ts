@@ -36,7 +36,7 @@ const defaultDiscussionAggregateV2: DiscussionAggregate = {
     resumeLink: undefined,
   },
   establishmentContact: {
-    contactMode: "EMAIL",
+    contactMethod: "EMAIL",
     email: "estab@mail.com",
     copyEmails: ["copy@yolo.com"],
     firstName: "estab",

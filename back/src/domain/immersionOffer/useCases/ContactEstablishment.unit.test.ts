@@ -238,7 +238,7 @@ describe("ContactEstablishment", () => {
           resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
         },
         establishmentContact: {
-          contactMode: "EMAIL",
+          contactMethod: "EMAIL",
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
           lastName: establishmentContact.lastName,
@@ -295,7 +295,7 @@ describe("ContactEstablishment", () => {
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
-          contactMode: "EMAIL",
+          contactMethod: "EMAIL",
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
           lastName: establishmentContact.lastName,
@@ -329,7 +329,7 @@ describe("ContactEstablishment", () => {
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
-          contactMode: "EMAIL",
+          contactMethod: "EMAIL",
           email: establishmentContact.email,
           firstName: establishmentContact.firstName,
           lastName: establishmentContact.lastName,

@@ -18,7 +18,7 @@ export class PgDiscussionAggregateRepository
   async insert(discussion: DiscussionAggregate) {
     logger.info({ ...discussion }, "PgDiscussionAggregateRepository_Insert");
     const query = `INSERT INTO discussions ( 
-      id, contact_mode, siret, appellation_code, potential_beneficiary_first_name, 
+      id, contact_method, siret, appellation_code, potential_beneficiary_first_name, 
       potential_beneficiary_last_name, potential_beneficiary_email, potential_beneficiary_phone, immersion_objective, potential_beneficiary_resume_link, 
       created_at, establishment_contact_email, establishment_contact_first_name, establishment_contact_last_name, establishment_contact_phone, 
       establishment_contact_job, establishment_contact_copy_emails, street_number_and_address, postcode, department_code, 
@@ -31,7 +31,7 @@ export class PgDiscussionAggregateRepository
       $21, $22
     )`;
     // prettier-ignore
-    const values = [ discussion.id, discussion.establishmentContact.contactMode, discussion.siret, discussion.appellationCode, discussion.potentialBeneficiary.firstName, discussion.potentialBeneficiary.lastName, discussion.potentialBeneficiary.email, discussion.potentialBeneficiary.phone, discussion.immersionObjective, discussion.potentialBeneficiary.resumeLink, discussion.createdAt.toISOString(), discussion.establishmentContact.email, discussion.establishmentContact.firstName, discussion.establishmentContact.lastName, discussion.establishmentContact.phone, discussion.establishmentContact.job, JSON.stringify(discussion.establishmentContact.copyEmails), discussion.address.streetNumberAndAddress, discussion.address.postcode, discussion.address.departmentCode, discussion.address.city, discussion.businessName, ];
+    const values = [ discussion.id, discussion.establishmentContact.contactMethod, discussion.siret, discussion.appellationCode, discussion.potentialBeneficiary.firstName, discussion.potentialBeneficiary.lastName, discussion.potentialBeneficiary.email, discussion.potentialBeneficiary.phone, discussion.immersionObjective, discussion.potentialBeneficiary.resumeLink, discussion.createdAt.toISOString(), discussion.establishmentContact.email, discussion.establishmentContact.firstName, discussion.establishmentContact.lastName, discussion.establishmentContact.phone, discussion.establishmentContact.job, JSON.stringify(discussion.establishmentContact.copyEmails), discussion.address.streetNumberAndAddress, discussion.address.postcode, discussion.address.departmentCode, discussion.address.city, discussion.businessName, ];
     await this.executeQuery("insert", query, values);
     await this.insertAllExchanges(discussion.id, discussion.exchanges);
   }
@@ -40,7 +40,7 @@ export class PgDiscussionAggregateRepository
     logger.info({ ...discussion }, "PgDiscussionAggregateRepository_Update");
     const query = `
     UPDATE discussions SET
-      contact_mode = $1, siret = $2, appellation_code = $3, potential_beneficiary_first_name = $4, potential_beneficiary_last_name = $5,
+      contact_method = $1, siret = $2, appellation_code = $3, potential_beneficiary_first_name = $4, potential_beneficiary_last_name = $5,
       potential_beneficiary_email = $6, potential_beneficiary_phone = $7, immersion_objective = $8, potential_beneficiary_resume_link = $9, created_at = $10,
       establishment_contact_email = $11, establishment_contact_first_name = $12, establishment_contact_last_name = $13, establishment_contact_phone = $14, establishment_contact_job = $15,
       establishment_contact_copy_emails = $16, street_number_and_address = $17, postcode = $18, department_code = $19, city = $20,
@@ -48,7 +48,7 @@ export class PgDiscussionAggregateRepository
     WHERE id = $21`;
     // prettier-ignore
     const values = [
-      discussion.establishmentContact.contactMode, discussion.siret, discussion.appellationCode, discussion.potentialBeneficiary.firstName, discussion.potentialBeneficiary.lastName,
+      discussion.establishmentContact.contactMethod, discussion.siret, discussion.appellationCode, discussion.potentialBeneficiary.firstName, discussion.potentialBeneficiary.lastName,
       discussion.potentialBeneficiary.email, discussion.potentialBeneficiary.phone, discussion.immersionObjective, discussion.potentialBeneficiary.resumeLink, discussion.createdAt.toISOString(),
       discussion.establishmentContact.email, discussion.establishmentContact.firstName, discussion.establishmentContact.lastName, discussion.establishmentContact.phone, discussion.establishmentContact.job,
       JSON.stringify(discussion.establishmentContact.copyEmails), discussion.address.streetNumberAndAddress, discussion.address.postcode, discussion.address.departmentCode, discussion.address.city,
@@ -93,7 +93,7 @@ export class PgDiscussionAggregateRepository
           'resumeLink', potential_beneficiary_resume_link
         ),
         'establishmentContact', JSON_BUILD_OBJECT(
-          'contactMode', contact_mode,
+          'contactMethod', contact_method,
           'firstName',  establishment_contact_first_name,
           'lastName',  establishment_contact_last_name,
           'email',  establishment_contact_email,
@@ -115,18 +115,20 @@ export class PgDiscussionAggregateRepository
     `;
     const values = [discussionId];
     const pgResult = await this.executeQuery("getById", query, values);
-    const discussion: DiscussionAggregate = pgResult.rows.at(0)?.discussion;
-    return discussion
-      ? {
-          ...discussion,
-          createdAt: new Date(discussion.createdAt),
-          immersionObjective: discussion.immersionObjective ?? null,
-          exchanges: discussion.exchanges.map((exchange) => ({
-            ...exchange,
-            sentAt: new Date(exchange.sentAt),
-          })),
-        }
-      : undefined;
+    const discussion = pgResult.rows.at(0)?.discussion;
+    return (
+      discussion && {
+        ...discussion,
+        createdAt: new Date(discussion.createdAt),
+        immersionObjective: discussion.immersionObjective ?? null,
+        exchanges: discussion.exchanges
+          ? discussion.exchanges.map(({ sentAt, ...rest }: ExchangeEntity) => ({
+              sentAt: new Date(sentAt),
+              ...rest,
+            }))
+          : [],
+      }
+    );
   }
 
   async countDiscussionsForSiretSince(

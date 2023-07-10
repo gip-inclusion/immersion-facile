@@ -77,7 +77,7 @@ describe("NotifyContactRequest", () => {
       .withEstablishmentContact({
         email: allowedContactEmail,
         copyEmails: [allowedCopyEmail],
-        contactMode: contactMethod,
+        contactMethod,
       })
       .withAppellationCode(TEST_APPELLATION_CODE)
       .build();
@@ -116,7 +116,9 @@ describe("NotifyContactRequest", () => {
               potentialBeneficiaryLastName:
                 discussion.potentialBeneficiary.lastName,
               immersionObjective: discussion.immersionObjective,
-              potentialBeneficiaryPhone: discussion.potentialBeneficiary.phone,
+              potentialBeneficiaryPhone:
+                discussion.potentialBeneficiary.phone ??
+                "pas de téléphone fourni",
               potentialBeneficiaryResumeLink:
                 discussion.potentialBeneficiary.resumeLink,
               message: discussion.exchanges[0].message,
