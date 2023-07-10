@@ -1,9 +1,6 @@
 import { SuperTest, Test } from "supertest";
 import { AppellationAndRomeDto } from "shared";
-import {
-  rueSaintHonore,
-  rueSaintHonoreDto,
-} from "../../../_testBuilders/addressDtos";
+import { rueSaintHonoreDto } from "../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
@@ -91,12 +88,16 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
       voluntaryToImmersion: true,
       position: TEST_POSITION,
       numberOfEmployeeRange: "10-19",
-      address: rueSaintHonore,
+      address: rueSaintHonoreDto,
       contactMode: "EMAIL",
       romeLabel: TEST_ROME_LABEL,
-      appellationLabels: [styliste.appellationLabel],
+      appellations: [
+        {
+          appellationLabel: styliste.appellationLabel,
+          appellationCode: styliste.appellationCode,
+        },
+      ],
       nafLabel: TEST_NAF_LABEL,
-      city: rueSaintHonoreDto.city,
     };
 
     const response = await request

@@ -1,5 +1,6 @@
 import {
-  addressDtoToString,
+  AddressDto,
+  AppellationDto,
   GeoPositionDto,
   RomeCode,
   SearchImmersionResultDto,
@@ -19,15 +20,14 @@ export type SearchContactDto = {
 export type SearchImmersionResultPublicV2 = {
   rome: RomeCode;
   romeLabel: string;
-  appellationLabels: string[];
+  appellations: AppellationDto[];
   naf: string;
   nafLabel: string;
   siret: SiretDto;
   name: string;
   voluntaryToImmersion: boolean;
   position: GeoPositionDto;
-  address: string;
-  city: string;
+  address: AddressDto;
   contactMode?: ContactMethod;
   distance_m?: number;
   contactDetails?: SearchContactDto;
@@ -40,10 +40,6 @@ export const domainToSearchImmersionResultPublicV2 = ({
   appellations,
   ...domain
 }: SearchImmersionResultDto): SearchImmersionResultPublicV2 => ({
+  appellations,
   ...domain,
-  appellationLabels: appellations.map(
-    (appellation) => appellation.appellationLabel,
-  ),
-  address: addressDtoToString(domain.address),
-  city: domain.address.city,
 });

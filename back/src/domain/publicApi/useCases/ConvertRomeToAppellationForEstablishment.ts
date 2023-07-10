@@ -3,7 +3,7 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class convertRomeToAppellationForEstablishment extends TransactionalUseCase<
+export class ConvertRomeToAppellationForEstablishment extends TransactionalUseCase<
   SiretAndRomeDto,
   AppellationCode
 > {

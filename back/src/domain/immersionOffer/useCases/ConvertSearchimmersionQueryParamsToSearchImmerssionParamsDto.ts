@@ -6,7 +6,7 @@ import {
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class ConvertSearchimmersionQueryParamsToSearchImmerssionParamsDto extends TransactionalUseCase<
+export class ConvertSearchImmersionQueryParamsToSearchImmerssionParamsDto extends TransactionalUseCase<
   SearchImmersionQueryParamsDto,
   SearchImmersionParamsDto
 > {
