@@ -97,9 +97,7 @@ const getPageByRouteName: {
     <ConventionManageInclusionConnectedPage route={route} />
   ),
   openApiDoc: () => <OpenApiDocPage />,
-  manageEstablishmentAdmin: (route) => (
-    <EstablishmentManageAdminPage route={route} />
-  ),
+  manageEstablishmentAdmin: () => <EstablishmentManageAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => <SearchPage route={route} />,
   standard: (route) =>

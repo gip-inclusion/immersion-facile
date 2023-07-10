@@ -7,13 +7,7 @@ import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishm
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
-type EditionSiretRelatedInputsProps = {
-  businessAddress: string;
-};
-
-export const EditionSiretRelatedInputs = ({
-  businessAddress,
-}: EditionSiretRelatedInputsProps) => {
+export const AdminSiretRelatedInputs = () => {
   const featureFlags = useFeatureFlags();
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
@@ -29,19 +23,22 @@ export const EditionSiretRelatedInputs = ({
       />
       <Input
         {...formContents.businessName}
+        disabled={true}
         nativeInputProps={{
           ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi.isActive,
+          readOnly: featureFlags.enableInseeApi,
         }}
       />
       <Input
         {...formContents.businessNameCustomized}
+        disabled={true}
         nativeInputProps={{
           ...register("businessNameCustomized"),
         }}
       />
       <AddressAutocomplete
-        initialSearchTerm={businessAddress}
+        initialSearchTerm={""}
+        disabled={true}
         {...formContents.businessAddress}
         setFormValue={({ address }) =>
           setValue("businessAddress", addressDtoToString(address))

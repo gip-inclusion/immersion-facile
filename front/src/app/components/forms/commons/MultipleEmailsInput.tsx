@@ -19,9 +19,10 @@ export const MultipleEmailsInput = (
     initialValue?: string;
     valuesInList: string[];
     setValues: (values: string[]) => void;
+    disabled?: boolean;
   },
 ) => {
-  const { valuesInList, setValues, ...addToListProps } = props;
+  const { valuesInList, setValues, disabled, ...addToListProps } = props;
   const { cx } = useStyles();
   const getEmailValuesFromString = (stringToParse: string) => {
     const matches = stringToParse.match(validateMultipleEmailRegex);
@@ -45,10 +46,12 @@ export const MultipleEmailsInput = (
         {...addToListProps}
         value={inputValue}
         onInputChange={onInputChange}
+        disabled={disabled}
       />
       {valuesInList.length > 0 && (
         <EmailsValuesSummary
           values={valuesInList}
+          disabled={disabled}
           onDelete={(valueToDelete) => {
             const newEmails = valuesInList.filter(notEqual(valueToDelete));
             setValues(newEmails);
@@ -70,6 +73,7 @@ type InputContainerProps = {
   placeholder?: string;
   description?: string;
   validationSchema?: z.ZodSchema<unknown>;
+  disabled?: boolean;
 };
 
 const createGetInputError =
@@ -94,6 +98,7 @@ const InputContainer = ({
   description,
   onInputChange,
   validationSchema,
+  disabled,
 }: InputContainerProps) => {
   const [error, setError] = useState<string | null>(null);
   const getInputError = createGetInputError(validationSchema);
@@ -128,6 +133,7 @@ const InputContainer = ({
                 event.currentTarget.blur();
               }
             }}
+            disabled={disabled}
             value={value}
             type="text"
             name={name}
@@ -153,11 +159,13 @@ const InputContainer = ({
 type EmailsValuesSummaryProps = {
   values: string[];
   onDelete: (valueToDelete: string) => void;
+  disabled?: boolean;
 };
 
 const EmailsValuesSummary = ({
   values,
   onDelete,
+  disabled,
 }: EmailsValuesSummaryProps) => (
   <div className={`${componentName}__list-of-chip`}>
     <span className={fr.cx("fr-hint-text")}>
@@ -171,6 +179,7 @@ const EmailsValuesSummary = ({
             onClick={() => onDelete(value)}
             key={value}
             aria-label={`Supprimer l'adresse email ${value}`}
+            disabled={disabled}
           >
             {value}
           </button>

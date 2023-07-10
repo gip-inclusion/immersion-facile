@@ -264,6 +264,7 @@ export const domElementIds = {
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
     submitButton: "im-form-add-establishment__submit-button",
+    deleteButton: "im-form-delete-establishment__onclick-button",
   },
 
   immersionAssessment: {
