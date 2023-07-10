@@ -16,6 +16,7 @@ export class PgDiscussionAggregateRepository
   constructor(private client: PoolClient) {}
 
   async insert(discussion: DiscussionAggregate) {
+    logger.info({ ...discussion }, "PgDiscussionAggregateRepository_Insert");
     const query = `INSERT INTO discussions ( 
       id, contact_mode, siret, appellation_code, potential_beneficiary_first_name, 
       potential_beneficiary_last_name, potential_beneficiary_email, potential_beneficiary_phone, immersion_objective, potential_beneficiary_resume_link, 
@@ -35,7 +36,8 @@ export class PgDiscussionAggregateRepository
     await this.insertAllExchanges(discussion.id, discussion.exchanges);
   }
 
-  async update(discussion: DiscussionAggregate) {
+  public async update(discussion: DiscussionAggregate) {
+    logger.info({ ...discussion }, "PgDiscussionAggregateRepository_Update");
     const query = `
     UPDATE discussions SET
       contact_mode = $1, siret = $2, appellation_code = $3, potential_beneficiary_first_name = $4, potential_beneficiary_last_name = $5,
