@@ -22,7 +22,7 @@ import { ConventionManageAdminPage } from "../pages/convention/ConventionManageA
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 import { ErrorPage } from "../pages/error/ErrorPage";
-import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
+import { EstablishmentCreationFormPage } from "../pages/establishment/EstablishmentCreationFormPage";
 import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
@@ -71,7 +71,7 @@ const getPageByRouteName: {
   debugPopulateDB: () => undefined,
   editFormEstablishment: () => <EstablishmentEditionFormPage />,
   errorRedirect: (route) => <ErrorRedirectPage route={route} />,
-  formEstablishment: () => <EstablishmentFormPage />,
+  formEstablishment: () => <EstablishmentCreationFormPage />,
   formEstablishmentForExternals: (route) => (
     <EstablishmentFormPageForExternals route={route} />
   ),
