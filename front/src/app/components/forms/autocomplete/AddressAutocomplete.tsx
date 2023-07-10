@@ -6,6 +6,7 @@ import { AddressAndPosition, addressDtoToString } from "shared";
 import { AutocompleteInput } from "react-design-system";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { getAddressesFromApi } from "./getAddressesFromApi";
+
 export type AddressAutocompleteProps = {
   label: string;
   initialSearchTerm?: string;
@@ -34,7 +35,7 @@ export const AddressAutocomplete = ({
   const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
   const [options, setOptions] = useState<AddressAndPosition[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const debounceSearchTerm = useDebounce(searchTerm, 400);
+  const debounceSearchTerm = useDebounce(searchTerm);
   const { cx } = useStyles();
 
   useEffect(
