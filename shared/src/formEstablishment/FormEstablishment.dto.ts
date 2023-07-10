@@ -4,11 +4,15 @@ import { NafDto } from "../naf";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
+import { includesTypeGuard } from "../typeGuard";
 
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
 
-export type ContactMethod = "EMAIL" | "PHONE" | "IN_PERSON";
+const contactMethods = ["EMAIL", "PHONE", "IN_PERSON"] as const;
+export type ContactMethod = (typeof contactMethods)[number];
+export const isContactMethod = includesTypeGuard(contactMethods);
+
 export type BusinessContactDto = {
   lastName: string;
   firstName: string;

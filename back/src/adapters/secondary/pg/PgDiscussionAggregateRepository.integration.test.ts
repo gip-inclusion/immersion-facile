@@ -21,6 +21,8 @@ const offer = new ImmersionOfferEntityV2Builder()
   .withAppellationLabel(styliste.appellationLabel)
   .build();
 
+const siret = "01234567891011";
+
 describe("PgDiscussionAggregateRepository", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -48,55 +50,66 @@ describe("PgDiscussionAggregateRepository", () => {
     await pool.end();
   });
 
-  it("Methode insert, update and getById", async () => {
-    const siret = "01234567891011";
-
-    await establishmentAggregateRepo.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(siret)
-        .withContactId("12345678-1111-2222-3333-444444444444")
-        .withImmersionOffers([offer])
+  it.each([
+    {
+      discussionAggregate: new DiscussionAggregateBuilder()
+        .withSiret(siret)
         .build(),
-    ]);
+      testName: "discussion with exchange",
+    },
+    {
+      discussionAggregate: new DiscussionAggregateBuilder()
+        .withSiret(siret)
+        .withExchanges([])
+        .build(),
+      testName: "discussion without exchange",
+    },
+  ])(
+    "Methode insert, update and getById, $testName",
+    async ({ discussionAggregate }) => {
+      expectToEqual(
+        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+        undefined,
+      );
 
-    const discussionAggregate = new DiscussionAggregateBuilder()
-      .withSiret(siret)
-      .build();
+      await pgDiscussionAggregateRepository.insert(discussionAggregate);
+      expectToEqual(
+        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+        discussionAggregate,
+      );
 
-    expectToEqual(
-      await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
-      undefined,
-    );
+      const updatedDiscussionAggregate1: DiscussionAggregate =
+        new DiscussionAggregateBuilder(discussionAggregate)
+          .withImmersionObjective("Initier une démarche de recrutement")
+          .build();
+      await pgDiscussionAggregateRepository.update(updatedDiscussionAggregate1);
+      expectToEqual(
+        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+        updatedDiscussionAggregate1,
+      );
 
-    await pgDiscussionAggregateRepository.insert(discussionAggregate);
+      const updatedDiscussionAggregate2 = new DiscussionAggregateBuilder()
+        .withExchanges([
+          ...updatedDiscussionAggregate1.exchanges,
+          {
+            subject: "mon nouveau sujet",
+            message: "mon nouveau message",
+            recipient: "potentialBeneficiary",
+            sentAt: new Date(),
+            sender: "establishment",
+          },
+        ])
+        .build();
 
-    expectToEqual(
-      await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
-      discussionAggregate,
-    );
+      await pgDiscussionAggregateRepository.update(updatedDiscussionAggregate2);
+      expectToEqual(
+        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+        updatedDiscussionAggregate2,
+      );
+    },
+  );
 
-    const updatedDiscussionAggregate: DiscussionAggregate = {
-      ...discussionAggregate,
-      immersionObjective: "Initier une démarche de recrutement",
-      exchanges: [
-        ...discussionAggregate.exchanges,
-        {
-          subject: "mon nouveau sujet",
-          message: "mon nouveau message",
-          recipient: "potentialBeneficiary",
-          sentAt: new Date(),
-          sender: "establishment",
-        },
-      ],
-    };
-    await pgDiscussionAggregateRepository.update(updatedDiscussionAggregate);
-    expectToEqual(
-      await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
-      updatedDiscussionAggregate,
-    );
-  });
-
-  it("Methode countDiscussionsForSiretSince", async () => {
+  it("Method countDiscussionsForSiretSince", async () => {
     const siret = "11112222333344";
     const since = new Date("2023-03-05");
 

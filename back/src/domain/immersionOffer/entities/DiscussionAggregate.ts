@@ -11,7 +11,7 @@ export type DiscussionPotentialBeneficiary = {
   email: string;
   firstName: string;
   lastName: string;
-  phone: string;
+  phone?: string;
   resumeLink?: string;
 };
 
@@ -22,7 +22,7 @@ export type DiscussionEstablishmentContact = {
   lastName: string;
   phone: string;
   job: string;
-  contactMode: ContactMethod;
+  contactMethod: ContactMethod;
 };
 
 export type DiscussionAggregate = {
