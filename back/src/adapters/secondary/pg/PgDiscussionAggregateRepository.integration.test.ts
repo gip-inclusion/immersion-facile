@@ -59,7 +59,6 @@ describe("PgDiscussionAggregateRepository", () => {
       discussionAggregate: new DiscussionAggregateBuilder()
         .withSiret(siret)
         .withCreatedAt(discussionCreatedAt)
-
         .build(),
       testName: "discussion with exchange",
     },
@@ -89,13 +88,16 @@ describe("PgDiscussionAggregateRepository", () => {
         new DiscussionAggregateBuilder(discussionAggregate)
           .withImmersionObjective("Initier une démarche de recrutement")
           .build();
+
       await pgDiscussionAggregateRepository.update(updatedDiscussionAggregate1);
       expectToEqual(
         await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
         updatedDiscussionAggregate1,
       );
 
-      const updatedDiscussionAggregate2 = new DiscussionAggregateBuilder()
+      const updatedDiscussionAggregate2 = new DiscussionAggregateBuilder(
+        updatedDiscussionAggregate1,
+      )
         .withExchanges([
           ...updatedDiscussionAggregate1.exchanges,
           {

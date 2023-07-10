@@ -71,7 +71,10 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
     if (similarDiscussionAlreadyExits)
       throw new ConflictError(
-        `A contact request already exists for siret ${contactRequest.siret} and appellation ${contactRequest.appellationCode}, and this potential beneficiary email.`,
+        [
+          `A contact request already exists for siret ${contactRequest.siret} and appellation ${contactRequest.appellationCode}, and this potential beneficiary email.`,
+          `Minimum ${this.minimumNumberOfDaysBetweenSimilarContactRequests} days between two similar contact requests.`,
+        ].join("\n"),
       );
 
     const appellationLabel = establishmentAggregate.immersionOffers.find(

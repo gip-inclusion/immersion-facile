@@ -20,7 +20,7 @@ const defaultDiscussionAggregateV2: DiscussionAggregate = {
   appellationCode: "11704",
   siret: "12345671234567",
   createdAt,
-  immersionObjective: null,
+  immersionObjective: "Confirmer un projet professionnel",
   businessName: "My default business name",
   address: {
     streetNumberAndAddress: "1 rue de la Paix",
