@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
@@ -14,6 +14,7 @@ import {
   domElementIds,
   SiretDto,
 } from "shared";
+import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { immersionSearchGateway } from "src/config/dependencies";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
@@ -72,13 +73,9 @@ export const ContactByEmail = ({
     handleSubmit,
     formState,
     formState: { isSubmitting },
-    getValues,
-    reset,
   } = methods;
 
-  useEffect(() => {
-    reset({ ...getValues(), appellationCode: initialValues.appellationCode });
-  }, [appellations]);
+  usePotentialBeneficiaryValues(initialValues, methods, appellations);
 
   const getFieldError = makeFieldError(formState);
 
