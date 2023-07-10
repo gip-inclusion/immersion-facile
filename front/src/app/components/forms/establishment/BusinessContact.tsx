@@ -41,7 +41,7 @@ const preferredContactMethodOptions = (
   },
 ];
 
-export const BusinessContact = () => {
+export const BusinessContact = ({ readOnly }: { readOnly: boolean }) => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { setValue, register, watch, getValues, formState } =
@@ -56,6 +56,7 @@ export const BusinessContact = () => {
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
       <Input
+        disabled={readOnly}
         label={formContents["businessContact.firstName"].label}
         hintText={formContents["businessContact.firstName"].hintText}
         nativeInputProps={{
@@ -65,6 +66,7 @@ export const BusinessContact = () => {
         {...getFieldError("businessContact.firstName")}
       />
       <Input
+        disabled={readOnly}
         label={formContents["businessContact.lastName"].label}
         hintText={formContents["businessContact.lastName"].hintText}
         nativeInputProps={{
@@ -74,6 +76,7 @@ export const BusinessContact = () => {
         {...getFieldError("businessContact.lastName")}
       />
       <Input
+        disabled={readOnly}
         label={formContents["businessContact.job"].label}
         hintText={formContents["businessContact.job"].hintText}
         nativeInputProps={{
@@ -83,6 +86,7 @@ export const BusinessContact = () => {
         {...getFieldError("businessContact.job")}
       />
       <Input
+        disabled={readOnly}
         label={formContents["businessContact.phone"].label}
         hintText={formContents["businessContact.phone"].hintText}
         nativeInputProps={{
@@ -92,6 +96,7 @@ export const BusinessContact = () => {
         {...getFieldError("businessContact.phone")}
       />
       <EmailValidationInput
+        disabled={readOnly}
         label={formContents["businessContact.email"].label}
         hintText={formContents["businessContact.email"].hintText}
         nativeInputProps={{
@@ -103,6 +108,7 @@ export const BusinessContact = () => {
         )} // seems we have an issue with our DotNestedKeys
       />
       <MultipleEmailsInput
+        disabled={readOnly}
         {...formContents["businessContact.copyEmails"]}
         valuesInList={watch().businessContact.copyEmails}
         initialValue={getValues().businessContact.copyEmails.join(", ")}
@@ -115,6 +121,7 @@ export const BusinessContact = () => {
         Mises en relation avec les candidats :
       </h2>
       <RadioButtons
+        disabled={readOnly}
         {...formContents["businessContact.contactMethod"]}
         legend={formContents["businessContact.contactMethod"].label}
         hintText={formContents["businessContact.contactMethod"].hintText}

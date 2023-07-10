@@ -13,6 +13,7 @@ type MultipleAppellationInputProps = {
   onAppellationDelete: (index: number) => void;
   error?: string;
   id: string;
+  disabled?: boolean;
 };
 
 export const MultipleAppellationInput = ({
@@ -23,6 +24,7 @@ export const MultipleAppellationInput = ({
   onAppellationDelete,
   error,
   id,
+  disabled = false,
 }: MultipleAppellationInputProps) => {
   const { cx } = useStyles();
 
@@ -40,6 +42,7 @@ export const MultipleAppellationInput = ({
           >
             <div className={fr.cx("fr-col", "fr-mt-2w")}>
               <AppellationAutocomplete
+                disabled={disabled}
                 label={`Rechercher un métier *`}
                 initialValue={currentAppellations[index]}
                 onAppellationSelected={(selectedAppellation) => {
@@ -52,6 +55,7 @@ export const MultipleAppellationInput = ({
               type="button"
               iconId="fr-icon-delete-bin-line"
               title="Suppression"
+              disabled={disabled}
               onClick={() => {
                 onAppellationDelete(index);
               }}
@@ -69,6 +73,7 @@ export const MultipleAppellationInput = ({
         onClick={() => {
           onAppellationAdd(emptyAppellationAndRome, currentAppellations.length);
         }}
+        disabled={disabled}
       >
         Ajouter un métier
       </Button>
