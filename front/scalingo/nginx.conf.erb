@@ -1,6 +1,6 @@
 location / {
   root /app/dist;
-  add_header Content-Security-Policy "default-src 'self' https://matomo.inclusion.beta.gouv.fr https://sentry.gip-inclusion.cloud-ed.fr wss://client.relay.crisp.chat/w/9d/  https://client.crisp.chat data: blob: https://immersion.cellar-c2.services.clever-cloud.com 'unsafe-inline'";
+  add_header Content-Security-Policy "default-src 'self' https://metabase.immersion-facile.beta.gouv.fr https://matomo.inclusion.beta.gouv.fr https://sentry.gip-inclusion.cloud-ed.fr wss://client.relay.crisp.chat/w/9d/  https://client.crisp.chat data: blob: https://immersion.cellar-c2.services.clever-cloud.com 'unsafe-inline'";
   add_header X-Content-Type-Options "nosniff";
   add_header X-XSS-Protection "1; mode=block";
   try_files $uri /index.html;
