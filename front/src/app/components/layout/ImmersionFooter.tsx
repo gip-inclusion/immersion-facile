@@ -165,6 +165,11 @@ const bottomsLinks: NavLink[] = [
     ...routes.standard({ pagePath: "plan-du-site" }).link,
     id: bottomsLinksIds.sitemap,
   },
+  {
+    label: "Budget",
+    ...routes.standard({ pagePath: "budget" }).link,
+    id: bottomsLinksIds.sitemap,
+  },
 ];
 
 export const ImmersionFooter = () => (
