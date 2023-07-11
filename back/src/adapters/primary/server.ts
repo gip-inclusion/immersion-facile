@@ -83,7 +83,7 @@ export const createApp = async (
   app.use(...createMagicLinkRouter(deps));
   app.use(...createAdminRouter(deps));
   app.use("/v1", createApiKeyAuthRouterV1(deps));
-  app.use("/v2", createApiKeyAuthRouterV2(deps));
+  app.use(createApiKeyAuthRouterV2(deps));
   app.use(...createInclusionConnectedAllowedRouter(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
