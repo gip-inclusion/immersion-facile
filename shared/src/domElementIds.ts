@@ -57,6 +57,7 @@ export const domElementIds = {
       contact: buildFooterNavLinkId("contact"),
       stats: buildFooterNavLinkId("stats"),
       sitemap: buildFooterNavLinkId("sitemap"),
+      budget: buildFooterNavLinkId("budget"),
     },
   },
 
