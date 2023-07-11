@@ -6,7 +6,7 @@ import {
   SearchImmersionResultDto,
   SearchTargets,
 } from "shared";
-import { HttpClient, HttpResponse } from "http-client";
+import { HttpClient, HttpResponse } from "shared-routes";
 import {
   ContactErrorKind,
   ImmersionSearchGateway,
@@ -23,7 +23,7 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
         .searchImmersion({
           queryParams: searchParams,
         })
-        .then(({ responseBody }) => responseBody),
+        .then(({ body }) => body),
     );
   }
 
@@ -34,9 +34,9 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
       .contactEstablishment({
         body: params,
       })
-      .catch((error): HttpResponse<string> | never => {
+      .catch((error): HttpResponse<number, string> | never => {
         if (error.httpStatusCode) {
-          return { responseBody: error.message, status: error.httpStatusCode };
+          return { body: error.message, status: error.httpStatusCode };
         }
         throw error;
       });
@@ -51,6 +51,6 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
       urlParams: { groupSlug },
     });
 
-    return response.responseBody;
+    return response.body;
   }
 }

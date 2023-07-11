@@ -1,4 +1,4 @@
-import { createTarget, createTargets } from "http-client";
+import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
 import {
   contactEstablishmentRoute,
@@ -8,21 +8,21 @@ import { searchImmersionQueryParamsSchema } from "./SearchImmersionQueryParams.s
 import { searchImmersionsSchema } from "./SearchImmersionResult.schema";
 
 export type SearchTargets = typeof searchTargets;
-export const searchTargets = createTargets({
-  getOffersByGroupSlug: createTarget({
-    method: "GET",
-    url: "/group-offers/:groupSlug",
-    validateResponseBody: searchImmersionsSchema.parse,
+export const searchTargets = defineRoutes({
+  getOffersByGroupSlug: defineRoute({
+    method: "get",
+    url: `/group-offers/:groupSlug`,
+    responses: { 200: searchImmersionsSchema },
   }),
-  searchImmersion: createTarget({
-    method: "GET",
+  searchImmersion: defineRoute({
+    method: "get",
     url: `/${immersionOffersRoute}`,
-    validateQueryParams: searchImmersionQueryParamsSchema.parse,
-    validateResponseBody: searchImmersionsSchema.parse,
+    queryParamsSchema: searchImmersionQueryParamsSchema,
+    responses: { 200: searchImmersionsSchema },
   }),
-  contactEstablishment: createTarget({
-    method: "POST",
+  contactEstablishment: defineRoute({
+    method: "post",
     url: `/${contactEstablishmentRoute}`,
-    validateRequestBody: contactEstablishmentRequestSchema.parse,
+    requestBodySchema: contactEstablishmentRequestSchema,
   }),
 });

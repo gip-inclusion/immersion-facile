@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 export const sendHttpResponse = async (
-  request: Request,
+  request: Request<any, any, any, any, any>,
   response: Response,
   callback: () => Promise<unknown>,
 ) => {
