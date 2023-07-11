@@ -1,4 +1,7 @@
 import { SuperTest, Test } from "supertest";
+import { expectToEqual } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
@@ -8,43 +11,62 @@ import {
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
+import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
 
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;
+  let authToken: string;
+  let sharedRequest: HttpClient<PublicApiV2Routes>;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
+
+    sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
+    authToken = generateApiConsumerJwt({
+      id: validAuthorizedApiKeyId,
+    });
   });
 
   describe(`v2 - /v2/immersion-offers`, () => {
     describe("verify consumer is authenticated and authorized", () => {
       it("rejects unauthenticated requests", async () => {
-        await request
-          .get(
-            `/v2/immersion-offers?rome=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
-          )
-          .expect(401, { error: "forbidden: unauthenticated" });
+        const response = await sharedRequest.searchImmersion({
+          headers: {
+            authorization: "",
+          },
+          queryParams: {} as any,
+        });
+        expectToEqual(response, {
+          status: 401,
+          body: { error: "forbidden: unauthenticated" },
+        });
       });
+
       it("rejects unauthorized consumer", async () => {
-        await request
-          .get(
-            `/v2/immersion-offers?rome=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
-          )
-          .set(
-            "Authorization",
-            generateApiConsumerJwt({ id: "my-unauthorized-id" }),
-          )
-          .expect(403, {
+        const authToken = generateApiConsumerJwt({
+          id: "my-unauthorized-id",
+        });
+        const response = await sharedRequest.searchImmersion({
+          headers: {
+            authorization: authToken,
+          },
+          queryParams: {} as any,
+        });
+        expectToEqual(response, {
+          status: 403,
+          body: {
             error: "forbidden: unauthorised consumer Id",
-          });
+          },
+        });
       });
     });
     describe("authenficated consumer", () => {
-      it("with given rome and position", async () => {
+      it("with given rome, appellation code and position", async () => {
         const immersionOffer = new ImmersionOfferEntityV2Builder()
           .withRomeCode("M1808")
           .withAppellationCode("11704")
@@ -141,15 +163,24 @@ describe("search-immersion route", () => {
     });
 
     it("rejects invalid requests with error code 400", async () => {
-      await request
-        .get(
-          `/v2/immersion-offers?rome=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
-        )
-        .set(
-          "Authorization",
-          generateApiConsumerJwt({ id: "my-authorized-id" }),
-        )
-        .expect(400, /Code ROME incorrect/);
+      const response = await sharedRequest.searchImmersion({
+        headers: {
+          authorization: authToken,
+        },
+        queryParams: {} as any,
+      });
+      expectToEqual(response, {
+        status: 400,
+        body: {
+          issues: [
+            "latitude : Expected number, received nan",
+            "longitude : Expected number, received nan",
+            "distanceKm : Expected number, received nan",
+          ],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/immersion-offers",
+        },
+      });
     });
   });
 });

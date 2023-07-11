@@ -474,7 +474,7 @@ describe("ContactEstablishment", () => {
           ...validRequest,
           contactMode: "PHONE",
         }),
-        new NotFoundError(`11112222333344`),
+        new NotFoundError(`No establishment found with siret: 11112222333344`),
       );
     });
 
