@@ -59,8 +59,8 @@ import { ConvertSearchImmersionQueryParamsToSearchImmerssionParamsDto } from "..
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetSearchImmersionResultBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
+import { GetSearchImmersionResultBySiretAndAppellationCode } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndAppellationCode";
 import { GetOffersByGroupSlug } from "../../../domain/immersionOffer/useCases/GetOffersByGroupSlug";
-import { GetSearchImmersionResultBySiretAndAppellationCode } from "../../../domain/immersionOffer/useCases/GetSearchImmersionResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
