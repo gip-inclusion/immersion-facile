@@ -14,13 +14,25 @@ const isReadyForLinkRequestOrRedirection = createSelector(
     establishment.feedback.kind === "readyForLinkRequestOrRedirection",
 );
 
-const sendModifyLinkFeedback = createSelector(
+const feedback = createSelector(
   establishmentState,
   (establishment) => establishment.feedback,
 );
 
+const isLoading = createSelector(
+  establishmentState,
+  (establishment) => establishment.isLoading,
+);
+
+const formEstablishment = createSelector(
+  establishmentState,
+  (establishment) => establishment.formEstablishment,
+);
+
 export const establishmentSelectors = {
   sendModifyLinkSucceeded,
-  sendModifyLinkFeedback,
+  formEstablishment,
+  feedback,
+  isLoading,
   isReadyForLinkRequestOrRedirection,
 };

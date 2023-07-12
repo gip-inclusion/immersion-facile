@@ -6,9 +6,7 @@ import {
   Email,
   FormEstablishmentDto,
   FormEstablishmentSource,
-  SiretDto,
 } from "shared";
-import { emptyAppellation } from "src/app/components/forms/establishment/MultipleAppellationInput";
 import { ENV } from "src/config/environmentVariables";
 
 export type FormEstablishmentParamsInUrl = Partial<{
@@ -152,29 +150,3 @@ export const createInitialFormValues = (
   }
   return formEstablishmentQueryParamsToFormEstablishmentDto(routeParams);
 };
-
-export const defaultInitialValue = (
-  siret?: SiretDto,
-): FormEstablishmentDto => ({
-  source: "immersion-facile",
-  siret: siret || "",
-  businessName: "",
-  businessAddress: "",
-  appellations: [emptyAppellation],
-  businessContact: {
-    firstName: "",
-    lastName: "",
-    job: "",
-    phone: "",
-    email: "",
-    contactMethod: "EMAIL",
-    copyEmails: [],
-  },
-  website: "",
-  additionalInformation: "",
-  maxContactsPerWeek: defaultMaxContactsPerWeek,
-  naf: undefined,
-  isEngagedEnterprise: undefined,
-  fitForDisabledWorkers: undefined,
-  businessNameCustomized: undefined,
-});

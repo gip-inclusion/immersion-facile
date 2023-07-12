@@ -7,11 +7,24 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   constructor(private readonly httpClient: HttpClient<EstablishmentTargets>) {}
 
   public async addFormEstablishment(
-    establishment: FormEstablishmentDto,
+    formEstablishment: FormEstablishmentDto,
   ): Promise<void> {
     await this.httpClient.addFormEstablishment({
-      body: establishment,
+      body: formEstablishment,
     });
+  }
+
+  public addFormEstablishment$(
+    formEstablishment: FormEstablishmentDto,
+  ): Observable<void> {
+    return from(this.addFormEstablishment(formEstablishment));
+  }
+
+  public getFormEstablishmentFromJwt$(
+    siret: SiretDto,
+    jwt: string,
+  ): Observable<FormEstablishmentDto> {
+    return from(this.getFormEstablishmentFromJwt(siret, jwt));
   }
 
   public async requestEstablishmentModification(
@@ -38,11 +51,11 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   }
 
   public async updateFormEstablishment(
-    establishment: FormEstablishmentDto,
+    formEstablishment: FormEstablishmentDto,
     jwt: string,
   ): Promise<void> {
     await this.httpClient.updateFormEstablishment({
-      body: establishment,
+      body: formEstablishment,
       headers: {
         authorization: jwt,
       },

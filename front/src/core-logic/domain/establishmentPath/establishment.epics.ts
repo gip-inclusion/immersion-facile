@@ -1,6 +1,9 @@
-import { filter, map, switchMap, tap } from "rxjs";
-import { LegacyHttpClientError } from "shared";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { filter, iif, map, of, switchMap, tap } from "rxjs";
+import { JwtDto, LegacyHttpClientError } from "shared";
+import {
+  defaultFormEstablishmentValue,
+  establishmentSlice,
+} from "src/core-logic/domain/establishmentPath/establishment.slice";
 import {
   SiretAction,
   siretSlice,
@@ -24,10 +27,8 @@ const requestEstablishmentModification: AppEpic<EstablishmentAction> = (
       establishmentGateway.requestEstablishmentModification$(action.payload),
     ),
     map(establishmentSlice.actions.sendModificationLinkSucceeded),
-    catchEpicError((error) =>
-      establishmentSlice.actions.sendModificationLinkFailed(
-        (error as LegacyHttpClientError).data.errors,
-      ),
+    catchEpicError(() =>
+      establishmentSlice.actions.sendModificationLinkFailed(),
     ),
   );
 
@@ -53,7 +54,51 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
     map(() => establishmentSlice.actions.backToIdle()),
   );
 
+const hasPayloadJwt = (payload: unknown): payload is JwtDto =>
+  "jwt" in (payload as JwtDto);
+
+const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(establishmentSlice.actions.establishmentRequested.match),
+    switchMap((action) =>
+      iif(
+        () => hasPayloadJwt(action.payload),
+        establishmentGateway.getFormEstablishmentFromJwt$(
+          action.payload.siret ? action.payload.siret : "",
+          hasPayloadJwt(action.payload) ? action.payload.jwt : "",
+        ),
+        of({
+          ...defaultFormEstablishmentValue(),
+          ...action.payload,
+        }),
+      ),
+    ),
+    map(establishmentSlice.actions.establishmentProvided),
+    catchEpicError((error) =>
+      establishmentSlice.actions.establishmentProvideFailed(error.message),
+    ),
+  );
+
+const addFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(establishmentSlice.actions.establishmentCreationRequested.match),
+    switchMap((action) =>
+      establishmentGateway.addFormEstablishment$(action.payload),
+    ),
+    map(establishmentSlice.actions.establishmentCreationSucceeded),
+  );
+
 export const establishmentEpics = [
   requestEstablishmentModification,
   redirectToEstablishmentFormPageEpic,
+  fetchEstablishmentEpic,
+  addFormEstablishmentEpic,
 ];

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -11,9 +13,11 @@ import {
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { establishmentGateway } from "src/config/dependencies";
+import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
+import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 
 export const CreationSiretRelatedInputs = () => {
   const {
@@ -24,15 +28,14 @@ export const CreationSiretRelatedInputs = () => {
     siretRawError,
     updateSiret,
   } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
-  const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
-    useState(false);
+  const establishmentFeedback = useAppSelector(establishmentSelectors.feedback);
+  const [requestEmailToEditFormSucceed] = useState(false);
+  const [requestEmailToEditFormError] = useState<string | null>(null);
   const {
     setValue,
     register,
     formState: { touchedFields },
   } = useFormContext<FormEstablishmentDto>();
-  const [requestEmailToEditFormError, setRequestEmailToEditFormError] =
-    useState<string | null>(null);
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
 
@@ -50,7 +53,7 @@ export const CreationSiretRelatedInputs = () => {
   }, [establishmentInfos]);
 
   const featureFlags = useFeatureFlags();
-
+  const dispatch = useDispatch();
   return (
     <>
       <Input
@@ -72,26 +75,29 @@ export const CreationSiretRelatedInputs = () => {
       />
       {siretRawError === "Establishment with this siret is already in our DB" &&
         !requestEmailToEditFormSucceed && (
-          <div>
+          <div className={fr.cx("fr-mb-4w")}>
             Cette entreprise a déjà été référencée.
             <Button
               onClick={() => {
-                establishmentGateway
-                  .requestEstablishmentModification(currentSiret)
-                  .then(() => {
-                    setRequestEmailToEditFormSucceed(true);
-                  })
-                  .catch((err) => {
-                    setRequestEmailToEditFormError(err.response.data.errors);
-                  });
+                dispatch(
+                  establishmentSlice.actions.sendModificationLinkRequested(
+                    currentSiret,
+                  ),
+                );
               }}
               nativeButtonProps={{
                 disabled: requestEmailToEditFormSucceed,
                 id: domElementIds.establishment.errorSiretAlreadyExistButton,
+                type: "button",
               }}
             >
               Demande de modification du formulaire de référencement
             </Button>
+            {establishmentFeedback.kind === "sendModificationLinkErrored" && (
+              <p className={fr.cx("fr-error-text")}>
+                Un email contenant un lien de modification a déjà été envoyé
+              </p>
+            )}
           </div>
         )}
       {requestEmailToEditFormSucceed && (
