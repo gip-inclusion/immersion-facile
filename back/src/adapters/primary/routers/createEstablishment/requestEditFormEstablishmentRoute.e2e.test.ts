@@ -2,7 +2,7 @@ import { SuperTest, Test } from "supertest";
 import { requestEmailToUpdateFormRoute } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Route to generate an establishment edition link", () => {

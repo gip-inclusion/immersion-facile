@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";

@@ -1,7 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import { siretTargets } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

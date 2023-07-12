@@ -19,6 +19,7 @@ import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEn
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
+  SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { createLogger } from "../../../utils/logger";
@@ -30,41 +31,6 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
-const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
-  // Only compare romeCode and appellationCode
-  a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
-
-const objectsDeepEqual = <T>(a: T, b: T) =>
-  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
-
-const establishmentsEqual = (
-  a: EstablishmentEntity,
-  b: EstablishmentEntity,
-) => {
-  // Ignore key updatedAt
-  const { updatedAt: _unusedUpdatedAtA, ...establishmentAWithoutUpdatedAt } = a;
-  const { updatedAt: _unusedUpdatedAtB, ...establishmentBWithoutUpdatedAt } = b;
-
-  return objectsDeepEqual(
-    establishmentAWithoutUpdatedAt,
-    establishmentBWithoutUpdatedAt,
-  );
-};
-const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
-  // Ignore key id
-  const { id: _unusedIdA, ...contactAWithoutId } = a;
-  const { id: _unusedIdB, ...contactBWithoutId } = b;
-  return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
-};
-
-const buildAppellationsArray = `JSON_AGG(
-    JSON_BUILD_OBJECT(
-      'appellationCode', ogr_appellation::text,
-      'appellationLabel', libelle_appellation_long
-    )
-    ORDER BY ogr_appellation
-  )`;
-
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
@@ -73,22 +39,20 @@ export class PgEstablishmentAggregateRepository
   public async insertEstablishmentAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
-    await this._upsertEstablishmentsFromAggregates(aggregates);
-    await this._insertContactsFromAggregates(aggregates);
-
-    const offersWithSiret: OfferWithSiret[] = aggregates.reduce(
-      (offersWithSiret, aggregate) => [
-        ...offersWithSiret,
-        ...aggregate.immersionOffers.map((immersionOffer) => ({
-          siret: aggregate.establishment.siret,
-          ...immersionOffer,
-        })),
-      ],
-      [] as OfferWithSiret[],
+    await this.upsertEstablishmentsFromAggregates(aggregates);
+    await this.insertContactsFromAggregates(aggregates);
+    await this.createImmersionOffersToEstablishments(
+      aggregates.reduce<OfferWithSiret[]>(
+        (offersWithSiret, aggregate) => [
+          ...offersWithSiret,
+          ...aggregate.immersionOffers.map((immersionOffer) => ({
+            siret: aggregate.establishment.siret,
+            ...immersionOffer,
+          })),
+        ],
+        [],
+      ),
     );
-    await this.createImmersionOffersToEstablishments(offersWithSiret);
-
-    return;
   }
 
   public async updateEstablishmentAggregate(
@@ -122,7 +86,7 @@ export class PgEstablishmentAggregateRepository
 
     // Create contact if it does'not exist
     if (!existingAggregate.contact) {
-      await this._insertContactsFromAggregates([updatedAggregate]);
+      await this.insertContactsFromAggregates([updatedAggregate]);
     } else {
       // Update contact if it has changed
       await this._updateContactFromAggregates(
@@ -132,7 +96,7 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  private async _upsertEstablishmentsFromAggregates(
+  private async upsertEstablishmentsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
     const establishmentFields = aggregates.map(({ establishment }) => [
@@ -196,7 +160,7 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  private async _insertContactsFromAggregates(
+  private async insertContactsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
     const aggregatesWithContact = aggregates.filter(
@@ -344,7 +308,7 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  async getSearchImmersionResultDtoFromSearchMade({
+  async searchImmersionResults({
     searchMade,
     withContactDetails = false,
     maxResults,
@@ -352,12 +316,14 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     withContactDetails?: boolean;
     maxResults?: number;
-  }): Promise<SearchImmersionResultDto[]> {
+  }): Promise<SearchImmersionResult[]> {
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
         (SELECT siret, fit_for_disabled_workers, gps
-         FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
+         FROM establishments 
+         WHERE is_active 
+         AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
         matching_offers AS (
           SELECT 
             aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
@@ -380,7 +346,7 @@ export class PgEstablishmentAggregateRepository
         selectedOffersSubQuery,
         [
           `POINT(${searchMade.lon} ${searchMade.lat})`,
-          searchMade.distance_km * 1000, // Formats parameters $1, $2
+          searchMade.distanceKm * 1000, // Formats parameters $1, $2
           maxResults,
         ],
       );
@@ -554,10 +520,15 @@ export class PgEstablishmentAggregateRepository
         GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
         [siret, rome],
       );
-    if (!immersionSearchResultDtos.length) return;
-    const { contactDetails, ...searchResultWithoutContactDetails } =
-      immersionSearchResultDtos[0];
-    return searchResultWithoutContactDetails;
+
+    const result = immersionSearchResultDtos.at(0);
+    if (!result) return;
+    const {
+      contactDetails,
+      isSearchable,
+      ...searchResultWithoutContactDetailsAndIsSearchable
+    } = result;
+    return searchResultWithoutContactDetailsAndIsSearchable;
   }
 
   public async getSearchImmersionResultDtoBySiretAndAppellationCode(
@@ -575,10 +546,10 @@ export class PgEstablishmentAggregateRepository
         GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
         [siret, appellationCode],
       );
-    if (!immersionSearchResultDtos.length) return;
-    const { contactDetails, ...searchResultWithoutContactDetails } =
-      immersionSearchResultDtos[0];
-    return searchResultWithoutContactDetails;
+    const immersionSearchResultDto = immersionSearchResultDtos.at(0);
+    if (!immersionSearchResultDto) return;
+    const { contactDetails, isSearchable, ...rest } = immersionSearchResultDto;
+    return rest;
   }
 
   public async createImmersionOffersToEstablishments(
@@ -607,7 +578,7 @@ export class PgEstablishmentAggregateRepository
   private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
     selectedOffersSubQuery: string,
     selectedOffersSubQueryParams: any[],
-  ): Promise<SearchImmersionResultDto[]> {
+  ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
     const pgResult = await this.client.query(
@@ -616,8 +587,9 @@ export class PgEstablishmentAggregateRepository
       ),
       selectedOffersSubQueryParams,
     );
+
     return pgResult.rows.map(
-      (row): SearchImmersionResultDto => ({
+      (row): SearchImmersionResult => ({
         ...row.search_immersion_result,
         // TODO : find a way to return 'undefined' instead of 'null' from query
         customizedName: optional(row.search_immersion_result.customizedName),
@@ -633,6 +605,7 @@ export class PgEstablishmentAggregateRepository
           row.search_immersion_result.fitForDisabledWorkers,
         ),
         voluntaryToImmersion: true,
+        isSearchable: row.search_immersion_result.isSearchable,
       }),
     );
   }
@@ -891,26 +864,27 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       SELECT 
       row_number,
       JSONB_BUILD_OBJECT(
-      'rome', io.rome_code, 
-      'siret', io.siret, 
-      'distance_m', io.distance_m, 
-      'name', e.name, 
-      'website', e.website, 
-      'additionalInformation', e.additional_information, 
-      'customizedName', e.customized_name, 
-      'fitForDisabledWorkers', e.fit_for_disabled_workers,
-      'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-      'romeLabel', io.rome_label,
-      'appellations',  io.appellations,
-      'naf', e.naf_code,
-      'nafLabel', public_naf_classes_2008.class_label,
-      'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
-                                    'postcode', e.post_code,
-                                    'city', e.city,
-                                    'departmentCode', e.department_code),
-      'contactMode', ic.contact_mode,
-      'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'job', ic.job, 'phone', ic.phone ),
-      'numberOfEmployeeRange', e.number_employees 
+        'rome', io.rome_code, 
+        'siret', io.siret, 
+        'distance_m', io.distance_m, 
+        'isSearchable',e.is_searchable,
+        'name', e.name, 
+        'website', e.website, 
+        'additionalInformation', e.additional_information, 
+        'customizedName', e.customized_name, 
+        'fitForDisabledWorkers', e.fit_for_disabled_workers,
+        'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+        'romeLabel', io.rome_label,
+        'appellations',  io.appellations,
+        'naf', e.naf_code,
+        'nafLabel', public_naf_classes_2008.class_label,
+        'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
+                                      'postcode', e.post_code,
+                                      'city', e.city,
+                                      'departmentCode', e.department_code),
+        'contactMode', ic.contact_mode,
+        'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'job', ic.job, 'phone', ic.phone ),
+        'numberOfEmployeeRange', e.number_employees 
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 
       LEFT JOIN establishments AS e ON e.siret = io.siret  
@@ -918,3 +892,38 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
       LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
       ORDER BY row_number ASC; `;
+
+const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
+  // Only compare romeCode and appellationCode
+  a.appellationCode == b.appellationCode;
+
+const objectsDeepEqual = <T>(a: T, b: T) =>
+  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
+
+const establishmentsEqual = (
+  a: EstablishmentEntity,
+  b: EstablishmentEntity,
+) => {
+  // Ignore key updatedAt
+  const { updatedAt: _unusedUpdatedAtA, ...establishmentAWithoutUpdatedAt } = a;
+  const { updatedAt: _unusedUpdatedAtB, ...establishmentBWithoutUpdatedAt } = b;
+
+  return objectsDeepEqual(
+    establishmentAWithoutUpdatedAt,
+    establishmentBWithoutUpdatedAt,
+  );
+};
+const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
+  // Ignore key id
+  const { id: _unusedIdA, ...contactAWithoutId } = a;
+  const { id: _unusedIdB, ...contactBWithoutId } = b;
+  return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
+};
+
+const buildAppellationsArray = `JSON_AGG(
+  JSON_BUILD_OBJECT(
+    'appellationCode', ogr_appellation::text,
+    'appellationLabel', libelle_appellation_long
+  )
+  ORDER BY ogr_appellation
+)`;

@@ -16,7 +16,11 @@ import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { formEstablishmentDtoPublicV0ToDomain } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { formEstablishmentSchemaPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.schema";
 import { searchImmersionRequestPublicV0ToDomain } from "../DtoAndSchemas/v0/input/SearchImmersionRequestPublicV0.dto";
-import { domainToSearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
+import {
+  domainToSearchImmersionResultPublicV0,
+  LegacyImmersionOfferId,
+  toGetSearchImmersionResultBySiretAndRomePayload,
+} from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const logger = createLogger(__filename);
 
@@ -43,8 +47,10 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         domainToSearchImmersionResultPublicV0(
-          await deps.useCases.getImmersionOfferById.execute(
-            req.params.id,
+          await deps.useCases.getSearchImmersionResultBySiretAndRome.execute(
+            toGetSearchImmersionResultBySiretAndRomePayload(
+              req.params.id as LegacyImmersionOfferId,
+            ),
             req.apiConsumer,
           ),
         ),

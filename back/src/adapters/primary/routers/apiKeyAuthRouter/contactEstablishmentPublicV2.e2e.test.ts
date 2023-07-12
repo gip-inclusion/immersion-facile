@@ -3,14 +3,14 @@ import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import {
-  InMemoryEstablishmentAggregateRepository,
-  TEST_POSITION,
-} from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
+import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { TEST_POSITION } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 
 const contactEstablishment: ContactEstablishmentPublicV2Dto = {
@@ -27,26 +27,16 @@ const contactEstablishment: ContactEstablishmentPublicV2Dto = {
 
 describe("POST contact-establishment public V2 route", () => {
   let request: SuperTest<Test>;
-  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
-  let authToken: string;
+  let inMemoryUow: InMemoryUnitOfWork;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
-    const config = new AppConfigBuilder()
-      .withRepositories("IN_MEMORY")
-      .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
-      .build();
-
-    const {
-      request: testAppRequest,
-      generateApiJwt,
-      inMemoryUow,
-    } = await buildTestApp(config);
-    request = testAppRequest;
-    authToken = generateApiJwt({
-      id: validAuthorizedApiKeyId,
-    });
-    establishmentAggregateRepository =
-      inMemoryUow.establishmentAggregateRepository;
+    ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp(
+      new AppConfigBuilder()
+        .withRepositories("IN_MEMORY")
+        .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
+        .build(),
+    ));
   });
 
   it("refuses to contact if no api key is provided", async () => {
@@ -57,37 +47,39 @@ describe("POST contact-establishment public V2 route", () => {
   it("returns 404 if siret not found", async () => {
     const response = await request
       .post(`/v2/contact-establishment`)
-      .set("Authorization", authToken)
+      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload))
       .send(contactEstablishment);
 
     expect(response.status).toBe(404);
   });
 
   it("contacts the establishment when everything goes right", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(contactEstablishment.siret)
-            .withPosition(TEST_POSITION)
-            .withNumberOfEmployeeRange("10-19")
-            .withAddress(rueSaintHonoreDto)
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-        )
-        .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder()
-            .withAppellationCode(contactEstablishment.appellationCode)
-            .build(),
-        ])
-        .build(),
-    ]);
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+      [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(contactEstablishment.siret)
+              .withPosition(TEST_POSITION)
+              .withNumberOfEmployeeRange("10-19")
+              .withAddress(rueSaintHonoreDto)
+              .build(),
+          )
+          .withContact(
+            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withAppellationCode(contactEstablishment.appellationCode)
+              .build(),
+          ])
+          .build(),
+      ],
+    );
 
     const response = await request
       .post(`/v2/contact-establishment`)
-      .set("Authorization", authToken)
+      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload))
       .send(contactEstablishment);
 
     expect(response.status).toBe(200);

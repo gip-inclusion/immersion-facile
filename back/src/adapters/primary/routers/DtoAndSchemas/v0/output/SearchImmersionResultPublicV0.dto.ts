@@ -7,6 +7,24 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
+import { GetSearchImmersionResultBySiretAndRomePayload } from "../../../../../../domain/immersionOffer/useCases/GetImmersionOfferById";
+
+export type LegacyImmersionOfferId = `${SiretDto}-${RomeCode}`;
+
+export const toLegacyImmersionOfferId = (
+  siret: SiretDto,
+  rome: RomeCode,
+): LegacyImmersionOfferId => `${siret}-${rome}`;
+
+export const toGetSearchImmersionResultBySiretAndRomePayload = (
+  id: LegacyImmersionOfferId,
+): GetSearchImmersionResultBySiretAndRomePayload => {
+  const [siret, rome] = id.split("-");
+  return {
+    rome,
+    siret,
+  };
+};
 
 type ContactDetailsPublicV0 = {
   id: ImmersionContactInEstablishmentId;
@@ -18,7 +36,7 @@ type ContactDetailsPublicV0 = {
 };
 
 export type SearchImmersionResultPublicV0 = {
-  id: string;
+  id: LegacyImmersionOfferId;
   rome: RomeCode;
   romeLabel: string;
   naf: string;
@@ -49,7 +67,7 @@ export const domainToSearchImmersionResultPublicV0 = (
     domain;
   return {
     ...rest,
-    id: `${rest.siret}-${rest.rome}`,
+    id: toLegacyImmersionOfferId(rest.siret, rest.rome),
     location: position,
     contactDetails: domain.contactDetails
       ? domainToContactDetailsV0(domain.contactDetails)

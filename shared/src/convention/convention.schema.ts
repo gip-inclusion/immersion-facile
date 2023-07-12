@@ -47,6 +47,7 @@ import {
   InternshipKind,
   internshipKinds,
   levelsOfEducation,
+  MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   RenewMagicLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
@@ -223,63 +224,34 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
           path: [path],
         });
       };
-
-      const signatoriesWithEmail = Object.entries(convention.signatories)
-        .filter(([_, value]) => !!value)
-        .map(([key, value]) => ({
-          key: key as keyof Signatories,
-          email: value.email,
-        }));
-      signatoriesWithEmail.forEach((signatory) => {
-        if (
-          signatoriesWithEmail
-            .filter((otherSignatory) => otherSignatory.key !== signatory.key)
-            .some((otherSignatory) => otherSignatory.email === signatory.email)
-        )
-          addIssue(
-            localization.signatoriesDistinctEmails,
-            getConventionFieldName(`signatories.${signatory.key}.email`),
-          );
-      });
-
-      if (
-        !isTutorEmailDifferentThanBeneficiaryRelatedEmails(
-          convention.signatories,
-          convention.establishmentTutor,
-        )
-      )
-        addIssue(
-          localization.beneficiaryTutorEmailMustBeDistinct,
-          getConventionFieldName("establishmentTutor.email"),
-        );
-
       const beneficiaryAgeAtConventionStart = differenceInYears(
         new Date(convention.dateStart),
         new Date(convention.signatories.beneficiary.birthdate),
       );
-      const weeklyHours = calculateWeeklyHoursFromSchedule(convention.schedule);
-      if (
-        convention.internshipKind === "mini-stage-cci" &&
-        beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
-        weeklyHours.some(
-          (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
-        )
-      ) {
-        addIssue(
-          `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
-          getConventionFieldName("schedule.totalHours"),
+
+      addIssuesIfDuplicateSignatoriesEmails(convention, addIssue);
+      addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor(convention, addIssue);
+
+      if (convention.internshipKind === "mini-stage-cci") {
+        addIssueIfLimitedScheduleHoursExceeded(
+          convention,
+          addIssue,
+          beneficiaryAgeAtConventionStart,
+        );
+        addIssueIfAgeLessThanMinimumAge(
+          addIssue,
+          beneficiaryAgeAtConventionStart,
+          MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
         );
       }
 
-      if (
-        beneficiaryAgeAtConventionStart <
-          IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT &&
-        convention.internshipKind === "immersion"
-      )
-        addIssue(
-          `L'âge minimum du bénéficiaire est de ${IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT}ans`,
-          getConventionFieldName("signatories.beneficiary.birthdate"),
+      if (convention.internshipKind === "immersion") {
+        addIssueIfAgeLessThanMinimumAge(
+          addIssue,
+          beneficiaryAgeAtConventionStart,
+          IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
         );
+      }
     })
     .refine(mustBeSignedByEveryone, {
       message: localization.mustBeSignedByEveryone,
@@ -338,3 +310,73 @@ export const renewMagicLinkRequestSchema: z.Schema<RenewMagicLinkRequestDto> =
     originalUrl: z.string(),
     expiredJwt: z.string(),
   });
+
+const addIssuesIfDuplicateSignatoriesEmails = (
+  convention: ConventionDtoWithoutExternalId,
+  addIssue: (message: string, path: string) => void,
+) => {
+  const signatoriesWithEmail = Object.entries(convention.signatories)
+    .filter(([_, value]) => !!value)
+    .map(([key, value]) => ({
+      key: key as keyof Signatories,
+      email: value.email,
+    }));
+  signatoriesWithEmail.forEach((signatory) => {
+    if (
+      signatoriesWithEmail
+        .filter((otherSignatory) => otherSignatory.key !== signatory.key)
+        .some((otherSignatory) => otherSignatory.email === signatory.email)
+    )
+      addIssue(
+        localization.signatoriesDistinctEmails,
+        getConventionFieldName(`signatories.${signatory.key}.email`),
+      );
+  });
+};
+
+const addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor = (
+  convention: ConventionDtoWithoutExternalId,
+  addIssue: (message: string, path: string) => void,
+) => {
+  if (
+    !isTutorEmailDifferentThanBeneficiaryRelatedEmails(
+      convention.signatories,
+      convention.establishmentTutor,
+    )
+  )
+    addIssue(
+      localization.beneficiaryTutorEmailMustBeDistinct,
+      getConventionFieldName("establishmentTutor.email"),
+    );
+};
+
+const addIssueIfLimitedScheduleHoursExceeded = (
+  convention: ConventionDtoWithoutExternalId,
+  addIssue: (message: string, path: string) => void,
+  beneficiaryAgeAtConventionStart: number,
+) => {
+  const weeklyHours = calculateWeeklyHoursFromSchedule(convention.schedule);
+  if (
+    beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
+    weeklyHours.some(
+      (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
+    )
+  ) {
+    addIssue(
+      `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
+      getConventionFieldName("schedule.totalHours"),
+    );
+  }
+};
+
+const addIssueIfAgeLessThanMinimumAge = (
+  addIssue: (message: string, path: string) => void,
+  beneficiaryAgeAtConventionStart: number,
+  miniumAgeRequirement: number,
+) => {
+  if (beneficiaryAgeAtConventionStart < miniumAgeRequirement)
+    addIssue(
+      `L'âge du bénéficiaire doit être au minimum de ${miniumAgeRequirement}ans`,
+      getConventionFieldName("signatories.beneficiary.birthdate"),
+    );
+};

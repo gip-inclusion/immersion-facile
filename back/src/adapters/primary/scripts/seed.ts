@@ -8,7 +8,7 @@ import {
   peParisAgencyId,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
@@ -80,16 +80,16 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
 
   const cciAgency = new AgencyDtoBuilder()
     .withId(cciAgencyId)
-    .withName("CCI Bordeaux")
+    .withName("CCI Carnac")
     .withQuestionnaireUrl("https://questionnaire.seed")
     .withSignature("Seed signature")
     .withKind("cci")
     .withStatus("active")
     .withAddress({
-      city: "Paris",
-      departmentCode: "75",
-      postcode: "75001",
-      streetNumberAndAddress: "1 rue de Rivoli",
+      city: "Plouharnel",
+      departmentCode: "56",
+      postcode: "56340",
+      streetNumberAndAddress: "5 Kerhueno",
     })
     .build();
 

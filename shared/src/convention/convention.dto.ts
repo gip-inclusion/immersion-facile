@@ -58,6 +58,7 @@ export const maximumCalendarDayByInternshipKind: Record<
   "mini-stage-cci": 5,
 };
 export const IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT = 16;
+export const MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT = 14;
 export const CCI_WEEKLY_LIMITED_SCHEDULE_HOURS = 30;
 export const CCI_WEEKLY_LIMITED_SCHEDULE_AGE = 16;
 
@@ -161,14 +162,14 @@ type StudentProperties = {
 //prettier-ignore
 export type Beneficiary<T extends InternshipKind> =
   GenericSignatory<"beneficiary"> & {
-    emergencyContact?: string;
-    emergencyContactPhone?: string;
-    emergencyContactEmail?: Email;
-    federatedIdentity?: PeConnectIdentity;
-    financiaryHelp?:string;
-    birthdate: string; // Date iso string
-    isRqth?: boolean;
-  } 
+  emergencyContact?: string;
+  emergencyContactPhone?: string;
+  emergencyContactEmail?: Email;
+  federatedIdentity?: PeConnectIdentity;
+  financiaryHelp?: string;
+  birthdate: string; // Date iso string
+  isRqth?: boolean;
+}
   & (T extends "mini-stage-cci" ? StudentProperties : {});
 /* eslint-enable @typescript-eslint/ban-types */
 

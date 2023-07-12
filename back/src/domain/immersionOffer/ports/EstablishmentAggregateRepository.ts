@@ -12,24 +12,25 @@ import { ImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
 export type OfferWithSiret = ImmersionOfferEntityV2 & { siret: SiretDto };
+export type SearchImmersionResult = SearchImmersionResultDto & {
+  isSearchable: boolean;
+};
+
+export type SearchImmersionParams = {
+  searchMade: SearchMade;
+  withContactDetails?: boolean;
+  maxResults?: number;
+};
+
 export interface EstablishmentAggregateRepository {
-  hasEstablishmentWithSiret: (siret: string) => Promise<boolean>;
   insertEstablishmentAggregates: (
     establishmentAggregates: EstablishmentAggregate[],
   ) => Promise<void>;
+
   updateEstablishmentAggregate: (
     establishmentAggregate: EstablishmentAggregate,
     updatedAt: Date,
   ) => Promise<void>;
-  createImmersionOffersToEstablishments: (
-    offersWithSiret: OfferWithSiret[],
-  ) => Promise<void>;
-
-  getSearchImmersionResultDtoFromSearchMade: (props: {
-    searchMade: SearchMade;
-    withContactDetails?: boolean;
-    maxResults?: number;
-  }) => Promise<SearchImmersionResultDto[]>;
 
   updateEstablishment: (
     propertiesToUpdate: Partial<EstablishmentEntity> & {
@@ -42,6 +43,17 @@ export interface EstablishmentAggregateRepository {
     siret: string,
   ) => Promise<void>;
 
+  markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
+    fromDate: Date,
+  ) => Promise<number>;
+
+  updateEstablishmentsWithInseeData: (
+    inseeCheckDate: Date,
+    params: UpdateEstablishmentsWithInseeDataParams,
+  ) => Promise<void>;
+
+  hasEstablishmentWithSiret: (siret: string) => Promise<boolean>;
+
   getEstablishmentAggregateBySiret: (
     siret: string,
   ) => Promise<EstablishmentAggregate | undefined>;
@@ -50,21 +62,12 @@ export interface EstablishmentAggregateRepository {
     siret: string,
   ) => Promise<AppellationAndRomeDto[]>;
 
-  getSearchImmersionResultDtoBySiretAndRome: (
-    siret: SiretDto,
-    rome: string,
-  ) => Promise<SearchImmersionResultDto | undefined>;
-
   getSearchImmersionResultDtoBySiretAndAppellationCode: (
     siret: SiretDto,
     appellationCode: AppellationCode,
   ) => Promise<SearchImmersionResultDto | undefined>;
 
   getSiretsOfEstablishmentsWithRomeCode: (rome: string) => Promise<SiretDto[]>;
-
-  markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
-    fromDate: Date,
-  ) => Promise<number>;
 
   getSiretOfEstablishmentsToSuggestUpdate: (
     before: Date,
@@ -75,10 +78,14 @@ export interface EstablishmentAggregateRepository {
     maxResults: number,
   ) => Promise<SiretDto[]>;
 
-  updateEstablishmentsWithInseeData: (
-    inseeCheckDate: Date,
-    params: UpdateEstablishmentsWithInseeDataParams,
-  ) => Promise<void>;
+  getSearchImmersionResultDtoBySiretAndRome: (
+    siret: SiretDto,
+    rome: string,
+  ) => Promise<SearchImmersionResultDto | undefined>;
+
+  searchImmersionResults: (
+    searchImmersionParams: SearchImmersionParams,
+  ) => Promise<SearchImmersionResult[]>;
 }
 
 export type ValuesToUpdateFromInseeApi = Partial<
