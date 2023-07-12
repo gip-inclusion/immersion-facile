@@ -93,15 +93,15 @@ export class InMemoryEstablishmentAggregateRepository
         uniq(aggregate.immersionOffers.map((offer) => offer.romeCode))
           .filter((uniqRome) => !rome || rome === uniqRome)
           .map((matchedRome) =>
-            buildSearchImmersionResultDtoForOneEstablishmentAndOneRome(
-              aggregate,
+            buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
+              establishmentAgg: aggregate,
               withContactDetails,
-              matchedRome,
-              {
+              searchedRome: matchedRome,
+              position: {
                 lat,
                 lon,
               },
-            ),
+            }),
           ),
       )
       .slice(0, maxResults);
@@ -119,11 +119,11 @@ export class InMemoryEstablishmentAggregateRepository
       contactDetails,
       isSearchable,
       ...buildSearchImmersionResultWithoutContactDetailsAndIsSearchable
-    } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome(
-      aggregate,
-      false,
-      rome,
-    );
+    } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
+      establishmentAgg: aggregate,
+      withContactDetails: false,
+      searchedRome: rome,
+    });
     return buildSearchImmersionResultWithoutContactDetailsAndIsSearchable;
   }
 
@@ -193,26 +193,13 @@ export class InMemoryEstablishmentAggregateRepository
       (offer) => offer.appellationCode === appellationCode,
     );
     if (!immersionOffer) return;
-    return {
-      rome: immersionOffer.romeCode,
-      romeLabel: TEST_ROME_LABEL,
-      appellations: [
-        {
-          appellationCode: immersionOffer.appellationCode,
-          appellationLabel: immersionOffer.appellationLabel,
-        },
-      ],
-      naf: aggregate.establishment.nafDto.code,
-      nafLabel: aggregate.establishment.nafDto.nomenclature,
-      siret,
-      name: aggregate.establishment.name,
-      customizedName: aggregate.establishment.customizedName,
-      voluntaryToImmersion: aggregate.establishment.voluntaryToImmersion,
-      numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
-      position: aggregate.establishment.position,
-      address: aggregate.establishment.address,
-      contactMode: aggregate.contact?.contactMethod,
-    };
+    const { isSearchable, ...rest } =
+      buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
+        establishmentAgg: aggregate,
+        withContactDetails: false,
+        searchedRome: immersionOffer.romeCode,
+      });
+    return rest;
   }
 
   async getSiretsOfEstablishmentsWithRomeCode(
@@ -273,12 +260,17 @@ export class InMemoryEstablishmentAggregateRepository
   }
 }
 
-const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = (
-  establishmentAgg: EstablishmentAggregate,
-  withContactDetails: boolean,
-  searchedRome: RomeCode,
-  position?: GeoPositionDto,
-): SearchImmersionResult => ({
+const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = ({
+  establishmentAgg,
+  withContactDetails,
+  searchedRome,
+  position,
+}: {
+  establishmentAgg: EstablishmentAggregate;
+  withContactDetails: boolean;
+  searchedRome: RomeCode;
+  position?: GeoPositionDto;
+}): SearchImmersionResult => ({
   address: establishmentAgg.establishment.address,
   naf: establishmentAgg.establishment.nafDto.code,
   nafLabel: establishmentAgg.establishment.nafDto.nomenclature,

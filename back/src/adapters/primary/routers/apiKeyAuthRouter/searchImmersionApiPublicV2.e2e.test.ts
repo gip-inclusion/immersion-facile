@@ -1,7 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import {
   defaultNafCode,
   EstablishmentEntityBuilder,
@@ -88,8 +88,8 @@ describe("search-immersion route", () => {
             voluntaryToImmersion: true,
             contactMode: "EMAIL",
             numberOfEmployeeRange: "10-19",
-            distance_m: 719436,
-            position: { lat: 43.8666, lon: 8.3333 },
+            distance_m: 0,
+            position: { lat: 48.8531, lon: 2.34999 },
           },
         ];
         const response = await request
