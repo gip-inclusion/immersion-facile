@@ -17,6 +17,5 @@ export const searchImmersionRequestPublicV2Schema: z.Schema<SearchImmersionReque
     longitude: zToNumber,
     distanceKm: zToNumber.positive("'distance_km' doit être > 0").max(100),
     voluntaryToImmersion: zToBoolean.optional(),
-    place: z.string().optional(),
     sortedBy: z.enum(["distance", "date"]).optional(),
   });
