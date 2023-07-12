@@ -1,25 +1,18 @@
-import { filter, map, prop } from "ramda";
+import { prop, propEq } from "ramda";
 import {
   ApiConsumer,
-  pipeWithValue,
   SearchImmersionParamsDto,
   searchImmersionParamsSchema,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
-import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
-import {
-  LaBonneBoiteAPI,
-  LaBonneBoiteRequestParams,
-} from "../ports/LaBonneBoiteAPI";
-import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
-
-const logger = createLogger(__filename);
+import { SearchMade } from "../entities/SearchMadeEntity";
+import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
+import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export class SearchImmersion extends TransactionalUseCase<
   SearchImmersionParamsDto,
@@ -28,7 +21,7 @@ export class SearchImmersion extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
+    private readonly laBonneBoiteAPI: LaBonneBoiteGateway,
     private readonly uuidGenerator: UuidGenerator,
   ) {
     super(uowPerformer);
@@ -37,97 +30,86 @@ export class SearchImmersion extends TransactionalUseCase<
   inputSchema = searchImmersionParamsSchema;
 
   public async _execute(
-    params: SearchImmersionParamsDto,
+    {
+      distanceKm,
+      latitude: lat,
+      longitude: lon,
+      place,
+      appellationCode,
+      sortedBy,
+      voluntaryToImmersion,
+      rome,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ...rest
+    }: SearchImmersionParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
-    const apiConsumerName = apiConsumer?.consumer;
-
     const searchMade: SearchMade = {
-      rome: params.rome,
-      lat: params.latitude,
-      lon: params.longitude,
-      distance_km: params.distanceKm,
-      sortedBy: params.sortedBy,
-      voluntaryToImmersion: params.voluntaryToImmersion,
-      place: params.place,
+      rome,
+      lat,
+      lon,
+      distanceKm,
+      sortedBy,
+      voluntaryToImmersion,
+      place,
     };
 
-    const searchMadeEntity: SearchMadeEntity = {
+    await uow.searchMadeRepository.insertSearchMade({
       ...searchMade,
       id: this.uuidGenerator.new(),
       needsToBeSearched: true,
-      apiConsumerName,
-    };
+      apiConsumerName: apiConsumer?.consumer,
+    });
 
-    await uow.searchMadeRepository.insertSearchMade(searchMadeEntity);
-
-    const lbbSearchResults = shouldFetchLBB(
-      params.rome,
-      params.voluntaryToImmersion,
-    )
-      ? await this.getSearchResultsFromLBB({
-          rome: params.rome,
-          lat: params.latitude,
-          lon: params.longitude,
-          distanceKm: params.distanceKm,
-        })
-      : [];
-
-    if (params.voluntaryToImmersion === false) return lbbSearchResults;
-
-    const resultsFromStorage =
-      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
-        {
-          searchMade,
-          withContactDetails: false,
-          maxResults: 100,
-        },
-      );
-
-    histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
-    logger.info(
-      { resultsFromStorage: resultsFromStorage.length },
-      "searchImmersionStored",
-    );
-
-    const isSiretAlreadyInStoredResults = <T extends { siret: SiretDto }>({
-      siret,
-    }: T) => !resultsFromStorage.map(prop("siret")).includes(siret);
+    const [repositorySearchResults, lbbSearchResults] = await Promise.all([
+      uow.establishmentAggregateRepository.searchImmersionResults({
+        searchMade,
+        withContactDetails: false,
+        maxResults: 100,
+      }),
+      shouldFetchLBB(rome, voluntaryToImmersion)
+        ? this.laBonneBoiteAPI.searchCompanies({
+            rome,
+            lat,
+            lon,
+            distanceKm,
+          })
+        : Promise.resolve([]),
+    ]);
 
     return [
-      ...resultsFromStorage,
-      ...lbbSearchResults.filter(isSiretAlreadyInStoredResults),
-    ];
+      ...(voluntaryToImmersion !== false
+        ? this.prepareVoluntaryToImmersionResults(repositorySearchResults)
+        : []),
+      ...lbbSearchResults.filter(
+        isSiretAlreadyInStoredResults(repositorySearchResults),
+      ),
+    ].filter(isSiretIsNotInNotSeachableResults(repositorySearchResults));
   }
 
-  private async getSearchResultsFromLBB(
-    params: LaBonneBoiteRequestParams & { distanceKm: number },
-  ): Promise<SearchImmersionResultDto[]> {
-    return pipeWithValue(
-      await this.laBonneBoiteAPI.searchCompanies(params),
-      filter<LaBonneBoiteCompanyVO>(
-        (company) =>
-          company.isCompanyRelevant() &&
-          company.props.distance <= params.distanceKm,
-      ),
-      deduplicateOnSiret,
-      map((company) => company.toSearchResult()),
-    );
+  private prepareVoluntaryToImmersionResults(
+    results: SearchImmersionResult[],
+  ): SearchImmersionResultDto[] {
+    histogramSearchImmersionStoredCount.observe(results.length);
+    return results.map(({ isSearchable, ...rest }) => rest);
   }
 }
-
-// first occurrence of a company is kept
-const deduplicateOnSiret = <T extends { siret: SiretDto }>(
-  companies: T[],
-): T[] => {
-  const sirets = companies.map((company) => company.siret);
-  return companies.filter(
-    (company, companyIndex) => sirets.indexOf(company.siret) === companyIndex,
-  );
-};
 
 const shouldFetchLBB = (
   rome: string | undefined,
   voluntaryToImmersion?: boolean | undefined,
 ): rome is string => !!rome && voluntaryToImmersion !== true;
+
+const isSiretAlreadyInStoredResults =
+  (searchImmersionQueryResults: SearchImmersionResult[]) =>
+  <T extends { siret: SiretDto }>({ siret }: T) =>
+    !searchImmersionQueryResults.map(prop("siret")).includes(siret);
+
+const isSiretIsNotInNotSeachableResults =
+  (searchImmersionQueryResults: SearchImmersionResult[]) =>
+  <T extends { siret: SiretDto }>({ siret }: T) =>
+    !searchImmersionQueryResults
+      .filter(propEq("isSearchable", false))
+      .map(prop("siret"))
+      .includes(siret);

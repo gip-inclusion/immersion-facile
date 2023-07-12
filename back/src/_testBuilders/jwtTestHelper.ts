@@ -1,8 +1,10 @@
 import {
+  ApiConsumerJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
   filterNotFalsy,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
+import { validAuthorizedApiKeyId } from "../adapters/secondary/InMemoryApiConsumerRepository";
 import { GenerateConventionJwt } from "../domain/auth/jwt";
 
 export const generateConventionJwtTestFn: GenerateConventionJwt = (payload) => {
@@ -34,4 +36,8 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
     .filter(filterNotFalsy)
     .join("/");
   return `http://fake-magic-link/${targetRoute}/${fakeJwt}`;
+};
+
+export const validApiConsumerJwtPayload: ApiConsumerJwtPayload = {
+  id: validAuthorizedApiKeyId,
 };

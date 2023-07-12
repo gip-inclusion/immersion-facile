@@ -1,7 +1,7 @@
 import { AbsoluteUrl } from "shared";
 import { withValidateHeadersAuthorization } from "shared";
 import { createTarget, createTargets } from "http-client";
-import { LaBonneBoiteCompanyProps } from "../../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
+import { LaBonneBoiteApiResultProps } from "./LaBonneBoiteCompanyDto";
 
 type HttpGetLaBonneBoiteCompanyParams = {
   commune_id?: string; // INSEE of municipality near which we are looking
@@ -19,7 +19,7 @@ type HttpGetLaBonneBoiteCompanyParams = {
 };
 
 type HttpGetLaBonneBoiteCompanyResponse = {
-  companies: LaBonneBoiteCompanyProps[];
+  companies: LaBonneBoiteApiResultProps[];
 };
 
 export type LaBonneBoiteTargets = ReturnType<typeof createLbbTargets>;

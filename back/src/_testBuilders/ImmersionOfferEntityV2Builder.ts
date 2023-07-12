@@ -48,3 +48,21 @@ export class ImmersionOfferEntityV2Builder
     return this.entity;
   }
 }
+
+export const secretariatImmersionOffer = new ImmersionOfferEntityV2Builder()
+  .withRomeCode("M1607")
+  .withAppellationLabel("Secrétaire")
+  .withAppellationCode("19364")
+  .build();
+
+export const boulangerImmersionOffer = new ImmersionOfferEntityV2Builder()
+  .withRomeCode("D1102")
+  .withAppellationLabel("Boulanger / Boulangère")
+  .withAppellationCode("11573")
+  .build();
+export const boulangerAssistantImmersionOffer =
+  new ImmersionOfferEntityV2Builder()
+    .withRomeCode("D1102")
+    .withAppellationLabel("Boulanger / Boulangère assistant de l'enfer!!!")
+    .withAppellationCode("00666")
+    .build();

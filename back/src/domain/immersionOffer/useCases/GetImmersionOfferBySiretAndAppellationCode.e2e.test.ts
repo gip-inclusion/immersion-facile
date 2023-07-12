@@ -4,7 +4,7 @@ import { rueSaintHonoreDto } from "../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import {
   defaultNafCode,
   EstablishmentEntityBuilder,
@@ -13,12 +13,13 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 import { InMemoryUnitOfWork } from "../../../adapters/primary/config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../../../adapters/primary/routers/DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
-  TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { validAuthorizedApiKeyId } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../auth/jwt";
+
+// TODO : A déplacer dans dossier e2e
 
 const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
@@ -31,7 +32,7 @@ const immersionOfferSiret = "78000403200019";
 describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersion-offers/:siret/:appellationCode`, () => {
   let request: SuperTest<Test>;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateApiJwt: GenerateApiConsumerJwt;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let authToken: string;
 
   beforeEach(async () => {
@@ -39,8 +40,10 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
       .withRepositories("IN_MEMORY")
       .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
       .build();
-    ({ request, inMemoryUow, generateApiJwt } = await buildTestApp(config));
-    authToken = generateApiJwt({
+    ({ request, inMemoryUow, generateApiConsumerJwt } = await buildTestApp(
+      config,
+    ));
+    authToken = generateApiConsumerJwt({
       id: validAuthorizedApiKeyId,
     });
 
@@ -79,8 +82,13 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
   });
 
   it("accepts valid authenticated requests", async () => {
-    // /!\ Those fields come from Builder (should probably not.)
-    const expectedResult: SearchImmersionResultPublicV2 = {
+    const response = await request
+      .get(
+        `/v2/immersion-offers/${immersionOfferSiret}/${styliste.appellationCode}`,
+      )
+      .set("Authorization", authToken);
+
+    expect(response.body).toEqual({
       rome: styliste.romeCode,
       naf: defaultNafCode,
       siret: "78000403200019",
@@ -97,16 +105,10 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
           appellationCode: styliste.appellationCode,
         },
       ],
-      nafLabel: TEST_NAF_LABEL,
-    };
-
-    const response = await request
-      .get(
-        `/v2/immersion-offers/${immersionOfferSiret}/${styliste.appellationCode}`,
-      )
-      .set("Authorization", authToken);
-
-    expect(response.body).toEqual(expectedResult);
+      nafLabel: "NAFRev2",
+      additionalInformation: "",
+      website: "www.jobs.fr",
+    } satisfies SearchImmersionResultPublicV2);
     expect(response.status).toBe(200);
   });
   it("returns 404 if no offer can be found with such siret & appelation code", async () => {
