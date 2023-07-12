@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -15,6 +16,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   defaultMaxContactsPerWeek,
   domElementIds,
+  emptyAppellationAndRome,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -38,21 +40,22 @@ import {
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {
-  createInitialFormValues,
-  defaultInitialValue,
   formEstablishmentDtoToFormEstablishmentQueryParams,
+  formEstablishmentQueryParamsToFormEstablishmentDto,
 } from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
-import { establishmentGateway } from "src/config/dependencies";
-import { BusinessContact } from "./BusinessContact";
+import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import {
-  emptyAppellation,
-  MultipleAppellationInput,
-} from "./MultipleAppellationInput";
+  EstablishmentRequestedPayload,
+  establishmentSlice,
+} from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { BusinessContact } from "./BusinessContact";
+import { MultipleAppellationInput } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
 
 type RouteByMode = {
@@ -66,29 +69,24 @@ type EstablishmentFormProps = {
   mode: Mode;
 };
 
-const getErrorsFromResponseData = (
-  error: Error | null,
-): error is Error & { response: { data: { errors: string } } } =>
-  !!error && !!(error as any)?.response?.data?.errors;
-
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const route = useRoute() as RouteByMode[Mode];
   const isEstablishmentCreation = route.name === "formEstablishment";
+  const feedback = useAppSelector(establishmentSelectors.feedback);
   const jwt = !isEstablishmentCreation ? route.params.jwt : "";
   const siret =
     isEstablishmentCreation && route.params.siret ? route.params.siret : "";
   const source =
     isEstablishmentCreation && route.params.source ? route.params.source : "";
-  const [isLoading, setIsLoading] = useState(mode === "edit");
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState<Error | null>(null);
+  const isLoading = useAppSelector(establishmentSelectors.isLoading);
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
   );
+  const initialFormEstablishment = useAppSelector(
+    establishmentSelectors.formEstablishment,
+  );
   const initialValues = {
-    ...(isEstablishmentCreation
-      ? createInitialFormValues(route.params)
-      : defaultInitialValue()),
+    ...initialFormEstablishment,
     source: (source === ""
       ? "immersion-facile"
       : source) as FormEstablishmentSource,
@@ -99,6 +97,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
+  const dispatch = useDispatch();
   const {
     handleSubmit,
     register,
@@ -114,31 +113,29 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const { enableMaxContactPerWeek } = useFeatureFlags();
   const formValues = getValues();
   const getFieldError = makeFieldError(methods.formState);
-  let errorMessage = submitError?.message;
 
   useInitialSiret(siret);
   useEffect(() => {
-    if (!isEstablishmentCreation && mode !== "create") {
-      establishmentGateway
-        .getFormEstablishmentFromJwt(
-          decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(jwt)
-            .siret,
-          jwt,
-        )
-        .then((formEstablishment) => reset(formEstablishment))
-        .catch((error) =>
-          routes
-            .errorRedirect({
-              kind: error.kind,
-              message: error.message,
-              title:
-                "Problème lors de la récupération des données de l'entreprise",
-            })
-            .push(),
-        )
-        .finally(() => setIsLoading(false));
-    }
+    const payload: EstablishmentRequestedPayload =
+      isEstablishmentCreation && mode !== "create"
+        ? formEstablishmentQueryParamsToFormEstablishmentDto(route.params)
+        : {
+            siret:
+              decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
+                jwt,
+              ).siret,
+            jwt,
+          };
+    dispatch(establishmentSlice.actions.establishmentRequested(payload));
+    return () => {
+      dispatch(establishmentSlice.actions.establishmentClearRequested());
+    };
   }, []);
+
+  useEffect(() => {
+    reset(initialFormEstablishment);
+  }, [initialFormEstablishment]);
+
   useEffect(() => {
     if (isEstablishmentCreation) {
       routes
@@ -149,33 +146,23 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, useDebounce(objectToDependencyList(formValues)));
 
-  if (getErrorsFromResponseData(submitError)) {
-    errorMessage = submitError["response"]["data"]["errors"];
-  }
+  useEffect(() => {
+    if (feedback.kind === "errored") {
+      routes
+        .errorRedirect({
+          message: feedback.errorMessage,
+          title: "Erreur",
+        })
+        .push();
+    }
+  }, [feedback.kind]);
 
-  const onSubmit: SubmitHandler<FormEstablishmentDto> = async (data) => {
-    setIsLoading(true);
-    setIsSuccess(false);
-    setSubmitError(null);
-    return (
-      isEstablishmentCreation
-        ? establishmentGateway.addFormEstablishment(data)
-        : establishmentGateway.updateFormEstablishment(data, jwt)
-    )
-      .then(() => {
-        setIsSuccess(true);
-        setSubmitError(null);
-      })
-      .catch((error) => {
-        //eslint-disable-next-line no-console
-        console.error("onSubmit", error);
-        setIsSuccess(false);
-        setSubmitError(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+  const onSubmit: SubmitHandler<FormEstablishmentDto> = (_data) => {
+    isEstablishmentCreation
+      ? dispatch(establishmentSlice.actions.establishmentCreationRequested())
+      : dispatch(establishmentSlice.actions.establishmentEditionRequested());
   };
+
   if (isLoading) {
     return <Loader />;
   }
@@ -293,7 +280,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               const appellationsToUpdate = formValues.appellations;
               const newAppellations: AppellationAndRomeDto[] =
                 appellationIndex === 0 && appellationsToUpdate.length === 1
-                  ? [emptyAppellation]
+                  ? [emptyAppellationAndRome]
                   : removeAtIndex(formValues.appellations, appellationIndex);
               setValue("appellations", newAppellations);
             }}
@@ -366,14 +353,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             errors={toDotNotation(formErrorsToFlatErrors(errors))}
             visible={submitCount !== 0 && Object.values(errors).length > 0}
           />
-          {submitError && (
+          {feedback.kind === "errored" && (
             <Alert
               severity="error"
               title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. "
-              description={errorMessage}
+              description={feedback.errorMessage}
             />
           )}
-          {isSuccess && (
+          {feedback.kind === "success" && (
             <Alert
               severity="success"
               title="Succès de l'envoi"
@@ -381,7 +368,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 votre entreprise."
             />
           )}
-          {!isSuccess && (
+          {feedback.kind !== "success" && (
             <div className={fr.cx("fr-mt-4w")}>
               <Button
                 iconId="fr-icon-checkbox-circle-line"

@@ -108,7 +108,7 @@ export const useEstablishmentSiret = (
     establishmentSelectors.sendModifyLinkSucceeded,
   );
   const sendModifyLinkFeedback = useAppSelector(
-    establishmentSelectors.sendModifyLinkFeedback,
+    establishmentSelectors.feedback,
   );
   return {
     currentSiret,

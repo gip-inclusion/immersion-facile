@@ -17,14 +17,23 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
     this.simulateBack = simulateBack;
   }
 
+  public formEstablishment$ = new Subject<FormEstablishmentDto>();
+  public addFormEstablishmentResult$ = new Subject<void>();
+
   public async addFormEstablishment(
-    immersionOffer: FormEstablishmentDto,
+    formEstablishment: FormEstablishmentDto,
   ): Promise<void> {
     //eslint-disable-next-line no-console
-    console.log("addFormEstablishment", immersionOffer);
+    console.log("addFormEstablishment", formEstablishment);
     await sleep(2000);
-    if (immersionOffer.businessName === "givemeanerrorplease")
+    if (formEstablishment.businessName === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
+  }
+
+  public addFormEstablishment$(
+    _formEstablishment: FormEstablishmentDto,
+  ): Observable<void> {
+    return this.addFormEstablishmentResult$;
   }
 
   public async requestEstablishmentModification(
@@ -40,7 +49,11 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
       ? of(undefined)
       : this.establishmentModificationResponse$;
   }
-
+  public getFormEstablishmentFromJwt$(
+    _jwt: string,
+  ): Observable<FormEstablishmentDto> {
+    return this.formEstablishment$;
+  }
   public async getFormEstablishmentFromJwt(
     _siret: string,
     jwt: string,

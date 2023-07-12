@@ -2,7 +2,7 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { useStyles } from "tss-react/dsfr";
-import { AppellationAndRomeDto } from "shared";
+import { AppellationAndRomeDto, emptyAppellationAndRome } from "shared";
 import { AppellationAutocomplete } from "../autocomplete/AppellationAutocomplete";
 
 type MultipleAppellationInputProps = {
@@ -13,13 +13,6 @@ type MultipleAppellationInputProps = {
   onAppellationDelete: (index: number) => void;
   error?: string;
   id: string;
-};
-
-export const emptyAppellation: AppellationAndRomeDto = {
-  romeCode: "",
-  appellationCode: "",
-  romeLabel: "",
-  appellationLabel: "",
 };
 
 export const MultipleAppellationInput = ({
@@ -74,7 +67,7 @@ export const MultipleAppellationInput = ({
         title="Ajouter un métier"
         priority="secondary"
         onClick={() => {
-          onAppellationAdd(emptyAppellation, currentAppellations.length);
+          onAppellationAdd(emptyAppellationAndRome, currentAppellations.length);
         }}
       >
         Ajouter un métier
