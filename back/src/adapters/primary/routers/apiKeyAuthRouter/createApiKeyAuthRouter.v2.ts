@@ -42,7 +42,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  publicV2SharedRouter.getOffersBySiretAndAppellationCode(async (req, res) =>
+  publicV2SharedRouter.getOfferBySiretAndAppellationCode(async (req, res) =>
     sendHttpResponse(req, res, async () => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
       return domainToSearchImmersionResultPublicV2(

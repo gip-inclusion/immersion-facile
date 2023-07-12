@@ -1,23 +1,26 @@
-import {SuperTest, Test} from "supertest";
-import {AppellationAndRomeDto, expectToEqual} from "shared";
-import {HttpClient} from "shared-routes";
-import {createSupertestSharedClient} from "shared-routes/supertest";
-import {rueSaintHonoreDto} from "../../../../_testBuilders/addressDtos";
-import {AppConfigBuilder} from "../../../../_testBuilders/AppConfigBuilder";
-import {buildTestApp} from "../../../../_testBuilders/buildTestApp";
-import {ContactEntityBuilder} from "../../../../_testBuilders/ContactEntityBuilder";
-import {EstablishmentAggregateBuilder} from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import {defaultNafCode, EstablishmentEntityBuilder,} from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import {ImmersionOfferEntityV2Builder} from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import {GenerateApiConsumerJwt} from "../../../../domain/auth/jwt";
+import { SuperTest, Test } from "supertest";
+import { AppellationAndRomeDto, expectToEqual } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
+import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
+import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
+import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
+import {
+  defaultNafCode,
+  EstablishmentEntityBuilder,
+} from "../../../../_testBuilders/EstablishmentEntityBuilder";
+import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import {validAuthorizedApiKeyId} from "../../../secondary/InMemoryApiConsumerRepository";
-import {InMemoryUnitOfWork} from "../../config/uowConfig";
-import {SearchImmersionResultPublicV2} from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
-import {PublicApiV2Routes, publicApiV2Routes} from "./publicApiV2.routes";
+import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
+import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
+import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
 
 // TODO : A déplacer dans dossier e2e
 
@@ -79,7 +82,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
   it("rejects unauthenticated requests", async () => {
     const siretNotInDB = "11000403200019";
 
-    const response = await sharedRequest.getOffersBySiretAndAppellationCode({
+    const response = await sharedRequest.getOfferBySiretAndAppellationCode({
       headers: {
         authorization: "",
       },
@@ -126,10 +129,10 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
     expect(response.status).toBe(200);
   });
 
-  it("returns 404 if no offer can be found with such siret & rome", async () => {
+  it("returns 404 if no offer can be found with such siret & appelation code", async () => {
     const siretNotInDB = "11000403200019";
 
-    const response = await sharedRequest.getOffersBySiretAndAppellationCode({
+    const response = await sharedRequest.getOfferBySiretAndAppellationCode({
       headers: {
         authorization: authToken,
       },
@@ -152,7 +155,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
       id: "my-unauthorized-id",
     });
 
-    const response = await sharedRequest.getOffersBySiretAndAppellationCode({
+    const response = await sharedRequest.getOfferBySiretAndAppellationCode({
       headers: {
         authorization: authToken,
       },
