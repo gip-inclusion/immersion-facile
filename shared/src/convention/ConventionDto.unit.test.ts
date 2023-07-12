@@ -1,5 +1,6 @@
 import { addDays, subYears } from "date-fns";
 import { keys } from "ramda";
+import { z, ZodError } from "zod";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
 import {
@@ -20,6 +21,7 @@ import {
   conventionSchema,
 } from "./convention.schema";
 import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
+import { getConventionTooLongMessageAndPath } from "./conventionRefinements";
 
 const currentEmployer: BeneficiaryCurrentEmployer = {
   role: "beneficiary-current-employer",
@@ -76,38 +78,68 @@ describe("conventionDtoSchema", () => {
     });
 
     it("rejects equal beneficiary and establishment tutor emails", () => {
-      expectConventionDtoToBeInvalid(
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
         new ConventionDtoBuilder()
           .withBeneficiaryEmail("demandeur@mail.fr")
           .withEstablishmentTutorEmail("demandeur@mail.fr")
           .build(),
+        [
+          "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
+        ],
       );
     });
 
     it("rejects equal beneficiary and establishment representative emails", () => {
-      expectConventionDtoToBeInvalid(
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
         new ConventionDtoBuilder()
           .withBeneficiaryEmail("demandeur@mail.fr")
           .withEstablishmentRepresentativeEmail("demandeur@mail.fr")
           .build(),
+        [
+          "Les emails des signataires doivent être différents.",
+          "Les emails des signataires doivent être différents.",
+        ],
       );
     });
 
     it("rejects equal beneficiary and beneficiary representative emails", () => {
-      expectConventionDtoToBeInvalid(
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
         new ConventionDtoBuilder()
           .withBeneficiaryEmail("demandeur@mail.fr")
           .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .build(),
+        [
+          "Obligatoire",
+          "Numéro de téléphone incorrect",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Les emails des signataires doivent être différents.",
+          "Les emails des signataires doivent être différents.",
+        ],
       );
     });
 
     it("rejects equal beneficiary representative and establishment tutor emails", () => {
-      expectConventionDtoToBeInvalid(
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
         new ConventionDtoBuilder()
           .withEstablishmentTutorEmail(beneficiaryRepresentative.email)
           .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .build(),
+        [
+          "Obligatoire",
+          "Numéro de téléphone incorrect",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
+        ],
       );
     });
 
@@ -115,23 +147,77 @@ describe("conventionDtoSchema", () => {
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryCurrentEmployer(currentEmployer)
         .build();
-      expectConventionDtoToBeInvalid(
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
         new ConventionDtoBuilder(convention)
           .withBeneficiaryEmail(currentEmployer.email)
           .build(),
+        [
+          "Obligatoire",
+          "Numéro de téléphone incorrect",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "SIRET doit être composé de 14 chiffres",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Les emails des signataires doivent être différents.",
+          "Les emails des signataires doivent être différents.",
+        ],
       );
-      expectConventionDtoToBeInvalid(
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
         new ConventionDtoBuilder(convention)
           .withBeneficiaryRepresentative({
             ...currentEmployer,
             role: "beneficiary-representative",
           })
           .build(),
+        [
+          "Obligatoire",
+          "Numéro de téléphone incorrect",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Numéro de téléphone incorrect",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "SIRET doit être composé de 14 chiffres",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Les emails des signataires doivent être différents.",
+          "Les emails des signataires doivent être différents.",
+        ],
       );
-      expectConventionDtoToBeInvalid(
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
         new ConventionDtoBuilder(convention)
           .withEstablishmentRepresentativeEmail(currentEmployer.email)
           .build(),
+        [
+          "Obligatoire",
+          "Numéro de téléphone incorrect",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "SIRET doit être composé de 14 chiffres",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Les emails des signataires doivent être différents.",
+          "Les emails des signataires doivent être différents.",
+        ],
       );
     });
 
@@ -155,14 +241,28 @@ describe("conventionDtoSchema", () => {
         agencyDepartment: "90",
         externalId: "sdfsdff",
       };
-      expect(() => conventionReadSchema.parse(invalidConventionRead)).toThrow();
+      expectConventionInvalidWithIssueMessages(
+        conventionReadSchema,
+        invalidConventionRead,
+        [
+          "Obligatoire",
+          "Numéro de téléphone incorrect",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Obligatoire",
+          "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
+        ],
+      );
     });
   });
 
   it("rejects when string with spaces are provided", () => {
     const convention = new ConventionDtoBuilder().withId("  ").build();
 
-    expectConventionDtoToBeInvalid(convention);
+    expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+      "Le format de l'identifiant est invalide",
+    ]);
   });
 
   it("rejects when phone is not a valid number", () => {
@@ -170,13 +270,17 @@ describe("conventionDtoSchema", () => {
       .withBeneficiaryPhone("wrong")
       .build();
 
-    expectConventionDtoToBeInvalid(convention);
+    expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+      "Numéro de téléphone incorrect",
+    ]);
 
     const convention2 = new ConventionDtoBuilder()
       .withBeneficiaryPhone("0203stillWrong")
       .build();
 
-    expectConventionDtoToBeInvalid(convention2);
+    expectConventionInvalidWithIssueMessages(conventionSchema, convention2, [
+      "Numéro de téléphone incorrect",
+    ]);
   });
 
   it("rejects when establishmentTutorPhone is not a valid number", () => {
@@ -184,7 +288,9 @@ describe("conventionDtoSchema", () => {
       .withEstablishementTutorPhone("wrong")
       .build();
 
-    expectConventionDtoToBeInvalid(convention);
+    expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+      "Numéro de téléphone incorrect",
+    ]);
   });
 
   describe("constraint on dates", () => {
@@ -193,7 +299,9 @@ describe("conventionDtoSchema", () => {
         .withDateSubmission("not-a-date")
         .build();
 
-      expectConventionDtoToBeInvalid(convention);
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "Le format de la date saisie est invalide",
+      ]);
     });
 
     it("rejects misformatted start dates", () => {
@@ -201,7 +309,11 @@ describe("conventionDtoSchema", () => {
         .withDateStart("not-a-date")
         .build();
 
-      expectConventionDtoToBeInvalid(convention);
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "Le format de la date de début est invalide",
+        "La date de fin doit être après la date de début.",
+        "La durée maximale calendaire d'une immersion est de 30 jours.",
+      ]);
     });
 
     it("rejects misformatted end dates", () => {
@@ -209,7 +321,11 @@ describe("conventionDtoSchema", () => {
         .withDateEnd("not-a-date")
         .build();
 
-      expectConventionDtoToBeInvalid(convention);
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "Le format de la date de fin est invalide",
+        "La date de fin doit être après la date de début.",
+        "La durée maximale calendaire d'une immersion est de 30 jours.",
+      ]);
     });
 
     it("rejects start dates that are after the end date", () => {
@@ -218,7 +334,9 @@ describe("conventionDtoSchema", () => {
         .withDateEnd("2021-01-03")
         .build();
 
-      expectConventionDtoToBeInvalid(convention);
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "La date de fin doit être après la date de début.",
+      ]);
     });
 
     it("accept start dates that are tuesday if submitting on previous friday", () => {
@@ -234,36 +352,46 @@ describe("conventionDtoSchema", () => {
     describe("Correctly handles max authorized number of days", () => {
       const calendarDayAndInternShips = keys(
         maximumCalendarDayByInternshipKind,
-      ).map((intershipKind) => ({
-        intershipKind,
-        maxCalendarDays: maximumCalendarDayByInternshipKind[intershipKind],
+      ).map((internshipKind) => ({
+        internshipKind,
+        maxCalendarDays: maximumCalendarDayByInternshipKind[internshipKind],
       }));
 
       it.each(calendarDayAndInternShips)(
         "for $intershipKind rejects when it is more than $maxCalendarDays",
-        ({ intershipKind, maxCalendarDays }) => {
+        ({ internshipKind, maxCalendarDays }) => {
           const convention = new ConventionDtoBuilder()
-            .withInternshipKind(intershipKind)
+            .withInternshipKind(internshipKind)
             .withDateStart(DATE_START)
             .withDateEnd(
               addDays(new Date(DATE_START), maxCalendarDays + 1).toISOString(),
             )
             .build();
 
-          expectConventionDtoToBeInvalid(convention);
+          expectConventionInvalidWithIssueMessages(
+            conventionSchema,
+            convention,
+            [
+              getConventionTooLongMessageAndPath({
+                internshipKind,
+                dateEnd: "",
+                dateStart: "",
+              }).message,
+            ],
+          );
         },
       );
 
       it.each(calendarDayAndInternShips)(
         "for $intershipKind accepts end date that are <= $maxCalendarDays calendar days after the start date",
-        ({ intershipKind, maxCalendarDays }) => {
+        ({ internshipKind, maxCalendarDays }) => {
           const dateStart = DATE_START;
           const dateEnd = addDays(
             new Date(DATE_START),
             maxCalendarDays,
           ).toISOString();
           const convention = new ConventionDtoBuilder()
-            .withInternshipKind(intershipKind)
+            .withInternshipKind(internshipKind)
             .withDateStart(dateStart)
             .withDateEnd(dateEnd)
             .build();
@@ -282,7 +410,7 @@ describe("conventionDtoSchema", () => {
           .withDateEnd(dateEnd)
           .withSchedule(reasonableSchedule)
           .withBeneficiary({
-            birthdate: new Date("2008-05-26").toISOString(),
+            birthdate: new Date("2006-05-26").toISOString(),
             firstName: "Jean",
             lastName: "Bono",
             role: "beneficiary",
@@ -292,7 +420,9 @@ describe("conventionDtoSchema", () => {
             isRqth: false,
           })
           .build();
-        expectConventionDtoToBeInvalid(convention);
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+          "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 16 ans est de 30h",
+        ]);
       });
     });
     describe("status that are available without signatures", () => {
@@ -324,7 +454,11 @@ describe("conventionDtoSchema", () => {
             .withStatus(status)
             .notSigned()
             .build();
-          expectConventionDtoToBeInvalid(convention);
+          expectConventionInvalidWithIssueMessages(
+            conventionSchema,
+            convention,
+            ["La confirmation de votre accord est obligatoire."],
+          );
         },
       );
     });
@@ -409,34 +543,63 @@ describe("conventionDtoSchema", () => {
             establishmentRepresentative,
           },
         };
-      expect(() =>
-        conventionInternshipKindSpecificSchema.parse(
-          badConventionInternshipKindSpecific,
-        ),
-      ).toThrow();
+      expectConventionInvalidWithIssueMessages(
+        conventionInternshipKindSpecificSchema,
+        badConventionInternshipKindSpecific,
+        ["Votre niveau d'étude est obligatoire."],
+      );
     });
   });
 
-  it("rejects when beneficiary age is under 16yr with internship kind 'immersion'", () => {
-    const immersionStartDate = new Date("2022-01-01");
-    const beneficiary: Beneficiary<"immersion"> = {
-      birthdate: addDays(subYears(immersionStartDate, 16), 1).toISOString(),
-      email: "a@a.com",
-      firstName: "sdfgf",
-      lastName: "sdfs",
-      phone: "0011223344",
-      role: "beneficiary",
-      isRqth: false,
-    };
+  describe("when beneficiary is too young", () => {
+    it('rejects when beneficiary age is under 16yr with internship kind "immersion"', () => {
+      const immersionStartDate = new Date("2022-01-01");
+      const beneficiary: Beneficiary<"immersion"> = {
+        birthdate: addDays(subYears(immersionStartDate, 16), 1).toISOString(),
+        email: "a@a.com",
+        firstName: "sdfgf",
+        lastName: "sdfs",
+        phone: "0011223344",
+        role: "beneficiary",
+        isRqth: false,
+      };
 
-    const convention = new ConventionDtoBuilder()
-      .withInternshipKind("immersion")
-      .withDateStart(immersionStartDate.toISOString())
-      .withDateEnd(new Date("2022-01-02").toISOString())
-      .withBeneficiary(beneficiary)
-      .build();
+      const convention = new ConventionDtoBuilder()
+        .withInternshipKind("immersion")
+        .withDateStart(immersionStartDate.toISOString())
+        .withDateEnd(new Date("2022-01-02").toISOString())
+        .withBeneficiary(beneficiary)
+        .build();
 
-    expectConventionDtoToBeInvalid(convention);
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "L'âge du bénéficiaire doit être au minimum de 16ans",
+      ]);
+    });
+
+    it('rejects when beneficiary age is under 14yr with internship kind "mini-stage-cci"', () => {
+      const immersionStartDate = new Date("2022-01-01");
+      const beneficiary: Beneficiary<"mini-stage-cci"> = {
+        levelOfEducation: "Terminale",
+        birthdate: addDays(subYears(immersionStartDate, 14), 1).toISOString(),
+        email: "a@a.com",
+        firstName: "sdfgf",
+        lastName: "sdfs",
+        phone: "0011223344",
+        role: "beneficiary",
+      };
+
+      const convention = new ConventionDtoBuilder()
+        .withInternshipKind("mini-stage-cci")
+        .withDateStart(immersionStartDate.toISOString())
+        .withDateEnd(new Date("2022-01-02").toISOString())
+        .withSchedule(reasonableSchedule)
+        .withBeneficiary(beneficiary)
+        .build();
+
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "L'âge du bénéficiaire doit être au minimum de 14ans",
+      ]);
+    });
   });
 });
 
@@ -445,5 +608,21 @@ const expectConventionDtoToBeValid = (validConvention: ConventionDto): void => {
   expect(conventionSchema.parse(validConvention)).toBeTruthy();
 };
 
-const expectConventionDtoToBeInvalid = (conventionDto: ConventionDto) =>
-  expect(() => conventionSchema.parse(conventionDto)).toThrow();
+const expectConventionInvalidWithIssueMessages = <T>(
+  schema: z.Schema<T>,
+  convention: T,
+  issueMessages: string[],
+) => {
+  expect(() => schema.parse(convention)).toThrow();
+  try {
+    schema.parse(convention);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      error.issues.forEach((issue, index) => {
+        expect(issue.message).toEqual(issueMessages[index]);
+      });
+      return;
+    }
+    throw new Error("Error expected when parsing convention");
+  }
+};
