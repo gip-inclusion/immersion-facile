@@ -7,7 +7,7 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { keys, values } from "ramda";
+import { keys } from "ramda";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
 import {
@@ -21,6 +21,7 @@ import {
   FormEstablishmentSource,
   immersionFacileContactEmail,
   noContactPerWeek,
+  objectToDependencyList,
   removeAtIndex,
   toDotNotation,
 } from "shared";
@@ -146,7 +147,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         )
         .replace();
     }
-  }, useDebounce(values(formValues)));
+  }, useDebounce(objectToDependencyList(formValues)));
 
   if (getErrorsFromResponseData(submitError)) {
     errorMessage = submitError["response"]["data"]["errors"];
