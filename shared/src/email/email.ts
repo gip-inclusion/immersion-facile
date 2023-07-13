@@ -1,5 +1,5 @@
 import { KeysOfUnion, ValueOf } from "../utils";
-import { Email } from "./email.dto";
+import { Email, EmailAttachment } from "./email.dto";
 import { emailTemplatesByName } from "./emailTemplatesByName";
 
 export type GenericTemplatedEmail<
@@ -11,7 +11,7 @@ export type GenericTemplatedEmail<
   recipients: string[];
   cc?: string[];
   replyTo?: { name: string; email: Email };
-  attachments?: { content: string; name: string }[];
+  attachments?: EmailAttachment[];
 };
 
 export type EmailType = TemplatedEmail["kind"];

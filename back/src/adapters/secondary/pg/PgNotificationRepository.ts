@@ -62,6 +62,7 @@ export class PgNotificationRepository implements NotificationRepository {
       `SELECT ${buildEmailNotificationObject} as notif
         FROM notifications_email e
         LEFT JOIN notifications_email_recipients r ON e.id = r.notifications_email_id
+        LEFT JOIN notifications_email_attachments a ON e.id = a.notifications_email_id
         WHERE e.id IN (${subQueryToGetEmailsNotificationsIds})
         GROUP BY e.id
         ORDER BY created_at DESC`,
@@ -137,6 +138,7 @@ export class PgNotificationRepository implements NotificationRepository {
     await this.insertNotificationEmail(notification);
     await this.insertEmailRecipients("to", notification);
     await this.insertEmailRecipients("cc", notification);
+    await this.insertEmailAttachments(notification);
   }
 
   private async insertNotificationEmail({
@@ -177,6 +179,24 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
+  private async insertEmailAttachments({
+    id,
+    templatedContent: { attachments },
+  }: EmailNotification) {
+    if (!attachments || attachments.length === 0) return;
+    if (attachments.length > 0) {
+      const query = `INSERT INTO notifications_email_attachments (notifications_email_id, attachment) VALUES %L`;
+      const values = attachments.map((attachment) => [id, attachment]);
+      await this.client.query(format(query, values)).catch((error) => {
+        logger.error(
+          { query, values, error },
+          "PgNotificationRepository_insertEmailAttachments_QueryErrored",
+        );
+        throw error;
+      });
+    }
+  }
+
   private async getSmsNotificationById(
     id: NotificationId,
   ): Promise<SmsNotification> {
@@ -199,7 +219,8 @@ export class PgNotificationRepository implements NotificationRepository {
         SELECT ${buildEmailNotificationObject} as notif
         FROM notifications_email e
         LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
-        WHERE id = $1
+        LEFT JOIN notifications_email_attachments a ON a.notifications_email_id = e.id
+        WHERE e.id = $1
         GROUP BY e.id
           `,
       [id],
@@ -260,7 +281,8 @@ const buildEmailNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
                 ) END,
               'recipients', ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'to' THEN r.email ELSE NULL END), NULL),
               'cc', ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'cc' THEN r.email ELSE NULL END), NULL),
-              'params', params
+              'params', params,
+              'attachments', ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL)
             )
         ))`;
 
