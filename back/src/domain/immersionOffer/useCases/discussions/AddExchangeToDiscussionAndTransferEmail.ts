@@ -224,6 +224,10 @@ const cleanContactEmailFromMessage = (message: string) =>
     .replaceAll(
       `&lt;<a href="mailto:${immersionFacileContactEmail}">${immersionFacileContactEmail}</a>&gt;`,
       "",
+    )
+    .replaceAll(
+      `&lt;<a href="mailto:${immersionFacileContactEmail}" target="_blank">${immersionFacileContactEmail}</a>&gt;`,
+      "",
     );
 
 const processEmailMessage = (item: BrevoEmailItem) => {
