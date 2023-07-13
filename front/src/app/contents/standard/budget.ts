@@ -5,7 +5,7 @@ export default {
 
   Il doit permettre au service Immersion Facilitée d’atteindre ses objectifs, en terme de volume d’immersions réalisées, d’entreprises inscrites sur le service, ou encore de satisfaction utilisateurs.
 
-  L’essentiel des dépenses se concentre sur les frais de personnels. 16 personnes travaillent pour la startup Immersion Facilitée.
+  L’essentiel des dépenses se concentre sur les frais de personnel. 16 personnes travaillent pour la startup Immersion Facilitée.
   
   <strong>Répartition des dépenses pour la période d’avril à septembre (en milliers d'euros)</strong>
   
