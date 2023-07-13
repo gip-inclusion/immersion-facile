@@ -173,4 +173,8 @@ export const defaultInitialValue = (
   website: "",
   additionalInformation: "",
   maxContactsPerWeek: defaultMaxContactsPerWeek,
+  naf: undefined,
+  isEngagedEnterprise: undefined,
+  fitForDisabledWorkers: undefined,
+  businessNameCustomized: undefined,
 });
