@@ -91,7 +91,7 @@ Ces derniers sont :
 
 Les mesures techniques et organisationnelles de sécurité adoptées pour assurer la confidentialité, l’intégrité et protéger l’accès des données sont notamment : 
 • Stockage des données en base de données
-• Stockage des mots de passe en base sont hachés
+• Mots de passe sont stockés en base de façon hachée afin de le rendre illisibles
 • Cloisonnement des données
 • Mesures de traçabilité
 • Surveillance
@@ -104,10 +104,10 @@ Les mesures techniques et organisationnelles de sécurité adoptées pour assure
 
 Certaines des données sont envoyées à des sous-traitants pour réaliser certaines missions. Le responsable de traitement s'est assuré de la mise en œuvre par ses sous-traitants de garanties adéquates et du respect de conditions strictes de confidentialité, d’usage et de protection des données.
 
-  Partenaire : OVH
+  Partenaire : Scalingo
   Pays destinataire : France
   Traitement réalisé : Hébergement
-  Garanties : <a href="https://www.ovh.com/fr/protection-donnees-personnelles" target="_blank">https://www.ovh.com/fr/protection-donnees-personnelles</a>
+  Garanties : <a href="https://scalingo.com/fr/contrat-gestion-traitements-donnees-personnelles" target="_blank">https://scalingo.com/fr/contrat-gestion-traitements-donnees-personnelles</a>
 
   Partenaire : Crisp
   Pays destinataire : Pays-Bas, Allemagne
