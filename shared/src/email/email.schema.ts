@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { requiredText } from "../zodUtils";
 import type { EmailType, TemplatedEmail } from "./email";
-import { Email } from "./email.dto";
+import type { Email, EmailAttachment } from "./email.dto";
+
+export const emailAttachmentSchema: z.Schema<EmailAttachment> = z.object({
+  name: z.string(),
+  content: z.string(),
+});
 
 const emailTypeSchema = z.string() as z.Schema<EmailType>;
 

@@ -26,6 +26,12 @@ const emailNotifications: EmailNotification[] = [
         agencyName: "My agency",
         agencyLogoUrl: "http://logo.com",
       },
+      attachments: [
+        {
+          name: "myFile.pdf",
+          content: "myFile content as base64",
+        },
+      ],
     },
   },
   {
@@ -42,6 +48,11 @@ const emailNotifications: EmailNotification[] = [
         businessAddress: "24 rue des boucher 67000 strasbourg",
         businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
       },
+      attachments: [
+        {
+          url: "http://my-file.com",
+        },
+      ],
     },
   },
   {
@@ -60,6 +71,7 @@ const emailNotifications: EmailNotification[] = [
         beneficiaryLastName: "L'éponge",
         businessName: "Essuie-tout",
       },
+      attachments: [],
     },
   },
 ];
@@ -89,6 +101,7 @@ describe("PgNotificationRepository", () => {
     );
     await client.query("DELETE FROM notifications_sms");
     await client.query("DELETE FROM notifications_email_recipients");
+    await client.query("DELETE FROM notifications_email_attachments");
     await client.query("DELETE FROM notifications_email");
   });
 
@@ -264,6 +277,7 @@ const createTemplatedEmailAndNotification = ({
     recipients,
     cc,
     params: { agencyName: "My agency", agencyLogoUrl: "https://my-logo.com" },
+    attachments: [],
   };
 
   const emailNotification: Notification = {

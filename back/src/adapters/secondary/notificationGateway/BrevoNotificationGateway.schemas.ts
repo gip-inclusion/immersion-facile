@@ -2,6 +2,8 @@ import { z } from "zod";
 import {
   AbsoluteUrl,
   absoluteUrlSchema,
+  EmailAttachment,
+  emailAttachmentSchema,
   emailSchema,
   Flavor,
   Phone,
@@ -49,12 +51,6 @@ const recipientOrSenderSchema: z.Schema<RecipientOrSender> = z.object({
   email: emailSchema,
 });
 
-type Attachement = { name: string; content: string } | { url: string };
-const attachementSchema: z.Schema<Attachement> = z.object({
-  name: z.string(),
-  content: z.string(),
-});
-
 export type SendTransactEmailRequestBody = {
   to: RecipientOrSender[];
   cc?: RecipientOrSender[];
@@ -63,7 +59,7 @@ export type SendTransactEmailRequestBody = {
   sender: RecipientOrSender;
   subject: string;
   tags?: string[];
-  attachment?: Attachement[];
+  attachment?: EmailAttachment[];
 };
 
 export const sendTransactEmailRequestBodySchema: z.Schema<SendTransactEmailRequestBody> =
@@ -75,7 +71,7 @@ export const sendTransactEmailRequestBodySchema: z.Schema<SendTransactEmailReque
     sender: recipientOrSenderSchema,
     subject: z.string(),
     tags: z.array(z.string()).optional(),
-    attachment: z.array(attachementSchema).optional(),
+    attachment: z.array(emailAttachmentSchema).optional(),
   });
 
 type SendTransactEmailResponseBody =
