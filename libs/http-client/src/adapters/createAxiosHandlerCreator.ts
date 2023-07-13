@@ -12,6 +12,7 @@ export const createAxiosHandlerCreator =
     const response = await axios.request({
       method: target.method,
       url: target.url,
+      responseType: target.responseType,
       data: body,
       params: queryParams,
       headers: {

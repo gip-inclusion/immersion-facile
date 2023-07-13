@@ -11,6 +11,7 @@ export type GenericTemplatedEmail<
   recipients: string[];
   cc?: string[];
   replyTo?: { name: string; email: Email };
+  attachments?: { content: string; name: string }[];
 };
 
 export type EmailType = TemplatedEmail["kind"];

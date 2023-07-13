@@ -5,6 +5,13 @@ type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 type MethodAndUrl<UrlWithParams = Url> = {
   method: HttpMethod;
   url: UrlWithParams;
+  responseType?:
+    | "arraybuffer"
+    | "blob"
+    | "document"
+    | "json"
+    | "text"
+    | "stream";
 };
 
 type OptionalFields<Body, QueryParams, Headers, ResponseBody> = {
@@ -106,6 +113,7 @@ export const createTarget = <
   validateHeaders: (headers) => headers as Headers,
   validateResponseBody: createThrowIfNotVoid("responseBody", target),
   ...target,
+  responseType: target.responseType ?? "json",
 });
 
 export const createTargets = <

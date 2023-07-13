@@ -89,6 +89,17 @@ export class BrevoNotificationGateway implements NotificationGateway {
       });
   }
 
+  public async getAttachmentContent(downloadToken: string): Promise<Buffer> {
+    const response = await this.httpClient.getAttachmentContent({
+      urlParams: { downloadToken },
+      headers: {
+        accept: "application/octet-stream",
+        "api-key": this.brevoHeaders["api-key"],
+      },
+    });
+    return response.responseBody;
+  }
+
   public async sendEmail(email: TemplatedEmail) {
     if (email.recipients.length === 0) {
       logger.error(
@@ -103,6 +114,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       to: this.filterAllowListAndConvertToRecipients(email.recipients),
       ...(email.replyTo ? { replyTo: email.replyTo } : {}),
       ...(cc.length ? { cc } : {}),
+      ...(email.attachments ? { attachment: email.attachments } : {}),
       ...configureGenerateHtmlFromTemplate(
         emailTemplatesByName,
         {

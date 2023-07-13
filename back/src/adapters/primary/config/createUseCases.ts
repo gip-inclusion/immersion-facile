@@ -129,6 +129,7 @@ export const createUseCases = (
           uowPerformer,
           saveNotificationAndRelatedEvent,
           config.immersionFacileDomain,
+          gateways.notification,
         ),
       convertSearchImmersionQueryParamsToSearchImmersionParamsDto:
         new ConvertSearchImmersionQueryParamsToSearchImmerssionParamsDto(

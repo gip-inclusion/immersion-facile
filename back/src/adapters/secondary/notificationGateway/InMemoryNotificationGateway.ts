@@ -36,6 +36,10 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     });
   }
 
+  public async getAttachmentContent(_downloadToken: string): Promise<Buffer> {
+    return this.attachment;
+  }
+
   public async sendSms(sms: TemplatedSms): Promise<void> {
     if (sms.recipientPhone === "33" + sendSmsErrorPhoneNumber.substring(1))
       throw new Error(
@@ -51,6 +55,8 @@ export class InMemoryNotificationGateway implements NotificationGateway {
   getSentSms(): TemplatedSms[] {
     return this.sentSms;
   }
+
+  public attachment: Buffer = Buffer.from("");
 
   private readonly sentEmails: {
     templatedEmail: TemplatedEmail;
