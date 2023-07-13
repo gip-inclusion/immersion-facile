@@ -46,7 +46,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
     private readonly httpClient: HttpClient<BrevoNotificationGatewayTargets>,
     private emailAllowListPredicate: (recipient: string) => boolean,
     apiKey: ApiKey,
-    private sender: RecipientOrSender,
+    private defaultSender: RecipientOrSender,
     private generateHtmlOptions: GenerateHtmlOptions = {},
   ) {
     this.brevoHeaders = {
@@ -128,7 +128,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
             }
           : { footer: undefined, header: undefined },
       )(email.kind, email.params, this.generateHtmlOptions),
-      sender: this.sender,
+      sender: email.sender ?? this.defaultSender,
     };
 
     if (emailData.to.length === 0) return;

@@ -135,6 +135,10 @@ describe("PgNotificationRepository", () => {
     const { id, emailNotification } = createTemplatedEmailAndNotification({
       recipients: ["bob@mail.com", "jane@mail.com"],
       cc: ["copy@mail.com"],
+      sender: {
+        email: "recette@immersion-facile.beta.gouv.fr",
+        name: "Recette Immersion Facile",
+      },
     });
 
     await pgNotificationRepository.save(emailNotification);
@@ -149,6 +153,10 @@ describe("PgNotificationRepository", () => {
     const { id, emailNotification } = createTemplatedEmailAndNotification({
       recipients,
       cc,
+      sender: {
+        email: "recette@immersion-facile.beta.gouv.fr",
+        name: "Recette Immersion Facile",
+      },
     });
 
     await pgNotificationRepository.save(emailNotification);
@@ -168,6 +176,10 @@ describe("PgNotificationRepository", () => {
     const { id, emailNotification } = createTemplatedEmailAndNotification({
       recipients: ["bob@mail.com"],
       cc: ["bob@mail.com"],
+      sender: {
+        email: "recette@immersion-facile.beta.gouv.fr",
+        name: "Recette Immersion Facile",
+      },
     });
 
     await pgNotificationRepository.save(emailNotification);
@@ -268,13 +280,19 @@ describe("PgNotificationRepository", () => {
 const createTemplatedEmailAndNotification = ({
   recipients,
   cc,
+  sender,
 }: {
   recipients: string[];
   cc?: string[];
+  sender: {
+    email: string;
+    name: string;
+  };
 }) => {
   const email: TemplatedEmail = {
     kind: "AGENCY_WAS_ACTIVATED",
     recipients,
+    sender,
     cc,
     params: { agencyName: "My agency", agencyLogoUrl: "https://my-logo.com" },
     attachments: [],

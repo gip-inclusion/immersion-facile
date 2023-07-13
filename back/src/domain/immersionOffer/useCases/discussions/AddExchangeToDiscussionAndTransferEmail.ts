@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { DiscussionId, ExchangeRole } from "shared";
+import {
+  DiscussionId,
+  ExchangeRole,
+  immersionFacileNoReplyEmailSender,
+} from "shared";
 import { renderContent } from "html-templates/src/components/email";
 import {
   BadRequestError,
@@ -159,6 +163,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       kind: "email",
       templatedContent: {
         kind: "DISCUSSION_EXCHANGE",
+        sender: immersionFacileNoReplyEmailSender,
         params: {
           subject: exchange.subject,
           htmlContent: exchange.message,
