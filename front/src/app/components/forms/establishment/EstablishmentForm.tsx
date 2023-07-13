@@ -118,7 +118,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   useInitialSiret(siret);
   useEffect(() => {
-    if (!isEstablishmentCreation) {
+    if (!isEstablishmentCreation && mode !== "create") {
       establishmentGateway
         .getFormEstablishmentFromJwt(
           decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(jwt)
