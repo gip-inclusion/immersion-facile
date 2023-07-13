@@ -84,5 +84,8 @@
   "peerDependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1"
+  },
+  "dependencies": {
+    "openapi-types": "^12.1.3"
   }
 }

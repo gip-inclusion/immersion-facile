@@ -6,6 +6,7 @@ import {
   createManagedAxiosInstance,
   establishmentTargets,
   inclusionConnectedAllowedTargets,
+  openApiDocTargets,
   searchTargets,
   siretTargets,
   unauthenticatedConventionTargets,
@@ -24,6 +25,7 @@ import { HttpEmailValidationGateway } from "src/core-logic/adapters/EmailValidat
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
+import { HttpOpenApiDocGateway } from "src/core-logic/adapters/OpenApiDocGateway/HttpOpenApiDocGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
@@ -60,6 +62,9 @@ export const createHttpDependencies = (): Dependencies => {
     technicalGateway: new HttpTechnicalGateway(axiosOnSlashApi),
     emailValidationGateway: new HttpEmailValidationGateway(
       createHttpClient(validateEmailsTargets),
+    ),
+    openApiDocGateway: new HttpOpenApiDocGateway(
+      createHttpClient(openApiDocTargets),
     ),
     ...createCommonDependencies(),
   };
