@@ -11,6 +11,8 @@ import {
 import { ignoreTabs } from "./helpers/formatters";
 import { HtmlTemplateEmailData } from "./createTemplatesByName";
 
+type Attachement = { url: string } | { name: string; content: string };
+
 export type GenerateHtmlOptions = { skipHead?: boolean };
 
 const renderHTMLRow = (html: string | undefined) =>
@@ -41,7 +43,7 @@ export const configureGenerateHtmlFromTemplate =
     subject: string;
     htmlContent: string;
     tags?: string[];
-    attachment?: { url: string }[];
+    attachment?: Attachement[];
   } => {
     const { createEmailVariables, tags } = templateByName[templateName];
     const {

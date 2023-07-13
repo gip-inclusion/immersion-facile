@@ -3,6 +3,7 @@ import { createTarget, createTargets } from "http-client";
 import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import {
+  brevoHeaderBinaryContentSchema,
   brevoHeaderSchema,
   sendTransactEmailRequestBodySchema,
   sendTransactEmailResponseSchema,
@@ -40,5 +41,12 @@ export const brevoNotificationGatewayTargets = createTargets({
         responseBody,
         logger,
       ),
+  }),
+  getAttachmentContent: createTarget({
+    method: "GET",
+    url: `${apiBrevoUrl}/inbound/attachments/:downloadToken`,
+    responseType: "arraybuffer",
+    validateHeaders: brevoHeaderBinaryContentSchema.parse,
+    validateResponseBody: (responseBody) => responseBody as Buffer,
   }),
 });

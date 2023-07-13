@@ -11,6 +11,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
+import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 import {
   addExchangeToDiscussion,
   createOpaqueEmail,
@@ -100,6 +101,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     domain: string,
+    private readonly notificationGateway: NotificationGateway,
   ) {
     super(uowPerformer);
     this.replyDomain = `reply.${domain}`;
@@ -114,6 +116,11 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     await Promise.all(
       brevoResponse.items.map((item) => this.processBrevoItem(uow, item)),
     );
+  }
+  private getBrevoItemAttachmentContent(
+    downloadToken: string,
+  ): Promise<Buffer> {
+    return this.notificationGateway.getAttachmentContent(downloadToken);
   }
   private async processBrevoItem(
     uow: UnitOfWork,
@@ -172,6 +179,14 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
               ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
               : `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
         },
+        attachments: await Promise.all(
+          item.Attachments.map(async (attachment) => ({
+            name: attachment.Name,
+            content: (
+              await this.getBrevoItemAttachmentContent(attachment.DownloadToken)
+            ).toString("base64"),
+          })),
+        ),
       },
       followedIds: {
         establishmentSiret: discussion.siret,

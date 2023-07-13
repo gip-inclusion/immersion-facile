@@ -13,6 +13,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryDiscussionAggregateRepository } from "../../../../adapters/secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   AddExchangeToDiscussionAndTransferEmail,
@@ -27,6 +28,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
   let addExchangeToDiscussionAndTransferEmail: AddExchangeToDiscussionAndTransferEmail;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
+  let notificationGateway: InMemoryNotificationGateway;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
@@ -39,6 +41,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
     );
     const uuidGenerator = new UuidV4Generator();
     timeGateway = new CustomTimeGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
       uuidGenerator,
       timeGateway,
@@ -49,6 +52,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         uowPerformer,
         saveNotificationAndRelatedEvent,
         domain,
+        notificationGateway,
       );
   });
 
@@ -60,6 +64,8 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         `${discussionId1}_b@${replyDomain}`,
         `${discussionId2}_e@${replyDomain}`,
       ]);
+      const bufferRawContent = Buffer.from("my-attachment-content");
+      notificationGateway.attachment = bufferRawContent;
 
       const discussion1 = new DiscussionAggregateBuilder()
         .withId(discussionId1)
@@ -141,6 +147,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
               name: `${discussion1.establishmentContact.firstName} ${discussion1.establishmentContact.lastName} - ${discussion1.businessName}`,
             },
             cc: [],
+            attachments: [
+              {
+                name: "IMG_20230617_151239.jpg",
+                content: bufferRawContent.toString("base64"),
+              },
+            ],
           },
           {
             kind: "DISCUSSION_EXCHANGE",
@@ -155,6 +167,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
               name: `${discussion2.potentialBeneficiary.firstName} ${discussion2.potentialBeneficiary.lastName}`,
             },
             cc: discussion2.establishmentContact.copyEmails,
+            attachments: [
+              {
+                name: "IMG_20230617_151239.jpg",
+                content: bufferRawContent.toString("base64"),
+              },
+            ],
           },
         ],
       });

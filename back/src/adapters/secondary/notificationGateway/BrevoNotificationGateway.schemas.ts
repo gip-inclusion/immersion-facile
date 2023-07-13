@@ -14,9 +14,17 @@ const apiKeySchema = z.string().nonempty();
 type ApplicationJsonType = "application/json";
 const applicationJsonSchema = z.literal("application/json");
 
+type ApplicationOctetStreamType = "application/octet-stream";
+const applicationOctetStreamSchema = z.literal("application/octet-stream");
+
 export type BrevoHeaders = {
   accept: ApplicationJsonType;
   "content-type": ApplicationJsonType;
+  "api-key": ApiKey;
+};
+
+export type BrevoBinaryContentHeaders = {
+  accept: ApplicationOctetStreamType;
   "api-key": ApiKey;
 };
 
@@ -25,6 +33,12 @@ export const brevoHeaderSchema: z.Schema<BrevoHeaders> = z.object({
   "content-type": applicationJsonSchema,
   "api-key": apiKeySchema,
 });
+
+export const brevoHeaderBinaryContentSchema: z.Schema<BrevoBinaryContentHeaders> =
+  z.object({
+    accept: applicationOctetStreamSchema,
+    "api-key": apiKeySchema,
+  });
 
 export type RecipientOrSender = {
   name?: string;
@@ -35,9 +49,10 @@ const recipientOrSenderSchema: z.Schema<RecipientOrSender> = z.object({
   email: emailSchema,
 });
 
-type Attachement = { url: string };
+type Attachement = { name: string; content: string } | { url: string };
 const attachementSchema: z.Schema<Attachement> = z.object({
-  url: z.string(),
+  name: z.string(),
+  content: z.string(),
 });
 
 export type SendTransactEmailRequestBody = {
