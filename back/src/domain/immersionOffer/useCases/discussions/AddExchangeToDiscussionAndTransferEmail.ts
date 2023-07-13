@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   DiscussionId,
   ExchangeRole,
+  immersionFacileContactEmail,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { renderContent } from "html-templates/src/components/email";
@@ -145,11 +146,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
 
     const exchange: ExchangeEntity = {
       subject: item.Subject,
-      message:
-        item.RawHtmlBody ||
-        (item.RawTextBody &&
-          renderContent(item.RawTextBody, { wrapInTable: false })) ||
-        "Pas de contenu",
+      message: processEmailMessage(item),
       sentAt: new Date(item.SentAtDate),
       recipient: recipientKind,
       sender,
@@ -220,3 +217,20 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     return [id, kind];
   }
 }
+
+const cleanContactEmailFromMessage = (message: string) =>
+  message
+    .replaceAll(`<${immersionFacileContactEmail}>`, "")
+    .replaceAll(
+      `&lt;<a href="mailto:${immersionFacileContactEmail}">${immersionFacileContactEmail}</a>&gt;`,
+      "",
+    );
+
+const processEmailMessage = (item: BrevoEmailItem) => {
+  const emailContent =
+    item.RawHtmlBody ||
+    (item.RawTextBody &&
+      renderContent(item.RawTextBody, { wrapInTable: false })) ||
+    "Pas de contenu";
+  return cleanContactEmailFromMessage(emailContent);
+};
