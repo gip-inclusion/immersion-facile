@@ -148,11 +148,11 @@ export class PgNotificationRepository implements NotificationRepository {
     templatedContent,
   }: EmailNotification) {
     const query = `
-    INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email, sender_email, sender_name)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
   `;
     // prettier-ignore
-    const values = [id, templatedContent.kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, templatedContent.params, templatedContent.replyTo?.name, templatedContent.replyTo?.email];
+    const values = [id, templatedContent.kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, templatedContent.params, templatedContent.replyTo?.name, templatedContent.replyTo?.email, templatedContent.sender?.email, templatedContent.sender?.name];
     await this.client.query(query, values).catch((error) => {
       logger.error(
         { query, values, error },
@@ -282,6 +282,13 @@ const buildEmailNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
               'recipients', ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'to' THEN r.email ELSE NULL END), NULL),
               'cc', ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'cc' THEN r.email ELSE NULL END), NULL),
               'params', params,
+              'sender', CASE
+                WHEN sender_email IS NULL THEN NULL
+                ELSE JSON_BUILD_OBJECT(
+                  'name', sender_name,
+                  'email', sender_email
+                ) END,
+                
               'attachments', ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL)
             )
         ))`;

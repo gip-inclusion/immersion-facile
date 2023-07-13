@@ -8,6 +8,10 @@ export type GenericTemplatedEmail<
 > = {
   kind: K;
   params: P;
+  sender?: {
+    name: string;
+    email: Email;
+  };
   recipients: string[];
   cc?: string[];
   replyTo?: { name: string; email: Email };
