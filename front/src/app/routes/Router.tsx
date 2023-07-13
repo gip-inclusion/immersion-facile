@@ -10,6 +10,7 @@ import { ConventionStatusDashboardPage } from "src/app/pages/convention/Conventi
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
+import { OpenApiDocPage } from "src/app/pages/openApiDoc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
@@ -91,6 +92,7 @@ const getPageByRouteName: {
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionAdmin: (route) => <ConventionManageAdminPage route={route} />,
   manageConventionOld: (route) => <ConventionManagePage route={route} />,
+  openApiDoc: () => <OpenApiDocPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => <SearchPage route={route} />,
   standard: (route) =>

@@ -112,6 +112,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.manageConventionOld}`,
   ),
+  openApiDoc: defineRoute("/doc-api-v2"),
   renewConventionMagicLink: defineRoute(
     { expiredJwt: param.query.string, originalURL: param.query.string },
     () => `/${frontRoutes.magicLinkRenewal}`,
