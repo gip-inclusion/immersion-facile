@@ -310,11 +310,9 @@ export class PgEstablishmentAggregateRepository
 
   async searchImmersionResults({
     searchMade,
-    withContactDetails = false,
     maxResults,
   }: {
     searchMade: SearchMade;
-    withContactDetails?: boolean;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
@@ -352,7 +350,6 @@ export class PgEstablishmentAggregateRepository
       );
     return immersionSearchResultDtos.map((dto) => ({
       ...dto,
-      contactDetails: withContactDetails ? dto.contactDetails : undefined,
       voluntaryToImmersion: true,
     }));
   }
@@ -524,7 +521,6 @@ export class PgEstablishmentAggregateRepository
     const result = immersionSearchResultDtos.at(0);
     if (!result) return;
     const {
-      contactDetails,
       isSearchable,
       ...searchResultWithoutContactDetailsAndIsSearchable
     } = result;
@@ -548,7 +544,7 @@ export class PgEstablishmentAggregateRepository
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
     if (!immersionSearchResultDto) return;
-    const { contactDetails, isSearchable, ...rest } = immersionSearchResultDto;
+    const { isSearchable, ...rest } = immersionSearchResultDto;
     return rest;
   }
 
@@ -594,9 +590,6 @@ export class PgEstablishmentAggregateRepository
         // TODO : find a way to return 'undefined' instead of 'null' from query
         customizedName: optional(row.search_immersion_result.customizedName),
         contactMode: optional(row.search_immersion_result.contactMode),
-        contactDetails: row.search_immersion_result.contactDetails?.id
-          ? row.search_immersion_result.contactDetails
-          : undefined,
         distance_m: optional(row.search_immersion_result.distance_m),
         numberOfEmployeeRange: optional(
           row.search_immersion_result.numberOfEmployeeRange,
@@ -883,7 +876,6 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
                                       'city', e.city,
                                       'departmentCode', e.department_code),
         'contactMode', ic.contact_mode,
-        'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'job', ic.job, 'phone', ic.phone ),
         'numberOfEmployeeRange', e.number_employees 
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 

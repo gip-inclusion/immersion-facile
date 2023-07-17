@@ -18,7 +18,6 @@ export type SearchImmersionResult = SearchImmersionResultDto & {
 
 export type SearchImmersionParams = {
   searchMade: SearchMade;
-  withContactDetails?: boolean;
   maxResults?: number;
 };
 

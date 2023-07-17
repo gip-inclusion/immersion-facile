@@ -1,9 +1,7 @@
 import {
   addressDtoToString,
   GeoPositionDto,
-  ImmersionContactInEstablishmentId,
   RomeCode,
-  SearchContactDto,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
@@ -26,15 +24,6 @@ export const toGetSearchImmersionResultBySiretAndRomePayload = (
   };
 };
 
-type ContactDetailsPublicV0 = {
-  id: ImmersionContactInEstablishmentId;
-  lastName: string;
-  firstName: string;
-  email: string;
-  role: string;
-  phone: string;
-};
-
 export type SearchImmersionResultPublicV0 = {
   id: LegacyImmersionOfferId;
   rome: RomeCode;
@@ -49,15 +38,7 @@ export type SearchImmersionResultPublicV0 = {
   city: string;
   contactMode?: "EMAIL" | "PHONE" | "IN_PERSON";
   distance_m?: number;
-  contactDetails?: ContactDetailsPublicV0;
   numberOfEmployeeRange?: string;
-};
-
-const domainToContactDetailsV0 = (
-  contactDetails: SearchContactDto,
-): ContactDetailsPublicV0 => {
-  const { job, ...rest } = contactDetails;
-  return { ...rest, role: job };
 };
 
 export const domainToSearchImmersionResultPublicV0 = (
@@ -69,9 +50,6 @@ export const domainToSearchImmersionResultPublicV0 = (
     ...rest,
     id: toLegacyImmersionOfferId(rest.siret, rest.rome),
     location: position,
-    contactDetails: domain.contactDetails
-      ? domainToContactDetailsV0(domain.contactDetails)
-      : undefined,
     address: addressDtoToString(domain.address),
     city: domain.address.city,
   };
