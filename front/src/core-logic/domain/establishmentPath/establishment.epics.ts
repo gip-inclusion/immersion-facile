@@ -1,5 +1,5 @@
 import { filter, iif, map, of, switchMap, tap } from "rxjs";
-import { JwtDto, LegacyHttpClientError } from "shared";
+import { JwtDto } from "shared";
 import {
   defaultFormEstablishmentValue,
   establishmentSlice,
@@ -42,15 +42,24 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
         siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound.match(action),
     ),
     filter(
-      () =>
+      (_action) =>
         state$.value.establishment.feedback.kind ===
         "readyForLinkRequestOrRedirection",
     ),
-    tap(() =>
-      navigationGateway.navigateToEstablishmentForm(
-        state$.value.siret.currentSiret,
-      ),
-    ),
+    tap((action) => {
+      if (
+        action.payload &&
+        typeof action.payload === "object" &&
+        "siret" in action.payload &&
+        "businessName" in action.payload
+      ) {
+        return navigationGateway.navigateToEstablishmentForm({
+          siret: action.payload.siret,
+          bName: action.payload.businessName,
+          bAddress: action.payload.businessAddress,
+        });
+      }
+    }),
     map(() => establishmentSlice.actions.backToIdle()),
   );
 
@@ -66,7 +75,13 @@ const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
     filter(establishmentSlice.actions.establishmentRequested.match),
     switchMap((action) =>
       iif(
-        () => hasPayloadJwt(action.payload),
+        () => {
+          console.log(
+            "hasPayloadJwt(action.payload)",
+            hasPayloadJwt(action.payload),
+          );
+          return hasPayloadJwt(action.payload);
+        },
         establishmentGateway.getFormEstablishmentFromJwt$(
           action.payload.siret ? action.payload.siret : "",
           hasPayloadJwt(action.payload) ? action.payload.jwt : "",
@@ -77,6 +92,10 @@ const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
         }),
       ),
     ),
+    map((args) => ({
+      ...defaultFormEstablishmentValue(),
+      //...action.payload,
+    })),
     map(establishmentSlice.actions.establishmentProvided),
     catchEpicError((error) =>
       establishmentSlice.actions.establishmentProvideFailed(error.message),
@@ -94,6 +113,24 @@ const addFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
       establishmentGateway.addFormEstablishment$(action.payload),
     ),
     map(establishmentSlice.actions.establishmentCreationSucceeded),
+    catchEpicError(establishmentSlice.actions.establishmentCreationFailed),
+  );
+
+const editFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(establishmentSlice.actions.establishmentEditionRequested.match),
+    switchMap((action) =>
+      establishmentGateway.updateFormEstablishment$(
+        action.payload.formEstablishment,
+        action.payload.jwt,
+      ),
+    ),
+    map(establishmentSlice.actions.establishmentEditionSucceeded),
+    catchEpicError(establishmentSlice.actions.establishmentEditionFailed),
   );
 
 export const establishmentEpics = [
@@ -101,4 +138,5 @@ export const establishmentEpics = [
   redirectToEstablishmentFormPageEpic,
   fetchEstablishmentEpic,
   addFormEstablishmentEpic,
+  editFormEstablishmentEpic,
 ];

@@ -10,9 +10,16 @@ import { SubmitFeedBack } from "../SubmitFeedback"; // type EstablishmentUiStatu
 type EstablishmentFeedback = SubmitFeedBack<
   | "success"
   | "readyForLinkRequestOrRedirection"
+  | "submitSuccess"
   | "submitErrored"
+  | "sendModificationLinkSuccess"
   | "sendModificationLinkErrored"
 >;
+
+export type EstablishmentUpdatePayload = {
+  formEstablishment: FormEstablishmentDto;
+  jwt: string;
+};
 
 export type EstablishmentRequestedPayload =
   | Partial<FormEstablishmentDto>
@@ -41,6 +48,10 @@ export const defaultFormEstablishmentValue = (
   website: "",
   additionalInformation: "",
   maxContactsPerWeek: defaultMaxContactsPerWeek,
+  naf: undefined,
+  isEngagedEnterprise: undefined,
+  fitForDisabledWorkers: undefined,
+  businessNameCustomized: undefined,
 });
 
 export type EstablishmentState = {
@@ -103,20 +114,30 @@ export const establishmentSlice = createSlice({
     },
     establishmentCreationSucceeded: (state) => {
       state.isLoading = false;
-      state.feedback = { kind: "success" };
+      state.feedback = { kind: "submitSuccess" };
     },
-    establishmentCreationFailed: () => {
-      //
+    establishmentCreationFailed: (state) => {
+      state.isLoading = false;
+      state.feedback = {
+        kind: "submitErrored",
+      };
     },
 
-    establishmentEditionRequested: () => {
-      //
+    establishmentEditionRequested: (
+      state,
+      _action: PayloadAction<EstablishmentUpdatePayload>,
+    ) => {
+      state.isLoading = true;
     },
-    establishmentEditionSucceeded: () => {
-      //
+    establishmentEditionSucceeded: (state) => {
+      state.isLoading = false;
+      state.feedback = { kind: "submitSuccess" };
     },
-    establishmentEditionFailed: () => {
-      //
+    establishmentEditionFailed: (state) => {
+      state.isLoading = false;
+      state.feedback = {
+        kind: "submitErrored",
+      };
     },
 
     // clear
@@ -130,7 +151,7 @@ export const establishmentSlice = createSlice({
     },
     sendModificationLinkSucceeded: (state) => {
       state.isLoading = false;
-      state.feedback = { kind: "success" };
+      state.feedback = { kind: "sendModificationLinkSuccess" };
     },
     sendModificationLinkFailed: (state) => {
       state.isLoading = false;

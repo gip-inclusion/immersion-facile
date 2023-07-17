@@ -5,7 +5,8 @@ const establishmentState = (state: RootState) => state.establishment;
 
 const sendModifyLinkSucceeded = createSelector(
   establishmentState,
-  (establishment) => establishment.feedback.kind === "success",
+  (establishment) =>
+    establishment.feedback.kind === "sendModificationLinkSuccess",
 );
 
 const isReadyForLinkRequestOrRedirection = createSelector(
