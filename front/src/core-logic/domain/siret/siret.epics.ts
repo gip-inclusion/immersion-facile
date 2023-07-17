@@ -60,7 +60,9 @@ const getSiretEpic: SiretEpic = (
     // (with an errored observable, caught here with catchEpicError())
     map<GetSiretInfo | null, SiretAction>((siretResult) => {
       if (siretResult === null)
-        return siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound();
+        return siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound({
+          siret: state$.value.siret.currentSiret,
+        });
       return typeof siretResult === "string"
         ? siretSlice.actions.siretInfoFailed(siretResult)
         : siretSlice.actions.siretInfoSucceeded(siretResult);

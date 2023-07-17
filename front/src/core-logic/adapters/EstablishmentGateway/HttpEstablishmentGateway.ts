@@ -24,7 +24,6 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     siret: SiretDto,
     jwt: string,
   ): Observable<FormEstablishmentDto> {
-    console.log("getFormEstablishmentFromJwt$", jwt);
     return from(this.getFormEstablishmentFromJwt(siret, jwt));
   }
 
