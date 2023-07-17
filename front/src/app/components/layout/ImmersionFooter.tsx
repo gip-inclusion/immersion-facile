@@ -176,7 +176,7 @@ const bottomsLinks: NavLink[] = [
   },
   {
     label: "Documentation API",
-    href: "/doc-api-v2",
+    href: "/doc-api",
     id: bottomsLinksIds.sitemap,
   },
 ];
