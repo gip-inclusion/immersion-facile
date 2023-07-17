@@ -19,8 +19,6 @@ import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlag
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { inclusionConnectedEpics } from "src/core-logic/domain/inclusionConnected/inclusionConnected.epics";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
-import { openApiDocEpics } from "src/core-logic/domain/openApiDoc/openApiDoc.epics";
-import { openApiDocSlice } from "src/core-logic/domain/openApiDoc/openApiDoc.slice";
 import { romeAutocompleteEpic } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.epics";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
@@ -61,7 +59,6 @@ const allEpics: any[] = [
   ...inclusionConnectedEpics,
   ...agencyInfoEpics,
   ...icUsersAdminEpics,
-  ...openApiDocEpics,
 ];
 
 const rootReducer = combineReducers({
@@ -78,7 +75,6 @@ const rootReducer = combineReducers({
   [authSlice.name]: authSlice.reducer,
   [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
-  [openApiDocSlice.name]: openApiDocSlice.reducer,
   admin: combineReducers({
     [agencyAdminSlice.name]: agencyAdminSlice.reducer,
     [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,
