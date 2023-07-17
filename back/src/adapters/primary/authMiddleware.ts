@@ -281,3 +281,65 @@ export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
 
   return { verifyJwt, verifyDeprecatedJwt };
 };
+
+const responseErrorForV2 = (res: Response, message: string, status = 403) =>
+  res.status(status).json({ message: `forbidden: ${message}`, status });
+
+export const makeApiKeyAuthMiddlewareV2 = (
+  getApiConsumerById: GetApiConsumerById,
+  timeGateway: TimeGateway,
+  config: AppConfig,
+) => {
+  const verifyJwt = makeVerifyJwtES256<"apiConsumer">(config.apiJwtPublicKey);
+
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const incTotalCountForRequest = createIncTotalCountForRequest(req);
+    if (!req.headers.authorization) {
+      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
+      return responseErrorForV2(res, "unauthenticated", 401);
+    }
+
+    try {
+      const { id } = verifyJwt(req.headers.authorization);
+
+      const apiConsumer = await getApiConsumerById(id);
+
+      if (!apiConsumer) {
+        incTotalCountForRequest({
+          authorisationStatus: "consumerNotFound",
+        });
+        return responseErrorForV2(res, "consumer not found");
+      }
+
+      if (!apiConsumer.isAuthorized) {
+        incTotalCountForRequest({
+          authorisationStatus: "unauthorisedId",
+          consumerName: apiConsumer.consumer,
+        });
+        return responseErrorForV2(res, "unauthorised consumer Id");
+      }
+
+      if (apiConsumer.expirationDate < timeGateway.now()) {
+        incTotalCountForRequest({
+          authorisationStatus: "expiredToken",
+          consumerName: apiConsumer.consumer,
+        });
+        return responseErrorForV2(res, "expired token");
+      }
+
+      // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
+      incTotalCountForRequest({
+        consumerName: apiConsumer.consumer,
+        authorisationStatus: "authorised",
+      });
+
+      req.apiConsumer = apiConsumer;
+      return next();
+    } catch (_) {
+      incTotalCountForRequest({
+        authorisationStatus: "incorrectJwt",
+      });
+      return responseErrorForV2(res, "incorrect Jwt", 401);
+    }
+  };
+};
