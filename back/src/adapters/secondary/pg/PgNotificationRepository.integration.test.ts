@@ -71,7 +71,7 @@ const emailNotifications: EmailNotification[] = [
         beneficiaryLastName: "L'éponge",
         businessName: "Essuie-tout",
       },
-      attachments: [],
+      attachments: undefined,
     },
   },
 ];
@@ -295,7 +295,6 @@ const createTemplatedEmailAndNotification = ({
     sender,
     cc,
     params: { agencyName: "My agency", agencyLogoUrl: "https://my-logo.com" },
-    attachments: [],
   };
 
   const emailNotification: Notification = {
