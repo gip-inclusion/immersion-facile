@@ -6,11 +6,13 @@ import {
   createManagedAxiosInstance,
   establishmentTargets,
   inclusionConnectedAllowedTargets,
+  openApiDocTargets,
   searchTargets,
   siretTargets,
   unauthenticatedConventionTargets,
   validateEmailsTargets,
 } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
@@ -23,6 +25,7 @@ import { HttpEmailValidationGateway } from "src/core-logic/adapters/EmailValidat
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
+import { HttpOpenApiDocGateway } from "src/core-logic/adapters/OpenApiDocGateway/HttpOpenApiDocGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
@@ -50,7 +53,7 @@ export const createHttpDependencies = (): Dependencies => {
       axiosOnSlashApi,
     ),
     immersionSearchGateway: new HttpImmersionSearchGateway(
-      createHttpClient(searchTargets),
+      createAxiosSharedClient(searchTargets, axiosOnSlashApi),
     ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(
@@ -59,6 +62,9 @@ export const createHttpDependencies = (): Dependencies => {
     technicalGateway: new HttpTechnicalGateway(axiosOnSlashApi),
     emailValidationGateway: new HttpEmailValidationGateway(
       createHttpClient(validateEmailsTargets),
+    ),
+    openApiDocGateway: new HttpOpenApiDocGateway(
+      createHttpClient(openApiDocTargets),
     ),
     ...createCommonDependencies(),
   };

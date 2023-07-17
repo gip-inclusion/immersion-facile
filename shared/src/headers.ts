@@ -16,3 +16,7 @@ export const withValidateHeadersAuthorization = {
   // Authorization is needed but the rest of the headers will still be there at runtime.
   // Without passthrough, the rest of the headers would have been stripped.
 };
+
+export const withAuthorizationHeaders = {
+  headersSchema: withAuthorizationSchema.passthrough(),
+};

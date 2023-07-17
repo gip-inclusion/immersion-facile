@@ -7,15 +7,6 @@ import {
 } from "shared";
 import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
 
-type SearchContactDto = {
-  id: string;
-  lastName: string;
-  firstName: string;
-  email: string;
-  job: string;
-  phone: string;
-};
-
 export type SearchImmersionResultPublicV1 = {
   rome: RomeCode;
   romeLabel: string;
@@ -30,7 +21,6 @@ export type SearchImmersionResultPublicV1 = {
   city: string;
   contactMode?: ContactMethod;
   distance_m?: number;
-  contactDetails?: SearchContactDto;
   numberOfEmployeeRange?: string;
   website?: string;
   additionalInformation?: string;

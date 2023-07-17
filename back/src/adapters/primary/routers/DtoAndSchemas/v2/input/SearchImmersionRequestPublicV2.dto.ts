@@ -14,7 +14,6 @@ export type SearchImmersionRequestPublicV2 = {
   distanceKm: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
-  place?: string;
 };
 
 export const searchImmersionRequestPublicV2ToDomain = (

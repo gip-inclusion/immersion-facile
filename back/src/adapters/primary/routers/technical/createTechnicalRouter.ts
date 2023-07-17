@@ -15,6 +15,7 @@ import {
 } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
+import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
 
 export const createTechnicalRouter = (
   deps: AppDependencies,
@@ -54,6 +55,14 @@ export const createTechnicalRouter = (
     .get(async (req, res) =>
       sendRedirectResponse(req, res, () =>
         deps.useCases.getLink.execute(req.params.shortLinkId),
+      ),
+    );
+
+  technicalRouter
+    .route(`/open-api-spec`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        Promise.resolve(createOpenApiSpecV2(deps.config.envType)),
       ),
     );
 

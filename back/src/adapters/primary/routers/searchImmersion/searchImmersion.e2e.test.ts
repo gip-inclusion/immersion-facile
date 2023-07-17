@@ -50,7 +50,6 @@ describe("search-immersion route", () => {
           establishmentAggregateToSearchResultByRome(
             establishmentAgg,
             immersionOffer.romeCode,
-            false,
             0,
           ),
         ]);

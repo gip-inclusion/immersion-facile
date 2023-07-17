@@ -106,7 +106,9 @@ describe(`/${contactEstablishmentRoute} route`, () => {
       siret: "40400040000404",
     });
 
-    expect(response.body).toEqual({ errors: 40400040000404 });
+    expect(response.body).toEqual({
+      errors: "No establishment found with siret: 40400040000404",
+    });
     expect(response.status).toBe(404);
   });
 

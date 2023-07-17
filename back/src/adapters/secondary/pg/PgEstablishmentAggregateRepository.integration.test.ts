@@ -142,7 +142,6 @@ describe("PgEstablishmentAggregateRepository", () => {
         const searchResult: SearchImmersionResultDto[] =
           await pgEstablishmentAggregateRepository.searchImmersionResults({
             searchMade: searchMadeWithoutRome,
-            withContactDetails: false,
             maxResults: 1,
           });
 
@@ -485,14 +484,10 @@ describe("PgEstablishmentAggregateRepository", () => {
       const searchResult: SearchImmersionResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: searchMadeWithRome,
-          withContactDetails: true,
         });
 
       // Assert : one match and defined contact details
       expect(searchResult).toHaveLength(1);
-      expect(searchResult[0].contactDetails?.id).toEqual(
-        contactUidOfOfferMatchingSearch,
-      );
     });
   });
 
@@ -979,7 +974,6 @@ describe("PgEstablishmentAggregateRepository", () => {
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         contactMode: contact.contactMethod,
         distance_m: undefined,
-        // contactDetails: undefined,
       });
     });
   });
@@ -1062,7 +1056,6 @@ describe("PgEstablishmentAggregateRepository", () => {
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         contactMode: contact.contactMethod,
         distance_m: undefined,
-        // contactDetails: undefined,
       });
     });
     it("Returns reconstructed SearchImmersionResultDto for given siret and rome when no appellation and no contact is specified", async () => {
@@ -1116,7 +1109,6 @@ describe("PgEstablishmentAggregateRepository", () => {
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         contactMode: undefined,
         distance_m: undefined,
-        contactDetails: undefined,
       });
     });
 

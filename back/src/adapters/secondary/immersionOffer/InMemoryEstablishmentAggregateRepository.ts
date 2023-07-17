@@ -84,7 +84,6 @@ export class InMemoryEstablishmentAggregateRepository
 
   public async searchImmersionResults({
     searchMade: { lat, lon, rome },
-    withContactDetails = false,
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this._establishmentAggregates
@@ -95,7 +94,6 @@ export class InMemoryEstablishmentAggregateRepository
           .map((matchedRome) =>
             buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
               establishmentAgg: aggregate,
-              withContactDetails,
               searchedRome: matchedRome,
               position: {
                 lat,
@@ -116,12 +114,10 @@ export class InMemoryEstablishmentAggregateRepository
     );
     if (!aggregate) return undefined;
     const {
-      contactDetails,
       isSearchable,
       ...buildSearchImmersionResultWithoutContactDetailsAndIsSearchable
     } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
       establishmentAgg: aggregate,
-      withContactDetails: false,
       searchedRome: rome,
     });
     return buildSearchImmersionResultWithoutContactDetailsAndIsSearchable;
@@ -196,7 +192,6 @@ export class InMemoryEstablishmentAggregateRepository
     const { isSearchable, ...rest } =
       buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
         establishmentAgg: aggregate,
-        withContactDetails: false,
         searchedRome: immersionOffer.romeCode,
       });
     return rest;
@@ -262,12 +257,10 @@ export class InMemoryEstablishmentAggregateRepository
 
 const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = ({
   establishmentAgg,
-  withContactDetails,
   searchedRome,
   position,
 }: {
   establishmentAgg: EstablishmentAggregate;
-  withContactDetails: boolean;
   searchedRome: RomeCode;
   position?: GeoPositionDto;
 }): SearchImmersionResult => ({
@@ -299,16 +292,5 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = ({
       )
     : undefined,
   position: establishmentAgg.establishment.position,
-  ...(withContactDetails &&
-    establishmentAgg.contact && {
-      contactDetails: {
-        id: establishmentAgg.contact.id,
-        firstName: establishmentAgg.contact.firstName,
-        lastName: establishmentAgg.contact.lastName,
-        email: establishmentAgg.contact.email,
-        phone: establishmentAgg.contact.phone,
-        job: establishmentAgg.contact.job,
-      },
-    }),
   isSearchable: establishmentAgg.establishment.isSearchable,
 });
