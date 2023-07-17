@@ -1,4 +1,4 @@
-import { filter, iif, map, of, switchMap, tap } from "rxjs";
+import { filter, map, of, switchMap, tap } from "rxjs";
 import { JwtDto } from "shared";
 import {
   defaultFormEstablishmentValue,
@@ -50,13 +50,16 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
       if (
         action.payload &&
         typeof action.payload === "object" &&
-        "siret" in action.payload &&
-        "businessName" in action.payload
+        "siret" in action.payload
       ) {
         return navigationGateway.navigateToEstablishmentForm({
           siret: action.payload.siret,
-          bName: action.payload.businessName,
-          bAddress: action.payload.businessAddress,
+          bName:
+            "businessName" in action.payload ? action.payload.businessName : "",
+          bAddress:
+            "businessAddress" in action.payload
+              ? action.payload.businessAddress
+              : "",
         });
       }
     }),
@@ -74,28 +77,16 @@ const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
   action$.pipe(
     filter(establishmentSlice.actions.establishmentRequested.match),
     switchMap((action) =>
-      iif(
-        () => {
-          console.log(
-            "hasPayloadJwt(action.payload)",
-            hasPayloadJwt(action.payload),
-          );
-          return hasPayloadJwt(action.payload);
-        },
-        establishmentGateway.getFormEstablishmentFromJwt$(
-          action.payload.siret ? action.payload.siret : "",
-          hasPayloadJwt(action.payload) ? action.payload.jwt : "",
-        ),
-        of({
-          ...defaultFormEstablishmentValue(),
-          ...action.payload,
-        }),
-      ),
+      hasPayloadJwt(action.payload)
+        ? establishmentGateway.getFormEstablishmentFromJwt$(
+            action.payload.siret ? action.payload.siret : "",
+            hasPayloadJwt(action.payload) ? action.payload.jwt : "",
+          )
+        : of({
+            ...defaultFormEstablishmentValue(),
+            ...action.payload,
+          }),
     ),
-    map((args) => ({
-      ...defaultFormEstablishmentValue(),
-      //...action.payload,
-    })),
     map(establishmentSlice.actions.establishmentProvided),
     catchEpicError((error) =>
       establishmentSlice.actions.establishmentProvideFailed(error.message),

@@ -4,9 +4,9 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   LegacyHttpClientError,
-  SiretDto,
   SiretEstablishmentDto,
 } from "shared";
+import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
@@ -72,12 +72,14 @@ describe("Establishment", () => {
     dependencies.siretGatewayThroughBack.siretInfo$.next(
       establishmentFromSiretFetched,
     );
-    expectNavigationToEstablishmentFormPageToHaveBeenTriggered(
-      "10002000300040",
-    );
+    expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
+      siret: establishmentFromSiretFetched.siret,
+      bName: establishmentFromSiretFetched.businessName,
+      bAddress: establishmentFromSiretFetched.businessAddress,
+    });
   });
 
-  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION', event if insee feature flag is OFF", () => {
+  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION', even if insee feature flag is OFF", () => {
     ({ store, dependencies } = createTestStore({
       establishment: {
         isLoading: false,
@@ -91,9 +93,9 @@ describe("Establishment", () => {
     }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
     dependencies.siretGatewayThroughBack.isSiretInDb$.next(false);
-    expectNavigationToEstablishmentFormPageToHaveBeenTriggered(
-      "10002000300040",
-    );
+    expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
+      siret: "10002000300040",
+    });
   });
 
   it("send modification link", () => {
@@ -110,7 +112,7 @@ describe("Establishment", () => {
     );
     expectEstablishmentStateToMatch({
       isLoading: false,
-      feedback: { kind: "success" },
+      feedback: { kind: "sendModificationLinkSuccess" },
     });
     expect(
       establishmentSelectors.sendModifyLinkSucceeded(store.getState()),
@@ -263,7 +265,7 @@ describe("Establishment", () => {
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
       expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "success",
+        kind: "submitSuccess",
       });
     });
     it("should fail when creating establishment on gateway error", () => {
@@ -319,7 +321,7 @@ describe("Establishment", () => {
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
       expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "success",
+        kind: "submitSuccess",
       });
     });
     it("should fail when editing establishment on gateway error", () => {
@@ -360,22 +362,21 @@ describe("Establishment", () => {
       });
     });
   });
-  const expectStoreToMatchInitialState = () => {
+  const expectStoreToMatchInitialState = () =>
     expectEstablishmentStateToMatch({
       isLoading: false,
       feedback: { kind: "idle" },
       formEstablishment: defaultFormEstablishmentValue(),
     });
-  };
   const expectEstablishmentStateToMatch = (
     expected: Partial<EstablishmentState>,
   ) => expectObjectsToMatch(store.getState().establishment, expected);
 
   const expectNavigationToEstablishmentFormPageToHaveBeenTriggered = (
-    siretOfRoute: SiretDto | null,
+    formEstablishmentParamsInUrl: FormEstablishmentParamsInUrl | null,
   ) => {
-    expect(dependencies.navigationGateway.navigatedToEstablishmentForm).toBe(
-      siretOfRoute,
+    expect(dependencies.navigationGateway.navigatedToEstablishmentForm).toEqual(
+      formEstablishmentParamsInUrl,
     );
   };
 });
