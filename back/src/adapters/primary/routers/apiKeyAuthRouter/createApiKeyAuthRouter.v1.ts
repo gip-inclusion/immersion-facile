@@ -24,7 +24,7 @@ const logger = createLogger(__filename);
 export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   const publicV1Router = Router({ mergeParams: true });
 
-  publicV1Router.use(deps.apiKeyAuthMiddleware);
+  publicV1Router.use(deps.apiKeyAuthMiddlewareV1);
 
   // Form establishments routes
   publicV1Router

@@ -13,6 +13,7 @@ import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
   createApiKeyAuthMiddlewareV0,
   makeApiKeyAuthMiddlewareV1,
+  makeApiKeyAuthMiddlewareV2,
   makeMagicLinkAuthMiddleware,
 } from "../authMiddleware";
 import {
@@ -110,7 +111,12 @@ export const createAppDependencies = async (config: AppConfig) => {
       gateways.timeGateway,
       config,
     ),
-    apiKeyAuthMiddleware: makeApiKeyAuthMiddlewareV1(
+    apiKeyAuthMiddlewareV1: makeApiKeyAuthMiddlewareV1(
+      useCases.getApiConsumerById.execute,
+      gateways.timeGateway,
+      config,
+    ),
+    apiKeyAuthMiddlewareV2: makeApiKeyAuthMiddlewareV2(
       useCases.getApiConsumerById.execute,
       gateways.timeGateway,
       config,

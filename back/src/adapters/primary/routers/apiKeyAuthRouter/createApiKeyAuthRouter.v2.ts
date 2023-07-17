@@ -19,7 +19,7 @@ const logger = createLogger(__filename);
 export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   const publicV2Router = Router({ mergeParams: true });
 
-  publicV2Router.use("/v2", deps.apiKeyAuthMiddleware);
+  publicV2Router.use("/v2", deps.apiKeyAuthMiddlewareV2);
 
   const publicV2SharedRouter = createExpressSharedRouter(
     publicApiV2Routes,
