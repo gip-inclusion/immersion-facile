@@ -118,7 +118,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   search: defineRoute(
     {
-      distance_km: param.query.optional.number,
+      distanceKm: param.query.optional.number,
       latitude: param.query.optional.number,
       longitude: param.query.optional.number,
       place: param.query.optional.string,
