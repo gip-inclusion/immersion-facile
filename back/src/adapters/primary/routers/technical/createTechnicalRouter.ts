@@ -59,7 +59,7 @@ export const createTechnicalRouter = (
     );
 
   technicalRouter
-    .route(`/v2-open-api-spec`)
+    .route(`/open-api-spec`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () => Promise.resolve(openApiSpecV2)),
     );
