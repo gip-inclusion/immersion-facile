@@ -32,7 +32,7 @@ describe("search-immersion route", () => {
     });
   });
 
-  describe(`v2 - /v2/immersion-offers`, () => {
+  describe(`v2 - /offers`, () => {
     describe("verify consumer is authenticated and authorized", () => {
       it("rejects unauthenticated requests", async () => {
         const response = await sharedRequest.searchImmersion({
@@ -116,7 +116,7 @@ describe("search-immersion route", () => {
         ];
         const response = await request
           .get(
-            `/v2/immersion-offers?appellationCode=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+            `/v2/offers?appellationCode=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
           )
           .set(
             "Authorization",
@@ -129,7 +129,7 @@ describe("search-immersion route", () => {
       it("accept address with only city", async () => {
         const response = await request
           .get(
-            `/v2/immersion-offers?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
+            `/v2/offers?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
           )
           .set(
             "Authorization",
@@ -140,7 +140,7 @@ describe("search-immersion route", () => {
       it("with no specified appellation code", async () => {
         await request
           .get(
-            `/v2/immersion-offers?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
+            `/v2/offers?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
           .set(
             "Authorization",
@@ -152,7 +152,7 @@ describe("search-immersion route", () => {
       it("with filter voluntaryToImmersion", async () => {
         await request
           .get(
-            `/v2/immersion-offers?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
+            `/v2/offers?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
           )
           .set(
             "Authorization",
@@ -178,7 +178,7 @@ describe("search-immersion route", () => {
             "distanceKm : Expected number, received nan",
           ],
           message:
-            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/immersion-offers",
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/offers",
         },
       });
     });

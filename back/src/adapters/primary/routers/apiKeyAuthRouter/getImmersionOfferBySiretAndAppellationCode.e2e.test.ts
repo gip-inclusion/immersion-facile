@@ -32,7 +32,7 @@ const styliste: AppellationAndRomeDto = {
 };
 const immersionOfferSiret = "78000403200019";
 
-describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersion-offers/:siret/:appellationCode`, () => {
+describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:siret/:appellationCode`, () => {
   let request: SuperTest<Test>;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
@@ -100,9 +100,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/immersio
 
   it("accepts valid authenticated requests", async () => {
     const response = await request
-      .get(
-        `/v2/immersion-offers/${immersionOfferSiret}/${styliste.appellationCode}`,
-      )
+      .get(`/v2/offers/${immersionOfferSiret}/${styliste.appellationCode}`)
       .set("Authorization", authToken);
 
     expect(response.body).toEqual({

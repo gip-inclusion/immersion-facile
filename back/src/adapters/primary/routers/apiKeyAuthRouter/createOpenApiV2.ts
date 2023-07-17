@@ -195,7 +195,7 @@ export const openApiSpecV2 = generateOpenApi({
         responses: {
           "200": {
             description: "Opération réussie",
-            example: [searchImmersionResult],
+            example: searchImmersionResult,
           },
           // TODO
           // "400": {
