@@ -1,6 +1,6 @@
 // TODO: find the standard for gouv.fr phone verification
 
-import { flatten, pipe, prop, sortBy, toLower, values } from "ramda";
+import { pipe, prop, sortBy, toLower, values } from "ramda";
 
 export const phoneRegExp = /^\+?[0-9]+$/;
 export const stringOfNumbers = /^\+?[0-9]+$/;
@@ -141,12 +141,16 @@ export const sortByPropertyCaseInsensitive = (propertyName: string) =>
   sortBy(pipe(prop(propertyName), toLower));
 
 export const objectToDependencyList = <T extends Record<string, unknown>>(
-  object: Record<string, ValueOf<T>>,
-): ValueOf<T>[] =>
-  flatten(values(object)).reduce(
+  object: T,
+): Primitive[] => {
+  const objectValues = values(object) as Primitive[];
+  return objectValues.reduce(
     (acc, value) =>
       typeof value === "object"
         ? [...acc, JSON.stringify(value)] // Stringify to avoid array length difference
         : [...acc, value],
-    [],
+    [] as Primitive[],
   );
+};
+
+type Primitive = string | boolean | number | undefined | null;
