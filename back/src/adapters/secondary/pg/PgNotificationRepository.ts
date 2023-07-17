@@ -289,7 +289,11 @@ const buildEmailNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
                   'email', sender_email
                 ) END,
                 
-              'attachments', ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL)
+              'attachments', CASE 
+                      WHEN ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL) = ARRAY[]::jsonb[] 
+                        THEN NULL
+                      ELSE ARRAY_REMOVE(ARRAY_AGG(DISTINCT a.attachment), NULL)
+                    END
             )
         ))`;
 
