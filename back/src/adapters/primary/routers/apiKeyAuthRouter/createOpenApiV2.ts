@@ -1,5 +1,6 @@
 import { SearchImmersionResultDto } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
+import { AppConfig } from "../../config/appConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { publicApiV2Routes } from "./publicApiV2.routes";
 
@@ -75,6 +76,28 @@ const apiKeyAuth = "apiKeyAuth";
 
 const searchSection = "Recherche d'entreprise accueillante et mise en contact";
 
+const getServers = () => {
+  const config = AppConfig.createFromEnv();
+  if (config.envType === "production") {
+    return [
+      {
+        url: "https://staging.immersion-facile.beta.gouv.fr/api",
+        description: "Staging",
+      },
+      {
+        url: "https://immersion-facile.beta.gouv.fr/api",
+        description: "Production",
+      },
+    ];
+  }
+  return [
+    {
+      url: "/api",
+      description: config.envType,
+    },
+  ];
+};
+
 const generateOpenApi = createOpenApiGenerator(
   { [searchSection]: publicApiV2Routes },
   {
@@ -89,12 +112,7 @@ const generateOpenApi = createOpenApiGenerator(
       `,
       version: "v2",
     },
-    servers: [
-      {
-        url: "/api",
-        description: "Url de l'api",
-      },
-    ],
+    servers: getServers(),
     openapi: "3.1.0",
     security: [{ [apiKeyAuth]: [] }],
     components: {
