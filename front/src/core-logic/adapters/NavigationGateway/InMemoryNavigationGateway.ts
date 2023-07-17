@@ -9,6 +9,6 @@ export class InMemoryNavigationGateway implements NavigationGateway {
   }
 
   // test purpose
-  public navigatedToEstablishmentForm: null | FormEstablishmentParamsInUrl =
+  public navigatedToEstablishmentForm: FormEstablishmentParamsInUrl | null =
     null;
 }

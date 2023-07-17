@@ -35,10 +35,8 @@ describe("utils", () => {
     const list = objectToDependencyList(object);
 
     expectToEqual(list, [
-      1,
-      2,
-      3,
-      4,
+      "[1,2]",
+      "[3,4]",
       "truc",
       "null",
       '{"f":[5,6],"g":{"h":[7,8]}}',

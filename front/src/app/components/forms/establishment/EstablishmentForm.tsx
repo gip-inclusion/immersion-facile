@@ -116,7 +116,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   useInitialSiret(siret);
   useEffect(() => {
     const payload: EstablishmentRequestedPayload =
-      isEstablishmentCreation && mode !== "create"
+      isEstablishmentCreation && mode === "create"
         ? formEstablishmentQueryParamsToFormEstablishmentDto(route.params)
         : {
             siret:

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GetSiretInfoError, SiretEstablishmentDto } from "shared";
+import { GetSiretInfoError, SiretDto, SiretEstablishmentDto } from "shared";
 import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 
 export type InvalidSiretError = "SIRET must be 14 digits";
@@ -48,7 +48,12 @@ export const siretSlice = createSlice({
       state.isSearching = false;
       state.establishment = action.payload;
     },
-    siretInfoDisabledAndNoMatchInDbFound: (state) => {
+    siretInfoDisabledAndNoMatchInDbFound: (
+      state,
+      _action: PayloadAction<{
+        siret: SiretDto;
+      }>,
+    ) => {
       state.isSearching = false;
       state.establishment = null;
     },

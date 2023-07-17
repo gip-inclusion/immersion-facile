@@ -47,19 +47,15 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
         "readyForLinkRequestOrRedirection",
     ),
     tap((action) => {
-      if (
-        action.payload &&
-        typeof action.payload === "object" &&
-        "siret" in action.payload
-      ) {
+      if (action.payload && typeof action.payload === "object") {
         return navigationGateway.navigateToEstablishmentForm({
-          siret: action.payload.siret,
-          bName:
-            "businessName" in action.payload ? action.payload.businessName : "",
-          bAddress:
-            "businessAddress" in action.payload
-              ? action.payload.businessAddress
-              : "",
+          siret: "siret" in action.payload ? action.payload.siret : "",
+          ...("businessName" in action.payload && {
+            bName: action.payload.businessName,
+          }),
+          ...("businessAddress" in action.payload && {
+            bAddress: action.payload.businessAddress,
+          }),
         });
       }
     }),
