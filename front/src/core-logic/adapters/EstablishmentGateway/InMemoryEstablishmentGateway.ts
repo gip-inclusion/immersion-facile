@@ -19,6 +19,7 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
 
   public formEstablishment$ = new Subject<FormEstablishmentDto>();
   public addFormEstablishmentResult$ = new Subject<void>();
+  public editFormEstablishmentResult$ = new Subject<void>();
 
   public async addFormEstablishment(
     formEstablishment: FormEstablishmentDto,
@@ -114,5 +115,11 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
     await sleep(1000);
     if (formEstablishmentDto.businessName === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
+  }
+  public updateFormEstablishment$(
+    _formEstablishment: FormEstablishmentDto,
+    _jwt: string,
+  ): Observable<void> {
+    return this.editFormEstablishmentResult$;
   }
 }

@@ -90,7 +90,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     source: (source === ""
       ? "immersion-facile"
       : source) as FormEstablishmentSource,
-    isSearchable: true,
   };
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: initialValues,
@@ -157,10 +156,19 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [feedback.kind]);
 
-  const onSubmit: SubmitHandler<FormEstablishmentDto> = (_data) => {
+  const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) => {
     isEstablishmentCreation
-      ? dispatch(establishmentSlice.actions.establishmentCreationRequested())
-      : dispatch(establishmentSlice.actions.establishmentEditionRequested());
+      ? dispatch(
+          establishmentSlice.actions.establishmentCreationRequested(
+            formEstablishment,
+          ),
+        )
+      : dispatch(
+          establishmentSlice.actions.establishmentEditionRequested({
+            formEstablishment,
+            jwt,
+          }),
+        );
   };
 
   if (isLoading) {
@@ -360,7 +368,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               description={feedback.errorMessage}
             />
           )}
-          {feedback.kind === "success" && (
+          {feedback.kind === "submitSuccess" && (
             <Alert
               severity="success"
               title="Succès de l'envoi"
@@ -368,7 +376,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 votre entreprise."
             />
           )}
-          {feedback.kind !== "success" && (
+          {feedback.kind !== "submitSuccess" && (
             <div className={fr.cx("fr-mt-4w")}>
               <Button
                 iconId="fr-icon-checkbox-circle-line"

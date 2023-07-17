@@ -20,5 +20,8 @@ export interface EstablishmentGateway {
     establishment: FormEstablishmentDto,
     jwt: string,
   ) => Promise<void>;
-  // addFormEstablishmentBatch$: () => {};
+  updateFormEstablishment$(
+    establishment: FormEstablishmentDto,
+    jwt: string,
+  ): Observable<void>;
 }

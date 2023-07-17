@@ -135,7 +135,6 @@ describe("Establishment", () => {
     expect(establishmentSelectors.isLoading(store.getState())).toBe(false);
     expect(establishmentSelectors.feedback(store.getState())).toEqual({
       kind: "sendModificationLinkErrored",
-      errorMessage,
     });
     expect(
       establishmentSelectors.sendModifyLinkSucceeded(store.getState()),
@@ -144,11 +143,7 @@ describe("Establishment", () => {
 
   describe("establishment fetch", () => {
     it("fetches establishment on establishment creation (empty params)", () => {
-      expectEstablishmentStateToMatch({
-        isLoading: false,
-        feedback: { kind: "idle" },
-        formEstablishment: defaultFormEstablishmentValue(),
-      });
+      expectStoreToMatchInitialState();
       store.dispatch(establishmentSlice.actions.establishmentRequested({}));
 
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
@@ -161,11 +156,7 @@ describe("Establishment", () => {
       );
     });
     it("fetches establishment on establishment creation (with params)", () => {
-      expectEstablishmentStateToMatch({
-        isLoading: false,
-        feedback: { kind: "idle" },
-        formEstablishment: defaultFormEstablishmentValue(),
-      });
+      expectStoreToMatchInitialState();
       const testedQueryParams: EstablishmentRequestedPayload = {
         siret: "12345678901234",
         fitForDisabledWorkers: true,
@@ -189,11 +180,7 @@ describe("Establishment", () => {
       );
     });
     it("fetches establishment on establishment edition (JWT query params)", () => {
-      expectEstablishmentStateToMatch({
-        isLoading: false,
-        feedback: { kind: "idle" },
-        formEstablishment: defaultFormEstablishmentValue(),
-      });
+      expectStoreToMatchInitialState();
       const testedQueryParams: EstablishmentRequestedPayload = {
         jwt: "some-correct-jwt",
         siret: "12345678901234",
@@ -216,11 +203,7 @@ describe("Establishment", () => {
       );
     });
     it("should fail when fetching establishment on establishment edition (JWT query params) on gateway error", () => {
-      expectEstablishmentStateToMatch({
-        isLoading: false,
-        feedback: { kind: "idle" },
-        formEstablishment: defaultFormEstablishmentValue(),
-      });
+      expectStoreToMatchInitialState();
       const testedQueryParams: EstablishmentRequestedPayload = {
         jwt: "some-wrong-jwt",
         siret: "12345678901234",
@@ -268,11 +251,7 @@ describe("Establishment", () => {
 
   describe("establishment creation", () => {
     it("should create establishment", () => {
-      expectEstablishmentStateToMatch({
-        isLoading: false,
-        feedback: { kind: "idle" },
-        formEstablishment: defaultFormEstablishmentValue(),
-      });
+      expectStoreToMatchInitialState();
       store.dispatch(
         establishmentSlice.actions.establishmentCreationRequested(
           formEstablishment,
@@ -287,8 +266,107 @@ describe("Establishment", () => {
         kind: "success",
       });
     });
+    it("should fail when creating establishment on gateway error", () => {
+      expectStoreToMatchInitialState();
+      store.dispatch(
+        establishmentSlice.actions.establishmentCreationRequested(
+          formEstablishment,
+        ),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.establishmentGateway.addFormEstablishmentResult$.error(
+        new Error("Submit error message not used in slice"),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(establishmentSelectors.feedback(store.getState()), {
+        kind: "submitErrored",
+      });
+    });
   });
 
+  describe("establishment edition", () => {
+    it("should edit requested establishment", () => {
+      expectStoreToMatchInitialState();
+      store.dispatch(
+        establishmentSlice.actions.establishmentRequested({
+          jwt: "previously-saved-jwt",
+          siret: "12345678901234",
+        }),
+      );
+      dependencies.establishmentGateway.formEstablishment$.next(
+        formEstablishment,
+      );
+      expectEstablishmentStateToMatch({
+        feedback: { kind: "success" },
+        formEstablishment,
+        isLoading: false,
+      });
+      const editedEstablishment: FormEstablishmentDto = {
+        ...formEstablishment,
+        isEngagedEnterprise: !formEstablishment.isEngagedEnterprise,
+        businessAddress: "26 rue des castors, 75002 Paris",
+        businessNameCustomized: "My custom name",
+      };
+      store.dispatch(
+        establishmentSlice.actions.establishmentEditionRequested({
+          formEstablishment: editedEstablishment,
+          jwt: "previously-saved-jwt",
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.establishmentGateway.editFormEstablishmentResult$.next(
+        undefined,
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(establishmentSelectors.feedback(store.getState()), {
+        kind: "success",
+      });
+    });
+    it("should fail when editing establishment on gateway error", () => {
+      expectStoreToMatchInitialState();
+      store.dispatch(
+        establishmentSlice.actions.establishmentRequested({
+          jwt: "previously-saved-jwt",
+          siret: "12345678901234",
+        }),
+      );
+      dependencies.establishmentGateway.formEstablishment$.next(
+        formEstablishment,
+      );
+      expectEstablishmentStateToMatch({
+        feedback: { kind: "success" },
+        formEstablishment,
+        isLoading: false,
+      });
+      const editedEstablishment: FormEstablishmentDto = {
+        ...formEstablishment,
+        isEngagedEnterprise: !formEstablishment.isEngagedEnterprise,
+        businessAddress: "26 rue des castors, 75002 Paris",
+        businessNameCustomized: "My custom name",
+      };
+      store.dispatch(
+        establishmentSlice.actions.establishmentEditionRequested({
+          formEstablishment: editedEstablishment,
+          jwt: "previously-saved-jwt",
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.establishmentGateway.editFormEstablishmentResult$.error(
+        new Error("Submit error message not used in slice"),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(establishmentSelectors.feedback(store.getState()), {
+        kind: "submitErrored",
+      });
+    });
+  });
+  const expectStoreToMatchInitialState = () => {
+    expectEstablishmentStateToMatch({
+      isLoading: false,
+      feedback: { kind: "idle" },
+      formEstablishment: defaultFormEstablishmentValue(),
+    });
+  };
   const expectEstablishmentStateToMatch = (
     expected: Partial<EstablishmentState>,
   ) => expectObjectsToMatch(store.getState().establishment, expected);

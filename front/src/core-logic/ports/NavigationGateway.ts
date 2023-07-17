@@ -1,5 +1,7 @@
-import { SiretDto } from "shared";
+import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 
 export interface NavigationGateway {
-  navigateToEstablishmentForm(siret: SiretDto): void;
+  navigateToEstablishmentForm(
+    formEstablishmentParamsInUrl: FormEstablishmentParamsInUrl,
+  ): void;
 }

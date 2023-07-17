@@ -55,32 +55,35 @@ export type FormEstablishmentKeysInUrl =
 
 export const formEstablishmentQueryParamsToFormEstablishmentDto = (
   params: FormEstablishmentParamsInUrl,
-): FormEstablishmentDto => ({
-  source: (params.source ?? "immersion-facile") as FormEstablishmentSource,
-  siret: params.siret ?? "",
-  businessName: params.bName ?? "",
-  businessNameCustomized: params.bNameCustomized,
-  businessAddress: params.bAddress ?? "",
-  isEngagedEnterprise: Boolean(params.isEngagedEnterprise),
-  fitForDisabledWorkers: Boolean(params.fitForDisabledWorkers),
-  maxContactsPerWeek: params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
-  naf: {
-    code: params.nafCode ?? "",
-    nomenclature: params.nafNomenclature ?? "",
-  },
-  businessContact: {
-    lastName: params.bcLastName ?? "",
-    firstName: params.bcFirstName ?? "",
-    job: params.bcJob ?? "",
-    phone: params.bcPhone ?? "",
-    email: params.bcEmail ?? "",
-    contactMethod: params.bcContactMethod as ContactMethod,
-    copyEmails: params.bcCopyEmails ?? [],
-  },
-  website: params.website,
-  additionalInformation: params.additionalInformation,
-  appellations: params.appellations ?? [],
-});
+): FormEstablishmentDto => {
+  console.log("formEstablishmentQueryParamsToFormEstablishmentDto", params);
+  return {
+    source: (params.source ?? "immersion-facile") as FormEstablishmentSource,
+    siret: params.siret ?? "",
+    businessName: params.bName ?? "",
+    businessNameCustomized: params.bNameCustomized,
+    businessAddress: params.bAddress ?? "",
+    isEngagedEnterprise: Boolean(params.isEngagedEnterprise),
+    fitForDisabledWorkers: Boolean(params.fitForDisabledWorkers),
+    maxContactsPerWeek: params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
+    naf: {
+      code: params.nafCode ?? "",
+      nomenclature: params.nafNomenclature ?? "",
+    },
+    businessContact: {
+      lastName: params.bcLastName ?? "",
+      firstName: params.bcFirstName ?? "",
+      job: params.bcJob ?? "",
+      phone: params.bcPhone ?? "",
+      email: params.bcEmail ?? "",
+      contactMethod: params.bcContactMethod as ContactMethod,
+      copyEmails: params.bcCopyEmails ?? [],
+    },
+    website: params.website,
+    additionalInformation: params.additionalInformation,
+    appellations: params.appellations ?? [],
+  };
+};
 
 export const formEstablishmentDtoToFormEstablishmentQueryParams = (
   formEstablishmentDto: FormEstablishmentDto,
