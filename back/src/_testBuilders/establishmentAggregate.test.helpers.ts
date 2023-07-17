@@ -121,7 +121,6 @@ export class EstablishmentAggregateBuilder
 export const establishmentAggregateToSearchResultByRome = (
   establishmentAggregate: EstablishmentAggregate,
   romeCode: RomeCode,
-  withContactDetails: boolean,
   distance_m?: number,
 ): SearchImmersionResultDto => ({
   rome: romeCode,
@@ -147,16 +146,4 @@ export const establishmentAggregateToSearchResultByRome = (
       appellationCode: immersionOffer.appellationCode,
       appellationLabel: immersionOffer.appellationLabel,
     })),
-  ...(withContactDetails && establishmentAggregate.contact
-    ? {
-        contactDetails: {
-          id: establishmentAggregate.contact.id,
-          email: establishmentAggregate.contact.email,
-          firstName: establishmentAggregate.contact.firstName,
-          lastName: establishmentAggregate.contact.lastName,
-          job: establishmentAggregate.contact.job,
-          phone: establishmentAggregate.contact.phone,
-        },
-      }
-    : undefined),
 });

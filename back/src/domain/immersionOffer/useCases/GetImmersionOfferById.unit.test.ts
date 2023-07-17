@@ -54,7 +54,6 @@ describe("GetImmersionOfferById", () => {
         establishmentAggregateToSearchResultByRome(
           establishmentAgg,
           immersionOffer.romeCode,
-          false,
         ),
       );
     });
@@ -79,7 +78,6 @@ describe("GetImmersionOfferById", () => {
         establishmentAggregateToSearchResultByRome(
           notSearchableEstablishmentAgg,
           immersionOffer.romeCode,
-          false,
         ),
       );
     });
