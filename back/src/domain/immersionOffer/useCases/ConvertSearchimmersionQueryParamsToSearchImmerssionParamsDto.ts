@@ -20,13 +20,13 @@ export class ConvertSearchImmersionQueryParamsToSearchImmerssionParamsDto extend
     queryParams: SearchImmersionQueryParamsDto,
     uow: UnitOfWork,
   ): Promise<SearchImmersionParamsDto> {
-    const appelationAndRome = queryParams.appellationCode
+    const appellationAndRome = queryParams.appellationCode
       ? await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
           queryParams.appellationCode,
         ])
-      : undefined;
+      : [];
 
-    const rome = appelationAndRome ? appelationAndRome[0].romeCode : undefined;
+    const rome = appellationAndRome.at(0)?.romeCode;
 
     if (!rome) return queryParams;
 

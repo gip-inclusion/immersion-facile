@@ -200,7 +200,10 @@ export const ContactByEmail = ({
               {
                 type: "button",
                 priority: "secondary",
-                onClick: onClose,
+                onClick: () => {
+                  setActiveErrorKind(null);
+                  onClose();
+                },
                 nativeButtonProps: {
                   id: domElementIds.search.contactByMailCancelButton,
                 },

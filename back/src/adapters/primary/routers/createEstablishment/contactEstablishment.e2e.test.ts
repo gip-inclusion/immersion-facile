@@ -1,9 +1,12 @@
-import { SuperTest, Test } from "supertest";
 import {
   ContactEstablishmentRequestDto,
-  contactEstablishmentRoute,
   expectArraysToMatch,
+  expectToEqual,
+  SearchImmersionRoutes,
+  searchImmersionRoutes,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import {
   buildTestApp,
   InMemoryGateways,
@@ -31,15 +34,20 @@ const validRequest: ContactEstablishmentRequestDto = {
   potentialBeneficiaryPhone: "0654783402",
 };
 
-describe(`/${contactEstablishmentRoute} route`, () => {
-  let request: SuperTest<Test>;
+describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersionRoutes.contactEstablishment.url} route`, () => {
   let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
   let inMemoryUow: InMemoryUnitOfWork;
+  let sharedRequest: HttpClient<SearchImmersionRoutes>;
   // let uuidGenerator: Cust
 
   beforeEach(async () => {
-    ({ request, gateways, eventCrawler, inMemoryUow } = await buildTestApp());
+    const testAppAndDeps = await buildTestApp();
+    ({ gateways, eventCrawler, inMemoryUow } = testAppAndDeps);
+    sharedRequest = createSupertestSharedClient(
+      searchImmersionRoutes,
+      testAppAndDeps.request,
+    );
   });
 
   it("sends email for valid request and save the discussion", async () => {
@@ -71,10 +79,14 @@ describe(`/${contactEstablishmentRoute} route`, () => {
       ],
     );
 
-    await request
-      .post(`/${contactEstablishmentRoute}`)
-      .send(validRequest)
-      .expect(200);
+    const result = await sharedRequest.contactEstablishment({
+      body: validRequest,
+    });
+
+    expectToEqual(result, {
+      status: 201,
+      body: "",
+    });
 
     const discussions =
       inMemoryUow.discussionAggregateRepository.discussionAggregates;
@@ -101,21 +113,28 @@ describe(`/${contactEstablishmentRoute} route`, () => {
   });
 
   it("fails with 404 for unknown siret", async () => {
-    const response = await request.post(`/${contactEstablishmentRoute}`).send({
-      ...validRequest,
-      siret: "40400040000404",
+    const response = await sharedRequest.contactEstablishment({
+      body: {
+        ...validRequest,
+        siret: "40400040000404",
+      },
     });
 
-    expect(response.body).toEqual({
-      errors: "No establishment found with siret: 40400040000404",
+    expectToEqual(response.body, {
+      status: 404,
+      message: "No establishment found with siret: 40400040000404",
     });
-    expect(response.status).toBe(404);
   });
 
   it("fails with 400 for invalid requests", async () => {
-    await request
-      .post(`/${contactEstablishmentRoute}`)
-      .send({ not_a: "valid_request" })
-      .expect(400);
+    const response = await sharedRequest.contactEstablishment({
+      body: { appellationCode: "lala" } as any,
+    });
+    expectToEqual(response.body, {
+      status: 400,
+      message:
+        "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /contact-establishment",
+      issues: [" : Invalid input"], // TODO fix shared-routes to get correct issues
+    });
   });
 });

@@ -1,5 +1,11 @@
-import { SuperTest, Test } from "supertest";
-import { expectToEqual, immersionOffersRoute, searchTargets } from "shared";
+import {
+  expectToEqual,
+  immersionOffersRoute,
+  SearchImmersionRoutes,
+  searchImmersionRoutes,
+} from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import {
   EstablishmentAggregateBuilder,
@@ -11,18 +17,25 @@ import { stubSearchResult } from "../../../secondary/immersionOffer/inMemoryEsta
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("search-immersion route", () => {
-  let request: SuperTest<Test>;
   let inMemoryUow: InMemoryUnitOfWork;
+  let sharedRequest: HttpClient<SearchImmersionRoutes>;
 
   beforeEach(async () => {
-    ({ request, inMemoryUow } = await buildTestApp());
+    const testAppAndDeps = await buildTestApp();
+    inMemoryUow = testAppAndDeps.inMemoryUow;
+    sharedRequest = createSupertestSharedClient(
+      searchImmersionRoutes,
+      testAppAndDeps.request,
+    );
   });
 
   describe(`from front - /${immersionOffersRoute}`, () => {
     describe("accepts valid requests", () => {
-      it("with given rome and position", async () => {
+      it("with given appellationCode and position", async () => {
         const immersionOffer = new ImmersionOfferEntityV2Builder()
-          .withRomeCode("A1000")
+          .withRomeCode("D1202")
+          .withAppellationCode("12694")
+          .withAppellationLabel("Coiffeur / Coiffeuse mixte")
           .build();
         const establishmentAgg = new EstablishmentAggregateBuilder()
           .withImmersionOffers([immersionOffer])
@@ -43,55 +56,94 @@ describe("search-immersion route", () => {
         );
 
         // Act and assert
-        const result = await request.get(
-          `/${immersionOffersRoute}?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
-        );
-        expectToEqual(result.body, [
-          establishmentAggregateToSearchResultByRome(
-            establishmentAgg,
-            immersionOffer.romeCode,
-            0,
-          ),
-        ]);
-        expectToEqual(result.statusCode, 200);
+        const result = await sharedRequest.searchImmersion({
+          queryParams: {
+            appellationCode: immersionOffer.appellationCode,
+            distanceKm: 30,
+            longitude: 2.34999,
+            latitude: 48.8531,
+            sortedBy: "distance",
+          },
+        });
+
+        expectToEqual(result, {
+          status: 200,
+          body: [
+            establishmentAggregateToSearchResultByRome(
+              establishmentAgg,
+              immersionOffer.romeCode,
+              0,
+            ),
+          ],
+        });
       });
-      it("with no specified rome", async () => {
-        await request
-          .get(
-            `/${immersionOffersRoute}?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
-          )
-          .expect(200, []);
+
+      it("with no specified appellationCode", async () => {
+        const result = await sharedRequest.searchImmersion({
+          queryParams: {
+            distanceKm: 30,
+            longitude: 2.34999,
+            latitude: 48.8531,
+            sortedBy: "distance",
+          },
+        });
+        expectToEqual(result, {
+          status: 200,
+          body: [],
+        });
       });
+
       it("with filter voluntaryToImmersion", async () => {
-        await request
-          .get(
-            `/${immersionOffersRoute}?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
-          )
-          .expect(200, []);
+        const result = await sharedRequest.searchImmersion({
+          queryParams: {
+            distanceKm: 30,
+            longitude: 2.34999,
+            latitude: 48.8531,
+            voluntaryToImmersion: true,
+            sortedBy: "distance",
+          },
+        });
+
+        expectToEqual(result, {
+          status: 200,
+          body: [],
+        });
       });
     });
 
-    // TODO add test which actually recovers data (and one with token, one without)
-
     it("rejects invalid requests with error code 400", async () => {
-      await request
-        .get(
-          `/${immersionOffersRoute}?appellationCode=XXXXX&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
-        )
-        .expect(400, /Code ROME incorrect/);
+      const result = await sharedRequest.searchImmersion({
+        queryParams: {
+          distanceKm: 30,
+          longitude: 2.34999,
+          latitude: 48.8531,
+          sortedBy: "distance",
+          appellationCode: "XXX",
+        },
+      });
+      expectToEqual(result, {
+        status: 400,
+        body: {
+          status: 400,
+          issues: ["appellationCode : Code ROME incorrect"],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
+        },
+      });
     });
   });
 
   describe("GET getOffersByGroupSlug", () => {
     it("should get the stubbed data", async () => {
-      const response = await request.get(
-        searchTargets.getOffersByGroupSlug.url.replace(
-          ":slug",
-          "some-group-slug",
-        ),
-      );
-      expect(response.status).toBe(200);
-      expectToEqual(response.body, [stubSearchResult]);
+      const result = await sharedRequest.getOffersByGroupSlug({
+        urlParams: {
+          groupSlug: "some-group-slug",
+        },
+      });
+      expectToEqual(result, {
+        status: 200,
+        body: [stubSearchResult],
+      });
     });
   });
 });

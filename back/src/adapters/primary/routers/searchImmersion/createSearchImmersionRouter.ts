@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { searchTargets } from "shared";
+import { searchImmersionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
@@ -8,7 +8,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   const searchImmersionRouter = Router();
 
   const expressSharedRouter = createExpressSharedRouter(
-    searchTargets,
+    searchImmersionRoutes,
     searchImmersionRouter,
   );
 
@@ -16,7 +16,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
     sendHttpResponse(req, res, async () => {
       const query =
         await deps.useCases.convertSearchImmersionQueryParamsToSearchImmersionParamsDto.execute(
-          req.query as any,
+          req.query,
         );
 
       return deps.useCases.searchImmersion.execute(query, req.apiConsumer);
@@ -24,7 +24,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   );
 
   expressSharedRouter.contactEstablishment(async (req, res) =>
-    sendHttpResponse(req, res, () =>
+    sendHttpResponse(req, res.status(201), () =>
       deps.useCases.contactEstablishment.execute(req.body),
     ),
   );
