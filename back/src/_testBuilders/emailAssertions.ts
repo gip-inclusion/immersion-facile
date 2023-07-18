@@ -141,6 +141,31 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   });
 };
 
+export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsCancelled = (
+  templatedEmail: TemplatedEmail,
+  recipients: string[],
+  convention: ConventionDto,
+  agency: AgencyDto,
+) => {
+  expectToEqual(templatedEmail, {
+    kind: "CANCELLED_CONVENTION_NOTIFICATION",
+    recipients,
+    params: {
+      agencyName: agency.name,
+      conventionId: convention.id,
+      internshipKind: convention.internshipKind,
+      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+      beneficiaryLastName: convention.signatories.beneficiary.lastName,
+      businessName: convention.businessName,
+      signature: agency.signature,
+      immersionProfession: convention.immersionAppellation.appellationLabel,
+      agencyLogoUrl: agency.logoUrl,
+      dateStart: convention.dateStart,
+      dateEnd: convention.dateEnd,
+    },
+  });
+};
+
 export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated = (
   templatedEmail: TemplatedEmail,
   recipients: string[],

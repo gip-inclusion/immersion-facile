@@ -73,6 +73,7 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationCancelled: [
+    useCases.notifyBeneficiaryAndEnterpriseThatConventionIsCancelled,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ConventionDeprecated: [useCases.notifyAllActorsThatConventionIsDeprecated],
