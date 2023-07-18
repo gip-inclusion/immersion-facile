@@ -2,6 +2,11 @@ import { Request, Response } from "express";
 import { HttpError } from "./httpErrors";
 import { unhandledError } from "./unhandledError";
 
+type ErrorObject = {
+  errorMessage: string;
+  status: number;
+  issues?: string[];
+};
 export const handleHttpJsonResponseError = (
   req: Request,
   res: Response,
@@ -12,6 +17,24 @@ export const handleHttpJsonResponseError = (
   if (error instanceof HttpError) {
     res.status(error.httpCode);
     return res.json({ errors: toValidJSONObjectOrString(error) });
+  }
+
+  throw Error("Should never reach there");
+};
+
+export const handleHttpJsonResponseErrorForApiV2 = (
+  req: Request,
+  res: Response,
+  error: any,
+): Response<any, Record<string, ErrorObject>> => {
+  if (!isManagedError(error)) return unhandledError(error, req, res);
+
+  if (error instanceof HttpError) {
+    res.status(error.httpCode);
+    return res.json({
+      message: toValidJSONObjectOrString(error),
+      status: error.httpCode,
+    });
   }
 
   throw Error("Should never reach there");

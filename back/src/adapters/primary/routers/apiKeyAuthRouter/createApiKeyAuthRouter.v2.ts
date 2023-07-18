@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { pipeWithValue, SiretAndAppellationDto } from "shared";
+import { pipeWithValue } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -7,7 +7,7 @@ import {
   ForbiddenError,
   validateAndParseZodSchema,
 } from "../../helpers/httpErrors";
-import { sendHttpResponse } from "../../helpers/sendHttpResponse";
+import { sendHttpResponseForApiV2 } from "../../helpers/sendHttpResponse";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { searchImmersionRequestPublicV2ToDomain } from "../DtoAndSchemas/v2/input/SearchImmersionRequestPublicV2.dto";
@@ -27,9 +27,9 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   publicV2SharedRouter.searchImmersion(async (req, res) =>
-    sendHttpResponse(req, res, async () => {
+    sendHttpResponseForApiV2(req, res, async () => {
       const searchImmersionRequest = searchImmersionRequestPublicV2ToDomain(
-        req.query as any,
+        req.query,
       );
       const searchImmersionResultDtos =
         await deps.useCases.searchImmersion.execute(
@@ -43,14 +43,14 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   publicV2SharedRouter.getOfferBySiretAndAppellationCode(async (req, res) =>
-    sendHttpResponse(req, res, async () => {
+    sendHttpResponseForApiV2(req, res, async () => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
       return domainToSearchImmersionResultPublicV2(
         await deps.useCases.getSearchImmersionResultBySiretAndAppellationCode.execute(
           {
             siret: req.params.siret,
             appellationCode: req.params.appellationCode,
-          } as SiretAndAppellationDto,
+          },
           req.apiConsumer,
         ),
       );
@@ -58,7 +58,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   publicV2SharedRouter.contactEstablishment(async (req, res) =>
-    sendHttpResponse(req, res, () => {
+    sendHttpResponseForApiV2(req, res.status(201), () => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
       return pipeWithValue(
         validateAndParseZodSchema(
