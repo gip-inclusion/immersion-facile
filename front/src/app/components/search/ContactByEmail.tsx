@@ -106,7 +106,11 @@ export const ContactByEmail = ({
             description={
               <div>
                 Besoin d’aide ? {""}
-                <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/">
+                <a
+                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Nos conseils pour choisir l’objet et rédiger un bon email de
                   motivation.
                 </a>
