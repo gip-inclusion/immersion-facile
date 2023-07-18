@@ -4,7 +4,7 @@ import {
   EstablishmentGroupSlug,
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
-  SearchTargets,
+  SearchImmersionRoutes,
 } from "shared";
 import { HttpClient, HttpResponse } from "shared-routes";
 import {
@@ -13,7 +13,7 @@ import {
 } from "src/core-logic/ports/ImmersionSearchGateway";
 
 export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
-  constructor(private readonly httpClient: HttpClient<SearchTargets>) {}
+  constructor(private readonly httpClient: HttpClient<SearchImmersionRoutes>) {}
 
   public search(
     searchParams: SearchImmersionQueryParamsDto,
@@ -23,7 +23,10 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
         .searchImmersion({
           queryParams: searchParams,
         })
-        .then(({ body }) => body),
+        .then((result) => {
+          if (result.status === 200) return result.body;
+          throw new Error(result.body.message);
+        }),
     );
   }
 

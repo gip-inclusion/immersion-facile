@@ -7,7 +7,7 @@ import {
   establishmentTargets,
   inclusionConnectedAllowedTargets,
   openApiDocTargets,
-  searchTargets,
+  searchImmersionRoutes,
   siretTargets,
   unauthenticatedConventionTargets,
   validateEmailsTargets,
@@ -53,7 +53,7 @@ export const createHttpDependencies = (): Dependencies => {
       axiosOnSlashApi,
     ),
     immersionSearchGateway: new HttpImmersionSearchGateway(
-      createAxiosSharedClient(searchTargets, axiosOnSlashApi),
+      createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApi),
     ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(

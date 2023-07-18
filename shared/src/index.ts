@@ -74,7 +74,7 @@ export * from "./schedule/Schedule.schema";
 export * from "./schedule/ScheduleDtoBuilder";
 export * from "./schedule/ScheduleDtoBuilder";
 export * from "./schedule/ScheduleUtils";
-export * from "./searchImmersion/searchImmersion.targets";
+export * from "./searchImmersion/searchImmersion.routes";
 export * from "./searchImmersion/SearchImmersionQueryParams.dto";
 export * from "./searchImmersion/SearchImmersionQueryParams.schema";
 export * from "./searchImmersion/SearchImmersionResult.dto";

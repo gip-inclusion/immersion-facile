@@ -8,11 +8,7 @@ export const sendHttpResponse = async (
 ) => {
   try {
     const useCaseResult = await callback();
-    const { method } = request;
-    if (method === "GET" && !useCaseResult) {
-      return response.status(200).json(useCaseResult);
-    }
-    return response.status(200).json(useCaseResult);
+    return response.json(useCaseResult);
   } catch (error: any) {
     handleHttpJsonResponseError(request, response, error);
   }
