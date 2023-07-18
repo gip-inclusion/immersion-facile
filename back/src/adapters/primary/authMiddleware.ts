@@ -283,7 +283,7 @@ export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
 };
 
 const responseErrorForV2 = (res: Response, message: string, status = 403) =>
-  res.status(status).json({ message: `forbidden: ${message}`, status });
+  res.status(status).json({ message, status });
 
 export const makeApiKeyAuthMiddlewareV2 = (
   getApiConsumerById: GetApiConsumerById,

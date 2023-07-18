@@ -71,7 +71,7 @@ describe("POST contact-establishment public V2 route", () => {
     });
     expectToEqual(response, {
       status: 401,
-      body: { status: 401, message: "forbidden: unauthenticated" },
+      body: { status: 401, message: "unauthenticated" },
     });
   });
 
@@ -108,7 +108,7 @@ describe("POST contact-establishment public V2 route", () => {
       status: 403,
       body: {
         status: 403,
-        message: "forbidden: unauthorised consumer Id",
+        message: "unauthorised consumer Id",
       },
     });
   });
