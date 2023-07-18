@@ -28,7 +28,11 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: searchImmersionsSchema,
-      400: z.object({ message: z.string(), issues: z.array(z.string()) }),
+      400: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()),
+      }),
       401: z.object({ error: z.string() }),
       403: z.object({ error: z.string() }),
     },
@@ -42,14 +46,11 @@ export const publicApiV2Routes = defineRoutes({
       201: z.void(),
       400: z
         .object({
+          status: z.number(),
           message: z.string(),
           issues: z.array(z.string()).optional(),
         })
-        .or(
-          z.object({
-            errors: z.string(),
-          }),
-        ),
+        .or(z.object({ errors: z.string() })),
       401: z.object({ error: z.string() }),
       403: z.object({ error: z.string() }),
       404: z.object({ errors: z.string() }),
