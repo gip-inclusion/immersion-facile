@@ -591,6 +591,56 @@ export const emailTemplatesByName =
         agencyLogoUrl,
       }),
     },
+    CANCELLED_CONVENTION_NOTIFICATION: {
+      niceName: "Notification d'annulation de convention",
+      tags: ["annulation demande d'immersion"],
+      createEmailVariables: ({
+        agencyLogoUrl,
+        agencyName,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        immersionProfession,
+        internshipKind,
+        signature,
+        dateEnd,
+        dateStart,
+      }) => ({
+        subject:
+          internshipKind === "immersion"
+            ? `Annulation de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`
+            : `Mini Stage - Annulation de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `
+      Nous vous informons que la demande ${
+        internshipKind === "immersion"
+          ? "d'immersion professionnelle"
+          : "de mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${
+          isStringDate(dateStart)
+            ? toDisplayedDate(new Date(dateStart), true)
+            : "DATE INVALIDE"
+        } au ${
+          isStringDate(dateEnd)
+            ? toDisplayedDate(new Date(dateEnd), true)
+            : "DATE INVALIDE"
+        } a été annulée par ${agencyName}.
+      
+      Cette demande de convention était devenue obsolète car une autre demande a déjà été traitée.
+      
+      Vous pouvez vous rapprocher de votre conseiller${
+        internshipKind === "immersion"
+          ? ""
+          : " de la chambre de commerce et d'instrustrie - CCI"
+      } pour en échanger ou établir une nouvelle demande si nécessaire.      
+      
+      Bien cordialement,       
+      ${signature} 
+      `,
+        agencyLogoUrl,
+      }),
+    },
     CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
       niceName: "Requête demande de modification de convention",
       tags: ["demande de modifications"],

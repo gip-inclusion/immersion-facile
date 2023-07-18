@@ -40,6 +40,19 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
     magicLink: string;
   };
+  CANCELLED_CONVENTION_NOTIFICATION: {
+    agencyName: string;
+    agencyLogoUrl: AbsoluteUrl | undefined;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    conventionId: ConventionId;
+    immersionProfession: string;
+    internshipKind: InternshipKind;
+    signature: string;
+    dateEnd: string;
+    dateStart: string;
+  };
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: string;
     businessAddress: string;
