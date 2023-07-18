@@ -94,7 +94,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
 
     expectToEqual(response, {
       status: 401,
-      body: { status: 401, message: "forbidden: unauthenticated" },
+      body: { status: 401, message: "unauthenticated" },
     });
   });
 
@@ -166,7 +166,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
 
     expectToEqual(response, {
       status: 403,
-      body: { message: "forbidden: unauthorised consumer Id", status: 403 },
+      body: { message: "unauthorised consumer Id", status: 403 },
     });
   });
 });

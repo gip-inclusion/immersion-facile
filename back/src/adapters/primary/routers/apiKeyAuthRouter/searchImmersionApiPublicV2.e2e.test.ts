@@ -43,7 +43,7 @@ describe("search-immersion route", () => {
         });
         expectToEqual(response, {
           status: 401,
-          body: { message: "forbidden: unauthenticated", status: 401 },
+          body: { message: "unauthenticated", status: 401 },
         });
       });
 
@@ -61,12 +61,12 @@ describe("search-immersion route", () => {
           status: 403,
           body: {
             status: 403,
-            message: "forbidden: unauthorised consumer Id",
+            message: "unauthorised consumer Id",
           },
         });
       });
     });
-    describe("authenficated consumer", () => {
+    describe("authenticated consumer", () => {
       it("with given rome, appellation code and position", async () => {
         const immersionOffer = new ImmersionOfferEntityV2Builder()
           .withRomeCode("M1808")
