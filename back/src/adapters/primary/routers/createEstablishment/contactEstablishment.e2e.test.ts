@@ -128,13 +128,22 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
 
   it("fails with 400 for invalid requests", async () => {
     const response = await sharedRequest.contactEstablishment({
-      body: { appellationCode: "lala" } as any,
+      body: {
+        ...validRequest,
+        siret: undefined,
+        appellationCode: undefined,
+      } as any,
     });
     expectToEqual(response.body, {
       status: 400,
       message:
         "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /contact-establishment",
-      issues: [" : Invalid input"], // TODO fix shared-routes to get correct issues
+      issues: [
+        "appellationCode : Required",
+        "siret : Obligatoire",
+        'contactMode : Invalid literal value, expected "PHONE"',
+        'contactMode : Invalid literal value, expected "IN_PERSON"',
+      ],
     });
   });
 });
