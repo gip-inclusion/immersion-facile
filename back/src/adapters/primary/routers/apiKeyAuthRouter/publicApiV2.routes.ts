@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
+  httpErrorSchema,
   searchImmersionResultSchema,
   searchImmersionsSchema,
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { errorSchema } from "../../helpers/httpErrors.schema";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { searchImmersionRequestPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchImmersionRequestPublicV2.schema";
 
@@ -17,9 +17,9 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: searchImmersionResultSchema,
-      401: errorSchema,
-      403: errorSchema,
-      404: errorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   searchImmersion: defineRoute({
@@ -29,9 +29,9 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: searchImmersionsSchema,
-      400: errorSchema,
-      401: errorSchema,
-      403: errorSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   contactEstablishment: defineRoute({
@@ -41,10 +41,10 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       201: z.void(),
-      400: errorSchema,
-      401: errorSchema,
-      403: errorSchema,
-      404: errorSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });

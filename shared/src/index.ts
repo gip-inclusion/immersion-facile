@@ -43,6 +43,7 @@ export * from "./geoPosition/geoPosition.schema";
 export * from "./headers";
 export * from "./http/httpStatus";
 export { HttpClientError as LegacyHttpClientError } from "./httpClient/errors/4xxClientError.error";
+export { httpErrorSchema } from "./httpClient/errors/httpErrors.schema";
 export * from "./httpClient/ports/axios.port";
 export * from "./immersionAssessment/ImmersionAssessmentDto";
 export * from "./immersionAssessment/immersionAssessmentSchema";
