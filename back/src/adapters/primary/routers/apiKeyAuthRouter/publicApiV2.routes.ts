@@ -5,6 +5,7 @@ import {
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
+import { errorSchema } from "../../helpers/httpErrors.schema";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { searchImmersionRequestPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchImmersionRequestPublicV2.schema";
 
@@ -16,21 +17,9 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: searchImmersionResultSchema,
-      401: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
-      403: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
-      404: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
+      401: errorSchema,
+      403: errorSchema,
+      404: errorSchema,
     },
   }),
   searchImmersion: defineRoute({
@@ -40,21 +29,9 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: searchImmersionsSchema,
-      400: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
-      401: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
-      403: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
+      400: errorSchema,
+      401: errorSchema,
+      403: errorSchema,
     },
   }),
   contactEstablishment: defineRoute({
@@ -64,26 +41,10 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       201: z.void(),
-      400: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
-      401: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
-      403: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
-      404: z.object({
-        status: z.number(),
-        message: z.string(),
-        issues: z.array(z.string()).optional(),
-      }),
+      400: errorSchema,
+      401: errorSchema,
+      403: errorSchema,
+      404: errorSchema,
     },
   }),
 });
