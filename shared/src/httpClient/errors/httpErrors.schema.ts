@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const errorSchema = z.object({
+export const httpErrorSchema = z.object({
   status: z.number(),
   message: z.string(),
   issues: z.array(z.string()).optional(),
