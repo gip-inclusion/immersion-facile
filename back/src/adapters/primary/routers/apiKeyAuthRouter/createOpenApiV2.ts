@@ -102,8 +102,8 @@ const generateOpenApi = (envType: string) =>
     {
       info: {
         title: "Les API Immersion facilitée",
-        description: `Ceci est la documentation pour consommer l’api d’immersion facilité.
-      Une clé API est nécessaire pour utiliser l’api. Veuillez vous mettre en contact avec l’équipe d’immersion facilité pour l’obtenir.
+        description: `Ceci est la documentation pour consommer l’api d’immersion facilitée.
+      Une clé API est nécessaire pour utiliser l’api. Veuillez vous mettre en contact avec l’équipe d’immersion facilitée pour l’obtenir.
       La clé API est à fournir en authorization header de toutes les requêtes.
       
       ⚠️Attention, cette documentation est encore en cours de construction.
@@ -121,7 +121,7 @@ const generateOpenApi = (envType: string) =>
             in: "header",
             name: "authorization",
             description:
-              "Une clé api est nécessaire pour utiliser l’api. Veuillez contacter immersion facilité si vous souhaitez l’obtenir.",
+              "Une clé api est nécessaire pour utiliser l’api. Veuillez contacter immersion facilitée si vous souhaitez l’obtenir.",
           },
         },
       },

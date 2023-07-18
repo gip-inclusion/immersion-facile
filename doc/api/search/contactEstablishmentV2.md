@@ -1,6 +1,6 @@
-# Immersion facilitée recherche d'entreprises accueillantes API v2
+# Immersion Facilitée recherche d'entreprises accueillantes API v2
 
-Ceci est la documentation pour consommer l'api d'immersion facilité.
+Ceci est la documentation pour consommer l'api d'Immersion Facilitée.
 
 Une clé API est nécessaire pour utiliser l'api. Veuillez vous mettre en contact avec l'équipe d'immersion facilité pour l'obtenir.
 
