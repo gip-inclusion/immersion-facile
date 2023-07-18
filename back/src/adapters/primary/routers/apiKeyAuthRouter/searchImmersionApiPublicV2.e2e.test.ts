@@ -43,7 +43,7 @@ describe("search-immersion route", () => {
         });
         expectToEqual(response, {
           status: 401,
-          body: { error: "forbidden: unauthenticated" },
+          body: { message: "forbidden: unauthenticated", status: 401 },
         });
       });
 
@@ -60,7 +60,8 @@ describe("search-immersion route", () => {
         expectToEqual(response, {
           status: 403,
           body: {
-            error: "forbidden: unauthorised consumer Id",
+            status: 403,
+            message: "forbidden: unauthorised consumer Id",
           },
         });
       });

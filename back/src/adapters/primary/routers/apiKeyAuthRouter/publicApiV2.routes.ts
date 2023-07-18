@@ -16,9 +16,21 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: searchImmersionResultSchema,
-      401: z.object({ error: z.string() }),
-      403: z.object({ error: z.string() }),
-      404: z.object({ errors: z.string() }),
+      401: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
+      403: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
+      404: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
     },
   }),
   searchImmersion: defineRoute({
@@ -31,10 +43,18 @@ export const publicApiV2Routes = defineRoutes({
       400: z.object({
         status: z.number(),
         message: z.string(),
-        issues: z.array(z.string()),
+        issues: z.array(z.string()).optional(),
       }),
-      401: z.object({ error: z.string() }),
-      403: z.object({ error: z.string() }),
+      401: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
+      403: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
     },
   }),
   contactEstablishment: defineRoute({
@@ -44,16 +64,26 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       201: z.void(),
-      400: z
-        .object({
-          status: z.number(),
-          message: z.string(),
-          issues: z.array(z.string()).optional(),
-        })
-        .or(z.object({ errors: z.string() })),
-      401: z.object({ error: z.string() }),
-      403: z.object({ error: z.string() }),
-      404: z.object({ errors: z.string() }),
+      400: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
+      401: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
+      403: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
+      404: z.object({
+        status: z.number(),
+        message: z.string(),
+        issues: z.array(z.string()).optional(),
+      }),
     },
   }),
 });

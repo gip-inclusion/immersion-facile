@@ -67,6 +67,7 @@ export abstract class TransactionalUseCase<
   JWTPayload = ConventionMagicLinkPayload,
 > {
   protected abstract inputSchema: z.ZodSchema<Input>;
+
   protected constructor(private uowPerformer: UnitOfWorkPerformer) {}
 
   // this methode should not be overwritten, implement _execute instead

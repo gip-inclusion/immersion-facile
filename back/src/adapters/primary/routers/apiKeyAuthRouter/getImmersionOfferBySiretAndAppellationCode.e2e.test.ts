@@ -94,7 +94,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
 
     expectToEqual(response, {
       status: 401,
-      body: { error: "forbidden: unauthenticated" },
+      body: { status: 401, message: "forbidden: unauthenticated" },
     });
   });
 
@@ -143,7 +143,8 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
     expectToEqual(response, {
       status: 404,
       body: {
-        errors: `No offer found for siret ${siretNotInDB} and appellation code ${styliste.appellationCode}`,
+        message: `No offer found for siret ${siretNotInDB} and appellation code ${styliste.appellationCode}`,
+        status: 404,
       },
     });
   });
@@ -165,7 +166,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
 
     expectToEqual(response, {
       status: 403,
-      body: { error: "forbidden: unauthorised consumer Id" },
+      body: { message: "forbidden: unauthorised consumer Id", status: 403 },
     });
   });
 });

@@ -71,7 +71,7 @@ describe("POST contact-establishment public V2 route", () => {
     });
     expectToEqual(response, {
       status: 401,
-      body: { error: "forbidden: unauthenticated" },
+      body: { status: 401, message: "forbidden: unauthenticated" },
     });
   });
 
@@ -86,7 +86,8 @@ describe("POST contact-establishment public V2 route", () => {
     expectToEqual(response, {
       status: 404,
       body: {
-        errors: `No establishment found with siret: ${contactEstablishment.siret}`,
+        status: 404,
+        message: `No establishment found with siret: ${contactEstablishment.siret}`,
       },
     });
   });
@@ -106,7 +107,8 @@ describe("POST contact-establishment public V2 route", () => {
     expectToEqual(response, {
       status: 403,
       body: {
-        error: "forbidden: unauthorised consumer Id",
+        status: 403,
+        message: "forbidden: unauthorised consumer Id",
       },
     });
   });
@@ -165,7 +167,8 @@ describe("POST contact-establishment public V2 route", () => {
     expectToEqual(response, {
       status: 400,
       body: {
-        errors: `Contact mode mismatch: ${contactEstablishment.contactMode} in params. In contact (fetched with siret) : ${testEstablishmentContactMethod}`,
+        status: 400,
+        message: `Contact mode mismatch: ${contactEstablishment.contactMode} in params. In contact (fetched with siret) : ${testEstablishmentContactMethod}`,
       },
     });
   });
@@ -203,7 +206,8 @@ describe("POST contact-establishment public V2 route", () => {
     expectToEqual(response, {
       status: 400,
       body: {
-        errors: `Establishment with siret '${contactEstablishment.siret}' doesn't have an immersion offer with appellation code '${contactEstablishment.appellationCode}'.`,
+        status: 400,
+        message: `Establishment with siret '${contactEstablishment.siret}' doesn't have an immersion offer with appellation code '${contactEstablishment.appellationCode}'.`,
       },
     });
   });
@@ -235,7 +239,7 @@ describe("POST contact-establishment public V2 route", () => {
       .set("Authorization", generateApiJwt(validApiConsumerJwtPayload))
       .send(contactEstablishment);
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
     expect(response.body).toBe("");
   });
 });
