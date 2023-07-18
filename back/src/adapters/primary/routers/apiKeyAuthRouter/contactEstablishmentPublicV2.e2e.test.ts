@@ -118,16 +118,16 @@ describe("POST contact-establishment public V2 route", () => {
       headers: {
         authorization: authToken,
       },
-      body: {} as any,
+      body: { ...contactEstablishment, siret: "wrong" } as any,
     });
 
     expectToEqual(response, {
       status: 400,
       body: {
         status: 400,
-        issues: [" : Invalid input"],
         message:
           "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v2/contact-establishment",
+        issues: ["siret : SIRET doit être composé de 14 chiffres"],
       },
     });
   });
