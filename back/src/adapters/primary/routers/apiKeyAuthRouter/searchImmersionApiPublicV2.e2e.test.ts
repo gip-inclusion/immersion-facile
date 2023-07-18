@@ -172,6 +172,7 @@ describe("search-immersion route", () => {
       expectToEqual(response, {
         status: 400,
         body: {
+          status: 400,
           issues: [
             "latitude : Expected number, received nan",
             "longitude : Expected number, received nan",
