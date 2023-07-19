@@ -8,6 +8,7 @@ import {
   calculateTotalImmersionHoursFromComplexSchedule,
   calculateWeeklyHoursFromSchedule,
   dayPeriodsFromComplexSchedule,
+  isSundayInSchedule,
   makeDailySchedule,
   prettyPrintSchedule,
 } from "./ScheduleUtils";
@@ -509,6 +510,23 @@ describe("ScheduleUtils", () => {
         4,
       );
       expectToEqual(calculateNumberOfWorkedDays(schedule.complexSchedule), 1);
+    });
+  });
+  describe("isSundayInSchedule", () => {
+    it("return false if schedule does not contain sunday", () => {
+      const complexSchedule = makeDailySchedule(new Date("2023-07-18"), [
+        { start: "01:00", end: "02:00" },
+      ]);
+
+      expect(isSundayInSchedule([complexSchedule])).toBe(false);
+    });
+
+    it("return true if schedule contains sunday", () => {
+      const complexSchedule = makeDailySchedule(new Date("2023-07-23"), [
+        { start: "01:00", end: "02:00" },
+      ]);
+
+      expect(isSundayInSchedule([complexSchedule])).toBe(true);
     });
   });
 });

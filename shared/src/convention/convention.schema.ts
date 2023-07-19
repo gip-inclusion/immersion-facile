@@ -4,8 +4,12 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { DailyScheduleDto } from "../schedule/Schedule.dto";
 import { scheduleSchema } from "../schedule/Schedule.schema";
-import { calculateWeeklyHoursFromSchedule } from "../schedule/ScheduleUtils";
+import {
+  calculateWeeklyHoursFromSchedule,
+  isSundayInSchedule,
+} from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret.schema";
 import { allRoles } from "../tokens/token.dto";
 import { phoneRegExp } from "../utils";
@@ -238,6 +242,10 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
           addIssue,
           beneficiaryAgeAtConventionStart,
         );
+        addIssueIfSundayIsInSchedule(
+          addIssue,
+          convention.schedule.complexSchedule,
+        );
         addIssueIfAgeLessThanMinimumAge(
           addIssue,
           beneficiaryAgeAtConventionStart,
@@ -379,4 +387,16 @@ const addIssueIfAgeLessThanMinimumAge = (
       `L'âge du bénéficiaire doit être au minimum de ${miniumAgeRequirement}ans`,
       getConventionFieldName("signatories.beneficiary.birthdate"),
     );
+};
+
+const addIssueIfSundayIsInSchedule = (
+  addIssue: (message: string, path: string) => void,
+  complexSchedule: DailyScheduleDto[],
+) => {
+  if (isSundayInSchedule(complexSchedule)) {
+    addIssue(
+      "Le mini-stage ne peut pas se dérouler un dimanche",
+      getConventionFieldName("schedule.workedDays"),
+    );
+  }
 };
