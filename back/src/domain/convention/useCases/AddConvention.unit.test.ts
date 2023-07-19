@@ -2,6 +2,7 @@ import {
   ConventionDtoBuilder,
   conventionStatuses,
   expectPromiseToFailWithError,
+  makeBooleanFeatureFlag,
 } from "shared";
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -42,7 +43,7 @@ describe("Add Convention", () => {
     conventionRepository = uow.conventionRepository;
     outboxRepository = uow.outboxRepository;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: true,
+      enableInseeApi: makeBooleanFeatureFlag(true),
     });
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
@@ -150,7 +151,7 @@ describe("Add Convention", () => {
       it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
         uowPerformer.setUow({
           featureFlagRepository: new InMemoryFeatureFlagRepository({
-            enableInseeApi: false,
+            enableInseeApi: makeBooleanFeatureFlag(false),
           }),
         });
         siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);

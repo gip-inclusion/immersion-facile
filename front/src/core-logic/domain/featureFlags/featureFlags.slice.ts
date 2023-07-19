@@ -1,18 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FeatureFlag, FeatureFlags } from "shared";
+import {
+  FeatureFlags,
+  makeBooleanFeatureFlag,
+  makeTextFeatureFlag,
+  SetFeatureFlagParam,
+} from "shared";
 
 export type FeatureFlagsState = FeatureFlags & {
   isLoading: boolean;
 };
 
 const initialState: FeatureFlagsState = {
-  enableInseeApi: true,
-  enablePeConnectApi: false,
-  enableLogoUpload: false,
-  enablePeConventionBroadcast: false,
-  enableTemporaryOperation: false,
-  enableMaxContactPerWeek: false,
-  enableMaintenance: false,
+  enableInseeApi: makeBooleanFeatureFlag(true),
+  enablePeConnectApi: makeBooleanFeatureFlag(false),
+  enableLogoUpload: makeBooleanFeatureFlag(false),
+  enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
+  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
+  enableMaintenance: makeTextFeatureFlag(false, { message: "" }),
   isLoading: true,
 };
 
@@ -30,11 +35,14 @@ export const featureFlagsSlice = createSlice({
     }),
     setFeatureFlagRequested: (
       state,
-      action: PayloadAction<FeatureFlag>,
+      action: PayloadAction<SetFeatureFlagParam>,
     ): FeatureFlagsState => ({
       ...state,
       isLoading: true,
-      [action.payload]: !state[action.payload],
+      [action.payload.flagName]: {
+        ...state[action.payload.flagName],
+        ...action.payload.flagContent,
+      },
     }),
     setFeatureFlagSucceeded: (state): FeatureFlagsState => ({
       ...state,

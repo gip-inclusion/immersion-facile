@@ -92,7 +92,7 @@ const rejectIfFeatureFlagNotActive = async (
   deps: AppDependencies,
 ): Promise<void> | never => {
   const { enableLogoUpload } = await deps.useCases.getFeatureFlags.execute();
-  if (!enableLogoUpload) {
+  if (!enableLogoUpload.isActive) {
     throw new FeatureDisabledError("Upload Logo");
   }
 };

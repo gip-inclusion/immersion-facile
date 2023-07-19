@@ -6,7 +6,9 @@ import {
   expectToEqual,
   featureFlagsRoute,
   IcUserRoleForAgencyParams,
-  SetFeatureFlagParams,
+  makeBooleanFeatureFlag,
+  makeTextFeatureFlag,
+  SetFeatureFlagParam,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
@@ -109,11 +111,15 @@ describe("/admin router", () => {
       const initialFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(initialFeatureFlagsResponse.body.enableLogoUpload).toBe(true);
+      expect(initialFeatureFlagsResponse.body.enableLogoUpload).toEqual(
+        makeBooleanFeatureFlag(true),
+      );
 
-      const params: SetFeatureFlagParams = {
+      const params: SetFeatureFlagParam = {
         flagName: "enableLogoUpload",
-        value: false,
+        flagContent: {
+          isActive: false,
+        },
       };
 
       const response = await request
@@ -127,7 +133,44 @@ describe("/admin router", () => {
       const updatedFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(updatedFeatureFlagsResponse.body.enableLogoUpload).toBe(false);
+      expect(updatedFeatureFlagsResponse.body.enableLogoUpload).toEqual(
+        makeBooleanFeatureFlag(false),
+      );
+    });
+    it("sets the feature flag to given value if token is valid with value", async () => {
+      const initialFeatureFlagsResponse = await request.get(
+        `/${featureFlagsRoute}`,
+      );
+      expect(initialFeatureFlagsResponse.body.enableMaintenance).toEqual(
+        makeTextFeatureFlag(false, { message: "Maintenance message" }),
+      );
+
+      const params: SetFeatureFlagParam = {
+        flagName: "enableMaintenance",
+        flagContent: {
+          isActive: true,
+          value: {
+            message: "Maintenance message",
+          },
+        },
+      };
+
+      const response = await request
+        .post(`/admin/${featureFlagsRoute}`)
+        .send(params)
+        .set("authorization", token);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toBe("");
+
+      const updatedFeatureFlagsResponse = await request.get(
+        `/${featureFlagsRoute}`,
+      );
+      expect(updatedFeatureFlagsResponse.body.enableMaintenance).toEqual(
+        makeTextFeatureFlag(true, {
+          message: "Maintenance message",
+        }),
+      );
     });
   });
 

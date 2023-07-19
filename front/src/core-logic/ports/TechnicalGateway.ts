@@ -3,12 +3,12 @@ import {
   AbsoluteUrl,
   BackOfficeJwt,
   FeatureFlags,
-  SetFeatureFlagParams,
+  SetFeatureFlagParam,
 } from "shared";
 
 export interface TechnicalGateway {
   setFeatureFlag: (
-    params: SetFeatureFlagParams,
+    params: SetFeatureFlagParam,
     adminToken: BackOfficeJwt,
   ) => Observable<void>;
   getAllFeatureFlags: () => Observable<FeatureFlags>;

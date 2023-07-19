@@ -28,7 +28,7 @@ const setFeatureFlagEpic: FeatureFlagEpic = (
     filter(featureFlagsSlice.actions.setFeatureFlagRequested.match),
     switchMap(({ payload }) =>
       technicalGateway.setFeatureFlag(
-        { flagName: payload, value: state$.value.featureFlags[payload] },
+        payload,
         state$.value.admin.adminAuth.adminToken ?? "",
       ),
     ),

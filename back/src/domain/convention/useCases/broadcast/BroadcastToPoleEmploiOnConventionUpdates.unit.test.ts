@@ -4,6 +4,7 @@ import {
   ConventionId,
   expectObjectsToMatch,
   expectToEqual,
+  makeBooleanFeatureFlag,
   reasonableSchedule,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
@@ -21,7 +22,9 @@ const prepareUseCase = async ({
   const poleEmploiGateWay = new InMemoryPoleEmploiGateway();
   const uow = createInMemoryUow();
   uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-    enablePeConventionBroadcast,
+    enablePeConventionBroadcast: makeBooleanFeatureFlag(
+      enablePeConventionBroadcast,
+    ),
   });
   const timeGateway = new CustomTimeGateway();
   const broadcastToPe = new BroadcastToPoleEmploiOnConventionUpdates(

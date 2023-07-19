@@ -5,6 +5,8 @@ import {
   cciAgencyId,
   ConventionDtoBuilder,
   FeatureFlags,
+  makeBooleanFeatureFlag,
+  makeTextFeatureFlag,
   peParisAgencyId,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
@@ -38,13 +40,15 @@ const featureFlagsSeed = async (client: PoolClient) => {
   console.log("seeding feature flags...");
   await client.query("DELETE FROM feature_flags");
   const featureFlags: FeatureFlags = {
-    enableInseeApi: true,
-    enableLogoUpload: true,
-    enableMaintenance: false,
-    enableMaxContactPerWeek: true,
-    enablePeConnectApi: true,
-    enablePeConventionBroadcast: false,
-    enableTemporaryOperation: false,
+    enableInseeApi: makeBooleanFeatureFlag(true),
+    enableLogoUpload: makeBooleanFeatureFlag(true),
+    enableMaintenance: makeTextFeatureFlag(false, {
+      message: "Mon message de maintenance",
+    }),
+    enableMaxContactPerWeek: makeBooleanFeatureFlag(true),
+    enablePeConnectApi: makeBooleanFeatureFlag(true),
+    enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
+    enableTemporaryOperation: makeBooleanFeatureFlag(false),
   };
 
   await Promise.all(

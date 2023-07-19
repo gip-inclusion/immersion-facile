@@ -45,7 +45,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
 
 const throwIfPeConnectDisabled = async (deps: AppDependencies) => {
   const features = await deps.useCases.getFeatureFlags.execute();
-  if (!features.enablePeConnectApi) {
+  if (!features.enablePeConnectApi.isActive) {
     throw new FeatureDisabledError("PeConnect");
   }
 };

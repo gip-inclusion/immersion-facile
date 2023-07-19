@@ -125,7 +125,7 @@ export const CreationSiretRelatedInputs = () => {
         nativeInputProps={{
           ...formContents.businessName,
           ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi,
+          readOnly: featureFlags.enableInseeApi.isActive,
         }}
       />
       <Input

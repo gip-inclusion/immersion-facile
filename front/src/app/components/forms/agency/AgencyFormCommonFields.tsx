@@ -173,7 +173,7 @@ export const AgencyLogoUpload = () => {
   const fieldsContent: FormAgencyFieldsLabels = getFormFields();
   const formValues = getValues();
 
-  if (!enableLogoUpload) return null;
+  if (!enableLogoUpload.isActive) return null;
   return (
     <>
       <UploadLogo

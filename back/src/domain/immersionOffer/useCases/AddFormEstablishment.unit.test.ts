@@ -4,6 +4,7 @@ import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   FormEstablishmentDtoBuilder,
+  makeBooleanFeatureFlag,
 } from "shared";
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -45,7 +46,7 @@ describe("Add FormEstablishment", () => {
     });
     romeRepository.appellations = defaultValidFormEstablishment.appellations;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: true,
+      enableInseeApi: makeBooleanFeatureFlag(true),
     });
 
     uowPerformer = new InMemoryUowPerformer(uow);
@@ -176,7 +177,7 @@ describe("Add FormEstablishment", () => {
     describe("when feature flag to do siret validation is OFF", () => {
       it("accepts formEstablishment with SIRETs that don't correspond to active businesses and quarantines events", async () => {
         const featureFlagRepository = new InMemoryFeatureFlagRepository({
-          enableInseeApi: false,
+          enableInseeApi: makeBooleanFeatureFlag(false),
         });
         uowPerformer.setUow({
           featureFlagRepository,
