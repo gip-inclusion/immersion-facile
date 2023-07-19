@@ -5,8 +5,9 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
+import { getAllConventionRecipientsEmail } from "../../entities/Convention";
 
-export class NotifyBeneficiaryAndEnterpriseThatConventionIsCancelled extends TransactionalUseCase<ConventionDto> {
+export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -27,14 +28,8 @@ export class NotifyBeneficiaryAndEnterpriseThatConventionIsCancelled extends Tra
       );
     }
     const beneficiary = convention.signatories.beneficiary;
-    const establishmentRepresentative =
-      convention.signatories.establishmentRepresentative;
 
-    const recipients = [
-      beneficiary.email,
-      establishmentRepresentative.email,
-      ...agency.counsellorEmails,
-    ];
+    const recipients = getAllConventionRecipientsEmail(convention, agency);
 
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",

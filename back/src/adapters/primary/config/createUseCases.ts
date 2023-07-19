@@ -22,10 +22,10 @@ import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/Get
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
+import { NotifyAllActorsThatConventionIsCancelled as NotifyAllActorsThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { NotifyBeneficiaryAndEnterpriseThatConventionIsCancelled as NotifyBeneficiaryAndEnterpriseThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatConventionIsCancelled";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
 import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightChanged";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
@@ -388,8 +388,8 @@ export const createUseCases = (
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      notifyBeneficiaryAndEnterpriseThatConventionIsCancelled:
-        new NotifyBeneficiaryAndEnterpriseThatConventionIsCancelled(
+      notifyAllActorsThatConventionIsCancelled:
+        new NotifyAllActorsThatConventionIsCancelled(
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),

@@ -1,3 +1,4 @@
+import { uniq } from "ramda";
 import {
   AgencyDto,
   ConventionDto,
@@ -97,6 +98,32 @@ export async function retrieveConventionWithAgency(
   if (!agency) throw new NotFoundError(agencyMissingMessage(convention));
   return { agency, convention };
 }
+
+export const getAllConventionRecipientsEmail = (
+  convention: ConventionDto,
+  agency: AgencyDto,
+): string[] => {
+  const {
+    beneficiary,
+    beneficiaryRepresentative,
+    establishmentRepresentative,
+    beneficiaryCurrentEmployer,
+  } = convention.signatories;
+  const { validatorEmails, counsellorEmails } = agency;
+  const { establishmentTutor } = convention;
+
+  const recipientEmails = uniq([
+    beneficiary.email,
+    establishmentRepresentative.email,
+    establishmentTutor.email,
+    beneficiaryRepresentative?.email,
+    beneficiaryCurrentEmployer?.email,
+    ...counsellorEmails,
+    ...validatorEmails,
+  ]).filter((email): email is string => !!email);
+
+  return recipientEmails;
+};
 
 export const conventionMissingMessage = (convention: ConventionDto): string =>
   `Convention with id '${convention.id}' missing.`;
