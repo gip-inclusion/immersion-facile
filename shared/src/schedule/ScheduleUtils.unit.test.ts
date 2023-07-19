@@ -1,15 +1,12 @@
 import { expectToEqual } from "../test.helpers";
-import { DayPeriodsDto, ScheduleDto, weekdays } from "./Schedule.dto";
+import { DayPeriodsDto, ScheduleDto } from "./Schedule.dto";
 import { dateIsoStringSchema, scheduleSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
   calculateScheduleTotalDurationInDays,
-  calculateTotalImmersionHoursBetweenDate,
   calculateTotalImmersionHoursFromComplexSchedule,
-  convertToFrenchNamedDays,
   dayPeriodsFromComplexSchedule,
-  isArrayOfWeekdays,
   makeDailySchedule,
   prettyPrintSchedule,
 } from "./ScheduleUtils";
@@ -213,55 +210,6 @@ describe("ScheduleUtils", () => {
     });
   });
 
-  describe("convertToFrenchNamedDays", () => {
-    it("converts complex schedule", () => {
-      expect(
-        convertToFrenchNamedDays(
-          new ScheduleDtoBuilder()
-            .withDateInterval({
-              start: new Date(2022, 6, 13),
-              end: new Date(2022, 6, 19),
-            })
-            .build(),
-        ),
-      ).toEqual([]);
-      expect(convertToFrenchNamedDays(complexSchedule())).toEqual([
-        "lundi",
-        "jeudi",
-        "dimanche",
-      ]);
-    });
-
-    it("converts simple schedule", () => {
-      expect(
-        convertToFrenchNamedDays(
-          new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
-        ),
-      ).toEqual([]);
-      expect(convertToFrenchNamedDays(regularSchedule())).toEqual([
-        "lundi",
-        "mercredi",
-        "jeudi",
-        "dimanche",
-      ]);
-    });
-  });
-
-  describe("isArrayOfWeekdays", () => {
-    it("accepts valid arrays", () => {
-      expect(isArrayOfWeekdays([])).toBe(true);
-      expect(isArrayOfWeekdays(["lundi", "jeudi", "samedi"])).toBe(true);
-      expect(isArrayOfWeekdays(weekdays)).toBe(true);
-    });
-    it("rejects invalid arrays", () => {
-      expect(isArrayOfWeekdays(undefined)).toBe(false);
-      expect(isArrayOfWeekdays("hello world")).toBe(false);
-      expect(isArrayOfWeekdays(12345)).toBe(false);
-      expect(isArrayOfWeekdays([1, 2, 3])).toBe(false);
-      expect(isArrayOfWeekdays(["Lundi"])).toBe(false);
-      expect(isArrayOfWeekdays(["lundi", "MARDI"])).toBe(false);
-    });
-  });
   describe("calculateTotalDurationInDays", () => {
     it("calculates correctly the total duration in days for a complex schedule", () => {
       const expectedForShortSchedule = 6;
@@ -322,181 +270,6 @@ describe("ScheduleUtils", () => {
         ),
         22.5,
       );
-    });
-  });
-
-  describe("calculateTotalImmersionHoursBetweenDate", () => {
-    describe("with simple schedule", () => {
-      const regularScheduleClassic = new ScheduleDtoBuilder()
-        .withDateInterval({
-          start: new Date("2022-06-04"),
-          end: new Date("2022-06-28"),
-        })
-        .withRegularSchedule({
-          dayPeriods: [
-            [0, 0],
-            [2, 3],
-          ],
-          timePeriods: [
-            { start: "09:00", end: "12:30" },
-            { start: "14:00", end: "18:00" },
-          ],
-        })
-        .build();
-
-      it("give hours time when immersion last only one day", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-13",
-          dateEnd: "2022-06-13",
-          schedule: regularScheduleClassic,
-        });
-        expect(totalHours).toBe(7.5);
-      });
-
-      it("has no hours if the day is out of immersion date range", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-03",
-          dateEnd: "2022-06-03",
-          schedule: regularScheduleClassic,
-        });
-        expect(totalHours).toBe(0);
-      });
-
-      it("has no hours if the day is not one of the worked day", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-12",
-          dateEnd: "2022-06-12",
-          schedule: regularScheduleClassic,
-        });
-        expect(totalHours).toBe(0);
-      });
-
-      it("calculate the some of days worked on same week", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-13",
-          dateEnd: "2022-06-19",
-          schedule: regularScheduleClassic,
-        });
-        expect(totalHours).toBe(22.5);
-      });
-
-      it("calculate the some of days worked even on several weeks", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-04",
-          dateEnd: "2022-06-20",
-          schedule: regularScheduleClassic,
-        });
-        expect(totalHours).toBe(52.5);
-      });
-    });
-
-    describe("with complex schedule", () => {
-      const complexSchedule = new ScheduleDtoBuilder()
-        .withComplexSchedule([
-          makeDailySchedule(new Date("2022-06-13"), [
-            { start: "08:00", end: "12:00" },
-          ]),
-          makeDailySchedule(new Date("2022-06-14"), []),
-          makeDailySchedule(new Date("2022-06-15"), []),
-          makeDailySchedule(new Date("2022-06-16"), [
-            { start: "06:00", end: "12:00" },
-            { start: "18:00", end: "22:00" },
-          ]),
-          makeDailySchedule(new Date("2022-06-17"), []),
-          makeDailySchedule(new Date("2022-06-18"), []),
-          makeDailySchedule(new Date("2022-06-19"), [
-            { start: "02:00", end: "06:00" },
-            { start: "07:00", end: "10:00" },
-            { start: "19:00", end: "21:00" },
-          ]),
-          makeDailySchedule(new Date("2022-06-20"), [
-            { start: "08:00", end: "12:00" },
-          ]),
-          makeDailySchedule(new Date("2022-06-21"), []),
-          makeDailySchedule(new Date("2022-06-22"), []),
-          makeDailySchedule(new Date("2022-06-23"), [
-            { start: "06:00", end: "12:00" },
-            { start: "18:00", end: "22:00" },
-          ]),
-          makeDailySchedule(new Date("2022-06-24"), []),
-          makeDailySchedule(new Date("2022-06-25"), [
-            { start: "07:00", end: "11:00" },
-          ]),
-          makeDailySchedule(new Date("2022-06-26"), [
-            { start: "02:00", end: "06:00" },
-            { start: "07:00", end: "10:00" },
-            { start: "19:00", end: "21:00" },
-          ]),
-        ])
-        .build();
-
-      it("give day hours when immersion last only one day", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-13",
-          dateEnd: "2022-06-13",
-          schedule: complexSchedule,
-        });
-        expect(totalHours).toBe(4);
-      });
-
-      it("has no hours if the day is not one of the worked day", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-18",
-          dateEnd: "2022-06-18",
-          schedule: complexSchedule,
-        });
-        expect(totalHours).toBe(0);
-      });
-
-      it("calculate the some of days worked", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-13",
-          dateEnd: "2022-06-19",
-          schedule: complexSchedule,
-        });
-        expect(totalHours).toBe(23);
-      });
-
-      it("calculate the some of days worked even on several weeks", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-13",
-          dateEnd: "2022-06-26",
-          schedule: complexSchedule,
-        });
-        expect(totalHours).toBe(50);
-      });
-    });
-    describe("with complex schedule that return 0 if bad date string format", () => {
-      const complexSchedule = new ScheduleDtoBuilder()
-        .withDateInterval({
-          start: new Date("2022-06-13"),
-          end: new Date("2022-07-11"),
-        })
-        .withRegularSchedule({
-          dayPeriods: [[0, 4]],
-          timePeriods: [
-            { end: "12:00", start: "08:00" },
-            { end: "16:40", start: "14:00" },
-          ],
-        })
-        .build();
-
-      it("has 140 hours with good date format.", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-06-13",
-          dateEnd: "2022-07-11",
-          schedule: complexSchedule,
-        });
-        expect(totalHours).toBe(140);
-      });
-      it("has no hours if the start and end dates are in french format", () => {
-        const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "11/04/2022",
-          dateEnd: "08/05/2022",
-          schedule: complexSchedule,
-        });
-        expect(totalHours).toBe(0);
-      });
     });
   });
 
