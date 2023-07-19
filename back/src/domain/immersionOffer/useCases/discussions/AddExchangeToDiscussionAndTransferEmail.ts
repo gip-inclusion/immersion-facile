@@ -122,11 +122,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       brevoResponse.items.map((item) => this.processBrevoItem(uow, item)),
     );
   }
-  private getBrevoItemAttachmentContent(
-    downloadToken: string,
-  ): Promise<Buffer> {
-    return this.notificationGateway.getAttachmentContent(downloadToken);
-  }
+
   private async processBrevoItem(
     uow: UnitOfWork,
     item: BrevoEmailItem,
@@ -185,7 +181,9 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
           item.Attachments.map(async (attachment) => ({
             name: attachment.Name,
             content: (
-              await this.getBrevoItemAttachmentContent(attachment.DownloadToken)
+              await this.notificationGateway.getAttachmentContent(
+                attachment.DownloadToken,
+              )
             ).toString("base64"),
           })),
         ),
