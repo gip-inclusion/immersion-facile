@@ -1,5 +1,10 @@
-import { expectToEqual, FeatureFlags } from "shared";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import {
+  expectToEqual,
+  FeatureFlags,
+  makeBooleanFeatureFlag,
+  makeTextFeatureFlag,
+} from "shared";
+import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import {
   featureFlagsSlice,
   FeatureFlagsState,
@@ -11,23 +16,27 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const defaultFeatureFlags: FeatureFlags = {
-  enableInseeApi: true,
-  enablePeConnectApi: false,
-  enableLogoUpload: false,
-  enablePeConventionBroadcast: false,
-  enableTemporaryOperation: false,
-  enableMaxContactPerWeek: false,
-  enableMaintenance: false,
+  enableInseeApi: makeBooleanFeatureFlag(true),
+  enablePeConnectApi: makeBooleanFeatureFlag(false),
+  enableLogoUpload: makeBooleanFeatureFlag(false),
+  enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
+  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
+  enableMaintenance: makeTextFeatureFlag(false, {
+    message: "",
+  }),
 };
 
 const flagsFromApi: FeatureFlags = {
-  enableInseeApi: true,
-  enablePeConnectApi: true,
-  enableLogoUpload: false,
-  enablePeConventionBroadcast: true,
-  enableTemporaryOperation: false,
-  enableMaxContactPerWeek: false,
-  enableMaintenance: false,
+  enableInseeApi: makeBooleanFeatureFlag(true),
+  enablePeConnectApi: makeBooleanFeatureFlag(true),
+  enableLogoUpload: makeBooleanFeatureFlag(false),
+  enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
+  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
+  enableMaintenance: makeTextFeatureFlag(true, {
+    message: "My maintenance message",
+  }),
 };
 
 describe("feature flag slice", () => {
@@ -59,31 +68,41 @@ describe("feature flag slice", () => {
     ({ store, dependencies } = createTestStore({
       featureFlags: {
         ...defaultFeatureFlags,
-        enableLogoUpload: false,
+        enableLogoUpload: makeBooleanFeatureFlag(false),
         isLoading: false,
       },
     }));
     store.dispatch(
-      featureFlagsSlice.actions.setFeatureFlagRequested("enableLogoUpload"),
+      featureFlagsSlice.actions.setFeatureFlagRequested({
+        flagName: "enableLogoUpload",
+        flagContent: {
+          isActive: true,
+        },
+      }),
     );
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableLogoUpload: true,
+      enableLogoUpload: makeBooleanFeatureFlag(true),
       isLoading: true,
     });
     dependencies.technicalGateway.setFeatureFlagResponse$.next(undefined);
     expectToEqual(dependencies.technicalGateway.setFeatureFlagLastCalledWith, {
       flagName: "enableLogoUpload",
-      value: true,
+      flagContent: {
+        isActive: true,
+      },
     });
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableLogoUpload: true,
+      enableLogoUpload: makeBooleanFeatureFlag(true),
       isLoading: false,
     });
   });
 
   const expectFeatureFlagsStateToEqual = (expected: FeatureFlagsState) => {
-    expectToEqual(featureFlagsSelector(store.getState()), expected);
+    expectToEqual(
+      featureFlagSelectors.featureFlagState(store.getState()),
+      expected,
+    );
   };
 });

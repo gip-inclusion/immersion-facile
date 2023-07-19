@@ -50,7 +50,7 @@ const getSiretEpic: SiretEpic = (
     filter(siretSlice.actions.siretInfoRequested.match),
     switchMap((action) =>
       getSiret({
-        enableInseeApi: state$.value.featureFlags.enableInseeApi,
+        enableInseeApi: state$.value.featureFlags.enableInseeApi.isActive,
         shouldFetchEvenIfAlreadySaved:
           state$.value.siret.shouldFetchEvenIfAlreadySaved,
         siret: action.payload,

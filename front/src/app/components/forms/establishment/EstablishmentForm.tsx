@@ -334,7 +334,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             />
           )}
 
-          {enableMaxContactPerWeek && isSearchable && (
+          {enableMaxContactPerWeek.isActive && isSearchable && (
             <Input
               label={formContents.maxContactsPerWeek.label}
               nativeInputProps={{

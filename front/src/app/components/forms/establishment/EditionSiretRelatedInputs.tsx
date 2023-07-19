@@ -29,7 +29,7 @@ export const EditionSiretRelatedInputs = ({
         {...formContents.businessName}
         nativeInputProps={{
           ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi,
+          readOnly: featureFlags.enableInseeApi.isActive,
         }}
       />
       <Input

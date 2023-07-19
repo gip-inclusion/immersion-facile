@@ -4,6 +4,7 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   LegacyHttpClientError,
+  makeBooleanFeatureFlag,
   SiretEstablishmentDto,
 } from "shared";
 import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
@@ -87,7 +88,11 @@ describe("Establishment", () => {
         formEstablishment: defaultFormEstablishmentValue(),
       },
       featureFlags: {
-        ...makeStubFeatureFlags({ enableInseeApi: false }),
+        ...makeStubFeatureFlags({
+          enableInseeApi: {
+            ...makeBooleanFeatureFlag(false),
+          },
+        }),
         isLoading: false,
       },
     }));

@@ -6,6 +6,7 @@ import {
   EstablishmentTutor,
   expectPromiseToFailWithError,
   expectToEqual,
+  makeBooleanFeatureFlag,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -37,7 +38,7 @@ describe("Update Convention", () => {
     conventionRepository = uow.conventionRepository;
     outboxRepo = uow.outboxRepository;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: true,
+      enableInseeApi: makeBooleanFeatureFlag(true),
     });
 
     createNewEvent = makeCreateNewEvent({

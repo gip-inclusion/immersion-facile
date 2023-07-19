@@ -1,4 +1,8 @@
-import { FeatureFlags } from "shared";
+import {
+  FeatureFlags,
+  makeBooleanFeatureFlag,
+  makeTextFeatureFlag,
+} from "shared";
 import { StoreAndDeps } from "src/core-logic/storeConfig/createTestStore";
 
 type ScenarioUnitTest = (storeAndDeps: StoreAndDeps) => void;
@@ -24,13 +28,15 @@ export const fastForwardObservables = createScenarioUnitTest<string>(
 );
 
 const defaultFlagsInFront: FeatureFlags = {
-  enableInseeApi: true,
-  enablePeConnectApi: true,
-  enableLogoUpload: true,
-  enablePeConventionBroadcast: true,
-  enableTemporaryOperation: false,
-  enableMaxContactPerWeek: false,
-  enableMaintenance: false,
+  enableInseeApi: makeBooleanFeatureFlag(true),
+  enablePeConnectApi: makeBooleanFeatureFlag(true),
+  enableLogoUpload: makeBooleanFeatureFlag(true),
+  enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
+  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
+  enableMaintenance: makeTextFeatureFlag(false, {
+    message: "My maintenance message",
+  }),
 };
 
 export const makeStubFeatureFlags = (

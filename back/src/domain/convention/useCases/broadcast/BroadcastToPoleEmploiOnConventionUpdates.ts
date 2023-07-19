@@ -44,7 +44,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     const { enablePeConventionBroadcast } =
       await uow.featureFlagRepository.getAll();
 
-    if (!enablePeConventionBroadcast)
+    if (!enablePeConventionBroadcast.isActive)
       return this.options.resyncMode
         ? uow.conventionsToSyncRepository.save({
             id: convention.id,

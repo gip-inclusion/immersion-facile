@@ -207,7 +207,7 @@ export const ConventionFormFields = ({
             <AgencySelector
               internshipKind={conventionValues.internshipKind}
               defaultAgencyId={conventionValues.agencyId}
-              shouldListAll={!enablePeConnectApi}
+              shouldListAll={!enablePeConnectApi.isActive}
             />
           </Accordion>
         )}

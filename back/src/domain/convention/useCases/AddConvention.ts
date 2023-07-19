@@ -39,7 +39,7 @@ export class AddConvention extends TransactionalUseCase<
     }
 
     const featureFlags = await uow.featureFlagRepository.getAll();
-    if (featureFlags.enableInseeApi) {
+    if (featureFlags.enableInseeApi.isActive) {
       await rejectsSiretIfNotAnOpenCompany(
         this.siretGateway,
         createConventionParams.siret,

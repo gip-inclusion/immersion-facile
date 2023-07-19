@@ -1,14 +1,21 @@
-import { FeatureFlag, FeatureFlags } from "shared";
+import {
+  FeatureFlags,
+  makeBooleanFeatureFlag,
+  makeTextFeatureFlag,
+  SetFeatureFlagParam,
+} from "shared";
 import { FeatureFlagRepository } from "../../domain/core/ports/FeatureFlagRepository";
 
 const defaultFlags: FeatureFlags = {
-  enableInseeApi: true,
-  enablePeConnectApi: true,
-  enableLogoUpload: true,
-  enablePeConventionBroadcast: true,
-  enableTemporaryOperation: false,
-  enableMaxContactPerWeek: false,
-  enableMaintenance: false,
+  enableInseeApi: makeBooleanFeatureFlag(true),
+  enablePeConnectApi: makeBooleanFeatureFlag(true),
+  enableLogoUpload: makeBooleanFeatureFlag(true),
+  enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
+  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
+  enableMaintenance: makeTextFeatureFlag(false, {
+    message: "Maintenance message",
+  }),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
@@ -22,7 +29,10 @@ export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
     return this.featureFlags;
   }
 
-  async set(params: { flagName: FeatureFlag; value: boolean }): Promise<void> {
-    this.featureFlags[params.flagName] = params.value;
+  async set(params: SetFeatureFlagParam): Promise<void> {
+    this.featureFlags[params.flagName] = {
+      ...this.featureFlags[params.flagName],
+      ...(params.flagContent as any),
+    };
   }
 }

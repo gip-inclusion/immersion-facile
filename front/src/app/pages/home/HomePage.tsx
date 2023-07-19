@@ -72,7 +72,7 @@ export const HomePage = ({ type }: HomePageProps) => {
         />
         <SectionFaq articles={sectionFaqDataForType} />
       </MainWrapper>
-      {featureFlags.enableTemporaryOperation && (
+      {featureFlags.enableTemporaryOperation.isActive && (
         <FixedStamp
           image={
             <img

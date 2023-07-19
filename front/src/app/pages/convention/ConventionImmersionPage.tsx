@@ -67,11 +67,11 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   useScrollToTop(shouldShowForm);
   useEffect(() => {
     setShouldShowForm(
-      enablePeConnectApi &&
+      enablePeConnectApi.isActive &&
         !!federatedIdentity &&
         isPeConnectIdentity(federatedIdentity),
     );
-  }, [enablePeConnectApi, federatedIdentity]);
+  }, [enablePeConnectApi.isActive, federatedIdentity]);
 
   return match({
     isLoading,

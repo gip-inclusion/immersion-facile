@@ -6,7 +6,7 @@ import {
   FeatureFlags,
   featureFlagsRoute,
   featureFlagsSchema,
-  SetFeatureFlagParams,
+  SetFeatureFlagParam,
   uploadFileRoute,
 } from "shared";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
@@ -30,7 +30,7 @@ export class HttpTechnicalGateway implements TechnicalGateway {
     );
 
   setFeatureFlag = (
-    params: SetFeatureFlagParams,
+    params: SetFeatureFlagParam,
     token: BackOfficeJwt,
   ): Observable<void> =>
     from(

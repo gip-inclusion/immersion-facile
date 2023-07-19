@@ -39,7 +39,7 @@ export const InitiateConventionCard = ({
   const currentRoute = useRoute();
   const cardContent = (
     <div>
-      {enablePeConnectApi ? (
+      {enablePeConnectApi.isActive ? (
         <>
           <div>
             <p className={fr.cx("fr-h6", "fr-mb-2w")}>

@@ -25,6 +25,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     const featureFlags = await uow.featureFlagRepository.getAll();
+    const isApiInseeEnabled = featureFlags.enableInseeApi.isActive;
 
     const existingFormEstablishment =
       await uow.formEstablishmentRepository.getBySiret(dto.siret);
@@ -34,8 +35,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
         `Establishment with siret ${dto.siret} already exists`,
       );
     }
-
-    if (featureFlags.enableInseeApi) {
+    if (isApiInseeEnabled) {
       await rejectsSiretIfNotAnOpenCompany(this.siretGateway, dto.siret);
     }
 
@@ -52,7 +52,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     const event = this.createNewEvent({
       topic: "FormEstablishmentAdded",
       payload: correctFormEstablishement,
-      ...(featureFlags.enableInseeApi ? {} : { wasQuarantined: true }),
+      ...(isApiInseeEnabled ? {} : { wasQuarantined: true }),
     });
 
     await Promise.all([

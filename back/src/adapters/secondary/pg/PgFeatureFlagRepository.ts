@@ -1,12 +1,16 @@
 import { PoolClient } from "pg";
-import { FeatureFlag, FeatureFlags } from "shared";
+import { FeatureFlags, SetFeatureFlagParam } from "shared";
 import { FeatureFlagRepository } from "../../../domain/core/ports/FeatureFlagRepository";
 
 const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
   raw.reduce(
     (acc, row) => ({
       ...acc,
-      [row.flag_name]: row.is_active,
+      [row.flag_name]: {
+        isActive: row.is_active,
+        kind: row.kind,
+        ...(row.kind === "text" && { value: row.value }),
+      },
     }),
     {} as FeatureFlags,
   );
@@ -19,10 +23,19 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
     return rawPgToFeatureFlags(result.rows);
   }
 
-  async set(params: { flagName: FeatureFlag; value: boolean }): Promise<void> {
-    await this.client.query(
-      "UPDATE feature_flags SET is_active = $1 WHERE flag_name = $2",
-      [params.value, params.flagName],
-    );
+  async set(params: SetFeatureFlagParam): Promise<void> {
+    "value" in params.flagContent
+      ? await this.client.query(
+          "UPDATE feature_flags SET is_active = $1, value = $2 WHERE flag_name = $3",
+          [
+            params.flagContent.isActive,
+            JSON.stringify(params.flagContent.value),
+            params.flagName,
+          ],
+        )
+      : await this.client.query(
+          "UPDATE feature_flags SET is_active = $1 WHERE flag_name = $2",
+          [params.flagContent.isActive, params.flagName],
+        );
   }
 }

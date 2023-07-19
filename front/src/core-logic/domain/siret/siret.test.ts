@@ -1,5 +1,6 @@
 import {
   GetSiretInfo,
+  makeBooleanFeatureFlag,
   SiretEstablishmentDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
@@ -137,7 +138,11 @@ describe("Siret validation and fetching", () => {
     beforeEach(() => {
       ({ store, dependencies } = createTestStore({
         featureFlags: {
-          ...makeStubFeatureFlags({ enableInseeApi: false }),
+          ...makeStubFeatureFlags({
+            enableInseeApi: {
+              ...makeBooleanFeatureFlag(false),
+            },
+          }),
           isLoading: false,
         },
       }));

@@ -190,7 +190,9 @@ describe("ResyncOldConventionsToPe use case", () => {
     it("when feature flag enablePeConventionBroadcast is disabled", async () => {
       await uow.featureFlagRepository.set({
         flagName: "enablePeConventionBroadcast",
-        value: false,
+        flagContent: {
+          isActive: false,
+        },
       });
       uow.agencyRepository.setAgencies([agencyPE]);
       uow.conventionRepository.setConventions({

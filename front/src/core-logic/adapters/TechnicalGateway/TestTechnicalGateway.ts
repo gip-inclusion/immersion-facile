@@ -3,14 +3,14 @@ import {
   AbsoluteUrl,
   BackOfficeJwt,
   FeatureFlags,
-  SetFeatureFlagParams,
+  SetFeatureFlagParam,
 } from "shared";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class TestTechnicalGateway implements TechnicalGateway {
   getAllFeatureFlags = () => this.featureFlags$;
   setFeatureFlag = (
-    params: SetFeatureFlagParams,
+    params: SetFeatureFlagParam,
     _adminToken: BackOfficeJwt,
   ) => {
     this.setFeatureFlagLastCalledWith = params;
@@ -27,6 +27,6 @@ export class TestTechnicalGateway implements TechnicalGateway {
   // test purposes only
   public featureFlags$ = new Subject<FeatureFlags>();
   public setFeatureFlagResponse$ = new Subject<void>();
-  public setFeatureFlagLastCalledWith: SetFeatureFlagParams | undefined =
+  public setFeatureFlagLastCalledWith: SetFeatureFlagParam | undefined =
     undefined;
 }

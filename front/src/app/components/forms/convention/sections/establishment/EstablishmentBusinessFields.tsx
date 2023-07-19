@@ -60,7 +60,7 @@ export const EstablishmentBusinessFields = ({
           ...register("businessName"),
           value: establishmentInfos ? establishmentInfos.businessName : "",
         }}
-        disabled={enableInseeApi}
+        disabled={enableInseeApi.isActive}
       />
     </>
   );

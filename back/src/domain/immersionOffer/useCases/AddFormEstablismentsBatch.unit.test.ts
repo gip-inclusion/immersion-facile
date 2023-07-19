@@ -5,6 +5,7 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
+  makeBooleanFeatureFlag,
 } from "shared";
 import {
   createInMemoryUow,
@@ -65,7 +66,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     uow.romeRepository.appellations =
       defaultValidFormEstablishment.appellations;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: true,
+      enableInseeApi: makeBooleanFeatureFlag(true),
     });
 
     uowPerformer = new InMemoryUowPerformer(uow);
