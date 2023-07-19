@@ -82,7 +82,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.establishment}`,
   ),
   formEstablishmentForExternals: defineRoute(
-    { consumer: param.path.string },
+    {
+      ...formEstablishmentParamsInUrl,
+      consumer: param.path.string,
+    },
     (params) => `/etablissement/${params.consumer}`,
   ),
   group: defineRoute(

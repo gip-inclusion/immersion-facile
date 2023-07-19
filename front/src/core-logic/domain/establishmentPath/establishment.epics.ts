@@ -89,7 +89,7 @@ const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
     ),
   );
 
-const addFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
+const createFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
   action$,
   _state$,
   { establishmentGateway },
@@ -124,6 +124,6 @@ export const establishmentEpics = [
   requestEstablishmentModification,
   redirectToEstablishmentFormPageEpic,
   fetchEstablishmentEpic,
-  addFormEstablishmentEpic,
+  createFormEstablishmentEpic,
   editFormEstablishmentEpic,
 ];
