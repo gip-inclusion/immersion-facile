@@ -71,6 +71,14 @@ const searchImmersionResult: SearchImmersionResultDto = {
   website: "www.masuperboite.com",
 };
 
+const withAuthorizationHeader = {
+  authorization: {
+    description:
+      "La clé API à fournir. (Pas besoin de 'Bearer xxx', juste 'xxx')",
+    example: "my-jwt-token",
+  },
+};
+
 const apiKeyAuth = "apiKeyAuth";
 
 const searchSection = "Recherche d'entreprise accueillante et mise en contact";
@@ -128,21 +136,35 @@ const generateOpenApi = (envType: string) =>
     },
   );
 
+const error401Example = {
+  status: 401,
+  message: "unauthenticated",
+};
+const error403Example = {
+  status: 403,
+  message: "unauthorized consumer Id",
+};
+const error404Example = {
+  status: 404,
+  message: "No establishment found with siret 12345678912345",
+};
+
 export const createOpenApiSpecV2 = (envType: string) =>
   generateOpenApi(envType)({
     [searchSection]: {
       searchImmersion: {
         summary: "Recherche",
         description:
-          "Description : Retourne un tableau d'offres d'immersion correspondant a la recherche",
+          "Retourne un tableau d'offres d'immersion correspondant a la recherche",
         extraDocs: {
+          headerParams: withAuthorizationHeader,
           queryParams: {
             longitude: {
-              example: 52.387783,
+              example: 2.34839,
               description: "Coordonnées de latitude",
             },
             latitude: {
-              example: 9.7334394,
+              example: 48.8535,
               description: "Coordonnées de longitude",
             },
             rome: {
@@ -162,11 +184,29 @@ export const createOpenApiSpecV2 = (envType: string) =>
               description: "Critère de tri des résultats de recheche",
             },
             voluntaryToImmersion: {
-              example: true,
-              description: `Valeurs possibles:
-              true -> seul nos entreprises référencées seront renvoyées,
-              false -> seul les entreprises non référencées seront renvoyées,
-              Si ce paramètre n'est pas renseigné toutes les entreprises seront renvoyées`,
+              allowEmptyValue: true,
+              examples: {
+                true: {
+                  summary:
+                    "Entreprises référencés chez Immersion Facilitée uniquement",
+                  value: true,
+                  description:
+                    "Seules nos entreprises référencées seront renvoyées",
+                },
+                false: {
+                  summary: "Entreprises non-référencées uniquement",
+                  value: false,
+                  description:
+                    "Seules les entreprises non-référencées seront renvoyées (celles qui viennent de La Bonne Boite)",
+                },
+                notDefined: {
+                  summary: "Les entreprise référencées avec compléments",
+                  value: undefined,
+                  description:
+                    "Si ce paramètre n'est pas renseigné toutes les entreprises seront renvoyées",
+                },
+              },
+              description: `Voulez-vous uniquement les entreprises référencées par immersion facilitée ?`,
             },
           },
           responses: {
@@ -176,21 +216,30 @@ export const createOpenApiSpecV2 = (envType: string) =>
             },
             "400": {
               description: "Requête invalide: paramètres d'entrées invalides",
+              example: {
+                status: 400,
+                message:
+                  "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v2/contact-establishment",
+                issues: ["siret : SIRET doit être composé de 14 chiffres"],
+              },
             },
             "401": {
               description: "Utilisateur non authentifié",
+              example: error401Example,
             },
             "403": {
               description:
                 "Accès non autorisé (veuillez vérifier que vous avez les droits)",
+              example: error403Example,
             },
           },
         },
       },
       getOfferBySiretAndAppellationCode: {
         summary: "Récupération d’un résultat de recherche d'immersion connu",
-        description: "Description : Renvoie l'offre d'immersion correspondante",
+        description: "Renvoie l'offre d'immersion correspondante",
         extraDocs: {
+          headerParams: withAuthorizationHeader,
           urlParams: {
             siret: {
               description:
@@ -203,31 +252,31 @@ export const createOpenApiSpecV2 = (envType: string) =>
               example: "12001",
             },
           },
-          headerParams: {
-            authorization: {
-              description:
-                "La clé API à fournir. (Pas besoin de 'Bearer xxx', juste 'xxx')",
-              example: "my-jwt-token",
-            },
-          },
           responses: {
             "200": {
               description: "Opération réussie",
               example: searchImmersionResult,
             },
-            // TODO
-            // "400": {
-            //   description: "TODO",
-            // },
+            "400": {
+              description: "TODO",
+              example: {
+                status: 400,
+                message: "Schema validation failed",
+                issues: ["siret: SIRET doit être composé de 14 chiffres"],
+              },
+            },
             "401": {
               description: "Utilisateur non authentifié",
+              example: error401Example,
             },
             "403": {
               description:
                 "Accès non autorisé (veuillez vérifier que vous avez les droits)",
+              example: error403Example,
             },
             "404": {
               description: "Résultat non trouvé",
+              example: error404Example,
             },
           },
         },
@@ -244,6 +293,7 @@ export const createOpenApiSpecV2 = (envType: string) =>
       IN_PERSON : Dans le cas en personne le candidat reçoit un email avec le nom de la personne, et l’adresse de l’entreprise et doit se présenter en personne.`,
 
         extraDocs: {
+          headerParams: withAuthorizationHeader,
           body: {
             examples: {
               email: {
@@ -271,17 +321,26 @@ export const createOpenApiSpecV2 = (envType: string) =>
               description: "Opération réussie",
             },
             "400": {
-              description: "Le mode de contact ne correspond pas",
+              description:
+                "Error dans la contrat, ou le mode de contact ne correspond pas à celui renseigné par l'entreprise",
+              example: {
+                status: 400,
+                message:
+                  "Contact mode mismatch: 'EMAIL' in params. In contact (fetched with siret) : 'PHONE'",
+              },
             },
             "401": {
               description: "Utilisateur non authentifié",
+              example: error401Example,
             },
             "403": {
               description:
                 "Accès non autorisé (veuillez vérifier que vous avez les droits)",
+              example: error403Example,
             },
             "404": {
               description: "Établissement/Contact non trouvé",
+              example: error404Example,
             },
           },
         },

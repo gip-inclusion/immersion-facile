@@ -3,8 +3,7 @@ import { z } from "zod";
 
 export abstract class HttpError extends Error {
   abstract httpCode: number;
-
-  constructor(message?: any) {
+  constructor(message?: any, public readonly issues?: string[]) {
     super(message);
     Object.setPrototypeOf(this, HttpError.prototype);
   }
@@ -52,8 +51,8 @@ export class NotFoundError extends HttpError {
 export class BadRequestError extends HttpError {
   httpCode = 400;
 
-  constructor(msg?: any) {
-    super(msg);
+  constructor(msg?: any, issues?: string[]) {
+    super(msg, issues);
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }
 }
@@ -94,5 +93,22 @@ export const validateAndParseZodSchema = <T>(
   } catch (e) {
     logger.error("ValidateAndParseZodSchema failed with: ", params);
     throw new BadRequestError(e);
+  }
+};
+
+export const validateAndParseZodSchemaV2 = <T>(
+  inputSchema: z.Schema<T>,
+  params: unknown,
+  logger: Logger,
+): T => {
+  try {
+    return inputSchema.parse(params);
+  } catch (e) {
+    logger.error("ValidateAndParseZodSchema failed with: ", params);
+    const error = e as z.ZodError;
+    const issues = error.issues.map(
+      (issue) => `${issue.path.join(".")}: ${issue.message}`,
+    );
+    throw new BadRequestError("Schema validation failed", issues);
   }
 };
