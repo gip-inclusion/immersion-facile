@@ -601,6 +601,26 @@ describe("conventionDtoSchema", () => {
       ]);
     });
   });
+
+  describe("when sunday is in schedule", () => {
+    const conventionBuilder = new ConventionDtoBuilder()
+      .withDateStart(new Date("2023-07-20").toISOString())
+      .withDateEnd(new Date("2023-07-25").toISOString());
+
+    it("rejects when internship kind is mini-stage-cci", () => {
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
+        conventionBuilder.withInternshipKind("mini-stage-cci").build(),
+        ["Le mini-stage ne peut pas se dérouler un dimanche"],
+      );
+    });
+
+    it("accepts valid convention when kind is immersion", () => {
+      expectConventionDtoToBeValid(
+        conventionBuilder.withInternshipKind("immersion").build(),
+      );
+    });
+  });
 });
 
 const expectConventionDtoToBeValid = (validConvention: ConventionDto): void => {

@@ -475,3 +475,8 @@ export const calculateScheduleTotalDurationInDays = (
   const dateEnd = dates.reverse()[0];
   return differenceInDays(new Date(dateEnd), new Date(dateStart));
 };
+
+export const isSundayInSchedule = (complexSchedule: DailyScheduleDto[]) => {
+  const sunday = 0;
+  return complexSchedule.some((week) => getDay(parseISO(week.date)) === sunday);
+};
