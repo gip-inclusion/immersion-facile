@@ -118,7 +118,7 @@ describe("POST contact-establishment public V2 route", () => {
       headers: {
         authorization: authToken,
       },
-      body: { ...contactEstablishment, siret: "wrong" } as any,
+      body: { ...contactEstablishment, siret: "wrong" },
     });
 
     expectToEqual(response, {
