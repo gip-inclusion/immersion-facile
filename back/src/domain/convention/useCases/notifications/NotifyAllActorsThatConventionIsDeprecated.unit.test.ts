@@ -6,7 +6,7 @@ import {
   ConventionDtoBuilder,
 } from "shared";
 import { EmailNotification } from "shared";
-import { expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated } from "../../../../_testBuilders/emailAssertions";
+import { expectNotifyConventionIsDeprecated } from "../../../../_testBuilders/emailAssertions";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -86,7 +86,7 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
 
     expect(templatedEmailsSent).toHaveLength(1);
 
-    expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated(
+    expectNotifyConventionIsDeprecated(
       templatedEmailsSent[0],
       [
         deprecatedConvention.signatories.beneficiary.email,

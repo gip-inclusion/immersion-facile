@@ -141,7 +141,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   });
 };
 
-export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsCancelled = (
+export const expectNotifyConventionCancelled = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
   convention: ConventionDto,
@@ -166,7 +166,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsCancelled = (
   });
 };
 
-export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated = (
+export const expectNotifyConventionIsDeprecated = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
   convention: ConventionDto,
