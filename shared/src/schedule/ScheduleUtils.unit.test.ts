@@ -6,6 +6,7 @@ import {
   calculateNumberOfWorkedDays,
   calculateScheduleTotalDurationInDays,
   calculateTotalImmersionHoursFromComplexSchedule,
+  calculateWeeklyHoursFromSchedule,
   dayPeriodsFromComplexSchedule,
   makeDailySchedule,
   prettyPrintSchedule,
@@ -243,6 +244,29 @@ describe("ScheduleUtils", () => {
           exampleLongRegularSchedule.complexSchedule,
         ),
       ).toEqual(expectedForLongSchedule);
+    });
+  });
+  describe("calculateWeeklyHoursFromSchedule", () => {
+    it("calculates correctly the total number of hours from a complex schedule", () => {
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval({
+          start: new Date("2022-06-06"),
+          end: new Date("2022-06-10"),
+        })
+        .withRegularSchedule({
+          dayPeriods: [
+            [0, 0],
+            [2, 3],
+          ],
+          timePeriods: [
+            { start: "09:00", end: "12:30" },
+            { start: "14:00", end: "18:00" },
+          ],
+        })
+        .build();
+
+      const weeklyHours = calculateWeeklyHoursFromSchedule(schedule);
+      expectToEqual(weeklyHours, [22.5]);
     });
   });
   describe("CalculateTotalImmersionHoursFromComplexSchedule", () => {
