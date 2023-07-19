@@ -1,27 +1,17 @@
 import { Observable } from "rxjs";
-import { FormEstablishmentDto, SiretDto } from "shared";
+import { EstablishmentJwt, FormEstablishmentDto, SiretDto } from "shared";
 
 export interface EstablishmentGateway {
-  addFormEstablishment: (establishment: FormEstablishmentDto) => Promise<void>;
   addFormEstablishment$: (
     establishment: FormEstablishmentDto,
   ) => Observable<void>;
-  requestEstablishmentModification(siret: SiretDto): Promise<void>;
   requestEstablishmentModification$(siret: SiretDto): Observable<void>;
-  getFormEstablishmentFromJwt: (
-    siret: SiretDto,
-    jwt: string,
-  ) => Promise<FormEstablishmentDto>;
   getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    jwt: string,
+    jwt: EstablishmentJwt,
   ): Observable<FormEstablishmentDto>;
-  updateFormEstablishment: (
-    establishment: FormEstablishmentDto,
-    jwt: string,
-  ) => Promise<void>;
   updateFormEstablishment$(
     establishment: FormEstablishmentDto,
-    jwt: string,
+    jwt: EstablishmentJwt,
   ): Observable<void>;
 }

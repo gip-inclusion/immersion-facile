@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -29,8 +29,7 @@ export const CreationSiretRelatedInputs = () => {
     updateSiret,
   } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
   const establishmentFeedback = useAppSelector(establishmentSelectors.feedback);
-  const [requestEmailToEditFormSucceed] = useState(false);
-  const [requestEmailToEditFormError] = useState<string | null>(null);
+  const isLoading = useAppSelector(establishmentSelectors.isLoading);
   const {
     setValue,
     register,
@@ -74,10 +73,11 @@ export const CreationSiretRelatedInputs = () => {
         disabled={isFetchingSiret}
       />
       {siretRawError === "Establishment with this siret is already in our DB" &&
-        !requestEmailToEditFormSucceed && (
+        establishmentFeedback.kind !== "sendModificationLinkSuccess" && (
           <div className={fr.cx("fr-mb-4w")}>
             Cette entreprise a déjà été référencée.
             <Button
+              className={fr.cx("fr-mt-2w")}
               onClick={() => {
                 dispatch(
                   establishmentSlice.actions.sendModificationLinkRequested(
@@ -86,10 +86,10 @@ export const CreationSiretRelatedInputs = () => {
                 );
               }}
               nativeButtonProps={{
-                disabled: requestEmailToEditFormSucceed,
                 id: domElementIds.establishment.errorSiretAlreadyExistButton,
-                type: "button",
+                disabled: isLoading,
               }}
+              type="button"
             >
               Demande de modification du formulaire de référencement
             </Button>
@@ -100,21 +100,25 @@ export const CreationSiretRelatedInputs = () => {
             )}
           </div>
         )}
-      {requestEmailToEditFormSucceed && (
+      {establishmentFeedback.kind === "sendModificationLinkSuccess" && (
         <Alert
           severity="success"
           title="Succès de la demande"
           description="Succès. Un mail a été envoyé au référent de cet établissement avec un
         lien permettant la mise à jour des informations."
+          className={fr.cx("fr-mb-4w")}
         />
       )}
-      {requestEmailToEditFormError && (
-        <Alert
-          severity="info"
-          title="La demande de modification n'a pas aboutie."
-          description={requestEmailToEditFormError}
-        />
-      )}
+      {siretRawError !== null &&
+        siretRawError !==
+          "Establishment with this siret is already in our DB" && (
+          <Alert
+            severity="error"
+            title="La vérification du SIRET a échoué"
+            description={siretErrorToDisplay}
+            className={fr.cx("fr-mb-4w")}
+          />
+        )}
       <Input
         label={formContents.businessName.label}
         hintText={formContents.businessName.hintText}

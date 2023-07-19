@@ -59,7 +59,9 @@ import { MultipleAppellationInput } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
 
 type RouteByMode = {
-  create: Route<typeof routes.formEstablishment>;
+  create:
+    | Route<typeof routes.formEstablishment>
+    | Route<typeof routes.formEstablishmentForExternals>;
   edit: Route<typeof routes.editFormEstablishment>;
 };
 
@@ -70,20 +72,27 @@ type EstablishmentFormProps = {
 };
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
+  const dispatch = useDispatch();
+
   const route = useRoute() as RouteByMode[Mode];
-  const isEstablishmentCreation = route.name === "formEstablishment";
+  const isEstablishmentCreation =
+    route.name === "formEstablishment" ||
+    route.name === "formEstablishmentForExternals";
+
   const feedback = useAppSelector(establishmentSelectors.feedback);
+  const isLoading = useAppSelector(establishmentSelectors.isLoading);
+  const initialFormEstablishment = useAppSelector(
+    establishmentSelectors.formEstablishment,
+  );
+
   const jwt = !isEstablishmentCreation ? route.params.jwt : "";
   const siret =
     isEstablishmentCreation && route.params.siret ? route.params.siret : "";
   const source =
     isEstablishmentCreation && route.params.source ? route.params.source : "";
-  const isLoading = useAppSelector(establishmentSelectors.isLoading);
+
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
-  );
-  const initialFormEstablishment = useAppSelector(
-    establishmentSelectors.formEstablishment,
   );
   const initialValues = {
     ...initialFormEstablishment,
@@ -96,7 +105,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
-  const dispatch = useDispatch();
   const {
     handleSubmit,
     register,
@@ -105,15 +113,16 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     formState: { errors, submitCount, isSubmitting, touchedFields },
     reset,
   } = methods;
+  const formValues = getValues();
+  const formContents = getFormFields();
+  const getFieldError = makeFieldError(methods.formState);
   const [isSearchable, setIsSearchable] = useState(
     initialValues.maxContactsPerWeek > noContactPerWeek,
   );
-  const formContents = getFormFields();
   const { enableMaxContactPerWeek } = useFeatureFlags();
-  const formValues = getValues();
-  const getFieldError = makeFieldError(methods.formState);
 
   useInitialSiret(siret);
+
   useEffect(() => {
     const payload: EstablishmentRequestedPayload =
       isEstablishmentCreation && mode === "create"
@@ -361,11 +370,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             errors={toDotNotation(formErrorsToFlatErrors(errors))}
             visible={submitCount !== 0 && Object.values(errors).length > 0}
           />
-          {feedback.kind === "errored" && (
+          {feedback.kind === "submitErrored" && (
             <Alert
               severity="error"
-              title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. "
-              description={feedback.errorMessage}
+              title="Erreur lors de l'envoi du formulaire de référencement d'entreprise"
+              description={
+                "Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations."
+              }
             />
           )}
           {feedback.kind === "submitSuccess" && (

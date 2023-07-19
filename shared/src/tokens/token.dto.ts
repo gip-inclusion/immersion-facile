@@ -102,6 +102,7 @@ export const allRoles = [
 
 export type ConventionMagicLinkJwt = Flavor<string, "ConventionMagicLinkJwt">;
 export type BackOfficeJwt = Flavor<string, "BackOfficeJwt">;
+export type EstablishmentJwt = Flavor<string, "EstablishmentJwt">;
 
 export type JwtPayloads = {
   convention?: ConventionMagicLinkPayload;

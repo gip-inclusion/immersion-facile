@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   defaultMaxContactsPerWeek,
+  EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
 } from "shared";
@@ -18,14 +19,14 @@ type EstablishmentFeedback = SubmitFeedBack<
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
-  jwt: string;
+  jwt: EstablishmentJwt;
 };
 
 export type EstablishmentRequestedPayload =
   | Partial<FormEstablishmentDto>
   | {
       siret: SiretDto;
-      jwt: string;
+      jwt: EstablishmentJwt;
     };
 
 export const defaultFormEstablishmentValue = (
@@ -104,8 +105,6 @@ export const establishmentSlice = createSlice({
       };
     },
 
-    // submit actions
-
     establishmentCreationRequested: (
       state,
       _action: PayloadAction<FormEstablishmentDto>,
@@ -140,7 +139,6 @@ export const establishmentSlice = createSlice({
       };
     },
 
-    // clear
     establishmentClearRequested: () => initialState,
 
     sendModificationLinkRequested: (
