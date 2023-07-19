@@ -1,4 +1,3 @@
-import { uniq } from "ramda";
 import { ConventionDto, conventionSchema } from "shared";
 import {
   UnitOfWork,
@@ -6,6 +5,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
+import { getAllConventionRecipientsEmail } from "../../entities/Convention";
 
 export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseCase<ConventionDto> {
   constructor(
@@ -28,21 +28,9 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
       );
     }
 
-    const {
-      beneficiary,
-      establishmentRepresentative,
-      beneficiaryCurrentEmployer,
-      beneficiaryRepresentative,
-    } = convention.signatories;
+    const { beneficiary } = convention.signatories;
 
-    const recipients = uniq([
-      beneficiary.email,
-      establishmentRepresentative.email,
-      ...agency.counsellorEmails,
-      ...agency.validatorEmails,
-      ...(beneficiaryCurrentEmployer ? [beneficiaryCurrentEmployer.email] : []),
-      ...(beneficiaryRepresentative ? [beneficiaryRepresentative.email] : []),
-    ]);
+    const recipients = getAllConventionRecipientsEmail(convention, agency);
 
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",

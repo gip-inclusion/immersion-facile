@@ -45,6 +45,17 @@ const deprecatedConvention = new ConventionDtoBuilder()
   .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
   .build();
 
+const deprecatedConventionWithDuplicatedEmails = new ConventionDtoBuilder()
+  .withStatus("DEPRECATED")
+  .withAgencyId("fakeAgencyId")
+  .withBeneficiaryRepresentative(beneficiaryRepresentative)
+  .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+  .withEstablishmentRepresentativeEmail(
+    "establishment-representative@gmail.com",
+  )
+  .withEstablishmentTutorEmail("establishment-representative@gmail.com")
+  .build();
+
 const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
 
 const validatorEmails = ["validator@gmail.com"];
@@ -54,6 +65,13 @@ const defaultAgency = AgencyDtoBuilder.create(deprecatedConvention.agencyId)
   .withCounsellorEmails(counsellorEmails)
   .withValidatorEmails(validatorEmails)
   .build();
+
+const agencyWithSameEmailAdressForCounsellorAndValidator =
+  AgencyDtoBuilder.create(deprecatedConventionWithDuplicatedEmails.agencyId)
+    .withName("duplicated-email-test-agency-name")
+    .withCounsellorEmails(counsellorEmails)
+    .withValidatorEmails(counsellorEmails)
+    .build();
 
 describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
   let useCase: NotifyAllActorsThatConventionIsDeprecated;
@@ -79,6 +97,12 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
 
   it("Sends a conevention deprecated notification to all actors", async () => {
     await useCase.execute(deprecatedConvention);
+    const {
+      beneficiaryCurrentEmployer,
+      beneficiary,
+      establishmentRepresentative,
+      beneficiaryRepresentative,
+    } = deprecatedConvention.signatories;
 
     const templatedEmailsSent = uow.notificationRepository.notifications
       .filter((notif): notif is EmailNotification => notif.kind === "email")
@@ -89,14 +113,47 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
     expectNotifyConventionIsDeprecated(
       templatedEmailsSent[0],
       [
-        deprecatedConvention.signatories.beneficiary.email,
-        deprecatedConvention.signatories.establishmentRepresentative.email,
+        beneficiary.email,
+        establishmentRepresentative.email,
+        beneficiaryRepresentative!.email,
+        beneficiaryCurrentEmployer!.email,
         ...counsellorEmails,
         ...validatorEmails,
-        deprecatedConvention.signatories.beneficiaryCurrentEmployer!.email,
-        deprecatedConvention.signatories.beneficiaryRepresentative!.email,
       ],
       deprecatedConvention,
+    );
+  });
+
+  it("doesn't send duplicated rejection emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
+    uow.agencyRepository.setAgencies([
+      agencyWithSameEmailAdressForCounsellorAndValidator,
+    ]);
+
+    await useCase.execute(deprecatedConventionWithDuplicatedEmails);
+
+    const {
+      beneficiaryCurrentEmployer,
+      beneficiary,
+      establishmentRepresentative,
+      beneficiaryRepresentative,
+    } = deprecatedConventionWithDuplicatedEmails.signatories;
+
+    const templatedEmailsSent = uow.notificationRepository.notifications
+      .filter((notif): notif is EmailNotification => notif.kind === "email")
+      .map((notif) => notif.templatedContent);
+
+    expect(templatedEmailsSent).toHaveLength(1);
+
+    expectNotifyConventionIsDeprecated(
+      templatedEmailsSent[0],
+      [
+        beneficiary.email,
+        establishmentRepresentative.email,
+        beneficiaryRepresentative!.email,
+        beneficiaryCurrentEmployer!.email,
+        ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
+      ],
+      deprecatedConventionWithDuplicatedEmails,
     );
   });
 });
