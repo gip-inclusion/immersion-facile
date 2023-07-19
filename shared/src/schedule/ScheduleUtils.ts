@@ -51,26 +51,10 @@ export const calculateWeeklyHoursFromSchedule = (schedule: ScheduleDto) =>
     calculateWeeklyHours(week),
   );
 
-export const isArrayOfWeekdays = (value: any): boolean =>
-  Array.isArray(value) && value.every((el) => weekdays.includes(el));
-
 type DatesOfImmersion = {
   dateStart: string;
   dateEnd: string;
 };
-
-type CalculateTotalHoursProps = DatesOfImmersion & {
-  schedule: ScheduleDto;
-};
-
-export const calculateTotalImmersionHoursBetweenDate = ({
-  schedule,
-  ...dates
-}: CalculateTotalHoursProps): number =>
-  calculateTotalImmersionHoursBetweenDateComplex({
-    complexSchedule: schedule.complexSchedule,
-    ...dates,
-  });
 
 export const calculateTotalImmersionHoursFromComplexSchedule = (
   complexSchedule: DailyScheduleDto[],
@@ -90,14 +74,6 @@ export const prettyPrintSchedule = (
   displayFreeDays = true,
 ): string =>
   prettyPrintComplexSchedule(schedule.complexSchedule, displayFreeDays);
-
-// Extract all weekday names for which there is at least one
-export const convertToFrenchNamedDays = (schedule: ScheduleDto): Weekday[] => {
-  const complexSchedule = schedule.complexSchedule;
-  return complexSchedule
-    .filter((daily) => daily.timePeriods.length > 0)
-    .map((daily) => weekdays[frenchDayMapping(daily.date).frenchDay]);
-};
 
 const reasonableTimePeriods: TimePeriodsDto = [
   {
@@ -295,7 +271,9 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
   dateStart,
   dateEnd,
   complexSchedule,
-}: DatesOfImmersion & { complexSchedule: DailyScheduleDto[] }): number => {
+}: DatesOfImmersion & {
+  complexSchedule: DailyScheduleDto[];
+}): number => {
   const start = parseISO(dateStart);
   const end = parseISO(dateEnd);
   let totalOfMinutes = 0;
