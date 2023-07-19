@@ -31,7 +31,7 @@ describe("Route to generate an establishment edition link", () => {
       `/${requestEmailToUpdateFormRoute}/11111111111111`,
     );
 
-    expect(response.body.errors).toContain(
+    expect(response.body.message).toContain(
       "Un email a déjà été envoyé au contact référent de l'établissement",
     );
     expect(response.status).toBe(400);

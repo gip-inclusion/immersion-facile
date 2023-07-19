@@ -87,19 +87,6 @@ export class UnavailableApiError extends HttpError {
 
 export const validateAndParseZodSchema = <T>(
   inputSchema: z.Schema<T>,
-  params: any,
-  logger: Logger,
-): T => {
-  try {
-    return inputSchema.parse(params);
-  } catch (e) {
-    logger.error("ValidateAndParseZodSchema failed with: ", params);
-    throw new BadRequestError(e);
-  }
-};
-
-export const validateAndParseZodSchemaV2 = <T>(
-  inputSchema: z.Schema<T>,
   params: unknown,
   logger: Logger,
 ): T => {
@@ -108,6 +95,7 @@ export const validateAndParseZodSchemaV2 = <T>(
   } catch (e) {
     logger.error("ValidateAndParseZodSchema failed with: ", params);
     const error = e as z.ZodError;
+
     const issues = error.issues.map(
       (issue) => `${issue.path.join(".")}: ${issue.message}`,
     );

@@ -39,7 +39,8 @@ describe("shortLink routes", () => {
 
       expect(response.status).toBe(404);
       expectObjectsToMatch(response.body, {
-        errors: shortLinkNotFoundMessage(expectedShortLinkId),
+        status: 404,
+        message: shortLinkNotFoundMessage(expectedShortLinkId),
       });
     });
   });

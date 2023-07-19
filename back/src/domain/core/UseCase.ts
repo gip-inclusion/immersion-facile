@@ -4,10 +4,7 @@ import {
   ConventionJwtPayload,
   stringToMd5,
 } from "shared";
-import {
-  BadRequestError,
-  validateAndParseZodSchema,
-} from "../../adapters/primary/helpers/httpErrors";
+import { validateAndParseZodSchema } from "../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
@@ -44,12 +41,11 @@ export abstract class UseCase<
   ): Promise<Output> {
     const startDate = new Date();
     const useCaseName = this.constructor.name;
-    let validParams: Input;
-    try {
-      validParams = validateAndParseZodSchema(this.inputSchema, params, logger);
-    } catch (e) {
-      throw new BadRequestError(e);
-    }
+    const validParams = validateAndParseZodSchema(
+      this.inputSchema,
+      params,
+      logger,
+    );
     const result = await this._execute(validParams, jwtPayload);
     const durationInSeconds = calculateDurationInSecondsFrom(startDate);
     logger.info({

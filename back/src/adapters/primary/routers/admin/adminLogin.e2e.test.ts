@@ -46,7 +46,8 @@ describe(`${displayRouteName(adminRoutes.login)} Admin login`, () => {
     expectToEqual(response, {
       status: 403,
       body: {
-        errors: "Wrong credentials",
+        status: 403,
+        message: "Wrong credentials",
       },
     });
   });

@@ -184,8 +184,9 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
 
     expectToEqual(response.status, 409);
     expectToEqual(response.body, {
-      errors:
+      message:
         "Cannot update form establishment DTO with siret 77561959600155, since it is not found.",
+      status: 409,
     });
     expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
   });

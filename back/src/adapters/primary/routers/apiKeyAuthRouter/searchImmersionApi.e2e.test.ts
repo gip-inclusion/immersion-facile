@@ -100,14 +100,9 @@ describe("search-immersion route", () => {
       });
 
       expectToEqual(response.body, {
-        errors: [
-          {
-            code: "invalid_string",
-            message: "Code ROME incorrect",
-            path: ["rome"],
-            validation: "regex",
-          },
-        ],
+        issues: ["rome: Code ROME incorrect"],
+        message: "Schema validation failed",
+        status: 400,
       });
       expectToEqual(response.statusCode, 400);
     });

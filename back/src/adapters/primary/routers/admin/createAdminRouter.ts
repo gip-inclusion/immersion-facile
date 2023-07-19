@@ -1,5 +1,13 @@
 import { Router } from "express";
-import { adminRoutes, agencyRoutes, GetDashboardParams } from "shared";
+import {
+  AdminDashboardKind,
+  adminDashboardKinds,
+  adminRoutes,
+  agencyRoutes,
+  ConventionMagicLinkDashboardName,
+  conventionMagicLinkDashboardNames,
+  GetDashboardParams,
+} from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
@@ -29,6 +37,16 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
 
   sharedAdminRouter.getDashboardUrl((req, res) =>
     sendHttpResponse(req, res, () => {
+      if (
+        !adminDashboardKinds.includes(
+          req.params.dashboardName as AdminDashboardKind,
+        ) &&
+        !conventionMagicLinkDashboardNames.includes(
+          req.params.dashboardName as ConventionMagicLinkDashboardName,
+        )
+      ) {
+        throw new BadRequestError("Incorrect dashboard name");
+      }
       if (req.params.dashboardName === "agency" && !req.query.agencyId)
         throw new BadRequestError(
           "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",

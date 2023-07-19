@@ -105,7 +105,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
 
   it("returns 404 if no offer can be found with such siret & rome", async () => {
     const siretNotInDB = "11000403200019";
-    const { body, status } = await request
+    const response = await request
       .get(`/v1/immersion-offers/${siretNotInDB}/${styliste.romeCode}`)
       .set(
         "Authorization",
@@ -113,9 +113,10 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
         }),
       );
-    expectToEqual(body, {
-      errors: `No offer found for siret ${siretNotInDB} and rome ${styliste.romeCode}`,
+    expect(response.body).toEqual({
+      status: 404,
+      message: `No offer found for siret ${siretNotInDB} and rome ${styliste.romeCode}`,
     });
-    expectToEqual(status, 404);
+    expect(response.status).toBe(404);
   });
 });

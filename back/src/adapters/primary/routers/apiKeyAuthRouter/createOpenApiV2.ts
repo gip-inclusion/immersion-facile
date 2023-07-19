@@ -149,10 +149,12 @@ const error401Example = {
   status: 401,
   message: "unauthenticated",
 };
+
 const error403Example = {
   status: 403,
   message: "unauthorized consumer Id",
 };
+
 const error404Example = {
   status: 404,
   message: "No establishment found with siret 12345678912345",

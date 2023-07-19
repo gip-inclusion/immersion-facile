@@ -13,6 +13,7 @@ import {
 } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
+  httpErrorSchema,
   legacyBadRequestErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
@@ -35,7 +36,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: userAndPasswordSchema,
     responses: {
       200: backOfficeJwtSchema,
-      403: legacyBadRequestErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   getDashboardUrl: defineRoute({
@@ -45,8 +46,8 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: absoluteUrlSchema,
-      400: legacyBadRequestErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   addFormEstablishmentBatch: defineRoute({

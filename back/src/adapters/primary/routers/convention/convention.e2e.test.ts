@@ -102,7 +102,8 @@ describe("convention e2e", () => {
 
       expectToEqual(response.statusCode, 409);
       expectToEqual(response.body, {
-        errors: `Convention with id ${convention.id} already exists`,
+        status: 409,
+        message: `Convention with id ${convention.id} already exists`,
       });
     });
   });
@@ -160,15 +161,9 @@ describe("convention e2e", () => {
 
         expectToEqual(response.status, 400);
         expectToEqual(response.body, {
-          errors: [
-            {
-              code: "invalid_type",
-              expected: "string",
-              received: "undefined",
-              path: ["conventionLink"],
-              message: "Obligatoire",
-            },
-          ],
+          issues: ["conventionLink: Obligatoire"],
+          message: "Schema validation failed",
+          status: 400,
         });
       });
     });
@@ -288,7 +283,8 @@ describe("convention e2e", () => {
         .set("Authorization", jwt);
 
       expect(response.body).toEqual({
-        errors:
+        status: 404,
+        message:
           "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
       });
       expect(response.status).toBe(404);
@@ -367,7 +363,8 @@ describe("convention e2e", () => {
         });
 
       expectToEqual(response.body, {
-        errors: `Convention with id ${unknownId} was not found`,
+        status: 404,
+        message: `Convention with id ${unknownId} was not found`,
       });
       expect(response.status).toBe(404);
     });
@@ -510,7 +507,8 @@ describe("convention e2e", () => {
 
       expectToEqual(response.statusCode, 403);
       expectToEqual(response.body, {
-        errors:
+        status: 403,
+        message:
           "establishment-representative is not allowed to go to status ACCEPTED_BY_VALIDATOR",
       });
     });
@@ -538,7 +536,8 @@ describe("convention e2e", () => {
 
       expectToEqual(response.statusCode, 404);
       expectToEqual(response.body, {
-        errors: conventionMissingMessage(unknownId),
+        status: 404,
+        message: conventionMissingMessage(unknownId),
       });
     });
   });

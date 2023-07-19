@@ -148,7 +148,7 @@ describe("Add form establishment", () => {
           .post(`/immersion-offers`)
           .send(formEstablishment);
 
-        expectToEqual(body, { errors: "Accès refusé" });
+        expectToEqual(body, { status: 403, message: "Accès refusé" });
         expectToEqual(status, 403);
       });
 

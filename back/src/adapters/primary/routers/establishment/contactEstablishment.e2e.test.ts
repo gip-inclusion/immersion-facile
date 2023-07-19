@@ -122,7 +122,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
     expectToEqual(response.status, 404);
     expectToEqual(
       JSON.stringify(response.body),
-      '{"errors":"No establishment found with siret: 40400040000404"}',
+      '{"status":404,"message":"No establishment found with siret: 40400040000404"}',
     );
     // TODO exeptToEqual when errors are handled correctly
     // expectToEqual(response.body, {

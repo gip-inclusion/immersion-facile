@@ -4,7 +4,7 @@ import { Counter, Histogram } from "prom-client";
 export const apiKeyAuthMiddlewareRequestsTotal = new Counter({
   name: "api_key_auth_middleware_requests_total",
   help: "The total count each api keys that tried to use the api",
-  labelNames: ["route", "method", "consumerName", "authorisationStatus"],
+  labelNames: ["route", "method", "consumerName", "authorizationStatus"],
 });
 
 //ESTABLISHMENT

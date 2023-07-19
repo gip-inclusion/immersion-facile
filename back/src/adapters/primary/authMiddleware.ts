@@ -23,9 +23,9 @@ const convertRouteToLog = (originalUrl: string) =>
 
 type TotalCountProps = {
   consumerName?: ApiConsumerName;
-  authorisationStatus:
-    | "authorised"
-    | "unauthorisedId"
+  authorizationStatus:
+    | "authorized"
+    | "unauthorizedId"
     | "incorrectJwt"
     | "expiredToken"
     | "consumerNotFound"
@@ -34,20 +34,20 @@ type TotalCountProps = {
 
 const createIncTotalCountForRequest =
   (req: Request) =>
-  ({ consumerName, authorisationStatus }: TotalCountProps) => {
+  ({ consumerName, authorizationStatus }: TotalCountProps) => {
     const route = convertRouteToLog(req.originalUrl);
     apiKeyAuthMiddlewareRequestsTotal.inc({
       route,
       method: req.method,
       consumerName,
-      authorisationStatus,
+      authorizationStatus,
     });
     logger.info(
       {
         route,
         method: req.method,
         consumerName,
-        authorisationStatus,
+        authorizationStatus,
       },
       "apiKeyAuthMiddlewareRequestsTotal",
     );
@@ -64,7 +64,7 @@ export const createApiKeyAuthMiddlewareV0 = (
   return async (req: Request, _res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
     if (!req.headers.authorization) {
-      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
+      incTotalCountForRequest({ authorizationStatus: "unauthenticated" });
       return next();
     }
 
@@ -73,7 +73,7 @@ export const createApiKeyAuthMiddlewareV0 = (
       const apiConsumer = await getApiConsumerById(id);
       if (!apiConsumer) {
         incTotalCountForRequest({
-          authorisationStatus: "consumerNotFound",
+          authorizationStatus: "consumerNotFound",
         });
         return next();
       }
@@ -87,7 +87,7 @@ export const createApiKeyAuthMiddlewareV0 = (
         })
       ) {
         incTotalCountForRequest({
-          authorisationStatus: "unauthorisedId",
+          authorizationStatus: "unauthorizedId",
           consumerName: apiConsumer.consumer,
         });
         return next();
@@ -95,7 +95,7 @@ export const createApiKeyAuthMiddlewareV0 = (
 
       if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         incTotalCountForRequest({
-          authorisationStatus: "expiredToken",
+          authorizationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
         });
         return next();
@@ -104,14 +104,14 @@ export const createApiKeyAuthMiddlewareV0 = (
       // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
       incTotalCountForRequest({
         consumerName: apiConsumer.consumer,
-        authorisationStatus: "authorised",
+        authorizationStatus: "authorized",
       });
 
       req.apiConsumer = apiConsumer;
       return next();
     } catch (_) {
       incTotalCountForRequest({
-        authorisationStatus: "incorrectJwt",
+        authorizationStatus: "incorrectJwt",
       });
       return next();
     }
@@ -135,7 +135,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
   return async (req: Request, res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
     if (!req.headers.authorization) {
-      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
+      incTotalCountForRequest({ authorizationStatus: "unauthenticated" });
       return responseError(res, "unauthenticated", 401);
     }
 
@@ -146,7 +146,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
 
       if (!apiConsumer) {
         incTotalCountForRequest({
-          authorisationStatus: "consumerNotFound",
+          authorizationStatus: "consumerNotFound",
         });
         return responseError(res, "consumer not found");
       }
@@ -159,7 +159,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
         })
       ) {
         incTotalCountForRequest({
-          authorisationStatus: "unauthorisedId",
+          authorizationStatus: "unauthorizedId",
           consumerName: apiConsumer.consumer,
         });
         return responseError(res, "consumer has not enough privileges");
@@ -167,7 +167,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
 
       if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         incTotalCountForRequest({
-          authorisationStatus: "expiredToken",
+          authorizationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
         });
         return responseError(res, "expired token");
@@ -176,7 +176,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
       // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
       incTotalCountForRequest({
         consumerName: apiConsumer.consumer,
-        authorisationStatus: "authorised",
+        authorizationStatus: "authorized",
       });
 
       req.apiConsumer = apiConsumer;
@@ -189,7 +189,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
         `makeApiKeyAuthMiddlewareV1 : ${(error as any).message}`,
       );
       incTotalCountForRequest({
-        authorisationStatus: "incorrectJwt",
+        authorizationStatus: "incorrectJwt",
       });
       return responseError(res, "incorrect Jwt", 401);
     }
@@ -300,7 +300,7 @@ export const makeConsumerMiddleware = (
   return async (req: Request, res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
     if (!req.headers.authorization) {
-      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
+      incTotalCountForRequest({ authorizationStatus: "unauthenticated" });
       return responseErrorForV2(res, "unauthenticated", 401);
     }
 
@@ -311,14 +311,14 @@ export const makeConsumerMiddleware = (
 
       if (!apiConsumer) {
         incTotalCountForRequest({
-          authorisationStatus: "consumerNotFound",
+          authorizationStatus: "consumerNotFound",
         });
         return responseErrorForV2(res, "consumer not found");
       }
 
       if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         incTotalCountForRequest({
-          authorisationStatus: "expiredToken",
+          authorizationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
         });
         return responseErrorForV2(res, "expired token");
@@ -327,7 +327,7 @@ export const makeConsumerMiddleware = (
       // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
       incTotalCountForRequest({
         consumerName: apiConsumer.consumer,
-        authorisationStatus: "authorised",
+        authorizationStatus: "authorized",
       });
 
       req.apiConsumer = apiConsumer;
@@ -340,7 +340,7 @@ export const makeConsumerMiddleware = (
         `makeApiKeyAuthMiddlewareV2 : ${(error as any).message}`,
       );
       incTotalCountForRequest({
-        authorisationStatus: "incorrectJwt",
+        authorizationStatus: "incorrectJwt",
       });
       return responseErrorForV2(res, "incorrect Jwt", 401);
     }

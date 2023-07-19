@@ -110,9 +110,9 @@ describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTarg
       .send();
 
     expectToEqual(response.body, {
-      errors: "Accès refusé",
+      message: "Accès refusé",
+      status: 403,
     });
-    expectToEqual(response.status, 403);
   });
 
   it("404 - Establishment Aggregate not found", async () => {
@@ -129,11 +129,11 @@ describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTarg
       .send();
 
     expectToEqual(response.body, {
-      errors: establishmentNotFoundErrorMessage(
+      message: establishmentNotFoundErrorMessage(
         establishmentAggregate.establishment.siret,
       ),
+      status: 404,
     });
-    expectToEqual(response.status, 404);
   });
 
   it("404 - Establishment Form not found", async () => {
@@ -154,10 +154,10 @@ describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTarg
       .send();
 
     expectToEqual(response.body, {
-      errors: formEstablishmentNotFoundErrorMessage(
+      message: formEstablishmentNotFoundErrorMessage(
         establishmentAggregate.establishment.siret,
       ),
+      status: 404,
     });
-    expectToEqual(response.status, 404);
   });
 });

@@ -15,7 +15,7 @@ import {
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { RetrieveFormEstablishmentFromAggregates } from "../useCases/RetrieveFormEstablishmentFromAggregates";
+import { RetrieveFormEstablishmentFromAggregates } from "./RetrieveFormEstablishmentFromAggregates";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();

@@ -50,9 +50,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     // Assert
     expect(response.body).toMatchObject({
-      errors: "No establishment found with siret 12345678901234.",
+      message: "No establishment found with siret 12345678901234.",
+      status: 400,
     });
-    expect(response.status).toBe(400);
   });
 
   it("Retrieves form establishment from aggregates when exists and authenticated with establishment jwt", async () => {

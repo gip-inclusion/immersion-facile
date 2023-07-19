@@ -91,7 +91,7 @@ describe("POST contact-establishment public V2 route", () => {
   });
 
   it("rejects unauthorized consumer", async () => {
-    const { body, status } = await sharedRequest.contactEstablishment({
+    const response = await sharedRequest.contactEstablishment({
       headers: {
         authorization: generateApiConsumerJwt({
           id: unauthorisedApiConsumer.id,
@@ -100,11 +100,13 @@ describe("POST contact-establishment public V2 route", () => {
       body: contactEstablishment,
     });
 
-    expectToEqual(body, {
+    expectToEqual(response, {
       status: 403,
-      message: "Accès refusé",
+      body: {
+        status: 403,
+        message: "unauthorized consumer Id",
+      },
     });
-    expectToEqual(status, 403);
   });
 
   it("rejects invalid requests with error code 400", async () => {

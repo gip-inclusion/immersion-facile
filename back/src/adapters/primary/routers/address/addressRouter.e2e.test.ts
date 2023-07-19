@@ -1,5 +1,4 @@
 import { SuperTest, Test } from "supertest";
-import { ZodError } from "zod";
 import {
   addressTargets,
   LookupAddress,
@@ -51,23 +50,12 @@ describe("addressRouter", () => {
         );
         expect(response.status).toBe(400);
         expect(response.body).toEqual({
-          errors: `Error: ${new ZodError([
-            {
-              code: "too_small",
-              minimum: 2,
-              type: "string",
-              inclusive: true,
-              exact: false,
-              message: "String must contain at least 2 character(s)",
-              path: ["lookup"],
-            },
-            {
-              code: "custom",
-              message:
-                "String must contain at least 2 character(s), excluding special chars",
-              path: ["lookup"],
-            },
-          ]).toString()}`,
+          status: 400,
+          message: "Schema validation failed",
+          issues: [
+            "lookup: String must contain at least 2 character(s)",
+            "lookup: String must contain at least 2 character(s), excluding special chars",
+          ],
         });
       });
 
@@ -79,13 +67,9 @@ describe("addressRouter", () => {
         );
         expect(response.status).toBe(400);
         expect(response.body).toEqual({
-          errors: `Error: ${new ZodError([
-            {
-              code: "custom",
-              message: "String must contain a maximum of 18 words",
-              path: ["lookup"],
-            },
-          ]).toString()}`,
+          status: 400,
+          message: "Schema validation failed",
+          issues: ["lookup: String must contain a maximum of 18 words"],
         });
       });
 
@@ -97,14 +81,11 @@ describe("addressRouter", () => {
           );
           expect(response.status).toBe(400);
           expect(response.body).toEqual({
-            errors: `Error: ${new ZodError([
-              {
-                code: "custom",
-                message:
-                  "String must contain at least 2 character(s), excluding special chars",
-                path: ["lookup"],
-              },
-            ]).toString()}`,
+            status: 400,
+            message: "Schema validation failed",
+            issues: [
+              "lookup: String must contain at least 2 character(s), excluding special chars",
+            ],
           });
         },
       );

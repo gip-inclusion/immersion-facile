@@ -1,4 +1,3 @@
-import { ZodError } from "zod";
 import {
   AdminRoutes,
   adminRoutes,
@@ -61,7 +60,7 @@ describe("Admin router", () => {
       .login({ body: { user: "user", password: "pwd" } })
       .then((response) => {
         if (response.status === 200) return response.body;
-        throw new Error(response.body.errors);
+        throw new Error(response.body.message);
       });
 
     getFeatureFlags = async () => {
@@ -120,68 +119,8 @@ describe("Admin router", () => {
       expectToEqual(response, {
         status: 400,
         body: {
-          errors: `Error: ${new ZodError([
-            {
-              code: "invalid_union",
-              unionErrors: [
-                new ZodError([
-                  {
-                    code: "invalid_union",
-                    unionErrors: [
-                      new ZodError([
-                        {
-                          received: "unknown-dashboard",
-                          code: "invalid_enum_value",
-                          options: ["conventions", "events", "establishments"],
-                          path: ["name"],
-                          message:
-                            "Invalid enum value. Expected 'conventions' | 'events' | 'establishments', received 'unknown-dashboard'",
-                        },
-                      ]),
-                      new ZodError([
-                        {
-                          received: "unknown-dashboard",
-                          code: "invalid_enum_value",
-                          options: ["agency"],
-                          path: ["name"],
-                          message:
-                            "Invalid enum value. Expected 'agency', received 'unknown-dashboard'",
-                        },
-                        {
-                          code: "invalid_type",
-                          expected: "string",
-                          received: "undefined",
-                          path: ["agencyId"],
-                          message: "Required",
-                        },
-                      ]),
-                    ],
-                    path: [],
-                    message: "Invalid input",
-                  },
-                ]),
-                new ZodError([
-                  {
-                    received: "unknown-dashboard",
-                    code: "invalid_enum_value",
-                    options: ["conventionStatus"],
-                    path: ["name"],
-                    message:
-                      "Invalid enum value. Expected 'conventionStatus', received 'unknown-dashboard'",
-                  },
-                  {
-                    code: "invalid_type",
-                    expected: "string",
-                    received: "undefined",
-                    path: ["conventionId"],
-                    message: "Required",
-                  },
-                ]),
-              ],
-              path: [],
-              message: "Invalid input",
-            },
-          ]).toString()}`,
+          message: "Incorrect dashboard name",
+          status: 400,
         },
       });
     });
@@ -196,7 +135,8 @@ describe("Admin router", () => {
       expectToEqual(response, {
         status: 400,
         body: {
-          errors:
+          status: 400,
+          message:
             "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
         },
       });
@@ -210,7 +150,7 @@ describe("Admin router", () => {
       });
       expectToEqual(response, {
         status: 401,
-        body: { error: "You need to authenticate first" },
+        body: { status: 401, message: "You need to authenticate first" },
       });
     });
 
@@ -222,7 +162,7 @@ describe("Admin router", () => {
       });
       expectToEqual(response, {
         status: 401,
-        body: { error: "Provided token is invalid" },
+        body: { status: 401, message: "Provided token is invalid" },
       });
     });
   });

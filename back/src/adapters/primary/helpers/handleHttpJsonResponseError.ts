@@ -14,12 +14,12 @@ export const handleHttpJsonResponseError = (
 ): Response<any, Record<string, any>> => {
   if (!isManagedError(error)) return unhandledError(error, req, res);
 
-  if (error instanceof HttpError) {
-    res.status(error.httpCode);
-    return res.json({ errors: toValidJSONObjectOrString(error) });
-  }
-
-  throw Error("Should never reach there");
+  res.status(error.httpCode);
+  return res.json({
+    status: error.httpCode,
+    message: error.message,
+    issues: error.issues,
+  });
 };
 
 export const handleHttpJsonResponseErrorForApiV2 = (
@@ -41,7 +41,8 @@ export const handleHttpJsonResponseErrorForApiV2 = (
   throw Error("Should never reach there");
 };
 
-const isManagedError = (error: unknown): boolean => error instanceof HttpError;
+const isManagedError = (error: unknown): error is HttpError =>
+  error instanceof HttpError;
 
 const toValidJSONObjectOrString = (
   error: HttpError,

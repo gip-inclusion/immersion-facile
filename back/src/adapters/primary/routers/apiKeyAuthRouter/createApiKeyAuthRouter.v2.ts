@@ -6,7 +6,7 @@ import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
   ForbiddenError,
-  validateAndParseZodSchemaV2,
+  validateAndParseZodSchema,
 } from "../../helpers/httpErrors";
 import { sendHttpResponseForApiV2 } from "../../helpers/sendHttpResponse";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
@@ -88,7 +88,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       )
         throw new ForbiddenError();
       return pipeWithValue(
-        validateAndParseZodSchemaV2(
+        validateAndParseZodSchema(
           contactEstablishmentPublicV2Schema,
           req.body,
           logger,
