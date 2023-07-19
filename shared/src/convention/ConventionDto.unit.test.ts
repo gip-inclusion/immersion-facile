@@ -576,11 +576,11 @@ describe("conventionDtoSchema", () => {
       ]);
     });
 
-    it('rejects when beneficiary age is under 14yr with internship kind "mini-stage-cci"', () => {
+    it('rejects when beneficiary age is under 10yr with internship kind "mini-stage-cci"', () => {
       const immersionStartDate = new Date("2022-01-01");
       const beneficiary: Beneficiary<"mini-stage-cci"> = {
         levelOfEducation: "Terminale",
-        birthdate: addDays(subYears(immersionStartDate, 14), 1).toISOString(),
+        birthdate: addDays(subYears(immersionStartDate, 10), 1).toISOString(),
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
@@ -597,7 +597,7 @@ describe("conventionDtoSchema", () => {
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-        "L'âge du bénéficiaire doit être au minimum de 14ans",
+        "L'âge du bénéficiaire doit être au minimum de 10ans",
       ]);
     });
   });
