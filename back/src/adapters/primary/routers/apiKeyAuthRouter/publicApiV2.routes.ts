@@ -17,6 +17,7 @@ export const publicApiV2Routes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: searchImmersionResultSchema,
+      400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,

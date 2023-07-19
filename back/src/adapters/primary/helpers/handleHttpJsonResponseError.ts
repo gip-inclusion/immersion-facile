@@ -32,6 +32,7 @@ export const handleHttpJsonResponseErrorForApiV2 = (
   if (error instanceof HttpError) {
     res.status(error.httpCode);
     return res.json({
+      ...(error.issues ? { issues: error.issues } : {}),
       message: toValidJSONObjectOrString(error),
       status: error.httpCode,
     });

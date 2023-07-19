@@ -5,7 +5,7 @@ import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
   ForbiddenError,
-  validateAndParseZodSchema,
+  validateAndParseZodSchemaV2,
 } from "../../helpers/httpErrors";
 import { sendHttpResponseForApiV2 } from "../../helpers/sendHttpResponse";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
@@ -26,7 +26,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     publicV2Router,
   );
 
-  publicV2SharedRouter.searchImmersion(async (req, res) =>
+  publicV2SharedRouter.searchImmersion((req, res) =>
     sendHttpResponseForApiV2(req, res, async () => {
       const searchImmersionRequest = searchImmersionRequestPublicV2ToDomain(
         req.query,
@@ -42,26 +42,23 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  publicV2SharedRouter.getOfferBySiretAndAppellationCode(async (req, res) =>
+  publicV2SharedRouter.getOfferBySiretAndAppellationCode((req, res) =>
     sendHttpResponseForApiV2(req, res, async () => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
       return domainToSearchImmersionResultPublicV2(
         await deps.useCases.getSearchImmersionResultBySiretAndAppellationCode.execute(
-          {
-            siret: req.params.siret,
-            appellationCode: req.params.appellationCode,
-          },
+          req.params,
           req.apiConsumer,
         ),
       );
     }),
   );
 
-  publicV2SharedRouter.contactEstablishment(async (req, res) =>
+  publicV2SharedRouter.contactEstablishment((req, res) =>
     sendHttpResponseForApiV2(req, res.status(201), () => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
       return pipeWithValue(
-        validateAndParseZodSchema(
+        validateAndParseZodSchemaV2(
           contactEstablishmentPublicV2Schema,
           req.body,
           logger,
