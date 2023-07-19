@@ -69,7 +69,7 @@ const getUseCasesByTopics = (
     },
   ],
   ImmersionApplicationRejected: [
-    useCases.notifyBeneficiaryAndEnterpriseThatConventionIsRejected,
+    useCases.notifyAllActorsThatConventionIsRejected,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationCancelled: [

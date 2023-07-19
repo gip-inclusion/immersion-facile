@@ -117,7 +117,7 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
     },
   ]);
 
-export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
+export const expectNotifyConventionRejected = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
   convention: ConventionDto,

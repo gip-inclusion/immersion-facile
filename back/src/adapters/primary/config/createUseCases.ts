@@ -24,7 +24,7 @@ import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/not
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled as NotifyAllActorsThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
+import { NotifyAllActorsThatConventionIsRejected } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
 import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightChanged";
@@ -383,8 +383,8 @@ export const createUseCases = (
         gateways.shortLinkGenerator,
         config,
       ),
-      notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
-        new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+      notifyAllActorsThatConventionIsRejected:
+        new NotifyAllActorsThatConventionIsRejected(
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
