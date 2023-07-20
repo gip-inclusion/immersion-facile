@@ -14,11 +14,10 @@ const featureFlagNames = [
 type FeatureFlagKind = (typeof featureFlagKinds)[number];
 const featureFlagKinds = ["boolean", "text"] as const;
 
-type GenericFeatureFlag<K extends FeatureFlagKind, V = undefined> = {
+type GenericFeatureFlag<K extends FeatureFlagKind, V = void> = {
   kind: K;
   isActive: boolean;
-  value: V;
-};
+} & (V extends void ? object : { value: V });
 
 type FeatureFlagTextValue = { message: string };
 
@@ -33,7 +32,7 @@ const featureFlagSchema: z.Schema<FeatureFlag> = z
   .object({
     isActive: z.boolean(),
     kind: z.literal("boolean"),
-    value: z.undefined(),
+    value: z.void().optional(),
   })
   .or(
     z.object({
