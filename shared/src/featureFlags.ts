@@ -94,3 +94,7 @@ const makeFeatureFlag =
 
 export const makeBooleanFeatureFlag = makeFeatureFlag("boolean");
 export const makeTextFeatureFlag = makeFeatureFlag("text");
+
+export const hasFeatureFlagValue = (
+  flag: FeatureFlag | SetFeatureFlagParam["flagContent"],
+): flag is Extract<FeatureFlag, { value: unknown }> => "value" in flag;
