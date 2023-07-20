@@ -1,3 +1,4 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -14,6 +15,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ConflictError } from "../../primary/helpers/httpErrors";
+import { ImmersionDatabase } from "./sql/database";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import {
   beneficiaryCurrentEmployerIdColumnName,
@@ -36,7 +38,11 @@ describe("PgConventionRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    const agencyRepository = new PgAgencyRepository(client);
+    const agencyRepository = new PgAgencyRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
   });
 

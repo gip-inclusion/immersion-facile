@@ -1,3 +1,4 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -11,6 +12,7 @@ import {
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
+import { ImmersionDatabase } from "./sql/database";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import {
   PgConventionPoleEmploiAdvisorRepository,
@@ -71,7 +73,11 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    const agencyRepository = new PgAgencyRepository(client);
+    const agencyRepository = new PgAgencyRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(client);
     const { externalId, ...createConventionParams } = convention;

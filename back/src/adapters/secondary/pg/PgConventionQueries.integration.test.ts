@@ -1,4 +1,5 @@
 import { addDays } from "date-fns";
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -13,6 +14,7 @@ import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
+import { ImmersionDatabase } from "./sql/database";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
@@ -34,6 +36,9 @@ describe("Pg implementation of ConventionQueries", () => {
   });
 
   beforeEach(async () => {
+    const db = new Kysely<ImmersionDatabase>({
+      dialect: new PostgresDialect({ pool }),
+    });
     await client.query("DELETE FROM conventions");
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
@@ -41,7 +46,7 @@ describe("Pg implementation of ConventionQueries", () => {
     await client.query("DELETE FROM agencies");
 
     conventionQueries = new PgConventionQueries(client);
-    agencyRepo = new PgAgencyRepository(client);
+    agencyRepo = new PgAgencyRepository(db);
     conventionRepository = new PgConventionRepository(client);
   });
 
@@ -246,7 +251,11 @@ describe("Pg implementation of ConventionQueries", () => {
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     const agency = AgencyDtoBuilder.create().build();
     beforeEach(async () => {
-      const agencyRepository = new PgAgencyRepository(client);
+      const agencyRepository = new PgAgencyRepository(
+        new Kysely<ImmersionDatabase>({
+          dialect: new PostgresDialect({ pool }),
+        }),
+      );
       await agencyRepository.insert(agency);
       await client.query("DELETE FROM outbox_failures");
       await client.query("DELETE FROM outbox_publications");

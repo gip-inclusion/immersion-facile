@@ -1,3 +1,4 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -11,6 +12,7 @@ import {
   InclusionConnectedUser,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ImmersionDatabase } from "./sql/database";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 
@@ -60,7 +62,11 @@ describe("PgInclusionConnectedUserRepository", () => {
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
     icUserRepository = new PgInclusionConnectedUserRepository(client);
-    agencyRepository = new PgAgencyRepository(client);
+    agencyRepository = new PgAgencyRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
   });
 
   describe("getById", () => {

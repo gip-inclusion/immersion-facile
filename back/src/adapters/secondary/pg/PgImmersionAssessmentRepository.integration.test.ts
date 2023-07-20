@@ -1,3 +1,4 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -8,6 +9,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
+import { ImmersionDatabase } from "./sql/database";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "./PgImmersionAssessmentRepository";
@@ -33,7 +35,11 @@ describe("PgImmersionAssessmentRepository", () => {
     client = await pool.connect();
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    const agencyRepository = new PgAgencyRepository(client);
+    const agencyRepository = new PgAgencyRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(client);
     await conventionRepository.save(convention);

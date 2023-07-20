@@ -1,3 +1,4 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   activeAgencyStatuses,
@@ -7,6 +8,7 @@ import {
   GeoPositionDto,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ImmersionDatabase } from "./sql/database";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
 const agency1builder = AgencyDtoBuilder.create(
@@ -69,7 +71,11 @@ describe("PgAgencyRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    agencyRepository = new PgAgencyRepository(client);
+    agencyRepository = new PgAgencyRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
   });
 
   describe("getByIds", () => {

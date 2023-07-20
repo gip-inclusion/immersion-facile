@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { CompiledQuery, Kysely } from "kysely";
 import format from "pg-format";
 import {
   AgencyDto,
@@ -16,6 +16,7 @@ import {
 import { AgencyRepository } from "../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
+import { ImmersionDatabase } from "./sql/database";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
@@ -84,7 +85,7 @@ const makeStatusFilterSQL = (
 };
 
 export class PgAgencyRepository implements AgencyRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   public async getAgencies({
     filters = {},
@@ -120,7 +121,9 @@ export class PgAgencyRepository implements AgencyRepository {
       ...(limitClause ? [limitClause] : []),
     ].join("\n");
 
-    const pgResult = await this.client.query(query);
+    const pgResult = await this.transaction.executeQuery<PersistenceAgency>(
+      CompiledQuery.raw(query),
+    );
     return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
@@ -131,29 +134,53 @@ export class PgAgencyRepository implements AgencyRepository {
     const councellorEmailsIncludesProvidedEmail =
       "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
 
-    const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
-        street_number_and_address, post_code, city, department_code
-       FROM public.agencies
-       WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
-      [email],
+    const pgResult = await this.transaction.executeQuery<PersistenceAgency>(
+      CompiledQuery.raw(
+        `SELECT id,
+                name,
+                status,
+                kind,
+                counsellor_emails,
+                validator_emails,
+                admin_emails,
+                questionnaire_url,
+                email_signature,
+                logo_url,
+                ${positionAsCoordinates},
+                agency_siret,
+                code_safir,
+                street_number_and_address,
+                post_code,
+                city,
+                department_code
+         FROM public.agencies
+         WHERE ${validatorEmailsIncludesProvidedEmail}
+            OR ${councellorEmailsIncludesProvidedEmail}`,
+        [email],
+      ),
     );
 
-    const first = pgResult.rows[0];
-
-    if (!first) return;
-    return persistenceAgencyToAgencyDto(first);
+    const first = pgResult.rows.at(0);
+    return first && persistenceAgencyToAgencyDto(first);
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    const query = `SELECT id, name, status, kind, counsellor_emails, validator_emails,
-    admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
+    const query = `SELECT id,
+                          name,
+                          status,
+                          kind,
+                          counsellor_emails,
+                          validator_emails,
+                          admin_emails,
+                          questionnaire_url,
+                          email_signature,
+                          logo_url,
+                          ST_AsGeoJSON(position) AS position,
     street_number_and_address, post_code, city, department_code, agency_siret, code_safir
-  FROM agencies
-  WHERE id IN (%L)`;
-
-    const pgResult = await this.client
-      .query(format(query, ids))
+                   FROM agencies
+                   WHERE id IN (%L)`;
+    const pgResult = await this.transaction
+      .executeQuery<PersistenceAgency>(CompiledQuery.raw(format(query, ids)))
       .catch((error) => {
         logger.error(
           { query, values: ids, error },
@@ -167,24 +194,28 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
-    const pgResult = await this.client.query(`
-           SELECT id 
-           FROM agencies
-           WHERE agencies.kind = 'immersion-facile'
-           LIMIT 1
-           `);
+    const pgResult = await this.transaction.executeQuery<{ id: AgencyId }>(
+      CompiledQuery.raw(`
+          SELECT id
+          FROM agencies
+          WHERE agencies.kind = 'immersion-facile' LIMIT 1
+      `),
+    );
 
     return pgResult.rows[0]?.id;
   }
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
-    const query = `INSERT INTO agencies(
-      id, name, status, kind, counsellor_emails, validator_emails, admin_emails, 
-      questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir,
-      street_number_and_address, post_code, city, department_code
-    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
+    const query = `INSERT INTO agencies(id, name, status, kind, counsellor_emails, validator_emails, admin_emails,
+                                        questionnaire_url, email_signature, logo_url, position, agency_siret,
+                                        code_safir,
+                                        street_number_and_address, post_code, city, department_code)
+                   VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
+
     try {
-      await this.client.query(format(query, ...entityToPgArray(agency)));
+      await this.transaction.executeQuery(
+        CompiledQuery.raw(format(query, ...entityToPgArray(agency))),
+      );
     } catch (error: any) {
       // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
       // See https://www.postgresql.org/docs/10/errcodes-appendix.html
@@ -198,30 +229,36 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async update(agency: PartialAgencyDto): Promise<void> {
-    const query = `UPDATE agencies SET
-      name = COALESCE(%2$L, name),
-      status = COALESCE(%3$L, status),
-      kind= COALESCE(%4$L, kind),
-      counsellor_emails= COALESCE(%5$L, counsellor_emails),
-      validator_emails= COALESCE(%6$L, validator_emails),
-      admin_emails= COALESCE(%7$L, admin_emails),
-      questionnaire_url= COALESCE(%8$L, questionnaire_url),
-      email_signature = COALESCE(%9$L, email_signature),
-      logo_url = COALESCE(%10$L, logo_url),
-      ${agency.position ? "position = ST_GeographyFromText(%11$L)," : ""}
-      agency_siret = COALESCE(%12$L, agency_siret),
-      code_safir = COALESCE(%13$L, code_safir),
-      street_number_and_address = COALESCE(%14$L, street_number_and_address),
-      post_code = COALESCE(%15$L, post_code),
-      city = COALESCE(%16$L, city),
-      department_code = COALESCE(%17$L, department_code),
-      updated_at = NOW()
-    WHERE id = %1$L`;
+    const query = `UPDATE agencies
+                   SET name                      = COALESCE(%2$L, name),
+                       status                    = COALESCE(%3$L, status),
+                       kind= COALESCE(%4$L, kind),
+                       counsellor_emails= COALESCE(%5$L, counsellor_emails),
+                       validator_emails= COALESCE(%6$L, validator_emails),
+                       admin_emails= COALESCE(%7$L, admin_emails),
+                       questionnaire_url= COALESCE(%8$L, questionnaire_url),
+                       email_signature           = COALESCE(%9$L, email_signature),
+                       logo_url                  = COALESCE(%10$L, logo_url),
+                       ${
+                         agency.position
+                           ? "position = ST_GeographyFromText(%11$L),"
+                           : ""
+                       }
+                           agency_siret = COALESCE(%12$L, agency_siret),
+                       code_safir                = COALESCE(%13$L, code_safir),
+                       street_number_and_address = COALESCE(%14$L, street_number_and_address),
+                       post_code                 = COALESCE(%15$L, post_code),
+                       city                      = COALESCE(%16$L, city),
+                       department_code           = COALESCE(%17$L, department_code),
+                       updated_at                = NOW()
+                   WHERE id = %1$L`;
 
     const params = entityToPgArray(agency);
     params[10] =
       agency.position && `POINT(${agency.position.lon} ${agency.position.lat})`;
-    await this.client.query(format(query, ...params));
+    await this.transaction.executeQuery(
+      CompiledQuery.raw(format(query, ...params)),
+    );
   }
 }
 
