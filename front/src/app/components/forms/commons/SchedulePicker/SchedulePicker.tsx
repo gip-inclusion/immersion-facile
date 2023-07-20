@@ -31,7 +31,7 @@ export const SchedulePicker = ({
   const values = getValues();
   const onBoolRadioPickerChange = (isSimple: boolean): void => {
     const newScheduleValue = isSimple
-      ? reasonableSchedule(interval, [])
+      ? reasonableSchedule(interval, [], [])
       : scheduleWithFirstDayActivity(interval);
     setValue(name, newScheduleValue);
   };

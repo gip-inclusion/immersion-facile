@@ -366,6 +366,7 @@ describe("conventionDtoSchema", () => {
             .withDateEnd(
               addDays(new Date(DATE_START), maxCalendarDays + 1).toISOString(),
             )
+            .withSchedule(reasonableSchedule, ["dimanche"])
             .build();
 
           expectConventionInvalidWithIssueMessages(
@@ -394,6 +395,7 @@ describe("conventionDtoSchema", () => {
             .withInternshipKind(internshipKind)
             .withDateStart(dateStart)
             .withDateEnd(dateEnd)
+            .withSchedule(reasonableSchedule, ["dimanche"])
             .build();
 
           expectConventionDtoToBeValid(convention);
@@ -402,8 +404,8 @@ describe("conventionDtoSchema", () => {
     });
     describe("CCI specific, minor under 16yo", () => {
       it("max week hours depends on beneficiary age", () => {
-        const dateStart = DATE_START;
-        const dateEnd = addDays(new Date(DATE_START), 4).toISOString();
+        const dateStart = new Date("2021-01-04").toISOString();
+        const dateEnd = addDays(new Date(DATE_START), 3).toISOString();
         const convention = new ConventionDtoBuilder()
           .withInternshipKind("mini-stage-cci")
           .withDateStart(dateStart)
@@ -592,7 +594,7 @@ describe("conventionDtoSchema", () => {
         .withInternshipKind("mini-stage-cci")
         .withDateStart(immersionStartDate.toISOString())
         .withDateEnd(new Date("2022-01-02").toISOString())
-        .withSchedule(reasonableSchedule)
+        .withSchedule(reasonableSchedule, ["dimanche"])
         .withBeneficiary(beneficiary)
         .build();
 
