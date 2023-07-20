@@ -1,15 +1,15 @@
-import { PoolClient } from "pg";
+import { CompiledQuery, Kysely } from "kysely";
 import { ApiConsumer, ApiConsumerId, apiConsumerSchema } from "shared";
 import { ApiConsumerRepository } from "../../../domain/auth/ports/ApiConsumerRepository";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 import { optional } from "./pgUtils";
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
-    const result = await this.client.query(
-      "SELECT * FROM api_consumers WHERE id = $1",
-      [id],
+    const result = await this.transaction.executeQuery<any>(
+      CompiledQuery.raw("SELECT * FROM api_consumers WHERE id = $1", [id]),
     );
 
     const rawPg = result.rows[0];
@@ -17,31 +17,32 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   }
 
   public async save(apiConsumer: ApiConsumer): Promise<void> {
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       `
-      INSERT INTO api_consumers (
-        id, consumer, description, is_authorized, created_at, 
-        expiration_date, contact_emails, contact_first_name, contact_last_name, contact_job, 
-        contact_phone
-      ) VALUES(
-        $1, $2, $3, $4, $5, 
-        $6, $7, $8, $9, $10,
-        $11 
-      ) 
-      ON CONFLICT (id) DO UPDATE 
-      SET (
-        id, consumer, description, is_authorized, created_at, 
-        expiration_date, contact_emails, contact_first_name, contact_last_name, contact_job, 
-        contact_phone
-      ) = (
-        $1, $2, $3, $4, $5, 
-        $6, $7, $8, $9, $10,
-        $11 
-      )`,
+          INSERT INTO api_consumers (
+              id, consumer, description, is_authorized, created_at,
+              expiration_date, contact_emails, contact_first_name, contact_last_name, contact_job,
+              contact_phone
+          ) VALUES(
+                      $1, $2, $3, $4, $5,
+                      $6, $7, $8, $9, $10,
+                      $11
+                  )
+              ON CONFLICT (id) DO UPDATE
+                                      SET (
+                                      id, consumer, description, is_authorized, created_at,
+                                      expiration_date, contact_emails, contact_first_name, contact_last_name, contact_job,
+                                      contact_phone
+                                      ) = (
+                                      $1, $2, $3, $4, $5,
+                                      $6, $7, $8, $9, $10,
+                                      $11
+                                      )`,
       //prettier-ignore
       [
         apiConsumer.id, apiConsumer.consumer, apiConsumer.description, apiConsumer.isAuthorized, apiConsumer.createdAt.toISOString(),
-        apiConsumer.expirationDate.toISOString(), apiConsumer.contact.emails, apiConsumer.contact.firstName, apiConsumer.contact.lastName, apiConsumer.contact.job, 
+        apiConsumer.expirationDate.toISOString(), apiConsumer.contact.emails, apiConsumer.contact.firstName, apiConsumer.contact.lastName, apiConsumer.contact.job,
         apiConsumer.contact.phone,
       ],
     );

@@ -107,7 +107,7 @@ export const createPgUow = (
   const shortLinkRepository = new PgShortLinkRepository(client);
   return {
     agencyRepository: new PgAgencyRepository(transaction),
-    apiConsumerRepository: new PgApiConsumerRepository(client),
+    apiConsumerRepository: new PgApiConsumerRepository(transaction),
     authenticatedUserRepository: new PgAuthenticatedUserRepository(client),
     conventionRepository: new PgConventionRepository(client),
     conventionQueries: new PgConventionQueries(client),

@@ -1,7 +1,9 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { ApiConsumer, expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
+import { ImmersionDatabase } from "./sql/database";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
 describe("PgApiConsumerRepository", () => {
@@ -13,7 +15,11 @@ describe("PgApiConsumerRepository", () => {
     pool = getTestPgPool();
     client = await pool.connect();
     await client.query("DELETE FROM api_consumers");
-    apiConsumerRepository = new PgApiConsumerRepository(client);
+    apiConsumerRepository = new PgApiConsumerRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
   });
 
   afterAll(async () => {
