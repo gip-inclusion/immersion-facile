@@ -15,15 +15,15 @@ import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/poleEm
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 
 const prepareUseCase = async ({
-  enablePeConventionBroadcast,
+  enablePeConventionBroadcastIsActive,
 }: {
-  enablePeConventionBroadcast: boolean;
+  enablePeConventionBroadcastIsActive: boolean;
 }) => {
   const poleEmploiGateWay = new InMemoryPoleEmploiGateway();
   const uow = createInMemoryUow();
   uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
     enablePeConventionBroadcast: makeBooleanFeatureFlag(
-      enablePeConventionBroadcast,
+      enablePeConventionBroadcastIsActive,
     ),
   });
   const timeGateway = new CustomTimeGateway();
@@ -56,7 +56,7 @@ describe("Broadcasts events to pole-emploi", () => {
     // Prepare
     const { broadcastToPe, poleEmploiGateWay, agencyRepository } =
       await prepareUseCase({
-        enablePeConventionBroadcast: true,
+        enablePeConventionBroadcastIsActive: true,
       });
 
     const agency = new AgencyDtoBuilder().withKind("mission-locale").build();
@@ -78,7 +78,7 @@ describe("Broadcasts events to pole-emploi", () => {
     // Prepare
     const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
       {
-        enablePeConventionBroadcast: true,
+        enablePeConventionBroadcastIsActive: true,
       },
     );
 
@@ -103,7 +103,7 @@ describe("Broadcasts events to pole-emploi", () => {
       errorRepository,
       timeGateway,
     } = await prepareUseCase({
-      enablePeConventionBroadcast: true,
+      enablePeConventionBroadcastIsActive: true,
     });
 
     // Act
@@ -140,7 +140,7 @@ describe("Broadcasts events to pole-emploi", () => {
     // Prepare
     const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
       {
-        enablePeConventionBroadcast: false,
+        enablePeConventionBroadcastIsActive: false,
       },
     );
 
@@ -169,7 +169,7 @@ describe("Broadcasts events to pole-emploi", () => {
     // Prepare
     const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
       {
-        enablePeConventionBroadcast: true,
+        enablePeConventionBroadcastIsActive: true,
       },
     );
 

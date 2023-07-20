@@ -4,6 +4,7 @@ import {
   expectToEqual,
   FeatureFlags,
   FeatureFlagText,
+  hasFeatureFlagValue,
   makeBooleanFeatureFlag,
   makeTextFeatureFlag,
 } from "shared";
@@ -99,10 +100,9 @@ describe("PG getFeatureFlags", () => {
       keys(flags).map((flagName) => {
         const isFlagActive = flags[flagName].isActive;
         const flagKind = flags[flagName].kind;
-        const flagValue =
-          "value" in flags[flagName]
-            ? (flags[flagName] as FeatureFlagText).value
-            : null;
+        const flagValue = hasFeatureFlagValue(flags[flagName])
+          ? (flags[flagName] as FeatureFlagText).value
+          : null;
 
         return client.query(
           `INSERT INTO feature_flags (flag_name, is_active, kind, value) VALUES ('${flagName}', ${isFlagActive}, '${flagKind}', ${
