@@ -97,6 +97,16 @@ const beneficiarySummary = (convention: ConventionReadDto) => {
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
+  const levelOfEducationRowInArray: ConventionSummaryRow[] =
+    convention.internshipKind === "mini-stage-cci"
+      ? [
+          [
+            fields["signatories.beneficiary.levelOfEducation"].label,
+            convention.signatories.beneficiary.levelOfEducation,
+          ],
+        ]
+      : [];
+
   const rows: ConventionSummaryRow[] = [
     [
       fields["signatories.beneficiary.firstName"].label,
@@ -110,12 +120,7 @@ const beneficiarySummary = (convention: ConventionReadDto) => {
       fields["signatories.beneficiary.birthdate"].label,
       convention.signatories.beneficiary.birthdate,
     ],
-    convention.internshipKind === "mini-stage-cci"
-      ? [
-          fields["signatories.beneficiary.levelOfEducation"].label,
-          convention.signatories.beneficiary.levelOfEducation,
-        ]
-      : ["", ""],
+    ...levelOfEducationRowInArray,
     [
       fields["signatories.beneficiary.financiaryHelp"].label,
       convention.signatories.beneficiary.financiaryHelp,
