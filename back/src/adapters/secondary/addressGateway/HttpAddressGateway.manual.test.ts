@@ -277,6 +277,12 @@ describe("HttpOpenCageDataAddressGateway", () => {
         new Error(errorMessage.minimumCharErrorMessage(2)),
       );
     });
+    it("Should not support lookup address with 3 chars matching the pattern '{digit} ,'", async () => {
+      await expectPromiseToFailWithError(
+        httpAddressGateway.lookupStreetAddress("4 ,"),
+        new Error(errorMessage.minimumCharErrorMessage(2)),
+      );
+    });
     it("Should support lookup address with two char.", async () => {
       const resultPreviousNotFoundWithAddresseAPI =
         await httpAddressGateway.lookupStreetAddress("Ro");
