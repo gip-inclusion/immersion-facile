@@ -2,7 +2,11 @@ import { AgencyId } from "../agency/agency.dto";
 import { Builder } from "../Builder";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
+import {
+  DateIntervalDto,
+  ScheduleDto,
+  Weekday,
+} from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import {
   Beneficiary,
@@ -106,6 +110,30 @@ const validConvention: ConventionDto = {
 
 export class ConventionDtoBuilder implements Builder<ConventionDto> {
   constructor(private dto: ConventionDto = validConvention) {}
+
+  private get establishmentTutor(): EstablishmentTutor {
+    return this.dto.establishmentTutor;
+  }
+
+  private get establishmentRepresentative(): EstablishmentRepresentative {
+    return this.dto.signatories.establishmentRepresentative;
+  }
+
+  private get beneficiary(): Beneficiary<InternshipKind> {
+    return this.dto.signatories.beneficiary;
+  }
+
+  private get beneficiaryRepresentative():
+    | BeneficiaryRepresentative
+    | undefined {
+    return this.dto.signatories.beneficiaryRepresentative;
+  }
+
+  private get beneficiaryCurrentEmployer():
+    | BeneficiaryCurrentEmployer
+    | undefined {
+    return this.dto.signatories.beneficiaryCurrentEmployer;
+  }
 
   public withBusinessName(businessName: string): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, businessName });
@@ -288,6 +316,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       firstName,
     });
   }
+
   public withEstablishmentRepresentativeLastName(lastName: string) {
     return this.withEstablishmentRepresentative({
       ...this.dto.signatories.establishmentRepresentative,
@@ -389,6 +418,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, dateValidation });
   }
+
   public withoutDateValidation(): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, dateValidation: undefined });
   }
@@ -396,11 +426,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withId(id: ConventionId): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, id });
   }
+
   public withExternalId(
     externalId: ConventionExternalId,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, externalId });
   }
+
   public withAgencyId(agencyId: AgencyId): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, agencyId });
   }
@@ -408,6 +440,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withStatus(status: ConventionStatus): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, status });
   }
+
   public validated(): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
@@ -450,14 +483,21 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withSchedule(
-    scheduleMaker: (interval: DateIntervalDto) => ScheduleDto,
+    scheduleMaker: (
+      interval: DateIntervalDto,
+      excludedDays: Weekday[],
+    ) => ScheduleDto,
+    excludedDays: Weekday[] = [],
   ) {
     return new ConventionDtoBuilder({
       ...this.dto,
-      schedule: scheduleMaker({
-        start: new Date(this.dto.dateStart),
-        end: new Date(this.dto.dateEnd),
-      }),
+      schedule: scheduleMaker(
+        {
+          start: new Date(this.dto.dateStart),
+          end: new Date(this.dto.dateEnd),
+        },
+        excludedDays,
+      ),
     });
   }
 
@@ -499,6 +539,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       federatedIdentity: undefined,
     });
   }
+
   public notSigned(): ConventionDtoBuilder {
     if (
       this.dto.internshipKind === "immersion" &&
@@ -593,30 +634,6 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       immersionObjective,
     });
-  }
-
-  private get establishmentTutor(): EstablishmentTutor {
-    return this.dto.establishmentTutor;
-  }
-
-  private get establishmentRepresentative(): EstablishmentRepresentative {
-    return this.dto.signatories.establishmentRepresentative;
-  }
-
-  private get beneficiary(): Beneficiary<InternshipKind> {
-    return this.dto.signatories.beneficiary;
-  }
-
-  private get beneficiaryRepresentative():
-    | BeneficiaryRepresentative
-    | undefined {
-    return this.dto.signatories.beneficiaryRepresentative;
-  }
-
-  private get beneficiaryCurrentEmployer():
-    | BeneficiaryCurrentEmployer
-    | undefined {
-    return this.dto.signatories.beneficiaryCurrentEmployer;
   }
 
   public build() {

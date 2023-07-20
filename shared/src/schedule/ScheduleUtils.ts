@@ -87,9 +87,14 @@ const reasonableTimePeriods: TimePeriodsDto = [
 ];
 export const reasonableSchedule = (
   interval: DateIntervalDto,
+  excludedDays: Weekday[] = [],
   timePeriods: TimePeriodsDto = reasonableTimePeriods,
 ): ScheduleDto => {
-  const complexSchedule = makeComplexSchedule(interval, timePeriods);
+  const complexSchedule = makeComplexSchedule(
+    interval,
+    timePeriods,
+    excludedDays,
+  );
   return {
     totalHours:
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
@@ -456,14 +461,24 @@ export const makeDailySchedule = (
 export const makeComplexSchedule = (
   { start, end }: DateIntervalDto,
   timePeriods: TimePeriodsDto,
+  excludedDays?: Weekday[],
 ): DailyScheduleDto[] => {
   const complexSchedules: DailyScheduleDto[] = [];
+  const excludedDayNumbers =
+    excludedDays?.map(
+      (weekday) =>
+        dayOfWeekMapping.find((value) => value.frenchDayName === weekday)
+          ?.universalDay,
+    ) || [];
+
   for (
     let currentDate = start;
     currentDate <= end;
     currentDate = addHours(currentDate, 24)
-  )
-    complexSchedules.push(makeDailySchedule(currentDate, timePeriods));
+  ) {
+    if (!excludedDayNumbers.includes(getDay(currentDate)))
+      complexSchedules.push(makeDailySchedule(currentDate, timePeriods));
+  }
   return complexSchedules;
 };
 
