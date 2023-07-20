@@ -1,4 +1,5 @@
 import { addDays } from "date-fns";
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
@@ -6,6 +7,7 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishm
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
+import { ImmersionDatabase } from "./sql/database";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
@@ -37,13 +39,16 @@ describe("PgDiscussionAggregateRepository", () => {
   });
 
   beforeEach(async () => {
+    const db = new Kysely<ImmersionDatabase>({
+      dialect: new PostgresDialect({ pool }),
+    });
+
     await client.query("DELETE FROM immersion_contacts");
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM discussions");
     await client.query("DELETE FROM exchanges");
-    pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(
-      client,
-    );
+
+    pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(client);
   });
 

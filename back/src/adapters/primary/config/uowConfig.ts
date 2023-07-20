@@ -1,3 +1,4 @@
+import { Transaction } from "kysely";
 import { PoolClient } from "pg";
 import {
   UnitOfWork,
@@ -51,6 +52,7 @@ import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
 import { PgShortLinkRepository } from "../../secondary/pg/PgShortLinkRepository";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
+import { ImmersionDatabase } from "../../secondary/pg/sql/database";
 import { AppConfig } from "./appConfig";
 import { GetPgPoolFn } from "./createGateways";
 
@@ -98,7 +100,10 @@ export const createInMemoryUow = () => {
   } satisfies UnitOfWork;
 };
 
-export const createPgUow = (client: PoolClient): UnitOfWork => {
+export const createPgUow = (
+  client: PoolClient,
+  transaction: Transaction<ImmersionDatabase>,
+): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(client);
   return {
     agencyRepository: new PgAgencyRepository(client),
@@ -112,7 +117,9 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     deletedEstablishmentRepository: new PgDeletedEstablishmentRepository(
       client,
     ),
-    discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
+    discussionAggregateRepository: new PgDiscussionAggregateRepository(
+      transaction,
+    ),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       client,
     ),

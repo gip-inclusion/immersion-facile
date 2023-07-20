@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
 import {
@@ -31,6 +32,7 @@ import {
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsWithInseeDataParams } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+import { ImmersionDatabase } from "./sql/database";
 import { NotFoundError } from "../../primary/helpers/httpErrors";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -1404,7 +1406,10 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       beforeEach(async () => {
         await client.query("DELETE FROM discussions");
-        pgDiscussionRepository = new PgDiscussionAggregateRepository(client);
+        const db = new Kysely<ImmersionDatabase>({
+          dialect: new PostgresDialect({ pool }),
+        });
+        pgDiscussionRepository = new PgDiscussionAggregateRepository(db);
         const establishment1 = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret1)
           .withIsSearchable(false)
