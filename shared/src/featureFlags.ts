@@ -14,7 +14,7 @@ const featureFlagNames = [
 type FeatureFlagKind = (typeof featureFlagKinds)[number];
 const featureFlagKinds = ["boolean", "text"] as const;
 
-type GenericFeatureFlag<K extends FeatureFlagKind, V = never> = {
+type GenericFeatureFlag<K extends FeatureFlagKind, V = undefined> = {
   kind: K;
   isActive: boolean;
   value: V;
@@ -33,7 +33,7 @@ const featureFlagSchema: z.Schema<FeatureFlag> = z
   .object({
     isActive: z.boolean(),
     kind: z.literal("boolean"),
-    value: z.never(),
+    value: z.undefined(),
   })
   .or(
     z.object({
@@ -97,4 +97,5 @@ export const makeTextFeatureFlag = makeFeatureFlag("text");
 
 export const hasFeatureFlagValue = (
   flag: FeatureFlag | SetFeatureFlagParam["flagContent"],
-): flag is Extract<FeatureFlag, { value: unknown }> => "value" in flag;
+): flag is Extract<FeatureFlag, { value: object }> =>
+  "value" in flag && flag.value !== undefined;
