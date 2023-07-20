@@ -261,7 +261,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     id: beneficiarySectionIds.financiaryHelp,
     placeholder: "Ex : aide à la mobilité (optionnel)",
     hintText:
-      "Le bénéficiaire a-t-il besoin d'une aide matérielle pour réaliser l'immersion? Les aides sont soumises à des conditions de ressources. Renseignez-vous auprès de votre conseiller.",
+      "Le bénéficiaire a-t-il besoin d'une aide matérielle pour réaliser l'immersion ? Les aides sont soumises à des conditions de ressources. Renseignez-vous auprès de votre conseiller.",
   },
   "signatories.beneficiary.federatedIdentity": {
     // hidden field
