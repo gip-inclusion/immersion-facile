@@ -354,8 +354,16 @@ export const makeImmersionTimetable = (
   complexSchedule: DailyScheduleDto[],
 ): ImmersionTimeTable => {
   const calendar: WeeklyImmersionTimetableDto[] = [];
+  const firstDay = complexSchedule.at(0);
+  const firstDayOfFirstWeekIndex = firstDay
+    ? parseInt((new Date(firstDay.date), "i")) - 1
+    : 0;
   const lastDayOfTheWeekIndex = 6;
-  applyDaysWithScheduleOnTimetable(complexSchedule, calendar);
+  applyDaysWithScheduleOnTimetable(
+    complexSchedule,
+    calendar,
+    firstDayOfFirstWeekIndex,
+  );
   applyDaysWithoutScheduleOnTimetable(calendar, lastDayOfTheWeekIndex);
   return calendar;
 };
@@ -381,8 +389,9 @@ const applyDaysWithoutScheduleOnTimetable = (
 const applyDaysWithScheduleOnTimetable = (
   complexSchedule: DailyScheduleDto[],
   calendar: WeeklyImmersionTimetableDto[],
+  firstDayOfFirstWeekIndex: number,
 ) => {
-  let currentWeekIndex = 0;
+  let currentWeekIndex = firstDayOfFirstWeekIndex;
   let higherWeekDay = 0;
   complexSchedule.forEach((dailySchedule, dayIndex) => {
     const frenchDay = frenchDayMapping(dailySchedule.date).frenchDay;
