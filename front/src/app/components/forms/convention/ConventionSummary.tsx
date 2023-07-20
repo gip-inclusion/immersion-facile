@@ -110,6 +110,12 @@ const beneficiarySummary = (convention: ConventionReadDto) => {
       fields["signatories.beneficiary.birthdate"].label,
       convention.signatories.beneficiary.birthdate,
     ],
+    convention.internshipKind === "mini-stage-cci"
+      ? [
+          fields["signatories.beneficiary.levelOfEducation"].label,
+          convention.signatories.beneficiary.levelOfEducation,
+        ]
+      : ["", ""],
     [
       fields["signatories.beneficiary.financiaryHelp"].label,
       convention.signatories.beneficiary.financiaryHelp,
