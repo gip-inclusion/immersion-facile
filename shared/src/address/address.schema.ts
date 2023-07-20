@@ -39,7 +39,7 @@ export const lookupStreetAddressQueryMinLength = 2;
 export const lookupStreetAddressQueryMaxWordLength = 18;
 
 export const lookupStreetAddressSpecialCharsRegex =
-  /[&/\\#,+()&$~%€.":`*?<>{}]/g;
+  /[&/\\#,+()&$~%€.":`*?<>{}]|[{d}\s,]/g;
 export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddressQueryParams> =
   z.object({
     lookup: z
