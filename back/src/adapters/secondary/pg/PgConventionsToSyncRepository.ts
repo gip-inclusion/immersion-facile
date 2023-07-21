@@ -1,20 +1,21 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import { ConventionId } from "shared";
 import {
   ConventionsToSyncRepository,
   ConventionToSync,
 } from "../../../domain/convention/ports/ConventionsToSyncRepository";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 
 export const conventionsToSyncTableName = "conventions_to_sync_with_pe";
 
 export class PgConventionsToSyncRepository
   implements ConventionsToSyncRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   async getById(id: ConventionId): Promise<ConventionToSync | undefined> {
     const pgConventionToSync = await selectConventionToSyncById(
-      this.client,
+      this.transaction,
       id,
     );
     return pgConventionToSync
@@ -23,28 +24,29 @@ export class PgConventionsToSyncRepository
   }
 
   async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
-    const queryResult = await this.client.query<PgConventionToSync>(
-      `
+    const query = `
           SELECT id, status, process_date, reason
           FROM ${conventionsToSyncTableName}
           WHERE status = 'TO_PROCESS'
              OR status = 'ERROR'
               LIMIT $1
-      `,
+      `;
+
+    const queryResult = await executeKyselyRawSqlQuery<PgConventionToSync>(
+      this.transaction,
+      query,
       [limit],
     );
-    return queryResult.rows.map((pgConventionToSync) =>
-      pgResultToConventionToSync(pgConventionToSync),
-    );
+    return queryResult.rows.map(pgResultToConventionToSync);
   }
 
   async save(conventionToSync: ConventionToSync): Promise<void> {
     return (await isConventionToSyncAlreadyExists(
-      this.client,
+      this.transaction,
       conventionToSync.id,
     ))
-      ? updateConventionToSync(this.client, conventionToSync)
-      : insertConventionToSync(this.client, conventionToSync);
+      ? updateConventionToSync(this.transaction, conventionToSync)
+      : insertConventionToSync(this.transaction, conventionToSync);
   }
 }
 
@@ -66,11 +68,12 @@ const pgResultToConventionToSync = (
   } as ConventionToSync);
 
 const isConventionToSyncAlreadyExists = async (
-  client: PoolClient,
+  transaction: Kysely<ImmersionDatabase>,
   conventionId: ConventionId,
 ): Promise<boolean> =>
   (
-    await client.query(
+    await executeKyselyRawSqlQuery<any>(
+      transaction,
       `SELECT EXISTS(SELECT 1
                      FROM ${conventionsToSyncTableName}
                      WHERE id = $1)`,
@@ -79,10 +82,11 @@ const isConventionToSyncAlreadyExists = async (
   ).rows.at(0).exists;
 
 const updateConventionToSync = async (
-  client: PoolClient,
+  transaction: Kysely<ImmersionDatabase>,
   conventionToSync: ConventionToSync,
 ): Promise<void> => {
-  await client.query(
+  await executeKyselyRawSqlQuery(
+    transaction,
     `
         UPDATE ${conventionsToSyncTableName}
         SET status       = $2,
@@ -104,16 +108,15 @@ const updateConventionToSync = async (
 };
 
 const insertConventionToSync = async (
-  client: PoolClient,
+  transaction: Kysely<ImmersionDatabase>,
   conventionToSync: ConventionToSync,
 ): Promise<void> => {
-  await client.query(
+  await executeKyselyRawSqlQuery(
+    transaction,
     `
-        INSERT INTO ${conventionsToSyncTableName} (id,
-                                                   status,
-                                                   process_date,
-                                                   reason)
-        VALUES ($1, $2, $3, $4)
+      INSERT INTO ${conventionsToSyncTableName} 
+      (id, status, process_date, reason)
+      VALUES ($1, $2, $3, $4)
     `,
     [
       conventionToSync.id,
@@ -129,11 +132,12 @@ const insertConventionToSync = async (
 };
 
 const selectConventionToSyncById = async (
-  client: PoolClient,
+  transaction: Kysely<ImmersionDatabase>,
   conventionId: ConventionId,
 ): Promise<PgConventionToSync | undefined> =>
   (
-    await client.query<PgConventionToSync>(
+    await executeKyselyRawSqlQuery<any>(
+      transaction,
       `
           SELECT id, status, process_date, reason
           FROM ${conventionsToSyncTableName}

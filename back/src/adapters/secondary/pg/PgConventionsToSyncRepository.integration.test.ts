@@ -1,7 +1,9 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ConventionToSync } from "../../../domain/convention/ports/ConventionsToSyncRepository";
+import { ImmersionDatabase } from "./sql/database";
 import {
   conventionsToSyncTableName,
   PgConventionsToSyncRepository,
@@ -49,7 +51,11 @@ describe("PgConventionsRepository", () => {
   beforeEach(async () => {
     await client.query(`DELETE
                         FROM ${conventionsToSyncTableName}`);
-    conventionsToSyncRepository = new PgConventionsToSyncRepository(client);
+    conventionsToSyncRepository = new PgConventionsToSyncRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
   });
 
   it.each(conventionsToSync)(
@@ -106,12 +112,17 @@ describe("PgConventionsRepository", () => {
     });
 
     it("with limit 1", async () => {
+      const processedAndErrorConventionIds = [
+        conventionsToSync[0].id,
+        conventionsToSync[2].id,
+      ];
       const conventionsToSyncNotProcessedAndErrored =
         await conventionsToSyncRepository.getToProcessOrError(1);
 
-      expectToEqual(conventionsToSyncNotProcessedAndErrored, [
-        conventionsToSync[0],
-      ]);
+      expectToEqual(conventionsToSyncNotProcessedAndErrored.length, 1);
+      expect(processedAndErrorConventionIds).toContain(
+        conventionsToSyncNotProcessedAndErrored[0].id,
+      );
     });
   });
 });
