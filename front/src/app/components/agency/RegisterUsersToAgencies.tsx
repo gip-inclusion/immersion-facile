@@ -90,6 +90,16 @@ export const RegisterUsersToAgencies = () => {
                               {agency.address.streetNumberAndAddress}{" "}
                               {agency.address.postcode} {agency.address.city}
                             </p>
+                            <p className={fr.cx("fr-card__desc")}>
+                              <DisplayEmailList
+                                emailKind={"conseillers"}
+                                emails={agency.counsellorEmails}
+                              />
+                              <DisplayEmailList
+                                emailKind={"validateurs"}
+                                emails={agency.validatorEmails}
+                              />
+                            </p>
                             <div className={fr.cx("fr-card__desc")}>
                               <Select
                                 label="Sélectionner un rôle"
@@ -198,6 +208,25 @@ export const RegisterUsersToAgencies = () => {
         </>
       </div>
     </>
+  );
+};
+
+const DisplayEmailList = ({
+  emails,
+  emailKind,
+}: {
+  emailKind: string;
+  emails: string[];
+}) => {
+  if (emails.length === 0) return null;
+
+  return (
+    <ul>
+      <strong>Email {emailKind} :</strong>
+      {emails.map((email) => (
+        <li key={email}>{email}</li>
+      ))}
+    </ul>
   );
 };
 

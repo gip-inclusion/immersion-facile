@@ -1,10 +1,7 @@
 import { Pool, PoolClient } from "pg";
-import { keys } from "ramda";
 import {
   expectToEqual,
   FeatureFlags,
-  FeatureFlagText,
-  hasFeatureFlagValue,
   makeBooleanFeatureFlag,
   makeTextFeatureFlag,
 } from "shared";
@@ -42,7 +39,7 @@ describe("PG getFeatureFlags", () => {
       }),
     };
 
-    await insertFeatureFlagsInTable(expectedFeatureFlags);
+    await featureFlagRepository.insert(expectedFeatureFlags);
 
     const featureFlags = await featureFlagRepository.getAll();
 
@@ -59,7 +56,7 @@ describe("PG getFeatureFlags", () => {
     });
   });
 
-  it("sets a Feature Flag to the given value", async () => {
+  it("inserts featureFlags than updates a Feature Flag to the given value", async () => {
     const initialFeatureFlags: FeatureFlags = {
       enableInseeApi: makeBooleanFeatureFlag(true),
       enablePeConnectApi: makeBooleanFeatureFlag(true),
@@ -72,9 +69,12 @@ describe("PG getFeatureFlags", () => {
       }),
     };
 
-    await insertFeatureFlagsInTable(initialFeatureFlags);
+    await featureFlagRepository.insert(initialFeatureFlags);
 
-    await featureFlagRepository.set({
+    const featureFlagsInitiallyInserted = await featureFlagRepository.getAll();
+    expectToEqual(initialFeatureFlags, featureFlagsInitiallyInserted);
+
+    await featureFlagRepository.update({
       flagName: "enableLogoUpload",
       flagContent: {
         isActive: true,
@@ -94,22 +94,4 @@ describe("PG getFeatureFlags", () => {
       }),
     });
   });
-
-  const insertFeatureFlagsInTable = async (flags: FeatureFlags) => {
-    await Promise.all(
-      keys(flags).map((flagName) => {
-        const isFlagActive = flags[flagName].isActive;
-        const flagKind = flags[flagName].kind;
-        const flagValue = hasFeatureFlagValue(flags[flagName])
-          ? (flags[flagName] as FeatureFlagText).value
-          : null;
-
-        return client.query(
-          `INSERT INTO feature_flags (flag_name, is_active, kind, value) VALUES ('${flagName}', ${isFlagActive}, '${flagKind}', ${
-            flagValue ? `'${JSON.stringify(flagValue)}'` : "NULL"
-          });`,
-        );
-      }),
-    );
-  };
 });
