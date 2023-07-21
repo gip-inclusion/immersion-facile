@@ -1,4 +1,5 @@
-import { ColumnType } from "kysely";
+import { ColumnType, CompiledQuery, Kysely } from "kysely";
+import { QueryResultRow } from "pg";
 
 export interface ImmersionDatabase {
   discussions: DiscussionsTable;
@@ -55,3 +56,9 @@ interface Exchanges {
   sent_at: Timestamp;
   subject: string;
 }
+
+export const executeKyselyRawSqlQuery = <T extends QueryResultRow>(
+  transaction: Kysely<ImmersionDatabase>,
+  sqlQuery: string,
+  values: any[],
+) => transaction.executeQuery<T>(CompiledQuery.raw(sqlQuery, values));
