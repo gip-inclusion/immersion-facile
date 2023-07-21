@@ -1,6 +1,8 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { SavedError } from "../../../domain/core/ports/ErrorRepository";
+import { ImmersionDatabase } from "./sql/database";
 import { PgErrorRepository } from "./PgErrorRepository";
 
 const savedError: SavedError = {
@@ -21,7 +23,11 @@ describe("PgErrorRepository", () => {
   });
 
   beforeEach(async () => {
-    pgErrorRepository = new PgErrorRepository(client);
+    pgErrorRepository = new PgErrorRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
     await client.query("DELETE FROM saved_errors");
   });
 
