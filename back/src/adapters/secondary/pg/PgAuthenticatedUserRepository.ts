@@ -29,6 +29,21 @@ export class PgAuthenticatedUserRepository
     return toAuthenticatedUser(response.rows.at(0));
   }
 
+  private async insert(
+    id: AuthenticatedUserId,
+    email: Email,
+    firstName: string,
+    lastName: string,
+  ) {
+    const query = `
+      INSERT INTO authenticated_users (id, email, first_name, last_name) 
+      VALUES ($1, $2, $3, $4 )
+    `;
+    await this.transaction.executeQuery<any>(
+      CompiledQuery.raw(query, [id, email, firstName, lastName]),
+    );
+  }
+
   public async save({
     email,
     firstName,
@@ -43,21 +58,6 @@ export class PgAuthenticatedUserRepository
     )
       return;
     return this.update(email, firstName, lastName);
-  }
-
-  private async insert(
-    id: AuthenticatedUserId,
-    email: Email,
-    firstName: string,
-    lastName: string,
-  ) {
-    const query = `
-      INSERT INTO authenticated_users (id, email, first_name, last_name) 
-      VALUES ($1, $2, $3, $4 )
-    `;
-    await this.transaction.executeQuery<any>(
-      CompiledQuery.raw(query, [id, email, firstName, lastName]),
-    );
   }
 
   private async update(email: Email, firstName: string, lastName: string) {

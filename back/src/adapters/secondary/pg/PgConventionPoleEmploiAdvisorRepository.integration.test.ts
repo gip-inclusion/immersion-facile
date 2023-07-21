@@ -92,7 +92,11 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM partners_pe_connect");
     conventionPoleEmploiAdvisorRepository =
-      new PgConventionPoleEmploiAdvisorRepository(client);
+      new PgConventionPoleEmploiAdvisorRepository(
+        new Kysely<ImmersionDatabase>({
+          dialect: new PostgresDialect({ pool }),
+        }),
+      );
   });
 
   describe("openSlotForNextConvention", () => {
