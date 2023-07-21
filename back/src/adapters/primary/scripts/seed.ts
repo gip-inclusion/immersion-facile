@@ -26,7 +26,7 @@ const seed = async () => {
   const client = await pool.connect();
 
   await deps.uowPerformer.perform(async (uow) => {
-    await featureFlagsSeed(client);
+    await featureFlagsSeed(uow, client);
     await agencySeed(uow, client);
     await establishmentAggregateSeed(uow, client);
     await conventionSeed(uow);
@@ -36,7 +36,7 @@ const seed = async () => {
   await pool.end();
 };
 
-const featureFlagsSeed = async (client: PoolClient) => {
+const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
   console.log("seeding feature flags...");
   await client.query("DELETE FROM feature_flags");
   const featureFlags: FeatureFlags = {
@@ -52,12 +52,12 @@ const featureFlagsSeed = async (client: PoolClient) => {
   };
 
   await Promise.all(
-    keys(featureFlags).map((flagName) => {
-      const isFlagActive = featureFlags[flagName];
-      return client.query(
-        `INSERT INTO feature_flags (flag_name, is_active)
-         VALUES ('${flagName}', ${isFlagActive});`,
-      );
+    keys(featureFlags).map(async (flagName) => {
+      const flag = featureFlags[flagName];
+      await uow.featureFlagRepository.set({
+        flagName,
+        flagContent: flag,
+      });
     }),
   );
   console.log("done");
