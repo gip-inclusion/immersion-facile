@@ -1,7 +1,9 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { AuthenticatedUser } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ImmersionDatabase } from "./sql/database";
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 
 describe("PgAuthenticatedUserRepository", () => {
@@ -12,7 +14,11 @@ describe("PgAuthenticatedUserRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(client);
+    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
     await client.query("DELETE FROM authenticated_users");
   });
   afterAll(async () => {

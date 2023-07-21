@@ -1,6 +1,7 @@
-import { PoolClient } from "pg";
-import { AuthenticatedUser } from "shared";
+import { CompiledQuery, Kysely } from "kysely";
+import { AuthenticatedUser, AuthenticatedUserId, Email } from "shared";
 import { AuthenticatedUserRepository } from "../../../domain/generic/OAuth/ports/AuthenticatedUserRepositiory";
+import { ImmersionDatabase } from "./sql/database";
 
 type PersistenceAuthenticatedUser = {
   id: string;
@@ -12,46 +13,62 @@ type PersistenceAuthenticatedUser = {
 export class PgAuthenticatedUserRepository
   implements AuthenticatedUserRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   public async findByEmail(
     email: string,
   ): Promise<AuthenticatedUser | undefined> {
-    const response = await this.client.query(
-      `
-      SELECT * FROM authenticated_users WHERE email = $1
-      `,
-      [email],
+    const query = `
+      SELECT * 
+      FROM authenticated_users 
+      WHERE email = $1
+    `;
+    const response = await this.transaction.executeQuery<any>(
+      CompiledQuery.raw(query, [email]),
     );
-    return toAuthenticatedUser(response.rows[0]);
+    return toAuthenticatedUser(response.rows.at(0));
   }
 
-  public async save(user: AuthenticatedUser): Promise<void> {
-    const { id, email, firstName, lastName } = user;
-    const existingUser = await this.findByEmail(user.email);
-    if (existingUser) {
-      if (
-        existingUser.firstName === firstName &&
-        existingUser.lastName === lastName
-      )
-        return;
+  public async save({
+    email,
+    firstName,
+    id,
+    lastName,
+  }: AuthenticatedUser): Promise<void> {
+    const existingUser = await this.findByEmail(email);
+    if (!existingUser) return this.insert(id, email, firstName, lastName);
+    if (
+      existingUser.firstName === firstName &&
+      existingUser.lastName === lastName
+    )
+      return;
+    return this.update(email, firstName, lastName);
+  }
 
-      await this.client.query(
-        `
-        UPDATE authenticated_users
-        SET first_name=$2, last_name=$3, updated_at=now()
-        WHERE email=$1
-        `,
-        [email, firstName, lastName],
-      );
-    } else {
-      await this.client.query(
-        `
-      INSERT INTO authenticated_users(id, email, first_name, last_name) VALUES ($1, $2, $3, $4 )
-      `,
-        [id, email, firstName, lastName],
-      );
-    }
+  private async insert(
+    id: AuthenticatedUserId,
+    email: Email,
+    firstName: string,
+    lastName: string,
+  ) {
+    const query = `
+      INSERT INTO authenticated_users (id, email, first_name, last_name) 
+      VALUES ($1, $2, $3, $4 )
+    `;
+    await this.transaction.executeQuery<any>(
+      CompiledQuery.raw(query, [id, email, firstName, lastName]),
+    );
+  }
+
+  private async update(email: Email, firstName: string, lastName: string) {
+    const query = `
+      UPDATE authenticated_users
+      SET first_name=$2, last_name=$3, updated_at=now()
+      WHERE email=$1
+    `;
+    await this.transaction.executeQuery<any>(
+      CompiledQuery.raw(query, [email, firstName, lastName]),
+    );
   }
 }
 
