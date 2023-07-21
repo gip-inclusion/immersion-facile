@@ -109,8 +109,8 @@ export const createPgUow = (
     agencyRepository: new PgAgencyRepository(transaction),
     apiConsumerRepository: new PgApiConsumerRepository(transaction),
     authenticatedUserRepository: new PgAuthenticatedUserRepository(transaction),
-    conventionRepository: new PgConventionRepository(client),
-    conventionQueries: new PgConventionQueries(client),
+    conventionRepository: new PgConventionRepository(transaction),
+    conventionQueries: new PgConventionQueries(transaction),
     conventionPoleEmploiAdvisorRepository:
       new PgConventionPoleEmploiAdvisorRepository(transaction),
     conventionsToSyncRepository: new PgConventionsToSyncRepository(client),

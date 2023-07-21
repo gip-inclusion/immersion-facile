@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { CompiledQuery, Kysely } from "kysely";
 import {
   ConventionId,
   ConventionReadDto,
@@ -6,6 +6,7 @@ import {
   parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
 import { createLogger } from "../../../utils/logger";
+import { ImmersionDatabase } from "./sql/database";
 
 const buildSignatoriesObject = `JSON_BUILD_OBJECT(
       'beneficiary' , JSON_BUILD_OBJECT(
@@ -115,12 +116,11 @@ const getReadConventionByIdQuery = `
   ${selectAllConventionDtosById} WHERE conventions.id = $1`;
 
 export const getReadConventionById = async (
-  client: PoolClient,
+  transaction: Kysely<ImmersionDatabase>,
   conventionId: ConventionId,
 ): Promise<ConventionReadDto | undefined> => {
-  const pgResult = await client.query<{ dto: unknown }>(
-    getReadConventionByIdQuery,
-    [conventionId],
+  const pgResult = await transaction.executeQuery<{ dto: any }>(
+    CompiledQuery.raw(getReadConventionByIdQuery, [conventionId]),
   );
   const pgConvention = pgResult.rows.at(0);
 

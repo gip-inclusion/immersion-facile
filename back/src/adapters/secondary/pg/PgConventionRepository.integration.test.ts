@@ -31,6 +31,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
 };
 
 describe("PgConventionRepository", () => {
+  let db: Kysely<ImmersionDatabase>;
   let pool: Pool;
   let client: PoolClient;
   let conventionRepository: PgConventionRepository;
@@ -38,11 +39,10 @@ describe("PgConventionRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    const agencyRepository = new PgAgencyRepository(
-      new Kysely<ImmersionDatabase>({
-        dialect: new PostgresDialect({ pool }),
-      }),
-    );
+    db = new Kysely<ImmersionDatabase>({
+      dialect: new PostgresDialect({ pool }),
+    });
+    const agencyRepository = new PgAgencyRepository(db);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
   });
 
@@ -58,7 +58,7 @@ describe("PgConventionRepository", () => {
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
     );
-    conventionRepository = new PgConventionRepository(client);
+    conventionRepository = new PgConventionRepository(db);
   });
 
   it("Adds a new convention", async () => {

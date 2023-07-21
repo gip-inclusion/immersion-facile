@@ -24,6 +24,7 @@ const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
 const idB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
 
 describe("Pg implementation of ConventionQueries", () => {
+  let db: Kysely<ImmersionDatabase>;
   let pool: Pool;
   let client: PoolClient;
   let conventionQueries: PgConventionQueries;
@@ -36,7 +37,7 @@ describe("Pg implementation of ConventionQueries", () => {
   });
 
   beforeEach(async () => {
-    const db = new Kysely<ImmersionDatabase>({
+    db = new Kysely<ImmersionDatabase>({
       dialect: new PostgresDialect({ pool }),
     });
     await client.query("DELETE FROM conventions");
@@ -45,9 +46,9 @@ describe("Pg implementation of ConventionQueries", () => {
     );
     await client.query("DELETE FROM agencies");
 
-    conventionQueries = new PgConventionQueries(client);
     agencyRepo = new PgAgencyRepository(db);
-    conventionRepository = new PgConventionRepository(client);
+    conventionQueries = new PgConventionQueries(db);
+    conventionRepository = new PgConventionRepository(db);
   });
 
   afterAll(async () => {
@@ -134,12 +135,8 @@ describe("Pg implementation of ConventionQueries", () => {
         AgencyDtoBuilder.create().withId(agencyId).build(),
       );
 
-      await Promise.all(
-        [
-          conventionCancelledAndDateStart20230327,
-          conventionDraftAndDateStart20230330,
-        ].map((params) => conventionRepository.save(params)),
-      );
+      await conventionRepository.save(conventionCancelledAndDateStart20230327);
+      await conventionRepository.save(conventionDraftAndDateStart20230330);
     });
 
     it(`getConventionsByFilters with filters :
@@ -264,7 +261,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
-      const conventionRepo = new PgConventionRepository(client);
+      const conventionRepo = new PgConventionRepository(db);
       const outboxRepo = new PgOutboxRepository(client);
       const dateStart = new Date("2022-05-10").toISOString();
       const dateEnd14 = new Date("2022-05-14").toISOString();
@@ -301,14 +298,12 @@ describe("Pg implementation of ConventionQueries", () => {
         .withSchedule(reasonableSchedule)
         .withStatus("IN_REVIEW")
         .build();
-      await Promise.all(
-        [
-          validatedImmersionEndingThe14th,
-          validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail,
-          validatedImmersionEndingThe15th,
-          ongoingImmersionEndingThe15th,
-        ].map((params) => conventionRepo.save(params)),
+      await conventionRepo.save(validatedImmersionEndingThe14th);
+      await conventionRepo.save(
+        validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail,
       );
+      await conventionRepo.save(validatedImmersionEndingThe15th);
+      await conventionRepo.save(ongoingImmersionEndingThe15th);
 
       const createNewEvent = makeCreateNewEvent({
         timeGateway: new RealTimeGateway(),

@@ -35,13 +35,12 @@ describe("PgImmersionAssessmentRepository", () => {
     client = await pool.connect();
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    const agencyRepository = new PgAgencyRepository(
-      new Kysely<ImmersionDatabase>({
-        dialect: new PostgresDialect({ pool }),
-      }),
-    );
+    const db = new Kysely<ImmersionDatabase>({
+      dialect: new PostgresDialect({ pool }),
+    });
+    const agencyRepository = new PgAgencyRepository(db);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
-    const conventionRepository = new PgConventionRepository(client);
+    const conventionRepository = new PgConventionRepository(db);
     await conventionRepository.save(convention);
   });
 

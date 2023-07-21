@@ -60,6 +60,7 @@ const poleEmploiUpdatedUserAdvisor: PeUserAndAdvisor = {
 };
 
 describe("PgConventionPoleEmploiAdvisorRepository", () => {
+  let db: Kysely<ImmersionDatabase>;
   let pool: Pool;
   let client: PoolClient;
   let conventionPoleEmploiAdvisorRepository: PgConventionPoleEmploiAdvisorRepository;
@@ -79,7 +80,10 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       }),
     );
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
-    const conventionRepository = new PgConventionRepository(client);
+    db = new Kysely<ImmersionDatabase>({
+      dialect: new PostgresDialect({ pool }),
+    });
+    const conventionRepository = new PgConventionRepository(db);
     const { externalId, ...createConventionParams } = convention;
     await conventionRepository.save(createConventionParams);
   });
@@ -91,12 +95,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM partners_pe_connect");
+
     conventionPoleEmploiAdvisorRepository =
-      new PgConventionPoleEmploiAdvisorRepository(
-        new Kysely<ImmersionDatabase>({
-          dialect: new PostgresDialect({ pool }),
-        }),
-      );
+      new PgConventionPoleEmploiAdvisorRepository(db);
   });
 
   describe("openSlotForNextConvention", () => {

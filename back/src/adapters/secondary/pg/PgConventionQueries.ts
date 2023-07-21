@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { CompiledQuery, Kysely } from "kysely";
 import format from "pg-format";
 import {
   ConventionId,
@@ -13,6 +13,7 @@ import {
   ConventionQueries,
   GetConventionByFiltersQueries,
 } from "../../../domain/convention/ports/ConventionQueries";
+import { ImmersionDatabase } from "./sql/database";
 import {
   getReadConventionById,
   selectAllConventionDtosById,
@@ -27,7 +28,7 @@ type GetConventionsRequestProperties = {
 };
 
 export class PgConventionQueries implements ConventionQueries {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,
@@ -44,7 +45,7 @@ export class PgConventionQueries implements ConventionQueries {
   public async getConventionById(
     id: ConventionId,
   ): Promise<ConventionReadDto | undefined> {
-    return getReadConventionById(this.client, id);
+    return getReadConventionById(this.transaction, id);
   }
 
   getConventionsByFilters({
@@ -83,7 +84,9 @@ export class PgConventionQueries implements ConventionQueries {
       .filter(filterNotFalsy)
       .join("\n");
 
-    const pgResult = await this.client.query<{ dto: unknown }>(query);
+    const pgResult = await this.transaction.executeQuery<{ dto: any }>(
+      CompiledQuery.raw(query),
+    );
     return pgResult.rows.map((row) => conventionReadSchema.parse(row.dto));
   }
 
