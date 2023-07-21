@@ -3,6 +3,7 @@ import subDays from "date-fns/subDays";
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
 import {
+  AppellationAndRomeDto,
   expectArraysToEqualIgnoringOrder,
   expectObjectsToMatch,
   expectPromiseToFailWith,
@@ -61,6 +62,13 @@ const analysteEnGeomatiqueImmersionOffer = new ImmersionOfferEntityV2Builder()
   .withRomeCode("M1808")
   .build();
 
+const hydrographeAppellationAndRome: AppellationAndRomeDto = {
+  appellationCode: "15504",
+  appellationLabel: "Hydrographe",
+  romeLabel: "Information géographique",
+  romeCode: "M1808",
+};
+
 describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -90,8 +98,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     const searchedPosition = { lat: 49, lon: 6 };
     const notMatchingRome = "B1805";
     const farFromSearchedPosition = { lat: 32, lon: 89 };
-    const searchMadeWithRome: SearchMade = {
-      rome: cartographeImmersionOffer.romeCode,
+    const cartographeSearchMade: SearchMade = {
       appellationCode: cartographeImmersionOffer.appellationCode,
       ...searchedPosition,
       distanceKm: 30,
@@ -106,7 +113,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchWithNoRomeResult =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: searchMadeWithRome,
+          searchMade: cartographeSearchMade,
         });
       // Assert
       expect(searchWithNoRomeResult).toHaveLength(0);
@@ -218,7 +225,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
-        appellationCode: "15504", // Appellation
+        appellationCode: hydrographeAppellationAndRome.appellationCode, // Appellation
         siret: notActiveSiret,
       });
 
@@ -231,7 +238,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchWithNoRomeResult =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: searchMadeWithRome,
+          searchMade: cartographeSearchMade,
         });
       // Assert
       expect(searchWithNoRomeResult).toHaveLength(0);
@@ -250,8 +257,8 @@ describe("PgEstablishmentAggregateRepository", () => {
       await Promise.all([
         insertImmersionOffer(client, {
           siret: notSearchableSiret,
-          romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: "15504", // Appellation
+          romeCode: hydrographeAppellationAndRome.romeCode,
+          appellationCode: hydrographeAppellationAndRome.appellationCode, // Appellation
         }),
         insertImmersionOffer(client, {
           siret: notSearchableSiret,
@@ -263,7 +270,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchWithNoRomeResult =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: searchMadeWithRome,
+          searchMade: cartographeSearchMade,
         });
 
       // Assert
@@ -281,9 +288,12 @@ describe("PgEstablishmentAggregateRepository", () => {
           appellations: [
             {
               appellationCode: cartographeImmersionOffer.appellationCode,
-              appellationLabel: "Cartographe",
+              appellationLabel: cartographeImmersionOffer.appellationLabel,
             },
-            { appellationCode: "15504", appellationLabel: "Hydrographe" },
+            {
+              appellationCode: hydrographeAppellationAndRome.appellationCode,
+              appellationLabel: hydrographeAppellationAndRome.appellationLabel,
+            },
           ],
           isSearchable: false,
           naf: "8622B",
@@ -347,7 +357,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchResult: SearchImmersionResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: searchMadeWithRome,
+          searchMade: cartographeSearchMade,
         });
 
       // Assert : one match and defined contact details
@@ -398,19 +408,19 @@ describe("PgEstablishmentAggregateRepository", () => {
         },
       });
       await insertImmersionOffer(client, {
-        romeCode: searchMadeWithRome.rome!,
+        romeCode: cartographeImmersionOffer.romeCode,
         siret: closeSiret,
-        appellationCode: searchMadeWithRome.appellationCode!,
+        appellationCode: cartographeSearchMade.appellationCode!,
       });
       await insertImmersionOffer(client, {
-        romeCode: searchMadeWithRome.rome!,
+        romeCode: cartographeImmersionOffer.romeCode,
         siret: farSiret,
-        appellationCode: searchMadeWithRome.appellationCode!,
+        appellationCode: cartographeSearchMade.appellationCode!,
       });
       // Act
       const searchResult =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: { ...searchMadeWithRome, sortedBy: "distance" },
+          searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
           maxResults: 2,
         });
       // Assert
@@ -435,14 +445,14 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       await Promise.all([
         insertImmersionOffer(client, {
-          romeCode: searchMadeWithRome.rome!,
-          appellationCode: searchMadeWithRome.appellationCode!,
+          romeCode: cartographeImmersionOffer.romeCode,
+          appellationCode: cartographeSearchMade.appellationCode!,
           siret: recentOfferSiret,
           offerCreatedAt: new Date("2022-05-05"),
         }),
         insertImmersionOffer(client, {
-          romeCode: searchMadeWithRome.rome!,
-          appellationCode: searchMadeWithRome.appellationCode!,
+          romeCode: cartographeImmersionOffer.romeCode,
+          appellationCode: cartographeSearchMade.appellationCode!,
           siret: oldOfferSiret,
           offerCreatedAt: new Date("2022-05-02"),
         }),
@@ -451,7 +461,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchResult =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: { ...searchMadeWithRome, sortedBy: "date" },
+          searchMade: { ...cartographeSearchMade, sortedBy: "date" },
           maxResults: 2,
         });
       // Assert
@@ -483,7 +493,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchResult: SearchImmersionResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: searchMadeWithRome,
+          searchMade: cartographeSearchMade,
         });
 
       // Assert : one match and defined contact details

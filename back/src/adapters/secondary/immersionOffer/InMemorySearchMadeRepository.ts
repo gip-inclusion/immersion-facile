@@ -21,19 +21,6 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
     return;
   }
 
-  public async markPendingSearchesAsProcessedAndRetrieveThem() {
-    logger.info("markPendingSearchesAsProcessedAndRetrieveThem");
-    const searchesToReturn = this._searchesMadeEntities;
-    this._processedSearchesMadeIds = new Set(
-      this._searchesMadeEntities.map((entity) => entity.id),
-    );
-    return searchesToReturn.map((searchMadeEntity) => ({
-      distance_km: searchMadeEntity.distanceKm,
-      lat: searchMadeEntity.lat,
-      lon: searchMadeEntity.lon,
-      rome: searchMadeEntity.rome,
-    }));
-  }
   public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
     return this._searchesMadeEntities.filter(
       (entity) => !this._processedSearchesMadeIds.has(entity.id),

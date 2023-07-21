@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { expectToEqual } from "shared";
+import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
@@ -16,6 +16,13 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
 
+const cartographeAppellationAndRome: AppellationAndRomeDto = {
+  romeCode: "M1808",
+  appellationCode: "11704",
+  romeLabel: "Information géographique",
+  appellationLabel: "Cartographe",
+};
+
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;
   let authToken: string;
@@ -25,7 +32,7 @@ describe("search-immersion route", () => {
 
   beforeEach(async () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
-
+    inMemoryUow.romeRepository.appellations = [cartographeAppellationAndRome];
     sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
     authToken = generateApiConsumerJwt({
       id: validAuthorizedApiKeyId,
