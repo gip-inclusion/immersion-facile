@@ -26,10 +26,6 @@ export type SearchImmersionResultPublicV2 = {
   additionalInformation?: string;
 };
 
-export const domainToSearchImmersionResultPublicV2 = ({
-  appellations,
-  ...domain
-}: SearchImmersionResultDto): SearchImmersionResultPublicV2 => ({
-  appellations,
-  ...domain,
-});
+export const domainToSearchImmersionResultPublicV2 = (
+  searchImmersionResult: SearchImmersionResultDto,
+): SearchImmersionResultPublicV2 => searchImmersionResult;

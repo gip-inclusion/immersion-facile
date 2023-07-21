@@ -13,14 +13,9 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   );
 
   expressSharedRouter.searchImmersion(async (req, res) =>
-    sendHttpResponse(req, res, async () => {
-      const query =
-        await deps.useCases.convertSearchImmersionQueryParamsToSearchImmersionParamsDto.execute(
-          req.query,
-        );
-
-      return deps.useCases.searchImmersion.execute(query, req.apiConsumer);
-    }),
+    sendHttpResponse(req, res, async () =>
+      deps.useCases.searchImmersion.execute(req.query, req.apiConsumer),
+    ),
   );
 
   expressSharedRouter.contactEstablishment(async (req, res) =>

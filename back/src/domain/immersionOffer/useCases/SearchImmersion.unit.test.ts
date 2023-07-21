@@ -1,6 +1,7 @@
 import {
   addressStringToDto,
   ApiConsumer,
+  AppellationAndRomeDto,
   expectToEqual,
   SearchImmersionParamsDto,
   SearchImmersionResultDto,
@@ -27,6 +28,13 @@ import { LaBonneBoiteCompanyDto } from "../../../adapters/secondary/immersionOff
 import { LaBonneBoiteCompanyDtoBuilder } from "../../../adapters/secondary/immersionOffer/laBonneBoite/LaBonneBoiteCompanyDtoBuilder";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SearchImmersion } from "./SearchImmersion";
+
+const secretariatAppellationAndRome: AppellationAndRomeDto = {
+  romeCode: "M1607",
+  appellationCode: "19364",
+  appellationLabel: "Secrétaire",
+  romeLabel: "Secrétariat",
+};
 
 const establishment = new EstablishmentAggregateBuilder()
   .withEstablishment(
@@ -65,6 +73,7 @@ describe("SearchImmersionUseCase", () => {
     uow = createInMemoryUow();
     laBonneBoiteGateway = new InMemoryLaBonneBoiteGateway();
     uuidGenerator = new TestUuidGenerator();
+    uow.romeRepository.appellations = [secretariatAppellationAndRome];
     searchImmersionUseCase = new SearchImmersion(
       new InMemoryUowPerformer(uow),
       laBonneBoiteGateway,
@@ -80,7 +89,7 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
-        rome: secretariatImmersionOffer.romeCode,
+        appellationCode: secretariatImmersionOffer.appellationCode,
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
         distanceKm: searchInMetzParams.distanceKm,
@@ -121,7 +130,7 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersionUseCase.execute({
       ...searchInMetzParams,
       sortedBy: "distance",
-      rome: secretariatImmersionOffer.romeCode,
+      appellationCode: secretariatImmersionOffer.appellationCode,
     });
 
     expectToEqual(response, [
@@ -196,7 +205,7 @@ describe("SearchImmersionUseCase", () => {
 
     const response = await searchImmersionUseCase.execute({
       ...searchInMetzParams,
-      rome: secretariatImmersionOffer.romeCode,
+      appellationCode: secretariatImmersionOffer.appellationCode,
       sortedBy: "distance",
       voluntaryToImmersion: false,
       distanceKm: range,
@@ -222,7 +231,7 @@ describe("SearchImmersionUseCase", () => {
 
     const response = await searchImmersionUseCase.execute({
       ...searchInMetzParams,
-      rome: secretariatImmersionOffer.romeCode,
+      appellationCode: secretariatImmersionOffer.appellationCode,
       sortedBy: "distance",
     });
 
@@ -258,7 +267,7 @@ describe("SearchImmersionUseCase", () => {
     it("Without voluntary to immersion", async () => {
       const response = await searchImmersionUseCase.execute({
         ...searchInMetzParams,
-        rome: secretariatImmersionOffer.romeCode,
+        appellationCode: secretariatImmersionOffer.appellationCode,
         sortedBy: "distance",
       });
       expectToEqual(response, []);
@@ -267,7 +276,7 @@ describe("SearchImmersionUseCase", () => {
     it("With voluntary to immersion false", async () => {
       const response = await searchImmersionUseCase.execute({
         ...searchInMetzParams,
-        rome: secretariatImmersionOffer.romeCode,
+        appellationCode: secretariatImmersionOffer.appellationCode,
         sortedBy: "distance",
         voluntaryToImmersion: false,
       });
@@ -277,7 +286,7 @@ describe("SearchImmersionUseCase", () => {
     it("With voluntary to immersion true", async () => {
       const response = await searchImmersionUseCase.execute({
         ...searchInMetzParams,
-        rome: secretariatImmersionOffer.romeCode,
+        appellationCode: secretariatImmersionOffer.appellationCode,
         sortedBy: "distance",
         voluntaryToImmersion: true,
       });
@@ -347,7 +356,7 @@ const searchInMetzParams: SearchImmersionParamsDto = {
 
 const searchSecretariatInMetzRequestDto: SearchImmersionParamsDto = {
   ...searchInMetzParams,
-  rome: secretariatImmersionOffer.romeCode,
+  appellationCode: secretariatImmersionOffer.appellationCode,
 };
 
 const authenticatedApiConsumerPayload: ApiConsumer = {

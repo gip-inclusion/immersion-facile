@@ -1,4 +1,4 @@
-import { uniq } from "ramda";
+import { uniqBy } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
@@ -8,7 +8,6 @@ import {
   pathEq,
   pathNotEq,
   replaceArrayElement,
-  RomeCode,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
@@ -83,18 +82,21 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async searchImmersionResults({
-    searchMade: { lat, lon, rome },
+    searchMade: { lat, lon, appellationCode },
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this._establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isActive)
       .flatMap((aggregate) =>
-        uniq(aggregate.immersionOffers.map((offer) => offer.romeCode))
-          .filter((uniqRome) => !rome || rome === uniqRome)
-          .map((matchedRome) =>
+        uniqBy((offer) => offer.romeCode, aggregate.immersionOffers)
+          .filter(
+            (offer) =>
+              !appellationCode || appellationCode === offer.appellationCode,
+          )
+          .map((offer) =>
             buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
               establishmentAgg: aggregate,
-              searchedRome: matchedRome,
+              searchedAppellationCode: offer.appellationCode,
               position: {
                 lat,
                 lon,
@@ -105,6 +107,7 @@ export class InMemoryEstablishmentAggregateRepository
       .slice(0, maxResults);
   }
 
+  // to delete when api v0 and v1 are removed
   public async getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
     rome: string,
@@ -113,12 +116,17 @@ export class InMemoryEstablishmentAggregateRepository
       (aggregate) => aggregate.establishment.siret === siret,
     );
     if (!aggregate) return undefined;
+
+    const searchedAppellationCode =
+      aggregate.immersionOffers.find(({ romeCode }) => romeCode === rome)
+        ?.appellationCode ?? "no-appellation-code-matched";
+
     const {
       isSearchable,
       ...buildSearchImmersionResultWithoutContactDetailsAndIsSearchable
     } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
       establishmentAgg: aggregate,
-      searchedRome: rome,
+      searchedAppellationCode,
     });
     return buildSearchImmersionResultWithoutContactDetailsAndIsSearchable;
   }
@@ -192,7 +200,7 @@ export class InMemoryEstablishmentAggregateRepository
     const { isSearchable, ...rest } =
       buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
         establishmentAgg: aggregate,
-        searchedRome: immersionOffer.romeCode,
+        searchedAppellationCode: immersionOffer.appellationCode,
       });
     return rest;
   }
@@ -257,40 +265,48 @@ export class InMemoryEstablishmentAggregateRepository
 
 const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = ({
   establishmentAgg,
-  searchedRome,
+  searchedAppellationCode,
   position,
 }: {
   establishmentAgg: EstablishmentAggregate;
-  searchedRome: RomeCode;
+  searchedAppellationCode: AppellationCode;
   position?: GeoPositionDto;
-}): SearchImmersionResult => ({
-  address: establishmentAgg.establishment.address,
-  naf: establishmentAgg.establishment.nafDto.code,
-  nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
-  name: establishmentAgg.establishment.name,
-  customizedName: establishmentAgg.establishment.customizedName,
-  rome: searchedRome,
-  romeLabel: TEST_ROME_LABEL,
-  appellations: establishmentAgg.immersionOffers
-    .filter((immersionOffer) => immersionOffer.romeCode === searchedRome)
-    .map((immersionOffer) => ({
-      appellationLabel: immersionOffer.appellationLabel,
-      appellationCode: immersionOffer.appellationCode,
-    })),
-  siret: establishmentAgg.establishment.siret,
-  voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
-  contactMode: establishmentAgg.contact?.contactMethod,
-  numberOfEmployeeRange: establishmentAgg.establishment.numberEmployeesRange,
-  website: establishmentAgg.establishment?.website,
-  additionalInformation: establishmentAgg.establishment?.additionalInformation,
-  distance_m: position
-    ? distanceBetweenCoordinatesInMeters(
-        establishmentAgg.establishment.position.lat,
-        establishmentAgg.establishment.position.lon,
-        position.lat,
-        position.lon,
-      )
-    : undefined,
-  position: establishmentAgg.establishment.position,
-  isSearchable: establishmentAgg.establishment.isSearchable,
-});
+}): SearchImmersionResult => {
+  const romeCode =
+    establishmentAgg.immersionOffers.find(
+      (offer) => offer.appellationCode === searchedAppellationCode,
+    )?.romeCode ?? "no-offer-matched";
+
+  return {
+    address: establishmentAgg.establishment.address,
+    naf: establishmentAgg.establishment.nafDto.code,
+    nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+    name: establishmentAgg.establishment.name,
+    customizedName: establishmentAgg.establishment.customizedName,
+    rome: romeCode,
+    romeLabel: TEST_ROME_LABEL,
+    appellations: establishmentAgg.immersionOffers
+      .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
+      .map((immersionOffer) => ({
+        appellationLabel: immersionOffer.appellationLabel,
+        appellationCode: immersionOffer.appellationCode,
+      })),
+    siret: establishmentAgg.establishment.siret,
+    voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
+    contactMode: establishmentAgg.contact?.contactMethod,
+    numberOfEmployeeRange: establishmentAgg.establishment.numberEmployeesRange,
+    website: establishmentAgg.establishment?.website,
+    additionalInformation:
+      establishmentAgg.establishment?.additionalInformation,
+    distance_m: position
+      ? distanceBetweenCoordinatesInMeters(
+          establishmentAgg.establishment.position.lat,
+          establishmentAgg.establishment.position.lon,
+          position.lat,
+          position.lon,
+        )
+      : undefined,
+    position: establishmentAgg.establishment.position,
+    isSearchable: establishmentAgg.establishment.isSearchable,
+  };
+};

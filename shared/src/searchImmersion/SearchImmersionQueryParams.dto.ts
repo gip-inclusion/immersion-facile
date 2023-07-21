@@ -8,12 +8,11 @@ export type SearchImmersionQueryParamsDto = {
   longitude: number;
   latitude: number;
   appellationCode?: AppellationCode;
+  rome?: RomeCode;
   distanceKm: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
   place?: string;
 };
 
-export type SearchImmersionParamsDto = SearchImmersionQueryParamsDto & {
-  rome?: RomeCode;
-};
+export type SearchImmersionParamsDto = SearchImmersionQueryParamsDto;

@@ -3,7 +3,6 @@ import { ApiConsumerName, Flavor, SearchSortedBy } from "shared";
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
 export type SearchMade = {
-  rome?: string;
   appellationCode?: string;
   distanceKm: number;
   lat: number;

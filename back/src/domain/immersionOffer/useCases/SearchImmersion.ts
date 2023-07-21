@@ -1,6 +1,7 @@
 import { prop, propEq } from "ramda";
 import {
   ApiConsumer,
+  AppellationCode,
   SearchImmersionParamsDto,
   searchImmersionParamsSchema,
   SearchImmersionResultDto,
@@ -38,7 +39,6 @@ export class SearchImmersion extends TransactionalUseCase<
       appellationCode,
       sortedBy,
       voluntaryToImmersion,
-      rome,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ...rest
     }: SearchImmersionParamsDto,
@@ -46,13 +46,13 @@ export class SearchImmersion extends TransactionalUseCase<
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
     const searchMade: SearchMade = {
-      rome,
       lat,
       lon,
       distanceKm,
       sortedBy,
       voluntaryToImmersion,
       place,
+      appellationCode,
     };
 
     await uow.searchMadeRepository.insertSearchMade({
@@ -67,13 +67,8 @@ export class SearchImmersion extends TransactionalUseCase<
         searchMade,
         maxResults: 100,
       }),
-      shouldFetchLBB(rome, voluntaryToImmersion)
-        ? this.laBonneBoiteAPI.searchCompanies({
-            rome,
-            lat,
-            lon,
-            distanceKm,
-          })
+      shouldFetchLBB(appellationCode, voluntaryToImmersion)
+        ? this.searchOnLbb(uow, { appellationCode, lat, lon, distanceKm })
         : Promise.resolve([]),
     ]);
 
@@ -87,6 +82,39 @@ export class SearchImmersion extends TransactionalUseCase<
     ].filter(isSiretIsNotInNotSeachableResults(repositorySearchResults));
   }
 
+  private async searchOnLbb(
+    uow: UnitOfWork,
+    {
+      appellationCode,
+      lat,
+      lon,
+      distanceKm,
+    }: {
+      appellationCode: AppellationCode;
+      lat: number;
+      lon: number;
+      distanceKm: number;
+    },
+  ) {
+    const matches =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
+        appellationCode,
+      ]);
+
+    const romeCode = matches.at(0)?.romeCode;
+    if (!romeCode)
+      throw new Error(
+        `No Rome code matching appellation code ${appellationCode}`,
+      );
+
+    return this.laBonneBoiteAPI.searchCompanies({
+      rome: romeCode,
+      lat,
+      lon,
+      distanceKm,
+    });
+  }
+
   private prepareVoluntaryToImmersionResults(
     results: SearchImmersionResult[],
   ): SearchImmersionResultDto[] {
@@ -96,9 +124,10 @@ export class SearchImmersion extends TransactionalUseCase<
 }
 
 const shouldFetchLBB = (
-  rome: string | undefined,
+  appellationCode: AppellationCode | undefined,
   voluntaryToImmersion?: boolean | undefined,
-): rome is string => !!rome && voluntaryToImmersion !== true;
+): appellationCode is string =>
+  !!appellationCode && voluntaryToImmersion !== true;
 
 const isSiretAlreadyInStoredResults =
   (searchImmersionQueryResults: SearchImmersionResult[]) =>

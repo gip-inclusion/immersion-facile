@@ -5,6 +5,7 @@ import {
   AppellationAndRomeDto,
   AppellationCode,
   GeoPositionDto,
+  RomeCode,
   SearchImmersionResultDto,
   SearchSortedBy,
   SiretDto,
@@ -315,6 +316,9 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
+    const romeCode = await this.getRomeCodeFromAppellationCode(
+      searchMade.appellationCode,
+    );
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
@@ -332,12 +336,12 @@ export class PgEstablishmentAggregateRepository
             LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
             LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
             LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-            ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
+            ${romeCode ? "WHERE rome_code = %1$L" : ""}
             GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
           )
         SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
         LIMIT $3`,
-      searchMade.rome,
+      romeCode,
     ); // Formats optional litterals %1$L
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -504,7 +508,7 @@ export class PgEstablishmentAggregateRepository
 
   public async getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
-    rome: string,
+    rome: RomeCode,
   ): Promise<SearchImmersionResultDto | undefined> {
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -825,6 +829,27 @@ export class PgEstablishmentAggregateRepository
     });
 
     await this.client.query(queries.join("\n"));
+  }
+
+  private async getRomeCodeFromAppellationCode(
+    appellationCode: AppellationCode | undefined,
+  ): Promise<RomeCode | undefined> {
+    if (!appellationCode) return;
+
+    const result = await this.client.query(
+      `SELECT code_rome
+        from public_appellations_data
+        where ogr_appellation = $1`,
+      [appellationCode],
+    );
+
+    const romeCode: RomeCode | undefined = result.rows[0]?.code_rome;
+    if (!romeCode)
+      throw new Error(
+        `No Rome code found for appellation code ${appellationCode}`,
+      );
+
+    return romeCode;
   }
 }
 

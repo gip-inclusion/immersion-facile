@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { andThen, map } from "ramda";
 import { pipeWithValue } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { createLogger } from "../../../../utils/logger";
@@ -27,19 +28,18 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   publicV2SharedRouter.searchImmersion((req, res) =>
-    sendHttpResponseForApiV2(req, res, async () => {
-      const searchImmersionRequest = searchImmersionRequestPublicV2ToDomain(
+    sendHttpResponseForApiV2(req, res, async () =>
+      pipeWithValue(
         req.query,
-      );
-      const searchImmersionResultDtos =
-        await deps.useCases.searchImmersion.execute(
-          searchImmersionRequest,
-          req.apiConsumer,
-        );
-      return searchImmersionResultDtos.map(
-        domainToSearchImmersionResultPublicV2,
-      );
-    }),
+        searchImmersionRequestPublicV2ToDomain,
+        (searchImmersionRequest) =>
+          deps.useCases.searchImmersion.execute(
+            searchImmersionRequest,
+            req.apiConsumer,
+          ),
+        andThen(map(domainToSearchImmersionResultPublicV2)),
+      ),
+    ),
   );
 
   publicV2SharedRouter.getOfferBySiretAndAppellationCode((req, res) =>

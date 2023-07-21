@@ -16,7 +16,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
        ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10, $11, $12)`,
       [
         searchMade.id,
-        searchMade.rome,
+        null, // no need to store ROME as we now store appellation_code
         searchMade.lat,
         searchMade.lon,
         searchMade.distanceKm,
@@ -41,7 +41,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         distanceKm: row.distance,
         lat: row.lat,
         lon: row.lon,
-        rome: optional(row.rome),
         needsToBeSearched: row.needstobesearched,
         sortedBy: row.sorted_by,
         place: row.address,

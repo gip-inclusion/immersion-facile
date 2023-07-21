@@ -6,7 +6,6 @@ import {
 
 const validSearchMadeEntity: SearchMadeEntity = {
   id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
-  rome: "M1607",
   distanceKm: 30,
   lat: 49.119146,
   lon: 6.17602,
