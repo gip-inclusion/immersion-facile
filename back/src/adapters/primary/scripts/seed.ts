@@ -1,5 +1,4 @@
 import { PoolClient } from "pg";
-import { keys } from "ramda";
 import {
   AgencyDtoBuilder,
   cciAgencyId,
@@ -39,6 +38,7 @@ const seed = async () => {
 const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
   console.log("seeding feature flags...");
   await client.query("DELETE FROM feature_flags");
+
   const featureFlags: FeatureFlags = {
     enableInseeApi: makeBooleanFeatureFlag(true),
     enableLogoUpload: makeBooleanFeatureFlag(true),
@@ -51,15 +51,7 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
     enableTemporaryOperation: makeBooleanFeatureFlag(false),
   };
 
-  await Promise.all(
-    keys(featureFlags).map(async (flagName) => {
-      const flag = featureFlags[flagName];
-      await uow.featureFlagRepository.set({
-        flagName,
-        flagContent: flag,
-      });
-    }),
-  );
+  await uow.featureFlagRepository.insert(featureFlags);
   console.log("done");
 };
 

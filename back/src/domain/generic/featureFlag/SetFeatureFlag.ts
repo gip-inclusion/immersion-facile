@@ -10,6 +10,6 @@ export class SetFeatureFlag extends TransactionalUseCase<SetFeatureFlagParam> {
   inputSchema = setFeatureFlagSchema;
 
   public async _execute(params: SetFeatureFlagParam, uow: UnitOfWork) {
-    await uow.featureFlagRepository.set(params);
+    await uow.featureFlagRepository.update(params);
   }
 }

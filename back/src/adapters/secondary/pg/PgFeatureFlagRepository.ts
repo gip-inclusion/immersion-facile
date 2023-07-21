@@ -1,4 +1,5 @@
 import { PoolClient } from "pg";
+import { keys } from "ramda";
 import { FeatureFlags, hasFeatureFlagValue, SetFeatureFlagParam } from "shared";
 import { FeatureFlagRepository } from "../../../domain/core/ports/FeatureFlagRepository";
 
@@ -23,7 +24,7 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
     return rawPgToFeatureFlags(result.rows);
   }
 
-  async set(params: SetFeatureFlagParam): Promise<void> {
+  async update(params: SetFeatureFlagParam): Promise<void> {
     await this.client.query(
       "UPDATE feature_flags SET is_active = $1, value = $2 WHERE flag_name = $3",
       [
@@ -33,6 +34,23 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
           : null,
         params.flagName,
       ],
+    );
+  }
+
+  async insert(featureFlags: FeatureFlags): Promise<void> {
+    await Promise.all(
+      keys(featureFlags).map(async (flagName) => {
+        const flag = featureFlags[flagName];
+        await this.client.query(
+          "INSERT INTO feature_flags (flag_name, is_active, kind, value) VALUES ($1, $2, $3, $4)",
+          [
+            flagName,
+            flag.isActive,
+            flag.kind,
+            hasFeatureFlagValue(flag) ? JSON.stringify(flag.value) : null,
+          ],
+        );
+      }),
     );
   }
 }

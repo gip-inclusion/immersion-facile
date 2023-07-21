@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import {
   FeatureFlags,
   makeBooleanFeatureFlag,
@@ -29,10 +30,16 @@ export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
     return this.featureFlags;
   }
 
-  async set(params: SetFeatureFlagParam): Promise<void> {
+  async update(params: SetFeatureFlagParam): Promise<void> {
     this.featureFlags[params.flagName] = {
       ...this.featureFlags[params.flagName],
       ...(params.flagContent as any),
     };
+  }
+
+  async insert(flags: FeatureFlags): Promise<void> {
+    keys(flags).forEach((flagName) => {
+      this.featureFlags[flagName] = flags[flagName];
+    });
   }
 }
