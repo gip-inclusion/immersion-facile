@@ -49,7 +49,7 @@ export const RegisterUsersToAgencies = () => {
               },
               ...icUsersNeedingReview.map((user) => ({
                 value: user.id,
-                label: `${user.firstName} ${user.lastName}`,
+                label: `${user.firstName} ${user.lastName} - ${user.email}`,
               })),
             ]}
             nativeSelectProps={{
