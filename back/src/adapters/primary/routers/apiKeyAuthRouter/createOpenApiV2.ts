@@ -60,7 +60,7 @@ const searchImmersionResult: SearchImmersionResultDto = {
   fitForDisabledWorkers: false,
   naf: "123",
   nafLabel: "Fabrication de vêtements",
-  name: "Raison social de ma super boite",
+  name: "Raison sociale de ma super boite",
   numberOfEmployeeRange: "",
   position: {
     lat: 48.8589507,
@@ -113,9 +113,6 @@ const generateOpenApi = (envType: string) =>
         description: `Ceci est la documentation pour consommer l’api d’immersion facilitée.
       Une clé API est nécessaire pour utiliser l’api. Veuillez vous mettre en contact avec l’équipe d’immersion facilitée pour l’obtenir.
       La clé API est à fournir en authorization header de toutes les requêtes.
-      
-      ⚠️Attention, cette documentation est encore en cours de construction.
-      L'API n'est pas encore disponible à la consommation. ⚠️
       `,
         version: "v2",
       },
@@ -155,7 +152,7 @@ export const createOpenApiSpecV2 = (envType: string) =>
       searchImmersion: {
         summary: "Recherche",
         description:
-          "Retourne un tableau d'offres d'immersion correspondant a la recherche",
+          "Retourne un tableau d'offres d'immersion correspondant à la recherche",
         extraDocs: {
           headerParams: withAuthorizationHeader,
           queryParams: {
@@ -237,7 +234,9 @@ export const createOpenApiSpecV2 = (envType: string) =>
       },
       getOfferBySiretAndAppellationCode: {
         summary: "Récupération d’un résultat de recherche d'immersion connu",
-        description: "Renvoie l'offre d'immersion correspondante",
+        description:
+          "Renvoie l'offre d'immersion correspondante. N'est possible que dans le case d'une immersion référencée par Immersion Facilitée (c'est à dire avec `volontaryToImmersion` à `true`). " +
+          "Les établissements peuvent également être supprimés et les métiers peuvent évoluer. Dans ce cas il y aura un retour 404.",
         extraDocs: {
           headerParams: withAuthorizationHeader,
           urlParams: {
@@ -258,7 +257,7 @@ export const createOpenApiSpecV2 = (envType: string) =>
               example: searchImmersionResult,
             },
             "400": {
-              description: "TODO",
+              description: "Dans le cas d'une requête invalide",
               example: {
                 status: 400,
                 message: "Schema validation failed",
