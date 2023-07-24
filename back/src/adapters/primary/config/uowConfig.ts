@@ -104,7 +104,7 @@ export const createPgUow = (
   client: PoolClient,
   transaction: Transaction<ImmersionDatabase>,
 ): UnitOfWork => {
-  const shortLinkRepository = new PgShortLinkRepository(client);
+  const shortLinkRepository = new PgShortLinkRepository(transaction);
   return {
     agencyRepository: new PgAgencyRepository(transaction),
     apiConsumerRepository: new PgApiConsumerRepository(transaction),

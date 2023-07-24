@@ -6,6 +6,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
+import { makeKyselyDb } from "./sql/database";
 import {
   deleteShortLinkByIdQuery,
   insertShortLinkQuery,
@@ -32,7 +33,7 @@ describe("PgShortLinkQuery", () => {
 
   beforeEach(async () => {
     await client.query(deleteShortLinkByIdQuery(testShortLinkId));
-    pgShortLinkQuery = new PgShortLinkRepository(client);
+    pgShortLinkQuery = new PgShortLinkRepository(makeKyselyDb(pool));
   });
 
   afterAll(async () => {

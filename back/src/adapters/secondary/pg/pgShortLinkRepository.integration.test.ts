@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { AbsoluteUrl, expectPromiseToFailWithError } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
+import { makeKyselyDb } from "./sql/database";
 import {
   deleteShortLinkByIdQuery,
   getShortLinkByIdQuery,
@@ -25,7 +26,7 @@ describe("PgShortLinkRepository", () => {
   });
 
   beforeEach(() => {
-    pgShortLinkRepository = new PgShortLinkRepository(client);
+    pgShortLinkRepository = new PgShortLinkRepository(makeKyselyDb(pool));
   });
 
   afterAll(async () => {
