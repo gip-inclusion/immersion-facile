@@ -230,5 +230,15 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
           ? "Vous ne pouvez pas encore signer votre demande d'immersion car des modifications sont en cours. Vous recevrez un nouveau e-mail de signature lorsque les modifications seront faites."
           : "Vous ne pouvez pas encore signer votre demande de mini stage car des modifications sont en cours. Vous recevrez un nouveau e-mail de signature lorsque les modifications seront faites.",
     },
+    deprecated: {
+      title:
+        internshipKind === "immersion"
+          ? "Désolé : votre demande d'immersion a été annulée"
+          : "Désolé : votre demande de mini stage a été annulée",
+      detail:
+        internshipKind === "immersion"
+          ? "Votre demande d'immersion a été annulée. Il n'est plus possible de la signer."
+          : "Votre demande de mini stage a été annulée.  Il n'est plus possible de la signer.",
+    },
   },
 });

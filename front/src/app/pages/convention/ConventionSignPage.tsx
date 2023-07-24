@@ -190,8 +190,25 @@ const ConventionSignPageContent = ({
                       }
                     />
                   )}
+                  {convention.status === "DEPRECATED" && (
+                    <Alert
+                      severity="error"
+                      title={t.sign.deprecated.title}
+                      description={
+                        <>
+                          <p className={fr.cx("fr-mt-1w")}>
+                            {t.sign.deprecated.detail}
+                          </p>
+                          <p>
+                            Les raisons sont : {convention.statusJustification}
+                          </p>
+                        </>
+                      }
+                    />
+                  )}
                   {convention.status !== "DRAFT" &&
-                    convention.status !== "REJECTED" && (
+                    convention.status !== "REJECTED" &&
+                    convention.status !== "DEPRECATED" && (
                       <ConventionSignForm
                         convention={convention}
                         jwt={jwt}
