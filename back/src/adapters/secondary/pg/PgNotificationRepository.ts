@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import format from "pg-format";
 import { uniq } from "ramda";
 import {
@@ -16,24 +16,27 @@ import {
   NotificationRepository,
 } from "../../../domain/generic/notifications/ports/NotificationRepository";
 import { createLogger } from "../../../utils/logger";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 
 const logger = createLogger(__filename);
+
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
-    private client: PoolClient,
+    private transaction: Kysely<ImmersionDatabase>,
     private maxRetrievedNotifications: number = 30,
   ) {}
 
   async deleteAllEmailAttachements(): Promise<number> {
     const deletedContent = "deleted-content";
-    const response = await this.client.query(
+    const response = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
-      UPDATE notifications_email_attachments
-        SET attachment = jsonb_set(attachment::jsonb, '{content}', '"${deletedContent}"')
-        WHERE attachment::jsonb ->> 'content' != '${deletedContent}';
+          UPDATE notifications_email_attachments
+          SET attachment = jsonb_set(attachment::jsonb, '{content}', '"${deletedContent}"')
+          WHERE attachment::jsonb ->> 'content' != '${deletedContent}';
       `,
     );
-    return response.rowCount;
+    return Number(response.numAffectedRows);
   }
 
   async getByIdAndKind(
@@ -56,15 +59,16 @@ export class PgNotificationRepository implements NotificationRepository {
   private async getEmailNotificationById(
     id: NotificationId,
   ): Promise<EmailNotification> {
-    const response = await this.client.query(
+    const response = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
-        SELECT ${buildEmailNotificationObject} as notif
-        FROM notifications_email e
-        LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
-        LEFT JOIN notifications_email_attachments a ON a.notifications_email_id = e.id
-        WHERE e.id = $1
-        GROUP BY e.id
-          `,
+          SELECT ${buildEmailNotificationObject} as notif
+          FROM notifications_email e
+                   LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
+                   LEFT JOIN notifications_email_attachments a ON a.notifications_email_id = e.id
+          WHERE e.id = $1
+          GROUP BY e.id
+      `,
       [id],
     );
     return response.rows[0]?.notif;
@@ -93,25 +97,33 @@ export class PgNotificationRepository implements NotificationRepository {
       filterValues.push(email);
     }
 
-    const subQueryToGetEmailsNotificationsIds = `SELECT e.id FROM notifications_email e
-      LEFT JOIN notifications_email_recipients r ON id = r.notifications_email_id
-      ${
-        filterConditions.length > 0
-          ? "WHERE " + filterConditions.join(" AND ")
-          : ""
-      }
-      GROUP BY e.id
-      ORDER BY created_at DESC
-      LIMIT $${filterValues.length + 1}`;
+    const subQueryToGetEmailsNotificationsIds = `SELECT e.id
+                                                 FROM notifications_email e
+                                                          LEFT JOIN notifications_email_recipients r ON id = r.notifications_email_id
+                                                     ${
+                                                       filterConditions.length >
+                                                       0
+                                                         ? "WHERE " +
+                                                           filterConditions.join(
+                                                             " AND ",
+                                                           )
+                                                         : ""
+                                                     }
+                                                 GROUP BY e.id
+                                                 ORDER BY created_at DESC
+                                                     LIMIT $${
+                                                       filterValues.length + 1
+                                                     }`;
 
-    const response = await this.client.query(
+    const response = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT ${buildEmailNotificationObject} as notif
-        FROM notifications_email e
-        LEFT JOIN notifications_email_recipients r ON e.id = r.notifications_email_id
-        LEFT JOIN notifications_email_attachments a ON e.id = a.notifications_email_id
-        WHERE e.id IN (${subQueryToGetEmailsNotificationsIds})
-        GROUP BY e.id
-        ORDER BY created_at DESC`,
+       FROM notifications_email e
+                LEFT JOIN notifications_email_recipients r ON e.id = r.notifications_email_id
+                LEFT JOIN notifications_email_attachments a ON e.id = a.notifications_email_id
+       WHERE e.id IN (${subQueryToGetEmailsNotificationsIds})
+       GROUP BY e.id
+       ORDER BY created_at DESC`,
       [...filterValues, this.maxRetrievedNotifications],
     );
 
@@ -119,13 +131,14 @@ export class PgNotificationRepository implements NotificationRepository {
   }
 
   async getLastNotifications(): Promise<NotificationsByKind> {
-    const smsResponse = await this.client.query(
+    const smsResponse = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
-        SELECT ${buildSmsNotificationObject} as notif
-        FROM notifications_sms
-        ORDER BY created_at DESC
-        LIMIT $1
-          `,
+          SELECT ${buildSmsNotificationObject} as notif
+          FROM notifications_sms
+          ORDER BY created_at DESC
+              LIMIT $1
+      `,
       [this.maxRetrievedNotifications],
     );
 
@@ -138,12 +151,13 @@ export class PgNotificationRepository implements NotificationRepository {
   private async getSmsNotificationById(
     id: NotificationId,
   ): Promise<SmsNotification> {
-    const response = await this.client.query(
+    const response = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
           SELECT ${buildSmsNotificationObject} as notif
-        FROM notifications_sms
-        WHERE id = $1
-          `,
+          FROM notifications_sms
+          WHERE id = $1
+      `,
       [id],
     );
     return response.rows[0]?.notif;
@@ -155,9 +169,13 @@ export class PgNotificationRepository implements NotificationRepository {
   }: EmailNotification) {
     if (!attachments || attachments.length === 0) return;
     if (attachments.length > 0) {
-      const query = `INSERT INTO notifications_email_attachments (notifications_email_id, attachment) VALUES %L`;
+      const query = `INSERT INTO notifications_email_attachments (notifications_email_id, attachment)
+                     VALUES %L`;
       const values = attachments.map((attachment) => [id, attachment]);
-      await this.client.query(format(query, values)).catch((error) => {
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        format(query, values),
+      ).catch((error) => {
         logger.error(
           { query, values, error },
           "PgNotificationRepository_insertEmailAttachments_QueryErrored",
@@ -173,8 +191,12 @@ export class PgNotificationRepository implements NotificationRepository {
   ) {
     const values = recipientsByKind(id, recipientKind, templatedContent);
     if (values.length > 0) {
-      const query = `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L`;
-      await this.client.query(format(query, values)).catch((error) => {
+      const query = `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type)
+                     VALUES %L`;
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        format(query, values),
+      ).catch((error) => {
         logger.error(
           { query, values, error },
           `PgNotificationRepository_insertEmailRecipients_${recipientKind}_QueryErrored`,
@@ -191,18 +213,21 @@ export class PgNotificationRepository implements NotificationRepository {
     templatedContent,
   }: EmailNotification) {
     const query = `
-    INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email, sender_email, sender_name)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-  `;
+        INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id,
+                                         params, reply_to_name, reply_to_email, sender_email, sender_name)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    `;
     // prettier-ignore
     const values = [id, templatedContent.kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, templatedContent.params, templatedContent.replyTo?.name, templatedContent.replyTo?.email, templatedContent.sender?.email, templatedContent.sender?.name];
-    await this.client.query(query, values).catch((error) => {
-      logger.error(
-        { query, values, error },
-        "PgNotificationRepository_insertNotificationEmail_QueryErrored",
-      );
-      throw error;
-    });
+    await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
+      (error) => {
+        logger.error(
+          { query, values, error },
+          "PgNotificationRepository_insertNotificationEmail_QueryErrored",
+        );
+        throw error;
+      },
+    );
   }
 
   async save(notification: Notification): Promise<void> {
@@ -247,13 +272,15 @@ export class PgNotificationRepository implements NotificationRepository {
       templatedContent: { kind, recipientPhone, params },
     } = notification;
 
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       `
-      INSERT INTO notifications_sms (id, sms_kind, recipient_phone, created_at, convention_id, establishment_siret, agency_id, params) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    `,
+          INSERT INTO notifications_sms (id, sms_kind, recipient_phone, created_at, convention_id, establishment_siret,
+                                         agency_id, params)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `,
       // prettier-ignore
-      [ id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params ],
+      [id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params],
     );
   }
 }

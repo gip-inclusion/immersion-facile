@@ -1,11 +1,10 @@
 import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
-import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { ImmersionDatabase } from "./sql/database";
+import { makeKyselyDb } from "./sql/database";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 import { PgOutboxRepository } from "./PgOutboxRepository";
@@ -30,12 +29,11 @@ describe("PgScriptsQueries", () => {
     await client.query("DELETE FROM outbox");
     await client.query("DELETE FROM notifications_email_recipients");
     await client.query("DELETE FROM notifications_email");
+    const db = makeKyselyDb(pool);
     pgOutboxRepository = new PgOutboxRepository(client);
-    pgNotificationRepository = new PgNotificationRepository(client);
+    pgNotificationRepository = new PgNotificationRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      new Kysely<ImmersionDatabase>({
-        dialect: new PostgresDialect({ pool }),
-      }),
+      db,
     );
   });
 
