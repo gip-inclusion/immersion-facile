@@ -1,3 +1,4 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   expectToEqual,
@@ -7,6 +8,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { FeatureFlagRepository } from "../../../domain/core/ports/FeatureFlagRepository";
+import { ImmersionDatabase } from "./sql/database";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
 describe("PG getFeatureFlags", () => {
@@ -18,7 +20,11 @@ describe("PG getFeatureFlags", () => {
     pool = getTestPgPool();
     client = await pool.connect();
     await client.query("DELETE FROM feature_flags");
-    featureFlagRepository = new PgFeatureFlagRepository(client);
+    featureFlagRepository = new PgFeatureFlagRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
   });
 
   afterEach(async () => {
