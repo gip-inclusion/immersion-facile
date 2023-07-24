@@ -1,3 +1,4 @@
+import { FormEstablishmentDtoBuilder } from "shared";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
 import { InMemoryAddressGateway } from "src/core-logic/adapters/AddressGateway/InMemoryAddressGateway";
@@ -6,7 +7,7 @@ import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InM
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { InMemoryEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/InMemoryEmailValidationGateway";
-import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
+import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
 import {
   InMemoryImmersionSearchGateway,
   seedSearchResults,
@@ -27,11 +28,12 @@ export const createInMemoryDependencies = (): Dependencies => ({
   adminGateway: new SimulatedAdminGateway(),
   agencyGateway: new InMemoryAgencyGateway(),
   conventionGateway: new InMemoryConventionGateway(SIMULATED_LATENCY_MS),
-  establishmentGateway: new InMemoryEstablishmentGateway(
-    ["12345678901238", "12345678901239", "12345678901237"],
-    undefined,
-    true,
-  ),
+  establishmentGateway: new SimulatedEstablishmentGateway([
+    FormEstablishmentDtoBuilder.valid()
+      .withSiret("12345678901236")
+      .withFitForDisabledWorkers(false)
+      .build(),
+  ]),
   immersionAssessmentGateway: new SimulatedImmersionAssessmentGateway(),
   immersionSearchGateway: new InMemoryImmersionSearchGateway(
     seedSearchResults,

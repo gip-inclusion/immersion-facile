@@ -20,7 +20,6 @@ import {
   EstablishmentJwtPayload,
   FormEstablishmentDto,
   formEstablishmentSchema,
-  FormEstablishmentSource,
   immersionFacileContactEmail,
   noContactPerWeek,
   objectToDependencyList,
@@ -51,10 +50,7 @@ import {
 } from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import {
-  EstablishmentRequestedPayload,
-  establishmentSlice,
-} from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import { AdminSiretRelatedInputs } from "./AdminSiretRelatedInputs";
 import { BusinessContact } from "./BusinessContact";
 import { MultipleAppellationInput } from "./MultipleAppellationInput";
@@ -76,8 +72,10 @@ type EstablishmentFormProps = {
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
-
+  const adminJwt = useAdminToken();
   const route = useRoute() as RouteByMode[Mode];
+  const { enableMaxContactPerWeek } = useFeatureFlags();
+
   const isEstablishmentCreation =
     route.name === "formEstablishment" ||
     route.name === "formEstablishmentForExternals";
@@ -89,53 +87,16 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     establishmentSelectors.formEstablishment,
   );
 
-  const adminJwt = useAdminToken();
-  const jwt: string = match({ route, adminJwt })
-    .with({ route: { name: "formEstablishment" } }, () => "")
-    .with({ route: { name: "formEstablishmentForExternals" } }, () => "")
-    .with(
-      { route: { name: "editFormEstablishment" } },
-      ({ route }) => route.params.jwt,
-    )
-    .with(
-      { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.not(null) },
-      ({ adminJwt }) => adminJwt,
-    )
-    .with(
-      { route: { name: "manageEstablishmentAdmin" }, adminJwt: null },
-      () => {
-        routes
-          .errorRedirect({
-            message: "Accès interdit sans être connecté en admin.",
-            title: "Erreur",
-          })
-          .push();
-        return "";
-      },
-    )
-    .exhaustive();
-  const siret =
-    (isEstablishmentCreation || isEstablishmentAdmin) && route.params.siret
-      ? route.params.siret
-      : "";
-
-  const source =
-    isEstablishmentCreation && route.params.source ? route.params.source : "";
-
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
   );
-  const initialValues = {
-    ...initialFormEstablishment,
-    source: (source === ""
-      ? "immersion-facile"
-      : source) as FormEstablishmentSource,
-  };
+
   const methods = useForm<FormEstablishmentDto>({
-    defaultValues: initialValues,
+    defaultValues: initialFormEstablishment,
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
+
   const {
     handleSubmit,
     register,
@@ -144,28 +105,73 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     formState: { errors, submitCount, isSubmitting, touchedFields },
     reset,
   } = methods;
+
   const formValues = getValues();
   const formContents = getFormFields();
   const getFieldError = makeFieldError(methods.formState);
-  const [isSearchable, setIsSearchable] = useState(
-    initialValues.maxContactsPerWeek > noContactPerWeek,
-  );
-  const { enableMaxContactPerWeek } = useFeatureFlags();
 
-  useInitialSiret(siret);
+  const [isSearchable, setIsSearchable] = useState(
+    initialFormEstablishment.maxContactsPerWeek > noContactPerWeek,
+  );
+
+  useInitialSiret(
+    (isEstablishmentCreation || isEstablishmentAdmin) && route.params.siret
+      ? route.params.siret
+      : "",
+  );
 
   useEffect(() => {
-    const payload: EstablishmentRequestedPayload =
-      isEstablishmentCreation && mode === "create"
-        ? formEstablishmentQueryParamsToFormEstablishmentDto(route.params)
-        : {
+    match({ route, adminJwt })
+      .with(
+        {
+          route: {
+            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+          },
+        },
+        ({ route }) =>
+          dispatch(
+            establishmentSlice.actions.establishmentRequested(
+              formEstablishmentQueryParamsToFormEstablishmentDto(route.params),
+            ),
+          ),
+      )
+      .with({ route: { name: "editFormEstablishment" } }, ({ route }) =>
+        dispatch(
+          establishmentSlice.actions.establishmentRequested({
             siret:
               decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
-                jwt,
+                route.params.jwt,
               ).siret,
-            jwt,
-          };
-    dispatch(establishmentSlice.actions.establishmentRequested(payload));
+            jwt: route.params.jwt,
+          }),
+        ),
+      )
+      .with(
+        { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
+        () => {
+          routes
+            .errorRedirect({
+              message: "Accès interdit sans être connecté en admin.",
+              title: "Erreur",
+            })
+            .push();
+        },
+      )
+      .with(
+        {
+          route: { name: "manageEstablishmentAdmin" },
+          adminJwt: P.not(P.nullish),
+        },
+        ({ route, adminJwt }) =>
+          dispatch(
+            establishmentSlice.actions.establishmentRequested({
+              siret: route.params.siret,
+              jwt: adminJwt,
+            }),
+          ),
+      )
+
+      .exhaustive();
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
@@ -196,26 +202,49 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [feedback.kind]);
 
-  const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) => {
-    isEstablishmentCreation
-      ? dispatch(
-          establishmentSlice.actions.establishmentCreationRequested(
-            formEstablishment,
+  const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
+    match(route)
+      .with(
+        { name: P.union("formEstablishment", "formEstablishmentForExternals") },
+        () =>
+          dispatch(
+            establishmentSlice.actions.establishmentCreationRequested(
+              formEstablishment,
+            ),
           ),
-        )
-      : dispatch(
+      )
+      .with({ name: "editFormEstablishment" }, (route) =>
+        dispatch(
           establishmentSlice.actions.establishmentEditionRequested({
             formEstablishment,
-            jwt,
+            jwt: route.params.jwt,
           }),
-        );
-  };
+        ),
+      )
+      .with({ name: "manageEstablishmentAdmin" }, () =>
+        routes
+          .errorRedirect({
+            message:
+              "Vous n'avez pas le droit de modifier une entreprise dans l'admin.",
+            title: "Erreur",
+          })
+          .push(),
+      )
+      .exhaustive();
+
   const onClickEstablishmentDeleteButton = () => {
     const confirmed = confirm(
-      `Etes-vous sûr de vouloir supprimer cette établissement ?
-      (cette opération est irréversible 💀)`,
+      `⚠️ Etes-vous sûr de vouloir supprimer cette établissement ? ⚠️
+                (cette opération est irréversible 💀)`,
     );
-    if (confirmed === false) return;
+    if (confirmed && adminJwt)
+      dispatch(
+        establishmentSlice.actions.establishmentDeletionRequested({
+          siret: formValues.siret,
+          jwt: adminJwt,
+        }),
+      );
+    if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
   };
 
   if (isLoading) {
@@ -440,6 +469,20 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 votre entreprise."
             />
           )}
+          {feedback.kind === "deleteSuccess" && (
+            <Alert
+              severity="success"
+              title="Succès de la suppression"
+              description="Succès. Nous avons bien supprimé les informations concernant l'entreprise."
+            />
+          )}
+          {feedback.kind === "deleteErrored" && (
+            <Alert
+              severity="error"
+              title="Erreur lors de la suppression"
+              description="Veuillez nous excuser. Un problème est survenu lors de la suppression de l'entreprise."
+            />
+          )}
           {feedback.kind !== "submitSuccess" && !isEstablishmentAdmin && (
             <div className={fr.cx("fr-mt-4w")}>
               <Button
@@ -455,7 +498,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               </Button>
             </div>
           )}
-          {feedback.kind !== "submitSuccess" && isEstablishmentAdmin && (
+          {feedback.kind !== "deleteSuccess" && isEstablishmentAdmin && (
             <div className={fr.cx("fr-mt-4w")}>
               <Button
                 iconId="fr-icon-delete-bin-line"
