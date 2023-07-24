@@ -26,7 +26,7 @@ export const AdminSiretRelatedInputs = () => {
         disabled={true}
         nativeInputProps={{
           ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi,
+          readOnly: featureFlags.enableInseeApi.isActive,
         }}
       />
       <Input
