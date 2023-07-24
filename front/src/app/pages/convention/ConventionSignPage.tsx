@@ -199,9 +199,12 @@ const ConventionSignPageContent = ({
                           <p className={fr.cx("fr-mt-1w")}>
                             {t.sign.deprecated.detail}
                           </p>
-                          <p>
-                            Les raisons sont : {convention.statusJustification}
-                          </p>
+                          {convention.statusJustification ? (
+                            <p>
+                              Les raisons sont :{" "}
+                              {convention.statusJustification}
+                            </p>
+                          ) : null}
                         </>
                       }
                     />
