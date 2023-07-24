@@ -9,7 +9,7 @@ import {
   ShareLinkByEmailDto,
   UnauthenticatedConventionTargets,
   UpdateConventionStatusRequestDto,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import { HttpClient } from "http-client";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
@@ -98,7 +98,7 @@ export class HttpConventionGateway implements ConventionGateway {
     params: UpdateConventionStatusRequestDto,
     conventionId: ConventionId,
     jwt: string,
-  ): Promise<WithConventionId> {
+  ): Promise<WithConventionIdLegacy> {
     return this.magicLinkHttpClient
       .updateConventionStatus({
         body: params,
@@ -112,7 +112,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return fromPromise(this.signConvention(jwt).then(() => undefined));
   }
 
-  private async signConvention(jwt: string): Promise<WithConventionId> {
+  private async signConvention(jwt: string): Promise<WithConventionIdLegacy> {
     return this.magicLinkHttpClient
       .signConvention({
         headers: { authorization: jwt },

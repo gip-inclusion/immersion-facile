@@ -1,11 +1,15 @@
 import {
   ConventionDtoBuilder,
   ConventionId,
+  ConventionMagicLinkPayload,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import {
   TEST_AGENCY_DEPARTMENT,
   TEST_AGENCY_NAME,
@@ -28,8 +32,42 @@ describe("Get Convention", () => {
     it("throws NotFoundError", async () => {
       const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
       await expectPromiseToFailWithError(
-        getConvention.execute({ id: conventionId }),
-        new NotFoundError(conventionId),
+        getConvention.execute({ conventionId }, {
+          role: "establishment",
+          applicationId: "add5c20e-6dd2-45af-affe-927358005251",
+        } as ConventionMagicLinkPayload),
+        new NotFoundError(`No convention found with id ${conventionId}`),
+      );
+    });
+  });
+
+  describe("When user is forbidden", () => {
+    it("no auth payload provided", async () => {
+      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
+      await expectPromiseToFailWithError(
+        getConvention.execute({ conventionId }),
+        new ForbiddenError(`No auth payload provided`),
+      );
+    });
+
+    it("convention id in jwt token does not match provided one", async () => {
+      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
+      await expectPromiseToFailWithError(
+        getConvention.execute({ conventionId }, {
+          role: "establishment",
+          applicationId: "not-matching-convention-id",
+        } as ConventionMagicLinkPayload),
+        new ForbiddenError(
+          `This token is not allowed to access convention with id ${conventionId}. Role was 'establishment'`,
+        ),
+      );
+    });
+
+    it("user is not allowed to access the convention (convention not linked to one of it's agencies)", async () => {
+      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
+      await expectPromiseToFailWithError(
+        getConvention.execute({ conventionId }, { userId: "my-user-id" }),
+        new ForbiddenError("TODO : handle inclusion connected user"),
       );
     });
   });
@@ -39,9 +77,15 @@ describe("Get Convention", () => {
       const entity = new ConventionDtoBuilder().build();
       conventionRepository.setConventions({ [entity.id]: entity });
 
-      const convention = await getConvention.execute({
-        id: entity.id,
-      });
+      const convention = await getConvention.execute(
+        {
+          conventionId: entity.id,
+        },
+        {
+          role: "establishment",
+          applicationId: entity.id,
+        } as ConventionMagicLinkPayload,
+      );
       expectToEqual(convention, {
         ...entity,
         agencyName: TEST_AGENCY_NAME,

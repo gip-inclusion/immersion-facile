@@ -4,7 +4,7 @@ import {
   ConventionReadDto,
   ListConventionsRequestDto,
   validatedConventionStatuses,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import {
   ConventionQueries,
@@ -93,7 +93,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
       ? this.outboxRepository.events
           .filter(propEq("topic", "EmailWithLinkToCreateAssessmentSent"))
-          .map((event) => (event.payload as WithConventionId).id)
+          .map((event) => (event.payload as WithConventionIdLegacy).id)
       : [];
     return Object.values(this.conventionRepository._conventions)
       .filter(

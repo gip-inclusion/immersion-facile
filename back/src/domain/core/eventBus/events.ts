@@ -10,7 +10,7 @@ import {
   FormEstablishmentDto,
   IcUserRoleForAgencyParams,
   ImmersionAssessmentDto,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
@@ -81,7 +81,7 @@ export type DomainEvent =
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>
-  | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionId>
+  | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
 
   // PECONNECT related
   | GenericEvent<"FederatedIdentityBoundToConvention", ConventionDto>

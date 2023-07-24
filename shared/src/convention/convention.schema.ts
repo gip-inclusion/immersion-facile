@@ -57,6 +57,7 @@ import {
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
+  WithConventionIdLegacy,
   WithStatusJustification,
 } from "./convention.dto";
 import {
@@ -279,8 +280,13 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
     }),
   );
 
+export const withConventionIdLegacySchema: z.Schema<WithConventionIdLegacy> =
+  z.object({
+    id: conventionIdSchema,
+  });
+
 export const withConventionIdSchema: z.Schema<WithConventionId> = z.object({
-  id: conventionIdSchema,
+  conventionId: conventionIdSchema,
 });
 
 export const updateConventionRequestSchema: z.Schema<UpdateConventionRequestDto> =

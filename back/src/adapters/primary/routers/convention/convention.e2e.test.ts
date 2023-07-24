@@ -148,19 +148,20 @@ describe("convention e2e", () => {
           const jwt = generateConventionJwt(payload);
 
           // GETting the created convention succeeds.
-          await request
+          const response = await request
             .get(
               conventionMagicLinkTargets.getConvention.url.replace(
                 ":conventionId",
-                "OSEF",
+                convention.id,
               ),
             )
-            .set("Authorization", jwt)
-            .expect(200, {
-              ...convention,
-              agencyName: TEST_AGENCY_NAME,
-              agencyDepartment: TEST_AGENCY_DEPARTMENT,
-            });
+            .set("Authorization", jwt);
+          expect(response.body).toEqual({
+            ...convention,
+            agencyName: TEST_AGENCY_NAME,
+            agencyDepartment: TEST_AGENCY_DEPARTMENT,
+          });
+          expect(response.status).toBe(200);
         });
 
         it("succeeds with JWT BackOfficeJwtPayload", async () => {
@@ -281,20 +282,29 @@ describe("convention e2e", () => {
             now,
           }),
         );
-        await request
+        const response = await request
           .get(
             conventionMagicLinkTargets.getConvention.url.replace(
               ":conventionId",
-              "anything",
+              unknownId,
             ),
           )
-          .set("Authorization", jwt)
-          .expect(404);
+          .set("Authorization", jwt);
+        expect(response.body).toEqual({
+          errors:
+            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+        });
+        expect(response.status).toBe(404);
 
-        await request
+        const adminResponse = await request
           .get(adminTargets.getConventionById.url.replace(":id", unknownId))
-          .set("Authorization", adminToken)
-          .expect(404);
+          .set("Authorization", adminToken);
+
+        expect(adminResponse.body).toEqual({
+          errors:
+            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+        });
+        expect(adminResponse.status).toBe(404);
       });
 
       it("Updating an unknown convention IDs fails with 404 Not Found", async () => {

@@ -5,7 +5,7 @@ import {
   ExtractFromExisting,
   Role,
   signConventionDtoWithRole,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import {
   ForbiddenError,
@@ -50,7 +50,7 @@ const isAllowedToSign = (
 
 export class SignConvention extends TransactionalUseCase<
   void,
-  WithConventionId
+  WithConventionIdLegacy
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -66,7 +66,7 @@ export class SignConvention extends TransactionalUseCase<
     _: void,
     uow: UnitOfWork,
     { applicationId, role }: ConventionMagicLinkPayload,
-  ): Promise<WithConventionId> {
+  ): Promise<WithConventionIdLegacy> {
     logger.debug({ applicationId, role });
 
     if (!isAllowedToSign(role))
