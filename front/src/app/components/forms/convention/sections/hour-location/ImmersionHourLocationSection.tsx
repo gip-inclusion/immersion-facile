@@ -38,11 +38,11 @@ export const ImmersionHourLocationSection = () => {
   const [dateMax, setDateMax] = useState(
     addMonths(defaultDateMax, 1).toISOString(),
   );
+  const excludedDays =
+    values.internshipKind === "mini-stage-cci"
+      ? (["dimanche"] as Weekday[])
+      : [];
   const resetSchedule = (interval: DateIntervalDto) => {
-    const excludedDays =
-      values.internshipKind === "mini-stage-cci"
-        ? (["dimanche"] as Weekday[])
-        : [];
     setValue(
       "schedule",
       values.schedule.isSimple
@@ -145,6 +145,7 @@ export const ImmersionHourLocationSection = () => {
           start: new Date(values.dateStart),
           end: new Date(values.dateEnd),
         }}
+        excludedDays={excludedDays}
       />
       <AddressAutocomplete
         {...formContents["immersionAddress"]}
