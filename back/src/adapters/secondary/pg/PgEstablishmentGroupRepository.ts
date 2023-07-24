@@ -1,8 +1,9 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import format from "pg-format";
 import { EstablishmentGroupSlug, SearchResultDto, SiretDto } from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 
 const buildAppellationsArray = `JSON_AGG(
     JSON_BUILD_OBJECT(
@@ -15,13 +16,12 @@ const buildAppellationsArray = `JSON_AGG(
 export class PgEstablishmentGroupRepository
   implements EstablishmentGroupRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   public async findSearchImmersionResultsBySlug(
     slug: EstablishmentGroupSlug,
   ): Promise<SearchResultDto[]> {
-    const response = await this.client.query(
-      `
+    const query = `
       SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
         'rome', io.rome_code, 
         'siret', e.siret, 
@@ -57,9 +57,11 @@ export class PgEstablishmentGroupRepository
       LEFT JOIN "public_naf_classes_2008" ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       WHERE establishment_groups__sirets.group_slug = $1 AND e.is_open AND e.is_searchable
       GROUP BY(e.siret, io.rome_code, r.libelle_rome, public_naf_classes_2008.class_label, ic.contact_mode)
-    `,
-      [slug],
-    );
+    `;
+
+    const response = await executeKyselyRawSqlQuery(this.transaction, query, [
+      slug,
+    ]);
 
     return response.rows.map((row) => row.search_result_dto);
   }
@@ -67,11 +69,12 @@ export class PgEstablishmentGroupRepository
   public async groupsWithSiret(
     siret: SiretDto,
   ): Promise<EstablishmentGroupEntity[]> {
-    const { rows } = await this.client.query<{
+    const { rows } = await executeKyselyRawSqlQuery<{
       slug: string;
       name: string;
       sirets: string[];
     }>(
+      this.transaction,
       `
       SELECT g.slug, g.name, array_agg(establishment_groups__sirets.siret) as sirets
       FROM establishment_groups g
@@ -97,43 +100,63 @@ export class PgEstablishmentGroupRepository
   }
 
   public async save(group: EstablishmentGroupEntity): Promise<void> {
-    const { rows } = await this.client.query(
-      `SELECT * FROM establishment_groups WHERE slug = $1`,
-      [group.slug],
-    );
-    const establishmentGroupAlreadyExists = !!rows.length;
+    const pgResult = await this.#selectEstablishmentGroupBySlug(group.slug);
+    const establishmentGroupAlreadyExists = !!pgResult.rows.length;
     if (establishmentGroupAlreadyExists) {
       await this.#clearExistingSiretsForGroup(group.slug);
       await this.#insertEstablishmentGroupSirets(group);
     } else {
-      await this.client.query(
-        `
-            INSERT INTO establishment_groups (slug, name) VALUES ($1, $2)
-        `,
-        [group.slug, group.name],
-      );
+      await this.#insertEstablishmentGroup(group);
       await this.#insertEstablishmentGroupSirets(group);
     }
   }
 
+  async #insertEstablishmentGroup(group: EstablishmentGroupEntity) {
+    const query = `
+      INSERT INTO establishment_groups (
+        slug, name
+      ) VALUES (
+        $1, $2
+      )
+    `;
+    await executeKyselyRawSqlQuery(this.transaction, query, [
+      group.slug,
+      group.name,
+    ]);
+  }
+
+  #selectEstablishmentGroupBySlug(slug: EstablishmentGroupSlug) {
+    const query = `
+      SELECT * 
+      FROM establishment_groups 
+      WHERE slug = $1
+    `;
+    return executeKyselyRawSqlQuery(this.transaction, query, [slug]);
+  }
+
   async #insertEstablishmentGroupSirets(group: EstablishmentGroupEntity) {
     if (!group.sirets.length) return;
+    const query = `
+      INSERT INTO establishment_groups__sirets (
+        group_slug, siret
+      ) VALUES %L
+    `;
     const groupAndSiretPairs: [string, SiretDto][] = group.sirets.map(
       (siret) => [group.slug, siret],
     );
 
-    await this.client.query(
-      format(
-        `INSERT INTO establishment_groups__sirets (group_slug, siret) VALUES %L`,
-        groupAndSiretPairs,
-      ),
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      format(query, groupAndSiretPairs),
     );
   }
 
   async #clearExistingSiretsForGroup(groupSlug: EstablishmentGroupSlug) {
-    await this.client.query(
-      `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
-      [groupSlug],
-    );
+    const query = `
+      DELETE
+      FROM establishment_groups__sirets
+      WHERE group_slug = $1
+    `;
+    await executeKyselyRawSqlQuery(this.transaction, query, [groupSlug]);
   }
 }

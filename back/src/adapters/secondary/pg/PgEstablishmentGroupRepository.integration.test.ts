@@ -41,11 +41,12 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   beforeEach(async () => {
-    pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(client);
+    const db = new Kysely<ImmersionDatabase>({
+      dialect: new PostgresDialect({ pool }),
+    });
+    pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      new Kysely<ImmersionDatabase>({
-        dialect: new PostgresDialect({ pool }),
-      }),
+      db,
     );
     await client.query("DELETE FROM establishment_groups__sirets");
     await client.query("DELETE FROM establishment_groups");
