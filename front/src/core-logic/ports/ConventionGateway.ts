@@ -1,15 +1,16 @@
 import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  BackOfficeJwt,
   ConventionDto,
   ConventionId,
-  ConventionMagicLinkJwt,
   ConventionReadDto,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
 } from "shared";
-import { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
+import {
+  ConventionJwt,
+  FetchConventionRequestedPayload,
+} from "../domain/convention/convention.slice";
 
 export interface ConventionGateway {
   retrieveFromToken$(
@@ -25,7 +26,7 @@ export interface ConventionGateway {
   updateConventionStatus$(
     params: UpdateConventionStatusRequestDto,
     conventionId: ConventionId,
-    jwt: ConventionMagicLinkJwt | BackOfficeJwt,
+    jwt: ConventionJwt,
   ): Observable<void>;
   signConvention$(jwt: string): Observable<void>;
   shareConventionLinkByEmail(

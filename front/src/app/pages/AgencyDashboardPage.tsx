@@ -11,6 +11,7 @@ import { Loader } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
@@ -36,7 +37,12 @@ export const AgencyDashboardPage = () => {
     {
       label: "Tableau de bord agence",
       content: (
-        <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+        <>
+          <ManageConventionFormSection
+            routeNameToRedirectTo={"manageConventionAdmin"}
+          />
+          <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+        </>
       ),
     },
     ...(conventionErrorUrl

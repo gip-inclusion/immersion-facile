@@ -6,6 +6,7 @@ import {
   ConventionId,
   ConventionMagicLinkJwt,
   ConventionReadDto,
+  InclusionConnectJwt,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -70,14 +71,19 @@ export const initialConventionState: ConventionState = {
   currentSignatoryRole: null,
 };
 
+export type ConventionJwt =
+  | ConventionMagicLinkJwt
+  | BackOfficeJwt
+  | InclusionConnectJwt;
+
 export type FetchConventionRequestedPayload = {
-  jwt: ConventionMagicLinkJwt | BackOfficeJwt;
+  jwt: ConventionJwt;
   conventionId: ConventionId;
 };
 
 type StatusChangePayload = {
   feedbackKind: ConventionFeedbackKind;
-  jwt: ConventionMagicLinkJwt | BackOfficeJwt;
+  jwt: ConventionJwt;
   conventionId: ConventionId;
   updateStatusParams: UpdateConventionStatusRequestDto;
 };
