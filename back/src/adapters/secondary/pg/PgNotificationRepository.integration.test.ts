@@ -1,5 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import {
+  EmailAttachment,
   EmailNotification,
   expectToEqual,
   SmsNotification,
@@ -275,12 +276,70 @@ describe("PgNotificationRepository", () => {
       });
     });
   });
+
+  describe("deleteAllAttachements", () => {
+    it("remove all the attachment content, but keeps the metadata (attachement exited, name of file)", async () => {
+      const { emailNotification } = createTemplatedEmailAndNotification({
+        recipients: ["bob@mail.com"],
+        sender: {
+          email: "recette@immersion-facile.beta.gouv.fr",
+          name: "Recette Immersion Facile",
+        },
+        cc: [],
+        attachments: [
+          { name: "myFile.pdf", content: "myFile content as base64" },
+        ],
+      });
+
+      await pgNotificationRepository.save(emailNotification);
+
+      const { emailNotification: emailNotificationWithUrlAttachment } =
+        createTemplatedEmailAndNotification({
+          id: "33333333-3333-4444-3333-333333333333",
+          recipients: ["bob@mail.com"],
+          sender: {
+            email: "recette@immersion-facile.beta.gouv.fr",
+            name: "Recette Immersion Facile",
+          },
+          cc: [],
+          attachments: [{ url: "www.truc.com" }],
+        });
+
+      await pgNotificationRepository.save(emailNotificationWithUrlAttachment);
+
+      const numberOfUpdatedRows =
+        await pgNotificationRepository.deleteAllEmailAttachements();
+
+      expect(numberOfUpdatedRows).toBe(1);
+
+      expectToEqual(await pgNotificationRepository.getLastNotifications(), {
+        sms: [],
+        emails: [
+          {
+            ...emailNotification,
+            templatedContent: {
+              ...emailNotification.templatedContent,
+              attachments: [
+                {
+                  ...emailNotification.templatedContent.attachments![0]!,
+                  content: "deleted-content",
+                },
+              ],
+            },
+          },
+          emailNotificationWithUrlAttachment,
+        ],
+      });
+    });
+  });
 });
 
 const createTemplatedEmailAndNotification = ({
   recipients,
   cc,
   sender,
+  attachments,
+  id,
 }: {
   recipients: string[];
   cc?: string[];
@@ -288,6 +347,8 @@ const createTemplatedEmailAndNotification = ({
     email: string;
     name: string;
   };
+  attachments?: EmailAttachment[];
+  id?: string;
 }) => {
   const email: TemplatedEmail = {
     kind: "AGENCY_WAS_ACTIVATED",
@@ -295,10 +356,11 @@ const createTemplatedEmailAndNotification = ({
     sender,
     cc,
     params: { agencyName: "My agency", agencyLogoUrl: "https://my-logo.com" },
+    attachments,
   };
 
   const emailNotification: Notification = {
-    id: "22222222-2222-4444-2222-222222222222",
+    id: id ?? "22222222-2222-4444-2222-222222222222",
     kind: "email",
     createdAt: new Date("2023-01-01").toISOString(),
     followedIds: { agencyId: "cccccccc-1111-4111-1111-cccccccccccc" },

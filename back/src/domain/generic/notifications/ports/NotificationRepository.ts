@@ -26,4 +26,5 @@ export interface NotificationRepository {
   getEmailsByFilters: (
     filters?: EmailNotificationFilters,
   ) => Promise<EmailNotification[]>;
+  deleteAllEmailAttachements: () => Promise<number>;
 }
