@@ -1,5 +1,5 @@
-import { ColumnType, CompiledQuery, Kysely } from "kysely";
-import { QueryResultRow } from "pg";
+import { ColumnType, CompiledQuery, Kysely, PostgresDialect } from "kysely";
+import { Pool, QueryResultRow } from "pg";
 
 export interface ImmersionDatabase {
   discussions: DiscussionsTable;
@@ -62,3 +62,8 @@ export const executeKyselyRawSqlQuery = <T extends QueryResultRow>(
   sqlQuery: string,
   values?: any[],
 ) => transaction.executeQuery<T>(CompiledQuery.raw(sqlQuery, values));
+
+export const makeKyselyDb = (pool: Pool): Kysely<ImmersionDatabase> =>
+  new Kysely<ImmersionDatabase>({
+    dialect: new PostgresDialect({ pool }),
+  });
