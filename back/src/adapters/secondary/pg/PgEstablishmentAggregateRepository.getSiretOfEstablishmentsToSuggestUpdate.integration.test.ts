@@ -1,9 +1,11 @@
 import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ImmersionDatabase } from "./sql/database";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 import { PgOutboxRepository } from "./PgOutboxRepository";
@@ -31,7 +33,9 @@ describe("PgScriptsQueries", () => {
     pgOutboxRepository = new PgOutboxRepository(client);
     pgNotificationRepository = new PgNotificationRepository(client);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      client,
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
     );
   });
 

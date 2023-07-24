@@ -1,10 +1,11 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import format from "pg-format";
 import { equals, keys } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
   GeoPositionDto,
+  ImmersionContactInEstablishmentId,
   RomeCode,
   SearchResultDto,
   SearchSortedBy,
@@ -28,6 +29,7 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../primary/helpers/httpErrors";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
@@ -35,7 +37,41 @@ const logger = createLogger(__filename);
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
+
+  private async _updateContactFromAggregates(
+    existingAggregate: EstablishmentAggregate & {
+      contact: ContactEntity;
+    },
+    updatedAggregate: EstablishmentAggregate,
+  ) {
+    if (
+      !!updatedAggregate.contact &&
+      !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
+    ) {
+      const query = `
+          UPDATE immersion_contacts
+          SET lastname     = $1,
+              firstname    = $2,
+              email        = $3,
+              job          = $4,
+              phone        = $5,
+              contact_mode = $6,
+              copy_emails  = $7
+          WHERE uuid = $8
+      `;
+      await executeKyselyRawSqlQuery(this.transaction, query, [
+        updatedAggregate.contact.lastName,
+        updatedAggregate.contact.firstName,
+        updatedAggregate.contact.email,
+        updatedAggregate.contact.job,
+        updatedAggregate.contact.phone,
+        updatedAggregate.contact.contactMethod,
+        JSON.stringify(updatedAggregate.contact.copyEmails),
+        existingAggregate.contact.id,
+      ]);
+    }
+  }
 
   public async createImmersionOffersToEstablishments(
     offersWithSiret: OfferWithSiret[],
@@ -52,12 +88,11 @@ export class PgEstablishmentAggregateRepository
       ],
     );
     const query = format(
-      `INSERT INTO immersion_offers (
-          rome_code, appellation_code, siret, score, created_at
-        ) VALUES %L`,
+      `INSERT INTO immersion_offers (rome_code, appellation_code, siret, score, created_at)
+       VALUES %L`,
       immersionOfferFields,
     );
-    await this.client.query(query);
+    await executeKyselyRawSqlQuery(this.transaction, query);
   }
 
   public async delete(siret: string): Promise<void> {
@@ -66,7 +101,8 @@ export class PgEstablishmentAggregateRepository
 
       await this.#deleteEstablishmentContactBySiret(siret);
 
-      const { rowCount } = await this.client.query(
+      const pgResult = await executeKyselyRawSqlQuery(
+        this.transaction,
         `
         DELETE
         FROM establishments
@@ -74,7 +110,7 @@ export class PgEstablishmentAggregateRepository
       `,
         [siret],
       );
-      if (rowCount !== 1)
+      if (Number(pgResult.numAffectedRows) !== 1)
         throw new NotFoundError(
           `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
         );
@@ -91,95 +127,84 @@ export class PgEstablishmentAggregateRepository
   public async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
-    const aggregateWithStringDates = (
-      await this.client.query(
-        `WITH unique_establishments__immersion_contacts AS (
-          SELECT 
-            DISTINCT ON (establishment_siret) establishment_siret, 
-            contact_uuid 
-          FROM 
-            establishments__immersion_contacts
-        ), 
-        filtered_immersion_offers AS (
-          SELECT 
-            siret, 
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
-                'romeCode', rome_code, 
-                'score', score, 
-                'appellationCode', appellation_code::text, 
-                'appellationLabel', pad.libelle_appellation_long::text,
-                'createdAt', 
-                to_char(
-                  created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                )
-              )
-              ORDER BY appellation_code
-            ) as immersionOffers 
-          FROM 
-            immersion_offers
-          LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.appellation_code
-          WHERE 
-            siret = $1 
-          GROUP BY 
-            siret
-        ) 
-        SELECT 
-          JSON_STRIP_NULLS(
-            JSON_BUILD_OBJECT(
-              'establishment', JSON_BUILD_OBJECT(
-                'siret', e.siret, 
-                'name', e.name, 
-                'customizedName', e.customized_name, 
-                'website', e.website, 
-                'additionalInformation', e.additional_information, 
-                'address', JSON_BUILD_OBJECT(
-                  'streetNumberAndAddress', e.street_number_and_address, 
-                  'postcode', e.post_code,
-                  'city', e.city,
-                  'departmentCode', e.department_code
-                ),  
-                'sourceProvider', e.source_provider, 
-                'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-                'nafDto', JSON_BUILD_OBJECT(
-                  'code', e.naf_code, 
-                  'nomenclature', e.naf_nomenclature
-                ), 
-                'numberEmployeesRange', e.number_employees, 
-                'updatedAt', to_char(
-                  e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'createdAt', to_char(
+    const query = `WITH unique_establishments__immersion_contacts AS (SELECT DISTINCT
+                   ON (establishment_siret) establishment_siret,
+                       contact_uuid
+                   FROM
+                       establishments__immersion_contacts
+                       ), filtered_immersion_offers AS (
+                   SELECT
+                       siret, JSON_AGG(
+                       JSON_BUILD_OBJECT(
+                       'romeCode', rome_code, 'score', score, 'appellationCode', appellation_code::text, 'appellationLabel', pad.libelle_appellation_long::text, 'createdAt', to_char(
+                       created_at:: timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                       )
+                       )
+                       ORDER BY appellation_code
+                       ) as immersionOffers
+                   FROM
+                       immersion_offers
+                       LEFT JOIN public_appellations_data AS pad
+                   ON pad.ogr_appellation = immersion_offers.appellation_code
+                   WHERE
+                       siret = $1
+                   GROUP BY
+                       siret
+                       )
+    SELECT JSON_STRIP_NULLS(
+                   JSON_BUILD_OBJECT(
+                           'establishment', JSON_BUILD_OBJECT(
+                           'siret', e.siret,
+                           'name', e.name,
+                           'customizedName', e.customized_name,
+                           'website', e.website,
+                           'additionalInformation', e.additional_information,
+                           'address', JSON_BUILD_OBJECT(
+                                   'streetNumberAndAddress', e.street_number_and_address,
+                                   'postcode', e.post_code,
+                                   'city', e.city,
+                                   'departmentCode', e.department_code
+                               ),
+                           'sourceProvider', e.source_provider,
+                           'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat),
+                           'nafDto', JSON_BUILD_OBJECT(
+                                   'code', e.naf_code,
+                                   'nomenclature', e.naf_nomenclature
+                               ),
+                           'numberEmployeesRange', e.number_employees,
+                           'updatedAt', to_char(
+                                   e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                               ),
+                           'createdAt', to_char(
                   e.created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
                 'lastInseeCheckDate', to_char(
-                  e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'isOpen', e.is_open, 
-                'isSearchable', e.is_searchable, 
-                'isCommited', e.is_commited,
-                'fitForDisabledWorkers', e.fit_for_disabled_workers,
-                'maxContactsPerWeek', e.max_contacts_per_week
-              ), 
-              'immersionOffers', io.immersionOffers, 
-              'contact', JSON_BUILD_OBJECT(
-                'id', ic.uuid, 'firstName', ic.firstname, 
-                'lastName', ic.lastname, 'job', ic.job, 
-                'contactMethod', ic.contact_mode, 
-                'phone', ic.phone, 'email', ic.email, 
-                'copyEmails', ic.copy_emails
-              )
-            )
-          ) AS aggregate 
-        FROM 
-          filtered_immersion_offers AS io 
-          LEFT JOIN establishments AS e ON e.siret = io.siret 
-          LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret 
-          LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid;
-        
-        `,
-        [siret],
-      )
+                                   e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                               ),
+                           'isOpen', e.is_open,
+                           'isSearchable', e.is_searchable,
+                           'isCommited', e.is_commited,
+                           'fitForDisabledWorkers', e.fit_for_disabled_workers,
+                           'maxContactsPerWeek', e.max_contacts_per_week
+                       ),
+                           'immersionOffers', io.immersionOffers,
+                           'contact', JSON_BUILD_OBJECT(
+                                   'id', ic.uuid, 'firstName', ic.firstname,
+                                   'lastName', ic.lastname, 'job', ic.job,
+                                   'contactMethod', ic.contact_mode,
+                                   'phone', ic.phone, 'email', ic.email,
+                                   'copyEmails', ic.copy_emails
+                               )
+                       )
+               ) AS aggregate
+    FROM filtered_immersion_offers AS io
+             LEFT JOIN establishments AS e ON e.siret = io.siret
+             LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret
+             LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid;
+
+    `;
+    const aggregateWithStringDates = (
+      await executeKyselyRawSqlQuery(this.transaction, query, [siret])
     ).rows[0]?.aggregate;
     // Convert date fields from string to Date
     return (
@@ -212,14 +237,17 @@ export class PgEstablishmentAggregateRepository
   public async getOffersAsAppellationDtoEstablishment(
     siret: string,
   ): Promise<AppellationAndRomeDto[]> {
-    const pgResult = await this.client.query(
-      `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
-       FROM immersion_offers io
-       JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
-       LEFT JOIN public_appellations_data pad on io.appellation_code = pad.ogr_appellation
-       WHERE siret = $1;`,
-      [siret],
-    );
+    const query = `
+        SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
+        FROM immersion_offers io
+                 JOIN public_romes_data prd ON prd.code_rome = io.rome_code
+                 LEFT JOIN public_appellations_data pad
+        on io.appellation_code = pad.ogr_appellation
+        WHERE siret = $1;
+    `;
+    const pgResult = await executeKyselyRawSqlQuery(this.transaction, query, [
+      siret,
+    ]);
     return pgResult.rows.map((row: any) => ({
       romeCode: row.rome_code,
       appellationCode:
@@ -233,15 +261,23 @@ export class PgEstablishmentAggregateRepository
     siret: SiretDto,
     appellationCode: AppellationCode,
   ): Promise<SearchResultDto | undefined> {
+    const subQuery = `
+        SELECT siret,
+               io.rome_code,
+               prd.libelle_rome          as rome_label,
+               ${buildAppellationsArray} AS appellations,
+               null                      AS distance_m,
+               1                         AS row_number
+        FROM immersion_offers AS io
+                 LEFT JOIN public_appellations_data AS pad
+        ON pad.ogr_appellation = io.appellation_code
+            LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code
+        WHERE io.siret = $1
+          AND io.appellation_code = $2
+        GROUP BY (siret, io.rome_code, prd.libelle_rome)`;
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
-        FROM immersion_offers AS io
-        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-        WHERE io.siret = $1 AND io.appellation_code = $2
-        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
+        subQuery,
         [siret, appellationCode],
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
@@ -254,15 +290,23 @@ export class PgEstablishmentAggregateRepository
     siret: SiretDto,
     rome: RomeCode,
   ): Promise<SearchResultDto | undefined> {
+    const subQuery = `
+        SELECT siret,
+               io.rome_code,
+               prd.libelle_rome          as rome_label,
+               ${buildAppellationsArray} AS appellations,
+               null                      AS distance_m,
+               1                         AS row_number
+        FROM immersion_offers AS io
+                 LEFT JOIN public_appellations_data AS pad
+        ON pad.ogr_appellation = io.appellation_code
+            LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code
+        WHERE io.siret = $1
+          AND io.rome_code = $2
+        GROUP BY (siret, io.rome_code, prd.libelle_rome)`;
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
-        FROM immersion_offers AS io
-        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-        WHERE io.siret = $1 AND io.rome_code = $2
-        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
+        subQuery,
         [siret, rome],
       );
 
@@ -278,27 +322,22 @@ export class PgEstablishmentAggregateRepository
   public async getSiretOfEstablishmentsToSuggestUpdate(
     before: Date,
   ): Promise<SiretDto[]> {
-    const response = await this.client.query(
-      `SELECT DISTINCT e.siret 
-       FROM establishments e
-       WHERE e.update_date < $1 
-       AND NOT EXISTS (
-          SELECT 1 
-          FROM outbox o
-          WHERE o.topic='FormEstablishmentEditLinkSent' 
-          AND o.occurred_at > $1
-          AND o.payload ->> 'siret' = e.siret
-       )
-       AND NOT EXISTS (
-          SELECT 1 
-          FROM notifications_email n
-          WHERE n.email_kind='SUGGEST_EDIT_FORM_ESTABLISHMENT' 
-          AND n.created_at > $1
-          AND n.establishment_siret = e.siret
-       )`,
-      [before],
-    );
-
+    const query = `SELECT DISTINCT e.siret
+                   FROM establishments e
+                   WHERE e.update_date < $1
+                     AND NOT EXISTS (SELECT 1
+                                     FROM outbox o
+                                     WHERE o.topic = 'FormEstablishmentEditLinkSent'
+                                       AND o.occurred_at > $1
+                                       AND o.payload ->> 'siret' = e.siret)
+                     AND NOT EXISTS (SELECT 1
+                                     FROM notifications_email n
+                                     WHERE n.email_kind = 'SUGGEST_EDIT_FORM_ESTABLISHMENT'
+                                       AND n.created_at > $1
+                                       AND n.establishment_siret = e.siret)`;
+    const response = await executeKyselyRawSqlQuery(this.transaction, query, [
+      before,
+    ]);
     return response.rows.map(({ siret }) => siret);
   }
 
@@ -311,15 +350,17 @@ export class PgEstablishmentAggregateRepository
         "Querying getSiretsOfEstablishmentsNotCheckedAtInseeSince, maxResults must be <= 1000",
       );
 
-    const result = await this.client.query(
-      `
+    const query = `
         SELECT siret
         FROM establishments
-        WHERE last_insee_check_date IS NULL OR last_insee_check_date < $1
-        LIMIT $2
-    `,
-      [checkDate.toISOString(), maxResults],
-    );
+        WHERE last_insee_check_date IS NULL
+           OR last_insee_check_date < $1
+            LIMIT $2
+    `;
+    const result = await executeKyselyRawSqlQuery(this.transaction, query, [
+      checkDate.toISOString(),
+      maxResults,
+    ]);
 
     return result.rows.map(({ siret }) => siret);
   }
@@ -327,18 +368,26 @@ export class PgEstablishmentAggregateRepository
   public async getSiretsOfEstablishmentsWithRomeCode(
     rome: string,
   ): Promise<string[]> {
-    const pgResult = await this.client.query(
-      `SELECT siret FROM immersion_offers WHERE rome_code = $1`,
-      [rome],
-    );
+    const query = `
+        SELECT siret
+        FROM immersion_offers
+        WHERE rome_code = $1
+    `;
+    const pgResult = await executeKyselyRawSqlQuery(this.transaction, query, [
+      rome,
+    ]);
     return pgResult.rows.map((row) => row.siret);
   }
 
   public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
-    const pgResult = await this.client.query(
-      `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);`,
-      [siret],
-    );
+    const query = `
+        SELECT EXISTS (SELECT 1
+                       FROM establishments
+                       WHERE siret = $1);
+    `;
+    const pgResult = await executeKyselyRawSqlQuery(this.transaction, query, [
+      siret,
+    ]);
     return pgResult.rows[0].exists;
   }
 
@@ -365,27 +414,28 @@ export class PgEstablishmentAggregateRepository
     since: Date,
   ): Promise<number> {
     const querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek = `
-      SELECT e.siret
-      FROM establishments e
-      LEFT JOIN discussions d ON e.siret = d.siret
-      WHERE is_searchable = false
-        AND max_contacts_per_week > 0
-        AND d.created_at > $1
-      GROUP BY e.siret HAVING COUNT(*) >= e.max_contacts_per_week
-      `;
+        SELECT e.siret
+        FROM establishments e
+                 LEFT JOIN discussions d ON e.siret = d.siret
+        WHERE is_searchable = false
+          AND max_contacts_per_week > 0
+          AND d.created_at > $1
+        GROUP BY e.siret
+        HAVING COUNT(*) >= e.max_contacts_per_week
+    `;
 
-    const result = await this.client.query(
-      `
+    const query = `
         UPDATE establishments
-        SET is_searchable = true 
+        SET is_searchable = true
         WHERE is_searchable = false
           AND max_contacts_per_week > 0
           AND siret NOT IN (${querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek})
-        `,
-      [since],
-    );
+    `;
+    const result = await executeKyselyRawSqlQuery(this.transaction, query, [
+      since,
+    ]);
 
-    return result.rowCount;
+    return result.numAffectedRows ? Number(result.numAffectedRows) : 0;
   }
 
   public async searchImmersionResults({
@@ -400,26 +450,28 @@ export class PgEstablishmentAggregateRepository
     );
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
-      `WITH active_establishments_within_area AS 
-        (SELECT siret, fit_for_disabled_workers, gps
-         FROM establishments 
-         WHERE is_open 
-         AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
-        matching_offers AS (
-          SELECT 
-            aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-            ${buildAppellationsArray} AS appellations,
-            MAX(created_at) AS max_created_at, 
-            fit_for_disabled_workers
-          FROM active_establishments_within_area aewa 
-            LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-            LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
-            LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-            ${romeCode ? "WHERE rome_code = %1$L" : ""}
-            GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
-          )
-        SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
-        LIMIT $3`,
+      `WITH active_establishments_within_area AS
+                (SELECT siret, fit_for_disabled_workers, gps
+                 FROM establishments
+                 WHERE is_open
+                   AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
+            matching_offers AS (SELECT aewa.siret,
+                                       rome_code,
+                                       prd.libelle_rome                           AS rome_label,
+                                       ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+                                       ${buildAppellationsArray}                  AS appellations,
+                                       MAX(created_at)                            AS max_created_at,
+                                       fit_for_disabled_workers
+                                FROM active_establishments_within_area aewa
+                                         LEFT JOIN immersion_offers io ON io.siret = aewa.siret
+                                         LEFT JOIN public_appellations_data pad
+       ON io.appellation_code = pad.ogr_appellation
+           LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
+           ${romeCode ? "WHERE rome_code = %1$L" : ""}
+       GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
+           )
+      SELECT *, (ROW_NUMBER() OVER (${sortExpression})) ::integer as row_number
+      from matching_offers ${sortExpression} LIMIT $3`,
       romeCode,
     ); // Formats optional litterals %1$L
     const immersionSearchResultDtos =
@@ -444,62 +496,52 @@ export class PgEstablishmentAggregateRepository
     },
   ): Promise<void> {
     const updateQuery = `
-          UPDATE establishments
-                   SET update_date = %1$L
-                   ${
-                     propertiesToUpdate.isOpen !== undefined
-                       ? ", is_open=%2$L"
-                       : ""
-                   }
-                   ${propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
-                   ${propertiesToUpdate.nafDto ? ", naf_nomenclature=%4$L" : ""}
-                   ${
-                     propertiesToUpdate.numberEmployeesRange
-                       ? ", number_employees=%5$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
-                       ? ", street_number_and_address=%6$L, post_code=%7$L, city=%8$L, department_code=%9$L, gps=ST_GeographyFromText(%10$L), lon=%11$L, lat=%12$L"
-                       : ""
-                   }
-                   ${propertiesToUpdate.name ? ", name=%13$L" : ""}
-                   ${
-                     propertiesToUpdate.customizedName
-                       ? ", customized_name=%14$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.isSearchable !== undefined
-                       ? ", is_searchable=%15$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.isCommited !== undefined
-                       ? ", is_commited=%16$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.website !== undefined
-                       ? ", website=%17$L"
-                       : ""
-                   }
-                  ${
-                    propertiesToUpdate.additionalInformation !== undefined
-                      ? ", additional_information=%18$L"
-                      : ""
-                  }
-                  ${
-                    propertiesToUpdate.fitForDisabledWorkers !== undefined
-                      ? ", fit_for_disabled_workers=%19$L"
-                      : ""
-                  }
-                  ${
-                    propertiesToUpdate.maxContactsPerWeek !== undefined
-                      ? ", max_contacts_per_week=%20$L"
-                      : ""
-                  }
-                   WHERE siret=%21$L;`;
+        UPDATE establishments
+        SET update_date = %1$L
+            ${propertiesToUpdate.isOpen !== undefined ? ", is_open=%2$L" : ""}
+            ${propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
+            ${propertiesToUpdate.nafDto ? ", naf_nomenclature=%4$L" : ""}
+            ${
+              propertiesToUpdate.numberEmployeesRange
+                ? ", number_employees=%5$L"
+                : ""
+            }
+            ${
+              propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
+                ? ", street_number_and_address=%6$L, post_code=%7$L, city=%8$L, department_code=%9$L, gps=ST_GeographyFromText(%10$L), lon=%11$L, lat=%12$L"
+                : ""
+            }
+            ${propertiesToUpdate.name ? ", name=%13$L" : ""}
+            ${
+              propertiesToUpdate.customizedName ? ", customized_name=%14$L" : ""
+            }
+            ${
+              propertiesToUpdate.isSearchable !== undefined
+                ? ", is_searchable=%15$L"
+                : ""
+            }
+            ${
+              propertiesToUpdate.isCommited !== undefined
+                ? ", is_commited=%16$L"
+                : ""
+            }
+            ${propertiesToUpdate.website !== undefined ? ", website=%17$L" : ""}
+            ${
+              propertiesToUpdate.additionalInformation !== undefined
+                ? ", additional_information=%18$L"
+                : ""
+            }
+            ${
+              propertiesToUpdate.fitForDisabledWorkers !== undefined
+                ? ", fit_for_disabled_workers=%19$L"
+                : ""
+            }
+            ${
+              propertiesToUpdate.maxContactsPerWeek !== undefined
+                ? ", max_contacts_per_week=%20$L"
+                : ""
+            }
+        WHERE siret=%21$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
       propertiesToUpdate.isOpen,
@@ -526,8 +568,10 @@ export class PgEstablishmentAggregateRepository
       propertiesToUpdate.maxContactsPerWeek,
       propertiesToUpdate.siret,
     ];
-    const formatedQuery = format(updateQuery, ...queryArgs);
-    await this.client.query(formatedQuery);
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      format(updateQuery, ...queryArgs),
+    );
   }
 
   public async updateEstablishmentAggregate(
@@ -580,12 +624,12 @@ export class PgEstablishmentAggregateRepository
       return format(
         `
             UPDATE establishments
-            SET last_insee_check_date = %1$L 
-              ${values?.isOpen !== undefined ? ", is_open=%3$L" : ""}
-              ${values?.nafDto ? ", naf_code=%4$L" : ""}
-              ${values?.nafDto ? ", naf_nomenclature=%5$L" : ""}
-              ${values?.name ? ", name=%6$L" : ""}
-              ${values?.numberEmployeesRange ? ", number_employees=%7$L" : ""}
+            SET last_insee_check_date = %1$L
+                ${values?.isOpen !== undefined ? ", is_open=%3$L" : ""}
+                ${values?.nafDto ? ", naf_code=%4$L" : ""}
+                ${values?.nafDto ? ", naf_nomenclature=%5$L" : ""}
+                ${values?.name ? ", name=%6$L" : ""}
+                ${values?.numberEmployeesRange ? ", number_employees=%7$L" : ""}
             WHERE siret = %2$L;`,
         inseeCheckDate.toISOString(),
         siret,
@@ -599,11 +643,12 @@ export class PgEstablishmentAggregateRepository
       );
     });
 
-    await this.client.query(queries.join("\n"));
+    await executeKyselyRawSqlQuery(this.transaction, queries.join("\n"));
   }
 
   async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       `
       DELETE
       FROM immersion_contacts
@@ -623,7 +668,8 @@ export class PgEstablishmentAggregateRepository
   ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         selectedOffersSubQuery,
       ),
@@ -678,21 +724,21 @@ export class PgEstablishmentAggregateRepository
           ON CONSTRAINT establishments_pkey
             DO UPDATE
               SET
-                name=EXCLUDED.name,
-                street_number_and_address=EXCLUDED.street_number_and_address,
-                post_code=EXCLUDED.post_code,
-                city=EXCLUDED.city,
-                department_code=EXCLUDED.department_code,
-                number_employees=EXCLUDED.number_employees,
-                naf_code=EXCLUDED.naf_code,
-                fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
-                max_contacts_per_week=EXCLUDED.max_contacts_per_week
-              `,
+                  name=EXCLUDED.name,
+              street_number_and_address=EXCLUDED.street_number_and_address,
+              post_code=EXCLUDED.post_code,
+              city=EXCLUDED.city,
+              department_code=EXCLUDED.department_code,
+              number_employees=EXCLUDED.number_employees,
+              naf_code=EXCLUDED.naf_code,
+              fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
+              max_contacts_per_week=EXCLUDED.max_contacts_per_week
+          `,
           establishmentFields,
         ),
       );
 
-      await this.client.query(query);
+      await executeKyselyRawSqlQuery(this.transaction, query);
     } catch (e: any) {
       logger.error(e, "Error inserting establishments");
       throw e;
@@ -726,25 +772,40 @@ export class PgEstablishmentAggregateRepository
     );
 
     try {
-      const insertContactsQuery = format(
-        `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
-      ) VALUES %L`,
-        contactFields,
-      );
-
-      const insertEstablishmentsContactsQuery = format(
-        `INSERT INTO establishments__immersion_contacts (
-        establishment_siret, contact_uuid) VALUES %L`,
+      await this.#insertImmersionContact(contactFields);
+      await this.#insertEstablishmentImmersionContact(
         establishmentContactFields,
       );
-
-      await this.client.query(insertContactsQuery);
-      await this.client.query(insertEstablishmentsContactsQuery);
     } catch (e: any) {
       logger.error(e, "Error inserting contacts");
       throw e;
     }
+  }
+
+  async #insertImmersionContact(contactFields: string[][]) {
+    const query = `
+        INSERT INTO immersion_contacts (uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails)
+        VALUES %L
+    `;
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      format(query, contactFields),
+    );
+  }
+
+  async #insertEstablishmentImmersionContact(
+    establishmentContactFields: (
+      | SiretDto
+      | ImmersionContactInEstablishmentId
+    )[][],
+  ) {
+    const query = `INSERT INTO establishments__immersion_contacts (establishment_siret, contact_uuid)
+                   VALUES %L`;
+
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      format(query, establishmentContactFields),
+    );
   }
 
   async #getRomeCodeFromAppellationCode(
@@ -752,10 +813,11 @@ export class PgEstablishmentAggregateRepository
   ): Promise<RomeCode | undefined> {
     if (!appellationCode) return;
 
-    const result = await this.client.query(
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT code_rome
-        from public_appellations_data
-        where ogr_appellation = $1`,
+       from public_appellations_data
+       where ogr_appellation = $1`,
       [appellationCode],
     );
 
@@ -783,12 +845,20 @@ export class PgEstablishmentAggregateRepository
         ),
     );
 
-    if (offersToAdd.length > 0)
-      await this.client.query(
+    if (offersToAdd.length > 0) {
+      const query = `
+          INSERT INTO immersion_offers (rome_code,
+                                        appellation_code,
+                                        score,
+                                        created_at,
+                                        siret)
+          VALUES %L
+      `;
+
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         format(
-          `INSERT INTO immersion_offers (
-            rome_code, appellation_code, score, created_at, siret
-          ) VALUES %L`,
+          query,
           offersToAdd.map((offerToAdd) => [
             offerToAdd.romeCode,
             offerToAdd.appellationCode,
@@ -798,6 +868,7 @@ export class PgEstablishmentAggregateRepository
           ]),
         ),
       );
+    }
 
     const offersToRemove = existingOffers.filter(
       (updatedOffer) =>
@@ -810,12 +881,22 @@ export class PgEstablishmentAggregateRepository
       .map((offer) => offer.romeCode);
 
     if (offersToRemoveByRomeCode.length > 0) {
+      const query = `
+          DELETE
+          FROM immersion_offers
+          WHERE siret = '%s'
+            AND appellation_code IS NULL
+            AND rome_code IN (%L);
+      `;
       const queryToRemoveOffersFromRome = format(
-        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code IS NULL AND rome_code IN (%L); `,
+        query,
         siret,
         offersToRemoveByRomeCode,
       );
-      await this.client.query(queryToRemoveOffersFromRome);
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        queryToRemoveOffersFromRome,
+      );
     }
 
     const offersToRemoveByRomeAppellation = offersToRemove
@@ -828,7 +909,10 @@ export class PgEstablishmentAggregateRepository
         siret,
         offersToRemoveByRomeAppellation,
       );
-      await this.client.query(queryToRemoveOffersFromAppellationCode);
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        queryToRemoveOffersFromAppellationCode,
+      );
     }
   }
 
@@ -842,8 +926,7 @@ export class PgEstablishmentAggregateRepository
       !!updatedAggregate.contact &&
       !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
     ) {
-      await this.client.query(
-        `UPDATE immersion_contacts 
+      const query = `UPDATE immersion_contacts 
        SET lastname = $1, 
             firstname = $2, 
             email = $3, 
@@ -851,18 +934,18 @@ export class PgEstablishmentAggregateRepository
             phone = $5, 
             contact_mode = $6, 
             copy_emails = $7
-       WHERE uuid = $8`,
-        [
-          updatedAggregate.contact.lastName,
-          updatedAggregate.contact.firstName,
-          updatedAggregate.contact.email,
-          updatedAggregate.contact.job,
-          updatedAggregate.contact.phone,
-          updatedAggregate.contact.contactMethod,
-          JSON.stringify(updatedAggregate.contact.copyEmails),
-          existingAggregate.contact.id,
-        ],
-      );
+       WHERE uuid = $8`;
+
+      await executeKyselyRawSqlQuery(this.transaction, query, [
+        updatedAggregate.contact.lastName,
+        updatedAggregate.contact.firstName,
+        updatedAggregate.contact.email,
+        updatedAggregate.contact.job,
+        updatedAggregate.contact.phone,
+        updatedAggregate.contact.contactMethod,
+        JSON.stringify(updatedAggregate.contact.copyEmails),
+        existingAggregate.contact.id,
+      ]);
     }
   }
 }
@@ -891,38 +974,39 @@ const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
 ) => `
-      WITH unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ), 
-           match_immersion_offer AS (${selectedOffersSubQuery})
-      SELECT 
-      row_number,
-      JSONB_BUILD_OBJECT(
-        'rome', io.rome_code, 
-        'siret', io.siret, 
-        'distance_m', io.distance_m, 
-        'isSearchable',e.is_searchable,
-        'name', e.name, 
-        'website', e.website, 
-        'additionalInformation', e.additional_information, 
-        'customizedName', e.customized_name, 
-        'fitForDisabledWorkers', e.fit_for_disabled_workers,
-        'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-        'romeLabel', io.rome_label,
-        'appellations',  io.appellations,
-        'naf', e.naf_code,
-        'nafLabel', public_naf_classes_2008.class_label,
-        'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
-                                      'postcode', e.post_code,
-                                      'city', e.city,
-                                      'departmentCode', e.department_code),
-        'contactMode', ic.contact_mode,
-        'numberOfEmployeeRange', e.number_employees 
-      ) AS search_immersion_result
-      FROM match_immersion_offer AS io 
-      LEFT JOIN establishments AS e ON e.siret = io.siret  
-      LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
-      LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
-      ORDER BY row_number ASC; `;
+    WITH unique_establishments__immersion_contacts AS (SELECT DISTINCT
+    ON (establishment_siret) establishment_siret, contact_uuid
+    FROM establishments__immersion_contacts ), match_immersion_offer AS (${selectedOffersSubQuery})
+    SELECT row_number,
+           JSONB_BUILD_OBJECT(
+                   'rome', io.rome_code,
+                   'siret', io.siret,
+                   'distance_m', io.distance_m,
+                   'isSearchable', e.is_searchable,
+                   'name', e.name,
+                   'website', e.website,
+                   'additionalInformation', e.additional_information,
+                   'customizedName', e.customized_name,
+                   'fitForDisabledWorkers', e.fit_for_disabled_workers,
+                   'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat),
+                   'romeLabel', io.rome_label,
+                   'appellations', io.appellations,
+                   'naf', e.naf_code,
+                   'nafLabel', public_naf_classes_2008.class_label,
+                   'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address,
+                                                'postcode', e.post_code,
+                                                'city', e.city,
+                                                'departmentCode', e.department_code),
+                   'contactMode', ic.contact_mode,
+                   'numberOfEmployeeRange', e.number_employees
+               ) AS search_immersion_result
+    FROM match_immersion_offer AS io
+             LEFT JOIN establishments AS e ON e.siret = io.siret
+             LEFT JOIN public_naf_classes_2008
+                       ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code, '(\\d\\d)(\\d\\d).', '\\1.\\2'))
+             LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
+             LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
+    ORDER BY row_number ASC; `;
 
 const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
   // Only compare romeCode and appellationCode

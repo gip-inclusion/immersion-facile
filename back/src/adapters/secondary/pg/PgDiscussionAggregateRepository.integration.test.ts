@@ -49,7 +49,7 @@ describe("PgDiscussionAggregateRepository", () => {
     await client.query("DELETE FROM exchanges");
 
     pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(db);
-    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(client);
+    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
   });
 
   afterAll(async () => {

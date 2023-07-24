@@ -1,7 +1,9 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
 import { MarkEstablishmentsAsSearchableScript } from "../../../domain/immersionOffer/useCases/MarkEstablishmentsAsSearchableScript";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
+import { ImmersionDatabase } from "../../secondary/pg/sql/database";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -13,10 +15,14 @@ const startScript = async () => {
   const pool = new Pool({
     connectionString: dbUrl,
   });
-  const client = await pool.connect();
+  //const client = await pool.connect();
 
   const establishmentAggregateRepository =
-    new PgEstablishmentAggregateRepository(client);
+    new PgEstablishmentAggregateRepository(
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
+    );
 
   const markAsSearchableScript = new MarkEstablishmentsAsSearchableScript(
     establishmentAggregateRepository,

@@ -32,8 +32,8 @@ import {
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsWithInseeDataParams } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { ImmersionDatabase } from "./sql/database";
 import { NotFoundError } from "../../primary/helpers/httpErrors";
+import { ImmersionDatabase } from "./sql/database";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
@@ -90,7 +90,9 @@ describe("PgEstablishmentAggregateRepository", () => {
     await client.query("DELETE FROM establishments");
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      client,
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
     );
   });
 

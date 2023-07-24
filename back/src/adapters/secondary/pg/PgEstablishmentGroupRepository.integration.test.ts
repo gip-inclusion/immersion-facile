@@ -1,3 +1,4 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   AppellationDto,
@@ -10,6 +11,7 @@ import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
+import { ImmersionDatabase } from "./sql/database";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
 
@@ -41,7 +43,9 @@ describe("PgEstablishmentGroupRepository", () => {
   beforeEach(async () => {
     pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(client);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      client,
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
     );
     await client.query("DELETE FROM establishment_groups__sirets");
     await client.query("DELETE FROM establishment_groups");

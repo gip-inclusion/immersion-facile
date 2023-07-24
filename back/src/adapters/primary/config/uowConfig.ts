@@ -121,7 +121,7 @@ export const createPgUow = (
       transaction,
     ),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
-      client,
+      transaction,
     ),
     establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
     errorRepository: new PgErrorRepository(transaction),

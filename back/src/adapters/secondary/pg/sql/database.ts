@@ -60,5 +60,5 @@ interface Exchanges {
 export const executeKyselyRawSqlQuery = <T extends QueryResultRow>(
   transaction: Kysely<ImmersionDatabase>,
   sqlQuery: string,
-  values: any[],
+  values?: any[],
 ) => transaction.executeQuery<T>(CompiledQuery.raw(sqlQuery, values));
