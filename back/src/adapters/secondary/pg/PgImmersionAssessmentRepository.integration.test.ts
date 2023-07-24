@@ -1,4 +1,4 @@
-import { Kysely, PostgresDialect } from "kysely";
+import { Kysely } from "kysely";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -9,7 +9,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
-import { ImmersionDatabase } from "./sql/database";
+import { ImmersionDatabase, makeKyselyDb } from "./sql/database";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "./PgImmersionAssessmentRepository";
@@ -29,15 +29,14 @@ describe("PgImmersionAssessmentRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let immersionAssessmentRepository: PgImmersionAssessmentRepository;
+  let db: Kysely<ImmersionDatabase>;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+    db = makeKyselyDb(pool);
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    const db = new Kysely<ImmersionDatabase>({
-      dialect: new PostgresDialect({ pool }),
-    });
     const agencyRepository = new PgAgencyRepository(db);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(db);
@@ -51,7 +50,7 @@ describe("PgImmersionAssessmentRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_assessments");
-    immersionAssessmentRepository = new PgImmersionAssessmentRepository(client);
+    immersionAssessmentRepository = new PgImmersionAssessmentRepository(db);
   });
 
   describe("save", () => {

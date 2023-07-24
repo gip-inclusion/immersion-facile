@@ -129,7 +129,9 @@ export const createPgUow = (
     errorRepository: new PgErrorRepository(transaction),
     featureFlagRepository: new PgFeatureFlagRepository(transaction),
     formEstablishmentRepository: new PgFormEstablishmentRepository(transaction),
-    immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
+    immersionAssessmentRepository: new PgImmersionAssessmentRepository(
+      transaction,
+    ),
     inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
       client,
     ),
