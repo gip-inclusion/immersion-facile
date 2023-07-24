@@ -1,4 +1,5 @@
 import {
+  BackOfficeJwt,
   expectObjectsToMatch,
   expectToEqual,
   FormEstablishmentDto,
@@ -370,6 +371,76 @@ describe("Establishment", () => {
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
       expectToEqual(establishmentSelectors.feedback(store.getState()), {
         kind: "submitErrored",
+      });
+    });
+  });
+
+  describe("establishment deletion", () => {
+    const backOfficeJwt: BackOfficeJwt = "backoffice-jwt";
+
+    it("should delete requested establishment", () => {
+      expectStoreToMatchInitialState();
+
+      store.dispatch(
+        establishmentSlice.actions.establishmentRequested({
+          jwt: backOfficeJwt,
+          siret: "12345678901234",
+        }),
+      );
+      dependencies.establishmentGateway.formEstablishment$.next(
+        formEstablishment,
+      );
+      expectEstablishmentStateToMatch({
+        feedback: { kind: "success" },
+        formEstablishment,
+        isLoading: false,
+      });
+
+      store.dispatch(
+        establishmentSlice.actions.establishmentDeletionRequested({
+          siret: formEstablishment.siret,
+          jwt: "backoffice-jwt",
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.establishmentGateway.deleteEstablishmentResult$.next(
+        undefined,
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(establishmentSelectors.feedback(store.getState()), {
+        kind: "deleteSuccess",
+      });
+    });
+
+    it("should fail when editing establishment on gateway error", () => {
+      expectStoreToMatchInitialState();
+      store.dispatch(
+        establishmentSlice.actions.establishmentRequested({
+          jwt: backOfficeJwt,
+          siret: "12345678901234",
+        }),
+      );
+      dependencies.establishmentGateway.formEstablishment$.next(
+        formEstablishment,
+      );
+      expectEstablishmentStateToMatch({
+        feedback: { kind: "success" },
+        formEstablishment,
+        isLoading: false,
+      });
+      store.dispatch(
+        establishmentSlice.actions.establishmentDeletionRequested({
+          siret: formEstablishment.siret,
+          jwt: backOfficeJwt,
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.establishmentGateway.deleteEstablishmentResult$.error(
+        new Error("Deletion error message not used in slice"),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(establishmentSelectors.feedback(store.getState()), {
+        kind: "deleteErrored",
       });
     });
   });

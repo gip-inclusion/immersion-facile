@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  BackOfficeJwt,
   defaultMaxContactsPerWeek,
   EstablishmentJwt,
   FormEstablishmentDto,
@@ -15,6 +16,8 @@ type EstablishmentFeedback = SubmitFeedBack<
   | "submitErrored"
   | "sendModificationLinkSuccess"
   | "sendModificationLinkErrored"
+  | "deleteSuccess"
+  | "deleteErrored"
 >;
 
 export type EstablishmentUpdatePayload = {
@@ -22,11 +25,16 @@ export type EstablishmentUpdatePayload = {
   jwt: EstablishmentJwt;
 };
 
+export type EstablishmentDeletePayload = {
+  siret: SiretDto;
+  jwt: BackOfficeJwt;
+};
+
 export type EstablishmentRequestedPayload =
   | Partial<FormEstablishmentDto>
   | {
       siret: SiretDto;
-      jwt: EstablishmentJwt;
+      jwt: EstablishmentJwt | BackOfficeJwt;
     };
 
 export const defaultFormEstablishmentValue = (
@@ -115,7 +123,7 @@ export const establishmentSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: "submitSuccess" };
     },
-    establishmentCreationFailed: (state) => {
+    establishmentCreationFailed: (state, _action: PayloadAction<string>) => {
       state.isLoading = false;
       state.feedback = {
         kind: "submitErrored",
@@ -132,10 +140,27 @@ export const establishmentSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: "submitSuccess" };
     },
-    establishmentEditionFailed: (state) => {
+    establishmentEditionFailed: (state, _action: PayloadAction<string>) => {
       state.isLoading = false;
       state.feedback = {
         kind: "submitErrored",
+      };
+    },
+
+    establishmentDeletionRequested: (
+      state,
+      _action: PayloadAction<EstablishmentDeletePayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    establishmentDeletionSucceeded: (state) => {
+      state.isLoading = false;
+      state.feedback = { kind: "deleteSuccess" };
+    },
+    establishmentDeletionFailed: (state, _action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.feedback = {
+        kind: "deleteErrored",
       };
     },
 
