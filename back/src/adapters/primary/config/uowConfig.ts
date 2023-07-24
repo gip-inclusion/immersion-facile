@@ -101,7 +101,7 @@ export const createInMemoryUow = () => {
 };
 
 export const createPgUow = (
-  client: PoolClient,
+  _client: PoolClient, //TODO remove client
   transaction: Transaction<ImmersionDatabase>,
 ): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);
@@ -138,7 +138,7 @@ export const createPgUow = (
     notificationRepository: new PgNotificationRepository(transaction),
     ongoingOAuthRepository: new PgOngoingOAuthRepository(transaction),
     outboxRepository: new PgOutboxRepository(transaction),
-    outboxQueries: new PgOutboxQueries(client),
+    outboxQueries: new PgOutboxQueries(transaction),
     romeRepository: new PgRomeRepository(transaction),
     searchMadeRepository: new PgSearchMadeRepository(transaction),
     shortLinkRepository,

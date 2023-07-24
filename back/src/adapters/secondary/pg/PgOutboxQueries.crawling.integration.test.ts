@@ -38,7 +38,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     await client.query("DELETE FROM outbox_publications");
     await client.query("DELETE FROM outbox");
 
-    outboxQueries = new PgOutboxQueries(client);
+    outboxQueries = new PgOutboxQueries(makeKyselyDb(pool));
   });
 
   it("finds all events to be processed", async () => {
