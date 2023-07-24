@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import format from "pg-format";
 import {
   AgencyRole,
@@ -7,11 +7,12 @@ import {
   WithAgencyRole,
 } from "shared";
 import { InclusionConnectedUserRepository } from "../../../domain/dashboard/port/InclusionConnectedUserRepository";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 
 export class PgInclusionConnectedUserRepository
   implements InclusionConnectedUserRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   async getById(userId: string): Promise<InclusionConnectedUser | undefined> {
     const icUsers = await this.getInclusionConnectedUsers({ userId });
@@ -59,7 +60,8 @@ export class PgInclusionConnectedUserRepository
 
     const whereClause = getWhereClause(filters);
 
-    const response = await this.client.query(
+    const response = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
       SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
         'id', authenticated_users.id,
@@ -92,13 +94,15 @@ export class PgInclusionConnectedUserRepository
   }
 
   async update(user: InclusionConnectedUser): Promise<void> {
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       `
         DELETE FROM users__agencies WHERE user_id = $1
         `,
       [user.id],
     );
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       format(
         `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
         user.agencyRights.map(({ agency, role }) => [user.id, agency.id, role]),
