@@ -5,6 +5,7 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
+import { makeKyselyDb } from "./sql/database";
 import { PgOutboxQueries } from "./PgOutboxQueries";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 
@@ -169,7 +170,9 @@ describe("PgOutboxQueries for crawling purposes", () => {
 
   const storeInOutbox = async (events: DomainEvent[]) => {
     await Promise.all(
-      events.map((event) => new PgOutboxRepository(client).save(event)),
+      events.map((event) =>
+        new PgOutboxRepository(makeKyselyDb(pool)).save(event),
+      ),
     );
   };
 });

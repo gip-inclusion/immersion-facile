@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import { differenceWith } from "ramda";
 import { DateIsoString, propEq, replaceArrayElement } from "shared";
 import {
@@ -10,6 +10,7 @@ import {
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { counterEventsSavedBeforePublish } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 
 export type StoredEventRow = {
   id: string;
@@ -25,19 +26,26 @@ export type StoredEventRow = {
 const logger = createLogger(__filename);
 
 export class PgOutboxRepository implements OutboxRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   private async getEventById(id: string): Promise<DomainEvent | undefined> {
-    const { rows } = await this.client.query<StoredEventRow>(
+    const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
+      this.transaction,
       `
-        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
-          outbox_publications.id as publication_id, published_at,
-          subscription_id, error_message 
-        FROM outbox
-        LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
-        LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-        WHERE outbox.id = $1
-        ORDER BY published_at ASC
+          SELECT outbox.id              as id,
+                 occurred_at,
+                 was_quarantined,
+                 topic,
+                 payload,
+                 outbox_publications.id as publication_id,
+                 published_at,
+                 subscription_id,
+                 error_message
+          FROM outbox
+                   LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
+                   LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
+          WHERE outbox.id = $1
+          ORDER BY published_at ASC
       `,
       [id],
     );
@@ -78,7 +86,8 @@ export class PgOutboxRepository implements OutboxRepository {
     eventId: string,
     { publishedAt, failures }: EventPublication,
   ) {
-    const { rows } = await this.client.query(
+    const { rows } = await executeKyselyRawSqlQuery(
+      this.transaction,
       "INSERT INTO outbox_publications(event_id, published_at) VALUES($1, $2) RETURNING id",
       [eventId, publishedAt],
     );
@@ -87,7 +96,8 @@ export class PgOutboxRepository implements OutboxRepository {
 
     await Promise.all(
       failures.map(({ subscriptionId, errorMessage }) =>
-        this.client.query(
+        executeKyselyRawSqlQuery(
+          this.transaction,
           "INSERT INTO outbox_failures(publication_id, subscription_id, error_message) VALUES($1, $2, $3)",
           [publicationId, subscriptionId, errorMessage],
         ),
@@ -106,24 +116,26 @@ export class PgOutboxRepository implements OutboxRepository {
         return eventAlreadyInDb;
       }
 
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         "UPDATE outbox SET was_quarantined = $2 WHERE id = $1",
         [id, wasQuarantined],
       );
       return { ...eventAlreadyInDb, wasQuarantined: event.wasQuarantined };
     }
 
-    const query = `INSERT INTO outbox(
-        id, occurred_at, was_quarantined, topic, payload
-      ) VALUES($1, $2, $3, $4, $5)`;
+    const query = `INSERT INTO outbox(id, occurred_at, was_quarantined, topic, payload)
+                   VALUES ($1, $2, $3, $4, $5)`;
     const values = [id, occurredAt, wasQuarantined, topic, payload];
-    await this.client.query(query, values).catch((error) => {
-      logger.error(
-        { query, values, error },
-        "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
-      );
-      throw error;
-    });
+    await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
+      (error) => {
+        logger.error(
+          { query, values, error },
+          "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
+        );
+        throw error;
+      },
+    );
 
     return { ...event, publications: [] }; // publications will be added after in process
   }

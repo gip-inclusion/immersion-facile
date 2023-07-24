@@ -262,7 +262,7 @@ describe("Pg implementation of ConventionQueries", () => {
     it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
       const conventionRepo = new PgConventionRepository(db);
-      const outboxRepo = new PgOutboxRepository(client);
+      const outboxRepo = new PgOutboxRepository(db);
       const dateStart = new Date("2022-05-10").toISOString();
       const dateEnd14 = new Date("2022-05-14").toISOString();
       const dateEnd15 = new Date("2022-05-15").toISOString();

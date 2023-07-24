@@ -137,7 +137,7 @@ export const createPgUow = (
     ),
     notificationRepository: new PgNotificationRepository(transaction),
     ongoingOAuthRepository: new PgOngoingOAuthRepository(transaction),
-    outboxRepository: new PgOutboxRepository(client),
+    outboxRepository: new PgOutboxRepository(transaction),
     outboxQueries: new PgOutboxQueries(client),
     romeRepository: new PgRomeRepository(client),
     searchMadeRepository: new PgSearchMadeRepository(client),

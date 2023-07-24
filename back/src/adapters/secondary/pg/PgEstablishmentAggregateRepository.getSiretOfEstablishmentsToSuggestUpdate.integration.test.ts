@@ -30,7 +30,7 @@ describe("PgScriptsQueries", () => {
     await client.query("DELETE FROM notifications_email_recipients");
     await client.query("DELETE FROM notifications_email");
     const db = makeKyselyDb(pool);
-    pgOutboxRepository = new PgOutboxRepository(client);
+    pgOutboxRepository = new PgOutboxRepository(db);
     pgNotificationRepository = new PgNotificationRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       db,
