@@ -1,5 +1,4 @@
 import { Transaction } from "kysely";
-import { PoolClient } from "pg";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -101,7 +100,6 @@ export const createInMemoryUow = () => {
 };
 
 export const createPgUow = (
-  _client: PoolClient, //TODO remove client
   transaction: Transaction<ImmersionDatabase>,
 ): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);
