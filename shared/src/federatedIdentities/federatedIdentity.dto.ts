@@ -35,10 +35,10 @@ export const isPeConnectIdentity = (
 ): federatedIdentity is PeConnectIdentity =>
   federatedIdentity?.provider === "peConnect";
 
-export type InclusionConnectToken = Flavor<string, "InclusionConnectToken">;
+export type InclusionConnectJwt = Flavor<string, "InclusionConnectJwt">;
 export type InclusionConnectIdentity = GenericFederatedIdentity<
   "inclusionConnect",
-  InclusionConnectToken
+  InclusionConnectJwt
 >;
 
 export type FederatedIdentity = InclusionConnectIdentity | PeConnectIdentity;

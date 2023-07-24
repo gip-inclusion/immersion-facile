@@ -327,5 +327,6 @@ export const domElementIds = {
   conventionMiniStageRoute: {},
   agencyDashboard: {},
   manageConventionAdmin: {},
+  manageConventionInclusionConnected: {},
   manageConventionOld: {},
 } satisfies DomElementIds;

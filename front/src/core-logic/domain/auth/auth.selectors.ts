@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { authFailed } from "shared";
+import { authFailed, InclusionConnectJwt } from "shared";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
@@ -23,7 +23,9 @@ const inclusionConnectToken = createSelector(
   isInclusionConnected,
   currentFederatedIdentity,
   (isInclusionConnected, federatedIdentity) =>
-    isInclusionConnected ? federatedIdentity?.token : undefined,
+    isInclusionConnected
+      ? (federatedIdentity?.token as InclusionConnectJwt)
+      : undefined,
 );
 
 const userIsDefined = (
