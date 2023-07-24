@@ -140,7 +140,7 @@ export const createPgUow = (
     outboxRepository: new PgOutboxRepository(transaction),
     outboxQueries: new PgOutboxQueries(client),
     romeRepository: new PgRomeRepository(transaction),
-    searchMadeRepository: new PgSearchMadeRepository(client),
+    searchMadeRepository: new PgSearchMadeRepository(transaction),
     shortLinkRepository,
     shortLinkQuery: shortLinkRepository,
   };
