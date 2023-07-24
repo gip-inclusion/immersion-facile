@@ -16,6 +16,7 @@ type WeekdayPickerProps = {
   onValueChange: (dayPeriods: DayPeriodsDto) => void;
   disabled?: boolean;
   interval: DateIntervalDto;
+  maxDay: WeekdayNumber;
 };
 
 export const WeekdayPicker = ({
@@ -24,6 +25,7 @@ export const WeekdayPicker = ({
   onValueChange,
   disabled,
   interval,
+  maxDay,
 }: WeekdayPickerProps) => {
   const { cx } = useStyles();
   const canAddNewPeriod = (): WeekDayRangeSchemaDTO | false => {
@@ -95,7 +97,7 @@ export const WeekdayPicker = ({
                     name="du"
                     id={`weekday-dropdown-end-day-${index}`}
                     minDay={dayRange[0]}
-                    maxDay={6}
+                    maxDay={maxDay}
                     selected={dayRange[1]}
                     onValueChange={(x) => onEndChange(x as WeekdayNumber)}
                     disabled={disabled}

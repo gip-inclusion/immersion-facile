@@ -427,16 +427,19 @@ export const emptySchedule = (
 
 export const scheduleWithFirstDayActivity = (
   interval: DateIntervalDto,
+  excludedDays: Weekday[] = [],
 ): Readonly<ScheduleDto> => {
-  const complexSchedule = makeComplexSchedule(interval, []).map((schedule) => {
-    if (schedule.date === interval.start.toISOString()) {
-      schedule.timePeriods = [
-        { start: "09:00", end: "12:00" },
-        { start: "13:00", end: "17:00" },
-      ];
-    }
-    return schedule;
-  });
+  const complexSchedule = makeComplexSchedule(interval, [], excludedDays).map(
+    (schedule) => {
+      if (schedule.date === interval.start.toISOString()) {
+        schedule.timePeriods = [
+          { start: "09:00", end: "12:00" },
+          { start: "13:00", end: "17:00" },
+        ];
+      }
+      return schedule;
+    },
+  );
   return {
     totalHours:
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),

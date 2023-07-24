@@ -12,6 +12,7 @@ import {
   reasonableSchedule,
   scheduleWithFirstDayActivity,
   toDateString,
+  Weekday,
 } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
@@ -38,11 +39,15 @@ export const ImmersionHourLocationSection = () => {
     addMonths(defaultDateMax, 1).toISOString(),
   );
   const resetSchedule = (interval: DateIntervalDto) => {
+    const excludedDays =
+      values.internshipKind === "mini-stage-cci"
+        ? (["dimanche"] as Weekday[])
+        : [];
     setValue(
       "schedule",
       values.schedule.isSimple
-        ? reasonableSchedule(interval, [], [])
-        : scheduleWithFirstDayActivity(interval),
+        ? reasonableSchedule(interval, excludedDays, [])
+        : scheduleWithFirstDayActivity(interval, excludedDays),
     );
   };
   const getFieldError = makeFieldError(formState);
