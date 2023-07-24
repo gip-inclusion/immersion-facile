@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { makeKyselyDb } from "./sql/database";
 import { PgRomeRepository } from "./PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {
@@ -12,7 +13,7 @@ describe("Postgres implementation of Rome Gateway", () => {
     //We do not empty the data because the table data is static as it public data
     pool = getTestPgPool();
     client = await pool.connect();
-    pgRomeRepository = new PgRomeRepository(client);
+    pgRomeRepository = new PgRomeRepository(makeKyselyDb(pool));
   });
 
   afterAll(async () => {

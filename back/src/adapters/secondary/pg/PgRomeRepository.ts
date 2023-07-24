@@ -1,45 +1,44 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import { AppellationAndRomeDto, AppellationCode, RomeDto } from "shared";
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../utils/logger";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 
 const logger = createLogger(__filename);
 
 export class PgRomeRepository implements RomeRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   public async appellationToCodeMetier(
     romeCodeAppellation: string,
   ): Promise<string | undefined> {
-    return this.client
-      .query(
-        `SELECT code_rome
+    return executeKyselyRawSqlQuery<{ code_rome: string }>(
+      this.transaction,
+      `SELECT code_rome
         FROM public_appellations_data
         WHERE ogr_appellation=$1`,
-        [romeCodeAppellation],
-      )
-      .then((res) => {
-        try {
-          return res.rows[0].code_rome;
-        } catch (_) {
+      [romeCodeAppellation],
+    )
+      .then((queryResult) => {
+        const code_rome = queryResult.rows.at(0)?.code_rome;
+        if (!code_rome)
           logger.error(
-            { romeCodeAppellation, resultFromQuery: res },
+            { romeCodeAppellation, resultFromQuery: queryResult },
             "could not fetch rome code with given appellation",
           );
-
-          return;
-        }
+        return code_rome;
       })
       .catch((e) => {
         logger.error(e);
-        return;
+        return undefined;
       });
   }
 
   public async getAppellationAndRomeDtosFromAppellationCodes(
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
-    const { rows } = await this.client.query(
+    const { rows } = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
         SELECT ogr_appellation, libelle_appellation_long, appellations.code_rome, libelle_rome
         FROM public_appellations_data AS appellations
@@ -56,17 +55,17 @@ export class PgRomeRepository implements RomeRepository {
   ): Promise<AppellationAndRomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
 
-    return this.client
-      .query(
-        `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
+    return executeKyselyRawSqlQuery(
+      this.transaction,
+      `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
         FROM public_appellations_data 
         JOIN public_romes_data ON  public_appellations_data.code_rome = public_romes_data.code_rome
         WHERE
            (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long_without_special_char ILIKE $3)
            OR (libelle_appellation_long_without_special_char ILIKE $2 AND libelle_appellation_long_without_special_char ILIKE $3)
         LIMIT 80`,
-        [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
-      )
+      [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
+    )
       .then((res) => res.rows.map(convertRowToAppellationDto))
       .catch((error) => {
         logger.error({ error, query }, "searchAppellation error");
@@ -76,9 +75,9 @@ export class PgRomeRepository implements RomeRepository {
 
   public async searchRome(query: string): Promise<RomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
-    return this.client
-      .query(
-        `
+    return executeKyselyRawSqlQuery(
+      this.transaction,
+      `
         WITH matching_rome AS(
             WITH search_corpus AS (
               SELECT code_rome, libelle_rome::text AS searchable_text, libelle_rome_tsvector AS ts_vector FROM public_romes_data
@@ -94,10 +93,10 @@ export class PgRomeRepository implements RomeRepository {
             )
         SELECT matching_rome.code_rome, libelle_rome
         FROM matching_rome LEFT JOIN public_romes_data ON matching_rome.code_rome = public_romes_data.code_rome`,
-        [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
-      )
-      .then((res) =>
-        res.rows.map(
+      [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
+    )
+      .then((queryResult) =>
+        queryResult.rows.map(
           (row): RomeDto => ({
             romeCode: row.code_rome,
             romeLabel: row.libelle_rome,
