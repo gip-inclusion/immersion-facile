@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { OngoingOAuth } from "../../../domain/generic/OAuth/entities/OngoingOAuth";
+import { makeKyselyDb } from "./sql/database";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 
 describe("PgOngoingOAuthRepository", () => {
@@ -12,7 +13,7 @@ describe("PgOngoingOAuthRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    pgOngoingOAuthRepository = new PgOngoingOAuthRepository(client);
+    pgOngoingOAuthRepository = new PgOngoingOAuthRepository(makeKyselyDb(pool));
     await client.query("DELETE FROM ongoing_oauths");
   });
 
