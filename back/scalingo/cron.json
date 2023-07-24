@@ -1,6 +1,10 @@
 {
   "jobs": [
     {
+      "command": "0 21 * * * pnpm back run trigger-delete-email-attachements",
+      "size": "M"
+    },
+    {
       "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
       "size": "M"
     },

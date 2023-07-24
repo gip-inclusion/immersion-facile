@@ -60,4 +60,8 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
   // for tests purposes
   public notifications: Notification[] = [];
+
+  public deleteAllEmailAttachements(): Promise<number> {
+    throw new Error("Not implemented");
+  }
 }

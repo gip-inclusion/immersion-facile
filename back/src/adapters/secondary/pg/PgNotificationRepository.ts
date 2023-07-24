@@ -114,6 +114,18 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
+  async deleteAllEmailAttachements(): Promise<number> {
+    const deletedContent = "deleted-content";
+    const response = await this.client.query(
+      `
+      UPDATE notifications_email_attachments
+        SET attachment = jsonb_set(attachment::jsonb, '{content}', '"${deletedContent}"')
+        WHERE attachment::jsonb ->> 'content' != '${deletedContent}';
+      `,
+    );
+    return response.rowCount;
+  }
+
   private async saveSmsNotification(
     notification: SmsNotification,
   ): Promise<void> {
