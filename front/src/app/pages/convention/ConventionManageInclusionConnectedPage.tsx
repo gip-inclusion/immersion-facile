@@ -20,8 +20,6 @@ export const ConventionManageInclusionConnectedPage = ({
     authSelectors.inclusionConnectToken,
   );
 
-  // ... Récupérer le JWT convention ou bien { convention, fetchConventionError, submitFeedback, isLoading } à partir d'un admin qui a le conventionId
-
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
@@ -29,13 +27,12 @@ export const ConventionManageInclusionConnectedPage = ({
           <ConventionManageContent
             jwt={inclusionConnectedJwt}
             conventionId={conventionId}
-            role={"backOffice"}
           />
         ) : (
           <Alert
             severity="error"
             title="Non autorisé"
-            description="Cette page est reservé aux utilisteurs connecté avec Inclusion Connect"
+            description="Cette page est reservé aux utilisteurs connecté avec Inclusion Connect, et dont l'agence est responsable de cette convention."
           />
         )}
       </MainWrapper>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -14,7 +14,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { RegisterAgenciesForm } from "../components/forms/register-agencies/RegisterAgenciesForm";
 
 export const AgencyDashboardPage = () => {
@@ -39,7 +38,7 @@ export const AgencyDashboardPage = () => {
       content: (
         <>
           <ManageConventionFormSection
-            routeNameToRedirectTo={"manageConventionAdmin"}
+            routeNameToRedirectTo={"manageConventionInclusionConnected"}
           />
           <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
         </>
@@ -59,10 +58,6 @@ export const AgencyDashboardPage = () => {
         ]
       : []),
   ];
-
-  useEffect(() => {
-    dispatch(inclusionConnectedSlice.actions.currentUserFetchRequested());
-  }, []);
 
   return (
     <>
