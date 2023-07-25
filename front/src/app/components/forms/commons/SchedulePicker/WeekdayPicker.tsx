@@ -32,12 +32,13 @@ export const WeekdayPicker = ({
     if (dayPeriods.length === 0) return false;
     const lastPeriod = dayPeriods[dayPeriods.length - 1];
     const lastPeriodEnd = lastPeriod[1];
-    return lastPeriodEnd < 5 ? lastPeriod : false;
+    const lastPeriodStart = maxDay - 1;
+    return lastPeriodEnd < lastPeriodStart ? lastPeriod : false;
   };
 
   const add = () => {
     let start = 0;
-    let end = 5;
+    let end = maxDay - 1;
     // Autofill next period as one day after the current period,
     // with duration of 1 day.
     const last = canAddNewPeriod();
