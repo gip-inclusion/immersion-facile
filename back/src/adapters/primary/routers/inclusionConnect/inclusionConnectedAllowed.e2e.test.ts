@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  currentJwtVersions,
   expectToEqual,
   inclusionConnectedAllowedTargets,
 } from "shared";
@@ -22,7 +23,10 @@ describe("Router for users authenticated with Inclusion Connect", () => {
         agencyRights: [{ agency, role: "validator" }],
       },
     ]);
-    const token = generateAuthenticatedUserJwt({ userId });
+    const token = generateAuthenticatedUserJwt({
+      userId,
+      version: currentJwtVersions.inclusion,
+    });
 
     const response = await request
       .get(inclusionConnectedAllowedTargets.getAgencyDashboard.url)
@@ -57,7 +61,10 @@ describe("Router for users authenticated with Inclusion Connect", () => {
     it("throws forbidden if token is expired", async () => {
       const { request, generateAuthenticatedUserJwt } = await buildTestApp();
       const userId = "123";
-      const token = generateAuthenticatedUserJwt({ userId }, 0);
+      const token = generateAuthenticatedUserJwt(
+        { userId, version: currentJwtVersions.inclusion },
+        0,
+      );
 
       const response = await request
         .get(inclusionConnectedAllowedTargets.getInclusionConnectedUser.url)
@@ -82,7 +89,10 @@ describe("Router for users authenticated with Inclusion Connect", () => {
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
       ]);
-      const token = generateAuthenticatedUserJwt({ userId });
+      const token = generateAuthenticatedUserJwt({
+        userId,
+        version: currentJwtVersions.inclusion,
+      });
 
       const response = await request
         .get(inclusionConnectedAllowedTargets.getInclusionConnectedUser.url)
@@ -124,7 +134,10 @@ describe("Router for users authenticated with Inclusion Connect", () => {
         user,
       ]);
       inMemoryUow.agencyRepository.setAgencies([agency]);
-      const token = generateAuthenticatedUserJwt({ userId });
+      const token = generateAuthenticatedUserJwt({
+        userId,
+        version: currentJwtVersions.inclusion,
+      });
       const response = await request
         .post(inclusionConnectedAllowedTargets.registerAgenciesToUser.url)
         .set("Authorization", token)

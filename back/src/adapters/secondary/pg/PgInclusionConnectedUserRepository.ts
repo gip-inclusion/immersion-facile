@@ -39,6 +39,29 @@ export class PgInclusionConnectedUserRepository
     );
   }
 
+  async isUserAllowedToAccessConvention(
+    userId: string,
+    conventionId: string,
+  ): Promise<boolean> {
+    const response = await this.client.query(
+      `
+          WITH agency_id_in_convention AS (
+              SELECT agency_id
+              FROM conventions
+              WHERE id = $2
+          )
+          SELECT role
+          FROM users__agencies
+          WHERE user_id = $1 AND agency_id IN (SELECT agency_id FROM agency_id_in_convention)
+      `,
+      [userId, conventionId],
+    );
+    const withRole: { role: AgencyRole } = response.rows[0];
+    const noResult = !withRole;
+
+    return !(noResult || withRole.role === "toReview");
+  }
+
   private async getInclusionConnectedUsers(filters: {
     userId?: AuthenticatedUserId;
     agencyRole?: AgencyRole;

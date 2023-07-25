@@ -35,7 +35,9 @@ export const createMagicLinkRouter = (
       sendHttpResponse(req, res, async () =>
         deps.useCases.getConvention.execute(
           { conventionId: req.params.conventionId },
-          req.payloads?.backOffice ?? req.payloads?.convention,
+          req.payloads?.backOffice ??
+            req.payloads?.inclusion ??
+            req.payloads?.convention,
         ),
       ),
     )

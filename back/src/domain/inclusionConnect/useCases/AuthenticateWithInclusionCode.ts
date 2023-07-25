@@ -4,6 +4,7 @@ import {
   AuthenticatedUserQueryParams,
   AuthenticateWithInclusionCodeConnectParams,
   authenticateWithInclusionCodeSchema,
+  currentJwtVersions,
   decodeJwtWithoutSignatureCheck,
   frontRoutes,
   queryParamsAsString,
@@ -102,7 +103,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     ]);
 
     const token = this.generateAppToken(
-      { userId: newOrUpdatedAuthenticatedUser.id },
+      {
+        userId: newOrUpdatedAuthenticatedUser.id,
+        version: currentJwtVersions.inclusion,
+      },
       response.expires_in * 60,
     );
 
