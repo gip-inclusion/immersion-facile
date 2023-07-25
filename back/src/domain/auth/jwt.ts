@@ -11,6 +11,7 @@ import {
 
 type AuthenticatedUserJwtPayload = {
   userId: string;
+  version: number;
 };
 
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;

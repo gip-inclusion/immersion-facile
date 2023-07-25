@@ -7,6 +7,7 @@ import {
   currentJwtVersions,
   EstablishmentJwtPayload,
   ExtractFromExisting,
+  InclusionConnectJwtPayload,
   PayloadKey,
 } from "shared";
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
@@ -179,7 +180,7 @@ export const makeMagicLinkAuthMiddleware = (
   payloadKey: ExtractFromExisting<PayloadKey, "convention" | "establishment">,
 ): RequestHandler => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig<
-    "convention" | "editEstablishment" | "backOffice"
+    "convention" | "editEstablishment" | "backOffice" | "authenticatedUser"
   >(config);
   return (req, res, next) => {
     const maybeJwt = req.headers.authorization;
@@ -202,8 +203,13 @@ export const makeMagicLinkAuthMiddleware = (
       }
 
       switch (payloadKey) {
-        case "convention":
-          if ("role" in payload && payload.role === "backOffice") {
+        case "convention": {
+          if (!("role" in payload)) {
+            req.payloads = { inclusion: payload as InclusionConnectJwtPayload };
+            break;
+          }
+
+          if (payload.role === "backOffice") {
             req.payloads = {
               backOffice: backOfficeJwtPayloadSchema.parse(payload),
             };
@@ -213,6 +219,7 @@ export const makeMagicLinkAuthMiddleware = (
             };
           }
           break;
+        }
         case "establishment":
           req.payloads = { establishment: payload as EstablishmentJwtPayload };
           break;

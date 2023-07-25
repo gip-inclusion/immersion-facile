@@ -46,10 +46,10 @@ export class GetConvention extends TransactionalUseCase<
 
   // eslint-disable-next-line @typescript-eslint/require-await
   private async throwIfNotAllowed(
-    _uow: UnitOfWork,
+    uow: UnitOfWork,
     authPayload: AuthPayload | undefined,
     conventionId: ConventionId,
-  ): Promise<void> {
+  ): Promise<void | never> {
     if (!authPayload) throw new ForbiddenError(`No auth payload provided`);
     if ("role" in authPayload) {
       if (authPayload.role === "backOffice") return;
@@ -61,19 +61,16 @@ export class GetConvention extends TransactionalUseCase<
       return;
     }
 
-    throw new ForbiddenError("TODO : handle inclusion connected user");
+    const userIsAllowed =
+      await uow.inclusionConnectedUserRepository.isUserAllowedToAccessConvention(
+        authPayload.userId,
+        conventionId,
+      );
 
-    // todo handle inclusion connected user, here is a idea of implementation :
-
-    // const userIsAllowed =
-    //   await uow.inclusionConnectedUserRepository.isUserAllowedToAccessConvention(
-    //     authPayload.userId,
-    //     conventionId,
-    //   );
-    // if (!userIsAllowed) {
-    //   throw new ForbiddenError(
-    //     `User with id ${authPayload.userId} is not allowed to access convention with id ${conventionId}`,
-    //   );
-    // }
+    if (!userIsAllowed) {
+      throw new ForbiddenError(
+        `User with id '${authPayload.userId}' is not allowed to access convention with id '${conventionId}'`,
+      );
+    }
   }
 }

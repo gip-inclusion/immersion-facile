@@ -11,6 +11,8 @@ import {
   createConventionMagicLinkPayload,
   currentJwtVersions,
   expectToEqual,
+  InclusionConnectedUser,
+  InclusionConnectJwtPayload,
   stringToMd5,
   unauthenticatedConventionTargets,
   UpdateConventionRequestDto,
@@ -21,6 +23,7 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import {
+  GenerateAuthenticatedUserJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
 } from "../../../../domain/auth/jwt";
@@ -29,12 +32,14 @@ import {
   TEST_AGENCY_DEPARTMENT,
   TEST_AGENCY_NAME,
 } from "../../../secondary/InMemoryConventionQueries";
+import { conventionIdAllowedForIcUser } from "../../../secondary/InMemoryInclusionConnectedUserRepository";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 let request: SuperTest<Test>;
 let generateConventionJwt: GenerateConventionJwt;
 let generateBackOfficeJwt: GenerateBackOfficeJwt;
+let generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
 let inMemoryUow: InMemoryUnitOfWork;
 let eventCrawler: BasicEventCrawler;
 let gateways: InMemoryGateways;
@@ -60,6 +65,7 @@ const initializeSystemUnderTest = async (
     request,
     generateConventionJwt,
     generateBackOfficeJwt,
+    generateAuthenticatedUserJwt,
     inMemoryUow,
   } = await buildTestApp(config));
 
@@ -172,6 +178,54 @@ describe("convention e2e", () => {
             iat: Math.round(now.getTime() / 1000),
           };
           const jwt = generateBackOfficeJwt(payload);
+
+          // GETting the created convention succeeds.
+          const response = await request
+            .get(
+              conventionMagicLinkTargets.getConvention.url.replace(
+                ":conventionId",
+                convention.id,
+              ),
+            )
+            .set("Authorization", jwt);
+
+          expectToEqual(response.body, {
+            ...convention,
+            agencyName: TEST_AGENCY_NAME,
+            agencyDepartment: TEST_AGENCY_DEPARTMENT,
+          });
+          expectToEqual(response.status, 200);
+        });
+
+        it("succeeds with JWT InclusionConnectedJwtPayload", async () => {
+          const agency = new AgencyDtoBuilder().build();
+          const convention = new ConventionDtoBuilder()
+            .withId(conventionIdAllowedForIcUser)
+            .withAgencyId(agency.id)
+            .build();
+          inMemoryUow.agencyRepository.setAgencies([agency]);
+          inMemoryUow.conventionRepository.setConventions({
+            [convention.id]: convention,
+          });
+
+          const user: InclusionConnectedUser = {
+            id: "my-user-id",
+            email: "my-user@email.com",
+            firstName: "John",
+            lastName: "Doe",
+            agencyRights: [{ role: "validator", agency }],
+          };
+          inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
+            [user],
+          );
+
+          const payload: InclusionConnectJwtPayload = {
+            userId: user.id,
+            version: currentJwtVersions.inclusion,
+            iat: Math.round(now.getTime() / 1000),
+          };
+
+          const jwt = generateAuthenticatedUserJwt(payload);
 
           // GETting the created convention succeeds.
           const response = await request
