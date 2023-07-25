@@ -17,16 +17,13 @@ type ConventionManagePageProps = {
 
 export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
   const jwt = route.params.jwt;
-  const { role, applicationId: conventionId } =
+  const { applicationId: conventionId } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
+
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
-        <ConventionManageContent
-          jwt={jwt}
-          conventionId={conventionId}
-          role={role}
-        />
+        <ConventionManageContent jwt={jwt} conventionId={conventionId} />
       </MainWrapper>
     </HeaderFooterLayout>
   );

@@ -12,7 +12,7 @@ const conventionState = (state: RootState) => state.convention;
 
 const feedback = createSelector(conventionState, ({ feedback }) => feedback);
 
-const convention = createSelector(
+export const fetchedConventionSelector = createSelector(
   conventionState,
   ({ convention }) => convention,
 );
@@ -75,7 +75,7 @@ const currentStep = createSelector(
 );
 
 export const conventionSelectors = {
-  convention,
+  convention: fetchedConventionSelector,
   fetchError,
   feedback,
   signatoryData,

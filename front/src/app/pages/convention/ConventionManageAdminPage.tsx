@@ -26,7 +26,6 @@ export const ConventionManageAdminPage = ({
           <ConventionManageContent
             jwt={backOfficeJwt}
             conventionId={conventionId}
-            role={"backOffice"}
           />
         ) : (
           <Alert
