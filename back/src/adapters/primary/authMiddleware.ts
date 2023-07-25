@@ -5,9 +5,7 @@ import {
   backOfficeJwtPayloadSchema,
   ConventionJwtPayload,
   currentJwtVersions,
-  EstablishmentJwtPayload,
   ExtractFromExisting,
-  InclusionConnectJwtPayload,
   PayloadKey,
 } from "shared";
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
@@ -202,35 +200,12 @@ export const makeMagicLinkAuthMiddleware = (
         );
       }
 
-      switch (payloadKey) {
-        case "convention": {
-          if (!("role" in payload)) {
-            req.payloads = { inclusion: payload as InclusionConnectJwtPayload };
-            break;
-          }
-
-          if (payload.role === "backOffice") {
-            req.payloads = {
+      req.payloads =
+        "role" in payload && payload.role === "backOffice"
+          ? {
               backOffice: backOfficeJwtPayloadSchema.parse(payload),
-            };
-          } else {
-            req.payloads = {
-              convention: payload as ConventionJwtPayload,
-            };
-          }
-          break;
-        }
-        case "establishment":
-          req.payloads = { establishment: payload as EstablishmentJwtPayload };
-          break;
-        default:
-          // eslint-disable-next-line no-case-declarations
-          const unhandledPayloadKey: never = payloadKey;
-          throw new Error(
-            "Should not happen. Expected payoaldKey, received : " +
-              unhandledPayloadKey,
-          );
-      }
+            }
+          : { [payloadKey]: payload };
 
       next();
     } catch (err: any) {

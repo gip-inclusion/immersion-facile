@@ -1,5 +1,6 @@
 import {
   addressDtoToString,
+  BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   expectPromiseToFailWithError,
   FormEstablishmentDto,
@@ -9,7 +10,10 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishm
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  ForbiddenError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 
@@ -28,17 +32,33 @@ const prepareUseCase = () => {
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
   const siret = "12345678901234";
-  const jwtPayload: EstablishmentJwtPayload = {
+  const establishmentJwtPayload: EstablishmentJwtPayload = {
     siret,
     exp: 2,
     iat: 1,
     version: 1,
   };
 
+  const backOfficeJwtPayload: BackOfficeJwtPayload = {
+    exp: 2,
+    iat: 1,
+    version: 1,
+    role: "backOffice",
+    sub: "admin",
+  };
+
+  it("throws an error if there is jwt", async () => {
+    const { useCase } = prepareUseCase();
+    await expectPromiseToFailWithError(
+      useCase.execute(establishmentJwtPayload.siret),
+      new ForbiddenError("Accès refusé"),
+    );
+  });
+
   it("throws an error if there is no establishment with this siret", async () => {
     const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
-      useCase.execute(jwtPayload.siret, jwtPayload),
+      useCase.execute(establishmentJwtPayload.siret, establishmentJwtPayload),
       new BadRequestError("No establishment found with siret 12345678901234."),
     );
   });
@@ -48,12 +68,12 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     const { useCase } = prepareUseCase();
     // Act and assert
     await expectPromiseToFailWithError(
-      useCase.execute(jwtPayload.siret, jwtPayload),
+      useCase.execute(establishmentJwtPayload.siret, establishmentJwtPayload),
       new BadRequestError("No establishment found with siret 12345678901234."),
     );
   });
 
-  it("returns a reconstructed form if establishment with siret exists with dataSource=form", async () => {
+  it("returns a reconstructed form if establishment with siret exists with dataSource=form & establishment jwt payload", async () => {
     const { useCase, establishmentAggregateRepository } = prepareUseCase();
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
@@ -72,7 +92,57 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         .build(),
     ]);
     // Act
-    const retrievedForm = await useCase.execute(jwtPayload.siret, jwtPayload);
+    const retrievedForm = await useCase.execute(
+      establishmentJwtPayload.siret,
+      establishmentJwtPayload,
+    );
+
+    // Assert
+    expect(retrievedForm).toBeDefined();
+    const expectedForm: FormEstablishmentDto = {
+      siret,
+      source: "immersion-facile",
+      businessName: establishment.name,
+      businessNameCustomized: establishment.customizedName,
+      businessAddress: addressDtoToString(establishment.address),
+      isEngagedEnterprise: establishment.isCommited,
+      naf: establishment.nafDto,
+      appellations: [
+        {
+          appellationLabel: "test_appellation_label",
+          romeLabel: "test_rome_label",
+          romeCode: "A1101",
+          appellationCode: "11987",
+        },
+      ],
+      businessContact: contact,
+      website: establishment.website,
+      additionalInformation: establishment.additionalInformation,
+      maxContactsPerWeek: establishment.maxContactsPerWeek,
+    };
+    expect(retrievedForm).toMatchObject(expectedForm);
+  });
+
+  it("returns a reconstructed form if establishment with siret exists with dataSource=form & backoffice jwt payload", async () => {
+    const { useCase, establishmentAggregateRepository } = prepareUseCase();
+    const establishment = new EstablishmentEntityBuilder()
+      .withSiret(siret)
+      .build();
+    const contact = new ContactEntityBuilder().build();
+    const offer = new ImmersionOfferEntityV2Builder()
+      .withRomeCode("A1101")
+      .withAppellationCode("11987")
+      .build();
+
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(establishment)
+        .withContact(contact)
+        .withImmersionOffers([offer])
+        .build(),
+    ]);
+    // Act
+    const retrievedForm = await useCase.execute(siret, backOfficeJwtPayload);
 
     // Assert
     expect(retrievedForm).toBeDefined();
