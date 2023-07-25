@@ -2,6 +2,7 @@ import * as crypto from "crypto";
 import { decode } from "js-base64";
 import { currentJwtVersions, SiretDto } from "..";
 import {
+  BackOfficeJwtPayload,
   ConventionJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
   EstablishmentJwtPayload,
@@ -73,5 +74,23 @@ export const createEstablishmentMagicLinkPayload = ({
     iat,
     exp,
     version: currentJwtVersions.establishment,
+  };
+};
+
+export const createBackOfficeJwtPayload = ({
+  durationDays,
+  now,
+}: {
+  durationDays: number;
+  now: Date;
+}): BackOfficeJwtPayload => {
+  const iat = Math.round(now.getTime() / 1000);
+  const exp = iat + durationDays * 24 * 3600;
+  return {
+    iat,
+    exp,
+    version: currentJwtVersions.establishment,
+    role: "backOffice",
+    sub: "admin",
   };
 };
