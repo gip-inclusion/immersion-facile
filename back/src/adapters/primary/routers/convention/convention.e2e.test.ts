@@ -32,7 +32,6 @@ import {
   TEST_AGENCY_DEPARTMENT,
   TEST_AGENCY_NAME,
 } from "../../../secondary/InMemoryConventionQueries";
-import { conventionIdAllowedForIcUser } from "../../../secondary/InMemoryInclusionConnectedUserRepository";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
@@ -200,7 +199,6 @@ describe("convention e2e", () => {
         it("succeeds with JWT InclusionConnectedJwtPayload", async () => {
           const agency = new AgencyDtoBuilder().build();
           const convention = new ConventionDtoBuilder()
-            .withId(conventionIdAllowedForIcUser)
             .withAgencyId(agency.id)
             .build();
           inMemoryUow.agencyRepository.setAgencies([agency]);

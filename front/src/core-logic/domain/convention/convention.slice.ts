@@ -2,11 +2,10 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   AbsoluteUrl,
   AgencyId,
-  BackOfficeJwt,
   ConventionId,
+  ConventionJwt,
   ConventionMagicLinkJwt,
   ConventionReadDto,
-  InclusionConnectJwt,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -70,11 +69,6 @@ export const initialConventionState: ConventionState = {
   feedback: { kind: "idle" },
   currentSignatoryRole: null,
 };
-
-export type ConventionJwt =
-  | ConventionMagicLinkJwt
-  | BackOfficeJwt
-  | InclusionConnectJwt;
 
 export type FetchConventionRequestedPayload = {
   jwt: ConventionJwt;

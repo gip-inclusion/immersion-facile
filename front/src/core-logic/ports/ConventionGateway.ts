@@ -3,14 +3,12 @@ import {
   AbsoluteUrl,
   ConventionDto,
   ConventionId,
+  ConventionJwt,
   ConventionReadDto,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
 } from "shared";
-import {
-  ConventionJwt,
-  FetchConventionRequestedPayload,
-} from "../domain/convention/convention.slice";
+import { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
 
 export interface ConventionGateway {
   retrieveFromToken$(

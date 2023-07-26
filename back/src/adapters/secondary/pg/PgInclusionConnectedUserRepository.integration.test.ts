@@ -6,14 +6,12 @@ import {
   AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
-  ConventionDtoBuilder,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   InclusionConnectedUser,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "./PgAgencyRepository";
-import { PgConventionRepository } from "./PgConventionRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 
 const authenticatedUser1: AuthenticatedUser = {
@@ -40,16 +38,11 @@ const agency2 = new AgencyDtoBuilder()
   .withName("Agence 2")
   .build();
 
-const conventionLinkedToAgency1 = new ConventionDtoBuilder()
-  .withAgencyId(agency1.id)
-  .build();
-
 describe("PgInclusionConnectedUserRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let icUserRepository: PgInclusionConnectedUserRepository;
   let agencyRepository: PgAgencyRepository;
-  let conventionRepository: PgConventionRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -68,7 +61,6 @@ describe("PgInclusionConnectedUserRepository", () => {
     await client.query("DELETE FROM agencies");
     icUserRepository = new PgInclusionConnectedUserRepository(client);
     agencyRepository = new PgAgencyRepository(client);
-    conventionRepository = new PgConventionRepository(client);
   });
 
   describe("getById", () => {
@@ -196,73 +188,6 @@ describe("PgInclusionConnectedUserRepository", () => {
           agencyRights: [{ agency: agency2, role: "toReview" }],
         },
       ]);
-    });
-  });
-
-  describe("isUserAllowedToAccessConvention", () => {
-    it("returns true if user is allowed to access the convention", async () => {
-      await Promise.all([
-        conventionRepository.save(conventionLinkedToAgency1),
-        agencyRepository.insert(agency1),
-        insertAuthenticatedUser(authenticatedUser1),
-      ]);
-
-      await insertAgencyRegistrationToUser({
-        agencyId: agency1.id,
-        userId: authenticatedUser1.id,
-        role: "validator",
-      });
-
-      const isAllowed = await icUserRepository.isUserAllowedToAccessConvention(
-        authenticatedUser1.id,
-        conventionLinkedToAgency1.id,
-      );
-
-      expect(isAllowed).toBe(true);
-    });
-
-    it("returns false if user is not linked to the agency", async () => {
-      await Promise.all([
-        conventionRepository.save(conventionLinkedToAgency1),
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
-        insertAuthenticatedUser(authenticatedUser1),
-      ]);
-
-      await insertAgencyRegistrationToUser({
-        agencyId: agency2.id,
-        userId: authenticatedUser1.id,
-        role: "validator",
-      });
-
-      const isAllowed = await icUserRepository.isUserAllowedToAccessConvention(
-        authenticatedUser1.id,
-        conventionLinkedToAgency1.id,
-      );
-
-      expect(isAllowed).toBe(false);
-    });
-
-    it("returns false if user is linked to the agency but with role 'toReview'", async () => {
-      await Promise.all([
-        conventionRepository.save(conventionLinkedToAgency1),
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
-        insertAuthenticatedUser(authenticatedUser1),
-      ]);
-
-      await insertAgencyRegistrationToUser({
-        agencyId: agency1.id,
-        userId: authenticatedUser1.id,
-        role: "toReview",
-      });
-
-      const isAllowed = await icUserRepository.isUserAllowedToAccessConvention(
-        authenticatedUser1.id,
-        conventionLinkedToAgency1.id,
-      );
-
-      expect(isAllowed).toBe(false);
     });
   });
 

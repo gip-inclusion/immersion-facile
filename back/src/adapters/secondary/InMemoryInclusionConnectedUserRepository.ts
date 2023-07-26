@@ -9,8 +9,6 @@ import { InMemoryAuthenticatedUserRepository } from "./InMemoryAuthenticatedUser
 
 type AgencyRightsByUserId = Record<AuthenticatedUserId, AgencyRight[]>;
 
-export const conventionIdAllowedForIcUser =
-  "20020020-0000-4000-0000-000000200200";
 export class InMemoryInclusionConnectedUserRepository
   implements InclusionConnectedUserRepository
 {
@@ -43,15 +41,6 @@ export class InMemoryInclusionConnectedUserRepository
 
   async update(user: InclusionConnectedUser): Promise<void> {
     this.agencyRightsByUserId[user.id] = user.agencyRights;
-  }
-
-  public async isUserAllowedToAccessConvention(
-    _userId: string,
-    conventionId: "20020020-0000-4000-0000-000000200200",
-  ): Promise<boolean> {
-    if (conventionId === conventionIdAllowedForIcUser) return true;
-    if (conventionId === "convention-id-not-allowed") return false;
-    return false;
   }
 
   public agencyRightsByUserId: AgencyRightsByUserId = {};
