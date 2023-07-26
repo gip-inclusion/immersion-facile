@@ -1,10 +1,11 @@
 import {
   AgencyDtoBuilder,
+  BackOfficeJwtPayload,
   ConventionDtoBuilder,
-  ConventionId,
   ConventionMagicLinkPayload,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
 } from "shared";
 import {
@@ -19,11 +20,12 @@ import {
   TEST_AGENCY_DEPARTMENT,
   TEST_AGENCY_NAME,
 } from "../../../adapters/secondary/InMemoryConventionQueries";
-import { conventionIdAllowedForIcUser } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
+  const agency = new AgencyDtoBuilder().build();
+  const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
   let getConvention: GetConvention;
   let uow: InMemoryUnitOfWork;
 
@@ -32,62 +34,85 @@ describe("Get Convention", () => {
     getConvention = new GetConvention(new InMemoryUowPerformer(uow));
   });
 
-  describe("When the Convention does not exist", () => {
-    it("throws NotFoundError", async () => {
-      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
-      await expectPromiseToFailWithError(
-        getConvention.execute({ conventionId }, {
-          role: "establishment",
-          applicationId: "add5c20e-6dd2-45af-affe-927358005251",
-        } as ConventionMagicLinkPayload),
-        new NotFoundError(`No convention found with id ${conventionId}`),
-      );
+  describe("Wrong paths", () => {
+    describe("Forbidden error", () => {
+      it("When no auth payload provided", async () => {
+        await expectPromiseToFailWithError(
+          getConvention.execute({ conventionId: convention.id }),
+          new ForbiddenError(`No auth payload provided`),
+        );
+      });
+
+      it("When convention id in jwt token does not match provided one", async () => {
+        await expectPromiseToFailWithError(
+          getConvention.execute({ conventionId: convention.id }, {
+            role: "establishment",
+            applicationId: "not-matching-convention-id",
+          } as ConventionMagicLinkPayload),
+          new ForbiddenError(
+            `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment'`,
+          ),
+        );
+      });
+
+      it("When the user don't have correct role on inclusion connected users", async () => {
+        const user: InclusionConnectedUser = {
+          id: "my-user-id",
+          email: "my-user@email.com",
+          firstName: "John",
+          lastName: "Doe",
+          agencyRights: [{ role: "toReview", agency }],
+        };
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+        uow.agencyRepository.setAgencies([agency]);
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+
+        await expectPromiseToFailWithError(
+          getConvention.execute(
+            { conventionId: convention.id },
+            { userId: "my-user-id" },
+          ),
+          new ForbiddenError(
+            `User with id 'my-user-id' is not allowed to access convention with id '${convention.id}'`,
+          ),
+        );
+      });
+    });
+
+    describe("Not found error", () => {
+      it("When the Convention does not exist", async () => {
+        await expectPromiseToFailWithError(
+          getConvention.execute({ conventionId: convention.id }, {
+            role: "establishment",
+            applicationId: convention.id,
+          } as ConventionMagicLinkPayload),
+          new NotFoundError(`No convention found with id ${convention.id}`),
+        );
+      });
+      it("When if user is not on inclusion connected users", async () => {
+        uow.agencyRepository.setAgencies([agency]);
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        const userId = "my-user-id";
+
+        await expectPromiseToFailWithError(
+          getConvention.execute({ conventionId: convention.id }, { userId }),
+          new NotFoundError(`No user found with id '${userId}'`),
+        );
+      });
     });
   });
 
-  describe("When user is forbidden", () => {
-    it("no auth payload provided", async () => {
-      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
-      await expectPromiseToFailWithError(
-        getConvention.execute({ conventionId }),
-        new ForbiddenError(`No auth payload provided`),
-      );
-    });
-
-    it("convention id in jwt token does not match provided one", async () => {
-      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
-      await expectPromiseToFailWithError(
-        getConvention.execute({ conventionId }, {
-          role: "establishment",
-          applicationId: "not-matching-convention-id",
-        } as ConventionMagicLinkPayload),
-        new ForbiddenError(
-          `This token is not allowed to access convention with id ${conventionId}. Role was 'establishment'`,
-        ),
-      );
-    });
-  });
-
-  describe("With inclusion connected user", () => {
-    it("throws if user is not allowed to access the convention (convention not linked to one of it's agencies)", async () => {
-      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
-      await expectPromiseToFailWithError(
-        getConvention.execute({ conventionId }, { userId: "my-user-id" }),
-        new ForbiddenError(
-          `User with id 'my-user-id' is not allowed to access convention with id '${conventionId}'`,
-        ),
-      );
-    });
-
-    it("gets it if icUser has enough rights for the agency linked to the convention", async () => {
-      const agency = new AgencyDtoBuilder().build();
+  describe("Right paths", () => {
+    beforeEach(() => {
       uow.agencyRepository.setAgencies([agency]);
-      const entity = new ConventionDtoBuilder()
-        .withId(conventionIdAllowedForIcUser)
-        .withAgencyId(agency.id)
-        .build();
-      uow.conventionRepository.setConventions({ [entity.id]: entity });
+      uow.conventionRepository.setConventions({ [convention.id]: convention });
+    });
 
+    it("Inclusion connected user", async () => {
       const user: InclusionConnectedUser = {
         id: "my-user-id",
         email: "my-user@email.com",
@@ -96,36 +121,58 @@ describe("Get Convention", () => {
         agencyRights: [{ role: "validator", agency }],
       };
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+      const jwtPayload: InclusionConnectDomainJwtPayload = {
+        userId: "my-user-id",
+      };
 
       const fetchedConvention = await getConvention.execute(
-        { conventionId: entity.id },
-        { userId: "my-user-id" },
+        { conventionId: convention.id },
+        jwtPayload,
       );
 
       expectToEqual(fetchedConvention, {
-        ...entity,
+        ...convention,
         agencyName: TEST_AGENCY_NAME,
         agencyDepartment: TEST_AGENCY_DEPARTMENT,
       });
     });
-  });
 
-  describe("When a Convention is stored", () => {
-    it("returns the Convention", async () => {
-      const entity = new ConventionDtoBuilder().build();
-      uow.conventionRepository.setConventions({ [entity.id]: entity });
+    it("with ConventionMagicLinkPayload", async () => {
+      const payload: ConventionMagicLinkPayload = {
+        role: "establishment",
+        emailHash: "",
+        applicationId: convention.id,
+        iat: 1,
+        version: 1,
+      };
 
-      const convention = await getConvention.execute(
-        {
-          conventionId: entity.id,
-        },
-        {
-          role: "establishment",
-          applicationId: entity.id,
-        } as ConventionMagicLinkPayload,
+      const conventionResult = await getConvention.execute(
+        { conventionId: convention.id },
+        payload,
       );
-      expectToEqual(convention, {
-        ...entity,
+
+      expectToEqual(conventionResult, {
+        ...convention,
+        agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+      });
+    });
+
+    it("with BackOfficeJwtPayload", async () => {
+      const payload: BackOfficeJwtPayload = {
+        role: "backOffice",
+        sub: "",
+        iat: 1,
+        version: 1,
+      };
+
+      const conventionResult = await getConvention.execute(
+        { conventionId: convention.id },
+        payload,
+      );
+
+      expectToEqual(conventionResult, {
+        ...convention,
         agencyName: TEST_AGENCY_NAME,
         agencyDepartment: TEST_AGENCY_DEPARTMENT,
       });

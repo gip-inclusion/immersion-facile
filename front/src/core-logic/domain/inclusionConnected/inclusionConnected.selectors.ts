@@ -1,5 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { fetchedConventionSelector } from "src/core-logic/domain/convention/convention.selectors";
+import { getUserRoleForAccessingConvention } from "shared";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const inclusionConnectedState = createRootSelector(
@@ -23,16 +24,11 @@ const feedback = createSelector(
 
 const agencyRoleForFetchedConvention = createSelector(
   currentUser,
-  fetchedConventionSelector,
-  (icUser, convention) => {
-    if (!convention || !icUser) return null;
-    const agencyRight = icUser.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === convention.agencyId,
-    );
-    if (!agencyRight) return null;
-    if (agencyRight.role === "toReview") return null;
-    return agencyRight.role;
-  },
+  conventionSelectors.convention,
+  (icUser, convention) =>
+    convention && icUser
+      ? getUserRoleForAccessingConvention(convention, icUser)
+      : null,
 );
 
 export const inclusionConnectedSelectors = {

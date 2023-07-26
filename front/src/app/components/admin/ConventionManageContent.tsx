@@ -19,14 +19,10 @@ import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConn
 import { NpsSection } from "../nps/NpsSection";
 import { ConventionManageActions } from "./ConventionManageActions";
 
-type ConventionManageContentProps = {
-  // role: Role;
-} & FetchConventionRequestedPayload;
-
 export const ConventionManageContent = ({
   conventionId,
   jwt,
-}: ConventionManageContentProps): JSX.Element => {
+}: FetchConventionRequestedPayload): JSX.Element => {
   const route = useRoute();
   const inclusionConnectedRole = useAppSelector(
     inclusionConnectedSelectors.agencyRoleForFetchedConvention,

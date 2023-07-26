@@ -9,7 +9,7 @@ import {
 
 type InclusionConnectedAction = ActionOfSlice<typeof inclusionConnectedSlice>;
 
-const onFederatedIdentityFoundInDevice: AppEpic<InclusionConnectedAction> = (
+const federatedIdentityFoundInDeviceEpic: AppEpic<InclusionConnectedAction> = (
   action$,
 ) =>
   action$.pipe(
@@ -62,5 +62,5 @@ const registerAgenciesEpic: AppEpic<InclusionConnectedAction> = (
 export const inclusionConnectedEpics = [
   getCurrentUserEpic,
   registerAgenciesEpic,
-  onFederatedIdentityFoundInDevice,
+  federatedIdentityFoundInDeviceEpic,
 ];

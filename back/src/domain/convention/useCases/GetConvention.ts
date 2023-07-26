@@ -1,9 +1,9 @@
 import {
-  BackOfficeJwtPayload,
   ConventionId,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   ConventionReadDto,
-  InclusionConnectDomainJwtPayload,
+  getUserRoleForAccessingConvention,
+  InclusionConnectJwtPayload,
   WithConventionId,
   withConventionIdSchema,
 } from "shared";
@@ -14,15 +14,10 @@ import {
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-type AuthPayload =
-  | BackOfficeJwtPayload
-  | ConventionMagicLinkPayload
-  | InclusionConnectDomainJwtPayload;
-
 export class GetConvention extends TransactionalUseCase<
   WithConventionId,
   ConventionReadDto,
-  AuthPayload
+  ConventionJwtPayload
 > {
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
@@ -33,44 +28,49 @@ export class GetConvention extends TransactionalUseCase<
   public async _execute(
     { conventionId }: WithConventionId,
     uow: UnitOfWork,
-    authPayload: AuthPayload,
+    authPayload?: ConventionJwtPayload,
   ): Promise<ConventionReadDto> {
-    await this.throwIfNotAllowed(uow, authPayload, conventionId);
+    const isInclusionConnectPayload = this.isInclusionConnectPayload(
+      authPayload,
+      conventionId,
+    );
+
     const convention = await uow.conventionQueries.getConventionById(
       conventionId,
     );
     if (!convention)
       throw new NotFoundError(`No convention found with id ${conventionId}`);
+
+    if (isInclusionConnectPayload) {
+      const user = await uow.inclusionConnectedUserRepository.getById(
+        authPayload.userId,
+      );
+      if (!user)
+        throw new NotFoundError(
+          `No user found with id '${authPayload.userId}'`,
+        );
+
+      const role = getUserRoleForAccessingConvention(convention, user);
+
+      if (!role)
+        throw new ForbiddenError(
+          `User with id '${authPayload.userId}' is not allowed to access convention with id '${conventionId}'`,
+        );
+    }
+
     return convention;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  private async throwIfNotAllowed(
-    uow: UnitOfWork,
-    authPayload: AuthPayload | undefined,
+  private isInclusionConnectPayload(
+    authPayload: ConventionJwtPayload | undefined,
     conventionId: ConventionId,
-  ): Promise<void | never> {
+  ): authPayload is InclusionConnectJwtPayload {
     if (!authPayload) throw new ForbiddenError(`No auth payload provided`);
-    if ("role" in authPayload) {
-      if (authPayload.role === "backOffice") return;
-      if (authPayload.applicationId !== conventionId) {
-        throw new ForbiddenError(
-          `This token is not allowed to access convention with id ${conventionId}. Role was '${authPayload.role}'`,
-        );
-      }
-      return;
-    }
-
-    const userIsAllowed =
-      await uow.inclusionConnectedUserRepository.isUserAllowedToAccessConvention(
-        authPayload.userId,
-        conventionId,
-      );
-
-    if (!userIsAllowed) {
-      throw new ForbiddenError(
-        `User with id '${authPayload.userId}' is not allowed to access convention with id '${conventionId}'`,
-      );
-    }
+    if (!("role" in authPayload)) return true;
+    if (authPayload.role === "backOffice") return false;
+    if (authPayload.applicationId === conventionId) return false;
+    throw new ForbiddenError(
+      `This token is not allowed to access convention with id ${conventionId}. Role was '${authPayload.role}'`,
+    );
   }
 }

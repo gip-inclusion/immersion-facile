@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import {
+  ConventionJwt,
   ConventionReadDto,
   ConventionStatus,
   Role,
@@ -12,7 +13,6 @@ import { VerificationActionButton } from "src/app/components/forms/convention/Ve
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
   ConventionFeedbackKind,
-  ConventionJwt,
   conventionSlice,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";

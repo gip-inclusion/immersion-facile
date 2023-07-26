@@ -85,6 +85,16 @@ export type ConventionMagicLinkPayload = AppJwtPayload & {
   sub?: string;
 };
 
+export type ConventionJwt =
+  | ConventionMagicLinkJwt
+  | BackOfficeJwt
+  | InclusionConnectJwt;
+
+export type ConventionJwtPayload =
+  | BackOfficeJwtPayload
+  | ConventionMagicLinkPayload
+  | InclusionConnectDomainJwtPayload;
+
 export type Role = (typeof allRoles)[number];
 
 export const allRoles = [
@@ -103,6 +113,7 @@ export const allRoles = [
 export type ConventionMagicLinkJwt = Flavor<string, "ConventionMagicLinkJwt">;
 export type BackOfficeJwt = Flavor<string, "BackOfficeJwt">;
 export type EstablishmentJwt = Flavor<string, "EstablishmentJwt">;
+export type InclusionConnectJwt = Flavor<string, "InclusionConnectJwt">;
 
 export type JwtPayloads = {
   convention?: ConventionMagicLinkPayload;
