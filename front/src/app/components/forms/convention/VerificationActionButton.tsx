@@ -35,27 +35,41 @@ type VerificationActionsModal = Exclude<
   "ACCEPTED_BY_COUNSELLOR" | "ACCEPTED_BY_VALIDATOR"
 >;
 
-const { RejectModal, openRejectModal, closeRejectModal } = createModal({
-  name: "reject",
+const {
+  Component: RejectModal,
+  open: openRejectModal,
+  close: closeRejectModal,
+} = createModal({
+  id: "reject",
   isOpenedByDefault: false,
 });
 
-const { DraftModal, openDraftModal, closeDraftModal } = createModal({
-  name: "draft",
+const {
+  Component: DraftModal,
+  open: openDraftModal,
+  close: closeDraftModal,
+} = createModal({
+  id: "draft",
   isOpenedByDefault: false,
 });
 
-const { CancelModal, openCancelModal, closeCancelModal } = createModal({
-  name: "cancel",
+const {
+  Component: CancelModal,
+  open: openCancelModal,
+  close: closeCancelModal,
+} = createModal({
+  id: "cancel",
   isOpenedByDefault: false,
 });
 
-const { DeprecateModal, openDeprecateModal, closeDeprecateModal } = createModal(
-  {
-    name: "deprecate",
-    isOpenedByDefault: false,
-  },
-);
+const {
+  Component: DeprecateModal,
+  open: openDeprecateModal,
+  close: closeDeprecateModal,
+} = createModal({
+  id: "deprecate",
+  isOpenedByDefault: false,
+});
 
 const ModalByStatus = (status: VerificationActionsModal) => {
   const modals = {
