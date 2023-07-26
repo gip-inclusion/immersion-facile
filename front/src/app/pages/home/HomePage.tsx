@@ -27,9 +27,9 @@ type HomePageProps = {
   type: UserType;
 };
 
-const { SiretModal, openSiretModal } = createModal({
+const { Component: SiretModal, open: openSiretModal } = createModal({
   isOpenedByDefault: false,
-  name: "siret",
+  id: "siret",
 });
 
 export const HomePage = ({ type }: HomePageProps) => {
