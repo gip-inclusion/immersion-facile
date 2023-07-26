@@ -86,7 +86,7 @@ export class InMemoryEstablishmentAggregateRepository
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this._establishmentAggregates
-      .filter((aggregate) => aggregate.establishment.isActive)
+      .filter((aggregate) => aggregate.establishment.isOpen)
       .flatMap((aggregate) =>
         uniqBy((offer) => offer.romeCode, aggregate.immersionOffers)
           .filter(

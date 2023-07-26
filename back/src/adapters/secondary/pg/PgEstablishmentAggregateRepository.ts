@@ -118,7 +118,7 @@ export class PgEstablishmentAggregateRepository
       establishment.position.lon,
       establishment.position.lat,
       establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
-      establishment.isActive,
+      establishment.isOpen,
       establishment.isSearchable,
       establishment.isCommited,
       establishment.fitForDisabledWorkers,
@@ -395,7 +395,7 @@ export class PgEstablishmentAggregateRepository
           UPDATE establishments
                    SET update_date = %1$L
                    ${
-                     propertiesToUpdate.isActive !== undefined
+                     propertiesToUpdate.isOpen !== undefined
                        ? ", is_active=%2$L"
                        : ""
                    }
@@ -450,7 +450,7 @@ export class PgEstablishmentAggregateRepository
                    WHERE siret=%21$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
-      propertiesToUpdate.isActive,
+      propertiesToUpdate.isOpen,
       propertiesToUpdate.nafDto?.code,
       propertiesToUpdate.nafDto?.nomenclature,
       propertiesToUpdate.numberEmployeesRange,
@@ -671,7 +671,7 @@ export class PgEstablishmentAggregateRepository
                 'lastInseeCheckDate', to_char(
                   e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
-                'isActive', e.is_active, 
+                'isOpen', e.is_active, 
                 'isSearchable', e.is_searchable, 
                 'isCommited', e.is_commited,
                 'fitForDisabledWorkers', e.fit_for_disabled_workers,
@@ -810,7 +810,7 @@ export class PgEstablishmentAggregateRepository
         `
             UPDATE establishments
             SET last_insee_check_date = %1$L 
-              ${values?.isActive !== undefined ? ", is_active=%3$L" : ""}
+              ${values?.isOpen !== undefined ? ", is_active=%3$L" : ""}
               ${values?.nafDto ? ", naf_code=%4$L" : ""}
               ${values?.nafDto ? ", naf_nomenclature=%5$L" : ""}
               ${values?.name ? ", name=%6$L" : ""}
@@ -819,7 +819,7 @@ export class PgEstablishmentAggregateRepository
         inseeCheckDate.toISOString(),
         siret,
         ...[
-          values?.isActive,
+          values?.isOpen,
           values?.nafDto?.code,
           values?.nafDto?.nomenclature,
           values?.name,

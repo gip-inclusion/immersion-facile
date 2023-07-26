@@ -144,7 +144,7 @@ const siretEstablishmentToValuesToUpdateInEstablishment = (
 ): Partial<ValuesToUpdateFromInseeApi> => ({
   ...(params.nafDto !== undefined ? { nafDto: params.nafDto } : {}),
   ...(params.businessName !== undefined ? { name: params.businessName } : {}),
-  ...(params.isOpen !== undefined ? { isActive: params.isOpen } : {}),
+  ...(params.isOpen !== undefined ? { isOpen: params.isOpen } : {}),
   ...(params.numberEmployeesRange !== undefined
     ? { numberEmployeesRange: params.numberEmployeesRange }
     : {}),

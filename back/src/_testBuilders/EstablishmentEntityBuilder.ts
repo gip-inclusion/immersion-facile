@@ -28,7 +28,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
   updatedAt: new Date("2022-01-05T12:00:00.000"),
-  isActive: true,
+  isOpen: true,
   isSearchable: true,
   maxContactsPerWeek: defaultMaxContactsPerWeek,
 };
@@ -85,10 +85,10 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  withIsActive(isActive: boolean) {
+  withIsOpen(isOpen: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      isActive,
+      isOpen,
     });
   }
 

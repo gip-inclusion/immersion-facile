@@ -24,7 +24,7 @@ export type EstablishmentEntity = {
   numberEmployeesRange: NumberEmployeesRange;
   updatedAt?: Date;
   lastInseeCheckDate?: Date;
-  isActive: boolean;
+  isOpen: boolean;
   isSearchable: boolean;
   isCommited?: boolean;
   fitForDisabledWorkers?: boolean;
