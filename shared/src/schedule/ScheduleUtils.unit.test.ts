@@ -16,6 +16,7 @@ import {
 describe("ScheduleUtils", () => {
   describe("complexScheduleFromRegularSchedule", () => {
     const timePeriods = [{ start: "08:00", end: "10:00" }];
+
     it("with empty regular schedule and same days", () => {
       const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
         .withDateInterval({
@@ -37,6 +38,7 @@ describe("ScheduleUtils", () => {
           .build().complexSchedule,
       );
     });
+
     describe("with updated regular schedule dayPeriods", () => {
       it("initial dayPeriods", () => {
         const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
@@ -58,6 +60,7 @@ describe("ScheduleUtils", () => {
             .build().complexSchedule,
         );
       });
+
       it("updated dayPeriods", () => {
         const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
           .withDateInterval({
@@ -82,6 +85,7 @@ describe("ScheduleUtils", () => {
       });
     });
   });
+
   describe("prettyPrintSchedule", () => {
     it("prints complex schedules", () => {
       expect(
@@ -137,6 +141,7 @@ describe("ScheduleUtils", () => {
         "dimanche : 01:00-02:00, 03:00-04:00",
       ]);
     });
+
     it("prints schedules with schedule that have no timeperiod", () => {
       expect(
         prettyPrintSchedule({
@@ -247,6 +252,7 @@ describe("ScheduleUtils", () => {
       ).toEqual(expectedForLongSchedule);
     });
   });
+
   describe("calculateWeeklyHoursFromSchedule", () => {
     it("calculates correctly the total number of hours from a complex schedule", () => {
       const schedule = new ScheduleDtoBuilder()
@@ -270,6 +276,7 @@ describe("ScheduleUtils", () => {
       expectToEqual(weeklyHours, [22.5]);
     });
   });
+
   describe("CalculateTotalImmersionHoursFromComplexSchedule", () => {
     it("calculates correctly the total number of hours from a complex schedule", () => {
       const schedule = new ScheduleDtoBuilder()
@@ -307,6 +314,7 @@ describe("ScheduleUtils", () => {
       start: new Date("2022-06-29"),
       end: new Date("2022-07-21"),
     };
+
     describe("with no schedule", () => {
       it("empty day period without simple schedule build", () => {
         const schedule = new ScheduleDtoBuilder()
@@ -316,6 +324,7 @@ describe("ScheduleUtils", () => {
           [],
         );
       });
+
       it(`dayperiods '${JSON.stringify([])}'`, () => {
         const schedule = new ScheduleDtoBuilder()
           .withDateInterval(dateInterval)
@@ -325,6 +334,7 @@ describe("ScheduleUtils", () => {
           [],
         );
       });
+
       it("should not validate schema without any timeperiod", () => {
         const emptySchedule = new ScheduleDtoBuilder()
           .withRegularSchedule({
@@ -335,6 +345,7 @@ describe("ScheduleUtils", () => {
 
         expect(() => scheduleSchema.parse(emptySchedule)).toThrow();
       });
+
       describe("check matching totalHours and worked days", () => {
         const scheduleBuilder = new ScheduleDtoBuilder()
           .withDateInterval({
@@ -427,6 +438,7 @@ describe("ScheduleUtils", () => {
         }),
       );
     });
+
     describe("with multiple day periods of multiple days", () => {
       const dayPeriodsScenarios: DayPeriodsDto[] = [
         [
@@ -473,12 +485,14 @@ describe("ScheduleUtils", () => {
         );
       },
     );
+
     it.each(["Not a date", "31-07-2022"])("parse '%s' is invalid", (date) => {
       expect(() => dateIsoStringSchema.parse(date)).toThrow(
         "Invalid time value",
       );
     });
   });
+
   describe("french hour changes (changement d'heure)", () => {
     it("schedule with 26th March", () => {
       const interval = {
@@ -512,6 +526,7 @@ describe("ScheduleUtils", () => {
       expectToEqual(calculateNumberOfWorkedDays(schedule.complexSchedule), 1);
     });
   });
+
   describe("isSundayInSchedule", () => {
     it("return false if schedule does not contain sunday", () => {
       const complexSchedule = makeDailySchedule(new Date("2023-07-18"), [

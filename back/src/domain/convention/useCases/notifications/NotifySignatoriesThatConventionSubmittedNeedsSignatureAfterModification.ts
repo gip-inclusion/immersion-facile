@@ -25,6 +25,8 @@ import { retrieveConventionWithAgency } from "../../entities/Convention";
 export const NO_JUSTIFICATION = "Aucune justification trouvée.";
 
 export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification extends TransactionalUseCase<ConventionDto> {
+  protected inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly timeGateway: TimeGateway,
@@ -35,8 +37,6 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = conventionSchema;
 
   protected async _execute(
     conventionPayload: ConventionDto,

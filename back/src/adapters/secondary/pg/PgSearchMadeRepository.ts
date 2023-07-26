@@ -31,6 +31,15 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     );
   }
 
+  public async markSearchAsProcessed(
+    searchMadeId: SearchMadeId,
+  ): Promise<void> {
+    await this.client.query(
+      "UPDATE searches_made SET needstobesearched=false WHERE id = $1 ; ",
+      [searchMadeId],
+    );
+  }
+
   public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
     const requestResult = await this.client.query(
       "SELECT * from searches_made WHERE needstobesearched=true",
@@ -48,14 +57,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         apiConsumerName: optional(row.api_consumer_name),
         voluntaryToImmersion: row.voluntary_to_immersion,
       }),
-    );
-  }
-  public async markSearchAsProcessed(
-    searchMadeId: SearchMadeId,
-  ): Promise<void> {
-    await this.client.query(
-      "UPDATE searches_made SET needstobesearched=false WHERE id = $1 ; ",
-      [searchMadeId],
     );
   }
 }

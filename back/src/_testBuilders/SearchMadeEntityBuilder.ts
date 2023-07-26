@@ -18,19 +18,21 @@ export class SearchMadeEntityBuilder implements Builder<SearchMadeEntity> {
     private readonly entity: SearchMadeEntity = validSearchMadeEntity,
   ) {}
 
+  build(): SearchMadeEntity {
+    return this.entity;
+  }
+
   public withId(id: SearchMadeId): SearchMadeEntityBuilder {
     return new SearchMadeEntityBuilder({
       ...this.entity,
       id,
     });
   }
+
   public withNeedsToBeSearch() {
     return new SearchMadeEntityBuilder({
       ...this.entity,
       needsToBeSearched: true,
     });
-  }
-  build(): SearchMadeEntity {
-    return this.entity;
   }
 }

@@ -90,6 +90,7 @@ describe("HttpPeConnectGateway", () => {
         });
       });
     });
+
     describe("Wrong path", () => {
       it("Invalid grant -> ManagedRedirectError kind peConnectInvalidGrant", async () => {
         mock.onPost(targets.exchangeCodeForAccessToken.url).reply(400, {
@@ -105,6 +106,7 @@ describe("HttpPeConnectGateway", () => {
           ),
         );
       });
+
       it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
         mock.onPost(targets.exchangeCodeForAccessToken.url).abortRequest();
         await testManagedRedirectError(
@@ -137,6 +139,7 @@ describe("HttpPeConnectGateway", () => {
           },
         );
       });
+
       it(`OK with ${peExternalUser.email} user and ${peExternalAdvisorCapemploi.mail} advisor`, async () => {
         mock
           .onGet(targets.getAdvisorsInfo.url)
@@ -157,6 +160,7 @@ describe("HttpPeConnectGateway", () => {
           },
         );
       });
+
       it(`OK with user not jobseeker -> no advisors`, async () => {
         mock
           .onGet(targets.getUserInfo.url)
@@ -176,6 +180,7 @@ describe("HttpPeConnectGateway", () => {
         );
       });
     });
+
     describe("Wrong path", () => {
       describe("Errors on getUserInfo", () => {
         // eslint-disable-next-line jest/no-disabled-tests
@@ -246,6 +251,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Network error -> RawRedirectError`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -261,6 +267,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -275,6 +282,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Error 500 -> RawRedirectError`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -369,6 +377,7 @@ describe("HttpPeConnectGateway", () => {
             new ManagedRedirectError("peConnectConnectionAborted", new Error()),
           );
         });
+
         it(`Network error -> RawRedirectError`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -389,6 +398,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Error 401 -> ManagedRedirectError kind peConnectAdvisorForbiddenAccess`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -408,6 +418,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Error 500 -> OK with no advisors`, async () => {
           mock
             .onGet(targets.getUserInfo.url)
@@ -446,6 +457,7 @@ describe("HttpPeConnectGateway", () => {
             },
           );
         });
+
         it("Bad status code -> OK with No advisors and not jobseeker", async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -465,6 +477,7 @@ describe("HttpPeConnectGateway", () => {
             },
           );
         });
+
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -481,6 +494,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Network error -> RawRedirectError`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -498,6 +512,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)
@@ -514,6 +529,7 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
+
         it(`Error 500 -> RawRedirectError`, async () => {
           mock
             .onGet(targets.getAdvisorsInfo.url)

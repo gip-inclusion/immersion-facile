@@ -13,14 +13,14 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,
   SiretEstablishmentDto
 > {
+  inputSchema = getSiretRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly siretGateway: SiretGateway,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = getSiretRequestSchema;
 
   public async _execute(
     params: GetSiretRequestDto,

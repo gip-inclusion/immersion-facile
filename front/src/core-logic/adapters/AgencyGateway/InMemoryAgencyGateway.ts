@@ -74,7 +74,6 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .build();
 
 export class InMemoryAgencyGateway implements AgencyGateway {
-  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
   private _agencies: Record<string, AgencyDto> = {
     [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
     [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
@@ -83,9 +82,7 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     [CCI_ACTIVE.id]: CCI_ACTIVE,
   };
 
-  updateAgency$(): Observable<void> {
-    return of(undefined);
-  }
+  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
 
   async addAgency(createAgencyDto: CreateAgencyDto) {
     this._agencies[createAgencyDto.id] = {
@@ -94,6 +91,63 @@ export class InMemoryAgencyGateway implements AgencyGateway {
       adminEmails: [],
       questionnaireUrl: createAgencyDto.questionnaireUrl ?? "",
     };
+  }
+
+  getAgencyAdminById$(
+    agencyId: AgencyId,
+    _adminToken: BackOfficeJwt,
+  ): Observable<AgencyDto> {
+    return of(this._agencies[agencyId]);
+  }
+
+  async getAgencyPublicInfoById(
+    withAgencyId: WithAgencyId,
+  ): Promise<AgencyPublicDisplayDto> {
+    const agency = this._agencies[withAgencyId.agencyId];
+    if (agency) return toAgencyPublicDisplayDto(agency);
+    throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
+  }
+
+  getAgencyPublicInfoById$(
+    agencyId: WithAgencyId,
+  ): Observable<AgencyPublicDisplayDto> {
+    return from(this.getAgencyPublicInfoById(agencyId));
+  }
+
+  async getFilteredAgencies(
+    filter: ListAgenciesRequestDto,
+  ): Promise<AgencyOption[]> {
+    return values(this._agencies)
+      .filter((agency) => filter.status?.includes(agency.status) ?? true)
+      .map((agency) => ({
+        id: agency.id,
+        name: agency.name,
+        kind: agency.kind,
+      }));
+  }
+
+  getImmersionFacileAgencyId$(): Observable<AgencyId> {
+    return of("agency-id-with-immersion-facile-kind");
+  }
+
+  listAgenciesByFilter$(
+    _filter: ListAgenciesRequestDto,
+  ): Observable<AgencyOption[]> {
+    return of(values(this._agencies));
+  }
+
+  listAgenciesNeedingReview$(
+    _adminToken: BackOfficeJwt,
+  ): Observable<AgencyOption[]> {
+    return of(
+      values(this._agencies)
+        .filter((agency) => agency.status === "needsReview")
+        .map((agency) => ({
+          id: agency.id,
+          name: agency.name,
+          kind: agency.kind,
+        })),
+    );
   }
 
   async listImmersionAgencies(
@@ -122,6 +176,10 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     return values(this._agencies).filter(propEq("kind", "cci"));
   }
 
+  updateAgency$(): Observable<void> {
+    return of(undefined);
+  }
+
   async validateOrRejectAgency(
     _: BackOfficeJwt,
     agencyId: AgencyId,
@@ -134,62 +192,5 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     agencyId: AgencyId,
   ): Observable<void> {
     return from(this.validateOrRejectAgency(adminToken, agencyId));
-  }
-
-  async getAgencyPublicInfoById(
-    withAgencyId: WithAgencyId,
-  ): Promise<AgencyPublicDisplayDto> {
-    const agency = this._agencies[withAgencyId.agencyId];
-    if (agency) return toAgencyPublicDisplayDto(agency);
-    throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
-  }
-
-  getAgencyPublicInfoById$(
-    agencyId: WithAgencyId,
-  ): Observable<AgencyPublicDisplayDto> {
-    return from(this.getAgencyPublicInfoById(agencyId));
-  }
-
-  listAgenciesByFilter$(
-    _filter: ListAgenciesRequestDto,
-  ): Observable<AgencyOption[]> {
-    return of(values(this._agencies));
-  }
-
-  getImmersionFacileAgencyId$(): Observable<AgencyId> {
-    return of("agency-id-with-immersion-facile-kind");
-  }
-
-  getAgencyAdminById$(
-    agencyId: AgencyId,
-    _adminToken: BackOfficeJwt,
-  ): Observable<AgencyDto> {
-    return of(this._agencies[agencyId]);
-  }
-
-  listAgenciesNeedingReview$(
-    _adminToken: BackOfficeJwt,
-  ): Observable<AgencyOption[]> {
-    return of(
-      values(this._agencies)
-        .filter((agency) => agency.status === "needsReview")
-        .map((agency) => ({
-          id: agency.id,
-          name: agency.name,
-          kind: agency.kind,
-        })),
-    );
-  }
-
-  async getFilteredAgencies(
-    filter: ListAgenciesRequestDto,
-  ): Promise<AgencyOption[]> {
-    return values(this._agencies)
-      .filter((agency) => filter.status?.includes(agency.status) ?? true)
-      .map((agency) => ({
-        id: agency.id,
-        name: agency.name,
-        kind: agency.kind,
-      }));
   }
 }

@@ -206,6 +206,7 @@ describe("PgAgencyRepository", () => {
       });
       expect(sortById(agencies)).toEqual([agency2MissionLocale, agency1PE]);
     });
+
     it("if agencyKindFilter = 'immersionPeOnly', returns only pe agencies", async () => {
       await Promise.all([
         agencyRepository.insert(agency1PE),
@@ -217,6 +218,7 @@ describe("PgAgencyRepository", () => {
       });
       expect(sortById(agencies)).toEqual([agency1PE]);
     });
+
     it("if agencyKindFilter = 'miniStageOnly', returns only cci agencies", async () => {
       await Promise.all([
         agencyRepository.insert(agencyCciInParis),
@@ -228,6 +230,7 @@ describe("PgAgencyRepository", () => {
       });
       expect(sortById(agencies)).toEqual([agencyCciInParis]);
     });
+
     it("if agencyKindFilter = 'miniStageExcluded', returns agencies that are not kind cci", async () => {
       await Promise.all([
         agencyRepository.insert(agencyCciInParis),
@@ -254,6 +257,7 @@ describe("PgAgencyRepository", () => {
         agenciesByName[1],
       ]);
     });
+
     it("returns agencies filtered by departmentCode", async () => {
       await Promise.all([
         agencyRepository.insert(agenciesByName[0]),
@@ -316,6 +320,7 @@ describe("PgAgencyRepository", () => {
       lat: 48.693339,
       lon: 6.182858,
     };
+
     it("returns only active agencies which are less than certain distance", async () => {
       const nancyAgency = agency1builder
         .withName("Nancy agency")
@@ -390,6 +395,7 @@ describe("PgAgencyRepository", () => {
       // Assert
       expect(agencies).toEqual([peNancyAgency]);
     });
+
     it("if agencyKindFilter is 'immersionWithoutPe', it returns all agencies except those from PE", async () => {
       const peNancyAgency = agency1builder
         .withName("Nancy PE agency")
@@ -488,6 +494,7 @@ describe("PgAgencyRepository", () => {
         .build();
       agency2 = agency2builder.build();
     });
+
     it("inserts unknown entities", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
@@ -532,6 +539,7 @@ describe("PgAgencyRepository", () => {
       expect(inDb).toHaveLength(1);
       expectToEqual(inDb[0], updatedAgency1);
     });
+
     it("updates the only some fields", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 

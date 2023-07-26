@@ -3,8 +3,17 @@ import { GetSiretInfo } from "shared";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class TestSiretGatewayThroughBack implements SiretGatewayThroughBack {
-  isSiretAlreadySaved(): Observable<boolean> {
-    return this.isSiretInDb$;
+  public getSiretInfoCallCount = 0;
+
+  public getSiretInfoIfNotAlreadySavedCallCount = 0;
+
+  public isSiretInDb$ = new Subject<boolean>();
+
+  public siretInfo$ = new Subject<GetSiretInfo>();
+
+  getSiretInfo(): Observable<GetSiretInfo> {
+    this.getSiretInfoCallCount++;
+    return this.siretInfo$;
   }
 
   getSiretInfoIfNotAlreadySaved(): Observable<GetSiretInfo> {
@@ -12,13 +21,7 @@ export class TestSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return this.siretInfo$;
   }
 
-  getSiretInfo(): Observable<GetSiretInfo> {
-    this.getSiretInfoCallCount++;
-    return this.siretInfo$;
+  isSiretAlreadySaved(): Observable<boolean> {
+    return this.isSiretInDb$;
   }
-
-  public isSiretInDb$ = new Subject<boolean>();
-  public siretInfo$ = new Subject<GetSiretInfo>();
-  public getSiretInfoCallCount = 0;
-  public getSiretInfoIfNotAlreadySavedCallCount = 0;
 }

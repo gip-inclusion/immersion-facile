@@ -11,11 +11,11 @@ export class GetSiret extends UseCase<
   GetSiretRequestDto,
   SiretEstablishmentDto
 > {
+  inputSchema = getSiretRequestSchema;
+
   constructor(private readonly siretGateway: SiretGateway) {
     super();
   }
-
-  inputSchema = getSiretRequestSchema;
 
   public async _execute(
     params: GetSiretRequestDto,

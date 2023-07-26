@@ -109,6 +109,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       distanceKm: 30,
       sortedBy: "distance",
     };
+
     it("returns empty list when repo is empty", async () => {
       // Act
       const searchWithNoRomeResult =
@@ -391,6 +392,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       expect(searchResult).toMatchObject([expectedResult]);
     });
+
     it("if sorted=distance, returns closest establishments in first", async () => {
       // Prepare : establishment in geographical area but not active
       const closeSiret = "99000403200029";
@@ -427,6 +429,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       expect(searchResult[0].siret).toEqual(closeSiret);
       expect(searchResult[1].siret).toEqual(farSiret);
     });
+
     it("if sorted=date, returns latest offers in first", async () => {
       // Prepare : establishment in geographical area but not active
       const recentOfferSiret = "99000403200029";
@@ -468,6 +471,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       expect(searchResult[0].siret).toEqual(recentOfferSiret);
       expect(searchResult[1].siret).toEqual(oldOfferSiret);
     });
+
     it("returns also contact details if offer has contact uuid and flag is True", async () => {
       // Prepare
       /// Establishment with offer inside geographical area with searched rome
@@ -503,6 +507,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
   describe("Pg implementation of method updateEstablishment", () => {
     const position = { lon: 2, lat: 3 };
+
     it("Updates the parameter `updatedAt`, `fitForDisabledWorkers` and `isActive if given", async () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
@@ -592,6 +597,7 @@ describe("PgEstablishmentAggregateRepository", () => {
   describe("pg implementation of method insertEstablishmentAggregates", () => {
     const siret1 = "11111111111111";
     const siret2 = "22222222222222";
+
     describe("create new establishments", () => {
       it("does nothing if empty list given", async () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates(
@@ -599,6 +605,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
         expect(await getAllEstablishmentsRows(client)).toHaveLength(0);
       });
+
       it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
         // Prepare
         const establishmentToInsert = new EstablishmentEntityBuilder()
@@ -638,6 +645,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           expectedEstablishmentRow,
         );
       });
+
       it("adds one new row per establishment in `establishments` table when multiple establishments are given", async () => {
         // Act
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
@@ -659,6 +667,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           siret2,
         ]);
       });
+
       it("adds a new row in contact table with contact referencing the establishment siret", async () => {
         // Prepare
         const contactId = "3ca6e619-d654-4d0d-8fa6-2febefbe953d";
@@ -695,6 +704,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           expectedImmersionContactRow,
         );
       });
+
       it("adds as many row as immersion offers in table `immersion_offers`, each referencing the establishment siret and the contact uuid", async () => {
         // Arrange
         const offer1 = new ImmersionOfferEntityV2Builder()
@@ -743,6 +753,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
   describe("Pg implementation of method hasEstablishmentFromFormWithSiret", () => {
     const siret = "12345678901234";
+
     it("returns false if no establishment from form with given siret exists", async () => {
       // Act and assert
       expect(
@@ -751,6 +762,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         ),
       ).toBe(false);
     });
+
     it("returns true if an establishment from form with given siret exists", async () => {
       // Prepare
       await insertEstablishment(client, {
@@ -875,6 +887,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         aggregate,
       ]);
     });
+
     it("returns an empty list if no establishment found with this siret", async () => {
       const siretNotInTable = "11111111111111";
 
@@ -884,6 +897,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         ),
       ).toHaveLength(0);
     });
+
     it("returns a list with offers from offers as AppellationDto of given siret", async () => {
       const actualOffersAsAppelationDto =
         await pgEstablishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
@@ -917,6 +931,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         ),
       ).toBeUndefined();
     });
+
     it("Returns reconstructed SearchImmersionResultDto for given siret and appellationCode", async () => {
       // Prepare
       const siret = "12345678901234";
@@ -999,6 +1014,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         ),
       ).toBeUndefined();
     });
+
     it("Returns reconstructed SearchImmersionResultDto for given siret and rome when appellation is specified", async () => {
       // Prepare
       const siret = "12345678901234";
@@ -1068,6 +1084,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         distance_m: undefined,
       });
     });
+
     it("Returns reconstructed SearchImmersionResultDto for given siret and rome when no appellation and no contact is specified", async () => {
       // Prepare
       const siret = "12345678901234";
@@ -1124,6 +1141,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     describe("Pg implementation of method  getEstablishmentAggregateBySiret", () => {
       const siret = "12345678901234";
+
       it("Returns undefined if no aggregate exists with given siret", async () => {
         // Act
         const retrievedAggregate =
@@ -1133,6 +1151,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         // Assert
         expect(retrievedAggregate).toBeUndefined();
       });
+
       it("Retrieves an existing aggregate given its siret", async () => {
         // Prepare
         const establishmentAggregate = new EstablishmentAggregateBuilder()
@@ -1195,6 +1214,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           existingEstablishmentAggregate,
         ]);
       });
+
       it("Throws if the siret does not exist in base", async () => {
         const aggregateNotInBase = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("11111111111111")
@@ -1208,6 +1228,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           `We do not have an establishment with siret 11111111111111 to update`,
         );
       });
+
       it("Updates offers: removes some and creates some", async () => {
         // Act
         const updatedAggregate: EstablishmentAggregate = {
@@ -1234,6 +1255,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         expect(retrievedAggregate).toBeDefined();
         expectAggregateEqual(retrievedAggregate!, updatedAggregate);
       });
+
       it("Updates establishment informations", async () => {
         // Act
         const updatedAggregate: EstablishmentAggregate = {
@@ -1272,6 +1294,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         };
         expectAggregateEqual(retrievedAggregate!, expectedAggregate);
       });
+
       it("Updates immersion contact but keeps the same id", async () => {
         // Act
         const updatedAggregate: EstablishmentAggregate = {

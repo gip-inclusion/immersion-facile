@@ -23,6 +23,8 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 const logger = createLogger(__filename);
 
 export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<ConventionDto> {
+  inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -33,8 +35,6 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = conventionSchema;
 
   public async _execute(
     convention: ConventionDto,

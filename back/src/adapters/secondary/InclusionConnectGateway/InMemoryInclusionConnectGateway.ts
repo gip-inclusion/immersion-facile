@@ -27,6 +27,9 @@ export const defaultInclusionAccessTokenResponse: InclusionAccessTokenResponse =
 export class InMemoryInclusionConnectGateway
   implements InclusionConnectGateway
 {
+  private accessTokenResponse: InclusionAccessTokenResponse | undefined =
+    undefined;
+
   async getAccessToken(_code: string): Promise<InclusionAccessTokenResponse> {
     if (this.accessTokenResponse) return this.accessTokenResponse;
     throw new Error("No access token provided (in memory)");
@@ -36,6 +39,4 @@ export class InMemoryInclusionConnectGateway
   setAccessTokenResponse(response: InclusionAccessTokenResponse): void {
     this.accessTokenResponse = response;
   }
-  private accessTokenResponse: InclusionAccessTokenResponse | undefined =
-    undefined;
 }

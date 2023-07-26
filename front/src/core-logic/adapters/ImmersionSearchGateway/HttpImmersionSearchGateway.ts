@@ -15,21 +15,6 @@ import {
 export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   constructor(private readonly httpClient: HttpClient<SearchImmersionRoutes>) {}
 
-  public search(
-    searchParams: SearchImmersionQueryParamsDto,
-  ): Observable<SearchImmersionResultDto[]> {
-    return from(
-      this.httpClient
-        .searchImmersion({
-          queryParams: searchParams,
-        })
-        .then((result) => {
-          if (result.status === 200) return result.body;
-          throw new Error(result.body.message);
-        }),
-    );
-  }
-
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
   ): Promise<void | ContactErrorKind> {
@@ -55,5 +40,20 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
     });
 
     return response.body;
+  }
+
+  public search(
+    searchParams: SearchImmersionQueryParamsDto,
+  ): Observable<SearchImmersionResultDto[]> {
+    return from(
+      this.httpClient
+        .searchImmersion({
+          queryParams: searchParams,
+        })
+        .then((result) => {
+          if (result.status === 200) return result.body;
+          throw new Error(result.body.message);
+        }),
+    );
   }
 }

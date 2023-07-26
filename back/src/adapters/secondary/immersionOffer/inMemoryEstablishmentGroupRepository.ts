@@ -31,9 +31,8 @@ export const stubSearchResult: SearchImmersionResultDto = {
 export class InMemoryEstablishmentGroupRepository
   implements EstablishmentGroupRepository
 {
-  public async save(group: EstablishmentGroupEntity) {
-    this.groupsByName[group.name] = group;
-  }
+  // for test purpose
+  private groupsByName: Record<string, EstablishmentGroupEntity> = {};
 
   public async findSearchImmersionResultsBySlug(): Promise<
     SearchImmersionResultDto[]
@@ -41,18 +40,19 @@ export class InMemoryEstablishmentGroupRepository
     return [stubSearchResult];
   }
 
-  // for test purpose
-  private groupsByName: Record<string, EstablishmentGroupEntity> = {};
+  public async save(group: EstablishmentGroupEntity) {
+    this.groupsByName[group.name] = group;
+  }
+
+  public get groups(): EstablishmentGroupEntity[] {
+    return Object.values(this.groupsByName);
+  }
 
   public set groups(groups: EstablishmentGroupEntity[]) {
     this.groupsByName = groups.reduce(
       (acc, group) => ({ ...acc, [group.name]: group }),
       {} satisfies Record<string, EstablishmentGroupEntity>,
     );
-  }
-
-  public get groups(): EstablishmentGroupEntity[] {
-    return Object.values(this.groupsByName);
   }
 }
 

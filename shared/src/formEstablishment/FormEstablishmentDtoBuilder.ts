@@ -88,8 +88,38 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder(emptyFormEstablishment);
   }
 
+  public build() {
+    return this.dto;
+  }
+
+  public buildCsvRow(): EstablishmentCSVRow {
+    return FormEstablishmentToEstablishmentCsvRow(this.dto);
+  }
+
+  public withAppellations(appellations: AppellationAndRomeDto[]) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.dto,
+      appellations,
+    });
+  }
+
   public withBusinessAddress(businessAddress: string) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, businessAddress });
+  }
+
+  public withBusinessContact(businessContact: BusinessContactDto) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, businessContact });
+  }
+
+  public withBusinessContactEmail(email: string) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.dto,
+      businessContact: { ...this.dto.businessContact, email },
+    });
+  }
+
+  public withBusinessName(businessName: string) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, businessName });
   }
 
   public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
@@ -106,36 +136,12 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withBusinessContactEmail(email: string) {
-    return new FormEstablishmentDtoBuilder({
-      ...this.dto,
-      businessContact: { ...this.dto.businessContact, email },
-    });
+  public withSiret(siret: SiretDto) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, siret });
   }
 
   public withSource(source: FormEstablishmentSource) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, source });
-  }
-  public withSiret(siret: SiretDto) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, siret });
-  }
-  public withBusinessName(businessName: string) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, businessName });
-  }
-  public withAppellations(appellations: AppellationAndRomeDto[]) {
-    return new FormEstablishmentDtoBuilder({
-      ...this.dto,
-      appellations,
-    });
-  }
-  public withBusinessContact(businessContact: BusinessContactDto) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, businessContact });
-  }
-  public buildCsvRow(): EstablishmentCSVRow {
-    return FormEstablishmentToEstablishmentCsvRow(this.dto);
-  }
-  public build() {
-    return this.dto;
   }
 }
 

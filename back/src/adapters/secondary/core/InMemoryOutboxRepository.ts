@@ -8,16 +8,16 @@ const logger = createLogger(__filename);
 export class InMemoryOutboxRepository implements OutboxRepository {
   constructor(private readonly _events: Record<string, DomainEvent> = {}) {}
 
+  //test purposes
+  get events(): DomainEvent[] {
+    return values(this._events);
+  }
+
   public async save(event: DomainEvent): Promise<void> {
     this._events[event.id] = event;
     logger.info(
       { newEvent: event, newOutboxSize: this._events.length },
       "save",
     );
-  }
-
-  //test purposes
-  get events(): DomainEvent[] {
-    return values(this._events);
   }
 }

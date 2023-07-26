@@ -22,6 +22,7 @@ const prepareUseCase = () => {
     establishmentAggregateRepository,
   };
 };
+
 describe("Notify pass-emploi", () => {
   it("Calls pass-emploi API with formatted immersion offers from just inserted aggregate", async () => {
     // Prepare

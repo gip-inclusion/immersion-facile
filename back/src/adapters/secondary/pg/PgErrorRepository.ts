@@ -6,6 +6,7 @@ import {
 
 export class PgErrorRepository implements ErrorRepository {
   constructor(private client: PoolClient) {}
+
   public async save(savedError: SavedError): Promise<void> {
     // prettier-ignore
     const { serviceName, message, params, occurredAt } = savedError;

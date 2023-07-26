@@ -12,6 +12,7 @@ const logger = createLogger(__filename);
 
 export class HttpPeAgenciesReferential implements PeAgenciesReferential {
   private axios: AxiosInstance;
+
   private readonly referencielAgenceUrl: AbsoluteUrl;
 
   constructor(

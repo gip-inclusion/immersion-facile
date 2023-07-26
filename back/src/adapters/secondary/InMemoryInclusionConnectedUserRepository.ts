@@ -12,9 +12,19 @@ type AgencyRightsByUserId = Record<AuthenticatedUserId, AgencyRight[]>;
 export class InMemoryInclusionConnectedUserRepository
   implements InclusionConnectedUserRepository
 {
+  public agencyRightsByUserId: AgencyRightsByUserId = {};
+
   constructor(
     private authenticatedUsersRepository: InMemoryAuthenticatedUserRepository,
   ) {}
+
+  async getById(userId: string): Promise<InclusionConnectedUser | undefined> {
+    const user = await this.authenticatedUsersRepository.users.find(
+      (user) => user.id === userId,
+    );
+    if (!user) return;
+    return { ...user, agencyRights: this.agencyRightsByUserId[userId] ?? [] };
+  }
 
   async getWithFilter({
     agencyRole,
@@ -31,20 +41,6 @@ export class InMemoryInclusionConnectedUserRepository
       }));
   }
 
-  async getById(userId: string): Promise<InclusionConnectedUser | undefined> {
-    const user = await this.authenticatedUsersRepository.users.find(
-      (user) => user.id === userId,
-    );
-    if (!user) return;
-    return { ...user, agencyRights: this.agencyRightsByUserId[userId] ?? [] };
-  }
-
-  async update(user: InclusionConnectedUser): Promise<void> {
-    this.agencyRightsByUserId[user.id] = user.agencyRights;
-  }
-
-  public agencyRightsByUserId: AgencyRightsByUserId = {};
-
   setInclusionConnectedUsers(
     inclusionConnectedUsers: InclusionConnectedUser[],
   ) {
@@ -58,5 +54,9 @@ export class InMemoryInclusionConnectedUserRepository
       }),
       {} satisfies AgencyRightsByUserId,
     );
+  }
+
+  async update(user: InclusionConnectedUser): Promise<void> {
+    this.agencyRightsByUserId[user.id] = user.agencyRights;
   }
 }

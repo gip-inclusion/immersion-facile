@@ -15,10 +15,12 @@ describe("address", () => {
       city: "SAINTE-MARIE",
     });
   });
+
   it("infers the department code", () => {
     expect(inferDepartmentCode("75017")).toBe("75");
     expect(inferDepartmentCode("97187")).toBe("971");
   });
+
   it("captureAddressGroups should match any address", () => {
     for (const address in expectedGroups) {
       const capturedAddressGroups = captureAddressGroups(address);

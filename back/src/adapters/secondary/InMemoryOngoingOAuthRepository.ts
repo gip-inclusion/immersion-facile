@@ -5,6 +5,16 @@ import {
 import { OngoingOAuthRepository } from "../../domain/generic/OAuth/ports/OngoingOAuthRepositiory";
 
 export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
+  // for test purpose
+  public ongoingOAuths: OngoingOAuth[] = [];
+
+  public async findByState(state: string, provider: IdentityProvider) {
+    return this.ongoingOAuths.find(
+      (ongoingOAuth) =>
+        ongoingOAuth.state === state && ongoingOAuth.provider === provider,
+    );
+  }
+
   public async save(newOngoingOAuth: OngoingOAuth): Promise<void> {
     const existingOngoingOAuth = await this.findByState(
       newOngoingOAuth.state,
@@ -18,14 +28,4 @@ export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
 
     Object.assign(existingOngoingOAuth, newOngoingOAuth);
   }
-
-  public async findByState(state: string, provider: IdentityProvider) {
-    return this.ongoingOAuths.find(
-      (ongoingOAuth) =>
-        ongoingOAuth.state === state && ongoingOAuth.provider === provider,
-    );
-  }
-
-  // for test purpose
-  public ongoingOAuths: OngoingOAuth[] = [];
 }

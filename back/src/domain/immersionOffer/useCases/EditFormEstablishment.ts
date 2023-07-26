@@ -13,14 +13,14 @@ export class EditFormEstablishment extends TransactionalUseCase<
   void,
   EstablishmentJwtPayload
 > {
+  inputSchema = formEstablishmentSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = formEstablishmentSchema;
 
   public async _execute(
     dto: FormEstablishmentDto,

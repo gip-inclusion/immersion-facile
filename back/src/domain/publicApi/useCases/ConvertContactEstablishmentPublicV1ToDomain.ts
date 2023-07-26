@@ -9,11 +9,11 @@ export class ConvertContactEstablishmentPublicV1ToDomain extends TransactionalUs
   ContactEstablishmentPublicV1Dto,
   ContactEstablishmentRequestDto
 > {
+  inputSchema = contactEstablishmentPublicV1Schema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = contactEstablishmentPublicV1Schema;
 
   protected async _execute(
     { offer, ...contactRequest }: ContactEstablishmentPublicV1Dto,

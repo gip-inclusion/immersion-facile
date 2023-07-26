@@ -8,17 +8,31 @@ import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 const logger = createLogger(__filename);
 export const sendSmsErrorPhoneNumber = "0699999999";
 export class InMemoryNotificationGateway implements NotificationGateway {
-  public constructor(
+  public attachment: Buffer = Buffer.from("");
+
+  private readonly sentEmails: {
+    templatedEmail: TemplatedEmail;
+    sentAt: DateIsoString;
+  }[] = [];
+
+  private readonly sentSms: TemplatedSms[] = [];
+
+  constructor(
     private readonly timeGateway: TimeGateway = new CustomTimeGateway(),
     private readonly numberOfEmailToKeep: number | null = null,
   ) {}
 
-  public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
-    logger.info(
-      templatedEmail.params,
-      `sending email : ${templatedEmail.kind}`,
-    );
-    this.pushEmail(templatedEmail);
+  public async getAttachmentContent(_downloadToken: string): Promise<Buffer> {
+    return this.attachment;
+  }
+
+  // For testing.
+  getSentEmails(): TemplatedEmail[] {
+    return this.sentEmails.map(prop("templatedEmail"));
+  }
+
+  getSentSms(): TemplatedSms[] {
+    return this.sentSms;
   }
 
   private pushEmail(templatedEmail: TemplatedEmail) {
@@ -36,8 +50,12 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     });
   }
 
-  public async getAttachmentContent(_downloadToken: string): Promise<Buffer> {
-    return this.attachment;
+  public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
+    logger.info(
+      templatedEmail.params,
+      `sending email : ${templatedEmail.kind}`,
+    );
+    this.pushEmail(templatedEmail);
   }
 
   public async sendSms(sms: TemplatedSms): Promise<void> {
@@ -47,20 +65,4 @@ export class InMemoryNotificationGateway implements NotificationGateway {
       );
     this.sentSms.push(sms);
   }
-
-  // For testing.
-  getSentEmails(): TemplatedEmail[] {
-    return this.sentEmails.map(prop("templatedEmail"));
-  }
-  getSentSms(): TemplatedSms[] {
-    return this.sentSms;
-  }
-
-  public attachment: Buffer = Buffer.from("");
-
-  private readonly sentEmails: {
-    templatedEmail: TemplatedEmail;
-    sentAt: DateIsoString;
-  }[] = [];
-  private readonly sentSms: TemplatedSms[] = [];
 }

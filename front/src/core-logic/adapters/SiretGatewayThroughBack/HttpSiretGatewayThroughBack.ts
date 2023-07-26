@@ -15,16 +15,7 @@ import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroug
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   constructor(private readonly httpClient: HttpClient<SiretTargets>) {}
 
-  isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
-    return from(
-      this.httpClient
-        .isSiretAlreadySaved({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody),
-    );
-  }
-
   // public isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {}
-
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
     return from(
       this.httpClient
@@ -42,6 +33,14 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
         .getSiretInfoIfNotAlreadySaved({ urlParams: { siret } })
         .then(({ responseBody }) => responseBody)
         .catch(handleSiretApiError),
+    );
+  }
+
+  isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
+    return from(
+      this.httpClient
+        .isSiretAlreadySaved({ urlParams: { siret } })
+        .then(({ responseBody }) => responseBody),
     );
   }
 }

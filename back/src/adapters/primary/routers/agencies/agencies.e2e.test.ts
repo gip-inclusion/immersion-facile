@@ -94,6 +94,7 @@ describe(`/${agenciesRoute} route`, () => {
       ]);
     });
   });
+
   describe("private route to get agencies full dto given filters", () => {
     it("Returns Forbidden if no token provided", async () => {
       const response = await request.get(
@@ -149,6 +150,7 @@ describe(`/${agenciesRoute} route`, () => {
       expect(gateways.notification.getSentEmails()).toHaveLength(1);
     });
   });
+
   describe("private route to update an agency data", () => {
     it("fails if provided token is not valid", async () => {
       await request
@@ -183,6 +185,7 @@ describe(`/${agenciesRoute} route`, () => {
       expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
     });
   });
+
   describe("Public route to get agency public info by id", () => {
     it("Returns agency public info", async () => {
       // Prepare

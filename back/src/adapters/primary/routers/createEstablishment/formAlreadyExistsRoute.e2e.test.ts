@@ -13,6 +13,7 @@ describe("route to check if a form's siret already exists", () => {
   beforeEach(async () => {
     ({ request, inMemoryUow } = await buildTestApp());
   });
+
   it("Returns false if the siret does not exist", async () => {
     await request
       .get(siretTargets.isSiretAlreadySaved.url)

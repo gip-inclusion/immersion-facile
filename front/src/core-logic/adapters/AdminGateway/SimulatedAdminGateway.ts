@@ -38,22 +38,6 @@ const simulatedAgencyDtos: AgencyRight[] = [
   },
 ];
 export class SimulatedAdminGateway implements AdminGateway {
-  login({ user }: UserAndPassword): Observable<BackOfficeJwt> {
-    if (user.toLowerCase() === "failed")
-      return throwError(
-        () =>
-          new Error("Impossible de vous authentifier (SimulatedAdminGateway)"),
-      );
-    return of("some-token");
-  }
-
-  public getDashboardUrl$(
-    { name }: GetDashboardParams,
-    _token: BackOfficeJwt,
-  ): Observable<AbsoluteUrl> {
-    const url: AbsoluteUrl = `http://${name}.com`;
-    return of(url);
-  }
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
     _token: BackOfficeJwt,
@@ -76,6 +60,14 @@ export class SimulatedAdminGateway implements AdminGateway {
         },
       ],
     });
+  }
+
+  public getDashboardUrl$(
+    { name }: GetDashboardParams,
+    _token: BackOfficeJwt,
+  ): Observable<AbsoluteUrl> {
+    const url: AbsoluteUrl = `http://${name}.com`;
+    return of(url);
   }
 
   getInclusionConnectedUsersToReview$(): Observable<InclusionConnectedUser[]> {
@@ -112,6 +104,23 @@ export class SimulatedAdminGateway implements AdminGateway {
     ]);
   }
 
+  getLastNotifications(_token: BackOfficeJwt): Observable<NotificationsByKind> {
+    const notificationsByKind: NotificationsByKind = {
+      emails: [],
+      sms: [],
+    };
+    return of(notificationsByKind);
+  }
+
+  login({ user }: UserAndPassword): Observable<BackOfficeJwt> {
+    if (user.toLowerCase() === "failed")
+      return throwError(
+        () =>
+          new Error("Impossible de vous authentifier (SimulatedAdminGateway)"),
+      );
+    return of("some-token");
+  }
+
   updateUserRoleForAgency$(
     { agencyId }: IcUserRoleForAgencyParams,
     _token: string,
@@ -119,13 +128,5 @@ export class SimulatedAdminGateway implements AdminGateway {
     return agencyId === "non-existing-agency-id"
       ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
       : of(undefined);
-  }
-
-  getLastNotifications(_token: BackOfficeJwt): Observable<NotificationsByKind> {
-    const notificationsByKind: NotificationsByKind = {
-      emails: [],
-      sms: [],
-    };
-    return of(notificationsByKind);
   }
 }

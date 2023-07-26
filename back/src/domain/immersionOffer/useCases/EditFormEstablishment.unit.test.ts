@@ -36,6 +36,7 @@ const prepareUseCase = () => {
     formEstablishmentRepository,
   };
 };
+
 describe("Edit Form Establishment", () => {
   describe("Siret in JWT Payload does not match siret in edited establishment DTO", () => {
     it("Throws forbidden error", async () => {
@@ -53,6 +54,7 @@ describe("Edit Form Establishment", () => {
       );
     });
   });
+
   describe("Siret in JWT Payload matches siret in edited establishment DTO", () => {
     const formSiret = "12345678901234";
     const payload = { siret: formSiret } as EstablishmentJwtPayload;
@@ -80,6 +82,7 @@ describe("Edit Form Establishment", () => {
         expect(outboxRepository.events[0].topic).toEqual(expectedEventTopic);
         expect(outboxRepository.events[0].payload).toEqual(updatedDto);
       });
+
       it("should update the establishment form in repository", async () => {
         // Prepare
         const { useCase, formEstablishmentRepository } = prepareUseCase();
@@ -94,6 +97,7 @@ describe("Edit Form Establishment", () => {
         );
       });
     });
+
     describe("If establishment form id does not exist", () => {
       it("should throw a conflict error", async () => {
         const { useCase } = prepareUseCase();

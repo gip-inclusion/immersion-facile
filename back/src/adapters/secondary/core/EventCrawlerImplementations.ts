@@ -20,12 +20,6 @@ export class BasicEventCrawler implements EventCrawler {
     private readonly eventBus: EventBus,
   ) {}
 
-  startCrawler() {
-    logger.warn(
-      "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
-    );
-  }
-
   public async processNewEvents(): Promise<void> {
     const startDate = new Date();
     const events = await this.retrieveEvents("unpublished");
@@ -40,25 +34,6 @@ export class BasicEventCrawler implements EventCrawler {
       });
     }
 
-    await this.publishEvents(events);
-  }
-
-  public async retryFailedEvents(): Promise<void> {
-    const startDate = new Date();
-    const events = await this.retrieveEvents("failed");
-    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-
-    if (events.length) {
-      logger.warn(
-        {
-          durationInSeconds,
-          typeOfEvents: "failed",
-          numberOfEvent: events.length,
-          events: eventsToDebugInfo(events),
-        },
-        `retryFailedEvents | ${events.length} events to process`,
-      );
-    }
     await this.publishEvents(events);
   }
 
@@ -96,6 +71,31 @@ export class BasicEventCrawler implements EventCrawler {
       });
       return [];
     }
+  }
+
+  public async retryFailedEvents(): Promise<void> {
+    const startDate = new Date();
+    const events = await this.retrieveEvents("failed");
+    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+
+    if (events.length) {
+      logger.warn(
+        {
+          durationInSeconds,
+          typeOfEvents: "failed",
+          numberOfEvent: events.length,
+          events: eventsToDebugInfo(events),
+        },
+        `retryFailedEvents | ${events.length} events to process`,
+      );
+    }
+    await this.publishEvents(events);
+  }
+
+  startCrawler() {
+    logger.warn(
+      "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
+    );
   }
 }
 

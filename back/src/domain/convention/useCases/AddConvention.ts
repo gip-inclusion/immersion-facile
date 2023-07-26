@@ -15,6 +15,8 @@ export class AddConvention extends TransactionalUseCase<
   ConventionDtoWithoutExternalId,
   WithConventionIdLegacy
 > {
+  inputSchema = conventionWithoutExternalIdSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -22,8 +24,6 @@ export class AddConvention extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = conventionWithoutExternalIdSchema;
 
   public async _execute(
     createConventionParams: ConventionDtoWithoutExternalId,

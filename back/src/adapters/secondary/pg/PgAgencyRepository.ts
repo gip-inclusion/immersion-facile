@@ -166,6 +166,17 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
+  async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
+    const pgResult = await this.client.query(`
+           SELECT id 
+           FROM agencies
+           WHERE agencies.kind = 'immersion-facile'
+           LIMIT 1
+           `);
+
+    return pgResult.rows[0]?.id;
+  }
+
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
     const query = `INSERT INTO agencies(
       id, name, status, kind, counsellor_emails, validator_emails, admin_emails, 
@@ -211,17 +222,6 @@ export class PgAgencyRepository implements AgencyRepository {
     params[10] =
       agency.position && `POINT(${agency.position.lon} ${agency.position.lat})`;
     await this.client.query(format(query, ...params));
-  }
-
-  async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
-    const pgResult = await this.client.query(`
-           SELECT id 
-           FROM agencies
-           WHERE agencies.kind = 'immersion-facile'
-           LIMIT 1
-           `);
-
-    return pgResult.rows[0]?.id;
   }
 }
 

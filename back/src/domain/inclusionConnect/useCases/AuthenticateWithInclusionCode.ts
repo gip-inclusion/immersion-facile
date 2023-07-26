@@ -25,6 +25,8 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   AuthenticateWithInclusionCodeConnectParams,
   ConnectedRedirectUrl
 > {
+  inputSchema = authenticateWithInclusionCodeSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
@@ -35,8 +37,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = authenticateWithInclusionCodeSchema;
 
   protected async _execute(
     params: AuthenticateWithInclusionCodeConnectParams,
@@ -51,6 +51,18 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     throw new ForbiddenError(
       `No ongoing OAuth with provided state : ${params.state}`,
     );
+  }
+
+  private makeAuthenticatedUser(
+    userId: string,
+    jwtPayload: InclusionConnectIdTokenPayload,
+  ): AuthenticatedUser {
+    return {
+      id: userId,
+      firstName: jwtPayload.given_name,
+      lastName: jwtPayload.family_name,
+      email: jwtPayload.email,
+    };
   }
 
   private async onOngoingOAuth(
@@ -118,17 +130,5 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       lastName: newOrUpdatedAuthenticatedUser.lastName,
       email: newOrUpdatedAuthenticatedUser.email,
     })}`;
-  }
-
-  private makeAuthenticatedUser(
-    userId: string,
-    jwtPayload: InclusionConnectIdTokenPayload,
-  ): AuthenticatedUser {
-    return {
-      id: userId,
-      firstName: jwtPayload.given_name,
-      lastName: jwtPayload.family_name,
-      email: jwtPayload.email,
-    };
   }
 }

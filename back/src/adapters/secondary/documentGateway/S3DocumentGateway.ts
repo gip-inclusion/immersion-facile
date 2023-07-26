@@ -14,7 +14,9 @@ export interface S3Params {
 
 export class S3DocumentGateway implements DocumentGateway {
   private readonly bucketName: string;
+
   private readonly endpoint: string;
+
   private readonly s3: AWS.S3;
 
   constructor(params: S3Params) {
@@ -25,6 +27,10 @@ export class S3DocumentGateway implements DocumentGateway {
     this.bucketName = params.bucketName;
     this.endpoint = params.endPoint;
     this.s3 = new AWS.S3({ endpoint: params.endPoint });
+  }
+
+  getFileUrl(file: StoredFile): string {
+    return `https://${this.bucketName}.${this.endpoint}/${file.id}`;
   }
 
   async put(file: StoredFile): Promise<void> {
@@ -48,9 +54,5 @@ export class S3DocumentGateway implements DocumentGateway {
         },
       );
     });
-  }
-
-  getFileUrl(file: StoredFile): string {
-    return `https://${this.bucketName}.${this.endpoint}/${file.id}`;
   }
 }

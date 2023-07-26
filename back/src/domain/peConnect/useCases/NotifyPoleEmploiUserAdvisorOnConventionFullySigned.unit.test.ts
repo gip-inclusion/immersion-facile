@@ -120,6 +120,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       ],
     });
   });
+
   it("peConnected without advisor", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)

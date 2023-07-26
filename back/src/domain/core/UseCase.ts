@@ -31,6 +31,12 @@ export abstract class UseCase<
 > {
   protected abstract inputSchema: z.ZodSchema<Input>;
 
+  // this method is guaranteed to only receive validated params
+  protected abstract _execute(
+    params: Input,
+    jwtPayload?: JWTPayload,
+  ): Promise<Output>;
+
   // this methode should not be overwritten, implement _execute instead
   public async execute(
     params: Input,
@@ -53,12 +59,6 @@ export abstract class UseCase<
 
     return result;
   }
-
-  // this method is guaranteed to only receive validated params
-  protected abstract _execute(
-    params: Input,
-    jwtPayload?: JWTPayload,
-  ): Promise<Output>;
 }
 
 export abstract class TransactionalUseCase<
@@ -69,6 +69,12 @@ export abstract class TransactionalUseCase<
   protected abstract inputSchema: z.ZodSchema<Input>;
 
   protected constructor(private uowPerformer: UnitOfWorkPerformer) {}
+
+  protected abstract _execute(
+    params: Input,
+    uow: UnitOfWork,
+    jwtPayload?: JWTPayload,
+  ): Promise<Output>;
 
   // this methode should not be overwritten, implement _execute instead
   public async execute(
@@ -108,10 +114,4 @@ export abstract class TransactionalUseCase<
       throw error;
     }
   }
-
-  protected abstract _execute(
-    params: Input,
-    uow: UnitOfWork,
-    jwtPayload?: JWTPayload,
-  ): Promise<Output>;
 }

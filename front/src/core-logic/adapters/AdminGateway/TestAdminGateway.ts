@@ -11,13 +11,19 @@ import {
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
-  login(): Observable<BackOfficeJwt> {
-    return this.token$;
-  }
+  public dashboardUrl$ = new Subject<AbsoluteUrl>();
 
-  public getDashboardUrl$(): Observable<AbsoluteUrl> {
-    return this.dashboardUrl$;
-  }
+  public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
+
+  public getAgencyUsersToReviewResponse$ = new Subject<
+    InclusionConnectedUser[]
+  >();
+
+  public lastNotifications$ = new Subject<NotificationsByKind>();
+
+  public token$ = new Subject<string>();
+
+  public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
 
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
@@ -26,11 +32,8 @@ export class TestAdminGateway implements AdminGateway {
     return this.establishmentBatchResponse$;
   }
 
-  updateUserRoleForAgency$(
-    _params: IcUserRoleForAgencyParams,
-    _token: string,
-  ): Observable<void> {
-    return this.updateAgencyRoleForUserResponse$;
+  public getDashboardUrl$(): Observable<AbsoluteUrl> {
+    return this.dashboardUrl$;
   }
 
   getInclusionConnectedUsersToReview$(): Observable<InclusionConnectedUser[]> {
@@ -41,12 +44,14 @@ export class TestAdminGateway implements AdminGateway {
     return this.lastNotifications$;
   }
 
-  public getAgencyUsersToReviewResponse$ = new Subject<
-    InclusionConnectedUser[]
-  >();
-  public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
-  public token$ = new Subject<string>();
-  public dashboardUrl$ = new Subject<AbsoluteUrl>();
-  public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
-  public lastNotifications$ = new Subject<NotificationsByKind>();
+  login(): Observable<BackOfficeJwt> {
+    return this.token$;
+  }
+
+  updateUserRoleForAgency$(
+    _params: IcUserRoleForAgencyParams,
+    _token: string,
+  ): Observable<void> {
+    return this.updateAgencyRoleForUserResponse$;
+  }
 }

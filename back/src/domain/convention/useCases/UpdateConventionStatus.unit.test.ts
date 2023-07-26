@@ -50,6 +50,7 @@ describe("UpdateConventionStatus", () => {
         "ACCEPTED_BY_COUNSELLOR",
       ],
     });
+
     it("ImmersionApplicationRequiresModification event only has the role of the user that requested the change", async () => {
       const uow = createInMemoryUow();
 

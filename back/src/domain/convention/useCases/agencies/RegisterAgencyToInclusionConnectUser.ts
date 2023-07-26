@@ -20,14 +20,14 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
   void,
   InclusionConnectDomainJwtPayload
 > {
+  inputSchema = agencyIdsSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = agencyIdsSchema;
 
   protected async _execute(
     agencyIds: AgencyId[],

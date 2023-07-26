@@ -122,6 +122,7 @@ describe("addressRouter", () => {
         },
       },
     ];
+
     it(`GET ${lookupLocationUrl(exampleQuery)}`, async () => {
       addressGateway.setLookupSearchResults(expectedLookupSearchResults);
       const response = await request.get(lookupLocationUrl(exampleQuery));

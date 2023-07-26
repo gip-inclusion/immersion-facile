@@ -30,6 +30,7 @@ describe("Establishment batch", () => {
     const storeAndDeps = createTestStore();
     ({ store, dependencies } = storeAndDeps);
   });
+
   it("should indicates load state on add batch requested", () => {
     expectIsLoadingToBe(false);
     store.dispatch(

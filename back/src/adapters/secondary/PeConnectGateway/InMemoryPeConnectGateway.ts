@@ -4,6 +4,12 @@ import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dt
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 
 export class InMemoryPeConnectGateway implements PeConnectGateway {
+  private _accessToken: AccessTokenDto | undefined = undefined;
+
+  private _advisors: PeConnectAdvisorDto[] = [];
+
+  private _user: PeConnectUserDto | undefined = undefined;
+
   public async getAccessToken(
     _authorizationCode: string,
   ): Promise<AccessTokenDto | undefined> {
@@ -28,20 +34,16 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
     return peUserAndAdvisor;
   }
 
-  // test
-  public setUser(user: PeConnectUserDto | undefined) {
-    this._user = user;
+  public setAccessToken(accessToken: AccessTokenDto) {
+    this._accessToken = accessToken;
   }
 
   public setAdvisors(advisors: PeConnectAdvisorDto[]) {
     this._advisors = advisors;
   }
 
-  public setAccessToken(accessToken: AccessTokenDto) {
-    this._accessToken = accessToken;
+  // test
+  public setUser(user: PeConnectUserDto | undefined) {
+    this._user = user;
   }
-
-  private _user: PeConnectUserDto | undefined = undefined;
-  private _accessToken: AccessTokenDto | undefined = undefined;
-  private _advisors: PeConnectAdvisorDto[] = [];
 }

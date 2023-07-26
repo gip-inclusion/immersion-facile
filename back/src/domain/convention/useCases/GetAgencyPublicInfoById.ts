@@ -12,11 +12,11 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
   WithAgencyId,
   AgencyPublicDisplayDto
 > {
+  inputSchema = withAgencyIdSchema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = withAgencyIdSchema;
 
   public async _execute(
     { agencyId }: WithAgencyId,

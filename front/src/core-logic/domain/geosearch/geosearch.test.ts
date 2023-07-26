@@ -18,12 +18,14 @@ describe("Geosearch epic", () => {
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
+
   it("should update the searched query and reset the state", () => {
     const query = "fo";
     store.dispatch(geosearchSlice.actions.queryHasChanged(query));
     expectQueryToBe(query);
     expectLoadingToBe(false);
   });
+
   it("should trigger a new request to the gateway when query > threshold", () => {
     const query = "Poit";
     const expectedSuggestions: LookupSearchResult[] = [
@@ -44,6 +46,7 @@ describe("Geosearch epic", () => {
     expectLoadingToBe(false);
     expectSuggestionsToBe(expectedSuggestions);
   });
+
   it("should update selected suggestion in store", () => {
     const lookupSearchResult: LookupSearchResult = {
       label: "Mon super résultat",

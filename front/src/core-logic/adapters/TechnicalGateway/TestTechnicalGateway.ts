@@ -8,7 +8,11 @@ import {
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class TestTechnicalGateway implements TechnicalGateway {
+  // test purposes only
+  public featureFlags$ = new Subject<FeatureFlags>();
+
   getAllFeatureFlags = () => this.featureFlags$;
+
   setFeatureFlag = (
     params: SetFeatureFlagParam,
     _adminToken: BackOfficeJwt,
@@ -17,16 +21,15 @@ export class TestTechnicalGateway implements TechnicalGateway {
     return this.setFeatureFlagResponse$;
   };
 
+  public setFeatureFlagLastCalledWith: SetFeatureFlagParam | undefined =
+    undefined;
+
+  public setFeatureFlagResponse$ = new Subject<void>();
+
   // eslint-disable-next-line @typescript-eslint/require-await
   uploadLogo = async (file: File): Promise<AbsoluteUrl> => {
     // eslint-disable-next-line no-console
     console.log("file uploaded : ", file);
     return `http://${file.name}-url`;
   };
-
-  // test purposes only
-  public featureFlags$ = new Subject<FeatureFlags>();
-  public setFeatureFlagResponse$ = new Subject<void>();
-  public setFeatureFlagLastCalledWith: SetFeatureFlagParam | undefined =
-    undefined;
 }

@@ -32,8 +32,19 @@ const defaultConfigParams = {
 export class AppConfigBuilder implements Builder<AppConfig> {
   private readonly configParams: ProcessEnv;
 
-  public constructor(configParams: ProcessEnv = {}) {
+  constructor(configParams: ProcessEnv = {}) {
     this.configParams = { ...defaultConfigParams, ...configParams };
+  }
+
+  public build() {
+    return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);
+  }
+
+  public withAuthorizedApiKeyIds(authorizedApiKeyIds: string[]) {
+    return new AppConfigBuilder({
+      ...this.configParams,
+      AUTHORIZED_API_KEY_IDS: authorizedApiKeyIds.join(","),
+    });
   }
 
   public withConfigParams(configParams: ProcessEnv) {
@@ -50,13 +61,6 @@ export class AppConfigBuilder implements Builder<AppConfig> {
     });
   }
 
-  public withAuthorizedApiKeyIds(authorizedApiKeyIds: string[]) {
-    return new AppConfigBuilder({
-      ...this.configParams,
-      AUTHORIZED_API_KEY_IDS: authorizedApiKeyIds.join(","),
-    });
-  }
-
   public withTestPresetPreviousKeys() {
     return new AppConfigBuilder({
       ...this.configParams,
@@ -66,9 +70,5 @@ export class AppConfigBuilder implements Builder<AppConfig> {
       JWT_PREVIOUS_PRIVATE_KEY:
         "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIOgvkzcTPgVdse0fey6Lix4M6mywCpuWbdjFVj23OA2YoAoGCCqGSM49\nAwEHoUQDQgAEXM1fwl4kRy3ivmtJt2CdLTDx/HgSOeLqLQ+q+pqjLnsCJaQtiiy7\nkceujtxAhZcJBSh0QFBoq8JsuaZxNrrBpg==\n-----END EC PRIVATE KEY-----",
     });
-  }
-
-  public build() {
-    return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);
   }
 }

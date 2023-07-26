@@ -20,6 +20,7 @@ describe("Route to generate an establishment edition link", () => {
           )
           .build();
   });
+
   it("Returns 400 with an error message if previous edit link for this siret has not yet expired", async () => {
     // Prepare
     // first query of modification link

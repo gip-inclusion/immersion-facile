@@ -12,6 +12,30 @@ export class PgFormEstablishmentRepository
 {
   constructor(private client: PoolClient) {}
 
+  public async create(
+    formEstablishmentDto: FormEstablishmentDto,
+  ): Promise<void> {
+    // prettier-ignore
+    const {  siret, source, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise, naf, appellations: professions, businessContact,  website, additionalInformation, fitForDisabledWorkers, maxContactsPerWeek } =
+      formEstablishmentDto
+
+    const query = `INSERT INTO form_establishments(
+        siret, source, business_name, business_name_customized, business_address, website, additional_information, is_engaged_enterprise, naf, professions, business_contact, fit_for_disabled_workers, max_contacts_per_week
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`;
+
+    // prettier-ignore
+    try {
+      await this.client.query(query, [siret, source, businessName, businessNameCustomized, businessAddress, website, additionalInformation, isEngagedEnterprise, naf, JSON.stringify(professions), JSON.stringify(businessContact), fitForDisabledWorkers, maxContactsPerWeek]);
+    } catch (error: any) {
+      logger.error({error}, "Cannot save form establishment ")
+      notifyObjectDiscord({
+        _message: `Cannot create form establishment with siret ${formEstablishmentDto.siret}`,
+        ...error
+      });
+      throw new ConflictError(`Cannot create form establishment with siret ${formEstablishmentDto.siret}.`)
+    }
+  }
+
   public async getAll(): Promise<FormEstablishmentDto[]> {
     const pgResult = await this.client.query(
       "SELECT * FROM form_establishments",
@@ -36,29 +60,24 @@ export class PgFormEstablishmentRepository
     return this.pgToEntity(formEstablishment);
   }
 
-  public async create(
-    formEstablishmentDto: FormEstablishmentDto,
-  ): Promise<void> {
-    // prettier-ignore
-    const {  siret, source, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise, naf, appellations: professions, businessContact,  website, additionalInformation, fitForDisabledWorkers, maxContactsPerWeek } =
-      formEstablishmentDto
-
-    const query = `INSERT INTO form_establishments(
-        siret, source, business_name, business_name_customized, business_address, website, additional_information, is_engaged_enterprise, naf, professions, business_contact, fit_for_disabled_workers, max_contacts_per_week
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`;
-
-    // prettier-ignore
-    try {
-      await this.client.query(query, [siret, source, businessName, businessNameCustomized, businessAddress, website, additionalInformation, isEngagedEnterprise, naf, JSON.stringify(professions), JSON.stringify(businessContact), fitForDisabledWorkers, maxContactsPerWeek]);
-    } catch (error: any) {
-      logger.error({error}, "Cannot save form establishment ")
-      notifyObjectDiscord({
-        _message: `Cannot create form establishment with siret ${formEstablishmentDto.siret}`,
-        ...error
-      });
-      throw new ConflictError(`Cannot create form establishment with siret ${formEstablishmentDto.siret}.`)
-    }
+  pgToEntity(params: Record<any, any>): FormEstablishmentDto {
+    return {
+      siret: params.siret,
+      source: params.source,
+      businessName: params.business_name,
+      businessNameCustomized: params.business_name_customized,
+      website: params.website,
+      additionalInformation: params.additional_information,
+      businessAddress: params.business_address,
+      isEngagedEnterprise: params.is_engaged_enterprise,
+      naf: params.naf,
+      appellations: params.professions,
+      businessContact: params.business_contact,
+      fitForDisabledWorkers: optional(params.fit_for_disabled_workers),
+      maxContactsPerWeek: params.max_contacts_per_week,
+    };
   }
+
   public async update(
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<void> {
@@ -88,23 +107,5 @@ export class PgFormEstablishmentRepository
       formEstablishmentDto.fitForDisabledWorkers,
       formEstablishmentDto.maxContactsPerWeek,
     ]);
-  }
-
-  pgToEntity(params: Record<any, any>): FormEstablishmentDto {
-    return {
-      siret: params.siret,
-      source: params.source,
-      businessName: params.business_name,
-      businessNameCustomized: params.business_name_customized,
-      website: params.website,
-      additionalInformation: params.additional_information,
-      businessAddress: params.business_address,
-      isEngagedEnterprise: params.is_engaged_enterprise,
-      naf: params.naf,
-      appellations: params.professions,
-      businessContact: params.business_contact,
-      fitForDisabledWorkers: optional(params.fit_for_disabled_workers),
-      maxContactsPerWeek: params.max_contacts_per_week,
-    };
   }
 }

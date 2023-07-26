@@ -30,6 +30,12 @@ const logger = createLogger(__filename);
 const poleEmploiMaxRequestsPerSeconds = 3;
 
 export class HttpPoleEmploiGateway implements PoleEmploiGateway {
+  private limiter = new Bottleneck({
+    reservoir: poleEmploiMaxRequestsPerSeconds,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: poleEmploiMaxRequestsPerSeconds,
+  });
+
   private peTestPrefix: "test" | "";
 
   constructor(
@@ -40,6 +46,38 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     private readonly retryStrategy: RetryStrategy,
   ) {
     this.peTestPrefix = getPeTestPrefix(peApiUrl);
+  }
+
+  public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
+    return this.caching.caching(scope, () =>
+      this.retryStrategy.apply(() =>
+        this.limiter.schedule(() =>
+          createAxiosInstance(logger)
+            .post(
+              `${this.accessTokenConfig.peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+              querystring.stringify({
+                grant_type: "client_credentials",
+                client_id: this.accessTokenConfig.clientId,
+                client_secret: this.accessTokenConfig.clientSecret,
+                scope,
+              }),
+              {
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                timeout: secondsToMilliseconds(10),
+              },
+            )
+            .then((response) => response.data)
+            .catch((error) => {
+              if (isRetryableError(logger, error))
+                throw new RetryableError(error);
+              logAxiosError(logger, error);
+              throw error;
+            }),
+        ),
+      ),
+    );
   }
 
   public async notifyOnConventionUpdated(
@@ -134,42 +172,4 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       }),
     );
   }
-
-  public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
-    return this.caching.caching(scope, () =>
-      this.retryStrategy.apply(() =>
-        this.limiter.schedule(() =>
-          createAxiosInstance(logger)
-            .post(
-              `${this.accessTokenConfig.peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
-              querystring.stringify({
-                grant_type: "client_credentials",
-                client_id: this.accessTokenConfig.clientId,
-                client_secret: this.accessTokenConfig.clientSecret,
-                scope,
-              }),
-              {
-                headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-                timeout: secondsToMilliseconds(10),
-              },
-            )
-            .then((response) => response.data)
-            .catch((error) => {
-              if (isRetryableError(logger, error))
-                throw new RetryableError(error);
-              logAxiosError(logger, error);
-              throw error;
-            }),
-        ),
-      ),
-    );
-  }
-
-  private limiter = new Bottleneck({
-    reservoir: poleEmploiMaxRequestsPerSeconds,
-    reservoirRefreshInterval: 1000, // number of ms
-    reservoirRefreshAmount: poleEmploiMaxRequestsPerSeconds,
-  });
 }

@@ -16,6 +16,7 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
+
 describe("InclusionConnected", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;

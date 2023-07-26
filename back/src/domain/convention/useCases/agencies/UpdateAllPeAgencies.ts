@@ -31,6 +31,8 @@ const counts = {
 
 // this use case is used only in one script (not in the back app)
 export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
+  protected inputSchema = z.void();
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private referencielAgencesPe: PeAgenciesReferential,
@@ -40,8 +42,6 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = z.void();
 
   async _execute(_: void, uow: UnitOfWork): Promise<void> {
     const start = new Date();

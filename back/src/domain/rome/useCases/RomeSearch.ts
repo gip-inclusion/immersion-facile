@@ -7,11 +7,11 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
+  inputSchema = zTrimmedString;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = zTrimmedString;
 
   public async _execute(
     searchText: string,

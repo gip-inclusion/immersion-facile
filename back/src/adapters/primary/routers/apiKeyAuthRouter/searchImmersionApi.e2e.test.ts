@@ -76,6 +76,7 @@ describe("search-immersion route", () => {
         ] satisfies SearchImmersionResultPublicV0[]);
         expectToEqual(response.statusCode, 200);
       });
+
       it("with no specified rome", async () => {
         await request
           .post(`/${searchImmersionRoute__v0}`)

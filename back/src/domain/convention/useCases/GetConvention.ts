@@ -19,11 +19,11 @@ export class GetConvention extends TransactionalUseCase<
   ConventionReadDto,
   ConventionJwtPayload
 > {
+  inputSchema = withConventionIdSchema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = withConventionIdSchema;
 
   public async _execute(
     { conventionId }: WithConventionId,

@@ -25,6 +25,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     // Assert
     expect(response.status).toBe(401);
   });
+
   it("Retrieves form establishment from aggregates when exists and authenticated", async () => {
     // Prepare
     const { request, generateEditEstablishmentJwt, inMemoryUow } =

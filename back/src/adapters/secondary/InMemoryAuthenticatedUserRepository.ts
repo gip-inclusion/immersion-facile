@@ -5,9 +5,7 @@ import { AuthenticatedUserRepository } from "../../domain/generic/OAuth/ports/Au
 export class InMemoryAuthenticatedUserRepository
   implements AuthenticatedUserRepository
 {
-  async save(user: AuthenticatedUser): Promise<void> {
-    this.usersById[user.id] = user;
-  }
+  private usersById: Record<string, AuthenticatedUser> = {};
 
   async findByEmail(email: string): Promise<AuthenticatedUser | undefined> {
     return this.users.find((user) => user.email === email);
@@ -19,7 +17,9 @@ export class InMemoryAuthenticatedUserRepository
     return this.usersById[id];
   }
 
-  private usersById: Record<string, AuthenticatedUser> = {};
+  async save(user: AuthenticatedUser): Promise<void> {
+    this.usersById[user.id] = user;
+  }
 
   // for test purpose
   public get users(): AuthenticatedUser[] {

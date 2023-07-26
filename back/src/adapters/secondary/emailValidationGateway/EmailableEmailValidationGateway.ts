@@ -14,10 +14,36 @@ const logger = createLogger(__filename);
 const emailableVerifyEmailMaxRatePerSeconds = 25;
 
 export class EmailableEmailValidationGateway implements EmailValidationGetaway {
+  private limiter = new Bottleneck({
+    reservoir: emailableVerifyEmailMaxRatePerSeconds,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: emailableVerifyEmailMaxRatePerSeconds,
+  });
+
   constructor(
     private readonly httpClient: HttpClient<EmailableValidationTargets>,
     private readonly emailableApiKey: EmailableApiKey,
   ) {}
+
+  private isEmailValid(
+    state: EmailableEmailValidationStatus["state"],
+    reason: EmailableEmailValidationStatus["reason"],
+  ): boolean {
+    const unacceptableStates: EmailableEmailValidationStatus["state"][] = [
+      "undeliverable",
+    ];
+    const unacceptableReasons: EmailableEmailValidationStatus["reason"][] = [
+      "invalid_domain",
+      "invalid_email",
+      "invalid_smtp",
+      "rejected_email",
+      "unexpected_error",
+    ];
+    return unacceptableStates.includes(state) ||
+      unacceptableReasons.includes(reason)
+      ? false
+      : true;
+  }
 
   public async validateEmail(email: string): Promise<ValidateEmailStatus> {
     return this.limiter
@@ -44,30 +70,4 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
         throw error;
       });
   }
-
-  private isEmailValid(
-    state: EmailableEmailValidationStatus["state"],
-    reason: EmailableEmailValidationStatus["reason"],
-  ): boolean {
-    const unacceptableStates: EmailableEmailValidationStatus["state"][] = [
-      "undeliverable",
-    ];
-    const unacceptableReasons: EmailableEmailValidationStatus["reason"][] = [
-      "invalid_domain",
-      "invalid_email",
-      "invalid_smtp",
-      "rejected_email",
-      "unexpected_error",
-    ];
-    return unacceptableStates.includes(state) ||
-      unacceptableReasons.includes(reason)
-      ? false
-      : true;
-  }
-
-  private limiter = new Bottleneck({
-    reservoir: emailableVerifyEmailMaxRatePerSeconds,
-    reservoirRefreshInterval: 1000, // number of ms
-    reservoirRefreshAmount: emailableVerifyEmailMaxRatePerSeconds,
-  });
 }

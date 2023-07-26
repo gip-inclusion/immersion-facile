@@ -11,8 +11,9 @@ import {
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
-  private readonly _results$: Subject<SearchImmersionResultDto[]>;
   private _error: Error | null = null;
+
+  private readonly _results$: Subject<SearchImmersionResultDto[]>;
 
   constructor(
     private readonly seedResults?: SearchImmersionResultDto[],
@@ -21,6 +22,21 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     this._results$ = seedResults
       ? new BehaviorSubject(seedResults)
       : new Subject<SearchImmersionResultDto[]>();
+  }
+
+  public async contactEstablishment(
+    _params: ContactEstablishmentRequestDto,
+  ): Promise<void> {
+    await sleep(this.simulatedLatency);
+    if (this._error) throw this._error;
+    return;
+  }
+
+  public async getGroupOffersBySlug(
+    _groupName: EstablishmentGroupSlug,
+  ): Promise<SearchImmersionResultDto[]> {
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
+    return groupOffersBySlugStub;
   }
 
   public search(
@@ -34,18 +50,13 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
       : this._results$;
   }
 
-  public async contactEstablishment(
-    _params: ContactEstablishmentRequestDto,
-  ): Promise<void> {
-    await sleep(this.simulatedLatency);
-    if (this._error) throw this._error;
-    return;
+  // test purpose
+  get searchResults$() {
+    return this._results$;
   }
-  public async getGroupOffersBySlug(
-    _groupName: EstablishmentGroupSlug,
-  ): Promise<SearchImmersionResultDto[]> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    return groupOffersBySlugStub;
+
+  setError(error: Error) {
+    this._error = error;
   }
 
   private simulateSearch(searchParams: SearchImmersionQueryParamsDto) {
@@ -59,15 +70,6 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         ),
       ),
     );
-  }
-
-  // test purpose
-  get searchResults$() {
-    return this._results$;
-  }
-
-  setError(error: Error) {
-    this._error = error;
   }
 }
 

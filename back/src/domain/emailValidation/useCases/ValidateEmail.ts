@@ -10,10 +10,11 @@ export class ValidateEmail extends UseCase<
   ValidateEmailInput,
   ValidateEmailStatus
 > {
+  protected inputSchema = validateEmailInputSchema;
+
   constructor(private emailValidationGateway: EmailValidationGetaway) {
     super();
   }
-  protected inputSchema = validateEmailInputSchema;
 
   protected _execute({
     email,

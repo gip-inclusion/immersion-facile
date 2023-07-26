@@ -91,6 +91,7 @@ describe("Get Convention", () => {
           new NotFoundError(`No convention found with id ${convention.id}`),
         );
       });
+
       it("When if user is not on inclusion connected users", async () => {
         uow.agencyRepository.setAgencies([agency]);
         uow.conventionRepository.setConventions({

@@ -73,6 +73,7 @@ describe("search-immersion route", () => {
         });
       });
     });
+
     describe("authenticated consumer", () => {
       it("with given rome, appellation code and position", async () => {
         const immersionOffer = new ImmersionOfferEntityV2Builder()
@@ -145,6 +146,7 @@ describe("search-immersion route", () => {
           );
         expect(response.status).toBe(200);
       });
+
       it("with no specified appellation code", async () => {
         await request
           .get(

@@ -19,14 +19,14 @@ const withNotificationIdAndKind: z.Schema<WithNotificationIdAndKind> = z.object(
 // Careful, this use case is transactional,
 // but it should only do queries and NEVER write anything to the DB.
 export class SendNotification extends TransactionalUseCase<WithNotificationIdAndKind> {
+  protected inputSchema = withNotificationIdAndKind;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly notificationGateway: NotificationGateway,
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = withNotificationIdAndKind;
 
   protected async _execute(
     { id, kind }: WithNotificationIdAndKind,

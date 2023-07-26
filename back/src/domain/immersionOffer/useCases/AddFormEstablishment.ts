@@ -10,6 +10,8 @@ export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
+  inputSchema = formEstablishmentSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
@@ -17,8 +19,6 @@ export class AddFormEstablishment extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = formEstablishmentSchema;
 
   public async _execute(
     dto: FormEstablishmentDto,

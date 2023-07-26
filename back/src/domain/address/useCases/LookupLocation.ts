@@ -11,10 +11,11 @@ export class LookupLocation extends UseCase<
   WithLookupLocationInputQueryParams,
   LookupSearchResult[]
 > {
+  protected inputSchema = withLookupLocationInputQueryParamsSchema;
+
   constructor(private addressApiGateway: AddressGateway) {
     super();
   }
-  protected inputSchema = withLookupLocationInputQueryParamsSchema;
 
   protected _execute(
     params: WithLookupLocationInputQueryParams,

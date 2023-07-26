@@ -31,50 +31,18 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteApiResultProps = {
 export class LaBonneBoiteCompanyDtoBuilder
   implements Builder<LaBonneBoiteCompanyDto>
 {
-  public constructor(
+  constructor(
     private props: LaBonneBoiteApiResultProps = validEstablishmentFromLaBonneBoite,
   ) {}
 
-  withUrlOfPartner(urlOfPartner: string) {
-    return new LaBonneBoiteCompanyDtoBuilder({
-      ...this.props,
-      url: urlOfPartner,
-    });
-  }
-
-  withEmployeeRange(employeeRange: string) {
-    return new LaBonneBoiteCompanyDtoBuilder({
-      ...this.props,
-      headcount_text: employeeRange,
-    });
-  }
-
-  withName(name: string) {
-    return new LaBonneBoiteCompanyDtoBuilder({
-      ...this.props,
-      name,
-    });
+  public build() {
+    return new LaBonneBoiteCompanyDto(this.props);
   }
 
   withAddress(address: string) {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
       address,
-    });
-  }
-
-  withPosition(position: GeoPositionDto) {
-    return new LaBonneBoiteCompanyDtoBuilder({
-      ...this.props,
-      lat: position.lat,
-      lon: position.lon,
-    });
-  }
-
-  public withSiret(siret: string): LaBonneBoiteCompanyDtoBuilder {
-    return new LaBonneBoiteCompanyDtoBuilder({
-      ...this.props,
-      siret,
     });
   }
 
@@ -85,11 +53,42 @@ export class LaBonneBoiteCompanyDtoBuilder
     });
   }
 
+  withEmployeeRange(employeeRange: string) {
+    return new LaBonneBoiteCompanyDtoBuilder({
+      ...this.props,
+      headcount_text: employeeRange,
+    });
+  }
+
+  public withMatchedRomeCode(
+    matchedRomeCode: string,
+  ): LaBonneBoiteCompanyDtoBuilder {
+    return new LaBonneBoiteCompanyDtoBuilder({
+      ...this.props,
+      matched_rome_code: matchedRomeCode,
+    });
+  }
+
   public withNaf(naf: NafDto): LaBonneBoiteCompanyDtoBuilder {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
       naf: naf.code,
       naf_text: naf.nomenclature,
+    });
+  }
+
+  withName(name: string) {
+    return new LaBonneBoiteCompanyDtoBuilder({
+      ...this.props,
+      name,
+    });
+  }
+
+  withPosition(position: GeoPositionDto) {
+    return new LaBonneBoiteCompanyDtoBuilder({
+      ...this.props,
+      lat: position.lat,
+      lon: position.lon,
     });
   }
 
@@ -107,6 +106,13 @@ export class LaBonneBoiteCompanyDtoBuilder
     });
   }
 
+  public withSiret(siret: string): LaBonneBoiteCompanyDtoBuilder {
+    return new LaBonneBoiteCompanyDtoBuilder({
+      ...this.props,
+      siret,
+    });
+  }
+
   public withStars(stars: number): LaBonneBoiteCompanyDtoBuilder {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
@@ -114,16 +120,10 @@ export class LaBonneBoiteCompanyDtoBuilder
     });
   }
 
-  public withMatchedRomeCode(
-    matchedRomeCode: string,
-  ): LaBonneBoiteCompanyDtoBuilder {
+  withUrlOfPartner(urlOfPartner: string) {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
-      matched_rome_code: matchedRomeCode,
+      url: urlOfPartner,
     });
-  }
-
-  public build() {
-    return new LaBonneBoiteCompanyDto(this.props);
   }
 }

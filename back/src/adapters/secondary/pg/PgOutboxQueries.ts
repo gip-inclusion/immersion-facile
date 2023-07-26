@@ -19,21 +19,6 @@ type StoredEventRow = {
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private client: PoolClient) {}
 
-  async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
-    const { rows } = await this.client.query<StoredEventRow>(`
-    SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
-      outbox_publications.id as publication_id, published_at,
-      subscription_id, error_message
-    FROM outbox
-    LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
-    LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-    WHERE was_quarantined = false AND outbox_publications.id IS null
-    ORDER BY published_at ASC
-    `);
-
-    return convertRowsToDomainEvents(rows);
-  }
-
   async getAllFailedEvents(): Promise<DomainEvent[]> {
     const selectEventIdsWithFailure = `(
       SELECT outbox.id
@@ -71,6 +56,21 @@ export class PgOutboxQueries implements OutboxQueries {
      LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
      LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
      WHERE outbox.id IN ${selectEventIdsStillFailing}
+    `);
+
+    return convertRowsToDomainEvents(rows);
+  }
+
+  async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
+    const { rows } = await this.client.query<StoredEventRow>(`
+    SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
+      outbox_publications.id as publication_id, published_at,
+      subscription_id, error_message
+    FROM outbox
+    LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
+    LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
+    WHERE was_quarantined = false AND outbox_publications.id IS null
+    ORDER BY published_at ASC
     `);
 
     return convertRowsToDomainEvents(rows);

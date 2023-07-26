@@ -4,13 +4,14 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkByEmailDto> {
+  inputSchema = shareLinkByEmailSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
-  inputSchema = shareLinkByEmailSchema;
 
   public async _execute(
     params: ShareLinkByEmailDto,

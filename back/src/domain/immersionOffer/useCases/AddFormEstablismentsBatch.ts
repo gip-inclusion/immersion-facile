@@ -16,14 +16,14 @@ export class AddFormEstablishmentBatch extends UseCase<
   EstablishmentBatchReport,
   AppJwtPayload
 > {
+  protected inputSchema = formEstablishmentBatchSchema;
+
   constructor(
     private addFormEstablishmentUseCase: AddFormEstablishment,
     private uowPerformer: UnitOfWorkPerformer,
   ) {
     super();
   }
-
-  protected inputSchema = formEstablishmentBatchSchema;
 
   protected async _execute({
     formEstablishments,
