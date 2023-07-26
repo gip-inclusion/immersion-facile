@@ -135,7 +135,7 @@ describe("Update establishments from Sirene API", () => {
                 .withNafDto({ code: "999", nomenclature: "Old" })
                 .withName("My old Business")
                 .withCustomizedName("This is my custom name")
-                .withIsActive(true)
+                .withIsOpen(true)
 
                 .build(),
             )
@@ -169,7 +169,7 @@ describe("Update establishments from Sirene API", () => {
                 new EstablishmentEntityBuilder(
                   initialEstablishmentAggregate.establishment,
                 )
-                  .withIsActive(siretEstablishmentDto.isOpen)
+                  .withIsOpen(siretEstablishmentDto.isOpen)
                   .withName(siretEstablishmentDto.businessName)
                   .withNafDto(siretEstablishmentDto.nafDto)
                   .withNumberOfEmployeeRange(
@@ -195,7 +195,7 @@ describe("Update establishments from Sirene API", () => {
                 .withNafDto({ code: "999", nomenclature: "Old" })
                 .withName("My old Business")
                 .withCustomizedName("This is my custom name")
-                .withIsActive(true)
+                .withIsOpen(true)
 
                 .build(),
             )
@@ -212,7 +212,7 @@ describe("Update establishments from Sirene API", () => {
                 .withNafDto({ code: "999", nomenclature: "Old" })
                 .withName("My old Business")
                 .withCustomizedName("This is my custom name")
-                .withIsActive(true)
+                .withIsOpen(true)
 
                 .build(),
             )
@@ -229,7 +229,7 @@ describe("Update establishments from Sirene API", () => {
                 .withNafDto({ code: "999", nomenclature: "Old" })
                 .withName("My old Business")
                 .withCustomizedName("This is my custom name")
-                .withIsActive(true)
+                .withIsOpen(true)
 
                 .build(),
             )
@@ -270,7 +270,7 @@ describe("Update establishments from Sirene API", () => {
                 new EstablishmentEntityBuilder(
                   initialEstablishmentAggregate.establishment,
                 )
-                  .withIsActive(siretEstablishmentDto.isOpen)
+                  .withIsOpen(siretEstablishmentDto.isOpen)
                   .withName(siretEstablishmentDto.businessName)
                   .withNafDto(siretEstablishmentDto.nafDto)
                   .withNumberOfEmployeeRange(
@@ -285,7 +285,7 @@ describe("Update establishments from Sirene API", () => {
                 new EstablishmentEntityBuilder(
                   initialEstablishmentAggregate2.establishment,
                 )
-                  .withIsActive(siretEstablishmentDto.isOpen)
+                  .withIsOpen(siretEstablishmentDto.isOpen)
                   .withName(siretEstablishmentDto.businessName)
                   .withNafDto(siretEstablishmentDto.nafDto)
                   .withNumberOfEmployeeRange(

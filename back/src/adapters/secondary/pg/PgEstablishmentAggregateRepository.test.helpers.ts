@@ -91,7 +91,7 @@ export const insertEstablishment = async (
   props: {
     siret: string;
     updatedAt?: Date;
-    isActive?: boolean;
+    isOpen?: boolean;
     isSearchable?: boolean;
     nafCode?: string;
     numberEmployeesRange?: NumberEmployeesRange;
@@ -119,7 +119,7 @@ export const insertEstablishment = async (
     props.nafCode ?? "8622B",
     props.sourceProvider ?? "api_labonneboite",
     props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
-    props.isActive ?? true,
+    props.isOpen ?? true,
     props.isSearchable ?? true,
     props.fitForDisabledWorkers,
     position.lon,
@@ -238,7 +238,7 @@ export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
 ) => {
   await insertEstablishment(client, {
     siret,
-    isActive: true,
+    isOpen: true,
     position: establishmentPosition,
     sourceProvider,
     address,

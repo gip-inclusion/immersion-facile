@@ -193,7 +193,7 @@ const makeCreateEstablishmentAggregate =
       nafDto,
       position,
       numberEmployeesRange,
-      isActive: true,
+      isOpen: true,
       updatedAt: timeGateway.now(),
       fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
       isSearchable: formEstablishment.maxContactsPerWeek > noContactPerWeek,

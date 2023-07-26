@@ -220,7 +220,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       await insertEstablishment(client, {
         siret: notActiveSiret,
-        isActive: false,
+        isOpen: false,
         position: searchedPosition,
       });
       await insertImmersionOffer(client, {
@@ -510,7 +510,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       await insertEstablishment(client, {
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
-        isActive: true,
+        isOpen: true,
         fitForDisabledWorkers: false,
         position,
       });
@@ -519,7 +519,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       const updatedAt = new Date("2020-05-15T12:00:00.000");
       await pgEstablishmentAggregateRepository.updateEstablishment({
         siret: siretOfEstablishmentToUpdate,
-        isActive: false,
+        isOpen: false,
         fitForDisabledWorkers: true,
         updatedAt,
       });
@@ -553,7 +553,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       await insertEstablishment(client, {
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
-        isActive: true,
+        isOpen: true,
         position,
       });
 
@@ -628,7 +628,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           naf_code: establishmentToInsert.nafDto.code,
           naf_nomenclature: establishmentToInsert.nafDto.nomenclature,
           update_date: establishmentToInsert.updatedAt,
-          is_active: establishmentToInsert.isActive,
+          is_active: establishmentToInsert.isOpen,
           max_contacts_per_week: establishmentToInsert.maxContactsPerWeek,
           last_insee_check_date: establishmentToInsert.lastInseeCheckDate,
         };
@@ -1249,7 +1249,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             position: { lat: 8, lon: 30 },
             nafDto: { code: "8539B", nomenclature: "NAFRev3" },
             numberEmployeesRange: "100-199",
-            isActive: true,
+            isOpen: true,
             isSearchable: false,
             website: "www.updated-website.fr",
             additionalInformation: "Some additional informations",
@@ -1496,13 +1496,13 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         const updateFromInseeParams: UpdateEstablishmentsWithInseeDataParams = {
           [siret1]: {
-            isActive: false,
+            isOpen: false,
             name: "The new business name",
             nafDto: { code: "12345", nomenclature: "Naf nomenclature yolo" },
             numberEmployeesRange: "3-5",
           },
           [siret2]: {
-            isActive: true,
+            isOpen: true,
             nafDto: { code: "22222", nomenclature: "Naf nomenclature yolo" },
             numberEmployeesRange: "3-5",
           },
@@ -1522,7 +1522,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           updatedEstablishment1!.establishment,
           new EstablishmentEntityBuilder(establishment1.establishment)
-            .withIsActive(updateFromInseeParams[siret1]!.isActive!)
+            .withIsOpen(updateFromInseeParams[siret1]!.isOpen!)
             .withName(updateFromInseeParams[siret1]!.name!)
             .withNafDto(updateFromInseeParams[siret1]!.nafDto!)
             .withNumberOfEmployeeRange(
@@ -1540,7 +1540,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           updatedEstablishment2!.establishment,
           new EstablishmentEntityBuilder(establishment2.establishment)
-            .withIsActive(updateFromInseeParams[siret2]!.isActive!)
+            .withIsOpen(updateFromInseeParams[siret2]!.isOpen!)
             .withNafDto(updateFromInseeParams[siret2]!.nafDto!)
             .withNumberOfEmployeeRange(
               updateFromInseeParams[siret2]!.numberEmployeesRange!,
@@ -1589,7 +1589,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   // eslint-disable-next-line jest/no-if
                   ...(index < 2
                     ? {
-                        isActive: false,
+                        isOpen: false,
                         name: "The new business name",
                         nafDto: {
                           code: "12345",
@@ -1641,7 +1641,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           updatedEstablishment1!.establishment,
           new EstablishmentEntityBuilder(aggregates[0].establishment)
-            .withIsActive(updatedEstablishment1Params!.isActive!)
+            .withIsOpen(updatedEstablishment1Params!.isOpen!)
             .withName(updatedEstablishment1Params!.name!)
             .withNafDto(updatedEstablishment1Params!.nafDto!)
             .withNumberOfEmployeeRange(
@@ -1664,7 +1664,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           updatedEstablishment3!.establishment,
           new EstablishmentEntityBuilder(aggregates[2].establishment)
-            .withIsActive(aggregates[2]!.establishment.isActive!)
+            .withIsOpen(aggregates[2]!.establishment.isOpen!)
             .withName(aggregates[2]!.establishment.name!)
             .withNafDto(aggregates[2]!.establishment.nafDto!)
             .withNumberOfEmployeeRange(
