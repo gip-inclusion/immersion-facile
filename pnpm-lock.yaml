@@ -495,8 +495,8 @@ importers:
         specifier: ^7.20.12
         version: 7.20.12
       '@codegouvfr/react-dsfr':
-        specifier: ^0.54.7
-        version: 0.54.7
+        specifier: ^0.73.1
+        version: 0.73.1
       '@emotion/react':
         specifier: ^11.10.5
         version: 11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0)
@@ -3995,13 +3995,6 @@ packages:
 
   /@braintree/sanitize-url@6.0.2:
     resolution: {integrity: sha512-Tbsj02wXCbqGmzdnXNk0SOF19ChhRU70BsroIi4Pm6Ehp56in6vch94mfbdQ17DozxkL3BAVjbZ4Qc1a0HFRAg==}
-    dev: true
-
-  /@codegouvfr/react-dsfr@0.54.7:
-    resolution: {integrity: sha512-UiJy7FB+X6/EyL3O4GhPDwmjgM/T7DHm7puQTCviLikN88W8vOONLOwxuZa4E+IYoBRqCh6r5Kl8sX6KWP7lGA==}
-    hasBin: true
-    dependencies:
-      tsafe: 1.6.0
     dev: true
 
   /@codegouvfr/react-dsfr@0.73.1:
@@ -15784,10 +15777,6 @@ packages:
 
   /ts-toolbelt@9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
-    dev: true
-
-  /tsafe@1.6.0:
-    resolution: {integrity: sha512-wlUeRBnyN3EN2chXznpLm7vBEvJLEOziDU+MN6NRlD99AkwmXgtChNQhp+V97VyRa3Bp05IaL4Cocsc7JlyEUg==}
     dev: true
 
   /tsafe@1.6.4:
