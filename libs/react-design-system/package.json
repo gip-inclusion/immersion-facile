@@ -16,7 +16,7 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.20.12",
-    "@codegouvfr/react-dsfr": "^0.54.7",
+    "@codegouvfr/react-dsfr": "^0.73.1",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.8.0",
