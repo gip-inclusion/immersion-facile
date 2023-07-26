@@ -1,4 +1,3 @@
-import "@gouvfr/dsfr/dist/dsfr.main.min.css";
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
 
 startReactDsfr({
