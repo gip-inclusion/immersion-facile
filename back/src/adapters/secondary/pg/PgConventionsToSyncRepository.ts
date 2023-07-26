@@ -12,6 +12,16 @@ export class PgConventionsToSyncRepository
 {
   constructor(private client: PoolClient) {}
 
+  async getById(id: ConventionId): Promise<ConventionToSync | undefined> {
+    const pgConventionToSync = await selectConventionToSyncById(
+      this.client,
+      id,
+    );
+    return pgConventionToSync
+      ? pgResultToConventionToSync(pgConventionToSync)
+      : undefined;
+  }
+
   async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
     const queryResult = await this.client.query<PgConventionToSync>(
       `
@@ -35,16 +45,6 @@ export class PgConventionsToSyncRepository
     ))
       ? updateConventionToSync(this.client, conventionToSync)
       : insertConventionToSync(this.client, conventionToSync);
-  }
-
-  async getById(id: ConventionId): Promise<ConventionToSync | undefined> {
-    const pgConventionToSync = await selectConventionToSyncById(
-      this.client,
-      id,
-    );
-    return pgConventionToSync
-      ? pgResultToConventionToSync(pgConventionToSync)
-      : undefined;
   }
 }
 

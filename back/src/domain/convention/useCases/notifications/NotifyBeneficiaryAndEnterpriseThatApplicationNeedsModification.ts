@@ -23,6 +23,8 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
 
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends TransactionalUseCase<ConventionRequiresModificationPayload> {
+  protected inputSchema = conventionRequiresModificationPayloadSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -33,8 +35,6 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = conventionRequiresModificationPayloadSchema;
 
   protected async _execute(
     { justification, roles, convention }: ConventionRequiresModificationPayload,

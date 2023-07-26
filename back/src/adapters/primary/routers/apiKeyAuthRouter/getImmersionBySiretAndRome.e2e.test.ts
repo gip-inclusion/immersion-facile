@@ -95,6 +95,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
     } satisfies SearchImmersionResultPublicV1);
     expect(response.status).toBe(200);
   });
+
   it("returns 404 if no offer can be found with such siret & rome", async () => {
     const siretNotInDB = "11000403200019";
     await request

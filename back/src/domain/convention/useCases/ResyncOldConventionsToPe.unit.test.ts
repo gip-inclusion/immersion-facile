@@ -103,6 +103,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         errors: {},
       });
     });
+
     it("broadcast one convention to pe", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
       uow.conventionRepository.setConventions({
@@ -135,6 +136,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         errors: {},
       });
     });
+
     it("no convention to sync", async () => {
       uow.conventionsToSyncRepository.setForTesting([]);
       expectToEqual(peGateway.notifications, []);
@@ -150,6 +152,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         errors: {},
       });
     });
+
     it("when agency is not kind pole-emploi", async () => {
       const agencyCCI = new AgencyDtoBuilder().withKind("cci").build();
       const conventionToSync = new ConventionDtoBuilder()
@@ -187,6 +190,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         errors: {},
       });
     });
+
     it("when feature flag enablePeConventionBroadcast is disabled", async () => {
       await uow.featureFlagRepository.update({
         flagName: "enablePeConventionBroadcast",
@@ -227,6 +231,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         errors: {},
       });
     });
+
     it("only process convention with status TO_PROCESS and ERROR", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
       uow.conventionRepository.setConventions({
@@ -301,6 +306,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         errors: {},
       });
     });
+
     it("should consider limit", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
       uow.conventionRepository.setConventions({
@@ -385,6 +391,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         },
       });
     });
+
     it("when no agency", async () => {
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,

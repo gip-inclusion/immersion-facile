@@ -20,6 +20,8 @@ export class SearchImmersion extends TransactionalUseCase<
   SearchImmersionResultDto[],
   ApiConsumer
 > {
+  inputSchema = searchImmersionParamsSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly laBonneBoiteAPI: LaBonneBoiteGateway,
@@ -27,8 +29,6 @@ export class SearchImmersion extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = searchImmersionParamsSchema;
 
   public async _execute(
     {
@@ -82,6 +82,13 @@ export class SearchImmersion extends TransactionalUseCase<
     ].filter(isSiretIsNotInNotSeachableResults(repositorySearchResults));
   }
 
+  private prepareVoluntaryToImmersionResults(
+    results: SearchImmersionResult[],
+  ): SearchImmersionResultDto[] {
+    histogramSearchImmersionStoredCount.observe(results.length);
+    return results.map(({ isSearchable, ...rest }) => rest);
+  }
+
   private async searchOnLbb(
     uow: UnitOfWork,
     {
@@ -113,13 +120,6 @@ export class SearchImmersion extends TransactionalUseCase<
       lon,
       distanceKm,
     });
-  }
-
-  private prepareVoluntaryToImmersionResults(
-    results: SearchImmersionResult[],
-  ): SearchImmersionResultDto[] {
-    histogramSearchImmersionStoredCount.observe(results.length);
-    return results.map(({ isSearchable, ...rest }) => rest);
   }
 }
 

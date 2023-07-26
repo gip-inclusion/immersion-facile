@@ -45,6 +45,8 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   WithConventionIdLegacy,
   UpdateConventionStatusPayload
 > {
+  inputSchema = updateConventionStatusRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -52,8 +54,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = updateConventionStatusRequestSchema;
 
   public async _execute(
     params: UpdateConventionStatusRequestDto,

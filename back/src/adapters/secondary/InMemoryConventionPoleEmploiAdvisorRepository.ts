@@ -12,16 +12,17 @@ import { NotFoundError } from "../primary/helpers/httpErrors";
 export class InMemoryConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository
 {
-  public async openSlotForNextConvention(
-    peUserAndAdvisor: PeUserAndAdvisor,
-  ): Promise<void> {
-    this._conventionPoleEmploiUsersAdvisors.push({
-      advisor: peUserAndAdvisor.advisor,
-      conventionId: CONVENTION_ID_DEFAULT_UUID,
-      peExternalId: peUserAndAdvisor.user.peExternalId,
-      _entityName: "ConventionPoleEmploiAdvisor",
-    });
-  }
+  private _conventionPoleEmploiUsersAdvisors: ConventionPoleEmploiUserAdvisorEntity[] =
+    [];
+
+  private upsertWithClosedConvention = (
+    oldEntity: ConventionPoleEmploiUserAdvisorEntity,
+    newEntity: ConventionPoleEmploiUserAdvisorEntity,
+  ): void => {
+    this._conventionPoleEmploiUsersAdvisors[
+      this._conventionPoleEmploiUsersAdvisors.indexOf(oldEntity)
+    ] = newEntity;
+  };
 
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
@@ -40,22 +41,10 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
     };
   }
 
-  public async getByConventionId(
-    conventionId: ConventionId,
-  ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
-    return this._conventionPoleEmploiUsersAdvisors.find(
-      matchConventionId(conventionId),
-    );
+  //test purposes only
+  public get conventionPoleEmploiUsersAdvisors() {
+    return this._conventionPoleEmploiUsersAdvisors;
   }
-
-  private upsertWithClosedConvention = (
-    oldEntity: ConventionPoleEmploiUserAdvisorEntity,
-    newEntity: ConventionPoleEmploiUserAdvisorEntity,
-  ): void => {
-    this._conventionPoleEmploiUsersAdvisors[
-      this._conventionPoleEmploiUsersAdvisors.indexOf(oldEntity)
-    ] = newEntity;
-  };
 
   private async getAlreadyOpenIfExist(
     peExternalId: PeExternalId,
@@ -70,9 +59,23 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
     );
   }
 
-  //test purposes only
-  public get conventionPoleEmploiUsersAdvisors() {
-    return this._conventionPoleEmploiUsersAdvisors;
+  public async getByConventionId(
+    conventionId: ConventionId,
+  ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
+    return this._conventionPoleEmploiUsersAdvisors.find(
+      matchConventionId(conventionId),
+    );
+  }
+
+  public async openSlotForNextConvention(
+    peUserAndAdvisor: PeUserAndAdvisor,
+  ): Promise<void> {
+    this._conventionPoleEmploiUsersAdvisors.push({
+      advisor: peUserAndAdvisor.advisor,
+      conventionId: CONVENTION_ID_DEFAULT_UUID,
+      peExternalId: peUserAndAdvisor.user.peExternalId,
+      _entityName: "ConventionPoleEmploiAdvisor",
+    });
   }
 
   //test purposes only
@@ -82,9 +85,6 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
     this._conventionPoleEmploiUsersAdvisors =
       conventionPoleEmploiUserAdvisorEntities;
   }
-
-  private _conventionPoleEmploiUsersAdvisors: ConventionPoleEmploiUserAdvisorEntity[] =
-    [];
 }
 
 export const CONVENTION_ID_DEFAULT_UUID =

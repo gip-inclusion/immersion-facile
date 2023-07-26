@@ -14,6 +14,8 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   InclusionConnectedUser,
   InclusionConnectJwtPayload
 > {
+  inputSchema = z.void();
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private dashboardGateway: DashboardGateway,
@@ -21,8 +23,6 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = z.void();
 
   protected async _execute(
     _: void,

@@ -52,6 +52,8 @@ export class SignConvention extends TransactionalUseCase<
   void,
   WithConventionIdLegacy
 > {
+  inputSchema = z.void();
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -59,8 +61,6 @@ export class SignConvention extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = z.void();
 
   public async _execute(
     _: void,

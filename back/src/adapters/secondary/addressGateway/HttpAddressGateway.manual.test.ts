@@ -255,6 +255,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
         ],
       );
     });
+
     it("Should not support lookup address with only one char.", async () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress("R"),
@@ -277,12 +278,14 @@ describe("HttpOpenCageDataAddressGateway", () => {
         new Error(errorMessage.minimumCharErrorMessage(2)),
       );
     });
+
     it("Should not support lookup address with 3 chars matching the pattern '{digit} ,'", async () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress("4 ,"),
         new Error(errorMessage.minimumCharErrorMessage(2)),
       );
     });
+
     it("Should support lookup address with two char.", async () => {
       const resultPreviousNotFoundWithAddresseAPI =
         await httpAddressGateway.lookupStreetAddress("Ro");
@@ -301,6 +304,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
       });
     });
   });
+
   describe("lookupLocationName", () => {
     it.each([
       {
@@ -493,6 +497,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
 describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
   const parallelCalls = 50;
+
   it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
     const httpAddressGateway: AddressGateway = new HttpAddressGateway(
       configureCreateHttpClientForExternalApi()(addressesExternalTargets),

@@ -13,11 +13,11 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
   InclusionConnectedUser[],
   BackOfficeJwtPayload
 > {
+  inputSchema = withAgencyRoleSchema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = withAgencyRoleSchema;
 
   protected async _execute(
     { agencyRole }: WithAgencyRole,

@@ -22,6 +22,8 @@ import {
 } from "../entities/EstablishmentEntity";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
+  inputSchema = contactEstablishmentRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -31,8 +33,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = contactEstablishmentRequestSchema;
 
   public async _execute(
     contactRequest: ContactEstablishmentRequestDto,

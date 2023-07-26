@@ -46,6 +46,7 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
     expect(response.body).toEqual({ error: "Provided token is invalid" });
     expect(response.status).toBe(401);
   });
+
   it("Throws 401 if jwt is malformed", async () => {
     const { request } = await buildTestApp();
     const response = await request

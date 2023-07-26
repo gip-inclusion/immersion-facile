@@ -17,6 +17,7 @@ describe("toAbsoluteUrl conversion", () => {
       "https://un-autre-site-en-https.com",
     ],
   ];
+
   it.each(urlsToCheck)("url %s should equal to %s", (url, expectedUrl) => {
     expect(toAbsoluteUrl(url)).toBe(expectedUrl);
   });

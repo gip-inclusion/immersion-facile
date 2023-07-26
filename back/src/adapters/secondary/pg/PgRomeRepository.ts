@@ -36,6 +36,44 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 
+  public async getAppellationAndRomeDtosFromAppellationCodes(
+    codes: AppellationCode[],
+  ): Promise<AppellationAndRomeDto[]> {
+    const { rows } = await this.client.query(
+      `
+        SELECT ogr_appellation, libelle_appellation_long, appellations.code_rome, libelle_rome
+        FROM public_appellations_data AS appellations
+        JOIN public_romes_data AS romes ON  appellations.code_rome = romes.code_rome
+        WHERE appellations.ogr_appellation = ANY ($1)
+    `,
+      [codes],
+    );
+    return rows.map(convertRowToAppellationDto);
+  }
+
+  public async searchAppellation(
+    query: string,
+  ): Promise<AppellationAndRomeDto[]> {
+    const [queryBeginning, lastWord] = prepareQueryParams(query);
+
+    return this.client
+      .query(
+        `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
+        FROM public_appellations_data 
+        JOIN public_romes_data ON  public_appellations_data.code_rome = public_romes_data.code_rome
+        WHERE
+           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long_without_special_char ILIKE $3)
+           OR (libelle_appellation_long_without_special_char ILIKE $2 AND libelle_appellation_long_without_special_char ILIKE $3)
+        LIMIT 80`,
+        [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
+      )
+      .then((res) => res.rows.map(convertRowToAppellationDto))
+      .catch((error) => {
+        logger.error({ error, query }, "searchAppellation error");
+        return [];
+      });
+  }
+
   public async searchRome(query: string): Promise<RomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
     return this.client
@@ -70,44 +108,6 @@ export class PgRomeRepository implements RomeRepository {
         logger.error(e);
         return [];
       });
-  }
-
-  public async searchAppellation(
-    query: string,
-  ): Promise<AppellationAndRomeDto[]> {
-    const [queryBeginning, lastWord] = prepareQueryParams(query);
-
-    return this.client
-      .query(
-        `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
-        FROM public_appellations_data 
-        JOIN public_romes_data ON  public_appellations_data.code_rome = public_romes_data.code_rome
-        WHERE
-           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long_without_special_char ILIKE $3)
-           OR (libelle_appellation_long_without_special_char ILIKE $2 AND libelle_appellation_long_without_special_char ILIKE $3)
-        LIMIT 80`,
-        [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
-      )
-      .then((res) => res.rows.map(convertRowToAppellationDto))
-      .catch((error) => {
-        logger.error({ error, query }, "searchAppellation error");
-        return [];
-      });
-  }
-
-  public async getAppellationAndRomeDtosFromAppellationCodes(
-    codes: AppellationCode[],
-  ): Promise<AppellationAndRomeDto[]> {
-    const { rows } = await this.client.query(
-      `
-        SELECT ogr_appellation, libelle_appellation_long, appellations.code_rome, libelle_rome
-        FROM public_appellations_data AS appellations
-        JOIN public_romes_data AS romes ON  appellations.code_rome = romes.code_rome
-        WHERE appellations.ogr_appellation = ANY ($1)
-    `,
-      [codes],
-    );
-    return rows.map(convertRowToAppellationDto);
   }
 }
 

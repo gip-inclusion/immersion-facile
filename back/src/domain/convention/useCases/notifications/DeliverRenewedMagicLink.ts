@@ -30,14 +30,14 @@ const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> = z.object({
 });
 
 export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLinkPayload> {
+  inputSchema = renewMagicLinkPayloadSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = renewMagicLinkPayloadSchema;
 
   public async _execute(
     {

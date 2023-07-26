@@ -14,11 +14,11 @@ export class AppellationSearch extends TransactionalUseCase<
   string,
   AppellationMatchDto[]
 > {
-  public constructor(uowPerformer: UnitOfWorkPerformer) {
+  inputSchema = zTrimmedString;
+
+  constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = zTrimmedString;
 
   public async _execute(
     searchText: string,

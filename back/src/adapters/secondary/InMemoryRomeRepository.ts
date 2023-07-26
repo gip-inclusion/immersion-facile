@@ -64,6 +64,8 @@ const appellationDtoToRomeDto = ({
 });
 
 export class InMemoryRomeRepository implements RomeRepository {
+  public appellations: AppellationAndRomeDto[] = defaultAppellations;
+
   public async appellationToCodeMetier(
     romeCodeAppellation: AppellationCode,
   ): Promise<RomeCode | undefined> {
@@ -72,14 +74,12 @@ export class InMemoryRomeRepository implements RomeRepository {
     )?.romeCode;
   }
 
-  public async searchRome(query: string): Promise<RomeDto[]> {
-    logger.info({ query }, "searchRome");
-    const normalizedQuery = normalize(query);
-    return this.appellations
-      .filter((appellationDto) =>
-        normalize(appellationDto.appellationLabel).includes(normalizedQuery),
-      )
-      .map(appellationDtoToRomeDto);
+  public async getAppellationAndRomeDtosFromAppellationCodes(
+    codes: AppellationCode[],
+  ): Promise<AppellationAndRomeDto[]> {
+    return this.appellations.filter((appellationDto) =>
+      codes.includes(appellationDto.appellationCode),
+    );
   }
 
   public async searchAppellation(
@@ -92,13 +92,13 @@ export class InMemoryRomeRepository implements RomeRepository {
     );
   }
 
-  public async getAppellationAndRomeDtosFromAppellationCodes(
-    codes: AppellationCode[],
-  ): Promise<AppellationAndRomeDto[]> {
-    return this.appellations.filter((appellationDto) =>
-      codes.includes(appellationDto.appellationCode),
-    );
+  public async searchRome(query: string): Promise<RomeDto[]> {
+    logger.info({ query }, "searchRome");
+    const normalizedQuery = normalize(query);
+    return this.appellations
+      .filter((appellationDto) =>
+        normalize(appellationDto.appellationLabel).includes(normalizedQuery),
+      )
+      .map(appellationDtoToRomeDto);
   }
-
-  public appellations: AppellationAndRomeDto[] = defaultAppellations;
 }

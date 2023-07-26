@@ -6,12 +6,12 @@ export class ConsoleAppLogger implements AppLogger {
     console.debug(...messages);
   }
 
-  info(...messages: any[]): void {
-    console.log(...messages);
-  }
-
   error(...messages: any[]): void {
     console.error(...messages);
+  }
+
+  info(...messages: any[]): void {
+    console.log(...messages);
   }
 
   warn(...messages: any[]): void {

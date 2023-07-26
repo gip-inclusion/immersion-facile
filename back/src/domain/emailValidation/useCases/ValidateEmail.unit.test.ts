@@ -30,6 +30,7 @@ describe("Email validation status", () => {
     const response = await validateEmail.execute(emailValidationInput);
     expect(response).toEqual(expectedEmailValidationStatus);
   });
+
   it("should throw an error", async () => {
     const emailValidationInput: ValidateEmailInput = {
       email: "ezfzemflkzmle",

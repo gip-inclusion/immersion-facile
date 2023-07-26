@@ -27,38 +27,6 @@ export type LaBonneBoiteApiResultProps = {
 export class LaBonneBoiteCompanyDto {
   constructor(public readonly props: LaBonneBoiteApiResultProps) {}
 
-  public get siret() {
-    return this.props.siret;
-  }
-
-  public toSearchResult(): SearchImmersionResultDto {
-    return {
-      siret: this.props.siret,
-      name: this.props.name,
-      address: addressStringToDto(this.props.address),
-      additionalInformation: "",
-      appellations: [],
-      customizedName: "",
-      distance_m: this.props.distance * 1000,
-      fitForDisabledWorkers: false,
-      naf: this.props.naf,
-      nafLabel: this.props.naf_text,
-      numberOfEmployeeRange: this.props.headcount_text
-        .replace("salariés", "")
-        .replace("salarié", "")
-        .trim(),
-      position: {
-        lat: this.props.lat,
-        lon: this.props.lon,
-      },
-      rome: this.props.matched_rome_code,
-      romeLabel: this.props.matched_rome_label,
-      urlOfPartner: this.props.url,
-      voluntaryToImmersion: false,
-      website: "",
-    };
-  }
-
   public isCompanyRelevant(): boolean {
     const companyNaf = this.props.naf;
     const rome = this.props.matched_rome_code;
@@ -94,5 +62,37 @@ export class LaBonneBoiteCompanyDto {
       isRomeIgnoredForPublicAdministration;
 
     return !establishmentShouldBeIgnored;
+  }
+
+  public get siret() {
+    return this.props.siret;
+  }
+
+  public toSearchResult(): SearchImmersionResultDto {
+    return {
+      siret: this.props.siret,
+      name: this.props.name,
+      address: addressStringToDto(this.props.address),
+      additionalInformation: "",
+      appellations: [],
+      customizedName: "",
+      distance_m: this.props.distance * 1000,
+      fitForDisabledWorkers: false,
+      naf: this.props.naf,
+      nafLabel: this.props.naf_text,
+      numberOfEmployeeRange: this.props.headcount_text
+        .replace("salariés", "")
+        .replace("salarié", "")
+        .trim(),
+      position: {
+        lat: this.props.lat,
+        lon: this.props.lon,
+      },
+      rome: this.props.matched_rome_code,
+      romeLabel: this.props.matched_rome_label,
+      urlOfPartner: this.props.url,
+      voluntaryToImmersion: false,
+      website: "",
+    };
   }
 }

@@ -15,13 +15,6 @@ import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGa
 export class HttpRomeAutocompleteGateway implements RomeAutocompleteGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
-  public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
-    const queryParams = queryParamsAsString<RomeSearchInput>({ searchText });
-    return from(
-      this.httpClient.get<unknown>(`/${romeRoute}?${queryParams}`),
-    ).pipe(map(validateRomeList));
-  }
-
   public async getAppellationDtoMatching(
     searchText: string,
   ): Promise<AppellationMatchDto[]> {
@@ -33,6 +26,13 @@ export class HttpRomeAutocompleteGateway implements RomeAutocompleteGateway {
     );
     const appelationsDto = appellationSearchResponseSchema.parse(data);
     return appelationsDto;
+  }
+
+  public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
+    const queryParams = queryParamsAsString<RomeSearchInput>({ searchText });
+    return from(
+      this.httpClient.get<unknown>(`/${romeRoute}?${queryParams}`),
+    ).pipe(map(validateRomeList));
   }
 }
 const validateRomeList = ({ data }: AxiosResponse<unknown>): RomeDto[] =>

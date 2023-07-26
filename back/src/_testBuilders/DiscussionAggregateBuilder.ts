@@ -62,32 +62,8 @@ export class DiscussionAggregateBuilder
     private readonly discussionAggregate: DiscussionAggregate = defaultDiscussionAggregateV2,
   ) {}
 
-  withId(id: DiscussionId) {
-    return new DiscussionAggregateBuilder({ ...this.discussionAggregate, id });
-  }
-
-  withPotentialBeneficiary(
-    potentialBeneficiary: Partial<DiscussionPotentialBeneficiary>,
-  ) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
-      potentialBeneficiary: {
-        ...this.discussionAggregate.potentialBeneficiary,
-        ...potentialBeneficiary,
-      },
-    });
-  }
-
-  withEstablishmentContact(
-    establishmentContact: Partial<DiscussionEstablishmentContact>,
-  ) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
-      establishmentContact: {
-        ...this.discussionAggregate.establishmentContact,
-        ...establishmentContact,
-      },
-    });
+  build() {
+    return this.discussionAggregate;
   }
 
   withAddress(address: AddressDto) {
@@ -104,24 +80,22 @@ export class DiscussionAggregateBuilder
     });
   }
 
-  withSiret(siret: SiretDto) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
-      siret,
-    });
-  }
-
-  withImmersionObjective(immersionObjective: ImmersionObjective | null) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
-      immersionObjective,
-    });
-  }
-
   withCreatedAt(createdAt: Date) {
     return new DiscussionAggregateBuilder({
       ...this.discussionAggregate,
       createdAt,
+    });
+  }
+
+  withEstablishmentContact(
+    establishmentContact: Partial<DiscussionEstablishmentContact>,
+  ) {
+    return new DiscussionAggregateBuilder({
+      ...this.discussionAggregate,
+      establishmentContact: {
+        ...this.discussionAggregate.establishmentContact,
+        ...establishmentContact,
+      },
     });
   }
 
@@ -132,7 +106,33 @@ export class DiscussionAggregateBuilder
     });
   }
 
-  build() {
-    return this.discussionAggregate;
+  withId(id: DiscussionId) {
+    return new DiscussionAggregateBuilder({ ...this.discussionAggregate, id });
+  }
+
+  withImmersionObjective(immersionObjective: ImmersionObjective | null) {
+    return new DiscussionAggregateBuilder({
+      ...this.discussionAggregate,
+      immersionObjective,
+    });
+  }
+
+  withPotentialBeneficiary(
+    potentialBeneficiary: Partial<DiscussionPotentialBeneficiary>,
+  ) {
+    return new DiscussionAggregateBuilder({
+      ...this.discussionAggregate,
+      potentialBeneficiary: {
+        ...this.discussionAggregate.potentialBeneficiary,
+        ...potentialBeneficiary,
+      },
+    });
+  }
+
+  withSiret(siret: SiretDto) {
+    return new DiscussionAggregateBuilder({
+      ...this.discussionAggregate,
+      siret,
+    });
   }
 }

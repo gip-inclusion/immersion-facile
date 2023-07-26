@@ -10,14 +10,14 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class BindConventionToFederatedIdentity extends TransactionalUseCase<ConventionDto> {
+  protected inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = conventionSchema;
 
   protected async _execute(
     convention: ConventionDto,

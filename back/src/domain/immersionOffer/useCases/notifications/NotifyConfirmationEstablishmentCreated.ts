@@ -7,13 +7,14 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase<FormEstablishmentDto> {
+  inputSchema = formEstablishmentSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
-  inputSchema = formEstablishmentSchema;
 
   public async _execute(
     formEstablishment: FormEstablishmentDto,

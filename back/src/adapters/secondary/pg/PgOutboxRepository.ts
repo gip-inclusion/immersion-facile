@@ -27,6 +27,24 @@ const logger = createLogger(__filename);
 export class PgOutboxRepository implements OutboxRepository {
   constructor(private client: PoolClient) {}
 
+  private async getEventById(id: string): Promise<DomainEvent | undefined> {
+    const { rows } = await this.client.query<StoredEventRow>(
+      `
+        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
+          outbox_publications.id as publication_id, published_at,
+          subscription_id, error_message 
+        FROM outbox
+        LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
+        LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
+        WHERE outbox.id = $1
+        ORDER BY published_at ASC
+      `,
+      [id],
+    );
+    if (!rows.length) return;
+    return storedEventRowsToDomainEvent(rows);
+  }
+
   async save(event: DomainEvent): Promise<void> {
     const eventInDb = await this.storeEventInOutboxOrRecoverItIfAlreadyThere(
       event,
@@ -54,6 +72,27 @@ export class PgOutboxRepository implements OutboxRepository {
         "eventsSavedBeforePublish",
       );
     }
+  }
+
+  private async saveNewPublication(
+    eventId: string,
+    { publishedAt, failures }: EventPublication,
+  ) {
+    const { rows } = await this.client.query(
+      "INSERT INTO outbox_publications(event_id, published_at) VALUES($1, $2) RETURNING id",
+      [eventId, publishedAt],
+    );
+
+    const publicationId = rows[0].id;
+
+    await Promise.all(
+      failures.map(({ subscriptionId, errorMessage }) =>
+        this.client.query(
+          "INSERT INTO outbox_failures(publication_id, subscription_id, error_message) VALUES($1, $2, $3)",
+          [publicationId, subscriptionId, errorMessage],
+        ),
+      ),
+    );
   }
 
   private async storeEventInOutboxOrRecoverItIfAlreadyThere(
@@ -87,45 +126,6 @@ export class PgOutboxRepository implements OutboxRepository {
     });
 
     return { ...event, publications: [] }; // publications will be added after in process
-  }
-
-  private async saveNewPublication(
-    eventId: string,
-    { publishedAt, failures }: EventPublication,
-  ) {
-    const { rows } = await this.client.query(
-      "INSERT INTO outbox_publications(event_id, published_at) VALUES($1, $2) RETURNING id",
-      [eventId, publishedAt],
-    );
-
-    const publicationId = rows[0].id;
-
-    await Promise.all(
-      failures.map(({ subscriptionId, errorMessage }) =>
-        this.client.query(
-          "INSERT INTO outbox_failures(publication_id, subscription_id, error_message) VALUES($1, $2, $3)",
-          [publicationId, subscriptionId, errorMessage],
-        ),
-      ),
-    );
-  }
-
-  private async getEventById(id: string): Promise<DomainEvent | undefined> {
-    const { rows } = await this.client.query<StoredEventRow>(
-      `
-        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
-          outbox_publications.id as publication_id, published_at,
-          subscription_id, error_message 
-        FROM outbox
-        LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
-        LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-        WHERE outbox.id = $1
-        ORDER BY published_at ASC
-      `,
-      [id],
-    );
-    if (!rows.length) return;
-    return storedEventRowsToDomainEvent(rows);
   }
 }
 

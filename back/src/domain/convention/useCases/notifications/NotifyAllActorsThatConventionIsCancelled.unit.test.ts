@@ -124,6 +124,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
       agency,
     );
   });
+
   it("doesn't send duplicated emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
     uow.agencyRepository.setAgencies([
       agencyWithSameEmailAdressForCounsellorAndValidator,

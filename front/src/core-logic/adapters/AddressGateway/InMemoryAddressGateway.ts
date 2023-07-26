@@ -57,6 +57,7 @@ export class InMemoryAddressGateway implements AddressGateway {
     ];
     return testLocationSet;
   }
+
   public lookupLocation$(
     query: LookupLocationInput,
   ): Observable<LookupSearchResult[]> {

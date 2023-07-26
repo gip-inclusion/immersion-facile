@@ -7,6 +7,8 @@ import {
 export class InMemoryConventionsToSyncRepository
   implements ConventionsToSyncRepository
 {
+  public conventionsToSync: ConventionToSync[] = [];
+
   public async getById(
     id: ConventionId,
   ): Promise<ConventionToSync | undefined> {
@@ -32,6 +34,4 @@ export class InMemoryConventionsToSyncRepository
   public setForTesting(conventions: ConventionToSync[]) {
     this.conventionsToSync = conventions;
   }
-
-  public conventionsToSync: ConventionToSync[] = [];
 }

@@ -16,16 +16,6 @@ export class InMemoryRomeAutocompleteGateway
       : new Subject<RomeDto[]>();
   }
 
-  public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
-    if (searchText === "givemeanemptylistplease") return of([]);
-    if (searchText === "givemeanerrorplease")
-      throw new Error("418 I'm a teapot");
-
-    return this.simulatedLatency
-      ? this._romeDtos$.pipe(delay(this.simulatedLatency))
-      : this._romeDtos$;
-  }
-
   public async getAppellationDtoMatching(
     searchText: string,
   ): Promise<AppellationMatchDto[]> {
@@ -84,6 +74,16 @@ export class InMemoryRomeAutocompleteGateway
         matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 7 }],
       },
     ];
+  }
+
+  public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
+    if (searchText === "givemeanemptylistplease") return of([]);
+    if (searchText === "givemeanerrorplease")
+      throw new Error("418 I'm a teapot");
+
+    return this.simulatedLatency
+      ? this._romeDtos$.pipe(delay(this.simulatedLatency))
+      : this._romeDtos$;
   }
 
   // for test purpose

@@ -17,7 +17,10 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 import { createOpaqueEmail } from "../../entities/DiscussionAggregate";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
+  inputSchema = contactEstablishmentEventPayloadSchema;
+
   private readonly replyDomain: string;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -26,8 +29,6 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     super(uowPerformer);
     this.replyDomain = `reply.${domain}`;
   }
-
-  inputSchema = contactEstablishmentEventPayloadSchema;
 
   public async _execute(
     payload: ContactEstablishmentEventPayload,

@@ -153,6 +153,7 @@ describe("Add form establishment", () => {
 
     describe("v1", () => {
       const consumerv1FormEstablishmentsRoute = `/v1/form-establishments`;
+
       it("forbids access to route if no api consumer", async () => {
         const response = await request
           .post(consumerv1FormEstablishmentsRoute)

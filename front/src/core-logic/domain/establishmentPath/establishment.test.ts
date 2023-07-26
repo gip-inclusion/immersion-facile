@@ -162,6 +162,7 @@ describe("Establishment", () => {
         defaultFormEstablishmentValue(),
       );
     });
+
     it("fetches establishment on establishment creation (with params)", () => {
       expectStoreToMatchInitialState();
       const testedQueryParams: EstablishmentRequestedPayload = {
@@ -186,6 +187,7 @@ describe("Establishment", () => {
         expectedFormEstablishment,
       );
     });
+
     it("fetches establishment on establishment edition (JWT query params)", () => {
       expectStoreToMatchInitialState();
       const testedQueryParams: EstablishmentRequestedPayload = {
@@ -209,6 +211,7 @@ describe("Establishment", () => {
         formEstablishment,
       );
     });
+
     it("should fail when fetching establishment on establishment edition (JWT query params) on gateway error", () => {
       expectStoreToMatchInitialState();
       const testedQueryParams: EstablishmentRequestedPayload = {
@@ -233,6 +236,7 @@ describe("Establishment", () => {
         defaultFormEstablishmentValue(),
       );
     });
+
     it("should clear establishment", () => {
       const initialEstablishmentState: EstablishmentState = {
         isLoading: true,
@@ -273,6 +277,7 @@ describe("Establishment", () => {
         kind: "submitSuccess",
       });
     });
+
     it("should fail when creating establishment on gateway error", () => {
       expectStoreToMatchInitialState();
       store.dispatch(
@@ -329,6 +334,7 @@ describe("Establishment", () => {
         kind: "submitSuccess",
       });
     });
+
     it("should fail when editing establishment on gateway error", () => {
       expectStoreToMatchInitialState();
       store.dispatch(
@@ -367,6 +373,7 @@ describe("Establishment", () => {
       });
     });
   });
+
   const expectStoreToMatchInitialState = () =>
     expectEstablishmentStateToMatch({
       isLoading: false,

@@ -655,6 +655,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
   describe("LastReminderForSignatories", () => {
     const type: ReminderKind = "LastReminderForSignatories";
+
     it.each(authorizedSignatoryStatuses)(
       `Send email 'LastReminderForSignatories' to signatories when status is '%s'.
           Convention with same establishment representative & tutor`,

@@ -11,10 +11,11 @@ export class LookupStreetAddress extends UseCase<
   WithLookupAddressQueryParams,
   AddressAndPosition[]
 > {
+  protected inputSchema = withLookupStreetAddressQueryParamsSchema;
+
   constructor(private addressApiGateway: AddressGateway) {
     super();
   }
-  protected inputSchema = withLookupStreetAddressQueryParamsSchema;
 
   protected _execute(
     params: WithLookupAddressQueryParams,

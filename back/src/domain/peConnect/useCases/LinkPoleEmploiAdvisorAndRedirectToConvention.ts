@@ -45,6 +45,14 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
         });
   }
 
+  private makeRedirectUrl(
+    fields: Partial<ConventionPeConnectFields>,
+  ): AbsoluteUrl {
+    return `${this.baseUrlForRedirect}/${
+      frontRoutes.conventionImmersionRoute
+    }?${queryParamsAsString<Partial<ConventionPeConnectFields>>(fields)}`;
+  }
+
   private async onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
     const userAndAdvisors = await this.peConnectGateway.getUserAndAdvisors(
       accessToken,
@@ -67,13 +75,5 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
       );
 
     return this.makeRedirectUrl(toPartialConventionDtoWithPeIdentity(user));
-  }
-
-  private makeRedirectUrl(
-    fields: Partial<ConventionPeConnectFields>,
-  ): AbsoluteUrl {
-    return `${this.baseUrlForRedirect}/${
-      frontRoutes.conventionImmersionRoute
-    }?${queryParamsAsString<Partial<ConventionPeConnectFields>>(fields)}`;
   }
 }

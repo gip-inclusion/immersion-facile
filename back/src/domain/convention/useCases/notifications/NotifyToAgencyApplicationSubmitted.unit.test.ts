@@ -310,6 +310,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       ],
     });
   });
+
   it("Sends notification email to agency with warning when beneficiary is PeConnected and beneficiary has no PE advisor", async () => {
     const shortLinkIds = [
       "shortlink1",

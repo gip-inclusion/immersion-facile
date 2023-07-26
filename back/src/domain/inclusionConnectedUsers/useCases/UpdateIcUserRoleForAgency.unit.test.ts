@@ -25,6 +25,7 @@ const user: AuthenticatedUser = {
   firstName: "John",
   lastName: "Lennon",
 };
+
 describe("GetInclusionConnectedUsers", () => {
   let updateIcUserRoleForAgency: UpdateIcUserRoleForAgency;
   let uowPerformer: InMemoryUowPerformer;

@@ -12,14 +12,14 @@ export class GenerateConventionMagicLinkUseCase extends UseCase<
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto
 > {
+  inputSchema = generateMagicLinkRequestSchema;
+
   constructor(
     private readonly generateMagicLinkJwt: GenerateConventionJwt,
     private readonly timeGateway: TimeGateway,
   ) {
     super();
   }
-
-  inputSchema = generateMagicLinkRequestSchema;
 
   //eslint-disable-next-line @typescript-eslint/require-await
   public async _execute({

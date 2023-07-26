@@ -19,34 +19,8 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyTargets>) {}
 
-  getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
-    return from(
-      this.httpClient
-        .getImmersionFacileAgencyId()
-        .then(({ responseBody }) => responseBody),
-    );
-  }
-
-  public getAgencyAdminById$(
-    agencyId: AgencyId,
-    adminToken: BackOfficeJwt,
-  ): Observable<AgencyDto> {
-    return from(this.getAdminAgencyById(agencyId, adminToken));
-  }
-
-  public updateAgency$(
-    agencyDto: AgencyDto,
-    adminToken: BackOfficeJwt,
-  ): Observable<void> {
-    return from(
-      this.httpClient
-        .updateAgency({
-          body: agencyDto,
-          headers: { authorization: adminToken },
-          urlParams: { agencyId: agencyDto.id },
-        })
-        .then(({ responseBody }) => responseBody),
-    );
+  public async addAgency(createAgencyParams: CreateAgencyDto): Promise<void> {
+    await this.httpClient.addAgency({ body: createAgencyParams });
   }
 
   private getAdminAgencyById(
@@ -61,8 +35,11 @@ export class HttpAgencyGateway implements AgencyGateway {
       .then(({ responseBody }) => agencySchema.parse(responseBody));
   }
 
-  public async addAgency(createAgencyParams: CreateAgencyDto): Promise<void> {
-    await this.httpClient.addAgency({ body: createAgencyParams });
+  public getAgencyAdminById$(
+    agencyId: AgencyId,
+    adminToken: BackOfficeJwt,
+  ): Observable<AgencyDto> {
+    return from(this.getAdminAgencyById(agencyId, adminToken));
   }
 
   public getAgencyPublicInfoById(
@@ -79,10 +56,38 @@ export class HttpAgencyGateway implements AgencyGateway {
     return from(this.getAgencyPublicInfoById(agencyId));
   }
 
+  public getFilteredAgencies(
+    request: ListAgenciesRequestDto,
+  ): Promise<AgencyOption[]> {
+    return this.httpClient
+      .getFilteredAgencies({ queryParams: request })
+      .then(({ responseBody }) => responseBody);
+  }
+
+  getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
+    return from(
+      this.httpClient
+        .getImmersionFacileAgencyId()
+        .then(({ responseBody }) => responseBody),
+    );
+  }
+
   public listAgenciesByFilter$(
     filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]> {
     return from(this.getFilteredAgencies(filter));
+  }
+
+  // TODO Mieux identifier l'admin
+  private listAgenciesNeedingReview(
+    adminToken: BackOfficeJwt,
+  ): Promise<AgencyOption[]> {
+    return this.httpClient
+      .listAgenciesWithStatus({
+        queryParams: { status: "needsReview" },
+        headers: { authorization: adminToken },
+      })
+      .then(({ responseBody }) => responseBody);
   }
 
   public listAgenciesNeedingReview$(
@@ -131,16 +136,19 @@ export class HttpAgencyGateway implements AgencyGateway {
     return this.getFilteredAgencies(request);
   }
 
-  // TODO Mieux identifier l'admin
-  private listAgenciesNeedingReview(
+  public updateAgency$(
+    agencyDto: AgencyDto,
     adminToken: BackOfficeJwt,
-  ): Promise<AgencyOption[]> {
-    return this.httpClient
-      .listAgenciesWithStatus({
-        queryParams: { status: "needsReview" },
-        headers: { authorization: adminToken },
-      })
-      .then(({ responseBody }) => responseBody);
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .updateAgency({
+          body: agencyDto,
+          headers: { authorization: adminToken },
+          urlParams: { agencyId: agencyDto.id },
+        })
+        .then(({ responseBody }) => responseBody),
+    );
   }
 
   // TODO Mieux identifier l'admin
@@ -162,13 +170,5 @@ export class HttpAgencyGateway implements AgencyGateway {
     status: ActiveOrRejectedStatus,
   ): Observable<void> {
     return from(this.validateOrRejectAgency(adminToken, agencyId, status));
-  }
-
-  public getFilteredAgencies(
-    request: ListAgenciesRequestDto,
-  ): Promise<AgencyOption[]> {
-    return this.httpClient
-      .getFilteredAgencies({ queryParams: request })
-      .then(({ responseBody }) => responseBody);
   }
 }

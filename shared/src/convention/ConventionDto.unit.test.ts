@@ -58,6 +58,7 @@ describe("conventionDtoSchema", () => {
         "jerome_truc@associes.fr",
       );
     });
+
     it("allow empty emergency contact email", () => {
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryEmergencyContactEmail("")
@@ -67,6 +68,7 @@ describe("conventionDtoSchema", () => {
         parsedConvention.signatories.beneficiary.emergencyContactEmail,
       ).toBe("");
     });
+
     it("ignores accents on emergency contact email", () => {
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryEmergencyContactEmail("Jérôme_Truc@associés.fr")
@@ -402,6 +404,7 @@ describe("conventionDtoSchema", () => {
         },
       );
     });
+
     describe("CCI specific, minor under 16yo", () => {
       it("max week hours depends on beneficiary age", () => {
         const dateStart = new Date("2021-01-04").toISOString();
@@ -427,6 +430,7 @@ describe("conventionDtoSchema", () => {
         ]);
       });
     });
+
     describe("status that are available without signatures", () => {
       const [allowWithoutSignature, failingWithoutSignature] =
         splitCasesBetweenPassingAndFailing(conventionStatuses, [

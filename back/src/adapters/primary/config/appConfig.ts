@@ -33,11 +33,15 @@ export type AxiosConfig = {
 // See "Working with AppConfig" in back/README.md for more details.
 
 export class AppConfig {
-  private readonly throwIfNotInArray;
-  private readonly throwIfNotDefinedOrDefault;
-  private readonly throwIfNotAbsoluteUrl;
   private readonly getBooleanVariable;
+
+  private readonly throwIfNotAbsoluteUrl;
+
+  private readonly throwIfNotDefinedOrDefault;
+
   private readonly throwIfNotGeosearchApiKey;
+
+  private readonly throwIfNotInArray;
 
   public static createFromEnv(
     readDotEnv = true,
@@ -55,139 +59,98 @@ export class AppConfig {
     this.throwIfNotGeosearchApiKey = makeThrowIfNotOpenCageGeosearchKey(env);
   }
 
-  public get minimumNumberOfDaysBetweenSimilarContactRequests(): number {
-    return parseInt(
-      this.throwIfNotDefinedOrDefault(
-        "MINIMUM_NUMBER_OF_DAYS_BETWEEN_SIMILAR_CONTACT_REQUESTS",
-        "7",
-      ),
-    );
-  }
-
-  public get nodeProcessReportInterval(): number {
-    return parseInt(
-      this.throwIfNotDefinedOrDefault("NODE_PROCESS_REPORT_INTERVAL", "30000"),
-    );
-  }
-
-  public get externalAxiosTimeout(): number {
-    return parseInt(
-      this.throwIfNotDefinedOrDefault("EXTERNAL_AXIOS_TIMEOUT", "10000"),
-    );
-  }
-
-  public get shortLinkIdGeneratorGateway() {
+  // https://opencagedata.com/
+  public get apiAddress() {
     return this.throwIfNotInArray({
-      variableName: "SHORT_LINK_ID_GENERATOR_GATEWAY",
-      authorizedValues: ["NANO_ID", "DETERMINIST"],
+      variableName: "ADDRESS_API_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "OPEN_CAGE_DATA"],
     });
   }
 
-  public get nodeEnv() {
-    return this.throwIfNotInArray({
-      variableName: "NODE_ENV",
-      authorizedValues: ["test", "local", "production"],
-    });
+  // https://adresse.data.gouv.fr/
+  public get apiJwtPrivateKey() {
+    return this.throwIfNotDefinedOrDefault("API_JWT_PRIVATE_KEY");
   }
 
-  public get envType() {
-    return this.throwIfNotInArray({
-      variableName: "ENV_TYPE",
-      authorizedValues: ["dev", "staging", "production", "local"],
-      defaultValue: "local",
-    });
-  }
-
-  public get maxConventionsToSyncWithPe() {
-    return parseInt(
-      this.throwIfNotDefinedOrDefault("MAX_CONVENTIONS_TO_SYNC_WITH_PE", "50"),
-    );
-  }
-
-  // == Data repositories ==
-
-  public get repositories() {
-    return this.throwIfNotInArray({
-      variableName: "REPOSITORIES",
-      authorizedValues: ["IN_MEMORY", "PG"],
-      defaultValue: "IN_MEMORY",
-    });
-  }
-
-  public get pgImmersionDbUrl() {
-    return this.throwIfNotDefinedOrDefault("DATABASE_URL");
-  }
-
-  // == Sirene repository ==
-
-  public get siretGateway() {
-    return this.throwIfNotInArray({
-      variableName: "SIRENE_REPOSITORY",
-      authorizedValues: [
-        "IN_MEMORY",
-        "HTTPS", // Deprecated, use Insee instead
-        "INSEE",
-        "ANNUAIRE_DES_ENTREPRISES",
-      ],
-      defaultValue: "IN_MEMORY",
-    });
-  }
-
-  public get laBonneBoiteGateway() {
-    return this.throwIfNotInArray({
-      variableName: "LA_BONNE_BOITE_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
-    });
-  }
-
-  public get passEmploiGateway() {
-    return this.throwIfNotInArray({
-      variableName: "PASS_EMPLOI_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
-    });
-  }
-
-  public get passEmploiUrl() {
-    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_URL");
-  }
-
-  public get passEmploiKey() {
-    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_KEY");
-  }
-
-  public get poleEmploiGateway() {
-    return this.throwIfNotInArray({
-      variableName: "POLE_EMPLOI_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
-    });
-  }
-
-  public get inseeHttpConfig(): AxiosConfig {
-    return {
-      endpoint: this.throwIfNotDefinedOrDefault("SIRENE_ENDPOINT"),
-      bearerToken: this.throwIfNotDefinedOrDefault("SIRENE_BEARER_TOKEN"),
-    };
-  }
-
-  public get timeGateway() {
-    return this.throwIfNotInArray({
-      variableName: "TIME_GATEWAY",
-      authorizedValues: ["CUSTOM", "REAL"],
-      defaultValue: "REAL",
-    });
-  }
-
-  // == Notification gateway ==
-  public get notificationGateway() {
-    return this.throwIfNotInArray({
-      variableName: "NOTIFICATION_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "BREVO"],
-    });
+  // == Address Api gateway choice between 2 providers ==
+  public get apiJwtPublicKey() {
+    return this.throwIfNotDefinedOrDefault("API_JWT_PUBLIC_KEY");
   }
 
   // == Notification gateway provider api keys ==
   public get apiKeyBrevo() {
     return this.throwIfNotDefinedOrDefault("BREVO_API_KEY");
+  }
+
+  public get apiKeyOpenCageDataGeocoding() {
+    return this.throwIfNotDefinedOrDefault("API_KEY_OPEN_CAGE_DATA_GEOCODING");
+  }
+
+  public get apiKeyOpenCageDataGeosearch() {
+    return this.throwIfNotGeosearchApiKey("API_KEY_OPEN_CAGE_DATA_GEOSEARCH");
+  }
+
+  public get backofficePassword() {
+    return this.throwIfNotDefinedOrDefault("BACKOFFICE_PASSWORD");
+  }
+
+  // == Backoffice ==
+  public get backofficeUsername() {
+    return this.throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
+  }
+
+  public get cellarS3Params(): S3Params | undefined {
+    if (this.documentGateway === "S3") {
+      return {
+        endPoint: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_HOST"),
+        accessKeyId: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_KEY_ID"),
+        secretAccessKey: this.throwIfNotDefinedOrDefault(
+          "CELLAR_ADDON_KEY_SECRET",
+        ),
+        bucketName: this.throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
+      };
+    }
+  }
+
+  // Visible for testing.
+  public get configParams() {
+    return this.env;
+  }
+
+  // == Metabase
+  public get dashboard() {
+    return this.throwIfNotInArray({
+      variableName: "DASHBOARD_GATEWAY",
+      authorizedValues: ["METABASE", "NONE"],
+      defaultValue: "NONE",
+    });
+  }
+
+  public get discordPipelineReportsWebhookUrl() {
+    return this.env.DISCORD_PIPELINE_REPORTS_WEBHOOK_URL;
+  }
+
+  // == Discord notifications ==
+  public get discordWebhookUrl(): string | undefined {
+    return this.env.DISCORD_WEBHOOK_URL;
+  }
+
+  public get documentGateway() {
+    return this.throwIfNotInArray({
+      authorizedValues: ["NONE", "S3"],
+      variableName: "DOCUMENT_GATEWAY",
+      defaultValue: "NONE",
+    });
+  }
+
+  // == Email gateway provider api keys ==
+  public get emailableApiKey(): EmailableApiKey {
+    return this.throwIfNotDefinedOrDefault("EMAILABLE_API_KEY");
+  }
+
+  // == Email notifications ==
+  public get emailAllowList() {
+    return parseStringList(this.env.EMAIL_ALLOW_LIST);
   }
 
   // == Email validation gateway ==
@@ -199,33 +162,40 @@ export class AppConfig {
     });
   }
 
-  // == Email gateway provider api keys ==
-  public get emailableApiKey(): EmailableApiKey {
-    return this.throwIfNotDefinedOrDefault("EMAILABLE_API_KEY");
+  public get envType() {
+    return this.throwIfNotInArray({
+      variableName: "ENV_TYPE",
+      authorizedValues: ["dev", "staging", "production", "local"],
+      defaultValue: "local",
+    });
   }
 
-  // == PE Connect gateway ==
-  public get peConnectGateway() {
-    return this.throwIfNotInArray({
-      variableName: "PE_CONNECT_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
-      defaultValue: "IN_MEMORY",
-    });
+  // == Event Bus ==
+  public get eventCrawlerPeriodMs() {
+    return parseInteger(this.env.EVENT_CRAWLER_PERIOD_MS, 0);
+  }
+
+  public get externalAxiosTimeout(): number {
+    return parseInt(
+      this.throwIfNotDefinedOrDefault("EXTERNAL_AXIOS_TIMEOUT", "10000"),
+    );
+  }
+
+  // == Magic links ==
+  public get immersionFacileBaseUrl(): AbsoluteUrl {
+    return this.immersionFacileDomain.includes("localhost")
+      ? `http://${this.immersionFacileDomain}`
+      : `https://${this.immersionFacileDomain}`;
+  }
+
+  public get immersionFacileDomain(): string {
+    return this.throwIfNotDefinedOrDefault("DOMAIN");
   }
 
   public get inboundEmailAllowedIps() {
     return parseStringList(
       this.throwIfNotDefinedOrDefault("INBOUND_EMAIL_ALLOWED_IPS"),
     );
-  }
-
-  // == Inclusion Connect gateway ==
-  public get inclusionConnectGateway() {
-    return this.throwIfNotInArray({
-      variableName: "INCLUSION_CONNECT_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
-      defaultValue: "IN_MEMORY",
-    });
   }
 
   public get inclusionConnectConfig(): InclusionConnectConfig {
@@ -261,40 +231,95 @@ export class AppConfig {
         };
   }
 
-  // == Address Api gateway choice between 2 providers ==
-  // https://adresse.data.gouv.fr/
-  // https://opencagedata.com/
-  public get apiAddress() {
+  // == Inclusion Connect gateway ==
+  public get inclusionConnectGateway() {
     return this.throwIfNotInArray({
-      variableName: "ADDRESS_API_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "OPEN_CAGE_DATA"],
-    });
-  }
-
-  public get apiKeyOpenCageDataGeocoding() {
-    return this.throwIfNotDefinedOrDefault("API_KEY_OPEN_CAGE_DATA_GEOCODING");
-  }
-
-  public get apiKeyOpenCageDataGeosearch() {
-    return this.throwIfNotGeosearchApiKey("API_KEY_OPEN_CAGE_DATA_GEOSEARCH");
-  }
-
-  // == Rome gateway ==
-
-  public get romeRepository() {
-    return this.throwIfNotInArray({
-      variableName: "ROME_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "PG"],
+      variableName: "INCLUSION_CONNECT_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
     });
   }
 
-  public get poleEmploiClientId() {
-    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_ID");
+  public get inseeHttpConfig(): AxiosConfig {
+    return {
+      endpoint: this.throwIfNotDefinedOrDefault("SIRENE_ENDPOINT"),
+      bearerToken: this.throwIfNotDefinedOrDefault("SIRENE_BEARER_TOKEN"),
+    };
   }
 
-  public get poleEmploiClientSecret() {
-    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_SECRET");
+  public get jwtPrivateKey() {
+    return this.throwIfNotDefinedOrDefault("JWT_PRIVATE_KEY");
+  }
+
+  public get jwtPublicKey() {
+    return this.throwIfNotDefinedOrDefault("JWT_PUBLIC_KEY");
+  }
+
+  public get laBonneBoiteGateway() {
+    return this.throwIfNotInArray({
+      variableName: "LA_BONNE_BOITE_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+    });
+  }
+
+  public get maxConventionsToSyncWithPe() {
+    return parseInt(
+      this.throwIfNotDefinedOrDefault("MAX_CONVENTIONS_TO_SYNC_WITH_PE", "50"),
+    );
+  }
+
+  public get metabase() {
+    return {
+      metabaseUrl: this.throwIfNotDefinedOrDefault(
+        "METABASE_URL",
+      ) as AbsoluteUrl,
+      metabaseApiKey: this.throwIfNotDefinedOrDefault("METABASE_API_KEY"),
+    };
+  }
+
+  public get minimumNumberOfDaysBetweenSimilarContactRequests(): number {
+    return parseInt(
+      this.throwIfNotDefinedOrDefault(
+        "MINIMUM_NUMBER_OF_DAYS_BETWEEN_SIMILAR_CONTACT_REQUESTS",
+        "7",
+      ),
+    );
+  }
+
+  public get nodeEnv() {
+    return this.throwIfNotInArray({
+      variableName: "NODE_ENV",
+      authorizedValues: ["test", "local", "production"],
+    });
+  }
+
+  public get nodeProcessReportInterval(): number {
+    return parseInt(
+      this.throwIfNotDefinedOrDefault("NODE_PROCESS_REPORT_INTERVAL", "30000"),
+    );
+  }
+
+  // == Notification gateway ==
+  public get notificationGateway() {
+    return this.throwIfNotInArray({
+      variableName: "NOTIFICATION_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "BREVO"],
+    });
+  }
+
+  public get passEmploiGateway() {
+    return this.throwIfNotInArray({
+      variableName: "PASS_EMPLOI_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+    });
+  }
+
+  public get passEmploiKey() {
+    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_KEY");
+  }
+
+  public get passEmploiUrl() {
+    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_URL");
   }
 
   public get peApiUrl(): AbsoluteUrl {
@@ -307,8 +332,21 @@ export class AppConfig {
     );
   }
 
+  // == PE Connect gateway ==
+  public get peConnectGateway() {
+    return this.throwIfNotInArray({
+      variableName: "PE_CONNECT_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
   public get peEnterpriseUrl(): AbsoluteUrl {
     return this.throwIfNotAbsoluteUrl("POLE_EMPLOI_ENTREPRISE_URL");
+  }
+
+  public get pgImmersionDbUrl() {
+    return this.throwIfNotDefinedOrDefault("DATABASE_URL");
   }
 
   public get poleEmploiAccessTokenConfig(): AccessTokenConfig {
@@ -322,98 +360,85 @@ export class AppConfig {
     };
   }
 
-  // == Metabase
-  public get dashboard() {
+  public get poleEmploiClientId() {
+    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_ID");
+  }
+
+  public get poleEmploiClientSecret() {
+    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_SECRET");
+  }
+
+  public get poleEmploiGateway() {
     return this.throwIfNotInArray({
-      variableName: "DASHBOARD_GATEWAY",
-      authorizedValues: ["METABASE", "NONE"],
-      defaultValue: "NONE",
+      variableName: "POLE_EMPLOI_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
-  }
-
-  public get metabase() {
-    return {
-      metabaseUrl: this.throwIfNotDefinedOrDefault(
-        "METABASE_URL",
-      ) as AbsoluteUrl,
-      metabaseApiKey: this.throwIfNotDefinedOrDefault("METABASE_API_KEY"),
-    };
-  }
-
-  // == Magic links ==
-
-  public get immersionFacileBaseUrl(): AbsoluteUrl {
-    return this.immersionFacileDomain.includes("localhost")
-      ? `http://${this.immersionFacileDomain}`
-      : `https://${this.immersionFacileDomain}`;
-  }
-
-  public get immersionFacileDomain(): string {
-    return this.throwIfNotDefinedOrDefault("DOMAIN");
-  }
-
-  public get apiJwtPublicKey() {
-    return this.throwIfNotDefinedOrDefault("API_JWT_PUBLIC_KEY");
-  }
-
-  public get apiJwtPrivateKey() {
-    return this.throwIfNotDefinedOrDefault("API_JWT_PRIVATE_KEY");
-  }
-
-  public get jwtPublicKey() {
-    return this.throwIfNotDefinedOrDefault("JWT_PUBLIC_KEY");
-  }
-
-  public get jwtPrivateKey() {
-    return this.throwIfNotDefinedOrDefault("JWT_PRIVATE_KEY");
-  }
-
-  public get previousJwtPublicKey() {
-    return this.env.JWT_PREVIOUS_PUBLIC_KEY;
   }
 
   public get previousJwtPrivateKey() {
     return this.env.JWT_PREVIOUS_PRIVATE_KEY;
   }
 
-  // == Backoffice ==
-
-  public get backofficeUsername() {
-    return this.throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
-  }
-
-  public get backofficePassword() {
-    return this.throwIfNotDefinedOrDefault("BACKOFFICE_PASSWORD");
-  }
-
-  // == Email notifications ==
-
-  public get emailAllowList() {
-    return parseStringList(this.env.EMAIL_ALLOW_LIST);
-  }
-
-  public get skipEmailAllowlist() {
-    return this.getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
-  }
-
-  // == Discord notifications ==
-  public get discordWebhookUrl(): string | undefined {
-    return this.env.DISCORD_WEBHOOK_URL;
-  }
-
-  public get discordPipelineReportsWebhookUrl() {
-    return this.env.DISCORD_PIPELINE_REPORTS_WEBHOOK_URL;
-  }
-
-  // == Event Bus ==
-  public get eventCrawlerPeriodMs() {
-    return parseInteger(this.env.EVENT_CRAWLER_PERIOD_MS, 0);
+  public get previousJwtPublicKey() {
+    return this.env.JWT_PREVIOUS_PUBLIC_KEY;
   }
 
   public get quarantinedTopics(): DomainTopic[] {
     return parseStringList(this.env.QUARANTINED_TOPICS).filter(
       filterNotFalsy,
     ) as DomainTopic[];
+  }
+
+  // == Data repositories ==
+  public get repositories() {
+    return this.throwIfNotInArray({
+      variableName: "REPOSITORIES",
+      authorizedValues: ["IN_MEMORY", "PG"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
+  // == Rome gateway ==
+  public get romeRepository() {
+    return this.throwIfNotInArray({
+      variableName: "ROME_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "PG"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
+  public get shortLinkIdGeneratorGateway() {
+    return this.throwIfNotInArray({
+      variableName: "SHORT_LINK_ID_GENERATOR_GATEWAY",
+      authorizedValues: ["NANO_ID", "DETERMINIST"],
+    });
+  }
+
+  // == Sirene repository ==
+
+  public get siretGateway() {
+    return this.throwIfNotInArray({
+      variableName: "SIRENE_REPOSITORY",
+      authorizedValues: [
+        "IN_MEMORY",
+        "HTTPS", // Deprecated, use Insee instead
+        "INSEE",
+        "ANNUAIRE_DES_ENTREPRISES",
+      ],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
+  public get skipEmailAllowlist() {
+    return this.getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
+  }
+
+  public get timeGateway() {
+    return this.throwIfNotInArray({
+      variableName: "TIME_GATEWAY",
+      authorizedValues: ["CUSTOM", "REAL"],
+      defaultValue: "REAL",
+    });
   }
 
   public get updateEstablishmentFromInseeConfig() {
@@ -434,32 +459,6 @@ export class AppConfig {
         ),
       ),
     };
-  }
-
-  // Visible for testing.
-  public get configParams() {
-    return this.env;
-  }
-
-  public get documentGateway() {
-    return this.throwIfNotInArray({
-      authorizedValues: ["NONE", "S3"],
-      variableName: "DOCUMENT_GATEWAY",
-      defaultValue: "NONE",
-    });
-  }
-
-  public get cellarS3Params(): S3Params | undefined {
-    if (this.documentGateway === "S3") {
-      return {
-        endPoint: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_HOST"),
-        accessKeyId: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_KEY_ID"),
-        secretAccessKey: this.throwIfNotDefinedOrDefault(
-          "CELLAR_ADDON_KEY_SECRET",
-        ),
-        bucketName: this.throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
-      };
-    }
   }
 }
 

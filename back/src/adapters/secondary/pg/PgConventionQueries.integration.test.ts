@@ -48,10 +48,12 @@ describe("Pg implementation of ConventionQueries", () => {
     client.release();
     await pool.end();
   });
+
   describe("PG implementation of method getConventionById", () => {
     it("Returns undefined if no convention with such id", async () => {
       expect(await conventionQueries.getConventionById(idA)).toBeUndefined();
     });
+
     it("Retrieves a convention by id exists", async () => {
       // Prepare
       const expectedConventionRead = await insertAgencyAndConvention(
@@ -68,6 +70,7 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(result, expectedConventionRead);
     });
   });
+
   describe("PG implementation of method getLatestUpdated", () => {
     it("Gets all saved conventionAdminDtos", async () => {
       // Prepare
@@ -81,6 +84,7 @@ describe("Pg implementation of ConventionQueries", () => {
       // Assert
       expectArraysToEqualIgnoringOrder(resultAll, insertedConventionReadDtos);
     });
+
     it("Gets only convention of a given agency", async () => {
       // Prepare
       const insertedConventionReadDtos = await Promise.all([
@@ -193,6 +197,7 @@ describe("Pg implementation of ConventionQueries", () => {
         },
       ]);
     });
+
     it(`getConventionsByFilters with filters:
           - startDateGreater 2023-03-26
           - startDateLessOrEqual 2023-03-27
@@ -219,6 +224,7 @@ describe("Pg implementation of ConventionQueries", () => {
         },
       ]);
     });
+
     it(`getConventionsByFilters with:
           - startDateGreater 2023-03-30'
           - startDateLessOrEqual 2023-03-31
@@ -243,6 +249,7 @@ describe("Pg implementation of ConventionQueries", () => {
       await client.query("DELETE FROM outbox_publications");
       await client.query("DELETE FROM outbox");
     });
+
     it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
       const conventionRepo = new PgConventionRepository(client);

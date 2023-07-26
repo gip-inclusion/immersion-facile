@@ -12,6 +12,7 @@ const prepareUseCase = () => {
   });
   return new RomeSearch(uowPerformer);
 };
+
 describe("RomeSearch", () => {
   it("returns the list of found matches with ranges", async () => {
     const useCase = prepareUseCase();

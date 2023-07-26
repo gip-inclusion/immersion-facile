@@ -9,6 +9,7 @@ const savedError: SavedError = {
   params: { someId: "123", httpStatus: 500 },
   occurredAt: new Date("2021-01-01"),
 };
+
 describe("PgErrorRepository", () => {
   let pool: Pool;
   let client: PoolClient;

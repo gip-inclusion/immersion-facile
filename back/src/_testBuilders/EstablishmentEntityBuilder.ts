@@ -40,34 +40,29 @@ export class EstablishmentEntityBuilder
     private readonly entity: EstablishmentEntity = validEstablishmentEntityV2,
   ) {}
 
-  withSiret(siret: string) {
-    return new EstablishmentEntityBuilder({ ...this.entity, siret });
+  build() {
+    return this.entity;
+  }
+
+  withAdditionalInformation(additionalInformation: string) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      additionalInformation,
+    });
   }
 
   withAddress(address: AddressDto) {
     return new EstablishmentEntityBuilder({ ...this.entity, address });
   }
-  withWebsite(website: string) {
-    return new EstablishmentEntityBuilder({ ...this.entity, website });
-  }
-  withPosition(position: GeoPositionDto) {
-    return new EstablishmentEntityBuilder({ ...this.entity, position });
-  }
-  withName(name: string) {
-    return new EstablishmentEntityBuilder({ ...this.entity, name });
-  }
+
   withCustomizedName(customizedName: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
   }
 
-  withNafDto(nafDto: NafDto) {
-    return new EstablishmentEntityBuilder({ ...this.entity, nafDto });
-  }
-
-  withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
+  withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      numberEmployeesRange,
+      fitForDisabledWorkers,
     });
   }
 
@@ -78,13 +73,6 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
-    return new EstablishmentEntityBuilder({
-      ...this.entity,
-      fitForDisabledWorkers,
-    });
-  }
-
   withIsOpen(isOpen: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
@@ -92,22 +80,11 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  withSourceProvider(sourceProvider: FormEstablishmentSource) {
+  withIsSearchable(isSearchable: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      sourceProvider,
+      isSearchable,
     });
-  }
-
-  withAdditionalInformation(additionalInformation: string) {
-    return new EstablishmentEntityBuilder({
-      ...this.entity,
-      additionalInformation,
-    });
-  }
-
-  withUpdatedAt(updatedAt: Date) {
-    return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
   }
 
   withLastInseeCheck(lastInseeCheck: Date | undefined) {
@@ -124,14 +101,41 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  withIsSearchable(isSearchable: boolean) {
+  withNafDto(nafDto: NafDto) {
+    return new EstablishmentEntityBuilder({ ...this.entity, nafDto });
+  }
+
+  withName(name: string) {
+    return new EstablishmentEntityBuilder({ ...this.entity, name });
+  }
+
+  withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      isSearchable,
+      numberEmployeesRange,
     });
   }
 
-  build() {
-    return this.entity;
+  withPosition(position: GeoPositionDto) {
+    return new EstablishmentEntityBuilder({ ...this.entity, position });
+  }
+
+  withSiret(siret: string) {
+    return new EstablishmentEntityBuilder({ ...this.entity, siret });
+  }
+
+  withSourceProvider(sourceProvider: FormEstablishmentSource) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      sourceProvider,
+    });
+  }
+
+  withUpdatedAt(updatedAt: Date) {
+    return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
+  }
+
+  withWebsite(website: string) {
+    return new EstablishmentEntityBuilder({ ...this.entity, website });
   }
 }

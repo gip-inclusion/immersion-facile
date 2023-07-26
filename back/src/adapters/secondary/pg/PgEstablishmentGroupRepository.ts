@@ -21,24 +21,11 @@ export class PgEstablishmentGroupRepository
 {
   constructor(private client: PoolClient) {}
 
-  async save(group: EstablishmentGroupEntity): Promise<void> {
-    const { rows } = await this.client.query(
-      `SELECT * FROM establishment_groups WHERE slug = $1`,
-      [group.slug],
+  private async clearExistingSiretsForGroup(groupSlug: EstablishmentGroupSlug) {
+    await this.client.query(
+      `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
+      [groupSlug],
     );
-    const establishmentGroupAlreadyExists = !!rows.length;
-    if (establishmentGroupAlreadyExists) {
-      await this.clearExistingSiretsForGroup(group.slug);
-      await this.insertEstablishmentGroupSirets(group);
-    } else {
-      await this.client.query(
-        `
-            INSERT INTO establishment_groups (slug, name) VALUES ($1, $2)
-        `,
-        [group.slug, group.name],
-      );
-      await this.insertEstablishmentGroupSirets(group);
-    }
   }
 
   public async findSearchImmersionResultsBySlug(
@@ -104,10 +91,23 @@ export class PgEstablishmentGroupRepository
     );
   }
 
-  private async clearExistingSiretsForGroup(groupSlug: EstablishmentGroupSlug) {
-    await this.client.query(
-      `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
-      [groupSlug],
+  async save(group: EstablishmentGroupEntity): Promise<void> {
+    const { rows } = await this.client.query(
+      `SELECT * FROM establishment_groups WHERE slug = $1`,
+      [group.slug],
     );
+    const establishmentGroupAlreadyExists = !!rows.length;
+    if (establishmentGroupAlreadyExists) {
+      await this.clearExistingSiretsForGroup(group.slug);
+      await this.insertEstablishmentGroupSirets(group);
+    } else {
+      await this.client.query(
+        `
+            INSERT INTO establishment_groups (slug, name) VALUES ($1, $2)
+        `,
+        [group.slug, group.name],
+      );
+      await this.insertEstablishmentGroupSirets(group);
+    }
   }
 }

@@ -26,11 +26,12 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
       .map((result) => result.toSearchResult());
   }
 
+  public setError(error: Error | null) {
+    this._error = error;
+  }
+
   // for test purposes only
   public setNextResults(results: LaBonneBoiteCompanyDto[]) {
     this._results = results;
-  }
-  public setError(error: Error | null) {
-    this._error = error;
   }
 }

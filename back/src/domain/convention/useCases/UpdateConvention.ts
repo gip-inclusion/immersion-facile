@@ -21,14 +21,14 @@ export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,
   WithConventionIdLegacy
 > {
+  protected inputSchema = updateConventionRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = updateConventionRequestSchema;
 
   protected async _execute(
     { convention }: UpdateConventionRequestDto,

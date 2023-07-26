@@ -12,18 +12,6 @@ import {
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class HttpTechnicalGateway implements TechnicalGateway {
-  constructor(private readonly httpClient: AxiosInstance) {}
-
-  async uploadLogo(file: File): Promise<AbsoluteUrl> {
-    const formData = new FormData();
-    formData.append(uploadFileRoute, file);
-    const { data } = await this.httpClient.post(
-      `/${uploadFileRoute}`,
-      formData,
-    );
-    return data;
-  }
-
   getAllFeatureFlags = (): Observable<FeatureFlags> =>
     from(this.httpClient.get<unknown>(`/${featureFlagsRoute}`)).pipe(
       map(validateFeatureFlags),
@@ -38,6 +26,18 @@ export class HttpTechnicalGateway implements TechnicalGateway {
         headers: { authorization: token },
       }),
     ).pipe(map(() => undefined));
+
+  constructor(private readonly httpClient: AxiosInstance) {}
+
+  async uploadLogo(file: File): Promise<AbsoluteUrl> {
+    const formData = new FormData();
+    formData.append(uploadFileRoute, file);
+    const { data } = await this.httpClient.post(
+      `/${uploadFileRoute}`,
+      formData,
+    );
+    return data;
+  }
 }
 const validateFeatureFlags = ({ data }: AxiosResponse<unknown>): FeatureFlags =>
   featureFlagsSchema.parse(data);

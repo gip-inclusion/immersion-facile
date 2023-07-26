@@ -7,8 +7,9 @@ export class InMemoryImmersionAssessmentRepository
 {
   private _assessments: ImmersionAssessmentEntity[] = [];
 
-  public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
-    this._assessments.push(assessment);
+  // test purpose
+  get assessments(): ImmersionAssessmentEntity[] {
+    return this._assessments;
   }
 
   public async getByConventionId(
@@ -19,9 +20,8 @@ export class InMemoryImmersionAssessmentRepository
     );
   }
 
-  // test purpose
-  get assessments(): ImmersionAssessmentEntity[] {
-    return this._assessments;
+  public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
+    this._assessments.push(assessment);
   }
 
   setAssessments(assessments: ImmersionAssessmentEntity[]) {

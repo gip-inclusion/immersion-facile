@@ -25,6 +25,8 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 const logger = createLogger(__filename);
 
 export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends TransactionalUseCase<ConventionDto> {
+  inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly timeGateway: TimeGateway,
@@ -35,8 +37,6 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = conventionSchema;
 
   public async _execute(
     convention: ConventionDto,

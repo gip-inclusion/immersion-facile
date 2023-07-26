@@ -17,6 +17,7 @@ describe("utils", () => {
       { month: "mars" },
     ]);
   });
+
   it("objectToDependencyList", () => {
     const object = {
       a: [1, 2],

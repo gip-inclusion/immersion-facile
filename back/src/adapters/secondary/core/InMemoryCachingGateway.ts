@@ -4,7 +4,11 @@ import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { RealTimeGateway } from "./TimeGateway/RealTimeGateway";
 
 export class InMemoryCachingGateway<T> {
-  public constructor(
+  private readonly cache: Partial<Record<string, Promise<CacheEntry<T>>>> = {};
+
+  private readonly minimumCacheLifetime = 30;
+
+  constructor(
     private readonly timeGateway: TimeGateway = new RealTimeGateway(),
     private responseExpireInSecondsProp: keyof T,
   ) {}
@@ -17,6 +21,10 @@ export class InMemoryCachingGateway<T> {
     return cache === undefined || this.isExpired(await cache)
       ? this.onBadCache(value, onCacheMiss)
       : (await cache).response;
+  }
+
+  private isExpired(entry: CacheEntry<T>): boolean {
+    return isAfter(this.timeGateway.now(), entry.expirationTime);
   }
 
   private onBadCache(value: string, onCacheMiss: () => Promise<T>): Promise<T> {
@@ -37,13 +45,6 @@ export class InMemoryCachingGateway<T> {
       ),
     };
   }
-
-  private isExpired(entry: CacheEntry<T>): boolean {
-    return isAfter(this.timeGateway.now(), entry.expirationTime);
-  }
-
-  private readonly cache: Partial<Record<string, Promise<CacheEntry<T>>>> = {};
-  private readonly minimumCacheLifetime = 30;
 }
 
 type CacheEntry<T> = {

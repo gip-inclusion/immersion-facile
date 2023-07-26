@@ -212,6 +212,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
         conventionId,
       });
     });
+
     it("convention advisor without advisor", async () => {
       await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
         poleEmploiFirstUserWithoutAdvisor,

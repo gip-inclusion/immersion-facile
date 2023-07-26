@@ -29,6 +29,24 @@ type GetConventionsRequestProperties = {
 export class PgConventionQueries implements ConventionQueries {
   constructor(private client: PoolClient) {}
 
+  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
+    dateEnd: Date,
+  ): Promise<ConventionReadDto[]> {
+    return this.getConventionsWhere({
+      whereClauses: [
+        this.whereConventionsDateEndMatch(dateEnd),
+        this.whereConventionsAreValidated(),
+        this.whereConventionsAssessmentEmailHasNotBeenAlreadySent(),
+      ],
+    });
+  }
+
+  public async getConventionById(
+    id: ConventionId,
+  ): Promise<ConventionReadDto | undefined> {
+    return getReadConventionById(this.client, id);
+  }
+
   getConventionsByFilters({
     startDateGreater,
     startDateLessOrEqual,
@@ -46,38 +64,6 @@ export class PgConventionQueries implements ConventionQueries {
           ? format("conventions.date_start::date > %1$L", startDateGreater)
           : undefined,
       ].filter(filterNotFalsy),
-    });
-  }
-
-  public async getLatestConventions({
-    status,
-    agencyId,
-  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
-    return this.getConventionsWhere({
-      whereClauses: [
-        status && format("conventions.status = %1$L", status),
-        agencyId && format("conventions.agency_id::text = %1$L", agencyId),
-      ].filter(filterNotFalsy),
-      orderByClause: "ORDER BY date_validation DESC",
-      limit: 10,
-    });
-  }
-
-  public async getConventionById(
-    id: ConventionId,
-  ): Promise<ConventionReadDto | undefined> {
-    return getReadConventionById(this.client, id);
-  }
-
-  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
-    dateEnd: Date,
-  ): Promise<ConventionReadDto[]> {
-    return this.getConventionsWhere({
-      whereClauses: [
-        this.whereConventionsDateEndMatch(dateEnd),
-        this.whereConventionsAreValidated(),
-        this.whereConventionsAssessmentEmailHasNotBeenAlreadySent(),
-      ],
     });
   }
 
@@ -101,14 +87,28 @@ export class PgConventionQueries implements ConventionQueries {
     return pgResult.rows.map((row) => conventionReadSchema.parse(row.dto));
   }
 
-  private whereConventionsAssessmentEmailHasNotBeenAlreadySent(): WhereClause {
-    return format(
-      "conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )",
-    );
+  public async getLatestConventions({
+    status,
+    agencyId,
+  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
+    return this.getConventionsWhere({
+      whereClauses: [
+        status && format("conventions.status = %1$L", status),
+        agencyId && format("conventions.agency_id::text = %1$L", agencyId),
+      ].filter(filterNotFalsy),
+      orderByClause: "ORDER BY date_validation DESC",
+      limit: 10,
+    });
   }
 
   private whereConventionsAreValidated(): WhereClause {
     return format("conventions.status IN (%1$L)", validatedConventionStatuses);
+  }
+
+  private whereConventionsAssessmentEmailHasNotBeenAlreadySent(): WhereClause {
+    return format(
+      "conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )",
+    );
   }
 
   private whereConventionsDateEndMatch(dateEnd: Date): WhereClause {

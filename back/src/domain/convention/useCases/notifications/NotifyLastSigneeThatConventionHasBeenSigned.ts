@@ -27,6 +27,8 @@ export const noSignatoryMessage = (convention: ConventionDto): string =>
   `No signatories has signed the convention id ${convention.id}.`;
 
 export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<ConventionDto> {
+  protected inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -35,8 +37,6 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = conventionSchema;
 
   protected async _execute(
     convention: ConventionDto,
@@ -52,47 +52,6 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     ]);
     if (!agency) throw new Error(missingAgencyMessage(savedConvention));
     return this.onRepositoryConvention(uow, savedConvention, agency);
-  }
-
-  private onRepositoryConvention(
-    uow: UnitOfWork,
-    convention: ConventionDto,
-    agency: AgencyDto,
-  ): Promise<void> {
-    const lastSigneeEmail = this.lastSigneeEmail(
-      Object.values(convention.signatories),
-    );
-    if (lastSigneeEmail)
-      return this.saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: this.emailToSend(convention, lastSigneeEmail, agency),
-        followedIds: {
-          conventionId: convention.id,
-          agencyId: convention.agencyId,
-          establishmentSiret: convention.siret,
-        },
-      });
-    throw new Error(noSignatoryMessage(convention));
-  }
-
-  private lastSigneeEmail(
-    signatories: Signatory[],
-  ): { signedAt: string; email: string; role: SignatoryRole } | undefined {
-    const signatoryEmailsOrderedBySignedAt = signatories
-      .filter(
-        (
-          signatory,
-        ): signatory is Signatory & {
-          signedAt: string;
-        } => signatory.signedAt !== undefined,
-      )
-      .sort((a, b) => (a.signedAt < b.signedAt ? -1 : 0))
-      .map(({ email, signedAt, role }) => ({
-        email,
-        signedAt,
-        role,
-      }));
-    return signatoryEmailsOrderedBySignedAt.at(-1);
   }
 
   private emailToSend(
@@ -119,5 +78,46 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       },
       recipients: [lastSignee.email],
     };
+  }
+
+  private lastSigneeEmail(
+    signatories: Signatory[],
+  ): { signedAt: string; email: string; role: SignatoryRole } | undefined {
+    const signatoryEmailsOrderedBySignedAt = signatories
+      .filter(
+        (
+          signatory,
+        ): signatory is Signatory & {
+          signedAt: string;
+        } => signatory.signedAt !== undefined,
+      )
+      .sort((a, b) => (a.signedAt < b.signedAt ? -1 : 0))
+      .map(({ email, signedAt, role }) => ({
+        email,
+        signedAt,
+        role,
+      }));
+    return signatoryEmailsOrderedBySignedAt.at(-1);
+  }
+
+  private onRepositoryConvention(
+    uow: UnitOfWork,
+    convention: ConventionDto,
+    agency: AgencyDto,
+  ): Promise<void> {
+    const lastSigneeEmail = this.lastSigneeEmail(
+      Object.values(convention.signatories),
+    );
+    if (lastSigneeEmail)
+      return this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: this.emailToSend(convention, lastSigneeEmail, agency),
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
+        },
+      });
+    throw new Error(noSignatoryMessage(convention));
   }
 }

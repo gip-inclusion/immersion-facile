@@ -18,6 +18,16 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
   void,
   ResyncOldConventionToPeReport
 > {
+  private broadcastToPeUsecase: BroadcastToPoleEmploiOnConventionUpdates;
+
+  protected override inputSchema = z.void();
+
+  private report: ResyncOldConventionToPeReport = {
+    errors: {},
+    skips: {},
+    success: 0,
+  };
+
   constructor(
     private uowPerform: UnitOfWorkPerformer,
     private poleEmploiGateway: PoleEmploiGateway,
@@ -32,8 +42,6 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       { resyncMode: true },
     );
   }
-
-  protected override inputSchema = z.void();
 
   public async _execute(
     _: void,
@@ -111,11 +119,4 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       );
     return this.broadcastToPeUsecase.execute(convention);
   }
-
-  private broadcastToPeUsecase: BroadcastToPoleEmploiOnConventionUpdates;
-  private report: ResyncOldConventionToPeReport = {
-    errors: {},
-    skips: {},
-    success: 0,
-  };
 }

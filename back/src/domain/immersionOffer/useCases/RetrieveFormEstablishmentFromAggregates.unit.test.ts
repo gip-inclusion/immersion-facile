@@ -34,6 +34,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     iat: 1,
     version: 1,
   };
+
   it("throws an error if there is no establishment with this siret", async () => {
     const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
@@ -41,6 +42,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       new BadRequestError("No establishment found with siret 12345678901234."),
     );
   });
+
   it("throws an error if there is no establishment from form with this siret", async () => {
     // Prepare : there is an establishment with the siret, but from LBB
     const { useCase } = prepareUseCase();
@@ -50,6 +52,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       new BadRequestError("No establishment found with siret 12345678901234."),
     );
   });
+
   it("returns a reconstructed form if establishment with siret exists with dataSource=form", async () => {
     const { useCase, establishmentAggregateRepository } = prepareUseCase();
     const establishment = new EstablishmentEntityBuilder()

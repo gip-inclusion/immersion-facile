@@ -43,6 +43,7 @@ describe("agencyAdmin", () => {
           agencyOptions: [],
         });
       });
+
       it("after fetch agencies options are fetched", () => {
         const expectedAgencies: AgencyOption[] = [
           { id: "my-id", name: "My expected agency", kind: "mission-locale" },
@@ -239,6 +240,7 @@ describe("agencyAdmin", () => {
         });
       });
     });
+
     const agencyDto = new AgencyDtoBuilder().build();
 
     it("shows when update is ongoing", () => {

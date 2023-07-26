@@ -33,6 +33,8 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   RenewMagicLinkRequestDto,
   void
 > {
+  inputSchema = renewMagicLinkRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -43,8 +45,6 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = renewMagicLinkRequestSchema;
 
   public async _execute(
     { expiredJwt, originalUrl }: RenewMagicLinkRequestDto,
@@ -74,6 +74,72 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       uow,
       convention.internshipKind,
     );
+  }
+
+  private extractValidPayload(expiredJwt: string) {
+    const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.config);
+    let payloadToExtract: any | undefined;
+    try {
+      // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
+      // probably expired or an old version.
+      payloadToExtract = verifyJwt(expiredJwt);
+    } catch (err: any) {
+      // If this JWT is signed by us but expired, deal with it.
+      if (err instanceof TokenExpiredError) {
+        payloadToExtract = jwt.decode(expiredJwt) as ConventionMagicLinkPayload;
+      } else {
+        // Perhaps this is a JWT that is signed by a compromised key.
+        try {
+          verifyDeprecatedJwt(expiredJwt);
+          // If the above didn't throw, this is a JWT that we issued. Renew it.
+          // However, we cannot trust the contents of it, as the private key was potentially
+          // compromised. Therefore, only use the application ID and the role from it, and fill
+          // the remaining data from the database to prevent a hacker from getting magic links
+          // for any application form.
+          payloadToExtract = jwt.decode(expiredJwt);
+        } catch (_) {
+          // We don't want to renew this JWT.
+          throw new ForbiddenError();
+        }
+      }
+    }
+    if (payloadToExtract) return payloadToExtract;
+    throw new BadRequestError("Malformed expired JWT");
+  }
+
+  private findRouteToRenew(originalUrl: string) {
+    const supportedRenewRoutes = [
+      frontRoutes.conventionImmersionRoute,
+      frontRoutes.conventionToSign,
+      frontRoutes.manageConvention,
+      frontRoutes.manageConventionOld,
+      frontRoutes.immersionAssessment,
+    ];
+    const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>
+      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
+    );
+    if (routeToRenew) return routeToRenew;
+    throw new BadRequestError(
+      `Wrong link format, should be one of the supported route: ${supportedRenewRoutes
+        .map((route) => `/${route}`)
+        .join(", ")}. It was : ${originalUrl}`,
+    );
+  }
+
+  private async getAgency(uow: UnitOfWork, convention: ConventionDto) {
+    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
+    if (agency) return agency;
+    logger.error(
+      { agencyId: convention.agencyId },
+      "No Agency Config found for this agency code",
+    );
+    throw new BadRequestError(convention.agencyId);
+  }
+
+  private async getconvention(uow: UnitOfWork, applicationId: ConventionId) {
+    const convention = await uow.conventionRepository.getById(applicationId);
+    if (convention) return convention;
+    throw new NotFoundError(applicationId);
   }
 
   private async onEmails(
@@ -125,72 +191,6 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
         "Le lien magique n'est plus associé à cette demande d'immersion",
       );
     }
-  }
-
-  private async getconvention(uow: UnitOfWork, applicationId: ConventionId) {
-    const convention = await uow.conventionRepository.getById(applicationId);
-    if (convention) return convention;
-    throw new NotFoundError(applicationId);
-  }
-
-  private async getAgency(uow: UnitOfWork, convention: ConventionDto) {
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (agency) return agency;
-    logger.error(
-      { agencyId: convention.agencyId },
-      "No Agency Config found for this agency code",
-    );
-    throw new BadRequestError(convention.agencyId);
-  }
-
-  private findRouteToRenew(originalUrl: string) {
-    const supportedRenewRoutes = [
-      frontRoutes.conventionImmersionRoute,
-      frontRoutes.conventionToSign,
-      frontRoutes.manageConvention,
-      frontRoutes.manageConventionOld,
-      frontRoutes.immersionAssessment,
-    ];
-    const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>
-      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
-    );
-    if (routeToRenew) return routeToRenew;
-    throw new BadRequestError(
-      `Wrong link format, should be one of the supported route: ${supportedRenewRoutes
-        .map((route) => `/${route}`)
-        .join(", ")}. It was : ${originalUrl}`,
-    );
-  }
-
-  private extractValidPayload(expiredJwt: string) {
-    const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.config);
-    let payloadToExtract: any | undefined;
-    try {
-      // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
-      // probably expired or an old version.
-      payloadToExtract = verifyJwt(expiredJwt);
-    } catch (err: any) {
-      // If this JWT is signed by us but expired, deal with it.
-      if (err instanceof TokenExpiredError) {
-        payloadToExtract = jwt.decode(expiredJwt) as ConventionMagicLinkPayload;
-      } else {
-        // Perhaps this is a JWT that is signed by a compromised key.
-        try {
-          verifyDeprecatedJwt(expiredJwt);
-          // If the above didn't throw, this is a JWT that we issued. Renew it.
-          // However, we cannot trust the contents of it, as the private key was potentially
-          // compromised. Therefore, only use the application ID and the role from it, and fill
-          // the remaining data from the database to prevent a hacker from getting magic links
-          // for any application form.
-          payloadToExtract = jwt.decode(expiredJwt);
-        } catch (_) {
-          // We don't want to renew this JWT.
-          throw new ForbiddenError();
-        }
-      }
-    }
-    if (payloadToExtract) return payloadToExtract;
-    throw new BadRequestError("Malformed expired JWT");
   }
 }
 

@@ -107,6 +107,7 @@ export const feedRomeAutocompleteGatewayWith = createScenarioUnitTest<
 >((expected) => ({ dependencies }) => {
   const feedRomeAutocompleteGatewayWithRomeDtos =
     makeFeedRomeAutocompleteGatewayWithRomeDtos(dependencies);
+
   // eslint-disable-next-line jest/expect-expect
   it("feedRomeAutocompleteGatewayWith", () => {
     feedRomeAutocompleteGatewayWithRomeDtos(expected);

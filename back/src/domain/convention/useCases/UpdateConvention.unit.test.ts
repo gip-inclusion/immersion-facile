@@ -158,6 +158,7 @@ describe("Update Convention", () => {
       });
       expect(conventionRepository.conventions).toEqual([updatedConvention]);
     });
+
     it("With beneficiary current employer", async () => {
       const storedConvention = new ConventionDtoBuilder()
         .withStatus("DRAFT")

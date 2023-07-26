@@ -59,6 +59,7 @@ describe("Postgres implementation of Rome Gateway", () => {
         { romeCode: "D1102", romeLabel: "Boulangerie - viennoiserie" },
       ]);
     });
+
     it("Searches match in rome and returns distinct rome", async () => {
       expect((await pgRomeRepository.searchRome("boulangerie"))[0]).toEqual({
         romeCode: "D1102",

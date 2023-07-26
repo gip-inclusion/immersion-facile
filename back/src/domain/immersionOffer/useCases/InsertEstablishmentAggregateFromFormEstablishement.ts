@@ -20,6 +20,8 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
+  inputSchema = formEstablishmentSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly siretGateway: SiretGateway,
@@ -30,8 +32,6 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = formEstablishmentSchema;
 
   public async _execute(
     formEstablishment: FormEstablishmentDto,

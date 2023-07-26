@@ -36,50 +36,6 @@ export class InMemoryEventBus implements EventBus {
     this.subscriptions = {};
   }
 
-  public async publish(event: DomainEvent) {
-    const publishedAt = this.timeGateway.now().toISOString();
-    const publishedEvent = await this._publish(event, publishedAt);
-    logger.info(
-      {
-        eventId: publishedEvent.id,
-        topic: publishedEvent.topic,
-        occurredAt: publishedEvent.occurredAt,
-        publicationsBefore: event.publications,
-        publicationsAfter: publishedEvent.publications,
-      },
-      "Saving published event",
-    );
-    await this.uowPerformer.perform((uow) =>
-      uow.outboxRepository.save(publishedEvent),
-    );
-  }
-
-  public subscribe<T extends DomainTopic>(
-    domainTopic: T,
-    subscriptionId: SubscriptionId,
-    callback: EventCallback<T>,
-  ) {
-    logger.info({ domainTopic }, "subscribe");
-    if (!this.subscriptions[domainTopic]) {
-      this.subscriptions[domainTopic] = {};
-    }
-
-    // prettier-ignore
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
-
-    if (subscriptionsForTopic[subscriptionId]) {
-      logger.warn(
-        { domainTopic, subscriptionId },
-        "Subscription with this id already exists. It will be override",
-      );
-    }
-
-    if (callback) {
-      subscriptionsForTopic[subscriptionId] = callback as any;
-    }
-  }
-
   private async _publish(
     event: DomainEvent,
     publishedAt: DateIsoString,
@@ -147,6 +103,50 @@ export class InMemoryEventBus implements EventBus {
       publications,
       wasQuarantined,
     };
+  }
+
+  public async publish(event: DomainEvent) {
+    const publishedAt = this.timeGateway.now().toISOString();
+    const publishedEvent = await this._publish(event, publishedAt);
+    logger.info(
+      {
+        eventId: publishedEvent.id,
+        topic: publishedEvent.topic,
+        occurredAt: publishedEvent.occurredAt,
+        publicationsBefore: event.publications,
+        publicationsAfter: publishedEvent.publications,
+      },
+      "Saving published event",
+    );
+    await this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.save(publishedEvent),
+    );
+  }
+
+  public subscribe<T extends DomainTopic>(
+    domainTopic: T,
+    subscriptionId: SubscriptionId,
+    callback: EventCallback<T>,
+  ) {
+    logger.info({ domainTopic }, "subscribe");
+    if (!this.subscriptions[domainTopic]) {
+      this.subscriptions[domainTopic] = {};
+    }
+
+    // prettier-ignore
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
+
+    if (subscriptionsForTopic[subscriptionId]) {
+      logger.warn(
+        { domainTopic, subscriptionId },
+        "Subscription with this id already exists. It will be override",
+      );
+    }
+
+    if (callback) {
+      subscriptionsForTopic[subscriptionId] = callback as any;
+    }
   }
 }
 

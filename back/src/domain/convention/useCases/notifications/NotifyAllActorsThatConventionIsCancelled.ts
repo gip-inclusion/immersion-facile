@@ -8,14 +8,14 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 import { getAllConventionRecipientsEmail } from "../../entities/Convention";
 
 export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCase<ConventionDto> {
+  inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = conventionSchema;
 
   public async _execute(
     convention: ConventionDto,

@@ -11,6 +11,22 @@ import {
 } from "../../domain/generic/notifications/ports/NotificationRepository";
 
 export class InMemoryNotificationRepository implements NotificationRepository {
+  // for tests purposes
+  public notifications: Notification[] = [];
+
+  public deleteAllEmailAttachements(): Promise<number> {
+    throw new Error("Not implemented");
+  }
+
+  async getByIdAndKind(
+    id: NotificationId,
+    kind: NotificationKind,
+  ): Promise<Notification | undefined> {
+    return this.notifications
+      .filter((notification) => notification.kind === kind)
+      .find((notification) => notification.id === id);
+  }
+
   async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
     return this.notifications.filter(
       (notification): notification is EmailNotification => {
@@ -35,19 +51,6 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     );
   }
 
-  async getByIdAndKind(
-    id: NotificationId,
-    kind: NotificationKind,
-  ): Promise<Notification | undefined> {
-    return this.notifications
-      .filter((notification) => notification.kind === kind)
-      .find((notification) => notification.id === id);
-  }
-
-  async save(notification: Notification): Promise<void> {
-    this.notifications.push(notification);
-  }
-
   async getLastNotifications() {
     return {
       emails: await this.getEmailsByFilters(),
@@ -58,10 +61,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     };
   }
 
-  // for tests purposes
-  public notifications: Notification[] = [];
-
-  public deleteAllEmailAttachements(): Promise<number> {
-    throw new Error("Not implemented");
+  async save(notification: Notification): Promise<void> {
+    this.notifications.push(notification);
   }
 }

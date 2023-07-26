@@ -20,14 +20,20 @@ const validSirenEstablishmentDto: SiretEstablishmentDto = {
 export class SirenEstablishmentDtoBuilder
   implements Builder<SiretEstablishmentDto>
 {
-  public constructor(
+  constructor(
     private dto: SiretEstablishmentDto = validSirenEstablishmentDto,
   ) {}
 
-  public withSiret(siret: string): SirenEstablishmentDtoBuilder {
+  build(): SiretEstablishmentDto {
+    return this.dto;
+  }
+
+  public withBusinessAddress(
+    businessAddress: string,
+  ): SirenEstablishmentDtoBuilder {
     return new SirenEstablishmentDtoBuilder({
       ...this.dto,
-      siret,
+      businessAddress,
     });
   }
 
@@ -59,15 +65,10 @@ export class SirenEstablishmentDtoBuilder
     });
   }
 
-  public withBusinessAddress(
-    businessAddress: string,
-  ): SirenEstablishmentDtoBuilder {
+  public withSiret(siret: string): SirenEstablishmentDtoBuilder {
     return new SirenEstablishmentDtoBuilder({
       ...this.dto,
-      businessAddress,
+      siret,
     });
-  }
-  build(): SiretEstablishmentDto {
-    return this.dto;
   }
 }

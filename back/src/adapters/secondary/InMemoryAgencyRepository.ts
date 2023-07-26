@@ -110,6 +110,8 @@ const testAgencies: AgencyDto[] = [
 ];
 
 export class InMemoryAgencyRepository implements AgencyRepository {
+  private _agencies: { [id: string]: AgencyDto } = {};
+
   constructor(agencyList: AgencyDto[] = testAgencies) {
     agencyList.forEach((agency) => {
       this._agencies[agency.id] = agency;
@@ -117,9 +119,9 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     logger.info(this._agencies);
   }
 
-  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    logger.info({ id: ids, configs: this._agencies }, "getById");
-    return ids.map((id) => this._agencies[id]).filter(Boolean);
+  // test purpose only
+  get agencies(): AgencyDto[] {
+    return values(this._agencies);
   }
 
   public async getAgencies({
@@ -156,27 +158,20 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     )[0];
   }
 
-  public async insert(config: AgencyDto): Promise<AgencyId | undefined> {
-    logger.info({ config, configs: this._agencies }, "insert");
-    if (this._agencies[config.id]) return undefined;
-    this._agencies[config.id] = config;
-    return config.id;
-  }
-
-  public async update(agency: PartialAgencyDto) {
-    if (!this._agencies[agency.id]) {
-      throw new Error(`Agency ${agency.id} does not exist`);
-    }
-    this._agencies[agency.id] = { ...this._agencies[agency.id], ...agency };
+  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
+    logger.info({ id: ids, configs: this._agencies }, "getById");
+    return ids.map((id) => this._agencies[id]).filter(Boolean);
   }
 
   public async getImmersionFacileAgencyId(): Promise<AgencyId> {
     return "immersion-facile-agency";
   }
 
-  // test purpose only
-  get agencies(): AgencyDto[] {
-    return values(this._agencies);
+  public async insert(config: AgencyDto): Promise<AgencyId | undefined> {
+    logger.info({ config, configs: this._agencies }, "insert");
+    if (this._agencies[config.id]) return undefined;
+    this._agencies[config.id] = config;
+    return config.id;
   }
 
   setAgencies(agencyList: AgencyDto[]) {
@@ -186,7 +181,12 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     });
   }
 
-  private _agencies: { [id: string]: AgencyDto } = {};
+  public async update(agency: PartialAgencyDto) {
+    if (!this._agencies[agency.id]) {
+      throw new Error(`Agency ${agency.id} does not exist`);
+    }
+    this._agencies[agency.id] = { ...this._agencies[agency.id], ...agency };
+  }
 }
 
 const isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";

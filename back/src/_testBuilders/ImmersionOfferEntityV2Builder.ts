@@ -18,11 +18,8 @@ export class ImmersionOfferEntityV2Builder
     },
   ) {}
 
-  withRomeCode(romeCode: RomeCode) {
-    return new ImmersionOfferEntityV2Builder({
-      ...this.entity,
-      romeCode,
-    });
+  build() {
+    return this.entity;
   }
 
   withAppellationCode(appellationCode: string) {
@@ -31,12 +28,14 @@ export class ImmersionOfferEntityV2Builder
       appellationCode,
     });
   }
+
   withAppellationLabel(appellationLabel: string) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
       appellationLabel,
     });
   }
+
   withCreatedAt(createdAt: Date) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
@@ -44,8 +43,11 @@ export class ImmersionOfferEntityV2Builder
     });
   }
 
-  build() {
-    return this.entity;
+  withRomeCode(romeCode: RomeCode) {
+    return new ImmersionOfferEntityV2Builder({
+      ...this.entity,
+      romeCode,
+    });
   }
 }
 

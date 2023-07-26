@@ -28,6 +28,7 @@ const inclusionConnectBaseUri: AbsoluteUrl =
 
 describe("inclusion connection flow", () => {
   let testAppAndDeps: TestAppAndDeps;
+
   describe("Right path", () => {
     it("does successfully the complete inclusion connect flow", async () => {
       testAppAndDeps = await buildTestApp(
@@ -45,6 +46,7 @@ describe("inclusion connection flow", () => {
       await redirectionAfterInclusionConnection({ code: authCode, state });
     });
   });
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function, jest/no-disabled-tests
   describe.skip("Wrong path", () => {});
 

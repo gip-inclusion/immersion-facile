@@ -13,30 +13,9 @@ export class PgInclusionConnectedUserRepository
 {
   constructor(private client: PoolClient) {}
 
-  public async getWithFilter({
-    agencyRole,
-  }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
-    return this.getInclusionConnectedUsers({ agencyRole });
-  }
-
   async getById(userId: string): Promise<InclusionConnectedUser | undefined> {
     const icUsers = await this.getInclusionConnectedUsers({ userId });
     return icUsers[0];
-  }
-
-  async update(user: InclusionConnectedUser): Promise<void> {
-    await this.client.query(
-      `
-        DELETE FROM users__agencies WHERE user_id = $1
-        `,
-      [user.id],
-    );
-    await this.client.query(
-      format(
-        `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
-        user.agencyRights.map(({ agency, role }) => [user.id, agency.id, role]),
-      ),
-    );
   }
 
   private async getInclusionConnectedUsers(filters: {
@@ -104,6 +83,27 @@ export class PgInclusionConnectedUserRepository
 
     if (response.rows.length === 0) return [];
     return response.rows.map((row) => row.inclusion_user);
+  }
+
+  public async getWithFilter({
+    agencyRole,
+  }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
+    return this.getInclusionConnectedUsers({ agencyRole });
+  }
+
+  async update(user: InclusionConnectedUser): Promise<void> {
+    await this.client.query(
+      `
+        DELETE FROM users__agencies WHERE user_id = $1
+        `,
+      [user.id],
+    );
+    await this.client.query(
+      format(
+        `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
+        user.agencyRights.map(({ agency, role }) => [user.id, agency.id, role]),
+      ),
+    );
   }
 }
 
