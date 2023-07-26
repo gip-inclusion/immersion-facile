@@ -106,7 +106,7 @@ export const insertEstablishment = async (
   const position = props.position ?? defaultPosition;
   const insertQuery = `
   INSERT INTO establishments (
-    siret, name, street_number_and_address, post_code, city, department_code, number_employees, naf_code, source_provider, update_date, is_active, is_searchable, fit_for_disabled_workers, gps, lon, lat, max_contacts_per_week
+    siret, name, street_number_and_address, post_code, city, department_code, number_employees, naf_code, source_provider, update_date, is_open, is_searchable, fit_for_disabled_workers, gps, lon, lat, max_contacts_per_week
   ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15)`;
   const addressDto = props.address ?? rueGuillaumeTellDto;
   await client.query(insertQuery, [
@@ -150,7 +150,7 @@ export type PgEstablishmentRow = {
   naf_nomenclature: string;
   gps: string;
   update_date?: Date;
-  is_active: boolean;
+  is_open: boolean;
   is_commited?: boolean | null;
   fit_for_disabled_workers: boolean | null;
   max_contacts_per_week: number;

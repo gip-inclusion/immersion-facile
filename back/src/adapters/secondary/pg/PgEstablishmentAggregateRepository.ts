@@ -134,7 +134,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date 
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_open, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -324,7 +324,7 @@ export class PgEstablishmentAggregateRepository
       `WITH active_establishments_within_area AS 
         (SELECT siret, fit_for_disabled_workers, gps
          FROM establishments 
-         WHERE is_active 
+         WHERE is_open 
          AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
         matching_offers AS (
           SELECT 
@@ -396,7 +396,7 @@ export class PgEstablishmentAggregateRepository
                    SET update_date = %1$L
                    ${
                      propertiesToUpdate.isOpen !== undefined
-                       ? ", is_active=%2$L"
+                       ? ", is_open=%2$L"
                        : ""
                    }
                    ${propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
@@ -671,7 +671,7 @@ export class PgEstablishmentAggregateRepository
                 'lastInseeCheckDate', to_char(
                   e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
-                'isOpen', e.is_active, 
+                'isOpen', e.is_open, 
                 'isSearchable', e.is_searchable, 
                 'isCommited', e.is_commited,
                 'fitForDisabledWorkers', e.fit_for_disabled_workers,
@@ -810,7 +810,7 @@ export class PgEstablishmentAggregateRepository
         `
             UPDATE establishments
             SET last_insee_check_date = %1$L 
-              ${values?.isOpen !== undefined ? ", is_active=%3$L" : ""}
+              ${values?.isOpen !== undefined ? ", is_open=%3$L" : ""}
               ${values?.nafDto ? ", naf_code=%4$L" : ""}
               ${values?.nafDto ? ", naf_nomenclature=%5$L" : ""}
               ${values?.name ? ", name=%6$L" : ""}

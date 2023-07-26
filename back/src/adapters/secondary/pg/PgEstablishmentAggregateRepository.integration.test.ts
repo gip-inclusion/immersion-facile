@@ -531,7 +531,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       );
 
       expectObjectsToMatch(establishmentRowInDB, {
-        is_active: false,
+        is_open: false,
         update_date: updatedAt,
         fit_for_disabled_workers: true,
       });
@@ -628,7 +628,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           naf_code: establishmentToInsert.nafDto.code,
           naf_nomenclature: establishmentToInsert.nafDto.nomenclature,
           update_date: establishmentToInsert.updatedAt,
-          is_active: establishmentToInsert.isOpen,
+          is_open: establishmentToInsert.isOpen,
           max_contacts_per_week: establishmentToInsert.maxContactsPerWeek,
           last_insee_check_date: establishmentToInsert.lastInseeCheckDate,
         };

@@ -79,7 +79,7 @@ export class PgEstablishmentGroupRepository
       LEFT JOIN "public_appellations_data" ap ON ap.ogr_appellation = io.appellation_code
       LEFT JOIN "public_romes_data" r ON io.rome_code = r.code_rome
       LEFT JOIN "public_naf_classes_2008" ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      WHERE establishment_groups__sirets.group_slug = $1 AND e.is_active AND e.is_searchable
+      WHERE establishment_groups__sirets.group_slug = $1 AND e.is_open AND e.is_searchable
       GROUP BY(e.siret, io.rome_code, r.libelle_rome, public_naf_classes_2008.class_label, ic.contact_mode)
     `,
       [slug],
