@@ -255,7 +255,30 @@ export const prettyPrintComplexSchedule = (
   displayFreeDays = true,
 ): string => {
   const lines: string[] = [];
-  makeImmersionTimetable(complexSchedule).forEach((week) => {
+  const weeks = makeImmersionTimetable(complexSchedule);
+  const weeksWithoutEmptyDays = weeks.map((week, weekIndex) => {
+    const isStartingWeek = weekIndex === 0;
+    const isEndingWeek = weekIndex === weeks.length - 1;
+    const shouldModifyWeek = isStartingWeek || isEndingWeek;
+    if (!shouldModifyWeek) return week;
+    return week.filter((day, dayIndex) => {
+      if (isStartingWeek) {
+        return !(
+          dayIndex <
+            week.findIndex((otherDay) => otherDay.dailySchedule !== null) &&
+          day.dailySchedule === null
+        );
+      }
+      if (isEndingWeek) {
+        return !(
+          dayIndex >
+            week.findLastIndex((otherDay) => otherDay.dailySchedule !== null) &&
+          day.dailySchedule === null
+        );
+      }
+    });
+  });
+  weeksWithoutEmptyDays.forEach((week) => {
     lines.push(
       `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
     );
@@ -354,16 +377,8 @@ export const makeImmersionTimetable = (
   complexSchedule: DailyScheduleDto[],
 ): ImmersionTimeTable => {
   const calendar: WeeklyImmersionTimetableDto[] = [];
-  const firstDay = complexSchedule.at(0);
-  const firstDayOfFirstWeekIndex = firstDay
-    ? parseInt((new Date(firstDay.date), "i")) - 1
-    : 0;
   const lastDayOfTheWeekIndex = 6;
-  applyDaysWithScheduleOnTimetable(
-    complexSchedule,
-    calendar,
-    firstDayOfFirstWeekIndex,
-  );
+  applyDaysWithScheduleOnTimetable(complexSchedule, calendar);
   applyDaysWithoutScheduleOnTimetable(calendar, lastDayOfTheWeekIndex);
   return calendar;
 };
@@ -389,9 +404,8 @@ const applyDaysWithoutScheduleOnTimetable = (
 const applyDaysWithScheduleOnTimetable = (
   complexSchedule: DailyScheduleDto[],
   calendar: WeeklyImmersionTimetableDto[],
-  firstDayOfFirstWeekIndex: number,
 ) => {
-  let currentWeekIndex = firstDayOfFirstWeekIndex;
+  let currentWeekIndex = 0;
   let higherWeekDay = 0;
   complexSchedule.forEach((dailySchedule, dayIndex) => {
     const frenchDay = frenchDayMapping(dailySchedule.date).frenchDay;

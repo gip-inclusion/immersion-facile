@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { useStyles } from "tss-react/dsfr";
 import {
   AgencyPublicDisplayDto,
   ConventionReadDto,
+  DailyScheduleDto,
   DotNestedKeys,
   prettyPrintComplexSchedule,
   toDateString,
@@ -19,7 +20,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 
 type ConventionSummaryRow = [
   keyof ConventionReadDto | DotNestedKeys<ConventionReadDto> | string,
-  string | undefined,
+  ReactNode | undefined,
 ];
 
 const filterEmptyRows = (row: ConventionSummaryRow) =>
@@ -173,7 +174,17 @@ const establishmentSummary = (convention: ConventionReadDto) => {
   ];
   return rows.filter(filterEmptyRows);
 };
-
+const prettyPrintComplexScheduleAsJSX = (
+  complexSchedule: DailyScheduleDto[],
+): JSX.Element => (
+  <ul>
+    {prettyPrintComplexSchedule(complexSchedule)
+      .split("\n")
+      .map((line, index) => (
+        <li key={index}>{line}</li>
+      ))}
+  </ul>
+);
 const immersionConditionsSummary = (convention: ConventionReadDto) => {
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(convention.internshipKind),
@@ -184,7 +195,7 @@ const immersionConditionsSummary = (convention: ConventionReadDto) => {
     [fields["dateEnd"].label, toDateString(new Date(convention.dateEnd))],
     [
       "Emploi du temps",
-      prettyPrintComplexSchedule(convention.schedule.complexSchedule),
+      prettyPrintComplexScheduleAsJSX(convention.schedule.complexSchedule),
     ],
     [
       fields["individualProtection"].label,
