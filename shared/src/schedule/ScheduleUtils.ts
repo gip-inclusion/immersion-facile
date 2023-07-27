@@ -6,17 +6,16 @@ import {
   getDay,
   parseISO,
 } from "date-fns";
-import { clone, prop } from "ramda";
+import { clone, prop, uniq } from "ramda";
 import {
   DailyScheduleDto,
   DateIntervalDto,
-  DayPeriodsDto,
   ScheduleDto,
+  SelectedDaysOfTheWeekDto,
   TimePeriodDto,
   TimePeriodsDto,
   Weekday,
   WeekdayNumber,
-  WeekDayRangeSchemaDTO,
   weekdays,
 } from "./Schedule.dto";
 
@@ -322,56 +321,14 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
   return totalOfMinutes / 60;
 };
 
-export const dayPeriodsFromComplexSchedule = (
+export const selectedDaysFromComplexSchedule = (
   complexSchedule: DailyScheduleDto[],
-  startDayDate?: Date,
-): DayPeriodsDto => {
-  const manageTimePeriodOnDay = (frenchDay: number) => {
-    const isSameFrenchDay = (day: DailyScheduleDto, frenchDay: number) =>
-      frenchDayMapping(day.date).frenchDay === frenchDay;
-    const hasTimePeriod = (day: DailyScheduleDto) => day.timePeriods.length > 0;
-    complexSchedule.some(
-      (day) => isSameFrenchDay(day, frenchDay) && hasTimePeriod(day),
-    ) && timePeriodsOnFrenchDays.splice(frenchDay, 1, true);
-  };
-  const timePeriodsOnFrenchDays: boolean[] = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
-  timePeriodsOnFrenchDays.forEach((_, frenchDay) =>
-    manageTimePeriodOnDay(frenchDay),
-  );
-
-  const dayPeriods: DayPeriodsDto = [];
-  for (
-    let frenchDay = 0;
-    frenchDay < timePeriodsOnFrenchDays.length;
-    frenchDay++
-  ) {
-    if (timePeriodsOnFrenchDays[frenchDay] === true) {
-      let lastFrenchDayWithTimePeriod = frenchDay;
-      while (timePeriodsOnFrenchDays[lastFrenchDayWithTimePeriod + 1] === true)
-        lastFrenchDayWithTimePeriod++;
-      dayPeriods.push([
-        frenchDay,
-        lastFrenchDayWithTimePeriod,
-      ] as WeekDayRangeSchemaDTO);
-      frenchDay = lastFrenchDayWithTimePeriod;
-    }
-  }
-  const startDay = startDayDate?.getDay() || 0;
-  const shouldSortDayPeriods =
-    startDay > 0 && calculateScheduleTotalDurationInDays(complexSchedule) < 8; // if the schedule is shorter than a week, we sort the day periods to start with the startDay
-
-  return shouldSortDayPeriods
-    ? dayPeriods.sort((a) => startDay - a[0])
-    : dayPeriods;
-};
+): SelectedDaysOfTheWeekDto =>
+  uniq(
+    complexSchedule
+      .filter((day) => day.timePeriods.length > 0)
+      .map((day) => frenchDayMapping(day.date).frenchDay),
+  ).sort();
 
 export const makeImmersionTimetable = (
   complexSchedule: DailyScheduleDto[],
@@ -435,7 +392,18 @@ export const regularTimePeriods = (schedule: ScheduleDto): TimePeriodsDto => {
   const scheduleWithTimePeriods = schedule.complexSchedule.find(
     (dailySchedule) => dailySchedule.timePeriods.length > 0,
   );
-  return scheduleWithTimePeriods ? scheduleWithTimePeriods.timePeriods : [];
+  return scheduleWithTimePeriods
+    ? scheduleWithTimePeriods.timePeriods
+    : [
+        {
+          start: "09:00",
+          end: "12:00",
+        },
+        {
+          start: "13:00",
+          end: "17:00",
+        },
+      ];
 };
 
 export const emptySchedule = (

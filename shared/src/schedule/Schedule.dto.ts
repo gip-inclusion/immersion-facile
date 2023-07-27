@@ -23,9 +23,8 @@ export type DailyScheduleDto = {
   date: string; //TODO Type better ? Format ISO 8601 "YYYY-MM-DDT00:00:00.000Z"
   timePeriods: TimePeriodsDto;
 };
-export type DayPeriodsDto = WeekDayRangeSchemaDTO[];
+export type SelectedDaysOfTheWeekDto = WeekdayNumber[];
 export type WeekdayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-export type WeekDayRangeSchemaDTO = [WeekdayNumber, WeekdayNumber];
 export type DateIntervalDto = {
   start: Date;
   end: Date;
