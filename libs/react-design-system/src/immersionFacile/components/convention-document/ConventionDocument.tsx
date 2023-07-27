@@ -6,15 +6,17 @@ import "./ConventionDocument.scss";
 
 const componentName = "im-convention-document";
 
+export type ConventionDocumentProperties = {
+  children: React.ReactNode;
+  logos: React.ReactNode[];
+  title: string;
+};
+
 export const ConventionDocument = ({
   children,
-  title,
   logos,
-}: {
-  children: React.ReactNode;
-  title: React.ReactNode;
-  logos: React.ReactNode[];
-}) => {
+  title,
+}: ConventionDocumentProperties) => {
   const { cx } = useStyles();
   const renderLogos = () =>
     logos?.map((logo: React.ReactNode, index) => {
