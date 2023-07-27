@@ -10,7 +10,10 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "lint": "pnpm -w lintconfig:glob ./libs/react-design-system/src",
-    "make-styles": "scss-to-ts update"
+    "make-styles": "scss-to-ts update",
+    "postinstall": "copy-dsfr-to-public",
+    "predev": "only-include-used-icons",
+    "prebuild": "only-include-used-icons"
   },
   "author": "",
   "license": "ISC",
