@@ -1,9 +1,8 @@
 import { Action, Slice } from "@reduxjs/toolkit";
 import { Epic } from "redux-observable";
+import { ValueOf } from "shared";
 import { Dependencies } from "src/config/dependencies";
 import { RootState } from "src/core-logic/storeConfig/store";
-
-type ValueOf<T> = T[keyof T];
 
 export type ActionOfSlice<S extends Slice> = ReturnType<ValueOf<S["actions"]>>;
 

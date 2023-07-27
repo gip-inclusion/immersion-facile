@@ -3,6 +3,7 @@ import { decode } from "js-base64";
 import { ConventionId } from "../convention/convention.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
+import { ValueOf } from "../utils";
 
 export const createConventionMagicLinkPayload = ({
   id,
@@ -121,8 +122,6 @@ export type JwtPayloads = {
   inclusion?: InclusionConnectJwtPayload;
   backOffice?: BackOfficeJwtPayload;
 };
-
-type ValueOf<T> = T[keyof T];
 
 export type PayloadKey = keyof JwtPayloads;
 export type PayloadOption = ValueOf<Required<JwtPayloads>>;
