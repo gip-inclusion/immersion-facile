@@ -1,5 +1,5 @@
 import { expectToEqual } from "../test.helpers";
-import { DayPeriodsDto, ScheduleDto } from "./Schedule.dto";
+import { ScheduleDto, SelectedDaysOfTheWeekDto } from "./Schedule.dto";
 import { dateIsoStringSchema, scheduleSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
@@ -7,10 +7,10 @@ import {
   calculateScheduleTotalDurationInDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   calculateWeeklyHoursFromSchedule,
-  dayPeriodsFromComplexSchedule,
   isSundayInSchedule,
   makeDailySchedule,
   prettyPrintSchedule,
+  selectedDaysFromComplexSchedule,
 } from "./ScheduleUtils";
 
 describe("ScheduleUtils", () => {
@@ -24,7 +24,7 @@ describe("ScheduleUtils", () => {
           end: new Date("2022-06-26"),
         })
         .withRegularSchedule({
-          dayPeriods: [[5, 6]],
+          selectedDays: [5, 6],
           timePeriods,
         })
         .build();
@@ -47,7 +47,7 @@ describe("ScheduleUtils", () => {
             end: new Date("2022-07-03"),
           })
           .withRegularSchedule({
-            dayPeriods: [[0, 1]],
+            selectedDays: [0, 1],
             timePeriods,
           })
           .build();
@@ -68,7 +68,7 @@ describe("ScheduleUtils", () => {
             end: new Date("2022-07-03"),
           })
           .withRegularSchedule({
-            dayPeriods: [[2, 3]],
+            selectedDays: [2, 3],
             timePeriods,
           })
           .build();
@@ -261,10 +261,7 @@ describe("ScheduleUtils", () => {
           end: new Date("2022-06-10"),
         })
         .withRegularSchedule({
-          dayPeriods: [
-            [0, 0],
-            [2, 3],
-          ],
+          selectedDays: [0, 2, 3],
           timePeriods: [
             { start: "09:00", end: "12:30" },
             { start: "14:00", end: "18:00" },
@@ -285,10 +282,7 @@ describe("ScheduleUtils", () => {
           end: new Date("2022-06-10"),
         })
         .withRegularSchedule({
-          dayPeriods: [
-            [0, 0],
-            [2, 3],
-          ],
+          selectedDays: [0, 2, 3],
           timePeriods: [
             { start: "09:00", end: "12:30" },
             { start: "14:00", end: "18:00" },
@@ -320,25 +314,25 @@ describe("ScheduleUtils", () => {
         const schedule = new ScheduleDtoBuilder()
           .withDateInterval(dateInterval)
           .build();
-        expect(dayPeriodsFromComplexSchedule(schedule.complexSchedule)).toEqual(
-          [],
-        );
+        expect(
+          selectedDaysFromComplexSchedule(schedule.complexSchedule),
+        ).toEqual([]);
       });
 
       it(`dayperiods '${JSON.stringify([])}'`, () => {
         const schedule = new ScheduleDtoBuilder()
           .withDateInterval(dateInterval)
-          .withRegularSchedule({ dayPeriods: [], timePeriods })
+          .withRegularSchedule({ selectedDays: [], timePeriods })
           .build();
-        expect(dayPeriodsFromComplexSchedule(schedule.complexSchedule)).toEqual(
-          [],
-        );
+        expect(
+          selectedDaysFromComplexSchedule(schedule.complexSchedule),
+        ).toEqual([]);
       });
 
       it("should not validate schema without any timeperiod", () => {
         const emptySchedule = new ScheduleDtoBuilder()
           .withRegularSchedule({
-            dayPeriods: [],
+            selectedDays: [],
             timePeriods: [],
           })
           .build();
@@ -353,10 +347,7 @@ describe("ScheduleUtils", () => {
             end: new Date("2022-06-10"),
           })
           .withRegularSchedule({
-            dayPeriods: [
-              [0, 0],
-              [2, 3],
-            ],
+            selectedDays: [0, 2, 3],
             timePeriods: [
               { start: "09:00", end: "12:30" },
               { start: "14:00", end: "18:00" },
@@ -388,89 +379,59 @@ describe("ScheduleUtils", () => {
     });
 
     describe("with one day period of one day", () => {
-      const dayPeriodsScenarios: DayPeriodsDto[] = [
-        [[0, 0]],
-        [[1, 1]],
-        [[2, 2]],
-        [[3, 3]],
-        [[4, 4]],
-        [[5, 5]],
-        [[6, 6]],
+      const selectedDaysScenarios: SelectedDaysOfTheWeekDto[] = [
+        [0],
+        [1],
+        [2],
+        [3],
+        [4],
+        [5],
+        [6],
       ];
-      dayPeriodsScenarios.forEach((dayPeriods) =>
-        it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
+      selectedDaysScenarios.forEach((selectedDays) =>
+        it(`selectedDay '${JSON.stringify(selectedDays)}'`, () => {
           const schedule = new ScheduleDtoBuilder()
             .withDateInterval(dateInterval)
             .withRegularSchedule({
-              dayPeriods,
+              selectedDays,
               timePeriods,
             })
             .build();
           expect(
-            dayPeriodsFromComplexSchedule(schedule.complexSchedule),
-          ).toEqual(dayPeriods);
+            selectedDaysFromComplexSchedule(schedule.complexSchedule),
+          ).toEqual(selectedDays);
         }),
       );
     });
 
-    describe("with one day period of multiple days", () => {
-      const dayPeriodsScenarios: DayPeriodsDto[] = [
-        [[0, 1]],
-        [[2, 3]],
-        [[2, 4]],
-        [[1, 6]],
-        [[3, 6]],
-        [[0, 4]],
-        [[5, 6]],
+    describe("validate selectedDaysFromComplexSchedule", () => {
+      const selectedDaysScenarios: SelectedDaysOfTheWeekDto[] = [
+        [0, 1],
+        [2, 3],
+        [2, 3, 4],
+        [1, 2, 3, 4, 5, 6],
+        [3, 4, 5, 6],
+        [0, 1, 2, 3, 4],
+        [5, 6],
+        [0, 4],
+        [2, 4, 6],
+        [0, 1, 3, 4],
+        [0, 1, 2, 3, 4, 6],
+        [1, 2, 4, 5],
+        [0, 2, 3, 4, 6],
       ];
-      dayPeriodsScenarios.forEach((dayPeriods) =>
-        it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
+      selectedDaysScenarios.forEach((selectedDays) =>
+        it(`selectedDay '${JSON.stringify(selectedDays)}'`, () => {
           const schedule = new ScheduleDtoBuilder()
             .withDateInterval(dateInterval)
             .withRegularSchedule({
-              dayPeriods,
+              selectedDays,
               timePeriods,
             })
             .build();
           expect(
-            dayPeriodsFromComplexSchedule(schedule.complexSchedule),
-          ).toEqual(dayPeriods);
-        }),
-      );
-    });
-
-    describe("with multiple day periods of multiple days", () => {
-      const dayPeriodsScenarios: DayPeriodsDto[] = [
-        [
-          [0, 1],
-          [3, 4],
-        ],
-        [
-          [0, 4],
-          [6, 6],
-        ],
-        [
-          [1, 2],
-          [4, 5],
-        ],
-        [
-          [0, 0],
-          [2, 4],
-          [6, 6],
-        ],
-      ];
-      dayPeriodsScenarios.forEach((dayPeriods) =>
-        it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
-          const schedule = new ScheduleDtoBuilder()
-            .withDateInterval(dateInterval)
-            .withRegularSchedule({
-              dayPeriods,
-              timePeriods,
-            })
-            .build();
-          expect(
-            dayPeriodsFromComplexSchedule(schedule.complexSchedule),
-          ).toEqual(dayPeriods);
+            selectedDaysFromComplexSchedule(schedule.complexSchedule),
+          ).toEqual(selectedDays);
         }),
       );
     });
@@ -502,7 +463,7 @@ describe("ScheduleUtils", () => {
       const schedule = new ScheduleDtoBuilder()
         .withDateInterval(interval)
         .withRegularSchedule({
-          dayPeriods: [[6, 6]],
+          selectedDays: [6],
           timePeriods: [{ start: "08:00", end: "12:00" }],
         })
         .build();
@@ -593,11 +554,7 @@ const longComplexSchedule = () =>
 const regularSchedule = () =>
   new ScheduleDtoBuilder()
     .withRegularSchedule({
-      dayPeriods: [
-        [0, 0],
-        [2, 3],
-        [6, 6],
-      ],
+      selectedDays: [0, 2, 3, 6],
       timePeriods: [
         { start: "01:00", end: "02:00" },
         { start: "03:00", end: "04:00" },
@@ -612,11 +569,7 @@ const longRegularSchedule = () =>
       end: new Date("2022-06-26"),
     })
     .withRegularSchedule({
-      dayPeriods: [
-        [0, 0],
-        [2, 3],
-        [6, 6],
-      ],
+      selectedDays: [0, 2, 3, 6],
       timePeriods: [
         { start: "01:00", end: "02:00" },
         { start: "03:00", end: "04:00" },

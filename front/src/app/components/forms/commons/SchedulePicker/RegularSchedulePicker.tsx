@@ -10,11 +10,11 @@ import {
   ConventionReadDto,
   DailyScheduleDto,
   DateIntervalDto,
-  DayPeriodsDto,
-  dayPeriodsFromComplexSchedule,
   regularTimePeriods,
   ScheduleDto,
   ScheduleDtoBuilder,
+  selectedDaysFromComplexSchedule,
+  SelectedDaysOfTheWeekDto,
 } from "shared";
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
@@ -30,10 +30,12 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const { setValue, getValues } = useFormContext<ConventionReadDto>();
   const values = getValues();
-  const dayPeriods = dayPeriodsFromComplexSchedule(
-    values.schedule.complexSchedule,
-    props.interval.start,
-  );
+  const cciWeekDays = ["L", "M", "M", "J", "V", "S"];
+  const immersionWeekDays = ["L", "M", "M", "J", "V", "S", "D"];
+  const availableWeekDays =
+    values.internshipKind === "mini-stage-cci"
+      ? cciWeekDays
+      : immersionWeekDays;
 
   return (
     <>
@@ -52,18 +54,20 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
         >
           <WeekdayPicker
             name={name}
-            dayPeriods={dayPeriods}
-            onValueChange={(dayPeriods: DayPeriodsDto) => {
-              values.schedule = new ScheduleDtoBuilder(values.schedule)
+            availableWeekDays={availableWeekDays}
+            selectedDays={selectedDaysFromComplexSchedule(
+              values.schedule.complexSchedule,
+            )}
+            onValueChange={(newSelectedDays: SelectedDaysOfTheWeekDto) => {
+              const newSchedule = new ScheduleDtoBuilder(values.schedule)
                 .withDateInterval(props.interval)
                 .withRegularSchedule({
-                  dayPeriods,
+                  selectedDays: newSelectedDays,
                   timePeriods: regularTimePeriods(values.schedule),
                 })
                 .build();
-              setValue(name, values.schedule);
+              setValue(name, newSchedule);
             }}
-            maxDay={values.internshipKind === "mini-stage-cci" ? 5 : 6}
             interval={props.interval}
             disabled={props.disabled}
           />
@@ -121,14 +125,27 @@ const WeeksHoursIndicator = ({
   schedule,
 }: {
   schedule: ScheduleDto;
-}): JSX.Element => (
-  <ul>
-    {calculateWeeklyHoursFromSchedule(schedule).map((weekTotalHours, index) => (
-      <TotalWeeklyHoursIndicator
-        key={`weeklyHoursIndicator-${index}`}
-        week={index + 1}
-        totalHours={weekTotalHours}
-      />
-    ))}
-  </ul>
-);
+}): JSX.Element => {
+  const workedHoursByWeek = calculateWeeklyHoursFromSchedule(schedule);
+  const shouldShowRecap = workedHoursByWeek.length > 0;
+  return (
+    <>
+      {shouldShowRecap && (
+        <ul>
+          {workedHoursByWeek.map((weekTotalHours, index) => (
+            <TotalWeeklyHoursIndicator
+              key={`weeklyHoursIndicator-${index}`}
+              week={index + 1}
+              totalHours={weekTotalHours}
+            />
+          ))}
+        </ul>
+      )}
+      {!shouldShowRecap && (
+        <p className={fr.cx("fr-text--xs")}>
+          Vous n'avez pas encore sélectionné de jours travaillés
+        </p>
+      )}
+    </>
+  );
+};

@@ -68,7 +68,7 @@ export const SchedulePicker = ({
 
       <p className={fr.cx("fr-h4", "fr-mt-4w")}>
         {values[name].isSimple
-          ? "Sélectionnez la période des jours *"
+          ? "Sélectionnez les jours travaillés *"
           : "Sélectionnez les horaires de travail jour par jour *"}
       </p>
       {scheduleErrors.map((value, index) => (

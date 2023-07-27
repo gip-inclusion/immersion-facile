@@ -2,12 +2,11 @@ import { z } from "zod";
 import { zTimeString } from "../zodUtils";
 import {
   DailyScheduleDto,
-  DayPeriodsDto,
   ScheduleDto,
+  SelectedDaysOfTheWeekDto,
   TimePeriodDto,
   TimePeriodsDto,
   WeekdayNumber,
-  WeekDayRangeSchemaDTO,
 } from "./Schedule.dto";
 import { validateSchedule } from "./ScheduleUtils";
 
@@ -41,16 +40,12 @@ export const weekDaySchema = z
   .int()
   .min(0)
   .max(6) as z.Schema<WeekdayNumber>;
-export const weekDayRangeSchema: z.Schema<WeekDayRangeSchemaDTO> = z.tuple([
-  weekDaySchema,
-  weekDaySchema,
-]);
 
 // Each tuple represents a weekday range, e.g.:
 // [0, 4] means "Monday to Friday, inclusive"
 // [0, 0] means "Monday"
-export const dayPeriodsSchema: z.Schema<DayPeriodsDto> =
-  z.array(weekDayRangeSchema);
+export const selectedDaysOfTheWeekSchema: z.Schema<SelectedDaysOfTheWeekDto> =
+  z.array(weekDaySchema);
 
 export const scheduleSchema: z.Schema<ScheduleDto> = z
   .object({
