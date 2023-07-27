@@ -74,18 +74,21 @@ describe("Query: List agencies by filter", () => {
         [cciAgency1InCergy, cciAgency2InParis].map(toAgencyOption),
       );
     });
+
     it("List immersionWithoutPe agencies", async () => {
       expectToEqual(
         await useCase.execute({ kind: "immersionWithoutPe" }, undefined),
         [otherAgencyInParis].map(toAgencyOption),
       );
     });
+
     it("List immersionPeOnly agencies", async () => {
       expectToEqual(
         await useCase.execute({ kind: "immersionPeOnly" }, undefined),
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
       );
     });
+
     it("List miniStageExcluded agencies", async () => {
       expectToEqual(
         await useCase.execute({ kind: "miniStageExcluded" }, undefined),
@@ -95,6 +98,7 @@ describe("Query: List agencies by filter", () => {
       );
     });
   });
+
   describe("With Agency department code filter", () => {
     it("List agencies with department code 95", async () => {
       expectToEqual(
@@ -102,6 +106,7 @@ describe("Query: List agencies by filter", () => {
         [cciAgency1InCergy].map(toAgencyOption),
       );
     });
+
     it("List agencies with department code 75", async () => {
       expectToEqual(
         await useCase.execute({ departmentCode: "75" }, undefined),
@@ -113,6 +118,7 @@ describe("Query: List agencies by filter", () => {
         ].map(toAgencyOption),
       );
     });
+
     it("List agencies with department code 78", async () => {
       expectToEqual(
         await useCase.execute({ departmentCode: "78" }, undefined),
@@ -128,12 +134,14 @@ describe("Query: List agencies by filter", () => {
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
       );
     });
+
     it("List agencies with name 'Agence'", async () => {
       expectToEqual(
         await useCase.execute({ nameIncludes: "Agence" }, undefined),
         allAgencies.map(toAgencyOption),
       );
     });
+
     it("List agencies with name 'TOTO'", async () => {
       expectToEqual(
         await useCase.execute({ nameIncludes: "TOTO" }, undefined),

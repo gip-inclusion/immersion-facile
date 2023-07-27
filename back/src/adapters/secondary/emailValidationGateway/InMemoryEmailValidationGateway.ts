@@ -4,6 +4,13 @@ import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/Em
 export class InMemoryEmailValidationGateway implements EmailValidationGetaway {
   private emailValidationStatus: ValidateEmailStatus | undefined;
 
+  // for test purposes only
+  public setEmailValidationStatusResponse(
+    emailValidationStatus: ValidateEmailStatus,
+  ) {
+    this.emailValidationStatus = emailValidationStatus;
+  }
+
   public async validateEmail(email: string): Promise<ValidateEmailStatus> {
     if (this.emailValidationStatus) return this.emailValidationStatus;
     if (email === "email-with-typo@gamil.com")
@@ -16,12 +23,5 @@ export class InMemoryEmailValidationGateway implements EmailValidationGetaway {
       isValid: true,
       reason: "accepted_email",
     };
-  }
-
-  // for test purposes only
-  public setEmailValidationStatusResponse(
-    emailValidationStatus: ValidateEmailStatus,
-  ) {
-    this.emailValidationStatus = emailValidationStatus;
   }
 }

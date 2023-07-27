@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export abstract class HttpError extends Error {
   abstract httpCode: number;
+
   constructor(message?: any, public readonly issues?: string[]) {
     super(message);
     Object.setPrototypeOf(this, HttpError.prototype);
@@ -59,6 +60,7 @@ export class BadRequestError extends HttpError {
 
 export class ConflictError extends HttpError {
   httpCode = 409;
+
   constructor(msg: any) {
     super(msg);
     Object.setPrototypeOf(this, ConflictError.prototype);

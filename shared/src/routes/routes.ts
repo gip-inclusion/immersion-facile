@@ -20,6 +20,7 @@ export const frontRoutes = {
   manageConvention: "pilotage-convention",
   manageConventionOld: "verification",
   manageConventionAdmin: "pilotage-convention-admin",
+  manageConventionInclusionConnected: "pilotage-convention-inclusion-connect",
   search: "recherche",
   standard: "pages",
 };

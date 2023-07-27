@@ -13,6 +13,8 @@ type MulterFile = {
 };
 
 export class UploadLogo extends TransactionalUseCase<MulterFile, string> {
+  inputSchema = z.any();
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly documentGateway: DocumentGateway,
@@ -20,8 +22,6 @@ export class UploadLogo extends TransactionalUseCase<MulterFile, string> {
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = z.any();
 
   protected async _execute(multerFile: MulterFile): Promise<string> {
     const extension = multerFile.originalname.split(".").at(-1);

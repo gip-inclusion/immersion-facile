@@ -30,6 +30,8 @@ export class ConventionsReminder extends TransactionalUseCase<
   void,
   ConventionsReminderSummary
 > {
+  protected inputSchema = z.void();
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private timeGateway: TimeGateway,
@@ -37,8 +39,6 @@ export class ConventionsReminder extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = z.void();
 
   protected async _execute(
     _: void,
@@ -78,6 +78,35 @@ export class ConventionsReminder extends TransactionalUseCase<
     };
   }
 
+  private addReminderTypeForConventionOnMatchCase(
+    reminderType: ReminderKind,
+    conventionId: ConventionId,
+    supportedCondition: boolean,
+  ): { id: ConventionId; event: DomainEvent }[] {
+    return supportedCondition
+      ? [
+          {
+            id: conventionId,
+            event: this.createNewEvent({
+              topic: "ConventionReminderRequired",
+              payload: {
+                conventionId,
+                reminderKind: reminderType,
+              },
+            }),
+          },
+        ]
+      : [];
+  }
+
+  private getSupportedConventions(uow: UnitOfWork): Promise<ConventionDto[]> {
+    return uow.conventionQueries.getConventionsByFilters({
+      startDateGreater: this.timeGateway.now(),
+      startDateLessOrEqual: addBusinessDays(this.timeGateway.now(), 3),
+      withStatuses: supportedStatuses,
+    });
+  }
+
   private prepareReminderEventsByConvention(
     convention: ConventionDto,
   ): { id: ConventionId; event: DomainEvent }[] {
@@ -108,35 +137,6 @@ export class ConventionsReminder extends TransactionalUseCase<
         isLastReminderForAgency(differenceInDays, convention),
       ),
     ];
-  }
-
-  private addReminderTypeForConventionOnMatchCase(
-    reminderType: ReminderKind,
-    conventionId: ConventionId,
-    supportedCondition: boolean,
-  ): { id: ConventionId; event: DomainEvent }[] {
-    return supportedCondition
-      ? [
-          {
-            id: conventionId,
-            event: this.createNewEvent({
-              topic: "ConventionReminderRequired",
-              payload: {
-                conventionId,
-                reminderKind: reminderType,
-              },
-            }),
-          },
-        ]
-      : [];
-  }
-
-  private getSupportedConventions(uow: UnitOfWork): Promise<ConventionDto[]> {
-    return uow.conventionQueries.getConventionsByFilters({
-      startDateGreater: this.timeGateway.now(),
-      startDateLessOrEqual: addBusinessDays(this.timeGateway.now(), 3),
-      withStatuses: supportedStatuses,
-    });
   }
 }
 

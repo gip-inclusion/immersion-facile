@@ -27,11 +27,11 @@ export class GetSearchImmersionResultBySiretAndRome extends TransactionalUseCase
   SearchImmersionResultDto,
   ApiConsumer
 > {
+  inputSchema = getSearchImmersionResultBySiretAndRomeSchema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = getSearchImmersionResultBySiretAndRomeSchema;
 
   public async _execute(
     { rome, siret }: GetSearchImmersionResultBySiretAndRomePayload,

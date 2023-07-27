@@ -2,7 +2,7 @@ import {
   ConventionStatus,
   UpdateConventionRequestDto,
   updateConventionRequestSchema,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import {
   BadRequestError,
@@ -19,8 +19,10 @@ import { TransactionalUseCase } from "../../core/UseCase";
 // https://trello.com/c/siRQLkeU
 export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,
-  WithConventionId
+  WithConventionIdLegacy
 > {
+  protected inputSchema = updateConventionRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -28,12 +30,10 @@ export class UpdateConvention extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  protected inputSchema = updateConventionRequestSchema;
-
   protected async _execute(
     { convention }: UpdateConventionRequestDto,
     uow: UnitOfWork,
-  ): Promise<WithConventionId> {
+  ): Promise<WithConventionIdLegacy> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
     if (convention.status !== minimalValidStatus)

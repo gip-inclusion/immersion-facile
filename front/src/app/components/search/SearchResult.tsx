@@ -8,8 +8,8 @@ import {
   addressDtoToString,
   ContactMethod,
   SearchImmersionResultDto,
+  toAbsoluteUrl,
 } from "shared";
-import { toAbsoluteUrl } from "shared";
 import { getMapsLink } from "../search/ContactModalContent";
 import "./SearchResult.scss";
 
@@ -99,7 +99,14 @@ const SearchResultComponent = ({
       >
         <div className={fr.cx("fr-card__body")}>
           <div className={fr.cx("fr-card__content")}>
-            <h3 className={fr.cx("fr-card__title")}>{establismentName}</h3>
+            <h3
+              className={cx(
+                fr.cx("fr-card__title"),
+                `${componentName}-card__title`,
+              )}
+            >
+              {establismentName}
+            </h3>
             <p className={fr.cx("fr-card__desc")}>
               {" "}
               {appellations.length > 0

@@ -202,6 +202,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         );
       },
     );
+
     it("Agency without counsellors", async () => {
       const role: Role = "counsellor";
       const agencyWithoutCounsellors = new AgencyDtoBuilder(agency)

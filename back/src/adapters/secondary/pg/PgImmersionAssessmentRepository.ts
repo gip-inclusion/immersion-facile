@@ -18,24 +18,6 @@ export class PgImmersionAssessmentRepository
 {
   constructor(private client: PoolClient) {}
 
-  public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
-    const { status, conventionId, establishmentFeedback } = assessment;
-
-    await this.client
-      .query(
-        `INSERT INTO immersion_assessments(
-        convention_id, status, establishment_feedback
-      ) VALUES($1, $2, $3)`,
-        [conventionId, status, establishmentFeedback],
-      )
-      .catch((error) => {
-        if (error?.message.includes(noConventionMatchingErrorMessage))
-          throw new Error(`No convention found for id ${conventionId}`);
-
-        throw error;
-      });
-  }
-
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ImmersionAssessmentEntity | undefined> {
@@ -56,6 +38,24 @@ export class PgImmersionAssessmentRepository
       _entityName: "ImmersionAssessment",
       ...dto,
     };
+  }
+
+  public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
+    const { status, conventionId, establishmentFeedback } = assessment;
+
+    await this.client
+      .query(
+        `INSERT INTO immersion_assessments(
+        convention_id, status, establishment_feedback
+      ) VALUES($1, $2, $3)`,
+        [conventionId, status, establishmentFeedback],
+      )
+      .catch((error) => {
+        if (error?.message.includes(noConventionMatchingErrorMessage))
+          throw new Error(`No convention found for id ${conventionId}`);
+
+        throw error;
+      });
   }
 }
 

@@ -9,7 +9,7 @@ import {
   renewMagicLinkRequestSchema,
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
-  withConventionIdSchema,
+  withConventionIdLegacySchema,
 } from "./convention.schema";
 
 export type ConventionMagicLinkTargets = typeof conventionMagicLinkTargets;
@@ -31,21 +31,21 @@ export const conventionMagicLinkTargets = createTargets({
     method: "POST",
     validateRequestBody: updateConventionRequestSchema.parse,
     ...withValidateHeadersAuthorization,
-    validateResponseBody: withConventionIdSchema.parse,
+    validateResponseBody: withConventionIdLegacySchema.parse,
   }),
   updateConventionStatus: createTarget({
     url: "/auth/update-application-status/:conventionId",
     method: "POST",
     validateRequestBody: updateConventionStatusRequestSchema.parse,
     ...withValidateHeadersAuthorization,
-    validateResponseBody: withConventionIdSchema.parse,
+    validateResponseBody: withConventionIdLegacySchema.parse,
   }),
   signConvention: createTarget({
     url: "/auth/sign-application/:conventionId",
     method: "POST",
     validateRequestBody: z.void().parse,
     ...withValidateHeadersAuthorization,
-    validateResponseBody: withConventionIdSchema.parse,
+    validateResponseBody: withConventionIdLegacySchema.parse,
   }),
 });
 
@@ -56,7 +56,7 @@ export const unauthenticatedConventionTargets = createTargets({
     url: "/demandes-immersion",
     method: "POST",
     validateRequestBody: conventionWithoutExternalIdSchema.parse,
-    validateResponseBody: withConventionIdSchema.parse,
+    validateResponseBody: withConventionIdLegacySchema.parse,
   }),
   shareConvention: createTarget({
     url: "/share-immersion-demand",

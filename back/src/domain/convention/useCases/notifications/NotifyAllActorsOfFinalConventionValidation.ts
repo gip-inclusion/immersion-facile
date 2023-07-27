@@ -22,6 +22,8 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 
 export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
+  inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -32,8 +34,6 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = conventionSchema;
 
   public async _execute(
     convention: ConventionDto,
@@ -78,6 +78,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       },
     });
   }
+
   private async getValidatedConventionFinalConfirmationParams(
     agency: AgencyDto,
     convention: ConventionDto,

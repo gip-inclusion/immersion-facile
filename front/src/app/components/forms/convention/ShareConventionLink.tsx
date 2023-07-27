@@ -11,12 +11,14 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { ShareForm } from "./ShareForm";
 
-const { ShareLinkModal, openShareLinkModal, closeShareLinkModal } = createModal(
-  {
-    isOpenedByDefault: false,
-    name: "shareLink",
-  },
-);
+const {
+  Component: ShareLinkModal,
+  open: openShareLinkModal,
+  close: closeShareLinkModal,
+} = createModal({
+  isOpenedByDefault: false,
+  id: "shareLink",
+});
 
 export const ShareConventionLink = () => {
   const { getValues } = useFormContext<ConventionReadDto>();

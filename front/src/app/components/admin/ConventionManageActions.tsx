@@ -1,8 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import {
-  BackOfficeJwt,
-  ConventionMagicLinkJwt,
+  ConventionJwt,
   ConventionReadDto,
   ConventionStatus,
   Role,
@@ -19,7 +18,7 @@ import {
 } from "src/core-logic/domain/convention/convention.slice";
 
 type ConventionManageActionsProps = {
-  jwt: ConventionMagicLinkJwt | BackOfficeJwt;
+  jwt: ConventionJwt;
   convention: ConventionReadDto;
   role: Role;
   submitFeedback: ConventionSubmitFeedback;

@@ -2,7 +2,11 @@ import { AgencyId } from "../agency/agency.dto";
 import { Builder } from "../Builder";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
+import {
+  DateIntervalDto,
+  ScheduleDto,
+  Weekday,
+} from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import {
   Beneficiary,
@@ -107,398 +111,34 @@ const validConvention: ConventionDto = {
 export class ConventionDtoBuilder implements Builder<ConventionDto> {
   constructor(private dto: ConventionDto = validConvention) {}
 
-  public withBusinessName(businessName: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, businessName });
+  private get beneficiary(): Beneficiary<InternshipKind> {
+    return this.dto.signatories.beneficiary;
   }
 
-  public withInternshipKind(
-    internshipKind: InternshipKind,
-  ): ConventionDtoBuilder {
-    return internshipKind === "immersion"
-      ? new ConventionDtoBuilder({
-          ...this.dto,
-          internshipKind,
-          signatories: {
-            ...this.dto.signatories,
-            beneficiary,
-          },
-        })
-      : new ConventionDtoBuilder({
-          ...this.dto,
-          internshipKind,
-          signatories: {
-            ...this.dto.signatories,
-            beneficiary: {
-              ...beneficiary,
-              levelOfEducation: "3ème",
-            },
-          },
-        });
+  private get beneficiaryCurrentEmployer():
+    | BeneficiaryCurrentEmployer
+    | undefined {
+    return this.dto.signatories.beneficiaryCurrentEmployer;
   }
 
-  public withBeneficiary(
-    beneficiary: Beneficiary<InternshipKind>,
-  ): ConventionDtoBuilder {
-    if (this.dto.internshipKind === "immersion" && isBeneficiary(beneficiary)) {
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiary,
-        },
-      });
-    }
-    if (
-      this.dto.internshipKind === "mini-stage-cci" &&
-      isBeneficiaryStudent(beneficiary)
-    )
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiary,
-        },
-      });
-    throw new Error(
-      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
-    );
+  private get beneficiaryRepresentative():
+    | BeneficiaryRepresentative
+    | undefined {
+    return this.dto.signatories.beneficiaryRepresentative;
   }
 
-  public withBeneficiarySignedAt(signedAt?: Date) {
-    return this.withBeneficiary({
-      ...this.dto.signatories.beneficiary,
-      signedAt: signedAt && signedAt.toISOString(),
-    });
+  public build() {
+    return this.dto;
   }
 
-  public withBeneficiaryRepresentative(
-    beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
-  ): ConventionDtoBuilder {
-    if (
-      this.dto.internshipKind === "immersion" &&
-      isBeneficiary(this.dto.signatories.beneficiary)
-    ) {
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiaryRepresentative,
-        },
-      });
-    }
-    if (
-      this.dto.internshipKind === "mini-stage-cci" &&
-      isBeneficiaryStudent(this.dto.signatories.beneficiary)
-    )
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiaryRepresentative,
-        },
-      });
-    throw new Error(
-      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
-    );
+  private get establishmentRepresentative(): EstablishmentRepresentative {
+    return this.dto.signatories.establishmentRepresentative;
   }
 
-  public withBeneficiaryRepresentativeEmail(email: string) {
-    const beneficiaryRepresentative =
-      this.dto.signatories.beneficiaryRepresentative;
-    if (beneficiaryRepresentative)
-      return this.withBeneficiaryRepresentative({
-        ...beneficiaryRepresentative,
-        email,
-      });
-    throw new Error("beneficiaryRepresentative is undefined.");
+  private get establishmentTutor(): EstablishmentTutor {
+    return this.dto.establishmentTutor;
   }
 
-  public withBeneficiaryCurrentEmployer(
-    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
-  ): ConventionDtoBuilder {
-    if (
-      this.dto.internshipKind === "immersion" &&
-      isBeneficiary(this.dto.signatories.beneficiary)
-    ) {
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiaryCurrentEmployer,
-        },
-      });
-    }
-    if (
-      this.dto.internshipKind === "mini-stage-cci" &&
-      isBeneficiaryStudent(this.dto.signatories.beneficiary)
-    )
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiaryCurrentEmployer,
-        },
-      });
-    throw new Error(
-      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
-    );
-  }
-
-  public withEstablishmentRepresentative(
-    establishmentRepresentative: EstablishmentRepresentative,
-  ) {
-    if (
-      this.dto.internshipKind === "immersion" &&
-      isBeneficiary(this.dto.signatories.beneficiary)
-    ) {
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          establishmentRepresentative,
-        },
-      });
-    }
-    if (
-      this.dto.internshipKind === "mini-stage-cci" &&
-      isBeneficiaryStudent(this.dto.signatories.beneficiary)
-    )
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          establishmentRepresentative,
-        },
-      });
-    throw new Error(
-      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
-    );
-  }
-
-  public withEstablishmentRepresentativePhone(phone: string) {
-    return this.withEstablishmentRepresentative({
-      ...this.dto.signatories.establishmentRepresentative,
-      phone,
-    });
-  }
-
-  public withEstablishmentRepresentativeFirstName(firstName: string) {
-    return this.withEstablishmentRepresentative({
-      ...this.dto.signatories.establishmentRepresentative,
-      firstName,
-    });
-  }
-  public withEstablishmentRepresentativeLastName(lastName: string) {
-    return this.withEstablishmentRepresentative({
-      ...this.dto.signatories.establishmentRepresentative,
-      lastName,
-    });
-  }
-
-  public withEstablishmentRepresentativeEmail(email: string) {
-    return this.withEstablishmentRepresentative({
-      ...this.establishmentRepresentative,
-      email,
-    });
-  }
-
-  public withEstablishmentRepresentativeSignedAt(signedAt?: Date) {
-    return this.withEstablishmentRepresentative({
-      ...this.establishmentRepresentative,
-      signedAt: signedAt && signedAt.toISOString(),
-    });
-  }
-
-  public withBeneficiaryEmail(email: string): ConventionDtoBuilder {
-    return this.withBeneficiary({ ...this.beneficiary, email });
-  }
-
-  withBeneficiaryEmergencyContactEmail(
-    emergencyContactEmail: string | undefined,
-  ) {
-    return this.withBeneficiary({ ...this.beneficiary, emergencyContactEmail });
-  }
-
-  public withBeneficiaryFirstName(firstName: string): ConventionDtoBuilder {
-    return this.withBeneficiary({
-      ...this.beneficiary,
-      firstName,
-    });
-  }
-
-  public withBeneficiaryLastName(lastName: string): ConventionDtoBuilder {
-    return this.withBeneficiary({
-      ...this.beneficiary,
-      lastName,
-    });
-  }
-
-  public withBeneficiaryPhone(phone: string): ConventionDtoBuilder {
-    return this.withBeneficiary({ ...this.beneficiary, phone });
-  }
-
-  public withEstablishmentTutor(
-    establishmentTutor: EstablishmentTutor,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      establishmentTutor,
-    });
-  }
-
-  public withEstablishmentTutorFirstName(
-    firstName: string,
-  ): ConventionDtoBuilder {
-    return this.withEstablishmentTutor({
-      ...this.establishmentTutor,
-      firstName,
-    });
-  }
-
-  public withEstablishmentTutorLastName(
-    lastName: string,
-  ): ConventionDtoBuilder {
-    return this.withEstablishmentTutor({
-      ...this.establishmentTutor,
-      lastName,
-    });
-  }
-
-  public withEstablishementTutorPhone(phone: string): ConventionDtoBuilder {
-    return this.withEstablishmentTutor({ ...this.establishmentTutor, phone });
-  }
-
-  public withEstablishmentTutorEmail(email: string): ConventionDtoBuilder {
-    return this.withEstablishmentTutor({ ...this.establishmentTutor, email });
-  }
-
-  public withDateSubmission(dateSubmission: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, dateSubmission });
-  }
-
-  public withDateStart(dateStart: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, dateStart });
-  }
-
-  public withDateEnd(dateEnd: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, dateEnd });
-  }
-
-  public withDateValidation(
-    dateValidation: string | undefined,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, dateValidation });
-  }
-  public withoutDateValidation(): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, dateValidation: undefined });
-  }
-
-  public withId(id: ConventionId): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, id });
-  }
-  public withExternalId(
-    externalId: ConventionExternalId,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, externalId });
-  }
-  public withAgencyId(agencyId: AgencyId): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, agencyId });
-  }
-
-  public withStatus(status: ConventionStatus): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, status });
-  }
-  public validated(): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      status: "ACCEPTED_BY_VALIDATOR",
-    });
-  }
-
-  public withImmersionAddress(immersionAddress: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      immersionAddress,
-    });
-  }
-
-  public withSanitaryPrevention(
-    sanitaryPrevention: boolean,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      sanitaryPrevention,
-    });
-  }
-
-  public withSanitaryPreventionDescription(
-    sanitaryPreventionDescription: string,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      sanitaryPreventionDescription,
-    });
-  }
-
-  public withIndividualProtection(
-    individualProtection: boolean,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      individualProtection,
-    });
-  }
-
-  public withSchedule(
-    scheduleMaker: (interval: DateIntervalDto) => ScheduleDto,
-  ) {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      schedule: scheduleMaker({
-        start: new Date(this.dto.dateStart),
-        end: new Date(this.dto.dateEnd),
-      }),
-    });
-  }
-
-  public withStatusJustification(statusJustification: string | undefined) {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      statusJustification,
-    });
-  }
-
-  public withoutWorkCondition(): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      workConditions: undefined,
-    });
-  }
-
-  public withImmersionAppelation(
-    immersionAppellation: AppellationAndRomeDto,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      immersionAppellation,
-    });
-  }
-
-  withFederatedIdentity(
-    federatedIdentity: PeConnectIdentity | undefined,
-  ): ConventionDtoBuilder {
-    return this.withBeneficiary({
-      ...this.beneficiary,
-      ...(federatedIdentity ? { federatedIdentity } : {}),
-    });
-  }
-
-  withoutFederatedIdentity(): ConventionDtoBuilder {
-    return this.withBeneficiary({
-      ...this.beneficiary,
-      federatedIdentity: undefined,
-    });
-  }
   public notSigned(): ConventionDtoBuilder {
     if (
       this.dto.internshipKind === "immersion" &&
@@ -586,6 +226,311 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
+  public validated(): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      status: "ACCEPTED_BY_VALIDATOR",
+    });
+  }
+
+  public withAgencyId(agencyId: AgencyId): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, agencyId });
+  }
+
+  public withBeneficiary(
+    beneficiary: Beneficiary<InternshipKind>,
+  ): ConventionDtoBuilder {
+    if (this.dto.internshipKind === "immersion" && isBeneficiary(beneficiary)) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiary,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiary,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
+  }
+
+  public withBeneficiaryCurrentEmployer(
+    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
+  ): ConventionDtoBuilder {
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryCurrentEmployer,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryCurrentEmployer,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
+  }
+
+  public withBeneficiaryEmail(email: string): ConventionDtoBuilder {
+    return this.withBeneficiary({ ...this.beneficiary, email });
+  }
+
+  withBeneficiaryEmergencyContactEmail(
+    emergencyContactEmail: string | undefined,
+  ) {
+    return this.withBeneficiary({ ...this.beneficiary, emergencyContactEmail });
+  }
+
+  public withBeneficiaryFirstName(firstName: string): ConventionDtoBuilder {
+    return this.withBeneficiary({
+      ...this.beneficiary,
+      firstName,
+    });
+  }
+
+  public withBeneficiaryLastName(lastName: string): ConventionDtoBuilder {
+    return this.withBeneficiary({
+      ...this.beneficiary,
+      lastName,
+    });
+  }
+
+  public withBeneficiaryPhone(phone: string): ConventionDtoBuilder {
+    return this.withBeneficiary({ ...this.beneficiary, phone });
+  }
+
+  public withBeneficiaryRepresentative(
+    beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
+  ): ConventionDtoBuilder {
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryRepresentative,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryRepresentative,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
+  }
+
+  public withBeneficiaryRepresentativeEmail(email: string) {
+    const beneficiaryRepresentative =
+      this.dto.signatories.beneficiaryRepresentative;
+    if (beneficiaryRepresentative)
+      return this.withBeneficiaryRepresentative({
+        ...beneficiaryRepresentative,
+        email,
+      });
+    throw new Error("beneficiaryRepresentative is undefined.");
+  }
+
+  public withBeneficiarySignedAt(signedAt?: Date) {
+    return this.withBeneficiary({
+      ...this.dto.signatories.beneficiary,
+      signedAt: signedAt && signedAt.toISOString(),
+    });
+  }
+
+  public withBusinessName(businessName: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, businessName });
+  }
+
+  public withDateEnd(dateEnd: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateEnd });
+  }
+
+  public withDateStart(dateStart: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateStart });
+  }
+
+  public withDateSubmission(dateSubmission: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateSubmission });
+  }
+
+  public withDateValidation(
+    dateValidation: string | undefined,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateValidation });
+  }
+
+  public withEstablishementTutorPhone(phone: string): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({ ...this.establishmentTutor, phone });
+  }
+
+  public withEstablishmentRepresentative(
+    establishmentRepresentative: EstablishmentRepresentative,
+  ) {
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          establishmentRepresentative,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          establishmentRepresentative,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
+  }
+
+  public withEstablishmentRepresentativeEmail(email: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.establishmentRepresentative,
+      email,
+    });
+  }
+
+  public withEstablishmentRepresentativeFirstName(firstName: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.dto.signatories.establishmentRepresentative,
+      firstName,
+    });
+  }
+
+  public withEstablishmentRepresentativeLastName(lastName: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.dto.signatories.establishmentRepresentative,
+      lastName,
+    });
+  }
+
+  public withEstablishmentRepresentativePhone(phone: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.dto.signatories.establishmentRepresentative,
+      phone,
+    });
+  }
+
+  public withEstablishmentRepresentativeSignedAt(signedAt?: Date) {
+    return this.withEstablishmentRepresentative({
+      ...this.establishmentRepresentative,
+      signedAt: signedAt && signedAt.toISOString(),
+    });
+  }
+
+  public withEstablishmentTutor(
+    establishmentTutor: EstablishmentTutor,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      establishmentTutor,
+    });
+  }
+
+  public withEstablishmentTutorEmail(email: string): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({ ...this.establishmentTutor, email });
+  }
+
+  public withEstablishmentTutorFirstName(
+    firstName: string,
+  ): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({
+      ...this.establishmentTutor,
+      firstName,
+    });
+  }
+
+  public withEstablishmentTutorLastName(
+    lastName: string,
+  ): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({
+      ...this.establishmentTutor,
+      lastName,
+    });
+  }
+
+  public withExternalId(
+    externalId: ConventionExternalId,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, externalId });
+  }
+
+  withFederatedIdentity(
+    federatedIdentity: PeConnectIdentity | undefined,
+  ): ConventionDtoBuilder {
+    return this.withBeneficiary({
+      ...this.beneficiary,
+      ...(federatedIdentity ? { federatedIdentity } : {}),
+    });
+  }
+
+  public withId(id: ConventionId): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, id });
+  }
+
+  public withImmersionAddress(immersionAddress: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      immersionAddress,
+    });
+  }
+
+  public withImmersionAppelation(
+    immersionAppellation: AppellationAndRomeDto,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      immersionAppellation,
+    });
+  }
+
   public withImmersionObjective(
     immersionObjective: ImmersionObjective,
   ): ConventionDtoBuilder {
@@ -595,31 +540,103 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  private get establishmentTutor(): EstablishmentTutor {
-    return this.dto.establishmentTutor;
+  public withIndividualProtection(
+    individualProtection: boolean,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      individualProtection,
+    });
   }
 
-  private get establishmentRepresentative(): EstablishmentRepresentative {
-    return this.dto.signatories.establishmentRepresentative;
+  public withInternshipKind(
+    internshipKind: InternshipKind,
+  ): ConventionDtoBuilder {
+    return internshipKind === "immersion"
+      ? new ConventionDtoBuilder({
+          ...this.dto,
+          internshipKind,
+          signatories: {
+            ...this.dto.signatories,
+            beneficiary,
+          },
+        })
+      : new ConventionDtoBuilder({
+          ...this.dto,
+          internshipKind,
+          signatories: {
+            ...this.dto.signatories,
+            beneficiary: {
+              ...beneficiary,
+              levelOfEducation: "3ème",
+            },
+          },
+        });
   }
 
-  private get beneficiary(): Beneficiary<InternshipKind> {
-    return this.dto.signatories.beneficiary;
+  public withoutDateValidation(): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateValidation: undefined });
   }
 
-  private get beneficiaryRepresentative():
-    | BeneficiaryRepresentative
-    | undefined {
-    return this.dto.signatories.beneficiaryRepresentative;
+  withoutFederatedIdentity(): ConventionDtoBuilder {
+    return this.withBeneficiary({
+      ...this.beneficiary,
+      federatedIdentity: undefined,
+    });
   }
 
-  private get beneficiaryCurrentEmployer():
-    | BeneficiaryCurrentEmployer
-    | undefined {
-    return this.dto.signatories.beneficiaryCurrentEmployer;
+  public withoutWorkCondition(): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      workConditions: undefined,
+    });
   }
 
-  public build() {
-    return this.dto;
+  public withSanitaryPrevention(
+    sanitaryPrevention: boolean,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      sanitaryPrevention,
+    });
+  }
+
+  public withSanitaryPreventionDescription(
+    sanitaryPreventionDescription: string,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      sanitaryPreventionDescription,
+    });
+  }
+
+  public withSchedule(
+    scheduleMaker: (
+      interval: DateIntervalDto,
+      excludedDays: Weekday[],
+    ) => ScheduleDto,
+    excludedDays: Weekday[] = [],
+  ) {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      schedule: scheduleMaker(
+        {
+          start: new Date(this.dto.dateStart),
+          end: new Date(this.dto.dateEnd),
+        },
+        excludedDays,
+      ),
+    });
+  }
+
+  public withStatus(status: ConventionStatus): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, status });
+  }
+
+  public withStatusJustification(statusJustification: string | undefined) {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      statusJustification,
+    });
   }
 }

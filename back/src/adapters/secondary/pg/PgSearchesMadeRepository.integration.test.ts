@@ -41,6 +41,7 @@ describe("PgSearchesMadeRepository", () => {
     const retrievedSearchMade = await getSearchMadeById(searchMade.id);
     expect(retrievedSearchMade).toEqual(searchMade);
   });
+
   it("Retrieve pending searches", async () => {
     // Prepare : insert two entities : one already processed, the other not yet processed
     const entityNeedingToBeProcessed = new SearchMadeEntityBuilder()

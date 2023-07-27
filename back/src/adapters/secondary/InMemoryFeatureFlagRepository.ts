@@ -30,16 +30,16 @@ export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
     return this.featureFlags;
   }
 
+  async insert(flags: FeatureFlags): Promise<void> {
+    keys(flags).forEach((flagName) => {
+      this.featureFlags[flagName] = flags[flagName];
+    });
+  }
+
   async update(params: SetFeatureFlagParam): Promise<void> {
     this.featureFlags[params.flagName] = {
       ...this.featureFlags[params.flagName],
       ...(params.flagContent as any),
     };
-  }
-
-  async insert(flags: FeatureFlags): Promise<void> {
-    keys(flags).forEach((flagName) => {
-      this.featureFlags[flagName] = flags[flagName];
-    });
   }
 }

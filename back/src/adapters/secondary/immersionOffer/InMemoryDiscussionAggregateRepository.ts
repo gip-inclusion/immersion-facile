@@ -10,25 +10,15 @@ export class InMemoryDiscussionAggregateRepository
 {
   constructor(private _discussionAggregates: DiscussionsById = {}) {}
 
-  public async insert(discussionAggregate: DiscussionAggregate) {
-    this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
-  }
-
-  public async update(discussionAggregate: DiscussionAggregate) {
-    if (!this._discussionAggregates[discussionAggregate.id])
-      throw new Error("DiscussionAggregate not found");
-    this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
-  }
-
-  public async getById(discussionId: DiscussionId) {
-    return this._discussionAggregates[discussionId];
-  }
-
   public async countDiscussionsForSiretSince(siret: SiretDto, since: Date) {
     return this.discussionAggregates.filter(
       (discussion) =>
         discussion.siret === siret && isAfter(discussion.createdAt, since),
     ).length;
+  }
+
+  public async getById(discussionId: DiscussionId) {
+    return this._discussionAggregates[discussionId];
   }
 
   public async hasDiscussionMatching({
@@ -49,6 +39,16 @@ export class InMemoryDiscussionAggregateRepository
         discussion.potentialBeneficiary.email === potentialBeneficiaryEmail &&
         discussion.createdAt >= since,
     );
+  }
+
+  public async insert(discussionAggregate: DiscussionAggregate) {
+    this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
+  }
+
+  public async update(discussionAggregate: DiscussionAggregate) {
+    if (!this._discussionAggregates[discussionAggregate.id])
+      throw new Error("DiscussionAggregate not found");
+    this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
   }
 
   // For test purposes

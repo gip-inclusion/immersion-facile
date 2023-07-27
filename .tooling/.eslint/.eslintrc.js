@@ -39,7 +39,12 @@ module.exports = {
         ecmaVersion: 2020,
         sourceType: "module",
       },
-      plugins: ["@typescript-eslint", "simple-import-sort"],
+      plugins: [
+        "@typescript-eslint",
+        "simple-import-sort",
+        "sort-class-members",
+        "jest-formatting",
+      ],
       rules: {
         ...require("./eslint.rules"),
         ...require("./typescript-eslint.rules"),

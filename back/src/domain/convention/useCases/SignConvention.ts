@@ -5,7 +5,7 @@ import {
   ExtractFromExisting,
   Role,
   signConventionDtoWithRole,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import {
   ForbiddenError,
@@ -50,8 +50,10 @@ const isAllowedToSign = (
 
 export class SignConvention extends TransactionalUseCase<
   void,
-  WithConventionId
+  WithConventionIdLegacy
 > {
+  inputSchema = z.void();
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -60,13 +62,11 @@ export class SignConvention extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = z.void();
-
   public async _execute(
     _: void,
     uow: UnitOfWork,
     { applicationId, role }: ConventionMagicLinkPayload,
-  ): Promise<WithConventionId> {
+  ): Promise<WithConventionIdLegacy> {
     logger.debug({ applicationId, role });
 
     if (!isAllowedToSign(role))

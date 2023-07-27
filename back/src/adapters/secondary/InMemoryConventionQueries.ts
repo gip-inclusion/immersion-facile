@@ -4,7 +4,7 @@ import {
   ConventionReadDto,
   ListConventionsRequestDto,
   validatedConventionStatuses,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import {
   ConventionQueries,
@@ -23,6 +23,44 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly outboxRepository?: InMemoryOutboxRepository,
   ) {}
+
+  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
+    dateEnd: Date,
+  ): Promise<ConventionReadDto[]> {
+    const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
+      ? this.outboxRepository.events
+          .filter(propEq("topic", "EmailWithLinkToCreateAssessmentSent"))
+          .map((event) => (event.payload as WithConventionIdLegacy).id)
+      : [];
+    return Object.values(this.conventionRepository._conventions)
+      .filter(
+        (convention) =>
+          new Date(convention.dateEnd).getDate() === dateEnd.getDate() &&
+          validatedConventionStatuses.includes(convention.status) &&
+          !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
+      )
+      .map((convention) => ({
+        ...convention,
+        agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+      }));
+  }
+
+  public async getConventionById(
+    id: ConventionId,
+  ): Promise<ConventionReadDto | undefined> {
+    logger.info("getAll");
+    const storedConvention = this.conventionRepository.conventions.find(
+      propEq("id", id),
+    );
+    return (
+      storedConvention && {
+        ...storedConvention,
+        agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+      }
+    );
+  }
 
   async getConventionsByFilters({
     startDateGreater,
@@ -66,44 +104,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .filter((dto) => !agencyId || dto.agencyId === agencyId)
       .map((dto) => ({
         ...dto,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
-      }));
-  }
-
-  public async getConventionById(
-    id: ConventionId,
-  ): Promise<ConventionReadDto | undefined> {
-    logger.info("getAll");
-    const storedConvention = this.conventionRepository.conventions.find(
-      propEq("id", id),
-    );
-    return (
-      storedConvention && {
-        ...storedConvention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
-      }
-    );
-  }
-
-  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
-    dateEnd: Date,
-  ): Promise<ConventionReadDto[]> {
-    const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
-      ? this.outboxRepository.events
-          .filter(propEq("topic", "EmailWithLinkToCreateAssessmentSent"))
-          .map((event) => (event.payload as WithConventionId).id)
-      : [];
-    return Object.values(this.conventionRepository._conventions)
-      .filter(
-        (convention) =>
-          new Date(convention.dateEnd).getDate() === dateEnd.getDate() &&
-          validatedConventionStatuses.includes(convention.status) &&
-          !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
-      )
-      .map((convention) => ({
-        ...convention,
         agencyName: TEST_AGENCY_NAME,
         agencyDepartment: TEST_AGENCY_DEPARTMENT,
       }));

@@ -51,26 +51,10 @@ export const calculateWeeklyHoursFromSchedule = (schedule: ScheduleDto) =>
     calculateWeeklyHours(week),
   );
 
-export const isArrayOfWeekdays = (value: any): boolean =>
-  Array.isArray(value) && value.every((el) => weekdays.includes(el));
-
 type DatesOfImmersion = {
   dateStart: string;
   dateEnd: string;
 };
-
-type CalculateTotalHoursProps = DatesOfImmersion & {
-  schedule: ScheduleDto;
-};
-
-export const calculateTotalImmersionHoursBetweenDate = ({
-  schedule,
-  ...dates
-}: CalculateTotalHoursProps): number =>
-  calculateTotalImmersionHoursBetweenDateComplex({
-    complexSchedule: schedule.complexSchedule,
-    ...dates,
-  });
 
 export const calculateTotalImmersionHoursFromComplexSchedule = (
   complexSchedule: DailyScheduleDto[],
@@ -91,14 +75,6 @@ export const prettyPrintSchedule = (
 ): string =>
   prettyPrintComplexSchedule(schedule.complexSchedule, displayFreeDays);
 
-// Extract all weekday names for which there is at least one
-export const convertToFrenchNamedDays = (schedule: ScheduleDto): Weekday[] => {
-  const complexSchedule = schedule.complexSchedule;
-  return complexSchedule
-    .filter((daily) => daily.timePeriods.length > 0)
-    .map((daily) => weekdays[frenchDayMapping(daily.date).frenchDay]);
-};
-
 const reasonableTimePeriods: TimePeriodsDto = [
   {
     start: "08:00",
@@ -111,9 +87,14 @@ const reasonableTimePeriods: TimePeriodsDto = [
 ];
 export const reasonableSchedule = (
   interval: DateIntervalDto,
+  excludedDays: Weekday[] = [],
   timePeriods: TimePeriodsDto = reasonableTimePeriods,
 ): ScheduleDto => {
-  const complexSchedule = makeComplexSchedule(interval, timePeriods);
+  const complexSchedule = makeComplexSchedule(
+    interval,
+    timePeriods,
+    excludedDays,
+  );
   return {
     totalHours:
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
@@ -318,7 +299,9 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
   dateStart,
   dateEnd,
   complexSchedule,
-}: DatesOfImmersion & { complexSchedule: DailyScheduleDto[] }): number => {
+}: DatesOfImmersion & {
+  complexSchedule: DailyScheduleDto[];
+}): number => {
   const start = parseISO(dateStart);
   const end = parseISO(dateEnd);
   let totalOfMinutes = 0;
@@ -467,16 +450,19 @@ export const emptySchedule = (
 
 export const scheduleWithFirstDayActivity = (
   interval: DateIntervalDto,
+  excludedDays: Weekday[] = [],
 ): Readonly<ScheduleDto> => {
-  const complexSchedule = makeComplexSchedule(interval, []).map((schedule) => {
-    if (schedule.date === interval.start.toISOString()) {
-      schedule.timePeriods = [
-        { start: "09:00", end: "12:00" },
-        { start: "13:00", end: "17:00" },
-      ];
-    }
-    return schedule;
-  });
+  const complexSchedule = makeComplexSchedule(interval, [], excludedDays).map(
+    (schedule) => {
+      if (schedule.date === interval.start.toISOString()) {
+        schedule.timePeriods = [
+          { start: "09:00", end: "12:00" },
+          { start: "13:00", end: "17:00" },
+        ];
+      }
+      return schedule;
+    },
+  );
   return {
     totalHours:
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
@@ -501,14 +487,24 @@ export const makeDailySchedule = (
 export const makeComplexSchedule = (
   { start, end }: DateIntervalDto,
   timePeriods: TimePeriodsDto,
+  excludedDays?: Weekday[],
 ): DailyScheduleDto[] => {
   const complexSchedules: DailyScheduleDto[] = [];
+  const excludedDayNumbers =
+    excludedDays?.map(
+      (weekday) =>
+        dayOfWeekMapping.find((value) => value.frenchDayName === weekday)
+          ?.universalDay,
+    ) || [];
+
   for (
     let currentDate = start;
     currentDate <= end;
     currentDate = addHours(currentDate, 24)
-  )
-    complexSchedules.push(makeDailySchedule(currentDate, timePeriods));
+  ) {
+    if (!excludedDayNumbers.includes(getDay(currentDate)))
+      complexSchedules.push(makeDailySchedule(currentDate, timePeriods));
+  }
   return complexSchedules;
 };
 
@@ -519,4 +515,9 @@ export const calculateScheduleTotalDurationInDays = (
   const dateStart = dates.sort()[0];
   const dateEnd = dates.reverse()[0];
   return differenceInDays(new Date(dateEnd), new Date(dateStart));
+};
+
+export const isSundayInSchedule = (complexSchedule: DailyScheduleDto[]) => {
+  const sunday = 0;
+  return complexSchedule.some((week) => getDay(parseISO(week.date)) === sunday);
 };

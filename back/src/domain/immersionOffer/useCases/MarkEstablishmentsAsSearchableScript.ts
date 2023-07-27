@@ -8,14 +8,14 @@ export class MarkEstablishmentsAsSearchableScript extends UseCase<
   void,
   number
 > {
+  inputSchema = z.void();
+
   constructor(
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly timeGateway: TimeGateway,
   ) {
     super();
   }
-
-  inputSchema = z.void();
 
   protected async _execute(): Promise<number> {
     const since = subDays(this.timeGateway.now(), 7);

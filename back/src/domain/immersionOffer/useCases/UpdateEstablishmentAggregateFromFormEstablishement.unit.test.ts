@@ -135,7 +135,7 @@ describe("Update Establishment aggregate from form data", () => {
       siret,
       address: newAddress,
       position: newPosition,
-      isActive: true,
+      isOpen: true,
       name: formEstablishment.businessName,
     };
     expect(

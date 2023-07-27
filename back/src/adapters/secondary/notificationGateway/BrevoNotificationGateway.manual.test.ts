@@ -55,6 +55,7 @@ describe("BrevoNotificationGateway manual", () => {
   });
 
   const times = 50;
+
   it(
     `should send ${times} SMS with rate correctly`,
     async () => {
@@ -79,6 +80,7 @@ describe("BrevoNotificationGateway manual", () => {
     },
     1100 * times,
   );
+
   it("should retrieve attachment content correctly", async () => {
     const downloadToken =
       "eyJmb2xkZXIiOiIyMDIzMDcxMzEyMTcxNS45Mi40Mjg0MDQyMiIsImZpbGVuYW1lIjoiaWYtbG9nby1wZS1pby5wbmcifQ";

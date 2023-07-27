@@ -74,23 +74,7 @@ export class InMemorySiretGateway implements SiretGateway {
     [TEST_CLOSED_ESTABLISHMENT_1.siret]: TEST_CLOSED_ESTABLISHMENT_1,
   };
 
-  public async getEstablishmentUpdatedBetween(
-    _fromDate: Date,
-    _toDate: Date,
-    sirets: SiretDto[],
-  ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
-    return this.siretEstablishmentsUpdateSince
-      .filter((siretEstablishmentDto) =>
-        sirets.includes(siretEstablishmentDto.siret),
-      )
-      .reduce(
-        (acc, siretEstablishmentDto) => ({
-          ...acc,
-          [siretEstablishmentDto.siret]: siretEstablishmentDto,
-        }),
-        {} as Record<SiretDto, SiretEstablishmentDto>,
-      );
-  }
+  public siretEstablishmentsUpdateSince: SiretEstablishmentDto[] = [];
 
   public async getEstablishmentBySiret(
     siret: SiretDto,
@@ -130,14 +114,30 @@ export class InMemorySiretGateway implements SiretGateway {
     }
   }
 
-  // Visible for testing
-  public setSirenEstablishment(establishment: SiretEstablishmentDto) {
-    this._repo[establishment.siret] = establishment;
+  public async getEstablishmentUpdatedBetween(
+    _fromDate: Date,
+    _toDate: Date,
+    sirets: SiretDto[],
+  ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
+    return this.siretEstablishmentsUpdateSince
+      .filter((siretEstablishmentDto) =>
+        sirets.includes(siretEstablishmentDto.siret),
+      )
+      .reduce(
+        (acc, siretEstablishmentDto) => ({
+          ...acc,
+          [siretEstablishmentDto.siret]: siretEstablishmentDto,
+        }),
+        {} as Record<SiretDto, SiretEstablishmentDto>,
+      );
   }
 
   public setError(error: any) {
     this._error = error;
   }
 
-  public siretEstablishmentsUpdateSince: SiretEstablishmentDto[] = [];
+  // Visible for testing
+  public setSirenEstablishment(establishment: SiretEstablishmentDto) {
+    this._repo[establishment.siret] = establishment;
+  }
 }

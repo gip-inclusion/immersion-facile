@@ -49,6 +49,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       saveNotificationAndRelatedEvent,
     );
   });
+
   it("throw error when no agency found", async () => {
     await expectPromiseToFailWith(
       notifyIcUserAgencyRightChanged.execute(icUserRoleParams),

@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   AbsoluteUrl,
   AgencyId,
-  BackOfficeJwt,
   ConventionId,
+  ConventionJwt,
   ConventionMagicLinkJwt,
   ConventionReadDto,
   SignatoryRole,
@@ -71,13 +71,13 @@ export const initialConventionState: ConventionState = {
 };
 
 export type FetchConventionRequestedPayload = {
-  jwt: ConventionMagicLinkJwt | BackOfficeJwt;
+  jwt: ConventionJwt;
   conventionId: ConventionId;
 };
 
 type StatusChangePayload = {
   feedbackKind: ConventionFeedbackKind;
-  jwt: ConventionMagicLinkJwt | BackOfficeJwt;
+  jwt: ConventionJwt;
   conventionId: ConventionId;
   updateStatusParams: UpdateConventionStatusRequestDto;
 };

@@ -32,7 +32,7 @@ const emptyAgency: AgencyDto = {
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {
   // Initializes all feature flags to be off.
-  public constructor(readonly agency: AgencyDto = emptyAgency) {}
+  constructor(readonly agency: AgencyDto = emptyAgency) {}
 
   public static create(id?: AgencyId) {
     return new AgencyDtoBuilder({
@@ -45,32 +45,8 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({ ...emptyAgency });
   }
 
-  public withId(id: AgencyId) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      id,
-    });
-  }
-
-  public withName(name: string) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      name,
-    });
-  }
-
-  public withKind(kind: AgencyKind) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      kind,
-    });
-  }
-
-  public withStatus(status: AgencyStatus) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      status,
-    });
+  public build() {
+    return this.agency;
   }
 
   public withAddress(address: AddressDto) {
@@ -80,55 +56,10 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withCounsellorEmails(counsellorEmails: Email[]) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      counsellorEmails,
-    });
-  }
-
-  public withValidatorEmails(validatorEmails: Email[]) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      validatorEmails,
-    });
-  }
-
   public withAdminEmails(adminEmails: string[]) {
     return new AgencyDtoBuilder({
       ...this.agency,
       adminEmails,
-    });
-  }
-
-  public withQuestionnaireUrl(questionnaireUrl: string) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      questionnaireUrl,
-    });
-  }
-
-  public withLogoUrl(logoUrl?: AbsoluteUrl) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      logoUrl,
-    });
-  }
-
-  public withSignature(signature: string) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      signature,
-    });
-  }
-
-  public withPosition(lat: number, lon: number) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      position: {
-        lat,
-        lon,
-      },
     });
   }
 
@@ -146,7 +77,76 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public build() {
-    return this.agency;
+  public withCounsellorEmails(counsellorEmails: Email[]) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      counsellorEmails,
+    });
+  }
+
+  public withId(id: AgencyId) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      id,
+    });
+  }
+
+  public withKind(kind: AgencyKind) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      kind,
+    });
+  }
+
+  public withLogoUrl(logoUrl?: AbsoluteUrl) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      logoUrl,
+    });
+  }
+
+  public withName(name: string) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      name,
+    });
+  }
+
+  public withPosition(lat: number, lon: number) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      position: {
+        lat,
+        lon,
+      },
+    });
+  }
+
+  public withQuestionnaireUrl(questionnaireUrl: string) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      questionnaireUrl,
+    });
+  }
+
+  public withSignature(signature: string) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      signature,
+    });
+  }
+
+  public withStatus(status: AgencyStatus) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      status,
+    });
+  }
+
+  public withValidatorEmails(validatorEmails: Email[]) {
+    return new AgencyDtoBuilder({
+      ...this.agency,
+      validatorEmails,
+    });
   }
 }

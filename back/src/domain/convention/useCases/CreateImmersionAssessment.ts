@@ -17,14 +17,14 @@ import {
 } from "../entities/ImmersionAssessmentEntity";
 
 export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAssessmentDto> {
+  inputSchema = immersionAssessmentSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = immersionAssessmentSchema;
 
   public async _execute(
     dto: ImmersionAssessmentDto,

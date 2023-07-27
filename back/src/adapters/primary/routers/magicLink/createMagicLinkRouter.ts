@@ -32,17 +32,14 @@ export const createMagicLinkRouter = (
   authenticatedRouter
     .route(removeRouterPrefix(conventionMagicLinkTargets.getConvention.url))
     .get(async (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        if (req.payloads?.backOffice) {
-          return deps.useCases.getConvention.execute({
-            id: req.params.conventionId,
-          });
-        }
-        if (!req.payloads?.convention) throw new UnauthorizedError();
-        return deps.useCases.getConvention.execute({
-          id: req.payloads.convention.applicationId,
-        });
-      }),
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.getConvention.execute(
+          { conventionId: req.params.conventionId },
+          req.payloads?.backOffice ??
+            req.payloads?.inclusion ??
+            req.payloads?.convention,
+        ),
+      ),
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {

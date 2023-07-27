@@ -250,7 +250,7 @@ describe("Insert Establishment aggregate from form data", () => {
     const partialExpectedEstablishment: Partial<EstablishmentEntity> = {
       siret,
       address: rueGuillaumeTellDto,
-      isActive: true,
+      isOpen: true,
       name: formEstablishment.businessName,
     };
     expect(

@@ -400,6 +400,7 @@ const scheduleFromParams = (
           end: new Date(dateEnd),
         },
         [],
+        [],
       ),
   };
 };

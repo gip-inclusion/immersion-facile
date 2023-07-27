@@ -24,19 +24,6 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
     return rawPgToFeatureFlags(result.rows);
   }
 
-  async update(params: SetFeatureFlagParam): Promise<void> {
-    await this.client.query(
-      "UPDATE feature_flags SET is_active = $1, value = $2 WHERE flag_name = $3",
-      [
-        params.flagContent.isActive,
-        hasFeatureFlagValue(params.flagContent)
-          ? JSON.stringify(params.flagContent.value)
-          : null,
-        params.flagName,
-      ],
-    );
-  }
-
   async insert(featureFlags: FeatureFlags): Promise<void> {
     await Promise.all(
       keys(featureFlags).map(async (flagName) => {
@@ -51,6 +38,19 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
           ],
         );
       }),
+    );
+  }
+
+  async update(params: SetFeatureFlagParam): Promise<void> {
+    await this.client.query(
+      "UPDATE feature_flags SET is_active = $1, value = $2 WHERE flag_name = $3",
+      [
+        params.flagContent.isActive,
+        hasFeatureFlagValue(params.flagContent)
+          ? JSON.stringify(params.flagContent.value)
+          : null,
+        params.flagName,
+      ],
     );
   }
 }

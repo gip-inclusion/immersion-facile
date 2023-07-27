@@ -68,6 +68,24 @@ const defaultInterval: DateIntervalDto = {
 export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
   constructor(private dto: ScheduleDto = emptySchedule(defaultInterval)) {}
 
+  public build() {
+    return this.dto;
+  }
+
+  public withComplexSchedule(
+    complexSchedule: DailyScheduleDto[],
+  ): ScheduleDtoBuilder {
+    return new ScheduleDtoBuilder({
+      ...this.dto,
+      isSimple: false,
+      complexSchedule,
+    });
+  }
+
+  public withDateInterval(interval: DateIntervalDto): ScheduleDtoBuilder {
+    return this.withComplexSchedule(emptySchedule(interval).complexSchedule);
+  }
+
   public withEmptyRegularSchedule(): ScheduleDtoBuilder {
     return this.withRegularSchedule(emptyRegularSchedule);
   }
@@ -90,28 +108,11 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
     });
   }
 
-  public withDateInterval(interval: DateIntervalDto): ScheduleDtoBuilder {
-    return this.withComplexSchedule(emptySchedule(interval).complexSchedule);
-  }
-
-  public withComplexSchedule(
-    complexSchedule: DailyScheduleDto[],
-  ): ScheduleDtoBuilder {
-    return new ScheduleDtoBuilder({
-      ...this.dto,
-      isSimple: false,
-      complexSchedule,
-    });
-  }
-
   public withTotalHours(totalHours: number) {
     return new ScheduleDtoBuilder({ ...this.dto, totalHours });
   }
+
   public withWorkedDays(workedDays: number) {
     return new ScheduleDtoBuilder({ ...this.dto, workedDays });
-  }
-
-  public build() {
-    return this.dto;
   }
 }

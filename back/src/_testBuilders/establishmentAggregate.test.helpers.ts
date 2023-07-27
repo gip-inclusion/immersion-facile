@@ -24,21 +24,28 @@ export class EstablishmentAggregateBuilder
     private readonly aggregate: EstablishmentAggregate = validEstablishmentAggregate,
   ) {}
 
+  build() {
+    return this.aggregate;
+  }
+
+  public withContact(contact: ContactEntity | undefined) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      contact,
+    });
+  }
+
+  public withContactId(id: string) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      contact: new ContactEntityBuilder().withId(id).build(),
+    });
+  }
+
   public withEstablishment(establishment: EstablishmentEntity) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment,
-    });
-  }
-
-  public withEstablishmentUpdatedAt(updatedAt: Date) {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      establishment: new EstablishmentEntityBuilder(
-        this.aggregate.establishment,
-      )
-        .withUpdatedAt(updatedAt)
-        .build(),
     });
   }
 
@@ -55,50 +62,32 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withImmersionOffers(immersionOffers: ImmersionOfferEntityV2[]) {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      immersionOffers,
-    });
-  }
-
-  public withContact(contact: ContactEntity | undefined) {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      contact,
-    });
-  }
-  public withoutContact() {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      contact: undefined,
-    });
-  }
-
   public withEstablishmentSiret(siret: string) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder().withSiret(siret).build(),
     });
   }
-  public withContactId(id: string) {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      contact: new ContactEntityBuilder().withId(id).build(),
-    });
-  }
-  public withGeneratedContactId() {
-    return this.withContactId(new UuidV4Generator().new());
-  }
 
-  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
+  public withEstablishmentUpdatedAt(updatedAt: Date) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
         this.aggregate.establishment,
       )
-        .withMaxContactsPerWeek(maxContactsPerWeek)
+        .withUpdatedAt(updatedAt)
         .build(),
+    });
+  }
+
+  public withGeneratedContactId() {
+    return this.withContactId(new UuidV4Generator().new());
+  }
+
+  public withImmersionOffers(immersionOffers: ImmersionOfferEntityV2[]) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      immersionOffers,
     });
   }
 
@@ -113,8 +102,22 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  build() {
-    return this.aggregate;
+  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withMaxContactsPerWeek(maxContactsPerWeek)
+        .build(),
+    });
+  }
+
+  public withoutContact() {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      contact: undefined,
+    });
   }
 }
 

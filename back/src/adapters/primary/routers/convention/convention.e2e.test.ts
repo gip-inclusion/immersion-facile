@@ -11,6 +11,8 @@ import {
   createConventionMagicLinkPayload,
   currentJwtVersions,
   expectToEqual,
+  InclusionConnectedUser,
+  InclusionConnectJwtPayload,
   stringToMd5,
   unauthenticatedConventionTargets,
   UpdateConventionRequestDto,
@@ -21,6 +23,7 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import {
+  GenerateAuthenticatedUserJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
 } from "../../../../domain/auth/jwt";
@@ -35,6 +38,7 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 let request: SuperTest<Test>;
 let generateConventionJwt: GenerateConventionJwt;
 let generateBackOfficeJwt: GenerateBackOfficeJwt;
+let generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
 let inMemoryUow: InMemoryUnitOfWork;
 let eventCrawler: BasicEventCrawler;
 let gateways: InMemoryGateways;
@@ -60,6 +64,7 @@ const initializeSystemUnderTest = async (
     request,
     generateConventionJwt,
     generateBackOfficeJwt,
+    generateAuthenticatedUserJwt,
     inMemoryUow,
   } = await buildTestApp(config));
 
@@ -148,19 +153,20 @@ describe("convention e2e", () => {
           const jwt = generateConventionJwt(payload);
 
           // GETting the created convention succeeds.
-          await request
+          const response = await request
             .get(
               conventionMagicLinkTargets.getConvention.url.replace(
                 ":conventionId",
-                "OSEF",
+                convention.id,
               ),
             )
-            .set("Authorization", jwt)
-            .expect(200, {
-              ...convention,
-              agencyName: TEST_AGENCY_NAME,
-              agencyDepartment: TEST_AGENCY_DEPARTMENT,
-            });
+            .set("Authorization", jwt);
+          expect(response.body).toEqual({
+            ...convention,
+            agencyName: TEST_AGENCY_NAME,
+            agencyDepartment: TEST_AGENCY_DEPARTMENT,
+          });
+          expect(response.status).toBe(200);
         });
 
         it("succeeds with JWT BackOfficeJwtPayload", async () => {
@@ -171,6 +177,53 @@ describe("convention e2e", () => {
             iat: Math.round(now.getTime() / 1000),
           };
           const jwt = generateBackOfficeJwt(payload);
+
+          // GETting the created convention succeeds.
+          const response = await request
+            .get(
+              conventionMagicLinkTargets.getConvention.url.replace(
+                ":conventionId",
+                convention.id,
+              ),
+            )
+            .set("Authorization", jwt);
+
+          expectToEqual(response.body, {
+            ...convention,
+            agencyName: TEST_AGENCY_NAME,
+            agencyDepartment: TEST_AGENCY_DEPARTMENT,
+          });
+          expectToEqual(response.status, 200);
+        });
+
+        it("succeeds with JWT InclusionConnectedJwtPayload", async () => {
+          const agency = new AgencyDtoBuilder().build();
+          const convention = new ConventionDtoBuilder()
+            .withAgencyId(agency.id)
+            .build();
+          inMemoryUow.agencyRepository.setAgencies([agency]);
+          inMemoryUow.conventionRepository.setConventions({
+            [convention.id]: convention,
+          });
+
+          const user: InclusionConnectedUser = {
+            id: "my-user-id",
+            email: "my-user@email.com",
+            firstName: "John",
+            lastName: "Doe",
+            agencyRights: [{ role: "validator", agency }],
+          };
+          inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
+            [user],
+          );
+
+          const payload: InclusionConnectJwtPayload = {
+            userId: user.id,
+            version: currentJwtVersions.inclusion,
+            iat: Math.round(now.getTime() / 1000),
+          };
+
+          const jwt = generateAuthenticatedUserJwt(payload);
 
           // GETting the created convention succeeds.
           const response = await request
@@ -281,20 +334,29 @@ describe("convention e2e", () => {
             now,
           }),
         );
-        await request
+        const response = await request
           .get(
             conventionMagicLinkTargets.getConvention.url.replace(
               ":conventionId",
-              "anything",
+              unknownId,
             ),
           )
-          .set("Authorization", jwt)
-          .expect(404);
+          .set("Authorization", jwt);
+        expect(response.body).toEqual({
+          errors:
+            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+        });
+        expect(response.status).toBe(404);
 
-        await request
+        const adminResponse = await request
           .get(adminTargets.getConventionById.url.replace(":id", unknownId))
-          .set("Authorization", adminToken)
-          .expect(404);
+          .set("Authorization", adminToken);
+
+        expect(adminResponse.body).toEqual({
+          errors:
+            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+        });
+        expect(adminResponse.status).toBe(404);
       });
 
       it("Updating an unknown convention IDs fails with 404 Not Found", async () => {

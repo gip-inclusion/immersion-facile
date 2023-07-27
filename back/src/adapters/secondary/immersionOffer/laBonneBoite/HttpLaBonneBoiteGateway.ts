@@ -18,6 +18,12 @@ const MAX_DISTANCE_IN_KM = 100;
 const lbbMaxQueryPerSeconds = 1;
 
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
+  private limiter = new Bottleneck({
+    reservoir: lbbMaxQueryPerSeconds,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: lbbMaxQueryPerSeconds,
+  });
+
   constructor(
     private readonly httpClient: HttpClient<LaBonneBoiteTargets>,
     private readonly poleEmploiGateway: PoleEmploiGateway,
@@ -62,12 +68,6 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
       )
       .map((result) => result.toSearchResult());
   }
-
-  private limiter = new Bottleneck({
-    reservoir: lbbMaxQueryPerSeconds,
-    reservoirRefreshInterval: 1000, // number of ms
-    reservoirRefreshAmount: lbbMaxQueryPerSeconds,
-  });
 }
 
 const createAuthorization = (accessToken: string) => `Bearer ${accessToken}`;

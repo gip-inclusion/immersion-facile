@@ -6,6 +6,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<ConventionDto> {
+  inputSchema = conventionSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -14,8 +16,6 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = conventionSchema;
 
   public async _execute(
     conventionFromEvent: ConventionDto,

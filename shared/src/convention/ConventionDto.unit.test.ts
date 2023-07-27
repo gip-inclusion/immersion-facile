@@ -58,6 +58,7 @@ describe("conventionDtoSchema", () => {
         "jerome_truc@associes.fr",
       );
     });
+
     it("allow empty emergency contact email", () => {
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryEmergencyContactEmail("")
@@ -67,6 +68,7 @@ describe("conventionDtoSchema", () => {
         parsedConvention.signatories.beneficiary.emergencyContactEmail,
       ).toBe("");
     });
+
     it("ignores accents on emergency contact email", () => {
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryEmergencyContactEmail("Jérôme_Truc@associés.fr")
@@ -366,6 +368,7 @@ describe("conventionDtoSchema", () => {
             .withDateEnd(
               addDays(new Date(DATE_START), maxCalendarDays + 1).toISOString(),
             )
+            .withSchedule(reasonableSchedule, ["dimanche"])
             .build();
 
           expectConventionInvalidWithIssueMessages(
@@ -394,16 +397,18 @@ describe("conventionDtoSchema", () => {
             .withInternshipKind(internshipKind)
             .withDateStart(dateStart)
             .withDateEnd(dateEnd)
+            .withSchedule(reasonableSchedule, ["dimanche"])
             .build();
 
           expectConventionDtoToBeValid(convention);
         },
       );
     });
+
     describe("CCI specific, minor under 16yo", () => {
       it("max week hours depends on beneficiary age", () => {
-        const dateStart = DATE_START;
-        const dateEnd = addDays(new Date(DATE_START), 4).toISOString();
+        const dateStart = new Date("2021-01-04").toISOString();
+        const dateEnd = addDays(new Date(DATE_START), 3).toISOString();
         const convention = new ConventionDtoBuilder()
           .withInternshipKind("mini-stage-cci")
           .withDateStart(dateStart)
@@ -425,6 +430,7 @@ describe("conventionDtoSchema", () => {
         ]);
       });
     });
+
     describe("status that are available without signatures", () => {
       const [allowWithoutSignature, failingWithoutSignature] =
         splitCasesBetweenPassingAndFailing(conventionStatuses, [
@@ -592,13 +598,33 @@ describe("conventionDtoSchema", () => {
         .withInternshipKind("mini-stage-cci")
         .withDateStart(immersionStartDate.toISOString())
         .withDateEnd(new Date("2022-01-02").toISOString())
-        .withSchedule(reasonableSchedule)
+        .withSchedule(reasonableSchedule, ["dimanche"])
         .withBeneficiary(beneficiary)
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
         "L'âge du bénéficiaire doit être au minimum de 10ans",
       ]);
+    });
+  });
+
+  describe("when sunday is in schedule", () => {
+    const conventionBuilder = new ConventionDtoBuilder()
+      .withDateStart(new Date("2023-07-20").toISOString())
+      .withDateEnd(new Date("2023-07-25").toISOString());
+
+    it("rejects when internship kind is mini-stage-cci", () => {
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
+        conventionBuilder.withInternshipKind("mini-stage-cci").build(),
+        ["Le mini-stage ne peut pas se dérouler un dimanche"],
+      );
+    });
+
+    it("accepts valid convention when kind is immersion", () => {
+      expectConventionDtoToBeValid(
+        conventionBuilder.withInternshipKind("immersion").build(),
+      );
     });
   });
 });

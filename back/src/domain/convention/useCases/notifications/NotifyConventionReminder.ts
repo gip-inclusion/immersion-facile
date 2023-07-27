@@ -62,6 +62,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   ConventionReminderPayload,
   void
 > {
+  inputSchema = conventionReminderPayloadSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private timeGateway: TimeGateway,
@@ -72,8 +74,6 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = conventionReminderPayloadSchema;
 
   protected async _execute(
     { conventionId, reminderKind }: ConventionReminderPayload,
@@ -98,6 +98,87 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     if (!agency) throw new NotFoundError(missingAgencyMessage(conventionRead));
 
     return this.onAgencyReminder(reminderKind, conventionRead, agency, uow);
+  }
+
+  private async makeSignatoryReminderEmail(
+    { role, email, firstName, lastName }: GenericActor<Role>,
+    convention: ConventionDto,
+    uow: UnitOfWork,
+    kind: Extract<
+      ReminderKind,
+      "FirstReminderForSignatories" | "LastReminderForSignatories"
+    >,
+  ): Promise<TemplatedEmail> {
+    const makeShortMagicLink = prepareMagicShortLinkMaker({
+      config: this.config,
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        role,
+        email,
+        now: this.timeGateway.now(),
+      },
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      uow,
+    });
+
+    return {
+      kind:
+        kind === "FirstReminderForSignatories"
+          ? "SIGNATORY_FIRST_REMINDER"
+          : "SIGNATORY_LAST_REMINDER",
+      recipients: [email],
+      params: {
+        actorFirstName: firstName,
+        actorLastName: lastName,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        businessName: convention.businessName,
+        conventionId: convention.id,
+        signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
+        magicLinkUrl: isSignatoryRole(role)
+          ? await makeShortMagicLink(frontRoutes.conventionToSign)
+          : undefined,
+      },
+    };
+  }
+
+  private async onAgencyReminder(
+    reminderKind: AgenciesReminderKind,
+    conventionRead: ConventionReadDto,
+    agency: AgencyDto,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    if (conventionRead.status !== "IN_REVIEW")
+      throw new ForbiddenError(
+        forbiddenUnsupportedStatusMessage(conventionRead, reminderKind),
+      );
+    await Promise.all(
+      [
+        ...agency.counsellorEmails.map(
+          (email) =>
+            ({
+              role: "counsellor",
+              email,
+            } satisfies EmailWithRole),
+        ),
+        ...agency.validatorEmails.map(
+          (email) =>
+            ({
+              role: "validator",
+              email,
+            } satisfies EmailWithRole),
+        ),
+      ].map((emailWithRole) =>
+        this.sendAgencyReminderEmails(
+          emailWithRole,
+          conventionRead,
+          agency,
+          uow,
+          reminderKind,
+        ),
+      ),
+    );
   }
 
   private async onSignatoriesReminder(
@@ -186,44 +267,6 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     };
   }
 
-  private async onAgencyReminder(
-    reminderKind: AgenciesReminderKind,
-    conventionRead: ConventionReadDto,
-    agency: AgencyDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    if (conventionRead.status !== "IN_REVIEW")
-      throw new ForbiddenError(
-        forbiddenUnsupportedStatusMessage(conventionRead, reminderKind),
-      );
-    await Promise.all(
-      [
-        ...agency.counsellorEmails.map(
-          (email) =>
-            ({
-              role: "counsellor",
-              email,
-            } satisfies EmailWithRole),
-        ),
-        ...agency.validatorEmails.map(
-          (email) =>
-            ({
-              role: "validator",
-              email,
-            } satisfies EmailWithRole),
-        ),
-      ].map((emailWithRole) =>
-        this.sendAgencyReminderEmails(
-          emailWithRole,
-          conventionRead,
-          agency,
-          uow,
-          reminderKind,
-        ),
-      ),
-    );
-  }
-
   private async sendAgencyReminderEmails(
     { email, role }: EmailWithRole,
     convention: ConventionReadDto,
@@ -287,49 +330,6 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       },
       templatedContent: templatedEmail,
     });
-  }
-
-  private async makeSignatoryReminderEmail(
-    { role, email, firstName, lastName }: GenericActor<Role>,
-    convention: ConventionDto,
-    uow: UnitOfWork,
-    kind: Extract<
-      ReminderKind,
-      "FirstReminderForSignatories" | "LastReminderForSignatories"
-    >,
-  ): Promise<TemplatedEmail> {
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
-      config: this.config,
-      conventionMagicLinkPayload: {
-        id: convention.id,
-        role,
-        email,
-        now: this.timeGateway.now(),
-      },
-      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
-      uow,
-    });
-
-    return {
-      kind:
-        kind === "FirstReminderForSignatories"
-          ? "SIGNATORY_FIRST_REMINDER"
-          : "SIGNATORY_LAST_REMINDER",
-      recipients: [email],
-      params: {
-        actorFirstName: firstName,
-        actorLastName: lastName,
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
-        businessName: convention.businessName,
-        conventionId: convention.id,
-        signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
-        magicLinkUrl: isSignatoryRole(role)
-          ? await makeShortMagicLink(frontRoutes.conventionToSign)
-          : undefined,
-      },
-    };
   }
 }
 

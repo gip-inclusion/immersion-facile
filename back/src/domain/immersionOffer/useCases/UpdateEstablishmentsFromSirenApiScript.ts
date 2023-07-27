@@ -28,52 +28,7 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
 > {
   private callsToInseeApi = 0;
 
-  constructor(
-    private uowPerformer: UnitOfWorkPerformer,
-    private readonly siretGateway: SiretGateway,
-    private readonly timeGateway: TimeGateway,
-    private readonly numberOfDaysAgoToCheckForInseeUpdates: number = 30,
-    private readonly maxEstablishmentsPerBatch: number = 1000,
-    private readonly maxEstablishmentsPerFullRun: number = 5000,
-  ) {
-    super();
-  }
-
   inputSchema = z.void();
-
-  public async _execute(_: void): Promise<Report> {
-    this.callsToInseeApi = 0;
-    const now = this.timeGateway.now();
-    const since = subDays(now, this.numberOfDaysAgoToCheckForInseeUpdates);
-
-    let offset = 0;
-    let numberOfEstablishmentsToUpdate = 0;
-    let establishmentWithNewData = 0;
-
-    while (this.maxEstablishmentsPerFullRun > offset) {
-      const {
-        numberOfEstablishmentsToUpdateInBatch,
-        establishmentWithNewDataInBatch,
-      } = await this.processOneBatch(now, since);
-
-      numberOfEstablishmentsToUpdate += numberOfEstablishmentsToUpdateInBatch;
-      establishmentWithNewData += establishmentWithNewDataInBatch;
-
-      const areThereMoreEstablishmentsToUpdate =
-        numberOfEstablishmentsToUpdateInBatch ===
-        this.maxEstablishmentsPerBatch;
-
-      offset = areThereMoreEstablishmentsToUpdate
-        ? offset + this.maxEstablishmentsPerBatch
-        : this.maxEstablishmentsPerFullRun;
-    }
-
-    return {
-      numberOfEstablishmentsToUpdate,
-      establishmentWithNewData,
-      callsToInseeApi: this.callsToInseeApi,
-    };
-  }
 
   private processOneBatch = async (
     now: Date,
@@ -120,6 +75,51 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
     };
   };
 
+  constructor(
+    private uowPerformer: UnitOfWorkPerformer,
+    private readonly siretGateway: SiretGateway,
+    private readonly timeGateway: TimeGateway,
+    private readonly numberOfDaysAgoToCheckForInseeUpdates: number = 30,
+    private readonly maxEstablishmentsPerBatch: number = 1000,
+    private readonly maxEstablishmentsPerFullRun: number = 5000,
+  ) {
+    super();
+  }
+
+  public async _execute(_: void): Promise<Report> {
+    this.callsToInseeApi = 0;
+    const now = this.timeGateway.now();
+    const since = subDays(now, this.numberOfDaysAgoToCheckForInseeUpdates);
+
+    let offset = 0;
+    let numberOfEstablishmentsToUpdate = 0;
+    let establishmentWithNewData = 0;
+
+    while (this.maxEstablishmentsPerFullRun > offset) {
+      const {
+        numberOfEstablishmentsToUpdateInBatch,
+        establishmentWithNewDataInBatch,
+      } = await this.processOneBatch(now, since);
+
+      numberOfEstablishmentsToUpdate += numberOfEstablishmentsToUpdateInBatch;
+      establishmentWithNewData += establishmentWithNewDataInBatch;
+
+      const areThereMoreEstablishmentsToUpdate =
+        numberOfEstablishmentsToUpdateInBatch ===
+        this.maxEstablishmentsPerBatch;
+
+      offset = areThereMoreEstablishmentsToUpdate
+        ? offset + this.maxEstablishmentsPerBatch
+        : this.maxEstablishmentsPerFullRun;
+    }
+
+    return {
+      numberOfEstablishmentsToUpdate,
+      establishmentWithNewData,
+      callsToInseeApi: this.callsToInseeApi,
+    };
+  }
+
   private async getEstablishmentsUpdatesFromInsee(
     since: Date,
     now: Date,
@@ -144,7 +144,7 @@ const siretEstablishmentToValuesToUpdateInEstablishment = (
 ): Partial<ValuesToUpdateFromInseeApi> => ({
   ...(params.nafDto !== undefined ? { nafDto: params.nafDto } : {}),
   ...(params.businessName !== undefined ? { name: params.businessName } : {}),
-  ...(params.isOpen !== undefined ? { isActive: params.isOpen } : {}),
+  ...(params.isOpen !== undefined ? { isOpen: params.isOpen } : {}),
   ...(params.numberEmployeesRange !== undefined
     ? { numberEmployeesRange: params.numberEmployeesRange }
     : {}),

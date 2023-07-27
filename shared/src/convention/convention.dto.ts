@@ -222,8 +222,12 @@ export type ConventionReadDto = ConventionDto & {
   agencyDepartment: string;
 };
 
-export type WithConventionId = {
+export type WithConventionIdLegacy = {
   id: ConventionId;
+};
+
+export type WithConventionId = {
+  conventionId: ConventionId;
 };
 
 export type UpdateConventionRequestDto = {

@@ -1,11 +1,18 @@
-import { expectToEqual, FederatedIdentity } from "shared";
-import { Dependencies } from "src/config/dependencies";
+import {
+  expectToEqual,
+  FederatedIdentity,
+  InclusionConnectedUser,
+} from "shared";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
   authSlice,
   FederatedIdentityWithUser,
 } from "src/core-logic/domain/auth/auth.slice";
-import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import {
+  createTestStore,
+  TestDependencies,
+} from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { appIsReadyAction } from "../actions";
 
@@ -27,7 +34,7 @@ const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
 
 describe("Auth slice", () => {
   let store: ReduxStore;
-  let dependencies: Dependencies;
+  let dependencies: TestDependencies;
 
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
@@ -61,11 +68,23 @@ describe("Auth slice", () => {
     expectFederatedIdentityToEqual(null);
     dependencies.deviceRepository.set(
       "federatedIdentityWithUser",
-      peConnectedFederatedIdentity,
+      inclusionConnectedFederatedIdentity,
     );
     store.dispatch(appIsReadyAction());
-    expectFederatedIdentityToEqual(peConnectedFederatedIdentity);
-    expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
+    expectFederatedIdentityToEqual(inclusionConnectedFederatedIdentity);
+    expectFederatedIdentityInDevice(inclusionConnectedFederatedIdentity);
+    const icUser: InclusionConnectedUser = {
+      id: "123",
+      email: inclusionConnectedFederatedIdentity.email,
+      firstName: inclusionConnectedFederatedIdentity.firstName,
+      lastName: inclusionConnectedFederatedIdentity.lastName,
+      agencyRights: [],
+    };
+    dependencies.inclusionConnectedGateway.currentUser$.next(icUser);
+    expectToEqual(
+      inclusionConnectedSelectors.currentUser(store.getState()),
+      icUser,
+    );
   });
 
   it("shouldn't be logged in if no federatedIdentity stored in device", () => {

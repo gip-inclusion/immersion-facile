@@ -9,6 +9,8 @@ const logger = createLogger(__filename);
 export class NanoIdShortLinkIdGeneratorGateway
   implements ShortLinkIdGeneratorGateway
 {
+  public readonly idSize = 36;
+
   public generate(): ShortLinkId {
     const id = nanoid(this.idSize);
     logger.info(
@@ -19,5 +21,4 @@ export class NanoIdShortLinkIdGeneratorGateway
     );
     return id;
   }
-  public readonly idSize = 36;
 }

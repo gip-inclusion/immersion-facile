@@ -101,7 +101,10 @@ const brevoInboundBodySchema: z.Schema<BrevoInboundBody> = z.object({
 });
 
 export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundBody> {
+  inputSchema = brevoInboundBodySchema;
+
   private readonly replyDomain: string;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -112,8 +115,6 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     this.replyDomain = `reply.${domain}`;
   }
 
-  inputSchema = brevoInboundBodySchema;
-
   protected async _execute(
     brevoResponse: BrevoInboundBody,
     uow: UnitOfWork,
@@ -121,6 +122,28 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     await Promise.all(
       brevoResponse.items.map((item) => this.processBrevoItem(uow, item)),
     );
+  }
+
+  private getDiscussionParamsFromEmail(
+    email: BrevoEmailItem,
+  ): [DiscussionId, ExchangeRole] {
+    const recipient = email.To.find((recipent) => {
+      const regex = new RegExp(`.*_.*@${this.replyDomain}$`);
+      return recipent.Address?.match(regex);
+    });
+    if (!recipient)
+      throw new BadRequestError(
+        `Email does not have the right format email to : ${email.To.map(
+          (recipient) => recipient.Address,
+        ).join(", ")}`,
+      );
+    const [id, rawKind] = recipient.Address.split("@")[0].split("_");
+    if (!["e", "b"].includes(rawKind))
+      throw new BadRequestError(
+        `Email does not have the right format kind : ${rawKind}`,
+      );
+    const kind = rawKind === "e" ? "establishment" : "potentialBeneficiary";
+    return [id, kind];
   }
 
   private async processBrevoItem(
@@ -192,27 +215,6 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
         establishmentSiret: discussion.siret,
       },
     });
-  }
-  private getDiscussionParamsFromEmail(
-    email: BrevoEmailItem,
-  ): [DiscussionId, ExchangeRole] {
-    const recipient = email.To.find((recipent) => {
-      const regex = new RegExp(`.*_.*@${this.replyDomain}$`);
-      return recipent.Address?.match(regex);
-    });
-    if (!recipient)
-      throw new BadRequestError(
-        `Email does not have the right format email to : ${email.To.map(
-          (recipient) => recipient.Address,
-        ).join(", ")}`,
-      );
-    const [id, rawKind] = recipient.Address.split("@")[0].split("_");
-    if (!["e", "b"].includes(rawKind))
-      throw new BadRequestError(
-        `Email does not have the right format kind : ${rawKind}`,
-      );
-    const kind = rawKind === "e" ? "establishment" : "potentialBeneficiary";
-    return [id, kind];
   }
 }
 

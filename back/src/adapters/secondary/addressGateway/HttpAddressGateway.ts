@@ -38,11 +38,44 @@ const logger = createLogger(__filename);
 const openCageDateMaxRequestsPerSeconds = 15;
 
 export class HttpAddressGateway implements AddressGateway {
+  private limiter = new Bottleneck({
+    reservoir: openCageDateMaxRequestsPerSeconds,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: openCageDateMaxRequestsPerSeconds,
+  });
+
   constructor(
     private readonly httpClient: HttpClient<AddressesTargets>,
     private geocodingApiKey: string,
     private geosearchApiKey: OpenCageGeoSearchKey,
   ) {}
+
+  private featureToAddress(
+    feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
+  ): AddressDto | undefined {
+    const components = feature.properties.components;
+    const city = getCityFromAliases(components);
+    const postcode = getPostcodeFromAliases(components);
+    const departmentName = getDepartmentNameFromAliases(components);
+    // OpenCageData gives the department name but not the code.
+    const departmentCode =
+      departmentName &&
+      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
+
+    return (
+      city &&
+      departmentCode &&
+      postcode && {
+        streetNumberAndAddress: makeStreetNumberAndAddress(
+          getStreetNumberFromAliases(components),
+          getStreetNameFromAliases(components),
+        ),
+        postcode,
+        departmentCode,
+        city,
+      }
+    );
+  }
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
@@ -66,44 +99,6 @@ export class HttpAddressGateway implements AddressGateway {
       .filter(filterNotFalsy);
 
     return addresses.at(0);
-  }
-
-  public async lookupStreetAddress(
-    query: string,
-  ): Promise<AddressAndPosition[]> {
-    const startDate = new Date();
-    try {
-      if (
-        query.replace(lookupStreetAddressSpecialCharsRegex, "").length <
-        lookupStreetAddressQueryMinLength
-      )
-        throw new Error(
-          errorMessage.minimumCharErrorMessage(
-            lookupStreetAddressQueryMinLength,
-          ),
-        );
-      const { responseBody } = await this.limiter.schedule(() =>
-        this.httpClient.geocoding({
-          queryParams: {
-            countrycode: franceAndAttachedTerritoryCountryCodes,
-            key: this.geocodingApiKey,
-            language,
-            q: query,
-          },
-        }),
-      );
-
-      return (responseBody as OpenCageDataFeatureCollection).features
-        .map((feature) => this.toAddressAndPosition(feature))
-        .filter(filterNotFalsy);
-    } finally {
-      calculateDurationInSecondsFrom(startDate);
-      logger.info({
-        method: "lookupStreetAddress",
-        query,
-        durationInSeconds: calculateDurationInSecondsFrom(startDate),
-      });
-    }
   }
 
   public async lookupLocationName(
@@ -146,6 +141,44 @@ export class HttpAddressGateway implements AddressGateway {
     }
   }
 
+  public async lookupStreetAddress(
+    query: string,
+  ): Promise<AddressAndPosition[]> {
+    const startDate = new Date();
+    try {
+      if (
+        query.replace(lookupStreetAddressSpecialCharsRegex, "").length <
+        lookupStreetAddressQueryMinLength
+      )
+        throw new Error(
+          errorMessage.minimumCharErrorMessage(
+            lookupStreetAddressQueryMinLength,
+          ),
+        );
+      const { responseBody } = await this.limiter.schedule(() =>
+        this.httpClient.geocoding({
+          queryParams: {
+            countrycode: franceAndAttachedTerritoryCountryCodes,
+            key: this.geocodingApiKey,
+            language,
+            q: query,
+          },
+        }),
+      );
+
+      return (responseBody as OpenCageDataFeatureCollection).features
+        .map((feature) => this.toAddressAndPosition(feature))
+        .filter(filterNotFalsy);
+    } finally {
+      calculateDurationInSecondsFrom(startDate);
+      logger.info({
+        method: "lookupStreetAddress",
+        query,
+        durationInSeconds: calculateDurationInSecondsFrom(startDate),
+      });
+    }
+  }
+
   private toAddressAndPosition(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
   ): AddressAndPosition | undefined {
@@ -160,39 +193,6 @@ export class HttpAddressGateway implements AddressGateway {
       }
     );
   }
-
-  private featureToAddress(
-    feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-  ): AddressDto | undefined {
-    const components = feature.properties.components;
-    const city = getCityFromAliases(components);
-    const postcode = getPostcodeFromAliases(components);
-    const departmentName = getDepartmentNameFromAliases(components);
-    // OpenCageData gives the department name but not the code.
-    const departmentCode =
-      departmentName &&
-      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
-
-    return (
-      city &&
-      departmentCode &&
-      postcode && {
-        streetNumberAndAddress: makeStreetNumberAndAddress(
-          getStreetNumberFromAliases(components),
-          getStreetNameFromAliases(components),
-        ),
-        postcode,
-        departmentCode,
-        city,
-      }
-    );
-  }
-
-  private limiter = new Bottleneck({
-    reservoir: openCageDateMaxRequestsPerSeconds,
-    reservoirRefreshInterval: 1000, // number of ms
-    reservoirRefreshAmount: openCageDateMaxRequestsPerSeconds,
-  });
 }
 
 const getPostcodeFromAliases = (

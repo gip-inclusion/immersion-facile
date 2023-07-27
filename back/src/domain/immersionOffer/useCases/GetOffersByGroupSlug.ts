@@ -10,11 +10,11 @@ export class GetOffersByGroupSlug extends TransactionalUseCase<
   WithEstablishmentGroupSlug,
   SearchImmersionResultDto[]
 > {
+  inputSchema = withEstablishmentGroupSlugSchema;
+
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
-
-  inputSchema = withEstablishmentGroupSlugSchema;
 
   public async _execute(
     { groupSlug }: WithEstablishmentGroupSlug,

@@ -7,7 +7,7 @@ import {
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
@@ -42,9 +42,11 @@ type UpdateConventionStatusPayload = {
 
 export class UpdateConventionStatus extends TransactionalUseCase<
   UpdateConventionStatusRequestDto,
-  WithConventionId,
+  WithConventionIdLegacy,
   UpdateConventionStatusPayload
 > {
+  inputSchema = updateConventionStatusRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -53,13 +55,11 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = updateConventionStatusRequestSchema;
-
   public async _execute(
     params: UpdateConventionStatusRequestDto,
     uow: UnitOfWork,
     { conventionId, role }: UpdateConventionStatusPayload,
-  ): Promise<WithConventionId> {
+  ): Promise<WithConventionIdLegacy> {
     logger.debug({ status: params.status, conventionId, role });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();

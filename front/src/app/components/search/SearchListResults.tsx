@@ -14,9 +14,13 @@ import {
 } from "./ContactModalContent";
 import { SearchResult } from "./SearchResult";
 
-const { ContactModal, openContactModal, closeContactModal } = createModal({
+const {
+  Component: ContactModal,
+  open: openContactModal,
+  close: closeContactModal,
+} = createModal({
   isOpenedByDefault: false,
-  name: "contact",
+  id: "contact",
 });
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {

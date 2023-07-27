@@ -37,177 +37,37 @@ export class PgEstablishmentAggregateRepository
 {
   constructor(private client: PoolClient) {}
 
-  public async insertEstablishmentAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    await this.upsertEstablishmentsFromAggregates(aggregates);
-    await this.insertContactsFromAggregates(aggregates);
-    await this.createImmersionOffersToEstablishments(
-      aggregates.reduce<OfferWithSiret[]>(
-        (offersWithSiret, aggregate) => [
-          ...offersWithSiret,
-          ...aggregate.immersionOffers.map((immersionOffer) => ({
-            siret: aggregate.establishment.siret,
-            ...immersionOffer,
-          })),
-        ],
-        [],
-      ),
-    );
-  }
-
-  public async updateEstablishmentAggregate(
+  private async _updateContactFromAggregates(
+    existingAggregate: EstablishmentAggregate & {
+      contact: ContactEntity;
+    },
     updatedAggregate: EstablishmentAggregate,
-    updatedAt: Date,
   ) {
-    const existingAggregate = await this.getEstablishmentAggregateBySiret(
-      updatedAggregate.establishment.siret,
-    );
-    if (!existingAggregate)
-      throw new NotFoundError(
-        `We do not have an establishment with siret ${updatedAggregate.establishment.siret} to update`,
-      );
-    // Remove offers that don't exist anymore and create those that did not exist before
-    await this._updateImmersionOffersFromAggregates(
-      existingAggregate,
-      updatedAggregate,
-    );
-    // Update establishment if it has changed
     if (
-      !establishmentsEqual(
-        existingAggregate.establishment,
-        updatedAggregate.establishment,
-      )
+      !!updatedAggregate.contact &&
+      !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
     ) {
-      await this.updateEstablishment({
-        ...updatedAggregate.establishment,
-        updatedAt,
-      });
-    }
-
-    // Create contact if it does'not exist
-    if (!existingAggregate.contact) {
-      await this.insertContactsFromAggregates([updatedAggregate]);
-    } else {
-      // Update contact if it has changed
-      await this._updateContactFromAggregates(
-        { ...existingAggregate, contact: existingAggregate.contact },
-        updatedAggregate,
+      await this.client.query(
+        `UPDATE immersion_contacts 
+       SET lastname = $1, 
+            firstname = $2, 
+            email = $3, 
+            job = $4, 
+            phone = $5, 
+            contact_mode = $6, 
+            copy_emails = $7
+       WHERE uuid = $8`,
+        [
+          updatedAggregate.contact.lastName,
+          updatedAggregate.contact.firstName,
+          updatedAggregate.contact.email,
+          updatedAggregate.contact.job,
+          updatedAggregate.contact.phone,
+          updatedAggregate.contact.contactMethod,
+          JSON.stringify(updatedAggregate.contact.copyEmails),
+          existingAggregate.contact.id,
+        ],
       );
-    }
-  }
-
-  private async upsertEstablishmentsFromAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    const establishmentFields = aggregates.map(({ establishment }) => [
-      establishment.siret,
-      establishment.name,
-      establishment.customizedName,
-      establishment.website,
-      establishment.additionalInformation,
-      establishment.address.streetNumberAndAddress,
-      establishment.address.postcode,
-      establishment.address.city,
-      establishment.address.departmentCode,
-      establishment.numberEmployeesRange,
-      establishment.nafDto.code,
-      establishment.nafDto.nomenclature,
-      establishment.sourceProvider,
-      convertPositionToStGeography(establishment.position),
-      establishment.position.lon,
-      establishment.position.lat,
-      establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
-      establishment.isActive,
-      establishment.isSearchable,
-      establishment.isCommited,
-      establishment.fitForDisabledWorkers,
-      establishment.maxContactsPerWeek,
-      establishment.lastInseeCheckDate
-        ? establishment.lastInseeCheckDate.toISOString()
-        : null,
-    ]);
-
-    if (establishmentFields.length === 0) return;
-
-    try {
-      const query = fixStGeographyEscapingInQuery(
-        format(
-          `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date 
-        ) VALUES %L
-        ON CONFLICT
-          ON CONSTRAINT establishments_pkey
-            DO UPDATE
-              SET
-                name=EXCLUDED.name,
-                street_number_and_address=EXCLUDED.street_number_and_address,
-                post_code=EXCLUDED.post_code,
-                city=EXCLUDED.city,
-                department_code=EXCLUDED.department_code,
-                number_employees=EXCLUDED.number_employees,
-                naf_code=EXCLUDED.naf_code,
-                fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
-                max_contacts_per_week=EXCLUDED.max_contacts_per_week
-              `,
-          establishmentFields,
-        ),
-      );
-
-      await this.client.query(query);
-    } catch (e: any) {
-      logger.error(e, "Error inserting establishments");
-      throw e;
-    }
-  }
-
-  private async insertContactsFromAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    const aggregatesWithContact = aggregates.filter(
-      (establishment): establishment is Required<EstablishmentAggregate> =>
-        !!establishment.contact,
-    );
-
-    if (aggregatesWithContact.length === 0) return;
-
-    const contactFields = aggregatesWithContact.map((aggregate) => {
-      const contact = aggregate.contact;
-      return [
-        contact.id,
-        contact.lastName,
-        contact.firstName,
-        contact.email,
-        contact.job,
-        contact.phone,
-        contact.contactMethod,
-        JSON.stringify(contact.copyEmails),
-      ];
-    });
-
-    const establishmentContactFields = aggregatesWithContact.map(
-      ({ establishment, contact }) => [establishment.siret, contact.id],
-    );
-
-    try {
-      const insertContactsQuery = format(
-        `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
-      ) VALUES %L`,
-        contactFields,
-      );
-
-      const insertEstablishmentsContactsQuery = format(
-        `INSERT INTO establishments__immersion_contacts (
-        establishment_siret, contact_uuid) VALUES %L`,
-        establishmentContactFields,
-      );
-
-      await this.client.query(insertContactsQuery);
-      await this.client.query(insertEstablishmentsContactsQuery);
-    } catch (e: any) {
-      logger.error(e, "Error inserting contacts");
-      throw e;
     }
   }
 
@@ -275,283 +135,6 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  private async _updateContactFromAggregates(
-    existingAggregate: EstablishmentAggregate & {
-      contact: ContactEntity;
-    },
-    updatedAggregate: EstablishmentAggregate,
-  ) {
-    if (
-      !!updatedAggregate.contact &&
-      !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
-    ) {
-      await this.client.query(
-        `UPDATE immersion_contacts 
-       SET lastname = $1, 
-            firstname = $2, 
-            email = $3, 
-            job = $4, 
-            phone = $5, 
-            contact_mode = $6, 
-            copy_emails = $7
-       WHERE uuid = $8`,
-        [
-          updatedAggregate.contact.lastName,
-          updatedAggregate.contact.firstName,
-          updatedAggregate.contact.email,
-          updatedAggregate.contact.job,
-          updatedAggregate.contact.phone,
-          updatedAggregate.contact.contactMethod,
-          JSON.stringify(updatedAggregate.contact.copyEmails),
-          existingAggregate.contact.id,
-        ],
-      );
-    }
-  }
-
-  async searchImmersionResults({
-    searchMade,
-    maxResults,
-  }: {
-    searchMade: SearchMade;
-    maxResults?: number;
-  }): Promise<SearchImmersionResult[]> {
-    const romeCode = await this.getRomeCodeFromAppellationCode(
-      searchMade.appellationCode,
-    );
-    const sortExpression = makeOrderByStatement(searchMade.sortedBy);
-    const selectedOffersSubQuery = format(
-      `WITH active_establishments_within_area AS 
-        (SELECT siret, fit_for_disabled_workers, gps
-         FROM establishments 
-         WHERE is_active 
-         AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
-        matching_offers AS (
-          SELECT 
-            aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-            ${buildAppellationsArray} AS appellations,
-            MAX(created_at) AS max_created_at, 
-            fit_for_disabled_workers
-          FROM active_establishments_within_area aewa 
-            LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-            LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
-            LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-            ${romeCode ? "WHERE rome_code = %1$L" : ""}
-            GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
-          )
-        SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
-        LIMIT $3`,
-      romeCode,
-    ); // Formats optional litterals %1$L
-    const immersionSearchResultDtos =
-      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        selectedOffersSubQuery,
-        [
-          `POINT(${searchMade.lon} ${searchMade.lat})`,
-          searchMade.distanceKm * 1000, // Formats parameters $1, $2
-          maxResults,
-        ],
-      );
-    return immersionSearchResultDtos.map((dto) => ({
-      ...dto,
-      voluntaryToImmersion: true,
-    }));
-  }
-
-  public async getSiretsOfEstablishmentsWithRomeCode(
-    rome: string,
-  ): Promise<string[]> {
-    const pgResult = await this.client.query(
-      `SELECT siret FROM immersion_offers WHERE rome_code = $1`,
-      [rome],
-    );
-    return pgResult.rows.map((row) => row.siret);
-  }
-
-  public async removeEstablishmentAndOffersAndContactWithSiret(
-    siret: string,
-  ): Promise<void> {
-    try {
-      logger.info(`About to delete establishment with siret : ${siret}`);
-      const query = `DELETE FROM establishments WHERE siret = $1;`;
-      await this.client.query(query, [siret]);
-      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
-    } catch (error: any) {
-      logger.info(
-        `Error when deleting establishment with siret ${siret} : ${error.message}`,
-      );
-      logger.info({ error }, "Full Error");
-      throw error;
-    }
-  }
-
-  public async updateEstablishment(
-    propertiesToUpdate: Partial<EstablishmentEntity> & {
-      updatedAt: Date;
-      siret: SiretDto;
-    },
-  ): Promise<void> {
-    const updateQuery = `
-          UPDATE establishments
-                   SET update_date = %1$L
-                   ${
-                     propertiesToUpdate.isActive !== undefined
-                       ? ", is_active=%2$L"
-                       : ""
-                   }
-                   ${propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
-                   ${propertiesToUpdate.nafDto ? ", naf_nomenclature=%4$L" : ""}
-                   ${
-                     propertiesToUpdate.numberEmployeesRange
-                       ? ", number_employees=%5$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
-                       ? ", street_number_and_address=%6$L, post_code=%7$L, city=%8$L, department_code=%9$L, gps=ST_GeographyFromText(%10$L), lon=%11$L, lat=%12$L"
-                       : ""
-                   }
-                   ${propertiesToUpdate.name ? ", name=%13$L" : ""}
-                   ${
-                     propertiesToUpdate.customizedName
-                       ? ", customized_name=%14$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.isSearchable !== undefined
-                       ? ", is_searchable=%15$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.isCommited !== undefined
-                       ? ", is_commited=%16$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.website !== undefined
-                       ? ", website=%17$L"
-                       : ""
-                   }
-                  ${
-                    propertiesToUpdate.additionalInformation !== undefined
-                      ? ", additional_information=%18$L"
-                      : ""
-                  }
-                  ${
-                    propertiesToUpdate.fitForDisabledWorkers !== undefined
-                      ? ", fit_for_disabled_workers=%19$L"
-                      : ""
-                  }
-                  ${
-                    propertiesToUpdate.maxContactsPerWeek !== undefined
-                      ? ", max_contacts_per_week=%20$L"
-                      : ""
-                  }
-                   WHERE siret=%21$L;`;
-    const queryArgs = [
-      propertiesToUpdate.updatedAt.toISOString(),
-      propertiesToUpdate.isActive,
-      propertiesToUpdate.nafDto?.code,
-      propertiesToUpdate.nafDto?.nomenclature,
-      propertiesToUpdate.numberEmployeesRange,
-      propertiesToUpdate.address?.streetNumberAndAddress,
-      propertiesToUpdate.address?.postcode,
-      propertiesToUpdate.address?.city,
-      propertiesToUpdate.address?.departmentCode,
-      propertiesToUpdate.position
-        ? `POINT(${propertiesToUpdate.position.lon} ${propertiesToUpdate.position.lat})`
-        : undefined,
-      propertiesToUpdate.position?.lon,
-      propertiesToUpdate.position?.lat,
-
-      propertiesToUpdate.name,
-      propertiesToUpdate.customizedName,
-      propertiesToUpdate.isSearchable,
-      propertiesToUpdate.isCommited,
-      propertiesToUpdate.website,
-      propertiesToUpdate.additionalInformation,
-      propertiesToUpdate.fitForDisabledWorkers,
-      propertiesToUpdate.maxContactsPerWeek,
-      propertiesToUpdate.siret,
-    ];
-    const formatedQuery = format(updateQuery, ...queryArgs);
-    await this.client.query(formatedQuery);
-  }
-
-  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
-    const pgResult = await this.client.query(
-      `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);`,
-      [siret],
-    );
-    return pgResult.rows[0].exists;
-  }
-
-  public async getOffersAsAppellationDtoEstablishment(
-    siret: string,
-  ): Promise<AppellationAndRomeDto[]> {
-    const pgResult = await this.client.query(
-      `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
-       FROM immersion_offers io
-       JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
-       LEFT JOIN public_appellations_data pad on io.appellation_code = pad.ogr_appellation
-       WHERE siret = $1;`,
-      [siret],
-    );
-    return pgResult.rows.map((row: any) => ({
-      romeCode: row.rome_code,
-      appellationCode:
-        optional(row.ogr_appellation) && row.ogr_appellation.toString(),
-      romeLabel: row.libelle_rome,
-      appellationLabel: row.libelle_appellation_long, // libelle_appellation_long should not be undefined
-    }));
-  }
-
-  public async getSearchImmersionResultDtoBySiretAndRome(
-    siret: SiretDto,
-    rome: RomeCode,
-  ): Promise<SearchImmersionResultDto | undefined> {
-    const immersionSearchResultDtos =
-      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
-        FROM immersion_offers AS io
-        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-        WHERE io.siret = $1 AND io.rome_code = $2
-        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
-        [siret, rome],
-      );
-
-    const result = immersionSearchResultDtos.at(0);
-    if (!result) return;
-    const {
-      isSearchable,
-      ...searchResultWithoutContactDetailsAndIsSearchable
-    } = result;
-    return searchResultWithoutContactDetailsAndIsSearchable;
-  }
-
-  public async getSearchImmersionResultDtoBySiretAndAppellationCode(
-    siret: SiretDto,
-    appellationCode: AppellationCode,
-  ): Promise<SearchImmersionResultDto | undefined> {
-    const immersionSearchResultDtos =
-      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
-        FROM immersion_offers AS io
-        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-        WHERE io.siret = $1 AND io.appellation_code = $2
-        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
-        [siret, appellationCode],
-      );
-    const immersionSearchResultDto = immersionSearchResultDtos.at(0);
-    if (!immersionSearchResultDto) return;
-    const { isSearchable, ...rest } = immersionSearchResultDto;
-    return rest;
-  }
-
   public async createImmersionOffersToEstablishments(
     offersWithSiret: OfferWithSiret[],
   ) {
@@ -573,38 +156,6 @@ export class PgEstablishmentAggregateRepository
       immersionOfferFields,
     );
     await this.client.query(query);
-  }
-
-  private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-    selectedOffersSubQuery: string,
-    selectedOffersSubQueryParams: any[],
-  ): Promise<SearchImmersionResult[]> {
-    // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
-    // this method returns a list of SearchImmersionResultDto
-    const pgResult = await this.client.query(
-      makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        selectedOffersSubQuery,
-      ),
-      selectedOffersSubQueryParams,
-    );
-
-    return pgResult.rows.map(
-      (row): SearchImmersionResult => ({
-        ...row.search_immersion_result,
-        // TODO : find a way to return 'undefined' instead of 'null' from query
-        customizedName: optional(row.search_immersion_result.customizedName),
-        contactMode: optional(row.search_immersion_result.contactMode),
-        distance_m: optional(row.search_immersion_result.distance_m),
-        numberOfEmployeeRange: optional(
-          row.search_immersion_result.numberOfEmployeeRange,
-        ),
-        fitForDisabledWorkers: optional(
-          row.search_immersion_result.fitForDisabledWorkers,
-        ),
-        voluntaryToImmersion: true,
-        isSearchable: row.search_immersion_result.isSearchable,
-      }),
-    );
   }
 
   async getEstablishmentAggregateBySiret(
@@ -671,7 +222,7 @@ export class PgEstablishmentAggregateRepository
                 'lastInseeCheckDate', to_char(
                   e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
-                'isActive', e.is_active, 
+                'isOpen', e.is_open, 
                 'isSearchable', e.is_searchable, 
                 'isCommited', e.is_commited,
                 'fitForDisabledWorkers', e.fit_for_disabled_workers,
@@ -724,31 +275,91 @@ export class PgEstablishmentAggregateRepository
     );
   }
 
-  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
-    since: Date,
-  ): Promise<number> {
-    const querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek = `
-      SELECT e.siret
-      FROM establishments e
-      LEFT JOIN discussions d ON e.siret = d.siret
-      WHERE is_searchable = false
-        AND max_contacts_per_week > 0
-        AND d.created_at > $1
-      GROUP BY e.siret HAVING COUNT(*) >= e.max_contacts_per_week
-      `;
+  public async getOffersAsAppellationDtoEstablishment(
+    siret: string,
+  ): Promise<AppellationAndRomeDto[]> {
+    const pgResult = await this.client.query(
+      `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
+       FROM immersion_offers io
+       JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
+       LEFT JOIN public_appellations_data pad on io.appellation_code = pad.ogr_appellation
+       WHERE siret = $1;`,
+      [siret],
+    );
+    return pgResult.rows.map((row: any) => ({
+      romeCode: row.rome_code,
+      appellationCode:
+        optional(row.ogr_appellation) && row.ogr_appellation.toString(),
+      romeLabel: row.libelle_rome,
+      appellationLabel: row.libelle_appellation_long, // libelle_appellation_long should not be undefined
+    }));
+  }
+
+  private async getRomeCodeFromAppellationCode(
+    appellationCode: AppellationCode | undefined,
+  ): Promise<RomeCode | undefined> {
+    if (!appellationCode) return;
 
     const result = await this.client.query(
-      `
-        UPDATE establishments
-        SET is_searchable = true 
-        WHERE is_searchable = false
-          AND max_contacts_per_week > 0
-          AND siret NOT IN (${querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek})
-        `,
-      [since],
+      `SELECT code_rome
+        from public_appellations_data
+        where ogr_appellation = $1`,
+      [appellationCode],
     );
 
-    return result.rowCount;
+    const romeCode: RomeCode | undefined = result.rows[0]?.code_rome;
+    if (!romeCode)
+      throw new Error(
+        `No Rome code found for appellation code ${appellationCode}`,
+      );
+
+    return romeCode;
+  }
+
+  public async getSearchImmersionResultDtoBySiretAndAppellationCode(
+    siret: SiretDto,
+    appellationCode: AppellationCode,
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const immersionSearchResultDtos =
+      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        `
+        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
+        FROM immersion_offers AS io
+        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
+        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+        WHERE io.siret = $1 AND io.appellation_code = $2
+        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
+        [siret, appellationCode],
+      );
+    const immersionSearchResultDto = immersionSearchResultDtos.at(0);
+    if (!immersionSearchResultDto) return;
+    const { isSearchable, ...rest } = immersionSearchResultDto;
+    return rest;
+  }
+
+  public async getSearchImmersionResultDtoBySiretAndRome(
+    siret: SiretDto,
+    rome: RomeCode,
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const immersionSearchResultDtos =
+      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        `
+        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
+        FROM immersion_offers AS io
+        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
+        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+        WHERE io.siret = $1 AND io.rome_code = $2
+        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
+        [siret, rome],
+      );
+
+    const result = immersionSearchResultDtos.at(0);
+    if (!result) return;
+    const {
+      isSearchable,
+      ...searchResultWithoutContactDetailsAndIsSearchable
+    } = result;
+    return searchResultWithoutContactDetailsAndIsSearchable;
   }
 
   public async getSiretOfEstablishmentsToSuggestUpdate(
@@ -800,6 +411,352 @@ export class PgEstablishmentAggregateRepository
     return result.rows.map(({ siret }) => siret);
   }
 
+  public async getSiretsOfEstablishmentsWithRomeCode(
+    rome: string,
+  ): Promise<string[]> {
+    const pgResult = await this.client.query(
+      `SELECT siret FROM immersion_offers WHERE rome_code = $1`,
+      [rome],
+    );
+    return pgResult.rows.map((row) => row.siret);
+  }
+
+  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
+    const pgResult = await this.client.query(
+      `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);`,
+      [siret],
+    );
+    return pgResult.rows[0].exists;
+  }
+
+  private async insertContactsFromAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    const aggregatesWithContact = aggregates.filter(
+      (establishment): establishment is Required<EstablishmentAggregate> =>
+        !!establishment.contact,
+    );
+
+    if (aggregatesWithContact.length === 0) return;
+
+    const contactFields = aggregatesWithContact.map((aggregate) => {
+      const contact = aggregate.contact;
+      return [
+        contact.id,
+        contact.lastName,
+        contact.firstName,
+        contact.email,
+        contact.job,
+        contact.phone,
+        contact.contactMethod,
+        JSON.stringify(contact.copyEmails),
+      ];
+    });
+
+    const establishmentContactFields = aggregatesWithContact.map(
+      ({ establishment, contact }) => [establishment.siret, contact.id],
+    );
+
+    try {
+      const insertContactsQuery = format(
+        `INSERT INTO immersion_contacts (
+        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
+      ) VALUES %L`,
+        contactFields,
+      );
+
+      const insertEstablishmentsContactsQuery = format(
+        `INSERT INTO establishments__immersion_contacts (
+        establishment_siret, contact_uuid) VALUES %L`,
+        establishmentContactFields,
+      );
+
+      await this.client.query(insertContactsQuery);
+      await this.client.query(insertEstablishmentsContactsQuery);
+    } catch (e: any) {
+      logger.error(e, "Error inserting contacts");
+      throw e;
+    }
+  }
+
+  public async insertEstablishmentAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    await this.upsertEstablishmentsFromAggregates(aggregates);
+    await this.insertContactsFromAggregates(aggregates);
+    await this.createImmersionOffersToEstablishments(
+      aggregates.reduce<OfferWithSiret[]>(
+        (offersWithSiret, aggregate) => [
+          ...offersWithSiret,
+          ...aggregate.immersionOffers.map((immersionOffer) => ({
+            siret: aggregate.establishment.siret,
+            ...immersionOffer,
+          })),
+        ],
+        [],
+      ),
+    );
+  }
+
+  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+    since: Date,
+  ): Promise<number> {
+    const querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek = `
+      SELECT e.siret
+      FROM establishments e
+      LEFT JOIN discussions d ON e.siret = d.siret
+      WHERE is_searchable = false
+        AND max_contacts_per_week > 0
+        AND d.created_at > $1
+      GROUP BY e.siret HAVING COUNT(*) >= e.max_contacts_per_week
+      `;
+
+    const result = await this.client.query(
+      `
+        UPDATE establishments
+        SET is_searchable = true 
+        WHERE is_searchable = false
+          AND max_contacts_per_week > 0
+          AND siret NOT IN (${querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek})
+        `,
+      [since],
+    );
+
+    return result.rowCount;
+  }
+
+  public async removeEstablishmentAndOffersAndContactWithSiret(
+    siret: string,
+  ): Promise<void> {
+    try {
+      logger.info(`About to delete establishment with siret : ${siret}`);
+      const query = `DELETE FROM establishments WHERE siret = $1;`;
+      await this.client.query(query, [siret]);
+      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
+    } catch (error: any) {
+      logger.info(
+        `Error when deleting establishment with siret ${siret} : ${error.message}`,
+      );
+      logger.info({ error }, "Full Error");
+      throw error;
+    }
+  }
+
+  async searchImmersionResults({
+    searchMade,
+    maxResults,
+  }: {
+    searchMade: SearchMade;
+    maxResults?: number;
+  }): Promise<SearchImmersionResult[]> {
+    const romeCode = await this.getRomeCodeFromAppellationCode(
+      searchMade.appellationCode,
+    );
+    const sortExpression = makeOrderByStatement(searchMade.sortedBy);
+    const selectedOffersSubQuery = format(
+      `WITH active_establishments_within_area AS 
+        (SELECT siret, fit_for_disabled_workers, gps
+         FROM establishments 
+         WHERE is_open 
+         AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
+        matching_offers AS (
+          SELECT 
+            aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+            ${buildAppellationsArray} AS appellations,
+            MAX(created_at) AS max_created_at, 
+            fit_for_disabled_workers
+          FROM active_establishments_within_area aewa 
+            LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
+            LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
+            LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
+            ${romeCode ? "WHERE rome_code = %1$L" : ""}
+            GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
+          )
+        SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
+        LIMIT $3`,
+      romeCode,
+    ); // Formats optional litterals %1$L
+    const immersionSearchResultDtos =
+      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        selectedOffersSubQuery,
+        [
+          `POINT(${searchMade.lon} ${searchMade.lat})`,
+          searchMade.distanceKm * 1000, // Formats parameters $1, $2
+          maxResults,
+        ],
+      );
+    return immersionSearchResultDtos.map((dto) => ({
+      ...dto,
+      voluntaryToImmersion: true,
+    }));
+  }
+
+  private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+    selectedOffersSubQuery: string,
+    selectedOffersSubQueryParams: any[],
+  ): Promise<SearchImmersionResult[]> {
+    // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
+    // this method returns a list of SearchImmersionResultDto
+    const pgResult = await this.client.query(
+      makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        selectedOffersSubQuery,
+      ),
+      selectedOffersSubQueryParams,
+    );
+
+    return pgResult.rows.map(
+      (row): SearchImmersionResult => ({
+        ...row.search_immersion_result,
+        // TODO : find a way to return 'undefined' instead of 'null' from query
+        customizedName: optional(row.search_immersion_result.customizedName),
+        contactMode: optional(row.search_immersion_result.contactMode),
+        distance_m: optional(row.search_immersion_result.distance_m),
+        numberOfEmployeeRange: optional(
+          row.search_immersion_result.numberOfEmployeeRange,
+        ),
+        fitForDisabledWorkers: optional(
+          row.search_immersion_result.fitForDisabledWorkers,
+        ),
+        voluntaryToImmersion: true,
+        isSearchable: row.search_immersion_result.isSearchable,
+      }),
+    );
+  }
+
+  public async updateEstablishment(
+    propertiesToUpdate: Partial<EstablishmentEntity> & {
+      updatedAt: Date;
+      siret: SiretDto;
+    },
+  ): Promise<void> {
+    const updateQuery = `
+          UPDATE establishments
+                   SET update_date = %1$L
+                   ${
+                     propertiesToUpdate.isOpen !== undefined
+                       ? ", is_open=%2$L"
+                       : ""
+                   }
+                   ${propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
+                   ${propertiesToUpdate.nafDto ? ", naf_nomenclature=%4$L" : ""}
+                   ${
+                     propertiesToUpdate.numberEmployeesRange
+                       ? ", number_employees=%5$L"
+                       : ""
+                   }
+                   ${
+                     propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
+                       ? ", street_number_and_address=%6$L, post_code=%7$L, city=%8$L, department_code=%9$L, gps=ST_GeographyFromText(%10$L), lon=%11$L, lat=%12$L"
+                       : ""
+                   }
+                   ${propertiesToUpdate.name ? ", name=%13$L" : ""}
+                   ${
+                     propertiesToUpdate.customizedName
+                       ? ", customized_name=%14$L"
+                       : ""
+                   }
+                   ${
+                     propertiesToUpdate.isSearchable !== undefined
+                       ? ", is_searchable=%15$L"
+                       : ""
+                   }
+                   ${
+                     propertiesToUpdate.isCommited !== undefined
+                       ? ", is_commited=%16$L"
+                       : ""
+                   }
+                   ${
+                     propertiesToUpdate.website !== undefined
+                       ? ", website=%17$L"
+                       : ""
+                   }
+                  ${
+                    propertiesToUpdate.additionalInformation !== undefined
+                      ? ", additional_information=%18$L"
+                      : ""
+                  }
+                  ${
+                    propertiesToUpdate.fitForDisabledWorkers !== undefined
+                      ? ", fit_for_disabled_workers=%19$L"
+                      : ""
+                  }
+                  ${
+                    propertiesToUpdate.maxContactsPerWeek !== undefined
+                      ? ", max_contacts_per_week=%20$L"
+                      : ""
+                  }
+                   WHERE siret=%21$L;`;
+    const queryArgs = [
+      propertiesToUpdate.updatedAt.toISOString(),
+      propertiesToUpdate.isOpen,
+      propertiesToUpdate.nafDto?.code,
+      propertiesToUpdate.nafDto?.nomenclature,
+      propertiesToUpdate.numberEmployeesRange,
+      propertiesToUpdate.address?.streetNumberAndAddress,
+      propertiesToUpdate.address?.postcode,
+      propertiesToUpdate.address?.city,
+      propertiesToUpdate.address?.departmentCode,
+      propertiesToUpdate.position
+        ? `POINT(${propertiesToUpdate.position.lon} ${propertiesToUpdate.position.lat})`
+        : undefined,
+      propertiesToUpdate.position?.lon,
+      propertiesToUpdate.position?.lat,
+
+      propertiesToUpdate.name,
+      propertiesToUpdate.customizedName,
+      propertiesToUpdate.isSearchable,
+      propertiesToUpdate.isCommited,
+      propertiesToUpdate.website,
+      propertiesToUpdate.additionalInformation,
+      propertiesToUpdate.fitForDisabledWorkers,
+      propertiesToUpdate.maxContactsPerWeek,
+      propertiesToUpdate.siret,
+    ];
+    const formatedQuery = format(updateQuery, ...queryArgs);
+    await this.client.query(formatedQuery);
+  }
+
+  public async updateEstablishmentAggregate(
+    updatedAggregate: EstablishmentAggregate,
+    updatedAt: Date,
+  ) {
+    const existingAggregate = await this.getEstablishmentAggregateBySiret(
+      updatedAggregate.establishment.siret,
+    );
+    if (!existingAggregate)
+      throw new NotFoundError(
+        `We do not have an establishment with siret ${updatedAggregate.establishment.siret} to update`,
+      );
+    // Remove offers that don't exist anymore and create those that did not exist before
+    await this._updateImmersionOffersFromAggregates(
+      existingAggregate,
+      updatedAggregate,
+    );
+    // Update establishment if it has changed
+    if (
+      !establishmentsEqual(
+        existingAggregate.establishment,
+        updatedAggregate.establishment,
+      )
+    ) {
+      await this.updateEstablishment({
+        ...updatedAggregate.establishment,
+        updatedAt,
+      });
+    }
+
+    // Create contact if it does'not exist
+    if (!existingAggregate.contact) {
+      await this.insertContactsFromAggregates([updatedAggregate]);
+    } else {
+      // Update contact if it has changed
+      await this._updateContactFromAggregates(
+        { ...existingAggregate, contact: existingAggregate.contact },
+        updatedAggregate,
+      );
+    }
+  }
+
   public async updateEstablishmentsWithInseeData(
     inseeCheckDate: Date,
     params: UpdateEstablishmentsWithInseeDataParams,
@@ -810,7 +767,7 @@ export class PgEstablishmentAggregateRepository
         `
             UPDATE establishments
             SET last_insee_check_date = %1$L 
-              ${values?.isActive !== undefined ? ", is_active=%3$L" : ""}
+              ${values?.isOpen !== undefined ? ", is_open=%3$L" : ""}
               ${values?.nafDto ? ", naf_code=%4$L" : ""}
               ${values?.nafDto ? ", naf_nomenclature=%5$L" : ""}
               ${values?.name ? ", name=%6$L" : ""}
@@ -819,7 +776,7 @@ export class PgEstablishmentAggregateRepository
         inseeCheckDate.toISOString(),
         siret,
         ...[
-          values?.isActive,
+          values?.isOpen,
           values?.nafDto?.code,
           values?.nafDto?.nomenclature,
           values?.name,
@@ -831,25 +788,68 @@ export class PgEstablishmentAggregateRepository
     await this.client.query(queries.join("\n"));
   }
 
-  private async getRomeCodeFromAppellationCode(
-    appellationCode: AppellationCode | undefined,
-  ): Promise<RomeCode | undefined> {
-    if (!appellationCode) return;
+  private async upsertEstablishmentsFromAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    const establishmentFields = aggregates.map(({ establishment }) => [
+      establishment.siret,
+      establishment.name,
+      establishment.customizedName,
+      establishment.website,
+      establishment.additionalInformation,
+      establishment.address.streetNumberAndAddress,
+      establishment.address.postcode,
+      establishment.address.city,
+      establishment.address.departmentCode,
+      establishment.numberEmployeesRange,
+      establishment.nafDto.code,
+      establishment.nafDto.nomenclature,
+      establishment.sourceProvider,
+      convertPositionToStGeography(establishment.position),
+      establishment.position.lon,
+      establishment.position.lat,
+      establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
+      establishment.isOpen,
+      establishment.isSearchable,
+      establishment.isCommited,
+      establishment.fitForDisabledWorkers,
+      establishment.maxContactsPerWeek,
+      establishment.lastInseeCheckDate
+        ? establishment.lastInseeCheckDate.toISOString()
+        : null,
+    ]);
 
-    const result = await this.client.query(
-      `SELECT code_rome
-        from public_appellations_data
-        where ogr_appellation = $1`,
-      [appellationCode],
-    );
+    if (establishmentFields.length === 0) return;
 
-    const romeCode: RomeCode | undefined = result.rows[0]?.code_rome;
-    if (!romeCode)
-      throw new Error(
-        `No Rome code found for appellation code ${appellationCode}`,
+    try {
+      const query = fixStGeographyEscapingInQuery(
+        format(
+          `INSERT INTO establishments (
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_open, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date 
+        ) VALUES %L
+        ON CONFLICT
+          ON CONSTRAINT establishments_pkey
+            DO UPDATE
+              SET
+                name=EXCLUDED.name,
+                street_number_and_address=EXCLUDED.street_number_and_address,
+                post_code=EXCLUDED.post_code,
+                city=EXCLUDED.city,
+                department_code=EXCLUDED.department_code,
+                number_employees=EXCLUDED.number_employees,
+                naf_code=EXCLUDED.naf_code,
+                fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
+                max_contacts_per_week=EXCLUDED.max_contacts_per_week
+              `,
+          establishmentFields,
+        ),
       );
 
-    return romeCode;
+      await this.client.query(query);
+    } catch (e: any) {
+      logger.error(e, "Error inserting establishments");
+      throw e;
+    }
   }
 }
 

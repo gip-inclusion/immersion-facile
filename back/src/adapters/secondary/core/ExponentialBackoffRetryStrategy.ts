@@ -26,7 +26,7 @@ const logger = createLogger(__filename);
 // - The backoff duration will not exceed maxBackOffPeriodMs.
 // - Retrying is abandoned after retryDeadlineMs is reached.
 export class ExponentialBackoffRetryStrategy implements RetryStrategy {
-  public constructor(
+  constructor(
     private readonly maxBackoffPeriodMs: number,
     private readonly retryDeadlineMs: number,
     private readonly timeGateway: TimeGateway,

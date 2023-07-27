@@ -11,30 +11,6 @@ import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway"
 export class HttpEstablishmentGateway implements EstablishmentGateway {
   constructor(private readonly httpClient: HttpClient<EstablishmentTargets>) {}
 
-  public getFormEstablishmentFromJwt$(
-    siret: SiretDto,
-    jwt: string,
-  ): Observable<FormEstablishmentDto> {
-    return from(this.getFormEstablishmentFromJwt(siret, jwt));
-  }
-
-  public addFormEstablishment$(
-    formEstablishment: FormEstablishmentDto,
-  ): Observable<void> {
-    return from(this.addFormEstablishment(formEstablishment));
-  }
-
-  public requestEstablishmentModification$(siret: SiretDto): Observable<void> {
-    return from(this.requestEstablishmentModification(siret));
-  }
-
-  public updateFormEstablishment$(
-    formEstablishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt,
-  ): Observable<void> {
-    return from(this.updateFormEstablishment(formEstablishment, jwt));
-  }
-
   private async addFormEstablishment(
     formEstablishment: FormEstablishmentDto,
   ): Promise<void> {
@@ -43,12 +19,10 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     });
   }
 
-  private async requestEstablishmentModification(
-    siret: SiretDto,
-  ): Promise<void> {
-    await this.httpClient.requestEmailToUpdateFormRoute({
-      urlParams: { siret },
-    });
+  public addFormEstablishment$(
+    formEstablishment: FormEstablishmentDto,
+  ): Observable<void> {
+    return from(this.addFormEstablishment(formEstablishment));
   }
 
   private async getFormEstablishmentFromJwt(
@@ -62,6 +36,25 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     return responseBody;
   }
 
+  public getFormEstablishmentFromJwt$(
+    siret: SiretDto,
+    jwt: string,
+  ): Observable<FormEstablishmentDto> {
+    return from(this.getFormEstablishmentFromJwt(siret, jwt));
+  }
+
+  private async requestEstablishmentModification(
+    siret: SiretDto,
+  ): Promise<void> {
+    await this.httpClient.requestEmailToUpdateFormRoute({
+      urlParams: { siret },
+    });
+  }
+
+  public requestEstablishmentModification$(siret: SiretDto): Observable<void> {
+    return from(this.requestEstablishmentModification(siret));
+  }
+
   private async updateFormEstablishment(
     formEstablishment: FormEstablishmentDto,
     jwt: EstablishmentJwt,
@@ -72,5 +65,12 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
         authorization: jwt,
       },
     });
+  }
+
+  public updateFormEstablishment$(
+    formEstablishment: FormEstablishmentDto,
+    jwt: EstablishmentJwt,
+  ): Observable<void> {
+    return from(this.updateFormEstablishment(formEstablishment, jwt));
   }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -11,9 +11,9 @@ import { Loader } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { RegisterAgenciesForm } from "../components/forms/register-agencies/RegisterAgenciesForm";
 
 export const AgencyDashboardPage = () => {
@@ -36,7 +36,12 @@ export const AgencyDashboardPage = () => {
     {
       label: "Tableau de bord agence",
       content: (
-        <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+        <>
+          <ManageConventionFormSection
+            routeNameToRedirectTo={"manageConventionInclusionConnected"}
+          />
+          <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+        </>
       ),
     },
     ...(conventionErrorUrl
@@ -53,10 +58,6 @@ export const AgencyDashboardPage = () => {
         ]
       : []),
   ];
-
-  useEffect(() => {
-    dispatch(inclusionConnectedSlice.actions.currentUserFetchRequested());
-  }, []);
 
   return (
     <>

@@ -37,136 +37,11 @@ export class InMemoryEstablishmentAggregateRepository
     private _establishmentAggregates: EstablishmentAggregate[] = [],
   ) {}
 
-  public getSiretOfEstablishmentsToSuggestUpdate(): Promise<SiretDto[]> {
-    throw new Error(
-      "Method not implemented : getSiretOfEstablishmentsToSuggestUpdate, you can use PG implementation instead",
-    );
-  }
-
-  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(): Promise<number> {
-    // not implemented because this method is used only in a script,
-    // and the use case consists only in a PG query
-    throw new Error("NOT implemented");
-  }
-
-  public async insertEstablishmentAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    this._establishmentAggregates = [
-      ...this._establishmentAggregates,
-      ...aggregates,
-    ];
-  }
-
-  public async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
-    const aggregateIndex = this._establishmentAggregates.findIndex(
-      pathEq("establishment.siret", aggregate.establishment.siret),
-    );
-    if (aggregateIndex === -1)
-      throw new NotFoundError(
-        `We do not have an establishment with siret ${aggregate.establishment.siret} to update`,
-      );
-    this._establishmentAggregates = replaceArrayElement(
-      this._establishmentAggregates,
-      aggregateIndex,
-      aggregate,
-    );
-  }
-
   public async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
     return this._establishmentAggregates.find(
       pathEq("establishment.siret", siret),
-    );
-  }
-
-  public async searchImmersionResults({
-    searchMade: { lat, lon, appellationCode },
-    maxResults,
-  }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
-    return this._establishmentAggregates
-      .filter((aggregate) => aggregate.establishment.isActive)
-      .flatMap((aggregate) =>
-        uniqBy((offer) => offer.romeCode, aggregate.immersionOffers)
-          .filter(
-            (offer) =>
-              !appellationCode || appellationCode === offer.appellationCode,
-          )
-          .map((offer) =>
-            buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
-              establishmentAgg: aggregate,
-              searchedAppellationCode: offer.appellationCode,
-              position: {
-                lat,
-                lon,
-              },
-            }),
-          ),
-      )
-      .slice(0, maxResults);
-  }
-
-  // to delete when api v0 and v1 are removed
-  public async getSearchImmersionResultDtoBySiretAndRome(
-    siret: SiretDto,
-    rome: string,
-  ): Promise<SearchImmersionResultDto | undefined> {
-    const aggregate = this.establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret === siret,
-    );
-    if (!aggregate) return undefined;
-
-    const searchedAppellationCode =
-      aggregate.immersionOffers.find(({ romeCode }) => romeCode === rome)
-        ?.appellationCode ?? "no-appellation-code-matched";
-
-    const {
-      isSearchable,
-      ...buildSearchImmersionResultWithoutContactDetailsAndIsSearchable
-    } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
-      establishmentAgg: aggregate,
-      searchedAppellationCode,
-    });
-    return buildSearchImmersionResultWithoutContactDetailsAndIsSearchable;
-  }
-
-  public async updateEstablishment(
-    propertiesToUpdate: Partial<EstablishmentEntity> & {
-      updatedAt: Date;
-      siret: SiretDto;
-    },
-  ): Promise<void> {
-    this._establishmentAggregates = this._establishmentAggregates.map(
-      (aggregate) =>
-        aggregate.establishment.siret === propertiesToUpdate.siret
-          ? {
-              ...aggregate,
-              establishment: {
-                ...aggregate.establishment,
-                ...JSON.parse(JSON.stringify(propertiesToUpdate)), // parse and stringify to drop undefined values from propertiesToUpdate (Does not work with clone() from ramda)
-                updatedAt: propertiesToUpdate.updatedAt,
-              },
-            }
-          : aggregate,
-    );
-  }
-
-  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
-    if (siret === conflictErrorSiret)
-      throw new ConflictError(
-        `Establishment with siret ${siret} already in db`,
-      );
-    return !!this._establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret === siret,
-    );
-  }
-
-  public async removeEstablishmentAndOffersAndContactWithSiret(
-    siret: string,
-  ): Promise<void> {
-    this.establishmentAggregates = this._establishmentAggregates.filter(
-      pathNotEq("establishment.siret", siret),
     );
   }
 
@@ -205,15 +80,34 @@ export class InMemoryEstablishmentAggregateRepository
     return rest;
   }
 
-  async getSiretsOfEstablishmentsWithRomeCode(
+  // to delete when api v0 and v1 are removed
+  public async getSearchImmersionResultDtoBySiretAndRome(
+    siret: SiretDto,
     rome: string,
-  ): Promise<SiretDto[]> {
-    return this._establishmentAggregates
-      .filter(
-        (aggregate) =>
-          !!aggregate.immersionOffers.find((offer) => offer.romeCode === rome),
-      )
-      .map(path("establishment.siret"));
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const aggregate = this.establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret === siret,
+    );
+    if (!aggregate) return undefined;
+
+    const searchedAppellationCode =
+      aggregate.immersionOffers.find(({ romeCode }) => romeCode === rome)
+        ?.appellationCode ?? "no-appellation-code-matched";
+
+    const {
+      isSearchable,
+      ...buildSearchImmersionResultWithoutContactDetailsAndIsSearchable
+    } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
+      establishmentAgg: aggregate,
+      searchedAppellationCode,
+    });
+    return buildSearchImmersionResultWithoutContactDetailsAndIsSearchable;
+  }
+
+  public getSiretOfEstablishmentsToSuggestUpdate(): Promise<SiretDto[]> {
+    throw new Error(
+      "Method not implemented : getSiretOfEstablishmentsToSuggestUpdate, you can use PG implementation instead",
+    );
   }
 
   public async getSiretsOfEstablishmentsNotCheckedAtInseeSince(
@@ -228,6 +122,112 @@ export class InMemoryEstablishmentAggregateRepository
       )
       .map(({ establishment }) => establishment.siret)
       .slice(0, maxResults);
+  }
+
+  async getSiretsOfEstablishmentsWithRomeCode(
+    rome: string,
+  ): Promise<SiretDto[]> {
+    return this._establishmentAggregates
+      .filter(
+        (aggregate) =>
+          !!aggregate.immersionOffers.find((offer) => offer.romeCode === rome),
+      )
+      .map(path("establishment.siret"));
+  }
+
+  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
+    if (siret === conflictErrorSiret)
+      throw new ConflictError(
+        `Establishment with siret ${siret} already in db`,
+      );
+    return !!this._establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret === siret,
+    );
+  }
+
+  public async insertEstablishmentAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    this._establishmentAggregates = [
+      ...this._establishmentAggregates,
+      ...aggregates,
+    ];
+  }
+
+  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(): Promise<number> {
+    // not implemented because this method is used only in a script,
+    // and the use case consists only in a PG query
+    throw new Error("NOT implemented");
+  }
+
+  public async removeEstablishmentAndOffersAndContactWithSiret(
+    siret: string,
+  ): Promise<void> {
+    this.establishmentAggregates = this._establishmentAggregates.filter(
+      pathNotEq("establishment.siret", siret),
+    );
+  }
+
+  public async searchImmersionResults({
+    searchMade: { lat, lon, appellationCode },
+    maxResults,
+  }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
+    return this._establishmentAggregates
+      .filter((aggregate) => aggregate.establishment.isOpen)
+      .flatMap((aggregate) =>
+        uniqBy((offer) => offer.romeCode, aggregate.immersionOffers)
+          .filter(
+            (offer) =>
+              !appellationCode || appellationCode === offer.appellationCode,
+          )
+          .map((offer) =>
+            buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
+              establishmentAgg: aggregate,
+              searchedAppellationCode: offer.appellationCode,
+              position: {
+                lat,
+                lon,
+              },
+            }),
+          ),
+      )
+      .slice(0, maxResults);
+  }
+
+  public async updateEstablishment(
+    propertiesToUpdate: Partial<EstablishmentEntity> & {
+      updatedAt: Date;
+      siret: SiretDto;
+    },
+  ): Promise<void> {
+    this._establishmentAggregates = this._establishmentAggregates.map(
+      (aggregate) =>
+        aggregate.establishment.siret === propertiesToUpdate.siret
+          ? {
+              ...aggregate,
+              establishment: {
+                ...aggregate.establishment,
+                ...JSON.parse(JSON.stringify(propertiesToUpdate)), // parse and stringify to drop undefined values from propertiesToUpdate (Does not work with clone() from ramda)
+                updatedAt: propertiesToUpdate.updatedAt,
+              },
+            }
+          : aggregate,
+    );
+  }
+
+  public async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
+    const aggregateIndex = this._establishmentAggregates.findIndex(
+      pathEq("establishment.siret", aggregate.establishment.siret),
+    );
+    if (aggregateIndex === -1)
+      throw new NotFoundError(
+        `We do not have an establishment with siret ${aggregate.establishment.siret} to update`,
+      );
+    this._establishmentAggregates = replaceArrayElement(
+      this._establishmentAggregates,
+      aggregateIndex,
+      aggregate,
+    );
   }
 
   public async updateEstablishmentsWithInseeData(

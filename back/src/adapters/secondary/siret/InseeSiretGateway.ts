@@ -36,7 +36,13 @@ const inseeMaxRequestsPerMinute = 500;
 // https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/templates/api/documentation/download.jag?tenant=carbon.super&resourceUrl=/registry/resource/_system/governance/apimgt/applicationdata/provider/insee/Sirene/V3/documentation/files/INSEE%20Documentation%20API%20Sirene%20Services-V3.9.pdf
 
 export class InseeSiretGateway implements SiretGateway {
-  public constructor(
+  private limiter = new Bottleneck({
+    reservoir: inseeMaxRequestsPerMinute,
+    reservoirRefreshInterval: 60 * 1000, // number of ms
+    reservoirRefreshAmount: inseeMaxRequestsPerMinute,
+  });
+
+  constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly timeGateway: TimeGateway,
     private readonly retryStrategy: RetryStrategy,
@@ -51,6 +57,75 @@ export class InseeSiretGateway implements SiretGateway {
       },
       timeout: secondsToMilliseconds(10),
     });
+  }
+
+  private createSiretQueryParams(
+    siret: SiretDto,
+    includeClosedEstablishments = false,
+  ) {
+    const params: any = {
+      q: `siret:${siret}`,
+    };
+
+    // According to API SIRENE documentation :
+    // etatAdministratifEtablissement :
+    //   État de l'établissement pendant la période :
+    //     A= établissement actif
+    //     F= établissement fermé
+    if (!includeClosedEstablishments) {
+      params.q += " AND periode(etatAdministratifEtablissement:A)";
+      params.date = formatISO(this.timeGateway.now(), {
+        representation: "date",
+      });
+    }
+
+    return params;
+  }
+
+  public async getEstablishmentBySiret(
+    siret: SiretDto,
+    includeClosedEstablishments = false,
+  ): Promise<SiretEstablishmentDto | undefined> {
+    logger.debug({ siret, includeClosedEstablishments }, "get");
+
+    return this.retryStrategy
+      .apply(async () => {
+        try {
+          const axios = this.createAxiosInstance();
+          const response = await this.limiter.schedule(() =>
+            axios.get("/siret", {
+              params: this.createSiretQueryParams(
+                siret,
+                includeClosedEstablishments,
+              ),
+            }),
+          );
+          const dataFromApi: SirenGatewayAnswer | undefined = response?.data;
+          const establishment = dataFromApi?.etablissements[0];
+          if (!establishment) return;
+          return convertSirenRawEstablishmentToSirenEstablishmentDto(
+            establishment,
+          );
+        } catch (error: any) {
+          if (axios.isAxiosError(error)) {
+            if (error.response?.status === 404) {
+              return;
+            }
+            if (isRetryableError(logger, error))
+              throw new RetryableError(error);
+          }
+
+          logAxiosError(logger, error);
+          throw error;
+        }
+      })
+      .catch((error) => {
+        const serviceName = "Sirene API";
+        logger.error({ siret, error }, "Error fetching siret");
+        if (error?.initialError?.status === 429)
+          throw new TooManyRequestApiError(serviceName);
+        throw new UnavailableApiError(serviceName);
+      });
   }
 
   public async getEstablishmentUpdatedBetween(
@@ -113,81 +188,6 @@ export class InseeSiretGateway implements SiretGateway {
       throw error?.response.data;
     }
   }
-
-  public async getEstablishmentBySiret(
-    siret: SiretDto,
-    includeClosedEstablishments = false,
-  ): Promise<SiretEstablishmentDto | undefined> {
-    logger.debug({ siret, includeClosedEstablishments }, "get");
-
-    return this.retryStrategy
-      .apply(async () => {
-        try {
-          const axios = this.createAxiosInstance();
-          const response = await this.limiter.schedule(() =>
-            axios.get("/siret", {
-              params: this.createSiretQueryParams(
-                siret,
-                includeClosedEstablishments,
-              ),
-            }),
-          );
-          const dataFromApi: SirenGatewayAnswer | undefined = response?.data;
-          const establishment = dataFromApi?.etablissements[0];
-          if (!establishment) return;
-          return convertSirenRawEstablishmentToSirenEstablishmentDto(
-            establishment,
-          );
-        } catch (error: any) {
-          if (axios.isAxiosError(error)) {
-            if (error.response?.status === 404) {
-              return;
-            }
-            if (isRetryableError(logger, error))
-              throw new RetryableError(error);
-          }
-
-          logAxiosError(logger, error);
-          throw error;
-        }
-      })
-      .catch((error) => {
-        const serviceName = "Sirene API";
-        logger.error({ siret, error }, "Error fetching siret");
-        if (error?.initialError?.status === 429)
-          throw new TooManyRequestApiError(serviceName);
-        throw new UnavailableApiError(serviceName);
-      });
-  }
-
-  private createSiretQueryParams(
-    siret: SiretDto,
-    includeClosedEstablishments = false,
-  ) {
-    const params: any = {
-      q: `siret:${siret}`,
-    };
-
-    // According to API SIRENE documentation :
-    // etatAdministratifEtablissement :
-    //   État de l'établissement pendant la période :
-    //     A= établissement actif
-    //     F= établissement fermé
-    if (!includeClosedEstablishments) {
-      params.q += " AND periode(etatAdministratifEtablissement:A)";
-      params.date = formatISO(this.timeGateway.now(), {
-        representation: "date",
-      });
-    }
-
-    return params;
-  }
-
-  private limiter = new Bottleneck({
-    reservoir: inseeMaxRequestsPerMinute,
-    reservoirRefreshInterval: 60 * 1000, // number of ms
-    reservoirRefreshAmount: inseeMaxRequestsPerMinute,
-  });
 }
 
 export type InseeApiRawEstablishment = {

@@ -25,6 +25,7 @@ export class InMemoryEmailValidationGateway implements EmailValidationGateway {
       proposal: null,
     };
   }
+
   public getEmailStatus$(query: Email): Observable<ValidateEmailStatus> {
     return from(this.getEmailStatus(query));
   }

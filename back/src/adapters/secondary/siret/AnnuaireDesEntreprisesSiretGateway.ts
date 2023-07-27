@@ -10,16 +10,16 @@ import {
 const adeMaxQueryPerSeconds = 7;
 export const nonDiffusibleEstablishmentName = "NON-DIFFUSIBLE";
 export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
-  constructor(
-    private httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>,
-    private fallbackGateway: SiretGateway,
-  ) {}
-
   private limiter = new Bottleneck({
     reservoir: adeMaxQueryPerSeconds,
     reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: adeMaxQueryPerSeconds,
   });
+
+  constructor(
+    private httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>,
+    private fallbackGateway: SiretGateway,
+  ) {}
 
   public async getEstablishmentBySiret(
     siret: SiretDto,

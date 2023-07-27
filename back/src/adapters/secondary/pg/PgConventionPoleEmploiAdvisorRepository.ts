@@ -50,21 +50,6 @@ export class PgConventionPoleEmploiAdvisorRepository
     };
   }
 
-  public async openSlotForNextConvention(
-    peUserAndAdvisor: PeUserAndAdvisor,
-  ): Promise<void> {
-    const { user, advisor } = peUserAndAdvisor;
-
-    await this.client.query(upsertOnCompositePrimaryKeyConflict, [
-      user.peExternalId,
-      CONVENTION_ID_DEFAULT_UUID,
-      advisor?.firstName ?? null,
-      advisor?.lastName ?? null,
-      advisor?.email ?? null,
-      advisor?.type ?? null,
-    ]);
-  }
-
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
@@ -91,6 +76,21 @@ export class PgConventionPoleEmploiAdvisorRepository
         ),
       )
     );
+  }
+
+  public async openSlotForNextConvention(
+    peUserAndAdvisor: PeUserAndAdvisor,
+  ): Promise<void> {
+    const { user, advisor } = peUserAndAdvisor;
+
+    await this.client.query(upsertOnCompositePrimaryKeyConflict, [
+      user.peExternalId,
+      CONVENTION_ID_DEFAULT_UUID,
+      advisor?.firstName ?? null,
+      advisor?.lastName ?? null,
+      advisor?.email ?? null,
+      advisor?.type ?? null,
+    ]);
   }
 }
 

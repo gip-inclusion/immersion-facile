@@ -16,10 +16,18 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 export class HttpAdminGateway implements AdminGateway {
   constructor(private readonly httpClient: HttpClient<AdminTargets>) {}
 
-  public login(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
+  public addEstablishmentBatch$(
+    establishmentBatch: FormEstablishmentBatchDto,
+    token: BackOfficeJwt,
+  ): Observable<EstablishmentBatchReport> {
     return from(
       this.httpClient
-        .login({ body: userAndPassword })
+        .addFormEstablishmentBatch({
+          headers: {
+            authorization: token,
+          },
+          body: establishmentBatch,
+        })
         .then(({ responseBody }) => responseBody),
     );
   }
@@ -42,35 +50,6 @@ export class HttpAdminGateway implements AdminGateway {
         .then(({ responseBody }) => responseBody),
     );
   }
-  public addEstablishmentBatch$(
-    establishmentBatch: FormEstablishmentBatchDto,
-    token: BackOfficeJwt,
-  ): Observable<EstablishmentBatchReport> {
-    return from(
-      this.httpClient
-        .addFormEstablishmentBatch({
-          headers: {
-            authorization: token,
-          },
-          body: establishmentBatch,
-        })
-        .then(({ responseBody }) => responseBody),
-    );
-  }
-
-  public updateUserRoleForAgency$(
-    params: IcUserRoleForAgencyParams,
-    token: string,
-  ): Observable<void> {
-    return from(
-      this.httpClient
-        .updateUserRoleForAgency({
-          body: params,
-          headers: { authorization: token },
-        })
-        .then(({ responseBody }) => responseBody),
-    );
-  }
 
   public getInclusionConnectedUsersToReview$(
     token: BackOfficeJwt,
@@ -89,6 +68,28 @@ export class HttpAdminGateway implements AdminGateway {
     return from(
       this.httpClient
         .getLastNotifications({ headers: { authorization: token } })
+        .then(({ responseBody }) => responseBody),
+    );
+  }
+
+  public login(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
+    return from(
+      this.httpClient
+        .login({ body: userAndPassword })
+        .then(({ responseBody }) => responseBody),
+    );
+  }
+
+  public updateUserRoleForAgency$(
+    params: IcUserRoleForAgencyParams,
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .updateUserRoleForAgency({
+          body: params,
+          headers: { authorization: token },
+        })
         .then(({ responseBody }) => responseBody),
     );
   }

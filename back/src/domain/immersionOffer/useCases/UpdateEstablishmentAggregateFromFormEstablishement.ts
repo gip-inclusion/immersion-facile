@@ -10,6 +10,8 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
+  inputSchema = formEstablishmentSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly addressAPI: AddressGateway,
@@ -18,8 +20,6 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = formEstablishmentSchema;
 
   public async _execute(
     formEstablishment: FormEstablishmentDto,

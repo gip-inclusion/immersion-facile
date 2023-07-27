@@ -216,6 +216,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         shortLinkId,
       );
     });
+
     it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and dedicated advisor", async () => {
       const userPeExternalId = "i-am-an-external-id";
       const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
@@ -268,6 +269,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         shortLinkId,
       );
     });
+
     it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
       const userPeExternalId = "i-am-an-external-id";
       const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {

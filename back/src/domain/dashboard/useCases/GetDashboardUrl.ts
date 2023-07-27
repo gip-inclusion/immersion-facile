@@ -4,14 +4,14 @@ import { UseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";
 
 export class GetDashboardUrl extends UseCase<GetDashboardParams, AbsoluteUrl> {
+  inputSchema = getDashboardParams;
+
   constructor(
     private dashboardGateway: DashboardGateway,
     private timeGateway: TimeGateway,
   ) {
     super();
   }
-
-  inputSchema = getDashboardParams;
 
   // eslint-disable-next-line @typescript-eslint/require-await
   public async _execute(params: GetDashboardParams): Promise<AbsoluteUrl> {

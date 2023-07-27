@@ -26,6 +26,8 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
   void,
   AbsoluteUrl
 > {
+  protected inputSchema = z.void();
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private uuidGenerator: UuidGenerator,
@@ -33,8 +35,6 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
   ) {
     super(uowPerformer);
   }
-
-  protected inputSchema = z.void();
 
   protected async _execute(_: void, uow: UnitOfWork): Promise<AbsoluteUrl> {
     const nonce = this.uuidGenerator.new();

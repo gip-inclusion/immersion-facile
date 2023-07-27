@@ -17,6 +17,7 @@ describe("toDotNotation utils", () => {
     };
     expect(toDotNotation(sample)).toStrictEqual(expected);
   });
+
   it("should transform a nested object to a flat object using dot notation on a form errors object", () => {
     const sample = {
       siret: localization.required,
@@ -32,6 +33,7 @@ describe("toDotNotation utils", () => {
     };
     expect(toDotNotation(sample)).toStrictEqual(expected);
   });
+
   it("should do nothing on a flat object", () => {
     const sample = {
       foo: "hey",

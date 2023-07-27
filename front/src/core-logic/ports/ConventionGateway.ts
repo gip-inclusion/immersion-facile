@@ -1,10 +1,9 @@
 import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  BackOfficeJwt,
   ConventionDto,
   ConventionId,
-  ConventionMagicLinkJwt,
+  ConventionJwt,
   ConventionReadDto,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -25,7 +24,7 @@ export interface ConventionGateway {
   updateConventionStatus$(
     params: UpdateConventionStatusRequestDto,
     conventionId: ConventionId,
-    jwt: ConventionMagicLinkJwt | BackOfficeJwt,
+    jwt: ConventionJwt,
   ): Observable<void>;
   signConvention$(jwt: string): Observable<void>;
   shareConventionLinkByEmail(

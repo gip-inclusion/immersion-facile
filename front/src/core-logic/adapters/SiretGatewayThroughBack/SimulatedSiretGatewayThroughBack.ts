@@ -18,22 +18,12 @@ import { SiretGatewayThroughBack } from "../../ports/SiretGatewayThroughBack";
 export class SimulatedSiretGatewayThroughBack
   implements SiretGatewayThroughBack
 {
-  public constructor(
+  constructor(
     private readonly simulatedLatency = 0,
     public sireneEstablishments: {
       [siret: SiretDto]: SiretEstablishmentDto;
     } = {},
   ) {}
-
-  public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
-    const response = this.simulatedResponse(siret);
-    const response$ = of(
-      response === "Establishment with this siret is already in our DB",
-    );
-    return this.simulatedLatency
-      ? response$.pipe(delay(this.simulatedLatency))
-      : response$;
-  }
 
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
     const response$ = of(this.simulatedResponse(siret));
@@ -46,6 +36,16 @@ export class SimulatedSiretGatewayThroughBack
     siret: SiretDto,
   ): Observable<GetSiretInfo> {
     return this.getSiretInfo(siret);
+  }
+
+  public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
+    const response = this.simulatedResponse(siret);
+    const response$ = of(
+      response === "Establishment with this siret is already in our DB",
+    );
+    return this.simulatedLatency
+      ? response$.pipe(delay(this.simulatedLatency))
+      : response$;
   }
 
   private simulatedResponse(rawSiret: SiretDto): GetSiretInfo {

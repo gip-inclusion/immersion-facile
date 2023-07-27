@@ -10,14 +10,14 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyRequestDto,
   void
 > {
+  inputSchema = updateAgencyRequestSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = updateAgencyRequestSchema;
 
   public async _execute(
     { status, id }: UpdateAgencyRequestDto,

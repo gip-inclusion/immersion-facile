@@ -296,6 +296,7 @@ describe("Convention slice", () => {
           );
           expectIsLoadingToBe(true);
         });
+
         it("fetches agency id successfully", () => {
           const agency = new AgencyDtoBuilder().build();
           store.dispatch(
@@ -308,6 +309,7 @@ describe("Convention slice", () => {
             kind: "idle",
           });
         });
+
         it("returns an error if fetches fail", () => {
           store.dispatch(
             conventionSlice.actions.preselectedAgencyIdRequested(),
@@ -323,6 +325,7 @@ describe("Convention slice", () => {
           });
         });
       });
+
       describe("isTutorEstablishmentRepresentative", () => {
         it("reflects formUi when get convention with tutor different from establishment representative", () => {
           const convention = new ConventionDtoBuilder()
@@ -359,6 +362,7 @@ describe("Convention slice", () => {
             },
           });
         });
+
         it("reflects formUi when get convention with tutor same as establishment representative", () => {
           const tutor: EstablishmentTutor = {
             email: "tutor@email.com",
@@ -409,6 +413,7 @@ describe("Convention slice", () => {
           });
         });
       });
+
       describe("isMinor", () => {
         it("reflects formUi when get convention with minor", () => {
           const convention = new ConventionDtoBuilder()
@@ -488,6 +493,7 @@ describe("Convention slice", () => {
           });
         });
       });
+
       describe("hasCurrentEmployer", () => {
         it("reflects formUi when we fetch a convention without current employer", () => {
           const convention = new ConventionDtoBuilder()

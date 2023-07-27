@@ -29,6 +29,34 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     private metabaseApiKey: string,
   ) {}
 
+  private createToken({
+    dashboard,
+    params = {},
+    now,
+  }: {
+    dashboard: MetabaseDashboard;
+    params?: Record<string, string[]>;
+    now: Date;
+  }): string {
+    const payload: MetabasePayload = {
+      resource: { [dashboard.kind]: dashboard.id },
+      params,
+      exp: Math.round(now.getTime() / 1000) + 60 * 30, // 30 minute expiration
+    };
+
+    return jwt.sign(payload, this.metabaseApiKey);
+  }
+
+  public getAgencyUserUrl(agencyIds: AgencyId[], now: Date): AbsoluteUrl {
+    const dashboard = dashboardByName.agency;
+    const token = this.createToken({
+      dashboard,
+      params: { filtrer_par_structure: agencyIds },
+      now,
+    });
+    return this.makeUrl(token, dashboard);
+  }
+
   public getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl {
     const dashboard = dashboardByName.conventionStatus;
     const token = this.createToken({
@@ -39,11 +67,10 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     return this.makeUrl(token, dashboard);
   }
 
-  public getAgencyUserUrl(agencyIds: AgencyId[], now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.agency;
+  public getDashboardUrl(dashboardName: DashboardName, now: Date): AbsoluteUrl {
+    const dashboard = dashboardByName[dashboardName];
     const token = this.createToken({
       dashboard,
-      params: { filtrer_par_structure: agencyIds },
       now,
     });
     return this.makeUrl(token, dashboard);
@@ -62,34 +89,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     return this.makeUrl(token, dashboard);
   }
 
-  public getDashboardUrl(dashboardName: DashboardName, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName[dashboardName];
-    const token = this.createToken({
-      dashboard,
-      now,
-    });
-    return this.makeUrl(token, dashboard);
-  }
-
   private makeUrl(token: string, { kind }: MetabaseDashboard): AbsoluteUrl {
     return `${this.metabaseUrl}/embed/${kind}/${token}#bordered=true&titled=true`;
-  }
-
-  private createToken({
-    dashboard,
-    params = {},
-    now,
-  }: {
-    dashboard: MetabaseDashboard;
-    params?: Record<string, string[]>;
-    now: Date;
-  }): string {
-    const payload: MetabasePayload = {
-      resource: { [dashboard.kind]: dashboard.id },
-      params,
-      exp: Math.round(now.getTime() / 1000) + 60 * 30, // 30 minute expiration
-    };
-
-    return jwt.sign(payload, this.metabaseApiKey);
   }
 }

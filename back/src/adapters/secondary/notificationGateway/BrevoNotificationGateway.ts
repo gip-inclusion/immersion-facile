@@ -42,6 +42,22 @@ const ONE_HOUR_MS = ONE_SECOND_MS * 3_600;
 
 // documentation https://developers.brevo.com/reference/sendtransacemail
 export class BrevoNotificationGateway implements NotificationGateway {
+  private readonly brevoHeaders: BrevoHeaders;
+
+  private emailLimiter = new Bottleneck({
+    reservoir: brevoMaxEmailRequestsPerSeconds,
+    reservoirRefreshInterval: ONE_SECOND_MS, // number of ms
+    reservoirRefreshAmount: brevoMaxEmailRequestsPerSeconds,
+  });
+
+  private smslimiter = new Bottleneck({
+    reservoir: brevoMaxSmsRequestsPerHours,
+    reservoirRefreshInterval: ONE_HOUR_MS, // number of ms
+    reservoirRefreshAmount: brevoMaxSmsRequestsPerHours,
+    minTime: 1000,
+    maxConcurrent: 1,
+  });
+
   constructor(
     private readonly httpClient: HttpClient<BrevoNotificationGatewayTargets>,
     private emailAllowListPredicate: (recipient: string) => boolean,
@@ -56,37 +72,12 @@ export class BrevoNotificationGateway implements NotificationGateway {
     };
   }
 
-  sendSms({ kind, params, recipientPhone }: TemplatedSms): Promise<void> {
-    logger.info(
-      {
-        phone: recipientPhone,
-      },
-      "sendTransactSmsTotal",
-    );
-
-    return this.sendTransacSms({
-      content: smsTemplatesByName[kind].createContent(params as any),
-      sender: "ImmerFacile",
-      recipient: recipientPhone,
-    })
-      .then((_response) =>
-        logger.info(
-          {
-            phone: recipientPhone,
-          },
-          "sendTransactSmsSuccess",
-        ),
-      )
-      .catch((error) => {
-        logger.error(
-          {
-            phone: recipientPhone,
-            error,
-          },
-          "sendTransactSmsError",
-        );
-        throw error;
-      });
+  private filterAllowListAndConvertToRecipients(
+    emails: string[] = [],
+  ): RecipientOrSender[] {
+    return emails
+      .filter(this.emailAllowListPredicate)
+      .map((email) => ({ email }));
   }
 
   public async getAttachmentContent(downloadToken: string): Promise<Buffer> {
@@ -169,12 +160,37 @@ export class BrevoNotificationGateway implements NotificationGateway {
       });
   }
 
-  private filterAllowListAndConvertToRecipients(
-    emails: string[] = [],
-  ): RecipientOrSender[] {
-    return emails
-      .filter(this.emailAllowListPredicate)
-      .map((email) => ({ email }));
+  sendSms({ kind, params, recipientPhone }: TemplatedSms): Promise<void> {
+    logger.info(
+      {
+        phone: recipientPhone,
+      },
+      "sendTransactSmsTotal",
+    );
+
+    return this.sendTransacSms({
+      content: smsTemplatesByName[kind].createContent(params as any),
+      sender: "ImmerFacile",
+      recipient: recipientPhone,
+    })
+      .then((_response) =>
+        logger.info(
+          {
+            phone: recipientPhone,
+          },
+          "sendTransactSmsSuccess",
+        ),
+      )
+      .catch((error) => {
+        logger.error(
+          {
+            phone: recipientPhone,
+            error,
+          },
+          "sendTransactSmsError",
+        );
+        throw error;
+      });
   }
 
   private async sendTransacEmail(body: SendTransactEmailRequestBody) {
@@ -194,20 +210,4 @@ export class BrevoNotificationGateway implements NotificationGateway {
       }),
     );
   }
-
-  private emailLimiter = new Bottleneck({
-    reservoir: brevoMaxEmailRequestsPerSeconds,
-    reservoirRefreshInterval: ONE_SECOND_MS, // number of ms
-    reservoirRefreshAmount: brevoMaxEmailRequestsPerSeconds,
-  });
-
-  private smslimiter = new Bottleneck({
-    reservoir: brevoMaxSmsRequestsPerHours,
-    reservoirRefreshInterval: ONE_HOUR_MS, // number of ms
-    reservoirRefreshAmount: brevoMaxSmsRequestsPerHours,
-    minTime: 1000,
-    maxConcurrent: 1,
-  });
-
-  private readonly brevoHeaders: BrevoHeaders;
 }

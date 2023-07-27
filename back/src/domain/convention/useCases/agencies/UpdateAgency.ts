@@ -8,14 +8,14 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class UpdateAgency extends TransactionalUseCase<AgencyDto> {
+  inputSchema = agencySchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = agencySchema;
 
   public async _execute(agency: AgencyDto, uow: UnitOfWork): Promise<void> {
     await uow.agencyRepository.update(agency).catch((error) => {

@@ -9,6 +9,65 @@ module.exports = {
   "import/no-unresolved": "off",
   "import/named": "off",
   "react/no-array-index-key": "warn",
+  "lines-between-class-members": ["error", "always"],
+  "jest-formatting/padding-around-describe-blocks": "error",
+  "jest-formatting/padding-around-test-blocks": "error",
+  "@typescript-eslint/explicit-member-accessibility": [
+    "warn",
+    {
+      accessibility: "explicit",
+      overrides: {
+        accessors: "explicit",
+        constructors: "no-public",
+        methods: "explicit",
+        properties: "explicit",
+        parameterProperties: "explicit",
+      },
+    },
+  ],
+  "no-restricted-syntax": [
+    "warn",
+    {
+      selector:
+        ':matches(PropertyDefinition, MethodDefinition)[accessibility="private"]',
+      message: "Use #private instead",
+    },
+  ],
+  "sort-class-members/sort-class-members": [
+    "error",
+    {
+      groups: {
+        "public-methods": [
+          {
+            type: "method",
+            private: false,
+            sort: "alphabetical",
+          },
+        ],
+        "public-properties": [
+          {
+            type: "property",
+            private: false,
+            sort: "alphabetical",
+          },
+        ],
+      },
+      order: [
+        "[static-methods]",
+        "[static-properties]",
+        "[public-properties]",
+        "[properties]",
+        "constructor",
+        "[public-methods]",
+        "[methods]",
+        "[arrow-function-properties]",
+        "[accessor-pairs]",
+        "[everything-else]",
+      ],
+      accessorPairPositioning: "getThenSet",
+      stopAfterFirstProblem: false,
+    },
+  ],
   "simple-import-sort/imports": [
     "error",
     {

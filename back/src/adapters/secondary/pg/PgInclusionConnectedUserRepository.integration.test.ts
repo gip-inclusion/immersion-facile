@@ -56,6 +56,7 @@ describe("PgInclusionConnectedUserRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM authenticated_users");
+    await client.query("DELETE FROM users__agencies");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
     icUserRepository = new PgInclusionConnectedUserRepository(client);
@@ -84,12 +85,17 @@ describe("PgInclusionConnectedUserRepository", () => {
       const userId = authenticatedUser1.id;
 
       // create the link between the user and the agencies
-      await client.query(
-        `INSERT INTO users__agencies VALUES 
-        ('${userId}', '${agency1.id}', 'toReview'),
-        ('${userId}', '${agency2.id}', 'validator');
-        `,
-      );
+
+      await insertAgencyRegistrationToUser({
+        agencyId: agency1.id,
+        userId,
+        role: "toReview",
+      });
+      await insertAgencyRegistrationToUser({
+        agencyId: agency2.id,
+        userId,
+        role: "validator",
+      });
 
       const inclusionConnectedUser = await icUserRepository.getById(
         authenticatedUser1.id,

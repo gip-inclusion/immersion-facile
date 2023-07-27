@@ -90,7 +90,7 @@ export interface EstablishmentAggregateRepository {
 export type ValuesToUpdateFromInseeApi = Partial<
   Pick<
     EstablishmentEntity,
-    "name" | "numberEmployeesRange" | "isActive" | "nafDto"
+    "name" | "numberEmployeesRange" | "isOpen" | "nafDto"
   >
 >;
 

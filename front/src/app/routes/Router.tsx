@@ -4,6 +4,7 @@ import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { AgencyDashboardPage } from "src/app/pages/AgencyDashboardPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
+import { ConventionManageInclusionConnectedPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
@@ -91,6 +92,9 @@ const getPageByRouteName: {
   immersionAssessment: (route) => <ImmersionAssessmentPage route={route} />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionAdmin: (route) => <ConventionManageAdminPage route={route} />,
+  manageConventionInclusionConnected: (route) => (
+    <ConventionManageInclusionConnectedPage route={route} />
+  ),
   manageConventionOld: (route) => <ConventionManagePage route={route} />,
   openApiDoc: () => <OpenApiDocPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,

@@ -146,6 +146,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
     });
   });
+
   it("doesn't return errored convention dashboard url when user has no agency of kind PE", async () => {
     const agencyBuilder = new AgencyDtoBuilder();
     const agency1 = agencyBuilder.withId("1111").withKind("cci").build();

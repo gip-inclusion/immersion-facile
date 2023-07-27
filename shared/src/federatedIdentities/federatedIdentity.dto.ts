@@ -1,3 +1,4 @@
+import { InclusionConnectJwt } from "../tokens/token.dto";
 import { Flavor } from "../typeFlavors";
 
 export type FederatedIdentityProvider =
@@ -35,10 +36,9 @@ export const isPeConnectIdentity = (
 ): federatedIdentity is PeConnectIdentity =>
   federatedIdentity?.provider === "peConnect";
 
-export type InclusionConnectToken = Flavor<string, "InclusionConnectToken">;
 export type InclusionConnectIdentity = GenericFederatedIdentity<
   "inclusionConnect",
-  InclusionConnectToken
+  InclusionConnectJwt
 >;
 
 export type FederatedIdentity = InclusionConnectIdentity | PeConnectIdentity;

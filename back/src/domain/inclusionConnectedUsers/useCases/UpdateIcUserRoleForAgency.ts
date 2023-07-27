@@ -19,14 +19,14 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   void,
   BackOfficeJwtPayload
 > {
+  inputSchema = icUserRoleForAgencyParamsSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
-
-  inputSchema = icUserRoleForAgencyParamsSchema;
 
   protected async _execute(
     params: IcUserRoleForAgencyParams,

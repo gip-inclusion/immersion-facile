@@ -81,6 +81,7 @@ describe("/admin router", () => {
       expect(response.body).toBe("http://stubAgencyDashboard/my-agency-id");
       expect(response.status).toBe(200);
     });
+
     it("Fails to get the absolute Url of the agency dashboard when no agencyId is provided", async () => {
       const response = await request
         .get(
@@ -137,6 +138,7 @@ describe("/admin router", () => {
         makeBooleanFeatureFlag(false),
       );
     });
+
     it("sets the feature flag to given value if token is valid with value", async () => {
       const initialFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,

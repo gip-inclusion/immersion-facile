@@ -24,6 +24,52 @@ export class PgNotificationRepository implements NotificationRepository {
     private maxRetrievedNotifications: number = 30,
   ) {}
 
+  async deleteAllEmailAttachements(): Promise<number> {
+    const deletedContent = "deleted-content";
+    const response = await this.client.query(
+      `
+      UPDATE notifications_email_attachments
+        SET attachment = jsonb_set(attachment::jsonb, '{content}', '"${deletedContent}"')
+        WHERE attachment::jsonb ->> 'content' != '${deletedContent}';
+      `,
+    );
+    return response.rowCount;
+  }
+
+  async getByIdAndKind(
+    id: NotificationId,
+    kind: NotificationKind,
+  ): Promise<Notification | undefined> {
+    switch (kind) {
+      case "sms":
+        return this.getSmsNotificationById(id);
+      case "email":
+        return this.getEmailNotificationById(id);
+      default:
+        exhaustiveCheck(kind, {
+          variableName: "notificationKind",
+          throwIfReached: true,
+        });
+    }
+  }
+
+  private async getEmailNotificationById(
+    id: NotificationId,
+  ): Promise<EmailNotification> {
+    const response = await this.client.query(
+      `
+        SELECT ${buildEmailNotificationObject} as notif
+        FROM notifications_email e
+        LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
+        LEFT JOIN notifications_email_attachments a ON a.notifications_email_id = e.id
+        WHERE e.id = $1
+        GROUP BY e.id
+          `,
+      [id],
+    );
+    return response.rows[0]?.notif;
+  }
+
   async getEmailsByFilters({
     since,
     emailKind,
@@ -72,21 +118,91 @@ export class PgNotificationRepository implements NotificationRepository {
     return response.rows.map((row) => row.notif);
   }
 
-  async getByIdAndKind(
+  async getLastNotifications(): Promise<NotificationsByKind> {
+    const smsResponse = await this.client.query(
+      `
+        SELECT ${buildSmsNotificationObject} as notif
+        FROM notifications_sms
+        ORDER BY created_at DESC
+        LIMIT $1
+          `,
+      [this.maxRetrievedNotifications],
+    );
+
+    return {
+      emails: await this.getEmailsByFilters(),
+      sms: smsResponse.rows.map((row) => row.notif),
+    };
+  }
+
+  private async getSmsNotificationById(
     id: NotificationId,
-    kind: NotificationKind,
-  ): Promise<Notification | undefined> {
-    switch (kind) {
-      case "sms":
-        return this.getSmsNotificationById(id);
-      case "email":
-        return this.getEmailNotificationById(id);
-      default:
-        exhaustiveCheck(kind, {
-          variableName: "notificationKind",
-          throwIfReached: true,
-        });
+  ): Promise<SmsNotification> {
+    const response = await this.client.query(
+      `
+          SELECT ${buildSmsNotificationObject} as notif
+        FROM notifications_sms
+        WHERE id = $1
+          `,
+      [id],
+    );
+    return response.rows[0]?.notif;
+  }
+
+  private async insertEmailAttachments({
+    id,
+    templatedContent: { attachments },
+  }: EmailNotification) {
+    if (!attachments || attachments.length === 0) return;
+    if (attachments.length > 0) {
+      const query = `INSERT INTO notifications_email_attachments (notifications_email_id, attachment) VALUES %L`;
+      const values = attachments.map((attachment) => [id, attachment]);
+      await this.client.query(format(query, values)).catch((error) => {
+        logger.error(
+          { query, values, error },
+          "PgNotificationRepository_insertEmailAttachments_QueryErrored",
+        );
+        throw error;
+      });
     }
+  }
+
+  private async insertEmailRecipients(
+    recipientKind: "to" | "cc",
+    { id, templatedContent }: EmailNotification,
+  ) {
+    const values = recipientsByKind(id, recipientKind, templatedContent);
+    if (values.length > 0) {
+      const query = `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L`;
+      await this.client.query(format(query, values)).catch((error) => {
+        logger.error(
+          { query, values, error },
+          `PgNotificationRepository_insertEmailRecipients_${recipientKind}_QueryErrored`,
+        );
+        throw error;
+      });
+    }
+  }
+
+  private async insertNotificationEmail({
+    id,
+    createdAt,
+    followedIds,
+    templatedContent,
+  }: EmailNotification) {
+    const query = `
+    INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email, sender_email, sender_name)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+  `;
+    // prettier-ignore
+    const values = [id, templatedContent.kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, templatedContent.params, templatedContent.replyTo?.name, templatedContent.replyTo?.email, templatedContent.sender?.email, templatedContent.sender?.name];
+    await this.client.query(query, values).catch((error) => {
+      logger.error(
+        { query, values, error },
+        "PgNotificationRepository_insertNotificationEmail_QueryErrored",
+      );
+      throw error;
+    });
   }
 
   async save(notification: Notification): Promise<void> {
@@ -114,16 +230,11 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
-  async deleteAllEmailAttachements(): Promise<number> {
-    const deletedContent = "deleted-content";
-    const response = await this.client.query(
-      `
-      UPDATE notifications_email_attachments
-        SET attachment = jsonb_set(attachment::jsonb, '{content}', '"${deletedContent}"')
-        WHERE attachment::jsonb ->> 'content' != '${deletedContent}';
-      `,
-    );
-    return response.rowCount;
+  private async saveEmailNotification(notification: EmailNotification) {
+    await this.insertNotificationEmail(notification);
+    await this.insertEmailRecipients("to", notification);
+    await this.insertEmailRecipients("cc", notification);
+    await this.insertEmailAttachments(notification);
   }
 
   private async saveSmsNotification(
@@ -144,117 +255,6 @@ export class PgNotificationRepository implements NotificationRepository {
       // prettier-ignore
       [ id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params ],
     );
-  }
-
-  private async saveEmailNotification(notification: EmailNotification) {
-    await this.insertNotificationEmail(notification);
-    await this.insertEmailRecipients("to", notification);
-    await this.insertEmailRecipients("cc", notification);
-    await this.insertEmailAttachments(notification);
-  }
-
-  private async insertNotificationEmail({
-    id,
-    createdAt,
-    followedIds,
-    templatedContent,
-  }: EmailNotification) {
-    const query = `
-    INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email, sender_email, sender_name)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-  `;
-    // prettier-ignore
-    const values = [id, templatedContent.kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, templatedContent.params, templatedContent.replyTo?.name, templatedContent.replyTo?.email, templatedContent.sender?.email, templatedContent.sender?.name];
-    await this.client.query(query, values).catch((error) => {
-      logger.error(
-        { query, values, error },
-        "PgNotificationRepository_insertNotificationEmail_QueryErrored",
-      );
-      throw error;
-    });
-  }
-
-  private async insertEmailRecipients(
-    recipientKind: "to" | "cc",
-    { id, templatedContent }: EmailNotification,
-  ) {
-    const values = recipientsByKind(id, recipientKind, templatedContent);
-    if (values.length > 0) {
-      const query = `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L`;
-      await this.client.query(format(query, values)).catch((error) => {
-        logger.error(
-          { query, values, error },
-          `PgNotificationRepository_insertEmailRecipients_${recipientKind}_QueryErrored`,
-        );
-        throw error;
-      });
-    }
-  }
-
-  private async insertEmailAttachments({
-    id,
-    templatedContent: { attachments },
-  }: EmailNotification) {
-    if (!attachments || attachments.length === 0) return;
-    if (attachments.length > 0) {
-      const query = `INSERT INTO notifications_email_attachments (notifications_email_id, attachment) VALUES %L`;
-      const values = attachments.map((attachment) => [id, attachment]);
-      await this.client.query(format(query, values)).catch((error) => {
-        logger.error(
-          { query, values, error },
-          "PgNotificationRepository_insertEmailAttachments_QueryErrored",
-        );
-        throw error;
-      });
-    }
-  }
-
-  private async getSmsNotificationById(
-    id: NotificationId,
-  ): Promise<SmsNotification> {
-    const response = await this.client.query(
-      `
-          SELECT ${buildSmsNotificationObject} as notif
-        FROM notifications_sms
-        WHERE id = $1
-          `,
-      [id],
-    );
-    return response.rows[0]?.notif;
-  }
-
-  private async getEmailNotificationById(
-    id: NotificationId,
-  ): Promise<EmailNotification> {
-    const response = await this.client.query(
-      `
-        SELECT ${buildEmailNotificationObject} as notif
-        FROM notifications_email e
-        LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
-        LEFT JOIN notifications_email_attachments a ON a.notifications_email_id = e.id
-        WHERE e.id = $1
-        GROUP BY e.id
-          `,
-      [id],
-    );
-    return response.rows[0]?.notif;
-  }
-
-  async getLastNotifications(): Promise<NotificationsByKind> {
-    const smsResponse = await this.client.query(
-      `
-        SELECT ${buildSmsNotificationObject} as notif
-        FROM notifications_sms
-        ORDER BY created_at DESC
-        LIMIT $1
-          `,
-      [this.maxRetrievedNotifications],
-    );
-
-    return {
-      emails: await this.getEmailsByFilters(),
-      sms: smsResponse.rows.map((row) => row.notif),
-    };
   }
 }
 

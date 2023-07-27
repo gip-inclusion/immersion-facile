@@ -8,6 +8,7 @@ import {
   DateIntervalDto,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
+  Weekday,
 } from "shared";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";
@@ -16,11 +17,13 @@ import "./SchedulePicker.css";
 type SchedulePickerProps = {
   disabled?: boolean;
   interval: DateIntervalDto;
+  excludedDays: Weekday[];
 };
 
 export const SchedulePicker = ({
   interval,
   disabled,
+  excludedDays,
 }: SchedulePickerProps): JSX.Element => {
   const name: keyof ConventionDto = "schedule";
   const {
@@ -31,8 +34,8 @@ export const SchedulePicker = ({
   const values = getValues();
   const onBoolRadioPickerChange = (isSimple: boolean): void => {
     const newScheduleValue = isSimple
-      ? reasonableSchedule(interval, [])
-      : scheduleWithFirstDayActivity(interval);
+      ? reasonableSchedule(interval, excludedDays, [])
+      : scheduleWithFirstDayActivity(interval, excludedDays);
     setValue(name, newScheduleValue);
   };
   const error = errors[name];

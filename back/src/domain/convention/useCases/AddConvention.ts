@@ -2,7 +2,7 @@ import {
   ConventionDtoWithoutExternalId,
   ConventionStatus,
   conventionWithoutExternalIdSchema,
-  WithConventionId,
+  WithConventionIdLegacy,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -13,8 +13,10 @@ import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAn
 
 export class AddConvention extends TransactionalUseCase<
   ConventionDtoWithoutExternalId,
-  WithConventionId
+  WithConventionIdLegacy
 > {
+  inputSchema = conventionWithoutExternalIdSchema;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
@@ -23,12 +25,10 @@ export class AddConvention extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = conventionWithoutExternalIdSchema;
-
   public async _execute(
     createConventionParams: ConventionDtoWithoutExternalId,
     uow: UnitOfWork,
-  ): Promise<WithConventionId> {
+  ): Promise<WithConventionIdLegacy> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
     if (

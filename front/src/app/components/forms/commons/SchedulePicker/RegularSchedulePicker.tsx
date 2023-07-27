@@ -30,6 +30,11 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const { setValue, getValues } = useFormContext<ConventionReadDto>();
   const values = getValues();
+  const dayPeriods = dayPeriodsFromComplexSchedule(
+    values.schedule.complexSchedule,
+    props.interval.start,
+  );
+
   return (
     <>
       <div
@@ -47,10 +52,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
         >
           <WeekdayPicker
             name={name}
-            dayPeriods={dayPeriodsFromComplexSchedule(
-              values.schedule.complexSchedule,
-              props.interval.start,
-            )}
+            dayPeriods={dayPeriods}
             onValueChange={(dayPeriods: DayPeriodsDto) => {
               values.schedule = new ScheduleDtoBuilder(values.schedule)
                 .withDateInterval(props.interval)
@@ -61,6 +63,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
                 .build();
               setValue(name, values.schedule);
             }}
+            maxDay={values.internshipKind === "mini-stage-cci" ? 5 : 6}
             interval={props.interval}
             disabled={props.disabled}
           />

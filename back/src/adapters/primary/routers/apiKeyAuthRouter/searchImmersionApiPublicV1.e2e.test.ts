@@ -34,6 +34,7 @@ describe("search-immersion route", () => {
           )
           .expect(401, { error: "forbidden: unauthenticated" });
       });
+
       it("rejects unauthorized consumer", async () => {
         await request
           .get(
@@ -48,6 +49,7 @@ describe("search-immersion route", () => {
           });
       });
     });
+
     describe("authenficated consumer", () => {
       it("with given rome and position", async () => {
         const immersionOffer = new ImmersionOfferEntityV2Builder()
@@ -102,6 +104,7 @@ describe("search-immersion route", () => {
         ] satisfies SearchImmersionResultPublicV1[]);
         expect(response.status).toBe(200);
       });
+
       it("accept address with only city", async () => {
         const response = await request
           .get(
@@ -113,6 +116,7 @@ describe("search-immersion route", () => {
           );
         expect(response.status).toBe(200);
       });
+
       it("with no specified rome", async () => {
         await request
           .get(
@@ -124,6 +128,7 @@ describe("search-immersion route", () => {
           )
           .expect(200, []);
       });
+
       it("with filter voluntaryToImmersion", async () => {
         await request
           .get(

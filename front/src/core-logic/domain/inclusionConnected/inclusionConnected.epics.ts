@@ -9,6 +9,15 @@ import {
 
 type InclusionConnectedAction = ActionOfSlice<typeof inclusionConnectedSlice>;
 
+const federatedIdentityFoundInDeviceEpic: AppEpic<InclusionConnectedAction> = (
+  action$,
+) =>
+  action$.pipe(
+    filter(authSlice.actions.federatedIdentityFoundInDevice.match),
+    filter((action) => action.payload?.provider === "inclusionConnect"),
+    map(() => inclusionConnectedSlice.actions.currentUserFetchRequested()),
+  );
+
 const getCurrentUserEpic: AppEpic<InclusionConnectedAction> = (
   action$,
   state$,
@@ -49,7 +58,9 @@ const registerAgenciesEpic: AppEpic<InclusionConnectedAction> = (
       inclusionConnectedSlice.actions.registerAgenciesFailed(error?.message),
     ),
   );
+
 export const inclusionConnectedEpics = [
   getCurrentUserEpic,
   registerAgenciesEpic,
+  federatedIdentityFoundInDeviceEpic,
 ];

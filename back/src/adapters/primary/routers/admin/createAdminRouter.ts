@@ -48,7 +48,10 @@ export const createAdminRouter = (
     .route(removeRouterPrefix(adminTargets.getConventionById.url))
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getConvention.execute(req.params),
+        deps.useCases.getConvention.execute(
+          { conventionId: req.params.id },
+          req.payloads?.backOffice,
+        ),
       ),
     );
 

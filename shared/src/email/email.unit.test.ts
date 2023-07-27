@@ -15,6 +15,7 @@ describe("email schemas validation", () => {
       "bidule.truc@sousdomaine.dom-haine.fr",
       "machin.truc@sous-domaine.domhaine.fr",
     ];
+
     it.each(validEmailsSet)("email address %s should be valid", (email) => {
       expect(emailSchema.parse(email)).toBe(email);
     });

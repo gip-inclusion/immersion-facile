@@ -7,10 +7,10 @@ import {
 export class TestImmersionAssessmentGateway
   implements ImmersionAssessmentGateway
 {
+  // test purpose
+  public creationResponse$ = new Subject<void>();
+
   createAssessment(_params: AssessmentAndJwt): Observable<void> {
     return this.creationResponse$;
   }
-
-  // test purpose
-  public creationResponse$ = new Subject<void>();
 }

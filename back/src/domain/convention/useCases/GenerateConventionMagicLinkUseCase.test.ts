@@ -39,6 +39,7 @@ describe("Generate magic links", () => {
         ),
       });
     });
+
     it("Decode convention magic link", async () => {
       const request: GenerateMagicLinkRequestDto = {
         applicationId: "20f44402-80f9-42ad-9f53-9353cb2629ee",
