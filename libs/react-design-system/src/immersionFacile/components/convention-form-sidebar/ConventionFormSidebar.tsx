@@ -4,15 +4,17 @@ import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ConventionFormSidebar.styles";
 
-export const ConventionFormSidebar = ({
-  sidebarContent,
-  currentStep,
-  sidebarFooter,
-}: {
+export type ConventionFormSidebarProperties = {
   currentStep: number;
   sidebarContent: Record<string, React.ReactNode>[];
   sidebarFooter?: React.ReactNode;
-}) => {
+};
+
+export const ConventionFormSidebar = ({
+  currentStep,
+  sidebarContent,
+  sidebarFooter,
+}: ConventionFormSidebarProperties) => {
   const { cx } = useStyles();
   const maxSteps = sidebarContent.length;
   const stepNumberToStepIndex = (stepNumber: number) => stepNumber - 1;
