@@ -98,21 +98,7 @@ export const ConventionSignForm = ({
   };
   if (alreadySigned) {
     return (
-      <>
-        <div
-          className={fr.cx(
-            "fr-grid-row",
-            "fr-grid-row--center",
-            "fr-grid-row--middle",
-            "fr-mb-7v",
-          )}
-        >
-          <strong className={fr.cx("fr-h5")}>
-            Identifiant de votre convention : {convention.id}
-          </strong>
-        </div>
-        <Alert {...t.conventionAlreadySigned} severity="success" />
-      </>
+      <Alert {...t.conventionAlreadySigned(convention.id)} severity="success" />
     );
   }
   return (

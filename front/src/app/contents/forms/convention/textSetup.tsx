@@ -1,6 +1,6 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { InternshipKind } from "shared";
+import { ConventionId, InternshipKind } from "shared";
 
 export const useConventionTexts = (internshipKind: InternshipKind) =>
   immersionTexts(internshipKind);
@@ -167,14 +167,13 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     validationText:
       "Une fois le formulaire envoyé, vous allez recevoir une demande de confirmation par mail et l'entreprise également",
   },
-  conventionAlreadySigned: {
+  conventionAlreadySigned: (conventionId: ConventionId) => ({
     title:
       internshipKind === "immersion"
         ? "Vous avez signé cette convention."
         : "Vous avez signé cette demande de stage.",
-    description:
-      "Vous recevrez un e-mail de confirmation lorsque toutes les parties auront signé et validé la convention.",
-  },
+    description: `Vous recevrez un e-mail de confirmation lorsque toutes les parties auront signé et validé la convention (${conventionId})`,
+  }),
   conventionReadyToBeSigned: {
     title:
       internshipKind === "immersion"
