@@ -102,10 +102,23 @@ export const SignatureActions = ({
         className="im-signature-actions__checkbox"
         options={[
           {
-            label: `Je, soussigné ${signatoryFullName} (${signatoryFunction})
-            m'engage à avoir pris connaissance des dispositions réglementaires ${
-              internshipKind === "immersion" ? "de la PMSMP" : "du mini stage"
-            } et à les respecter *`,
+            label: (
+              <>
+                Je, soussigné {signatoryFullName} ({signatoryFunction}) m'engage
+                à avoir pris connaissance des{" "}
+                <a
+                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/?bust=1690274462053"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  dispositions réglementaires
+                </a>
+                {internshipKind === "immersion"
+                  ? " de la PMSMP"
+                  : "du mini stage"}{" "}
+                et à les respecter *
+              </>
+            ),
             nativeInputProps: {
               ...register(fieldName),
               defaultChecked: false,
