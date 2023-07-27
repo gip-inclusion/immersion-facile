@@ -640,7 +640,21 @@ export const sidebarStepContent = (
       },
       {
         title: "Détails de l'immersion professionnelle",
-        description: <></>,
+        description: (
+          <p>
+            <strong>
+              Consultez les{" "}
+              <a
+                href="https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/?bust=1690274462053"
+                rel="noreferrer"
+                target="_blank"
+              >
+                conditions réglementaires
+              </a>
+              applicables aux immersions
+            </strong>
+          </p>
+        ),
       },
     ],
     "mini-stage-cci": [
