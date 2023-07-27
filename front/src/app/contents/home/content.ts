@@ -292,9 +292,9 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/",
     },
     {
-      title: "Comment trouver une entreprise accueillante ?",
-      description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur les boutons "Vous êtes candidat pour une immersion" puis "Trouver une entreprise accueillante"...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
+      title: "Quelles sont les obligations à respecter pour une immersion ?",
+      description: `Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
     },
   ],
   establishment: [
