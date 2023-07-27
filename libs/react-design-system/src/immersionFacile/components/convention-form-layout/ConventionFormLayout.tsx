@@ -3,13 +3,15 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ConventionFormLayout.styles";
 
+export type ConventionFormLayoutProperties = {
+  form: React.ReactNode;
+  sidebar: React.ReactNode;
+};
+
 export const ConventionFormLayout = ({
   form,
   sidebar,
-}: {
-  form: React.ReactNode;
-  sidebar: React.ReactNode;
-}) => {
+}: ConventionFormLayoutProperties) => {
   const { cx } = useStyles();
   return (
     <>
