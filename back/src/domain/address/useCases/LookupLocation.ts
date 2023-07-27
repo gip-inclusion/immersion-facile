@@ -1,5 +1,5 @@
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   LookupSearchResult,
   WithLookupLocationInputQueryParams,
   withLookupLocationInputQueryParamsSchema,
@@ -19,7 +19,7 @@ export class LookupLocation extends UseCase<
 
   protected _execute(
     params: WithLookupLocationInputQueryParams,
-    _jwtPayload?: ConventionMagicLinkPayload | undefined,
+    _jwtPayload?: ConventionJwtPayload | undefined,
   ): Promise<LookupSearchResult[]> {
     return this.addressApiGateway.lookupLocationName(params.query);
   }

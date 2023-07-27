@@ -25,7 +25,7 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
   it("Throws 401 if Jwt is generated from wrong private key", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
     const { request } = await buildTestApp();
-    const generateJwtWithWrongKey = makeGenerateJwtES256<"editEstablishment">(
+    const generateJwtWithWrongKey = makeGenerateJwtES256<"establishment">(
       config.apiJwtPrivateKey,
       undefined,
     ); // Private Key is the wrong one !
@@ -61,7 +61,7 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
   it("Throws 401 if Jwt is expired", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
     const { request, gateways } = await buildTestApp();
-    const generateJwtWithWrongKey = makeGenerateJwtES256<"editEstablishment">(
+    const generateJwtWithWrongKey = makeGenerateJwtES256<"establishment">(
       config.apiJwtPrivateKey,
       undefined,
     ); // Private Key is the wrong one !

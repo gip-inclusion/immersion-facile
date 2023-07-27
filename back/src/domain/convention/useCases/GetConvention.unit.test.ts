@@ -2,7 +2,8 @@ import {
   AgencyDtoBuilder,
   BackOfficeJwtPayload,
   ConventionDtoBuilder,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
+  currentJwtVersions,
   expectPromiseToFailWithError,
   expectToEqual,
   InclusionConnectDomainJwtPayload,
@@ -48,7 +49,7 @@ describe("Get Convention", () => {
           getConvention.execute({ conventionId: convention.id }, {
             role: "establishment",
             applicationId: "not-matching-convention-id",
-          } as ConventionMagicLinkPayload),
+          } as ConventionJwtPayload),
           new ForbiddenError(
             `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment'`,
           ),
@@ -84,10 +85,15 @@ describe("Get Convention", () => {
     describe("Not found error", () => {
       it("When the Convention does not exist", async () => {
         await expectPromiseToFailWithError(
-          getConvention.execute({ conventionId: convention.id }, {
-            role: "establishment",
-            applicationId: convention.id,
-          } as ConventionMagicLinkPayload),
+          getConvention.execute(
+            { conventionId: convention.id },
+            {
+              role: "establishment",
+              applicationId: convention.id,
+              emailHash: "",
+              version: currentJwtVersions.convention,
+            },
+          ),
           new NotFoundError(`No convention found with id ${convention.id}`),
         );
       });
@@ -139,7 +145,7 @@ describe("Get Convention", () => {
     });
 
     it("with ConventionMagicLinkPayload", async () => {
-      const payload: ConventionMagicLinkPayload = {
+      const payload: ConventionJwtPayload = {
         role: "establishment",
         emailHash: "",
         applicationId: convention.id,

@@ -1,9 +1,9 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import {
-  ConventionJwt,
   ConventionReadDto,
   ConventionStatus,
+  ConventionSupportedJwt,
   Role,
   statusTransitionConfigs,
   UpdateConventionStatusRequestDto,
@@ -18,7 +18,7 @@ import {
 } from "src/core-logic/domain/convention/convention.slice";
 
 type ConventionManageActionsProps = {
-  jwt: ConventionJwt;
+  jwt: ConventionSupportedJwt;
   convention: ConventionReadDto;
   role: Role;
   submitFeedback: ConventionSubmitFeedback;

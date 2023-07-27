@@ -11,7 +11,7 @@ import { withValidateHeadersAuthorization } from "../headers";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { adminLogin } from "../routes/routes";
-import { adminTokenSchema } from "../tokens/token.schema";
+import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
 import {
   icUserRoleForAgencyParamsSchema,
   userAndPasswordSchema,
@@ -24,7 +24,7 @@ export const adminTargets = createTargets({
     method: "POST",
     url: `/admin/${adminLogin}`,
     validateRequestBody: userAndPasswordSchema.parse,
-    validateResponseBody: adminTokenSchema.parse,
+    validateResponseBody: backOfficeJwtSchema.parse,
   }),
   getDashboardUrl: createTarget({
     method: "GET",

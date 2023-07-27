@@ -1,4 +1,5 @@
 import { SuperTest, Test } from "supertest";
+import { match } from "ts-pattern";
 import {
   adminTargets,
   AgencyDtoBuilder,
@@ -6,13 +7,11 @@ import {
   BackOfficeJwtPayload,
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionMagicLinkPayload,
   conventionMagicLinkTargets,
   createConventionMagicLinkPayload,
   currentJwtVersions,
   expectToEqual,
   InclusionConnectedUser,
-  InclusionConnectJwtPayload,
   stringToMd5,
   unauthenticatedConventionTargets,
   UpdateConventionRequestDto,
@@ -23,9 +22,9 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import {
-  GenerateAuthenticatedUserJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
+  GenerateInclusionConnectJwt,
 } from "../../../../domain/auth/jwt";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import {
@@ -38,7 +37,7 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 let request: SuperTest<Test>;
 let generateConventionJwt: GenerateConventionJwt;
 let generateBackOfficeJwt: GenerateBackOfficeJwt;
-let generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
+let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 let inMemoryUow: InMemoryUnitOfWork;
 let eventCrawler: BasicEventCrawler;
 let gateways: InMemoryGateways;
@@ -64,7 +63,7 @@ const initializeSystemUnderTest = async (
     request,
     generateConventionJwt,
     generateBackOfficeJwt,
-    generateAuthenticatedUserJwt,
+    generateInclusionConnectJwt,
     inMemoryUow,
   } = await buildTestApp(config));
 
@@ -141,18 +140,60 @@ describe("convention e2e", () => {
             .expect(200, { id: convention.id });
         });
 
-        it("succeeds with JWT ConventionMagicLinkPayload", async () => {
-          const payload: ConventionMagicLinkPayload = {
-            applicationId: convention.id,
-            role: "beneficiary",
-            emailHash: stringToMd5(convention.signatories.beneficiary.email),
-            iat: Math.round(now.getTime() / 1000),
-            exp: Math.round(now.getTime() / 1000) + 31 * 24 * 3600,
-            version: currentJwtVersions.convention,
+        it.each([
+          "ConventionJwt",
+          "BackOfficeJwt",
+          "InclusionConnectJwt",
+        ] as const)("succeeds with JWT %s", async (scenario) => {
+          const agency = new AgencyDtoBuilder().build();
+          const convention = new ConventionDtoBuilder()
+            .withAgencyId(agency.id)
+            .build();
+          const user: InclusionConnectedUser = {
+            id: "my-user-id",
+            email: "my-user@email.com",
+            firstName: "John",
+            lastName: "Doe",
+            agencyRights: [{ role: "validator", agency }],
           };
-          const jwt = generateConventionJwt(payload);
+          inMemoryUow.agencyRepository.setAgencies([agency]);
+          inMemoryUow.conventionRepository.setConventions({
+            [convention.id]: convention,
+          });
+          inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
+            [user],
+          );
 
-          // GETting the created convention succeeds.
+          const jwt = match(scenario)
+            .with("ConventionJwt", () =>
+              generateConventionJwt({
+                applicationId: convention.id,
+                role: "beneficiary",
+                emailHash: stringToMd5(
+                  convention.signatories.beneficiary.email,
+                ),
+                iat: Math.round(now.getTime() / 1000),
+                exp: Math.round(now.getTime() / 1000) + 31 * 24 * 3600,
+                version: currentJwtVersions.convention,
+              }),
+            )
+            .with("BackOfficeJwt", () =>
+              generateBackOfficeJwt({
+                role: "backOffice",
+                sub: "",
+                version: 1,
+                iat: Math.round(now.getTime() / 1000),
+              }),
+            )
+            .with("InclusionConnectJwt", () =>
+              generateInclusionConnectJwt({
+                userId: user.id,
+                version: currentJwtVersions.inclusion,
+                iat: Math.round(now.getTime() / 1000),
+              }),
+            )
+            .exhaustive();
+
           const response = await request
             .get(
               conventionMagicLinkTargets.getConvention.url.replace(
@@ -167,80 +208,6 @@ describe("convention e2e", () => {
             agencyDepartment: TEST_AGENCY_DEPARTMENT,
           });
           expect(response.status).toBe(200);
-        });
-
-        it("succeeds with JWT BackOfficeJwtPayload", async () => {
-          const payload: BackOfficeJwtPayload = {
-            role: "backOffice",
-            sub: "",
-            version: 1,
-            iat: Math.round(now.getTime() / 1000),
-          };
-          const jwt = generateBackOfficeJwt(payload);
-
-          // GETting the created convention succeeds.
-          const response = await request
-            .get(
-              conventionMagicLinkTargets.getConvention.url.replace(
-                ":conventionId",
-                convention.id,
-              ),
-            )
-            .set("Authorization", jwt);
-
-          expectToEqual(response.body, {
-            ...convention,
-            agencyName: TEST_AGENCY_NAME,
-            agencyDepartment: TEST_AGENCY_DEPARTMENT,
-          });
-          expectToEqual(response.status, 200);
-        });
-
-        it("succeeds with JWT InclusionConnectedJwtPayload", async () => {
-          const agency = new AgencyDtoBuilder().build();
-          const convention = new ConventionDtoBuilder()
-            .withAgencyId(agency.id)
-            .build();
-          inMemoryUow.agencyRepository.setAgencies([agency]);
-          inMemoryUow.conventionRepository.setConventions({
-            [convention.id]: convention,
-          });
-
-          const user: InclusionConnectedUser = {
-            id: "my-user-id",
-            email: "my-user@email.com",
-            firstName: "John",
-            lastName: "Doe",
-            agencyRights: [{ role: "validator", agency }],
-          };
-          inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
-            [user],
-          );
-
-          const payload: InclusionConnectJwtPayload = {
-            userId: user.id,
-            version: currentJwtVersions.inclusion,
-            iat: Math.round(now.getTime() / 1000),
-          };
-
-          const jwt = generateAuthenticatedUserJwt(payload);
-
-          // GETting the created convention succeeds.
-          const response = await request
-            .get(
-              conventionMagicLinkTargets.getConvention.url.replace(
-                ":conventionId",
-                convention.id,
-              ),
-            )
-            .set("Authorization", jwt);
-
-          expectToEqual(response.body, {
-            ...convention,
-            agencyName: TEST_AGENCY_NAME,
-            agencyDepartment: TEST_AGENCY_DEPARTMENT,
-          });
-          expectToEqual(response.status, 200);
         });
 
         it("redirects expired magic links to a renewal page", async () => {
@@ -324,97 +291,99 @@ describe("convention e2e", () => {
         expect(result.status).toBe(200);
       });
 
-      it("Fetching unknown convention IDs fails with 404 Not Found", async () => {
-        const unknownId = "add5c20e-6dd2-45af-affe-927358005251";
-        const jwt = generateConventionJwt(
-          createConventionMagicLinkPayload({
-            id: unknownId,
-            role: "beneficiary",
-            email: "some email",
-            now,
-          }),
-        );
-        const response = await request
-          .get(
-            conventionMagicLinkTargets.getConvention.url.replace(
-              ":conventionId",
-              unknownId,
-            ),
-          )
-          .set("Authorization", jwt);
-        expect(response.body).toEqual({
-          errors:
-            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+      describe("wrong paths", () => {
+        it("404 Not Found - Fetching unknown convention IDs", async () => {
+          const unknownId = "add5c20e-6dd2-45af-affe-927358005251";
+          const jwt = generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: unknownId,
+              role: "beneficiary",
+              email: "some email",
+              now,
+            }),
+          );
+          const response = await request
+            .get(
+              conventionMagicLinkTargets.getConvention.url.replace(
+                ":conventionId",
+                unknownId,
+              ),
+            )
+            .set("Authorization", jwt);
+          expect(response.body).toEqual({
+            errors:
+              "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+          });
+          expect(response.status).toBe(404);
+
+          const adminResponse = await request
+            .get(adminTargets.getConventionById.url.replace(":id", unknownId))
+            .set("Authorization", adminToken);
+
+          expect(adminResponse.body).toEqual({
+            errors:
+              "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+          });
+          expect(adminResponse.status).toBe(404);
         });
-        expect(response.status).toBe(404);
 
-        const adminResponse = await request
-          .get(adminTargets.getConventionById.url.replace(":id", unknownId))
-          .set("Authorization", adminToken);
+        it("404 Not Found - Updating an unknown convention IDs", async () => {
+          const unknownId = "40400000-0000-4000-0000-000000000404";
+          const conventionWithUnknownId = new ConventionDtoBuilder()
+            .withId(unknownId)
+            .withStatus("READY_TO_SIGN")
+            .build();
+          const { externalId, ...createConventionParams } =
+            conventionWithUnknownId;
 
-        expect(adminResponse.body).toEqual({
-          errors:
-            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+          const jwt = generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: unknownId,
+              role: "beneficiary",
+              email: "some email",
+              now,
+            }),
+          );
+
+          const updatedConvention: UpdateConventionRequestDto = {
+            convention: { ...createConventionParams, externalId: "0001" },
+          };
+
+          const response = await request
+            .post(
+              conventionMagicLinkTargets.updateConvention.url.replace(
+                ":conventionId",
+                unknownId,
+              ),
+            )
+            .set("Authorization", jwt)
+            .send(updatedConvention);
+
+          expectToEqual(response.body, {
+            errors: `Convention with id ${unknownId} was not found`,
+          });
+          expect(response.status).toBe(404);
         });
-        expect(adminResponse.status).toBe(404);
-      });
 
-      it("Updating an unknown convention IDs fails with 404 Not Found", async () => {
-        const unknownId = "40400000-0000-4000-0000-000000000404";
-        const conventionWithUnknownId = new ConventionDtoBuilder()
-          .withId(unknownId)
-          .withStatus("READY_TO_SIGN")
-          .build();
-        const { externalId, ...createConventionParams } =
-          conventionWithUnknownId;
+        it("409 Conflict - Creating an convention with an existing ID", async () => {
+          const convention = new ConventionDtoBuilder().build();
+          const { externalId, ...createConventionParams } = convention;
 
-        const jwt = generateConventionJwt(
-          createConventionMagicLinkPayload({
-            id: unknownId,
-            role: "beneficiary",
-            email: "some email",
-            now,
-          }),
-        );
+          // POSTing a valid convention succeeds.
+          await request
+            .post(unauthenticatedConventionTargets.createConvention.url)
+            .send(createConventionParams)
+            .expect(200, { id: convention.id });
 
-        const updatedConvention: UpdateConventionRequestDto = {
-          convention: { ...createConventionParams, externalId: "0001" },
-        };
-
-        const response = await request
-          .post(
-            conventionMagicLinkTargets.updateConvention.url.replace(
-              ":conventionId",
-              unknownId,
-            ),
-          )
-          .set("Authorization", jwt)
-          .send(updatedConvention);
-
-        expectToEqual(response.body, {
-          errors: `Convention with id ${unknownId} was not found`,
+          // POSTing a another valid convention with the same ID fails.
+          await request
+            .post(unauthenticatedConventionTargets.createConvention.url)
+            .send({
+              ...createConventionParams,
+              email: "another@email.fr",
+            })
+            .expect(409);
         });
-        expect(response.status).toBe(404);
-      });
-
-      it("Creating an convention with an existing ID fails with 409 Conflict", async () => {
-        const convention = new ConventionDtoBuilder().build();
-        const { externalId, ...createConventionParams } = convention;
-
-        // POSTing a valid convention succeeds.
-        await request
-          .post(unauthenticatedConventionTargets.createConvention.url)
-          .send(createConventionParams)
-          .expect(200, { id: convention.id });
-
-        // POSTing a another valid convention with the same ID fails.
-        await request
-          .post(unauthenticatedConventionTargets.createConvention.url)
-          .send({
-            ...createConventionParams,
-            email: "another@email.fr",
-          })
-          .expect(409);
       });
     });
   });

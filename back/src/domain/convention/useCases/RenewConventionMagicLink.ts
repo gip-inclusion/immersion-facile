@@ -1,9 +1,9 @@
-import jwt, { TokenExpiredError } from "jsonwebtoken";
+import { decode, TokenExpiredError } from "jsonwebtoken";
 import {
   AgencyDto,
   ConventionDto,
   ConventionId,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   frontRoutes,
   InternshipKind,
   RenewMagicLinkRequestDto,
@@ -86,7 +86,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     } catch (err: any) {
       // If this JWT is signed by us but expired, deal with it.
       if (err instanceof TokenExpiredError) {
-        payloadToExtract = jwt.decode(expiredJwt) as ConventionMagicLinkPayload;
+        payloadToExtract = decode(expiredJwt) as ConventionJwtPayload;
       } else {
         // Perhaps this is a JWT that is signed by a compromised key.
         try {
@@ -96,7 +96,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
           // compromised. Therefore, only use the application ID and the role from it, and fill
           // the remaining data from the database to prevent a hacker from getting magic links
           // for any application form.
-          payloadToExtract = jwt.decode(expiredJwt);
+          payloadToExtract = decode(expiredJwt);
         } catch (_) {
           // We don't want to renew this JWT.
           throw new ForbiddenError();

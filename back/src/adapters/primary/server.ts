@@ -4,10 +4,10 @@ import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
 import {
   GenerateApiConsumerJwt,
-  GenerateAuthenticatedUserJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
@@ -50,7 +50,7 @@ type CreateAppProperties = {
   generateApiConsumerJwt: GenerateApiConsumerJwt;
   generateConventionJwt: GenerateConventionJwt;
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
-  generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
+  generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   generateBackOfficeJwt: GenerateBackOfficeJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
@@ -109,7 +109,7 @@ export const createApp = async (
     generateApiConsumerJwt: deps.generateApiConsumerJwt,
     generateConventionJwt: deps.generateConventionJwt,
     generateEditEstablishmentJwt: deps.generateEditEstablishmentJwt,
-    generateAuthenticatedUserJwt: deps.generateAuthenticatedUserJwt,
+    generateInclusionConnectJwt: deps.generateInclusionConnectJwt,
     generateBackOfficeJwt: deps.generateBackOfficeJwt,
     uuidGenerator: deps.uuidGenerator,
   };

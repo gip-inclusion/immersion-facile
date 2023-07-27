@@ -2,7 +2,7 @@ import { values } from "ramda";
 import {
   AgencyDto,
   ConventionDto,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   conventionSchema,
   filterNotFalsy,
   frontRoutes,
@@ -41,7 +41,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
   protected async _execute(
     conventionPayload: ConventionDto,
     uow: UnitOfWork,
-    _jwtPayload?: ConventionMagicLinkPayload | undefined,
+    _jwtPayload?: ConventionJwtPayload | undefined,
   ): Promise<void> {
     const { agency, convention } = await retrieveConventionWithAgency(
       uow,

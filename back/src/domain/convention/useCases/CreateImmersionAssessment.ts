@@ -1,5 +1,5 @@
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   ImmersionAssessmentDto,
   immersionAssessmentSchema,
 } from "shared";
@@ -29,7 +29,7 @@ export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAss
   public async _execute(
     dto: ImmersionAssessmentDto,
     uow: UnitOfWork,
-    magicLinkPayload: ConventionMagicLinkPayload,
+    magicLinkPayload: ConventionJwtPayload,
   ): Promise<void> {
     throwForbiddenIfNotAllow(dto, magicLinkPayload);
 
@@ -74,7 +74,7 @@ const validateConventionAndCreateImmersionAssessmentEntity = async (
 
 const throwForbiddenIfNotAllow = (
   dto: ImmersionAssessmentDto,
-  magicLinkPayload: ConventionMagicLinkPayload,
+  magicLinkPayload: ConventionJwtPayload,
 ) => {
   if (!magicLinkPayload) throw new ForbiddenError("No magic link provided");
   if (magicLinkPayload.role !== "establishment")

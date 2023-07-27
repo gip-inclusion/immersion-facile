@@ -2,7 +2,7 @@ import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Route } from "type-route";
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
 import { Loader, MainWrapper } from "react-design-system";
@@ -23,7 +23,7 @@ export const ImmersionAssessmentPage = ({
   route,
 }: ImmersionAssessmentPageProps) => {
   const { role, applicationId: conventionId } =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
       route.params.jwt,
     );
   const { convention, fetchConventionError, isLoading } = useConvention({

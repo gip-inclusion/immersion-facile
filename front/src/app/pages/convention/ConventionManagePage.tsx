@@ -1,7 +1,7 @@
 import React from "react";
 import { Route } from "type-route";
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
 import { MainWrapper } from "react-design-system";
@@ -18,7 +18,7 @@ type ConventionManagePageProps = {
 export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
   const jwt = route.params.jwt;
   const { applicationId: conventionId } =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
 
   return (
     <HeaderFooterLayout>

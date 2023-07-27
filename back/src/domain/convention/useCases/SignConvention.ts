@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   ConventionStatus,
   ExtractFromExisting,
   Role,
@@ -65,7 +65,7 @@ export class SignConvention extends TransactionalUseCase<
   public async _execute(
     _: void,
     uow: UnitOfWork,
-    { applicationId, role }: ConventionMagicLinkPayload,
+    { applicationId, role }: ConventionJwtPayload,
   ): Promise<WithConventionIdLegacy> {
     logger.debug({ applicationId, role });
 

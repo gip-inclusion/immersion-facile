@@ -3,7 +3,7 @@ import {
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   ConventionStatus,
   conventionStatuses,
   EstablishmentRepresentative,
@@ -84,7 +84,7 @@ describe("Sign convention", () => {
       await expectPromiseToFailWithError(
         triggerSignature({
           role,
-        } as ConventionMagicLinkPayload),
+        } as ConventionJwtPayload),
         new ForbiddenError(
           "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
         ),
@@ -98,7 +98,7 @@ describe("Sign convention", () => {
     await expectPromiseToFailWithError(
       triggerSignature({
         role: allowedRole,
-      } as ConventionMagicLinkPayload),
+      } as ConventionJwtPayload),
       new NotFoundError(),
     );
   });
@@ -121,7 +121,7 @@ describe("Sign convention", () => {
         triggerSignature({
           role: allowedRole,
           applicationId: conventionInDb.id,
-        } as ConventionMagicLinkPayload),
+        } as ConventionJwtPayload),
         new BadRequestError(
           `Cannot go from status '${initialStatus}' to 'PARTIALLY_SIGNED'`,
         ),
@@ -142,7 +142,7 @@ describe("Sign convention", () => {
       await triggerSignature({
         role,
         applicationId: conventionInDb.id,
-      } as ConventionMagicLinkPayload);
+      } as ConventionJwtPayload);
 
       expectConventionInDbToEqual({
         ...conventionInDb,
@@ -180,7 +180,7 @@ describe("Sign convention", () => {
     await triggerSignature({
       role: "establishment",
       applicationId: initialConvention.id,
-    } as ConventionMagicLinkPayload);
+    } as ConventionJwtPayload);
 
     const expectedConvention: ConventionDto = {
       ...initialConvention,
@@ -219,7 +219,7 @@ describe("Sign convention", () => {
     await triggerSignature({
       role: "establishment",
       applicationId: initialConvention.id,
-    } as ConventionMagicLinkPayload);
+    } as ConventionJwtPayload);
 
     const expectedConvention: ConventionDto = {
       ...initialConvention,
@@ -264,7 +264,7 @@ describe("Sign convention", () => {
     await triggerSignature({
       role: "establishment",
       applicationId: initialConvention.id,
-    } as ConventionMagicLinkPayload);
+    } as ConventionJwtPayload);
 
     const expectedConvention: ConventionDto = {
       ...initialConvention,
@@ -284,7 +284,7 @@ describe("Sign convention", () => {
     ]);
   });
 
-  const triggerSignature = (jwtPayload: ConventionMagicLinkPayload) =>
+  const triggerSignature = (jwtPayload: ConventionJwtPayload) =>
     signConvention.execute(undefined, jwtPayload);
 
   const prepareConventionWithStatus = (status: ConventionStatus) => {

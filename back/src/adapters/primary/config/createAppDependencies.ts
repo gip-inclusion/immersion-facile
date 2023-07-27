@@ -1,10 +1,10 @@
 import { AbsoluteUrl, frontRoutes } from "shared";
 import {
   GenerateApiConsumerJwt,
-  GenerateAuthenticatedUserJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../domain/auth/jwt";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
@@ -52,10 +52,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const thirtyDaysInSecond = oneDayInSecond * 30;
 
   const generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt =
-    makeGenerateJwtES256<"editEstablishment">(
-      config.jwtPrivateKey,
-      oneDayInSecond,
-    );
+    makeGenerateJwtES256<"establishment">(config.jwtPrivateKey, oneDayInSecond);
   const generateApiConsumerJwt: GenerateApiConsumerJwt =
     makeGenerateJwtES256<"apiConsumer">(
       config.apiJwtPrivateKey,
@@ -63,8 +60,8 @@ export const createAppDependencies = async (config: AppConfig) => {
     );
   const generateBackOfficeJwt: GenerateBackOfficeJwt =
     makeGenerateJwtES256<"backOffice">(config.jwtPrivateKey, onYearInSeconds);
-  const generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt =
-    makeGenerateJwtES256<"authenticatedUser">(
+  const generateInclusionConnectJwt: GenerateInclusionConnectJwt =
+    makeGenerateJwtES256<"inclusionConnect">(
       config.jwtPrivateKey,
       oneHourInSeconds,
     );
@@ -88,7 +85,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateBackOfficeJwt,
-    generateAuthenticatedUserJwt,
+    generateInclusionConnectJwt,
     uowPerformer,
     uuidGenerator,
   );
@@ -128,7 +125,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateEditEstablishmentJwt,
     generateConventionJwt,
     generateApiConsumerJwt,
-    generateAuthenticatedUserJwt,
+    generateInclusionConnectJwt,
     generateBackOfficeJwt,
     eventBus,
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
