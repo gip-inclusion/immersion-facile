@@ -1,7 +1,8 @@
 import {
   ConventionDtoBuilder,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   conventionStatuses,
+  currentJwtVersions,
   expectArraysToEqual,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -37,10 +38,12 @@ const ConventionDtoBuilderWithId = new ConventionDtoBuilder().withId(
   conventionId,
 );
 
-const validPayload = {
+const validPayload: ConventionJwtPayload = {
   applicationId: conventionId,
   role: "establishment",
-} as ConventionMagicLinkPayload;
+  emailHash: "",
+  version: currentJwtVersions.convention,
+};
 
 describe("CreateImmersionAssessment", () => {
   let outboxRepository: InMemoryOutboxRepository;
@@ -84,7 +87,7 @@ describe("CreateImmersionAssessment", () => {
       createImmersionAssessment.execute(immersionAssessment, {
         applicationId: "otherId",
         role: "establishment",
-      } as ConventionMagicLinkPayload),
+      } as ConventionJwtPayload),
       new ForbiddenError(
         "Convention provided in DTO is not the same as application linked to it",
       ),
@@ -96,7 +99,7 @@ describe("CreateImmersionAssessment", () => {
       createImmersionAssessment.execute(immersionAssessment, {
         applicationId: conventionId,
         role: "beneficiary",
-      } as ConventionMagicLinkPayload),
+      } as ConventionJwtPayload),
       new ForbiddenError("Only an establishment can create an assessment"),
     );
   });

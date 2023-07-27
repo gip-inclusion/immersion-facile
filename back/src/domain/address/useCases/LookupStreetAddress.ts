@@ -1,6 +1,6 @@
 import {
   AddressAndPosition,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   WithLookupAddressQueryParams,
   withLookupStreetAddressQueryParamsSchema,
 } from "shared";
@@ -19,7 +19,7 @@ export class LookupStreetAddress extends UseCase<
 
   protected _execute(
     params: WithLookupAddressQueryParams,
-    _jwtPayload?: ConventionMagicLinkPayload | undefined,
+    _jwtPayload?: ConventionJwtPayload | undefined,
   ): Promise<AddressAndPosition[]> {
     return this.addressApiGateway.lookupStreetAddress(params.lookup);
   }

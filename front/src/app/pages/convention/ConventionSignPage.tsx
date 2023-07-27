@@ -5,7 +5,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { match, P } from "ts-pattern";
 import { Route } from "type-route";
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   immersionFacileContactEmail,
   isSignatory,
@@ -52,7 +52,7 @@ export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => {
       ) : (
         <>
           {isSignatory(
-            decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+            decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
               route.params.jwt,
             ).role,
           ) ? (
@@ -91,7 +91,7 @@ const ConventionSignPageContent = ({
 }: ConventionSignPageContentProperties): JSX.Element => {
   const dispatch = useDispatch();
   const { applicationId: conventionId } =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
   const { convention, fetchConventionError, submitFeedback, isLoading } =
     useConvention({ jwt, conventionId });
   useEffect(() => {
@@ -230,9 +230,7 @@ const ConventionSignPageContent = ({
 
 const extractRole = (jwt: string): SignatoryRole => {
   const role =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
-      jwt,
-    ).role;
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt).role;
   if (isSignatory(role)) return role;
   throw new Error(
     `Only ${signatoryRoles.join(", ")} are allow to sign, received ${role}`,

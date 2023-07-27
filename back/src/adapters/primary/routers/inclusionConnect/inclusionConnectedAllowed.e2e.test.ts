@@ -10,7 +10,7 @@ import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 describe("Router for users authenticated with Inclusion Connect", () => {
   // <<<<----- Test to delete when getAgencyDashboard is obsolete
   it("Right path getAgencyDashboard : HTTP 200 with dashboard url on response body", async () => {
-    const { request, generateAuthenticatedUserJwt, inMemoryUow } =
+    const { request, generateInclusionConnectJwt, inMemoryUow } =
       await buildTestApp();
     const userId = "123";
     const agency = new AgencyDtoBuilder().build();
@@ -23,7 +23,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
         agencyRights: [{ agency, role: "validator" }],
       },
     ]);
-    const token = generateAuthenticatedUserJwt({
+    const token = generateInclusionConnectJwt({
       userId,
       version: currentJwtVersions.inclusion,
     });
@@ -59,9 +59,9 @@ describe("Router for users authenticated with Inclusion Connect", () => {
     });
 
     it("throws forbidden if token is expired", async () => {
-      const { request, generateAuthenticatedUserJwt } = await buildTestApp();
+      const { request, generateInclusionConnectJwt } = await buildTestApp();
       const userId = "123";
-      const token = generateAuthenticatedUserJwt(
+      const token = generateInclusionConnectJwt(
         { userId, version: currentJwtVersions.inclusion },
         0,
       );
@@ -75,7 +75,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
     });
 
     it("Right path getInclusionConnectedUser : HTTP 200 with dashboard url on response body", async () => {
-      const { request, generateAuthenticatedUserJwt, inMemoryUow } =
+      const { request, generateInclusionConnectJwt, inMemoryUow } =
         await buildTestApp();
       const userId = "123";
       const agency = new AgencyDtoBuilder().build();
@@ -89,7 +89,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
       ]);
-      const token = generateAuthenticatedUserJwt({
+      const token = generateInclusionConnectJwt({
         userId,
         version: currentJwtVersions.inclusion,
       });
@@ -119,7 +119,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
     });
 
     it("add an agency as registered to an Inclusion Connected user", async () => {
-      const { request, inMemoryUow, generateAuthenticatedUserJwt } =
+      const { request, inMemoryUow, generateInclusionConnectJwt } =
         await buildTestApp();
       const userId = "123456ab";
       const agency = new AgencyDtoBuilder().build();
@@ -134,7 +134,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
         user,
       ]);
       inMemoryUow.agencyRepository.setAgencies([agency]);
-      const token = generateAuthenticatedUserJwt({
+      const token = generateInclusionConnectJwt({
         userId,
         version: currentJwtVersions.inclusion,
       });

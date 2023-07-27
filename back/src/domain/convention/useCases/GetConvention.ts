@@ -1,7 +1,7 @@
 import {
   ConventionId,
-  ConventionJwtPayload,
   ConventionReadDto,
+  ConventionRelatedJwtPayload,
   getUserRoleForAccessingConvention,
   InclusionConnectJwtPayload,
   WithConventionId,
@@ -17,7 +17,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 export class GetConvention extends TransactionalUseCase<
   WithConventionId,
   ConventionReadDto,
-  ConventionJwtPayload
+  ConventionRelatedJwtPayload
 > {
   inputSchema = withConventionIdSchema;
 
@@ -28,7 +28,7 @@ export class GetConvention extends TransactionalUseCase<
   public async _execute(
     { conventionId }: WithConventionId,
     uow: UnitOfWork,
-    authPayload?: ConventionJwtPayload,
+    authPayload?: ConventionRelatedJwtPayload,
   ): Promise<ConventionReadDto> {
     const isInclusionConnectPayload = this.isInclusionConnectPayload(
       authPayload,
@@ -62,7 +62,7 @@ export class GetConvention extends TransactionalUseCase<
   }
 
   private isInclusionConnectPayload(
-    authPayload: ConventionJwtPayload | undefined,
+    authPayload: ConventionRelatedJwtPayload | undefined,
     conventionId: ConventionId,
   ): authPayload is InclusionConnectJwtPayload {
     if (!authPayload) throw new ForbiddenError(`No auth payload provided`);

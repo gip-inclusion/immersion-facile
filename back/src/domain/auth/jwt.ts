@@ -1,56 +1,44 @@
 import jwt from "jsonwebtoken";
 import {
+  ApiConsumerJwt,
   ApiConsumerJwtPayload,
+  AppSupportedJwt,
   BackOfficeJwt,
   BackOfficeJwtPayload,
-  ConventionMagicLinkJwt,
-  ConventionMagicLinkPayload,
+  CommonJwtPayload,
+  ConventionJwt,
+  ConventionJwtPayload,
+  EstablishmentJwt,
   EstablishmentJwtPayload,
-  Flavor,
+  InclusionConnectJwt,
+  InclusionConnectJwtPayload,
 } from "shared";
 
-type AuthenticatedUserJwtPayload = {
-  userId: string;
-  version: number;
-};
-
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;
-export type GenerateAuthenticatedUserJwt = GenerateJwtFn<"authenticatedUser">;
-export type GenerateEditFormEstablishmentJwt =
-  GenerateJwtFn<"editEstablishment">;
+export type GenerateInclusionConnectJwt = GenerateJwtFn<"inclusionConnect">;
+export type GenerateEditFormEstablishmentJwt = GenerateJwtFn<"establishment">;
 export type GenerateBackOfficeJwt = GenerateJwtFn<"backOffice">;
 export type GenerateApiConsumerJwt = GenerateJwtFn<"apiConsumer">;
 
-type JwtTokenMapping<K extends string, T extends string, JwtPayload> = {
+type JwtTokenMapping<
+  K extends string,
+  T extends AppSupportedJwt,
+  JwtPayload,
+> = {
   token: T;
   kind: K;
   payload: JwtPayload;
 };
 
+//prettier-ignore
 type JwtMap =
-  | JwtTokenMapping<
-      "convention",
-      ConventionMagicLinkJwt,
-      ConventionMagicLinkPayload
-    >
-  | JwtTokenMapping<
-      "editEstablishment",
-      EditEstablishmentJwt,
-      EstablishmentJwtPayload
-    >
-  | JwtTokenMapping<
-      "authenticatedUser",
-      AuthenticatedUserJwt,
-      AuthenticatedUserJwtPayload
-    >
+  | JwtTokenMapping<"convention", ConventionJwt, ConventionJwtPayload>
+  | JwtTokenMapping<"establishment", EstablishmentJwt, EstablishmentJwtPayload>
+  | JwtTokenMapping<"inclusionConnect", InclusionConnectJwt, InclusionConnectJwtPayload>
   | JwtTokenMapping<"backOffice", BackOfficeJwt, BackOfficeJwtPayload>
   | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>;
 
 export type JwtKind = JwtMap["kind"];
-
-type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
-type EditEstablishmentJwt = Flavor<string, "EditEstablishmentJwt">;
-type AuthenticatedUserJwt = Flavor<string, "AuthenticatedUserJwt">;
 
 type GenerateJwtFn<K extends JwtKind> = (
   payload: Extract<JwtMap, { kind: K }>["payload"],
@@ -75,7 +63,7 @@ export const makeGenerateJwtES256 =
 
 type VerifyJwtFn<K extends JwtKind> = (
   jwt: Extract<JwtMap, { kind: K }>["token"],
-) => JwtPayloadCommonFields & Extract<JwtMap, { kind: K }>["payload"];
+) => CommonJwtPayload & Extract<JwtMap, { kind: K }>["payload"];
 
 export const makeVerifyJwtES256 = <K extends JwtKind>(
   jwtPublicKey: string,
@@ -86,5 +74,3 @@ export const makeVerifyJwtES256 = <K extends JwtKind>(
       complete: false,
       ignoreExpiration: false,
     })) as any;
-
-type JwtPayloadCommonFields = { exp: number; iat: number; version: number };

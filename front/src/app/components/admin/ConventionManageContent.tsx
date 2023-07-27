@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { match, P } from "ts-pattern";
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   Role,
 } from "shared";
@@ -35,8 +35,7 @@ export const ConventionManageContent = ({
     .with(
       { name: "manageConvention" },
       () =>
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt)
-          .role,
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt).role,
     )
     .with({ name: "manageConventionAdmin" }, (): Role => "backOffice")
     .with(

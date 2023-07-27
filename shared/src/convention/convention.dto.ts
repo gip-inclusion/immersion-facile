@@ -1,10 +1,10 @@
 import { AgencyId } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { Role } from "../role/role.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
-import { Role } from "../tokens/token.dto";
 import { Flavor } from "../typeFlavors";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];

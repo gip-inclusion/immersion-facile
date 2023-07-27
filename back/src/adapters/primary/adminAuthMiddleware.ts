@@ -16,6 +16,9 @@ export const makeAdminAuthMiddleware = (
     }
     try {
       const payload = verifyJwt(req.headers.authorization);
+      if (!payload.exp) {
+        return res.status(401).json({ error: "Token is expired" });
+      }
       const expirationDate = new Date(payload.exp * 1000);
 
       if (timeGateway.now() > expirationDate) {

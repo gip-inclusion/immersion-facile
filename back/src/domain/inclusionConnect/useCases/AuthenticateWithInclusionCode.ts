@@ -10,7 +10,7 @@ import {
   queryParamsAsString,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { GenerateAuthenticatedUserJwt } from "../../auth/jwt";
+import { GenerateInclusionConnectJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -32,7 +32,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     private createNewEvent: CreateNewEvent,
     private inclusionConnectGateway: InclusionConnectGateway,
     private uuidGenerator: UuidGenerator,
-    private generateAppToken: GenerateAuthenticatedUserJwt,
+    private generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
     private immersionFacileBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
@@ -114,7 +114,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ),
     ]);
 
-    const token = this.generateAppToken(
+    const token = this.generateAuthenticatedUserJwt(
       {
         userId: newOrUpdatedAuthenticatedUser.id,
         version: currentJwtVersions.inclusion,

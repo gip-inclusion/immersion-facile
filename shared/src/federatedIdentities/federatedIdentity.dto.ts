@@ -1,4 +1,4 @@
-import { InclusionConnectJwt } from "../tokens/token.dto";
+import { InclusionConnectJwt } from "../tokens/jwt.dto";
 import { Flavor } from "../typeFlavors";
 
 export type FederatedIdentityProvider =
@@ -11,7 +11,7 @@ export const federatedIdentityProviders = [
 
 type GenericFederatedIdentity<
   P extends FederatedIdentityProvider,
-  T extends string,
+  T extends PeConnectToken | InclusionConnectJwt,
 > = {
   provider: P;
   token: T;

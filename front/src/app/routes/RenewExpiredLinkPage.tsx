@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Route } from "type-route";
-import { ConventionMagicLinkPayload, domElementIds } from "shared";
+import { ConventionJwtPayload, domElementIds } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { LinkHome, MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -24,9 +24,7 @@ export const RenewExpiredLinkContent = ({
   originalURL,
 }: RenewExpiredLinkContentsProps) => {
   const jwtPayload =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
-      expiredJwt,
-    );
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(expiredJwt);
   // Flag that tracks if the link renewal had already been requested.
   const [requested, setRequested] = useState(false);
   // Tracks the success of the server request.

@@ -1,22 +1,13 @@
 import { z } from "zod";
 import { zStringCanBeEmpty } from "../zodUtils";
-import {
-  AppJwtPayload,
-  BackOfficeJwt,
-  BackOfficeJwtPayload,
-  JwtDto,
-} from "./token.dto";
+import { BackOfficeJwt } from "./jwt.dto";
+import { BackOfficeJwtPayload, CommonJwtPayload } from "./jwtPayload.dto";
 
-export const jwtSchema: z.Schema<JwtDto> = z.object({ jwt: z.string() });
-
-export const adminTokenSchema: z.Schema<BackOfficeJwt> = z.string();
-
-export const appJwtPayloadSchema: z.Schema<AppJwtPayload> = z.object({
+export const appJwtPayloadSchema: z.Schema<CommonJwtPayload> = z.object({
   iat: z.number(),
   exp: z.number().optional(),
   version: z.number(),
 });
-
 export const backOfficeJwtPayloadSchema: z.Schema<BackOfficeJwtPayload> =
   appJwtPayloadSchema.and(
     z.object({
@@ -24,3 +15,5 @@ export const backOfficeJwtPayloadSchema: z.Schema<BackOfficeJwtPayload> =
       role: z.literal("backOffice"),
     }),
   );
+
+export const backOfficeJwtSchema: z.Schema<BackOfficeJwt> = z.string();

@@ -3,7 +3,7 @@ import { makeVerifyJwtES256 } from "../../../../domain/auth/jwt";
 import { forbidden, unauthorized } from "../../middlewareHelpers";
 
 export const createInclusionConnectedMiddleware = (jwtSecret: string) => {
-  const verifyJwt = makeVerifyJwtES256<"authenticatedUser">(jwtSecret);
+  const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtSecret);
 
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) return unauthorized(res);

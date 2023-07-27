@@ -1,5 +1,5 @@
 import {
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   createConventionMagicLinkPayload,
   decodeJwtWithoutSignatureCheck,
   expectToEqual,
@@ -55,7 +55,7 @@ describe("Generate magic links", () => {
       ).execute(request);
 
       expectToEqual(
-        decodeJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(result.jwt),
+        decodeJwtWithoutSignatureCheck<ConventionJwtPayload>(result.jwt),
         {
           applicationId: request.applicationId,
           role: request.role,

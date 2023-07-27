@@ -3,8 +3,8 @@ import {
   AbsoluteUrl,
   ConventionDto,
   ConventionId,
-  ConventionJwt,
   ConventionReadDto,
+  ConventionSupportedJwt,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -24,7 +24,7 @@ export interface ConventionGateway {
   updateConventionStatus$(
     params: UpdateConventionStatusRequestDto,
     conventionId: ConventionId,
-    jwt: ConventionJwt,
+    jwt: ConventionSupportedJwt,
   ): Observable<void>;
   signConvention$(jwt: string): Observable<void>;
   shareConventionLinkByEmail(

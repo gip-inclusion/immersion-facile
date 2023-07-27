@@ -27,8 +27,10 @@ const startScript = async (): Promise<Report> => {
   });
   const uowPerformer = new PgUowPerformer(pool, createPgUow);
 
-  const generateEditEstablishmentJwt =
-    makeGenerateJwtES256<"editEstablishment">(config.jwtPrivateKey, 3600 * 24);
+  const generateEditEstablishmentJwt = makeGenerateJwtES256<"establishment">(
+    config.jwtPrivateKey,
+    3600 * 24,
+  );
 
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
     uuidGenerator,

@@ -3,7 +3,7 @@ import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
   ApiConsumerName,
   backOfficeJwtPayloadSchema,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   currentJwtVersions,
   EstablishmentJwtPayload,
   ExtractFromExisting,
@@ -180,7 +180,7 @@ export const makeMagicLinkAuthMiddleware = (
   payloadKey: ExtractFromExisting<PayloadKey, "convention" | "establishment">,
 ): RequestHandler => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig<
-    "convention" | "editEstablishment" | "backOffice" | "authenticatedUser"
+    "convention" | "establishment" | "backOffice" | "inclusionConnect"
   >(config);
   return (req, res, next) => {
     const maybeJwt = req.headers.authorization;
@@ -215,7 +215,7 @@ export const makeMagicLinkAuthMiddleware = (
             };
           } else {
             req.payloads = {
-              convention: payload as ConventionMagicLinkPayload,
+              convention: payload as ConventionJwtPayload,
             };
           }
           break;
@@ -234,7 +234,7 @@ export const makeMagicLinkAuthMiddleware = (
 
       next();
     } catch (err: any) {
-      const unsafePayload = jwt.decode(maybeJwt) as ConventionMagicLinkPayload;
+      const unsafePayload = jwt.decode(maybeJwt) as ConventionJwtPayload;
       if (err instanceof TokenExpiredError) {
         logger.warn(
           { token: maybeJwt, payload: unsafePayload },

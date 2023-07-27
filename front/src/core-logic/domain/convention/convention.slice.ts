@@ -4,8 +4,8 @@ import {
   AgencyId,
   ConventionId,
   ConventionJwt,
-  ConventionMagicLinkJwt,
   ConventionReadDto,
+  ConventionSupportedJwt,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -71,13 +71,13 @@ export const initialConventionState: ConventionState = {
 };
 
 export type FetchConventionRequestedPayload = {
-  jwt: ConventionJwt;
+  jwt: ConventionSupportedJwt;
   conventionId: ConventionId;
 };
 
 type StatusChangePayload = {
   feedbackKind: ConventionFeedbackKind;
-  jwt: ConventionJwt;
+  jwt: ConventionSupportedJwt;
   conventionId: ConventionId;
   updateStatusParams: UpdateConventionStatusRequestDto;
 };
@@ -152,7 +152,7 @@ export const conventionSlice = createSlice({
     signConventionRequested: (
       state,
       _action: PayloadAction<{
-        jwt: ConventionMagicLinkJwt;
+        jwt: ConventionJwt;
         role: SignatoryRole;
         signedAt: DateIsoStr;
       }>,
@@ -188,7 +188,7 @@ export const conventionSlice = createSlice({
     // get convention status dashboard
     conventionStatusDashboardRequested: (
       state,
-      _action: PayloadAction<ConventionMagicLinkJwt>,
+      _action: PayloadAction<ConventionJwt>,
     ) => {
       state.feedback = { kind: "idle" };
       state.isLoading = true;

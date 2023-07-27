@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Route } from "type-route";
 import {
-  ConventionMagicLinkJwt,
-  ConventionMagicLinkPayload,
+  ConventionJwt,
+  ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   isStringDate,
   prettyPrintSchedule,
@@ -38,9 +38,9 @@ type ConventionDocumentPageProps = {
 export const ConventionDocumentPage = ({
   route,
 }: ConventionDocumentPageProps) => {
-  const jwt: ConventionMagicLinkJwt = route.params.jwt;
+  const jwt: ConventionJwt = route.params.jwt;
   const { applicationId } =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
   const { convention, fetchConventionError, isLoading } = useConvention({
     jwt,
     conventionId: applicationId,

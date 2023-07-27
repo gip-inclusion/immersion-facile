@@ -1,5 +1,5 @@
 import {
-  AppJwtPayload,
+  CommonJwtPayload,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   formEstablishmentBatchSchema,
@@ -14,7 +14,7 @@ import { AddFormEstablishment } from "./AddFormEstablishment";
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
   EstablishmentBatchReport,
-  AppJwtPayload
+  CommonJwtPayload
 > {
   protected inputSchema = formEstablishmentBatchSchema;
 

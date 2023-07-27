@@ -3,6 +3,7 @@ import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
+import { allRoles } from "../role/role.dto";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { DailyScheduleDto } from "../schedule/Schedule.dto";
 import { scheduleSchema } from "../schedule/Schedule.schema";
@@ -12,7 +13,6 @@ import {
   validateSchedule,
 } from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret.schema";
-import { allRoles } from "../tokens/token.dto";
 import { phoneRegExp } from "../utils";
 import { dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";

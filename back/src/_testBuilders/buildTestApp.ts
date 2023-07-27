@@ -20,10 +20,10 @@ import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/sh
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import {
   GenerateApiConsumerJwt,
-  GenerateAuthenticatedUserJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
 } from "../domain/auth/jwt";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
@@ -56,7 +56,7 @@ export type TestAppAndDeps = {
   generateApiConsumerJwt: GenerateApiConsumerJwt;
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateConventionJwt: GenerateConventionJwt;
-  generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
+  generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   generateBackOfficeJwt: GenerateBackOfficeJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
@@ -109,7 +109,7 @@ export const buildTestApp = async (
     generateApiConsumerJwt,
     generateConventionJwt,
     generateEditEstablishmentJwt,
-    generateAuthenticatedUserJwt,
+    generateInclusionConnectJwt,
     generateBackOfficeJwt,
     uuidGenerator,
     inMemoryUow: uow,
@@ -131,7 +131,7 @@ export const buildTestApp = async (
     generateApiConsumerJwt,
     generateConventionJwt,
     generateEditEstablishmentJwt,
-    generateAuthenticatedUserJwt,
+    generateInclusionConnectJwt,
     generateBackOfficeJwt,
     uuidGenerator,
     inMemoryUow,

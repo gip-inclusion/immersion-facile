@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
   calculateDurationInSecondsFrom,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   stringToMd5,
 } from "shared";
 import {
@@ -27,7 +27,7 @@ const createParamsHash = (
 export abstract class UseCase<
   Input,
   Output = void,
-  JWTPayload = ConventionMagicLinkPayload,
+  JWTPayload = ConventionJwtPayload,
 > {
   protected abstract inputSchema: z.ZodSchema<Input>;
 
@@ -64,7 +64,7 @@ export abstract class UseCase<
 export abstract class TransactionalUseCase<
   Input,
   Output = void,
-  JWTPayload = ConventionMagicLinkPayload,
+  JWTPayload = ConventionJwtPayload,
 > {
   protected abstract inputSchema: z.ZodSchema<Input>;
 

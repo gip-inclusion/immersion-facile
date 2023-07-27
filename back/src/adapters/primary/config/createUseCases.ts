@@ -3,10 +3,10 @@ import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
-  GenerateAuthenticatedUserJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
 } from "../../../domain/auth/jwt";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
@@ -97,7 +97,7 @@ export const createUseCases = (
   generateConventionJwt: GenerateConventionJwt,
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
   generateBackOfficeJwt: GenerateBackOfficeJwt,
-  generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt,
+  generateAuthenticatedUserToken: GenerateInclusionConnectJwt,
   uowPerformer: UnitOfWorkPerformer,
   uuidGenerator: UuidGenerator,
 ) => {

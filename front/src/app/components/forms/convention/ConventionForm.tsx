@@ -10,7 +10,7 @@ import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import {
   Beneficiary,
-  ConventionMagicLinkPayload,
+  ConventionJwtPayload,
   ConventionReadDto,
   conventionWithoutExternalIdSchema,
   decodeMagicLinkJwtWithoutSignatureCheck,
@@ -165,7 +165,7 @@ export const ConventionForm = ({
     if (mode === "edit" && route.params.jwt) {
       dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
       const { applicationId: conventionId } =
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
           route.params.jwt,
         );
       dispatch(
