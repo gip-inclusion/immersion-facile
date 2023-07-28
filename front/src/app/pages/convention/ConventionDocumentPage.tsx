@@ -225,7 +225,13 @@ export const ConventionDocumentPage = ({
               ? "de l'immersion"
               : "du mini-stage"}{" "}
             seront :{" "}
-            {prettyPrintSchedule(convention.schedule).split("\n").join(", ")}.
+            {prettyPrintSchedule(convention.schedule, undefined, {
+              start: new Date(convention.dateStart),
+              end: new Date(convention.dateEnd),
+            })
+              .split("\n")
+              .join(", ")}
+            .
           </p>
           <h4 className={fr.cx("fr-h6")}>
             Conditions d'observation de l’activité

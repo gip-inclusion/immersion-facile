@@ -114,7 +114,13 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             <strong>Récapitulatif hebdomadaire</strong>
           </p>
           <hr className={fr.cx("fr-hr", "fr-pb-1w")} />
-          <WeeksHoursIndicator schedule={values.schedule} />
+          <WeeksHoursIndicator
+            schedule={values.schedule}
+            interval={{
+              start: new Date(values.dateStart),
+              end: new Date(values.dateEnd),
+            }}
+          />
         </div>
       </div>
     </>
@@ -123,10 +129,15 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
 
 const WeeksHoursIndicator = ({
   schedule,
+  interval,
 }: {
   schedule: ScheduleDto;
+  interval: DateIntervalDto;
 }): JSX.Element => {
-  const workedHoursByWeek = calculateWeeklyHoursFromSchedule(schedule);
+  const workedHoursByWeek = calculateWeeklyHoursFromSchedule(
+    schedule,
+    interval,
+  );
   const shouldShowRecap = workedHoursByWeek.length > 0;
   return (
     <>

@@ -35,6 +35,10 @@ export const ComplexSchedulePicker = ({
       <DayPicker
         complexSchedule={values.schedule.complexSchedule}
         selectedIndex={values.schedule.selectedIndex}
+        interval={{
+          start: new Date(values.dateStart),
+          end: new Date(values.dateEnd),
+        }}
         onChange={(lastClickedIndex) => {
           const updatedSchedule = clone(values.schedule);
           updatedSchedule.selectedIndex = lastClickedIndex;

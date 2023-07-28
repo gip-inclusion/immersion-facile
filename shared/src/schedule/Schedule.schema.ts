@@ -8,7 +8,6 @@ import {
   TimePeriodsDto,
   WeekdayNumber,
 } from "./Schedule.dto";
-import { validateSchedule } from "./ScheduleUtils";
 
 // Time period within a day.
 // TODO We could refine by checking that start < end
@@ -47,20 +46,10 @@ export const weekDaySchema = z
 export const selectedDaysOfTheWeekSchema: z.Schema<SelectedDaysOfTheWeekDto> =
   z.array(weekDaySchema);
 
-export const scheduleSchema: z.Schema<ScheduleDto> = z
-  .object({
-    totalHours: z.number(),
-    workedDays: z.number(),
-    isSimple: z.boolean(),
-    selectedIndex: z.number(),
-    complexSchedule: immersionDaysScheduleSchema,
-  })
-  .superRefine((schedule, issueMaker) => {
-    const message = validateSchedule(schedule);
-    if (message)
-      issueMaker.addIssue({
-        code: z.ZodIssueCode.custom,
-        message,
-        path: [],
-      });
-  });
+export const scheduleSchema: z.Schema<ScheduleDto> = z.object({
+  totalHours: z.number(),
+  workedDays: z.number(),
+  isSimple: z.boolean(),
+  selectedIndex: z.number(),
+  complexSchedule: immersionDaysScheduleSchema,
+});

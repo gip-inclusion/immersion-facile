@@ -1,12 +1,15 @@
 import {
   addDays,
   addHours,
+  differenceInCalendarWeeks,
   differenceInDays,
   format,
   getDay,
   parseISO,
+  startOfWeek,
 } from "date-fns";
 import { clone, prop, uniq } from "ramda";
+import { arrayFromNumber } from "../utils";
 import {
   DailyScheduleDto,
   DateIntervalDto,
@@ -44,12 +47,6 @@ const dayOfWeekMapping: UniversalDayMappingToFrenchCalendar[] = [
   { frenchDayName: "dimanche", frenchDay: 6, universalDay: 0 },
 ];
 
-// Calculate total hours per week for a given schedule.
-export const calculateWeeklyHoursFromSchedule = (schedule: ScheduleDto) =>
-  makeImmersionTimetable(schedule.complexSchedule).map((week) =>
-    calculateWeeklyHours(week),
-  );
-
 type DatesOfImmersion = {
   dateStart: string;
   dateEnd: string;
@@ -71,8 +68,13 @@ export const calculateTotalImmersionHoursFromComplexSchedule = (
 export const prettyPrintSchedule = (
   schedule: ScheduleDto,
   displayFreeDays = true,
+  interval: DateIntervalDto,
 ): string =>
-  prettyPrintComplexSchedule(schedule.complexSchedule, displayFreeDays);
+  prettyPrintComplexSchedule(
+    schedule.complexSchedule,
+    displayFreeDays,
+    interval,
+  );
 
 const reasonableTimePeriods: TimePeriodsDto = [
   {
@@ -84,16 +86,18 @@ const reasonableTimePeriods: TimePeriodsDto = [
     end: "16:00",
   },
 ];
+
+export const isValidInterval = (interval: DateIntervalDto): boolean =>
+  !(isNaN(interval.start.getTime()) || isNaN(interval.end.getTime()));
+
 export const reasonableSchedule = (
   interval: DateIntervalDto,
   excludedDays: Weekday[] = [],
   timePeriods: TimePeriodsDto = reasonableTimePeriods,
 ): ScheduleDto => {
-  const complexSchedule = makeComplexSchedule(
-    interval,
-    timePeriods,
-    excludedDays,
-  );
+  const complexSchedule = isValidInterval(interval)
+    ? makeComplexSchedule(interval, timePeriods, excludedDays)
+    : [];
   return {
     totalHours:
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
@@ -172,8 +176,11 @@ export const calculateNumberOfWorkedDays = (
   complexSchedule: DailyScheduleDto[],
 ): number => complexSchedule.filter((v) => v.timePeriods.length > 0).length;
 
-export const validateSchedule = (schedule: ScheduleDto): string | undefined => {
-  const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule);
+export const validateSchedule = (
+  schedule: ScheduleDto,
+  interval: DateIntervalDto,
+): string | undefined => {
+  const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule, interval);
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
     if (totalHours > maxPermittedHoursPerWeek)
       return `Veuillez saisir moins de ${maxPermittedHoursPerWeek}h pour la semaine ${
@@ -252,9 +259,10 @@ const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
 export const prettyPrintComplexSchedule = (
   complexSchedule: DailyScheduleDto[],
   displayFreeDays = true,
+  interval: DateIntervalDto,
 ): string => {
   const lines: string[] = [];
-  const weeks = makeImmersionTimetable(complexSchedule);
+  const weeks = makeImmersionTimetable(complexSchedule, interval);
   const weeksWithoutEmptyDays = weeks.map((week, weekIndex) => {
     const isStartingWeek = weekIndex === 0;
     const isEndingWeek = weekIndex === weeks.length - 1;
@@ -332,49 +340,50 @@ export const selectedDaysFromComplexSchedule = (
 
 export const makeImmersionTimetable = (
   complexSchedule: DailyScheduleDto[],
+  { start: startDay, end: endDay }: DateIntervalDto,
 ): ImmersionTimeTable => {
-  const calendar: WeeklyImmersionTimetableDto[] = [];
-  const lastDayOfTheWeekIndex = 6;
-  applyDaysWithScheduleOnTimetable(complexSchedule, calendar);
-  applyDaysWithoutScheduleOnTimetable(calendar, lastDayOfTheWeekIndex);
-  return calendar;
+  const differenceInCalendarWeeksBetweenDates =
+    differenceInCalendarWeeks(endDay, startDay, {
+      weekStartsOn: 1,
+    }) + 1;
+  return isValidInterval({
+    start: startDay,
+    end: endDay,
+  })
+    ? arrayFromNumber(differenceInCalendarWeeksBetweenDates).map(
+        (_, weekIndex) =>
+          arrayFromNumber(weekdays.length).map((dayIndex) => {
+            const date = addDays(
+              startOfWeek(startDay, {
+                weekStartsOn: 1,
+              }),
+              dayIndex + weekIndex * weekdays.length,
+            );
+            return {
+              dailySchedule:
+                complexSchedule.find(
+                  (dailySchedule) =>
+                    parseISO(dailySchedule.date).getDate() === date.getDate() &&
+                    parseISO(dailySchedule.date).getMonth() ===
+                      date.getMonth() &&
+                    parseISO(dailySchedule.date).getFullYear() ===
+                      date.getFullYear(),
+                ) ?? null,
+              key: frenchDayMapping(date.toISOString()).frenchDay,
+            };
+          }),
+      )
+    : [];
 };
 
-const applyDaysWithoutScheduleOnTimetable = (
-  calendar: WeeklyImmersionTimetableDto[],
-  lastDayOfTheWeekIndex: number,
-) => {
-  let outOfRangeDayskey = 10000;
-  for (let weekIndex = 0; weekIndex < calendar.length; weekIndex++) {
-    for (let dayIndex = 0; dayIndex <= lastDayOfTheWeekIndex; dayIndex++) {
-      if (calendar[weekIndex][dayIndex] === undefined) {
-        calendar[weekIndex][dayIndex] = {
-          dailySchedule: null,
-          key: outOfRangeDayskey,
-        };
-        outOfRangeDayskey++;
-      }
-    }
-  }
-};
-
-const applyDaysWithScheduleOnTimetable = (
-  complexSchedule: DailyScheduleDto[],
-  calendar: WeeklyImmersionTimetableDto[],
-) => {
-  let currentWeekIndex = 0;
-  let higherWeekDay = 0;
-  complexSchedule.forEach((dailySchedule, dayIndex) => {
-    const frenchDay = frenchDayMapping(dailySchedule.date).frenchDay;
-    if (frenchDay < higherWeekDay) currentWeekIndex++;
-    if (calendar[currentWeekIndex] === undefined) calendar.push([]);
-    calendar[currentWeekIndex][frenchDay] = {
-      dailySchedule,
-      key: dayIndex,
-    };
-    higherWeekDay = frenchDay;
-  });
-};
+// Calculate total hours per week for a given schedule.
+export const calculateWeeklyHoursFromSchedule = (
+  schedule: ScheduleDto,
+  interval: DateIntervalDto,
+) =>
+  makeImmersionTimetable(schedule.complexSchedule, interval).map(
+    calculateWeeklyHours,
+  );
 
 export const calculateWeeklyHours = (
   week: WeeklyImmersionTimetableDto,

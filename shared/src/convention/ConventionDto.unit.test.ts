@@ -315,6 +315,7 @@ describe("conventionDtoSchema", () => {
         "Le format de la date de début est invalide",
         "La date de fin doit être après la date de début.",
         "La durée maximale calendaire d'une immersion est de 30 jours.",
+        "Veuillez remplir les horaires.",
       ]);
     });
 
@@ -327,6 +328,7 @@ describe("conventionDtoSchema", () => {
         "Le format de la date de fin est invalide",
         "La date de fin doit être après la date de début.",
         "La durée maximale calendaire d'une immersion est de 30 jours.",
+        "Veuillez remplir les horaires.",
       ]);
     });
 
@@ -334,10 +336,12 @@ describe("conventionDtoSchema", () => {
       const convention = new ConventionDtoBuilder()
         .withDateStart("2021-01-10")
         .withDateEnd("2021-01-03")
+        .withSchedule(reasonableSchedule)
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
         "La date de fin doit être après la date de début.",
+        "Veuillez remplir les horaires.",
       ]);
     });
 
@@ -346,6 +350,7 @@ describe("conventionDtoSchema", () => {
         .withDateSubmission("2021-10-15") // which is a friday
         .withDateStart("2021-10-19") // which is the following tuesday
         .withDateEnd("2021-10-30")
+        .withSchedule(reasonableSchedule)
         .build();
 
       expectConventionDtoToBeValid(convention);
@@ -574,6 +579,7 @@ describe("conventionDtoSchema", () => {
         .withInternshipKind("immersion")
         .withDateStart(immersionStartDate.toISOString())
         .withDateEnd(new Date("2022-01-02").toISOString())
+        .withSchedule(reasonableSchedule)
         .withBeneficiary(beneficiary)
         .build();
 
@@ -616,14 +622,20 @@ describe("conventionDtoSchema", () => {
     it("rejects when internship kind is mini-stage-cci", () => {
       expectConventionInvalidWithIssueMessages(
         conventionSchema,
-        conventionBuilder.withInternshipKind("mini-stage-cci").build(),
+        conventionBuilder
+          .withInternshipKind("mini-stage-cci")
+          .withSchedule(reasonableSchedule)
+          .build(),
         ["Le mini-stage ne peut pas se dérouler un dimanche"],
       );
     });
 
     it("accepts valid convention when kind is immersion", () => {
       expectConventionDtoToBeValid(
-        conventionBuilder.withInternshipKind("immersion").build(),
+        conventionBuilder
+          .withInternshipKind("immersion")
+          .withSchedule(reasonableSchedule)
+          .build(),
       );
     });
   });
@@ -649,6 +661,6 @@ const expectConventionInvalidWithIssueMessages = <T>(
       });
       return;
     }
-    throw new Error("Error expected when parsing convention");
+    throw new Error("Zod error expected when parsing convention");
   }
 };

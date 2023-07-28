@@ -39,7 +39,7 @@ const regularScheduleSchema = z.object({
 
 type RegularScheduleDto = z.infer<typeof regularScheduleSchema>;
 
-const defaultInterval: DateIntervalDto = {
+export const defaultInterval: DateIntervalDto = {
   start: new Date("2022-06-13"),
   end: new Date("2022-06-19"),
 };

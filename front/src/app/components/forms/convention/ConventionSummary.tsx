@@ -6,6 +6,7 @@ import {
   AgencyPublicDisplayDto,
   ConventionReadDto,
   DailyScheduleDto,
+  DateIntervalDto,
   DotNestedKeys,
   prettyPrintComplexSchedule,
   toDateString,
@@ -176,9 +177,10 @@ const establishmentSummary = (convention: ConventionReadDto) => {
 };
 const prettyPrintComplexScheduleAsJSX = (
   complexSchedule: DailyScheduleDto[],
+  interval: DateIntervalDto,
 ): JSX.Element => (
   <ul>
-    {prettyPrintComplexSchedule(complexSchedule)
+    {prettyPrintComplexSchedule(complexSchedule, undefined, interval)
       .split("\n")
       .map((line, index) => (
         <li key={index}>{line}</li>
@@ -195,7 +197,10 @@ const immersionConditionsSummary = (convention: ConventionReadDto) => {
     [fields["dateEnd"].label, toDateString(new Date(convention.dateEnd))],
     [
       "Emploi du temps",
-      prettyPrintComplexScheduleAsJSX(convention.schedule.complexSchedule),
+      prettyPrintComplexScheduleAsJSX(convention.schedule.complexSchedule, {
+        start: new Date(convention.dateStart),
+        end: new Date(convention.dateEnd),
+      }),
     ],
     [
       fields["individualProtection"].label,
