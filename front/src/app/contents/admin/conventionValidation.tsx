@@ -1,9 +1,9 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import {
+  ConventionReadDto,
   displayEmergencyContactInfos,
   prettyPrintSchedule,
-  ScheduleDto,
   toDisplayedDate,
 } from "shared";
 import { ColField, FieldsAndTitle } from "./types";
@@ -13,9 +13,12 @@ export const signToBooleanDisplay = (value: string | undefined) =>
 
 const booleanToCheck = (value: boolean) => (value ? "✅" : "❌");
 
-const renderSchedule = (schedule: ScheduleDto) => (
+const renderSchedule = (convention: ConventionReadDto) => (
   <div style={{ whiteSpace: "pre" }}>
-    {prettyPrintSchedule(schedule, false)}
+    {prettyPrintSchedule(convention.schedule, false, {
+      start: new Date(convention.dateStart),
+      end: new Date(convention.dateEnd),
+    })}
   </div>
 );
 
@@ -291,7 +294,7 @@ const immersionPlaceDateFields: ColField[] = [
   {
     key: "schedule",
     colLabel: "Horaires",
-    value: (convention) => renderSchedule(convention.schedule),
+    value: (convention) => renderSchedule(convention),
   },
 ];
 

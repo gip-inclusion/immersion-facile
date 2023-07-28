@@ -9,6 +9,7 @@ import { scheduleSchema } from "../schedule/Schedule.schema";
 import {
   calculateWeeklyHoursFromSchedule,
   isSundayInSchedule,
+  validateSchedule,
 } from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret.schema";
 import { allRoles } from "../tokens/token.dto";
@@ -261,6 +262,14 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
           IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
         );
       }
+
+      const message = validateSchedule(convention.schedule, {
+        start: new Date(convention.dateStart),
+        end: new Date(convention.dateEnd),
+      });
+      if (message) {
+        addIssue(message, "schedule");
+      }
     })
     .refine(mustBeSignedByEveryone, {
       message: localization.mustBeSignedByEveryone,
@@ -369,7 +378,10 @@ const addIssueIfLimitedScheduleHoursExceeded = (
   addIssue: (message: string, path: string) => void,
   beneficiaryAgeAtConventionStart: number,
 ) => {
-  const weeklyHours = calculateWeeklyHoursFromSchedule(convention.schedule);
+  const weeklyHours = calculateWeeklyHoursFromSchedule(convention.schedule, {
+    start: new Date(convention.dateStart),
+    end: new Date(convention.dateEnd),
+  });
   if (
     beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
     weeklyHours.some(

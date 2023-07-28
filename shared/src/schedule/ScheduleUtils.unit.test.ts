@@ -1,7 +1,14 @@
+import { ZodError } from "zod";
+import { conventionSchema } from "../convention/convention.schema";
+import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { expectToEqual } from "../test.helpers";
-import { ScheduleDto, SelectedDaysOfTheWeekDto } from "./Schedule.dto";
+import {
+  DateIntervalDto,
+  ScheduleDto,
+  SelectedDaysOfTheWeekDto,
+} from "./Schedule.dto";
 import { dateIsoStringSchema, scheduleSchema } from "./Schedule.schema";
-import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
+import { defaultInterval, ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
   calculateScheduleTotalDurationInDays,
@@ -9,7 +16,9 @@ import {
   calculateWeeklyHoursFromSchedule,
   isSundayInSchedule,
   makeDailySchedule,
+  makeImmersionTimetable,
   prettyPrintSchedule,
+  reasonableSchedule,
   selectedDaysFromComplexSchedule,
 } from "./ScheduleUtils";
 
@@ -91,6 +100,8 @@ describe("ScheduleUtils", () => {
       expect(
         prettyPrintSchedule(
           new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
+          undefined,
+          defaultInterval,
         ).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires : 0",
@@ -102,7 +113,13 @@ describe("ScheduleUtils", () => {
         "samedi : libre",
         "dimanche : libre",
       ]);
-      expect(prettyPrintSchedule(complexSchedule()).split("\n")).toEqual([
+      expect(
+        prettyPrintSchedule(
+          complexSchedule(),
+          undefined,
+          defaultInterval,
+        ).split("\n"),
+      ).toEqual([
         "Heures de travail hebdomadaires : 6",
         "lundi : 01:00-02:00",
         "mardi : libre",
@@ -119,6 +136,8 @@ describe("ScheduleUtils", () => {
       expect(
         prettyPrintSchedule(
           new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
+          undefined,
+          defaultInterval,
         ).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires : 0",
@@ -130,7 +149,13 @@ describe("ScheduleUtils", () => {
         "samedi : libre",
         "dimanche : libre",
       ]);
-      expect(prettyPrintSchedule(regularSchedule()).split("\n")).toEqual([
+      expect(
+        prettyPrintSchedule(
+          regularSchedule(),
+          undefined,
+          defaultInterval,
+        ).split("\n"),
+      ).toEqual([
         "Heures de travail hebdomadaires : 8",
         "lundi : 01:00-02:00, 03:00-04:00",
         "mardi : libre",
@@ -142,68 +167,111 @@ describe("ScheduleUtils", () => {
       ]);
     });
 
+    it("prints long schedules", () => {
+      const conventionWithLongSchedule = new ConventionDtoBuilder()
+        .withDateStart(new Date("2023-07-26").toISOString())
+        .withDateEnd(new Date("2023-08-10").toISOString())
+        .withSchedule(reasonableSchedule)
+        .build();
+
+      expectToEqual(
+        prettyPrintSchedule(conventionWithLongSchedule.schedule, false, {
+          start: new Date(conventionWithLongSchedule.dateStart),
+          end: new Date(conventionWithLongSchedule.dateEnd),
+        }).split("\n"),
+        [
+          "Heures de travail hebdomadaires : 35",
+          "mercredi : 08:00-12:00, 13:00-16:00",
+          "jeudi : 08:00-12:00, 13:00-16:00",
+          "vendredi : 08:00-12:00, 13:00-16:00",
+          "samedi : 08:00-12:00, 13:00-16:00",
+          "dimanche : 08:00-12:00, 13:00-16:00",
+          "Heures de travail hebdomadaires : 49",
+          "lundi : 08:00-12:00, 13:00-16:00",
+          "mardi : 08:00-12:00, 13:00-16:00",
+          "mercredi : 08:00-12:00, 13:00-16:00",
+          "jeudi : 08:00-12:00, 13:00-16:00",
+          "vendredi : 08:00-12:00, 13:00-16:00",
+          "samedi : 08:00-12:00, 13:00-16:00",
+          "dimanche : 08:00-12:00, 13:00-16:00",
+          "Heures de travail hebdomadaires : 28",
+          "lundi : 08:00-12:00, 13:00-16:00",
+          "mardi : 08:00-12:00, 13:00-16:00",
+          "mercredi : 08:00-12:00, 13:00-16:00",
+          "jeudi : 08:00-12:00, 13:00-16:00",
+        ],
+      );
+    });
+
     it("prints schedules with schedule that have no timeperiod", () => {
       expect(
-        prettyPrintSchedule({
-          totalHours: 12,
-          workedDays: 4,
-          isSimple: false,
-          selectedIndex: 6,
-          complexSchedule: [
-            {
-              date: "2022-07-18T00:00:00.000Z",
-              timePeriods: [
-                {
-                  start: "14:00",
-                  end: "17:00",
-                },
-              ],
-            },
-            {
-              date: "2022-07-19T00:00:00.000Z",
-              timePeriods: [],
-            },
-            {
-              date: "2022-07-20T00:00:00.000Z",
-              timePeriods: [
-                {
-                  start: "10:00",
-                  end: "12:00",
-                },
-                {
-                  start: "14:00",
-                  end: "16:00",
-                },
-              ],
-            },
-            {
-              date: "2022-07-21T00:00:00.000Z",
-              timePeriods: [
-                {
-                  start: "14:00",
-                  end: "16:00",
-                },
-              ],
-            },
-            {
-              date: "2022-07-22T00:00:00.000Z",
-              timePeriods: [],
-            },
-            {
-              date: "2022-07-23T00:00:00.000Z",
-              timePeriods: [
-                {
-                  start: "09:00",
-                  end: "12:00",
-                },
-              ],
-            },
-            {
-              date: "2022-07-24T00:00:00.000Z",
-              timePeriods: [],
-            },
-          ],
-        }).split("\n"),
+        prettyPrintSchedule(
+          {
+            totalHours: 12,
+            workedDays: 4,
+            isSimple: false,
+            selectedIndex: 6,
+            complexSchedule: [
+              {
+                date: "2022-07-18T00:00:00.000Z",
+                timePeriods: [
+                  {
+                    start: "14:00",
+                    end: "17:00",
+                  },
+                ],
+              },
+              {
+                date: "2022-07-19T00:00:00.000Z",
+                timePeriods: [],
+              },
+              {
+                date: "2022-07-20T00:00:00.000Z",
+                timePeriods: [
+                  {
+                    start: "10:00",
+                    end: "12:00",
+                  },
+                  {
+                    start: "14:00",
+                    end: "16:00",
+                  },
+                ],
+              },
+              {
+                date: "2022-07-21T00:00:00.000Z",
+                timePeriods: [
+                  {
+                    start: "14:00",
+                    end: "16:00",
+                  },
+                ],
+              },
+              {
+                date: "2022-07-22T00:00:00.000Z",
+                timePeriods: [],
+              },
+              {
+                date: "2022-07-23T00:00:00.000Z",
+                timePeriods: [
+                  {
+                    start: "09:00",
+                    end: "12:00",
+                  },
+                ],
+              },
+              {
+                date: "2022-07-24T00:00:00.000Z",
+                timePeriods: [],
+              },
+            ],
+          },
+          undefined,
+          {
+            start: new Date("2022-07-18"),
+            end: new Date("2022-07-24"),
+          },
+        ).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires : 12",
         "lundi : 14:00-17:00",
@@ -255,11 +323,12 @@ describe("ScheduleUtils", () => {
 
   describe("calculateWeeklyHoursFromSchedule", () => {
     it("calculates correctly the total number of hours from a complex schedule", () => {
+      const interval: DateIntervalDto = {
+        start: new Date("2022-06-06"),
+        end: new Date("2022-06-10"),
+      };
       const schedule = new ScheduleDtoBuilder()
-        .withDateInterval({
-          start: new Date("2022-06-06"),
-          end: new Date("2022-06-10"),
-        })
+        .withDateInterval(interval)
         .withRegularSchedule({
           selectedDays: [0, 2, 3],
           timePeriods: [
@@ -269,7 +338,7 @@ describe("ScheduleUtils", () => {
         })
         .build();
 
-      const weeklyHours = calculateWeeklyHoursFromSchedule(schedule);
+      const weeklyHours = calculateWeeklyHoursFromSchedule(schedule, interval);
       expectToEqual(weeklyHours, [22.5]);
     });
   });
@@ -336,8 +405,21 @@ describe("ScheduleUtils", () => {
             timePeriods: [],
           })
           .build();
+        const conventionWithEmptySchedule = new ConventionDtoBuilder()
+          .withSchedule(() => emptySchedule)
+          .build();
 
-        expect(() => scheduleSchema.parse(emptySchedule)).toThrow();
+        expect(() =>
+          conventionSchema.parse(conventionWithEmptySchedule),
+        ).toThrow(
+          new ZodError([
+            {
+              code: "custom",
+              message: "Veuillez remplir les horaires.",
+              path: ["schedule"],
+            },
+          ]),
+        );
       });
 
       describe("check matching totalHours and worked days", () => {
@@ -356,7 +438,20 @@ describe("ScheduleUtils", () => {
 
         it("does not validate schema if totalHours do not match calculated one", () => {
           const schedule = scheduleBuilder.withTotalHours(3).build();
-          expect(() => scheduleSchema.parse(schedule)).toThrow();
+          const conventionWithSchedule = new ConventionDtoBuilder()
+            .withSchedule(() => schedule)
+            .build();
+
+          expect(() => conventionSchema.parse(conventionWithSchedule)).toThrow(
+            new ZodError([
+              {
+                code: "custom",
+                message:
+                  "Le nombre total d'heure ne correspond pas à celui du calendrier. Calcul du calendrier: 22.5, Nombre total heures fourni: 3",
+                path: ["schedule"],
+              },
+            ]),
+          );
         });
 
         it("validates schema if totalHours matches calculated one", () => {
@@ -367,7 +462,20 @@ describe("ScheduleUtils", () => {
 
         it("does not validate schema if workedDays do not match calculated one", () => {
           const schedule = scheduleBuilder.withWorkedDays(1).build();
-          expect(() => scheduleSchema.parse(schedule)).toThrow();
+          const conventionWithSchedule = new ConventionDtoBuilder()
+            .withSchedule(() => schedule)
+            .build();
+
+          expect(() => conventionSchema.parse(conventionWithSchedule)).toThrow(
+            new ZodError([
+              {
+                code: "custom",
+                message:
+                  "Le nombre total de jours travaillés ne correspond pas à celui du calendrier. Calcul du calendrier: 3, Nombre de jours fourni: 1",
+                path: ["schedule"],
+              },
+            ]),
+          );
         });
 
         it("validates schema if workedDays matches calculated one", () => {
@@ -503,6 +611,217 @@ describe("ScheduleUtils", () => {
       ]);
 
       expect(isSundayInSchedule([complexSchedule])).toBe(true);
+    });
+  });
+
+  describe("validate makeImmersionTimetable", () => {
+    it("should make a weekly timetable based on complex schedule", () => {
+      const interval = {
+        start: new Date("2023-07-30"),
+        end: new Date("2023-08-07"),
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withRegularSchedule({
+          selectedDays: [6],
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "17:00" },
+          ],
+        })
+        .build();
+      expectToEqual(
+        makeImmersionTimetable(schedule.complexSchedule, interval),
+        [
+          [
+            {
+              dailySchedule: null,
+              key: 0,
+            },
+            {
+              dailySchedule: null,
+              key: 1,
+            },
+            {
+              dailySchedule: null,
+              key: 2,
+            },
+            {
+              dailySchedule: null,
+              key: 3,
+            },
+            {
+              dailySchedule: null,
+              key: 4,
+            },
+            {
+              dailySchedule: null,
+              key: 5,
+            },
+            {
+              key: 6,
+              dailySchedule: {
+                date: "2023-07-30T00:00:00.000Z",
+                timePeriods: [
+                  { start: "09:00", end: "12:00" },
+                  { start: "13:00", end: "17:00" },
+                ],
+              },
+            },
+          ],
+          [
+            {
+              dailySchedule: null,
+              key: 0,
+            },
+            {
+              dailySchedule: null,
+              key: 1,
+            },
+            {
+              dailySchedule: null,
+              key: 2,
+            },
+            {
+              dailySchedule: null,
+              key: 3,
+            },
+            {
+              dailySchedule: null,
+              key: 4,
+            },
+            {
+              dailySchedule: null,
+              key: 5,
+            },
+            {
+              key: 6,
+              dailySchedule: {
+                date: "2023-08-06T00:00:00.000Z",
+                timePeriods: [
+                  { start: "09:00", end: "12:00" },
+                  { start: "13:00", end: "17:00" },
+                ],
+              },
+            },
+          ],
+          [
+            {
+              dailySchedule: null,
+              key: 0,
+            },
+            {
+              dailySchedule: null,
+              key: 1,
+            },
+            {
+              dailySchedule: null,
+              key: 2,
+            },
+            {
+              dailySchedule: null,
+              key: 3,
+            },
+            {
+              dailySchedule: null,
+              key: 4,
+            },
+            {
+              dailySchedule: null,
+              key: 5,
+            },
+            {
+              key: 6,
+              dailySchedule: null,
+            },
+          ],
+        ],
+      );
+    });
+
+    it("should make a weekly timetable based on another complex schedule", () => {
+      const interval = {
+        start: new Date("2023-09-15"),
+        end: new Date("2023-09-21"),
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withRegularSchedule({
+          selectedDays: [0, 6],
+          timePeriods: [{ start: "09:00", end: "12:00" }],
+        })
+        .build();
+      expectToEqual(
+        makeImmersionTimetable(schedule.complexSchedule, interval),
+        [
+          [
+            {
+              dailySchedule: null,
+              key: 0,
+            },
+            {
+              dailySchedule: null,
+              key: 1,
+            },
+            {
+              dailySchedule: null,
+              key: 2,
+            },
+            {
+              dailySchedule: null,
+              key: 3,
+            },
+            {
+              dailySchedule: null,
+              key: 4,
+            },
+            {
+              dailySchedule: null,
+              key: 5,
+            },
+            {
+              key: 6,
+              dailySchedule: {
+                date: "2023-09-17T00:00:00.000Z",
+                timePeriods: [{ start: "09:00", end: "12:00" }],
+              },
+            },
+          ],
+          [
+            {
+              dailySchedule: {
+                date: "2023-09-18T00:00:00.000Z",
+                timePeriods: [{ start: "09:00", end: "12:00" }],
+              },
+              key: 0,
+            },
+            {
+              dailySchedule: null,
+              key: 1,
+            },
+            {
+              dailySchedule: null,
+              key: 2,
+            },
+            {
+              dailySchedule: null,
+              key: 3,
+            },
+            {
+              dailySchedule: null,
+              key: 4,
+            },
+            {
+              dailySchedule: null,
+              key: 5,
+            },
+            {
+              key: 6,
+              dailySchedule: null,
+            },
+          ],
+        ],
+      );
     });
   });
 });

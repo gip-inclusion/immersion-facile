@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   frontRoutes,
+  reasonableSchedule,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 import {
@@ -69,6 +70,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .withImmersionAddress("127 Avenue de la République 94800 Villejuif")
       .withDateStart("2022-07-06")
       .withDateEnd("2022-07-30")
+      .withSchedule((interval) =>
+        reasonableSchedule(interval, ["samedi", "dimanche"]),
+      )
       .withBusinessName("Boulangerie Les Echarts")
       .build();
 
@@ -132,6 +136,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .withImmersionAddress("127 Avenue de la République 94800 Villejuif")
       .withDateStart("2022-07-06")
       .withDateEnd("2022-07-30")
+      .withSchedule((interval) =>
+        reasonableSchedule(interval, ["samedi", "dimanche"]),
+      )
       .withBusinessName("Boulangerie Les Echarts")
       .build();
 

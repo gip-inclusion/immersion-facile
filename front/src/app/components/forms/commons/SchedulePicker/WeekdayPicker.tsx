@@ -1,8 +1,12 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import { addDays, differenceInDays } from "date-fns";
+import { uniq } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
+  arrayFromNumber,
   DateIntervalDto,
+  frenchDayMapping,
   removeAtIndex,
   SelectedDaysOfTheWeekDto,
   WeekdayNumber,
@@ -22,6 +26,7 @@ export const WeekdayPicker = ({
   onValueChange,
   availableWeekDays,
   selectedDays,
+  interval,
 }: WeekdayPickerProps) => {
   const { cx } = useStyles();
   const onDayClick = (day: WeekdayNumber) => {
@@ -29,6 +34,19 @@ export const WeekdayPicker = ({
       ? removeAtIndex(selectedDays, selectedDays.indexOf(day))
       : [...selectedDays, day];
     onValueChange(newDaysSelected);
+  };
+  const isDayDisabled = (
+    day: WeekdayNumber,
+    { start, end }: DateIntervalDto,
+  ) => {
+    const uniqueWeekDaysOnInterval = uniq(
+      arrayFromNumber(differenceInDays(end, start) + 1).map(
+        (dayIndex) =>
+          frenchDayMapping(addDays(new Date(start), dayIndex).toISOString())
+            .frenchDay,
+      ),
+    );
+    return !uniqueWeekDaysOnInterval.includes(day);
   };
 
   return (
@@ -44,6 +62,7 @@ export const WeekdayPicker = ({
           <DayCircle
             key={dayName + index}
             name={dayName}
+            disabled={isDayDisabled(index as WeekdayNumber, interval)}
             dayStatus={
               selectedDays.includes(index as WeekdayNumber)
                 ? "hasTime"

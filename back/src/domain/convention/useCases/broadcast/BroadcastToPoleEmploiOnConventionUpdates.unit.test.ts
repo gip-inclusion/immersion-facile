@@ -156,6 +156,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .withDateStart("2021-05-13T10:00:00.000Z")
       .withDateEnd("2021-05-14T10:30:00.000Z") // Lasts 1 day and half an hour, ie. 24.5 hours
+      .withSchedule(reasonableSchedule)
       .withImmersionObjective("Confirmer un projet professionnel")
       .build();
 

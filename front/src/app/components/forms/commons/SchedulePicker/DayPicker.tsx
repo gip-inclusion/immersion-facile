@@ -1,11 +1,16 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { DailyScheduleDto, makeImmersionTimetable } from "shared";
+import {
+  DailyScheduleDto,
+  DateIntervalDto,
+  makeImmersionTimetable,
+} from "shared";
 import { DayCircle } from "./DayCircle";
 import { WeeklyRow } from "./WeeklyRow";
 
 type DayPickerProps = {
   complexSchedule: DailyScheduleDto[];
+  interval: DateIntervalDto;
   selectedIndex: number;
   onChange: (index: number) => void;
   disabled?: boolean;
@@ -13,6 +18,7 @@ type DayPickerProps = {
 
 export const DayPicker = ({
   complexSchedule,
+  interval,
   selectedIndex,
   onChange,
   disabled,
@@ -31,15 +37,17 @@ export const DayPicker = ({
         total t/sem
       </strong>
     </div>
-    {makeImmersionTimetable(complexSchedule).map((weeklyCalendar, index) => (
-      <WeeklyRow
-        week={index + 1}
-        key={`week-${(index + 1).toString()}`}
-        weeklyCalendar={weeklyCalendar}
-        selectedIndex={selectedIndex}
-        disabled={disabled}
-        onChange={onChange}
-      />
-    ))}
+    {makeImmersionTimetable(complexSchedule, interval).map(
+      (weeklyCalendar, index) => (
+        <WeeklyRow
+          week={index + 1}
+          key={`week-${(index + 1).toString()}`}
+          weeklyCalendar={weeklyCalendar}
+          selectedIndex={selectedIndex}
+          disabled={disabled}
+          onChange={onChange}
+        />
+      ),
+    )}
   </>
 );
