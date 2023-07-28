@@ -156,4 +156,4 @@ export const objectToDependencyList = <T extends Record<string, unknown>>(
 type Primitive = string | boolean | number | undefined | null;
 
 export const arrayFromNumber = (n: number): number[] =>
-  Array.from(Array(n).keys());
+  n > 0 ? Array.from(Array(n).keys()) : [];

@@ -7,6 +7,7 @@ import {
   ConventionReadDto,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
+  reasonableSchedule,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
@@ -108,6 +109,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
       .withDateStart(new Date("2023-03-27").toISOString())
       .withDateEnd(new Date("2023-03-28").toISOString())
+      .withSchedule(reasonableSchedule)
       .withStatus("READY_TO_SIGN")
       .withExternalId("1")
       .withAgencyId(agencyId)
@@ -116,6 +118,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
       .withDateStart(new Date("2023-03-30").toISOString())
       .withDateEnd(new Date("2023-03-31").toISOString())
+      .withSchedule(reasonableSchedule)
       .withStatus("DRAFT")
       .withExternalId("2")
       .withAgencyId(agencyId)
@@ -262,6 +265,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .validated()
         .withDateStart(dateStart)
         .withDateEnd(dateEnd14)
+        .withSchedule(reasonableSchedule)
         .build();
       const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
         new ConventionDtoBuilder()
@@ -269,12 +273,14 @@ describe("Pg implementation of ConventionQueries", () => {
           .validated()
           .withDateStart(dateStart)
           .withDateEnd(dateEnd15)
+          .withSchedule(reasonableSchedule)
           .build();
       const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .validated()
         .withDateStart(dateStart)
         .withDateEnd(dateEnd15)
+        .withSchedule(reasonableSchedule)
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
         .withExternalId("3")
@@ -283,6 +289,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .withDateStart("2022-05-10")
         .withDateEnd("2022-05-15")
+        .withSchedule(reasonableSchedule)
         .withStatus("IN_REVIEW")
         .build();
       await Promise.all(

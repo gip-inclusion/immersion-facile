@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
@@ -15,6 +15,7 @@ import {
   ScheduleDtoBuilder,
   selectedDaysFromComplexSchedule,
   SelectedDaysOfTheWeekDto,
+  TimePeriodsDto,
 } from "shared";
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
@@ -30,6 +31,11 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const { setValue, getValues } = useFormContext<ConventionReadDto>();
   const values = getValues();
+  const [selectedHours, setSelectedHours] = useState<TimePeriodsDto>(
+    regularTimePeriods(
+      values.schedule.complexSchedule.at(0)?.timePeriods ?? [],
+    ),
+  );
   const cciWeekDays = ["L", "M", "M", "J", "V", "S"];
   const immersionWeekDays = ["L", "M", "M", "J", "V", "S", "D"];
   const availableWeekDays =
@@ -63,7 +69,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
                 .withDateInterval(props.interval)
                 .withRegularSchedule({
                   selectedDays: newSelectedDays,
-                  timePeriods: regularTimePeriods(values.schedule),
+                  timePeriods: regularTimePeriods(selectedHours),
                 })
                 .build();
               setValue(name, newSchedule);
@@ -78,7 +84,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
 
           <HourPicker
             name={name}
-            timePeriods={regularTimePeriods(values.schedule)}
+            timePeriods={regularTimePeriods(selectedHours)}
             onValueChange={(newHours) => {
               const complexSchedule = values.schedule.complexSchedule.map(
                 (dailySchedule): DailyScheduleDto => ({
@@ -100,6 +106,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
               setValue(name, schedule, {
                 shouldValidate: true,
               });
+              setSelectedHours(newHours);
             }}
             disabled={props.disabled}
           />
@@ -138,7 +145,7 @@ const WeeksHoursIndicator = ({
     schedule,
     interval,
   );
-  const shouldShowRecap = workedHoursByWeek.length > 0;
+  const shouldShowRecap = workedHoursByWeek.some((hours) => hours > 0);
   return (
     <>
       {shouldShowRecap && (
