@@ -397,23 +397,21 @@ export const calculateWeeklyHours = (
     0,
   );
 
-export const regularTimePeriods = (schedule: ScheduleDto): TimePeriodsDto => {
-  const scheduleWithTimePeriods = schedule.complexSchedule.find(
-    (dailySchedule) => dailySchedule.timePeriods.length > 0,
-  );
-  return scheduleWithTimePeriods
-    ? scheduleWithTimePeriods.timePeriods
-    : [
-        {
-          start: "09:00",
-          end: "12:00",
-        },
-        {
-          start: "13:00",
-          end: "17:00",
-        },
-      ];
-};
+export const defaultTimePeriods: TimePeriodsDto = [
+  {
+    start: "09:00",
+    end: "12:00",
+  },
+  {
+    start: "13:00",
+    end: "17:00",
+  },
+];
+
+export const regularTimePeriods = (
+  timePeriods: TimePeriodsDto,
+): TimePeriodsDto =>
+  timePeriods.length > 0 ? timePeriods : defaultTimePeriods;
 
 export const emptySchedule = (
   interval: DateIntervalDto,

@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { addDays, addMonths } from "date-fns";
+import { addDays, addMonths, differenceInDays, subDays } from "date-fns";
 import {
   addressDtoToString,
   ConventionReadDto,
@@ -86,17 +86,15 @@ export const ImmersionHourLocationSection = () => {
           id: formContents["dateStart"].id,
           value: toDateString(new Date(values.dateStart)),
           onChange: (event) => {
-            const newDateStart = event.target.value;
-            if (isStringDate(newDateStart) && newDateStart !== "") {
-              setValue("dateStart", newDateStart, {
-                shouldValidate: true,
-              });
-            }
-          },
-          onBlur: (event) => {
             const dateStart = event.target.value;
             if (isStringDate(dateStart) && dateStart !== "") {
-              const newDateEnd = addDays(new Date(values.dateStart), 1);
+              const newDateEnd =
+                differenceInDays(
+                  new Date(values.dateEnd),
+                  new Date(dateStart),
+                ) > 0
+                  ? new Date(values.dateEnd)
+                  : addDays(new Date(dateStart), 1);
               resetSchedule({
                 start: new Date(dateStart),
                 end: newDateEnd,
@@ -104,9 +102,13 @@ export const ImmersionHourLocationSection = () => {
               setValue("dateEnd", newDateEnd.toISOString(), {
                 shouldValidate: true,
               });
+              setValue("dateStart", dateStart, {
+                shouldValidate: true,
+              });
               setDateMax(addMonths(new Date(dateStart), 1).toISOString());
             }
           },
+
           type: "date",
         }}
         {...getFieldError("dateStart")}
@@ -120,18 +122,26 @@ export const ImmersionHourLocationSection = () => {
           id: formContents["dateEnd"].id,
           onChange: (event) => {
             const newDateEnd = event.target.value;
+
             if (isStringDate(newDateEnd) && newDateEnd !== "") {
+              const newDateStart =
+                differenceInDays(
+                  new Date(newDateEnd),
+                  new Date(values.dateStart),
+                ) > 0
+                  ? new Date(values.dateStart)
+                  : subDays(new Date(newDateEnd), 1);
               setValue("dateEnd", newDateEnd, {
                 shouldValidate: true,
               });
+              setValue("dateStart", newDateStart.toISOString(), {
+                shouldValidate: true,
+              });
+              resetSchedule({
+                start: new Date(values.dateStart),
+                end: new Date(newDateEnd),
+              });
             }
-          },
-          onBlur: (event) => {
-            const dateEnd = event.target.value;
-            resetSchedule({
-              start: new Date(values.dateStart),
-              end: new Date(dateEnd),
-            });
           },
           type: "date",
           max: dateMax,
