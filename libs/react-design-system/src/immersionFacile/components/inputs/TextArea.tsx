@@ -1,30 +1,30 @@
 import React from "react";
 
 export type TextAreaProperties = {
+  disabled?: boolean;
+  error?: string;
+  id?: string;
   name: string;
+  placeholder?: string;
+  readOnly?: boolean;
   value?: string;
   onKeyPress?: React.KeyboardEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   >;
   onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  error?: string;
-  placeholder?: string;
-  disabled?: boolean;
-  id?: string;
-  readOnly?: boolean;
 };
 export const TextArea = ({
+  disabled,
+  error,
+  id,
   name,
+  placeholder,
+  readOnly,
   value,
   onKeyPress,
   onChange,
   onBlur,
-  error,
-  placeholder,
-  disabled,
-  id,
-  readOnly,
 }: TextAreaProperties): JSX.Element => (
   <textarea
     id={id}
