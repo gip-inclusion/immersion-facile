@@ -119,7 +119,6 @@ export const ConventionSignForm = ({
         {currentSignatory && (
           <SignatureActions
             internshipKind={convention.internshipKind}
-            alreadySigned={false}
             signatory={currentSignatory}
             onSubmitClick={methods.handleSubmit(onSignFormSubmit, (errors) => {
               // eslint-disable-next-line no-console
