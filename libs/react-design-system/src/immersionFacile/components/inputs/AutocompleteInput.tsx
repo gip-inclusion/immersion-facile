@@ -4,24 +4,24 @@ import { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
 import "./AutocompleteInput.css";
 
-type AutocompleteInputProps = {
-  headerClassName: string | undefined;
-  label: string;
-  inputStyle: React.CSSProperties | undefined;
+export type AutocompleteInputProps = {
   disabled: boolean | undefined;
-  placeholder: string | undefined;
+  headerClassName: string | undefined;
   id: string | undefined;
+  inputStyle: React.CSSProperties | undefined;
+  label: string;
   params: AutocompleteRenderInputParams;
+  placeholder: string | undefined;
 };
 
 export const AutocompleteInput = ({
-  headerClassName,
-  label,
-  inputStyle,
   disabled,
-  placeholder,
+  headerClassName,
   id,
+  inputStyle,
+  label,
   params,
+  placeholder,
 }: AutocompleteInputProps) => {
   const { cx } = useStyles();
   return (
