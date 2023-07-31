@@ -2,34 +2,34 @@ import React from "react";
 import { AutocompleteAttributeValue } from "./AutocompleteAttributeValue.type";
 
 export type InputProperties = {
+  autoComplete?: AutocompleteAttributeValue;
+  disabled?: boolean;
+  error?: string;
+  id?: string;
   name: string;
-  value?: string;
+  placeholder?: string;
+  readOnly?: boolean;
   type?: React.HTMLInputTypeAttribute;
+  value?: string;
+  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onKeyPress?: React.KeyboardEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   >;
-  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  error?: string;
-  placeholder?: string;
-  disabled?: boolean;
-  id?: string;
-  readOnly?: boolean;
-  autoComplete?: AutocompleteAttributeValue;
 };
 export const Input = ({
-  name,
-  value,
-  type,
-  onKeyPress,
-  onChange,
-  onBlur,
-  error,
-  placeholder,
-  disabled,
-  id,
-  readOnly,
   autoComplete,
+  disabled,
+  error,
+  id,
+  name,
+  placeholder,
+  readOnly,
+  type,
+  value,
+  onBlur,
+  onChange,
+  onKeyPress,
 }: InputProperties): JSX.Element => (
   <input
     id={id}
