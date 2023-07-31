@@ -5,20 +5,20 @@ import { useStyles } from "tss-react/dsfr";
 
 const componentName = "im-notification-errors";
 
-type ErrorNotificationsProps = {
-  labels?: Record<string, string | undefined>;
+export type ErrorNotificationsProps = {
   errors: Record<string, string>;
+  labels?: Record<string, string | undefined>;
   visible: boolean;
 };
 
 const ErrorMessage = ({
-  labels,
-  field,
   error,
+  field,
+  labels,
 }: {
-  labels?: Record<string, string | undefined>;
-  field: string;
   error: string | object;
+  field: string;
+  labels?: Record<string, string | undefined>;
 }) => (
   <>
     <strong className={`${componentName}__error-label`}>
@@ -32,8 +32,8 @@ const ErrorMessage = ({
 );
 
 export const ErrorNotifications = ({
-  labels,
   errors,
+  labels,
   visible,
 }: ErrorNotificationsProps) => {
   const { cx } = useStyles();
