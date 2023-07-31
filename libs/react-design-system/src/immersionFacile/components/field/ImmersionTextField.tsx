@@ -5,43 +5,43 @@ import { Label } from "../label";
 import { FieldDescription } from "./FieldDescription";
 
 export interface ImmersionTextFieldProps {
+  autoComplete?: AutocompleteAttributeValue;
+  className?: string;
+  description?: string;
+  disabled?: boolean;
+  error?: string;
+  id?: string;
+  label?: string;
+  multiline?: boolean;
   name: string;
+  placeholder?: string;
+  readOnly?: boolean;
+  type?: string;
   value?: string;
   onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onKeyPress?: React.KeyboardEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   >;
-  error?: string;
-  label?: string;
-  placeholder?: string;
-  description?: string;
-  className?: string;
-  multiline?: boolean;
-  disabled?: boolean;
-  type?: string;
-  id?: string;
-  readOnly?: boolean;
-  autoComplete?: AutocompleteAttributeValue;
 }
 
 export const ImmersionTextField = ({
-  value,
+  autoComplete,
+  className,
+  description,
+  disabled,
+  error,
+  id,
+  label,
+  multiline,
+  name,
+  placeholder,
+  readOnly,
   type = "text",
+  value,
   onBlur,
   onChange,
   onKeyPress,
-  error,
-  className,
-  placeholder,
-  description,
-  label,
-  multiline,
-  disabled,
-  name,
-  id,
-  readOnly,
-  autoComplete,
 }: ImmersionTextFieldProps) => (
   <InputGroup className={className} error={error}>
     <Label label={label} htmlFor={id} />
