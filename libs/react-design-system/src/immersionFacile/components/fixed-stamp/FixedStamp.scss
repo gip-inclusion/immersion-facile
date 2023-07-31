@@ -16,6 +16,7 @@
   transition: right 0.5s ease;
   z-index: 500;
   display: none;
+
   &:hover {
     right: 0;
   }
@@ -27,36 +28,54 @@
     right: 0;
     bottom: 0;
   }
+
   &__image-wrapper {
     max-width: 70%;
     margin: 0 auto;
   }
+
   &__content {
     display: flex;
     flex-direction: column;
     margin-top: 0.1rem;
   }
+
   &__overtitle {
     font-size: 0.75rem;
   }
+
   &__title {
     font-size: 0.75rem;
     color: var(--blue-cumulus-main-526);
   }
+
   &__subtitle {
     font-size: 0.625rem;
     font-style: italic;
     margin-top: 0.2rem;
     opacity: 0.8;
   }
+
   @include for-screen-min($bp-sm) {
     display: block;
   }
   // overriding DSFR styles
   a.fixed-stamp__overlay-link {
     background-image: none;
+
     &:active {
       background-color: transparent;
     }
+  }
+}
+
+#storybook-docs {
+  #story--fixedstamp--default--primary-inner {
+    position: relative;
+    min-height: 200px;
+  }
+
+  .fixed-stamp {
+    position: absolute;
   }
 }
