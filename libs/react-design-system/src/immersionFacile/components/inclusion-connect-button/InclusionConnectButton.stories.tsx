@@ -1,25 +1,35 @@
-import React from "react";
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+import { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   InclusionConnectButton,
   InclusionConnectButtonProps,
 } from "./InclusionConnectButton";
 
 const Component = InclusionConnectButton;
+type Story = StoryObj<typeof Component>;
 const argTypes: Partial<ArgTypes<InclusionConnectButtonProps>> | undefined = {};
+
+const componentDescription = `
+\`\`\`tsx  
+import { InclusionConnectButton } from "react-design-system";
+\`\`\`
+`;
 
 export default {
   title: "InclusionConnectButton",
   component: Component,
   argTypes,
-} as ComponentMeta<typeof Component>;
+  parameters: {
+    docs: {
+      description: {
+        component: componentDescription,
+      },
+    },
+  },
+} as Meta<typeof Component>;
 
-const componentStory: ComponentStory<typeof Component> = (args) => (
-  <Component {...args} />
-);
-
-export const PeConnectButtonMock = componentStory.bind({});
-PeConnectButtonMock.args = {
-  inclusionConnectEndpoint: "fake-endpoint",
-  onClick: () => alert("clicked"),
+export const PeConnectButtonMock: Story = {
+  args: {
+    inclusionConnectEndpoint: "fake-endpoint",
+    onClick: () => alert("clicked"),
+  },
 };
