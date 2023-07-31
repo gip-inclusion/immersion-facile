@@ -3,14 +3,14 @@ import { fr } from "@codegouvfr/react-dsfr";
 import classNames, { ArgumentArray } from "classnames";
 
 export type FileProperties = {
+  accept?: string;
   className?: ArgumentArray;
-  label: string;
-  multiple?: boolean;
-  onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;
   errorMessage?: string;
   hint?: string;
   id: string;
-  accept?: string;
+  label: string;
+  multiple?: boolean;
+  onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;
 };
 
 /**
@@ -18,14 +18,14 @@ export type FileProperties = {
  * @visibleName File
  */
 export const File = ({
+  accept,
   className,
-  label,
   errorMessage,
   hint,
-  onChange,
-  multiple,
   id,
-  accept,
+  label,
+  multiple,
+  onChange,
 }: FileProperties) => {
   const _className = classNames("fr-upload-group", className, {
     [`ds-fr--${label}`]: label,
