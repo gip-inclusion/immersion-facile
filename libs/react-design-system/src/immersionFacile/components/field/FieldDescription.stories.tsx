@@ -1,22 +1,32 @@
-import React from "react";
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+import { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   FieldDescription,
   FieldDescriptionProperties,
 } from "./FieldDescription";
 
 const Component = FieldDescription;
+type Story = StoryObj<typeof Component>;
 const argTypes: Partial<ArgTypes<FieldDescriptionProperties>> | undefined = {};
+
+const componentDescription = `
+\`\`\`tsx  
+import { FieldDescription } from "react-design-system";
+\`\`\`
+`;
 
 export default {
   title: "FieldDescription",
   component: Component,
   argTypes,
-} as ComponentMeta<typeof Component>;
+  parameters: {
+    docs: {
+      description: {
+        component: componentDescription,
+      },
+    },
+  },
+} as Meta<typeof Component>;
 
-const componentStory: ComponentStory<typeof Component> = (args) => (
-  <Component {...args} />
-);
-
-export const Default = componentStory.bind({});
-Default.args = {};
+export const Default: Story = {
+  args: {},
+};
