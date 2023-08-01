@@ -45,10 +45,14 @@ describe("Get Convention", () => {
 
       it("When convention id in jwt token does not match provided one", async () => {
         await expectPromiseToFailWithError(
-          getConvention.execute({ conventionId: convention.id }, {
-            role: "establishment",
-            applicationId: "not-matching-convention-id",
-          } as ConventionJwtPayload),
+          getConvention.execute(
+            { conventionId: convention.id },
+            {
+              role: "establishment",
+              applicationId: "not-matching-convention-id",
+              emailHash: "",
+            },
+          ),
           new ForbiddenError(
             `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment'`,
           ),
