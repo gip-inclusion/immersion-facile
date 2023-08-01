@@ -6,6 +6,7 @@ import {
   BackOfficeJwt,
   ConventionDto,
   ConventionDtoBuilder,
+  ConventionId,
   conventionMagicLinkTargets,
   createConventionMagicLinkPayload,
   currentJwtVersions,
@@ -46,7 +47,7 @@ const convention = new ConventionDtoBuilder()
   .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
   .build();
 const { externalId, ...createConventionParams } = convention;
-const unknownId = "add5c20e-6dd2-45af-affe-927358005251";
+const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
 describe("convention e2e", () => {
   let request: SuperTest<Test>;
@@ -215,8 +216,7 @@ describe("convention e2e", () => {
       });
     });
 
-    it("404 Not Found - Fetching unknown convention IDs", async () => {
-      const unknownId = "add5c20e-6dd2-45af-affe-927358005251";
+    it("404 - Fetching unknown convention id", async () => {
       const jwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: unknownId,
@@ -284,8 +284,7 @@ describe("convention e2e", () => {
       expectToEqual(response.statusCode, 200);
     });
 
-    it("404 Not Found - Updating an unknown convention IDs", async () => {
-      const unknownId = "40400000-0000-4000-0000-000000000404";
+    it("404 - Updating an unknown convention id", async () => {
       const conventionWithUnknownId = new ConventionDtoBuilder()
         .withId(unknownId)
         .withStatus("READY_TO_SIGN")
@@ -463,7 +462,7 @@ describe("convention e2e", () => {
       });
     });
 
-    it("404 - unknown convention ids", async () => {
+    it("404 - unknown convention id", async () => {
       const response = await request
         .post(
           conventionMagicLinkTargets.updateConventionStatus.url.replace(
@@ -512,7 +511,7 @@ describe("convention e2e", () => {
       expect(result.status).toBe(200);
     });
 
-    it("404 Not Found - Admin fetching unknown convention IDs", async () => {
+    it("404 - Admin fetching unknown convention id", async () => {
       const adminResponse = await request
         .get(adminTargets.getConventionById.url.replace(":id", unknownId))
         .set("Authorization", adminToken);
