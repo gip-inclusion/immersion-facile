@@ -1,19 +1,29 @@
-import React from "react";
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+import { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import { Label, LabelProperties } from "./Label";
 
 const Component = Label;
+type Story = StoryObj<typeof Component>;
 const argTypes: Partial<ArgTypes<LabelProperties>> | undefined = {};
+
+const componentDescription = `
+\`\`\`tsx  
+import { Label } from "react-design-system";
+\`\`\`
+`;
 
 export default {
   title: "Label",
   component: Component,
   argTypes,
-} as ComponentMeta<typeof Component>;
+  parameters: {
+    docs: {
+      description: {
+        component: componentDescription,
+      },
+    },
+  },
+} as Meta<typeof Component>;
 
-const componentStory: ComponentStory<typeof Component> = (args) => (
-  <Component {...args} />
-);
-
-export const Default = componentStory.bind({});
-Default.args = { htmlFor: "default", label: "Default" };
+export const Default: Story = {
+  args: { htmlFor: "default", label: "Default" },
+};
