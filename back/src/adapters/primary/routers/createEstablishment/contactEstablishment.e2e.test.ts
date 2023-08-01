@@ -119,11 +119,15 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
       },
     });
 
-    expect(response.status).toBe(404);
-    // TODO exeptToEqual when errors are handled correctly
-    expect(JSON.stringify(response.body)).toContain(
-      "No establishment found with siret: 40400040000404",
+    expectToEqual(response.status, 404);
+    expectToEqual(
+      JSON.stringify(response.body),
+      '{"errors":"No establishment found with siret: 40400040000404"}',
     );
+    // TODO exeptToEqual when errors are handled correctly
+    // expectToEqual(response.body, {
+    //   errors: "No establishment found with siret: 40400040000404",
+    // });
   });
 
   it("fails with 400 for invalid requests", async () => {

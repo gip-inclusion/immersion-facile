@@ -40,6 +40,7 @@ const forceUnknownResponseBody = (responseBody: unknown): unknown =>
   responseBody;
 // forceUnknownResponseBody is to avoid changing all the behavior related to peResponses being validated in the gateways
 // TODO : move the validation here, and adapt the gateways
+// explicitely : replace forceUnknownResponseBody by validation code made actually on adapter
 
 export const makePeConnectExternalTargets = ({
   peApiUrl,

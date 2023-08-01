@@ -1,19 +1,13 @@
-import { parseISO } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  displayEmergencyContactInfos,
+  EmailNotification,
   expectToEqual,
   frontRoutes,
-  reasonableSchedule,
 } from "shared";
-import { EmailNotification } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import {
-  expectEmailFinalValidationConfirmationMatchingConvention,
-  getValidatedConventionFinalConfirmationParams,
-} from "../../../../_testBuilders/emailAssertions";
+import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
@@ -24,7 +18,6 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
@@ -303,99 +296,6 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         validConvention,
         config,
         shortLinkId,
-      );
-    });
-  });
-
-  describe("getValidatedApplicationFinalConfirmationParams", () => {
-    const timeGw = new CustomTimeGateway();
-    const agency = new AgencyDtoBuilder(defaultAgency)
-      .withQuestionnaireUrl("testQuestionnaireUrl")
-      .withSignature("testSignature")
-      .build();
-    const config = new AppConfigBuilder({}).build();
-
-    it("simple convention", () => {
-      const convention = new ConventionDtoBuilder()
-        .withImmersionAddress("immersionAddress")
-        .withSanitaryPrevention(true)
-        .withSanitaryPreventionDescription("sanitaryPreventionDescription")
-        .withIndividualProtection(true)
-        .withSchedule(reasonableSchedule)
-        .build();
-
-      const magicLinkNow = new Date("2023-04-12T10:00:00.000Z");
-      timeGw.setNextDate(magicLinkNow);
-
-      expectToEqual(
-        getValidatedConventionFinalConfirmationParams(
-          agency,
-          convention,
-          config,
-          shortLinkId,
-        ),
-        {
-          conventionId: convention.id,
-          internshipKind: convention.internshipKind,
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
-          beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
-          dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
-          dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-          establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-          businessName: convention.businessName,
-          immersionAppellationLabel:
-            convention.immersionAppellation.appellationLabel,
-          emergencyContactInfos: displayEmergencyContactInfos({
-            ...convention.signatories,
-          }),
-          agencyLogoUrl: agency.logoUrl,
-          magicLink: makeShortLinkUrl(config, shortLinkId),
-        },
-      );
-    });
-
-    it("with beneficiary representative", () => {
-      const convention = new ConventionDtoBuilder()
-        .withImmersionAddress("immersionAddress")
-        .withSanitaryPrevention(true)
-        .withSanitaryPreventionDescription("sanitaryPreventionDescription")
-        .withIndividualProtection(true)
-        .withSchedule(reasonableSchedule)
-        .withBeneficiaryRepresentative({
-          role: "beneficiary-representative",
-          firstName: "beneficiary",
-          lastName: "representative",
-          email: "rep@rep.com",
-          phone: "0011223344",
-        })
-        .build();
-
-      expectToEqual(
-        getValidatedConventionFinalConfirmationParams(
-          agency,
-          convention,
-          config,
-          shortLinkId,
-        ),
-        {
-          conventionId: convention.id,
-          internshipKind: convention.internshipKind,
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
-          beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
-          dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
-          dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-          establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-          businessName: convention.businessName,
-          immersionAppellationLabel:
-            convention.immersionAppellation.appellationLabel,
-          emergencyContactInfos: displayEmergencyContactInfos({
-            ...convention.signatories,
-          }),
-          agencyLogoUrl: agency.logoUrl,
-          magicLink: makeShortLinkUrl(config, shortLinkId),
-        },
       );
     });
   });

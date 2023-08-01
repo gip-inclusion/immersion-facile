@@ -3,7 +3,6 @@ import {
   AgencyDto,
   ConventionDto,
   displayEmergencyContactInfos,
-  EmailParamsByEmailType,
   expectToEqual,
   Signatory,
   TemplatedEmail,
@@ -11,34 +10,6 @@ import {
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { ShortLinkId } from "../domain/core/ports/ShortLinkQuery";
 import { makeShortLinkUrl } from "../domain/core/ShortLink";
-
-// TODO: we should use hardcoded values instead of relying on the getValidatedConventionFinalConfirmationParams
-export const getValidatedConventionFinalConfirmationParams = (
-  agency: AgencyDto,
-  convention: ConventionDto,
-  config: AppConfig,
-  conventionDocumentShortlinkId: ShortLinkId,
-): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
-  const { beneficiary, beneficiaryRepresentative } = convention.signatories;
-  return {
-    conventionId: convention.id,
-    internshipKind: convention.internshipKind,
-    beneficiaryFirstName: beneficiary.firstName,
-    beneficiaryLastName: beneficiary.lastName,
-    beneficiaryBirthdate: beneficiary.birthdate,
-    dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
-    dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-    establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-    businessName: convention.businessName,
-    immersionAppellationLabel: convention.immersionAppellation.appellationLabel,
-    emergencyContactInfos: displayEmergencyContactInfos({
-      beneficiaryRepresentative,
-      beneficiary,
-    }),
-    agencyLogoUrl: agency.logoUrl,
-    magicLink: makeShortLinkUrl(config, conventionDocumentShortlinkId),
-  };
-};
 
 export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention =
   ({
@@ -108,12 +79,26 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
     {
       kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
-      params: getValidatedConventionFinalConfirmationParams(
-        agency,
-        convention,
-        config,
-        conventionToSignLinkId,
-      ),
+      params: {
+        conventionId: convention.id,
+        internshipKind: convention.internshipKind,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
+        dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+        dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+        businessName: convention.businessName,
+        immersionAppellationLabel:
+          convention.immersionAppellation.appellationLabel,
+        emergencyContactInfos: displayEmergencyContactInfos({
+          beneficiaryRepresentative:
+            convention.signatories.beneficiaryRepresentative,
+          beneficiary: convention.signatories.beneficiary,
+        }),
+        agencyLogoUrl: agency.logoUrl,
+        magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
+      },
     },
   ]);
 

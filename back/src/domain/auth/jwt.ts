@@ -45,21 +45,23 @@ type GenerateJwtFn<K extends JwtKind> = (
   expiresInSeconds?: number,
 ) => Extract<JwtMap, { kind: K }>["token"];
 
-// TODO see if typing can be improved
 export const makeGenerateJwtES256 =
   <K extends JwtKind = never>(
     privateKey: string,
     defaultExpiresInSeconds: number | undefined,
   ): GenerateJwtFn<K> =>
-  (payload: any, expiresInSeconds?: string | number) =>
-    jwt.sign(payload, privateKey, {
-      algorithm: "ES256",
-      ...(!("exp" in payload) &&
+  (payload: any, expiresInSeconds?: string | number) => {
+    const expire =
+      !("exp" in payload) &&
       (expiresInSeconds !== undefined || defaultExpiresInSeconds)
         ? { expiresIn: expiresInSeconds ?? defaultExpiresInSeconds }
-        : {}),
+        : {};
+    return jwt.sign(payload, privateKey, {
+      algorithm: "ES256",
+      ...expire,
       //noTimestamp: true, //Remove iat on payload
-    }) as any;
+    });
+  };
 
 type VerifyJwtFn<K extends JwtKind> = (
   jwt: Extract<JwtMap, { kind: K }>["token"],
