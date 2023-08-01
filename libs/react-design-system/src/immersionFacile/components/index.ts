@@ -29,3 +29,4 @@ export * from "./section-text-embed";
 export * from "./skip-links";
 export * from "./submit-confirmation-section";
 export * from "./text";
+export * from "./tooltip";
