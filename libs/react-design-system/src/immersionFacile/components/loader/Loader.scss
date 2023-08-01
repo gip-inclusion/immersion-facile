@@ -9,12 +9,14 @@
     opacity: 0.8;
     z-index: 9999;
   }
+
   &__spinner {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9999;
+
     &-icon {
       display: block;
       width: 5rem;
@@ -38,5 +40,16 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+#storybook-docs {
+  #story--loader--default--primary-inner {
+    position: relative;
+    min-height: 200px;
+  }
+
+  .im-loader__overlay {
+    position: absolute;
   }
 }
