@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { createLogger } from "../../../utils/logger";
 import { PgNotificationRepository } from "../../secondary/pg/PgNotificationRepository";
+import { makeKyselyDb } from "../../secondary/pg/sql/database";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -12,13 +13,13 @@ const executeTriggerDeleteEmailAttachements = async () => {
   const pool = new Pool({
     connectionString: dbUrl,
   });
-  const client = await pool.connect();
+  const pgNotificationRepository = new PgNotificationRepository(
+    makeKyselyDb(pool),
+  );
 
-  const pgNotificationRepository = new PgNotificationRepository(client);
   const numberOfDeletedAttachements =
     await pgNotificationRepository.deleteAllEmailAttachements();
 
-  client.release();
   await pool.end();
 
   return {
