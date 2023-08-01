@@ -314,7 +314,7 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
   let totalOfMinutes = 0;
   for (
     let currentDate = start;
-    currentDate <= end;
+    currentDate < addDays(end, 1);
     currentDate = addDays(currentDate, 1)
   ) {
     const date = complexSchedule.find(

@@ -1,8 +1,16 @@
 import { addDays, subYears } from "date-fns";
 import { keys } from "ramda";
 import { z, ZodError } from "zod";
-import { reasonableSchedule } from "../schedule/ScheduleUtils";
-import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
+import {
+  calculateNumberOfWorkedDays,
+  calculateTotalImmersionHoursFromComplexSchedule,
+  reasonableSchedule,
+} from "../schedule/ScheduleUtils";
+import {
+  expectToEqual,
+  splitCasesBetweenPassingAndFailing,
+} from "../test.helpers";
+import { DailyScheduleDto, DateIntervalDto, Weekday } from "..";
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
@@ -347,13 +355,147 @@ describe("conventionDtoSchema", () => {
 
     it("accept start dates that are tuesday if submitting on previous friday", () => {
       const convention = new ConventionDtoBuilder()
-        .withDateSubmission("2021-10-15") // which is a friday
-        .withDateStart("2021-10-19") // which is the following tuesday
-        .withDateEnd("2021-10-30")
+        .withDateSubmission("2023-10-15") // which is a friday
+        .withDateStart("2023-10-19") // which is the following tuesday
+        .withDateEnd("2023-10-27")
         .withSchedule(reasonableSchedule)
         .build();
 
       expectConventionDtoToBeValid(convention);
+    });
+
+    describe("Handle convention validation with time periods on season time update", () => {
+      it("summer time", () => {
+        const complexSchedule: DailyScheduleDto[] = [
+          { date: "2023-03-20T00:00:00.000Z", timePeriods: [] },
+          { date: "2023-04-06T00:00:00.000Z", timePeriods: [] },
+          {
+            date: "2023-04-07T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          {
+            date: "2023-04-08T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          { date: "2023-04-09T00:00:00.000Z", timePeriods: [] },
+          {
+            date: "2023-04-10T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          {
+            date: "2023-04-11T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          {
+            date: "2023-04-12T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+        ];
+
+        expectToEqual(calculateNumberOfWorkedDays(complexSchedule), 5);
+        expectToEqual(
+          calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
+          35,
+        );
+        const convention = new ConventionDtoBuilder()
+          .withDateStart("2023-03-20")
+          .withDateEnd("2023-04-12")
+          .withSchedule(
+            (_interval: DateIntervalDto, _excludedDays?: Weekday[]) => ({
+              totalHours:
+                calculateTotalImmersionHoursFromComplexSchedule(
+                  complexSchedule,
+                ),
+              isSimple: false,
+              complexSchedule,
+              selectedIndex: 0,
+              workedDays: calculateNumberOfWorkedDays(complexSchedule),
+            }),
+          )
+          .build();
+        expectToEqual(conventionSchema.parse(convention), convention);
+      });
+
+      it("winter time", () => {
+        const complexSchedule: DailyScheduleDto[] = [
+          { date: "2023-10-20T00:00:00.000Z", timePeriods: [] },
+          { date: "2023-11-06T00:00:00.000Z", timePeriods: [] },
+          {
+            date: "2023-11-07T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          {
+            date: "2023-11-08T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          { date: "2023-11-09T00:00:00.000Z", timePeriods: [] },
+          {
+            date: "2023-11-10T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          {
+            date: "2023-11-11T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+          {
+            date: "2023-11-12T00:00:00.000Z",
+            timePeriods: [
+              { start: "09:00", end: "12:00" },
+              { start: "13:00", end: "17:00" },
+            ],
+          },
+        ];
+
+        expectToEqual(calculateNumberOfWorkedDays(complexSchedule), 5);
+        expectToEqual(
+          calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
+          35,
+        );
+        const convention = new ConventionDtoBuilder()
+          .withDateStart("2023-10-20")
+          .withDateEnd("2023-11-12")
+          .withSchedule(
+            (_interval: DateIntervalDto, _excludedDays?: Weekday[]) => ({
+              totalHours:
+                calculateTotalImmersionHoursFromComplexSchedule(
+                  complexSchedule,
+                ),
+              isSimple: false,
+              complexSchedule,
+              selectedIndex: 0,
+              workedDays: calculateNumberOfWorkedDays(complexSchedule),
+            }),
+          )
+          .build();
+        expectToEqual(conventionSchema.parse(convention), convention);
+      });
     });
 
     describe("Correctly handles max authorized number of days", () => {
