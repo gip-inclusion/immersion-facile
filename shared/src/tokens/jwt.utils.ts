@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import * as crypto from "crypto";
 import { decode } from "js-base64";
 import { currentJwtVersions, SiretDto } from "..";
 import {
@@ -9,7 +9,7 @@ import {
 
 export const stringToMd5 = (str: string) => {
   try {
-    return createHash("md5").update(str).digest("hex");
+    return crypto.createHash("md5").update(str).digest("hex");
   } catch (error) {
     Error.captureStackTrace(error as Error);
     throw error;

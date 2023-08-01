@@ -298,7 +298,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await expectPromiseToFailWithError(
         useCase.execute(convention),
-        new Error(conventionMissingMessage(convention)),
+        new Error(conventionMissingMessage(convention.id)),
       );
 
       await expectSavedNotificationsAndEvents({});

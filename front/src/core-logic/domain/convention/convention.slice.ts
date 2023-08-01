@@ -78,7 +78,6 @@ export type FetchConventionRequestedPayload = {
 type StatusChangePayload = {
   feedbackKind: ConventionFeedbackKind;
   jwt: ConventionSupportedJwt;
-  conventionId: ConventionId;
   updateStatusParams: UpdateConventionStatusRequestDto;
 };
 

@@ -9,6 +9,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ConventionId,
   ConventionStatus,
   ConventionStatusWithJustification,
   doesStatusNeedsJustification,
@@ -22,6 +23,7 @@ export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   disabled?: boolean;
   newStatus: VerificationActions;
+  conventionId: ConventionId;
   children: string;
 };
 
@@ -102,6 +104,7 @@ export const VerificationActionButton = ({
   disabled,
   children,
   onSubmit,
+  conventionId,
 }: VerificationActionButtonProps) => {
   const iconByStatus: Partial<Record<ConventionStatus, FrIconClassName>> = {
     REJECTED: "fr-icon-close-circle-line",
@@ -133,7 +136,7 @@ export const VerificationActionButton = ({
         onClick={() => {
           doesStatusNeedsJustification(newStatus)
             ? ModalByStatus(newStatus).openModal()
-            : onSubmit({ status: newStatus });
+            : onSubmit({ status: newStatus, conventionId });
         }}
         className={fr.cx("fr-m-1w")}
         disabled={disabled}
@@ -148,6 +151,7 @@ export const VerificationActionButton = ({
           title={children}
           newStatus={newStatus}
           onSubmit={onSubmit}
+          conventionId={conventionId}
         />
       )}
     </>
@@ -157,10 +161,12 @@ export const VerificationActionButton = ({
 const ModalWrapper = ({
   title,
   newStatus,
+  conventionId,
   onSubmit,
 }: {
   title: string;
   newStatus: VerificationActionsModal;
+  conventionId: ConventionId;
   onSubmit: VerificationActionButtonProps["onSubmit"];
 }) => {
   if (!doesStatusNeedsJustification(newStatus)) return null;
@@ -175,6 +181,7 @@ const ModalWrapper = ({
           onSubmit={onSubmit}
           closeModal={closeModal}
           newStatus={newStatus}
+          conventionId={conventionId}
         />
       </>
     </Modal>,
@@ -186,18 +193,22 @@ const JustificationModalContent = ({
   onSubmit,
   closeModal,
   newStatus,
+  conventionId,
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: VerificationActions;
+  conventionId: ConventionId;
 }) => {
   const { register, handleSubmit } = useForm<WithStatusJustification>({
     resolver: zodResolver(withStatusJustificationSchema),
     mode: "onTouched",
     defaultValues: { statusJustification: "" },
   });
-  const onFormSubmit: SubmitHandler<WithStatusJustification> = (values) => {
-    onSubmit({ ...values, status: newStatus });
+  const onFormSubmit: SubmitHandler<WithStatusJustification> = ({
+    statusJustification,
+  }) => {
+    onSubmit({ statusJustification, status: newStatus, conventionId });
     closeModal();
   };
 

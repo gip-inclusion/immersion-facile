@@ -86,8 +86,11 @@ export const ConventionSignForm = ({
 
     dispatch(
       conventionSlice.actions.statusChangeRequested({
-        conventionId: convention.id,
-        updateStatusParams: { status: "DRAFT", statusJustification },
+        updateStatusParams: {
+          status: "DRAFT",
+          statusJustification,
+          conventionId: convention.id,
+        },
         feedbackKind: "modificationsAskedFromSignatory",
         jwt,
       }),

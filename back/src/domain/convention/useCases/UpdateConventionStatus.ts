@@ -1,7 +1,10 @@
 import {
+  AgencyId,
+  AgencyRole,
+  AuthenticatedUserId,
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
+  ConventionRelatedJwtPayload,
   ConventionStatus,
   Role,
   UpdateConventionStatusRequestDto,
@@ -9,16 +12,19 @@ import {
   validatedConventionStatuses,
   WithConventionIdLegacy,
 } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { createLogger } from "../../../utils/logger";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeGetStoredConventionOrThrowIfNotAllowed } from "../entities/Convention";
-
-const logger = createLogger(__filename);
+import {
+  conventionMissingMessage,
+  throwIfTransitionNotAllowed,
+} from "../entities/Convention";
 
 const domainTopicByTargetStatusMap: Record<
   ConventionStatus,
@@ -35,17 +41,14 @@ const domainTopicByTargetStatusMap: Record<
   DEPRECATED: "ConventionDeprecated",
 };
 
-type UpdateConventionStatusPayload = {
-  conventionId: ConventionId;
-  role: Role;
-};
+type UpdateConventionStatusSupportedJwtPayload = ConventionRelatedJwtPayload;
 
 export class UpdateConventionStatus extends TransactionalUseCase<
   UpdateConventionStatusRequestDto,
   WithConventionIdLegacy,
-  UpdateConventionStatusPayload
+  UpdateConventionStatusSupportedJwtPayload
 > {
-  inputSchema = updateConventionStatusRequestSchema;
+  protected inputSchema = updateConventionStatusRequestSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -58,9 +61,32 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   public async _execute(
     params: UpdateConventionStatusRequestDto,
     uow: UnitOfWork,
-    { conventionId, role }: UpdateConventionStatusPayload,
+    payload: UpdateConventionStatusSupportedJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    logger.debug({ status: params.status, conventionId, role });
+    const originalConvention = await uow.conventionRepository.getById(
+      params.conventionId,
+    );
+    if (!originalConvention)
+      throw new NotFoundError(conventionMissingMessage(params.conventionId));
+
+    const role =
+      "role" in payload
+        ? payload.role
+        : await this.#agencyRoleFromUserIdAndAgencyId(
+            uow,
+            payload.userId,
+            originalConvention.agencyId,
+          );
+    if (role === "toReview" || role === "agencyOwner")
+      throw new ForbiddenError(
+        `${role} is not allowed to go to status ${params.status}`,
+      );
+
+    throwIfTransitionNotAllowed({
+      initialStatus: originalConvention.status,
+      role,
+      targetStatus: params.status,
+    });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();
 
@@ -72,11 +98,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ? params.statusJustification
         : undefined;
 
-    const conventionBuilder = new ConventionDtoBuilder(
-      await makeGetStoredConventionOrThrowIfNotAllowed(
-        uow.conventionRepository,
-      )(params.status, role, conventionId),
-    )
+    const conventionBuilder = new ConventionDtoBuilder(originalConvention)
       .withStatus(params.status)
       .withDateValidation(
         validatedConventionStatuses.includes(params.status)
@@ -87,22 +109,47 @@ export class UpdateConventionStatus extends TransactionalUseCase<
 
     if (params.status === "DRAFT") conventionBuilder.notSigned();
 
-    const updatedDto: ConventionDto = conventionBuilder.build();
+    const updatedConvention: ConventionDto = conventionBuilder.build();
 
-    const updatedId = await uow.conventionRepository.update(updatedDto);
+    const updatedId = await uow.conventionRepository.update(updatedConvention);
     if (!updatedId) throw new NotFoundError(updatedId);
 
     const domainTopic = domainTopicByTargetStatusMap[params.status];
     if (domainTopic)
       await uow.outboxRepository.save({
-        ...this.createEvent(updatedDto, domainTopic, role, statusJustification),
+        ...this.#createEvent(
+          updatedConvention,
+          domainTopic,
+          role,
+          statusJustification,
+        ),
         occurredAt: conventionUpdatedAt,
       });
 
     return { id: updatedId };
   }
 
-  private createEvent(
+  async #agencyRoleFromUserIdAndAgencyId(
+    uow: UnitOfWork,
+    userId: AuthenticatedUserId,
+    agencyId: AgencyId,
+  ): Promise<AgencyRole> {
+    const user = await uow.inclusionConnectedUserRepository.getById(userId);
+    if (!user)
+      throw new NotFoundError(
+        `User '${userId}' not found on inclusion connected user repository.`,
+      );
+    const userAgencyRights = user.agencyRights.find(
+      (agencyRight) => agencyRight.agency.id === agencyId,
+    );
+    if (!userAgencyRights)
+      throw new ForbiddenError(
+        `User '${userId}' has no rôle on agency '${agencyId}'.`,
+      );
+    return userAgencyRights.role;
+  }
+
+  #createEvent(
     updatedDto: ConventionDto,
     domainTopic: DomainTopic,
     requesterRole: Role,

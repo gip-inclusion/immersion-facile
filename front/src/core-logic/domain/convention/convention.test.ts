@@ -724,10 +724,10 @@ describe("Convention slice", () => {
           updateStatusParams: {
             status: "DRAFT",
             statusJustification: "There is a mistake in my last name",
+            conventionId: "some-id",
           },
           feedbackKind: "modificationsAskedFromSignatory",
           jwt,
-          conventionId: "some-id",
         }),
       );
       expectConventionState({
@@ -747,10 +747,10 @@ describe("Convention slice", () => {
           updateStatusParams: {
             status: "DRAFT",
             statusJustification: "There is a mistake in my last name",
+            conventionId: "some-id",
           },
           feedbackKind: "modificationsAskedFromSignatory",
           jwt,
-          conventionId: "some-id",
         }),
       );
       expectConventionState({
