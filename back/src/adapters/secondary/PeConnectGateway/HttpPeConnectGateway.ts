@@ -82,6 +82,7 @@ const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
   "exchangeCodeForAccessToken",
 );
 
+// TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS PE
 export class HttpPeConnectGateway implements PeConnectGateway {
   constructor(
     private httpClient: HttpClient<PeConnectExternalTargets>,
@@ -143,61 +144,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     }
   }
 
-  private async getAdvisorsInfo(
-    headers: PeConnectHeaders,
-  ): Promise<ExternalPeConnectAdvisor[]> {
-    const counter = getAdvisorsInfoCounter;
-    const log = getAdvisorsInfoLogger;
-    try {
-      counter.total.inc();
-      log.total({});
-      const response = await this.httpClient.getAdvisorsInfo({
-        headers,
-      });
-      if (response.status !== 200) {
-        counter.error.inc({
-          errorType: `Bad response status code ${response.status}`,
-        });
-        log.error({ response, errorKind: "Response status is not 200." });
-        return [];
-      }
-      const externalPeConnectAdvisors =
-        parseZodSchemaAndLogErrorOnParsingFailure(
-          externalPeConnectAdvisorsSchema,
-          response.responseBody,
-          logger,
-          {
-            token: headers.Authorization,
-          },
-        );
-      counter.success.inc();
-      log.success({});
-      return externalPeConnectAdvisors;
-    } catch (error) {
-      errorChecker(
-        error,
-        (error) => {
-          counter.error.inc({ errorType: error.message });
-          log.error({ errorType: error.message });
-        },
-        (payload) => notifyDiscordOnNotError(payload),
-      );
-      if (error instanceof ZodError) return [];
-      // TODO TODO TODO A RETRAVAILLER AVEC LE RETRY
-      // pour que managed error retourne une valeur
-      if (isJobseekerButNoAdvisorsResponse(error)) {
-        notifyObjectDiscord({
-          message: `isJobseekerButNoAdvisorsResponse for token: ${headers.Authorization}`,
-          error,
-        });
-        return [];
-      }
-      return managePeConnectError(error, "getAdvisorsInfo", {
-        authorization: headers.Authorization,
-      });
-    }
-  }
-
   public async getUserAndAdvisors(accessToken: AccessTokenDto): Promise<
     | {
         user: PeConnectUserDto;
@@ -211,8 +157,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       Authorization: `Bearer ${accessToken.value}`,
     };
 
-    const externalPeUser = await this.getUserInfo(headers);
-    const isUserJobseeker = await this.userIsJobseeker(
+    const externalPeUser = await this.#getUserInfo(headers);
+    const isUserJobseeker = await this.#userIsJobseeker(
       headers,
       externalPeUser && externalPeUser.idIdentiteExterne,
     );
@@ -221,59 +167,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       ? {
           user: toPeConnectUserDto({ ...externalPeUser, isUserJobseeker }),
           advisors: (isUserJobseeker
-            ? await this.getAdvisorsInfo(headers)
+            ? await this.#getAdvisorsInfo(headers)
             : []
           ).map(toPeConnectAdvisorDto),
         }
       : undefined;
   }
 
-  private async getUserInfo(
-    headers: PeConnectHeaders,
-  ): Promise<ExternalPeConnectUser | undefined> {
-    const counter = getUserInfoCounter;
-    const log = getUserInfoLogger;
-    try {
-      counter.total.inc();
-      log.total({});
-      const response = await this.httpClient.getUserInfo({
-        headers,
-      });
-      if (response.status !== 200) {
-        counter.error.inc({
-          errorType: `Bad response status code ${response.status}`,
-        });
-        log.error({ response, errorKind: "Response status is not 200." });
-        return undefined;
-      }
-      const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
-        externalPeConnectUserSchema,
-        response.responseBody,
-        logger,
-        {
-          token: headers.Authorization,
-        },
-      );
-      counter.success.inc();
-      log.success({});
-      return externalPeConnectUser;
-    } catch (error) {
-      errorChecker(
-        error,
-        (error) => {
-          counter.error.inc({ errorType: error.message });
-          log.error({ errorType: error.message });
-        },
-        (payload) => notifyDiscordOnNotError(payload),
-      );
-      if (error instanceof ZodError) return undefined;
-      return managePeConnectError(error, "getUserInfo", {
-        authorization: headers.Authorization,
-      });
-    }
-  }
-
-  private async userIsJobseeker(
+  async #userIsJobseeker(
     headers: PeConnectHeaders,
     peExternalId: string | undefined,
   ): Promise<boolean> {
@@ -324,6 +225,104 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         : managePeConnectError(error, "getUserStatutInfo", {
             authorization: headers.Authorization,
           });
+    }
+  }
+
+  async #getUserInfo(
+    headers: PeConnectHeaders,
+  ): Promise<ExternalPeConnectUser | undefined> {
+    const counter = getUserInfoCounter;
+    const log = getUserInfoLogger;
+    try {
+      counter.total.inc();
+      log.total({});
+      const response = await this.httpClient.getUserInfo({
+        headers,
+      });
+      if (response.status !== 200) {
+        counter.error.inc({
+          errorType: `Bad response status code ${response.status}`,
+        });
+        log.error({ response, errorKind: "Response status is not 200." });
+        return undefined;
+      }
+      const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
+        externalPeConnectUserSchema,
+        response.responseBody,
+        logger,
+        {
+          token: headers.Authorization,
+        },
+      );
+      counter.success.inc();
+      log.success({});
+      return externalPeConnectUser;
+    } catch (error) {
+      errorChecker(
+        error,
+        (error) => {
+          counter.error.inc({ errorType: error.message });
+          log.error({ errorType: error.message });
+        },
+        (payload) => notifyDiscordOnNotError(payload),
+      );
+      if (error instanceof ZodError) return undefined;
+      return managePeConnectError(error, "getUserInfo", {
+        authorization: headers.Authorization,
+      });
+    }
+  }
+
+  async #getAdvisorsInfo(
+    headers: PeConnectHeaders,
+  ): Promise<ExternalPeConnectAdvisor[]> {
+    const counter = getAdvisorsInfoCounter;
+    const log = getAdvisorsInfoLogger;
+    try {
+      counter.total.inc();
+      log.total({});
+      const response = await this.httpClient.getAdvisorsInfo({
+        headers,
+      });
+      if (response.status !== 200) {
+        counter.error.inc({
+          errorType: `Bad response status code ${response.status}`,
+        });
+        log.error({ response, errorKind: "Response status is not 200." });
+        return [];
+      }
+      const externalPeConnectAdvisors =
+        parseZodSchemaAndLogErrorOnParsingFailure(
+          externalPeConnectAdvisorsSchema,
+          response.responseBody,
+          logger,
+          {
+            token: headers.Authorization,
+          },
+        );
+      counter.success.inc();
+      log.success({});
+      return externalPeConnectAdvisors;
+    } catch (error) {
+      errorChecker(
+        error,
+        (error) => {
+          counter.error.inc({ errorType: error.message });
+          log.error({ errorType: error.message });
+        },
+        (payload) => notifyDiscordOnNotError(payload),
+      );
+      if (error instanceof ZodError) return [];
+      if (isJobseekerButNoAdvisorsResponse(error)) {
+        notifyObjectDiscord({
+          message: `isJobseekerButNoAdvisorsResponse for token: ${headers.Authorization}`,
+          error,
+        });
+        return [];
+      }
+      return managePeConnectError(error, "getAdvisorsInfo", {
+        authorization: headers.Authorization,
+      });
     }
   }
 }

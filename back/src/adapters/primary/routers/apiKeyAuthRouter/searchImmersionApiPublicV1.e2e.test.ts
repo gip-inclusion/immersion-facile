@@ -142,8 +142,6 @@ describe("search-immersion route", () => {
       });
     });
 
-    // TODO add test which actually recovers data (and one with token, one without)
-
     it("rejects invalid requests with error code 400", async () => {
       await request
         .get(

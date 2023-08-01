@@ -13,10 +13,6 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-//TODO UpdateConventionAfterModifications request
-// should receive a convention with draft status
-// for now the frontend send a status with READY_TO_SIGN, it will be inverted after refacto
-// https://trello.com/c/siRQLkeU
 export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,
   WithConventionIdLegacy

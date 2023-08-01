@@ -22,8 +22,6 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
 
-// TODO : A déplacer dans dossier e2e
-
 const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
   romeLabel: "Stylisme",

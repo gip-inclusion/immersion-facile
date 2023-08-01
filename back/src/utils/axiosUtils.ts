@@ -4,21 +4,11 @@ import { createLogger } from "./logger";
 
 const _logger = createLogger(__filename);
 
-// TODO: Add prometheus counters.
-
 export const createAxiosInstance = (
   logger: Logger = _logger,
   config?: AxiosRequestConfig,
 ): AxiosInstance => {
   const axiosInstance = axios.create(config);
-  axiosInstance.interceptors.request.use(
-    (request) =>
-      /*logger.debug(
-      { request: extractPartialRequest(request) },
-      "Sending HTTP request",
-    );*/
-      request,
-  );
   axiosInstance.interceptors.response.use((response) => {
     logger.debug(
       { response: extractPartialResponse(response) },
