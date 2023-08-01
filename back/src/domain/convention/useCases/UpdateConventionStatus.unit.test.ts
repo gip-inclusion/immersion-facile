@@ -3,6 +3,8 @@
 
 import {
   ConventionDtoBuilder,
+  ConventionId,
+  createConventionMagicLinkPayload,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -12,9 +14,11 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { conventionMissingMessage } from "../entities/Convention";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
   executeUpdateConventionStatusUseCase,
+  originalConventionId,
   setupInitialState,
   testForAllRolesAndInitialStatusCases,
 } from "./UpdateConventionStatus.testHelpers";
@@ -25,6 +29,7 @@ describe("UpdateConventionStatus", () => {
       updateStatusParams: {
         status: "DRAFT",
         statusJustification: "test justification",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
       updatedFields: {
@@ -42,6 +47,10 @@ describe("UpdateConventionStatus", () => {
         "counsellor",
         "validator",
         "backOffice",
+      ],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleCounsellor",
+        "icUserWithRoleValidator",
       ],
       allowedInitialStatuses: [
         "READY_TO_SIGN",
@@ -71,7 +80,7 @@ describe("UpdateConventionStatus", () => {
         timeGateway,
       );
 
-      const conventionId = "1111222233334444";
+      const conventionId = "add5c20e-6dd2-45af-affe-927358004444";
       const requesterRole = "beneficiary";
 
       const conventionBuilder = new ConventionDtoBuilder()
@@ -82,8 +91,8 @@ describe("UpdateConventionStatus", () => {
       await conventionRepository.save(conventionBuilder);
 
       await updateConventionStatus.execute(
-        { status: "DRAFT", statusJustification: "because" },
-        { conventionId, role: requesterRole },
+        { status: "DRAFT", statusJustification: "because", conventionId },
+        { applicationId: conventionId, role: requesterRole, emailHash: "" },
       );
 
       const convention = await conventionRepository.getById(conventionId);
@@ -108,6 +117,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "READY_TO_SIGN",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: null,
       allowedRoles: [
@@ -118,6 +128,7 @@ describe("UpdateConventionStatus", () => {
         "beneficiary-representative",
         "beneficiary-current-employer",
       ],
+      allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["DRAFT"],
     });
   });
@@ -126,6 +137,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "PARTIALLY_SIGNED",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationPartiallySigned",
       allowedRoles: [
@@ -136,6 +148,7 @@ describe("UpdateConventionStatus", () => {
         "beneficiary-representative",
         "beneficiary-current-employer",
       ],
+      allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
   });
@@ -144,6 +157,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "IN_REVIEW",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationFullySigned",
       allowedRoles: [
@@ -154,6 +168,7 @@ describe("UpdateConventionStatus", () => {
         "beneficiary-representative",
         "beneficiary-current-employer",
       ],
+      allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });
   });
@@ -162,9 +177,11 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "ACCEPTED_BY_COUNSELLOR",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationAcceptedByCounsellor",
       allowedRoles: ["counsellor"],
+      allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],
       allowedInitialStatuses: ["IN_REVIEW"],
     });
   });
@@ -174,9 +191,11 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "ACCEPTED_BY_VALIDATOR",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationAcceptedByValidator",
       allowedRoles: ["validator"],
+      allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
       updatedFields: { dateValidation: validationDate.toISOString() },
       nextDate: validationDate,
@@ -188,10 +207,15 @@ describe("UpdateConventionStatus", () => {
       updateStatusParams: {
         status: "REJECTED",
         statusJustification: "my rejection justification",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationRejected",
       updatedFields: { statusJustification: "my rejection justification" },
       allowedRoles: ["backOffice", "validator", "counsellor"],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleValidator",
+        "icUserWithRoleCounsellor",
+      ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
         "READY_TO_SIGN",
@@ -206,10 +230,12 @@ describe("UpdateConventionStatus", () => {
       updateStatusParams: {
         status: "CANCELLED",
         statusJustification: "Cancelled justification",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationCancelled",
       updatedFields: { statusJustification: "Cancelled justification" },
       allowedRoles: ["validator", "backOffice"],
+      allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
   });
@@ -219,10 +245,15 @@ describe("UpdateConventionStatus", () => {
       updateStatusParams: {
         status: "DEPRECATED",
         statusJustification: "my deprecation justification",
+        conventionId: originalConventionId,
       },
       expectedDomainTopic: "ConventionDeprecated",
       updatedFields: { statusJustification: "my deprecation justification" },
       allowedRoles: ["backOffice", "validator", "counsellor"],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleCounsellor",
+        "icUserWithRoleValidator",
+      ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
         "READY_TO_SIGN",
@@ -233,19 +264,30 @@ describe("UpdateConventionStatus", () => {
     });
   });
 
-  it("fails for unknown application ids", async () => {
-    const { updateConventionStatus, conventionRepository } =
-      await setupInitialState({ initialStatus: "IN_REVIEW" });
+  it("fails for unknown convention ids", async () => {
+    const { updateConventionStatusUseCase, conventionRepository, timeGateway } =
+      await setupInitialState({
+        initialStatus: "IN_REVIEW",
+        withIcUser: false,
+      });
+    const missingConventionId: ConventionId =
+      "add5c20e-6dd2-45af-affe-000000000000";
     await expectPromiseToFailWithError(
       executeUpdateConventionStatusUseCase({
-        conventionId: "unknown_application_id",
-        role: "validator",
-        email: "test@test.fr",
-        updateStatusParams: { status: "ACCEPTED_BY_VALIDATOR" },
-        updateConventionStatus,
+        jwtPayload: createConventionMagicLinkPayload({
+          id: missingConventionId,
+          email: "test@test.fr",
+          role: "validator",
+          now: timeGateway.now(),
+        }),
+        updateStatusParams: {
+          status: "ACCEPTED_BY_VALIDATOR",
+          conventionId: missingConventionId,
+        },
+        updateConventionStatusUseCase,
         conventionRepository,
       }),
-      new NotFoundError("unknown_application_id"),
+      new NotFoundError(conventionMissingMessage(missingConventionId)),
     );
   });
 });

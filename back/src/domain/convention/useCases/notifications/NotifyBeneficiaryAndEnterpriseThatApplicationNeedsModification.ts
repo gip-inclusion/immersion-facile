@@ -53,7 +53,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
       for (const recipient of recipientsOrError) {
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
-          templatedContent: await this.prepareEmail(
+          templatedContent: await this.#prepareEmail(
             convention,
             role,
             recipient,
@@ -71,7 +71,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     }
   }
 
-  private async prepareEmail(
+  async #prepareEmail(
     convention: ConventionDto,
     role: Role,
     recipient: string,

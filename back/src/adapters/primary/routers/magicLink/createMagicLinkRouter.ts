@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { match, P } from "ts-pattern";
 import { conventionMagicLinkTargets, immersionAssessmentRoute } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
@@ -55,18 +56,23 @@ export const createMagicLinkRouter = (
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (req.payloads?.backOffice)
-          return deps.useCases.updateConventionStatus.execute(req.body, {
-            conventionId: req.params.conventionId,
-            role: req.payloads.backOffice.role,
+        const params = {
+          ...req.body,
+          conventionId: req.params.conventionId,
+        };
+        return match(req.payloads)
+          .with({ backOffice: P.not(P.nullish) }, ({ backOffice }) =>
+            deps.useCases.updateConventionStatus.execute(params, backOffice),
+          )
+          .with({ convention: P.not(P.nullish) }, ({ convention }) =>
+            deps.useCases.updateConventionStatus.execute(params, convention),
+          )
+          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
+            deps.useCases.updateConventionStatus.execute(params, inclusion),
+          )
+          .otherwise(() => {
+            throw new UnauthorizedError();
           });
-
-        if (!req?.payloads?.convention) throw new UnauthorizedError();
-
-        return deps.useCases.updateConventionStatus.execute(req.body, {
-          conventionId: req.payloads.convention.applicationId,
-          role: req.payloads.convention.role,
-        });
       }),
     );
 

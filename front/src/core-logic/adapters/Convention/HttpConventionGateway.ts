@@ -3,7 +3,6 @@ import { fromPromise } from "rxjs/internal/observable/innerFrom";
 import {
   AbsoluteUrl,
   ConventionDto,
-  ConventionId,
   ConventionMagicLinkTargets,
   ConventionReadDto,
   ShareLinkByEmailDto,
@@ -22,7 +21,9 @@ export class HttpConventionGateway implements ConventionGateway {
   ) {}
 
   public createConvention$(conventionDto: ConventionDto): Observable<void> {
-    return fromPromise(this.newConvention(conventionDto).then(() => undefined));
+    return fromPromise(
+      this.#newConvention(conventionDto).then(() => undefined),
+    );
   }
 
   public getConventionStatusDashboardUrl$(
@@ -37,14 +38,6 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  private async newConvention(conventionDto: ConventionDto): Promise<string> {
-    return this.unauthenticatedHttpClient
-      .createConvention({
-        body: conventionDto,
-      })
-      .then(({ responseBody }) => responseBody.id);
-  }
-
   public async renewMagicLink(
     expiredJwt: string,
     originalUrl: string,
@@ -57,21 +50,10 @@ export class HttpConventionGateway implements ConventionGateway {
     });
   }
 
-  private async retrieveFromToken(
-    payload: FetchConventionRequestedPayload,
-  ): Promise<ConventionReadDto> {
-    return this.magicLinkHttpClient
-      .getConvention({
-        headers: { authorization: payload.jwt },
-        urlParams: { conventionId: payload.conventionId },
-      })
-      .then(({ responseBody }) => responseBody);
-  }
-
   public retrieveFromToken$(
     payload: FetchConventionRequestedPayload,
   ): Observable<ConventionReadDto | undefined> {
-    return from(this.retrieveFromToken(payload));
+    return from(this.#retrieveFromToken(payload));
   }
 
   public async shareConventionLinkByEmail(
@@ -84,7 +66,46 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ status }) => status === 200);
   }
 
-  private async signConvention(jwt: string): Promise<WithConventionIdLegacy> {
+  public signConvention$(jwt: string): Observable<void> {
+    return fromPromise(this.#signConvention(jwt).then(() => undefined));
+  }
+
+  public updateConvention$(
+    conventionDto: ConventionDto,
+    jwt: string,
+  ): Observable<void> {
+    return fromPromise(
+      this.#updateConvention(conventionDto, jwt).then(() => undefined),
+    );
+  }
+
+  public updateConventionStatus$(
+    params: UpdateConventionStatusRequestDto,
+    jwt: string,
+  ): Observable<void> {
+    return fromPromise(this.#updateStatus(params, jwt).then(() => undefined));
+  }
+
+  async #newConvention(conventionDto: ConventionDto): Promise<string> {
+    return this.unauthenticatedHttpClient
+      .createConvention({
+        body: conventionDto,
+      })
+      .then(({ responseBody }) => responseBody.id);
+  }
+
+  async #retrieveFromToken(
+    payload: FetchConventionRequestedPayload,
+  ): Promise<ConventionReadDto> {
+    return this.magicLinkHttpClient
+      .getConvention({
+        headers: { authorization: payload.jwt },
+        urlParams: { conventionId: payload.conventionId },
+      })
+      .then(({ responseBody }) => responseBody);
+  }
+
+  async #signConvention(jwt: string): Promise<WithConventionIdLegacy> {
     return this.magicLinkHttpClient
       .signConvention({
         headers: { authorization: jwt },
@@ -93,11 +114,7 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ responseBody }) => responseBody);
   }
 
-  public signConvention$(jwt: string): Observable<void> {
-    return fromPromise(this.signConvention(jwt).then(() => undefined));
-  }
-
-  private async updateConvention(
+  async #updateConvention(
     convention: ConventionDto,
     jwt: string,
   ): Promise<string> {
@@ -110,34 +127,14 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ responseBody }) => responseBody.id);
   }
 
-  public updateConvention$(
-    conventionDto: ConventionDto,
-    jwt: string,
-  ): Observable<void> {
-    return fromPromise(
-      this.updateConvention(conventionDto, jwt).then(() => undefined),
-    );
-  }
-
-  public updateConventionStatus$(
+  async #updateStatus(
     params: UpdateConventionStatusRequestDto,
-    conventionId: ConventionId,
-    jwt: string,
-  ): Observable<void> {
-    return fromPromise(
-      this.updateStatus(params, conventionId, jwt).then(() => undefined),
-    );
-  }
-
-  private async updateStatus(
-    params: UpdateConventionStatusRequestDto,
-    conventionId: ConventionId,
     jwt: string,
   ): Promise<WithConventionIdLegacy> {
     return this.magicLinkHttpClient
       .updateConventionStatus({
         body: params,
-        urlParams: { conventionId },
+        urlParams: { conventionId: params.conventionId },
         headers: { authorization: jwt },
       })
       .then(({ responseBody }) => responseBody);

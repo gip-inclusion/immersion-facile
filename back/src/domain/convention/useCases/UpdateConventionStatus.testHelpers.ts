@@ -1,14 +1,18 @@
+import { values } from "ramda";
 import {
+  AgencyDtoBuilder,
   allRoles,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
+  ConventionRelatedJwtPayload,
   ConventionStatus,
   conventionStatuses,
   createConventionMagicLinkPayload,
   doesStatusNeedsJustification,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUser,
   Role,
   splitCasesBetweenPassingAndFailing,
   UpdateConventionStatusRequestDto,
@@ -33,6 +37,73 @@ import {
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
 
+export const allInclusionConnectedTestUsers = [
+  "icUserWithRoleToReview",
+  "icUserWithRoleCounsellor",
+  "icUserWithRoleValidator",
+  "icUserWithRoleAgencyOwner",
+] as const;
+
+type InclusionConnectedTestUser =
+  (typeof allInclusionConnectedTestUsers)[number];
+
+const fakeAgency = new AgencyDtoBuilder().build();
+
+const makeUserIdMapInclusionConnectedUser: Record<
+  InclusionConnectedTestUser,
+  InclusionConnectedUser
+> = {
+  icUserWithRoleToReview: {
+    agencyRights: [
+      {
+        agency: fakeAgency,
+        role: "toReview",
+      },
+    ],
+    email: "icUserWithRoleToReview@mail.com",
+    firstName: "icUserWithRoleToReview",
+    id: "icUserWithRoleToReview",
+    lastName: "ToReview",
+  },
+  icUserWithRoleCounsellor: {
+    agencyRights: [
+      {
+        agency: fakeAgency,
+        role: "counsellor",
+      },
+    ],
+    email: "icUserWithRoleCounsellor@mail.com",
+    firstName: "icUserWithRoleCounsellor",
+    id: "icUserWithRoleCounsellor",
+    lastName: "Consellor",
+  },
+  icUserWithRoleValidator: {
+    agencyRights: [
+      {
+        agency: fakeAgency,
+        role: "validator",
+      },
+    ],
+    email: "icUserWithRoleValidator@mail.com",
+    firstName: "icUserWithRoleValidator",
+    id: "icUserWithRoleValidator",
+    lastName: "Validator",
+  },
+
+  icUserWithRoleAgencyOwner: {
+    agencyRights: [
+      {
+        agency: fakeAgency,
+        role: "agencyOwner",
+      },
+    ],
+    email: "icUserWithRoleAgencyOwner@mail.com",
+    firstName: "icUserWithRoleAgencyOwner",
+    id: "icUserWithRoleAgencyOwner",
+    lastName: "Owner",
+  },
+};
+
 type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
 
 type ConventionDomainTopic = ExtractFromDomainTopics<
@@ -49,14 +120,19 @@ type ConventionDomainTopic = ExtractFromDomainTopics<
 
 type SetupInitialStateParams = {
   initialStatus: ConventionStatus;
+  withIcUser: boolean;
   alreadySigned?: boolean;
 };
+export const originalConventionId: ConventionId =
+  "add5c20e-6dd2-45af-affe-927358005251";
 
-export const setupInitialState = async ({
+export const setupInitialState = ({
   initialStatus,
   alreadySigned = true,
+  withIcUser,
 }: SetupInitialStateParams) => {
   const conventionBuilder = new ConventionDtoBuilder()
+    .withId(originalConventionId)
     .withStatus(initialStatus)
     .withoutDateValidation();
   const originalConvention = alreadySigned
@@ -72,51 +148,49 @@ export const setupInitialState = async ({
     uuidGenerator: new TestUuidGenerator(),
   });
 
-  const updateConventionStatus = new UpdateConventionStatus(
+  const updateConventionStatusUseCase = new UpdateConventionStatus(
     new InMemoryUowPerformer(uow),
     createNewEvent,
     timeGateway,
   );
 
-  await conventionRepository.save(originalConvention);
+  conventionRepository.setConventions({
+    [originalConvention.id]: originalConvention,
+  });
+  withIcUser &&
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
+      values(makeUserIdMapInclusionConnectedUser),
+    );
   return {
     originalConvention,
-    updateConventionStatus,
+    updateConventionStatusUseCase,
     conventionRepository,
     outboxRepository,
     timeGateway,
   };
 };
 
-type ExecuteUseCaseParams = {
-  conventionId: ConventionId;
-  role: Role;
-  email: string;
+type ExecuteUseCaseParamsByUserId = {
+  jwtPayload: ConventionRelatedJwtPayload;
   updateStatusParams: UpdateConventionStatusRequestDto;
-  updateConventionStatus: UpdateConventionStatus;
+  updateConventionStatusUseCase: UpdateConventionStatus;
   conventionRepository: InMemoryConventionRepository;
 };
 
 export const executeUpdateConventionStatusUseCase = async ({
-  conventionId,
-  role,
-  email,
+  jwtPayload,
   updateStatusParams,
-  updateConventionStatus,
+  updateConventionStatusUseCase,
   conventionRepository,
-}: ExecuteUseCaseParams): Promise<ConventionDto> => {
-  const payload = createConventionMagicLinkPayload({
-    id: conventionId,
-    role,
-    email,
-    now: new Date(),
-  });
-  const response = await updateConventionStatus.execute(updateStatusParams, {
-    conventionId: payload.applicationId,
-    role: payload.role,
-  });
-  expect(response.id).toEqual(conventionId);
-  const storedConvention = await conventionRepository.getById(conventionId);
+}: ExecuteUseCaseParamsByUserId): Promise<ConventionDto> => {
+  const response = await updateConventionStatusUseCase.execute(
+    updateStatusParams,
+    jwtPayload,
+  );
+  expect(response.id).toEqual(updateStatusParams.conventionId);
+  const storedConvention = await conventionRepository.getById(
+    updateStatusParams.conventionId,
+  );
   return storedConvention;
 };
 
@@ -133,9 +207,8 @@ const expectNewEvent = async <T extends DomainTopic>(
 };
 
 type TestAcceptNewStatusParams = {
-  role: Role;
   initialStatus: ConventionStatus;
-};
+} & ({ role: Role } | { userId: InclusionConnectedTestUser });
 
 type UpdatedFields = Partial<
   ConventionDto & {
@@ -158,25 +231,35 @@ const makeTestAcceptsStatusUpdate =
     updatedFields = {},
     nextDate,
   }: TestAcceptExpectation) =>
-  async ({ role, initialStatus }: TestAcceptNewStatusParams) => {
+  async (testAcceptNewStatusParams: TestAcceptNewStatusParams) => {
     const {
       originalConvention,
-      updateConventionStatus,
+      updateConventionStatusUseCase,
       conventionRepository,
       outboxRepository,
       timeGateway,
     } = await setupInitialState({
-      initialStatus,
+      initialStatus: testAcceptNewStatusParams.initialStatus,
+      withIcUser: "userId" in testAcceptNewStatusParams,
     });
 
     if (nextDate) timeGateway.setNextDate(nextDate);
 
+    const jwt: ConventionRelatedJwtPayload =
+      "role" in testAcceptNewStatusParams
+        ? createConventionMagicLinkPayload({
+            id: originalConvention.id,
+            role: testAcceptNewStatusParams.role,
+            email: "",
+            now: new Date(),
+          })
+        : {
+            userId: testAcceptNewStatusParams.userId,
+          };
     const storedConvention = await executeUpdateConventionStatusUseCase({
-      conventionId: originalConvention.id,
-      role,
-      email: "test@test.fr",
+      jwtPayload: jwt,
       updateStatusParams,
-      updateConventionStatus,
+      updateConventionStatusUseCase,
       conventionRepository,
     });
 
@@ -217,6 +300,23 @@ const makeTestAcceptsStatusUpdate =
     expectToEqual(storedConvention, expectedConvention);
 
     if (expectedDomainTopic === "ImmersionApplicationRequiresModification") {
+      const role =
+        "role" in testAcceptNewStatusParams
+          ? testAcceptNewStatusParams.role
+          : makeUserIdMapInclusionConnectedUser[
+              testAcceptNewStatusParams.userId
+            ].agencyRights.find(
+              (agencyRight) =>
+                agencyRight.agency.id === expectedConvention.agencyId,
+            )?.role;
+
+      if (!role || role === "agencyOwner" || role === "toReview")
+        throw new Error(
+          `No supported role found according to ${JSON.stringify(
+            testAcceptNewStatusParams,
+          )}`,
+        );
+
       const payload: ConventionRequiresModificationPayload = {
         convention: expectedConvention,
         justification:
@@ -247,10 +347,16 @@ const makeTestAcceptsStatusUpdate =
   };
 
 type TestRejectsNewStatusParams = {
-  role: Role;
   initialStatus: ConventionStatus;
   expectedError: UnauthorizedError | BadRequestError;
-};
+} & (
+  | {
+      role: Role;
+    }
+  | {
+      userId: InclusionConnectedTestUser;
+    }
+);
 
 type TestRejectsExpectation = {
   targetStatus: ConventionStatus;
@@ -258,49 +364,73 @@ type TestRejectsExpectation = {
 
 const makeTestRejectsStatusUpdate =
   ({ targetStatus }: TestRejectsExpectation) =>
-  async ({
-    role,
-    initialStatus,
-    expectedError,
-  }: TestRejectsNewStatusParams) => {
-    const { originalConvention, updateConventionStatus, conventionRepository } =
-      await setupInitialState({
-        initialStatus,
-      });
+  async (testRejectsNewStatusParams: TestRejectsNewStatusParams) => {
+    const {
+      originalConvention,
+      updateConventionStatusUseCase,
+      conventionRepository,
+      timeGateway,
+    } = await setupInitialState({
+      initialStatus: testRejectsNewStatusParams.initialStatus,
+      withIcUser: "userId" in testRejectsNewStatusParams,
+    });
+    const jwtPayload: ConventionRelatedJwtPayload =
+      "role" in testRejectsNewStatusParams
+        ? createConventionMagicLinkPayload({
+            id: originalConvention.id,
+            email: "",
+            role: testRejectsNewStatusParams.role,
+            now: timeGateway.now(),
+          })
+        : {
+            userId: testRejectsNewStatusParams.userId,
+          };
     await expectPromiseToFailWithError(
       executeUpdateConventionStatusUseCase({
-        conventionId: originalConvention.id,
-        role,
+        jwtPayload,
         updateStatusParams: doesStatusNeedsJustification(targetStatus)
-          ? { status: targetStatus, statusJustification: "fake justification" }
-          : { status: targetStatus },
-        email: "test@test.fr",
-        updateConventionStatus,
+          ? {
+              status: targetStatus,
+              statusJustification: "fake justification",
+              conventionId: originalConvention.id,
+            }
+          : { status: targetStatus, conventionId: originalConvention.id },
+        updateConventionStatusUseCase,
         conventionRepository,
       }),
-      expectedError,
+      testRejectsNewStatusParams.expectedError,
     );
   };
 
-interface TestAllCaseProps {
+type TestAllCaseProps = {
   updateStatusParams: UpdateConventionStatusRequestDto;
   expectedDomainTopic: ConventionDomainTopic;
   updatedFields?: UpdatedFields;
   allowedRoles: Role[];
+  allowedInclusionConnectedUsers: InclusionConnectedTestUser[];
   allowedInitialStatuses: ConventionStatus[];
   nextDate?: Date;
-}
+};
 
 export const testForAllRolesAndInitialStatusCases = ({
   allowedRoles,
   expectedDomainTopic,
   updatedFields = {},
   allowedInitialStatuses,
+  allowedInclusionConnectedUsers,
   nextDate,
   updateStatusParams,
 }: TestAllCaseProps) => {
   const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
     splitCasesBetweenPassingAndFailing(allRoles, allowedRoles);
+
+  const [
+    allowedInclusionConnectedUsersToUpdate,
+    notAllowedInclusionConnectedUsersToUpdate,
+  ] = splitCasesBetweenPassingAndFailing(
+    allInclusionConnectedTestUsers,
+    allowedInclusionConnectedUsers,
+  );
 
   const [authorizedInitialStatuses, forbiddenInitalStatuses] =
     splitCasesBetweenPassingAndFailing(
@@ -311,61 +441,90 @@ export const testForAllRolesAndInitialStatusCases = ({
   const someValidInitialStatus = authorizedInitialStatuses[0];
   const someValidRole = allowedRolesToUpdate[0];
 
-  //RIGHT PATHS
-  const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
-    updateStatusParams,
-    expectedDomainTopic,
-    updatedFields,
-    nextDate,
-  });
+  describe("Accepted", () => {
+    const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
+      updateStatusParams,
+      expectedDomainTopic,
+      updatedFields,
+      nextDate,
+    });
 
-  it.each(allowedRoles.map((role) => ({ role })))(
-    "Accepted from '$role'",
-    ({ role }) =>
-      testAcceptsStatusUpdate({
-        role,
-        initialStatus: someValidInitialStatus,
-      }),
-  );
-
-  it.each(authorizedInitialStatuses.map((status) => ({ status })))(
-    "Accepted from status $status",
-    ({ status }) =>
-      testAcceptsStatusUpdate({
-        role: someValidRole,
-        initialStatus: status,
-      }),
-  );
-
-  //WRONG PATHS
-
-  const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({
-    targetStatus: updateStatusParams.status,
-  });
-
-  if (notAllowedRolesToUpdate.length) {
-    it.each(notAllowedRolesToUpdate.map((role) => ({ role })))(
-      "Rejected from '$role'",
+    it.each(allowedRoles.map((role) => ({ role })))(
+      "Accepted from role '$role'",
       ({ role }) =>
-        testRejectsStatusUpdate({
+        testAcceptsStatusUpdate({
           role,
           initialStatus: someValidInitialStatus,
+        }),
+    );
+
+    if (allowedInclusionConnectedUsersToUpdate.length)
+      it.each(
+        allowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
+      )("Accepted from userId '$userId'", ({ userId }) =>
+        testAcceptsStatusUpdate({
+          userId,
+          initialStatus: someValidInitialStatus,
+        }),
+      );
+
+    it.each(authorizedInitialStatuses.map((status) => ({ status })))(
+      "Accepted from status $status",
+      ({ status }) =>
+        testAcceptsStatusUpdate({
+          role: someValidRole,
+          initialStatus: status,
+        }),
+    );
+  });
+
+  describe("Rejected", () => {
+    const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({
+      targetStatus: updateStatusParams.status,
+    });
+
+    if (notAllowedRolesToUpdate.length) {
+      it.each(notAllowedRolesToUpdate.map((role) => ({ role })))(
+        "Rejected from role '$role'",
+        ({ role }) =>
+          testRejectsStatusUpdate({
+            role,
+            initialStatus: someValidInitialStatus,
+            expectedError: new ForbiddenError(
+              `${role} is not allowed to go to status ${updateStatusParams.status}`,
+            ),
+          }),
+      );
+    }
+
+    if (notAllowedInclusionConnectedUsersToUpdate.length) {
+      it.each(
+        notAllowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
+      )("Rejected from userId '$userId'", ({ userId }) =>
+        testRejectsStatusUpdate({
+          userId,
+          initialStatus: someValidInitialStatus,
           expectedError: new ForbiddenError(
-            `${role} is not allowed to go to status ${updateStatusParams.status}`,
+            `${
+              makeUserIdMapInclusionConnectedUser[userId].agencyRights.find(
+                (agencyRight) => agencyRight.agency.id === fakeAgency.id,
+              )?.role
+            } is not allowed to go to status ${updateStatusParams.status}`,
+          ),
+        }),
+      );
+    }
+
+    it.each(forbiddenInitalStatuses.map((status) => ({ status })))(
+      "Rejected from status $status",
+      ({ status }) =>
+        testRejectsStatusUpdate({
+          role: someValidRole,
+          initialStatus: status,
+          expectedError: new BadRequestError(
+            `Cannot go from status '${status}' to '${updateStatusParams.status}'`,
           ),
         }),
     );
-  }
-
-  it.each(forbiddenInitalStatuses.map((status) => ({ status })))(
-    "Rejected from status $status",
-    ({ status }) =>
-      testRejectsStatusUpdate({
-        role: someValidRole,
-        initialStatus: status,
-        expectedError: new BadRequestError(
-          `Cannot go from status '${status}' to '${updateStatusParams.status}'`,
-        ),
-      }),
-  );
+  });
 };

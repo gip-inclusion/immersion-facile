@@ -24,6 +24,7 @@ import {
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domain/auth/jwt";
+import { conventionMissingMessage } from "../../../../domain/convention/entities/Convention";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import {
   TEST_AGENCY_DEPARTMENT,
@@ -33,7 +34,7 @@ import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
-const user: InclusionConnectedUser = {
+const inclusionConnectedUser: InclusionConnectedUser = {
   id: "my-user-id",
   email: "my-user@email.com",
   firstName: "John",
@@ -131,7 +132,7 @@ describe("convention e2e", () => {
       "200 - succeeds with JWT %s",
       async (scenario) => {
         inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
-          [user],
+          [inclusionConnectedUser],
         );
 
         const jwt = match(scenario)
@@ -157,7 +158,7 @@ describe("convention e2e", () => {
           )
           .with("InclusionConnectJwt", () =>
             generateInclusionConnectJwt({
-              userId: user.id,
+              userId: inclusionConnectedUser.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
             }),
@@ -329,6 +330,9 @@ describe("convention e2e", () => {
       inMemoryUow.conventionRepository.setConventions({
         [inReviewConvention.id]: inReviewConvention,
       });
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        inclusionConnectedUser,
+      ]);
     });
 
     it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
@@ -355,7 +359,7 @@ describe("convention e2e", () => {
           )
           .with("InclusionConnectJwt", () =>
             generateInclusionConnectJwt({
-              userId: user.id,
+              userId: inclusionConnectedUser.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
             }),
@@ -471,7 +475,7 @@ describe("convention e2e", () => {
           "Authorization",
           generateConventionJwt(
             createConventionMagicLinkPayload({
-              id: "unknown_application_id",
+              id: unknownId,
               role: "counsellor",
               email: "counsellor@pe.fr",
               now: gateways.timeGateway.now(),
@@ -481,7 +485,9 @@ describe("convention e2e", () => {
         .send({ status: "ACCEPTED_BY_COUNSELLOR" });
 
       expectToEqual(response.statusCode, 404);
-      expectToEqual(response.body, { errors: "unknown_application_id" });
+      expectToEqual(response.body, {
+        errors: conventionMissingMessage(unknownId),
+      });
     });
   });
 

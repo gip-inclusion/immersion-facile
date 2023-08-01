@@ -340,6 +340,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 ) => {
   const params: UpdateConventionStatusRequestDto = {
     status: "ACCEPTED_BY_VALIDATOR",
+    conventionId: initialConvention.id,
   };
 
   gateways.timeGateway.setNextDate(validationDate);

@@ -36,7 +36,6 @@ export const ConventionManageActions = ({
     (updateStatusParams: UpdateConventionStatusRequestDto) =>
       dispatch(
         conventionSlice.actions.statusChangeRequested({
-          conventionId: convention.id,
           jwt,
           feedbackKind,
           updateStatusParams,
@@ -62,6 +61,7 @@ export const ConventionManageActions = ({
         <VerificationActionButton
           disabled={disabled}
           newStatus="REJECTED"
+          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind("rejected")}
         >
           {t.verification.rejectConvention}
@@ -72,6 +72,7 @@ export const ConventionManageActions = ({
         <VerificationActionButton
           disabled={disabled}
           newStatus="DEPRECATED"
+          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
         >
           {t.verification.markAsDeprecated}
@@ -82,6 +83,7 @@ export const ConventionManageActions = ({
         <VerificationActionButton
           disabled={disabled}
           newStatus="DRAFT"
+          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind(
             "modificationAskedFromCounsellorOrValidator",
           )}
@@ -97,6 +99,7 @@ export const ConventionManageActions = ({
       ) && (
         <VerificationActionButton
           newStatus="ACCEPTED_BY_COUNSELLOR"
+          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
           disabled={disabled || convention.status != "IN_REVIEW"}
         >
@@ -113,6 +116,7 @@ export const ConventionManageActions = ({
       ) && (
         <VerificationActionButton
           newStatus="ACCEPTED_BY_VALIDATOR"
+          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind("markedAsValidated")}
           disabled={
             disabled ||
@@ -129,6 +133,7 @@ export const ConventionManageActions = ({
       {isAllowedTransition(convention.status, "CANCELLED", role) && (
         <VerificationActionButton
           newStatus="CANCELLED"
+          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind("cancelled")}
           disabled={disabled || convention.status != "ACCEPTED_BY_VALIDATOR"}
         >

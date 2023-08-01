@@ -14,7 +14,6 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork } from "../../core/ports/UnitOfWork";
-import { ConventionRepository } from "../ports/ConventionRepository";
 
 const throwIfStatusTransitionNotPossible = ({
   initialStatus,
@@ -57,29 +56,6 @@ export const throwIfTransitionNotAllowed = ({
   throwIfStatusTransitionNotPossible({ initialStatus, targetStatus });
 };
 
-export const makeGetStoredConventionOrThrowIfNotAllowed =
-  (conventionRepository: ConventionRepository) =>
-  async (
-    targetStatus: ConventionStatus,
-    role: Role,
-    applicationId: ConventionId,
-  ): Promise<ConventionDto> => {
-    throwIfRoleNotAllowedToChangeStatus({
-      role,
-      targetStatus,
-    });
-
-    const convention = await conventionRepository.getById(applicationId);
-    if (!convention) throw new NotFoundError(applicationId);
-
-    throwIfStatusTransitionNotPossible({
-      initialStatus: convention.status,
-      targetStatus,
-    });
-
-    return convention;
-  };
-
 export async function retrieveConventionWithAgency(
   uow: UnitOfWork,
   conventionEvent: ConventionDto,
@@ -91,7 +67,7 @@ export async function retrieveConventionWithAgency(
     conventionEvent.id,
   );
   if (!convention)
-    throw new NotFoundError(conventionMissingMessage(conventionEvent));
+    throw new NotFoundError(conventionMissingMessage(conventionEvent.id));
   const agency = (
     await uow.agencyRepository.getByIds([convention.agencyId])
   ).at(0);
@@ -125,7 +101,8 @@ export const getAllConventionRecipientsEmail = (
   return recipientEmails;
 };
 
-export const conventionMissingMessage = (convention: ConventionDto): string =>
-  `Convention with id '${convention.id}' missing.`;
+export const conventionMissingMessage = (conventionId: ConventionId): string =>
+  `Convention with id '${conventionId}' missing.`;
+
 export const agencyMissingMessage = (convention: ConventionDto): string =>
   `Agency with id '${convention.agencyId}' missing.`;

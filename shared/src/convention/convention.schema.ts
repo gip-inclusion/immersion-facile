@@ -313,11 +313,13 @@ export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatu
   z
     .object({
       status: z.enum(conventionStatusesWithoutJustification),
+      conventionId: conventionIdSchema,
     })
     .or(
       z.object({
         status: z.enum(conventionStatusesWithJustification),
         statusJustification: justificationSchema,
+        conventionId: conventionIdSchema,
       }),
     );
 

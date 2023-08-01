@@ -46,15 +46,11 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
         createConventionParams,
       );
 
-    await expectEstablishmentRequiresChanges(
-      appAndDeps,
-      establishmentRepJwt,
-      validConvention.id,
-      {
-        statusJustification: "change something which is wrong",
-        status: "DRAFT",
-      },
-    );
+    await expectEstablishmentRequiresChanges(appAndDeps, establishmentRepJwt, {
+      statusJustification: "change something which is wrong",
+      status: "DRAFT",
+      conventionId: validConvention.id,
+    });
     // could test edition and sign but it is similar to addImmersionApplicationAndSendMails e2e tests
   });
 });
@@ -121,14 +117,13 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 const expectEstablishmentRequiresChanges = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   establishmentJwt: string,
-  immersionApplicationId: string,
   params: UpdateConventionStatusRequestDto,
 ) => {
   await request
     .post(
       conventionMagicLinkTargets.updateConventionStatus.url.replace(
         ":conventionId",
-        immersionApplicationId,
+        params.conventionId,
       ),
     )
     .set("Authorization", establishmentJwt)
