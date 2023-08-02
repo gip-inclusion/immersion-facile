@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./PageHeader.styles";
 
-type PageHeaderProps = {
+export type PageHeaderProps = {
   title: string;
   className?: string;
   children?: React.ReactNode;
