@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./MaintenanceCallout.styles";
 
-type MaintenanceCalloutProps = {
+export type MaintenanceCalloutProps = {
   message: string;
 };
 
