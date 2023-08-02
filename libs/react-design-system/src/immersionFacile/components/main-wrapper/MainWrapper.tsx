@@ -12,17 +12,17 @@ type MainWrapperCommonProps = {
   pageHeader?: React.ReactNode;
 };
 
-export type WithBackground = {
+type WithBackground = {
   useBackground: true;
   backgroundStyles?: React.CSSProperties;
 };
 
-export type WithoutBackground = {
+type WithoutBackground = {
   useBackground?: undefined | false;
   backgroundStyles?: never;
 };
 
-type MainWrapperProps = MainWrapperCommonProps &
+export type MainWrapperProps = MainWrapperCommonProps &
   (WithBackground | WithoutBackground);
 
 export const MainWrapper = ({
