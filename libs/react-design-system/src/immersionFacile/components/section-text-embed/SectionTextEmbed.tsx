@@ -3,7 +3,7 @@ import ReactPlayer from "react-player";
 import { fr } from "@codegouvfr/react-dsfr";
 import "./SectionTextEmbed.scss";
 
-type SectionTextEmbedProps = {
+export type SectionTextEmbedProps = {
   videoUrl: string;
   videoPosterUrl: string;
   videoTranscription: string;
