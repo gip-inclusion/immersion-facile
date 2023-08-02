@@ -6,7 +6,6 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { match, P } from "ts-pattern";
 import { AgencyRole, allAgencyRoles, AuthenticatedUserId } from "shared";
-import { DsfrTitle } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -32,11 +31,9 @@ export const RegisterUsersToAgencies = () => {
 
   return (
     <>
-      <DsfrTitle
-        level={5}
-        text="Rapprocher un utilisateur d'une agence"
-        className={fr.cx("fr-mt-4w")}
-      />
+      <h5 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
+        Rapprocher un utilisateur d'une agence
+      </h5>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <>
           <Select

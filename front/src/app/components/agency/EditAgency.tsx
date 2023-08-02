@@ -1,6 +1,5 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { DsfrTitle } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
@@ -12,11 +11,9 @@ export const EditAgency = () => {
 
   return (
     <>
-      <DsfrTitle
-        level={5}
-        text="Editer une agence"
-        className={fr.cx("fr-mt-4w")}
-      />
+      <h5 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
+        Editer une agence
+      </h5>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <AgencyAdminAutocomplete
           title="Je sélectionne une agence"
