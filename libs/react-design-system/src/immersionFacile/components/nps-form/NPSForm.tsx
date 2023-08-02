@@ -2,7 +2,7 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 
-type NPSFormProps = {
+export type NPSFormProps = {
   title?: string;
   conventionInfos: {
     id: string;
