@@ -3,7 +3,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { useStyles } from "tss-react/dsfr";
 import { AbsoluteUrl } from "shared";
-import { DsfrTitle } from "react-design-system";
 import { ENV } from "src/config/environmentVariables";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
@@ -28,12 +27,9 @@ export const MetabaseView = ({
   if (!url) return <p>Chargement du dashboard en cours...</p>;
   return (
     <div>
-      <DsfrTitle
-        level={5}
-        text={title}
-        action={<TitleButton url={url} />}
-        className={cx("flex")}
-      />
+      <h5 className={cx(fr.cx("fr-h5", "fr-mb-2w"), "flex")}>
+        {title} <TitleButton url={url} />
+      </h5>
       {ENV.envType === "production" ? (
         <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
       ) : (

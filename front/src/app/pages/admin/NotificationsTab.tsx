@@ -13,7 +13,6 @@ import {
   SmsNotification,
   SmsVariables,
 } from "shared";
-import { DsfrTitle } from "react-design-system";
 import { TextCell } from "src/app/components/admin/TextCell";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
@@ -47,12 +46,11 @@ export const NotificationsTab = () => {
           )
         }
       />
-      <DsfrTitle
-        level={5}
-        text={`Derniers ${
+      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
+        {`Derniers ${
           notificationKindToShow === "email" ? "Emails" : "Sms"
         } envoyés`}
-      />
+      </h5>
       {errorMessage ? (
         <Alert title={"Oups..."} severity="error" description={errorMessage} />
       ) : (

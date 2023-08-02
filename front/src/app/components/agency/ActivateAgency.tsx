@@ -3,9 +3,7 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { ActiveOrRejectedStatus, AgencyOption } from "shared";
-import { domElementIds } from "shared";
-import { DsfrTitle } from "react-design-system";
+import { ActiveOrRejectedStatus, AgencyOption, domElementIds } from "shared";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { useAppSelector } from "../../hooks/reduxHooks";
@@ -51,11 +49,9 @@ export const ActivateAgency = () => {
 
   return (
     <>
-      <DsfrTitle
-        level={5}
-        text="Activer ou Rejeter une agence"
-        className={fr.cx("fr-mt-4w")}
-      />
+      <h5 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
+        Activer ou Rejeter une agence
+      </h5>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <Select
           label={`${agencyNeedingReviewOptions.length} agence(s) en attente de revue`}

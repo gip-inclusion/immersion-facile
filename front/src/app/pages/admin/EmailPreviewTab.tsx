@@ -10,7 +10,7 @@ import {
   immersionFacileContactEmail,
   internshipKinds,
 } from "shared";
-import { DsfrTitle, ImmersionTextField } from "react-design-system";
+import { ImmersionTextField } from "react-design-system";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
   cciCustomHtmlFooter,
@@ -54,7 +54,7 @@ export const EmailPreviewTab = () => {
 
   return (
     <div className={cx("admin-tab__email-preview")}>
-      <DsfrTitle level={5} text="Aperçu de template email" />
+      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>Aperçu de template email</h5>
       <div>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           <aside className={fr.cx("fr-col-12", "fr-col-lg-4")}>

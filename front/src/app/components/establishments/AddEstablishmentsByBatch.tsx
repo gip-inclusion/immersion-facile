@@ -12,7 +12,7 @@ import {
   EstablishmentCSVRow,
   FormEstablishmentDto,
 } from "shared";
-import { DsfrTitle, Loader } from "react-design-system";
+import { Loader } from "react-design-system";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";
@@ -161,7 +161,9 @@ export const AddEstablishmentsByBatch = () => {
   return (
     <>
       {isLoading && <Loader />}
-      <DsfrTitle level={5} text="Import en masse d'entreprises" />
+      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
+        Import en masse d'entreprises
+      </h5>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Renseignez un nom de groupe d'entreprises *"

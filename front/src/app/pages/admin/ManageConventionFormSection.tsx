@@ -9,7 +9,6 @@ import {
   ManageConventionAdminForm,
   manageConventionAdminFormSchema,
 } from "shared";
-import { DsfrTitle } from "react-design-system";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
 
@@ -31,7 +30,7 @@ export const ManageConventionFormSection = ({
 
   return (
     <>
-      <DsfrTitle level={5} text="Piloter une convention" />
+      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>Piloter une convention</h5>
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ conventionId }) => {
