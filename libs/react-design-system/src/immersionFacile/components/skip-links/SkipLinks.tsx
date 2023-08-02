@@ -6,7 +6,7 @@ export type SkipLink = {
   anchor: string;
 };
 
-type SkipLinksProps = {
+export type SkipLinksProps = {
   links: SkipLink[];
 };
 
