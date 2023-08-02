@@ -15,10 +15,14 @@ const booleanToCheck = (value: boolean) => (value ? "✅" : "❌");
 
 const renderSchedule = (convention: ConventionReadDto) => (
   <div style={{ whiteSpace: "pre" }}>
-    {prettyPrintSchedule(convention.schedule, false, {
-      start: new Date(convention.dateStart),
-      end: new Date(convention.dateEnd),
-    })}
+    {prettyPrintSchedule(
+      convention.schedule,
+      {
+        start: new Date(convention.dateStart),
+        end: new Date(convention.dateEnd),
+      },
+      false,
+    )}
   </div>
 );
 

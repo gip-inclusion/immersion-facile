@@ -6,10 +6,11 @@ import {
   format,
   getDay,
   parseISO,
-  startOfWeek,
+  subDays,
 } from "date-fns";
 import { clone, prop, uniq } from "ramda";
 import { arrayFromNumber } from "../utils";
+import { DateIsoString } from "../utils/date";
 import {
   DailyScheduleDto,
   DateIntervalDto,
@@ -22,10 +23,13 @@ import {
   weekdays,
 } from "./Schedule.dto";
 
-export type WeeklyImmersionTimetableDto = {
-  dailySchedule: DailyScheduleDto | null;
+export type DailyImmersionTimetableDto = {
+  timePeriods: TimePeriodsDto | null;
+  date: DateIsoString;
   key: number;
-}[];
+};
+
+export type WeeklyImmersionTimetableDto = DailyImmersionTimetableDto[];
 
 type ImmersionTimeTable = WeeklyImmersionTimetableDto[];
 
@@ -67,14 +71,55 @@ export const calculateTotalImmersionHoursFromComplexSchedule = (
 
 export const prettyPrintSchedule = (
   schedule: ScheduleDto,
-  displayFreeDays = true,
   interval: DateIntervalDto,
-): string =>
-  prettyPrintComplexSchedule(
-    schedule.complexSchedule,
-    displayFreeDays,
-    interval,
-  );
+  displayFreeDays = true,
+): string => {
+  const lines: string[] = [];
+  const weeks = makeImmersionTimetable(schedule.complexSchedule, interval);
+  const weeksWithoutEmptyDays = weeks.map((week, weekIndex) => {
+    const isStartingWeek = weekIndex === 0;
+    const isEndingWeek = weekIndex === weeks.length - 1;
+    const shouldModifyWeek = isStartingWeek || isEndingWeek;
+    if (!shouldModifyWeek) return week;
+    return week.filter((day, dayIndex) => {
+      if (isStartingWeek) {
+        return !(
+          dayIndex <
+            week.findIndex((otherDay) => otherDay.timePeriods !== null) &&
+          day.timePeriods === null
+        );
+      }
+      if (isEndingWeek) {
+        return !(
+          dayIndex >
+            week.findLastIndex((otherDay) => otherDay.timePeriods !== null) &&
+          day.timePeriods === null
+        );
+      }
+    });
+  });
+  weeksWithoutEmptyDays.forEach((week) => {
+    lines.push(
+      `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
+    );
+    week.forEach((day) => {
+      const isDateOutOfInterval =
+        day.date < interval.start.toISOString() ||
+        day.date > interval.end.toISOString();
+      const isFreeDaySkipped = !day.timePeriods && !displayFreeDays;
+      return (
+        !isDateOutOfInterval &&
+        !isFreeDaySkipped &&
+        lines.push(
+          `${
+            frenchDayMapping(day.date).frenchDayName
+          } : ${prettyPrintDaySchedule(day.timePeriods)}`,
+        )
+      );
+    });
+  });
+  return lines.join("\n");
+};
 
 const reasonableTimePeriods: TimePeriodsDto = [
   {
@@ -236,8 +281,10 @@ const toFrenchReadableDate = (isoStringDate: string): string =>
 
 // Converts an array of TimePeriodDto to a readable schedule, e.g.
 // "08:00-12:00, 14:00-17:00". Empty arrays get converted to "libre".
-const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
-  if (timePeriods.length == 0) {
+const prettyPrintDaySchedule = (
+  timePeriods: TimePeriodDto[] | null,
+): string => {
+  if (!timePeriods || timePeriods.length == 0) {
     return "libre";
   }
   return timePeriods
@@ -249,57 +296,6 @@ const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
           : `${acc}, ${start}-${end}`,
       `${timePeriods[0].start}-${timePeriods[0].end}`,
     );
-};
-
-// Converts a SimpleScheduleDto into a readable schdeule of the form:
-// Heures de travail hebdomadaires: 28
-// lundi: libre
-// mardi: 08:00-12:00, 14:00-17:00
-// ...
-export const prettyPrintComplexSchedule = (
-  complexSchedule: DailyScheduleDto[],
-  displayFreeDays = true,
-  interval: DateIntervalDto,
-): string => {
-  const lines: string[] = [];
-  const weeks = makeImmersionTimetable(complexSchedule, interval);
-  const weeksWithoutEmptyDays = weeks.map((week, weekIndex) => {
-    const isStartingWeek = weekIndex === 0;
-    const isEndingWeek = weekIndex === weeks.length - 1;
-    const shouldModifyWeek = isStartingWeek || isEndingWeek;
-    if (!shouldModifyWeek) return week;
-    return week.filter((day, dayIndex) => {
-      if (isStartingWeek) {
-        return !(
-          dayIndex <
-            week.findIndex((otherDay) => otherDay.dailySchedule !== null) &&
-          day.dailySchedule === null
-        );
-      }
-      if (isEndingWeek) {
-        return !(
-          dayIndex >
-            week.findLastIndex((otherDay) => otherDay.dailySchedule !== null) &&
-          day.dailySchedule === null
-        );
-      }
-    });
-  });
-  weeksWithoutEmptyDays.forEach((week) => {
-    lines.push(
-      `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
-    );
-    week.forEach((day, index) => {
-      const freeDay = displayFreeDays ? `${weekdays[index]} : libre` : "";
-      const dayToPush = day.dailySchedule
-        ? `${
-            frenchDayMapping(day.dailySchedule.date).frenchDayName
-          } : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`
-        : freeDay;
-      return dayToPush !== "" && lines.push(dayToPush);
-    });
-  });
-  return lines.join("\n");
 };
 
 const calculateTotalImmersionHoursBetweenDateComplex = ({
@@ -353,24 +349,26 @@ export const makeImmersionTimetable = (
     ? arrayFromNumber(differenceInCalendarWeeksBetweenDates).map(
         (_, weekIndex) =>
           arrayFromNumber(weekdays.length).map((dayIndex) => {
+            const mondayOfFirstWeek = subDays(
+              startDay,
+              frenchDayMapping(startDay.toISOString()).frenchDay,
+            );
             const date = addDays(
-              startOfWeek(startDay, {
-                weekStartsOn: 1,
-              }),
+              mondayOfFirstWeek,
               dayIndex + weekIndex * weekdays.length,
             );
+            const dailySchedule = complexSchedule.find(
+              (dailySchedule) =>
+                parseISO(dailySchedule.date).getDate() === date.getDate() &&
+                parseISO(dailySchedule.date).getMonth() === date.getMonth() &&
+                parseISO(dailySchedule.date).getFullYear() ===
+                  date.getFullYear(),
+            );
             return {
-              dailySchedule:
-                complexSchedule.find(
-                  (dailySchedule) =>
-                    parseISO(dailySchedule.date).getDate() === date.getDate() &&
-                    parseISO(dailySchedule.date).getMonth() ===
-                      date.getMonth() &&
-                    parseISO(dailySchedule.date).getFullYear() ===
-                      date.getFullYear(),
-                ) ?? null,
+              timePeriods: dailySchedule?.timePeriods ?? null,
+              date: date.toISOString(),
               key: frenchDayMapping(date.toISOString()).frenchDay,
-            };
+            } satisfies DailyImmersionTimetableDto;
           }),
       )
     : [];
@@ -390,9 +388,8 @@ export const calculateWeeklyHours = (
 ): number =>
   week.reduce(
     (previousValue, currentDay) =>
-      currentDay.dailySchedule
-        ? previousValue +
-          minutesInDay(currentDay.dailySchedule.timePeriods) / 60
+      currentDay.timePeriods
+        ? previousValue + minutesInDay(currentDay.timePeriods) / 60
         : previousValue,
     0,
   );

@@ -33,12 +33,12 @@ export const WeeklyRow = ({
   return (
     <div className={fr.cx("fr-grid-row", "fr-mt-1w", "fr-grid-row--middle")}>
       {weeklyCalendar.map((dayOfWeek) =>
-        dayOfWeek.dailySchedule !== null ? (
+        dayOfWeek.timePeriods !== null ? (
           <DayCircle
             key={dayOfWeek.key.toString()}
-            name={makeName(dayOfWeek.dailySchedule.date)}
+            name={makeName(dayOfWeek.date)}
             dayStatus={getDayStatus(
-              dayOfWeek.dailySchedule,
+              dayOfWeek.timePeriods,
               dayOfWeek.key,
               selectedIndex,
             )}

@@ -5,10 +5,10 @@ import { useStyles } from "tss-react/dsfr";
 import {
   AgencyPublicDisplayDto,
   ConventionReadDto,
-  DailyScheduleDto,
   DateIntervalDto,
   DotNestedKeys,
-  prettyPrintComplexSchedule,
+  prettyPrintSchedule,
+  ScheduleDto,
   toDateString,
 } from "shared";
 import { Loader } from "react-design-system";
@@ -175,12 +175,12 @@ const establishmentSummary = (convention: ConventionReadDto) => {
   ];
   return rows.filter(filterEmptyRows);
 };
-const prettyPrintComplexScheduleAsJSX = (
-  complexSchedule: DailyScheduleDto[],
+const prettyPrintScheduleAsJSX = (
+  schedule: ScheduleDto,
   interval: DateIntervalDto,
 ): JSX.Element => (
   <ul>
-    {prettyPrintComplexSchedule(complexSchedule, undefined, interval)
+    {prettyPrintSchedule(schedule, interval)
       .split("\n")
       .map((line, index) => (
         <li key={index}>{line}</li>
@@ -197,7 +197,7 @@ const immersionConditionsSummary = (convention: ConventionReadDto) => {
     [fields["dateEnd"].label, toDateString(new Date(convention.dateEnd))],
     [
       "Emploi du temps",
-      prettyPrintComplexScheduleAsJSX(convention.schedule.complexSchedule, {
+      prettyPrintScheduleAsJSX(convention.schedule, {
         start: new Date(convention.dateStart),
         end: new Date(convention.dateEnd),
       }),
