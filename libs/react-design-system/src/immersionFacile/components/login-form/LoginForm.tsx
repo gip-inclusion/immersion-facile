@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./LoginForm.styles";
 
-type LoginFormSectionProps = {
+export type LoginFormSectionProps = {
   title: string;
   description: string;
   authComponent: React.ReactNode;
