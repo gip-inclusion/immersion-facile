@@ -225,7 +225,7 @@ export const ConventionDocumentPage = ({
               ? "de l'immersion"
               : "du mini-stage"}{" "}
             seront :{" "}
-            {prettyPrintSchedule(convention.schedule, undefined, {
+            {prettyPrintSchedule(convention.schedule, {
               start: new Date(convention.dateStart),
               end: new Date(convention.dateEnd),
             })

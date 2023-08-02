@@ -100,7 +100,6 @@ describe("ScheduleUtils", () => {
       expect(
         prettyPrintSchedule(
           new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
-          undefined,
           defaultInterval,
         ).split("\n"),
       ).toEqual([
@@ -114,11 +113,7 @@ describe("ScheduleUtils", () => {
         "dimanche : libre",
       ]);
       expect(
-        prettyPrintSchedule(
-          complexSchedule(),
-          undefined,
-          defaultInterval,
-        ).split("\n"),
+        prettyPrintSchedule(complexSchedule(), defaultInterval).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires : 6",
         "lundi : 01:00-02:00",
@@ -136,7 +131,6 @@ describe("ScheduleUtils", () => {
       expect(
         prettyPrintSchedule(
           new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
-          undefined,
           defaultInterval,
         ).split("\n"),
       ).toEqual([
@@ -150,11 +144,7 @@ describe("ScheduleUtils", () => {
         "dimanche : libre",
       ]);
       expect(
-        prettyPrintSchedule(
-          regularSchedule(),
-          undefined,
-          defaultInterval,
-        ).split("\n"),
+        prettyPrintSchedule(regularSchedule(), defaultInterval).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires : 8",
         "lundi : 01:00-02:00, 03:00-04:00",
@@ -167,6 +157,40 @@ describe("ScheduleUtils", () => {
       ]);
     });
 
+    it("remove days before and after interval", () => {
+      const interval: DateIntervalDto = {
+        start: new Date("2023-08-07"),
+        end: new Date("2023-08-12"),
+      };
+
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withRegularSchedule({
+          selectedDays: [2, 4, 5],
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "17:00" },
+          ],
+        })
+        .build();
+
+      expect(prettyPrintSchedule(schedule, interval).split("\n")).toEqual([
+        "Heures de travail hebdomadaires : 21",
+        "mercredi : 09:00-12:00, 13:00-17:00",
+        "jeudi : libre",
+        "vendredi : 09:00-12:00, 13:00-17:00",
+        "samedi : 09:00-12:00, 13:00-17:00",
+      ]);
+      expect(
+        prettyPrintSchedule(schedule, interval, false).split("\n"),
+      ).toEqual([
+        "Heures de travail hebdomadaires : 21",
+        "mercredi : 09:00-12:00, 13:00-17:00",
+        "vendredi : 09:00-12:00, 13:00-17:00",
+        "samedi : 09:00-12:00, 13:00-17:00",
+      ]);
+    });
+
     it("prints long schedules", () => {
       const conventionWithLongSchedule = new ConventionDtoBuilder()
         .withDateStart(new Date("2023-07-26").toISOString())
@@ -175,10 +199,14 @@ describe("ScheduleUtils", () => {
         .build();
 
       expectToEqual(
-        prettyPrintSchedule(conventionWithLongSchedule.schedule, false, {
-          start: new Date(conventionWithLongSchedule.dateStart),
-          end: new Date(conventionWithLongSchedule.dateEnd),
-        }).split("\n"),
+        prettyPrintSchedule(
+          conventionWithLongSchedule.schedule,
+          {
+            start: new Date(conventionWithLongSchedule.dateStart),
+            end: new Date(conventionWithLongSchedule.dateEnd),
+          },
+          false,
+        ).split("\n"),
         [
           "Heures de travail hebdomadaires : 35",
           "mercredi : 08:00-12:00, 13:00-16:00",
@@ -266,7 +294,6 @@ describe("ScheduleUtils", () => {
               },
             ],
           },
-          undefined,
           {
             start: new Date("2022-07-18"),
             end: new Date("2022-07-24"),
@@ -635,104 +662,119 @@ describe("ScheduleUtils", () => {
         [
           [
             {
-              dailySchedule: null,
               key: 0,
+              date: new Date("2023-07-24").toISOString(),
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 1,
+              date: new Date("2023-07-25").toISOString(),
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 2,
+              date: new Date("2023-07-26").toISOString(),
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 3,
+              date: new Date("2023-07-27").toISOString(),
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 4,
+              date: "2023-07-28T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 5,
+              date: "2023-07-29T00:00:00.000Z",
+              timePeriods: null,
             },
             {
               key: 6,
-              dailySchedule: {
-                date: "2023-07-30T00:00:00.000Z",
-                timePeriods: [
-                  { start: "09:00", end: "12:00" },
-                  { start: "13:00", end: "17:00" },
-                ],
-              },
+              date: "2023-07-30T00:00:00.000Z",
+              timePeriods: [
+                { start: "09:00", end: "12:00" },
+                { start: "13:00", end: "17:00" },
+              ],
             },
           ],
           [
             {
-              dailySchedule: null,
               key: 0,
+              date: "2023-07-31T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 1,
+              date: "2023-08-01T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 2,
+              date: "2023-08-02T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 3,
+              date: "2023-08-03T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 4,
+              date: "2023-08-04T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 5,
+              date: "2023-08-05T00:00:00.000Z",
+              timePeriods: null,
             },
             {
               key: 6,
-              dailySchedule: {
-                date: "2023-08-06T00:00:00.000Z",
-                timePeriods: [
-                  { start: "09:00", end: "12:00" },
-                  { start: "13:00", end: "17:00" },
-                ],
-              },
+              date: "2023-08-06T00:00:00.000Z",
+              timePeriods: [
+                { start: "09:00", end: "12:00" },
+                { start: "13:00", end: "17:00" },
+              ],
             },
           ],
           [
             {
-              dailySchedule: null,
               key: 0,
+              date: "2023-08-07T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 1,
+              date: "2023-08-08T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 2,
+              date: "2023-08-09T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 3,
+              date: "2023-08-10T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 4,
+              date: "2023-08-11T00:00:00.000Z",
+              timePeriods: null,
             },
             {
-              dailySchedule: null,
               key: 5,
+              date: "2023-08-12T00:00:00.000Z",
+              timePeriods: null,
             },
             {
               key: 6,
-              dailySchedule: null,
+              date: "2023-08-13T00:00:00.000Z",
+              timePeriods: null,
             },
           ],
         ],
@@ -756,68 +798,76 @@ describe("ScheduleUtils", () => {
         [
           [
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-11T00:00:00.000Z",
               key: 0,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-12T00:00:00.000Z",
               key: 1,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-13T00:00:00.000Z",
               key: 2,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-14T00:00:00.000Z",
               key: 3,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-15T00:00:00.000Z",
               key: 4,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-16T00:00:00.000Z",
               key: 5,
             },
             {
               key: 6,
-              dailySchedule: {
-                date: "2023-09-17T00:00:00.000Z",
-                timePeriods: [{ start: "09:00", end: "12:00" }],
-              },
+              date: "2023-09-17T00:00:00.000Z",
+              timePeriods: [{ start: "09:00", end: "12:00" }],
             },
           ],
           [
             {
-              dailySchedule: {
-                date: "2023-09-18T00:00:00.000Z",
-                timePeriods: [{ start: "09:00", end: "12:00" }],
-              },
+              date: "2023-09-18T00:00:00.000Z",
+              timePeriods: [{ start: "09:00", end: "12:00" }],
               key: 0,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-19T00:00:00.000Z",
               key: 1,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-20T00:00:00.000Z",
               key: 2,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-21T00:00:00.000Z",
               key: 3,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-22T00:00:00.000Z",
               key: 4,
             },
             {
-              dailySchedule: null,
+              timePeriods: null,
+              date: "2023-09-23T00:00:00.000Z",
               key: 5,
             },
             {
               key: 6,
-              dailySchedule: null,
+              date: "2023-09-24T00:00:00.000Z",
+              timePeriods: null,
             },
           ],
         ],
