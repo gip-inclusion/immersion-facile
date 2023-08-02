@@ -1,22 +1,32 @@
-import React from "react";
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+import { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import { PeConnectButton, PeConnectButtonProps } from "./PeConnectButton";
 
 const Component = PeConnectButton;
+type Story = StoryObj<typeof Component>;
 const argTypes: Partial<ArgTypes<PeConnectButtonProps>> | undefined = {};
+
+const componentDescription = `
+\`\`\`tsx  
+import { PeConnectButton } from "react-design-system";
+\`\`\`
+`;
 
 export default {
   title: "PeConnectButton",
   component: Component,
   argTypes,
-} as ComponentMeta<typeof Component>;
+  parameters: {
+    docs: {
+      description: {
+        component: componentDescription,
+      },
+    },
+  },
+} as Meta<typeof Component>;
 
-const componentStory: ComponentStory<typeof Component> = (args) => (
-  <Component {...args} />
-);
-
-export const PeConnectButtonMock = componentStory.bind({});
-PeConnectButtonMock.args = {
-  peConnectEndpoint: "fake-endpoint",
-  onClick: () => alert("clicked"),
+export const PeConnectButtonMock: Story = {
+  args: {
+    peConnectEndpoint: "fake-endpoint",
+    onClick: () => alert("clicked"),
+  },
 };
