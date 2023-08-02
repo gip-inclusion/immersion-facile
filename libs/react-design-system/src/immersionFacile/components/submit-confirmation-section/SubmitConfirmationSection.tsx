@@ -5,7 +5,7 @@ import { useStyles } from "tss-react/dsfr";
 import { SectionConventionNextSteps } from "../section-convention-next-steps/SectionConventionNextSteps";
 import Styles from "./SubmitConfirmationSection.styles";
 
-type SubmitConfirmationSectionProps = {
+export type SubmitConfirmationSectionProps = {
   idToCopy: string;
   onCopyButtonClick: (stringToCopy: string) => void;
   copyButtonLabel: string;
