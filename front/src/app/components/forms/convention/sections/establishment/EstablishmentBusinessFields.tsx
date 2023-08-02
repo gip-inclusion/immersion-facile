@@ -1,5 +1,5 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { ConventionDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -24,8 +24,18 @@ export const EstablishmentBusinessFields = ({
     });
   const convention = useAppSelector(conventionSelectors.convention);
 
-  const { getValues, register } = useFormContext<ConventionDto>();
+  const { getValues, register, control } = useFormContext<ConventionDto>();
   const values = getValues();
+
+  // ADDED PREVIOUS FORM BEHAVIOR FOR FIXING BAD FORM UPDATE
+  const currentSiretOnSiretField = useWatch({
+    control,
+    name: "siret",
+  });
+  useEffect(() => {
+    updateSiret(currentSiretOnSiretField);
+  }, [currentSiretOnSiretField]);
+  // ====================
 
   useSiretRelatedField("businessName", {
     disabled: values.status !== "DRAFT",
@@ -43,9 +53,11 @@ export const EstablishmentBusinessFields = ({
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
-          onChange: (event) => {
-            updateSiret(event.target.value);
-          },
+          // NOT WORKING SINCE PREVIOUS UPDATE
+          // PROBABLY MISSING SET FROM VALUE ON CHANGE
+          // onChange: (event) => {
+          //   updateSiret(event.target.value);
+          // },
           value: currentSiret || values.siret,
         }}
         disabled={disabled}
