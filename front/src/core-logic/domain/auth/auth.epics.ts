@@ -22,9 +22,12 @@ const storeFederatedIdentityInDevice: AuthEpic = (
           "federatedIdentityWithUser",
           state$.value.auth.federatedIdentityWithUser,
         );
+      return state$.value.auth.federatedIdentityWithUser;
     }),
-    map(() =>
-      authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(),
+    map(({ payload }) =>
+      authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(
+        payload,
+      ),
     ),
   );
 
@@ -50,11 +53,9 @@ const checkConnectedWithFederatedIdentity: AuthEpic = (
       const federatedIdentity = deviceRepository.get(
         "federatedIdentityWithUser",
       );
-      if (federatedIdentity)
-        return authSlice.actions.federatedIdentityFoundInDevice(
-          federatedIdentity,
-        );
-      return authSlice.actions.federatedIdentityNotFoundInDevice();
+      return federatedIdentity
+        ? authSlice.actions.federatedIdentityFoundInDevice(federatedIdentity)
+        : authSlice.actions.federatedIdentityNotFoundInDevice();
     }),
   );
 
