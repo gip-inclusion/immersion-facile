@@ -1,5 +1,12 @@
-import { ShareLinkByEmailDto, shareLinkByEmailSchema } from "shared";
+import {
+  AbsoluteUrl,
+  ShareLinkByEmailDto,
+  shareLinkByEmailSchema,
+} from "shared";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { makeShortLink } from "../../core/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
@@ -9,6 +16,8 @@ export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkB
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    private readonly config: AppConfig,
   ) {
     super(uowPerformer);
   }
@@ -17,6 +26,12 @@ export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkB
     params: ShareLinkByEmailDto,
     uow: UnitOfWork,
   ): Promise<void> {
+    const shortLink = await makeShortLink({
+      uow,
+      longLink: params.conventionLink as AbsoluteUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      config: this.config,
+    });
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
@@ -25,7 +40,7 @@ export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkB
         params: {
           internshipKind: params.internshipKind,
           additionalDetails: params.details,
-          conventionFormUrl: params.conventionLink,
+          conventionFormUrl: shortLink,
         },
       },
       followedIds: {},
