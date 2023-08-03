@@ -17,7 +17,6 @@ export default {
   • Total : 794,1
 
   <strong>Évolution du budget depuis 2021</strong>
-  Si vous rencontrez un défaut d’accessibilité vous empêchant d’accéder à un contenu ou une fonctionnalité du site, merci de nous en faire part. Si vous n’obtenez pas de réponse rapide de notre part, vous êtes en droit de faire parvenir vos doléances ou une demande de saisine au Défenseur des droits.
   
   <img src="https://immersion.cellar-c2.services.clever-cloud.com/1-evolution-budget-2023.png" alt="Évolution du budget depuis 2021" />
 
