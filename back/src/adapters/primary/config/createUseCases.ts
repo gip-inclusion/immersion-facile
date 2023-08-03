@@ -434,6 +434,8 @@ export const createUseCases = (
       shareConventionByEmail: new ShareApplicationLinkByEmail(
         uowPerformer,
         saveNotificationAndRelatedEvent,
+        gateways.shortLinkGenerator,
+        config,
       ),
       addAgency: new AddAgency(uowPerformer, createNewEvent),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),

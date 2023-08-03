@@ -10,6 +10,7 @@ import {
   conventionMagicLinkTargets,
   createConventionMagicLinkPayload,
   currentJwtVersions,
+  expectEmailOfType,
   expectToEqual,
   InclusionConnectedUser,
   stringToMd5,
@@ -20,12 +21,14 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domain/auth/jwt";
 import { conventionMissingMessage } from "../../../../domain/convention/entities/Convention";
+import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import {
   TEST_AGENCY_DEPARTMENT,
@@ -117,6 +120,73 @@ describe("convention e2e", () => {
       expectToEqual(response.statusCode, 409);
       expectToEqual(response.body, {
         errors: `Convention with id ${convention.id} already exists`,
+      });
+    });
+  });
+
+  describe(`${unauthenticatedConventionTargets.shareConvention.method} ${unauthenticatedConventionTargets.shareConvention.url}`, () => {
+    describe("200 - Share convention without auth", () => {
+      it("should successfully ask for a short link", async () => {
+        const shortLinkId = "shortLink1";
+        gateways.shortLinkGenerator.addMoreShortLinkIds([shortLinkId]);
+        const veryLongConventionLink =
+          "http://localhost:3000/demande-immersion?email=&firstName=&lastName=&phone=&financiaryHelp=&emergencyContact=&emergencyContactPhone=&isRqth=false&birthdate=&agencyDepartment=&siret=&businessName=&businessAdvantages=&etFirstName=&etLastName=&etJob=&etPhone=&etEmail=&erFirstName=&erLastName=&erPhone=&erEmail=&immersionAddress=&immersionActivities=&immersionSkills=&sanitaryPreventionDescription=&workConditions=&dateStart=2023-08-05&dateEnd=2023-08-06&schedule=%7B%22totalHours%22%3A0%2C%22workedDays%22%3A0%2C%22isSimple%22%3Atrue%2C%22selectedIndex%22%3A0%2C%22complexSchedule%22%3A%5B%7B%22date%22%3A%222023-08-05T00%3A00%3A00.000Z%22%2C%22timePeriods%22%3A%5B%5D%7D%2C%7B%22date%22%3A%222023-08-06T00%3A00%3A00.000Z%22%2C%22timePeriods%22%3A%5B%5D%7D%5D%7D";
+        expectToEqual(inMemoryUow.conventionRepository.conventions, []);
+
+        const response = await request
+          .post(unauthenticatedConventionTargets.shareConvention.url)
+          .send({
+            conventionLink: veryLongConventionLink,
+            details: "Le message du mail",
+            email: "any@email.fr",
+            internshipKind: "immersion",
+          });
+
+        expectToEqual(response.status, 200);
+        expectToEqual(response.body, "");
+        await processEventsForEmailToBeSent(eventCrawler);
+
+        const sentEmails = gateways.notification.getSentEmails();
+        expectToEqual(sentEmails.length, 1);
+        const conventionShortLinkEmail = expectEmailOfType(
+          sentEmails[0],
+          "SHARE_DRAFT_CONVENTION_BY_LINK",
+        );
+
+        const sharedConventionLink =
+          await shortLinkRedirectToLinkWithValidation(
+            conventionShortLinkEmail.params.conventionFormUrl,
+            request,
+          );
+
+        expectToEqual(veryLongConventionLink, sharedConventionLink);
+      });
+    });
+
+    describe("400 - Invalid body", () => {
+      it("should return error message when missing mandatory fields", async () => {
+        expectToEqual(inMemoryUow.conventionRepository.conventions, []);
+
+        const response = await request
+          .post(unauthenticatedConventionTargets.shareConvention.url)
+          .send({
+            details: "any@email.fr",
+            email: "any@email.fr",
+            internshipKind: "immersion",
+          });
+
+        expectToEqual(response.status, 400);
+        expectToEqual(response.body, {
+          errors: [
+            {
+              code: "invalid_type",
+              expected: "string",
+              received: "undefined",
+              path: ["conventionLink"],
+              message: "Obligatoire",
+            },
+          ],
+        });
       });
     });
   });
