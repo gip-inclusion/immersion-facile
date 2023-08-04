@@ -11,23 +11,23 @@ import { WeeklyRow } from "./WeeklyRow";
 type DayPickerProps = {
   complexSchedule: DailyScheduleDto[];
   interval: DateIntervalDto;
-  selectedIndex: number;
-  onChange: (index: number) => void;
+  selectedDate: Date | undefined;
+  onChange: (date: Date) => void;
   disabled?: boolean;
 };
 
 export const DayPicker = ({
   complexSchedule,
   interval,
-  selectedIndex,
+  selectedDate,
   onChange,
   disabled,
 }: DayPickerProps) => (
   <>
     <div className={fr.cx("fr-grid-row", "fr-mt-1w")}>
-      {["L", "M", "M", "J", "V", "S", "D"].map((name, index) => (
+      {["L", "M", "M", "J", "V", "S", "D"].map((name) => (
         <DayCircle
-          key={name + index}
+          key={"legend-" + name}
           name={name}
           dayStatus={"empty"}
           disabled={true}
@@ -38,12 +38,11 @@ export const DayPicker = ({
       </strong>
     </div>
     {makeImmersionTimetable(complexSchedule, interval).map(
-      (weeklyCalendar, index) => (
+      (weeklyCalendar, weekIndex) => (
         <WeeklyRow
-          week={index + 1}
-          key={`week-${(index + 1).toString()}`}
+          key={`week-${(weekIndex + 1).toString()}`}
           weeklyCalendar={weeklyCalendar}
-          selectedIndex={selectedIndex}
+          selectedDate={selectedDate}
           disabled={disabled}
           onChange={onChange}
         />

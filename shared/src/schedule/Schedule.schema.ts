@@ -50,6 +50,5 @@ export const scheduleSchema: z.Schema<ScheduleDto> = z.object({
   totalHours: z.number(),
   workedDays: z.number(),
   isSimple: z.boolean(),
-  selectedIndex: z.number(),
   complexSchedule: immersionDaysScheduleSchema,
 });

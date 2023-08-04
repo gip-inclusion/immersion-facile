@@ -1,4 +1,5 @@
 import { NotEmptyArray } from "../utils";
+import { DateIsoString } from "../utils/date";
 
 export type Weekday =
   | "lundi"
@@ -13,14 +14,13 @@ export type ScheduleDto = {
   totalHours: number;
   workedDays: number;
   isSimple: boolean;
-  selectedIndex: number; // TODO this is a view constraint and should be removed
   complexSchedule: DailyScheduleDto[];
 };
-export type TimePeriodDto = { start: string; end: string }; //TODO Type better ? Format ISO ISO 8601 "HH-mm"
+export type TimePeriodDto = { start: DateIsoString; end: DateIsoString };
 export type TimePeriodsDto = TimePeriodDto[];
 
 export type DailyScheduleDto = {
-  date: string; //TODO Type better ? Format ISO 8601 "YYYY-MM-DDT00:00:00.000Z"
+  date: DateIsoString;
   timePeriods: TimePeriodsDto;
 };
 export type SelectedDaysOfTheWeekDto = WeekdayNumber[];

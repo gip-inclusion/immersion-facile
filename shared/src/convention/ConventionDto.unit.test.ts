@@ -423,7 +423,6 @@ describe("conventionDtoSchema", () => {
                 ),
               isSimple: false,
               complexSchedule,
-              selectedIndex: 0,
               workedDays: calculateNumberOfWorkedDays(complexSchedule),
             }),
           )
@@ -489,7 +488,6 @@ describe("conventionDtoSchema", () => {
                 ),
               isSimple: false,
               complexSchedule,
-              selectedIndex: 0,
               workedDays: calculateNumberOfWorkedDays(complexSchedule),
             }),
           )

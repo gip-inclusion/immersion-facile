@@ -1,13 +1,16 @@
-import { TimePeriodsDto } from "shared";
+import { isSameDay } from "date-fns";
+import { DailyImmersionTimetableDto } from "shared";
 
 export type DayStatus = "empty" | "hasTime" | "isSelected";
 
 export const getDayStatus = (
-  timePeriods: TimePeriodsDto,
-  key: number,
-  selectedIndex: number,
+  dailyTimetable: DailyImmersionTimetableDto,
+  selectedDate: Date | undefined,
 ): DayStatus => {
-  if (selectedIndex === key) return "isSelected";
-  if (timePeriods.length > 0) return "hasTime";
+  if (selectedDate && isSameDay(selectedDate, new Date(dailyTimetable.date))) {
+    return "isSelected";
+  }
+  if (dailyTimetable.timePeriods && dailyTimetable.timePeriods.length > 0)
+    return "hasTime";
   return "empty";
 };
