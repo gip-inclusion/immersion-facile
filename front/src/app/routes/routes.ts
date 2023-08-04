@@ -115,10 +115,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { conventionId: param.query.string },
     () => `/${frontRoutes.manageConventionInclusionConnected}`,
   ),
-  manageConventionOld: defineRoute(
-    { jwt: param.query.string },
-    () => `/${frontRoutes.manageConventionOld}`,
-  ),
   openApiDoc: defineRoute("/doc-api"),
   renewConventionMagicLink: defineRoute(
     { expiredJwt: param.query.string, originalURL: param.query.string },
