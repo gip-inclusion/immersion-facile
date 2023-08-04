@@ -13,6 +13,7 @@ export const authorisedNames = [
   "unJeuneUneSolution",
   "diagoriente",
   "bimBamJob",
+  "onlineformapro",
 ] as const;
 
 export type ApiConsumer = {
