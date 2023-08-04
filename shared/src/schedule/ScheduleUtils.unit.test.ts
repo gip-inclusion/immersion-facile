@@ -238,7 +238,6 @@ describe("ScheduleUtils", () => {
             totalHours: 12,
             workedDays: 4,
             isSimple: false,
-            selectedIndex: 6,
             complexSchedule: [
               {
                 date: "2022-07-18T00:00:00.000Z",
@@ -662,37 +661,30 @@ describe("ScheduleUtils", () => {
         [
           [
             {
-              key: 0,
               date: new Date("2023-07-24").toISOString(),
               timePeriods: null,
             },
             {
-              key: 1,
               date: new Date("2023-07-25").toISOString(),
               timePeriods: null,
             },
             {
-              key: 2,
               date: new Date("2023-07-26").toISOString(),
               timePeriods: null,
             },
             {
-              key: 3,
               date: new Date("2023-07-27").toISOString(),
               timePeriods: null,
             },
             {
-              key: 4,
               date: "2023-07-28T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 5,
               date: "2023-07-29T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 6,
               date: "2023-07-30T00:00:00.000Z",
               timePeriods: [
                 { start: "09:00", end: "12:00" },
@@ -702,37 +694,30 @@ describe("ScheduleUtils", () => {
           ],
           [
             {
-              key: 0,
               date: "2023-07-31T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 1,
               date: "2023-08-01T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 2,
               date: "2023-08-02T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 3,
               date: "2023-08-03T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 4,
               date: "2023-08-04T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 5,
               date: "2023-08-05T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 6,
               date: "2023-08-06T00:00:00.000Z",
               timePeriods: [
                 { start: "09:00", end: "12:00" },
@@ -742,37 +727,30 @@ describe("ScheduleUtils", () => {
           ],
           [
             {
-              key: 0,
               date: "2023-08-07T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 1,
               date: "2023-08-08T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 2,
               date: "2023-08-09T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 3,
               date: "2023-08-10T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 4,
               date: "2023-08-11T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 5,
               date: "2023-08-12T00:00:00.000Z",
               timePeriods: null,
             },
             {
-              key: 6,
               date: "2023-08-13T00:00:00.000Z",
               timePeriods: null,
             },
@@ -800,35 +778,28 @@ describe("ScheduleUtils", () => {
             {
               timePeriods: null,
               date: "2023-09-11T00:00:00.000Z",
-              key: 0,
             },
             {
               timePeriods: null,
               date: "2023-09-12T00:00:00.000Z",
-              key: 1,
             },
             {
               timePeriods: null,
               date: "2023-09-13T00:00:00.000Z",
-              key: 2,
             },
             {
               timePeriods: null,
               date: "2023-09-14T00:00:00.000Z",
-              key: 3,
             },
             {
               timePeriods: null,
               date: "2023-09-15T00:00:00.000Z",
-              key: 4,
             },
             {
               timePeriods: null,
               date: "2023-09-16T00:00:00.000Z",
-              key: 5,
             },
             {
-              key: 6,
               date: "2023-09-17T00:00:00.000Z",
               timePeriods: [{ start: "09:00", end: "12:00" }],
             },
@@ -837,35 +808,28 @@ describe("ScheduleUtils", () => {
             {
               date: "2023-09-18T00:00:00.000Z",
               timePeriods: [{ start: "09:00", end: "12:00" }],
-              key: 0,
             },
             {
               timePeriods: null,
               date: "2023-09-19T00:00:00.000Z",
-              key: 1,
             },
             {
               timePeriods: null,
               date: "2023-09-20T00:00:00.000Z",
-              key: 2,
             },
             {
               timePeriods: null,
               date: "2023-09-21T00:00:00.000Z",
-              key: 3,
             },
             {
               timePeriods: null,
               date: "2023-09-22T00:00:00.000Z",
-              key: 4,
             },
             {
               timePeriods: null,
               date: "2023-09-23T00:00:00.000Z",
-              key: 5,
             },
             {
-              key: 6,
               date: "2023-09-24T00:00:00.000Z",
               timePeriods: null,
             },

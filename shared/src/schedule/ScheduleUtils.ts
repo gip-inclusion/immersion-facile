@@ -26,7 +26,6 @@ import {
 export type DailyImmersionTimetableDto = {
   timePeriods: TimePeriodsDto | null;
   date: DateIsoString;
-  key: number;
 };
 
 export type WeeklyImmersionTimetableDto = DailyImmersionTimetableDto[];
@@ -148,7 +147,6 @@ export const reasonableSchedule = (
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
     workedDays: calculateNumberOfWorkedDays(complexSchedule),
     isSimple: true,
-    selectedIndex: 0,
     complexSchedule,
   };
 };
@@ -367,7 +365,6 @@ export const makeImmersionTimetable = (
             return {
               timePeriods: dailySchedule?.timePeriods ?? null,
               date: date.toISOString(),
-              key: frenchDayMapping(date.toISOString()).frenchDay,
             } satisfies DailyImmersionTimetableDto;
           }),
       )
@@ -416,7 +413,6 @@ export const emptySchedule = (
   totalHours: 0,
   workedDays: 0,
   isSimple: false,
-  selectedIndex: 0,
   complexSchedule: makeComplexSchedule(interval, []),
 });
 
@@ -440,7 +436,6 @@ export const scheduleWithFirstDayActivity = (
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
     workedDays: calculateNumberOfWorkedDays(complexSchedule),
     isSimple: false,
-    selectedIndex: 0,
     complexSchedule,
   };
 };

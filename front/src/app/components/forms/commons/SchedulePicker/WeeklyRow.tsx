@@ -13,18 +13,14 @@ import { HourIndicator } from "./HourIndicator";
 
 type WeeklyRowProperties = {
   weeklyCalendar: WeeklyImmersionTimetableDto;
-  week: number;
-  selectedIndex: number;
+  selectedDate: Date | undefined;
   disabled?: boolean;
-  onChange: (index: number) => void;
+  onChange: (date: Date) => void;
 };
-const makeName = (isoStringDate: string) => {
-  const date = parseISO(isoStringDate);
-  return `${date.getDate()}/${date.getMonth() + 1}`;
-};
+
 export const WeeklyRow = ({
   weeklyCalendar,
-  selectedIndex,
+  selectedDate,
   disabled,
   onChange,
 }: WeeklyRowProperties) => {
@@ -32,28 +28,15 @@ export const WeeklyRow = ({
   const values = getValues();
   return (
     <div className={fr.cx("fr-grid-row", "fr-mt-1w", "fr-grid-row--middle")}>
-      {weeklyCalendar.map((dayOfWeek) =>
-        dayOfWeek.timePeriods !== null ? (
-          <DayCircle
-            key={dayOfWeek.key.toString()}
-            name={makeName(dayOfWeek.date)}
-            dayStatus={getDayStatus(
-              dayOfWeek.timePeriods,
-              dayOfWeek.key,
-              selectedIndex,
-            )}
-            disabled={disabled}
-            onClick={() => onChange(dayOfWeek.key)}
-          />
-        ) : (
-          <DayCircle
-            key={dayOfWeek.key.toString()}
-            name={`x`}
-            dayStatus={"empty"}
-            disabled={true}
-          />
-        ),
-      )}
+      {weeklyCalendar.map((dayOfWeek) => (
+        <DayCircle
+          key={dayOfWeek.date}
+          name={dayOfWeek.timePeriods !== null ? makeName(dayOfWeek.date) : ""}
+          dayStatus={getDayStatus(dayOfWeek, selectedDate)}
+          disabled={dayOfWeek.timePeriods !== null ? disabled : true}
+          onClick={() => onChange(new Date(dayOfWeek.date))}
+        />
+      ))}
       <HourIndicator
         hours={calculateWeeklyHours(weeklyCalendar)}
         internshipKind={values.internshipKind}
@@ -61,4 +44,9 @@ export const WeeklyRow = ({
       />
     </div>
   );
+};
+
+const makeName = (isoStringDate: string) => {
+  const date = parseISO(isoStringDate);
+  return `${date.getDate()}/${date.getMonth() + 1}`;
 };
