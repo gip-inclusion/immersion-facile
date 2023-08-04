@@ -10,9 +10,7 @@ import { routes } from "src/app/routes/routes";
 import { ConventionManageContent } from "../../components/admin/ConventionManageContent";
 
 type ConventionManagePageProps = {
-  route: Route<
-    typeof routes.manageConvention | typeof routes.manageConventionOld
-  >;
+  route: Route<typeof routes.manageConvention>;
 };
 
 export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
