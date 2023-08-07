@@ -1,7 +1,11 @@
 import { FormEstablishmentDto, propEq, SiretDto } from "shared";
-import { FormEstablishmentRepository } from "../../domain/immersionOffer/ports/FormEstablishmentRepository";
+import {
+  formEstablishementUpdateFailedErrorMessage,
+  formEstablishmentNotFoundErrorMessage,
+  FormEstablishmentRepository,
+} from "../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../utils/logger";
-import { ConflictError } from "../primary/helpers/httpErrors";
+import { ConflictError, NotFoundError } from "../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
@@ -21,9 +25,12 @@ export class InMemoryFormEstablishmentRepository
   }
 
   public async delete(siret: SiretDto): Promise<void> {
-    this.#formEstablishments = this.#formEstablishments.filter(
-      (formEstablishment) => formEstablishment.siret !== siret,
+    const formEstablishmentIndex = this.#formEstablishments.findIndex(
+      (formEstablishment) => formEstablishment.siret === siret,
     );
+    if (formEstablishmentIndex === -1)
+      throw new NotFoundError(formEstablishmentNotFoundErrorMessage(siret));
+    this.#formEstablishments.splice(formEstablishmentIndex, 1);
   }
 
   public async getAll() {
@@ -42,13 +49,16 @@ export class InMemoryFormEstablishmentRepository
   }
 
   public async update(dto: FormEstablishmentDto): Promise<void> {
-    if (!(await this.getBySiret(dto.siret))) {
-      const message = `Cannot update form establishlment DTO with siret ${dto.siret}, since it is not in list.`;
-      logger.info({ dto }, message);
-      throw new ConflictError(message);
-    }
-    this.#formEstablishments = this.#formEstablishments.map((repoDto) =>
-      repoDto.siret === dto.siret ? dto : repoDto,
-    );
+    let updated = false;
+    this.#formEstablishments = this.#formEstablishments.map((repoDto) => {
+      if (repoDto.siret === dto.siret) {
+        updated = true;
+        return dto;
+      }
+      return repoDto;
+    });
+
+    if (!updated)
+      throw new ConflictError(formEstablishementUpdateFailedErrorMessage(dto));
   }
 }

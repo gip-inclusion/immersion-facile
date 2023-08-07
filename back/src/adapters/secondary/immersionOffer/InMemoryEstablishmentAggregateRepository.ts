@@ -17,6 +17,7 @@ import {
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   EstablishmentAggregateRepository,
+  establishmentNotFoundErrorMessage,
   SearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
@@ -36,10 +37,12 @@ export class InMemoryEstablishmentAggregateRepository
   #establishmentAggregates: EstablishmentAggregate[] = [];
 
   public async delete(siret: SiretDto): Promise<void> {
-    this.#establishmentAggregates = this.#establishmentAggregates.filter(
-      (establishmentAggregate) =>
-        establishmentAggregate.establishment.siret !== siret,
+    const formEstablishmentIndex = this.#establishmentAggregates.findIndex(
+      (formEstablishment) => formEstablishment.establishment.siret === siret,
     );
+    if (formEstablishmentIndex === -1)
+      throw new NotFoundError(establishmentNotFoundErrorMessage(siret));
+    this.#establishmentAggregates.splice(formEstablishmentIndex, 1);
   }
 
   public async getEstablishmentAggregateBySiret(

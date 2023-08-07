@@ -11,6 +11,8 @@ import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domain/auth/jwt";
+import { establishmentNotFoundErrorMessage } from "../../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+import { formEstablishmentNotFoundErrorMessage } from "../../../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTargets.deleteEstablishment.url}`, () => {
@@ -127,7 +129,9 @@ describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTarg
       .send();
 
     expectToEqual(response.body, {
-      errors: `Establishment with siret ${establishmentAggregate.establishment.siret} not found`,
+      errors: establishmentNotFoundErrorMessage(
+        establishmentAggregate.establishment.siret,
+      ),
     });
     expectToEqual(response.status, 404);
   });
@@ -150,7 +154,9 @@ describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTarg
       .send();
 
     expectToEqual(response.body, {
-      errors: `Establishment form with siret ${establishmentAggregate.establishment.siret} not found`,
+      errors: formEstablishmentNotFoundErrorMessage(
+        establishmentAggregate.establishment.siret,
+      ),
     });
     expectToEqual(response.status, 404);
   });

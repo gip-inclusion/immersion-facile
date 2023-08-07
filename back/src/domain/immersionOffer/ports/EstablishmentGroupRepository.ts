@@ -1,9 +1,15 @@
-import { EstablishmentGroupSlug, SearchImmersionResultDto } from "shared";
+import {
+  EstablishmentGroupSlug,
+  SearchImmersionResultDto,
+  SiretDto,
+} from "shared";
 import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 
 export interface EstablishmentGroupRepository {
-  save: (group: EstablishmentGroupEntity) => Promise<void>;
-  findSearchImmersionResultsBySlug: (
+  groupsWithSiret(siret: SiretDto): Promise<EstablishmentGroupEntity[]>;
+  findSearchImmersionResultsBySlug(
     slug: EstablishmentGroupSlug,
-  ) => Promise<SearchImmersionResultDto[]>;
+  ): Promise<SearchImmersionResultDto[]>;
+
+  save(group: EstablishmentGroupEntity): Promise<void>;
 }
