@@ -6,6 +6,7 @@ import {
   expectPromiseToFailWith,
   expectToEqual,
   frontRoutes,
+  ModifierRole,
   Role,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
@@ -28,7 +29,7 @@ import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
-  backOfficeEmail,
+  // backOfficeEmail,
   NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification,
 } from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
@@ -100,20 +101,50 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   });
 
   describe("Right paths", () => {
-    it.each<[Role, string[]]>([
-      ["beneficiary", [convention.signatories.beneficiary.email]],
+    it.each<[Role, ModifierRole, string[]]>([
+      ["beneficiary", "counsellor", agency.counsellorEmails],
       [
+<<<<<<< HEAD
+=======
+        "establishment",
+        "beneficiary-representative",
+        [beneficiaryRepresentativeEmail],
+      ],
+      [
+>>>>>>> 91c155dca (modify modification request in order to be able to send the notification to a specific actor back part)
         "establishment-representative",
+        "legal-representative",
+        [beneficiaryRepresentativeEmail],
+      ],
+      [
+        "beneficiary-current-employer",
+        "beneficiary",
+        [convention.signatories.beneficiary.email],
+      ],
+      [
+        "beneficiary-representative",
+        "beneficiary-current-employer",
+        [beneficiaryCurrentEmployerEmail],
+      ],
+      [
+        "legal-representative",
+        "establishment",
         [convention.signatories.establishmentRepresentative.email],
       ],
+<<<<<<< HEAD
       ["beneficiary-current-employer", [beneficiaryCurrentEmployerEmail]],
       ["beneficiary-representative", [beneficiaryRepresentativeEmail]],
       ["counsellor", agency.counsellorEmails],
       ["validator", agency.validatorEmails],
       ["backOffice", [backOfficeEmail]],
+=======
+      ["counsellor", "legal-representative", [beneficiaryRepresentativeEmail]],
+      ["validator", "validator", agency.validatorEmails],
+      ["backOffice", "beneficiary", [convention.signatories.beneficiary.email]],
+>>>>>>> 91c155dca (modify modification request in order to be able to send the notification to a specific actor back part)
     ])(
       "Notify %s that application needs modification.",
-      async (role, expectedRecipients) => {
+      async (role, modifierRole, expectedRecipients) => {
         shortLinkIdGateway.addMoreShortLinkIds(
           expectedRecipients.flatMap((expectedRecipient) => [
             `shortLinkId_${expectedRecipient}_1`,
@@ -125,7 +156,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         await usecase.execute({
           convention,
           justification,
-          roles: [role],
+          role,
+          modifierRole,
         });
 
         const shortLinks = expectedRecipients.reduce<
@@ -183,23 +215,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   });
 
   describe("Wrong paths", () => {
-    it.each<Role>(["establishment-tutor"])(
-      "Notify %s that application needs modification is not supported.",
-      async (role) => {
-        const justification = "Change required.";
-        await expectPromiseToFailWith(
-          usecase.execute({
-            convention,
-            justification,
-            roles: [role],
-          }),
-          `Unsupported role ${role}`,
-        );
-      },
-    );
-
     it("Agency without counsellors", async () => {
-      const role: Role = "counsellor";
+      const role: ModifierRole = "counsellor";
       const agencyWithoutCounsellors = new AgencyDtoBuilder(agency)
         .withCounsellorEmails([])
         .build();
@@ -209,14 +226,15 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         usecase.execute({
           convention,
           justification: "OSEF",
-          roles: [role],
+          role,
+          modifierRole: role,
         }),
         `No actor with role ${role} for agency ${agencyWithoutCounsellors.id}`,
       );
     });
 
     it("Agency without validators", async () => {
-      const role: Role = "validator";
+      const role: ModifierRole = "validator";
       const agencyWithoutValidators = new AgencyDtoBuilder(agency)
         .withValidatorEmails([])
         .build();
@@ -226,7 +244,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         usecase.execute({
           convention,
           justification: "OSEF",
-          roles: [role],
+          role,
+          modifierRole: role,
         }),
         `No actor with role ${role} for agency ${agencyWithoutValidators.id}`,
       );

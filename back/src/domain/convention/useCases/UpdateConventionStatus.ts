@@ -6,6 +6,7 @@ import {
   ConventionDtoBuilder,
   ConventionRelatedJwtPayload,
   ConventionStatus,
+  ModifierRole,
   Role,
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
@@ -17,6 +18,7 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { conventionRequiresModificationPayloadSchema } from "../../core/eventBus/eventPayload.schema";
 import { DomainTopic } from "../../core/eventBus/events";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -98,6 +100,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ? params.statusJustification
         : undefined;
 
+    const modifierRole =
+      params.status === "DRAFT" ? params.modifierRole : undefined;
+
     const conventionBuilder = new ConventionDtoBuilder(originalConvention)
       .withStatus(params.status)
       .withDateValidation(
@@ -122,6 +127,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
           domainTopic,
           role,
           statusJustification,
+          modifierRole,
         ),
         occurredAt: conventionUpdatedAt,
       });
@@ -154,15 +160,17 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     domainTopic: DomainTopic,
     requesterRole: Role,
     justification?: string,
+    modifierRole?: ModifierRole,
   ) {
     if (domainTopic === "ImmersionApplicationRequiresModification")
       return this.createNewEvent({
         topic: domainTopic,
-        payload: {
+        payload: conventionRequiresModificationPayloadSchema.parse({
           convention: updatedDto,
           justification: justification ?? "",
-          roles: [requesterRole],
-        },
+          role: requesterRole,
+          modifierRole,
+        }),
       });
 
     return this.createNewEvent({

@@ -50,6 +50,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       statusJustification: "change something which is wrong",
       status: "DRAFT",
       conventionId: validConvention.id,
+      modifierRole: "establishment-representative",
     });
     // could test edition and sign but it is similar to addImmersionApplicationAndSendMails e2e tests
   });

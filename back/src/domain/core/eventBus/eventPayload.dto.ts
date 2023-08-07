@@ -1,7 +1,8 @@
-import { ConventionDto, Role } from "shared";
+import { ConventionDto, ModifierRole, Role } from "shared";
 
 export type ConventionRequiresModificationPayload = {
   convention: ConventionDto;
   justification: string;
-  roles: Role[];
+  role: Role;
+  modifierRole: ModifierRole;
 };
