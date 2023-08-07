@@ -33,14 +33,19 @@ export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
 export class InMemoryEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
-  constructor(
-    private _establishmentAggregates: EstablishmentAggregate[] = [],
-  ) {}
+  #establishmentAggregates: EstablishmentAggregate[] = [];
+
+  public async delete(siret: SiretDto): Promise<void> {
+    this.#establishmentAggregates = this.#establishmentAggregates.filter(
+      (establishmentAggregate) =>
+        establishmentAggregate.establishment.siret !== siret,
+    );
+  }
 
   public async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
-    return this._establishmentAggregates.find(
+    return this.#establishmentAggregates.find(
       pathEq("establishment.siret", siret),
     );
   }
@@ -114,7 +119,7 @@ export class InMemoryEstablishmentAggregateRepository
     checkDate: Date,
     maxResults: number,
   ): Promise<SiretDto[]> {
-    return this._establishmentAggregates
+    return this.#establishmentAggregates
       .filter(
         (establishmentAggregate) =>
           !establishmentAggregate.establishment.lastInseeCheckDate ||
@@ -124,10 +129,10 @@ export class InMemoryEstablishmentAggregateRepository
       .slice(0, maxResults);
   }
 
-  async getSiretsOfEstablishmentsWithRomeCode(
+  public async getSiretsOfEstablishmentsWithRomeCode(
     rome: string,
   ): Promise<SiretDto[]> {
-    return this._establishmentAggregates
+    return this.#establishmentAggregates
       .filter(
         (aggregate) =>
           !!aggregate.immersionOffers.find((offer) => offer.romeCode === rome),
@@ -140,7 +145,7 @@ export class InMemoryEstablishmentAggregateRepository
       throw new ConflictError(
         `Establishment with siret ${siret} already in db`,
       );
-    return !!this._establishmentAggregates.find(
+    return !!this.#establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );
   }
@@ -148,8 +153,8 @@ export class InMemoryEstablishmentAggregateRepository
   public async insertEstablishmentAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
-    this._establishmentAggregates = [
-      ...this._establishmentAggregates,
+    this.#establishmentAggregates = [
+      ...this.#establishmentAggregates,
       ...aggregates,
     ];
   }
@@ -163,7 +168,7 @@ export class InMemoryEstablishmentAggregateRepository
   public async removeEstablishmentAndOffersAndContactWithSiret(
     siret: string,
   ): Promise<void> {
-    this.establishmentAggregates = this._establishmentAggregates.filter(
+    this.establishmentAggregates = this.#establishmentAggregates.filter(
       pathNotEq("establishment.siret", siret),
     );
   }
@@ -172,7 +177,7 @@ export class InMemoryEstablishmentAggregateRepository
     searchMade: { lat, lon, appellationCode },
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
-    return this._establishmentAggregates
+    return this.#establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
       .flatMap((aggregate) =>
         uniqBy((offer) => offer.romeCode, aggregate.immersionOffers)
@@ -200,7 +205,7 @@ export class InMemoryEstablishmentAggregateRepository
       siret: SiretDto;
     },
   ): Promise<void> {
-    this._establishmentAggregates = this._establishmentAggregates.map(
+    this.#establishmentAggregates = this.#establishmentAggregates.map(
       (aggregate) =>
         aggregate.establishment.siret === propertiesToUpdate.siret
           ? {
@@ -216,15 +221,15 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
-    const aggregateIndex = this._establishmentAggregates.findIndex(
+    const aggregateIndex = this.#establishmentAggregates.findIndex(
       pathEq("establishment.siret", aggregate.establishment.siret),
     );
     if (aggregateIndex === -1)
       throw new NotFoundError(
         `We do not have an establishment with siret ${aggregate.establishment.siret} to update`,
       );
-    this._establishmentAggregates = replaceArrayElement(
-      this._establishmentAggregates,
+    this.#establishmentAggregates = replaceArrayElement(
+      this.#establishmentAggregates,
       aggregateIndex,
       aggregate,
     );
@@ -234,7 +239,7 @@ export class InMemoryEstablishmentAggregateRepository
     inseeCheckDate: Date,
     params: UpdateEstablishmentsWithInseeDataParams,
   ): Promise<void> {
-    this._establishmentAggregates = this._establishmentAggregates.map(
+    this.#establishmentAggregates = this.#establishmentAggregates.map(
       (aggregate) => {
         const newValues = params[aggregate.establishment.siret];
         return newValues
@@ -252,14 +257,14 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   // for test purposes only :
-  get establishmentAggregates() {
-    return this._establishmentAggregates;
+  public get establishmentAggregates() {
+    return this.#establishmentAggregates;
   }
 
-  set establishmentAggregates(
+  public set establishmentAggregates(
     establishmentAggregates: EstablishmentAggregate[],
   ) {
-    this._establishmentAggregates = establishmentAggregates;
+    this.#establishmentAggregates = establishmentAggregates;
   }
 }
 

@@ -7,6 +7,7 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectObjectsToMatch,
   expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
   SearchImmersionResultDto,
 } from "shared";
@@ -30,6 +31,7 @@ import {
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsWithInseeDataParams } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+import { NotFoundError } from "../../primary/helpers/httpErrors";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
@@ -1697,6 +1699,24 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
         );
       });
+    });
+  });
+
+  // eslint-disable-next-line jest/no-disabled-tests
+  describe("Pg implementation of method delete", () => {
+    it("Throws on missing establishment", async () => {
+      const siretNotInTable = "11111111111111";
+
+      await expectPromiseToFailWithError(
+        pgEstablishmentAggregateRepository.delete(siretNotInTable),
+        new NotFoundError(
+          `Establishment with siret ${siretNotInTable} missing on Establishment Aggregate Repository.`,
+        ),
+      );
+    });
+
+    it("MORE !!!!", () => {
+      expect(true).toBeFalsy();
     });
   });
 });

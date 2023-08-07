@@ -45,5 +45,18 @@ export const establishmentRouterWithMagicLinkJwt = (
         ),
       ),
     );
+
+  router
+    .route(establishmentTargets.deleteEstablishment.url)
+    .delete(async (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        await deps.useCases.deleteEstablishment.execute(
+          req.params,
+          getBackOfficePayload(req),
+        ),
+          res.status(204);
+      }),
+    );
+
   return router;
 };

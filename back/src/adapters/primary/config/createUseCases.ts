@@ -56,6 +56,7 @@ import { SendNotification } from "../../../domain/generic/notifications/useCases
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
+import { DeleteEstablishment } from "../../../domain/immersionOffer/useCases/DeleteEstablishment";
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetSearchImmersionResultBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
@@ -281,6 +282,10 @@ export const createUseCases = (
           gateways.timeGateway,
           createNewEvent,
         ),
+      deleteEstablishment: new DeleteEstablishment(
+        uowPerformer,
+        createNewEvent,
+      ),
       contactEstablishment: new ContactEstablishment(
         uowPerformer,
         createNewEvent,

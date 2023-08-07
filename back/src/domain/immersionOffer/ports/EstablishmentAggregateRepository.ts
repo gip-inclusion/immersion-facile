@@ -22,6 +22,7 @@ export type SearchImmersionParams = {
 };
 
 export interface EstablishmentAggregateRepository {
+  delete: (siret: SiretDto) => Promise<void>;
   insertEstablishmentAggregates: (
     establishmentAggregates: EstablishmentAggregate[],
   ) => Promise<void>;

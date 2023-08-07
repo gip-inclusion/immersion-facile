@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import {
   expectArraysToEqualIgnoringOrder,
+  expectToEqual,
   FormEstablishmentDtoBuilder,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
@@ -35,9 +36,8 @@ describe("PgFormEstablishmentRepository", () => {
 
     await formEstablishmentRepository.create(formEstablishment);
 
-    const result = await client.query("SELECT * FROM form_establishments");
-
-    expect(formEstablishmentRepository.pgToEntity(result.rows[0])).toEqual(
+    expectToEqual(
+      await formEstablishmentRepository.getBySiret(formEstablishment.siret),
       formEstablishment,
     );
   });
