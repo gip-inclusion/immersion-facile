@@ -36,12 +36,16 @@ export class PgFormEstablishmentRepository
     }
   }
 
+  public delete(_siret: SiretDto): Promise<void> {
+    throw new Error("NOT IMPLEMENTED");
+  }
+
   public async getAll(): Promise<FormEstablishmentDto[]> {
     const pgResult = await this.client.query(
       "SELECT * FROM form_establishments",
     );
     return pgResult.rows.map((formEstablishment) =>
-      this.pgToEntity(formEstablishment),
+      this.#pgToEntity(formEstablishment),
     );
   }
 
@@ -57,25 +61,7 @@ export class PgFormEstablishmentRepository
     const formEstablishment = pgResult.rows[0];
     if (!formEstablishment) return;
 
-    return this.pgToEntity(formEstablishment);
-  }
-
-  pgToEntity(params: Record<any, any>): FormEstablishmentDto {
-    return {
-      siret: params.siret,
-      source: params.source,
-      businessName: params.business_name,
-      businessNameCustomized: params.business_name_customized,
-      website: params.website,
-      additionalInformation: params.additional_information,
-      businessAddress: params.business_address,
-      isEngagedEnterprise: params.is_engaged_enterprise,
-      naf: params.naf,
-      appellations: params.professions,
-      businessContact: params.business_contact,
-      fitForDisabledWorkers: optional(params.fit_for_disabled_workers),
-      maxContactsPerWeek: params.max_contacts_per_week,
-    };
+    return this.#pgToEntity(formEstablishment);
   }
 
   public async update(
@@ -107,5 +93,23 @@ export class PgFormEstablishmentRepository
       formEstablishmentDto.fitForDisabledWorkers,
       formEstablishmentDto.maxContactsPerWeek,
     ]);
+  }
+
+  #pgToEntity(params: Record<any, any>): FormEstablishmentDto {
+    return {
+      siret: params.siret,
+      source: params.source,
+      businessName: params.business_name,
+      businessNameCustomized: params.business_name_customized,
+      website: params.website,
+      additionalInformation: params.additional_information,
+      businessAddress: params.business_address,
+      isEngagedEnterprise: params.is_engaged_enterprise,
+      naf: params.naf,
+      appellations: params.professions,
+      businessContact: params.business_contact,
+      fitForDisabledWorkers: optional(params.fit_for_disabled_workers),
+      maxContactsPerWeek: params.max_contacts_per_week,
+    };
   }
 }
