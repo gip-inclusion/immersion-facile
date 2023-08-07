@@ -90,8 +90,8 @@ export const ComplexSchedulePicker = ({
           </>
         ) : (
           <p className={fr.cx("fr-hint-text")}>
-            Veuillez séléctionner un jour dans le planning si vous souhaitez
-            modifier les horraires du jour.
+            Veuillez sélectionner un jour dans le planning si vous souhaitez
+            modifier les horaires du jour.
           </p>
         )}
       </div>
