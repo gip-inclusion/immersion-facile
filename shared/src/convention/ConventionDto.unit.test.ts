@@ -755,28 +755,66 @@ describe("conventionDtoSchema", () => {
   });
 
   describe("when sunday is in schedule", () => {
+    const saturdayOfWeek1 = new Date("2023-07-22").toISOString();
+    const sundayOfWeek1 = new Date("2023-07-23").toISOString();
+    const mondayOfWeek2 = new Date("2023-07-24").toISOString();
     const conventionBuilder = new ConventionDtoBuilder()
-      .withDateStart(new Date("2023-07-20").toISOString())
-      .withDateEnd(new Date("2023-07-25").toISOString());
+      .withDateStart(saturdayOfWeek1)
+      .withDateEnd(mondayOfWeek2);
 
-    it("rejects when internship kind is mini-stage-cci", () => {
-      expectConventionInvalidWithIssueMessages(
-        conventionSchema,
-        conventionBuilder
-          .withInternshipKind("mini-stage-cci")
-          .withSchedule(reasonableSchedule)
-          .build(),
-        ["Le mini-stage ne peut pas se dérouler un dimanche"],
-      );
+    describe("when there is no timePeriods on sunday", () => {
+      it("accepts when internship kind is mini-stage-cci", () => {
+        const scheduleWithoutSunday: DailyScheduleDto[] = [
+          {
+            date: saturdayOfWeek1,
+            timePeriods: [{ start: "09:00", end: "12:00" }],
+          },
+          {
+            date: sundayOfWeek1,
+            timePeriods: [],
+          },
+          {
+            date: mondayOfWeek2,
+            timePeriods: [{ start: "09:00", end: "12:00" }],
+          },
+        ];
+
+        expectConventionDtoToBeValid(
+          conventionBuilder
+            .withInternshipKind("mini-stage-cci")
+            .withSchedule(() => ({
+              totalHours: calculateTotalImmersionHoursFromComplexSchedule(
+                scheduleWithoutSunday,
+              ),
+              workedDays: calculateNumberOfWorkedDays(scheduleWithoutSunday),
+              isSimple: false,
+              complexSchedule: scheduleWithoutSunday,
+            }))
+            .build(),
+        );
+      });
     });
 
-    it("accepts valid convention when kind is immersion", () => {
-      expectConventionDtoToBeValid(
-        conventionBuilder
-          .withInternshipKind("immersion")
-          .withSchedule(reasonableSchedule)
-          .build(),
-      );
+    describe("when there is timePeriods on sunday", () => {
+      it("rejects when internship kind is mini-stage-cci", () => {
+        expectConventionInvalidWithIssueMessages(
+          conventionSchema,
+          conventionBuilder
+            .withInternshipKind("mini-stage-cci")
+            .withSchedule(reasonableSchedule)
+            .build(),
+          ["Le mini-stage ne peut pas se dérouler un dimanche"],
+        );
+      });
+
+      it("accepts valid convention when kind is immersion", () => {
+        expectConventionDtoToBeValid(
+          conventionBuilder
+            .withInternshipKind("immersion")
+            .withSchedule(reasonableSchedule)
+            .build(),
+        );
+      });
     });
   });
 });

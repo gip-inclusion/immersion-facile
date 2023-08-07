@@ -486,5 +486,8 @@ export const calculateScheduleTotalDurationInDays = (
 
 export const isSundayInSchedule = (complexSchedule: DailyScheduleDto[]) => {
   const sunday = 0;
-  return complexSchedule.some((week) => getDay(parseISO(week.date)) === sunday);
+  return complexSchedule.some(
+    (week) =>
+      getDay(parseISO(week.date)) === sunday && week.timePeriods.length > 0,
+  );
 };
