@@ -4,7 +4,7 @@ export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
 
 export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "mission-locale": "Mission Locale",
-  "pole-emploi": "Pole Emploi",
+  "pole-emploi": "Pôle Emploi",
   "cap-emploi": "Cap Emploi",
   "conseil-departemental": "Conseil Départemental",
   "prepa-apprentissage": "Prépa Apprentissage",

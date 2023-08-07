@@ -9,6 +9,7 @@ import {
   CreateAgencyDto,
   emailSchema,
 } from "shared";
+import { LinkHome } from "react-design-system";
 import {
   agencyKindToLabel,
   AllowedAgencyKindToAdd,
@@ -26,6 +27,7 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { routes } from "src/app/routes/routes";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
@@ -70,6 +72,15 @@ export const AgencyFormCommonFields = ({
   const { getFormFields } = useFormContents(formAgencyFieldsLabels);
   const fieldsContent = getFormFields();
   const getFieldError = makeFieldError(formState);
+  const agencyErrorMessage = (
+    <span>
+      Attention, toutes les agences Pôle emploi ont déjà été ajoutées par notre
+      équipe sur Immersion.{" "}
+      <LinkHome {...routes.agencyDashboard().link}>
+        Accéder à votre espace prescripteur.
+      </LinkHome>
+    </span>
+  );
 
   return (
     <>
@@ -84,6 +95,10 @@ export const AgencyFormCommonFields = ({
           ...fieldsContent.kind,
           ...register("kind"),
         }}
+        state={watch("kind") === "pole-emploi" ? "error" : "default"}
+        stateRelatedMessage={
+          watch("kind") === "pole-emploi" ? agencyErrorMessage : undefined
+        }
       />
 
       <Input
