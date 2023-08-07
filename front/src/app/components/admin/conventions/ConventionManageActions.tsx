@@ -61,8 +61,9 @@ export const ConventionManageActions = ({
         <VerificationActionButton
           disabled={disabled}
           newStatus="REJECTED"
-          conventionId={convention.id}
+          convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("rejected")}
+          currentSignatoryRole={role}
         >
           {t.verification.rejectConvention}
         </VerificationActionButton>
@@ -72,8 +73,9 @@ export const ConventionManageActions = ({
         <VerificationActionButton
           disabled={disabled}
           newStatus="DEPRECATED"
-          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
+          convention={convention}
+          currentSignatoryRole={role}
         >
           {t.verification.markAsDeprecated}
         </VerificationActionButton>
@@ -83,10 +85,11 @@ export const ConventionManageActions = ({
         <VerificationActionButton
           disabled={disabled}
           newStatus="DRAFT"
-          conventionId={convention.id}
           onSubmit={createOnSubmitWithFeedbackKind(
             "modificationAskedFromCounsellorOrValidator",
           )}
+          convention={convention}
+          currentSignatoryRole={role}
         >
           {t.verification.modifyConvention}
         </VerificationActionButton>
@@ -99,9 +102,10 @@ export const ConventionManageActions = ({
       ) && (
         <VerificationActionButton
           newStatus="ACCEPTED_BY_COUNSELLOR"
-          conventionId={convention.id}
+          convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
           disabled={disabled || convention.status != "IN_REVIEW"}
+          currentSignatoryRole={role}
         >
           {convention.status === "ACCEPTED_BY_COUNSELLOR"
             ? t.verification.conventionAlreadyMarkedAsEligible
@@ -116,13 +120,14 @@ export const ConventionManageActions = ({
       ) && (
         <VerificationActionButton
           newStatus="ACCEPTED_BY_VALIDATOR"
-          conventionId={convention.id}
+          convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("markedAsValidated")}
           disabled={
             disabled ||
             (convention.status != "IN_REVIEW" &&
               convention.status != "ACCEPTED_BY_COUNSELLOR")
           }
+          currentSignatoryRole={role}
         >
           {convention.status === "ACCEPTED_BY_VALIDATOR"
             ? t.verification.conventionAlreadyValidated
@@ -133,9 +138,10 @@ export const ConventionManageActions = ({
       {isAllowedTransition(convention.status, "CANCELLED", role) && (
         <VerificationActionButton
           newStatus="CANCELLED"
-          conventionId={convention.id}
+          convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("cancelled")}
           disabled={disabled || convention.status != "ACCEPTED_BY_VALIDATOR"}
+          currentSignatoryRole={role}
         >
           {convention.status === "CANCELLED"
             ? t.verification.conventionAlreadyCancelled

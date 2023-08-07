@@ -4,7 +4,11 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { mergeDeepRight } from "ramda";
-import { ConventionDto, ConventionReadDto } from "shared";
+import {
+  ConventionDto,
+  ConventionReadDto,
+  UpdateConventionStatusRequestDto,
+} from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -13,6 +17,7 @@ import {
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
 import {
+  ConventionFeedbackKind,
   conventionSlice,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";
@@ -49,7 +54,6 @@ export const ConventionSignForm = ({
     if (!currentSignatory)
       throw new Error("Il n'y a pas de signataire identifié.");
 
-    // Confirm checkbox
     const { signedAtFieldName, signatory } = signatoryDataFromConvention(
       mergeDeepRight(
         convention as ConventionDto,
@@ -78,27 +82,17 @@ export const ConventionSignForm = ({
     );
   };
 
-  const askFormModificationWithMessageForm = (): void => {
-    const statusJustification = prompt(
-      "Précisez la raison et la modification nécessaire *",
-    )?.trim();
+  const onModifiCationRequired =
+    (feedbackKind: ConventionFeedbackKind) =>
+    (updateStatusParams: UpdateConventionStatusRequestDto) =>
+      dispatch(
+        conventionSlice.actions.statusChangeRequested({
+          jwt,
+          feedbackKind,
+          updateStatusParams,
+        }),
+      );
 
-    if (statusJustification === null || statusJustification === undefined)
-      return;
-    if (statusJustification === "") return askFormModificationWithMessageForm();
-
-    dispatch(
-      conventionSlice.actions.statusChangeRequested({
-        updateStatusParams: {
-          status: "DRAFT",
-          statusJustification,
-          conventionId: convention.id,
-        },
-        feedbackKind: "modificationsAskedFromSignatory",
-        jwt,
-      }),
-    );
-  };
   if (alreadySigned) {
     return (
       <Alert
@@ -139,7 +133,12 @@ export const ConventionSignForm = ({
               // eslint-disable-next-line no-console
               console.error(methods.getValues(), errors);
             })}
-            onModificationRequired={askFormModificationWithMessageForm}
+            convention={convention}
+            newStatus="DRAFT"
+            onModificationRequired={onModifiCationRequired(
+              "modificationsAskedFromSignatory",
+            )}
+            currentSignatoryRole={currentSignatory.role}
             onCloseSignModalWithoutSignature={SetIsModalClosedWithoutSignature}
           />
         )}

@@ -1,13 +1,7 @@
 import { keys, values } from "ramda";
-import { Role } from "../role/role.dto";
+import { allSignatoryRoles, Role, SignatoryRole } from "../role/role.dto";
 import { DotNestedKeys, ExtractFromExisting } from "../utils";
-import {
-  ConventionDto,
-  ConventionStatus,
-  Signatories,
-  SignatoryRole,
-  signatoryRoles,
-} from "./convention.dto";
+import { ConventionDto, ConventionStatus, Signatories } from "./convention.dto";
 
 export const allSignatoriesSigned = (signatories: Signatories) =>
   values(signatories).every((signatory) => !signatory || !!signatory.signedAt);
@@ -83,7 +77,7 @@ export const signConventionDtoWithRole = (
 };
 
 export const isSignatory = (role: Role): role is SignatoryRole =>
-  signatoryRoles.includes(role as SignatoryRole);
+  allSignatoryRoles.includes(role as SignatoryRole);
 
 export type ConventionField = DotNestedKeys<ConventionDto>;
 

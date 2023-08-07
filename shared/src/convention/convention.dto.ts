@@ -1,7 +1,12 @@
 import { AgencyId } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
-import { Role } from "../role/role.dto";
+import {
+  allSignatoryRoles,
+  ModifierRole,
+  Role,
+  SignatoryRole,
+} from "../role/role.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
@@ -37,14 +42,23 @@ export const doesStatusNeedsJustification = (
     status as ConventionStatusWithJustification,
   );
 
-export type ConventionStatusWithJustification =
-  (typeof conventionStatusesWithJustification)[number];
-export const conventionStatusesWithJustification = [
+export const conventionStatusesWithJustificationWithoutModifierRole = [
   "REJECTED",
-  "DRAFT",
   "CANCELLED",
   "DEPRECATED",
 ] as const;
+
+export const conventionStatusesWithJustificationWithModifierRole = [
+  "DRAFT",
+] as const;
+
+export type ConventionStatusWithJustification =
+  (typeof conventionStatusesWithJustification)[number];
+export const conventionStatusesWithJustification = [
+  ...conventionStatusesWithJustificationWithoutModifierRole,
+  ...conventionStatusesWithJustificationWithModifierRole,
+] as const;
+
 export const conventionStatuses = [
   ...conventionStatusesWithoutJustification,
   ...conventionStatusesWithJustification,
@@ -76,8 +90,6 @@ export const conventionObjectiveOptions = [
 ] as const;
 
 export type ImmersionObjective = (typeof conventionObjectiveOptions)[number];
-
-export type WithStatusJustification = { statusJustification: string };
 
 export const internshipKinds = ["immersion", "mini-stage-cci"] as const;
 export type InternshipKind = (typeof internshipKinds)[number];
@@ -125,20 +137,10 @@ export type Signatories<T extends InternshipKind = InternshipKind> = {
   beneficiaryCurrentEmployer?: BeneficiaryCurrentEmployer;
 };
 
-export type SignatoryRole =
-  Required<Signatories>[keyof Required<Signatories>]["role"];
-
 export const isSignatoryRole = (role: Role): role is SignatoryRole =>
-  signatoryRoles.includes(role as SignatoryRole);
+  allSignatoryRoles.includes(role as SignatoryRole);
 
 export type Signatory = GenericSignatory<SignatoryRole>;
-
-export const signatoryRoles: SignatoryRole[] = [
-  "beneficiary",
-  "beneficiary-representative",
-  "beneficiary-current-employer",
-  "establishment-representative",
-];
 
 export type GenericActor<R extends Role> = {
   role: R;
@@ -233,14 +235,31 @@ export type ListConventionsRequestDto = {
   status?: ConventionStatus;
 };
 
-export type UpdateConventionStatusRequestDto =
-  | { status: ConventionStatusWithoutJustification; conventionId: ConventionId }
-  | {
-      status: ConventionStatusWithJustification;
-      conventionId: ConventionId;
-      statusJustification: string;
-    };
+export type UpdateConventionStatusWithoutJustification = {
+  status: ConventionStatusWithoutJustification;
+  conventionId: ConventionId;
+};
 
+export type UpdateConventionStatusWithJustificationWhithoutModierRole = {
+  status: Exclude<ConventionStatusWithJustification, "DRAFT">;
+  conventionId: ConventionId;
+  statusJustification: string;
+};
+
+export type UpdateConventionStatusWithJustificationWhithModierRole = {
+  status: Extract<ConventionStatusWithJustification, "DRAFT">;
+  conventionId: ConventionId;
+  statusJustification: string;
+  modifierRole: ModifierRole;
+};
+
+export type UpdateConventionStatusWithJustification =
+  | UpdateConventionStatusWithJustificationWhithoutModierRole
+  | UpdateConventionStatusWithJustificationWhithModierRole;
+
+export type UpdateConventionStatusRequestDto =
+  | UpdateConventionStatusWithoutJustification
+  | UpdateConventionStatusWithJustification;
 // prettier-ignore
 const _isAssignable = (isValid: UpdateConventionStatusRequestDto): { status: ConventionStatus } => isValid;
 

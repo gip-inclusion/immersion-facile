@@ -3,7 +3,7 @@ import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
-import { allRoles } from "../role/role.dto";
+import { allModifierRoles, allRoles } from "../role/role.dto";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { DailyScheduleDto } from "../schedule/Schedule.dto";
 import { scheduleSchema } from "../schedule/Schedule.schema";
@@ -42,7 +42,8 @@ import {
   conventionObjectiveOptions,
   ConventionReadDto,
   conventionStatuses,
-  conventionStatusesWithJustification,
+  conventionStatusesWithJustificationWithModifierRole,
+  conventionStatusesWithJustificationWithoutModifierRole,
   conventionStatusesWithoutJustification,
   EstablishmentRepresentative,
   EstablishmentTutor,
@@ -57,9 +58,11 @@ import {
   Signatories,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
+  UpdateConventionStatusWithJustificationWhithModierRole,
+  UpdateConventionStatusWithJustificationWhithoutModierRole,
+  UpdateConventionStatusWithoutJustification,
   WithConventionId,
   WithConventionIdLegacy,
-  WithStatusJustification,
 } from "./convention.dto";
 import {
   getConventionTooLongMessageAndPath,
@@ -79,6 +82,8 @@ export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
 
 const roleSchema = z.enum(allRoles);
 const phoneSchema = zString.regex(phoneRegExp, localization.invalidPhone);
+
+const modifierRolesSchema = z.enum(allModifierRoles);
 
 const signatorySchema = z.object({
   role: roleSchema,
@@ -305,24 +310,33 @@ export const updateConventionRequestSchema: z.Schema<UpdateConventionRequestDto>
   });
 
 const justificationSchema = zTrimmedString;
-export const withStatusJustificationSchema: z.Schema<WithStatusJustification> =
+
+export const updateConventionStatusWithoutJustificationSchema: z.Schema<UpdateConventionStatusWithoutJustification> =
   z.object({
+    status: z.enum(conventionStatusesWithoutJustification),
+    conventionId: conventionIdSchema,
+  });
+
+export const updateConventionStatusWithJustificationWhithoutModierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWhithoutModierRole> =
+  z.object({
+    status: z.enum(conventionStatusesWithJustificationWithoutModifierRole),
     statusJustification: justificationSchema,
+    conventionId: conventionIdSchema,
+  });
+export const updateConventionStatusWithJustificationWhithModierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWhithModierRole> =
+  z.object({
+    status: z.enum(conventionStatusesWithJustificationWithModifierRole),
+    statusJustification: justificationSchema,
+    conventionId: conventionIdSchema,
+    modifierRole: modifierRolesSchema,
   });
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
-  z
-    .object({
-      status: z.enum(conventionStatusesWithoutJustification),
-      conventionId: conventionIdSchema,
-    })
-    .or(
-      z.object({
-        status: z.enum(conventionStatusesWithJustification),
-        statusJustification: justificationSchema,
-        conventionId: conventionIdSchema,
-      }),
-    );
+  z.union([
+    updateConventionStatusWithoutJustificationSchema,
+    updateConventionStatusWithJustificationWhithoutModierRoleSchema,
+    updateConventionStatusWithJustificationWhithModierRoleSchema,
+  ]);
 
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =
   z.object({
