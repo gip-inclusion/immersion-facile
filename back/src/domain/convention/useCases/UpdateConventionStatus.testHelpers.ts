@@ -9,7 +9,6 @@ import {
   ConventionStatus,
   conventionStatuses,
   createConventionMagicLinkPayload,
-  doesStatusNeedsJustification,
   expectPromiseToFailWithError,
   expectToEqual,
   InclusionConnectedUser,
@@ -300,6 +299,10 @@ const makeTestAcceptsStatusUpdate =
     expectToEqual(storedConvention, expectedConvention);
 
     if (expectedDomainTopic === "ImmersionApplicationRequiresModification") {
+      if (updateStatusParams.status !== "DRAFT")
+        throw new Error(
+          `Expected domain topic ${expectedDomainTopic} not supported with convention status ${updateStatusParams.status}`,
+        );
       const role =
         "role" in testAcceptNewStatusParams
           ? testAcceptNewStatusParams.role
@@ -319,11 +322,9 @@ const makeTestAcceptsStatusUpdate =
 
       const payload: ConventionRequiresModificationPayload = {
         convention: expectedConvention,
-        justification:
-          updateStatusParams.status === "DRAFT"
-            ? updateStatusParams.statusJustification
-            : "was not provided",
-        roles: [role],
+        justification: updateStatusParams.statusJustification,
+        role,
+        modifierRole: updateStatusParams.modifierRole,
       };
 
       await expectNewEvent(
@@ -359,11 +360,11 @@ type TestRejectsNewStatusParams = {
 );
 
 type TestRejectsExpectation = {
-  targetStatus: ConventionStatus;
+  updateStatusParams: UpdateConventionStatusRequestDto;
 };
 
 const makeTestRejectsStatusUpdate =
-  ({ targetStatus }: TestRejectsExpectation) =>
+  ({ updateStatusParams }: TestRejectsExpectation) =>
   async (testRejectsNewStatusParams: TestRejectsNewStatusParams) => {
     const {
       originalConvention,
@@ -388,13 +389,7 @@ const makeTestRejectsStatusUpdate =
     await expectPromiseToFailWithError(
       executeUpdateConventionStatusUseCase({
         jwtPayload,
-        updateStatusParams: doesStatusNeedsJustification(targetStatus)
-          ? {
-              status: targetStatus,
-              statusJustification: "fake justification",
-              conventionId: originalConvention.id,
-            }
-          : { status: targetStatus, conventionId: originalConvention.id },
+        updateStatusParams,
         updateConventionStatusUseCase,
         conventionRepository,
       }),
@@ -480,7 +475,7 @@ export const testForAllRolesAndInitialStatusCases = ({
 
   describe("Rejected", () => {
     const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({
-      targetStatus: updateStatusParams.status,
+      updateStatusParams,
     });
 
     if (notAllowedRolesToUpdate.length) {

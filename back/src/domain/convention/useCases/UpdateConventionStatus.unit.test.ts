@@ -31,6 +31,7 @@ describe("UpdateConventionStatus", () => {
         status: "DRAFT",
         statusJustification: "test justification",
         conventionId: originalConventionId,
+        modifierRole: "beneficiary",
       },
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
       updatedFields: {
@@ -90,7 +91,12 @@ describe("UpdateConventionStatus", () => {
       await conventionRepository.save(conventionBuilder);
 
       await updateConventionStatus.execute(
-        { status: "DRAFT", statusJustification: "because", conventionId },
+        {
+          status: "DRAFT",
+          statusJustification: "because",
+          conventionId,
+          modifierRole: "beneficiary",
+        },
         { applicationId: conventionId, role: requesterRole, emailHash: "" },
       );
 
@@ -105,7 +111,8 @@ describe("UpdateConventionStatus", () => {
           payload: {
             convention,
             justification: "because",
-            roles: [requesterRole],
+            role: requesterRole,
+            modifierRole: "beneficiary",
           },
         }),
       );

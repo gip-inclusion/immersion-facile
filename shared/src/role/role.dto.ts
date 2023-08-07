@@ -27,8 +27,6 @@ export const allModifierRoles = [
   "beneficiary",
   "beneficiary-representative",
   "beneficiary-current-employer",
-  "legal-representative", // legacy, now named : beneficiary-representative
-  "establishment", // legacy, now named : establishment-representative
   "establishment-representative",
   "counsellor",
   "validator",
