@@ -21,7 +21,7 @@ cp ../.env.sample ./env
 pnpm fullcheck
 ```
 
-You can run in watch mode individually :  
+You can run in watch mode individually :
 
 Unit tests :
 
@@ -51,7 +51,7 @@ Integration tests :
    ```
 
 5. You can run create some data in the database with :
-You will than have the correct featureFlags and an agency in Paris.
+   You will than have the correct featureFlags and an agency in Paris.
 
 ```
 pnpm seed
@@ -135,6 +135,22 @@ The back-end behaviour is controlled by environment variables. They can be speci
   back$ export REPOSITORIES=PG
   back$ pnpm start
   ```
+
+### Creating a JWT token for public api use by partners
+
+To generate a token for a partner:
+
+1. add the partner name to `authorisedNames` in shared/src/apiConsumer/ApiConsumer.ts
+2. run the script `generateApiKey` in Scalingo one-off container :
+
+```bash
+scalingo --app if-prod-back --region osc-secnum-fr1 run 'pnpm back run generate-api-key <company-name>'
+```
+
+3. the JWT token will then be printed on your screen and should be shared to the partner. You can also find it in DB table `api_consumers`.
+
+4. an sql command to insert data into `api_consumers` will also be printed on screen and should be executed manually. It
+   will authorize this new consumer to access the api.
 
 ### Controlling the log output
 
