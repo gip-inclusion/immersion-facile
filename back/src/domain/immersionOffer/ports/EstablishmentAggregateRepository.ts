@@ -98,3 +98,6 @@ export type ValuesToUpdateFromInseeApi = Partial<
 export type UpdateEstablishmentsWithInseeDataParams = Partial<
   Record<SiretDto, ValuesToUpdateFromInseeApi>
 >;
+
+export const establishmentNotFoundErrorMessage = (siret: SiretDto): string =>
+  `Establishment with siret ${siret} not found`;

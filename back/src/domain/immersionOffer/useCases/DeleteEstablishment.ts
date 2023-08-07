@@ -1,9 +1,6 @@
 import { z } from "zod";
 import { BackOfficeJwtPayload, SiretDto, siretSchema } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -38,25 +35,20 @@ export class DeleteEstablishment extends TransactionalUseCase<
   ): Promise<void> {
     if (!jwtPayload) throw new ForbiddenError();
 
-    const [establishmentInRepo, formEstablishmentInRepo] = await Promise.all([
-      uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
-      ),
-      await uow.formEstablishmentRepository.getBySiret(siret),
-    ]);
+    const groupsWithSiret =
+      await uow.establishmentGroupRepository.groupsWithSiret(siret);
 
-    if (!establishmentInRepo)
-      throw new NotFoundError(`Establishment with siret ${siret} not found`);
-    if (!formEstablishmentInRepo)
-      throw new NotFoundError(
-        `Establishment form with siret ${siret} not found`,
-      );
+    const groupsUpdatedWithoutSiret = groupsWithSiret.map((group) => ({
+      ...group,
+      sirets: group.sirets.filter((groupSiret) => groupSiret !== siret),
+    }));
 
     await Promise.all([
-      uow.establishmentAggregateRepository.delete(
-        establishmentInRepo.establishment.siret,
+      uow.establishmentAggregateRepository.delete(siret),
+      uow.formEstablishmentRepository.delete(siret),
+      ...groupsUpdatedWithoutSiret.map((group) =>
+        uow.establishmentGroupRepository.save(group),
       ),
-      uow.formEstablishmentRepository.delete(formEstablishmentInRepo.siret),
     ]);
   }
 }

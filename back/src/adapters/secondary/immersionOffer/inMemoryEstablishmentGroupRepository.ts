@@ -1,4 +1,9 @@
-import { SearchImmersionResultDto } from "shared";
+import { values } from "ramda";
+import {
+  EstablishmentGroupSlug,
+  SearchImmersionResultDto,
+  SiretDto,
+} from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
@@ -32,7 +37,7 @@ export class InMemoryEstablishmentGroupRepository
   implements EstablishmentGroupRepository
 {
   // for test purpose
-  private groupsByName: Record<string, EstablishmentGroupEntity> = {};
+  #groupsBySlug: Record<EstablishmentGroupSlug, EstablishmentGroupEntity> = {};
 
   public async findSearchImmersionResultsBySlug(): Promise<
     SearchImmersionResultDto[]
@@ -40,18 +45,30 @@ export class InMemoryEstablishmentGroupRepository
     return [stubSearchResult];
   }
 
+  public async groupsWithSiret(
+    siret: SiretDto,
+  ): Promise<EstablishmentGroupEntity[]> {
+    return values(this.#groupsBySlug).reduce<EstablishmentGroupEntity[]>(
+      (acc, group) => [
+        ...acc,
+        ...(group.sirets.includes(siret) ? [group] : []),
+      ],
+      [],
+    );
+  }
+
   public async save(group: EstablishmentGroupEntity) {
-    this.groupsByName[group.name] = group;
+    this.#groupsBySlug[group.slug] = group;
   }
 
   public get groups(): EstablishmentGroupEntity[] {
-    return Object.values(this.groupsByName);
+    return Object.values(this.#groupsBySlug);
   }
 
   public set groups(groups: EstablishmentGroupEntity[]) {
-    this.groupsByName = groups.reduce(
-      (acc, group) => ({ ...acc, [group.name]: group }),
-      {} satisfies Record<string, EstablishmentGroupEntity>,
+    this.#groupsBySlug = groups.reduce(
+      (acc, group) => ({ ...acc, [group.slug]: group }),
+      {} satisfies Record<EstablishmentGroupSlug, EstablishmentGroupEntity>,
     );
   }
 }

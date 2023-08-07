@@ -17,6 +17,8 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
+import { formEstablishmentNotFoundErrorMessage } from "../ports/FormEstablishmentRepository";
 import { DeleteEstablishment } from "./DeleteEstablishment";
 
 describe("Delete Establishment", () => {
@@ -64,7 +66,9 @@ describe("Delete Establishment", () => {
           backofficeJwtPayload,
         ),
         new NotFoundError(
-          `Establishment with siret ${establishmentAggregate.establishment.siret} not found`,
+          establishmentNotFoundErrorMessage(
+            establishmentAggregate.establishment.siret,
+          ),
         ),
       );
     });
@@ -81,20 +85,27 @@ describe("Delete Establishment", () => {
           backofficeJwtPayload,
         ),
         new NotFoundError(
-          `Establishment form with siret ${formEstablishment.siret} not found`,
+          formEstablishmentNotFoundErrorMessage(formEstablishment.siret),
         ),
       );
     });
   });
 
   describe("Right paths", () => {
-    it("Establishment aggregate and form establishment are deleted", async () => {
+    it("Establishment aggregate and form establishment are deleted, establishment group with siret have siret removed", async () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregate,
       ];
       uow.formEstablishmentRepository.setFormEstablishments([
         formEstablishment,
       ]);
+      uow.establishmentGroupRepository.groups = [
+        {
+          name: "group",
+          sirets: [formEstablishment.siret, "siret2"],
+          slug: "group",
+        },
+      ];
 
       await deleteEstablishment.execute(
         {
@@ -108,6 +119,13 @@ describe("Delete Establishment", () => {
         [],
       );
       expectToEqual(await uow.formEstablishmentRepository.getAll(), []);
+      expectToEqual(await uow.establishmentGroupRepository.groups, [
+        {
+          name: "group",
+          sirets: ["siret2"],
+          slug: "group",
+        },
+      ]);
     });
   });
 });
