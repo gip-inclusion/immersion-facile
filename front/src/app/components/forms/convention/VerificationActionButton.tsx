@@ -1,33 +1,38 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { SubmitHandler, useForm } from "react-hook-form";
+// import { SubmitHandler, useForm } from "react-hook-form";
 import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
+// import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { Input } from "@codegouvfr/react-dsfr/Input";
+// import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
+// import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { zodResolver } from "@hookform/resolvers/zod";
+// import Select from "@codegouvfr/react-dsfr/SelectNext";
+// import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ConventionId,
+  ConventionDto,
   ConventionStatus,
-  ConventionStatusWithJustification,
+  // ConventionStatusWithJustification,
   doesStatusNeedsJustification,
   domElementIds,
+  Role,
+  // Signatories,
+  // SignatoryRole,
   UpdateConventionStatusRequestDto,
-  WithStatusJustification,
-  withStatusJustificationSchema,
+  // updateConventionStatusRequestSchema,
 } from "shared";
+import { JustificationModalContent } from "./justificationModaleContent";
 
 export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   disabled?: boolean;
   newStatus: VerificationActions;
-  conventionId: ConventionId;
   children: string;
+  convention: ConventionDto;
+  currentSignatoryRole: Role;
 };
 
-type VerificationActions = Exclude<
+export type VerificationActions = Exclude<
   ConventionStatus,
   "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW"
 >;
@@ -104,7 +109,8 @@ export const VerificationActionButton = ({
   disabled,
   children,
   onSubmit,
-  conventionId,
+  convention,
+  currentSignatoryRole,
 }: VerificationActionButtonProps) => {
   const iconByStatus: Partial<Record<ConventionStatus, FrIconClassName>> = {
     REJECTED: "fr-icon-close-circle-line",
@@ -123,6 +129,8 @@ export const VerificationActionButton = ({
     DEPRECATED:
       domElementIds.manageConvention.conventionValidationDeprecateButton,
   };
+
+  const conventionId = convention.id;
 
   return (
     <>
@@ -151,7 +159,8 @@ export const VerificationActionButton = ({
           title={children}
           newStatus={newStatus}
           onSubmit={onSubmit}
-          conventionId={conventionId}
+          convention={convention}
+          currentSignatoryRole={currentSignatoryRole}
         />
       )}
     </>
@@ -161,13 +170,15 @@ export const VerificationActionButton = ({
 const ModalWrapper = ({
   title,
   newStatus,
-  conventionId,
   onSubmit,
+  convention,
+  currentSignatoryRole,
 }: {
   title: string;
   newStatus: VerificationActionsModal;
-  conventionId: ConventionId;
   onSubmit: VerificationActionButtonProps["onSubmit"];
+  convention: ConventionDto;
+  currentSignatoryRole: Role;
 }) => {
   if (!doesStatusNeedsJustification(newStatus)) return null;
 
@@ -181,124 +192,11 @@ const ModalWrapper = ({
           onSubmit={onSubmit}
           closeModal={closeModal}
           newStatus={newStatus}
-          conventionId={conventionId}
+          convention={convention}
+          currentSignatoryRole={currentSignatoryRole}
         />
       </>
     </Modal>,
     document.body,
   );
-};
-
-const JustificationModalContent = ({
-  onSubmit,
-  closeModal,
-  newStatus,
-  conventionId,
-}: {
-  onSubmit: (params: UpdateConventionStatusRequestDto) => void;
-  closeModal: () => void;
-  newStatus: VerificationActions;
-  conventionId: ConventionId;
-}) => {
-  const { register, handleSubmit } = useForm<WithStatusJustification>({
-    resolver: zodResolver(withStatusJustificationSchema),
-    mode: "onTouched",
-    defaultValues: { statusJustification: "" },
-  });
-  const onFormSubmit: SubmitHandler<WithStatusJustification> = ({
-    statusJustification,
-  }) => {
-    onSubmit({ statusJustification, status: newStatus, conventionId });
-    closeModal();
-  };
-
-  return (
-    <>
-      {newStatus === "DRAFT" && (
-        <>
-          <Alert
-            severity="warning"
-            title="Attention !"
-            className={fr.cx("fr-mb-2w")}
-            description="Ne surtout pas demander de modification pour relancer un signataire manquant. 
-            Cela revient à annuler les signatures déjà enregistrées. 
-            Si vous souhaitez le relancer, contactez-le directement par e-mail ou par téléphone."
-          />
-          <Alert
-            severity="warning"
-            title="Attention !"
-            className={fr.cx("fr-mb-2w")}
-            description="Vous seul allez recevoir par e-mail le lien pour modifier cette demande (peut-être dans une boite générique agence)."
-          />
-        </>
-      )}
-      {newStatus === "REJECTED" && (
-        <Alert
-          severity="warning"
-          title="Attention !"
-          className={fr.cx("fr-mb-2w")}
-          description="Ne surtout pas refuser une immersion si une signature manque ! Cela
-  revient à annuler les signatures déjà enregistrées. Pour relancer un
-  signataire manquant, le contacter par mail."
-        />
-      )}
-      {newStatus === "CANCELLED" && (
-        <Alert
-          severity="warning"
-          title="Attention ! Cette opération est irréversible !"
-          className={fr.cx("fr-mb-2w")}
-          description="Vous souhaitez annuler une convention qui a déjà été validée. Veuillez indiquer votre nom et prénom afin de garantir un suivi des annulations de convention."
-        />
-      )}
-      {doesStatusNeedsJustification(newStatus) && (
-        <form onSubmit={handleSubmit(onFormSubmit)}>
-          <Input
-            textArea
-            label={inputLabelByStatus[newStatus]}
-            nativeTextAreaProps={{
-              ...register("statusJustification"),
-            }}
-          />
-          <ButtonsGroup
-            alignment="center"
-            inlineLayoutWhen="always"
-            buttons={[
-              {
-                type: "button",
-                priority: "secondary",
-                onClick: closeModal,
-                nativeButtonProps: {
-                  id: domElementIds.manageConvention
-                    .justificationModalCancelButton,
-                },
-                children: "Annuler",
-              },
-              {
-                type: "submit",
-                nativeButtonProps: {
-                  id: domElementIds.manageConvention
-                    .justificationModalSubmitButton,
-                },
-                children: confirmByStatus[newStatus],
-              },
-            ]}
-          />
-        </form>
-      )}
-    </>
-  );
-};
-
-const inputLabelByStatus: Record<ConventionStatusWithJustification, string> = {
-  DRAFT: "Précisez la raison et la modification nécessaire",
-  REJECTED: "Pourquoi l'immersion est-elle refusée ?",
-  CANCELLED: "Pourquoi souhaitez-vous annuler cette convention ?",
-  DEPRECATED: "Pourquoi l'immersion est-elle obsolète ?",
-};
-
-const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
-  DRAFT: "Confirmer la demande de modification",
-  REJECTED: "Confirmer le refus",
-  CANCELLED: "Confirmer l'annulation",
-  DEPRECATED: "Confirmer que la demande est obsolète",
 };

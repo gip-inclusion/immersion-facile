@@ -4,15 +4,20 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
+  ConventionDto,
   ConventionField,
   domElementIds,
   getConventionFieldName,
   InternshipKind,
+  Role,
   Signatory,
   SignatoryRole,
+  UpdateConventionStatusRequestDto,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { JustificationModalContent } from "./justificationModaleContent";
+import { VerificationActions } from "./VerificationActionButton";
 
 const processedDataBySignatoryRole: Record<
   SignatoryRole,
@@ -60,7 +65,10 @@ type SignatureActionsProperties = {
   signatory: Signatory;
   internshipKind: InternshipKind;
   onSubmitClick: React.MouseEventHandler<HTMLButtonElement>;
-  onModificationRequired: React.MouseEventHandler<HTMLButtonElement>;
+  onModificationRequired: (params: UpdateConventionStatusRequestDto) => void;
+  convention: ConventionDto;
+  newStatus: VerificationActions;
+  currentSignatoryRole: Role;
   onCloseSignModalWithoutSignature: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -73,11 +81,23 @@ const {
   id: "sign",
 });
 
+const {
+  Component: RequestModificationModal,
+  open: openRequestModificationModal,
+  close: closeRequestModificationModal,
+} = createModal({
+  isOpenedByDefault: false,
+  id: "requestModification",
+});
+
 export const SignatureActions = ({
   onModificationRequired,
   onSubmitClick,
   signatory,
   internshipKind,
+  convention,
+  newStatus,
+  currentSignatoryRole,
   onCloseSignModalWithoutSignature,
 }: SignatureActionsProperties) => {
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
@@ -105,16 +125,23 @@ export const SignatureActions = ({
             nativeButtonProps: {
               id: domElementIds.conventionToSign.openSignModalButton,
             },
+            disabled:
+              isLoading ||
+              submitFeedback.kind === "modificationsAskedFromSignatory",
           },
           {
             priority: "secondary",
             children:
               "Annuler les signatures et recevoir un lien de modification",
             disabled: isLoading || submitFeedback.kind !== "idle",
-            onClick: onModificationRequired,
+            onClick: openRequestModificationModal,
             type: "button",
             iconId: "fr-icon-edit-fill",
             iconPosition: "left",
+            nativeButtonProps: {
+              id: domElementIds.conventionToSign
+                .openRequestModificationModalButton,
+            },
           },
         ]}
       />
@@ -173,6 +200,15 @@ export const SignatureActions = ({
           </div>
         </>
       </SignModal>
+      <RequestModificationModal title="Demande de modification">
+        <JustificationModalContent
+          onSubmit={onModificationRequired}
+          closeModal={closeRequestModificationModal}
+          newStatus={newStatus}
+          convention={convention}
+          currentSignatoryRole={currentSignatoryRole}
+        />
+      </RequestModificationModal>
     </>
   );
 };

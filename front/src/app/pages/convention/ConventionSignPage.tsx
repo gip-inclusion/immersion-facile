@@ -5,12 +5,12 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { match, P } from "ts-pattern";
 import { Route } from "type-route";
 import {
+  allSignatoryRoles,
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   immersionFacileContactEmail,
   isSignatory,
   SignatoryRole,
-  signatoryRoles,
 } from "shared";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
@@ -105,6 +105,7 @@ const ConventionSignPageContent = ({
   const t = convention
     ? useConventionTexts(convention.internshipKind)
     : useConventionTexts("immersion");
+
   return (
     <>
       {match({
@@ -233,7 +234,7 @@ const extractRole = (jwt: string): SignatoryRole => {
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt).role;
   if (isSignatory(role)) return role;
   throw new Error(
-    `Only ${signatoryRoles.join(", ")} are allow to sign, received ${role}`,
+    `Only ${allSignatoryRoles.join(", ")} are allow to sign, received ${role}`,
   );
 };
 

@@ -324,6 +324,10 @@ export const domElementIds = {
   conventionToSign: {
     submitButton: "im-convention-to-sign__submit-button",
     openSignModalButton: "im-convention-to-sign__open-sign-modal-button",
+    openRequestModificationModalButton:
+      "im-convention-to-sign__open-modification-modal-button",
+    submitModificationrequestButton:
+      "im-convention-to-sign__submit-modification-request-button",
   },
   editFormEstablishmentRoute: {},
   error: {},
