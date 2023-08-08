@@ -1,9 +1,14 @@
 import { z } from "zod";
-import { BackOfficeJwtPayload, SiretDto, siretSchema } from "shared";
+import {
+  addressDtoToString,
+  BackOfficeJwtPayload,
+  SiretDto,
+  siretSchema,
+} from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 type DeleteEstablishmentPayload = {
   siret: SiretDto;
@@ -23,7 +28,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
@@ -43,6 +48,11 @@ export class DeleteEstablishment extends TransactionalUseCase<
       sirets: group.sirets.filter((groupSiret) => groupSiret !== siret),
     }));
 
+    const establishmentAggregate =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        siret,
+      );
+
     await Promise.all([
       uow.establishmentAggregateRepository.delete(siret),
       uow.formEstablishmentRepository.delete(siret),
@@ -50,5 +60,25 @@ export class DeleteEstablishment extends TransactionalUseCase<
         uow.establishmentGroupRepository.save(group),
       ),
     ]);
+
+    if (establishmentAggregate && establishmentAggregate.contact)
+      await this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "ESTABLISHMENT_DELETED",
+          recipients: [establishmentAggregate.contact.email],
+          cc: establishmentAggregate.contact.copyEmails,
+          params: {
+            businessAddress: addressDtoToString(
+              establishmentAggregate.establishment.address,
+            ),
+            businessName: establishmentAggregate.establishment.name,
+            siret: establishmentAggregate.establishment.siret,
+          },
+        },
+        followedIds: {
+          establishmentSiret: establishmentAggregate.establishment.siret,
+        },
+      });
   }
 }
