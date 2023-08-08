@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
@@ -73,6 +73,7 @@ type SignatureActionsProperties = {
   internshipKind: InternshipKind;
   onSubmitClick: React.MouseEventHandler<HTMLButtonElement>;
   onModificationRequired: React.MouseEventHandler<HTMLButtonElement>;
+  onCloseSignModalWithoutSignature: Dispatch<SetStateAction<boolean>>;
 };
 
 const {
@@ -89,6 +90,7 @@ export const SignatureActions = ({
   onSubmitClick,
   signatory,
   internshipKind,
+  onCloseSignModalWithoutSignature,
 }: SignatureActionsProperties) => {
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
@@ -104,8 +106,11 @@ export const SignatureActions = ({
         buttons={[
           {
             priority: "primary",
-            children: "Confirmer et signer",
-            onClick: openSignModal,
+            children: "Signer",
+            onClick: () => {
+              onCloseSignModalWithoutSignature(false);
+              openSignModal();
+            },
             type: "button",
             iconId: "fr-icon-checkbox-circle-line",
             iconPosition: "left",
@@ -125,7 +130,41 @@ export const SignatureActions = ({
           },
         ]}
       />
-      <SignModal title="Accepter les dispositions réglementaires et terminer la signature">
+      <SignModal
+        title="Accepter les dispositions réglementaires et terminer la signature"
+        size="large"
+        concealingBackdrop={false}
+        buttons={[
+          {
+            priority: "secondary",
+            children: "J'abandonne",
+            disabled: isLoading || submitFeedback.kind !== "idle",
+            onClick: () => {
+              onCloseSignModalWithoutSignature(true);
+              closeSignModal();
+            },
+            type: "button",
+            iconId: "fr-icon-edit-fill",
+            iconPosition: "left",
+          },
+          {
+            priority: "primary",
+            children: "Je termine la signature",
+            onClick: (event) => {
+              setValue(fieldName, new Date().toISOString(), {
+                shouldValidate: true,
+              });
+              onSubmitClick(event);
+            },
+            type: "button",
+            iconId: "fr-icon-checkbox-circle-line",
+            iconPosition: "left",
+            nativeButtonProps: {
+              id: domElementIds.conventionToSign.submitButton,
+            },
+          },
+        ]}
+      >
         <>
           <strong className={fr.cx("fr-mb-8w")}>
             Je, soussigné {signatoryFullName} ({signatoryFunction}{" "}
@@ -140,7 +179,7 @@ export const SignatureActions = ({
             <h2 className={fr.cx("fr-h4", "fr-mt-4v")}>
               Obligations des parties :
             </h2>
-            <div>
+            <div className={fr.cx("fr-mb-5v")}>
               <h3 className={fr.cx("fr-h6")}>Le bénéficiaire (candidat)</h3>
               <p>
                 Le bénéficiaire s’engage à exercer les activités et tâches
@@ -179,7 +218,7 @@ export const SignatureActions = ({
               </ul>
             </div>
 
-            <div>
+            <div className={fr.cx("fr-mb-5v")}>
               <h3 className={fr.cx("fr-h6")}>
                 La structure d’accueil (entreprise)
               </h3>
@@ -241,7 +280,7 @@ export const SignatureActions = ({
               </ul>
             </div>
 
-            <div>
+            <div className={fr.cx("fr-mb-5v")}>
               <h3 className={fr.cx("fr-h6")}>
                 La structure d’accompagnement (conseiller)
               </h3>
@@ -276,7 +315,7 @@ export const SignatureActions = ({
               </ul>
             </div>
 
-            <div>
+            <div className={fr.cx("fr-mb-5v")}>
               <h3 className={fr.cx("fr-h6")}>
                 L’organisme prescripteur (prescripteur)
               </h3>
@@ -297,37 +336,6 @@ export const SignatureActions = ({
               </ul>
             </div>
           </div>
-          <ButtonsGroup
-            alignment="center"
-            buttonsEquisized={true}
-            buttons={[
-              {
-                priority: "primary",
-                children: "Je termine la signature",
-                onClick: (event) => {
-                  setValue(fieldName, new Date().toISOString(), {
-                    shouldValidate: true,
-                  });
-                  onSubmitClick(event);
-                },
-                type: "button",
-                iconId: "fr-icon-checkbox-circle-line",
-                iconPosition: "left",
-                nativeButtonProps: {
-                  id: domElementIds.conventionToSign.submitButton,
-                },
-              },
-              {
-                priority: "secondary",
-                children: "J'abandonne",
-                disabled: isLoading || submitFeedback.kind !== "idle",
-                onClick: closeSignModal,
-                type: "button",
-                iconId: "fr-icon-edit-fill",
-                iconPosition: "left",
-              },
-            ]}
-          />
         </>
       </SignModal>
     </>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -35,6 +35,9 @@ export const ConventionSignForm = ({
     conventionSelectors.signatoryData,
   );
   const alreadySigned = !!currentSignatory?.signedAt;
+
+  const [modalClosedWithoutSignature, SetModalClosedWithoutSignature] =
+    useState<boolean>(false);
 
   const methods = useForm<ConventionReadDto>({
     defaultValues: convention,
@@ -116,6 +119,15 @@ export const ConventionSignForm = ({
           submitFeedback={submitFeedback}
           signatories={methods.getValues().signatories}
         />
+        {modalClosedWithoutSignature && (
+          <Alert
+            {...t.conventionNeedToBeSign}
+            closable={true}
+            severity="warning"
+            small
+            className={fr.cx("fr-mb-5w")}
+          />
+        )}
         {currentSignatory && (
           <SignatureActions
             internshipKind={convention.internshipKind}
@@ -125,6 +137,7 @@ export const ConventionSignForm = ({
               console.error(methods.getValues(), errors);
             })}
             onModificationRequired={askFormModificationWithMessageForm}
+            onCloseSignModalWithoutSignature={SetModalClosedWithoutSignature}
           />
         )}
       </form>
