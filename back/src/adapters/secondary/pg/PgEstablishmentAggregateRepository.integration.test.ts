@@ -36,6 +36,7 @@ import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateReposito
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
   expectAggregateEqual,
+  getAllEstablishmentImmersionContactsRows,
   getAllEstablishmentsRows,
   getAllImmersionContactsRows,
   getAllImmersionOfferRows,
@@ -46,7 +47,6 @@ import {
   insertImmersionOffer,
   PgEstablishmentRow,
   PgEstablishmentRowWithGeo,
-  PgImmersionContactWithSiretRow,
   retrieveEstablishmentWithSiret,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
@@ -687,24 +687,24 @@ describe("PgEstablishmentAggregateRepository", () => {
         ]);
 
         // Assert
-        const actualImmersionContactRows = await getAllImmersionContactsRows(
-          client,
-        );
-        expect(actualImmersionContactRows).toHaveLength(1);
-        const expectedImmersionContactRow: PgImmersionContactWithSiretRow = {
-          uuid: contact.id,
-          email: contact.email,
-          phone: contact.phone,
-          lastname: contact.lastName,
-          firstname: contact.firstName,
-          job: contact.job,
-          establishment_siret: siret1,
-          contact_mode: "EMAIL",
-          copy_emails: contact.copyEmails,
-        };
-        expect(actualImmersionContactRows[0]).toMatchObject(
-          expectedImmersionContactRow,
-        );
+        expectToEqual(await getAllImmersionContactsRows(client), [
+          {
+            uuid: contact.id,
+            email: contact.email,
+            phone: contact.phone,
+            lastname: contact.lastName,
+            firstname: contact.firstName,
+            job: contact.job,
+            contact_mode: "EMAIL",
+            copy_emails: contact.copyEmails,
+          },
+        ]);
+        expectToEqual(await getAllEstablishmentImmersionContactsRows(client), [
+          {
+            contact_uuid: contact.id,
+            establishment_siret: siret1,
+          },
+        ]);
       });
 
       it("adds as many row as immersion offers in table `immersion_offers`, each referencing the establishment siret and the contact uuid", async () => {
@@ -842,6 +842,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       expectToEqual(await getAllImmersionOfferRows(client), []);
       expectToEqual(await getAllImmersionContactsRows(client), []);
+      expectToEqual(await getAllEstablishmentImmersionContactsRows(client), []);
       expectToEqual(await getAllEstablishmentsRows(client), []);
       expectToEqual(
         await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(

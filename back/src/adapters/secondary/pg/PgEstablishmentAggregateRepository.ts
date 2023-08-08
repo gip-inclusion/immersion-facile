@@ -63,6 +63,9 @@ export class PgEstablishmentAggregateRepository
   public async delete(siret: string): Promise<void> {
     try {
       logger.info(`About to delete establishment with siret : ${siret}`);
+
+      await this.#deleteEstablishmentContactBySiret(siret);
+
       const { rowCount } = await this.client.query(
         `
         DELETE
@@ -593,6 +596,21 @@ export class PgEstablishmentAggregateRepository
     });
 
     await this.client.query(queries.join("\n"));
+  }
+
+  async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
+    await this.client.query(
+      `
+      DELETE
+      FROM immersion_contacts
+      WHERE uuid IN (
+        SELECT contact_uuid
+        FROM establishments__immersion_contacts
+        WHERE establishment_siret = $1
+      )
+    `,
+      [siret],
+    );
   }
 
   async #selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
