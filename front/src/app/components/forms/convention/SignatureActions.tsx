@@ -131,8 +131,7 @@ export const SignatureActions = ({
           },
           {
             priority: "secondary",
-            children:
-              "Annuler les signatures et recevoir un lien de modification",
+            children: "Annuler les signatures et demander une modification",
             disabled: isLoading || submitFeedback.kind !== "idle",
             onClick: openRequestModificationModal,
             type: "button",
