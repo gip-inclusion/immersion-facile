@@ -138,7 +138,7 @@ const ConventionSignPageContent = ({
               severity="success"
               {...t.conventionAlreadySigned}
               title="Convention signée"
-              description="Votre convention a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée, vous la recevrez par email."
+              description={`Votre convention (${conventionId}) a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée, vous la recevrez par email.`}
             />
           </MainWrapper>
         ))
