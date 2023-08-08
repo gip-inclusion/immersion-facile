@@ -170,27 +170,31 @@ export const getEstablishmentsRowsBySiret = async (
     .query("SELECT * FROM establishments WHERE siret=$1", [siret])
     .then((res) => res.rows[0]);
 
-export type PgImmersionContactWithSiretRow = {
+export type PgImmersionContact = {
   uuid: string;
   lastname: string;
   firstname: string;
   job: string;
   email: string;
   phone: string;
-  establishment_siret: string;
   contact_mode: ContactMethod;
   copy_emails: string[];
 };
 
+export type PgEstablishmentImmersionContact = {
+  contact_uuid: string;
+  establishment_siret: string;
+};
+
 export const getAllImmersionContactsRows = async (
   client: PoolClient,
-): Promise<PgImmersionContactWithSiretRow[]> =>
-  client
-    .query(
-      `SELECT * FROM immersion_contacts AS ic JOIN establishments__immersion_contacts AS eic
-       ON ic.uuid = eic.contact_uuid WHERE contact_uuid IS NOT NULL`,
-    )
-    .then((res) => res.rows);
+): Promise<PgImmersionContact[]> =>
+  (await client.query(`SELECT * FROM immersion_contacts`)).rows;
+
+export const getAllEstablishmentImmersionContactsRows = async (
+  client: PoolClient,
+): Promise<PgEstablishmentImmersionContact[]> =>
+  (await client.query(`SELECT * FROM establishments__immersion_contacts`)).rows;
 
 export type PgEstablishmentRowWithGeo = PgEstablishmentRow & {
   longitude: number;
