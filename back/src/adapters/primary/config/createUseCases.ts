@@ -284,7 +284,7 @@ export const createUseCases = (
         ),
       deleteEstablishment: new DeleteEstablishment(
         uowPerformer,
-        createNewEvent,
+        saveNotificationAndRelatedEvent,
       ),
       contactEstablishment: new ContactEstablishment(
         uowPerformer,

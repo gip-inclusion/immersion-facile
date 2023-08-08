@@ -1,10 +1,15 @@
 import {
+  addressDtoToString,
   BackOfficeJwtPayload,
   expectPromiseToFailWithError,
   expectToEqual,
   FormEstablishmentDtoBuilder,
 } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -16,13 +21,26 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
+import { ContactEntity } from "../entities/ContactEntity";
 import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../ports/FormEstablishmentRepository";
 import { DeleteEstablishment } from "./DeleteEstablishment";
 
 describe("Delete Establishment", () => {
-  const establishmentAggregate = new EstablishmentAggregateBuilder().build();
+  const contact: ContactEntity = {
+    copyEmails: ["billy1@mail.com", "billy2@mail.com"],
+    contactMethod: "EMAIL",
+    email: "boss@mail.com",
+    firstName: "",
+    id: "",
+    job: "",
+    lastName: "",
+    phone: "",
+  };
+  const establishmentAggregate = new EstablishmentAggregateBuilder()
+    .withContact(contact)
+    .build();
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(establishmentAggregate.establishment.siret)
     .build();
@@ -33,17 +51,23 @@ describe("Delete Establishment", () => {
     iat: 1,
     version: 1,
   };
+
   let deleteEstablishment: DeleteEstablishment;
   let uow: InMemoryUnitOfWork;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     deleteEstablishment = new DeleteEstablishment(
       new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
-        timeGateway: new CustomTimeGateway(),
-        uuidGenerator: new TestUuidGenerator(),
-      }),
+      makeSaveNotificationAndRelatedEvent(
+        new TestUuidGenerator(),
+        new CustomTimeGateway(),
+      ),
+    );
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
     );
   });
 
@@ -126,6 +150,22 @@ describe("Delete Establishment", () => {
           slug: "group",
         },
       ]);
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_DELETED",
+            recipients: [contact.email],
+            params: {
+              businessName: establishmentAggregate.establishment.name,
+              siret: establishmentAggregate.establishment.siret,
+              businessAddress: addressDtoToString(
+                establishmentAggregate.establishment.address,
+              ),
+            },
+            cc: contact.copyEmails,
+          },
+        ],
+      });
     });
   });
 });

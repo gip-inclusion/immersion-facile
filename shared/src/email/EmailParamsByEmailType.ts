@@ -4,6 +4,7 @@ import {
   ImmersionObjective,
   InternshipKind,
 } from "../convention/convention.dto";
+import { SiretDto } from "../siret/siret";
 
 export type EmailParamsByEmailType = {
   AGENCY_FIRST_REMINDER: {
@@ -122,6 +123,11 @@ export type EmailParamsByEmailType = {
   EDIT_FORM_ESTABLISHMENT_LINK: {
     editFrontUrl: string;
     businessName: string;
+    businessAddress: string;
+  };
+  ESTABLISHMENT_DELETED: {
+    businessName: string;
+    siret: SiretDto;
     businessAddress: string;
   };
   FULL_PREVIEW_EMAIL: {
