@@ -797,14 +797,14 @@ describe("conventionDtoSchema", () => {
 
     describe("when there is timePeriods on sunday", () => {
       it("rejects when internship kind is mini-stage-cci", () => {
-        expectConventionInvalidWithIssueMessages(
-          conventionSchema,
-          conventionBuilder
-            .withInternshipKind("mini-stage-cci")
-            .withSchedule(reasonableSchedule)
-            .build(),
-          ["Le mini-stage ne peut pas se dérouler un dimanche"],
-        );
+        const convention = conventionBuilder
+          .withInternshipKind("mini-stage-cci")
+          .withSchedule(reasonableSchedule)
+          .build();
+
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+          `[${convention.id}] Le mini-stage ne peut pas se dérouler un dimanche`,
+        ]);
       });
 
       it("accepts valid convention when kind is immersion", () => {
