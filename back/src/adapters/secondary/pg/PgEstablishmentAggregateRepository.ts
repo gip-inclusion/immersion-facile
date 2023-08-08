@@ -60,8 +60,29 @@ export class PgEstablishmentAggregateRepository
     await this.client.query(query);
   }
 
-  public delete(_siret: SiretDto): Promise<void> {
-    throw new Error("NOT IMPLEMENTED");
+  public async delete(siret: string): Promise<void> {
+    try {
+      logger.info(`About to delete establishment with siret : ${siret}`);
+      const { rowCount } = await this.client.query(
+        `
+        DELETE
+        FROM establishments
+        WHERE siret = $1;
+      `,
+        [siret],
+      );
+      if (rowCount !== 1)
+        throw new NotFoundError(
+          `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
+        );
+      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
+    } catch (error: any) {
+      logger.info(
+        `Error when deleting establishment with siret ${siret} : ${error.message}`,
+      );
+      logger.info({ error }, "Full Error");
+      throw error;
+    }
   }
 
   public async getEstablishmentAggregateBySiret(
@@ -358,23 +379,6 @@ export class PgEstablishmentAggregateRepository
     );
 
     return result.rowCount;
-  }
-
-  public async removeEstablishmentAndOffersAndContactWithSiret(
-    siret: string,
-  ): Promise<void> {
-    try {
-      logger.info(`About to delete establishment with siret : ${siret}`);
-      const query = `DELETE FROM establishments WHERE siret = $1;`;
-      await this.client.query(query, [siret]);
-      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
-    } catch (error: any) {
-      logger.info(
-        `Error when deleting establishment with siret ${siret} : ${error.message}`,
-      );
-      logger.info({ error }, "Full Error");
-      throw error;
-    }
   }
 
   public async searchImmersionResults({

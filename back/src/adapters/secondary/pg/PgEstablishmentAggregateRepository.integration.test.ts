@@ -810,8 +810,48 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("Pg implementation of method removeEstablishmentAndOffersWithSiret", () => {
-    it("Removes only establishment with given siret and its offers", async () => {
+  describe("Pg implementation of method delete", () => {
+    it("Throws on missing establishment", async () => {
+      const siretNotInTable = "11111111111111";
+
+      await expectPromiseToFailWithError(
+        pgEstablishmentAggregateRepository.delete(siretNotInTable),
+        new NotFoundError(
+          `Establishment with siret ${siretNotInTable} missing on Establishment Aggregate Repository.`,
+        ),
+      );
+    });
+
+    it("Delete aggregate including establishment, immersion offers, immersion contacts", async () => {
+      const establishmentAggregate =
+        new EstablishmentAggregateBuilder().build();
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        establishmentAggregate,
+      ]);
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          establishmentAggregate.establishment.siret,
+        ),
+        establishmentAggregate,
+      );
+
+      await pgEstablishmentAggregateRepository.delete(
+        establishmentAggregate.establishment.siret,
+      );
+
+      expectToEqual(await getAllImmersionOfferRows(client), []);
+      expectToEqual(await getAllImmersionContactsRows(client), []);
+      expectToEqual(await getAllEstablishmentsRows(client), []);
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          establishmentAggregate.establishment.siret,
+        ),
+        undefined,
+      );
+    });
+
+    it("Removes only establishment with given siret and its offers and its contacts", async () => {
       // Prepare
       const siretToRemove = "11111111111111";
       const siretToKeep = "22222222222222";
@@ -842,9 +882,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       ]);
 
       // Act
-      await pgEstablishmentAggregateRepository.removeEstablishmentAndOffersAndContactWithSiret(
-        siretToRemove,
-      );
+      await pgEstablishmentAggregateRepository.delete(siretToRemove);
       // Assert
       //   Establishment has been removed
       expect(
@@ -1699,24 +1737,6 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
         );
       });
-    });
-  });
-
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe("Pg implementation of method delete", () => {
-    it("Throws on missing establishment", async () => {
-      const siretNotInTable = "11111111111111";
-
-      await expectPromiseToFailWithError(
-        pgEstablishmentAggregateRepository.delete(siretNotInTable),
-        new NotFoundError(
-          `Establishment with siret ${siretNotInTable} missing on Establishment Aggregate Repository.`,
-        ),
-      );
-    });
-
-    it("MORE !!!!", () => {
-      expect(true).toBeFalsy();
     });
   });
 });

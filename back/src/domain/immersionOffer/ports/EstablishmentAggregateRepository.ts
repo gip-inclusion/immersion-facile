@@ -39,10 +39,6 @@ export interface EstablishmentAggregateRepository {
     },
   ) => Promise<void>;
 
-  removeEstablishmentAndOffersAndContactWithSiret: (
-    siret: string,
-  ) => Promise<void>;
-
   markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
     fromDate: Date,
   ) => Promise<number>;
