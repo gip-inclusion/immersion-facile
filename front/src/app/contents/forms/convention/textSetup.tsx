@@ -182,6 +182,11 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     description:
       "Veuillez vérifier les informations de la convention. Vous pourrez ensuite la signer ou la renvoyer pour modification.",
   },
+  conventionNeedToBeSign: {
+    title: "Attention",
+    description:
+      "Vous n’avez pas fini la signature de la convention. Pour le faire, cliquez sur “Signer” puis sur “Je termine la signature” dans la fenêtre “Accepter les dispositions réglementaires et terminer la signature”.",
+  },
   conventionToSignOrAskForChanges:
     "Veuillez la signer ou la renvoyer pour modification.",
   conventionNotEditable:

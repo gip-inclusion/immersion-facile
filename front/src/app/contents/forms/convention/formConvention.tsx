@@ -651,7 +651,7 @@ export const sidebarStepContent = (
               >
                 conditions réglementaires
               </a>
-              applicables aux immersions
+              applicables aux immersions.
             </strong>
           </p>
         ),
