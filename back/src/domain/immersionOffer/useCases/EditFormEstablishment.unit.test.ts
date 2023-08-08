@@ -15,6 +15,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
+import { formEstablishementUpdateFailedErrorMessage } from "../ports/FormEstablishmentRepository";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
@@ -101,13 +102,13 @@ describe("Edit Form Establishment", () => {
     describe("If establishment form id does not exist", () => {
       it("should throw a conflict error", async () => {
         const { useCase } = prepareUseCase();
+        const formEstablishment = FormEstablishmentDtoBuilder.valid()
+          .withSiret(formSiret)
+          .build();
         await expectPromiseToFailWithError(
-          useCase.execute(
-            FormEstablishmentDtoBuilder.valid().withSiret(formSiret).build(),
-            payload,
-          ),
+          useCase.execute(formEstablishment, payload),
           new ConflictError(
-            "Cannot update form establishlment DTO with siret 12345678901234, since it is not in list.",
+            formEstablishementUpdateFailedErrorMessage(formEstablishment),
           ),
         );
       });

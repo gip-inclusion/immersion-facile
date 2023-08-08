@@ -6,7 +6,6 @@ import {
   GeoPositionDto,
   path,
   pathEq,
-  pathNotEq,
   replaceArrayElement,
   SearchImmersionResultDto,
   SiretDto,
@@ -166,14 +165,6 @@ export class InMemoryEstablishmentAggregateRepository
     // not implemented because this method is used only in a script,
     // and the use case consists only in a PG query
     throw new Error("NOT implemented");
-  }
-
-  public async removeEstablishmentAndOffersAndContactWithSiret(
-    siret: string,
-  ): Promise<void> {
-    this.establishmentAggregates = this.#establishmentAggregates.filter(
-      pathNotEq("establishment.siret", siret),
-    );
   }
 
   public async searchImmersionResults({

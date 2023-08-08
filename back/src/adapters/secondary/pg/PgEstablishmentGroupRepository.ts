@@ -21,13 +21,6 @@ export class PgEstablishmentGroupRepository
 {
   constructor(private client: PoolClient) {}
 
-  private async clearExistingSiretsForGroup(groupSlug: EstablishmentGroupSlug) {
-    await this.client.query(
-      `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
-      [groupSlug],
-    );
-  }
-
   public async findSearchImmersionResultsBySlug(
     slug: EstablishmentGroupSlug,
   ): Promise<SearchImmersionResultDto[]> {
@@ -75,9 +68,59 @@ export class PgEstablishmentGroupRepository
     return response.rows.map((row) => row.search_result_dto);
   }
 
-  private async insertEstablishmentGroupSirets(
-    group: EstablishmentGroupEntity,
-  ) {
+  public async groupsWithSiret(
+    siret: SiretDto,
+  ): Promise<EstablishmentGroupEntity[]> {
+    const { rows } = await this.client.query<{
+      slug: string;
+      name: string;
+      sirets: string[];
+    }>(
+      `
+      SELECT g.slug, g.name, array_agg(establishment_groups__sirets.siret) as sirets
+      FROM establishment_groups g
+      LEFT JOIN establishment_groups__sirets ON g.slug = establishment_groups__sirets.group_slug
+      INNER JOIN (
+        SELECT DISTINCT group_slug
+        FROM establishment_groups__sirets
+        WHERE siret = $1
+      ) est_groups ON g.slug = est_groups.group_slug
+      GROUP BY g.slug, g.name
+      ORDER BY g.slug;
+    `,
+      [siret],
+    );
+    return rows.map(
+      (row) =>
+        ({
+          name: row.name,
+          sirets: row.sirets,
+          slug: row.slug,
+        } satisfies EstablishmentGroupEntity),
+    );
+  }
+
+  public async save(group: EstablishmentGroupEntity): Promise<void> {
+    const { rows } = await this.client.query(
+      `SELECT * FROM establishment_groups WHERE slug = $1`,
+      [group.slug],
+    );
+    const establishmentGroupAlreadyExists = !!rows.length;
+    if (establishmentGroupAlreadyExists) {
+      await this.#clearExistingSiretsForGroup(group.slug);
+      await this.#insertEstablishmentGroupSirets(group);
+    } else {
+      await this.client.query(
+        `
+            INSERT INTO establishment_groups (slug, name) VALUES ($1, $2)
+        `,
+        [group.slug, group.name],
+      );
+      await this.#insertEstablishmentGroupSirets(group);
+    }
+  }
+
+  async #insertEstablishmentGroupSirets(group: EstablishmentGroupEntity) {
     if (!group.sirets.length) return;
     const groupAndSiretPairs: [string, SiretDto][] = group.sirets.map(
       (siret) => [group.slug, siret],
@@ -91,23 +134,10 @@ export class PgEstablishmentGroupRepository
     );
   }
 
-  async save(group: EstablishmentGroupEntity): Promise<void> {
-    const { rows } = await this.client.query(
-      `SELECT * FROM establishment_groups WHERE slug = $1`,
-      [group.slug],
+  async #clearExistingSiretsForGroup(groupSlug: EstablishmentGroupSlug) {
+    await this.client.query(
+      `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
+      [groupSlug],
     );
-    const establishmentGroupAlreadyExists = !!rows.length;
-    if (establishmentGroupAlreadyExists) {
-      await this.clearExistingSiretsForGroup(group.slug);
-      await this.insertEstablishmentGroupSirets(group);
-    } else {
-      await this.client.query(
-        `
-            INSERT INTO establishment_groups (slug, name) VALUES ($1, $2)
-        `,
-        [group.slug, group.name],
-      );
-      await this.insertEstablishmentGroupSirets(group);
-    }
   }
 }

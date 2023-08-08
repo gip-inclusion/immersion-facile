@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import {
   AppellationDto,
+  expectObjectsToMatch,
   expectToEqual,
   SearchImmersionResultDto,
 } from "shared";
@@ -12,10 +13,18 @@ import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entitie
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
 
-const group: EstablishmentGroupEntity = {
+const siret1 = "11112222111122";
+const siret2 = "33334444333344";
+const carrefourGroup: EstablishmentGroupEntity = {
   slug: "carrefour",
   name: "Carrefour",
-  sirets: ["11112222111122", "33334444333344"],
+  sirets: [siret1, siret2],
+};
+
+const laMieCalineGroup: EstablishmentGroupEntity = {
+  slug: "l-amie-caline",
+  name: "L'amie caline",
+  sirets: [],
 };
 
 describe("PgEstablishmentGroupRepository", () => {
@@ -47,39 +56,33 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   it("creates an EstablishmentGroup and the links with sirets", async () => {
-    await pgEstablishmentGroupRepository.save({
-      slug: "l-amie-caline",
-      name: "L'amie caline",
-      sirets: [],
-    });
-    await pgEstablishmentGroupRepository.save(group);
-    const groups = await getAllGroups();
-    expect(groups).toMatchObject([
+    await pgEstablishmentGroupRepository.save(laMieCalineGroup);
+    await pgEstablishmentGroupRepository.save(carrefourGroup);
+
+    expectObjectsToMatch(await getAllGroups(), [
       { name: "L'amie caline", slug: "l-amie-caline" },
       { name: "Carrefour", slug: "carrefour" },
     ]);
-
-    const groupSirets = await getAllGroupsSirets();
-    expect(groupSirets).toMatchObject([
+    expectObjectsToMatch(await getAllGroupsSirets(), [
       { group_slug: "carrefour", siret: "11112222111122" },
       { group_slug: "carrefour", siret: "33334444333344" },
     ]);
   });
 
   it("updates the group when one with the same slug already exists", async () => {
-    await pgEstablishmentGroupRepository.save(group);
+    await pgEstablishmentGroupRepository.save(carrefourGroup);
     const updatedGroup: EstablishmentGroupEntity = {
-      slug: group.slug,
-      name: group.name,
+      slug: carrefourGroup.slug,
+      name: carrefourGroup.name,
       sirets: ["55556666555566", "77778888777788"],
     };
 
     await pgEstablishmentGroupRepository.save(updatedGroup);
 
-    const groups = await getAllGroups();
-    const groupSirets = await getAllGroupsSirets();
-    expect(groups).toMatchObject([{ name: "Carrefour", slug: "carrefour" }]);
-    expect(groupSirets).toMatchObject([
+    expectObjectsToMatch(await getAllGroups(), [
+      { name: "Carrefour", slug: "carrefour" },
+    ]);
+    expectObjectsToMatch(await getAllGroupsSirets(), [
       { group_slug: "carrefour", siret: updatedGroup.sirets[0] },
       { group_slug: "carrefour", siret: updatedGroup.sirets[1] },
     ]);
@@ -108,18 +111,18 @@ describe("PgEstablishmentGroupRepository", () => {
         .build();
 
     const establishmentAggregate1 = new EstablishmentAggregateBuilder()
-      .withEstablishmentSiret(group.sirets[0])
+      .withEstablishmentSiret(carrefourGroup.sirets[0])
       .withContactId("11111111-1111-4444-1111-111111111111")
       .withImmersionOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
       .build();
 
     const establishmentAggregate2 = new EstablishmentAggregateBuilder()
-      .withEstablishmentSiret(group.sirets[1])
+      .withEstablishmentSiret(carrefourGroup.sirets[1])
       .withContactId("22222222-2222-4444-2222-222222222222")
       .withImmersionOffers([offerVendeurEnAlimentationGenerale])
       .build();
 
-    await pgEstablishmentGroupRepository.save(group);
+    await pgEstablishmentGroupRepository.save(carrefourGroup);
     await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
       establishmentAggregate1,
       establishmentAggregate2,
@@ -130,7 +133,7 @@ describe("PgEstablishmentGroupRepository", () => {
 
     const searchImmersionResults =
       await pgEstablishmentGroupRepository.findSearchImmersionResultsBySlug(
-        group.slug,
+        carrefourGroup.slug,
       );
 
     const createSearchResult = ({
@@ -199,6 +202,52 @@ describe("PgEstablishmentGroupRepository", () => {
         ],
       }),
     ]);
+  });
+
+  describe("groupsWithSiret", () => {
+    const group1WithSiret1: EstablishmentGroupEntity = {
+      name: "group1",
+      sirets: [siret1],
+      slug: "group1",
+    };
+
+    const group2WithSiret1: EstablishmentGroupEntity = {
+      name: "group2",
+      sirets: [siret1],
+      slug: "group2",
+    };
+
+    const group3WithoutSiret1: EstablishmentGroupEntity = {
+      name: "group3",
+      sirets: ["another-siret"],
+      slug: "group3",
+    };
+
+    it("Retreive groups with siret", async () => {
+      await Promise.all(
+        [group1WithSiret1, group2WithSiret1, group3WithoutSiret1].map((group) =>
+          pgEstablishmentGroupRepository.save(group),
+        ),
+      );
+
+      expectToEqual(
+        await pgEstablishmentGroupRepository.groupsWithSiret(siret1),
+        [group1WithSiret1, group2WithSiret1],
+      );
+    });
+
+    it("Retreive no groups when they don't have siret", async () => {
+      await Promise.all(
+        [group1WithSiret1, group2WithSiret1, group3WithoutSiret1].map((group) =>
+          pgEstablishmentGroupRepository.save(group),
+        ),
+      );
+
+      expectToEqual(
+        await pgEstablishmentGroupRepository.groupsWithSiret("unknown-siret"),
+        [],
+      );
+    });
   });
 
   const getAllGroups = async () => {
