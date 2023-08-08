@@ -246,6 +246,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
         );
         addIssueIfSundayIsInSchedule(
           addIssue,
+          convention.id,
           convention.schedule.complexSchedule,
         );
         addIssueIfAgeLessThanMinimumAge(
@@ -411,11 +412,12 @@ const addIssueIfAgeLessThanMinimumAge = (
 
 const addIssueIfSundayIsInSchedule = (
   addIssue: (message: string, path: string) => void,
+  conventionId: ConventionId,
   complexSchedule: DailyScheduleDto[],
 ) => {
   if (isSundayInSchedule(complexSchedule)) {
     addIssue(
-      "Le mini-stage ne peut pas se dérouler un dimanche",
+      `[${conventionId}] Le mini-stage ne peut pas se dérouler un dimanche`,
       getConventionFieldName("schedule.workedDays"),
     );
   }
