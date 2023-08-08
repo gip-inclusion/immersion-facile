@@ -1,108 +1,74 @@
+import { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
 import { domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 
-// TODO replace with react dsfr link props type
-type SiteMapLink = {
-  text: string;
-  linkProps: {
-    href: string;
-    id: string;
-  };
-};
-
 const { siteMap: siteMapIds } = domElementIds.standard;
 
-const siteMapLinks: SiteMapLink[] = [
+const siteMapLinks: RegisteredLinkProps[] = [
   {
-    text: "Accueil",
-    linkProps: {
-      ...routes.home().link,
-      id: siteMapIds.home,
-    },
+    title: "Accueil",
+    id: siteMapIds.home,
+    ...routes.home().link,
   },
   {
-    text: "Accueil candidat",
-    linkProps: {
-      ...routes.homeCandidates().link,
-      id: siteMapIds.candidateHome,
-    },
+    title: "Accueil candidat",
+    id: siteMapIds.candidateHome,
+    ...routes.homeCandidates().link,
   },
   {
-    text: "Accueil entreprise",
-    linkProps: {
-      ...routes.homeEstablishments().link,
-      id: siteMapIds.establishmentHome,
-    },
+    title: "Accueil entreprise",
+    id: siteMapIds.establishmentHome,
+    ...routes.homeEstablishments().link,
   },
   {
-    text: "Accueil prescripteurs",
-    linkProps: {
-      ...routes.homeAgencies().link,
-      id: siteMapIds.agencyHome,
-    },
+    title: "Accueil prescripteurs",
+    id: siteMapIds.agencyHome,
+    ...routes.homeAgencies().link,
   },
   {
-    text: "Trouver une entreprise accueillante",
-    linkProps: {
-      ...routes.search().link,
-      id: siteMapIds.search,
-    },
+    title: "Trouver une entreprise accueillante",
+    id: siteMapIds.search,
+    ...routes.search().link,
   },
   {
-    text: "Remplir la demande de convention",
-    linkProps: {
-      ...routes.conventionImmersion().link,
-      id: siteMapIds.coventionForm,
-    },
+    title: "Remplir la demande de convention",
+    id: siteMapIds.coventionForm,
+    ...routes.conventionImmersion().link,
   },
   {
-    text: "Référencer une entreprise",
-    linkProps: {
-      ...routes.formEstablishment().link,
-      id: siteMapIds.establishmentForm,
-    },
+    title: "Référencer une entreprise",
+    id: siteMapIds.establishmentForm,
+    ...routes.formEstablishment().link,
   },
   {
-    text: "Référencer un organisme",
-    linkProps: {
-      ...routes.addAgency().link,
-      id: siteMapIds.agencyForm,
-    },
+    title: "Référencer un organisme",
+    id: siteMapIds.agencyForm,
+    ...routes.addAgency().link,
   },
   {
-    text: "Déclaration d'accessibilité",
-    linkProps: {
-      ...routes.standard({ pagePath: "declaration-accessibilite" }).link,
-      id: siteMapIds.accessibility,
-    },
+    title: "Déclaration d'accessibilité",
+    id: siteMapIds.accessibility,
+    ...routes.standard({ pagePath: "declaration-accessibilite" }).link,
   },
   {
-    text: "Mentions légales",
-    linkProps: {
-      ...routes.standard({ pagePath: "mentions-legales" }).link,
-      id: siteMapIds.legals,
-    },
+    title: "Mentions légales",
+    id: siteMapIds.legals,
+    ...routes.standard({ pagePath: "mentions-legales" }).link,
   },
   {
-    text: "Politique de confidentialité",
-    linkProps: {
-      ...routes.standard({ pagePath: "politique-de-confidentialite" }).link,
-      id: siteMapIds.privacy,
-    },
+    title: "Politique de confidentialité",
+    ...routes.standard({ pagePath: "politique-de-confidentialite" }).link,
+    id: siteMapIds.privacy,
   },
   {
-    text: "Conditions générales d'utilisation",
-    linkProps: {
-      ...routes.standard({ pagePath: "cgu" }).link,
-      id: siteMapIds.cgu,
-    },
+    title: "Conditions générales d'utilisation",
+    ...routes.standard({ pagePath: "cgu" }).link,
+    id: siteMapIds.cgu,
   },
   {
-    text: "Statistiques",
-    linkProps: {
-      href: "/stats",
-      id: siteMapIds.stats,
-    },
+    title: "Statistiques",
+    href: "/stats",
+    id: siteMapIds.stats,
   },
 ];
 
@@ -112,7 +78,7 @@ export default {
   <ul>${siteMapLinks
     .map(
       (link) =>
-        `<li><a class="fr-link fr-fi-arrow-right-line fr-link--icon-right" href=${link.linkProps.href} id=${link.linkProps.id}>${link.text}</a></li>`,
+        `<li><a class="fr-link fr-fi-arrow-right-line fr-link--icon-right" href=${link.href} id=${link.id}>${link.title}</a></li>`,
     )
     .join("")} 
   </ul>
