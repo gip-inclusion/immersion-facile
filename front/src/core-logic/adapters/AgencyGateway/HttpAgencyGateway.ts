@@ -151,7 +151,6 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
-  // TODO Mieux identifier l'admin
   public async validateOrRejectAgency(
     adminToken: BackOfficeJwt,
     agencyId: AgencyId,
