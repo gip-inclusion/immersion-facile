@@ -198,7 +198,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       : "Cette demande de stage n'est plus modifiable.",
   verification: {
     rejectConvention: "Refuser l'immersion",
-    modifyConvention: "Recevoir un lien de modification",
+    modifyConvention: "Demander une modification",
     conventionAlreadyMarkedAsEligible: "Demande déjà validée.",
     markAsEligible: "Marquer la demande comme éligible",
     conventionAlreadyValidated: "Demande déjà validée",
