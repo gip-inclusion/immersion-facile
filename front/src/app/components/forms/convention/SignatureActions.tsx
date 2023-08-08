@@ -23,7 +23,7 @@ const processedDataBySignatoryRole: Record<
 > = {
   beneficiary: {
     fieldName: getConventionFieldName("signatories.beneficiary.signedAt"),
-    signatoryFunction: "bénéficiaire ",
+    signatoryFunction: "bénéficiaire",
   },
   "beneficiary-current-employer": {
     fieldName: getConventionFieldName(

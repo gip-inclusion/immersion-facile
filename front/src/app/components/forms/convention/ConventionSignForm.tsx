@@ -36,7 +36,7 @@ export const ConventionSignForm = ({
   );
   const alreadySigned = !!currentSignatory?.signedAt;
 
-  const [modalClosedWithoutSignature, SetModalClosedWithoutSignature] =
+  const [isModalClosedWithoutSignature, SetIsModalClosedWithoutSignature] =
     useState<boolean>(false);
 
   const methods = useForm<ConventionReadDto>({
@@ -119,7 +119,7 @@ export const ConventionSignForm = ({
           submitFeedback={submitFeedback}
           signatories={methods.getValues().signatories}
         />
-        {modalClosedWithoutSignature && (
+        {isModalClosedWithoutSignature && (
           <Alert
             {...t.conventionNeedToBeSign}
             closable={true}
@@ -137,7 +137,7 @@ export const ConventionSignForm = ({
               console.error(methods.getValues(), errors);
             })}
             onModificationRequired={askFormModificationWithMessageForm}
-            onCloseSignModalWithoutSignature={SetModalClosedWithoutSignature}
+            onCloseSignModalWithoutSignature={SetIsModalClosedWithoutSignature}
           />
         )}
       </form>
