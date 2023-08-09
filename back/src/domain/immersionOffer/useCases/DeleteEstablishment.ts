@@ -5,10 +5,15 @@ import {
   SiretDto,
   siretSchema,
 } from "shared";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
+import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
 
 type DeleteEstablishmentPayload = {
   siret: SiretDto;
@@ -28,6 +33,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
+    private timeGateway: TimeGateway,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
@@ -52,6 +58,8 @@ export class DeleteEstablishment extends TransactionalUseCase<
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
+    if (!establishmentAggregate)
+      throw new NotFoundError(establishmentNotFoundErrorMessage(siret));
 
     await Promise.all([
       uow.establishmentAggregateRepository.delete(siret),
@@ -59,9 +67,14 @@ export class DeleteEstablishment extends TransactionalUseCase<
       ...groupsUpdatedWithoutSiret.map((group) =>
         uow.establishmentGroupRepository.save(group),
       ),
+      uow.deletedEstablishmentRepository.save({
+        siret,
+        createdAt: establishmentAggregate.establishment.createdAt,
+        deletedAt: this.timeGateway.now(),
+      }),
     ]);
 
-    if (establishmentAggregate && establishmentAggregate.contact)
+    if (establishmentAggregate.contact)
       await this.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
