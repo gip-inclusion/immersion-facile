@@ -22,6 +22,7 @@ export type EstablishmentEntity = {
   position: GeoPositionDto;
   nafDto: NafDto;
   numberEmployeesRange: NumberEmployeesRange;
+  createdAt: Date;
   updatedAt?: Date;
   lastInseeCheckDate?: Date;
   isOpen: boolean;

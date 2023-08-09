@@ -19,6 +19,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   additionalInformation: "",
   customizedName: undefined,
   isCommited: undefined,
+  createdAt: new Date(),
   sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
   position: {
@@ -40,102 +41,102 @@ export class EstablishmentEntityBuilder
     private readonly entity: EstablishmentEntity = validEstablishmentEntityV2,
   ) {}
 
-  build() {
+  public build() {
     return this.entity;
   }
 
-  withAdditionalInformation(additionalInformation: string) {
+  public withAdditionalInformation(additionalInformation: string) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       additionalInformation,
     });
   }
 
-  withAddress(address: AddressDto) {
+  public withAddress(address: AddressDto) {
     return new EstablishmentEntityBuilder({ ...this.entity, address });
   }
 
-  withCustomizedName(customizedName: string) {
+  public withCustomizedName(customizedName: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
   }
 
-  withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       fitForDisabledWorkers,
     });
   }
 
-  withIsCommited(isCommited: boolean) {
+  public withIsCommited(isCommited: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       isCommited,
     });
   }
 
-  withIsOpen(isOpen: boolean) {
+  public withIsOpen(isOpen: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       isOpen,
     });
   }
 
-  withIsSearchable(isSearchable: boolean) {
+  public withIsSearchable(isSearchable: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       isSearchable,
     });
   }
 
-  withLastInseeCheck(lastInseeCheck: Date | undefined) {
+  public withLastInseeCheck(lastInseeCheck: Date | undefined) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       lastInseeCheckDate: lastInseeCheck,
     });
   }
 
-  withMaxContactsPerWeek(maxContactsPerWeek: number) {
+  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       maxContactsPerWeek,
     });
   }
 
-  withNafDto(nafDto: NafDto) {
+  public withNafDto(nafDto: NafDto) {
     return new EstablishmentEntityBuilder({ ...this.entity, nafDto });
   }
 
-  withName(name: string) {
+  public withName(name: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, name });
   }
 
-  withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
+  public withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       numberEmployeesRange,
     });
   }
 
-  withPosition(position: GeoPositionDto) {
+  public withPosition(position: GeoPositionDto) {
     return new EstablishmentEntityBuilder({ ...this.entity, position });
   }
 
-  withSiret(siret: string) {
+  public withSiret(siret: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, siret });
   }
 
-  withSourceProvider(sourceProvider: FormEstablishmentSource) {
+  public withSourceProvider(sourceProvider: FormEstablishmentSource) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       sourceProvider,
     });
   }
 
-  withUpdatedAt(updatedAt: Date) {
+  public withUpdatedAt(updatedAt: Date) {
     return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
   }
 
-  withWebsite(website: string) {
+  public withWebsite(website: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, website });
   }
 }
