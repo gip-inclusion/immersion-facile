@@ -284,6 +284,7 @@ export const createUseCases = (
         ),
       deleteEstablishment: new DeleteEstablishment(
         uowPerformer,
+        gateways.timeGateway,
         saveNotificationAndRelatedEvent,
       ),
       contactEstablishment: new ContactEstablishment(

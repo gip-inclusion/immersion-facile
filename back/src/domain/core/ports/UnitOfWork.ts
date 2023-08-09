@@ -8,6 +8,7 @@ import { InclusionConnectedUserRepository } from "../../dashboard/port/Inclusion
 import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
+import { DeletedEstablishmentRepository } from "../../immersionOffer/ports/DeletedEstablishmentRepository";
 import { DiscussionAggregateRepository } from "../../immersionOffer/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
 import { EstablishmentGroupRepository } from "../../immersionOffer/ports/EstablishmentGroupRepository";
@@ -30,6 +31,7 @@ export type UnitOfWork = {
   conventionQueries: ConventionQueries;
   conventionRepository: ConventionRepository;
   discussionAggregateRepository: DiscussionAggregateRepository;
+  deletedEstablishmentRepository: DeletedEstablishmentRepository;
   errorRepository: ErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   establishmentGroupRepository: EstablishmentGroupRepository;

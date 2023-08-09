@@ -21,6 +21,7 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { ContactEntity } from "../entities/ContactEntity";
 import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
@@ -54,16 +55,16 @@ describe("Delete Establishment", () => {
 
   let deleteEstablishment: DeleteEstablishment;
   let uow: InMemoryUnitOfWork;
+  let timeGateway: TimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
     deleteEstablishment = new DeleteEstablishment(
       new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new TestUuidGenerator(),
-        new CustomTimeGateway(),
-      ),
+      timeGateway,
+      makeSaveNotificationAndRelatedEvent(new TestUuidGenerator(), timeGateway),
     );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
@@ -143,11 +144,18 @@ describe("Delete Establishment", () => {
         [],
       );
       expectToEqual(await uow.formEstablishmentRepository.getAll(), []);
-      expectToEqual(await uow.establishmentGroupRepository.groups, [
+      expectToEqual(uow.establishmentGroupRepository.groups, [
         {
           name: "group",
           sirets: ["siret2"],
           slug: "group",
+        },
+      ]);
+      expectToEqual(uow.deletedEstablishmentRepository.deletedEstablishments, [
+        {
+          siret: establishmentAggregate.establishment.siret,
+          createdAt: establishmentAggregate.establishment.createdAt,
+          deletedAt: timeGateway.now(),
         },
       ]);
       expectSavedNotificationsAndEvents({
