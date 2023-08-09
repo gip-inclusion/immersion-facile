@@ -149,6 +149,9 @@ export class PgEstablishmentAggregateRepository
                 'updatedAt', to_char(
                   e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
+                'createdAt', to_char(
+                  e.created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                ), 
                 'lastInseeCheckDate', to_char(
                   e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
@@ -186,6 +189,7 @@ export class PgEstablishmentAggregateRepository
           updatedAt: aggregateWithStringDates.establishment.updatedAt
             ? new Date(aggregateWithStringDates.establishment.updatedAt)
             : undefined,
+          createdAt: new Date(aggregateWithStringDates.establishment.createdAt),
           lastInseeCheckDate: aggregateWithStringDates.establishment
             .lastInseeCheckDate
             ? new Date(
@@ -648,32 +652,13 @@ export class PgEstablishmentAggregateRepository
   async #upsertEstablishmentsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
+    //prettier-ignore
     const establishmentFields = aggregates.map(({ establishment }) => [
-      establishment.siret,
-      establishment.name,
-      establishment.customizedName,
-      establishment.website,
-      establishment.additionalInformation,
-      establishment.address.streetNumberAndAddress,
-      establishment.address.postcode,
-      establishment.address.city,
-      establishment.address.departmentCode,
-      establishment.numberEmployeesRange,
-      establishment.nafDto.code,
-      establishment.nafDto.nomenclature,
-      establishment.sourceProvider,
-      convertPositionToStGeography(establishment.position),
-      establishment.position.lon,
-      establishment.position.lat,
-      establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
-      establishment.isOpen,
-      establishment.isSearchable,
-      establishment.isCommited,
-      establishment.fitForDisabledWorkers,
-      establishment.maxContactsPerWeek,
-      establishment.lastInseeCheckDate
-        ? establishment.lastInseeCheckDate.toISOString()
-        : null,
+      establishment.siret, establishment.name, establishment.customizedName, establishment.website, establishment.additionalInformation,
+      establishment.address.streetNumberAndAddress, establishment.address.postcode, establishment.address.city, establishment.address.departmentCode, establishment.numberEmployeesRange,
+      establishment.nafDto.code, establishment.nafDto.nomenclature, establishment.sourceProvider, convertPositionToStGeography(establishment.position), establishment.position.lon,
+      establishment.position.lat, establishment.updatedAt ? establishment.updatedAt.toISOString() : null, establishment.isOpen, establishment.isSearchable, establishment.isCommited,
+      establishment.fitForDisabledWorkers, establishment.maxContactsPerWeek, establishment.lastInseeCheckDate ? establishment.lastInseeCheckDate.toISOString() : null, establishment.createdAt,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -681,8 +666,13 @@ export class PgEstablishmentAggregateRepository
     try {
       const query = fixStGeographyEscapingInQuery(
         format(
-          `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_open, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date 
+          `
+        INSERT INTO establishments (
+          siret, name, customized_name, website, additional_information, 
+          street_number_and_address, post_code, city, department_code, number_employees, 
+          naf_code, naf_nomenclature, source_provider, gps, lon, 
+          lat, update_date, is_open, is_searchable, is_commited, 
+          fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey

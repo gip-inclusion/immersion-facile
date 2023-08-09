@@ -194,6 +194,7 @@ const makeCreateEstablishmentAggregate =
       position,
       numberEmployeesRange,
       isOpen: true,
+      createdAt: timeGateway.now(),
       updatedAt: timeGateway.now(),
       fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
       isSearchable: formEstablishment.maxContactsPerWeek > noContactPerWeek,

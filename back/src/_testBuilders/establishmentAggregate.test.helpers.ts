@@ -24,7 +24,7 @@ export class EstablishmentAggregateBuilder
     private readonly aggregate: EstablishmentAggregate = validEstablishmentAggregate,
   ) {}
 
-  build() {
+  public build() {
     return this.aggregate;
   }
 

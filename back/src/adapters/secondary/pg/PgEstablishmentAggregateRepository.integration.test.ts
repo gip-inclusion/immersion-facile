@@ -42,6 +42,7 @@ import {
   getAllImmersionOfferRows,
   getEstablishmentsRowsBySiret,
   insertActiveEstablishmentAndOfferAndEventuallyContact,
+  InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
   insertEstablishment,
   insertImmersionContact,
   insertImmersionOffer,
@@ -124,20 +125,23 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     describe("if parameter `maxResults` is given", () => {
       it("returns at most `maxResults` establishments", async () => {
-        const establishmentsAndOffers = [
-          {
-            siret: "78000403200029",
-            rome: "A1101",
-            establishmentPosition: searchedPosition, // Position matching
-            appellationCode: "11987",
-          },
-          {
-            siret: "79000403200029",
-            rome: "A1201",
-            establishmentPosition: searchedPosition, // Position matching
-            appellationCode: "12755",
-          },
-        ];
+        const establishmentsAndOffers: InsertActiveEstablishmentAndOfferAndEventuallyContactProps[] =
+          [
+            {
+              siret: "78000403200029",
+              rome: "A1101",
+              establishmentPosition: searchedPosition, // Position matching
+              appellationCode: "11987",
+              createdAt: new Date(),
+            },
+            {
+              siret: "79000403200029",
+              rome: "A1201",
+              establishmentPosition: searchedPosition, // Position matching
+              appellationCode: "12755",
+              createdAt: new Date(),
+            },
+          ];
         // Prepare
         await Promise.all(
           establishmentsAndOffers.map((establishmentsAndOffer) =>
@@ -169,6 +173,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           rome: "A1101",
           appellationCode: "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
           establishmentPosition: searchedPosition,
+          createdAt: new Date(),
         });
         await insertImmersionOffer(client, {
           siret: "78000403200029",
@@ -184,6 +189,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             rome: "A1101",
             establishmentPosition: farFromSearchedPosition,
             appellationCode: "12862",
+            createdAt: new Date(),
           }, // Position not matching
         );
 
@@ -225,6 +231,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         siret: notActiveSiret,
         isOpen: false,
         position: searchedPosition,
+        createdAt: new Date(),
       });
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
@@ -255,6 +262,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         siret: notSearchableSiret,
         isSearchable: false,
         position: searchedPosition,
+        createdAt: new Date(),
       });
 
       await Promise.all([
@@ -333,6 +341,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         nafCode: matchingNaf,
         numberEmployeesRange: matchingNumberOfEmployeeRange,
         fitForDisabledWorkers: true,
+        createdAt: new Date(),
       });
 
       await insertImmersionOffer(client, {
@@ -347,6 +356,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         establishmentPosition: searchedPosition,
         rome: notMatchingRome,
         appellationCode: "19540",
+        createdAt: new Date(),
       });
 
       // Establishment with offer with searched rome but oustide geographical area
@@ -355,6 +365,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         establishmentPosition: farFromSearchedPosition,
         rome: analysteEnGeomatiqueImmersionOffer.romeCode,
         appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
+        createdAt: new Date(),
       });
 
       // Act
@@ -403,6 +414,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       await insertEstablishment(client, {
         siret: closeSiret,
         position: searchedPosition,
+        createdAt: new Date(),
       });
       await insertEstablishment(client, {
         siret: farSiret,
@@ -410,6 +422,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           lon: searchedPosition.lon + 0.01,
           lat: searchedPosition.lat + 0.01,
         },
+        createdAt: new Date(),
       });
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
@@ -441,10 +454,12 @@ describe("PgEstablishmentAggregateRepository", () => {
         insertEstablishment(client, {
           siret: recentOfferSiret,
           position: searchedPosition,
+          createdAt: new Date(),
         }),
         insertEstablishment(client, {
           siret: oldOfferSiret,
           position: searchedPosition,
+          createdAt: new Date(),
         }),
       ]);
 
@@ -486,6 +501,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         establishmentPosition: searchedPosition,
         appellationCode: cartographeImmersionOffer.appellationCode,
         offerContactUid: contactUidOfOfferMatchingSearch,
+        createdAt: new Date(),
       });
 
       // With multiple contacts
@@ -520,6 +536,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         isOpen: true,
         fitForDisabledWorkers: false,
         position,
+        createdAt: new Date(),
       });
 
       // Act
@@ -562,6 +579,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         updatedAt: new Date("2020-04-14T12:00:00.000"),
         isOpen: true,
         position,
+        createdAt: new Date(),
       });
 
       // Act
@@ -769,6 +787,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Prepare
       await insertEstablishment(client, {
         siret,
+        createdAt: new Date(),
       });
       // Act and assert
       expect(
@@ -861,6 +880,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         [siretToRemove, siretToKeep].map((siret) =>
           insertEstablishment(client, {
             siret,
+            createdAt: new Date(),
           }),
         ),
       );
@@ -1309,6 +1329,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             isCommited: true,
             sourceProvider: "immersion-facile",
             voluntaryToImmersion: true,
+            createdAt: existingEstablishmentAggregate.establishment.createdAt,
             position: { lat: 8, lon: 30 },
             nafDto: { code: "8539B", nomenclature: "NAFRev3" },
             numberEmployeesRange: "100-199",
