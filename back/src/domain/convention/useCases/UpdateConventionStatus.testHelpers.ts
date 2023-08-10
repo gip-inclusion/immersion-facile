@@ -320,12 +320,22 @@ const makeTestAcceptsStatusUpdate =
           )}`,
         );
 
-      const payload: ConventionRequiresModificationPayload = {
-        convention: expectedConvention,
-        justification: updateStatusParams.statusJustification,
-        role,
-        modifierRole: updateStatusParams.modifierRole,
-      };
+      const payload: ConventionRequiresModificationPayload =
+        updateStatusParams.modifierRole === "validator" ||
+        updateStatusParams.modifierRole === "counsellor"
+          ? {
+              convention: expectedConvention,
+              justification: updateStatusParams.statusJustification,
+              role,
+              modifierRole: updateStatusParams.modifierRole,
+              agencyActorEmail: "agency-actor@gmail.com",
+            }
+          : {
+              convention: expectedConvention,
+              justification: updateStatusParams.statusJustification,
+              role,
+              modifierRole: updateStatusParams.modifierRole,
+            };
 
       await expectNewEvent(
         expectedDomainTopic,

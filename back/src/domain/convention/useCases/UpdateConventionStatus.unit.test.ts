@@ -2,9 +2,11 @@
 /* eslint-disable jest/consistent-test-it */
 
 import {
+  AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
   createConventionMagicLinkPayload,
+  expectPromiseToFailWith,
   expectPromiseToFailWithError,
   expectToEqual,
   signatoryRoles,
@@ -115,6 +117,55 @@ describe("UpdateConventionStatus", () => {
             modifierRole: "beneficiary",
           },
         }),
+      );
+    });
+
+    it("Throw when modifier role is counsellor or validator and that no mail adress were found", async () => {
+      const uow = createInMemoryUow();
+
+      const timeGateway = new CustomTimeGateway();
+
+      const createNewEvent = makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new TestUuidGenerator(),
+      });
+
+      const conventionRepository = uow.conventionRepository;
+      const uowPerformer = new InMemoryUowPerformer(uow);
+      const updateConventionStatus = new UpdateConventionStatus(
+        uowPerformer,
+        createNewEvent,
+        timeGateway,
+      );
+
+      const conventionId = "add5c20e-6dd2-45af-affe-927358004444";
+      const requesterRole = "counsellor";
+
+      const agency = new AgencyDtoBuilder().build();
+
+      const conventionBuilder = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .withId(conventionId)
+        .withAgencyId(agency.id)
+        .build();
+
+      await conventionRepository.save(conventionBuilder);
+
+      await expectPromiseToFailWith(
+        updateConventionStatus.execute(
+          {
+            status: "DRAFT",
+            statusJustification: "because",
+            conventionId,
+            modifierRole: "counsellor",
+          },
+          {
+            applicationId: conventionId,
+            role: requesterRole,
+            emailHash: "osef",
+          },
+        ),
+        `No agency found with id ${agency.id}`,
       );
     });
   });

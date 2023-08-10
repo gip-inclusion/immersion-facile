@@ -1,8 +1,19 @@
-import { ConventionDto, ModifierRole, Role } from "shared";
+import { AgencyModifierRole, ConventionDto, Role, SignatoryRole } from "shared";
 
-export type ConventionRequiresModificationPayload = {
+type ConventionRequireModificationCommon = {
   convention: ConventionDto;
   justification: string;
   role: Role;
-  modifierRole: ModifierRole;
 };
+export type AgencyActorRequestModificationPayload =
+  ConventionRequireModificationCommon & {
+    modifierRole: AgencyModifierRole;
+    agencyActorEmail: string;
+  };
+export type SignatoryRequestModificationPayload =
+  ConventionRequireModificationCommon & {
+    modifierRole: SignatoryRole;
+  };
+export type ConventionRequiresModificationPayload =
+  | AgencyActorRequestModificationPayload
+  | SignatoryRequestModificationPayload;

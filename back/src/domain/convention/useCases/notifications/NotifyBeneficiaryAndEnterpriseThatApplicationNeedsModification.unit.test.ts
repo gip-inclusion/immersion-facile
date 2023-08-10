@@ -3,7 +3,6 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   CreateConventionMagicLinkPayloadProperties,
-  expectPromiseToFailWith,
   expectToEqual,
   frontRoutes,
   ModifierRole,
@@ -24,6 +23,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { ConventionRequiresModificationPayload } from "../../../core/eventBus/eventPayload.dto";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
@@ -35,6 +35,7 @@ import {
 
 const beneficiaryCurrentEmployerEmail = "current@employer.com";
 const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
+const agencyActorEmail = "agency-actor@gmail.com";
 
 const convention = new ConventionDtoBuilder()
   .withBeneficiaryRepresentative({
@@ -102,7 +103,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
 
   describe("Right paths", () => {
     it.each<[Role, ModifierRole, string[]]>([
-      ["beneficiary", "counsellor", agency.counsellorEmails],
+      ["beneficiary", "counsellor", [agencyActorEmail]],
       [
 <<<<<<< HEAD
 =======
@@ -139,7 +140,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
       ["backOffice", [backOfficeEmail]],
 =======
       ["counsellor", "legal-representative", [beneficiaryRepresentativeEmail]],
-      ["validator", "validator", agency.validatorEmails],
+      ["validator", "validator", [agencyActorEmail]],
       ["backOffice", "beneficiary", [convention.signatories.beneficiary.email]],
 >>>>>>> 91c155dca (modify modification request in order to be able to send the notification to a specific actor back part)
     ])(
@@ -152,13 +153,15 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
           ]),
         );
         const justification = "Change required.";
-
-        await usecase.execute({
-          convention,
-          justification,
-          role,
-          modifierRole,
-        });
+        const requestModificationPayload: ConventionRequiresModificationPayload =
+          {
+            convention,
+            justification,
+            role,
+            modifierRole,
+            agencyActorEmail,
+          };
+        await usecase.execute(requestModificationPayload);
 
         const shortLinks = expectedRecipients.reduce<
           Partial<Record<ShortLinkId, AbsoluteUrl>>
@@ -212,43 +215,5 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         });
       },
     );
-  });
-
-  describe("Wrong paths", () => {
-    it("Agency without counsellors", async () => {
-      const role: ModifierRole = "counsellor";
-      const agencyWithoutCounsellors = new AgencyDtoBuilder(agency)
-        .withCounsellorEmails([])
-        .build();
-      uow.agencyRepository.setAgencies([agencyWithoutCounsellors]);
-
-      await expectPromiseToFailWith(
-        usecase.execute({
-          convention,
-          justification: "OSEF",
-          role,
-          modifierRole: role,
-        }),
-        `No actor with role ${role} for agency ${agencyWithoutCounsellors.id}`,
-      );
-    });
-
-    it("Agency without validators", async () => {
-      const role: ModifierRole = "validator";
-      const agencyWithoutValidators = new AgencyDtoBuilder(agency)
-        .withValidatorEmails([])
-        .build();
-      uow.agencyRepository.setAgencies([agencyWithoutValidators]);
-
-      await expectPromiseToFailWith(
-        usecase.execute({
-          convention,
-          justification: "OSEF",
-          role,
-          modifierRole: role,
-        }),
-        `No actor with role ${role} for agency ${agencyWithoutValidators.id}`,
-      );
-    });
   });
 });

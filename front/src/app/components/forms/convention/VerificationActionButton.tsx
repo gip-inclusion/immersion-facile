@@ -1,25 +1,15 @@
 import React from "react";
 import { createPortal } from "react-dom";
-// import { SubmitHandler, useForm } from "react-hook-form";
 import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
-// import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-// import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
-// import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-// import Select from "@codegouvfr/react-dsfr/SelectNext";
-// import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ConventionDto,
   ConventionStatus,
-  // ConventionStatusWithJustification,
   doesStatusNeedsJustification,
   domElementIds,
   Role,
-  // Signatories,
-  // SignatoryRole,
   UpdateConventionStatusRequestDto,
-  // updateConventionStatusRequestSchema,
 } from "shared";
 import { JustificationModalContent } from "./justificationModaleContent";
 
