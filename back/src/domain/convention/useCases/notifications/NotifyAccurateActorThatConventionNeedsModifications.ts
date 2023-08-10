@@ -23,7 +23,7 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 
 export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
 
-export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends TransactionalUseCase<ConventionRequiresModificationPayload> {
+export class NotifyAccurateActorThatConventionNeedsModifications extends TransactionalUseCase<ConventionRequiresModificationPayload> {
   protected inputSchema = conventionRequiresModificationPayloadSchema;
 
   constructor(

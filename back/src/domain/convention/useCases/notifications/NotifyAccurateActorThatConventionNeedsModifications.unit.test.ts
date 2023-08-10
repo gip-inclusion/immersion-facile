@@ -30,8 +30,8 @@ import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   // backOfficeEmail,
-  NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification,
-} from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+  NotifyAccurateActorThatConventionNeedsModifications,
+} from "./NotifyAccurateActorThatConventionNeedsModifications";
 
 const beneficiaryCurrentEmployerEmail = "current@employer.com";
 const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
@@ -65,7 +65,7 @@ const agency = new AgencyDtoBuilder()
   .build();
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {
-  let usecase: NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification;
+  let usecase: NotifyAccurateActorThatConventionNeedsModifications;
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
   let config: AppConfig;
@@ -90,15 +90,14 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
       timeGateway,
     );
 
-    usecase =
-      new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
-        new InMemoryUowPerformer(uow),
-        saveNotificationAndRelatedEvent,
-        fakeGenerateMagicLinkUrlFn,
-        timeGateway,
-        shortLinkIdGateway,
-        config,
-      );
+    usecase = new NotifyAccurateActorThatConventionNeedsModifications(
+      new InMemoryUowPerformer(uow),
+      saveNotificationAndRelatedEvent,
+      fakeGenerateMagicLinkUrlFn,
+      timeGateway,
+      shortLinkIdGateway,
+      config,
+    );
   });
 
   describe("Right paths", () => {
