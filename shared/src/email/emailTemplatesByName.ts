@@ -669,13 +669,14 @@ export const emailTemplatesByName =
         justification,
         magicLink,
         signature,
+        requesterName,
       }) => ({
         subject:
           internshipKind === "immersion"
             ? "Pour action : veuillez modifier cette demande d'immersion professionnelle"
             : "Pour action : mini Stage - veuillez modifier cette demande de mini stage",
         greetings: greetingsWithConventionId(conventionId),
-        content: `Vous avez fait une demande de modification concernant la demande ${
+        content: `Une demande de modification vous a été adressé par ${requesterName} concernant la demande ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
         } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}.
          

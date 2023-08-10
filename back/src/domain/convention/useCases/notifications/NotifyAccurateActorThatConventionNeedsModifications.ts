@@ -53,6 +53,13 @@ export class NotifyAccurateActorThatConventionNeedsModifications extends Transac
     const recipientOrError = recipientByModifierRole(payload, agency);
     if (recipientOrError instanceof Error) throw recipientOrError;
 
+    const requesterNameOrError = requesterNameByRole(
+      payload.role,
+      payload.convention,
+      agency,
+    );
+    if (requesterNameOrError instanceof Error) throw requesterNameOrError;
+
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: await this.#prepareEmail(
@@ -62,6 +69,7 @@ export class NotifyAccurateActorThatConventionNeedsModifications extends Transac
         uow,
         payload.justification,
         agency,
+        requesterNameOrError,
       ),
       followedIds: {
         conventionId: payload.convention.id,
@@ -78,6 +86,7 @@ export class NotifyAccurateActorThatConventionNeedsModifications extends Transac
     uow: UnitOfWork,
     justification: string,
     agency: AgencyDto,
+    requesterName: string,
   ): Promise<TemplatedEmail> {
     const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
       {
@@ -117,6 +126,7 @@ export class NotifyAccurateActorThatConventionNeedsModifications extends Transac
           frontRoutes.conventionStatusDashboard,
         ),
         agencyLogoUrl: agency.logoUrl,
+        requesterName,
       },
     };
   }
@@ -195,4 +205,25 @@ const recipientByModifierRole = (
     .otherwise(() => new Error(missingActorConventionErrorMessage));
 
   return strategy;
+};
+
+const requesterNameByRole = (
+  requesterRole: Role,
+  convention: ConventionDto,
+  agency: AgencyDto,
+): string | Error => {
+  const wrongRequesterUser = `Actor with role ${requesterRole} is not allowed to request a modification`;
+  const strategy: Record<Role, string | Error> = {
+    "beneficiary-current-employer": `${convention.signatories.beneficiaryCurrentEmployer?.firstName} ${convention.signatories.beneficiaryCurrentEmployer?.lastName} (l'employeur actuel du bénéficiaire)`,
+    "beneficiary-representative": `${convention.signatories.beneficiaryRepresentative?.firstName} ${convention.signatories.beneficiaryRepresentative?.lastName} (le représentant légal du bénéficiaire)`,
+    "legal-representative": `${convention.signatories.beneficiaryRepresentative?.firstName} ${convention.signatories.beneficiaryRepresentative?.lastName} (le représentant légal du bénéficiaire)`,
+    beneficiary: `${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName} (le bénéficiaire)`,
+    "establishment-representative": `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName} (le représentant légal de l'entreprise)`,
+    establishment: `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName} (le représentant légal de l'entreprise)`,
+    counsellor: agency.name,
+    validator: agency.name,
+    "establishment-tutor": new Error(wrongRequesterUser),
+    backOffice: "L'équipe Immerssion Facilité",
+  };
+  return strategy[requesterRole];
 };

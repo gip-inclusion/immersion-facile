@@ -101,50 +101,53 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   });
 
   describe("Right paths", () => {
-    it.each<[Role, ModifierRole, string[]]>([
-      ["beneficiary", "counsellor", [agencyActorEmail]],
+    it.each<[Role, ModifierRole, string[], string]>([
       [
-<<<<<<< HEAD
-=======
-        "establishment",
-        "beneficiary-representative",
-        [beneficiaryRepresentativeEmail],
+        "beneficiary",
+        "counsellor",
+        [agencyActorEmail],
+        `${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName} (le bénéficiaire)`,
       ],
       [
->>>>>>> 91c155dca (modify modification request in order to be able to send the notification to a specific actor back part)
         "establishment-representative",
-        "legal-representative",
+        "beneficiary-representative",
         [beneficiaryRepresentativeEmail],
+        `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName} (le représentant légal de l'entreprise)`,
+      ],
+      [
+        "establishment-representative",
+        "beneficiary-representative",
+        [beneficiaryRepresentativeEmail],
+        `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName} (le représentant légal de l'entreprise)`,
       ],
       [
         "beneficiary-current-employer",
         "beneficiary",
         [convention.signatories.beneficiary.email],
+        `${convention.signatories.beneficiaryCurrentEmployer?.firstName} ${convention.signatories.beneficiaryCurrentEmployer?.lastName} (l'employeur actuel du bénéficiaire)`,
       ],
       [
         "beneficiary-representative",
         "beneficiary-current-employer",
         [beneficiaryCurrentEmployerEmail],
+        `${convention.signatories.beneficiaryRepresentative?.firstName} ${convention.signatories.beneficiaryRepresentative?.lastName} (le représentant légal du bénéficiaire)`,
       ],
       [
-        "legal-representative",
-        "establishment",
-        [convention.signatories.establishmentRepresentative.email],
+        "counsellor",
+        "beneficiary-representative",
+        [beneficiaryRepresentativeEmail],
+        agency.name,
       ],
-<<<<<<< HEAD
-      ["beneficiary-current-employer", [beneficiaryCurrentEmployerEmail]],
-      ["beneficiary-representative", [beneficiaryRepresentativeEmail]],
-      ["counsellor", agency.counsellorEmails],
-      ["validator", agency.validatorEmails],
-      ["backOffice", [backOfficeEmail]],
-=======
-      ["counsellor", "legal-representative", [beneficiaryRepresentativeEmail]],
-      ["validator", "validator", [agencyActorEmail]],
-      ["backOffice", "beneficiary", [convention.signatories.beneficiary.email]],
->>>>>>> 91c155dca (modify modification request in order to be able to send the notification to a specific actor back part)
+      ["validator", "validator", [agencyActorEmail], agency.name],
+      [
+        "backOffice",
+        "beneficiary",
+        [convention.signatories.beneficiary.email],
+        "L'équipe Immerssion Facilité",
+      ],
     ])(
       "Notify %s that application needs modification.",
-      async (role, modifierRole, expectedRecipients) => {
+      async (role, modifierRole, expectedRecipients, requesterName) => {
         shortLinkIdGateway.addMoreShortLinkIds(
           expectedRecipients.flatMap((expectedRecipient) => [
             `shortLinkId_${expectedRecipient}_1`,
@@ -209,6 +212,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
               ),
               signature: agency.signature,
               agencyLogoUrl: agency.logoUrl,
+              requesterName,
             },
           })),
         });
