@@ -94,6 +94,7 @@ export type EmailParamsByEmailType = {
     justification: string;
     magicLink: string;
     signature: string;
+    requesterName: string;
   };
   CREATE_IMMERSION_ASSESSMENT: {
     agencyLogoUrl: AbsoluteUrl | undefined;

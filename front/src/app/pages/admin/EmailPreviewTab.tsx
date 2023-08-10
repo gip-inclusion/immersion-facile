@@ -369,6 +369,7 @@ export const defaultEmailValueByEmailKind: {
     internshipKind: "immersion",
     magicLink: "MAGIC_LINK",
     signature: "SIGNATURE",
+    requesterName: "REQUESTER_FIRST_NAME REQUESTER_LAST_NAME",
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     agencyLogoUrl: defaultEmailPreviewUrl,
