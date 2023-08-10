@@ -27,7 +27,7 @@ import {
   conventionMissingMessage,
   throwIfTransitionNotAllowed,
 } from "../entities/Convention";
-import { backOfficeEmail } from "./notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { backOfficeEmail } from "./notifications/NotifyAccurateActorThatConventionNeedsModifications";
 
 const domainTopicByTargetStatusMap: Record<
   ConventionStatus,

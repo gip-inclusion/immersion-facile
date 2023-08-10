@@ -20,11 +20,11 @@ import { CreateImmersionAssessment } from "../../../domain/convention/useCases/C
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
+import { NotifyAccurateActorThatConventionNeedsModifications } from "../../../domain/convention/useCases/notifications/NotifyAccurateActorThatConventionNeedsModifications";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled as NotifyAllActorsThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyAllActorsThatConventionIsRejected } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsRejected";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
 import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightChanged";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
@@ -395,8 +395,8 @@ export const createUseCases = (
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
-        new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
+      notifyAccurateActorThatConventionNeedsModifications:
+        new NotifyAccurateActorThatConventionNeedsModifications(
           uowPerformer,
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
