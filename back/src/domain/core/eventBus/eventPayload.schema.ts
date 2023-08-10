@@ -1,16 +1,36 @@
 import { z } from "zod";
 import {
-  allModifierRoles,
+  agencyModifierRoles,
   allRoles,
+  allSignatoryRoles,
   conventionSchema,
   zTrimmedString,
 } from "shared";
-import { ConventionRequiresModificationPayload } from "./eventPayload.dto";
+import {
+  AgencyActorRequestModificationPayload,
+  ConventionRequiresModificationPayload,
+  SignatoryRequestModificationPayload,
+} from "./eventPayload.dto";
 
-export const conventionRequiresModificationPayloadSchema: z.Schema<ConventionRequiresModificationPayload> =
+const agencyActorRequestConventionModificationPayloadSchema: z.Schema<AgencyActorRequestModificationPayload> =
   z.object({
     convention: conventionSchema,
     justification: zTrimmedString,
     role: z.enum(allRoles),
-    modifierRole: z.enum(allModifierRoles),
+    modifierRole: z.enum(agencyModifierRoles),
+    agencyActorEmail: zTrimmedString,
   });
+
+const signatoryRequestConventionModificationPayloadSchema: z.Schema<SignatoryRequestModificationPayload> =
+  z.object({
+    convention: conventionSchema,
+    justification: zTrimmedString,
+    role: z.enum(allRoles),
+    modifierRole: z.enum(allSignatoryRoles),
+  });
+
+export const conventionRequiresModificationPayloadSchema: z.Schema<ConventionRequiresModificationPayload> =
+  z.union([
+    agencyActorRequestConventionModificationPayloadSchema,
+    signatoryRequestConventionModificationPayloadSchema,
+  ]);

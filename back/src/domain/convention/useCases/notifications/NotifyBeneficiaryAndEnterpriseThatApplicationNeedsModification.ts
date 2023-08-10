@@ -1,9 +1,9 @@
+import { match, P } from "ts-pattern";
 import {
   AgencyDto,
   ConventionDto,
   CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
-  ModifierRole,
   Role,
   TemplatedEmail,
 } from "shared";
@@ -38,46 +38,37 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
   }
 
   protected async _execute(
-    {
-      justification,
-      role,
-      convention,
-      modifierRole,
-    }: ConventionRequiresModificationPayload,
+    payload: ConventionRequiresModificationPayload,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
+    const [agency] = await uow.agencyRepository.getByIds([
+      payload.convention.agencyId,
+    ]);
     if (!agency) {
       throw new Error(
-        `Unable to send mail. No agency config found for ${convention.agencyId}`,
+        `Unable to send mail. No agency config found for ${payload.convention.agencyId}`,
       );
     }
 
-    const recipientsOrError = recipientsByModifierRole(
-      modifierRole,
-      convention,
-      agency,
-    );
-    if (recipientsOrError instanceof Error) throw recipientsOrError;
+    const recipientOrError = recipientByModifierRole(payload, agency);
+    if (recipientOrError instanceof Error) throw recipientOrError;
 
-    for (const recipient of recipientsOrError) {
-      await this.saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: await this.#prepareEmail(
-          convention,
-          role,
-          recipient,
-          uow,
-          justification,
-          agency,
-        ),
-        followedIds: {
-          conventionId: convention.id,
-          agencyId: convention.agencyId,
-          establishmentSiret: convention.siret,
-        },
-      });
-    }
+    await this.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: await this.#prepareEmail(
+        payload.convention,
+        payload.role,
+        recipientOrError,
+        uow,
+        payload.justification,
+        agency,
+      ),
+      followedIds: {
+        conventionId: payload.convention.id,
+        agencyId: payload.convention.agencyId,
+        establishmentSiret: payload.convention.siret,
+      },
+    });
   }
 
   async #prepareEmail(
@@ -131,33 +122,77 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
   }
 }
 
-const recipientsByModifierRole = (
-  modifierRole: ModifierRole,
-  convention: ConventionDto,
+const recipientByModifierRole = (
+  payload: ConventionRequiresModificationPayload,
   agency: AgencyDto,
-): string[] | Error => {
-  const missingActorConventionErrorMessage = `No actor with role ${modifierRole} for convention ${convention.id}`;
-  const missingActorAgencyErrorMessage = `No actor with role ${modifierRole} for agency ${agency.id}`;
+): string | Error => {
+  const missingActorConventionErrorMessage = `No actor with role ${payload.modifierRole} for convention ${payload.convention.id}`;
+  const missingActorAgencyErrorMessage = `No actor with role ${payload.modifierRole} for agency ${agency.id}`;
 
-  const strategy: Record<ModifierRole, string | string[] | Error> = {
-    "beneficiary-current-employer":
-      convention.signatories.beneficiaryCurrentEmployer?.email ??
-      new Error(missingActorConventionErrorMessage),
-    "beneficiary-representative":
-      convention.signatories.beneficiaryRepresentative?.email ??
-      new Error(missingActorConventionErrorMessage),
-    "establishment-representative":
-      convention.signatories.establishmentRepresentative.email,
-    beneficiary: convention.signatories.beneficiary.email,
-    counsellor:
-      agency.counsellorEmails.length > 0
-        ? agency.counsellorEmails
-        : new Error(missingActorAgencyErrorMessage),
-    validator:
-      agency.validatorEmails.length > 0
-        ? agency.validatorEmails
-        : new Error(missingActorAgencyErrorMessage),
-  };
-  const result = strategy[modifierRole];
-  return Array.isArray(result) || result instanceof Error ? result : [result];
+  const strategy = match(payload)
+    .with(
+      { modifierRole: "beneficiary" },
+      () => payload.convention.signatories.beneficiary.email,
+    )
+    .with(
+      { modifierRole: "establishment-representative" },
+      () => payload.convention.signatories.establishmentRepresentative.email,
+    )
+    .with(
+      {
+        modifierRole: "beneficiary-current-employer",
+        convention: {
+          signatories: {
+            beneficiaryCurrentEmployer: P.select(
+              P.when(
+                (beneficiaryCurrentEmployer) =>
+                  beneficiaryCurrentEmployer !== undefined,
+              ),
+            ),
+          },
+        },
+      },
+      (beneficiaryCurrentEmployer) => beneficiaryCurrentEmployer.email,
+    )
+    .with(
+      {
+        modifierRole: "beneficiary-representative",
+        convention: {
+          signatories: {
+            beneficiaryRepresentative: P.select(
+              P.when(
+                (beneficiaryRepresentative) =>
+                  beneficiaryRepresentative !== undefined,
+              ),
+            ),
+          },
+        },
+      },
+      (beneficiaryRepresentative) => beneficiaryRepresentative.email,
+    )
+    .with(
+      {
+        modifierRole: "counsellor",
+        agencyActorEmail: P.select(
+          P.when((agencyActorEmail) => agencyActorEmail !== undefined),
+        ),
+      },
+      (agencyActorEmail) => agencyActorEmail,
+    )
+    .with(
+      {
+        modifierRole: "validator",
+        agencyActorEmail: P.select(
+          P.when((agencyActorEmail) => agencyActorEmail !== undefined),
+        ),
+      },
+      (agencyActorEmail) => agencyActorEmail,
+    )
+    .with(
+      { modifierRole: P.union("counsellor", "validator") },
+      () => new Error(missingActorAgencyErrorMessage),
+    )
+    .otherwise(() => new Error(missingActorConventionErrorMessage));
+
+  return strategy;
 };

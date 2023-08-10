@@ -2,6 +2,7 @@ import { Signatories } from "..";
 
 export type Role = (typeof allRoles)[number];
 export type SignatoryRole = (typeof allSignatoryRoles)[number];
+export type AgencyModifierRole = (typeof agencyModifierRoles)[number];
 export type ModifierRole = (typeof allModifierRoles)[number];
 export const allRoles = [
   "beneficiary",
@@ -23,11 +24,9 @@ export const allSignatoryRoles = [
   Required<Signatories>[keyof Required<Signatories>]["role"]
 >;
 
+export const agencyModifierRoles = ["counsellor", "validator"] as const;
+
 export const allModifierRoles = [
-  "beneficiary",
-  "beneficiary-representative",
-  "beneficiary-current-employer",
-  "establishment-representative",
-  "counsellor",
-  "validator",
+  ...allSignatoryRoles,
+  ...agencyModifierRoles,
 ] as const;

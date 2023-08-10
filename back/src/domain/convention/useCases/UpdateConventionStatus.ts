@@ -6,8 +6,8 @@ import {
   ConventionDtoBuilder,
   ConventionRelatedJwtPayload,
   ConventionStatus,
-  ModifierRole,
-  Role,
+  Email,
+  stringToMd5,
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
@@ -18,7 +18,7 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { conventionRequiresModificationPayloadSchema } from "../../core/eventBus/eventPayload.schema";
+import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
 import { DomainTopic } from "../../core/eventBus/events";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -27,6 +27,7 @@ import {
   conventionMissingMessage,
   throwIfTransitionNotAllowed,
 } from "../entities/Convention";
+import { backOfficeEmail } from "./notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
 const domainTopicByTargetStatusMap: Record<
   ConventionStatus,
@@ -100,9 +101,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ? params.statusJustification
         : undefined;
 
-    const modifierRole =
-      params.status === "DRAFT" ? params.modifierRole : undefined;
-
     const conventionBuilder = new ConventionDtoBuilder(originalConvention)
       .withStatus(params.status)
       .withDateValidation(
@@ -122,13 +120,29 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     const domainTopic = domainTopicByTargetStatusMap[params.status];
     if (domainTopic)
       await uow.outboxRepository.save({
-        ...this.#createEvent(
-          updatedConvention,
-          domainTopic,
-          role,
-          statusJustification,
-          modifierRole,
-        ),
+        ...(params.status === "DRAFT"
+          ? this.#createRequireModificationEvent(
+              params.modifierRole === "validator" ||
+                params.modifierRole === "counsellor"
+                ? {
+                    role,
+                    convention: updatedConvention,
+                    justification: params.statusJustification,
+                    modifierRole: params.modifierRole,
+                    agencyActorEmail: await this.#getAgencyActorEmail(
+                      uow,
+                      payload,
+                      originalConvention,
+                    ),
+                  }
+                : {
+                    role,
+                    convention: updatedConvention,
+                    justification: params.statusJustification,
+                    modifierRole: params.modifierRole,
+                  },
+            )
+          : this.#createEvent(updatedConvention, domainTopic)),
         occurredAt: conventionUpdatedAt,
       });
 
@@ -155,27 +169,85 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     return userAgencyRights.role;
   }
 
-  #createEvent(
-    updatedDto: ConventionDto,
-    domainTopic: DomainTopic,
-    requesterRole: Role,
-    justification?: string,
-    modifierRole?: ModifierRole,
-  ) {
-    if (domainTopic === "ImmersionApplicationRequiresModification")
-      return this.createNewEvent({
-        topic: domainTopic,
-        payload: conventionRequiresModificationPayloadSchema.parse({
-          convention: updatedDto,
-          justification: justification ?? "",
-          role: requesterRole,
-          modifierRole,
-        }),
-      });
+  async #agencyEmailFromUserIdAndAgencyId(
+    uow: UnitOfWork,
+    userId: AuthenticatedUserId,
+    agencyId: AgencyId,
+  ): Promise<string> {
+    const user = await uow.inclusionConnectedUserRepository.getById(userId);
+    if (!user)
+      throw new NotFoundError(
+        `User '${userId}' not found on inclusion connected user repository.`,
+      );
+    const userAgencyRights = user.agencyRights.find(
+      (agencyRight) => agencyRight.agency.id === agencyId,
+    );
+    if (!userAgencyRights)
+      throw new ForbiddenError(
+        `User '${userId}' has no rôle on agency '${agencyId}'.`,
+      );
+    return user.email;
+  }
 
+  #createEvent(updatedDto: ConventionDto, domainTopic: DomainTopic) {
     return this.createNewEvent({
       topic: domainTopic,
       payload: updatedDto,
     });
   }
+
+  #createRequireModificationEvent(
+    payload: ConventionRequiresModificationPayload,
+  ) {
+    return this.createNewEvent({
+      topic: "ImmersionApplicationRequiresModification",
+      payload,
+    });
+  }
+
+  #getAgencyActorEmail = async (
+    uow: UnitOfWork,
+    payload: UpdateConventionStatusSupportedJwtPayload,
+    originalConvention: ConventionDto,
+  ): Promise<string> => {
+    const getEmailFromEmailHash = async (
+      agencyId: AgencyId,
+      emailHash: string,
+    ): Promise<Email> => {
+      const agencies = await uow.agencyRepository.getByIds([agencyId]);
+      const agency = agencies.at(0);
+      if (!agency)
+        throw new NotFoundError(`No agency found with id ${agencyId}`);
+
+      const agencyEmails = [
+        ...agency.validatorEmails,
+        ...agency.counsellorEmails,
+      ];
+
+      const email = agencyEmails.find(
+        (agencyEmail) => stringToMd5(agencyEmail) === emailHash,
+      );
+
+      if (!email)
+        throw new NotFoundError(
+          `Mail not found for agency with id: ${agencyId} on agency repository.`,
+        );
+
+      return email;
+    };
+
+    const email =
+      // eslint-disable-next-line no-nested-ternary
+      "emailHash" in payload
+        ? getEmailFromEmailHash(originalConvention.agencyId, payload.emailHash)
+        : "userId" in payload
+        ? await this.#agencyEmailFromUserIdAndAgencyId(
+            uow,
+            payload.userId,
+            originalConvention.agencyId,
+          )
+        : backOfficeEmail;
+
+    return email;
+  };
 }
