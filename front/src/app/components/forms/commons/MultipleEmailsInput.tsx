@@ -71,7 +71,7 @@ type InputContainerProps = {
   onInputChange: OnInputChange;
   label?: string;
   placeholder?: string;
-  description?: string;
+  description?: React.ReactNode;
   validationSchema?: z.ZodSchema<unknown>;
   disabled?: boolean;
 };

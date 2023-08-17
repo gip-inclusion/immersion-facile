@@ -1,5 +1,5 @@
 import React from "react";
-import { ConventionReadDto, Role } from "shared";
+import { ConventionReadDto, npsFormIds, Role } from "shared";
 import { NPSForm } from "react-design-system";
 
 type NpsSectionProps = {
@@ -19,6 +19,8 @@ export const NpsSection = ({
     <>
       {role !== "backOffice" && npsShowStatuses.includes(convention.status) && (
         <NPSForm
+          mode="embed"
+          formId={npsFormIds.agency}
           conventionInfos={{
             id: convention.id,
             role,
