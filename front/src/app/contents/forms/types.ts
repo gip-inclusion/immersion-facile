@@ -2,7 +2,7 @@ import { AutocompleteAttributeValue } from "react-design-system";
 
 export type FormFieldAttributesForContent = {
   label: string;
-  hintText?: string;
+  hintText?: React.ReactNode;
   placeholder?: string;
   id: string;
   required?: boolean;
