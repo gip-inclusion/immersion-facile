@@ -4,30 +4,34 @@ import { UseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";
 
 export class GetDashboardUrl extends UseCase<GetDashboardParams, AbsoluteUrl> {
-  inputSchema = getDashboardParams;
+  protected inputSchema = getDashboardParams;
 
-  constructor(
-    private dashboardGateway: DashboardGateway,
-    private timeGateway: TimeGateway,
-  ) {
+  readonly #dashboardGateway: DashboardGateway;
+
+  readonly #timeGateway: TimeGateway;
+
+  constructor(dashboardGateway: DashboardGateway, timeGateway: TimeGateway) {
     super();
+
+    this.#dashboardGateway = dashboardGateway;
+    this.#timeGateway = timeGateway;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public async _execute(params: GetDashboardParams): Promise<AbsoluteUrl> {
+  protected async _execute(params: GetDashboardParams): Promise<AbsoluteUrl> {
     if (params.name === "agency")
-      return this.dashboardGateway.getAgencyUserUrl(
+      return this.#dashboardGateway.getAgencyUserUrl(
         [params.agencyId],
-        this.timeGateway.now(),
+        this.#timeGateway.now(),
       );
     if (params.name === "conventionStatus")
-      return this.dashboardGateway.getConventionStatusUrl(
+      return this.#dashboardGateway.getConventionStatusUrl(
         params.conventionId,
-        this.timeGateway.now(),
+        this.#timeGateway.now(),
       );
-    return this.dashboardGateway.getDashboardUrl(
+    return this.#dashboardGateway.getDashboardUrl(
       params.name,
-      this.timeGateway.now(),
+      this.#timeGateway.now(),
     );
   }
 }

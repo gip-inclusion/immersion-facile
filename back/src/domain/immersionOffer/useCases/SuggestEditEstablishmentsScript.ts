@@ -17,23 +17,33 @@ type Report = {
 };
 
 export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
-  inputSchema = z.void();
+  protected inputSchema = z.void();
+
+  readonly #uowPerformer: UnitOfWorkPerformer;
+
+  readonly #suggestEditEstablishment: SuggestEditEstablishment;
+
+  readonly #timeGateway: TimeGateway;
 
   constructor(
-    private uowPerformer: UnitOfWorkPerformer,
-    private suggestEditEstablishment: SuggestEditEstablishment,
-    private timeGateway: TimeGateway,
+    uowPerformer: UnitOfWorkPerformer,
+    suggestEditEstablishment: SuggestEditEstablishment,
+    timeGateway: TimeGateway,
   ) {
     super();
+
+    this.#suggestEditEstablishment = suggestEditEstablishment;
+    this.#timeGateway = timeGateway;
+    this.#uowPerformer = uowPerformer;
   }
 
   protected async _execute() {
     logger.info(
       `[triggerSuggestEditFormEstablishmentEvery6Months] Script started.`,
     );
-    const since = subMonths(this.timeGateway.now(), NB_MONTHS_BEFORE_SUGGEST);
+    const since = subMonths(this.#timeGateway.now(), NB_MONTHS_BEFORE_SUGGEST);
 
-    const siretsToContact = await this.uowPerformer.perform(async (uow) =>
+    const siretsToContact = await this.#uowPerformer.perform(async (uow) =>
       uow.establishmentAggregateRepository.getSiretOfEstablishmentsToSuggestUpdate(
         since,
       ),
@@ -54,7 +64,7 @@ export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
 
     await Promise.all(
       siretsToContact.map(async (siret) => {
-        await this.suggestEditEstablishment
+        await this.#suggestEditEstablishment
           .execute(siret)
           .catch((error: any) => {
             errors[siret] = error;

@@ -78,7 +78,11 @@ const emptyFormEstablishment: FormEstablishmentDto = {
 export class FormEstablishmentDtoBuilder
   implements Builder<FormEstablishmentDto>
 {
-  private constructor(private dto: FormEstablishmentDto) {}
+  #dto: FormEstablishmentDto;
+
+  constructor(dto: FormEstablishmentDto) {
+    this.#dto = dto;
+  }
 
   public static valid() {
     return new FormEstablishmentDtoBuilder(defaultValidFormEstablishment);
@@ -89,59 +93,59 @@ export class FormEstablishmentDtoBuilder
   }
 
   public build() {
-    return this.dto;
+    return this.#dto;
   }
 
   public buildCsvRow(): EstablishmentCSVRow {
-    return FormEstablishmentToEstablishmentCsvRow(this.dto);
+    return FormEstablishmentToEstablishmentCsvRow(this.#dto);
   }
 
   public withAppellations(appellations: AppellationAndRomeDto[]) {
     return new FormEstablishmentDtoBuilder({
-      ...this.dto,
+      ...this.#dto,
       appellations,
     });
   }
 
   public withBusinessAddress(businessAddress: string) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, businessAddress });
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, businessAddress });
   }
 
   public withBusinessContact(businessContact: BusinessContactDto) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, businessContact });
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, businessContact });
   }
 
   public withBusinessContactEmail(email: string) {
     return new FormEstablishmentDtoBuilder({
-      ...this.dto,
-      businessContact: { ...this.dto.businessContact, email },
+      ...this.#dto,
+      businessContact: { ...this.#dto.businessContact, email },
     });
   }
 
   public withBusinessName(businessName: string) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, businessName });
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, businessName });
   }
 
   public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
     return new FormEstablishmentDtoBuilder({
-      ...this.dto,
+      ...this.#dto,
       fitForDisabledWorkers,
     });
   }
 
   public withMaxContactsPerWeek(maxContactsPerWeek: number) {
     return new FormEstablishmentDtoBuilder({
-      ...this.dto,
+      ...this.#dto,
       maxContactsPerWeek,
     });
   }
 
   public withSiret(siret: SiretDto) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, siret });
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, siret });
   }
 
   public withSource(source: FormEstablishmentSource) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, source });
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, source });
   }
 }
 

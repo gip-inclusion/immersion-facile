@@ -14,7 +14,7 @@ export class AppellationSearch extends TransactionalUseCase<
   string,
   AppellationMatchDto[]
 > {
-  inputSchema = zTrimmedString;
+  protected inputSchema = zTrimmedString;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

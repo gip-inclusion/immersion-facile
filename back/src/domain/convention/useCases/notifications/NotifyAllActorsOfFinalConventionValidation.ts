@@ -22,17 +22,33 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 
 export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
-  inputSchema = conventionSchema;
+  protected inputSchema = conventionSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
+  readonly #config: AppConfig;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private readonly timeGateway: TimeGateway,
-    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    private readonly config: AppConfig,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    timeGateway: TimeGateway,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    config: AppConfig,
   ) {
     super(uowPerformer);
+
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#timeGateway = timeGateway;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
+    this.#config = config;
   }
 
   public async _execute(
@@ -45,7 +61,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       throw new NotFoundError(
         `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
@@ -65,7 +81,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
             ? [convention.establishmentTutor.email]
             : []),
         ]),
-        params: await this.getValidatedConventionFinalConfirmationParams(
+        params: await this.#getValidatedConventionFinalConfirmationParams(
           agency,
           convention,
           uow,
@@ -79,7 +95,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
     });
   }
 
-  private async getValidatedConventionFinalConfirmationParams(
+  async #getValidatedConventionFinalConfirmationParams(
     agency: AgencyDto,
     convention: ConventionDto,
     uow: UnitOfWork,
@@ -92,13 +108,13 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         // role and email should not be valid
         role: beneficiary.role,
         email: beneficiary.email,
-        now: this.timeGateway.now(),
-        exp: this.timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+        now: this.#timeGateway.now(),
+        exp: this.#timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
       },
       uow,
-      config: this.config,
-      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      config: this.#config,
+      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
     });
 
     return {

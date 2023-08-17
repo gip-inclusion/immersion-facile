@@ -20,13 +20,16 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
   void,
   InclusionConnectDomainJwtPayload
 > {
-  inputSchema = agencyIdsSchema;
+  protected inputSchema = agencyIdsSchema;
+
+  #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(
@@ -69,7 +72,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
       role: "toReview",
     }));
 
-    const event = this.createNewEvent({
+    const event = this.#createNewEvent({
       topic: "AgencyRegisteredToInclusionConnectedUser",
       payload: { userId: user.id, agencyIds },
     });

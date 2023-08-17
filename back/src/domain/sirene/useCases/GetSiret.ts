@@ -11,15 +11,18 @@ export class GetSiret extends UseCase<
   GetSiretRequestDto,
   SiretEstablishmentDto
 > {
-  inputSchema = getSiretRequestSchema;
+  protected inputSchema = getSiretRequestSchema;
 
-  constructor(private readonly siretGateway: SiretGateway) {
+  readonly #siretGateway: SiretGateway;
+
+  constructor(siretGateway: SiretGateway) {
     super();
+    this.#siretGateway = siretGateway;
   }
 
   public async _execute(
     params: GetSiretRequestDto,
   ): Promise<SiretEstablishmentDto> {
-    return getSiretEstablishmentFromApi(params, this.siretGateway);
+    return getSiretEstablishmentFromApi(params, this.#siretGateway);
   }
 }

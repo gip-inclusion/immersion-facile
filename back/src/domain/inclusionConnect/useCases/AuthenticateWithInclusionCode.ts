@@ -25,17 +25,33 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   AuthenticateWithInclusionCodeConnectParams,
   ConnectedRedirectUrl
 > {
-  inputSchema = authenticateWithInclusionCodeSchema;
+  protected inputSchema = authenticateWithInclusionCodeSchema;
+
+  readonly #createNewEvent: CreateNewEvent;
+
+  readonly #inclusionConnectGateway: InclusionConnectGateway;
+
+  readonly #uuidGenerator: UuidGenerator;
+
+  readonly #generateAuthenticatedUserJwt: GenerateInclusionConnectJwt;
+
+  readonly #immersionFacileBaseUrl: AbsoluteUrl;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
-    private inclusionConnectGateway: InclusionConnectGateway,
-    private uuidGenerator: UuidGenerator,
-    private generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
-    private immersionFacileBaseUrl: AbsoluteUrl,
+    createNewEvent: CreateNewEvent,
+    inclusionConnectGateway: InclusionConnectGateway,
+    uuidGenerator: UuidGenerator,
+    generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
+    immersionFacileBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
+
+    this.#createNewEvent = createNewEvent;
+    this.#inclusionConnectGateway = inclusionConnectGateway;
+    this.#uuidGenerator = uuidGenerator;
+    this.#generateAuthenticatedUserJwt = generateAuthenticatedUserJwt;
+    this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
   }
 
   protected async _execute(
@@ -47,13 +63,13 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       "inclusionConnect",
     );
     if (existingOngoingOAuth)
-      return this.onOngoingOAuth(params, uow, existingOngoingOAuth);
+      return this.#onOngoingOAuth(params, uow, existingOngoingOAuth);
     throw new ForbiddenError(
       `No ongoing OAuth with provided state : ${params.state}`,
     );
   }
 
-  private makeAuthenticatedUser(
+  #makeAuthenticatedUser(
     userId: string,
     jwtPayload: InclusionConnectIdTokenPayload,
   ): AuthenticatedUser {
@@ -65,12 +81,12 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     };
   }
 
-  private async onOngoingOAuth(
+  async #onOngoingOAuth(
     params: AuthenticateWithInclusionCodeConnectParams,
     uow: UnitOfWork,
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
-    const response = await this.inclusionConnectGateway.getAccessToken(
+    const response = await this.#inclusionConnectGateway.getAccessToken(
       params.code,
     );
     const jwtPayload =
@@ -86,7 +102,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
     const newOrUpdatedAuthenticatedUser: AuthenticatedUser = {
       ...existingAuthenticatedUser,
-      ...this.makeAuthenticatedUser(this.uuidGenerator.new(), jwtPayload),
+      ...this.#makeAuthenticatedUser(this.#uuidGenerator.new(), jwtPayload),
       ...(existingAuthenticatedUser && {
         email: existingAuthenticatedUser.email,
         id: existingAuthenticatedUser.id,
@@ -104,7 +120,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       uow.ongoingOAuthRepository.save(ongoingOAuth),
       uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser),
       uow.outboxRepository.save(
-        this.createNewEvent({
+        this.#createNewEvent({
           topic: "UserAuthenticatedSuccessfully",
           payload: {
             userId: newOrUpdatedAuthenticatedUser.id,
@@ -114,7 +130,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ),
     ]);
 
-    const token = this.generateAuthenticatedUserJwt(
+    const token = this.#generateAuthenticatedUserJwt(
       {
         userId: newOrUpdatedAuthenticatedUser.id,
         version: currentJwtVersions.inclusion,
@@ -122,7 +138,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       response.expires_in * 60,
     );
 
-    return `${this.immersionFacileBaseUrl}/${
+    return `${this.#immersionFacileBaseUrl}/${
       frontRoutes.agencyDashboard
     }?${queryParamsAsString<AuthenticatedUserQueryParams>({
       token,

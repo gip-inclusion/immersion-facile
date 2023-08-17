@@ -20,7 +20,7 @@ export class PgShortLinkRepository
     super(client);
   }
 
-  async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
+  public async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
     logger.info({ shortLinkId }, "pgShortLinkRepositorySaveTotal");
 
     return this.client

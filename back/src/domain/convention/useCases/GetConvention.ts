@@ -19,18 +19,18 @@ export class GetConvention extends TransactionalUseCase<
   ConventionReadDto,
   ConventionRelatedJwtPayload
 > {
-  inputSchema = withConventionIdSchema;
+  protected inputSchema = withConventionIdSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
-  public async _execute(
+  protected async _execute(
     { conventionId }: WithConventionId,
     uow: UnitOfWork,
     authPayload?: ConventionRelatedJwtPayload,
   ): Promise<ConventionReadDto> {
-    const isInclusionConnectPayload = this.isInclusionConnectPayload(
+    const isInclusionConnectPayload = this.#isInclusionConnectPayload(
       authPayload,
       conventionId,
     );
@@ -61,7 +61,7 @@ export class GetConvention extends TransactionalUseCase<
     return convention;
   }
 
-  private isInclusionConnectPayload(
+  #isInclusionConnectPayload(
     authPayload: ConventionRelatedJwtPayload | undefined,
     conventionId: ConventionId,
   ): authPayload is InclusionConnectJwtPayload {

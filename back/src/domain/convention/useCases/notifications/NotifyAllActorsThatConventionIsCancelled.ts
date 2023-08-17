@@ -8,16 +8,19 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 import { getAllConventionRecipientsEmail } from "../../entities/Convention";
 
 export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCase<ConventionDto> {
-  inputSchema = conventionSchema;
+  protected inputSchema = conventionSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
-  public async _execute(
+  protected async _execute(
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
@@ -31,7 +34,7 @@ export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCa
 
     const recipients = getAllConventionRecipientsEmail(convention, agency);
 
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "CANCELLED_CONVENTION_NOTIFICATION",

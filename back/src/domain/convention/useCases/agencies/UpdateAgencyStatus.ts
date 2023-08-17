@@ -10,13 +10,16 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyRequestDto,
   void
 > {
-  inputSchema = updateAgencyRequestSchema;
+  protected inputSchema = updateAgencyRequestSchema;
+
+  #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
   }
 
   public async _execute(
@@ -28,7 +31,7 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
       const [agency] = await uow.agencyRepository.getByIds([id]);
       if (agency)
         await uow.outboxRepository.save(
-          this.createNewEvent({
+          this.#createNewEvent({
             topic: "AgencyActivated",
             payload: { agency },
           }),

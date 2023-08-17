@@ -20,45 +20,50 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
   string,
   AbsoluteUrl
 > {
-  inputSchema = z.string();
+  protected inputSchema = z.string();
+
+  readonly #peConnectGateway: PeConnectGateway;
+
+  readonly #baseUrlForRedirect: AbsoluteUrl;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private peConnectGateway: PeConnectGateway,
-    private baseUrlForRedirect: AbsoluteUrl,
+    peConnectGateway: PeConnectGateway,
+    baseUrlForRedirect: AbsoluteUrl,
   ) {
     super(uowPerformer);
+
+    this.#baseUrlForRedirect = baseUrlForRedirect;
+    this.#peConnectGateway = peConnectGateway;
   }
 
   protected async _execute(
     authorizationCode: string,
     uow: UnitOfWork,
   ): Promise<AbsoluteUrl> {
-    const accessToken = await this.peConnectGateway.getAccessToken(
+    const accessToken = await this.#peConnectGateway.getAccessToken(
       authorizationCode,
     );
     return accessToken
-      ? this.onAccessToken(accessToken, uow)
-      : this.makeRedirectUrl({
+      ? this.#onAccessToken(accessToken, uow)
+      : this.#makeRedirectUrl({
           fedIdProvider: "peConnect",
           fedId: authFailed,
         });
   }
 
-  private makeRedirectUrl(
-    fields: Partial<ConventionPeConnectFields>,
-  ): AbsoluteUrl {
-    return `${this.baseUrlForRedirect}/${
+  #makeRedirectUrl(fields: Partial<ConventionPeConnectFields>): AbsoluteUrl {
+    return `${this.#baseUrlForRedirect}/${
       frontRoutes.conventionImmersionRoute
     }?${queryParamsAsString<Partial<ConventionPeConnectFields>>(fields)}`;
   }
 
-  private async onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
-    const userAndAdvisors = await this.peConnectGateway.getUserAndAdvisors(
+  async #onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
+    const userAndAdvisors = await this.#peConnectGateway.getUserAndAdvisors(
       accessToken,
     );
     if (!userAndAdvisors)
-      return this.makeRedirectUrl({
+      return this.#makeRedirectUrl({
         fedIdProvider: "peConnect",
         fedId: authFailed,
       });
@@ -74,6 +79,6 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
         peUserAndAdvisor,
       );
 
-    return this.makeRedirectUrl(toPartialConventionDtoWithPeIdentity(user));
+    return this.#makeRedirectUrl(toPartialConventionDtoWithPeIdentity(user));
   }
 }

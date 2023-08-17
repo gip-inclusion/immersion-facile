@@ -7,7 +7,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
-  inputSchema = zTrimmedString;
+  protected inputSchema = zTrimmedString;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

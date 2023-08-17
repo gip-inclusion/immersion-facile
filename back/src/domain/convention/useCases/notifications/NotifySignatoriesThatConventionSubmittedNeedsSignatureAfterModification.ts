@@ -27,15 +27,31 @@ export const NO_JUSTIFICATION = "Aucune justification trouvée.";
 export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification extends TransactionalUseCase<ConventionDto> {
   protected inputSchema = conventionSchema;
 
+  readonly #timeGateway: TimeGateway;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
+  readonly #config: AppConfig;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly timeGateway: TimeGateway,
-    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    private readonly config: AppConfig,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    timeGateway: TimeGateway,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    config: AppConfig,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
   ) {
     super(uowPerformer);
+
+    this.#config = config;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
@@ -51,9 +67,9 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
       values(convention.signatories)
         .filter(filterNotFalsy)
         .map(async (signatory) =>
-          this.saveNotificationAndRelatedEvent(uow, {
+          this.#saveNotificationAndRelatedEvent(uow, {
             kind: "email",
-            templatedContent: await this.makeEmail(
+            templatedContent: await this.#makeEmail(
               signatory,
               convention,
               agency,
@@ -69,7 +85,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
     );
   }
 
-  private async makeEmail(
+  async #makeEmail(
     signatory: Signatory,
     convention: ConventionDto,
     agency: AgencyDto,
@@ -89,12 +105,12 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
             id: convention.id,
             role: signatory.role,
             email: signatory.email,
-            now: this.timeGateway.now(),
+            now: this.#timeGateway.now(),
           },
           uow,
-          config: this.config,
-          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+          config: this.#config,
+          generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+          shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
         })(frontRoutes.conventionToSign),
         justification: convention.statusJustification ?? NO_JUSTIFICATION,
         signatoryFirstName: signatory.firstName,

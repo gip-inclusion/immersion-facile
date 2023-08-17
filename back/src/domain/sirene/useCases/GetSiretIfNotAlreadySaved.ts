@@ -13,13 +13,14 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,
   SiretEstablishmentDto
 > {
-  inputSchema = getSiretRequestSchema;
+  protected inputSchema = getSiretRequestSchema;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private readonly siretGateway: SiretGateway,
-  ) {
+  readonly #siretGateway: SiretGateway;
+
+  constructor(uowPerformer: UnitOfWorkPerformer, siretGateway: SiretGateway) {
     super(uowPerformer);
+
+    this.#siretGateway = siretGateway;
   }
 
   public async _execute(
@@ -38,6 +39,6 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
       );
     }
 
-    return getSiretEstablishmentFromApi(params, this.siretGateway);
+    return getSiretEstablishmentFromApi(params, this.#siretGateway);
   }
 }

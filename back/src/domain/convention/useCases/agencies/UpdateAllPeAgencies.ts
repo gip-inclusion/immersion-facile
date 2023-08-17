@@ -33,28 +33,40 @@ const counts = {
 export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
   protected inputSchema = z.void();
 
+  readonly #referencielAgencesPe: PeAgenciesReferential;
+
+  readonly #adresseGateway: AddressGateway;
+
+  readonly #uuidGenerator: UuidGenerator;
+
+  readonly #logger: AppLogger;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private referencielAgencesPe: PeAgenciesReferential,
-    private adresseAPI: AddressGateway,
-    private uuid: UuidGenerator,
-    private logger: AppLogger,
+    referencielAgencesPe: PeAgenciesReferential,
+    adresseGateway: AddressGateway,
+    uuidGenerator: UuidGenerator,
+    logger: AppLogger,
   ) {
     super(uowPerformer);
+    this.#referencielAgencesPe = referencielAgencesPe;
+    this.#adresseGateway = adresseGateway;
+    this.#uuidGenerator = uuidGenerator;
+    this.#logger = logger;
   }
 
-  async _execute(_: void, uow: UnitOfWork): Promise<void> {
+  protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
     const start = new Date();
     const peReferentialAgencies =
-      await this.referencielAgencesPe.getPeAgencies();
+      await this.#referencielAgencesPe.getPeAgencies();
 
-    this.logger.info(
+    this.#logger.info(
       "Starting to process ",
       peReferentialAgencies.length,
       " agencies",
     );
 
-    this.logger.info(
+    this.#logger.info(
       "Total number of active agencies in DB before script : ",
       (await uow.agencyRepository.getAgencies({})).length,
     );
@@ -63,7 +75,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       counts.total++;
 
       if (!peReferentialAgency.contact?.email) {
-        this.logger.warn("No email for ", peReferentialAgency.libelleEtendu);
+        this.#logger.warn("No email for ", peReferentialAgency.libelleEtendu);
         counts.hasNoEmail++;
         continue;
       }
@@ -86,18 +98,19 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
 
       switch (matchedNearbyAgencies.length) {
         case 0: {
-          const geocodedAddress = await this.adresseAPI.getAddressFromPosition({
-            lat: peReferentialAgency.adressePrincipale.gpsLat,
-            lon: peReferentialAgency.adressePrincipale.gpsLon,
-          });
+          const geocodedAddress =
+            await this.#adresseGateway.getAddressFromPosition({
+              lat: peReferentialAgency.adressePrincipale.gpsLat,
+              lon: peReferentialAgency.adressePrincipale.gpsLon,
+            });
           if (!geocodedAddress) {
-            this.logger.error(
+            this.#logger.error(
               `No address found for agency : ${peReferentialAgency.libelle} | siret: ${peReferentialAgency.siret} | codeSafir: ${peReferentialAgency.codeSafir}`,
             );
             continue;
           }
 
-          const newAgency = this.convertToAgency(
+          const newAgency = this.#convertToAgency(
             peReferentialAgency,
             geocodedAddress,
           );
@@ -115,10 +128,10 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
         }
 
         default: {
-          this.logger.warn(
+          this.#logger.warn(
             `${peReferentialAgency.libelleEtendu} has ${matchedNearbyAgencies.length} agencies matching`,
           );
-          this.logger.info({
+          this.#logger.info({
             peReferentialAgency,
             matchedNearbyAgencies,
           });
@@ -131,18 +144,18 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
     const finish = new Date();
 
     const totalDurationInSeconds = (finish.getTime() - start.getTime()) / 1000;
-    this.logger.info(
+    this.#logger.info(
       `Finished in ${totalDurationInSeconds} seconds : `,
       counts,
     );
   }
 
-  private convertToAgency(
+  #convertToAgency(
     peReferentialAgency: PeAgencyFromReferenciel,
     geocodedAddress: AddressDto,
   ): AgencyDto {
     return {
-      id: this.uuid.new(),
+      id: this.#uuidGenerator.new(),
       name: peReferentialAgency.libelleEtendu,
       counsellorEmails: [],
       validatorEmails: peReferentialAgency.contact?.email

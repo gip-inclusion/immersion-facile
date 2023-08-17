@@ -18,29 +18,36 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
   void,
   ResyncOldConventionToPeReport
 > {
-  private broadcastToPeUsecase: BroadcastToPoleEmploiOnConventionUpdates;
-
   protected override inputSchema = z.void();
 
-  private report: ResyncOldConventionToPeReport = {
+  readonly #broadcastToPeUsecase: BroadcastToPoleEmploiOnConventionUpdates;
+
+  #report: ResyncOldConventionToPeReport = {
     errors: {},
     skips: {},
     success: 0,
   };
 
+  readonly #timeGateway: TimeGateway;
+
+  readonly #limit: number;
+
   constructor(
-    private uowPerform: UnitOfWorkPerformer,
-    private poleEmploiGateway: PoleEmploiGateway,
-    private timeGateway: TimeGateway,
-    private limit: number,
+    uowPerform: UnitOfWorkPerformer,
+    poleEmploiGateway: PoleEmploiGateway,
+    timeGateway: TimeGateway,
+    limit: number,
   ) {
     super(uowPerform);
-    this.broadcastToPeUsecase = new BroadcastToPoleEmploiOnConventionUpdates(
-      this.uowPerform,
-      this.poleEmploiGateway,
-      this.timeGateway,
+    this.#broadcastToPeUsecase = new BroadcastToPoleEmploiOnConventionUpdates(
+      uowPerform,
+      poleEmploiGateway,
+      timeGateway,
       { resyncMode: true },
     );
+
+    this.#timeGateway = timeGateway;
+    this.#limit = limit;
   }
 
   public async _execute(
@@ -48,46 +55,46 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<ResyncOldConventionToPeReport> {
     const conventionsToSync =
-      await uow.conventionsToSyncRepository.getToProcessOrError(this.limit);
+      await uow.conventionsToSyncRepository.getToProcessOrError(this.#limit);
     await Promise.all(
       conventionsToSync.map((conventionToSync) =>
-        this.handleConventionToSync(uow, conventionToSync.id),
+        this.#handleConventionToSync(uow, conventionToSync.id),
       ),
     );
 
-    return this.report;
+    return this.#report;
   }
 
-  private async handleConventionToSync(
+  async #handleConventionToSync(
     uow: UnitOfWork,
     conventionToSyncId: ConventionId,
   ) {
     try {
-      await this.resync(uow, conventionToSyncId);
+      await this.#resync(uow, conventionToSyncId);
       const updatedConventionToSync =
         await uow.conventionsToSyncRepository.getById(conventionToSyncId);
 
       match(updatedConventionToSync)
         .with(undefined, () => {
-          this.report.errors[conventionToSyncId] = new Error(
+          this.#report.errors[conventionToSyncId] = new Error(
             "Convention not found or no status",
           );
         })
         .with({ status: "SUCCESS" }, () => {
-          this.report.success += 1;
+          this.#report.success += 1;
         })
         .with({ status: "TO_PROCESS" }, (toProcessConventionToSync) => {
-          this.report.errors[toProcessConventionToSync.id] = new Error(
+          this.#report.errors[toProcessConventionToSync.id] = new Error(
             "Convention still have status TO_PROCESS",
           );
         })
         .with({ status: "ERROR" }, (errorConventionToSync) => {
-          this.report.errors[errorConventionToSync.id] = new Error(
+          this.#report.errors[errorConventionToSync.id] = new Error(
             errorConventionToSync.reason,
           );
         })
         .with({ status: "SKIP" }, (skipConventionToSync) => {
-          this.report.skips[skipConventionToSync.id] =
+          this.#report.skips[skipConventionToSync.id] =
             skipConventionToSync.reason;
         })
         .exhaustive();
@@ -99,14 +106,14 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       await uow.conventionsToSyncRepository.save({
         id: conventionToSyncId,
         status: "ERROR",
-        processDate: this.timeGateway.now(),
+        processDate: this.#timeGateway.now(),
         reason: anError.message,
       });
-      this.report.errors[conventionToSyncId] = anError;
+      this.#report.errors[conventionToSyncId] = anError;
     }
   }
 
-  private async resync(
+  async #resync(
     uow: UnitOfWork,
     conventionToSyncId: ConventionId,
   ): Promise<void> {
@@ -117,6 +124,6 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       throw new NotFoundError(
         `Convention with id ${conventionToSyncId} missing in conventionRepository.`,
       );
-    return this.broadcastToPeUsecase.execute(convention);
+    return this.#broadcastToPeUsecase.execute(convention);
   }
 }

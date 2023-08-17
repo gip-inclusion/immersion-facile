@@ -10,24 +10,31 @@ import {
 const adeMaxQueryPerSeconds = 7;
 export const nonDiffusibleEstablishmentName = "NON-DIFFUSIBLE";
 export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
-  private limiter = new Bottleneck({
+  #limiter = new Bottleneck({
     reservoir: adeMaxQueryPerSeconds,
     reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: adeMaxQueryPerSeconds,
   });
 
+  #httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>;
+
+  #fallbackGateway: SiretGateway;
+
   constructor(
-    private httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>,
-    private fallbackGateway: SiretGateway,
-  ) {}
+    httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>,
+    fallbackGateway: SiretGateway,
+  ) {
+    this.#httpClient = httpClient;
+    this.#fallbackGateway = fallbackGateway;
+  }
 
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SiretEstablishmentDto | undefined> {
     // https://api.gouv.fr/les-api/api-recherche-entreprises
-    const response = await this.limiter.schedule(async () =>
-      this.httpClient.search({
+    const response = await this.#limiter.schedule(async () =>
+      this.#httpClient.search({
         queryParams: {
           q: siret,
         },
@@ -45,13 +52,13 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
         .toUpperCase()
         .includes(nonDiffusibleEstablishmentName)
     ) {
-      return this.fallbackGateway.getEstablishmentBySiret(siret);
+      return this.#fallbackGateway.getEstablishmentBySiret(siret);
     }
     if (includeClosedEstablishments) return formattedResult;
     if (formattedResult.isOpen) return formattedResult;
   }
 
-  getEstablishmentUpdatedBetween(): Promise<
+  public getEstablishmentUpdatedBetween(): Promise<
     Record<SiretDto, SiretEstablishmentDto>
   > {
     throw new Error("Method not implemented. Use insee version please.");

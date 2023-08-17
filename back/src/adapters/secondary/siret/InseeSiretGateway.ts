@@ -36,50 +36,26 @@ const inseeMaxRequestsPerMinute = 500;
 // https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/templates/api/documentation/download.jag?tenant=carbon.super&resourceUrl=/registry/resource/_system/governance/apimgt/applicationdata/provider/insee/Sirene/V3/documentation/files/INSEE%20Documentation%20API%20Sirene%20Services-V3.9.pdf
 
 export class InseeSiretGateway implements SiretGateway {
-  private limiter = new Bottleneck({
+  #limiter = new Bottleneck({
     reservoir: inseeMaxRequestsPerMinute,
     reservoirRefreshInterval: 60 * 1000, // number of ms
     reservoirRefreshAmount: inseeMaxRequestsPerMinute,
   });
 
+  readonly #retryStrategy: RetryStrategy;
+
+  readonly #axiosConfig: AxiosConfig;
+
+  readonly #timeGateway: TimeGateway;
+
   constructor(
-    private readonly axiosConfig: AxiosConfig,
-    private readonly timeGateway: TimeGateway,
-    private readonly retryStrategy: RetryStrategy,
-  ) {}
-
-  private createAxiosInstance() {
-    return createAxiosInstance(logger, {
-      baseURL: this.axiosConfig.endpoint,
-      headers: {
-        Authorization: `Bearer ${this.axiosConfig.bearerToken}`,
-        Accept: "application/json",
-      },
-      timeout: secondsToMilliseconds(10),
-    });
-  }
-
-  private createSiretQueryParams(
-    siret: SiretDto,
-    includeClosedEstablishments = false,
+    axiosConfig: AxiosConfig,
+    timeGateway: TimeGateway,
+    retryStrategy: RetryStrategy,
   ) {
-    const params: any = {
-      q: `siret:${siret}`,
-    };
-
-    // According to API SIRENE documentation :
-    // etatAdministratifEtablissement :
-    //   État de l'établissement pendant la période :
-    //     A= établissement actif
-    //     F= établissement fermé
-    if (!includeClosedEstablishments) {
-      params.q += " AND periode(etatAdministratifEtablissement:A)";
-      params.date = formatISO(this.timeGateway.now(), {
-        representation: "date",
-      });
-    }
-
-    return params;
+    this.#axiosConfig = axiosConfig;
+    this.#retryStrategy = retryStrategy;
+    this.#timeGateway = timeGateway;
   }
 
   public async getEstablishmentBySiret(
@@ -88,13 +64,13 @@ export class InseeSiretGateway implements SiretGateway {
   ): Promise<SiretEstablishmentDto | undefined> {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
-    return this.retryStrategy
+    return this.#retryStrategy
       .apply(async () => {
         try {
-          const axios = this.createAxiosInstance();
-          const response = await this.limiter.schedule(() =>
+          const axios = this.#createAxiosInstance();
+          const response = await this.#limiter.schedule(() =>
             axios.get("/siret", {
-              params: this.createSiretQueryParams(
+              params: this.#createSiretQueryParams(
                 siret,
                 includeClosedEstablishments,
               ),
@@ -136,7 +112,7 @@ export class InseeSiretGateway implements SiretGateway {
     try {
       const formattedFromDate = format(fromDate, "yyyy-MM-dd");
       const formattedToDate = format(toDate, "yyyy-MM-dd");
-      const axios = this.createAxiosInstance();
+      const axios = this.#createAxiosInstance();
 
       const requestBody = queryParamsAsString({
         q: [
@@ -187,6 +163,40 @@ export class InseeSiretGateway implements SiretGateway {
 
       throw error?.response.data;
     }
+  }
+
+  #createAxiosInstance() {
+    return createAxiosInstance(logger, {
+      baseURL: this.#axiosConfig.endpoint,
+      headers: {
+        Authorization: `Bearer ${this.#axiosConfig.bearerToken}`,
+        Accept: "application/json",
+      },
+      timeout: secondsToMilliseconds(10),
+    });
+  }
+
+  #createSiretQueryParams(
+    siret: SiretDto,
+    includeClosedEstablishments = false,
+  ) {
+    const params: any = {
+      q: `siret:${siret}`,
+    };
+
+    // According to API SIRENE documentation :
+    // etatAdministratifEtablissement :
+    //   État de l'établissement pendant la période :
+    //     A= établissement actif
+    //     F= établissement fermé
+    if (!includeClosedEstablishments) {
+      params.q += " AND periode(etatAdministratifEtablissement:A)";
+      params.date = formatISO(this.#timeGateway.now(), {
+        representation: "date",
+      });
+    }
+
+    return params;
   }
 }
 

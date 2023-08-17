@@ -32,24 +32,30 @@ export class ConventionsReminder extends TransactionalUseCase<
 > {
   protected inputSchema = z.void();
 
+  readonly #timeGateway: TimeGateway;
+
+  readonly #createNewEvent: CreateNewEvent;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private timeGateway: TimeGateway,
-    private readonly createNewEvent: CreateNewEvent,
+    timeGateway: TimeGateway,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+    this.#timeGateway = timeGateway;
+    this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(
     _: void,
     uow: UnitOfWork,
   ): Promise<ConventionsReminderSummary> {
-    const supportedConventions = await this.getSupportedConventions(uow);
+    const supportedConventions = await this.#getSupportedConventions(uow);
 
     const results: { id: ConventionId; error?: Error }[] = await Promise.all(
       supportedConventions
         .flatMap((convention) =>
-          this.prepareReminderEventsByConvention(convention),
+          this.#prepareReminderEventsByConvention(convention),
         )
         .map((eventWithConvention) =>
           uow.outboxRepository
@@ -78,7 +84,7 @@ export class ConventionsReminder extends TransactionalUseCase<
     };
   }
 
-  private addReminderTypeForConventionOnMatchCase(
+  #addReminderTypeForConventionOnMatchCase(
     reminderType: ReminderKind,
     conventionId: ConventionId,
     supportedCondition: boolean,
@@ -87,7 +93,7 @@ export class ConventionsReminder extends TransactionalUseCase<
       ? [
           {
             id: conventionId,
-            event: this.createNewEvent({
+            event: this.#createNewEvent({
               topic: "ConventionReminderRequired",
               payload: {
                 conventionId,
@@ -99,39 +105,39 @@ export class ConventionsReminder extends TransactionalUseCase<
       : [];
   }
 
-  private getSupportedConventions(uow: UnitOfWork): Promise<ConventionDto[]> {
+  #getSupportedConventions(uow: UnitOfWork): Promise<ConventionDto[]> {
     return uow.conventionQueries.getConventionsByFilters({
-      startDateGreater: this.timeGateway.now(),
-      startDateLessOrEqual: addBusinessDays(this.timeGateway.now(), 3),
+      startDateGreater: this.#timeGateway.now(),
+      startDateLessOrEqual: addBusinessDays(this.#timeGateway.now(), 3),
       withStatuses: supportedStatuses,
     });
   }
 
-  private prepareReminderEventsByConvention(
+  #prepareReminderEventsByConvention(
     convention: ConventionDto,
   ): { id: ConventionId; event: DomainEvent }[] {
     const differenceInDays: number = differenceInBusinessDays(
       new Date(convention.dateStart),
-      this.timeGateway.now(),
+      this.#timeGateway.now(),
     );
 
     return [
-      ...this.addReminderTypeForConventionOnMatchCase(
+      ...this.#addReminderTypeForConventionOnMatchCase(
         "FirstReminderForSignatories",
         convention.id,
         IsFirstReminderForSignatories(differenceInDays, convention),
       ),
-      ...this.addReminderTypeForConventionOnMatchCase(
+      ...this.#addReminderTypeForConventionOnMatchCase(
         "LastReminderForSignatories",
         convention.id,
         isLastReminderForSignatories(differenceInDays, convention),
       ),
-      ...this.addReminderTypeForConventionOnMatchCase(
+      ...this.#addReminderTypeForConventionOnMatchCase(
         "FirstReminderForAgency",
         convention.id,
         isFirstReminderForAgency(differenceInDays, convention),
       ),
-      ...this.addReminderTypeForConventionOnMatchCase(
+      ...this.#addReminderTypeForConventionOnMatchCase(
         "LastReminderForAgency",
         convention.id,
         isLastReminderForAgency(differenceInDays, convention),

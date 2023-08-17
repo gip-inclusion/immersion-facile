@@ -26,25 +26,108 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
   void,
   Report
 > {
-  private callsToInseeApi = 0;
+  protected inputSchema = z.void();
 
-  inputSchema = z.void();
+  #callsToInseeApi = 0;
 
-  private processOneBatch = async (
+  readonly #uowPerformer: UnitOfWorkPerformer;
+
+  readonly #siretGateway: SiretGateway;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #numberOfDaysAgoToCheckForInseeUpdates: number;
+
+  readonly #maxEstablishmentsPerBatch: number;
+
+  readonly #maxEstablishmentsPerFullRun: number;
+
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    siretGateway: SiretGateway,
+    timeGateway: TimeGateway,
+    numberOfDaysAgoToCheckForInseeUpdates = 30,
+    maxEstablishmentsPerBatch = 1000,
+    maxEstablishmentsPerFullRun = 5000,
+  ) {
+    super();
+
+    this.#uowPerformer = uowPerformer;
+    this.#siretGateway = siretGateway;
+    this.#timeGateway = timeGateway;
+    this.#numberOfDaysAgoToCheckForInseeUpdates =
+      numberOfDaysAgoToCheckForInseeUpdates;
+    this.#maxEstablishmentsPerBatch = maxEstablishmentsPerBatch;
+    this.#maxEstablishmentsPerFullRun = maxEstablishmentsPerFullRun;
+  }
+
+  public async _execute(_: void): Promise<Report> {
+    this.#callsToInseeApi = 0;
+    const now = this.#timeGateway.now();
+    const since = subDays(now, this.#numberOfDaysAgoToCheckForInseeUpdates);
+
+    let offset = 0;
+    let numberOfEstablishmentsToUpdate = 0;
+    let establishmentWithNewData = 0;
+
+    while (this.#maxEstablishmentsPerFullRun > offset) {
+      const {
+        numberOfEstablishmentsToUpdateInBatch,
+        establishmentWithNewDataInBatch,
+      } = await this.#processOneBatch(now, since);
+
+      numberOfEstablishmentsToUpdate += numberOfEstablishmentsToUpdateInBatch;
+      establishmentWithNewData += establishmentWithNewDataInBatch;
+
+      const areThereMoreEstablishmentsToUpdate =
+        numberOfEstablishmentsToUpdateInBatch ===
+        this.#maxEstablishmentsPerBatch;
+
+      offset = areThereMoreEstablishmentsToUpdate
+        ? offset + this.#maxEstablishmentsPerBatch
+        : this.#maxEstablishmentsPerFullRun;
+    }
+
+    return {
+      numberOfEstablishmentsToUpdate,
+      establishmentWithNewData,
+      callsToInseeApi: this.#callsToInseeApi,
+    };
+  }
+
+  async #getEstablishmentsUpdatesFromInsee(
+    since: Date,
+    now: Date,
+    establishmentSiretsToUpdate: SiretDto[],
+  ): Promise<Partial<Record<SiretDto, SiretEstablishmentDto>>> {
+    if (establishmentSiretsToUpdate.length > 0) {
+      const results = await this.#siretGateway.getEstablishmentUpdatedBetween(
+        since,
+        now,
+        establishmentSiretsToUpdate,
+      );
+      this.#callsToInseeApi++;
+      return results;
+    }
+
+    return {};
+  }
+
+  #processOneBatch = async (
     now: Date,
     since: Date,
     // offset: number,
   ): Promise<BatchReport> => {
     const establishmentSiretsToUpdate: SiretDto[] =
-      await this.uowPerformer.perform(async (uow: UnitOfWork) =>
+      await this.#uowPerformer.perform(async (uow: UnitOfWork) =>
         uow.establishmentAggregateRepository.getSiretsOfEstablishmentsNotCheckedAtInseeSince(
           since,
-          this.maxEstablishmentsPerBatch,
+          this.#maxEstablishmentsPerBatch,
         ),
       );
 
     const siretEstablishmentsWithChanges =
-      await this.getEstablishmentsUpdatesFromInsee(
+      await this.#getEstablishmentsUpdatesFromInsee(
         since,
         now,
         establishmentSiretsToUpdate,
@@ -61,7 +144,7 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
         {} satisfies UpdateEstablishmentsWithInseeDataParams,
       );
 
-    await this.uowPerformer.perform(async (uow: UnitOfWork) =>
+    await this.#uowPerformer.perform(async (uow: UnitOfWork) =>
       uow.establishmentAggregateRepository.updateEstablishmentsWithInseeData(
         now,
         paramsToUpdate,
@@ -74,69 +157,6 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
         .length,
     };
   };
-
-  constructor(
-    private uowPerformer: UnitOfWorkPerformer,
-    private readonly siretGateway: SiretGateway,
-    private readonly timeGateway: TimeGateway,
-    private readonly numberOfDaysAgoToCheckForInseeUpdates: number = 30,
-    private readonly maxEstablishmentsPerBatch: number = 1000,
-    private readonly maxEstablishmentsPerFullRun: number = 5000,
-  ) {
-    super();
-  }
-
-  public async _execute(_: void): Promise<Report> {
-    this.callsToInseeApi = 0;
-    const now = this.timeGateway.now();
-    const since = subDays(now, this.numberOfDaysAgoToCheckForInseeUpdates);
-
-    let offset = 0;
-    let numberOfEstablishmentsToUpdate = 0;
-    let establishmentWithNewData = 0;
-
-    while (this.maxEstablishmentsPerFullRun > offset) {
-      const {
-        numberOfEstablishmentsToUpdateInBatch,
-        establishmentWithNewDataInBatch,
-      } = await this.processOneBatch(now, since);
-
-      numberOfEstablishmentsToUpdate += numberOfEstablishmentsToUpdateInBatch;
-      establishmentWithNewData += establishmentWithNewDataInBatch;
-
-      const areThereMoreEstablishmentsToUpdate =
-        numberOfEstablishmentsToUpdateInBatch ===
-        this.maxEstablishmentsPerBatch;
-
-      offset = areThereMoreEstablishmentsToUpdate
-        ? offset + this.maxEstablishmentsPerBatch
-        : this.maxEstablishmentsPerFullRun;
-    }
-
-    return {
-      numberOfEstablishmentsToUpdate,
-      establishmentWithNewData,
-      callsToInseeApi: this.callsToInseeApi,
-    };
-  }
-
-  private async getEstablishmentsUpdatesFromInsee(
-    since: Date,
-    now: Date,
-    establishmentSiretsToUpdate: SiretDto[],
-  ): Promise<Partial<Record<SiretDto, SiretEstablishmentDto>>> {
-    if (establishmentSiretsToUpdate.length > 0) {
-      const results = await this.siretGateway.getEstablishmentUpdatedBetween(
-        since,
-        now,
-        establishmentSiretsToUpdate,
-      );
-      this.callsToInseeApi++;
-      return results;
-    }
-
-    return {};
-  }
 }
 
 const siretEstablishmentToValuesToUpdateInEstablishment = (

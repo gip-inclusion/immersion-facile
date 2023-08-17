@@ -12,11 +12,15 @@ import { TransactionalUseCase } from "../../core/UseCase";
 export class BindConventionToFederatedIdentity extends TransactionalUseCase<ConventionDto> {
   protected inputSchema = conventionSchema;
 
+  readonly #createNewEvent: CreateNewEvent;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+
+    this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(
@@ -28,20 +32,20 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<Conv
 
     return isPeConnectIdentity(federatedIdentity) &&
       federatedIdentity.token !== authFailed
-      ? this.associateConventionToFederatedIdentity(
+      ? this.#associateConventionToFederatedIdentity(
           convention,
           federatedIdentity,
           uow,
         )
       : uow.outboxRepository.save(
-          this.createNewEvent({
+          this.#createNewEvent({
             topic: "FederatedIdentityNotBoundToConvention",
             payload: convention,
           }),
         );
   }
 
-  private async associateConventionToFederatedIdentity(
+  async #associateConventionToFederatedIdentity(
     convention: ConventionDto,
     federatedIdentity: PeConnectIdentity,
     uow: UnitOfWork,
@@ -52,14 +56,14 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<Conv
         federatedIdentity.token,
       );
       await uow.outboxRepository.save(
-        this.createNewEvent({
+        this.#createNewEvent({
           topic: "FederatedIdentityBoundToConvention",
           payload: convention,
         }),
       );
     } catch (_error) {
       await uow.outboxRepository.save(
-        this.createNewEvent({
+        this.#createNewEvent({
           topic: "FederatedIdentityNotBoundToConvention",
           payload: convention,
         }),

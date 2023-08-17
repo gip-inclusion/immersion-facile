@@ -6,7 +6,7 @@ import {
 } from "../../../domain/convention/ports/PoleEmploiGateway";
 
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
-  private nextResponse: PoleEmploiBroadcastResponse = { status: 200 };
+  #nextResponse: PoleEmploiBroadcastResponse = { status: 200 };
 
   constructor(public notifications: PoleEmploiConvention[] = []) {}
 
@@ -21,12 +21,12 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
     convention: PoleEmploiConvention,
   ): Promise<PoleEmploiBroadcastResponse> {
     this.notifications.push(convention);
-    return this.nextResponse;
+    return this.#nextResponse;
   }
 
   //For testing purpose
 
   public setNextResponse(response: PoleEmploiBroadcastResponse) {
-    this.nextResponse = response;
+    this.#nextResponse = response;
   }
 }
