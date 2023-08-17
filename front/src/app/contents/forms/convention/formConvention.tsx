@@ -192,6 +192,18 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       "Si le bénéficiaire est actuellement salarié d'une entreprise, l'immersion va-t-elle se dérouler pendant le temps de travail habituel ?",
     id: conventionSectionIds.isCurrentEmployer,
     required: true,
+    hintText: (
+      <>
+        <a
+          href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-beneficiaire-est-actuellement-salarie-dune-entreprise-et-limmersion-va-se-derouler-pendant-le-temps-de-travail-habituel-optionnel"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Dans quelles situations puis-je faire une immersion pendant mon temps
+          de travail ?
+        </a>
+      </>
+    ),
   },
   isEstablishmentTutorIsEstablishmentRepresentative: {
     label:
@@ -287,8 +299,19 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     label:
       "Le candidat a une reconnaissance travailleur handicapé (RQTH) ou équivalent ",
     id: beneficiarySectionIds.isRqth,
-    hintText:
-      "Il n'est pas obligatoire de le préciser, mais cela peut être utile au candidat et à l'entreprise.",
+    hintText: (
+      <>
+        Il n'est pas obligatoire de le préciser, mais{" "}
+        <a
+          href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-candidat-a-une-reconnaissance-travailleur-handicape-rqth-ou-equivalent-optionnel"
+          target="_blank"
+          rel="noreferrer"
+        >
+          cela peut être utile au candidat et à l'entreprise
+        </a>
+        .
+      </>
+    ),
   },
 });
 
