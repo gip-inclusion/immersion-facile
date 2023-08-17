@@ -253,7 +253,10 @@ export const AddEstablishmentsByBatch = () => {
             <SubmitFeedbackNotification
               submitFeedback={feedback}
               messageByKind={{
-                success: getBatchSuccessMessage(),
+                success: {
+                  title: "Succès",
+                  message: getBatchSuccessMessage(),
+                },
               }}
             />
             <table className={cx(fr.cx("fr-mt-2w"), classes.table)}>

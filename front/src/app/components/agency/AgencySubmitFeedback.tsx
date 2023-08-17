@@ -3,9 +3,15 @@ import { AgencySuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesA
 
 export const agencySubmitMessageByKind: Record<
   AgencySuccessFeedbackKind,
-  NonNullable<ReactNode>
+  { title: string; message: NonNullable<ReactNode> }
 > = {
-  agencyAdded:
-    "L'agence a été ajoutée avec succès. Vous devez attendre qu'elle soit validée avant qu'elle ne soit effectivement disponible pour conventionner des immersions",
-  agencyUpdated: "Agence éditée avec succès",
+  agencyAdded: {
+    title: "Succès",
+    message:
+      "L'agence a été ajoutée avec succès. Vous devez attendre qu'elle soit validée avant qu'elle ne soit effectivement disponible pour conventionner des immersions",
+  },
+  agencyUpdated: {
+    title: "Succès",
+    message: "Agence éditée avec succès",
+  },
 };

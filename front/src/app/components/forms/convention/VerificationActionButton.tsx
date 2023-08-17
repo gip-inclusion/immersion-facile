@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { createPortal } from "react-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
@@ -35,6 +35,9 @@ export type VerificationActionButtonProps = {
   children: string;
   convention: ConventionDto;
   currentSignatoryRole: Role;
+  onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
+    SetStateAction<string | null>
+  >;
 };
 
 export type VerificationActions = Exclude<
@@ -131,6 +134,7 @@ export const VerificationActionButton = ({
   convention,
   currentSignatoryRole,
   initialStatus,
+  onCloseValidatorModalWithoutValidatorInfo,
 }: VerificationActionButtonProps) => {
   const iconByStatus: Partial<Record<ConventionStatus, FrIconClassName>> = {
     REJECTED: "fr-icon-close-circle-line",
@@ -184,6 +188,9 @@ export const VerificationActionButton = ({
           onSubmit={onSubmit}
           convention={convention}
           currentSignatoryRole={currentSignatoryRole}
+          onCloseValidatorModalWithoutValidatorInfo={
+            onCloseValidatorModalWithoutValidatorInfo
+          }
         />
       )}
     </>
@@ -197,6 +204,7 @@ const ModalWrapper = ({
   onSubmit,
   convention,
   currentSignatoryRole,
+  onCloseValidatorModalWithoutValidatorInfo,
 }: {
   title: string;
   initialStatus: ConventionStatus;
@@ -204,6 +212,9 @@ const ModalWrapper = ({
   onSubmit: VerificationActionButtonProps["onSubmit"];
   convention: ConventionDto;
   currentSignatoryRole: Role;
+  onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
+    SetStateAction<string | null>
+  >;
 }) => {
   if (
     !doesStatusNeedsJustification(newStatus) &&
@@ -232,6 +243,9 @@ const ModalWrapper = ({
             closeModal={closeModal}
             newStatus={newStatus}
             conventionId={convention.id}
+            onCloseValidatorModalWithoutValidatorInfo={
+              onCloseValidatorModalWithoutValidatorInfo
+            }
           />
         )}
       </>
@@ -245,11 +259,15 @@ const ValidatorModalContent = ({
   closeModal,
   newStatus,
   conventionId,
+  onCloseValidatorModalWithoutValidatorInfo,
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithValidator;
   conventionId: ConventionId;
+  onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
+    SetStateAction<string | null>
+  >;
 }) => {
   const { register, handleSubmit } = useForm<WithValidatorInfo>({
     resolver: zodResolver(withValidatorInfoSchema),
@@ -284,7 +302,14 @@ const ValidatorModalContent = ({
             {
               type: "button",
               priority: "secondary",
-              onClick: closeModal,
+              onClick: () => {
+                if (onCloseValidatorModalWithoutValidatorInfo) {
+                  onCloseValidatorModalWithoutValidatorInfo(
+                    warningMessagesByConventionStatus[newStatus],
+                  );
+                }
+                closeModal();
+              },
               nativeButtonProps: {
                 id: domElementIds.manageConvention.validatorModalCancelButton,
               },
@@ -302,4 +327,14 @@ const ValidatorModalContent = ({
       </form>
     </>
   );
+};
+
+const warningMessagesByConventionStatus: Record<
+  ConventionStatusWithValidator,
+  string
+> = {
+  ACCEPTED_BY_COUNSELLOR:
+    'Vous n\'avez pas marqué la demande comme éligible. Pour le faire, cliquez sur "Marquer la demande comme éligible" puis sur "Terminer"',
+  ACCEPTED_BY_VALIDATOR:
+    'Vous n\'avez pas marqué la validation de la demande. Pour le faire, cliquez sur "Valider la demande" puis sur "Terminer la validation"',
 };

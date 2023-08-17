@@ -191,7 +191,9 @@ export const AgencyDashboardPage = () => {
       {feedback.kind === "errored" && (
         <SubmitFeedbackNotification
           submitFeedback={feedback}
-          messageByKind={{ errored: "pas utilisé" }}
+          messageByKind={{
+            errored: { title: "Erreur", message: "pas utilisé" },
+          }}
         />
       )}
     </>
