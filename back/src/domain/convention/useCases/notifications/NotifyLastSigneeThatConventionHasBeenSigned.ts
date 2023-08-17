@@ -51,10 +51,10 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       savedConvention.agencyId,
     ]);
     if (!agency) throw new Error(missingAgencyMessage(savedConvention));
-    return this.onRepositoryConvention(uow, savedConvention, agency);
+    return this.#onRepositoryConvention(uow, savedConvention, agency);
   }
 
-  private emailToSend(
+  #emailToSend(
     convention: ConventionDto,
     lastSignee: { signedAt: string; email: string; role: SignatoryRole },
     agency: AgencyDto,
@@ -75,12 +75,13 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         conventionId: convention.id,
         signedAt: lastSignee.signedAt,
         conventionStatusLink,
+        agencyName: agency.name,
       },
       recipients: [lastSignee.email],
     };
   }
 
-  private lastSigneeEmail(
+  #lastSigneeEmail(
     signatories: Signatory[],
   ): { signedAt: string; email: string; role: SignatoryRole } | undefined {
     const signatoryEmailsOrderedBySignedAt = signatories
@@ -100,18 +101,22 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     return signatoryEmailsOrderedBySignedAt.at(-1);
   }
 
-  private onRepositoryConvention(
+  #onRepositoryConvention(
     uow: UnitOfWork,
     convention: ConventionDto,
     agency: AgencyDto,
   ): Promise<void> {
-    const lastSigneeEmail = this.lastSigneeEmail(
+    const lastSigneeEmail = this.#lastSigneeEmail(
       Object.values(convention.signatories),
     );
     if (lastSigneeEmail)
       return this.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
-        templatedContent: this.emailToSend(convention, lastSigneeEmail, agency),
+        templatedContent: this.#emailToSend(
+          convention,
+          lastSigneeEmail,
+          agency,
+        ),
         followedIds: {
           conventionId: convention.id,
           agencyId: convention.agencyId,

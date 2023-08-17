@@ -1279,6 +1279,7 @@ export const emailTemplatesByName =
         conventionStatusLink,
         internshipKind,
         signedAt,
+        agencyName,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -1301,11 +1302,7 @@ export const emailTemplatesByName =
         Attention. Votre convention est en cours d'examen.
         Avant de débuter ${
           internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-        }, veuillez vous assurer que la convention a bien été validée par un conseiller${
-            internshipKind === "immersion"
-              ? ""
-              : " de la chambre de commerce et d'instrustrie - CCI"
-          }.
+        }, veuillez vous assurer que la convention a bien été validée par un conseiller de la structure d'accompagnement du bénéficiaire (${agencyName}).
         Vous recevrez une notification lorsque ce sera fait.
         `,
         },
