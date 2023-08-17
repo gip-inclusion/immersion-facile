@@ -671,10 +671,12 @@ describe("Convention slice", () => {
   describe("Convention signature", () => {
     it("signs the conventions with role from jwt", () => {
       const jwt = "some-correct-jwt";
+      const convention =
+        new ConventionDtoBuilder().build() as ConventionReadDto;
       ({ store, dependencies } = createTestStore({
         convention: {
           ...initialConventionState,
-          convention: new ConventionDtoBuilder().build() as ConventionReadDto,
+          convention,
         },
       }));
       store.dispatch(
@@ -691,7 +693,7 @@ describe("Convention slice", () => {
       expectConventionState({
         isLoading: false,
         feedback: { kind: "signedSuccessfully" },
-        convention: null,
+        convention,
       });
     });
 
