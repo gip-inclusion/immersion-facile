@@ -91,6 +91,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
             signedAt: signedConvention.signatories.beneficiary.signedAt!,
             conventionStatusLink,
             agencyLogoUrl: agency.logoUrl,
+            agencyName: agency.name,
           },
           recipients: [signedConvention.signatories.beneficiary.email],
           kind: "SIGNEE_HAS_SIGNED_CONVENTION",
@@ -130,6 +131,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
               now,
             }),
             agencyLogoUrl: agency.logoUrl,
+            agencyName: agency.name,
           },
           recipients: [
             signedConvention.signatories.establishmentRepresentative.email,

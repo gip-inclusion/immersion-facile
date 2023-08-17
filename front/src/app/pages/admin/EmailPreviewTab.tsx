@@ -502,6 +502,7 @@ export const defaultEmailValueByEmailKind: {
     conventionStatusLink: "http://CONVENTION_STATUS_LINK",
     internshipKind: "immersion",
     signedAt: new Date().toISOString(),
+    agencyName: "AGENCY_NAME",
   },
   IC_USER_RIGHTS_HAS_CHANGED: {
     agencyName: "AGENCY_NAME",

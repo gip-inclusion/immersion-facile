@@ -84,6 +84,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         conventionId: convention.id,
         signedAt: lastSignee.signedAt,
         conventionStatusLink,
+        agencyName: agency.name,
       },
       recipients: [lastSignee.email],
     };

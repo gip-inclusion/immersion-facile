@@ -289,6 +289,7 @@ export type EmailParamsByEmailType = {
     conventionStatusLink: AbsoluteUrl;
     internshipKind: InternshipKind;
     signedAt: string;
+    agencyName: string;
   };
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     editFrontUrl: string;
