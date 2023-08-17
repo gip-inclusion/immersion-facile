@@ -6,7 +6,7 @@ export type FileProperties = {
   accept?: string;
   className?: ArgumentArray;
   errorMessage?: string;
-  hint?: string;
+  hint?: React.ReactNode;
   id: string;
   label: string;
   multiple?: boolean;
@@ -41,7 +41,7 @@ export const File = ({
         className={fr.cx("fr-upload")}
         type="file"
         id={id}
-        aria-describedby={hint || undefined}
+        aria-label={label}
         multiple={multiple}
         accept={accept}
       />
