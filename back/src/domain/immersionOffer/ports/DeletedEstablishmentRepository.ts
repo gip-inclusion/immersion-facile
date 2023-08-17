@@ -7,5 +7,6 @@ export type DeletedEstablishementDto = {
 };
 
 export interface DeletedEstablishmentRepository {
+  isSiretsDeleted(siretsToCheck: SiretDto[]): Promise<SiretDto[]>;
   save(deleteEstablishment: DeletedEstablishementDto): Promise<void>;
 }

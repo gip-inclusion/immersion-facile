@@ -49,6 +49,18 @@ describe("PgDeletedEstablishmentRepository", () => {
         deleted_at: deletedEstablishment.deletedAt,
       },
     ]);
+
+    expectToEqual(
+      await pgDeletedEstablishmentRepository.isSiretsDeleted([]),
+      [],
+    );
+    expectToEqual(
+      await pgDeletedEstablishmentRepository.isSiretsDeleted([
+        deletedEstablishment.siret,
+        "not-deleted-siret",
+      ]),
+      [deletedEstablishment.siret],
+    );
   });
 });
 

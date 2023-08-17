@@ -20,7 +20,7 @@ export class SearchImmersion extends TransactionalUseCase<
   SearchImmersionResultDto[],
   ApiConsumer
 > {
-  inputSchema = searchImmersionParamsSchema;
+  protected inputSchema = searchImmersionParamsSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -30,7 +30,7 @@ export class SearchImmersion extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  public async _execute(
+  protected async _execute(
     {
       distanceKm,
       latitude: lat,
@@ -68,28 +68,34 @@ export class SearchImmersion extends TransactionalUseCase<
         maxResults: 100,
       }),
       shouldFetchLBB(appellationCode, voluntaryToImmersion)
-        ? this.searchOnLbb(uow, { appellationCode, lat, lon, distanceKm })
+        ? this.#searchOnLbb(uow, { appellationCode, lat, lon, distanceKm })
         : Promise.resolve([]),
     ]);
 
     return [
       ...(voluntaryToImmersion !== false
-        ? this.prepareVoluntaryToImmersionResults(repositorySearchResults)
+        ? this.#prepareVoluntaryToImmersionResults(repositorySearchResults)
         : []),
-      ...lbbSearchResults.filter(
-        isSiretAlreadyInStoredResults(repositorySearchResults),
-      ),
+      ...lbbSearchResults
+        .filter(isSiretAlreadyInStoredResults(repositorySearchResults))
+        .filter(
+          isEstablishmentNotDeleted(
+            await uow.deletedEstablishmentRepository.isSiretsDeleted(
+              lbbSearchResults.map((result) => result.siret),
+            ),
+          ),
+        ),
     ].filter(isSiretIsNotInNotSeachableResults(repositorySearchResults));
   }
 
-  private prepareVoluntaryToImmersionResults(
+  #prepareVoluntaryToImmersionResults(
     results: SearchImmersionResult[],
   ): SearchImmersionResultDto[] {
     histogramSearchImmersionStoredCount.observe(results.length);
     return results.map(({ isSearchable, ...rest }) => rest);
   }
 
-  private async searchOnLbb(
+  async #searchOnLbb(
     uow: UnitOfWork,
     {
       appellationCode,
@@ -141,3 +147,8 @@ const isSiretIsNotInNotSeachableResults =
       .filter(propEq("isSearchable", false))
       .map(prop("siret"))
       .includes(siret);
+
+const isEstablishmentNotDeleted =
+  (deletedSirets: SiretDto[]) =>
+  <T extends { siret: SiretDto }>({ siret }: T) =>
+    !deletedSirets.includes(siret);
