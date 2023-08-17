@@ -234,7 +234,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   const onClickEstablishmentDeleteButton = () => {
     const confirmed = confirm(
-      `⚠️ Etes-vous sûr de vouloir supprimer cette établissement ? ⚠️
+      `⚠️ Etes-vous sûr de vouloir supprimer cet établissement ? ⚠️
                 (cette opération est irréversible 💀)`,
     );
     if (confirmed && adminJwt)

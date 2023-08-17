@@ -13,7 +13,7 @@ import {
 } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { stubSearchResult } from "../../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
+import { stubSearchResult } from "../../../secondary/immersionOffer/InMemoryEstablishmentGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("search-immersion route", () => {

@@ -6,7 +6,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(tableName, {
     siret: {
       type: "character(14)",
-      primaryKey: true,
     },
     created_at: {
       type: "timestamptz",
@@ -17,6 +16,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       notNull: true,
     },
   });
+  pgm.createIndex(tableName, "siret");
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {

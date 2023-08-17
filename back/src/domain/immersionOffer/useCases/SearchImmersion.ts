@@ -80,7 +80,7 @@ export class SearchImmersion extends TransactionalUseCase<
         .filter(isSiretAlreadyInStoredResults(repositorySearchResults))
         .filter(
           isEstablishmentNotDeleted(
-            await uow.deletedEstablishmentRepository.isSiretsDeleted(
+            await uow.deletedEstablishmentRepository.areSiretsDeleted(
               lbbSearchResults.map((result) => result.siret),
             ),
           ),
@@ -149,6 +149,6 @@ const isSiretIsNotInNotSeachableResults =
       .includes(siret);
 
 const isEstablishmentNotDeleted =
-  (deletedSirets: SiretDto[]) =>
+  (deletedSirets: Record<SiretDto, boolean>) =>
   <T extends { siret: SiretDto }>({ siret }: T) =>
-    !deletedSirets.includes(siret);
+    !deletedSirets[siret];

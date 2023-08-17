@@ -51,15 +51,48 @@ describe("PgDeletedEstablishmentRepository", () => {
     ]);
 
     expectToEqual(
-      await pgDeletedEstablishmentRepository.isSiretsDeleted([]),
-      [],
+      await pgDeletedEstablishmentRepository.areSiretsDeleted([]),
+      {},
     );
     expectToEqual(
-      await pgDeletedEstablishmentRepository.isSiretsDeleted([
+      await pgDeletedEstablishmentRepository.areSiretsDeleted([
         deletedEstablishment.siret,
         "not-deleted-siret",
       ]),
-      [deletedEstablishment.siret],
+      {
+        [deletedEstablishment.siret]: true,
+        "not-deleted-siret": false,
+      },
+    );
+
+    const deletedEstablishmentBis: DeletedEstablishementDto = {
+      siret: establishment.establishment.siret,
+      createdAt: new Date(),
+      deletedAt: new Date(),
+    };
+
+    await pgDeletedEstablishmentRepository.save(deletedEstablishmentBis);
+
+    expectToEqual((await client.query(getAllDeletedEstablishmentQuery)).rows, [
+      {
+        siret: deletedEstablishment.siret,
+        created_at: deletedEstablishment.createdAt,
+        deleted_at: deletedEstablishment.deletedAt,
+      },
+      {
+        siret: deletedEstablishmentBis.siret,
+        created_at: deletedEstablishmentBis.createdAt,
+        deleted_at: deletedEstablishmentBis.deletedAt,
+      },
+    ]);
+
+    expectToEqual(
+      await pgDeletedEstablishmentRepository.areSiretsDeleted([
+        deletedEstablishment.siret,
+      ]),
+      {
+        [deletedEstablishment.siret]: true,
+      },
     );
   });
 });

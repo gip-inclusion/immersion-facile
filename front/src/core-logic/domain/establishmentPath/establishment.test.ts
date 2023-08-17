@@ -399,7 +399,7 @@ describe("Establishment", () => {
       store.dispatch(
         establishmentSlice.actions.establishmentDeletionRequested({
           siret: formEstablishment.siret,
-          jwt: "backoffice-jwt",
+          jwt: backOfficeJwt,
         }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);

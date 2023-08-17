@@ -12,7 +12,7 @@ export interface FormEstablishmentRepository {
 export const formEstablishementUpdateFailedErrorMessage = (
   dto: FormEstablishmentDto,
 ): string =>
-  `Cannot update form establishlment DTO with siret ${dto.siret}, since it is not found.`;
+  `Cannot update form establishment DTO with siret ${dto.siret}, since it is not found.`;
 
 export const formEstablishmentNotFoundErrorMessage = (
   siret: SiretDto,

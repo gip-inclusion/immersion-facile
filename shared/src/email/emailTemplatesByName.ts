@@ -31,7 +31,7 @@ export const emailTemplatesByName =
       tags: ["suppression entreprise"],
       createEmailVariables: ({ businessAddress, businessName, siret }) => ({
         subject:
-          "Votre entreprise a été supprimée de la liste des entreprises accueillantes d'immersion facilitée d'Immersion Facilitée",
+          "Votre entreprise a été supprimée de la liste des entreprises accueillantes d'Immersion Facilitée",
         greetings: "Bonjour,",
         content: `
         Suite à votre demande de suppression de votre établissement (SIRET ${siret} - ${businessName} - ${businessAddress}), nous vous confirmons que ce dernier a été supprimé définitivement de la liste des entreprises accueillantes exposées sur Immersion Facilitée.
