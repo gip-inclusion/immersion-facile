@@ -61,6 +61,7 @@ export * from "./ramdaExtensions/notEqual";
 export * from "./ramdaExtensions/path";
 export * from "./ramdaExtensions/propEq";
 export * from "./role/role.dto";
+export * from "./role/role.utils";
 export * from "./rome";
 export * from "./romeAndAppellationDtos/romeAndAppellation.dto";
 export * from "./romeAndAppellationDtos/romeAndAppellation.schema";

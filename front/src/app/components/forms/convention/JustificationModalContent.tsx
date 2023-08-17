@@ -6,6 +6,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { keys } from "ramda";
 import {
   ConventionDto,
   ConventionStatusWithJustification,
@@ -13,8 +14,7 @@ import {
   domElementIds,
   Role,
   Signatories,
-  Signatory,
-  SignatoryRole,
+  signatoryTitleByRole,
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
 } from "shared";
@@ -52,61 +52,26 @@ export const JustificationModalContent = ({
   };
 
   const getSignatoriesOption = (signatories: Signatories) => {
-    const getSignatoryTitleByRole = (role: SignatoryRole): string => {
-      switch (role) {
-        case "beneficiary":
-          return "Le bénéficiaire";
-        case "establishment":
-          return "Le représentant de l'entreprise";
-        case "establishment-representative":
-          return "Le représentant de l'entreprise";
-        case "beneficiary-representative":
-          return "Le représentant légal du bénéficiaire";
-        case "legal-representative":
-          return "Le représentant légal du bénéficiaire";
-        case "beneficiary-current-employer":
-          return "Le représentant de l'entreprise actuelle du candidat";
-      }
-    };
+    const conventionSignatories = keys(signatories).map(
+      (signatory) => signatories[signatory],
+    );
 
-    const getOptionLabelAndValue = (
-      currentSignatoryRole: Role,
-      signatory: Signatory | undefined,
-    ) => {
-      if (!signatory) return [];
-
-      if (currentSignatoryRole === signatory.role) {
-        return [
-          {
+    const signatoriesOptions = conventionSignatories.map((signatory) =>
+      signatory && signatory.role !== currentSignatoryRole
+        ? {
+            label: `${signatory.firstName} ${
+              signatory.lastName
+            } - ${signatoryTitleByRole(signatory.role)}`,
+            value: signatory.role,
+          }
+        : {
             label: `Vous même`,
             value: currentSignatoryRole,
           },
-        ];
-      }
-      return [
-        {
-          label: `${signatory.firstName} ${
-            signatory.lastName
-          } - ${getSignatoryTitleByRole(signatory.role)}`,
-          value: signatory.role,
-        },
-      ];
-    };
+    );
 
     return [
-      ...getOptionLabelAndValue(currentSignatoryRole, signatories.beneficiary),
-      ...getOptionLabelAndValue(
-        currentSignatoryRole,
-        signatories.establishmentRepresentative,
-      ),
-      ...getOptionLabelAndValue(
-        currentSignatoryRole,
-        signatories.beneficiaryCurrentEmployer,
-      ),
-      ...getOptionLabelAndValue(
-        currentSignatoryRole,
-        signatories.beneficiaryRepresentative,
-      ),
+      ...signatoriesOptions,
       ...(currentSignatoryRole === "validator" ||
       currentSignatoryRole === "counsellor"
         ? [

@@ -39,9 +39,9 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
     payload: ConventionRequiresModificationPayload,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [agency] = await uow.agencyRepository.getByIds([
-      payload.convention.agencyId,
-    ]);
+    const agency = (
+      await uow.agencyRepository.getByIds([payload.convention.agencyId])
+    ).at(0);
     if (!agency) {
       throw new Error(
         `Unable to send mail. No agency config found for ${payload.convention.agencyId}`,
