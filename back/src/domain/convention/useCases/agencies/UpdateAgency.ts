@@ -8,13 +8,16 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class UpdateAgency extends TransactionalUseCase<AgencyDto> {
-  inputSchema = agencySchema;
+  protected inputSchema = agencySchema;
+
+  #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
   }
 
   public async _execute(agency: AgencyDto, uow: UnitOfWork): Promise<void> {
@@ -26,7 +29,7 @@ export class UpdateAgency extends TransactionalUseCase<AgencyDto> {
     });
 
     await uow.outboxRepository.save(
-      this.createNewEvent({
+      this.#createNewEvent({
         topic: "AgencyUpdated",
         payload: { agency },
       }),

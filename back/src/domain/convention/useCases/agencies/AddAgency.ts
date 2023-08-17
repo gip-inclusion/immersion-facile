@@ -10,13 +10,16 @@ export const defaultQuestionnaireUrl =
   "https://docs.google.com/document/d/1pjsCZbu0CarBCR0GVJ1AmIgwkxGIsD6T/edit";
 
 export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
-  inputSchema = createAgencySchema;
+  protected inputSchema = createAgencySchema;
+
+  readonly #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(
@@ -30,7 +33,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
       questionnaireUrl: params.questionnaireUrl || defaultQuestionnaireUrl,
     };
 
-    const newAgencyAddEvent = this.createNewEvent({
+    const newAgencyAddEvent = this.#createNewEvent({
       topic: "NewAgencyAdded",
       payload: agency,
     });

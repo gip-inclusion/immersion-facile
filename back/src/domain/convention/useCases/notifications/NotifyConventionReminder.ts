@@ -62,17 +62,33 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   ConventionReminderPayload,
   void
 > {
-  inputSchema = conventionReminderPayloadSchema;
+  protected inputSchema = conventionReminderPayloadSchema;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
+  readonly #config: AppConfig;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private timeGateway: TimeGateway,
-    private saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    private readonly config: AppConfig,
+    timeGateway: TimeGateway,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    config: AppConfig,
   ) {
     super(uowPerformer);
+
+    this.#config = config;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
@@ -89,7 +105,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       reminderKind === "FirstReminderForSignatories" ||
       reminderKind === "LastReminderForSignatories"
     )
-      return this.onSignatoriesReminder(reminderKind, conventionRead, uow);
+      return this.#onSignatoriesReminder(reminderKind, conventionRead, uow);
 
     const [agency] = await uow.agencyRepository.getByIds([
       conventionRead.agencyId,
@@ -97,10 +113,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     if (!agency) throw new NotFoundError(missingAgencyMessage(conventionRead));
 
-    return this.onAgencyReminder(reminderKind, conventionRead, agency, uow);
+    return this.#onAgencyReminder(reminderKind, conventionRead, agency, uow);
   }
 
-  private async makeSignatoryReminderEmail(
+  async #makeSignatoryReminderEmail(
     { role, email, firstName, lastName }: GenericActor<Role>,
     convention: ConventionDto,
     uow: UnitOfWork,
@@ -110,15 +126,15 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     >,
   ): Promise<TemplatedEmail> {
     const makeShortMagicLink = prepareMagicShortLinkMaker({
-      config: this.config,
+      config: this.#config,
       conventionMagicLinkPayload: {
         id: convention.id,
         role,
         email,
-        now: this.timeGateway.now(),
+        now: this.#timeGateway.now(),
       },
-      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       uow,
     });
 
@@ -143,7 +159,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     };
   }
 
-  private async onAgencyReminder(
+  async #onAgencyReminder(
     reminderKind: AgenciesReminderKind,
     conventionRead: ConventionReadDto,
     agency: AgencyDto,
@@ -170,7 +186,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             } satisfies EmailWithRole),
         ),
       ].map((emailWithRole) =>
-        this.sendAgencyReminderEmails(
+        this.#sendAgencyReminderEmails(
           emailWithRole,
           conventionRead,
           agency,
@@ -181,7 +197,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     );
   }
 
-  private async onSignatoriesReminder(
+  async #onSignatoriesReminder(
     kind: SignatoriesReminderKind,
     conventionRead: ConventionReadDto,
     uow: UnitOfWork,
@@ -206,12 +222,12 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     const templatedEmails: TemplatedEmail[] = await Promise.all(
       emailActors.map((actor) =>
-        this.makeSignatoryReminderEmail(actor, conventionRead, uow, kind),
+        this.#makeSignatoryReminderEmail(actor, conventionRead, uow, kind),
       ),
     );
     const templatedSms = await Promise.all(
       smsSignatories.map((signatory) =>
-        this.prepareSmsReminderParams(signatory, conventionRead, uow, kind),
+        this.#prepareSmsReminderParams(signatory, conventionRead, uow, kind),
       ),
     );
 
@@ -223,14 +239,14 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     await Promise.all([
       ...templatedEmails.map((email) =>
-        this.saveNotificationAndRelatedEvent(uow, {
+        this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           followedIds,
           templatedContent: email,
         }),
       ),
       ...templatedSms.map((sms) =>
-        this.saveNotificationAndRelatedEvent(uow, {
+        this.#saveNotificationAndRelatedEvent(uow, {
           kind: "sms",
           followedIds,
           templatedContent: sms,
@@ -239,22 +255,22 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     ]);
   }
 
-  private async prepareSmsReminderParams(
+  async #prepareSmsReminderParams(
     { role, email, phone }: GenericActor<Role>,
     convention: ConventionReadDto,
     uow: UnitOfWork,
     kind: SignatoriesReminderKind,
   ): Promise<TemplatedSms> {
     const makeShortMagicLink = prepareMagicShortLinkMaker({
-      config: this.config,
+      config: this.#config,
       conventionMagicLinkPayload: {
         id: convention.id,
         role,
         email,
-        now: this.timeGateway.now(),
+        now: this.#timeGateway.now(),
       },
-      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       uow,
     });
 
@@ -267,7 +283,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     };
   }
 
-  private async sendAgencyReminderEmails(
+  async #sendAgencyReminderEmails(
     { email, role }: EmailWithRole,
     convention: ConventionReadDto,
     agency: AgencyDto,
@@ -275,15 +291,15 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     kind: AgenciesReminderKind,
   ): Promise<void> {
     const makeShortMagicLink = prepareMagicShortLinkMaker({
-      config: this.config,
+      config: this.#config,
       conventionMagicLinkPayload: {
         id: convention.id,
         role,
         email,
-        now: this.timeGateway.now(),
+        now: this.#timeGateway.now(),
       },
-      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       uow,
     });
 
@@ -321,7 +337,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             },
           };
 
-    return this.saveNotificationAndRelatedEvent(uow, {
+    return this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       followedIds: {
         conventionId: convention.id,

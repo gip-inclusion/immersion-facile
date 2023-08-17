@@ -7,20 +7,23 @@ import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/ent
 type WithAgency = { agency: AgencyDto };
 
 export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAgency> {
-  inputSchema = z.object({ agency: agencySchema });
+  protected inputSchema = z.object({ agency: agencySchema });
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
   public async _execute(
     { agency }: WithAgency,
     uow: UnitOfWork,
   ): Promise<void> {
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "AGENCY_WAS_ACTIVATED",

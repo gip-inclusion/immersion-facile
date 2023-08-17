@@ -17,17 +17,21 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 import { createOpaqueEmail } from "../../entities/DiscussionAggregate";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
-  inputSchema = contactEstablishmentEventPayloadSchema;
+  protected inputSchema = contactEstablishmentEventPayloadSchema;
 
-  private readonly replyDomain: string;
+  readonly #replyDomain: string;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     domain: string,
   ) {
     super(uowPerformer);
-    this.replyDomain = `reply.${domain}`;
+    this.#replyDomain = `reply.${domain}`;
+
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
   public async _execute(
@@ -64,7 +68,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           (email) => email !== establishmentContact.email,
         );
 
-        await this.saveNotificationAndRelatedEvent(uow, {
+        await this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "CONTACT_BY_EMAIL_REQUEST",
@@ -73,7 +77,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               email: createOpaqueEmail(
                 payload.discussionId,
                 "potentialBeneficiary",
-                this.replyDomain,
+                this.#replyDomain,
               ),
               name: `${potentialBeneficiary.firstName} ${potentialBeneficiary.lastName} - via Immersion Facilitée`,
             },
@@ -100,7 +104,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         break;
       }
       case "PHONE": {
-        await this.saveNotificationAndRelatedEvent(uow, {
+        await this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
@@ -119,7 +123,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         break;
       }
       case "IN_PERSON": {
-        await this.saveNotificationAndRelatedEvent(uow, {
+        await this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "CONTACT_IN_PERSON_INSTRUCTIONS",

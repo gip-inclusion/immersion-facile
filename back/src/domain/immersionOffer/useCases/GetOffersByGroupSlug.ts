@@ -10,7 +10,7 @@ export class GetOffersByGroupSlug extends TransactionalUseCase<
   WithEstablishmentGroupSlug,
   SearchImmersionResultDto[]
 > {
-  inputSchema = withEstablishmentGroupSlugSchema;
+  protected inputSchema = withEstablishmentGroupSlugSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

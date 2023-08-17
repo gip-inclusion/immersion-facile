@@ -14,14 +14,21 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   InclusionConnectedUser,
   InclusionConnectJwtPayload
 > {
-  inputSchema = z.void();
+  protected inputSchema = z.void();
+
+  readonly #dashboardGateway: DashboardGateway;
+
+  readonly #timeGateway: TimeGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private dashboardGateway: DashboardGateway,
-    private timeGateway: TimeGateway,
+    dashboardGateway: DashboardGateway,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
+
+    this.#dashboardGateway = dashboardGateway;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
@@ -48,16 +55,16 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
       ...(agencyIdsWithEnoughPrivileges.length < 1
         ? {}
         : {
-            dashboardUrl: await this.dashboardGateway.getAgencyUserUrl(
+            dashboardUrl: await this.#dashboardGateway.getAgencyUserUrl(
               agencyIdsWithEnoughPrivileges,
-              this.timeGateway.now(),
+              this.#timeGateway.now(),
             ),
             ...(hasAtLeastOnePeAgency
               ? {
                   erroredConventionsDashboardUrl:
-                    await this.dashboardGateway.getErroredConventionsDashboardUrl(
+                    await this.#dashboardGateway.getErroredConventionsDashboardUrl(
                       agencyIdsWithEnoughPrivileges,
-                      this.timeGateway.now(),
+                      this.#timeGateway.now(),
                     ),
                 }
               : {}),

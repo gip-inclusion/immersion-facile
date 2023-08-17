@@ -22,23 +22,37 @@ import {
 } from "../entities/EstablishmentEntity";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
-  inputSchema = contactEstablishmentRequestSchema;
+  protected inputSchema = contactEstablishmentRequestSchema;
+
+  readonly #createNewEvent: CreateNewEvent;
+
+  readonly #uuidGenerator: UuidGenerator;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #minimumNumberOfDaysBetweenSimilarContactRequests: number;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly createNewEvent: CreateNewEvent,
-    private readonly uuidGenerator: UuidGenerator,
-    private readonly timeGateway: TimeGateway,
-    private readonly minimumNumberOfDaysBetweenSimilarContactRequests: number,
+    createNewEvent: CreateNewEvent,
+    uuidGenerator: UuidGenerator,
+    timeGateway: TimeGateway,
+    minimumNumberOfDaysBetweenSimilarContactRequests: number,
   ) {
     super(uowPerformer);
+
+    this.#uuidGenerator = uuidGenerator;
+    this.#timeGateway = timeGateway;
+    this.#minimumNumberOfDaysBetweenSimilarContactRequests =
+      minimumNumberOfDaysBetweenSimilarContactRequests;
+    this.#createNewEvent = createNewEvent;
   }
 
   public async _execute(
     contactRequest: ContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const now = this.timeGateway.now();
+    const now = this.#timeGateway.now();
     const { siret, contactMode } = contactRequest;
 
     const establishmentAggregate =
@@ -66,7 +80,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         potentialBeneficiaryEmail: contactRequest.potentialBeneficiaryEmail,
         since: subDays(
           now,
-          this.minimumNumberOfDaysBetweenSimilarContactRequests,
+          this.#minimumNumberOfDaysBetweenSimilarContactRequests,
         ),
       });
 
@@ -74,7 +88,9 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       throw new ConflictError(
         [
           `A contact request already exists for siret ${contactRequest.siret} and appellation ${contactRequest.appellationCode}, and this potential beneficiary email.`,
-          `Minimum ${this.minimumNumberOfDaysBetweenSimilarContactRequests} days between two similar contact requests.`,
+          `Minimum ${
+            this.#minimumNumberOfDaysBetweenSimilarContactRequests
+          } days between two similar contact requests.`,
         ].join("\n"),
       );
 
@@ -96,7 +112,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       // );
     }
 
-    const discussion = this.createDiscussion({
+    const discussion = this.#createDiscussion({
       contactRequest,
       contact: establishmentContact,
       establishment: establishmentAggregate.establishment,
@@ -105,7 +121,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
     await uow.discussionAggregateRepository.insert(discussion);
 
-    await this.markEstablishmentAsNotSearchableIfLimitReached({
+    await this.#markEstablishmentAsNotSearchableIfLimitReached({
       uow,
       establishmentAggregate,
       contactRequest,
@@ -113,14 +129,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     });
 
     await uow.outboxRepository.save(
-      this.createNewEvent({
+      this.#createNewEvent({
         topic: "ContactRequestedByBeneficiary",
         payload: { ...contactRequest, discussionId: discussion.id },
       }),
     );
   }
 
-  private createDiscussion({
+  #createDiscussion({
     contactRequest,
     contact,
     establishment,
@@ -132,7 +148,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     now: Date;
   }): DiscussionAggregate {
     return {
-      id: this.uuidGenerator.new(),
+      id: this.#uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
       businessName: establishment.customizedName ?? establishment.name,
@@ -179,7 +195,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     };
   }
 
-  private async markEstablishmentAsNotSearchableIfLimitReached({
+  async #markEstablishmentAsNotSearchableIfLimitReached({
     uow,
     establishmentAggregate,
     contactRequest,

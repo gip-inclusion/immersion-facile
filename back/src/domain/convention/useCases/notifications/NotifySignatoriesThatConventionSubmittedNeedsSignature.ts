@@ -25,17 +25,33 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 const logger = createLogger(__filename);
 
 export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends TransactionalUseCase<ConventionDto> {
-  inputSchema = conventionSchema;
+  protected inputSchema = conventionSchema;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #config: AppConfig;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly timeGateway: TimeGateway,
-    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private readonly config: AppConfig,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    timeGateway: TimeGateway,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    config: AppConfig,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
+
+    this.#config = config;
+    this.#timeGateway = timeGateway;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
   public async _execute(
@@ -56,9 +72,9 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
     for (const signatory of values(convention.signatories).filter(
       filterNotFalsy,
     )) {
-      await this.saveNotificationAndRelatedEvent(uow, {
+      await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
-        templatedContent: await this.makeEmail(
+        templatedContent: await this.#makeEmail(
           signatory,
           convention,
           agency,
@@ -73,7 +89,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
     }
   }
 
-  private async makeEmail(
+  async #makeEmail(
     signatory: Signatory,
     convention: ConventionDto,
     agency: AgencyDto,
@@ -95,15 +111,15 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
         id,
         role: signatory.role,
         email: signatory.email,
-        now: this.timeGateway.now(),
+        now: this.#timeGateway.now(),
       };
 
     const makeMagicShortLink = prepareMagicShortLinkMaker({
       conventionMagicLinkPayload,
       uow,
-      config: this.config,
-      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      config: this.#config,
+      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
     });
 
     return {

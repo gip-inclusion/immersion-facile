@@ -13,7 +13,7 @@ export class GetSearchImmersionResultBySiretAndAppellationCode extends Transacti
   SearchImmersionResultDto,
   ApiConsumer
 > {
-  inputSchema = siretAndAppellationSchema;
+  protected inputSchema = siretAndAppellationSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

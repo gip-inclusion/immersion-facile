@@ -10,17 +10,24 @@ export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
-  inputSchema = formEstablishmentSchema;
+  protected inputSchema = formEstablishmentSchema;
+
+  readonly #createNewEvent: CreateNewEvent;
+
+  readonly #siretGateway: SiretGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
-    private readonly siretGateway: SiretGateway,
+    createNewEvent: CreateNewEvent,
+    siretGateway: SiretGateway,
   ) {
     super(uowPerformer);
+
+    this.#createNewEvent = createNewEvent;
+    this.#siretGateway = siretGateway;
   }
 
-  public async _execute(
+  protected async _execute(
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
@@ -36,7 +43,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
       );
     }
     if (isApiInseeEnabled) {
-      await rejectsSiretIfNotAnOpenCompany(this.siretGateway, dto.siret);
+      await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, dto.siret);
     }
 
     const appellations =
@@ -49,7 +56,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
       appellations,
     };
 
-    const event = this.createNewEvent({
+    const event = this.#createNewEvent({
       topic: "FormEstablishmentAdded",
       payload: correctFormEstablishement,
       ...(isApiInseeEnabled ? {} : { wasQuarantined: true }),

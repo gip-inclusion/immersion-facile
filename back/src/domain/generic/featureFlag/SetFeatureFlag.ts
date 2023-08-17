@@ -3,7 +3,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class SetFeatureFlag extends TransactionalUseCase<SetFeatureFlagParam> {
-  inputSchema = setFeatureFlagSchema;
+  protected inputSchema = setFeatureFlagSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

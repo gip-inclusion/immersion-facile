@@ -15,13 +15,13 @@ export class PrivateListAgencies extends TransactionalUseCase<
   PrivateListAgenciesRequestDto,
   AgencyOption[]
 > {
-  inputSchema = privateListAgenciesRequestSchema;
+  protected inputSchema = privateListAgenciesRequestSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
-  public async _execute(
+  protected async _execute(
     { status }: PrivateListAgenciesRequestDto,
     uow: UnitOfWork,
   ): Promise<AgencyOption[]> {

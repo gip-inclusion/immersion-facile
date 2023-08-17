@@ -12,7 +12,7 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
   WithAgencyId,
   AgencyPublicDisplayDto
 > {
-  inputSchema = withAgencyIdSchema;
+  protected inputSchema = withAgencyIdSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

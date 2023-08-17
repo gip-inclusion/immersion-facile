@@ -52,14 +52,20 @@ export class SignConvention extends TransactionalUseCase<
   void,
   WithConventionIdLegacy
 > {
-  inputSchema = z.void();
+  protected inputSchema = z.void();
+
+  readonly #createNewEvent: CreateNewEvent;
+
+  readonly #timeGateway: TimeGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly createNewEvent: CreateNewEvent,
-    private timeGateway: TimeGateway,
+    createNewEvent: CreateNewEvent,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
+    this.#timeGateway = timeGateway;
   }
 
   public async _execute(
@@ -81,7 +87,7 @@ export class SignConvention extends TransactionalUseCase<
     const signedConvention = signConventionDtoWithRole(
       initialConvention,
       role,
-      this.timeGateway.now().toISOString(),
+      this.#timeGateway.now().toISOString(),
     );
     throwIfTransitionNotAllowed({
       role,
@@ -94,7 +100,7 @@ export class SignConvention extends TransactionalUseCase<
 
     const domainTopic = domainTopicByTargetStatusMap[signedConvention.status];
     if (domainTopic) {
-      const event = this.createNewEvent({
+      const event = this.#createNewEvent({
         topic: domainTopic,
         payload: signedConvention,
       });

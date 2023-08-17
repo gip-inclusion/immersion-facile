@@ -30,16 +30,19 @@ const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> = z.object({
 });
 
 export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLinkPayload> {
-  inputSchema = renewMagicLinkPayloadSchema;
+  protected inputSchema = renewMagicLinkPayloadSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
-  public async _execute(
+  protected async _execute(
     {
       emails,
       magicLink,
@@ -49,7 +52,7 @@ export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLink
     }: RenewMagicLinkPayload,
     uow: UnitOfWork,
   ): Promise<void> {
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "MAGIC_LINK_RENEWAL",

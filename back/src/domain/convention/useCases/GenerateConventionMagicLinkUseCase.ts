@@ -12,13 +12,19 @@ export class GenerateConventionMagicLinkUseCase extends UseCase<
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto
 > {
-  inputSchema = generateMagicLinkRequestSchema;
+  protected inputSchema = generateMagicLinkRequestSchema;
+
+  readonly #generateMagicLinkJwt: GenerateConventionJwt;
+
+  readonly #timeGateway: TimeGateway;
 
   constructor(
-    private readonly generateMagicLinkJwt: GenerateConventionJwt,
-    private readonly timeGateway: TimeGateway,
+    generateMagicLinkJwt: GenerateConventionJwt,
+    timeGateway: TimeGateway,
   ) {
     super();
+    this.#generateMagicLinkJwt = generateMagicLinkJwt;
+    this.#timeGateway = timeGateway;
   }
 
   //eslint-disable-next-line @typescript-eslint/require-await
@@ -27,7 +33,7 @@ export class GenerateConventionMagicLinkUseCase extends UseCase<
     role,
     expired,
   }: GenerateMagicLinkRequestDto) {
-    const now = this.timeGateway.now();
+    const now = this.#timeGateway.now();
     const twoDaysAgo = Math.round((now.getTime() - 48 * 3600 * 1000) / 1000);
     const payload = createConventionMagicLinkPayload({
       id: applicationId,
@@ -38,7 +44,7 @@ export class GenerateConventionMagicLinkUseCase extends UseCase<
       exp: expired ? twoDaysAgo : undefined,
     });
     return {
-      jwt: this.generateMagicLinkJwt(payload),
+      jwt: this.#generateMagicLinkJwt(payload),
     };
   }
 }

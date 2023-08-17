@@ -10,7 +10,7 @@ export class NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm extends
   EstablishmentAggregate,
   void
 > {
-  inputSchema = z.any(); // No need of a validation schema here since this use-case is only called from the our domain
+  protected inputSchema = z.any(); // No need of a validation schema here since this use-case is only called from the our domain
 
   constructor(private passEmploiGateway: PassEmploiGateway) {
     super();

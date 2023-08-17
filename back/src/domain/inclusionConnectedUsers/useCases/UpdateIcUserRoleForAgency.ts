@@ -19,13 +19,17 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   void,
   BackOfficeJwtPayload
 > {
-  inputSchema = icUserRoleForAgencyParamsSchema;
+  protected inputSchema = icUserRoleForAgencyParamsSchema;
+
+  readonly #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+
+    this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(
@@ -68,7 +72,7 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
       ),
     };
 
-    const event: DomainEvent = this.createNewEvent({
+    const event: DomainEvent = this.#createNewEvent({
       topic: "IcUserAgencyRightChanged",
       payload: params,
     });

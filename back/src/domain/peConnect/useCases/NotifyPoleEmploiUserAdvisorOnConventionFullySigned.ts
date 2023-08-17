@@ -6,15 +6,25 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<ConventionDto> {
-  inputSchema = conventionSchema;
+  protected inputSchema = conventionSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #timeGateway: TimeGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private readonly timeGateway: TimeGateway,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
+
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#timeGateway = timeGateway;
   }
 
   public async _execute(
@@ -33,7 +43,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
     if (conventionPeAdvisor && conventionPeAdvisor.advisor && agency)
-      await this.saveNotificationAndRelatedEvent(uow, {
+      await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
@@ -50,12 +60,12 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
             immersionAddress: convention.immersionAddress,
-            magicLink: this.generateConventionMagicLinkUrl({
+            magicLink: this.#generateConventionMagicLinkUrl({
               id: convention.id,
               role: "validator",
               targetRoute: frontRoutes.manageConvention,
               email: conventionPeAdvisor.advisor.email,
-              now: this.timeGateway.now(),
+              now: this.#timeGateway.now(),
             }),
           },
         },

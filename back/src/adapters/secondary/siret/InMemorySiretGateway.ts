@@ -65,23 +65,23 @@ const apiSirenUnexpectedError = "apiSirenUnexpectedError";
 type EstablishmentBySiret = { [siret: string]: SiretEstablishmentDto };
 
 export class InMemorySiretGateway implements SiretGateway {
-  private _error: any = null;
+  public siretEstablishmentsUpdateSince: SiretEstablishmentDto[] = [];
 
-  private readonly _repo: EstablishmentBySiret = {
+  #error: any = null;
+
+  readonly #repo: EstablishmentBySiret = {
     [TEST_OPEN_ESTABLISHMENT_1.siret]: TEST_OPEN_ESTABLISHMENT_1,
     [TEST_OPEN_ESTABLISHMENT_2.siret]: TEST_OPEN_ESTABLISHMENT_2,
     [TEST_OPEN_ESTABLISHMENT_3.siret]: TEST_OPEN_ESTABLISHMENT_3,
     [TEST_CLOSED_ESTABLISHMENT_1.siret]: TEST_CLOSED_ESTABLISHMENT_1,
   };
 
-  public siretEstablishmentsUpdateSince: SiretEstablishmentDto[] = [];
-
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SiretEstablishmentDto | undefined> {
     try {
-      if (this._error) throw this._error;
+      if (this.#error) throw this.#error;
       if (siret === apiSirenUnexpectedError)
         throw {
           initialError: {
@@ -100,7 +100,7 @@ export class InMemorySiretGateway implements SiretGateway {
         };
 
       logger.info({ siret, includeClosedEstablishments }, "get");
-      const establishment = this._repo[siret];
+      const establishment = this.#repo[siret];
       if (!establishment) return;
       if (!establishment.isOpen && !includeClosedEstablishments) return;
 
@@ -133,11 +133,11 @@ export class InMemorySiretGateway implements SiretGateway {
   }
 
   public setError(error: any) {
-    this._error = error;
+    this.#error = error;
   }
 
   // Visible for testing
   public setSirenEstablishment(establishment: SiretEstablishmentDto) {
-    this._repo[establishment.siret] = establishment;
+    this.#repo[establishment.siret] = establishment;
   }
 }

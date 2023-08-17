@@ -29,13 +29,22 @@ export const noSignatoryMessage = (convention: ConventionDto): string =>
 export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<ConventionDto> {
   protected inputSchema = conventionSchema;
 
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #timeGateway: TimeGateway;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private readonly timeGateway: TimeGateway,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
@@ -51,20 +60,20 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       savedConvention.agencyId,
     ]);
     if (!agency) throw new Error(missingAgencyMessage(savedConvention));
-    return this.onRepositoryConvention(uow, savedConvention, agency);
+    return this.#onRepositoryConvention(uow, savedConvention, agency);
   }
 
-  private emailToSend(
+  #emailToSend(
     convention: ConventionDto,
     lastSignee: { signedAt: string; email: string; role: SignatoryRole },
     agency: AgencyDto,
   ): TemplatedEmail {
-    const conventionStatusLink = this.generateConventionMagicLinkUrl({
+    const conventionStatusLink = this.#generateConventionMagicLinkUrl({
       targetRoute: frontRoutes.conventionStatusDashboard,
       id: convention.id,
       role: lastSignee.role,
       email: lastSignee.email,
-      now: this.timeGateway.now(),
+      now: this.#timeGateway.now(),
     });
 
     return {
@@ -80,7 +89,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     };
   }
 
-  private lastSigneeEmail(
+  #lastSigneeEmail(
     signatories: Signatory[],
   ): { signedAt: string; email: string; role: SignatoryRole } | undefined {
     const signatoryEmailsOrderedBySignedAt = signatories
@@ -100,18 +109,22 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     return signatoryEmailsOrderedBySignedAt.at(-1);
   }
 
-  private onRepositoryConvention(
+  #onRepositoryConvention(
     uow: UnitOfWork,
     convention: ConventionDto,
     agency: AgencyDto,
   ): Promise<void> {
-    const lastSigneeEmail = this.lastSigneeEmail(
+    const lastSigneeEmail = this.#lastSigneeEmail(
       Object.values(convention.signatories),
     );
     if (lastSigneeEmail)
-      return this.saveNotificationAndRelatedEvent(uow, {
+      return this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
-        templatedContent: this.emailToSend(convention, lastSigneeEmail, agency),
+        templatedContent: this.#emailToSend(
+          convention,
+          lastSigneeEmail,
+          agency,
+        ),
         followedIds: {
           conventionId: convention.id,
           agencyId: convention.agencyId,

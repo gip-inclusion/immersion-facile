@@ -7,7 +7,7 @@ export class ConvertRomeToAppellationForEstablishment extends TransactionalUseCa
   SiretAndRomeDto,
   AppellationCode
 > {
-  inputSchema = siretAndRomeSchema;
+  protected inputSchema = siretAndRomeSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

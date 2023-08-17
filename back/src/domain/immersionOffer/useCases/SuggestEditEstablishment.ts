@@ -12,15 +12,25 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
-  inputSchema = siretSchema;
+  protected inputSchema = siretSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private timeGateway: TimeGateway,
-    private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    timeGateway: TimeGateway,
+    generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
   ) {
     super(uowPerformer);
+
+    this.#generateEditFormEstablishmentUrl = generateEditFormEstablishmentUrl;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
@@ -35,17 +45,17 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
     if (!contact)
       throw Error(`Email du contact introuvable, pour le siret : ${siret}`);
 
-    const now = this.timeGateway.now();
+    const now = this.#timeGateway.now();
 
     const payload = createEstablishmentMagicLinkPayload({
       siret,
       now,
       durationDays: 2,
     });
-    const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
+    const editFrontUrl = this.#generateEditFormEstablishmentUrl(payload);
 
     try {
-      await this.saveNotificationAndRelatedEvent(uow, {
+      await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",

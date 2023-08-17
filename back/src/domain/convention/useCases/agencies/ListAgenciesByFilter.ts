@@ -15,7 +15,7 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
   ListAgenciesRequestDto,
   AgencyOption[]
 > {
-  inputSchema = listAgenciesRequestSchema;
+  protected inputSchema = listAgenciesRequestSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

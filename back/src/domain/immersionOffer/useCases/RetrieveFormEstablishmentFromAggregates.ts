@@ -18,7 +18,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   FormEstablishmentDto,
   EstablishmentJwtPayload | BackOfficeJwtPayload
 > {
-  inputSchema = siretSchema;
+  protected inputSchema = siretSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
@@ -35,11 +35,11 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     const isValidBackOfficeJwtPayload =
       "role" in jwtPayload && jwtPayload.role === "backOffice";
     if (isValidBackOfficeJwtPayload || isValidEstablishmentJwtPayload)
-      return this.onValidJwt(uow, siret);
+      return this.#onValidJwt(uow, siret);
     throw new ForbiddenError();
   }
 
-  private async onValidJwt(uow: UnitOfWork, siret: SiretDto) {
+  async #onValidJwt(uow: UnitOfWork, siret: SiretDto) {
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,

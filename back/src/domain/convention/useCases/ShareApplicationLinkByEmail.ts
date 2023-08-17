@@ -11,15 +11,24 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkByEmailDto> {
-  inputSchema = shareLinkByEmailSchema;
+  protected inputSchema = shareLinkByEmailSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
+  readonly #config: AppConfig;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    private readonly config: AppConfig,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    config: AppConfig,
   ) {
     super(uowPerformer);
+    this.#config = config;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
   }
 
   public async _execute(
@@ -29,10 +38,10 @@ export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkB
     const shortLink = await makeShortLink({
       uow,
       longLink: params.conventionLink as AbsoluteUrl,
-      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
-      config: this.config,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
+      config: this.#config,
     });
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "SHARE_DRAFT_CONVENTION_BY_LINK",

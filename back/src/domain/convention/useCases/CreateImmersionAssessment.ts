@@ -17,13 +17,16 @@ import {
 } from "../entities/ImmersionAssessmentEntity";
 
 export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAssessmentDto> {
-  inputSchema = immersionAssessmentSchema;
+  protected inputSchema = immersionAssessmentSchema;
+
+  #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
   }
 
   public async _execute(
@@ -36,7 +39,7 @@ export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAss
     const immersionAssessmentEntity =
       await validateConventionAndCreateImmersionAssessmentEntity(uow, dto);
 
-    const event = this.createNewEvent({
+    const event = this.#createNewEvent({
       topic: "ImmersionAssessmentCreated",
       payload: dto,
     });

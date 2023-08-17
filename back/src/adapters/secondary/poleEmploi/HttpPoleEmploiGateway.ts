@@ -30,35 +30,49 @@ const logger = createLogger(__filename);
 const poleEmploiMaxRequestsPerSeconds = 3;
 
 export class HttpPoleEmploiGateway implements PoleEmploiGateway {
-  private limiter = new Bottleneck({
+  #limiter = new Bottleneck({
     reservoir: poleEmploiMaxRequestsPerSeconds,
     reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: poleEmploiMaxRequestsPerSeconds,
   });
 
-  private peTestPrefix: "test" | "";
+  #peTestPrefix: "test" | "";
+
+  readonly #httpClient: HttpClient<PoleEmploiTargets>;
+
+  readonly #caching: InMemoryCachingGateway<GetAccessTokenResponse>;
+
+  readonly #accessTokenConfig: AccessTokenConfig;
+
+  readonly #retryStrategy: RetryStrategy;
 
   constructor(
-    private readonly httpClient: HttpClient<PoleEmploiTargets>,
-    private readonly caching: InMemoryCachingGateway<GetAccessTokenResponse>,
+    httpClient: HttpClient<PoleEmploiTargets>,
+    caching: InMemoryCachingGateway<GetAccessTokenResponse>,
     peApiUrl: AbsoluteUrl,
-    private readonly accessTokenConfig: AccessTokenConfig,
-    private readonly retryStrategy: RetryStrategy,
+    accessTokenConfig: AccessTokenConfig,
+    retryStrategy: RetryStrategy,
   ) {
-    this.peTestPrefix = getPeTestPrefix(peApiUrl);
+    this.#peTestPrefix = getPeTestPrefix(peApiUrl);
+    this.#accessTokenConfig = accessTokenConfig;
+    this.#caching = caching;
+    this.#httpClient = httpClient;
+    this.#retryStrategy = retryStrategy;
   }
 
   public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
-    return this.caching.caching(scope, () =>
-      this.retryStrategy.apply(() =>
-        this.limiter.schedule(() =>
+    return this.#caching.caching(scope, () =>
+      this.#retryStrategy.apply(() =>
+        this.#limiter.schedule(() =>
           createAxiosInstance(logger)
             .post(
-              `${this.accessTokenConfig.peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+              `${
+                this.#accessTokenConfig.peEnterpriseUrl
+              }/connexion/oauth2/access_token?realm=%2Fpartenaire`,
               querystring.stringify({
                 grant_type: "client_credentials",
-                client_id: this.accessTokenConfig.clientId,
-                client_secret: this.accessTokenConfig.clientSecret,
+                client_id: this.#accessTokenConfig.clientId,
+                client_secret: this.#accessTokenConfig.clientSecret,
                 scope,
               }),
               {
@@ -91,7 +105,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         originalId: poleEmploiConvention.originalId,
       },
     });
-    return this.postPoleEmploiConvention(poleEmploiConvention)
+    return this.#postPoleEmploiConvention(poleEmploiConvention)
       .then((response) => {
         logger.info({
           _title: "PeBroadcast",
@@ -156,15 +170,15 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       });
   }
 
-  private async postPoleEmploiConvention(
+  async #postPoleEmploiConvention(
     poleEmploiConvention: PoleEmploiConvention,
   ): Promise<HttpResponse<void>> {
     const accessTokenResponse = await this.getAccessToken(
-      `echangespmsmp api_${this.peTestPrefix}immersion-prov2`,
+      `echangespmsmp api_${this.#peTestPrefix}immersion-prov2`,
     );
 
-    return this.limiter.schedule(() =>
-      this.httpClient.broadcastConvention({
+    return this.#limiter.schedule(() =>
+      this.#httpClient.broadcastConvention({
         body: poleEmploiConvention,
         headers: {
           authorization: `Bearer ${accessTokenResponse.access_token}`,
