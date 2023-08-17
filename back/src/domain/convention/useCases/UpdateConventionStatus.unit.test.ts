@@ -113,7 +113,7 @@ describe("UpdateConventionStatus", () => {
           payload: {
             convention,
             justification: "because",
-            role: requesterRole,
+            requesterRole,
             modifierRole: "beneficiary",
           },
         }),

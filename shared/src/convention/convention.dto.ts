@@ -246,7 +246,7 @@ export type UpdateConventionStatusWithJustificationWhithoutModierRole = {
   statusJustification: string;
 };
 
-export type UpdateConventionStatusWithJustificationWhithModierRole = {
+export type UpdateConventionStatusWithJustificationWithModifierRole = {
   status: Extract<ConventionStatusWithJustification, "DRAFT">;
   conventionId: ConventionId;
   statusJustification: string;
@@ -255,7 +255,7 @@ export type UpdateConventionStatusWithJustificationWhithModierRole = {
 
 export type UpdateConventionStatusWithJustification =
   | UpdateConventionStatusWithJustificationWhithoutModierRole
-  | UpdateConventionStatusWithJustificationWhithModierRole;
+  | UpdateConventionStatusWithJustificationWithModifierRole;
 
 export type UpdateConventionStatusRequestDto =
   | UpdateConventionStatusWithoutJustification

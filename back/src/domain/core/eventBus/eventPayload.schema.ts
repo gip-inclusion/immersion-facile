@@ -16,7 +16,7 @@ const agencyActorRequestConventionModificationPayloadSchema: z.Schema<AgencyActo
   z.object({
     convention: conventionSchema,
     justification: zTrimmedString,
-    role: z.enum(allRoles),
+    requesterRole: z.enum(allRoles),
     modifierRole: z.enum(agencyModifierRoles),
     agencyActorEmail: zTrimmedString,
   });
@@ -25,7 +25,7 @@ const signatoryRequestConventionModificationPayloadSchema: z.Schema<SignatoryReq
   z.object({
     convention: conventionSchema,
     justification: zTrimmedString,
-    role: z.enum(allRoles),
+    requesterRole: z.enum(allRoles),
     modifierRole: z.enum(allSignatoryRoles),
   });
 

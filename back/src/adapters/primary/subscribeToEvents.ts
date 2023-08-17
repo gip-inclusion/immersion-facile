@@ -61,7 +61,7 @@ const getUseCasesByTopics = (
 
   // Edge cases for immersion application.
   ImmersionApplicationRequiresModification: [
-    useCases.notifyAccurateActorThatConventionNeedsModifications,
+    useCases.notifyActorThatConventionNeedsModifications,
     {
       useCaseName: "BroadcastToPoleEmploi",
       execute: ({ convention }) =>

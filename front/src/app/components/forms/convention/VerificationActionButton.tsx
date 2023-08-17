@@ -11,7 +11,7 @@ import {
   Role,
   UpdateConventionStatusRequestDto,
 } from "shared";
-import { JustificationModalContent } from "./justificationModaleContent";
+import { JustificationModalContent } from "./JustificationModalContent";
 
 export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;

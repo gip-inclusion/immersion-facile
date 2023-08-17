@@ -28,10 +28,7 @@ import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import {
-  // backOfficeEmail,
-  NotifyAccurateActorThatConventionNeedsModifications,
-} from "./NotifyAccurateActorThatConventionNeedsModifications";
+import { NotifyActorThatConventionNeedsModifications } from "./NotifyActorThatConventionNeedsModifications";
 
 const beneficiaryCurrentEmployerEmail = "current@employer.com";
 const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
@@ -65,7 +62,7 @@ const agency = new AgencyDtoBuilder()
   .build();
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {
-  let usecase: NotifyAccurateActorThatConventionNeedsModifications;
+  let usecase: NotifyActorThatConventionNeedsModifications;
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
   let config: AppConfig;
@@ -90,7 +87,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
       timeGateway,
     );
 
-    usecase = new NotifyAccurateActorThatConventionNeedsModifications(
+    usecase = new NotifyActorThatConventionNeedsModifications(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
@@ -159,7 +156,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
           {
             convention,
             justification,
-            role,
+            requesterRole: role,
             modifierRole,
             agencyActorEmail,
           };

@@ -1,4 +1,4 @@
-import { Signatories } from "..";
+import { Signatories } from "../convention/convention.dto";
 
 export type Role = (typeof allRoles)[number];
 export type SignatoryRole = (typeof allSignatoryRoles)[number];
