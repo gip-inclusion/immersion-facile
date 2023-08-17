@@ -76,7 +76,10 @@ export const NPSForm = ({
             text: "👋",
             animation: "wave",
           },
-          hiddenFields: conventionInfos,
+          hiddenFields: {
+            id: conventionInfos.id,
+            role: conventionInfos.role,
+          },
           open: {
             trigger: "time",
             ms: 2000,

@@ -709,11 +709,7 @@ export const ConventionDocumentPage = ({
           </footer>
           <NPSForm
             mode="popup"
-            formId={
-              role.includes("beneficiary")
-                ? npsFormIds.beneficiary
-                : npsFormIds.establishment
-            }
+            formId={npsFormIds.conventionValidated}
             conventionInfos={{
               id: convention.id,
               role,

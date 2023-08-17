@@ -20,7 +20,7 @@ export const NpsSection = ({
       {role !== "backOffice" && npsShowStatuses.includes(convention.status) && (
         <NPSForm
           mode="embed"
-          formId={npsFormIds.agency}
+          formId={npsFormIds.conventionVerification}
           conventionInfos={{
             id: convention.id,
             role,

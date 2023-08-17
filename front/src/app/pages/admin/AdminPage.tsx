@@ -13,48 +13,50 @@ import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab, isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
 
-const getAdminTabs = (
-  currentTab: AdminTab,
-): Array<TabsProps.Controlled["tabs"][number] & { content: React.ReactNode }> =>
-  [
-    {
-      label: "Conventions",
-      tabId: "conventions",
-      content: <ConventionTab />,
-    },
-    {
-      label: "Evénements",
-      tabId: "events",
-      content: <EventsTab />,
-    },
-    {
-      label: "Agences",
-      tabId: "agencies",
-      content: <AgencyTab />,
-    },
-    {
-      label: "Établissements",
-      tabId: "establishments",
-      content: <EstablishmentsTab />,
-    },
-    {
-      label: "Notifications",
-      tabId: "notifications",
-      content: <NotificationsTab />,
-    },
-    {
-      label: "Aperçu email",
-      tabId: "email-preview",
-      content: <EmailPreviewTab />,
-    },
-    {
-      label: "Options techniques",
-      tabId: "technical-options",
-      content: <TechnicalOptions />,
-    },
-  ].map((tab) => ({
+const rawAdminTabs: Array<
+  TabsProps.Controlled["tabs"][number] & { content: React.ReactNode }
+> = [
+  {
+    label: "Conventions",
+    tabId: "conventions",
+    content: <ConventionTab />,
+  },
+  {
+    label: "Evénements",
+    tabId: "events",
+    content: <EventsTab />,
+  },
+  {
+    label: "Agences",
+    tabId: "agencies",
+    content: <AgencyTab />,
+  },
+  {
+    label: "Établissements",
+    tabId: "establishments",
+    content: <EstablishmentsTab />,
+  },
+  {
+    label: "Notifications",
+    tabId: "notifications",
+    content: <NotificationsTab />,
+  },
+  {
+    label: "Aperçu email",
+    tabId: "email-preview",
+    content: <EmailPreviewTab />,
+  },
+  {
+    label: "Options techniques",
+    tabId: "technical-options",
+    content: <TechnicalOptions />,
+  },
+];
+
+const getAdminTabs = (currentTab: AdminTab) =>
+  rawAdminTabs.map((tab) => ({
     ...tab,
-    tabId: tab.tabId as AdminTab,
+    tabId: tab.tabId,
     isDefault: currentTab === tab.tabId,
   }));
 
