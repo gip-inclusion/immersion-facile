@@ -1,4 +1,3 @@
-import { prop } from "ramda";
 import { SiretDto } from "shared";
 import {
   DeletedEstablishementDto,
@@ -10,9 +9,17 @@ export class InMemoryDeletedEstablishmentRepository
 {
   #deletedEstablishments: DeletedEstablishementDto[] = [];
 
-  public async isSiretsDeleted(siretsToCheck: SiretDto[]): Promise<SiretDto[]> {
-    return siretsToCheck.filter((siret) =>
-      this.#deletedEstablishments.map(prop("siret")).includes(siret),
+  public async areSiretsDeleted(
+    siretsToCheck: SiretDto[],
+  ): Promise<Record<SiretDto, boolean>> {
+    return siretsToCheck.reduce<Record<SiretDto, boolean>>(
+      (acc, siretToCheck) => ({
+        ...acc,
+        [siretToCheck]: this.#deletedEstablishments.some(
+          (deletedEstablishment) => deletedEstablishment.siret === siretToCheck,
+        ),
+      }),
+      {},
     );
   }
 

@@ -47,7 +47,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     sub: "admin",
   };
 
-  it("throws an error if there is jwt", async () => {
+  it("throws an error if there is no jwt", async () => {
     const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
       useCase.execute(establishmentJwtPayload.siret),

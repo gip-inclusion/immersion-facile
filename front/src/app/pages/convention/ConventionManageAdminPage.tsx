@@ -31,7 +31,7 @@ export const ConventionManageAdminPage = ({
           <Alert
             severity="error"
             title="Non autorisé"
-            description="Cette page est reservé aux administrateurs d'immersion facilitée."
+            description="Cette page est reservé aux administrateurs d'Immersion Facilitée."
           />
         )}
       </MainWrapper>

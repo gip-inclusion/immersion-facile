@@ -15,15 +15,24 @@ export class PgDeletedEstablishmentRepository
     this.#client = client;
   }
 
-  public async isSiretsDeleted(siretsToCheck: SiretDto[]): Promise<SiretDto[]> {
+  public async areSiretsDeleted(
+    siretsToCheck: SiretDto[],
+  ): Promise<Record<SiretDto, boolean>> {
     const query = `
-      SELECT siret
+      SELECT DISTINCT siret
       FROM establishments_deleted
       WHERE siret = ANY($1)
     `;
-    return (
-      await this.#client.query<{ siret: SiretDto }>(query, [siretsToCheck])
-    ).rows.map((row) => row.siret);
+    const result = await this.#client.query<{ siret: SiretDto }>(query, [
+      siretsToCheck,
+    ]);
+    return siretsToCheck.reduce<Record<SiretDto, boolean>>(
+      (acc, siretToCheck) => ({
+        ...acc,
+        [siretToCheck]: result.rows.some((row) => row.siret === siretToCheck),
+      }),
+      {},
+    );
   }
 
   public async save(

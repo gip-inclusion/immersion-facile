@@ -15,6 +15,12 @@ import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
 import { PgFormEstablishmentRepository } from "./PgFormEstablishmentRepository";
 
 describe("PgFormEstablishmentRepository", () => {
+  const formEstablishment = FormEstablishmentDtoBuilder.valid()
+    .withSource("lesentreprises-sengagent")
+    .withSiret("88888888888888")
+    .withMaxContactsPerWeek(8)
+    .build();
+
   let pool: Pool;
   let client: PoolClient;
   let formEstablishmentRepository: PgFormEstablishmentRepository;
@@ -36,12 +42,6 @@ describe("PgFormEstablishmentRepository", () => {
 
   describe("save & get", () => {
     it("Adds a new FormEstablishment", async () => {
-      const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withSource("lesentreprises-sengagent")
-        .withSiret("88888888888888")
-        .withMaxContactsPerWeek(8)
-        .build();
-
       await formEstablishmentRepository.create(formEstablishment);
 
       expectToEqual(
@@ -79,11 +79,6 @@ describe("PgFormEstablishmentRepository", () => {
 
   describe("update", () => {
     it("update all fields if establishment indeed exists", async () => {
-      const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withSiret("88888888888888")
-        .withBusinessName("oldName")
-        .build();
-
       await formEstablishmentRepository.create(formEstablishment);
 
       expectToEqual(await formEstablishmentRepository.getAll(), [
@@ -103,11 +98,6 @@ describe("PgFormEstablishmentRepository", () => {
     });
 
     it("establishment does not exist", async () => {
-      const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withSiret("88888888888888")
-        .withBusinessName("oldName")
-        .build();
-
       await expectPromiseToFailWithError(
         formEstablishmentRepository.update(formEstablishment),
         new ConflictError(
@@ -119,10 +109,6 @@ describe("PgFormEstablishmentRepository", () => {
 
   describe("delete", () => {
     it("delete establishment", async () => {
-      const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withSiret("88888888888888")
-        .withBusinessName("oldName")
-        .build();
       await formEstablishmentRepository.create(formEstablishment);
 
       await formEstablishmentRepository.delete(formEstablishment.siret);
@@ -131,11 +117,6 @@ describe("PgFormEstablishmentRepository", () => {
     });
 
     it("establishment not found", async () => {
-      const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withSiret("88888888888888")
-        .withBusinessName("oldName")
-        .build();
-
       await expectPromiseToFailWithError(
         formEstablishmentRepository.delete(formEstablishment.siret),
         new NotFoundError(

@@ -41,11 +41,11 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     log("Start");
     // Remove existing aggregate that could have been inserted by another process (eg. La Bonne Boite)
-    const establishlment =
+    const establishment =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         formEstablishment.siret,
       );
-    if (establishlment) {
+    if (establishment) {
       await uow.establishmentAggregateRepository.delete(
         formEstablishment.siret,
       );

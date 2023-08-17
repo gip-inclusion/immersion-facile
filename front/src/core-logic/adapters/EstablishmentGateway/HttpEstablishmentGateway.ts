@@ -15,79 +15,66 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   public addFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
   ): Observable<void> {
-    return from(this.#addFormEstablishment(formEstablishment));
+    return from(
+      this.httpClient
+        .addFormEstablishment({
+          body: formEstablishment,
+        })
+        .then((response) => response.responseBody),
+    );
   }
 
   public deleteEstablishment$(
     siret: SiretDto,
     jwt: BackOfficeJwt,
   ): Observable<void> {
-    return from(this.#deleteEstablishment(siret, jwt));
+    return from(
+      this.httpClient
+        .deleteEstablishment({
+          urlParams: { siret },
+          headers: { authorization: jwt },
+        })
+        .then((response) => response.responseBody),
+    );
   }
 
   public getFormEstablishmentFromJwt$(
     siret: SiretDto,
     jwt: EstablishmentJwt | BackOfficeJwt,
   ): Observable<FormEstablishmentDto> {
-    return from(this.#getFormEstablishmentFromJwt(siret, jwt));
+    return from(
+      this.httpClient
+        .getFormEstablishment({
+          urlParams: { siret },
+          headers: { authorization: jwt },
+        })
+        .then((response) => response.responseBody),
+    );
   }
 
   public requestEstablishmentModification$(siret: SiretDto): Observable<void> {
-    return from(this.#requestEstablishmentModification(siret));
+    return from(
+      this.httpClient
+        .requestEmailToUpdateFormRoute({
+          urlParams: { siret },
+        })
+        .then((response) => response.responseBody),
+    );
   }
 
   public updateFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
     jwt: EstablishmentJwt,
   ): Observable<void> {
-    return from(this.#updateFormEstablishment(formEstablishment, jwt));
-  }
-
-  async #addFormEstablishment(
-    formEstablishment: FormEstablishmentDto,
-  ): Promise<void> {
-    await this.httpClient.addFormEstablishment({
-      body: formEstablishment,
-    });
-  }
-
-  async #deleteEstablishment(
-    siret: SiretDto,
-    jwt: EstablishmentJwt | BackOfficeJwt,
-  ): Promise<void> {
-    await this.httpClient.deleteEstablishment({
-      urlParams: { siret },
-      headers: { authorization: jwt },
-    });
-  }
-
-  async #getFormEstablishmentFromJwt(
-    siret: SiretDto,
-    jwt: EstablishmentJwt | BackOfficeJwt,
-  ): Promise<FormEstablishmentDto> {
-    return (
-      await this.httpClient.getFormEstablishment({
-        urlParams: { siret },
-        headers: { authorization: jwt },
-      })
-    ).responseBody;
-  }
-
-  async #requestEstablishmentModification(siret: SiretDto): Promise<void> {
-    await this.httpClient.requestEmailToUpdateFormRoute({
-      urlParams: { siret },
-    });
-  }
-
-  async #updateFormEstablishment(
-    formEstablishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt,
-  ): Promise<void> {
-    await this.httpClient.updateFormEstablishment({
-      body: formEstablishment,
-      headers: {
-        authorization: jwt,
-      },
-    });
+    return from(
+      this.httpClient
+        .updateFormEstablishment({
+          body: formEstablishment,
+          headers: {
+            authorization: jwt,
+          },
+        })
+        .then((response) => response.responseBody),
+    );
   }
 }

@@ -40,7 +40,7 @@ describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTarg
     } = await buildTestApp());
   });
 
-  it("200 - Establishment Aggregate & Form deleted with back office JWT", async () => {
+  it("204 - Establishment Aggregate & Form deleted with back office JWT", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishmentAggregate,
     ];
