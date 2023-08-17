@@ -18,7 +18,6 @@ import {
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
 } from "shared";
-import { VerificationActions } from "./VerificationActionButton";
 
 export const JustificationModalContent = ({
   onSubmit,
@@ -29,7 +28,7 @@ export const JustificationModalContent = ({
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
-  newStatus: VerificationActions;
+  newStatus: ConventionStatusWithJustification;
   convention: ConventionDto;
   currentSignatoryRole: Role;
 }) => {

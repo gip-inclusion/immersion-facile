@@ -7,6 +7,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
   ConventionDto,
   ConventionField,
+  ConventionStatusWithJustification,
   domElementIds,
   getConventionFieldName,
   InternshipKind,
@@ -18,7 +19,6 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { JustificationModalContent } from "./JustificationModalContent";
-import { VerificationActions } from "./VerificationActionButton";
 
 const processedDataBySignatoryRole: Record<
   SignatoryRole,
@@ -68,7 +68,7 @@ type SignatureActionsProperties = {
   onSubmitClick: React.MouseEventHandler<HTMLButtonElement>;
   onModificationRequired: (params: UpdateConventionStatusRequestDto) => void;
   convention: ConventionDto;
-  newStatus: VerificationActions;
+  newStatus: ConventionStatusWithJustification;
   currentSignatoryRole: Role;
   onCloseSignModalWithoutSignature: Dispatch<SetStateAction<boolean>>;
 };

@@ -60,6 +60,7 @@ export const ConventionManageActions = ({
       {isAllowedTransition(convention.status, "REJECTED", role) && (
         <VerificationActionButton
           disabled={disabled}
+          initialStatus={convention.status}
           newStatus="REJECTED"
           convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("rejected")}
@@ -72,6 +73,7 @@ export const ConventionManageActions = ({
       {isAllowedTransition(convention.status, "DEPRECATED", role) && (
         <VerificationActionButton
           disabled={disabled}
+          initialStatus={convention.status}
           newStatus="DEPRECATED"
           onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
           convention={convention}
@@ -84,6 +86,7 @@ export const ConventionManageActions = ({
       {isAllowedTransition(convention.status, "DRAFT", role) && (
         <VerificationActionButton
           disabled={disabled}
+          initialStatus={convention.status}
           newStatus="DRAFT"
           onSubmit={createOnSubmitWithFeedbackKind(
             "modificationAskedFromCounsellorOrValidator",
@@ -101,6 +104,7 @@ export const ConventionManageActions = ({
         role,
       ) && (
         <VerificationActionButton
+          initialStatus={convention.status}
           newStatus="ACCEPTED_BY_COUNSELLOR"
           convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
@@ -119,6 +123,7 @@ export const ConventionManageActions = ({
         role,
       ) && (
         <VerificationActionButton
+          initialStatus={convention.status}
           newStatus="ACCEPTED_BY_VALIDATOR"
           convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("markedAsValidated")}
@@ -137,6 +142,7 @@ export const ConventionManageActions = ({
 
       {isAllowedTransition(convention.status, "CANCELLED", role) && (
         <VerificationActionButton
+          initialStatus={convention.status}
           newStatus="CANCELLED"
           convention={convention}
           onSubmit={createOnSubmitWithFeedbackKind("cancelled")}

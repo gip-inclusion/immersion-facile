@@ -1,21 +1,36 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   ConventionDto,
+  ConventionId,
   ConventionStatus,
+  ConventionStatusWithValidator,
   doesStatusNeedsJustification,
+  doesStatusNeedsValidators,
   domElementIds,
   Role,
   UpdateConventionStatusRequestDto,
 } from "shared";
 import { JustificationModalContent } from "./JustificationModalContent";
 
+type WithValidatorInfo = { firstname?: string; lastname?: string };
+const withValidatorInfoSchema: z.Schema<WithValidatorInfo> = z.object({
+  firstname: z.string().trim().optional(),
+  lastname: z.string().trim().optional(),
+});
+
 export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   disabled?: boolean;
+  initialStatus: ConventionStatus;
   newStatus: VerificationActions;
   children: string;
   convention: ConventionDto;
@@ -27,9 +42,9 @@ export type VerificationActions = Exclude<
   "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW"
 >;
 
-type VerificationActionsModal = Exclude<
+type VerificationOrValidatorActionsModal = Exclude<
   VerificationActions,
-  "ACCEPTED_BY_COUNSELLOR" | "ACCEPTED_BY_VALIDATOR"
+  "ACCEPTED_BY_VALIDATOR"
 >;
 
 const {
@@ -68,7 +83,16 @@ const {
   isOpenedByDefault: false,
 });
 
-const ModalByStatus = (status: VerificationActionsModal) => {
+const {
+  Component: ValidatorModal,
+  open: openValidatorModal,
+  close: closeValidatorModal,
+} = createModal({
+  id: "validator",
+  isOpenedByDefault: false,
+});
+
+const ModalByStatus = (status: VerificationOrValidatorActionsModal) => {
   const modals = {
     DRAFT: {
       modal: DraftModal,
@@ -90,6 +114,11 @@ const ModalByStatus = (status: VerificationActionsModal) => {
       openModal: openDeprecateModal,
       closeModal: closeDeprecateModal,
     },
+    ACCEPTED_BY_COUNSELLOR: {
+      modal: ValidatorModal,
+      openModal: openValidatorModal,
+      closeModal: closeValidatorModal,
+    },
   };
   return modals[status];
 };
@@ -101,6 +130,7 @@ export const VerificationActionButton = ({
   onSubmit,
   convention,
   currentSignatoryRole,
+  initialStatus,
 }: VerificationActionButtonProps) => {
   const iconByStatus: Partial<Record<ConventionStatus, FrIconClassName>> = {
     REJECTED: "fr-icon-close-circle-line",
@@ -121,6 +151,11 @@ export const VerificationActionButton = ({
   };
 
   const conventionId = convention.id;
+  const onActionButtonClick = () =>
+    doesStatusNeedsJustification(newStatus) ||
+    doesStatusNeedsValidators(initialStatus, newStatus)
+      ? ModalByStatus(newStatus).openModal()
+      : onSubmit({ status: newStatus, conventionId });
 
   return (
     <>
@@ -131,11 +166,7 @@ export const VerificationActionButton = ({
             ? "secondary"
             : "primary"
         }
-        onClick={() => {
-          doesStatusNeedsJustification(newStatus)
-            ? ModalByStatus(newStatus).openModal()
-            : onSubmit({ status: newStatus, conventionId });
-        }}
+        onClick={onActionButtonClick}
         className={fr.cx("fr-m-1w")}
         disabled={disabled}
         nativeButtonProps={{
@@ -144,9 +175,11 @@ export const VerificationActionButton = ({
       >
         {children}
       </Button>
-      {doesStatusNeedsJustification(newStatus) && (
+      {(doesStatusNeedsJustification(newStatus) ||
+        doesStatusNeedsValidators(initialStatus, newStatus)) && (
         <ModalWrapper
           title={children}
+          initialStatus={initialStatus}
           newStatus={newStatus}
           onSubmit={onSubmit}
           convention={convention}
@@ -159,18 +192,24 @@ export const VerificationActionButton = ({
 
 const ModalWrapper = ({
   title,
+  initialStatus,
   newStatus,
   onSubmit,
   convention,
   currentSignatoryRole,
 }: {
   title: string;
-  newStatus: VerificationActionsModal;
+  initialStatus: ConventionStatus;
+  newStatus: VerificationOrValidatorActionsModal;
   onSubmit: VerificationActionButtonProps["onSubmit"];
   convention: ConventionDto;
   currentSignatoryRole: Role;
 }) => {
-  if (!doesStatusNeedsJustification(newStatus)) return null;
+  if (
+    !doesStatusNeedsJustification(newStatus) &&
+    !doesStatusNeedsValidators(initialStatus, newStatus)
+  )
+    return null;
 
   const Modal = ModalByStatus(newStatus).modal;
   const closeModal = ModalByStatus(newStatus).closeModal;
@@ -178,15 +217,89 @@ const ModalWrapper = ({
   return createPortal(
     <Modal title={title}>
       <>
-        <JustificationModalContent
-          onSubmit={onSubmit}
-          closeModal={closeModal}
-          newStatus={newStatus}
-          convention={convention}
-          currentSignatoryRole={currentSignatoryRole}
-        />
+        {doesStatusNeedsJustification(newStatus) && (
+          <JustificationModalContent
+            onSubmit={onSubmit}
+            closeModal={closeModal}
+            newStatus={newStatus}
+            convention={convention}
+            currentSignatoryRole={currentSignatoryRole}
+          />
+        )}
+        {!doesStatusNeedsJustification(newStatus) && (
+          <ValidatorModalContent
+            onSubmit={onSubmit}
+            closeModal={closeModal}
+            newStatus={newStatus}
+            conventionId={convention.id}
+          />
+        )}
       </>
     </Modal>,
     document.body,
+  );
+};
+
+const ValidatorModalContent = ({
+  onSubmit,
+  closeModal,
+  newStatus,
+  conventionId,
+}: {
+  onSubmit: (params: UpdateConventionStatusRequestDto) => void;
+  closeModal: () => void;
+  newStatus: ConventionStatusWithValidator;
+  conventionId: ConventionId;
+}) => {
+  const { register, handleSubmit } = useForm<WithValidatorInfo>({
+    resolver: zodResolver(withValidatorInfoSchema),
+    mode: "onTouched",
+  });
+  const onFormSubmit: SubmitHandler<WithValidatorInfo> = ({
+    firstname,
+    lastname,
+  }) => {
+    onSubmit({ status: newStatus, conventionId, firstname, lastname });
+    closeModal();
+  };
+  return (
+    <>
+      <form onSubmit={handleSubmit(onFormSubmit)}>
+        <Input
+          label={"Nom du conseiller qui marque la demande (facultatif)"}
+          nativeInputProps={{
+            ...register("lastname"),
+          }}
+        />
+        <Input
+          label={"Prénom du conseiller qui marque la demande (facultatif)"}
+          nativeInputProps={{
+            ...register("firstname"),
+          }}
+        />
+        <ButtonsGroup
+          alignment="center"
+          inlineLayoutWhen="always"
+          buttons={[
+            {
+              type: "button",
+              priority: "secondary",
+              onClick: closeModal,
+              nativeButtonProps: {
+                id: domElementIds.manageConvention.validatorModalCancelButton,
+              },
+              children: "Annuler et revenir en arrière",
+            },
+            {
+              type: "submit",
+              nativeButtonProps: {
+                id: domElementIds.manageConvention.validatorModalSubmitButton,
+              },
+              children: "Terminer",
+            },
+          ]}
+        />
+      </form>
+    </>
   );
 };
