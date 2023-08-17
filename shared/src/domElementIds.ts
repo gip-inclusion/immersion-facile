@@ -237,6 +237,8 @@ export const domElementIds = {
       "im-convention-validation__deprecate-button",
     justificationModalCancelButton: "im-justification-modal__cancel-button",
     justificationModalSubmitButton: "im-justification-modal__submit-button",
+    validatorModalCancelButton: "im-validator-modal__cancel-button",
+    validatorModalSubmitButton: "im-validator-modal__submit-button",
   },
 
   establishment: {

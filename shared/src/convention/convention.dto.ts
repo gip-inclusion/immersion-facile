@@ -24,14 +24,13 @@ export const isBeneficiaryStudent = (
 ): beneficiary is Beneficiary<"mini-stage-cci"> =>
   "levelOfEducation" in beneficiary;
 
-type ConventionStatusWithoutJustification =
-  (typeof conventionStatusesWithoutJustification)[number];
+type ConventionStatusWithoutJustificationNorValidator =
+  (typeof conventionStatusesWithoutJustificationNorValidator)[number];
 
-export const conventionStatusesWithoutJustification = [
+export const conventionStatusesWithoutJustificationNorValidator = [
   "READY_TO_SIGN",
   "PARTIALLY_SIGNED",
   "IN_REVIEW",
-  "ACCEPTED_BY_COUNSELLOR",
   "ACCEPTED_BY_VALIDATOR",
 ] as const;
 
@@ -41,6 +40,16 @@ export const doesStatusNeedsJustification = (
   conventionStatusesWithJustification.includes(
     status as ConventionStatusWithJustification,
   );
+
+export const doesStatusNeedsValidators = (
+  initialStatus: ConventionStatus,
+  targetStatus: ConventionStatus,
+): boolean => {
+  const isValidatorRequired = conventionStatusesWithValidator.includes(
+    targetStatus as ConventionStatusWithValidator,
+  );
+  return isValidatorRequired && initialStatus === "IN_REVIEW";
+};
 
 export const conventionStatusesWithJustificationWithoutModifierRole = [
   "REJECTED",
@@ -58,10 +67,16 @@ export const conventionStatusesWithJustification = [
   ...conventionStatusesWithJustificationWithoutModifierRole,
   ...conventionStatusesWithJustificationWithModifierRole,
 ] as const;
+export type ConventionStatusWithValidator =
+  (typeof conventionStatusesWithValidator)[number];
+export const conventionStatusesWithValidator = [
+  "ACCEPTED_BY_COUNSELLOR",
+] as const;
 
 export const conventionStatuses = [
-  ...conventionStatusesWithoutJustification,
+  ...conventionStatusesWithoutJustificationNorValidator,
   ...conventionStatusesWithJustification,
+  ...conventionStatusesWithValidator,
 ] as const;
 
 export const maximumCalendarDayByInternshipKind: Record<
@@ -235,8 +250,15 @@ export type ListConventionsRequestDto = {
   status?: ConventionStatus;
 };
 
+export type UpdateConventionStatusWithValidator = {
+  status: ConventionStatusWithValidator;
+  conventionId: ConventionId;
+  lastname?: string;
+  firstname?: string;
+};
+
 export type UpdateConventionStatusWithoutJustification = {
-  status: ConventionStatusWithoutJustification;
+  status: ConventionStatusWithoutJustificationNorValidator;
   conventionId: ConventionId;
 };
 
@@ -259,7 +281,8 @@ export type UpdateConventionStatusWithJustification =
 
 export type UpdateConventionStatusRequestDto =
   | UpdateConventionStatusWithoutJustification
-  | UpdateConventionStatusWithJustification;
+  | UpdateConventionStatusWithJustification
+  | UpdateConventionStatusWithValidator;
 // prettier-ignore
 const _isAssignable = (isValid: UpdateConventionStatusRequestDto): { status: ConventionStatus } => isValid;
 

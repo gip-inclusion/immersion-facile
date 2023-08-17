@@ -44,7 +44,8 @@ import {
   conventionStatuses,
   conventionStatusesWithJustificationWithModifierRole,
   conventionStatusesWithJustificationWithoutModifierRole,
-  conventionStatusesWithoutJustification,
+  conventionStatusesWithoutJustificationNorValidator,
+  conventionStatusesWithValidator,
   EstablishmentRepresentative,
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
@@ -61,6 +62,7 @@ import {
   UpdateConventionStatusWithJustificationWithModifierRole,
   UpdateConventionStatusWithJustificationWithoutModierRole,
   UpdateConventionStatusWithoutJustification,
+  UpdateConventionStatusWithValidator,
   WithConventionId,
   WithConventionIdLegacy,
 } from "./convention.dto";
@@ -313,7 +315,7 @@ const justificationSchema = zTrimmedString;
 
 export const updateConventionStatusWithoutJustificationSchema: z.Schema<UpdateConventionStatusWithoutJustification> =
   z.object({
-    status: z.enum(conventionStatusesWithoutJustification),
+    status: z.enum(conventionStatusesWithoutJustificationNorValidator),
     conventionId: conventionIdSchema,
   });
 
@@ -330,12 +332,20 @@ export const updateConventionStatusWithJustificationWhithModierRoleSchema: z.Sch
     conventionId: conventionIdSchema,
     modifierRole: modifierRolesSchema,
   });
+const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatusWithValidator> =
+  z.object({
+    status: z.enum(conventionStatusesWithValidator),
+    conventionId: conventionIdSchema,
+    lastname: z.string().trim().optional(),
+    firstname: z.string().trim().optional(),
+  });
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z.union([
     updateConventionStatusWithoutJustificationSchema,
     updateConventionStatusWithJustificationWhithoutModierRoleSchema,
     updateConventionStatusWithJustificationWhithModierRoleSchema,
+    updateConventionStatusWithValidatorSchema,
   ]);
 
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =
