@@ -2,6 +2,7 @@ import {
   AgencyId,
   AgencyRole,
   AuthenticatedUserId,
+  backOfficeEmail,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionRelatedJwtPayload,
@@ -27,7 +28,6 @@ import {
   conventionMissingMessage,
   throwIfTransitionNotAllowed,
 } from "../entities/Convention";
-import { backOfficeEmail } from "./notifications/NotifyAccurateActorThatConventionNeedsModifications";
 
 const domainTopicByTargetStatusMap: Record<
   ConventionStatus,
@@ -125,7 +125,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
               params.modifierRole === "validator" ||
                 params.modifierRole === "counsellor"
                 ? {
-                    role,
+                    requesterRole: role,
                     convention: updatedConvention,
                     justification: params.statusJustification,
                     modifierRole: params.modifierRole,
@@ -136,7 +136,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
                     ),
                   }
                 : {
-                    role,
+                    requesterRole: role,
                     convention: updatedConvention,
                     justification: params.statusJustification,
                     modifierRole: params.modifierRole,

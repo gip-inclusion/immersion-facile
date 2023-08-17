@@ -326,14 +326,14 @@ const makeTestAcceptsStatusUpdate =
           ? {
               convention: expectedConvention,
               justification: updateStatusParams.statusJustification,
-              role,
+              requesterRole: role,
               modifierRole: updateStatusParams.modifierRole,
               agencyActorEmail: "agency-actor@gmail.com",
             }
           : {
               convention: expectedConvention,
               justification: updateStatusParams.statusJustification,
-              role,
+              requesterRole: role,
               modifierRole: updateStatusParams.modifierRole,
             };
 

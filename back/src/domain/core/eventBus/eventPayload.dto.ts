@@ -3,7 +3,7 @@ import { AgencyModifierRole, ConventionDto, Role, SignatoryRole } from "shared";
 type ConventionRequireModificationCommon = {
   convention: ConventionDto;
   justification: string;
-  role: Role;
+  requesterRole: Role;
 };
 export type AgencyActorRequestModificationPayload =
   ConventionRequireModificationCommon & {

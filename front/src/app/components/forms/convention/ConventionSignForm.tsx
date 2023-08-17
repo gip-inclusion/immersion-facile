@@ -82,7 +82,7 @@ export const ConventionSignForm = ({
     );
   };
 
-  const onModifiCationRequired =
+  const onModificationRequired =
     (feedbackKind: ConventionFeedbackKind) =>
     (updateStatusParams: UpdateConventionStatusRequestDto) =>
       dispatch(
@@ -135,7 +135,7 @@ export const ConventionSignForm = ({
             })}
             convention={convention}
             newStatus="DRAFT"
-            onModificationRequired={onModifiCationRequired(
+            onModificationRequired={onModificationRequired(
               "modificationsAskedFromSignatory",
             )}
             currentSignatoryRole={currentSignatory.role}

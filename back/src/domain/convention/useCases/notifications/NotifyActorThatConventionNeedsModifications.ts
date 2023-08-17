@@ -21,9 +21,7 @@ import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
-export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
-
-export class NotifyAccurateActorThatConventionNeedsModifications extends TransactionalUseCase<ConventionRequiresModificationPayload> {
+export class NotifyActorThatConventionNeedsModifications extends TransactionalUseCase<ConventionRequiresModificationPayload> {
   protected inputSchema = conventionRequiresModificationPayloadSchema;
 
   constructor(
@@ -54,7 +52,7 @@ export class NotifyAccurateActorThatConventionNeedsModifications extends Transac
     if (recipientOrError instanceof Error) throw recipientOrError;
 
     const requesterNameOrError = requesterNameByRole(
-      payload.role,
+      payload.requesterRole,
       payload.convention,
       agency,
     );
@@ -64,7 +62,7 @@ export class NotifyAccurateActorThatConventionNeedsModifications extends Transac
       kind: "email",
       templatedContent: await this.#prepareEmail(
         payload.convention,
-        payload.role,
+        payload.requesterRole,
         recipientOrError,
         uow,
         payload.justification,

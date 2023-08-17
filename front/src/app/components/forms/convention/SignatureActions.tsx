@@ -16,7 +16,7 @@ import {
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { JustificationModalContent } from "./justificationModaleContent";
+import { JustificationModalContent } from "./JustificationModalContent";
 import { VerificationActions } from "./VerificationActionButton";
 
 const processedDataBySignatoryRole: Record<

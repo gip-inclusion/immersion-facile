@@ -20,7 +20,7 @@ import { CreateImmersionAssessment } from "../../../domain/convention/useCases/C
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
-import { NotifyAccurateActorThatConventionNeedsModifications } from "../../../domain/convention/useCases/notifications/NotifyAccurateActorThatConventionNeedsModifications";
+import { NotifyActorThatConventionNeedsModifications } from "../../../domain/convention/useCases/notifications/NotifyActorThatConventionNeedsModifications";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled as NotifyAllActorsThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
@@ -395,8 +395,8 @@ export const createUseCases = (
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      notifyAccurateActorThatConventionNeedsModifications:
-        new NotifyAccurateActorThatConventionNeedsModifications(
+      notifyActorThatConventionNeedsModifications:
+        new NotifyActorThatConventionNeedsModifications(
           uowPerformer,
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,

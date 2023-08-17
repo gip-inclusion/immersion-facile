@@ -8,3 +8,5 @@ export const immersionFacileNoReplyEmailSender = {
   name: "Immersion Facilitée",
   email: immersionFacileNoReplyEmail,
 };
+
+export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
