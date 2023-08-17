@@ -43,33 +43,63 @@ const labelByRole: Record<SignatoryRole, string> = {
 
 export const createConventionFeedbackMessageByKind = (
   signatories: Signatories,
-): Record<ConventionFeedbackKind, NonNullable<ReactNode>> => ({
-  modificationsAskedFromSignatory:
-    "Vous avez renvoyé la demande pour modification.",
-  signedSuccessfully: "Votre accord a été enregistré.",
-  rejected:
-    "Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
-  modificationAskedFromCounsellorOrValidator:
-    "Succès. Vous allez recevoir un lien de modification par e-mail (peut-être dans une boite générique agence).",
-  markedAsEligible:
-    "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention.",
-  markedAsValidated:
-    "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail à chacun des signataires.",
-  justSubmitted: (
-    <InitialSubmitSuccessMessageBase>
-      {(values(signatories) as Signatory[])
-        .filter(filterNotFalsy)
-        .map(({ role, firstName, lastName }) => (
-          <li key={role}>
-            {labelByRole[role]}, {firstName} {lastName} doit confirmer et signer
-            cette demande (un mail avec lien de confirmation a été envoyé).
-          </li>
-        ))}
-    </InitialSubmitSuccessMessageBase>
-  ),
-  cancelled: "Succès. La convention a bien été annulée.",
-  deprecated:
-    "Succès. La convention a bien été supprimée. La confirmation de cette suppression va être communiquée par mail à chacun des signataires.",
+): Record<
+  ConventionFeedbackKind,
+  { title: string; message: NonNullable<ReactNode> }
+> => ({
+  modificationsAskedFromSignatory: {
+    title: "Succès",
+    message: "Vous avez renvoyé la demande pour modification.",
+  },
+  signedSuccessfully: {
+    title: "Succès",
+    message: "Votre accord a été enregistré.",
+  },
+  rejected: {
+    title: "Succès",
+    message:
+      "La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
+  },
+  modificationAskedFromCounsellorOrValidator: {
+    title: "Succès",
+    message:
+      "Vous allez recevoir un lien de modification par e-mail (peut-être dans une boite générique agence).",
+  },
+  markedAsEligible: {
+    title: "Convention marquée comme éligible !",
+    message:
+      "Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention.",
+  },
+  markedAsValidated: {
+    title: "Convention validée !",
+    message:
+      "La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail à chacun des signataires.",
+  },
+  justSubmitted: {
+    title: "Succès",
+    message: (
+      <InitialSubmitSuccessMessageBase>
+        {(values(signatories) as Signatory[])
+          .filter(filterNotFalsy)
+          .map(({ role, firstName, lastName }) => (
+            <li key={role}>
+              {labelByRole[role]}, {firstName} {lastName} doit confirmer et
+              signer cette demande (un mail avec lien de confirmation a été
+              envoyé).
+            </li>
+          ))}
+      </InitialSubmitSuccessMessageBase>
+    ),
+  },
+  cancelled: {
+    title: "Succès",
+    message: "La convention a bien été annulée.",
+  },
+  deprecated: {
+    title: "Succès",
+    message:
+      "La convention a bien été supprimée. La confirmation de cette suppression va être communiquée par mail à chacun des signataires.",
+  },
 });
 
 const InitialSubmitSuccessMessageBase = ({
