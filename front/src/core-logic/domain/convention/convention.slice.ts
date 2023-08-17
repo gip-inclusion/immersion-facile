@@ -164,7 +164,6 @@ export const conventionSlice = createSlice({
     ) => {
       state.isLoading = false;
       state.feedback = { kind: "signedSuccessfully" };
-      state.convention = null;
     },
     signConventionFailed: setFeedbackAsErrored,
 

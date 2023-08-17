@@ -101,7 +101,10 @@ export const ConventionSignForm = ({
   };
   if (alreadySigned) {
     return (
-      <Alert {...t.conventionAlreadySigned(convention.id)} severity="success" />
+      <Alert
+        {...t.conventionAlreadySigned(convention.id, convention.agencyName)}
+        severity="success"
+      />
     );
   }
   return (
