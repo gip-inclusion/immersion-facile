@@ -342,10 +342,10 @@ const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatus
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z.union([
+    updateConventionStatusWithValidatorSchema,
     updateConventionStatusWithoutJustificationSchema,
     updateConventionStatusWithJustificationWhithoutModierRoleSchema,
     updateConventionStatusWithJustificationWhithModierRoleSchema,
-    updateConventionStatusWithValidatorSchema,
   ]);
 
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =

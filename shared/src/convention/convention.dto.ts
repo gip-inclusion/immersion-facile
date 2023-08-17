@@ -31,7 +31,6 @@ export const conventionStatusesWithoutJustificationNorValidator = [
   "READY_TO_SIGN",
   "PARTIALLY_SIGNED",
   "IN_REVIEW",
-  "ACCEPTED_BY_VALIDATOR",
 ] as const;
 
 export const doesStatusNeedsJustification = (
@@ -71,6 +70,7 @@ export type ConventionStatusWithValidator =
   (typeof conventionStatusesWithValidator)[number];
 export const conventionStatusesWithValidator = [
   "ACCEPTED_BY_COUNSELLOR",
+  "ACCEPTED_BY_VALIDATOR",
 ] as const;
 
 export const conventionStatuses = [
