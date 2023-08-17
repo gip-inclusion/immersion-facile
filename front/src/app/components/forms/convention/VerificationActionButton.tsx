@@ -42,11 +42,6 @@ export type VerificationActions = Exclude<
   "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW"
 >;
 
-type VerificationOrValidatorActionsModal = Exclude<
-  VerificationActions,
-  "ACCEPTED_BY_VALIDATOR"
->;
-
 const {
   Component: RejectModal,
   open: openRejectModal,
@@ -92,7 +87,7 @@ const {
   isOpenedByDefault: false,
 });
 
-const ModalByStatus = (status: VerificationOrValidatorActionsModal) => {
+const ModalByStatus = (status: VerificationActions) => {
   const modals = {
     DRAFT: {
       modal: DraftModal,
@@ -115,6 +110,11 @@ const ModalByStatus = (status: VerificationOrValidatorActionsModal) => {
       closeModal: closeDeprecateModal,
     },
     ACCEPTED_BY_COUNSELLOR: {
+      modal: ValidatorModal,
+      openModal: openValidatorModal,
+      closeModal: closeValidatorModal,
+    },
+    ACCEPTED_BY_VALIDATOR: {
       modal: ValidatorModal,
       openModal: openValidatorModal,
       closeModal: closeValidatorModal,
@@ -200,7 +200,7 @@ const ModalWrapper = ({
 }: {
   title: string;
   initialStatus: ConventionStatus;
-  newStatus: VerificationOrValidatorActionsModal;
+  newStatus: VerificationActions;
   onSubmit: VerificationActionButtonProps["onSubmit"];
   convention: ConventionDto;
   currentSignatoryRole: Role;
