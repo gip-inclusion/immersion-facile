@@ -795,8 +795,8 @@ export const emailTemplatesByName =
       } de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
 
       <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
-        - Si les informations sont correctes, cochez la case "Je soussigné..." tout en bas du formulaire et cliquez sur le bouton "Confirmer et signer".
-        - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander des modifications".
+      - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
+      - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander une modification".
       `,
         buttons: [
           { url: magicLink, label: "Ouvrir ma demande" },
@@ -860,8 +860,8 @@ export const emailTemplatesByName =
           } de valider la convention. Merci !
         
         <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
-        - Si les informations sont correctes, cochez la case "Je soussigné..." tout en bas du formulaire et cliquez sur le bouton "Confirmer et signer".
-        - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander des modifications".`,
+        - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
+        - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander une modification".`,
         buttons: [
           { url: conventionSignShortlink, label: "Ouvrir ma demande" },
           createConventionStatusButton(conventionStatusLink),
@@ -923,8 +923,8 @@ export const emailTemplatesByName =
         Votre signature sur la première demande de convention a donc été annulée.
         
         Action attendue : cliquez sur le bouton ci-dessous, puis vérifiez dans l’écran qui s’ouvre si ce qui a été modifié vous convient :
-        - Si c'est la cas, confirmez votre accord en signant de nouveau cette demande (bouton “Valider la demande”).
-        - Si la modification ne vous convient pas, vous pouvez relancer des modifications (bouton “Annuler les signatures et recevoir un lien de modification”).`,
+        - Si c'est la cas, confirmez votre accord en signant de nouveau cette demande (cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant).
+        - Si la modification ne vous convient pas, vous pouvez relancer des modifications (cliquez sur le bouton "Annuler les signatures et demander une modification").`,
         buttons: [
           {
             url: conventionSignShortlink,
