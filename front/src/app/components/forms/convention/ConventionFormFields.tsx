@@ -22,6 +22,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   conventionSlice,
@@ -91,6 +92,7 @@ export const ConventionFormFields = ({
   }, [preselectedAgencyId]);
 
   const dispatch = useDispatch();
+  const isSuccessfullyPeConnected = useAppSelector(authSelectors.isPeConnected);
   const formContents = getFormFields();
   const t = useConventionTexts(conventionValues.internshipKind);
   const shouldSubmitButtonBeDisabled =
@@ -208,6 +210,7 @@ export const ConventionFormFields = ({
               internshipKind={conventionValues.internshipKind}
               defaultAgencyId={conventionValues.agencyId}
               shouldListAll={!enablePeConnectApi.isActive}
+              disabled={mode === "edit" && isSuccessfullyPeConnected}
             />
           </Accordion>
         )}
