@@ -23,6 +23,7 @@ import {
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useRoute } from "src/app/routes/routes";
 import { agencyGateway } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -47,6 +48,7 @@ export const AgencySelector = ({
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(internshipKind),
   );
+  const route = useRoute();
   const {
     agencyId: agencyIdField,
     agencyDepartment: agencyDepartmentField,
@@ -61,25 +63,32 @@ export const AgencySelector = ({
   const agencyDepartmentStored = useAppSelector(
     conventionSelectors.agencyDepartment,
   );
+  const convention = useAppSelector(conventionSelectors.convention);
   const agencyDepartment = getValues("agencyDepartment");
   const [isLoading, setIsLoading] = useState(false);
   const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
   const [loadingError, setLoadingError] = useState(false);
   const dispatch = useDispatch();
   const [agencies, setAgencies] = useState<AgencyOption[]>([]);
-
-  const agencyKindOptions = uniqBy(
-    (agencyOption) => agencyOption.kind,
-    agencies,
-  )
-    .map((agencyOption) => agencyOption.kind)
-    .filter(
-      (kind): kind is AllowedAgencyKindToAdd => kind !== "immersion-facile",
-    )
-    .map((agencyKind): { label: string; value: AgencyKindForSelector } => ({
-      label: agencyKindToLabel[agencyKind],
-      value: agencyKind,
-    }));
+  const shouldLockToPeAgencies = !!(
+    route.name === "conventionImmersion" &&
+    route.params.jwt &&
+    isPeConnectIdentity(convention?.signatories.beneficiary.federatedIdentity)
+  );
+  const agencyKindOptions = [
+    ...(shouldLockToPeAgencies ? [] : [{ label: "Toutes", value: "all" }]),
+    ...uniqBy((agencyOption) => agencyOption.kind, agencies)
+      .map((agencyOption) => agencyOption.kind)
+      .filter((kind): kind is AllowedAgencyKindToAdd =>
+        shouldLockToPeAgencies
+          ? kind === "pole-emploi"
+          : kind !== "immersion-facile",
+      )
+      .map((agencyKind): { label: string; value: AgencyKindForSelector } => ({
+        label: agencyKindToLabel[agencyKind],
+        value: agencyKind,
+      })),
+  ];
 
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const agencyIdName = agencyIdField.name as keyof ConventionReadDto;
@@ -88,6 +97,9 @@ export const AgencySelector = ({
 
   useEffect(() => {
     if (!agencyDepartment) return;
+    if (shouldLockToPeAgencies) {
+      setAgencyKind("pole-emploi");
+    }
     dispatch(
       conventionSlice.actions.agencyDepartementChangeRequested(
         agencyDepartment,
@@ -180,15 +192,18 @@ export const AgencySelector = ({
       {internshipKind === "immersion" && (
         <Select
           label={agencyKindField.label}
-          hint={agencyKindField.hintText}
-          options={[
-            {
-              label: "Toutes les structures d'accompagnement",
-              value: "all",
-            },
-            ...agencyKindOptions,
-          ]}
-          placeholder={agencyDepartmentField.placeholder}
+          hint={
+            shouldLockToPeAgencies
+              ? "Cette convention a été initié par un utilisateur connecté via PE Connect, vous ne pouvez choisir qu'une agence de rattachement de type Pole emploi"
+              : agencyKindField.hintText
+          }
+          options={agencyKindOptions}
+          placeholder={
+            agencyKindOptions.length === 0
+              ? agencyPlaceholder
+              : agencyDepartmentField.placeholder
+          }
+          disabled={agencyKindOptions.length === 0 || shouldLockToPeAgencies}
           nativeSelectProps={{
             ...agencyKindField,
             value: agencyKind,
