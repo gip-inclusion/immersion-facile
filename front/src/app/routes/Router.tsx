@@ -11,7 +11,7 @@ import { ConventionStatusDashboardPage } from "src/app/pages/convention/Conventi
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
-import { OpenApiDocPage } from "src/app/pages/openApiDoc/OpenApiDocPage";
+import { OpenApiDocPage } from "src/app/pages/open-api-doc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
