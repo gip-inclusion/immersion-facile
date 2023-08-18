@@ -383,6 +383,31 @@ describe("PgConventionRepository", () => {
     );
   });
 
+  it("Update convention with validator", async () => {
+    const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+    const convention = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withStatus("ACCEPTED_BY_COUNSELLOR")
+      .build();
+    const externalId = await conventionRepository.save(convention);
+
+    const updatedConvention = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withExternalId(externalId)
+      .withStatus("ACCEPTED_BY_COUNSELLOR")
+      .withValidator({ firstname: "John", lastname: "Doe" })
+      .withBeneficiaryEmail("some.updated@email.com")
+      .withStatusJustification("some justification")
+      .withDateEnd(new Date("2021-01-20").toISOString())
+      .build();
+
+    await conventionRepository.update(updatedConvention);
+
+    expect(await conventionRepository.getById(conventionId)).toEqual(
+      updatedConvention,
+    );
+  });
+
   it("Retrieves federated identity if exists", async () => {
     const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = new ConventionDtoBuilder()

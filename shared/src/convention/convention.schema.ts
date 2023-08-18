@@ -46,6 +46,8 @@ import {
   conventionStatusesWithJustificationWithoutModifierRole,
   conventionStatusesWithoutJustificationNorValidator,
   conventionStatusesWithValidator,
+  ConventionValidator,
+  ConventionValidators,
   EstablishmentRepresentative,
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
@@ -160,6 +162,16 @@ const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
     localization.invalidImmersionObjective,
   );
 
+const conventionValidatorSchema: z.Schema<ConventionValidator> = z.object({
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+});
+
+const conventionValidatorsSchema: z.Schema<ConventionValidators> = z.object({
+  agencyCounsellor: conventionValidatorSchema.optional(),
+  agencyValidator: conventionValidatorSchema.optional(),
+});
+
 const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
@@ -186,6 +198,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   immersionActivities: zTrimmedStringWithMax(2000),
   immersionSkills: zStringPossiblyEmptyWithMax(2000),
   establishmentTutor: establishmentTutorSchema,
+  validators: conventionValidatorsSchema.optional(),
 });
 
 export const internshipKindSchema: z.Schema<InternshipKind> =

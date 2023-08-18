@@ -132,6 +132,17 @@ export type ConventionCommon = {
   immersionActivities: string;
   immersionSkills: string;
   establishmentTutor: EstablishmentTutor;
+  validators?: ConventionValidators;
+};
+
+export type ConventionValidators = {
+  agencyCounsellor?: ConventionValidator;
+  agencyValidator?: ConventionValidator;
+};
+
+export type ConventionValidator = {
+  firstname?: string;
+  lastname?: string;
 };
 
 export type ConventionInternshipKindSpecific<T extends InternshipKind> = {
