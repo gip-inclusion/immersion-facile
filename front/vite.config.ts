@@ -12,10 +12,10 @@ export default defineConfig({
     process.env.SENTRY_AUTH_TOKEN
       ? [
           sentryVitePlugin({
-            url: "https://sentry.gip-inclusion.cloud-ed.fr/",
+            url: "https://sentry.gip-inclusion.org/",
             org: "gip-inclusion",
             project: "immersion-facilitee-front",
-            // Auth tokens can be obtained from https://sentry.gip-inclusion.cloud-ed.fr/settings/account/api/auth-tokens/
+            // Auth tokens can be obtained from https://sentry.gip-inclusion.org/settings/account/api/auth-tokens/
             // and need `project:releases` and `org:read` scopes
             authToken: process.env.SENTRY_AUTH_TOKEN,
             release: { name: process.env.VITE_RELEASE_TAG },
