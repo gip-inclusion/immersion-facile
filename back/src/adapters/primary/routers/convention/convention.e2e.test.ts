@@ -1,9 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import { match } from "ts-pattern";
 import {
-  adminTargets,
   AgencyDtoBuilder,
-  BackOfficeJwt,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -34,7 +32,6 @@ import {
   TEST_AGENCY_DEPARTMENT,
   TEST_AGENCY_NAME,
 } from "../../../secondary/InMemoryConventionQueries";
-import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
@@ -60,8 +57,6 @@ describe("convention e2e", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let gateways: InMemoryGateways;
-  let adminToken: BackOfficeJwt;
-  let appConfig: AppConfig;
 
   beforeEach(async () => {
     ({
@@ -72,17 +67,9 @@ describe("convention e2e", () => {
       generateBackOfficeJwt,
       generateInclusionConnectJwt,
       inMemoryUow,
-      appConfig,
     } = await buildTestApp(new AppConfigBuilder().build()));
 
     gateways.timeGateway.setNextDate(new Date());
-
-    const response = await request.post("/admin/login").send({
-      user: appConfig.backofficeUsername,
-      password: appConfig.backofficePassword,
-    });
-
-    adminToken = response.body;
   });
 
   describe(`${unauthenticatedConventionTargets.createConvention.method} ${unauthenticatedConventionTargets.createConvention.url}`, () => {
@@ -557,40 +544,6 @@ describe("convention e2e", () => {
       expectToEqual(response.body, {
         errors: conventionMissingMessage(unknownId),
       });
-    });
-  });
-
-  describe(`${adminTargets.getConventionById.method} ${adminTargets.getConventionById.url}`, () => {
-    beforeEach(() => {
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
-    });
-
-    it("200 - Success", async () => {
-      // GETting the updated convention succeeds.
-      const result = await request
-        .get(adminTargets.getConventionById.url.replace(":id", convention.id))
-        .set("Authorization", adminToken);
-
-      expect(result.body).toEqual({
-        ...convention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
-      });
-      expect(result.status).toBe(200);
-    });
-
-    it("404 - Admin fetching unknown convention id", async () => {
-      const adminResponse = await request
-        .get(adminTargets.getConventionById.url.replace(":id", unknownId))
-        .set("Authorization", adminToken);
-
-      expect(adminResponse.body).toEqual({
-        errors:
-          "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
-      });
-      expect(adminResponse.status).toBe(404);
     });
   });
 });
