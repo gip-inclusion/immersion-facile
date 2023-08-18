@@ -304,6 +304,7 @@ export const defaultEmailValueByEmailKind: {
     immersionAppellationLabel: "IMMERSION_APPELLATION_LABEL",
     internshipKind: "immersion",
     magicLink: "MAGIC_LINK",
+    validatorName: "VALIDATOR_NAME",
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: "ADVISOR_FIRST_NAME",
