@@ -16,6 +16,8 @@ import {
   ConventionExternalId,
   ConventionId,
   ConventionStatus,
+  ConventionValidator,
+  ConventionValidators,
   EstablishmentRepresentative,
   EstablishmentTutor,
   ImmersionObjective,
@@ -231,6 +233,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       status: "ACCEPTED_BY_VALIDATOR",
     });
+  }
+
+  private get validators(): ConventionValidators | undefined {
+    return this.dto.validators;
   }
 
   public withAgencyId(agencyId: AgencyId): ConventionDtoBuilder {
@@ -638,5 +644,25 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       statusJustification,
     });
+  }
+
+  public withValidator(validator: ConventionValidator): ConventionDtoBuilder {
+    const validatorKind: keyof ConventionValidators =
+      this.dto.status === "ACCEPTED_BY_COUNSELLOR"
+        ? "agencyCounsellor"
+        : "agencyValidator";
+    this.dto = {
+      ...this.dto,
+      validators: this.dto.validators
+        ? {
+            ...this.dto.validators,
+            [validatorKind]: validator,
+          }
+        : {
+            [validatorKind]: validator,
+          },
+    };
+
+    return new ConventionDtoBuilder(this.dto);
   }
 }

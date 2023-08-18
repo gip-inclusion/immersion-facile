@@ -25,57 +25,6 @@ const beneficiaryRepresentativeIdColumnName = "beneficiary_representative_id";
 export class PgConventionRepository implements ConventionRepository {
   constructor(private client: PoolClient) {}
 
-  private async establishmentTutorAndRepresentativeHaveSameId(
-    id: ConventionId,
-  ): Promise<boolean> {
-    const getConventionEstablishmentTutorAndRepresentativeQuery = `
-    SELECT establishment_tutor_id,establishment_representative_id
-    FROM conventions
-    WHERE id=$1`;
-    const queryReturn = await this.client.query<{
-      establishment_tutor_id: number;
-      establishment_representative_id: number;
-    }>(getConventionEstablishmentTutorAndRepresentativeQuery, [id]);
-    const result = queryReturn.rows.at(0);
-    if (result)
-      return (
-        result.establishment_tutor_id === result.establishment_representative_id
-      );
-    throw new Error(`No convention with id '${id}'.`);
-  }
-
-  private async getBeneficiaryCurrentEmployerId(
-    id: ConventionId,
-  ): Promise<number | null> {
-    const getBeneficiaryCurrentEmployerQuery = `  
-        SELECT ${beneficiaryCurrentEmployerIdColumnName}
-        FROM conventions 
-        WHERE conventions.id=$1
-        `;
-    // prettier-ignore
-    const getResult = await this.client.query<{
-      beneficiary_current_employer_id:number|null
-    }>(getBeneficiaryCurrentEmployerQuery, [ id]);
-    const result = getResult.rows.at(0);
-    if (result) return result.beneficiary_current_employer_id;
-    throw new Error(missingReturningRowError(getResult));
-  }
-
-  private async getBeneficiaryRepresentativeId(id: ConventionId) {
-    const getBeneficiaryRepresentativeQuery = `  
-        SELECT ${beneficiaryRepresentativeIdColumnName}
-        FROM conventions 
-        WHERE conventions.id=$1
-        `;
-    // prettier-ignore
-    const getResult = await this.client.query<{
-      beneficiary_representative_id:number|null
-    }>(getBeneficiaryRepresentativeQuery, [ id]);
-    const result = getResult.rows.at(0);
-    if (result) return result.beneficiary_representative_id;
-    throw new Error(missingReturningRowError(getResult));
-  }
-
   public async getById(
     conventionId: ConventionId,
   ): Promise<ConventionDto | undefined> {
@@ -83,168 +32,6 @@ export class PgConventionRepository implements ConventionRepository {
     if (!readDto) return;
     const { agencyName, agencyDepartment, ...dto } = readDto;
     return dto;
-  }
-
-  private async getEstablishmentRepresentativeId({
-    convention,
-    establishment_tutor_id,
-  }: {
-    convention: ConventionDto;
-    establishment_tutor_id: number;
-  }) {
-    const {
-      id,
-      signatories: { establishmentRepresentative },
-      establishmentTutor,
-    } = convention;
-
-    if (
-      // Tutor and establishment representative are same person (but may have different IDs)
-      isEstablishmentTutorIsEstablishmentRepresentative(convention)
-    )
-      return establishmentRepresentative.signedAt
-        ? this.updateEstablishmentTutor(
-            id,
-            establishmentTutor,
-            establishmentRepresentative.signedAt,
-          )
-        : establishment_tutor_id;
-
-    if (await this.establishmentTutorAndRepresentativeHaveSameId(id)) {
-      return this.insertEstablishmentRepresentative(
-        establishmentRepresentative,
-      );
-    }
-
-    return this.updateEstablishmentRepresentative(
-      id,
-      establishmentRepresentative,
-    );
-  }
-
-  private async insertBeneficiary(
-    beneficiary: Beneficiary<InternshipKind>,
-  ): Promise<number> {
-    const levelOfEducation = isBeneficiaryStudent(beneficiary)
-      ? beneficiary.levelOfEducation
-      : undefined;
-
-    const query_insert_beneficiary = `
-        INSERT into actors(first_name, last_name, email, phone, signed_at, extra_fields)
-        VALUES($1, $2, $3, $4, $5, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('emergencyContact', $6::text, 'emergencyContactPhone', $7::text, 'birthdate', $8::text, 'emergencyContactEmail', $9::text, 'levelOfEducation', $10::text, 'financiaryHelp', $11::text, 'isRqth', $12::boolean)))
-        RETURNING id;
-      `;
-    // prettier-ignore
-    const insertReturn = await this.client.query<{id:number}>(query_insert_beneficiary, [ beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone, beneficiary.birthdate, beneficiary.emergencyContactEmail,levelOfEducation, beneficiary.financiaryHelp, beneficiary.isRqth]);
-    const result = insertReturn.rows.at(0);
-    if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
-  }
-
-  private async insertBeneficiaryCurrentEmployer(
-    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
-  ) {
-    const query_insert_beneficiary_current_employer = `
-        INSERT into actors (first_name, last_name, email, phone, signed_at, extra_fields)
-        VALUES($1, $2, $3, $4, $5, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('businessName', $6::text,'businessSiret', $7::text,'job', $8::text, 'businessAddress', $9::text)))
-        RETURNING id;
-      `;
-    const insertReturn = await this.client.query<{ id: number }>(
-      query_insert_beneficiary_current_employer,
-      [
-        beneficiaryCurrentEmployer.firstName,
-        beneficiaryCurrentEmployer.lastName,
-        beneficiaryCurrentEmployer.email,
-        beneficiaryCurrentEmployer.phone,
-        beneficiaryCurrentEmployer.signedAt,
-        beneficiaryCurrentEmployer.businessName,
-        beneficiaryCurrentEmployer.businessSiret,
-        beneficiaryCurrentEmployer.job,
-        beneficiaryCurrentEmployer.businessAddress,
-      ],
-    );
-    const result = insertReturn.rows.at(0);
-    if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
-  }
-
-  private async insertBeneficiaryRepresentative(
-    beneficiaryRepresentative: BeneficiaryRepresentative,
-  ): Promise<number> {
-    const query_insert_beneficiary_representative = `
-        INSERT into actors (first_name, last_name, email, phone, signed_at)
-        VALUES($1, $2, $3, $4, $5)
-        RETURNING id;
-      `;
-    // prettier-ignore
-    const insertReturn = await this.client.query<{ id: number }>( query_insert_beneficiary_representative, [ beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
-    const result = insertReturn.rows.at(0);
-    if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
-  }
-
-  private async insertEstablishmentRepresentative(
-    establishmentRepresentative: EstablishmentRepresentative,
-  ): Promise<number> {
-    const query_insert_establishment_representative = `
-        INSERT into actors (first_name, last_name, email, phone, signed_at)
-        VALUES($1, $2, $3, $4, $5)
-        RETURNING id;
-      `;
-    // prettier-ignore
-    const insertReturn = await this.client.query<{ id: number }>(query_insert_establishment_representative,[ establishmentRepresentative.firstName, establishmentRepresentative.lastName, establishmentRepresentative.email, establishmentRepresentative.phone, establishmentRepresentative.signedAt, ]);
-    const result = insertReturn.rows.at(0);
-    if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
-  }
-
-  private async insertEstablishmentTutor(
-    establishmentTutor: EstablishmentTutor,
-  ): Promise<number> {
-    const query_insert_establishment_tutor = `
-        INSERT into actors (first_name, last_name, email, phone, extra_fields)
-        VALUES($1, $2, $3, $4, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', $5::text)))
-        RETURNING id;
-      `;
-    // prettier-ignore
-    const insertReturn = await this.client.query<{ id: number }>(query_insert_establishment_tutor,[ establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, ]);
-    const result = insertReturn.rows.at(0);
-    if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
-  }
-
-  private async insertOrUpdateBeneficiaryCurrentEmployerIfExists(
-    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
-    conventionId: ConventionId,
-  ): Promise<number | null> {
-    if (!beneficiaryCurrentEmployer) return null;
-
-    const beneficiaryCurrentEmployerIdInDb =
-      await this.getBeneficiaryCurrentEmployerId(conventionId);
-
-    return beneficiaryCurrentEmployerIdInDb === null
-      ? this.insertBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-      : this.updateBeneficiaryCurrentEmployer(
-          conventionId,
-          beneficiaryCurrentEmployer,
-        );
-  }
-
-  private async insertOrUpdateBeneficiaryRepresentativeIfExists(
-    beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
-    conventionId: ConventionId,
-  ): Promise<number | null> {
-    if (!beneficiaryRepresentative) return null;
-
-    const beneficiaryRepresentativeId =
-      await this.getBeneficiaryRepresentativeId(conventionId);
-
-    return beneficiaryRepresentativeId === null
-      ? this.insertBeneficiaryRepresentative(beneficiaryRepresentative)
-      : this.updateBeneficiaryRepresentative(
-          conventionId,
-          beneficiaryRepresentative,
-        );
   }
 
   public async save(
@@ -261,25 +48,27 @@ export class PgConventionRepository implements ConventionRepository {
         convention
 
     // Insert signatories and remember their id
-    const beneficiaryId = await this.insertBeneficiary(beneficiary);
-    const establishmentTutorId = await this.insertEstablishmentTutor(
+    const beneficiaryId = await this.#insertBeneficiary(beneficiary);
+    const establishmentTutorId = await this.#insertEstablishmentTutor(
       establishmentTutor,
     );
 
     const establishmentRepresentativeId =
       isEstablishmentTutorIsEstablishmentRepresentative(convention)
         ? establishmentTutorId
-        : await this.insertEstablishmentRepresentative(
+        : await this.#insertEstablishmentRepresentative(
             establishmentRepresentative,
           );
 
     const beneficiaryRepresentativeId =
       beneficiaryRepresentative &&
-      (await this.insertBeneficiaryRepresentative(beneficiaryRepresentative));
+      (await this.#insertBeneficiaryRepresentative(beneficiaryRepresentative));
 
     const beneficiaryCurrentEmployerId =
       beneficiaryCurrentEmployer &&
-      (await this.insertBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer));
+      (await this.#insertBeneficiaryCurrentEmployer(
+        beneficiaryCurrentEmployer,
+      ));
 
     const query_insert_convention = `INSERT INTO conventions(
           id, status, agency_id, date_submission, date_start, date_end, date_validation, siret, business_name, schedule, individual_protection,
@@ -307,30 +96,30 @@ export class PgConventionRepository implements ConventionRepository {
     const { signatories: { beneficiary, beneficiaryRepresentative, beneficiaryCurrentEmployer }, id, establishmentTutor } =
       convention
 
-    const establishment_tutor_id = await this.updateEstablishmentTutor(
+    const establishment_tutor_id = await this.#updateEstablishmentTutor(
       id,
       establishmentTutor,
     );
 
     const beneficiaryCurrentEmployerId =
-      await this.insertOrUpdateBeneficiaryCurrentEmployerIfExists(
+      await this.#insertOrUpdateBeneficiaryCurrentEmployerIfExists(
         beneficiaryCurrentEmployer,
         id,
       );
 
-    await this.updateBeneficiary(id, beneficiary);
+    await this.#updateBeneficiary(id, beneficiary);
 
     const beneficiaryRepresentativeId =
-      await this.insertOrUpdateBeneficiaryRepresentativeIfExists(
+      await this.#insertOrUpdateBeneficiaryRepresentativeIfExists(
         beneficiaryRepresentative,
         id,
       );
 
-    await this.updateConvention({
+    await this.#updateConvention({
       convention,
       establishment_tutor_id,
       establishment_representative_id:
-        await this.getEstablishmentRepresentativeId({
+        await this.#getEstablishmentRepresentativeId({
           convention,
           establishment_tutor_id,
         }),
@@ -341,7 +130,220 @@ export class PgConventionRepository implements ConventionRepository {
     return convention.id;
   }
 
-  private async updateBeneficiary(
+  async #establishmentTutorAndRepresentativeHaveSameId(
+    id: ConventionId,
+  ): Promise<boolean> {
+    const getConventionEstablishmentTutorAndRepresentativeQuery = `
+    SELECT establishment_tutor_id,establishment_representative_id
+    FROM conventions
+    WHERE id=$1`;
+    const queryReturn = await this.client.query<{
+      establishment_tutor_id: number;
+      establishment_representative_id: number;
+    }>(getConventionEstablishmentTutorAndRepresentativeQuery, [id]);
+    const result = queryReturn.rows.at(0);
+    if (result)
+      return (
+        result.establishment_tutor_id === result.establishment_representative_id
+      );
+    throw new Error(`No convention with id '${id}'.`);
+  }
+
+  async #getBeneficiaryCurrentEmployerId(
+    id: ConventionId,
+  ): Promise<number | null> {
+    const getBeneficiaryCurrentEmployerQuery = `  
+        SELECT ${beneficiaryCurrentEmployerIdColumnName}
+        FROM conventions 
+        WHERE conventions.id=$1
+        `;
+    // prettier-ignore
+    const getResult = await this.client.query<{
+      beneficiary_current_employer_id:number|null
+    }>(getBeneficiaryCurrentEmployerQuery, [ id]);
+    const result = getResult.rows.at(0);
+    if (result) return result.beneficiary_current_employer_id;
+    throw new Error(missingReturningRowError(getResult));
+  }
+
+  async #getBeneficiaryRepresentativeId(id: ConventionId) {
+    const getBeneficiaryRepresentativeQuery = `  
+        SELECT ${beneficiaryRepresentativeIdColumnName}
+        FROM conventions 
+        WHERE conventions.id=$1
+        `;
+    // prettier-ignore
+    const getResult = await this.client.query<{
+      beneficiary_representative_id:number|null
+    }>(getBeneficiaryRepresentativeQuery, [ id]);
+    const result = getResult.rows.at(0);
+    if (result) return result.beneficiary_representative_id;
+    throw new Error(missingReturningRowError(getResult));
+  }
+
+  async #getEstablishmentRepresentativeId({
+    convention,
+    establishment_tutor_id,
+  }: {
+    convention: ConventionDto;
+    establishment_tutor_id: number;
+  }) {
+    const {
+      id,
+      signatories: { establishmentRepresentative },
+      establishmentTutor,
+    } = convention;
+
+    if (
+      // Tutor and establishment representative are same person (but may have different IDs)
+      isEstablishmentTutorIsEstablishmentRepresentative(convention)
+    )
+      return establishmentRepresentative.signedAt
+        ? this.#updateEstablishmentTutor(
+            id,
+            establishmentTutor,
+            establishmentRepresentative.signedAt,
+          )
+        : establishment_tutor_id;
+
+    if (await this.#establishmentTutorAndRepresentativeHaveSameId(id)) {
+      return this.#insertEstablishmentRepresentative(
+        establishmentRepresentative,
+      );
+    }
+
+    return this.#updateEstablishmentRepresentative(
+      id,
+      establishmentRepresentative,
+    );
+  }
+
+  async #insertBeneficiary(
+    beneficiary: Beneficiary<InternshipKind>,
+  ): Promise<number> {
+    const levelOfEducation = isBeneficiaryStudent(beneficiary)
+      ? beneficiary.levelOfEducation
+      : undefined;
+
+    const query_insert_beneficiary = `
+        INSERT into actors(first_name, last_name, email, phone, signed_at, extra_fields)
+        VALUES($1, $2, $3, $4, $5, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('emergencyContact', $6::text, 'emergencyContactPhone', $7::text, 'birthdate', $8::text, 'emergencyContactEmail', $9::text, 'levelOfEducation', $10::text, 'financiaryHelp', $11::text, 'isRqth', $12::boolean)))
+        RETURNING id;
+      `;
+    // prettier-ignore
+    const insertReturn = await this.client.query<{id:number}>(query_insert_beneficiary, [ beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone, beneficiary.birthdate, beneficiary.emergencyContactEmail,levelOfEducation, beneficiary.financiaryHelp, beneficiary.isRqth]);
+    const result = insertReturn.rows.at(0);
+    if (result) return result.id;
+    throw new Error(missingReturningRowError(insertReturn));
+  }
+
+  async #insertBeneficiaryCurrentEmployer(
+    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
+  ) {
+    const query_insert_beneficiary_current_employer = `
+        INSERT into actors (first_name, last_name, email, phone, signed_at, extra_fields)
+        VALUES($1, $2, $3, $4, $5, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('businessName', $6::text,'businessSiret', $7::text,'job', $8::text, 'businessAddress', $9::text)))
+        RETURNING id;
+      `;
+    const insertReturn = await this.client.query<{ id: number }>(
+      query_insert_beneficiary_current_employer,
+      [
+        beneficiaryCurrentEmployer.firstName,
+        beneficiaryCurrentEmployer.lastName,
+        beneficiaryCurrentEmployer.email,
+        beneficiaryCurrentEmployer.phone,
+        beneficiaryCurrentEmployer.signedAt,
+        beneficiaryCurrentEmployer.businessName,
+        beneficiaryCurrentEmployer.businessSiret,
+        beneficiaryCurrentEmployer.job,
+        beneficiaryCurrentEmployer.businessAddress,
+      ],
+    );
+    const result = insertReturn.rows.at(0);
+    if (result) return result.id;
+    throw new Error(missingReturningRowError(insertReturn));
+  }
+
+  async #insertBeneficiaryRepresentative(
+    beneficiaryRepresentative: BeneficiaryRepresentative,
+  ): Promise<number> {
+    const query_insert_beneficiary_representative = `
+        INSERT into actors (first_name, last_name, email, phone, signed_at)
+        VALUES($1, $2, $3, $4, $5)
+        RETURNING id;
+      `;
+    // prettier-ignore
+    const insertReturn = await this.client.query<{ id: number }>( query_insert_beneficiary_representative, [ beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
+    const result = insertReturn.rows.at(0);
+    if (result) return result.id;
+    throw new Error(missingReturningRowError(insertReturn));
+  }
+
+  async #insertEstablishmentRepresentative(
+    establishmentRepresentative: EstablishmentRepresentative,
+  ): Promise<number> {
+    const query_insert_establishment_representative = `
+        INSERT into actors (first_name, last_name, email, phone, signed_at)
+        VALUES($1, $2, $3, $4, $5)
+        RETURNING id;
+      `;
+    // prettier-ignore
+    const insertReturn = await this.client.query<{ id: number }>(query_insert_establishment_representative,[ establishmentRepresentative.firstName, establishmentRepresentative.lastName, establishmentRepresentative.email, establishmentRepresentative.phone, establishmentRepresentative.signedAt, ]);
+    const result = insertReturn.rows.at(0);
+    if (result) return result.id;
+    throw new Error(missingReturningRowError(insertReturn));
+  }
+
+  async #insertEstablishmentTutor(
+    establishmentTutor: EstablishmentTutor,
+  ): Promise<number> {
+    const query_insert_establishment_tutor = `
+        INSERT into actors (first_name, last_name, email, phone, extra_fields)
+        VALUES($1, $2, $3, $4, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', $5::text)))
+        RETURNING id;
+      `;
+    // prettier-ignore
+    const insertReturn = await this.client.query<{ id: number }>(query_insert_establishment_tutor,[ establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, ]);
+    const result = insertReturn.rows.at(0);
+    if (result) return result.id;
+    throw new Error(missingReturningRowError(insertReturn));
+  }
+
+  async #insertOrUpdateBeneficiaryCurrentEmployerIfExists(
+    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
+    conventionId: ConventionId,
+  ): Promise<number | null> {
+    if (!beneficiaryCurrentEmployer) return null;
+
+    const beneficiaryCurrentEmployerIdInDb =
+      await this.#getBeneficiaryCurrentEmployerId(conventionId);
+
+    return beneficiaryCurrentEmployerIdInDb === null
+      ? this.#insertBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+      : this.#updateBeneficiaryCurrentEmployer(
+          conventionId,
+          beneficiaryCurrentEmployer,
+        );
+  }
+
+  async #insertOrUpdateBeneficiaryRepresentativeIfExists(
+    beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
+    conventionId: ConventionId,
+  ): Promise<number | null> {
+    if (!beneficiaryRepresentative) return null;
+
+    const beneficiaryRepresentativeId =
+      await this.#getBeneficiaryRepresentativeId(conventionId);
+
+    return beneficiaryRepresentativeId === null
+      ? this.#insertBeneficiaryRepresentative(beneficiaryRepresentative)
+      : this.#updateBeneficiaryRepresentative(
+          conventionId,
+          beneficiaryRepresentative,
+        );
+  }
+
+  async #updateBeneficiary(
     id: ConventionId,
     beneficiary: Beneficiary<InternshipKind>,
   ) {
@@ -359,7 +361,7 @@ export class PgConventionRepository implements ConventionRepository {
     await this.client.query(updateBeneficiaryQuery, [ id, beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone, beneficiary.birthdate, beneficiary.emergencyContactEmail, levelOfEducation, beneficiary.financiaryHelp, beneficiary.isRqth ]);
   }
 
-  private async updateBeneficiaryCurrentEmployer(
+  async #updateBeneficiaryCurrentEmployer(
     id: ConventionId,
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
   ): Promise<number> {
@@ -390,7 +392,7 @@ export class PgConventionRepository implements ConventionRepository {
     throw new Error(missingReturningRowError(updateReturn));
   }
 
-  private async updateBeneficiaryRepresentative(
+  async #updateBeneficiaryRepresentative(
     id: ConventionId,
     beneficiaryRepresentative: BeneficiaryRepresentative,
   ) {
@@ -408,7 +410,7 @@ export class PgConventionRepository implements ConventionRepository {
     throw new Error(missingReturningRowError(queryResult));
   }
 
-  private async updateConvention({
+  async #updateConvention({
     convention,
     establishment_tutor_id,
     establishment_representative_id,
@@ -431,13 +433,13 @@ export class PgConventionRepository implements ConventionRepository {
             schedule=$10, individual_protection=$11, sanitary_prevention=$12, sanitary_prevention_description=$13, immersion_address=$14,
             immersion_objective=$15, immersion_appellation=$16, immersion_activities=$17, immersion_skills=$18, work_conditions=$19, status_justification=$25,
             updated_at=now(),
-            establishment_tutor_id=$20, establishment_representative_id=$21, ${beneficiaryCurrentEmployerIdColumnName}=$22, ${beneficiaryRepresentativeIdColumnName}=$23, business_advantages=$24
+            establishment_tutor_id=$20, establishment_representative_id=$21, ${beneficiaryCurrentEmployerIdColumnName}=$22, ${beneficiaryRepresentativeIdColumnName}=$23, business_advantages=$24, validators=$26
       WHERE id=$1`;
     // prettier-ignore
-    await this.client.query(updateConventionQuery, [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id, beneficiary_representative_id,convention.businessAdvantages,convention.statusJustification ]);
+    await this.client.query(updateConventionQuery, [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id, beneficiary_representative_id,convention.businessAdvantages,convention.statusJustification, convention.validators ]);
   }
 
-  private async updateEstablishmentRepresentative(
+  async #updateEstablishmentRepresentative(
     id: ConventionId,
     establishmentRepresentative: EstablishmentRepresentative,
   ): Promise<number> {
@@ -455,7 +457,7 @@ export class PgConventionRepository implements ConventionRepository {
     throw new Error(missingReturningRowError(updateReturn));
   }
 
-  private async updateEstablishmentTutor(
+  async #updateEstablishmentTutor(
     id: ConventionId,
     establishmentTutor: EstablishmentTutor,
     signedAt?: string,

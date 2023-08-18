@@ -580,6 +580,10 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  validators: {
+    label: "",
+    id: "",
+  },
 };
 
 type SidebarStepContent = {

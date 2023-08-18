@@ -94,7 +94,8 @@ const buildDto = `JSON_STRIP_NULLS(
       'email', et.email,
       'phone', et.phone,
       'job', et.extra_fields ->> 'job'
-    )
+    ),
+    'validators', validators
 ))`;
 
 export const selectAllConventionDtosById = `SELECT conventions.id, ${buildDto} as dto 

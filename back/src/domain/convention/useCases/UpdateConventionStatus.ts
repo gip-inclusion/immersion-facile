@@ -110,6 +110,16 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       )
       .withStatusJustification(statusJustification);
 
+    const hasValidator =
+      (params.status === "ACCEPTED_BY_COUNSELLOR" ||
+        params.status === "ACCEPTED_BY_VALIDATOR") &&
+      (params.lastname || params.firstname);
+    if (hasValidator)
+      conventionBuilder.withValidator({
+        firstname: params.firstname,
+        lastname: params.lastname,
+      });
+
     if (params.status === "DRAFT") conventionBuilder.notSigned();
 
     const updatedConvention: ConventionDto = conventionBuilder.build();
