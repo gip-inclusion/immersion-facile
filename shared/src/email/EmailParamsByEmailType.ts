@@ -311,5 +311,6 @@ export type EmailParamsByEmailType = {
     immersionAppellationLabel: string;
     internshipKind: InternshipKind;
     magicLink: string;
+    validatorName: string;
   };
 };

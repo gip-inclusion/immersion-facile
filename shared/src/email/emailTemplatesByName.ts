@@ -379,6 +379,7 @@ export const emailTemplatesByName =
         immersionAppellationLabel,
         internshipKind,
         magicLink,
+        validatorName,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -392,7 +393,9 @@ export const emailTemplatesByName =
           isStringDate(beneficiaryBirthdate)
             ? toDisplayedDate(new Date(beneficiaryBirthdate))
             : "Date invalide"
-        }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée et la convention est bien enregistrée. 
+        }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée${
+          validatorName ? ` par ${validatorName} ` : " "
+        }et la convention est bien enregistrée. 
       
       ${
         internshipKind === "immersion" ? "L'immersion" : "Le mini stage"

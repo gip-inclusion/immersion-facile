@@ -5,6 +5,7 @@ import {
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
+  ConventionValidator,
   displayEmergencyContactInfos,
   Email,
   frontRoutes,
@@ -24,6 +25,9 @@ import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
+
+export const concatNames = (validator: ConventionValidator): string =>
+  [validator.firstname, validator.lastname].join(" ").trim();
 
 export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
   protected inputSchema = conventionSchema;
@@ -169,6 +173,9 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         }),
         agencyLogoUrl: agency.logoUrl,
         magicLink: await makeShortMagicLink(frontRoutes.conventionDocument),
+        validatorName: convention.validators?.agencyValidator
+          ? concatNames(convention.validators?.agencyValidator)
+          : "",
       },
     };
   }
