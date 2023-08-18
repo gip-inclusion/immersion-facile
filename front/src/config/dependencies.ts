@@ -10,6 +10,7 @@ import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
+import { ImmersionOfferGateway } from "src/core-logic/ports/ImmersionOfferGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
@@ -37,6 +38,7 @@ export type Dependencies = {
   scheduler: SchedulerLike;
   emailValidationGateway: EmailValidationGateway;
   openApiDocGateway: OpenApiDocGateway;
+  immersionOfferGateway: ImmersionOfferGateway;
 };
 
 const dependencies =
