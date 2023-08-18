@@ -4,6 +4,7 @@ import { Route } from "type-route";
 import {
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  Role,
 } from "shared";
 import { Loader, MainWrapper } from "react-design-system";
 import { ImmersionAssessmentForm } from "src/app/components/forms/immersion-assessment/ImmersionAssessmentForm";
@@ -32,7 +33,10 @@ export const ImmersionAssessmentPage = ({
   });
   const canCreateAssessment = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const hasRight =
-    role === "establishment" || role === "establishment-representative";
+    role === "establishment-tutor" ||
+    // TODO : keep this temporary for old JWT support until 2023/10
+    role === ("establishment" as Role);
+  // ---------------------------
 
   if (fetchConventionError)
     return (

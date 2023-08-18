@@ -138,8 +138,6 @@ export const signatoryDataFromConvention = (
     beneficiary,
     "beneficiary-current-employer": getBeneficiaryCurrentEmployer(),
     "beneficiary-representative": getBeneficiaryRepresentative(),
-    "legal-representative": getBeneficiaryRepresentative(),
-    establishment: establishmentRepresentative,
     "establishment-representative": establishmentRepresentative,
   };
 

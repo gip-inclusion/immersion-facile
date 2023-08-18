@@ -137,8 +137,6 @@ export const signatoryRoles: SignatoryRole[] = [
   "beneficiary",
   "beneficiary-representative",
   "beneficiary-current-employer",
-  "legal-representative", // legacy, now named : beneficiary-representative
-  "establishment", // legacy, now named : establishment-representative
   "establishment-representative",
 ];
 
@@ -191,9 +189,8 @@ export const levelsOfEducation = [
   "Etude supérieure 8ème année",
 ] as const;
 
-export type BeneficiaryRepresentative = GenericSignatory<
-  "beneficiary-representative" | "legal-representative"
->;
+export type BeneficiaryRepresentative =
+  GenericSignatory<"beneficiary-representative">;
 
 export type BeneficiaryCurrentEmployer =
   GenericSignatory<"beneficiary-current-employer"> & {
@@ -203,13 +200,10 @@ export type BeneficiaryCurrentEmployer =
     businessAddress: string;
   };
 
-export type EstablishmentRepresentative = GenericSignatory<
-  "establishment" | "establishment-representative"
->;
+export type EstablishmentRepresentative =
+  GenericSignatory<"establishment-representative">;
 
-export type EstablishmentTutor = GenericActor<
-  "establishment" | "establishment-tutor"
-> & {
+export type EstablishmentTutor = GenericActor<"establishment-tutor"> & {
   job: string;
 };
 

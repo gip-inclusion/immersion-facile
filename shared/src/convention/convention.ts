@@ -28,8 +28,6 @@ const updateSignatoriesOnSignature = (
         ...signatories,
         beneficiary: { ...signatories.beneficiary, signedAt },
       };
-
-    case "legal-representative":
     case "beneficiary-representative":
       if (!signatories.beneficiaryRepresentative)
         throw new Error(
@@ -42,7 +40,6 @@ const updateSignatoriesOnSignature = (
           signedAt,
         },
       };
-    case "establishment":
     case "establishment-representative":
       return {
         ...signatories,
@@ -122,9 +119,7 @@ export const signatoryKeyFromRole: Record<SignatoryRole, keyof Signatories> = {
   "beneficiary-current-employer": "beneficiaryCurrentEmployer",
   "beneficiary-representative": "beneficiaryRepresentative",
   "establishment-representative": "establishmentRepresentative",
-  "legal-representative": "beneficiaryRepresentative",
   beneficiary: "beneficiary",
-  establishment: "establishmentRepresentative",
 };
 
 export const hasBeneficiaryCurrentEmployer = (

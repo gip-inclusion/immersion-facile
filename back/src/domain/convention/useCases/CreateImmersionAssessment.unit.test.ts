@@ -40,7 +40,7 @@ const ConventionDtoBuilderWithId = new ConventionDtoBuilder().withId(
 
 const validPayload: ConventionJwtPayload = {
   applicationId: conventionId,
-  role: "establishment",
+  role: "establishment-tutor",
   emailHash: "",
   version: currentJwtVersions.convention,
 };
@@ -86,7 +86,7 @@ describe("CreateImmersionAssessment", () => {
     await expectPromiseToFailWithError(
       createImmersionAssessment.execute(immersionAssessment, {
         applicationId: "otherId",
-        role: "establishment",
+        role: "establishment-tutor",
       } as ConventionJwtPayload),
       new ForbiddenError(
         "Convention provided in DTO is not the same as application linked to it",

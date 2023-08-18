@@ -92,7 +92,7 @@ const signatorySchema = z.object({
 const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["beneficiary"]),
+      role: z.literal("beneficiary"),
       emergencyContact: zStringPossiblyEmpty,
       emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
       emergencyContactEmail: emailPossiblyEmptySchema,
@@ -115,7 +115,7 @@ const studentBeneficiarySchema: z.Schema<Beneficiary<"mini-stage-cci">> =
 const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["establishment-tutor", "establishment"]),
+      role: z.literal("establishment-tutor"),
       job: zStringPossiblyEmpty,
     }),
   );
@@ -123,7 +123,7 @@ const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
 const establishmentRepresentativeSchema: z.Schema<EstablishmentRepresentative> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["establishment-representative", "establishment"]),
+      role: z.literal("establishment-representative"),
       job: zStringPossiblyEmpty,
     }),
   );
@@ -131,7 +131,7 @@ const establishmentRepresentativeSchema: z.Schema<EstablishmentRepresentative> =
 const beneficiaryRepresentativeSchema: z.Schema<BeneficiaryRepresentative> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["legal-representative", "beneficiary-representative"]),
+      role: z.literal("beneficiary-representative"),
       job: zStringPossiblyEmpty,
     }),
   );
@@ -139,7 +139,7 @@ const beneficiaryRepresentativeSchema: z.Schema<BeneficiaryRepresentative> =
 const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["beneficiary-current-employer"]),
+      role: z.literal("beneficiary-current-employer"),
       job: zStringPossiblyEmpty,
       businessSiret: siretSchema,
       businessName: zTrimmedStringMax255,

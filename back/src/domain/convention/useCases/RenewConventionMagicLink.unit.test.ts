@@ -104,14 +104,6 @@ describe("RenewConventionMagicLink use case", () => {
         validConvention.signatories.beneficiaryRepresentative!.email,
       ],
       [
-        "legal-representative",
-        validConvention.signatories.beneficiaryRepresentative!.email,
-      ],
-      [
-        "establishment",
-        validConvention.signatories.establishmentRepresentative.email,
-      ],
-      [
         "establishment-representative",
         validConvention.signatories.establishmentRepresentative.email,
       ],

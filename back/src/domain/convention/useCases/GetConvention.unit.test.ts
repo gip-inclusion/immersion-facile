@@ -48,13 +48,13 @@ describe("Get Convention", () => {
           getConvention.execute(
             { conventionId: convention.id },
             {
-              role: "establishment",
+              role: "establishment-representative",
               applicationId: "not-matching-convention-id",
               emailHash: "",
             },
           ),
           new ForbiddenError(
-            `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment'`,
+            `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment-representative'`,
           ),
         );
       });
@@ -91,7 +91,7 @@ describe("Get Convention", () => {
           getConvention.execute(
             { conventionId: convention.id },
             {
-              role: "establishment",
+              role: "establishment-representative",
               applicationId: convention.id,
               emailHash: "",
             },
@@ -146,9 +146,9 @@ describe("Get Convention", () => {
       });
     });
 
-    it("with ConventionMagicLinkPayload", async () => {
+    it("with ConventionJwtPayload", async () => {
       const payload: ConventionJwtPayload = {
-        role: "establishment",
+        role: "establishment-representative",
         emailHash: "",
         applicationId: convention.id,
         iat: 1,

@@ -250,14 +250,8 @@ const conventionEmailsByRole = (
     : new BadRequestError(
         "There is no beneficiaryRepresentative on convention.",
       ),
-  "legal-representative": convention.signatories.beneficiaryRepresentative
-    ? [convention.signatories.beneficiaryRepresentative.email]
-    : new BadRequestError(
-        "There is no beneficiaryRepresentative on convention.",
-      ),
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,
-  establishment: [convention.signatories.establishmentRepresentative.email],
   "establishment-representative": [
     convention.signatories.establishmentRepresentative.email,
   ],

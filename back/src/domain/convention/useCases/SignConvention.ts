@@ -2,8 +2,9 @@ import { z } from "zod";
 import {
   ConventionJwtPayload,
   ConventionStatus,
-  ExtractFromExisting,
   Role,
+  SignatoryRole,
+  signatoryRoles,
   signConventionDtoWithRole,
   WithConventionIdLegacy,
 } from "shared";
@@ -28,25 +29,8 @@ const domainTopicByTargetStatusMap: Partial<
   IN_REVIEW: "ImmersionApplicationFullySigned",
 };
 
-const roleAllowToSign: Role[] = [
-  "beneficiary",
-  "establishment",
-  "establishment-representative",
-  "legal-representative",
-  "beneficiary-representative",
-  "beneficiary-current-employer",
-];
-const isAllowedToSign = (
-  role: Role,
-): role is ExtractFromExisting<
-  Role,
-  | "beneficiary"
-  | "beneficiary-current-employer"
-  | "establishment"
-  | "establishment-representative"
-  | "legal-representative"
-  | "beneficiary-representative"
-> => roleAllowToSign.includes(role);
+const isAllowedToSign = (role: Role): role is SignatoryRole =>
+  signatoryRoles.includes(role as SignatoryRole);
 
 export class SignConvention extends TransactionalUseCase<
   void,

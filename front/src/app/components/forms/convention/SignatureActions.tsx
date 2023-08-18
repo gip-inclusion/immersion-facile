@@ -31,12 +31,6 @@ const processedDataBySignatoryRole: Record<
     ),
     signatoryFunction: "employeur actuel du bénéficiaire",
   },
-  establishment: {
-    fieldName: getConventionFieldName(
-      "signatories.establishmentRepresentative.signedAt",
-    ),
-    signatoryFunction: "représentant de la structure d'accueil",
-  },
   "establishment-representative": {
     fieldName: getConventionFieldName(
       "signatories.establishmentRepresentative.signedAt",
@@ -44,12 +38,6 @@ const processedDataBySignatoryRole: Record<
     signatoryFunction: "représentant de la structure d'accueil",
   },
   "beneficiary-representative": {
-    fieldName: getConventionFieldName(
-      "signatories.beneficiaryRepresentative.signedAt",
-    ),
-    signatoryFunction: "représentant légal du bénéficiaire",
-  },
-  "legal-representative": {
     fieldName: getConventionFieldName(
       "signatories.beneficiaryRepresentative.signedAt",
     ),

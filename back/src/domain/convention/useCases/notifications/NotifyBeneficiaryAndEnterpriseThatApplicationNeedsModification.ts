@@ -139,12 +139,8 @@ const recipientsByRole = (
       convention.signatories.beneficiaryRepresentative?.email ??
       new Error(missingActorConventionErrorMessage),
     "establishment-tutor": new Error(unsupportedErrorMessage),
-    "legal-representative":
-      convention.signatories.beneficiaryRepresentative?.email ??
-      new Error(missingActorConventionErrorMessage),
     "establishment-representative":
       convention.signatories.establishmentRepresentative.email,
-    establishment: convention.signatories.establishmentRepresentative.email,
     beneficiary: convention.signatories.beneficiary.email,
     counsellor:
       agency.counsellorEmails.length > 0
