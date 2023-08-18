@@ -18,17 +18,17 @@ Instead, you need to create a new migration with the new changes.
 2. Generate a new migration file :
 
    ```sh
-   back$ npm run migrate create the-name-of-your-migration
+   back$ pnpm db:create the-name-of-your-migration
    ```
 
 3. Edit the created file
 
 4. You can then :
-   - run all migration which have never ran: `npm run migrate up`
-   - rollback the last migration: `npm run migrate down`
-   - rollback n last migration: `npm run migrate down 4` # or any number
-   - redo n last migration : `npm run migrate redo 4` # or any number
-   - (redo is equivalent to : `npm run migrate down 4; npm run migrate up;`)
+   - run all migration which have never ran: `pnpm db:up`
+   - rollback the last migration: `pnpm db:down`
+   - rollback n last migration: `pnpm db:down 4` # or any number
+   - redo n last migration : `pnpm db:migrate redo 4` # or any number
+   - (redo is equivalent to : `pnpm db:down 4; pnpm db:up;`)
 
 # Testing schema changes locally
 
@@ -68,5 +68,5 @@ Instead, you need to create a new migration with the new changes.
 
    ```sh
       immersion-facile$ cd back
-      back$ npm run migrate up
+      back$ pnpm db:up
    ```
