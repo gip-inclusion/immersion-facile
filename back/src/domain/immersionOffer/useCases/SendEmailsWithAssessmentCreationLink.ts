@@ -102,7 +102,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         immersionAssessmentCreationLink: this.#generateConventionMagicLinkUrl({
           id: convention.id,
           email: convention.establishmentTutor.email,
-          role: "establishment",
+          role: "establishment-tutor",
           targetRoute: frontRoutes.immersionAssessment,
           now: this.#timeGateway.now(),
         }),

@@ -7,6 +7,7 @@ import {
   createConventionMagicLinkPayload,
   expectPromiseToFailWithError,
   expectToEqual,
+  signatoryRoles,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
@@ -39,9 +40,7 @@ describe("UpdateConventionStatus", () => {
       },
       allowedRoles: [
         "beneficiary",
-        "establishment",
         "establishment-representative",
-        "legal-representative",
         "beneficiary-representative",
         "beneficiary-current-employer",
         "counsellor",
@@ -120,14 +119,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: originalConventionId,
       },
       expectedDomainTopic: null,
-      allowedRoles: [
-        "beneficiary",
-        "establishment",
-        "establishment-representative",
-        "legal-representative",
-        "beneficiary-representative",
-        "beneficiary-current-employer",
-      ],
+      allowedRoles: signatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["DRAFT"],
     });
@@ -140,14 +132,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationPartiallySigned",
-      allowedRoles: [
-        "beneficiary",
-        "establishment",
-        "establishment-representative",
-        "legal-representative",
-        "beneficiary-representative",
-        "beneficiary-current-employer",
-      ],
+      allowedRoles: signatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
@@ -160,14 +145,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationFullySigned",
-      allowedRoles: [
-        "beneficiary",
-        "establishment",
-        "establishment-representative",
-        "legal-representative",
-        "beneficiary-representative",
-        "beneficiary-current-employer",
-      ],
+      allowedRoles: signatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });

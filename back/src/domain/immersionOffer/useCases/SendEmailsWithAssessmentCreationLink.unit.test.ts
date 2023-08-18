@@ -98,7 +98,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
           conventionId: immersionApplicationEndingTomorrow.id,
           establishmentTutorName: "Tom Cruise",
           internshipKind: immersionApplicationEndingTomorrow.internshipKind,
-          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/immersion-ending-tommorow-id/establishment/2021-05-15T08:00:00.000Z/establishment@example.com`,
+          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/immersion-ending-tommorow-id/establishment-tutor/2021-05-15T08:00:00.000Z/establishment@example.com`,
         },
       },
     ]);

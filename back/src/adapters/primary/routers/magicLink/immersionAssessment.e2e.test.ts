@@ -17,7 +17,7 @@ describe("Immersion assessment routes", () => {
       const jwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: conventionId,
-          role: "establishment",
+          role: "establishment-tutor",
           email: "establishment@company.fr",
           now: new Date(),
         }),

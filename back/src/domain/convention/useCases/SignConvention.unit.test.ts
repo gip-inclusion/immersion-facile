@@ -10,6 +10,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   Signatories,
+  signatoryRoles,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -28,7 +29,7 @@ import { DomainEvent } from "../../core/eventBus/events";
 import { SignConvention } from "./SignConvention";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "legal-representative",
+  role: "beneficiary-representative",
   email: "bob@email.com",
   phone: "0665565432",
   firstName: "Bob",
@@ -36,7 +37,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
 };
 
 const establishmentRepresentative: EstablishmentRepresentative = {
-  role: "establishment",
+  role: "establishment-representative",
   email: "patron@email.com",
   phone: "0665565432",
   firstName: "Pa",
@@ -69,14 +70,7 @@ describe("Sign convention", () => {
   });
 
   const [allowedToSignRoles, forbiddenToSignRoles] =
-    splitCasesBetweenPassingAndFailing(allRoles, [
-      "beneficiary",
-      "beneficiary-current-employer",
-      "establishment-representative",
-      "establishment",
-      "legal-representative",
-      "beneficiary-representative",
-    ]);
+    splitCasesBetweenPassingAndFailing(allRoles, signatoryRoles);
 
   it.each(forbiddenToSignRoles.map((role) => ({ role })))(
     "$role is not allowed to sign",
@@ -149,7 +143,7 @@ describe("Sign convention", () => {
         status: "PARTIALLY_SIGNED",
         signatories: makeSignatories(conventionInDb, {
           establishmentRepresentativeSignedAt:
-            role === "establishment-representative" || role === "establishment"
+            role === "establishment-representative"
               ? signedAt.toISOString()
               : undefined,
           beneficiarySignedAt:
@@ -159,8 +153,7 @@ describe("Sign convention", () => {
               ? signedAt.toISOString()
               : undefined,
           beneficiaryRepresentativeSignedAt:
-            role === "beneficiary-representative" ||
-            role === "legal-representative"
+            role === "beneficiary-representative"
               ? signedAt.toISOString()
               : undefined,
         }),
@@ -178,7 +171,7 @@ describe("Sign convention", () => {
     timeGateway.setNextDate(signedAt);
 
     await triggerSignature({
-      role: "establishment",
+      role: "establishment-representative",
       applicationId: initialConvention.id,
     } as ConventionJwtPayload);
 
@@ -217,7 +210,7 @@ describe("Sign convention", () => {
     timeGateway.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
-      role: "establishment",
+      role: "establishment-representative",
       applicationId: initialConvention.id,
     } as ConventionJwtPayload);
 
@@ -262,7 +255,7 @@ describe("Sign convention", () => {
     timeGateway.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
-      role: "establishment",
+      role: "establishment-representative",
       applicationId: initialConvention.id,
     } as ConventionJwtPayload);
 

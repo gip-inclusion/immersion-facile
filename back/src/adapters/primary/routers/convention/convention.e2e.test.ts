@@ -504,7 +504,7 @@ describe("convention e2e", () => {
           generateConventionJwt(
             createConventionMagicLinkPayload({
               id: convention.id,
-              role: "establishment",
+              role: "establishment-representative",
               email: convention.signatories.establishmentRepresentative.email,
               now: gateways.timeGateway.now(),
             }),
@@ -515,7 +515,7 @@ describe("convention e2e", () => {
       expectToEqual(response.statusCode, 403);
       expectToEqual(response.body, {
         errors:
-          "establishment is not allowed to go to status ACCEPTED_BY_VALIDATOR",
+          "establishment-representative is not allowed to go to status ACCEPTED_BY_VALIDATOR",
       });
     });
 

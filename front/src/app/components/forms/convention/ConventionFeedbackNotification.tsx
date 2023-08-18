@@ -38,8 +38,6 @@ const labelByRole: Record<SignatoryRole, string> = {
   beneficiary: "Le bénéficiaire",
   "beneficiary-representative": "Le représentant légal",
   "beneficiary-current-employer": "L'employeur actuel du bénéficiare",
-  "legal-representative": "Le représentant légal",
-  establishment: "Le responsable de l'entreprise",
   "establishment-representative": "Le responsable de l'entreprise",
 };
 

@@ -2,6 +2,7 @@ import {
   ConventionJwtPayload,
   ImmersionAssessmentDto,
   immersionAssessmentSchema,
+  Role,
 } from "shared";
 import {
   ConflictError,
@@ -32,9 +33,9 @@ export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAss
   public async _execute(
     dto: ImmersionAssessmentDto,
     uow: UnitOfWork,
-    magicLinkPayload: ConventionJwtPayload,
+    conventionJwtPayload?: ConventionJwtPayload,
   ): Promise<void> {
-    throwForbiddenIfNotAllow(dto, magicLinkPayload);
+    throwForbiddenIfNotAllow(dto, conventionJwtPayload);
 
     const immersionAssessmentEntity =
       await validateConventionAndCreateImmersionAssessmentEntity(uow, dto);
@@ -77,12 +78,17 @@ const validateConventionAndCreateImmersionAssessmentEntity = async (
 
 const throwForbiddenIfNotAllow = (
   dto: ImmersionAssessmentDto,
-  magicLinkPayload: ConventionJwtPayload,
+  conventionJwtPayload?: ConventionJwtPayload,
 ) => {
-  if (!magicLinkPayload) throw new ForbiddenError("No magic link provided");
-  if (magicLinkPayload.role !== "establishment")
+  if (!conventionJwtPayload) throw new ForbiddenError("No magic link provided");
+  if (
+    conventionJwtPayload.role !== "establishment-tutor" &&
+    // TODO : keep this temporary for old JWT support until 2023/10
+    conventionJwtPayload.role !== ("establishment" as Role)
+    // -----------------
+  )
     throw new ForbiddenError("Only an establishment can create an assessment");
-  if (dto.conventionId !== magicLinkPayload.applicationId)
+  if (dto.conventionId !== conventionJwtPayload.applicationId)
     throw new ForbiddenError(
       "Convention provided in DTO is not the same as application linked to it",
     );

@@ -103,16 +103,11 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
     it.each<[Role, string[]]>([
       ["beneficiary", [convention.signatories.beneficiary.email]],
       [
-        "establishment",
-        [convention.signatories.establishmentRepresentative.email],
-      ],
-      [
         "establishment-representative",
         [convention.signatories.establishmentRepresentative.email],
       ],
       ["beneficiary-current-employer", [beneficiaryCurrentEmployerEmail]],
       ["beneficiary-representative", [beneficiaryRepresentativeEmail]],
-      ["legal-representative", [beneficiaryRepresentativeEmail]],
       ["counsellor", agency.counsellorEmails],
       ["validator", agency.validatorEmails],
       ["backOffice", [backOfficeEmail]],
