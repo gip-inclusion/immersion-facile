@@ -15,6 +15,7 @@ export const frontRoutes = {
   homeCandidates: "accueil-beneficiaires",
   homeEstablishments: "accueil-entreprises",
   immersionAssessment: "bilan-immersion",
+  immersionOffer: "offre-immersion",
   landingEstablishment: "accueil-etablissement",
   magicLinkRenewal: "refraichir-lien",
   manageConvention: "pilotage-convention",

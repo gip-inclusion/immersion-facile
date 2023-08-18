@@ -3,6 +3,8 @@ import { param, ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import {
   AppellationAndRomeDto,
+  AppellationCode,
+  appellationSchema,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -272,6 +274,11 @@ const scheduleSerializer: ValueSerializer<ScheduleDto> = {
 const appellationDtoSerializer: ValueSerializer<AppellationAndRomeDto> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (appellationDto) => JSON.stringify(appellationDto),
+};
+
+export const appellationStringSerializer: ValueSerializer<AppellationCode> = {
+  parse: (raw) => appellationSchema.parse(raw),
+  stringify: (appellation) => appellation,
 };
 
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;

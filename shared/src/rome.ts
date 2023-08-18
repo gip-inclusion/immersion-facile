@@ -10,4 +10,4 @@ export const romeCodeSchema = z
 const appellationCodeRegex = /^\d{5}\d?$/; // 5 or 6 digits
 export const appellationSchema = z
   .string()
-  .regex(appellationCodeRegex, "Code ROME incorrect");
+  .regex(appellationCodeRegex, "Code appellation incorrect");

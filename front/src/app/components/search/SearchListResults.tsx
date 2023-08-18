@@ -1,39 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
+import { domElementIds, SearchImmersionResultDto } from "shared";
 import { useStyleUtils } from "react-design-system";
-import { SuccessFeedback } from "src/app/components/SuccessFeedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import {
-  ContactModalContentProps,
-  ModalContactContent,
-} from "./ContactModalContent";
 import { SearchResult } from "./SearchResult";
-
-const {
-  Component: ContactModal,
-  open: openContactModal,
-  close: closeContactModal,
-} = createModal({
-  isOpenedByDefault: false,
-  id: "contact",
-});
-
-const getFeedBackMessage = (contactMethod?: ContactMethod) => {
-  switch (contactMethod) {
-    case "EMAIL":
-      return "L'entreprise a été contactée avec succès.";
-    case "PHONE":
-    case "IN_PERSON":
-      return "Un email vient de vous être envoyé.";
-    default:
-      return null;
-  }
-};
 
 type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
 
@@ -46,16 +20,11 @@ const isResultPerPageOption = (value: string): value is ResultsPerPageOptions =>
 
 export const SearchListResults = () => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
-  // prettier-ignore
-  const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
-  const [successFullyValidated, setSuccessfullyValidated] = useState(false);
   const [displayedResults, setDisplayedResults] =
     useState<SearchImmersionResultDto[]>(searchResults);
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
-  const [modalContent, setModalContent] =
-    useState<Omit<ContactModalContentProps, "onSuccess">>();
   const { cx, classes } = useStyleUtils();
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const resultsPerPageValue = parseInt(resultsPerPage);
@@ -102,14 +71,25 @@ export const SearchListResults = () => {
                 key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
                 establishment={searchResult}
                 onButtonClick={() => {
-                  setModalContent({
-                    siret: searchResult.siret,
-                    appellations: searchResult.appellations,
-                    contactMethod: searchResult.contactMode,
-                    searchResultData: searchResult,
-                    onClose: () => closeContactModal(),
-                  });
-                  openContactModal();
+                  const appellation =
+                    searchResult.appellations.at(0)?.appellationCode;
+                  if (appellation) {
+                    routes
+                      .immersionOffer({
+                        siret: searchResult.siret,
+                        appellation,
+                      })
+                      .push();
+                  }
+
+                  // setModalContent({
+                  //   siret: searchResult.siret,
+                  //   appellations: searchResult.appellations,
+                  //   contactMethod: searchResult.contactMode,
+                  //   searchResultData: searchResult,
+                  //   onClose: () => closeContactModal(),
+                  // });
+                  // openContactModal();
                 }}
               />
             ))}
@@ -162,43 +142,6 @@ export const SearchListResults = () => {
           </div>
         </div>
       </div>
-
-      <ContactModal
-        title={
-          modalContent?.contactMethod
-            ? `Contactez l'entreprise ${modalContent.searchResultData?.name}`
-            : "Tentez votre chance !"
-        }
-        size="large"
-      >
-        {modalContent && (
-          <ModalContactContent
-            {...modalContent}
-            onSuccess={() => {
-              setSuccessfulValidatedMessage(
-                getFeedBackMessage(modalContent.contactMethod),
-              );
-              setSuccessfullyValidated(true);
-              closeContactModal();
-            }}
-            onClose={() => {
-              closeContactModal();
-            }}
-          />
-        )}
-      </ContactModal>
-
-      {successfulValidationMessage && (
-        <SuccessFeedback
-          open={successFullyValidated}
-          handleClose={() => {
-            setSuccessfulValidatedMessage(null);
-            setSuccessfullyValidated(false);
-          }}
-        >
-          {successfulValidationMessage}
-        </SuccessFeedback>
-      )}
     </>
   );
 };

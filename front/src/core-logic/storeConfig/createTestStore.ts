@@ -15,6 +15,7 @@ import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { InMemoryEmailValidationGateway } from "../adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
+import { TestImmersionOfferGateway } from "../adapters/ImmersionOfferGateway/TestImmersionOfferGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
 export type TestDependencies = ReturnType<typeof createTestDependencies>;
@@ -38,6 +39,7 @@ const createTestDependencies = () =>
     minSearchResultsToPreventRefetch: 2,
     emailValidationGateway: new InMemoryEmailValidationGateway(),
     openApiDocGateway: new InMemoryOpenApiDocGateway(),
+    immersionOfferGateway: new TestImmersionOfferGateway(),
   } satisfies Dependencies);
 
 export const createTestStore = (preloadedState?: Partial<RootState>) => {

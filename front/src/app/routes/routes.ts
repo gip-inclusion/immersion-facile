@@ -2,7 +2,10 @@ import { createRouter, defineRoute, param } from "type-route";
 import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
 import { formEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { adminTabSerializer } from "./routeParams/adminTabs";
-import { conventionValuesFromUrl } from "./routeParams/convention";
+import {
+  appellationStringSerializer,
+  conventionValuesFromUrl,
+} from "./routeParams/convention";
 import { groupsSerializer } from "./routeParams/establishmentGroups";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 
@@ -102,6 +105,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   immersionAssessment: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionAssessment}`,
+  ),
+  immersionOffer: defineRoute(
+    {
+      appellation: param.query.ofType(appellationStringSerializer),
+      siret: param.query.string,
+      // prévoir de pouvoir préremplir le form
+    },
+    () => `/${frontRoutes.immersionOffer}`,
   ),
   manageConvention: defineRoute(
     { jwt: param.query.string },
