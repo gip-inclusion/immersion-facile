@@ -47,7 +47,7 @@ Integration tests :
 4. Run DB migration :
 
    ```sh
-   pnpm run migrate up
+   pnpm run db:up
    ```
 
 5. You can run create some data in the database with :

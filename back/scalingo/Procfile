@@ -1,2 +1,2 @@
 web: cd back && NODE_ENV=production exec node src/adapters/primary/scripts/startServer.js
-postdeploy: cd back && pnpm migrate up
+postdeploy: cd back && pnpm db:up
