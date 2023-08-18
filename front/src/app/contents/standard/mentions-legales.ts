@@ -8,8 +8,13 @@ export default {
   Monsieur Arnaud Denoix, directeur du GIP Plateforme de l'inclusion.
   
   <strong>Hébergement du site</strong>
-  Ce site est hébergé par : OVH 
-  2 rue Kellermann 59100 Roubaix
+  Ce site est hébergé par : 
+  Scalingo SAS
+  13 rue Jacques Peirotes
+  67000 Strasbourg
+  France
+  SIRET 80866548300018
+  
   
   <strong>Téléphone</strong> : 09 72 10 10 07
 
