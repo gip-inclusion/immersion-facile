@@ -3,7 +3,6 @@ import { Dependencies } from "src/config/dependencies";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
-import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
@@ -15,6 +14,7 @@ import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGatewa
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { InMemoryEmailValidationGateway } from "../adapters/EmailValidation/InMemoryEmailValidationGateway";
+import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
 export type TestDependencies = ReturnType<typeof createTestDependencies>;
@@ -25,7 +25,7 @@ const createTestDependencies = () =>
     immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
     siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
-    establishmentGateway: new InMemoryEstablishmentGateway(),
+    establishmentGateway: new TestEstablishmentGateway(),
     conventionGateway: new InMemoryConventionGateway(),
     addressGateway: new TestAddressGateway(),
     technicalGateway: new TestTechnicalGateway(),

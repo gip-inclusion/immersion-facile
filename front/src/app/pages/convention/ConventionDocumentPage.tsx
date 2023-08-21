@@ -7,10 +7,16 @@ import {
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   isStringDate,
+  npsFormIds,
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
-import { ConventionDocument, Loader, MainWrapper } from "react-design-system";
+import {
+  ConventionDocument,
+  Loader,
+  MainWrapper,
+  NPSForm,
+} from "react-design-system";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
@@ -39,7 +45,7 @@ export const ConventionDocumentPage = ({
   route,
 }: ConventionDocumentPageProps) => {
   const jwt: ConventionJwt = route.params.jwt;
-  const { applicationId } =
+  const { applicationId, role } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
   const { convention, fetchConventionError, isLoading } = useConvention({
     jwt,
@@ -701,6 +707,15 @@ export const ConventionDocumentPage = ({
               </>
             )}
           </footer>
+          <NPSForm
+            mode="popup"
+            formId={npsFormIds.conventionValidated}
+            conventionInfos={{
+              id: convention.id,
+              role,
+              status: convention.status,
+            }}
+          />
         </ConventionDocument>
       )}
     </MainWrapper>

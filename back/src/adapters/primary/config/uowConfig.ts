@@ -8,7 +8,7 @@ import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQuerie
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryEstablishmentGroupRepository } from "../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
+import { InMemoryEstablishmentGroupRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentGroupRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
@@ -17,6 +17,7 @@ import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/I
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
 import { InMemoryConventionsToSyncRepository } from "../../secondary/InMemoryConventionsToSyncRepository";
+import { InMemoryDeletedEstablishmentRepository } from "../../secondary/InMemoryDeletedEstablishmentRepository";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
@@ -33,6 +34,7 @@ import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgCo
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgConventionsToSyncRepository } from "../../secondary/pg/PgConventionsToSyncRepository";
+import { PgDeletedEstablishmentRepository } from "../../secondary/pg/PgDeletedEstablishmentRepository";
 import { PgDiscussionAggregateRepository } from "../../secondary/pg/PgDiscussionAggregateRepository";
 import { PgErrorRepository } from "../../secondary/pg/PgErrorRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
@@ -91,6 +93,8 @@ export const createInMemoryUow = () => {
     searchMadeRepository: new InMemorySearchMadeRepository(),
     shortLinkQuery: shortLinkRepository,
     shortLinkRepository,
+    deletedEstablishmentRepository:
+      new InMemoryDeletedEstablishmentRepository(),
   } satisfies UnitOfWork;
 };
 
@@ -105,6 +109,9 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     conventionPoleEmploiAdvisorRepository:
       new PgConventionPoleEmploiAdvisorRepository(client),
     conventionsToSyncRepository: new PgConventionsToSyncRepository(client),
+    deletedEstablishmentRepository: new PgDeletedEstablishmentRepository(
+      client,
+    ),
     discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       client,

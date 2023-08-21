@@ -11,7 +11,7 @@ import { ConventionStatusDashboardPage } from "src/app/pages/convention/Conventi
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
-import { OpenApiDocPage } from "src/app/pages/openApiDoc/OpenApiDocPage";
+import { OpenApiDocPage } from "src/app/pages/open-api-doc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
@@ -25,6 +25,7 @@ import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentCreationFormPage } from "../pages/establishment/EstablishmentCreationFormPage";
+import { EstablishmentManageAdminPage } from "../pages/establishment/EstablishmentManageAdminPage";
 import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
@@ -96,6 +97,7 @@ const getPageByRouteName: {
     <ConventionManageInclusionConnectedPage route={route} />
   ),
   openApiDoc: () => <OpenApiDocPage />,
+  manageEstablishmentAdmin: () => <EstablishmentManageAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => <SearchPage route={route} />,
   standard: (route) =>

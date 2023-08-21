@@ -31,6 +31,7 @@ type AppellationAutocompleteProps = {
   description?: string;
   placeholder?: string;
   id?: string;
+  disabled?: boolean;
 };
 
 type Option = Proposal<AppellationAndRomeDto>;
@@ -45,6 +46,7 @@ export const AppellationAutocomplete = ({
   description,
   placeholder,
   id = "im-appellation-autocomplete",
+  disabled = false,
 }: AppellationAutocompleteProps) => {
   const initialOption: Option | null = initialValue
     ? {
@@ -112,6 +114,7 @@ export const AppellationAutocomplete = ({
     <>
       <Autocomplete
         disablePortal
+        disabled={disabled}
         filterOptions={(x) => x}
         options={options}
         value={selectedOption}

@@ -6,7 +6,7 @@ import { technicalGateway } from "src/config/dependencies";
 
 interface UploadLogoProps {
   label: string;
-  hint?: string;
+  hint?: React.ReactNode;
   maxSize_Mo: number;
   setFileUrl: (fileUrl: AbsoluteUrl) => void;
 }

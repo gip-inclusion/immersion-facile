@@ -1,6 +1,6 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
+import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { Route } from "type-route";
 import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
@@ -13,13 +13,9 @@ import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab, isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
 
-type Tab = {
-  label: string;
-  tabId: AdminTab;
-  content: JSX.Element;
-};
-
-const adminTabs: Tab[] = [
+const rawAdminTabs: Array<
+  TabsProps.Controlled["tabs"][number] & { content: React.ReactNode }
+> = [
   {
     label: "Conventions",
     tabId: "conventions",
@@ -57,13 +53,20 @@ const adminTabs: Tab[] = [
   },
 ];
 
+const getAdminTabs = (currentTab: AdminTab) =>
+  rawAdminTabs.map((tab) => ({
+    ...tab,
+    tabId: tab.tabId,
+    isDefault: currentTab === tab.tabId,
+  }));
+
 export const AdminPage = ({
   route,
 }: {
   route: Route<typeof routes.adminTab>;
 }) => {
   const currentTab = route.params.tab;
-
+  const tabs = getAdminTabs(currentTab);
   return (
     <>
       <ImmersionHeader />
@@ -77,8 +80,8 @@ export const AdminPage = ({
         >
           <div className={fr.cx("fr-col-12", "fr-p-2w", "fr-mt-4w")}>
             <Tabs
-              selectedTabId={currentTab}
-              tabs={adminTabs}
+              tabs={tabs}
+              selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
               onTabChange={(tab) => {
                 if (isAdminTab(tab))
                   routes
@@ -88,9 +91,7 @@ export const AdminPage = ({
                     .push();
               }}
             >
-              <div>
-                {adminTabs.find((tab) => tab.tabId === currentTab)?.content}
-              </div>
+              {tabs.find((tab) => tab.tabId === currentTab)?.content}
             </Tabs>
           </div>
         </div>

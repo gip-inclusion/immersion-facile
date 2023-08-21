@@ -37,104 +37,6 @@ export class PgEstablishmentAggregateRepository
 {
   constructor(private client: PoolClient) {}
 
-  private async _updateContactFromAggregates(
-    existingAggregate: EstablishmentAggregate & {
-      contact: ContactEntity;
-    },
-    updatedAggregate: EstablishmentAggregate,
-  ) {
-    if (
-      !!updatedAggregate.contact &&
-      !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
-    ) {
-      await this.client.query(
-        `UPDATE immersion_contacts 
-       SET lastname = $1, 
-            firstname = $2, 
-            email = $3, 
-            job = $4, 
-            phone = $5, 
-            contact_mode = $6, 
-            copy_emails = $7
-       WHERE uuid = $8`,
-        [
-          updatedAggregate.contact.lastName,
-          updatedAggregate.contact.firstName,
-          updatedAggregate.contact.email,
-          updatedAggregate.contact.job,
-          updatedAggregate.contact.phone,
-          updatedAggregate.contact.contactMethod,
-          JSON.stringify(updatedAggregate.contact.copyEmails),
-          existingAggregate.contact.id,
-        ],
-      );
-    }
-  }
-
-  private async _updateImmersionOffersFromAggregates(
-    existingAggregate: EstablishmentAggregate,
-    updatingAggregate: EstablishmentAggregate,
-  ) {
-    const updatedOffers = updatingAggregate.immersionOffers;
-    const existingOffers = existingAggregate.immersionOffers;
-    const siret = existingAggregate.establishment.siret;
-
-    const offersToAdd = updatedOffers.filter(
-      (updatedOffer) =>
-        !existingOffers.find((existingOffer) =>
-          offersEqual(existingOffer, updatedOffer),
-        ),
-    );
-
-    if (offersToAdd.length > 0)
-      await this.client.query(
-        format(
-          `INSERT INTO immersion_offers (
-            rome_code, appellation_code, score, created_at, siret
-          ) VALUES %L`,
-          offersToAdd.map((offerToAdd) => [
-            offerToAdd.romeCode,
-            offerToAdd.appellationCode,
-            offerToAdd.score,
-            offerToAdd.createdAt,
-            siret,
-          ]),
-        ),
-      );
-
-    const offersToRemove = existingOffers.filter(
-      (updatedOffer) =>
-        !updatedOffers.find((existingOffer) =>
-          offersEqual(existingOffer, updatedOffer),
-        ),
-    );
-    const offersToRemoveByRomeCode = offersToRemove
-      .filter((offer) => !offer.appellationCode)
-      .map((offer) => offer.romeCode);
-
-    if (offersToRemoveByRomeCode.length > 0) {
-      const queryToRemoveOffersFromRome = format(
-        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code IS NULL AND rome_code IN (%L); `,
-        siret,
-        offersToRemoveByRomeCode,
-      );
-      await this.client.query(queryToRemoveOffersFromRome);
-    }
-
-    const offersToRemoveByRomeAppellation = offersToRemove
-      .filter((offer) => !!offer.appellationCode)
-      .map((offer) => offer.appellationCode);
-
-    if (offersToRemoveByRomeAppellation.length > 0) {
-      const queryToRemoveOffersFromAppellationCode = format(
-        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code::text IN (%L); `,
-        siret,
-        offersToRemoveByRomeAppellation,
-      );
-      await this.client.query(queryToRemoveOffersFromAppellationCode);
-    }
-  }
-
   public async createImmersionOffersToEstablishments(
     offersWithSiret: OfferWithSiret[],
   ) {
@@ -158,7 +60,35 @@ export class PgEstablishmentAggregateRepository
     await this.client.query(query);
   }
 
-  async getEstablishmentAggregateBySiret(
+  public async delete(siret: string): Promise<void> {
+    try {
+      logger.info(`About to delete establishment with siret : ${siret}`);
+
+      await this.#deleteEstablishmentContactBySiret(siret);
+
+      const { rowCount } = await this.client.query(
+        `
+        DELETE
+        FROM establishments
+        WHERE siret = $1;
+      `,
+        [siret],
+      );
+      if (rowCount !== 1)
+        throw new NotFoundError(
+          `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
+        );
+      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
+    } catch (error: any) {
+      logger.info(
+        `Error when deleting establishment with siret ${siret} : ${error.message}`,
+      );
+      logger.info({ error }, "Full Error");
+      throw error;
+    }
+  }
+
+  public async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
     const aggregateWithStringDates = (
@@ -219,6 +149,9 @@ export class PgEstablishmentAggregateRepository
                 'updatedAt', to_char(
                   e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
+                'createdAt', to_char(
+                  e.created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                ), 
                 'lastInseeCheckDate', to_char(
                   e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
@@ -256,6 +189,7 @@ export class PgEstablishmentAggregateRepository
           updatedAt: aggregateWithStringDates.establishment.updatedAt
             ? new Date(aggregateWithStringDates.establishment.updatedAt)
             : undefined,
+          createdAt: new Date(aggregateWithStringDates.establishment.createdAt),
           lastInseeCheckDate: aggregateWithStringDates.establishment
             .lastInseeCheckDate
             ? new Date(
@@ -295,33 +229,12 @@ export class PgEstablishmentAggregateRepository
     }));
   }
 
-  private async getRomeCodeFromAppellationCode(
-    appellationCode: AppellationCode | undefined,
-  ): Promise<RomeCode | undefined> {
-    if (!appellationCode) return;
-
-    const result = await this.client.query(
-      `SELECT code_rome
-        from public_appellations_data
-        where ogr_appellation = $1`,
-      [appellationCode],
-    );
-
-    const romeCode: RomeCode | undefined = result.rows[0]?.code_rome;
-    if (!romeCode)
-      throw new Error(
-        `No Rome code found for appellation code ${appellationCode}`,
-      );
-
-    return romeCode;
-  }
-
   public async getSearchImmersionResultDtoBySiretAndAppellationCode(
     siret: SiretDto,
     appellationCode: AppellationCode,
   ): Promise<SearchImmersionResultDto | undefined> {
     const immersionSearchResultDtos =
-      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+      await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
         SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
         FROM immersion_offers AS io
@@ -342,7 +255,7 @@ export class PgEstablishmentAggregateRepository
     rome: RomeCode,
   ): Promise<SearchImmersionResultDto | undefined> {
     const immersionSearchResultDtos =
-      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+      await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
         SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
         FROM immersion_offers AS io
@@ -429,61 +342,11 @@ export class PgEstablishmentAggregateRepository
     return pgResult.rows[0].exists;
   }
 
-  private async insertContactsFromAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    const aggregatesWithContact = aggregates.filter(
-      (establishment): establishment is Required<EstablishmentAggregate> =>
-        !!establishment.contact,
-    );
-
-    if (aggregatesWithContact.length === 0) return;
-
-    const contactFields = aggregatesWithContact.map((aggregate) => {
-      const contact = aggregate.contact;
-      return [
-        contact.id,
-        contact.lastName,
-        contact.firstName,
-        contact.email,
-        contact.job,
-        contact.phone,
-        contact.contactMethod,
-        JSON.stringify(contact.copyEmails),
-      ];
-    });
-
-    const establishmentContactFields = aggregatesWithContact.map(
-      ({ establishment, contact }) => [establishment.siret, contact.id],
-    );
-
-    try {
-      const insertContactsQuery = format(
-        `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
-      ) VALUES %L`,
-        contactFields,
-      );
-
-      const insertEstablishmentsContactsQuery = format(
-        `INSERT INTO establishments__immersion_contacts (
-        establishment_siret, contact_uuid) VALUES %L`,
-        establishmentContactFields,
-      );
-
-      await this.client.query(insertContactsQuery);
-      await this.client.query(insertEstablishmentsContactsQuery);
-    } catch (e: any) {
-      logger.error(e, "Error inserting contacts");
-      throw e;
-    }
-  }
-
   public async insertEstablishmentAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
-    await this.upsertEstablishmentsFromAggregates(aggregates);
-    await this.insertContactsFromAggregates(aggregates);
+    await this.#upsertEstablishmentsFromAggregates(aggregates);
+    await this.#insertContactsFromAggregates(aggregates);
     await this.createImmersionOffersToEstablishments(
       aggregates.reduce<OfferWithSiret[]>(
         (offersWithSiret, aggregate) => [
@@ -498,7 +361,7 @@ export class PgEstablishmentAggregateRepository
     );
   }
 
-  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
     since: Date,
   ): Promise<number> {
     const querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek = `
@@ -525,31 +388,14 @@ export class PgEstablishmentAggregateRepository
     return result.rowCount;
   }
 
-  public async removeEstablishmentAndOffersAndContactWithSiret(
-    siret: string,
-  ): Promise<void> {
-    try {
-      logger.info(`About to delete establishment with siret : ${siret}`);
-      const query = `DELETE FROM establishments WHERE siret = $1;`;
-      await this.client.query(query, [siret]);
-      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
-    } catch (error: any) {
-      logger.info(
-        `Error when deleting establishment with siret ${siret} : ${error.message}`,
-      );
-      logger.info({ error }, "Full Error");
-      throw error;
-    }
-  }
-
-  async searchImmersionResults({
+  public async searchImmersionResults({
     searchMade,
     maxResults,
   }: {
     searchMade: SearchMade;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
-    const romeCode = await this.getRomeCodeFromAppellationCode(
+    const romeCode = await this.#getRomeCodeFromAppellationCode(
       searchMade.appellationCode,
     );
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
@@ -577,7 +423,7 @@ export class PgEstablishmentAggregateRepository
       romeCode,
     ); // Formats optional litterals %1$L
     const immersionSearchResultDtos =
-      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+      await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         selectedOffersSubQuery,
         [
           `POINT(${searchMade.lon} ${searchMade.lat})`,
@@ -589,38 +435,6 @@ export class PgEstablishmentAggregateRepository
       ...dto,
       voluntaryToImmersion: true,
     }));
-  }
-
-  private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-    selectedOffersSubQuery: string,
-    selectedOffersSubQueryParams: any[],
-  ): Promise<SearchImmersionResult[]> {
-    // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
-    // this method returns a list of SearchImmersionResultDto
-    const pgResult = await this.client.query(
-      makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        selectedOffersSubQuery,
-      ),
-      selectedOffersSubQueryParams,
-    );
-
-    return pgResult.rows.map(
-      (row): SearchImmersionResult => ({
-        ...row.search_immersion_result,
-        // TODO : find a way to return 'undefined' instead of 'null' from query
-        customizedName: optional(row.search_immersion_result.customizedName),
-        contactMode: optional(row.search_immersion_result.contactMode),
-        distance_m: optional(row.search_immersion_result.distance_m),
-        numberOfEmployeeRange: optional(
-          row.search_immersion_result.numberOfEmployeeRange,
-        ),
-        fitForDisabledWorkers: optional(
-          row.search_immersion_result.fitForDisabledWorkers,
-        ),
-        voluntaryToImmersion: true,
-        isSearchable: row.search_immersion_result.isSearchable,
-      }),
-    );
   }
 
   public async updateEstablishment(
@@ -728,7 +542,7 @@ export class PgEstablishmentAggregateRepository
         `We do not have an establishment with siret ${updatedAggregate.establishment.siret} to update`,
       );
     // Remove offers that don't exist anymore and create those that did not exist before
-    await this._updateImmersionOffersFromAggregates(
+    await this.#updateImmersionOffersFromAggregates(
       existingAggregate,
       updatedAggregate,
     );
@@ -747,10 +561,10 @@ export class PgEstablishmentAggregateRepository
 
     // Create contact if it does'not exist
     if (!existingAggregate.contact) {
-      await this.insertContactsFromAggregates([updatedAggregate]);
+      await this.#insertContactsFromAggregates([updatedAggregate]);
     } else {
       // Update contact if it has changed
-      await this._updateContactFromAggregates(
+      await this.#updateContactFromAggregates(
         { ...existingAggregate, contact: existingAggregate.contact },
         updatedAggregate,
       );
@@ -788,35 +602,63 @@ export class PgEstablishmentAggregateRepository
     await this.client.query(queries.join("\n"));
   }
 
-  private async upsertEstablishmentsFromAggregates(
+  async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
+    await this.client.query(
+      `
+      DELETE
+      FROM immersion_contacts
+      WHERE uuid IN (
+        SELECT contact_uuid
+        FROM establishments__immersion_contacts
+        WHERE establishment_siret = $1
+      )
+    `,
+      [siret],
+    );
+  }
+
+  async #selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+    selectedOffersSubQuery: string,
+    selectedOffersSubQueryParams: any[],
+  ): Promise<SearchImmersionResult[]> {
+    // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
+    // this method returns a list of SearchImmersionResultDto
+    const pgResult = await this.client.query(
+      makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        selectedOffersSubQuery,
+      ),
+      selectedOffersSubQueryParams,
+    );
+
+    return pgResult.rows.map(
+      (row): SearchImmersionResult => ({
+        ...row.search_immersion_result,
+        // TODO : find a way to return 'undefined' instead of 'null' from query
+        customizedName: optional(row.search_immersion_result.customizedName),
+        contactMode: optional(row.search_immersion_result.contactMode),
+        distance_m: optional(row.search_immersion_result.distance_m),
+        numberOfEmployeeRange: optional(
+          row.search_immersion_result.numberOfEmployeeRange,
+        ),
+        fitForDisabledWorkers: optional(
+          row.search_immersion_result.fitForDisabledWorkers,
+        ),
+        voluntaryToImmersion: true,
+        isSearchable: row.search_immersion_result.isSearchable,
+      }),
+    );
+  }
+
+  async #upsertEstablishmentsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
+    //prettier-ignore
     const establishmentFields = aggregates.map(({ establishment }) => [
-      establishment.siret,
-      establishment.name,
-      establishment.customizedName,
-      establishment.website,
-      establishment.additionalInformation,
-      establishment.address.streetNumberAndAddress,
-      establishment.address.postcode,
-      establishment.address.city,
-      establishment.address.departmentCode,
-      establishment.numberEmployeesRange,
-      establishment.nafDto.code,
-      establishment.nafDto.nomenclature,
-      establishment.sourceProvider,
-      convertPositionToStGeography(establishment.position),
-      establishment.position.lon,
-      establishment.position.lat,
-      establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
-      establishment.isOpen,
-      establishment.isSearchable,
-      establishment.isCommited,
-      establishment.fitForDisabledWorkers,
-      establishment.maxContactsPerWeek,
-      establishment.lastInseeCheckDate
-        ? establishment.lastInseeCheckDate.toISOString()
-        : null,
+      establishment.siret, establishment.name, establishment.customizedName, establishment.website, establishment.additionalInformation,
+      establishment.address.streetNumberAndAddress, establishment.address.postcode, establishment.address.city, establishment.address.departmentCode, establishment.numberEmployeesRange,
+      establishment.nafDto.code, establishment.nafDto.nomenclature, establishment.sourceProvider, convertPositionToStGeography(establishment.position), establishment.position.lon,
+      establishment.position.lat, establishment.updatedAt ? establishment.updatedAt.toISOString() : null, establishment.isOpen, establishment.isSearchable, establishment.isCommited,
+      establishment.fitForDisabledWorkers, establishment.maxContactsPerWeek, establishment.lastInseeCheckDate ? establishment.lastInseeCheckDate.toISOString() : null, establishment.createdAt,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -824,8 +666,13 @@ export class PgEstablishmentAggregateRepository
     try {
       const query = fixStGeographyEscapingInQuery(
         format(
-          `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_open, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date 
+          `
+        INSERT INTO establishments (
+          siret, name, customized_name, website, additional_information, 
+          street_number_and_address, post_code, city, department_code, number_employees, 
+          naf_code, naf_nomenclature, source_provider, gps, lon, 
+          lat, update_date, is_open, is_searchable, is_commited, 
+          fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -849,6 +696,173 @@ export class PgEstablishmentAggregateRepository
     } catch (e: any) {
       logger.error(e, "Error inserting establishments");
       throw e;
+    }
+  }
+
+  async #insertContactsFromAggregates(aggregates: EstablishmentAggregate[]) {
+    const aggregatesWithContact = aggregates.filter(
+      (establishment): establishment is Required<EstablishmentAggregate> =>
+        !!establishment.contact,
+    );
+
+    if (aggregatesWithContact.length === 0) return;
+
+    const contactFields = aggregatesWithContact.map((aggregate) => {
+      const contact = aggregate.contact;
+      return [
+        contact.id,
+        contact.lastName,
+        contact.firstName,
+        contact.email,
+        contact.job,
+        contact.phone,
+        contact.contactMethod,
+        JSON.stringify(contact.copyEmails),
+      ];
+    });
+
+    const establishmentContactFields = aggregatesWithContact.map(
+      ({ establishment, contact }) => [establishment.siret, contact.id],
+    );
+
+    try {
+      const insertContactsQuery = format(
+        `INSERT INTO immersion_contacts (
+        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
+      ) VALUES %L`,
+        contactFields,
+      );
+
+      const insertEstablishmentsContactsQuery = format(
+        `INSERT INTO establishments__immersion_contacts (
+        establishment_siret, contact_uuid) VALUES %L`,
+        establishmentContactFields,
+      );
+
+      await this.client.query(insertContactsQuery);
+      await this.client.query(insertEstablishmentsContactsQuery);
+    } catch (e: any) {
+      logger.error(e, "Error inserting contacts");
+      throw e;
+    }
+  }
+
+  async #getRomeCodeFromAppellationCode(
+    appellationCode: AppellationCode | undefined,
+  ): Promise<RomeCode | undefined> {
+    if (!appellationCode) return;
+
+    const result = await this.client.query(
+      `SELECT code_rome
+        from public_appellations_data
+        where ogr_appellation = $1`,
+      [appellationCode],
+    );
+
+    const romeCode: RomeCode | undefined = result.rows[0]?.code_rome;
+    if (!romeCode)
+      throw new Error(
+        `No Rome code found for appellation code ${appellationCode}`,
+      );
+
+    return romeCode;
+  }
+
+  async #updateImmersionOffersFromAggregates(
+    existingAggregate: EstablishmentAggregate,
+    updatingAggregate: EstablishmentAggregate,
+  ) {
+    const updatedOffers = updatingAggregate.immersionOffers;
+    const existingOffers = existingAggregate.immersionOffers;
+    const siret = existingAggregate.establishment.siret;
+
+    const offersToAdd = updatedOffers.filter(
+      (updatedOffer) =>
+        !existingOffers.find((existingOffer) =>
+          offersEqual(existingOffer, updatedOffer),
+        ),
+    );
+
+    if (offersToAdd.length > 0)
+      await this.client.query(
+        format(
+          `INSERT INTO immersion_offers (
+            rome_code, appellation_code, score, created_at, siret
+          ) VALUES %L`,
+          offersToAdd.map((offerToAdd) => [
+            offerToAdd.romeCode,
+            offerToAdd.appellationCode,
+            offerToAdd.score,
+            offerToAdd.createdAt,
+            siret,
+          ]),
+        ),
+      );
+
+    const offersToRemove = existingOffers.filter(
+      (updatedOffer) =>
+        !updatedOffers.find((existingOffer) =>
+          offersEqual(existingOffer, updatedOffer),
+        ),
+    );
+    const offersToRemoveByRomeCode = offersToRemove
+      .filter((offer) => !offer.appellationCode)
+      .map((offer) => offer.romeCode);
+
+    if (offersToRemoveByRomeCode.length > 0) {
+      const queryToRemoveOffersFromRome = format(
+        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code IS NULL AND rome_code IN (%L); `,
+        siret,
+        offersToRemoveByRomeCode,
+      );
+      await this.client.query(queryToRemoveOffersFromRome);
+    }
+
+    const offersToRemoveByRomeAppellation = offersToRemove
+      .filter((offer) => !!offer.appellationCode)
+      .map((offer) => offer.appellationCode);
+
+    if (offersToRemoveByRomeAppellation.length > 0) {
+      const queryToRemoveOffersFromAppellationCode = format(
+        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code::text IN (%L); `,
+        siret,
+        offersToRemoveByRomeAppellation,
+      );
+      await this.client.query(queryToRemoveOffersFromAppellationCode);
+    }
+  }
+
+  async #updateContactFromAggregates(
+    existingAggregate: EstablishmentAggregate & {
+      contact: ContactEntity;
+    },
+    updatedAggregate: EstablishmentAggregate,
+  ) {
+    if (
+      !!updatedAggregate.contact &&
+      !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
+    ) {
+      await this.client.query(
+        `UPDATE immersion_contacts 
+       SET lastname = $1, 
+            firstname = $2, 
+            email = $3, 
+            job = $4, 
+            phone = $5, 
+            contact_mode = $6, 
+            copy_emails = $7
+       WHERE uuid = $8`,
+        [
+          updatedAggregate.contact.lastName,
+          updatedAggregate.contact.firstName,
+          updatedAggregate.contact.email,
+          updatedAggregate.contact.job,
+          updatedAggregate.contact.phone,
+          updatedAggregate.contact.contactMethod,
+          JSON.stringify(updatedAggregate.contact.copyEmails),
+          existingAggregate.contact.id,
+        ],
+      );
     }
   }
 }

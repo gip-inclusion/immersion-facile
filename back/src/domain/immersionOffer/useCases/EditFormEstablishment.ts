@@ -13,13 +13,16 @@ export class EditFormEstablishment extends TransactionalUseCase<
   void,
   EstablishmentJwtPayload
 > {
-  inputSchema = formEstablishmentSchema;
+  protected inputSchema = formEstablishmentSchema;
+
+  #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
   }
 
   public async _execute(
@@ -29,7 +32,7 @@ export class EditFormEstablishment extends TransactionalUseCase<
   ): Promise<void> {
     if (siret !== dto.siret) throw new ForbiddenError();
 
-    const event = this.createNewEvent({
+    const event = this.#createNewEvent({
       topic: "FormEstablishmentEdited",
       payload: dto,
     });

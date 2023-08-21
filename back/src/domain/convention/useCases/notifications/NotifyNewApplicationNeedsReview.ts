@@ -23,20 +23,36 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 const logger = createLogger(__filename);
 
 export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<ConventionDto> {
-  inputSchema = conventionSchema;
+  protected inputSchema = conventionSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
+  readonly #config: AppConfig;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private readonly timeGateway: TimeGateway,
-    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    private readonly config: AppConfig,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    timeGateway: TimeGateway,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    config: AppConfig,
   ) {
     super(uowPerformer);
+
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#timeGateway = timeGateway;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
+    this.#config = config;
   }
 
-  public async _execute(
+  protected async _execute(
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
@@ -76,15 +92,15 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     const emails: TemplatedEmail[] = await Promise.all(
       recipients.emails.map(async (recipientEmail) => {
         const makeShortMagicLink = prepareMagicShortLinkMaker({
-          config: this.config,
+          config: this.#config,
           conventionMagicLinkPayload: {
             id: convention.id,
             role: recipients.role,
             email: recipientEmail,
-            now: this.timeGateway.now(),
+            now: this.#timeGateway.now(),
           },
-          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+          generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+          shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
           uow,
         });
 
@@ -113,7 +129,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
 
     await Promise.all(
       emails.map((email) =>
-        this.saveNotificationAndRelatedEvent(uow, {
+        this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: email,
           followedIds: {

@@ -10,15 +10,25 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
-  inputSchema = formEstablishmentSchema;
+  protected inputSchema = formEstablishmentSchema;
+
+  readonly #addressAPI: AddressGateway;
+
+  readonly #uuidGenerator: UuidGenerator;
+
+  readonly #timeGateway: TimeGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly addressAPI: AddressGateway,
-    private readonly uuidGenerator: UuidGenerator,
-    private readonly timeGateway: TimeGateway,
+    addressAPI: AddressGateway,
+    uuidGenerator: UuidGenerator,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
+
+    this.#addressAPI = addressAPI;
+    this.#timeGateway = timeGateway;
+    this.#uuidGenerator = uuidGenerator;
   }
 
   public async _execute(
@@ -35,16 +45,16 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     const establishmentAggregate =
       await makeUpdateEstablishmentAggregateFromFormEstablishment({
-        addressGateway: this.addressAPI,
-        uuidGenerator: this.uuidGenerator,
-        timeGateway: this.timeGateway,
+        addressGateway: this.#addressAPI,
+        uuidGenerator: this.#uuidGenerator,
+        timeGateway: this.#timeGateway,
       })(initialEstablishmentAggregate, formEstablishment);
 
     if (!establishmentAggregate) return;
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
       establishmentAggregate,
-      this.timeGateway.now(),
+      this.#timeGateway.now(),
     );
   }
 }

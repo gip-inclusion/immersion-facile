@@ -7,11 +7,13 @@ import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishm
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
+type EditionSiretRelatedInputsProps = {
+  businessAddress: string;
+};
+
 export const EditionSiretRelatedInputs = ({
   businessAddress,
-}: {
-  businessAddress: string;
-}) => {
+}: EditionSiretRelatedInputsProps) => {
   const featureFlags = useFeatureFlags();
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();

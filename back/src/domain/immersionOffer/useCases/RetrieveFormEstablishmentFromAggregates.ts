@@ -1,5 +1,6 @@
 import {
   addressDtoToString,
+  BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
   SiretDto,
@@ -15,9 +16,9 @@ import { TransactionalUseCase } from "../../core/UseCase";
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
   FormEstablishmentDto,
-  EstablishmentJwtPayload
+  EstablishmentJwtPayload | BackOfficeJwtPayload
 > {
-  inputSchema = siretSchema;
+  protected inputSchema = siretSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
@@ -26,10 +27,19 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   protected async _execute(
     siret: SiretDto,
     uow: UnitOfWork,
-    { siret: siretFromJwt }: EstablishmentJwtPayload,
+    jwtPayload?: EstablishmentJwtPayload | BackOfficeJwtPayload,
   ) {
-    if (siret !== siretFromJwt) throw new ForbiddenError();
+    if (!jwtPayload) throw new ForbiddenError();
+    const isValidEstablishmentJwtPayload =
+      "siret" in jwtPayload && siret === jwtPayload.siret;
+    const isValidBackOfficeJwtPayload =
+      "role" in jwtPayload && jwtPayload.role === "backOffice";
+    if (isValidBackOfficeJwtPayload || isValidEstablishmentJwtPayload)
+      return this.#onValidJwt(uow, siret);
+    throw new ForbiddenError();
+  }
 
+  async #onValidJwt(uow: UnitOfWork, siret: SiretDto) {
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,

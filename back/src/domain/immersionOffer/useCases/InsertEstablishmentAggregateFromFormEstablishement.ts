@@ -20,7 +20,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
-  inputSchema = formEstablishmentSchema;
+  protected inputSchema = formEstablishmentSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -33,7 +33,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  public async _execute(
+  protected async _execute(
     formEstablishment: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
@@ -41,10 +41,16 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     log("Start");
     // Remove existing aggregate that could have been inserted by another process (eg. La Bonne Boite)
-    await uow.establishmentAggregateRepository.removeEstablishmentAndOffersAndContactWithSiret(
-      formEstablishment.siret,
-    );
-    log("Cleared existing Aggregate");
+    const establishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        formEstablishment.siret,
+      );
+    if (establishment) {
+      await uow.establishmentAggregateRepository.delete(
+        formEstablishment.siret,
+      );
+      log("Cleared existing Aggregate");
+    }
 
     const establishmentAggregate =
       await makeFormEstablishmentToEstablishmentAggregate({

@@ -22,17 +22,33 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
   ConventionDto,
   void
 > {
-  inputSchema = conventionSchema;
+  protected inputSchema = conventionSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
+  readonly #config: AppConfig;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private readonly timeGateway: TimeGateway,
-    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    private readonly config: AppConfig,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    timeGateway: TimeGateway,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    config: AppConfig,
   ) {
     super(uowPerformer);
+
+    this.#config = config;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#timeGateway = timeGateway;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
 
   protected async _execute(
@@ -61,16 +77,16 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
           role: "validator",
         };
 
-    return this.sendEmailToRecipients({
+    return this.#sendEmailToRecipients({
       agency,
       convention,
       ...recipients,
-      warning: await this.makeWarning(agency, convention, uow),
+      warning: await this.#makeWarning(agency, convention, uow),
       uow,
     });
   }
 
-  private async makeWarning(
+  async #makeWarning(
     agency: AgencyDto,
     convention: ConventionDto,
     uow: UnitOfWork,
@@ -86,7 +102,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
       : `Un mail a également été envoyé au conseiller référent (${advisor.firstName} ${advisor.lastName} - ${advisor.email})`;
   }
 
-  private async sendEmailToRecipients({
+  async #sendEmailToRecipients({
     agency,
     recipients,
     convention,
@@ -108,15 +124,15 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
             id: convention.id,
             role,
             email,
-            now: this.timeGateway.now(),
+            now: this.#timeGateway.now(),
           },
           uow,
-          config: this.config,
-          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+          config: this.#config,
+          generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+          shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
         });
 
-        return this.saveNotificationAndRelatedEvent(uow, {
+        return this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",

@@ -14,7 +14,7 @@ import {
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryEstablishmentGroupRepository } from "../../../adapters/secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
+import { InMemoryEstablishmentGroupRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentGroupRepository";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -168,8 +168,9 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   });
 
   it("updates Group if it already exists", async () => {
+    const slug = "l-amie-caline";
     await establishmentGroupRepository.save({
-      slug: "l'amie-caline",
+      slug,
       name: formEstablishmentBatch.groupName,
       sirets: [formEstablishmentBatch.formEstablishments[0].siret],
     });
@@ -194,14 +195,15 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       ],
     });
 
-    expect(establishmentGroupRepository.groups).toHaveLength(1);
-    expectToEqual(establishmentGroupRepository.groups[0], {
-      slug: "l-amie-caline",
-      name: formEstablishmentBatch.groupName,
-      sirets: [
-        formEstablishmentBatch.formEstablishments[0].siret,
-        formEstablishmentBatch.formEstablishments[1].siret,
-      ],
-    });
+    expectToEqual(establishmentGroupRepository.groups, [
+      {
+        slug,
+        name: formEstablishmentBatch.groupName,
+        sirets: [
+          formEstablishmentBatch.formEstablishments[0].siret,
+          formEstablishmentBatch.formEstablishments[1].siret,
+        ],
+      },
+    ]);
   });
 });

@@ -15,17 +15,23 @@ export class AddConvention extends TransactionalUseCase<
   ConventionDtoWithoutExternalId,
   WithConventionIdLegacy
 > {
-  inputSchema = conventionWithoutExternalIdSchema;
+  protected inputSchema = conventionWithoutExternalIdSchema;
+
+  readonly #createNewEvent: CreateNewEvent;
+
+  readonly #siretGateway: SiretGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly createNewEvent: CreateNewEvent,
-    private readonly siretGateway: SiretGateway,
+    createNewEvent: CreateNewEvent,
+    siretGateway: SiretGateway,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
+    this.#siretGateway = siretGateway;
   }
 
-  public async _execute(
+  protected async _execute(
     createConventionParams: ConventionDtoWithoutExternalId,
     uow: UnitOfWork,
   ): Promise<WithConventionIdLegacy> {
@@ -41,7 +47,7 @@ export class AddConvention extends TransactionalUseCase<
     const featureFlags = await uow.featureFlagRepository.getAll();
     if (featureFlags.enableInseeApi.isActive) {
       await rejectsSiretIfNotAnOpenCompany(
-        this.siretGateway,
+        this.#siretGateway,
         createConventionParams.siret,
       );
     }
@@ -50,7 +56,7 @@ export class AddConvention extends TransactionalUseCase<
       createConventionParams,
     );
 
-    const event = this.createNewEvent({
+    const event = this.#createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: { ...createConventionParams, externalId },
     });

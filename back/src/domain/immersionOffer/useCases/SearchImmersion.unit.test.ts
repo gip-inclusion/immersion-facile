@@ -222,12 +222,46 @@ describe("SearchImmersionUseCase", () => {
       establishment,
     ];
 
-    const lbbCompanyWithSameSiret = new LaBonneBoiteCompanyDtoBuilder()
-      .withSiret(establishment.establishment.siret)
-      .withRome(secretariatImmersionOffer.romeCode)
-      .build();
+    laBonneBoiteGateway.setNextResults([
+      new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret(establishment.establishment.siret)
+        .withRome(secretariatImmersionOffer.romeCode)
+        .build(),
+    ]);
 
-    laBonneBoiteGateway.setNextResults([lbbCompanyWithSameSiret]);
+    const response = await searchImmersionUseCase.execute({
+      ...searchInMetzParams,
+      appellationCode: secretariatImmersionOffer.appellationCode,
+      sortedBy: "distance",
+    });
+
+    expectToEqual(response, [
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        secretariatImmersionOffer.romeCode,
+        606885,
+      ),
+    ]);
+  });
+
+  it("gets only the form result if a company with same siret is also in LBB results even if establishement was previously deleted", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+    uow.deletedEstablishmentRepository.deletedEstablishments = [
+      {
+        siret: establishment.establishment.siret,
+        createdAt: new Date(),
+        deletedAt: new Date(),
+      },
+    ];
+
+    laBonneBoiteGateway.setNextResults([
+      new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret(establishment.establishment.siret)
+        .withRome(secretariatImmersionOffer.romeCode)
+        .build(),
+    ]);
 
     const response = await searchImmersionUseCase.execute({
       ...searchInMetzParams,
@@ -254,6 +288,61 @@ describe("SearchImmersionUseCase", () => {
     beforeEach(() => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
         notSearchableEstablishment,
+      ];
+
+      laBonneBoiteGateway.setNextResults([
+        new LaBonneBoiteCompanyDtoBuilder()
+          .withSiret(notSearchableEstablishment.establishment.siret)
+          .withRome(secretariatImmersionOffer.romeCode)
+          .build(),
+      ]);
+    });
+
+    it("Without voluntary to immersion", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        appellationCode: secretariatImmersionOffer.appellationCode,
+        sortedBy: "distance",
+      });
+      expectToEqual(response, []);
+    });
+
+    it("With voluntary to immersion false", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        appellationCode: secretariatImmersionOffer.appellationCode,
+        sortedBy: "distance",
+        voluntaryToImmersion: false,
+      });
+      expectToEqual(response, []);
+    });
+
+    it("With voluntary to immersion true", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        appellationCode: secretariatImmersionOffer.appellationCode,
+        sortedBy: "distance",
+        voluntaryToImmersion: true,
+      });
+      expectToEqual(response, []);
+    });
+  });
+
+  describe("No result when a company is deleted & LBB results", () => {
+    const notSearchableEstablishment = new EstablishmentAggregateBuilder(
+      establishment,
+    )
+      .withIsSearchable(false)
+      .build();
+
+    beforeEach(() => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [];
+      uow.deletedEstablishmentRepository.deletedEstablishments = [
+        {
+          siret: notSearchableEstablishment.establishment.siret,
+          createdAt: new Date(),
+          deletedAt: new Date(),
+        },
       ];
 
       laBonneBoiteGateway.setNextResults([

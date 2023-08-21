@@ -1,5 +1,9 @@
 import { Request, Router } from "express";
-import { establishmentTargets } from "shared";
+import {
+  BackOfficeJwtPayload,
+  EstablishmentJwtPayload,
+  establishmentTargets,
+} from "shared";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -8,7 +12,13 @@ export const establishmentRouterWithMagicLinkJwt = (
 ): Router => {
   // this considers the jwt checks have been made by the middleware
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const getEstablishmentPayload = (req: Request) => req.payloads!.establishment;
+  const getEstablishmentPayload = (
+    req: Request,
+  ): EstablishmentJwtPayload | undefined => req.payloads?.establishment;
+
+  const getBackOfficePayload = (
+    req: Request,
+  ): BackOfficeJwtPayload | undefined => req.payloads?.backOffice;
 
   const router = Router({ mergeParams: true });
   // Routes WITH jwt auth
@@ -20,7 +30,7 @@ export const establishmentRouterWithMagicLinkJwt = (
       sendHttpResponse(req, res, () =>
         deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
           req.params.siret,
-          getEstablishmentPayload(req),
+          getEstablishmentPayload(req) ?? getBackOfficePayload(req),
         ),
       ),
     );
@@ -35,5 +45,18 @@ export const establishmentRouterWithMagicLinkJwt = (
         ),
       ),
     );
+
+  router
+    .route(establishmentTargets.deleteEstablishment.url)
+    .delete(async (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        await deps.useCases.deleteEstablishment.execute(
+          req.params,
+          getBackOfficePayload(req),
+        ),
+          res.status(204);
+      }),
+    );
+
   return router;
 };

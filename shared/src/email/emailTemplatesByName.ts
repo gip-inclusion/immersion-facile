@@ -26,6 +26,20 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
+    ESTABLISHMENT_DELETED: {
+      niceName: "Suppression de l'entreprise",
+      tags: ["suppression entreprise"],
+      createEmailVariables: ({ businessAddress, businessName, siret }) => ({
+        subject:
+          "Votre entreprise a été supprimée de la liste des entreprises accueillantes d'Immersion Facilitée",
+        greetings: "Bonjour,",
+        content: `
+        Suite à votre demande de suppression de votre établissement (SIRET ${siret} - ${businessName} - ${businessAddress}), nous vous confirmons que ce dernier a été supprimé définitivement de la liste des entreprises accueillantes exposées sur Immersion Facilitée.
+        `,
+        subContent: `Bien cordialement,
+        l'équipe d'Immersion Facilitée`,
+      }),
+    },
     DISCUSSION_EXCHANGE: {
       niceName: "Échange entre établissement et potentiel bénéficiaire",
       tags: ["échange établissement potentiel bénéficiaire"],

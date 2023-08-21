@@ -20,23 +20,36 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
   void,
   SendEmailsWithAssessmentCreationLinkOutput
 > {
-  inputSchema = z.void();
+  protected inputSchema = z.void();
+
+  readonly #notificationGateway: NotificationGateway;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+
+  readonly #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private notificationGateway: NotificationGateway,
-    private timeGateway: TimeGateway,
-    private generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    private createNewEvent: CreateNewEvent,
+    notificationGateway: NotificationGateway,
+    timeGateway: TimeGateway,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
+
+    this.#createNewEvent = createNewEvent;
+    this.#notificationGateway = notificationGateway;
+    this.#timeGateway = timeGateway;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
   }
 
   protected async _execute(
     _: void,
     uow: UnitOfWork,
   ): Promise<SendEmailsWithAssessmentCreationLinkOutput> {
-    const now = this.timeGateway.now();
+    const now = this.#timeGateway.now();
     const tomorrow = addDays(now, 1);
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
@@ -53,7 +66,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     const errors: Record<ConventionId, any> = {};
     await Promise.all(
       conventions.map(async (convention) => {
-        await this._sendOneEmailWithImmersionAssessmentCreationLink(
+        await this.#sendOneEmailWithImmersionAssessmentCreationLink(
           uow,
           convention,
         ).catch((error: any) => {
@@ -68,7 +81,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     };
   }
 
-  private async _sendOneEmailWithImmersionAssessmentCreationLink(
+  async #sendOneEmailWithImmersionAssessmentCreationLink(
     uow: UnitOfWork,
     convention: ConventionDto,
   ) {
@@ -76,7 +89,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     if (!agency)
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
-    await this.notificationGateway.sendEmail({
+    await this.#notificationGateway.sendEmail({
       kind: "CREATE_IMMERSION_ASSESSMENT",
       recipients: [convention.establishmentTutor.email],
       params: {
@@ -86,19 +99,19 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         conventionId: convention.id,
         establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        immersionAssessmentCreationLink: this.generateConventionMagicLinkUrl({
+        immersionAssessmentCreationLink: this.#generateConventionMagicLinkUrl({
           id: convention.id,
           email: convention.establishmentTutor.email,
           role: "establishment",
           targetRoute: frontRoutes.immersionAssessment,
-          now: this.timeGateway.now(),
+          now: this.#timeGateway.now(),
         }),
         internshipKind: convention.internshipKind,
       },
     });
 
     await uow.outboxRepository.save(
-      this.createNewEvent({
+      this.#createNewEvent({
         topic: "EmailWithLinkToCreateAssessmentSent",
         payload: { id: convention.id },
       }),

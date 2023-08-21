@@ -9,7 +9,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { Route } from "type-route";
 import {
   AppellationAndRomeDto,
@@ -20,7 +20,6 @@ import {
   EstablishmentJwtPayload,
   FormEstablishmentDto,
   formEstablishmentSchema,
-  FormEstablishmentSource,
   immersionFacileContactEmail,
   noContactPerWeek,
   objectToDependencyList,
@@ -42,6 +41,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
+import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {
@@ -50,10 +50,8 @@ import {
 } from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import {
-  EstablishmentRequestedPayload,
-  establishmentSlice,
-} from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { AdminSiretRelatedInputs } from "./AdminSiretRelatedInputs";
 import { BusinessContact } from "./BusinessContact";
 import { MultipleAppellationInput } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
@@ -63,6 +61,7 @@ type RouteByMode = {
     | Route<typeof routes.formEstablishment>
     | Route<typeof routes.formEstablishmentForExternals>;
   edit: Route<typeof routes.editFormEstablishment>;
+  admin: Route<typeof routes.manageEstablishmentAdmin>;
 };
 
 type Mode = keyof RouteByMode;
@@ -73,11 +72,14 @@ type EstablishmentFormProps = {
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
-
+  const adminJwt = useAdminToken();
   const route = useRoute() as RouteByMode[Mode];
+  const { enableMaxContactPerWeek } = useFeatureFlags();
+
   const isEstablishmentCreation =
     route.name === "formEstablishment" ||
     route.name === "formEstablishmentForExternals";
+  const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
 
   const feedback = useAppSelector(establishmentSelectors.feedback);
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
@@ -85,26 +87,16 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     establishmentSelectors.formEstablishment,
   );
 
-  const jwt = !isEstablishmentCreation ? route.params.jwt : "";
-  const siret =
-    isEstablishmentCreation && route.params.siret ? route.params.siret : "";
-  const source =
-    isEstablishmentCreation && route.params.source ? route.params.source : "";
-
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
   );
-  const initialValues = {
-    ...initialFormEstablishment,
-    source: (source === ""
-      ? "immersion-facile"
-      : source) as FormEstablishmentSource,
-  };
+
   const methods = useForm<FormEstablishmentDto>({
-    defaultValues: initialValues,
+    defaultValues: initialFormEstablishment,
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
+
   const {
     handleSubmit,
     register,
@@ -113,28 +105,73 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     formState: { errors, submitCount, isSubmitting, touchedFields },
     reset,
   } = methods;
+
   const formValues = getValues();
   const formContents = getFormFields();
   const getFieldError = makeFieldError(methods.formState);
-  const [isSearchable, setIsSearchable] = useState(
-    initialValues.maxContactsPerWeek > noContactPerWeek,
-  );
-  const { enableMaxContactPerWeek } = useFeatureFlags();
 
-  useInitialSiret(siret);
+  const [isSearchable, setIsSearchable] = useState(
+    initialFormEstablishment.maxContactsPerWeek > noContactPerWeek,
+  );
+
+  useInitialSiret(
+    (isEstablishmentCreation || isEstablishmentAdmin) && route.params.siret
+      ? route.params.siret
+      : "",
+  );
 
   useEffect(() => {
-    const payload: EstablishmentRequestedPayload =
-      isEstablishmentCreation && mode === "create"
-        ? formEstablishmentQueryParamsToFormEstablishmentDto(route.params)
-        : {
+    match({ route, adminJwt })
+      .with(
+        {
+          route: {
+            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+          },
+        },
+        ({ route }) =>
+          dispatch(
+            establishmentSlice.actions.establishmentRequested(
+              formEstablishmentQueryParamsToFormEstablishmentDto(route.params),
+            ),
+          ),
+      )
+      .with({ route: { name: "editFormEstablishment" } }, ({ route }) =>
+        dispatch(
+          establishmentSlice.actions.establishmentRequested({
             siret:
               decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
-                jwt,
+                route.params.jwt,
               ).siret,
-            jwt,
-          };
-    dispatch(establishmentSlice.actions.establishmentRequested(payload));
+            jwt: route.params.jwt,
+          }),
+        ),
+      )
+      .with(
+        { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
+        () => {
+          routes
+            .errorRedirect({
+              message: "Accès interdit sans être connecté en admin.",
+              title: "Erreur",
+            })
+            .push();
+        },
+      )
+      .with(
+        {
+          route: { name: "manageEstablishmentAdmin" },
+          adminJwt: P.not(P.nullish),
+        },
+        ({ route, adminJwt }) =>
+          dispatch(
+            establishmentSlice.actions.establishmentRequested({
+              siret: route.params.siret,
+              jwt: adminJwt,
+            }),
+          ),
+      )
+
+      .exhaustive();
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
@@ -165,54 +202,92 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [feedback.kind]);
 
-  const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) => {
-    isEstablishmentCreation
-      ? dispatch(
-          establishmentSlice.actions.establishmentCreationRequested(
-            formEstablishment,
+  const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
+    match(route)
+      .with(
+        { name: P.union("formEstablishment", "formEstablishmentForExternals") },
+        () =>
+          dispatch(
+            establishmentSlice.actions.establishmentCreationRequested(
+              formEstablishment,
+            ),
           ),
-        )
-      : dispatch(
+      )
+      .with({ name: "editFormEstablishment" }, (route) =>
+        dispatch(
           establishmentSlice.actions.establishmentEditionRequested({
             formEstablishment,
-            jwt,
+            jwt: route.params.jwt,
           }),
-        );
+        ),
+      )
+      .with({ name: "manageEstablishmentAdmin" }, () =>
+        routes
+          .errorRedirect({
+            message:
+              "Vous n'avez pas le droit de modifier une entreprise dans l'admin.",
+            title: "Erreur",
+          })
+          .push(),
+      )
+      .exhaustive();
+
+  const onClickEstablishmentDeleteButton = () => {
+    const confirmed = confirm(
+      `⚠️ Etes-vous sûr de vouloir supprimer cet établissement ? ⚠️
+                (cette opération est irréversible 💀)`,
+    );
+    if (confirmed && adminJwt)
+      dispatch(
+        establishmentSlice.actions.establishmentDeletionRequested({
+          siret: formValues.siret,
+          jwt: adminJwt,
+        }),
+      );
+    if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
   };
 
   if (isLoading) {
     return <Loader />;
   }
+
   return (
     <>
-      <p>
-        Bienvenue sur l'espace de référencement des entreprises volontaires pour
-        l'accueil des immersions professionnelles.
-      </p>
-      <p>
-        En référençant votre entreprise, vous rejoignez la communauté{" "}
-        <a
-          href={"https://lesentreprises-sengagent.gouv.fr/"}
-          target={"_blank"}
-          rel="noreferrer"
-        >
-          « Les entreprises s'engagent »
-        </a>
-        .
-      </p>
-      <p>
-        Ce formulaire vous permet d'indiquer les métiers de votre établissement
-        ouverts aux immersions. Si votre entreprise comprend plusieurs
-        établissements, il convient de renseigner un formulaire pour chaque
-        établissement (Siret différent).
-      </p>
-      <p className={fr.cx("fr-text--xs")}>
-        Tous les champs marqués d'une astérisque (*) sont obligatoires.
-      </p>
+      {!isEstablishmentAdmin && (
+        <>
+          <p>
+            Bienvenue sur l'espace de référencement des entreprises volontaires
+            pour l'accueil des immersions professionnelles.
+          </p>
+          <p>
+            En référençant votre entreprise, vous rejoignez la communauté{" "}
+            <a
+              href={"https://lesentreprises-sengagent.gouv.fr/"}
+              target={"_blank"}
+              rel="noreferrer"
+            >
+              « Les entreprises s'engagent »
+            </a>
+            .
+          </p>
+          <p>
+            Ce formulaire vous permet d'indiquer les métiers de votre
+            établissement ouverts aux immersions. Si votre entreprise comprend
+            plusieurs établissements, il convient de renseigner un formulaire
+            pour chaque établissement (Siret différent).
+          </p>
+          <p className={fr.cx("fr-text--xs")}>
+            Tous les champs marqués d'une astérisque (*) sont obligatoires.
+          </p>
+        </>
+      )}
+
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-            Votre établissement
+            {!isEstablishmentAdmin
+              ? "Votre établissement"
+              : `Pilotage établissement ${formValues.siret}`}
           </h2>
           {match(mode)
             .with("create", () => <CreationSiretRelatedInputs />)
@@ -221,9 +296,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 businessAddress={formValues.businessAddress}
               />
             ))
+            .with("admin", () => <AdminSiretRelatedInputs />)
             .exhaustive()}
 
           <RadioButtons
+            disabled={isEstablishmentAdmin}
             {...formContents["isEngagedEnterprise"]}
             legend={formContents["isEngagedEnterprise"].label}
             options={booleanSelectOptions.map((option) => ({
@@ -241,9 +318,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 },
               },
             }))}
-            disabled={false}
           />
           <RadioButtons
+            disabled={isEstablishmentAdmin}
             {...formContents["fitForDisabledWorkers"]}
             legend={formContents["fitForDisabledWorkers"].label}
             options={booleanSelectOptions.map((option) => ({
@@ -261,9 +338,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 },
               },
             }))}
-            disabled={false}
           />
           <Input
+            disabled={isEstablishmentAdmin}
             label={formContents.website.label}
             hintText={formContents.website.hintText}
             nativeInputProps={{
@@ -273,6 +350,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             {...getFieldError("website")}
           />
           <Input
+            disabled={isEstablishmentAdmin}
             label={formContents.additionalInformation.label}
             hintText={formContents.additionalInformation.hintText}
             textArea
@@ -287,6 +365,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             Les métiers que vous proposez à l'immersion :
           </h2>
           <MultipleAppellationInput
+            disabled={isEstablishmentAdmin}
             {...formContents.appellations}
             onAppellationAdd={(appellation, index) => {
               const appellationsToUpdate = formValues.appellations;
@@ -304,7 +383,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             currentAppellations={formValues.appellations}
             error={errors?.appellations?.message}
           />
-          <BusinessContact />
+          <BusinessContact readOnly={isEstablishmentAdmin} />
 
           {mode === "edit" && (
             <Checkbox
@@ -336,6 +415,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
           {enableMaxContactPerWeek.isActive && isSearchable && (
             <Input
+              disabled={isEstablishmentAdmin}
               label={formContents.maxContactsPerWeek.label}
               nativeInputProps={{
                 ...formContents.maxContactsPerWeek,
@@ -362,9 +442,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               </p>
             </>
           )}
-          {keys(errors).length === 0 && keys(touchedFields).length > 0 && (
-            <SearchResultPreview establishment={formValues} />
-          )}
+          {!isEstablishmentAdmin &&
+            keys(errors).length === 0 &&
+            keys(touchedFields).length > 0 && (
+              <SearchResultPreview establishment={formValues} />
+            )}
           <ErrorNotifications
             labels={getFormErrors()}
             errors={toDotNotation(formErrorsToFlatErrors(errors))}
@@ -387,7 +469,21 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 votre entreprise."
             />
           )}
-          {feedback.kind !== "submitSuccess" && (
+          {feedback.kind === "deleteSuccess" && (
+            <Alert
+              severity="success"
+              title="Succès de la suppression"
+              description="Succès. Nous avons bien supprimé les informations concernant l'entreprise."
+            />
+          )}
+          {feedback.kind === "deleteErrored" && (
+            <Alert
+              severity="error"
+              title="Erreur lors de la suppression"
+              description="Veuillez nous excuser. Un problème est survenu lors de la suppression de l'entreprise."
+            />
+          )}
+          {feedback.kind !== "submitSuccess" && !isEstablishmentAdmin && (
             <div className={fr.cx("fr-mt-4w")}>
               <Button
                 iconId="fr-icon-checkbox-circle-line"
@@ -399,6 +495,23 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 }}
               >
                 Enregistrer mes informations
+              </Button>
+            </div>
+          )}
+          {feedback.kind !== "deleteSuccess" && isEstablishmentAdmin && (
+            <div className={fr.cx("fr-mt-4w")}>
+              <Button
+                iconId="fr-icon-delete-bin-line"
+                priority="secondary"
+                iconPosition="left"
+                type="button"
+                disabled={isSubmitting}
+                nativeButtonProps={{
+                  id: domElementIds.establishment.deleteButton,
+                }}
+                onClick={onClickEstablishmentDeleteButton}
+              >
+                Supprimer l'entreprise
               </Button>
             </div>
           )}

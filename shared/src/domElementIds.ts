@@ -264,6 +264,8 @@ export const domElementIds = {
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
     submitButton: "im-form-add-establishment__submit-button",
+    deleteButton: "im-form-delete-establishment__delete-button",
+    manageButton: "im-form-manage-establishment__manage-button",
   },
 
   immersionAssessment: {
@@ -329,4 +331,5 @@ export const domElementIds = {
   agencyDashboard: {},
   manageConventionAdmin: {},
   manageConventionInclusionConnected: {},
+  manageEstablishmentAdmin: {},
 } satisfies DomElementIds;

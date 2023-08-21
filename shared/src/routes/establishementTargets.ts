@@ -19,12 +19,17 @@ export const establishmentTargets = createTargets({
   }),
   getFormEstablishment: createTarget({
     method: "GET",
-    url: "/form-establishments/:siret",
+    url: `${formEstablishmentsUrl}/:siret`,
     ...withValidateHeadersAuthorization,
     validateResponseBody: formEstablishmentSchema.parse,
   }),
   requestEmailToUpdateFormRoute: createTarget({
     method: "POST",
     url: "/request-email-to-update-form/:siret",
+  }),
+  deleteEstablishment: createTarget({
+    method: "DELETE",
+    url: `${formEstablishmentsUrl}/:siret`,
+    ...withValidateHeadersAuthorization,
   }),
 });

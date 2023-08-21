@@ -101,18 +101,25 @@ const brevoInboundBodySchema: z.Schema<BrevoInboundBody> = z.object({
 });
 
 export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundBody> {
-  inputSchema = brevoInboundBodySchema;
+  protected inputSchema = brevoInboundBodySchema;
 
-  private readonly replyDomain: string;
+  readonly #replyDomain: string;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #notificationGateway: NotificationGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     domain: string,
-    private readonly notificationGateway: NotificationGateway,
+    notificationGateway: NotificationGateway,
   ) {
     super(uowPerformer);
-    this.replyDomain = `reply.${domain}`;
+    this.#replyDomain = `reply.${domain}`;
+
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#notificationGateway = notificationGateway;
   }
 
   protected async _execute(
@@ -120,15 +127,15 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     uow: UnitOfWork,
   ): Promise<void> {
     await Promise.all(
-      brevoResponse.items.map((item) => this.processBrevoItem(uow, item)),
+      brevoResponse.items.map((item) => this.#processBrevoItem(uow, item)),
     );
   }
 
-  private getDiscussionParamsFromEmail(
+  #getDiscussionParamsFromEmail(
     email: BrevoEmailItem,
   ): [DiscussionId, ExchangeRole] {
     const recipient = email.To.find((recipent) => {
-      const regex = new RegExp(`.*_.*@${this.replyDomain}$`);
+      const regex = new RegExp(`.*_.*@${this.#replyDomain}$`);
       return recipent.Address?.match(regex);
     });
     if (!recipient)
@@ -146,12 +153,12 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     return [id, kind];
   }
 
-  private async processBrevoItem(
+  async #processBrevoItem(
     uow: UnitOfWork,
     item: BrevoEmailItem,
   ): Promise<void> {
     const [discussionId, recipientKind] =
-      this.getDiscussionParamsFromEmail(item);
+      this.#getDiscussionParamsFromEmail(item);
     const discussion = await uow.discussionAggregateRepository.getById(
       discussionId,
     );
@@ -175,7 +182,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       addExchangeToDiscussion(discussion, exchange),
     );
 
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "DISCUSSION_EXCHANGE",
@@ -194,7 +201,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
             ? discussion.establishmentContact.copyEmails
             : [],
         replyTo: {
-          email: createOpaqueEmail(discussion.id, sender, this.replyDomain),
+          email: createOpaqueEmail(discussion.id, sender, this.#replyDomain),
           name:
             sender === "establishment"
               ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
@@ -204,7 +211,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
           item.Attachments.map(async (attachment) => ({
             name: attachment.Name,
             content: (
-              await this.notificationGateway.getAttachmentContent(
+              await this.#notificationGateway.getAttachmentContent(
                 attachment.DownloadToken,
               )
             ).toString("base64"),

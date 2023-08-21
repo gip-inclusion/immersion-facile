@@ -15,15 +15,25 @@ import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/ent
 import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
-  inputSchema = siretSchema;
+  protected inputSchema = siretSchema;
+
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+
+  readonly #timeGateway: TimeGateway;
+
+  readonly #generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private timeGateway: TimeGateway,
-    private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    timeGateway: TimeGateway,
+    generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
   ) {
     super(uowPerformer);
+
+    this.#generateEditFormEstablishmentUrl = generateEditFormEstablishmentUrl;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
@@ -38,9 +48,9 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     if (!contact) throw Error("Email du contact introuvable.");
 
-    const now = this.timeGateway.now();
+    const now = this.#timeGateway.now();
 
-    await this.throwIfMailToEditEstablishmentWasSentRecently(
+    await this.#throwIfMailToEditEstablishmentWasSentRecently(
       uow.notificationRepository,
       contact.email,
       now,
@@ -52,9 +62,9 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
       durationDays: 1,
     });
 
-    const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
+    const editFrontUrl = this.#generateEditFormEstablishmentUrl(payload);
 
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "EDIT_FORM_ESTABLISHMENT_LINK",
@@ -72,7 +82,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     });
   }
 
-  private async throwIfMailToEditEstablishmentWasSentRecently(
+  async #throwIfMailToEditEstablishmentWasSentRecently(
     notificationRepository: NotificationRepository,
     email: Email,
     now: Date,

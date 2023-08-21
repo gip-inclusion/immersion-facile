@@ -13,27 +13,34 @@ type MulterFile = {
 };
 
 export class UploadLogo extends TransactionalUseCase<MulterFile, string> {
-  inputSchema = z.any();
+  protected inputSchema = z.any();
+
+  readonly #documentGateway: DocumentGateway;
+
+  readonly #uuidGenerator: UuidGenerator;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly documentGateway: DocumentGateway,
-    private readonly uuidGenerator: UuidGenerator,
+    documentGateway: DocumentGateway,
+    uuidGenerator: UuidGenerator,
   ) {
     super(uowPerformer);
+
+    this.#documentGateway = documentGateway;
+    this.#uuidGenerator = uuidGenerator;
   }
 
   protected async _execute(multerFile: MulterFile): Promise<string> {
     const extension = multerFile.originalname.split(".").at(-1);
 
     const file: StoredFile = {
-      id: `${this.uuidGenerator.new()}.${extension}`,
+      id: `${this.#uuidGenerator.new()}.${extension}`,
       name: multerFile.originalname,
       encoding: multerFile.encoding,
       size: multerFile.size,
       buffer: multerFile.buffer,
     };
-    await this.documentGateway.put(file);
-    return this.documentGateway.getFileUrl(file);
+    await this.#documentGateway.put(file);
+    return this.#documentGateway.getFileUrl(file);
   }
 }

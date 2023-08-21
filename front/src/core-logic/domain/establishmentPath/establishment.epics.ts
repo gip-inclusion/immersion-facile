@@ -75,8 +75,8 @@ const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
     switchMap((action) =>
       hasPayloadJwt(action.payload)
         ? establishmentGateway.getFormEstablishmentFromJwt$(
-            action.payload.siret ? action.payload.siret : "",
-            hasPayloadJwt(action.payload) ? action.payload.jwt : "",
+            action.payload.siret ?? "",
+            action.payload.jwt,
           )
         : of({
             ...defaultFormEstablishmentValue(),
@@ -100,7 +100,9 @@ const createFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
       establishmentGateway.addFormEstablishment$(action.payload),
     ),
     map(establishmentSlice.actions.establishmentCreationSucceeded),
-    catchEpicError(establishmentSlice.actions.establishmentCreationFailed),
+    catchEpicError((error) =>
+      establishmentSlice.actions.establishmentCreationFailed(error.message),
+    ),
   );
 
 const editFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
@@ -117,7 +119,28 @@ const editFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
       ),
     ),
     map(establishmentSlice.actions.establishmentEditionSucceeded),
-    catchEpicError(establishmentSlice.actions.establishmentEditionFailed),
+    catchEpicError((error) =>
+      establishmentSlice.actions.establishmentEditionFailed(error.message),
+    ),
+  );
+
+const deleteFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(establishmentSlice.actions.establishmentDeletionRequested.match),
+    switchMap((action) =>
+      establishmentGateway.deleteEstablishment$(
+        action.payload.siret,
+        action.payload.jwt,
+      ),
+    ),
+    map(establishmentSlice.actions.establishmentDeletionSucceeded),
+    catchEpicError((error) =>
+      establishmentSlice.actions.establishmentDeletionFailed(error.message),
+    ),
   );
 
 export const establishmentEpics = [
@@ -126,4 +149,5 @@ export const establishmentEpics = [
   fetchEstablishmentEpic,
   createFormEstablishmentEpic,
   editFormEstablishmentEpic,
+  deleteFormEstablishmentEpic,
 ];

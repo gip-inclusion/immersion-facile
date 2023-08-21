@@ -16,7 +16,7 @@ const logger = createLogger(__filename);
 export class PgShortLinkQuery implements ShortLinkQuery {
   constructor(protected client: PoolClient) {}
 
-  getById(shortLinkId: ShortLinkId): Promise<AbsoluteUrl> {
+  public getById(shortLinkId: ShortLinkId): Promise<AbsoluteUrl> {
     logger.info({ shortLinkId }, "PgShortLinkQueryGetByIdTotal");
     return this.client
       .query<PgShortLinkRepositoryDto>({

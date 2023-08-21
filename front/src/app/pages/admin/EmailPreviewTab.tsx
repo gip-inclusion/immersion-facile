@@ -4,6 +4,7 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
+  addressDtoToString,
   domElementIds,
   type EmailTemplatesByName,
   emailTemplatesByName,
@@ -200,6 +201,16 @@ export const defaultEmailValueByEmailKind: {
     EmailTemplatesByName[K]["createEmailVariables"]
   >[0];
 } = {
+  ESTABLISHMENT_DELETED: {
+    businessAddress: addressDtoToString({
+      city: "CHOUCHEN-VILLE",
+      departmentCode: "666",
+      postcode: "66600",
+      streetNumberAndAddress: "666 boulevard des porcs",
+    }),
+    businessName: "Machin CORP",
+    siret: "12345678901234",
+  },
   DISCUSSION_EXCHANGE: {
     subject: "SUBJECT",
     htmlContent:

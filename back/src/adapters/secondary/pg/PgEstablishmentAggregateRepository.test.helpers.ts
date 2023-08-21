@@ -90,6 +90,7 @@ export const insertEstablishment = async (
   client: PoolClient,
   props: {
     siret: string;
+    createdAt: Date;
     updatedAt?: Date;
     isOpen?: boolean;
     isSearchable?: boolean;
@@ -106,25 +107,23 @@ export const insertEstablishment = async (
   const position = props.position ?? defaultPosition;
   const insertQuery = `
   INSERT INTO establishments (
-    siret, name, street_number_and_address, post_code, city, department_code, number_employees, naf_code, source_provider, update_date, is_open, is_searchable, fit_for_disabled_workers, gps, lon, lat, max_contacts_per_week
-  ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15)`;
+    siret, name, street_number_and_address, post_code, city,
+    department_code, number_employees, naf_code, source_provider, update_date, 
+    is_open, is_searchable, fit_for_disabled_workers, gps, lon, 
+    lat, max_contacts_per_week, created_at
+  ) VALUES (
+    $1, '', $2, $3, $4, $5,
+    $6, $7, $8, $9, $10,
+    $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15, $16
+  )`;
   const addressDto = props.address ?? rueGuillaumeTellDto;
+
+  //prettier-ignore
   await client.query(insertQuery, [
-    props.siret,
-    addressDto.streetNumberAndAddress,
-    addressDto.postcode,
-    addressDto.city,
-    addressDto.departmentCode,
-    props.numberEmployeesRange ?? null,
-    props.nafCode ?? "8622B",
-    props.sourceProvider ?? "api_labonneboite",
-    props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
-    props.isOpen ?? true,
-    props.isSearchable ?? true,
-    props.fitForDisabledWorkers,
-    position.lon,
-    position.lat,
-    props.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
+    props.siret, addressDto.streetNumberAndAddress, addressDto.postcode, addressDto.city, addressDto.departmentCode,
+    props.numberEmployeesRange ?? null, props.nafCode ?? "8622B", props.sourceProvider ?? "api_labonneboite", props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null, 
+    props.isOpen ?? true, props.isSearchable ?? true, props.fitForDisabledWorkers, position.lon, position.lat,
+    props.maxContactsPerWeek ?? defaultMaxContactsPerWeek, props.createdAt.toISOString(),
   ]);
 };
 
@@ -170,27 +169,31 @@ export const getEstablishmentsRowsBySiret = async (
     .query("SELECT * FROM establishments WHERE siret=$1", [siret])
     .then((res) => res.rows[0]);
 
-export type PgImmersionContactWithSiretRow = {
+export type PgImmersionContact = {
   uuid: string;
   lastname: string;
   firstname: string;
   job: string;
   email: string;
   phone: string;
-  establishment_siret: string;
   contact_mode: ContactMethod;
   copy_emails: string[];
 };
 
+export type PgEstablishmentImmersionContact = {
+  contact_uuid: string;
+  establishment_siret: string;
+};
+
 export const getAllImmersionContactsRows = async (
   client: PoolClient,
-): Promise<PgImmersionContactWithSiretRow[]> =>
-  client
-    .query(
-      `SELECT * FROM immersion_contacts AS ic JOIN establishments__immersion_contacts AS eic
-       ON ic.uuid = eic.contact_uuid WHERE contact_uuid IS NOT NULL`,
-    )
-    .then((res) => res.rows);
+): Promise<PgImmersionContact[]> =>
+  (await client.query(`SELECT * FROM immersion_contacts`)).rows;
+
+export const getAllEstablishmentImmersionContactsRows = async (
+  client: PoolClient,
+): Promise<PgEstablishmentImmersionContact[]> =>
+  (await client.query(`SELECT * FROM establishments__immersion_contacts`)).rows;
 
 export type PgEstablishmentRowWithGeo = PgEstablishmentRow & {
   longitude: number;
@@ -208,6 +211,21 @@ export const retrieveEstablishmentWithSiret = async (
   return pgResult.rows[0] ?? (pgResult.rows[0] as PgEstablishmentRowWithGeo);
 };
 
+export type InsertActiveEstablishmentAndOfferAndEventuallyContactProps = {
+  siret: string;
+  rome: string;
+  establishmentPosition: GeoPositionDto;
+  appellationCode: string;
+  offerContactUid?: string;
+  sourceProvider?: FormEstablishmentSource;
+  createdAt: Date;
+  address?: AddressDto;
+  nafCode?: string;
+  numberEmployeesRange?: NumberEmployeesRange;
+  offerCreatedAt?: Date;
+  fitForDisabledWorkers?: boolean;
+};
+
 export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
   client: PoolClient,
   {
@@ -220,27 +238,17 @@ export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
     address,
     nafCode,
     numberEmployeesRange,
+    createdAt,
     offerCreatedAt,
     fitForDisabledWorkers,
-  }: {
-    siret: string;
-    rome: string;
-    establishmentPosition: GeoPositionDto;
-    appellationCode: string;
-    offerContactUid?: string;
-    sourceProvider?: FormEstablishmentSource;
-    address?: AddressDto;
-    nafCode?: string;
-    numberEmployeesRange?: NumberEmployeesRange;
-    offerCreatedAt?: Date;
-    fitForDisabledWorkers?: boolean;
-  },
+  }: InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
 ) => {
   await insertEstablishment(client, {
     siret,
     isOpen: true,
     position: establishmentPosition,
     sourceProvider,
+    createdAt,
     address,
     nafCode,
     numberEmployeesRange,
