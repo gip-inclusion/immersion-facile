@@ -5,7 +5,6 @@ import {
   AgencyDto,
   AgencyId,
   agencyTargets,
-  featureFlagsRoute,
   generateMagicLinkRoute,
   GetDashboardParams,
 } from "shared";
@@ -110,7 +109,7 @@ export const createAdminRouter = (
 
   // POST admin/feature-flags
   adminRouter
-    .route(`/${featureFlagsRoute}`)
+    .route(removeRouterPrefix(adminTargets.featureFlags.url))
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.setFeatureFlag.execute(req.body),

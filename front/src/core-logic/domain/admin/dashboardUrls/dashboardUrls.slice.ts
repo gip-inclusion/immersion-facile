@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   AbsoluteUrl,
-  AdminDashboardName,
+  AdminDashboardKind,
   GetAdminDashboardParams,
 } from "shared";
 
-export type DashboardUrls = Record<AdminDashboardName, AbsoluteUrl | null>;
+export type DashboardUrls = Record<AdminDashboardKind, AbsoluteUrl | null>;
 export type DashboardsState = {
   urls: DashboardUrls;
   errorMessage: string | null;
@@ -17,6 +17,7 @@ export const dashboardInitialState: DashboardsState = {
     agency: null,
     events: null,
     erroredConventions: null,
+    establishments: null,
   },
   errorMessage: null,
 };
@@ -34,7 +35,7 @@ export const dashboardUrlsSlice = createSlice({
     dashboardUrlSucceeded: (
       state,
       action: PayloadAction<{
-        dashboardName: AdminDashboardName;
+        dashboardName: AdminDashboardKind;
         url: AbsoluteUrl;
       }>,
     ) => {

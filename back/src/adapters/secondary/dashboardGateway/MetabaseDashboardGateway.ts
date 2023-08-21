@@ -15,6 +15,7 @@ const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
   erroredConventions: { kind: "dashboard", id: 101 },
   conventionStatus: { kind: "dashboard", id: 45 },
   events: { kind: "question", id: 330 },
+  establishments: { kind: "dashboard", id: 666 }, // Require Dashboard Id
 };
 
 type MetabasePayload = {
@@ -29,7 +30,53 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     private metabaseApiKey: string,
   ) {}
 
-  private createToken({
+  public getAgencyUserUrl(agencyIds: AgencyId[], now: Date): AbsoluteUrl {
+    const dashboard = dashboardByName.agency;
+    const token = this.#createToken({
+      dashboard,
+      params: { filtrer_par_structure: agencyIds },
+      now,
+    });
+    return this.#makeUrl(token, dashboard);
+  }
+
+  public getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl {
+    const dashboard = dashboardByName.conventionStatus;
+    const token = this.#createToken({
+      dashboard,
+      params: { id: [id] },
+      now,
+    });
+    return this.#makeUrl(token, dashboard);
+  }
+
+  public getDashboardUrl(dashboardName: DashboardName, now: Date): AbsoluteUrl {
+    const dashboard = dashboardByName[dashboardName];
+    const token = this.#createToken({
+      dashboard,
+      now,
+    });
+    return this.#makeUrl(token, dashboard);
+  }
+
+  public getErroredConventionsDashboardUrl(
+    agencyIds: AgencyId[],
+    now: Date,
+  ): AbsoluteUrl {
+    const dashboard = dashboardByName.erroredConventions;
+    const token = this.#createToken({
+      dashboard,
+      params: { idstructure: agencyIds },
+      now,
+    });
+    return this.#makeUrl(token, dashboard);
+  }
+
+  #makeUrl(token: string, { kind }: MetabaseDashboard): AbsoluteUrl {
+    return `${this.metabaseUrl}/embed/${kind}/${token}#bordered=true&titled=true`;
+  }
+
+  #createToken({
     dashboard,
     params = {},
     now,
@@ -45,51 +92,5 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     };
 
     return jwt.sign(payload, this.metabaseApiKey);
-  }
-
-  public getAgencyUserUrl(agencyIds: AgencyId[], now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.agency;
-    const token = this.createToken({
-      dashboard,
-      params: { filtrer_par_structure: agencyIds },
-      now,
-    });
-    return this.makeUrl(token, dashboard);
-  }
-
-  public getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.conventionStatus;
-    const token = this.createToken({
-      dashboard,
-      params: { id: [id] },
-      now,
-    });
-    return this.makeUrl(token, dashboard);
-  }
-
-  public getDashboardUrl(dashboardName: DashboardName, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName[dashboardName];
-    const token = this.createToken({
-      dashboard,
-      now,
-    });
-    return this.makeUrl(token, dashboard);
-  }
-
-  public getErroredConventionsDashboardUrl(
-    agencyIds: AgencyId[],
-    now: Date,
-  ): AbsoluteUrl {
-    const dashboard = dashboardByName.erroredConventions;
-    const token = this.createToken({
-      dashboard,
-      params: { idstructure: agencyIds },
-      now,
-    });
-    return this.makeUrl(token, dashboard);
-  }
-
-  private makeUrl(token: string, { kind }: MetabaseDashboard): AbsoluteUrl {
-    return `${this.metabaseUrl}/embed/${kind}/${token}#bordered=true&titled=true`;
   }
 }
