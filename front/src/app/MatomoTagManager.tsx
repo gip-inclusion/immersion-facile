@@ -1,13 +1,10 @@
 import { useEffect } from "react";
-import { useRoute } from "src/app/routes/routes";
 
 type MatomoTagManagerProps = {
   containerUrl: string;
 };
 
 export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
-  const _route = useRoute();
-
   const appendMatomoScript = () => {
     const _mtm = ((window as any)._mtm = (window as any)._mtm || []);
     _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });

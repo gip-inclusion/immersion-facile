@@ -8,6 +8,7 @@ import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/Ass
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { InMemoryEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
+import { SimulatedImmersionOfferGateway } from "src/core-logic/adapters/ImmersionOfferGateway/SimulatedImmersionOfferGateway";
 import {
   InMemoryImmersionSearchGateway,
   seedSearchResults,
@@ -35,6 +36,9 @@ export const createInMemoryDependencies = (): Dependencies => ({
       .build(),
   ]),
   immersionAssessmentGateway: new SimulatedImmersionAssessmentGateway(),
+  immersionOfferGateway: new SimulatedImmersionOfferGateway(
+    SIMULATED_LATENCY_MS,
+  ),
   immersionSearchGateway: new InMemoryImmersionSearchGateway(
     seedSearchResults,
     SIMULATED_LATENCY_MS,

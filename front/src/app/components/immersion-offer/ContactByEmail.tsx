@@ -3,9 +3,11 @@ import { FormProvider, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
+import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Route } from "type-route";
 import {
   AppellationDto,
   ContactEstablishmentByMailDto,
@@ -17,14 +19,14 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { routes, useRoute } from "src/app/routes/routes";
 import { immersionSearchGateway } from "src/config/dependencies";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
   siret: SiretDto;
   appellations: AppellationDto[];
-  onSuccess: () => void;
-  onClose: () => void;
+  onSubmitSuccess: () => void;
 };
 
 const motivationPlaceholder =
@@ -41,23 +43,23 @@ En vous remerciant,`;
 export const ContactByEmail = ({
   siret,
   appellations,
-  onSuccess,
-  onClose,
+  onSubmitSuccess,
 }: ContactByEmailProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
+  const route = useRoute() as Route<typeof routes.immersionOffer>;
 
   const initialValues: ContactEstablishmentByMailDto = {
     siret,
     appellationCode:
       appellations.length > 1 ? "" : appellations[0].appellationCode,
     contactMode: "EMAIL",
-    potentialBeneficiaryFirstName: "",
-    potentialBeneficiaryLastName: "",
-    potentialBeneficiaryEmail: "",
-    message: initialMessage,
+    potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
+    potentialBeneficiaryLastName: route.params.contactLastName ?? "",
+    potentialBeneficiaryEmail: route.params.contactEmail ?? "",
+    message: route.params.contactMessage ?? initialMessage,
     immersionObjective: null,
     potentialBeneficiaryResumeLink: "",
-    potentialBeneficiaryPhone: "",
+    potentialBeneficiaryPhone: route.params.contactPhone ?? "",
   };
 
   const appellationListOfOptions = appellations.map((appellation) => ({
@@ -88,7 +90,7 @@ export const ContactByEmail = ({
       message: removeMotivationPlaceholder(values.message),
     });
     if (errorKind) return setActiveErrorKind(errorKind);
-    onSuccess();
+    onSubmitSuccess();
   };
 
   return (
@@ -99,25 +101,16 @@ export const ContactByEmail = ({
             Cette entreprise a choisi d'être contactée par mail. Veuillez
             compléter ce formulaire qui sera transmis à l'entreprise.
           </p>
-          <hr />
-          <Alert
-            severity="info"
-            small
-            description={
-              <div>
-                Besoin d’aide ? {""}
-                <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Nos conseils pour choisir l’objet et rédiger un bon email de
-                  motivation.
-                </a>
-              </div>
-            }
-            className={fr.cx("fr-mt-1w")}
-          />
+          <CallOut title="Besoin d'aide ?">
+            <a
+              href="https://aide.immersion-facile.beta.gouv.fr/fr/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Nos conseils pour choisir l’objet et rédiger un bon email de
+              motivation.
+            </a>
+          </CallOut>
 
           <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
             Votre email de motivation
@@ -197,18 +190,6 @@ export const ContactByEmail = ({
             alignment="right"
             inlineLayoutWhen="always"
             buttons={[
-              {
-                type: "button",
-                priority: "secondary",
-                onClick: () => {
-                  setActiveErrorKind(null);
-                  onClose();
-                },
-                nativeButtonProps: {
-                  id: domElementIds.search.contactByMailCancelButton,
-                },
-                children: "Annuler et revenir à la recherche",
-              },
               {
                 type: "submit",
                 priority: "primary",

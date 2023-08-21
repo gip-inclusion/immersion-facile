@@ -5,6 +5,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Route } from "type-route";
 import {
   AppellationDto,
   ContactEstablishmentByPhoneDto,
@@ -15,28 +16,30 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { routes, useRoute } from "src/app/routes/routes";
 import { immersionSearchGateway } from "src/config/dependencies";
 
 type ContactByPhoneProps = {
   siret: SiretDto;
   appellations: AppellationDto[];
-  onSuccess: () => void;
+  onSubmitSuccess: () => void;
 };
 
 export const ContactByPhone = ({
   siret,
   appellations,
-  onSuccess,
+  onSubmitSuccess,
 }: ContactByPhoneProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
+  const route = useRoute() as Route<typeof routes.immersionOffer>;
   const initialValues: ContactEstablishmentByPhoneDto = {
     siret,
     appellationCode:
       appellations.length > 1 ? "" : appellations[0].appellationCode,
     contactMode: "PHONE",
-    potentialBeneficiaryFirstName: "",
-    potentialBeneficiaryLastName: "",
-    potentialBeneficiaryEmail: "",
+    potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
+    potentialBeneficiaryLastName: route.params.contactLastName ?? "",
+    potentialBeneficiaryEmail: route.params.contactEmail ?? "",
   };
 
   const appellationListOfOptions = appellations.map((appellation) => ({
@@ -64,7 +67,7 @@ export const ContactByPhone = ({
   const onFormValid = async (values: ContactEstablishmentByPhoneDto) => {
     const errorKind = await immersionSearchGateway.contactEstablishment(values);
     if (errorKind) return setActiveErrorKind(errorKind);
-    onSuccess();
+    onSubmitSuccess();
   };
 
   return (

@@ -108,9 +108,13 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   immersionOffer: defineRoute(
     {
-      appellation: param.query.ofType(appellationStringSerializer),
+      appellationCode: param.query.ofType(appellationStringSerializer),
       siret: param.query.string,
-      // prévoir de pouvoir préremplir le form
+      contactFirstName: param.query.optional.string,
+      contactLastName: param.query.optional.string,
+      contactEmail: param.query.optional.string,
+      contactPhone: param.query.optional.string,
+      contactMessage: param.query.optional.string,
     },
     () => `/${frontRoutes.immersionOffer}`,
   ),

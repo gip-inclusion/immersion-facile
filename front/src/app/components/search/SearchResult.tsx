@@ -8,10 +8,10 @@ import {
   addressDtoToString,
   ContactMethod,
   frenchEstablishmentKinds,
+  getMapsLink,
   SearchImmersionResultDto,
   toAbsoluteUrl,
 } from "shared";
-import { getMapsLink } from "../search/ContactModalContent";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {

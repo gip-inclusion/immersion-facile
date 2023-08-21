@@ -31,5 +31,5 @@ export type SearchImmersionResultDto = {
 
 export type WithSiretAndAppellation = {
   siret: SiretDto;
-  appellation: AppellationCode;
+  appellationCode: AppellationCode;
 };

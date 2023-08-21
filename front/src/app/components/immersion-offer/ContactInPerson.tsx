@@ -5,6 +5,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Route } from "type-route";
 import {
   AppellationDto,
   ContactEstablishmentInPersonDto,
@@ -15,28 +16,31 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { routes, useRoute } from "src/app/routes/routes";
 import { immersionSearchGateway } from "src/config/dependencies";
 
 type ContactInPersonProps = {
   siret: SiretDto;
   appellations: AppellationDto[];
-  onSuccess: () => void;
+  onSubmitSuccess: () => void;
 };
 
 export const ContactInPerson = ({
   siret,
   appellations,
-  onSuccess,
+  onSubmitSuccess,
 }: ContactInPersonProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
+  const route = useRoute() as Route<typeof routes.immersionOffer>;
+
   const initialValues: ContactEstablishmentInPersonDto = {
     siret,
     appellationCode:
       appellations.length > 1 ? "" : appellations[0].appellationCode,
     contactMode: "IN_PERSON",
-    potentialBeneficiaryFirstName: "",
-    potentialBeneficiaryLastName: "",
-    potentialBeneficiaryEmail: "",
+    potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
+    potentialBeneficiaryLastName: route.params.contactLastName ?? "",
+    potentialBeneficiaryEmail: route.params.contactEmail ?? "",
   };
 
   const appellationListOfOptions = appellations.map((appellation) => ({
@@ -63,7 +67,7 @@ export const ContactInPerson = ({
   const onFormValid = async (values: ContactEstablishmentInPersonDto) => {
     const errorKind = await immersionSearchGateway.contactEstablishment(values);
     if (errorKind) return setActiveErrorKind(errorKind);
-    onSuccess();
+    onSubmitSuccess();
   };
 
   return (
