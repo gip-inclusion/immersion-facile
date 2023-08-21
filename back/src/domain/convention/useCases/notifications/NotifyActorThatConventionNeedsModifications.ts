@@ -136,7 +136,7 @@ const recipientByModifierRole = (
 ): string | Error => {
   const missingActorConventionErrorMessage = `No actor with role ${payload.modifierRole} for convention ${payload.convention.id}`;
   const missingActorAgencyErrorMessage = `No actor with role ${payload.modifierRole} for agency ${agency.id}`;
-
+  const agencyEmails = [...agency.counsellorEmails, ...agency.validatorEmails];
   const strategy = match(payload)
     .with(
       { modifierRole: "beneficiary" },
@@ -182,7 +182,13 @@ const recipientByModifierRole = (
       {
         modifierRole: "counsellor",
         agencyActorEmail: P.select(
-          P.when((agencyActorEmail) => agencyActorEmail !== undefined),
+          P.when(
+            (agencyActorEmail) =>
+              agencyActorEmail !== undefined &&
+              agencyEmails.find(
+                (agencyEmail) => agencyEmail === agencyActorEmail,
+              ),
+          ),
         ),
       },
       (agencyActorEmail) => agencyActorEmail,
@@ -191,7 +197,13 @@ const recipientByModifierRole = (
       {
         modifierRole: "validator",
         agencyActorEmail: P.select(
-          P.when((agencyActorEmail) => agencyActorEmail !== undefined),
+          P.when(
+            (agencyActorEmail) =>
+              agencyActorEmail !== undefined &&
+              agencyEmails.find(
+                (agencyEmail) => agencyEmail === agencyActorEmail,
+              ),
+          ),
         ),
       },
       (agencyActorEmail) => agencyActorEmail,
