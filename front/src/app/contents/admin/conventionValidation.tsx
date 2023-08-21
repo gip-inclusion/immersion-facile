@@ -3,6 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import {
   ConventionReadDto,
   displayEmergencyContactInfos,
+  makeSiretDescriptionLink,
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
@@ -28,7 +29,7 @@ const renderSchedule = (convention: ConventionReadDto) => (
 
 const renderSiret = (siret: string) => (
   <a
-    href={`https://annuaire-entreprises.data.gouv.fr/etablissement/${siret}`}
+    href={makeSiretDescriptionLink(siret)}
     title={"Voir sur l'annuaire des entreprises"}
     target="_blank"
     rel="noreferrer"

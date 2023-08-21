@@ -7,6 +7,7 @@ import {
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   isStringDate,
+  makeSiretDescriptionLink,
   npsFormIds,
   prettyPrintSchedule,
   toDisplayedDate,
@@ -211,7 +212,7 @@ export const ConventionDocumentPage = ({
             se déroulera au sein de <strong>{convention.businessName}</strong>,
             (Siret n° :{" "}
             <a
-              href={`https://annuaire-entreprises.data.gouv.fr/etablissement/${convention.siret}`}
+              href={makeSiretDescriptionLink(convention.siret)}
               target="_blank"
               rel="noreferrer"
             >

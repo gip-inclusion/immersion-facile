@@ -1,36 +1,11 @@
 import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
+import { domElementIds, SearchImmersionResultDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
-import { SuccessFeedback } from "src/app/components/SuccessFeedback";
-import {
-  ContactModalContentProps,
-  ModalContactContent,
-} from "../../components/search/ContactModalContent";
+import { routes } from "src/app/routes/routes";
 
-const {
-  Component: ContactModal,
-  open: openContactModal,
-  close: closeContactModal,
-} = createModal({
-  isOpenedByDefault: false,
-  id: "contact",
-});
-
-const getFeedBackMessage = (contactMethod?: ContactMethod) => {
-  switch (contactMethod) {
-    case "EMAIL":
-      return "L'entreprise a été contactée avec succès.";
-    case "PHONE":
-    case "IN_PERSON":
-      return "Un email vient de vous être envoyé.";
-    default:
-      return null;
-  }
-};
 type GroupListResultsProps = {
   results: SearchImmersionResultDto[];
 };
@@ -51,12 +26,6 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
   );
   const resultsPerPageValue = parseInt(resultsPerPage);
   const totalPages = Math.ceil(results.length / resultsPerPageValue);
-  const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<
-    string | null
-  >(null);
-  const [successFullyValidated, setSuccessfullyValidated] = useState(false);
-  const [modalContent, setModalContent] =
-    useState<Omit<ContactModalContentProps, "onSuccess">>();
   const getSearchResultsForPage = (
     currentPage: number,
   ): SearchImmersionResultDto[] => {
@@ -73,14 +42,16 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
               key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
               establishment={searchResult}
               onButtonClick={() => {
-                setModalContent({
-                  siret: searchResult.siret,
-                  appellations: searchResult.appellations,
-                  contactMethod: searchResult.contactMode,
-                  searchResultData: searchResult,
-                  onClose: () => closeContactModal(),
-                });
-                openContactModal();
+                const appellationCode =
+                  searchResult.appellations.at(0)?.appellationCode;
+                if (appellationCode) {
+                  routes
+                    .immersionOffer({
+                      appellationCode,
+                      siret: searchResult.siret,
+                    })
+                    .push();
+                }
               }}
             />
           ))}
@@ -133,37 +104,6 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
           </div>
         </div>
       </div>
-      <ContactModal
-        title={
-          modalContent?.contactMethod
-            ? "Contactez l'entreprise"
-            : "Tentez votre chance !"
-        }
-      >
-        {modalContent && (
-          <ModalContactContent
-            {...modalContent}
-            onSuccess={() => {
-              setSuccessfulValidatedMessage(
-                getFeedBackMessage(modalContent.contactMethod),
-              );
-              setSuccessfullyValidated(true);
-              closeContactModal();
-            }}
-          />
-        )}
-      </ContactModal>
-      {successfulValidationMessage && (
-        <SuccessFeedback
-          open={successFullyValidated}
-          handleClose={() => {
-            setSuccessfulValidatedMessage(null);
-            setSuccessfullyValidated(false);
-          }}
-        >
-          {successfulValidationMessage}
-        </SuccessFeedback>
-      )}
     </>
   );
 };

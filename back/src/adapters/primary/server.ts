@@ -32,6 +32,7 @@ import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnec
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
+import { createImmersionOfferRouter } from "./routers/searchImmersion/createImmersionOfferRouter";
 import { createSearchImmersionRouter } from "./routers/searchImmersion/createSearchImmersionRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
@@ -94,6 +95,7 @@ export const createApp = async (
   app.use(createAgenciesRouter(deps));
   app.use(createPeConnectRouter(deps));
   app.use(createInclusionConnectRouter(deps));
+  app.use(createImmersionOfferRouter(deps));
   app.use(createValidateEmailRouter(deps));
   app.use(createApiKeyAuthRouter(deps));
   // Auth issues below this last router

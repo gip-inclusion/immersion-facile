@@ -43,3 +43,6 @@ export type GetSiretRequestDto = {
   siret: SiretDto;
   includeClosedEstablishments?: boolean;
 };
+
+export const makeSiretDescriptionLink = (siret: SiretDto) =>
+  `https://annuaire-entreprises.data.gouv.fr/etablissement/${siret}`;

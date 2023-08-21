@@ -71,25 +71,16 @@ export const SearchListResults = () => {
                 key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
                 establishment={searchResult}
                 onButtonClick={() => {
-                  const appellation =
+                  const appellationCode =
                     searchResult.appellations.at(0)?.appellationCode;
-                  if (appellation) {
+                  if (appellationCode) {
                     routes
                       .immersionOffer({
                         siret: searchResult.siret,
-                        appellation,
+                        appellationCode,
                       })
                       .push();
                   }
-
-                  // setModalContent({
-                  //   siret: searchResult.siret,
-                  //   appellations: searchResult.appellations,
-                  //   contactMethod: searchResult.contactMode,
-                  //   searchResultData: searchResult,
-                  //   onClose: () => closeContactModal(),
-                  // });
-                  // openContactModal();
                 }}
               />
             ))}

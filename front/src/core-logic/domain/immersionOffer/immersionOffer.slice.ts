@@ -12,7 +12,7 @@ type ImmersionOfferState = {
 
 type ImmersionOfferPayload = {
   siret: SiretDto;
-  appellation: AppellationCode;
+  appellationCode: AppellationCode;
 };
 
 export const initialState: ImmersionOfferState = {

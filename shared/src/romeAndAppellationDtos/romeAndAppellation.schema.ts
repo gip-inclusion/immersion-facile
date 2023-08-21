@@ -19,7 +19,7 @@ export const codeRomeSchema: z.Schema<RomeCode> = z
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
 export const codeAppellationSchema: z.Schema<AppellationCode> = z
   .string()
-  .regex(codeAppellationRegex, "Code Appellation incorrect");
+  .regex(codeAppellationRegex, "Code appellation incorrect");
 
 export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
   romeCode: codeRomeSchema,

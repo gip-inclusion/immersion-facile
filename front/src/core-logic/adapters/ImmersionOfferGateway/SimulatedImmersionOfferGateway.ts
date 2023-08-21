@@ -8,8 +8,12 @@ export class SimulatedImmersionOfferGateway implements ImmersionOfferGateway {
     romeLabel: "Aide agricole de production fruitière ou viticole",
     appellations: [
       {
-        appellationCode: "A1201",
+        appellationCode: "20552",
         appellationLabel: "Aide agricole de production fruitière ou viticole",
+      },
+      {
+        appellationCode: "15480",
+        appellationLabel: "Ouvrier agricole polyvalent",
       },
     ],
     naf: "01.11Z",

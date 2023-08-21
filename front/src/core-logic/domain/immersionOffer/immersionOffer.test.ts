@@ -53,7 +53,7 @@ describe("ImmersionOffer epic", () => {
 
     store.dispatch(
       immersionOfferSlice.actions.fetchImmersionOfferRequested({
-        appellation: "11111",
+        appellationCode: "11111",
         siret: "01234567890123",
       }),
     );
@@ -80,7 +80,7 @@ describe("ImmersionOffer epic", () => {
 
     store.dispatch(
       immersionOfferSlice.actions.fetchImmersionOfferRequested({
-        appellation: "11111",
+        appellationCode: "11111",
         siret: "01234567890123",
       }),
     );
