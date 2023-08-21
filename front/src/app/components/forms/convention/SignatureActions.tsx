@@ -1,4 +1,5 @@
 import React, { Dispatch, SetStateAction } from "react";
+import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
@@ -144,70 +145,79 @@ export const SignatureActions = ({
           },
         ]}
       />
-      <SignModal
-        title="Accepter les dispositions réglementaires et terminer la signature"
-        size="large"
-        concealingBackdrop={false}
-        buttons={[
-          {
-            priority: "secondary",
-            children: "J'abandonne",
-            disabled: isLoading || submitFeedback.kind !== "idle",
-            onClick: () => {
-              onCloseSignModalWithoutSignature(true);
-              closeSignModal();
+      {createPortal(
+        <SignModal
+          title="Accepter les dispositions réglementaires et terminer la signature"
+          size="large"
+          concealingBackdrop={false}
+          buttons={[
+            {
+              priority: "secondary",
+              children: "J'abandonne",
+              disabled: isLoading || submitFeedback.kind !== "idle",
+              onClick: () => {
+                onCloseSignModalWithoutSignature(true);
+                closeSignModal();
+              },
+              type: "button",
+              iconId: "fr-icon-edit-fill",
+              iconPosition: "left",
             },
-            type: "button",
-            iconId: "fr-icon-edit-fill",
-            iconPosition: "left",
-          },
-          {
-            priority: "primary",
-            children: "Je termine la signature",
-            onClick: (event) => {
-              setValue(fieldName, new Date().toISOString(), {
-                shouldValidate: true,
-              });
-              onSubmitClick(event);
+            {
+              priority: "primary",
+              children: "Je termine la signature",
+              onClick: (event) => {
+                setValue(fieldName, new Date().toISOString(), {
+                  shouldValidate: true,
+                });
+                onSubmitClick(event);
+              },
+              type: "button",
+              iconId: "fr-icon-checkbox-circle-line",
+              iconPosition: "left",
+              nativeButtonProps: {
+                id: domElementIds.conventionToSign.submitButton,
+              },
             },
-            type: "button",
-            iconId: "fr-icon-checkbox-circle-line",
-            iconPosition: "left",
-            nativeButtonProps: {
-              id: domElementIds.conventionToSign.submitButton,
-            },
-          },
-        ]}
-      >
-        <>
-          <strong className={fr.cx("fr-mb-8w")}>
-            Je, soussigné {signatoryFullName} ({signatoryFunction}{" "}
-            {internshipKind === "immersion"
-              ? "de l'immersion"
-              : "du mini-stage"}
-            ) m'engage à avoir pris connaissance des dispositions réglementaires{" "}
-            {internshipKind === "immersion" ? "de la PMSMP " : "du mini-stage "}
-            énoncées ci-dessous et à les respecter
-          </strong>
-          <div>
-            <h2 className={fr.cx("fr-h4", "fr-mt-4v")}>
+          ]}
+        >
+          <>
+            <strong className={fr.cx("fr-mb-8w")}>
+              Je, soussigné {signatoryFullName} ({signatoryFunction}{" "}
               {internshipKind === "immersion"
-                ? "Obligations des parties :"
-                : "Dispositions générales :"}
-            </h2>
-            {regulatoryConditionContent(internshipKind)}
-          </div>
-        </>
-      </SignModal>
-      <RequestModificationModal title="Demande de modification">
-        <JustificationModalContent
-          onSubmit={onModificationRequired}
-          closeModal={closeRequestModificationModal}
-          newStatus={newStatus}
-          convention={convention}
-          currentSignatoryRole={currentSignatoryRole}
-        />
-      </RequestModificationModal>
+                ? "de l'immersion"
+                : "du mini-stage"}
+              ) m'engage à avoir pris connaissance des dispositions
+              réglementaires{" "}
+              {internshipKind === "immersion"
+                ? "de la PMSMP "
+                : "du mini-stage "}
+              énoncées ci-dessous et à les respecter
+            </strong>
+            <div>
+              <h2 className={fr.cx("fr-h4", "fr-mt-4v")}>
+                {internshipKind === "immersion"
+                  ? "Obligations des parties :"
+                  : "Dispositions générales :"}
+              </h2>
+              {regulatoryConditionContent(internshipKind)}
+            </div>
+          </>
+        </SignModal>,
+        document.body,
+      )}
+      {createPortal(
+        <RequestModificationModal title="Demande de modification">
+          <JustificationModalContent
+            onSubmit={onModificationRequired}
+            closeModal={closeRequestModificationModal}
+            newStatus={newStatus}
+            convention={convention}
+            currentSignatoryRole={currentSignatoryRole}
+          />
+        </RequestModificationModal>,
+        document.body,
+      )}
     </>
   );
 };
