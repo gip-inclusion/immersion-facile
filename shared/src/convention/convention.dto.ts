@@ -240,7 +240,7 @@ export type UpdateConventionStatusWithoutJustification = {
   conventionId: ConventionId;
 };
 
-export type UpdateConventionStatusWithJustificationWhithoutModierRole = {
+export type UpdateConventionStatusWithJustificationWithoutModierRole = {
   status: Exclude<ConventionStatusWithJustification, "DRAFT">;
   conventionId: ConventionId;
   statusJustification: string;
@@ -254,7 +254,7 @@ export type UpdateConventionStatusWithJustificationWithModifierRole = {
 };
 
 export type UpdateConventionStatusWithJustification =
-  | UpdateConventionStatusWithJustificationWhithoutModierRole
+  | UpdateConventionStatusWithJustificationWithoutModierRole
   | UpdateConventionStatusWithJustificationWithModifierRole;
 
 export type UpdateConventionStatusRequestDto =
