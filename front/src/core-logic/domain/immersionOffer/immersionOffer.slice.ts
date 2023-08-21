@@ -33,5 +33,22 @@ export const immersionOfferSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
+    fetchImmersionOfferSucceeded: (
+      state,
+      action: PayloadAction<SearchImmersionResultDto>,
+    ) => {
+      state.currentImmersionOffer = action.payload;
+      state.feedback = {
+        kind: "success",
+      };
+      state.isLoading = false;
+    },
+    fetchImmersionOfferFailed: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.feedback = {
+        kind: "errored",
+        errorMessage: action.payload,
+      };
+    },
   },
 });

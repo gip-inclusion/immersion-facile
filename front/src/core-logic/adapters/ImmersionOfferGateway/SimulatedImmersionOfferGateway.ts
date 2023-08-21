@@ -39,7 +39,7 @@ export class SimulatedImmersionOfferGateway implements ImmersionOfferGateway {
 
   constructor(private simulatedLatency: number = 0) {}
 
-  public getImmersionOffer(
+  public getImmersionOffer$(
     _params: WithSiretAndAppellation,
   ): Observable<SearchImmersionResultDto> {
     return of(this.#simulatedResponse).pipe(delay(this.simulatedLatency));

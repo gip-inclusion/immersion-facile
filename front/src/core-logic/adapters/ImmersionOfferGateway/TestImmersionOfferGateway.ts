@@ -5,7 +5,7 @@ import { ImmersionOfferGateway } from "src/core-logic/ports/ImmersionOfferGatewa
 export class TestImmersionOfferGateway implements ImmersionOfferGateway {
   public currentImmersionOffer$ = new Subject<SearchImmersionResultDto>();
 
-  public getImmersionOffer(
+  public getImmersionOffer$(
     _params: WithSiretAndAppellation,
   ): Observable<SearchImmersionResultDto> {
     return this.currentImmersionOffer$;

@@ -62,6 +62,7 @@ describe("ImmersionOffer epic", () => {
     dependencies.immersionOfferGateway.currentImmersionOffer$.next(
       immersionOffer,
     );
+
     expect(immersionOfferSelectors.isLoading(store.getState())).toBe(false);
 
     expectToEqual(immersionOfferSelectors.feedback(store.getState()), {
@@ -71,6 +72,30 @@ describe("ImmersionOffer epic", () => {
       immersionOfferSelectors.currentImmersionOffer(store.getState()),
       immersionOffer,
     );
+  });
+
+  it("should throw if the gateway returns an error", () => {
+    const errorMessage = "Error fetching immersion offer";
+    expectStateToMatchInitialState();
+
+    store.dispatch(
+      immersionOfferSlice.actions.fetchImmersionOfferRequested({
+        appellation: "11111",
+        siret: "01234567890123",
+      }),
+    );
+    expect(immersionOfferSelectors.isLoading(store.getState())).toBe(true);
+
+    dependencies.immersionOfferGateway.currentImmersionOffer$.error(
+      new Error(errorMessage),
+    );
+
+    expect(immersionOfferSelectors.isLoading(store.getState())).toBe(false);
+
+    expectToEqual(immersionOfferSelectors.feedback(store.getState()), {
+      kind: "errored",
+      errorMessage,
+    });
   });
 
   const expectStateToMatchInitialState = () => {
