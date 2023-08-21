@@ -1,4 +1,5 @@
 import { SuperTest, Test } from "supertest";
+import { ZodError } from "zod";
 import {
   adminTargets,
   AgencyDtoBuilder,
@@ -24,53 +25,49 @@ describe("/admin router", () => {
   let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
-    const appConfig = new AppConfigBuilder()
-      .withConfigParams({
-        BACKOFFICE_USERNAME: "user",
-        BACKOFFICE_PASSWORD: "pwd",
-      })
-      .build();
-
-    ({ request, gateways, inMemoryUow } = await buildTestApp(appConfig));
+    ({ request, gateways, inMemoryUow } = await buildTestApp(
+      new AppConfigBuilder()
+        .withConfigParams({
+          BACKOFFICE_USERNAME: "user",
+          BACKOFFICE_PASSWORD: "pwd",
+        })
+        .build(),
+    ));
 
     gateways.timeGateway.setNextDate(new Date());
-
-    const response = await request
-      .post("/admin/login")
-      .send({ user: "user", password: "pwd" });
-
-    token = response.body;
+    token = (
+      await request
+        .post(adminTargets.login.url)
+        .send({ user: "user", password: "pwd" })
+    ).body;
   });
 
   describe(`GET ${adminTargets.getDashboardUrl.url}`, () => {
-    it("Fails with 401 Unauthorized without admin token", async () => {
-      const { body, status } = await request.get(
-        adminTargets.getDashboardUrl.url,
-      );
-      expectToEqual(body, { error: "You need to authenticate first" });
-      expect(status).toBe(401);
-    });
-
-    it("Fails if token is not valid", async () => {
-      const response = await request
-        .get(adminTargets.getDashboardUrl.url)
-        .set("authorization", "wrong-token");
-      expect(response.body).toEqual({ error: "Provided token is invalid" });
-      expect(response.status).toBe(401);
-    });
-
-    it("Gets the absolute Url of the dashboard", async () => {
-      const response = await request
+    it("200 - Gets the absolute Url of the events dashboard", async () => {
+      const { body, status } = await request
         .get(
           adminTargets.getDashboardUrl.url.replace(":dashboardName", "events"),
         )
         .set("authorization", token);
-      expect(response.body).toBe("http://stubDashboard/events");
-      expect(response.status).toBe(200);
+      expectToEqual(body, "http://stubDashboard/events");
+      expectToEqual(status, 200);
     });
 
-    it("Gets the absolute Url of the agency dashboard", async () => {
-      const response = await request
+    it("200 - Gets the absolute Url of the establishments dashboard", async () => {
+      const { body, status } = await request
+        .get(
+          adminTargets.getDashboardUrl.url.replace(
+            ":dashboardName",
+            "establishments",
+          ),
+        )
+        .set("authorization", token);
+      expectToEqual(body, "http://stubDashboard/establishments");
+      expectToEqual(status, 200);
+    });
+
+    it("200 - Gets the absolute Url of the agency dashboard", async () => {
+      const { body, status } = await request
         .get(
           `${adminTargets.getDashboardUrl.url.replace(
             ":dashboardName",
@@ -78,11 +75,88 @@ describe("/admin router", () => {
           )}?agencyId=my-agency-id`,
         )
         .set("authorization", token);
-      expect(response.body).toBe("http://stubAgencyDashboard/my-agency-id");
-      expect(response.status).toBe(200);
+      expectToEqual(body, "http://stubAgencyDashboard/my-agency-id");
+      expectToEqual(status, 200);
     });
 
-    it("Fails to get the absolute Url of the agency dashboard when no agencyId is provided", async () => {
+    it("400 - unknown dashboard", async () => {
+      const { body, status } = await request
+        .get(
+          adminTargets.getDashboardUrl.url.replace(
+            ":dashboardName",
+            "unknown-dashboard",
+          ),
+        )
+        .set("authorization", token);
+
+      expectToEqual(body, {
+        errors: `Error: ${new ZodError([
+          {
+            code: "invalid_union",
+            unionErrors: [
+              new ZodError([
+                {
+                  code: "invalid_union",
+                  unionErrors: [
+                    new ZodError([
+                      {
+                        received: "unknown-dashboard",
+                        code: "invalid_enum_value",
+                        options: ["conventions", "events", "establishments"],
+                        path: ["name"],
+                        message:
+                          "Invalid enum value. Expected 'conventions' | 'events' | 'establishments', received 'unknown-dashboard'",
+                      },
+                    ]),
+                    new ZodError([
+                      {
+                        received: "unknown-dashboard",
+                        code: "invalid_enum_value",
+                        options: ["agency"],
+                        path: ["name"],
+                        message:
+                          "Invalid enum value. Expected 'agency', received 'unknown-dashboard'",
+                      },
+                      {
+                        code: "invalid_type",
+                        expected: "string",
+                        received: "undefined",
+                        path: ["agencyId"],
+                        message: "Required",
+                      },
+                    ]),
+                  ],
+                  path: [],
+                  message: "Invalid input",
+                },
+              ]),
+              new ZodError([
+                {
+                  received: "unknown-dashboard",
+                  code: "invalid_enum_value",
+                  options: ["conventionStatus"],
+                  path: ["name"],
+                  message:
+                    "Invalid enum value. Expected 'conventionStatus', received 'unknown-dashboard'",
+                },
+                {
+                  code: "invalid_type",
+                  expected: "string",
+                  received: "undefined",
+                  path: ["conventionId"],
+                  message: "Required",
+                },
+              ]),
+            ],
+            path: [],
+            message: "Invalid input",
+          },
+        ]).toString()}`,
+      });
+      expectToEqual(status, 400);
+    });
+
+    it("400 - no agencyId is provided for agency dashboard", async () => {
       const response = await request
         .get(
           `${adminTargets.getDashboardUrl.url.replace(
@@ -91,18 +165,35 @@ describe("/admin router", () => {
           )}`,
         )
         .set("authorization", token);
-      expect(response.body).toEqual({
+
+      expectToEqual(response.body, {
         errors:
           "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
       });
-      expect(response.status).toBe(400);
+      expectToEqual(response.status, 400);
+    });
+
+    it("401 - Unauthorized without admin token", async () => {
+      const { body, status } = await request.get(
+        adminTargets.getDashboardUrl.url,
+      );
+      expectToEqual(body, { error: "You need to authenticate first" });
+      expectToEqual(status, 401);
+    });
+
+    it("401 - token is not valid", async () => {
+      const { body, status } = await request
+        .get(adminTargets.getDashboardUrl.url)
+        .set("authorization", "wrong-token");
+      expectToEqual(body, { error: "Provided token is invalid" });
+      expectToEqual(status, 401);
     });
   });
 
-  describe(`set feature flags route`, () => {
+  describe(`POST ${adminTargets.featureFlags.url}`, () => {
     it("fails with 401 with wrong admin token", async () => {
       const response = await request
-        .post(`/admin/${featureFlagsRoute}`)
+        .post(adminTargets.featureFlags.url)
         .set("authorization", "wrong-token");
       expect(response.body).toEqual({ error: "Provided token is invalid" });
       expect(response.status).toBe(401);
@@ -116,16 +207,14 @@ describe("/admin router", () => {
         makeBooleanFeatureFlag(true),
       );
 
-      const params: SetFeatureFlagParam = {
-        flagName: "enableLogoUpload",
-        flagContent: {
-          isActive: false,
-        },
-      };
-
       const response = await request
-        .post(`/admin/${featureFlagsRoute}`)
-        .send(params)
+        .post(adminTargets.featureFlags.url)
+        .send({
+          flagName: "enableLogoUpload",
+          flagContent: {
+            isActive: false,
+          },
+        } satisfies SetFeatureFlagParam)
         .set("authorization", token);
 
       expect(response.status).toBe(200);

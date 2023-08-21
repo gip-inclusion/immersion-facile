@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { UnitOfWorkPerformer } from "../../../core/ports/UnitOfWork";
+import { FeatureDisabledError } from "../../../../adapters/primary/helpers/httpErrors";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { StoredFile } from "../entity/StoredFile";
@@ -30,7 +34,15 @@ export class UploadLogo extends TransactionalUseCase<MulterFile, string> {
     this.#uuidGenerator = uuidGenerator;
   }
 
-  protected async _execute(multerFile: MulterFile): Promise<string> {
+  protected async _execute(
+    multerFile: MulterFile,
+    uow: UnitOfWork,
+  ): Promise<string> {
+    const { enableLogoUpload } = await uow.featureFlagRepository.getAll();
+    if (!enableLogoUpload.isActive) {
+      throw new FeatureDisabledError("Upload Logo");
+    }
+
     const extension = multerFile.originalname.split(".").at(-1);
 
     const file: StoredFile = {

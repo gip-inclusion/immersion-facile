@@ -34,6 +34,21 @@ describe("dashboardUrls slice", () => {
       expectDashboardError(null);
     });
 
+    it("should store AbsoluteUrl in establishments when requesting establishments dashboard", () => {
+      expectUrlsToMatch({ establishments: null });
+
+      store.dispatch(
+        dashboardUrlsSlice.actions.dashboardUrlRequested({
+          name: "establishments",
+        }),
+      );
+      const valueFromApi: AbsoluteUrl = "https://establishments.url";
+      dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
+
+      expectUrlsToMatch({ establishments: valueFromApi });
+      expectDashboardError(null);
+    });
+
     it("should store AbsoluteUrl in events when requesting events dashboard", () => {
       expectUrlsToMatch({ agency: null });
 

@@ -9,10 +9,7 @@ import {
   uploadFileRoute,
 } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
-import {
-  BadRequestError,
-  FeatureDisabledError,
-} from "../../helpers/httpErrors";
+import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
 import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
@@ -42,10 +39,7 @@ export const createTechnicalRouter = (
     .route(`/${uploadFileRoute}`)
     .post(upload.single(uploadFileRoute), (req, res) =>
       sendHttpResponse(req, res, async () => {
-        await rejectIfFeatureFlagNotActive(deps);
-
         if (!req.file) throw new BadRequestError("No file provided");
-
         return deps.useCases.uploadLogo.execute(req.file);
       }),
     );
@@ -86,13 +80,4 @@ export const createTechnicalRouter = (
   );
 
   return technicalRouter;
-};
-
-const rejectIfFeatureFlagNotActive = async (
-  deps: AppDependencies,
-): Promise<void> | never => {
-  const { enableLogoUpload } = await deps.useCases.getFeatureFlags.execute();
-  if (!enableLogoUpload.isActive) {
-    throw new FeatureDisabledError("Upload Logo");
-  }
 };

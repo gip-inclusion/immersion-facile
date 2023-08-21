@@ -2,23 +2,28 @@ import { AgencyId } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
 
 export type DashboardName =
-  | AdminDashboardName
+  | AdminDashboardKind
   | ConventionMagicLinkDashboardName;
 
-export type AdminDashboardName = (typeof dashboardNames)[number];
-export const simpleDashboardNames = ["conventions", "events"] as const;
-export const dashboardNames = [
-  ...simpleDashboardNames,
+export const simpleDashboardKinds = [
+  "conventions",
+  "events",
+  "establishments",
+] as const;
+
+export const adminDashboardKinds = [
+  ...simpleDashboardKinds,
   "agency",
   "erroredConventions",
 ] as const;
+export type AdminDashboardKind = (typeof adminDashboardKinds)[number];
 
 export type ConventionMagicLinkDashboardName =
   (typeof conventionMagicLinkDashboardNames)[number];
 export const conventionMagicLinkDashboardNames = ["conventionStatus"] as const;
 
 type GenericGetDashboardParams<
-  N extends AdminDashboardName | ConventionMagicLinkDashboardName,
+  N extends AdminDashboardKind | ConventionMagicLinkDashboardName,
 > = {
   name: N;
 };
@@ -28,7 +33,7 @@ export type GetDashboardParams =
   | GetConventionMagicLinkDashboardParams;
 
 export type GetAdminDashboardParams =
-  | GenericGetDashboardParams<"events" | "conventions">
+  | GenericGetDashboardParams<"events" | "conventions" | "establishments">
   | (GenericGetDashboardParams<"agency" | "erroredConventions"> & {
       agencyId: AgencyId;
     });

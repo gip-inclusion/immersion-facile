@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTarget, createTargets } from "http-client";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAgencyIdSchema } from "../agency/agency.schema";
+import { setFeatureFlagSchema } from "../featureFlags";
 import {
   establishmentBatchReportSchema,
   formEstablishmentBatchSchema,
@@ -9,7 +10,7 @@ import {
 import { withValidateHeadersAuthorization } from "../headers";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
-import { adminLogin } from "../routes/routes";
+import { adminLogin, featureFlagsRoute } from "../routes/routes";
 import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
 import {
   icUserRoleForAgencyParamsSchema,
@@ -57,5 +58,11 @@ export const adminTargets = createTargets({
     url: "/admin/notifications",
     ...withValidateHeadersAuthorization,
     validateResponseBody: notificationsByKindSchema.parse,
+  }),
+  featureFlags: createTarget({
+    method: "POST",
+    url: `/admin/${featureFlagsRoute}`,
+    ...withValidateHeadersAuthorization,
+    validateRequestBody: setFeatureFlagSchema.parse,
   }),
 });
