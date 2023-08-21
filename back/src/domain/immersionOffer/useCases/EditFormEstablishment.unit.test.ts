@@ -1,10 +1,15 @@
 import {
+  BackOfficeDomainPayload,
+  EstablishmentDomainPayload,
   EstablishmentJwtPayload,
   expectPromiseToFailWithError,
-  FormEstablishmentDto,
+  expectToEqual,
   FormEstablishmentDtoBuilder,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import {
   ConflictError,
   ForbiddenError,
@@ -13,105 +18,123 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
+import { TimeGateway } from "../../core/ports/TimeGateway";
+import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { formEstablishementUpdateFailedErrorMessage } from "../ports/FormEstablishmentRepository";
 
-const prepareUseCase = () => {
-  const uow = createInMemoryUow();
-  const formEstablishmentRepository = uow.formEstablishmentRepository;
-  const outboxRepository = uow.outboxRepository;
-  const uowPerformer = new InMemoryUowPerformer(uow);
-  const timeGateway = new CustomTimeGateway();
-  const uuidGenerator = new TestUuidGenerator();
-  const createNewEvent = makeCreateNewEvent({
-    timeGateway,
-    uuidGenerator,
+describe("Edit Form Establishment", () => {
+  let uow: InMemoryUnitOfWork;
+  let useCase: EditFormEstablishment;
+  let timeGateway: TimeGateway;
+  let uuidGenerator: UuidGenerator;
+
+  const formSiret = "12345678901234";
+  const establishmentPayload: EstablishmentDomainPayload = { siret: formSiret };
+  const backofficePayload: BackOfficeDomainPayload = {
+    role: "backOffice",
+    sub: "",
+  };
+
+  const existingFormEstablishment = FormEstablishmentDtoBuilder.valid()
+    .withSiret(formSiret)
+    .build();
+  const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
+    .withSiret(formSiret)
+    .withBusinessName("Edited Business Name")
+    .build();
+
+  beforeEach(() => {
+    uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
+    uuidGenerator = new TestUuidGenerator();
+    useCase = new EditFormEstablishment(
+      new InMemoryUowPerformer(uow),
+      makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator,
+      }),
+    );
   });
 
-  const useCase = new EditFormEstablishment(uowPerformer, createNewEvent);
-
-  return {
-    useCase,
-    outboxRepository,
-    formEstablishmentRepository,
-  };
-};
-
-describe("Edit Form Establishment", () => {
-  describe("Siret in JWT Payload does not match siret in edited establishment DTO", () => {
-    it("Throws forbidden error", async () => {
-      const { useCase } = prepareUseCase();
-      const siretInJwtPayload = "11111111111111";
-      const siretInFormEstablishment = "22222222222222";
+  describe("Wrong paths", () => {
+    it("Forbidden error on EstablishmentJwtPayload with bad siret", async () => {
       await expectPromiseToFailWithError(
-        useCase.execute(
-          FormEstablishmentDtoBuilder.valid()
-            .withSiret(siretInFormEstablishment)
-            .build(),
-          { siret: siretInJwtPayload } as EstablishmentJwtPayload,
-        ),
+        useCase.execute(updatedFormEstablishment, {
+          siret: "bad-siret",
+        } as EstablishmentJwtPayload),
         new ForbiddenError(),
+      );
+    });
+
+    it("Forbidden error without jwt payload", async () => {
+      await expectPromiseToFailWithError(
+        useCase.execute(updatedFormEstablishment),
+        new ForbiddenError(),
+      );
+    });
+
+    it("conflict error when form does not exist", async () => {
+      await expectPromiseToFailWithError(
+        useCase.execute(updatedFormEstablishment, establishmentPayload),
+        new ConflictError(
+          formEstablishementUpdateFailedErrorMessage(updatedFormEstablishment),
+        ),
       );
     });
   });
 
-  describe("Siret in JWT Payload matches siret in edited establishment DTO", () => {
-    const formSiret = "12345678901234";
-    const payload = { siret: formSiret } as EstablishmentJwtPayload;
+  describe("Right paths", () => {
+    it("publish a FormEstablishmentEdited event & update formEstablishment on repository with an establishment payload", async () => {
+      // Prepare
+      uow.formEstablishmentRepository.setFormEstablishments([
+        existingFormEstablishment,
+      ]);
 
-    describe("If establishment form id already exists", () => {
-      const existingDto: FormEstablishmentDto =
-        FormEstablishmentDtoBuilder.valid().withSiret(formSiret).build();
-      const updatedDto: FormEstablishmentDto = {
-        ...existingDto,
-        businessName: "Edited Business Name",
-      };
+      // Act
+      await useCase.execute(updatedFormEstablishment, establishmentPayload);
 
-      it("should publish an event", async () => {
-        // Prepare
-        const { useCase, formEstablishmentRepository, outboxRepository } =
-          prepareUseCase();
-        await formEstablishmentRepository.create(existingDto);
-
-        // Act
-        await useCase.execute(updatedDto, payload);
-
-        // Assert
-        expect(outboxRepository.events).toHaveLength(1);
-        const expectedEventTopic: DomainTopic = "FormEstablishmentEdited";
-        expect(outboxRepository.events[0].topic).toEqual(expectedEventTopic);
-        expect(outboxRepository.events[0].payload).toEqual(updatedDto);
-      });
-
-      it("should update the establishment form in repository", async () => {
-        // Prepare
-        const { useCase, formEstablishmentRepository } = prepareUseCase();
-        await formEstablishmentRepository.create(existingDto);
-
-        // Act
-        await useCase.execute(updatedDto, payload);
-
-        // Assert
-        expect(await formEstablishmentRepository.getBySiret(formSiret)).toEqual(
-          updatedDto,
-        );
-      });
+      // Assert
+      expectToEqual(uow.outboxRepository.events, [
+        {
+          id: uuidGenerator.new(),
+          occurredAt: timeGateway.now().toISOString(),
+          payload: updatedFormEstablishment,
+          publications: [],
+          topic: "FormEstablishmentEdited",
+          wasQuarantined: false,
+        },
+      ]);
+      expectToEqual(
+        await uow.formEstablishmentRepository.getBySiret(formSiret),
+        updatedFormEstablishment,
+      );
     });
 
-    describe("If establishment form id does not exist", () => {
-      it("should throw a conflict error", async () => {
-        const { useCase } = prepareUseCase();
-        const formEstablishment = FormEstablishmentDtoBuilder.valid()
-          .withSiret(formSiret)
-          .build();
-        await expectPromiseToFailWithError(
-          useCase.execute(formEstablishment, payload),
-          new ConflictError(
-            formEstablishementUpdateFailedErrorMessage(formEstablishment),
-          ),
-        );
-      });
+    it("publish a FormEstablishmentEdited event & update formEstablishment on repository with a backoffice payload", async () => {
+      // Prepare
+      uow.formEstablishmentRepository.setFormEstablishments([
+        existingFormEstablishment,
+      ]);
+
+      // Act
+      await useCase.execute(updatedFormEstablishment, backofficePayload);
+
+      // Assert
+      expectToEqual(uow.outboxRepository.events, [
+        {
+          id: uuidGenerator.new(),
+          occurredAt: timeGateway.now().toISOString(),
+          payload: updatedFormEstablishment,
+          publications: [],
+          topic: "FormEstablishmentEdited",
+          wasQuarantined: false,
+        },
+      ]);
+      expectToEqual(
+        await uow.formEstablishmentRepository.getBySiret(formSiret),
+        updatedFormEstablishment,
+      );
     });
   });
 });

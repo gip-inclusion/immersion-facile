@@ -1,121 +1,192 @@
 import { subYears } from "date-fns";
+import supertest from "supertest";
 import {
-  createEstablishmentMagicLinkPayload,
+  createBackOfficeJwtPayload,
+  createEstablishmentJwtPayload,
   establishmentTargets,
+  expectToEqual,
   FormEstablishmentDtoBuilder,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { makeGenerateJwtES256 } from "../../../../domain/auth/jwt";
-import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
+import {
+  buildTestApp,
+  InMemoryGateways,
+} from "../../../../_testBuilders/buildTestApp";
+import {
+  GenerateBackOfficeJwt,
+  GenerateEditFormEstablishmentJwt,
+  makeGenerateJwtES256,
+} from "../../../../domain/auth/jwt";
+import {
+  TEST_OPEN_ESTABLISHMENT_1,
+  TEST_OPEN_ESTABLISHMENT_2,
+} from "../../../secondary/siret/InMemorySiretGateway";
+import { AppConfig } from "../../config/appConfig";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to post edited form establishments`, () => {
-  it("Throws 401 if not authenticated", async () => {
-    const { request } = await buildTestApp();
+  let request: supertest.SuperTest<supertest.Test>;
+  let appConfig: AppConfig;
+  let gateways: InMemoryGateways;
+  let inMemoryUow: InMemoryUnitOfWork;
+  let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
+  let generateBackOfficeJwt: GenerateBackOfficeJwt;
 
+  const formEstablishment = FormEstablishmentDtoBuilder.valid()
+    .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
+    .build();
+
+  beforeEach(async () => {
+    ({
+      request,
+      appConfig,
+      gateways,
+      inMemoryUow,
+      generateEditEstablishmentJwt,
+      generateBackOfficeJwt,
+    } = await buildTestApp(
+      new AppConfigBuilder().withTestPresetPreviousKeys().build(),
+    ));
+
+    inMemoryUow.formEstablishmentRepository.setFormEstablishments([
+      formEstablishment,
+    ]);
+  });
+
+  it("200 - Supports posting already existing form establisment when authenticated with establishment JWT", async () => {
+    const response = await request
+      .put(establishmentTargets.updateFormEstablishment.url)
+      .set(
+        "Authorization",
+        generateEditEstablishmentJwt(
+          createEstablishmentJwtPayload({
+            siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+            durationDays: 1,
+            now: new Date(),
+          }),
+        ),
+      )
+      .send(formEstablishment);
+
+    expectToEqual(response.status, 200);
+    expectToEqual(response.body, "");
+    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+    expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
+      formEstablishment,
+    ]);
+  });
+
+  it("200 - Supports posting already existing form establisment when authenticated with backoffice JWT", async () => {
+    const response = await request
+      .put(establishmentTargets.updateFormEstablishment.url)
+      .set(
+        "Authorization",
+        generateBackOfficeJwt(
+          createBackOfficeJwtPayload({
+            durationDays: 1,
+            now: new Date(),
+          }),
+        ),
+      )
+      .send(formEstablishment);
+
+    expectToEqual(response.status, 200);
+    expectToEqual(response.body, "");
+    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+    expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
+      formEstablishment,
+    ]);
+  });
+
+  it("401 - not authenticated", async () => {
     const response = await request
       .put(establishmentTargets.updateFormEstablishment.url)
       .send({});
 
-    // Assert
-    expect(response.body).toEqual({ error: "forbidden: unauthenticated" });
-    expect(response.status).toBe(401);
+    expectToEqual(response.body, { error: "forbidden: unauthenticated" });
+    expectToEqual(response.status, 401);
   });
 
-  it("Throws 401 if Jwt is generated from wrong private key", async () => {
-    const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
-    const { request } = await buildTestApp();
+  it("401 - Jwt is generated from wrong private key", async () => {
     const generateJwtWithWrongKey = makeGenerateJwtES256<"establishment">(
-      config.apiJwtPrivateKey,
+      appConfig.apiJwtPrivateKey, // Private Key is the wrong one !
       undefined,
-    ); // Private Key is the wrong one !
-
-    const wrongJwt = generateJwtWithWrongKey(
-      createEstablishmentMagicLinkPayload({
-        siret: "12345678901234",
-        durationDays: 1,
-        now: new Date(),
-      }),
     );
+
     const response = await request
       .put(establishmentTargets.updateFormEstablishment.url)
-      .set("Authorization", wrongJwt)
+      .set(
+        "Authorization",
+        generateJwtWithWrongKey(
+          createEstablishmentJwtPayload({
+            siret: "12345678901234",
+            durationDays: 1,
+            now: new Date(),
+          }),
+        ),
+      )
       .send({});
 
-    // Assert
-    expect(response.body).toEqual({ error: "Provided token is invalid" });
-    expect(response.status).toBe(401);
+    expectToEqual(response.body, { error: "Provided token is invalid" });
+    expectToEqual(response.status, 401);
   });
 
-  it("Throws 401 if jwt is malformed", async () => {
-    const { request } = await buildTestApp();
+  it("401 - Jwt is malformed", async () => {
     const response = await request
       .put(establishmentTargets.updateFormEstablishment.url)
       .set("Authorization", "malformed-jwt")
       .send({});
-    // Assert
-    expect(response.body).toEqual({ error: "Provided token is invalid" });
-    expect(response.status).toBe(401);
+
+    expectToEqual(response.body, { error: "Provided token is invalid" });
+    expectToEqual(response.status, 401);
   });
 
-  it("Throws 401 if Jwt is expired", async () => {
-    const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
-    const { request, gateways } = await buildTestApp();
-    const generateJwtWithWrongKey = makeGenerateJwtES256<"establishment">(
-      config.apiJwtPrivateKey,
-      undefined,
-    ); // Private Key is the wrong one !
-
-    const wrongJwt = generateJwtWithWrongKey(
-      createEstablishmentMagicLinkPayload({
-        siret: "12345678901234",
-        durationDays: 1,
-        now: subYears(gateways.timeGateway.now(), 1),
-      }),
-    );
+  it("403 - Jwt is expired", async () => {
     const response = await request
       .put(establishmentTargets.updateFormEstablishment.url)
-      .set("Authorization", wrongJwt)
+      .set(
+        "Authorization",
+        generateEditEstablishmentJwt(
+          createEstablishmentJwtPayload({
+            siret: "12345678901234",
+            durationDays: 1,
+            now: subYears(gateways.timeGateway.now(), 1),
+          }),
+        ),
+      )
       .send({});
 
-    // Assert
-    expect(response.body).toEqual({ error: "Provided token is invalid" });
-    expect(response.status).toBe(401);
+    expectToEqual(response.body, {
+      message: "Le lien magique est périmé",
+      needsNewMagicLink: true,
+    });
+    expectToEqual(response.status, 403);
   });
 
-  it("Supports posting already existing form establisment when authenticated", async () => {
-    // Prepare
-    const { request, inMemoryUow, generateEditEstablishmentJwt } =
-      await buildTestApp();
-
-    const validJwt = generateEditEstablishmentJwt(
-      createEstablishmentMagicLinkPayload({
-        siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-        durationDays: 1,
-        now: new Date(),
-      }),
-    );
-    await inMemoryUow.formEstablishmentRepository.create(
-      FormEstablishmentDtoBuilder.valid()
-        .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-        .build(),
-    );
-
-    // Act
-    const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-      .build();
+  it("409 - Missing establishment form", async () => {
     const response = await request
       .put(establishmentTargets.updateFormEstablishment.url)
-      .set("Authorization", validJwt)
-      .send(formEstablishment);
+      .set(
+        "Authorization",
+        generateEditEstablishmentJwt(
+          createEstablishmentJwtPayload({
+            siret: TEST_OPEN_ESTABLISHMENT_2.siret,
+            durationDays: 1,
+            now: new Date(),
+          }),
+        ),
+      )
+      .send(
+        FormEstablishmentDtoBuilder.valid()
+          .withSiret(TEST_OPEN_ESTABLISHMENT_2.siret)
+          .build(),
+      );
 
-    // Assert
-    expect(response.status).toBe(200);
-
+    expectToEqual(response.status, 409);
+    expectToEqual(response.body, {
+      errors:
+        "Cannot update form establishment DTO with siret 77561959600155, since it is not found.",
+    });
     expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
-    expect(await inMemoryUow.formEstablishmentRepository.getAll()).toEqual([
-      formEstablishment,
-    ]);
   });
 });

@@ -1,6 +1,6 @@
 import {
   addressDtoToString,
-  createEstablishmentMagicLinkPayload,
+  createEstablishmentJwtPayload,
   SiretDto,
   siretSchema,
 } from "shared";
@@ -47,7 +47,7 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
 
     const now = this.#timeGateway.now();
 
-    const payload = createEstablishmentMagicLinkPayload({
+    const payload = createEstablishmentJwtPayload({
       siret,
       now,
       durationDays: 2,

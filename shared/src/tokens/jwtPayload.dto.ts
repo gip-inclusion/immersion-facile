@@ -1,6 +1,7 @@
 import { ConventionId } from "../convention/convention.dto";
 import { AuthenticatedUserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { Role } from "../role/role.dto";
+import { SiretDto } from "../siret/siret";
 import { ValueOf } from "../utils";
 
 export type CommonJwtPayload = {
@@ -34,8 +35,8 @@ export type ConventionRelatedJwtPayload =
   | ConventionDomainPayload
   | InclusionConnectDomainJwtPayload;
 
-type EstablishmentDomainPayload = {
-  siret: string;
+export type EstablishmentDomainPayload = {
+  siret: SiretDto;
 };
 export type EstablishmentJwtPayload = CommonJwtPayload &
   EstablishmentDomainPayload;

@@ -1,6 +1,6 @@
 import {
   createBackOfficeJwtPayload,
-  createEstablishmentMagicLinkPayload,
+  createEstablishmentJwtPayload,
   establishmentTargets,
 } from "shared";
 import {
@@ -75,7 +75,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     // Act
     const validJwt = generateEditEstablishmentJwt(
-      createEstablishmentMagicLinkPayload({
+      createEstablishmentJwtPayload({
         siret: TEST_OPEN_ESTABLISHMENT_1.siret,
         durationDays: 1,
         now: new Date(),
