@@ -58,7 +58,7 @@ export const createConventionMagicLinkPayload = ({
   ...(sub ? { sub } : {}),
 });
 
-export const createEstablishmentMagicLinkPayload = ({
+export const createEstablishmentJwtPayload = ({
   siret,
   durationDays,
   now,

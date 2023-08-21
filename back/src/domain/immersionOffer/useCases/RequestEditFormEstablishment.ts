@@ -1,7 +1,7 @@
 import subDays from "date-fns/subDays";
 import {
   addressDtoToString,
-  createEstablishmentMagicLinkPayload,
+  createEstablishmentJwtPayload,
   Email,
   SiretDto,
   siretSchema,
@@ -56,7 +56,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
       now,
     );
 
-    const payload = createEstablishmentMagicLinkPayload({
+    const payload = createEstablishmentJwtPayload({
       siret,
       now,
       durationDays: 1,
