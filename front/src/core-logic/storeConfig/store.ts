@@ -39,6 +39,7 @@ import { geosearchEpics } from "../domain/geosearch/geosearch.epics";
 import { geosearchSlice } from "../domain/geosearch/geosearch.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
+import { immersionOfferEpics } from "../domain/immersionOffer/immersionOffer.epic";
 import { immersionOfferSlice } from "../domain/immersionOffer/immersionOffer.slice";
 
 const allEpics: any[] = [
@@ -60,6 +61,7 @@ const allEpics: any[] = [
   ...inclusionConnectedEpics,
   ...agencyInfoEpics,
   ...icUsersAdminEpics,
+  ...immersionOfferEpics,
 ];
 
 const rootReducer = combineReducers({
