@@ -117,7 +117,7 @@ export const JustificationModalContent = ({
         />
       )}
       {doesStatusNeedsJustification(newStatus) && (
-        <form>
+        <form onSubmit={handleSubmit(onFormSubmit)}>
           {newStatus === "DRAFT" && (
             <Select
               label="À qui souhaitez-vous envoyer la demande de modification ?"
@@ -150,12 +150,11 @@ export const JustificationModalContent = ({
                 children: "Annuler",
               },
               {
-                type: "button",
+                type: "submit",
                 nativeButtonProps: {
                   id: domElementIds.manageConvention
                     .justificationModalSubmitButton,
                 },
-                onClick: handleSubmit(onFormSubmit),
                 children: confirmByStatus[newStatus],
               },
             ]}
