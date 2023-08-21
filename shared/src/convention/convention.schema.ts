@@ -58,8 +58,8 @@ import {
   Signatories,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
-  UpdateConventionStatusWithJustificationWhithoutModierRole,
   UpdateConventionStatusWithJustificationWithModifierRole,
+  UpdateConventionStatusWithJustificationWithoutModierRole,
   UpdateConventionStatusWithoutJustification,
   WithConventionId,
   WithConventionIdLegacy,
@@ -317,7 +317,7 @@ export const updateConventionStatusWithoutJustificationSchema: z.Schema<UpdateCo
     conventionId: conventionIdSchema,
   });
 
-export const updateConventionStatusWithJustificationWhithoutModierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWhithoutModierRole> =
+export const updateConventionStatusWithJustificationWhithoutModierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithoutModierRole> =
   z.object({
     status: z.enum(conventionStatusesWithJustificationWithoutModifierRole),
     statusJustification: justificationSchema,
