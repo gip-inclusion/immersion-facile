@@ -93,6 +93,7 @@ const getPageByRouteName: {
   homeEstablishments: () => <HomePage type="establishment" />,
   immersionAssessment: (route) => <ImmersionAssessmentPage route={route} />,
   immersionOffer: () => <ImmersionOfferPage />,
+  immersionOfferLbb: () => <ImmersionOfferPage />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionAdmin: (route) => <ConventionManageAdminPage route={route} />,
   manageConventionInclusionConnected: (route) => (

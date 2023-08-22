@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
@@ -6,6 +7,7 @@ import { domElementIds, SearchImmersionResultDto } from "shared";
 import { useStyleUtils } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { immersionOfferSlice } from "src/core-logic/domain/immersionOffer/immersionOffer.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { SearchResult } from "./SearchResult";
 
@@ -25,6 +27,7 @@ export const SearchListResults = () => {
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
+  const dispatch = useDispatch();
   const { cx, classes } = useStyleUtils();
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const resultsPerPageValue = parseInt(resultsPerPage);
@@ -80,7 +83,18 @@ export const SearchListResults = () => {
                         appellationCode,
                       })
                       .push();
+                    return;
                   }
+                  dispatch(
+                    immersionOfferSlice.actions.fetchImmersionOfferRequested(
+                      searchResult,
+                    ),
+                  );
+                  routes
+                    .immersionOfferLbb({
+                      siret: searchResult.siret,
+                    })
+                    .push();
                 }}
               />
             ))}
