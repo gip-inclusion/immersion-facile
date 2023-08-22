@@ -63,7 +63,7 @@ const agency = new AgencyDtoBuilder()
   .withId(convention.agencyId)
   .build();
 
-describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {
+describe("NotifyActorThatConventionNeedsModifications", () => {
   let usecase: NotifyActorThatConventionNeedsModifications;
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
