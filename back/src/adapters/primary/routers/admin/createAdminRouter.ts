@@ -5,7 +5,6 @@ import {
   AgencyDto,
   AgencyId,
   agencyTargets,
-  generateMagicLinkRoute,
   GetDashboardParams,
 } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -20,8 +19,6 @@ export const createAdminRouter = (
   deps: AppDependencies,
 ): [RelativeUrl, Router] => {
   const adminRouter = Router({ mergeParams: true });
-  const { removeRouterPrefix, routerPrefix } =
-    createRemoveRouterPrefix("/admin");
 
   adminRouter
     .route(`/${adminLogin}`)
@@ -33,20 +30,9 @@ export const createAdminRouter = (
 
   adminRouter.use(deps.adminAuthMiddleware);
 
-  adminRouter.route(`/${generateMagicLinkRoute}`).get(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.generateMagicLink.execute({
-        applicationId: req.query.id,
-        role: req.query.role,
-        expired: req.query.expired === "true",
-      } as any),
-    ),
-  );
+  const { removeRouterPrefix, routerPrefix } =
+    createRemoveRouterPrefix("/admin");
 
-  // GET,
-  // PATCH Update on status to activate
-  // PUT Full update following admin edit
-  // admin/agencies/:id
   adminRouter
     .route(removeRouterPrefix(agencyTargets.getAgencyAdminById.url))
     .get(async (req, res) =>
@@ -74,7 +60,6 @@ export const createAdminRouter = (
       ),
     );
 
-  // GET admin/agencies?status=needsReview
   adminRouter
     .route(removeRouterPrefix(agencyTargets.listAgenciesWithStatus.url))
     .get(async (req, res) =>
@@ -100,36 +85,32 @@ export const createAdminRouter = (
       }),
     );
 
-  // GET admin/emails
   adminRouter
     .route(removeRouterPrefix(adminTargets.getLastNotifications.url))
-    .get(async (req, res) =>
+    .get((req, res) =>
       sendHttpResponse(req, res, deps.useCases.getLastNotifications.execute),
     );
 
-  // POST admin/feature-flags
   adminRouter
-    .route(removeRouterPrefix(adminTargets.featureFlags.url))
-    .post(async (req, res) =>
+    .route(removeRouterPrefix(adminTargets.updateFeatureFlags.url))
+    .post((req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.setFeatureFlag.execute(req.body),
       ),
     );
 
-  //Establishment
   adminRouter
     .route(removeRouterPrefix(adminTargets.addFormEstablishmentBatch.url))
-    .post(async (req, res) =>
-      // eslint-disable-next-line @typescript-eslint/require-await
-      sendHttpResponse(req, res, async () =>
+    .post((req, res) =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.addFormEstablishmentBatch.execute(req.body),
       ),
     );
 
   adminRouter
     .route(removeRouterPrefix(adminTargets.getInclusionConnectedUsers.url))
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
+    .get((req, res) =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.getIcUsers.execute(
           req.query as any,
           req.payloads?.backOffice,
@@ -139,8 +120,8 @@ export const createAdminRouter = (
 
   adminRouter
     .route(removeRouterPrefix(adminTargets.updateUserRoleForAgency.url))
-    .patch(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
+    .patch((req, res) =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.updateIcUserRoleForAgency.execute(
           req.body as any,
           req.payloads?.backOffice,

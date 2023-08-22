@@ -13,7 +13,7 @@ type AdminEpic = AppEpic<AdminAuthAction>;
 const callLoginEpic: AdminEpic = (action$, _, { adminGateway }) =>
   action$.pipe(
     filter(adminAuthSlice.actions.loginRequested.match),
-    switchMap((action) => adminGateway.login(action.payload)),
+    switchMap((action) => adminGateway.login$(action.payload)),
     map(adminAuthSlice.actions.loginSucceeded),
     catchEpicError((error) =>
       adminAuthSlice.actions.loginFailed(error.message),

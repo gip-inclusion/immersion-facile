@@ -85,8 +85,8 @@ describe("feature flag slice", () => {
       enableLogoUpload: makeBooleanFeatureFlag(true),
       isLoading: true,
     });
-    dependencies.technicalGateway.setFeatureFlagResponse$.next(undefined);
-    expectToEqual(dependencies.technicalGateway.setFeatureFlagLastCalledWith, {
+    dependencies.adminGateway.setFeatureFlagResponse$.next(undefined);
+    expectToEqual(dependencies.adminGateway.setFeatureFlagLastCalledWith, {
       flagName: "enableLogoUpload",
       flagContent: {
         isActive: true,
