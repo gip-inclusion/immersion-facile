@@ -236,18 +236,17 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       return email;
     };
 
-    const email =
-      // eslint-disable-next-line no-nested-ternary
-      "emailHash" in payload
-        ? getEmailFromEmailHash(originalConvention.agencyId, payload.emailHash)
-        : "userId" in payload
-        ? await this.#agencyEmailFromUserIdAndAgencyId(
-            uow,
-            payload.userId,
-            originalConvention.agencyId,
-          )
-        : backOfficeEmail;
+    if (!("role" in payload)) {
+      const agencyIcUserEmail = await this.#agencyEmailFromUserIdAndAgencyId(
+        uow,
+        payload.userId,
+        originalConvention.agencyId,
+      );
+      return agencyIcUserEmail;
+    }
 
-    return email;
+    return "emailHash" in payload
+      ? getEmailFromEmailHash(originalConvention.agencyId, payload.emailHash)
+      : backOfficeEmail;
   };
 }
