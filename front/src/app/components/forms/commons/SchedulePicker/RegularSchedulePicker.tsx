@@ -32,9 +32,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const { setValue, getValues } = useFormContext<ConventionReadDto>();
   const values = getValues();
   const [selectedHours, setSelectedHours] = useState<TimePeriodsDto>(
-    regularTimePeriods(
-      values.schedule.complexSchedule.at(0)?.timePeriods ?? [],
-    ),
+    regularTimePeriods(values.schedule.complexSchedule[0]?.timePeriods ?? []),
   );
   const cciWeekDays = ["L", "M", "M", "J", "V", "S"];
   const immersionWeekDays = ["L", "M", "M", "J", "V", "S", "D"];

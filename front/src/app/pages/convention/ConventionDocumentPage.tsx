@@ -34,7 +34,7 @@ const throwOnMissingSignDate = (signedAt: string | undefined): string => {
 
 const isStartingByVowel = (string: string): boolean => {
   const vowels = ["a", "e", "i", "o", "u", "y"];
-  return Boolean(vowels.find((vowel) => vowel === string.at(0)?.toLowerCase()));
+  return Boolean(vowels.find((vowel) => vowel === string[0]?.toLowerCase()));
 };
 
 type ConventionDocumentPageProps = {
