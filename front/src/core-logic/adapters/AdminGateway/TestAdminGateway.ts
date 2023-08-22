@@ -7,6 +7,7 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   NotificationsByKind,
+  SetFeatureFlagParam,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -21,9 +22,22 @@ export class TestAdminGateway implements AdminGateway {
 
   public lastNotifications$ = new Subject<NotificationsByKind>();
 
+  public setFeatureFlagLastCalledWith: SetFeatureFlagParam | undefined =
+    undefined;
+
+  public setFeatureFlagResponse$ = new Subject<void>();
+
   public token$ = new Subject<string>();
 
   public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
+
+  public updateFeatureFlags$ = (
+    params: SetFeatureFlagParam,
+    _adminToken: BackOfficeJwt,
+  ) => {
+    this.setFeatureFlagLastCalledWith = params;
+    return this.setFeatureFlagResponse$;
+  };
 
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
@@ -36,19 +50,23 @@ export class TestAdminGateway implements AdminGateway {
     return this.dashboardUrl$;
   }
 
-  getInclusionConnectedUsersToReview$(): Observable<InclusionConnectedUser[]> {
+  public getInclusionConnectedUsersToReview$(): Observable<
+    InclusionConnectedUser[]
+  > {
     return this.getAgencyUsersToReviewResponse$;
   }
 
-  getLastNotifications(_token: BackOfficeJwt): Observable<NotificationsByKind> {
+  public getLastNotifications$(
+    _token: BackOfficeJwt,
+  ): Observable<NotificationsByKind> {
     return this.lastNotifications$;
   }
 
-  login(): Observable<BackOfficeJwt> {
+  public login$(): Observable<BackOfficeJwt> {
     return this.token$;
   }
 
-  updateUserRoleForAgency$(
+  public updateUserRoleForAgency$(
     _params: IcUserRoleForAgencyParams,
     _token: string,
   ): Observable<void> {

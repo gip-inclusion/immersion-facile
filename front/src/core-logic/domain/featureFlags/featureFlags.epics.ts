@@ -15,19 +15,19 @@ const fetchFeatureFlagsEpic: FeatureFlagEpic = (
 ) =>
   action$.pipe(
     filter(featureFlagsSlice.actions.retrieveFeatureFlagsRequested.match),
-    switchMap(() => technicalGateway.getAllFeatureFlags()),
+    switchMap(technicalGateway.getAllFeatureFlags$),
     map(featureFlagsSlice.actions.retrieveFeatureFlagsSucceeded),
   );
 
 const setFeatureFlagEpic: FeatureFlagEpic = (
   action$,
   state$,
-  { technicalGateway },
+  { adminGateway },
 ) =>
   action$.pipe(
     filter(featureFlagsSlice.actions.setFeatureFlagRequested.match),
     switchMap(({ payload }) =>
-      technicalGateway.setFeatureFlag(
+      adminGateway.updateFeatureFlags$(
         payload,
         state$.value.admin.adminAuth.adminToken ?? "",
       ),

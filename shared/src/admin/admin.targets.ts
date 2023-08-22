@@ -59,7 +59,7 @@ export const adminTargets = createTargets({
     ...withValidateHeadersAuthorization,
     validateResponseBody: notificationsByKindSchema.parse,
   }),
-  featureFlags: createTarget({
+  updateFeatureFlags: createTarget({
     method: "POST",
     url: `/admin/${featureFlagsRoute}`,
     ...withValidateHeadersAuthorization,

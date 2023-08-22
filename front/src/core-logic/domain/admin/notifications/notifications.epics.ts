@@ -13,7 +13,7 @@ const getSentEmail: SentEmailEpic = (action$, state$, { adminGateway }) =>
   action$.pipe(
     filter(notificationsSlice.actions.getLastNotificationsRequested.match),
     switchMap(() =>
-      adminGateway.getLastNotifications(
+      adminGateway.getLastNotifications$(
         state$.value.admin.adminAuth.adminToken || "",
       ),
     ),

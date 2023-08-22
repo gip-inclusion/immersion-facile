@@ -1,4 +1,4 @@
-import { from, Observable } from "rxjs";
+import { from, map, Observable } from "rxjs";
 import {
   AbsoluteUrl,
   AdminTargets,
@@ -8,12 +8,24 @@ import {
   GetDashboardParams,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
+  SetFeatureFlagParam,
   UserAndPassword,
 } from "shared";
 import { HttpClient } from "http-client";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {
+  public updateFeatureFlags$ = (
+    params: SetFeatureFlagParam,
+    token: BackOfficeJwt,
+  ): Observable<void> =>
+    from(
+      this.httpClient.updateFeatureFlags({
+        body: params,
+        headers: { authorization: token },
+      }),
+    ).pipe(map(() => undefined));
+
   constructor(private readonly httpClient: HttpClient<AdminTargets>) {}
 
   public addEstablishmentBatch$(
@@ -64,7 +76,7 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  public getLastNotifications(token: BackOfficeJwt) {
+  public getLastNotifications$(token: BackOfficeJwt) {
     return from(
       this.httpClient
         .getLastNotifications({ headers: { authorization: token } })
@@ -72,7 +84,7 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  public login(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
+  public login$(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
     return from(
       this.httpClient
         .login({ body: userAndPassword })

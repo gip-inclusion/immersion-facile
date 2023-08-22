@@ -3,10 +3,12 @@ import { ZodError } from "zod";
 import {
   adminTargets,
   AgencyDtoBuilder,
+  AgencyRole,
   BackOfficeJwt,
   expectToEqual,
   featureFlagsRoute,
   IcUserRoleForAgencyParams,
+  InclusionConnectedUser,
   makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   SetFeatureFlagParam,
@@ -18,7 +20,7 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
-describe("/admin router", () => {
+describe("Admin router", () => {
   let request: SuperTest<Test>;
   let token: BackOfficeJwt;
   let gateways: InMemoryGateways;
@@ -42,7 +44,7 @@ describe("/admin router", () => {
     ).body;
   });
 
-  describe(`GET ${adminTargets.getDashboardUrl.url}`, () => {
+  describe(`${adminTargets.getDashboardUrl.method} ${adminTargets.getDashboardUrl.url}`, () => {
     it("200 - Gets the absolute Url of the events dashboard", async () => {
       const { body, status } = await request
         .get(
@@ -190,25 +192,18 @@ describe("/admin router", () => {
     });
   });
 
-  describe(`POST ${adminTargets.featureFlags.url}`, () => {
-    it("fails with 401 with wrong admin token", async () => {
-      const response = await request
-        .post(adminTargets.featureFlags.url)
-        .set("authorization", "wrong-token");
-      expect(response.body).toEqual({ error: "Provided token is invalid" });
-      expect(response.status).toBe(401);
-    });
-
-    it("sets the feature flag to given value if token is valid", async () => {
+  describe(`${adminTargets.updateFeatureFlags.method} ${adminTargets.updateFeatureFlags.url}`, () => {
+    it("200 - sets the feature flag to given value if token is valid", async () => {
       const initialFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(initialFeatureFlagsResponse.body.enableLogoUpload).toEqual(
+      expectToEqual(
+        initialFeatureFlagsResponse.body.enableLogoUpload,
         makeBooleanFeatureFlag(true),
       );
 
       const response = await request
-        .post(adminTargets.featureFlags.url)
+        .post(adminTargets.updateFeatureFlags.url)
         .send({
           flagName: "enableLogoUpload",
           flagContent: {
@@ -217,22 +212,24 @@ describe("/admin router", () => {
         } satisfies SetFeatureFlagParam)
         .set("authorization", token);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toBe("");
+      expectToEqual(response.status, 200);
+      expectToEqual(response.body, "");
 
       const updatedFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(updatedFeatureFlagsResponse.body.enableLogoUpload).toEqual(
+      expectToEqual(
+        updatedFeatureFlagsResponse.body.enableLogoUpload,
         makeBooleanFeatureFlag(false),
       );
     });
 
-    it("sets the feature flag to given value if token is valid with value", async () => {
+    it("200 - sets the feature flag to given value if token is valid with value", async () => {
       const initialFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(initialFeatureFlagsResponse.body.enableMaintenance).toEqual(
+      expectToEqual(
+        initialFeatureFlagsResponse.body.enableMaintenance,
         makeTextFeatureFlag(false, { message: "Maintenance message" }),
       );
 
@@ -251,75 +248,116 @@ describe("/admin router", () => {
         .send(params)
         .set("authorization", token);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toBe("");
+      expectToEqual(response.status, 200);
+      expectToEqual(response.body, "");
 
       const updatedFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(updatedFeatureFlagsResponse.body.enableMaintenance).toEqual(
+      expectToEqual(
+        updatedFeatureFlagsResponse.body.enableMaintenance,
         makeTextFeatureFlag(true, {
           message: "Maintenance message",
         }),
       );
     });
+
+    it("401 - wrong admin token", async () => {
+      const response = await request
+        .post(adminTargets.updateFeatureFlags.url)
+        .set("authorization", "wrong-token");
+      expectToEqual(response.body, { error: "Provided token is invalid" });
+      expectToEqual(response.status, 401);
+    });
   });
 
-  describe(`GET ${adminTargets.getInclusionConnectedUsers.url}`, () => {
-    it("Fails with 401 Unauthorized without admin token", async () => {
-      const { body, status } = await request.get(
-        adminTargets.getInclusionConnectedUsers.url,
-      );
-      expect(body).toEqual({ error: "You need to authenticate first" });
-      expect(status).toBe(401);
-    });
-
-    it("Gets the list of connected users with role 'toReview'", async () => {
+  describe(`${adminTargets.getInclusionConnectedUsers.method} ${adminTargets.getInclusionConnectedUsers.url}`, () => {
+    it("200 - Gets the list of connected users with role 'toReview'", async () => {
       const response = await request
         .get(
           `${adminTargets.getInclusionConnectedUsers.url}?agencyRole=toReview`,
         )
         .set("authorization", token);
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual([]);
+      expectToEqual(response.status, 200);
+      expectToEqual(response.body, []);
+    });
+
+    it("401 - missing token", async () => {
+      const { body, status } = await request.get(
+        adminTargets.getInclusionConnectedUsers.url,
+      );
+      expectToEqual(body, { error: "You need to authenticate first" });
+      expectToEqual(status, 401);
     });
   });
 
-  describe(`GET ${adminTargets.updateUserRoleForAgency.url}`, () => {
-    it("Fails with 401 Unauthorized without admin token", async () => {
+  describe(`${adminTargets.updateUserRoleForAgency.method} ${adminTargets.updateUserRoleForAgency.url}`, () => {
+    it("200 - Updates role of user form 'toReview' to 'counsellor' for given agency", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const inclusionConnectedUser: InclusionConnectedUser = {
+        id: "my-user-id",
+        email: "john@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        agencyRights: [{ agency, role: "toReview" }],
+      };
+
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        inclusionConnectedUser,
+      ]);
+
+      const updatedRole: AgencyRole = "counsellor";
+
+      const { body, status } = await request
+        .patch(`${adminTargets.updateUserRoleForAgency.url}`)
+        .send({
+          agencyId: agency.id,
+          userId: inclusionConnectedUser.id,
+          role: updatedRole,
+        } satisfies IcUserRoleForAgencyParams)
+        .set("authorization", token);
+
+      expectToEqual(body, "");
+      expectToEqual(status, 200);
+      expectToEqual(
+        inMemoryUow.inclusionConnectedUserRepository.agencyRightsByUserId,
+        {
+          [inclusionConnectedUser.id]: [{ agency, role: updatedRole }],
+        },
+      );
+    });
+
+    it("401 - missing admin token", async () => {
       const { body, status } = await request.patch(
         adminTargets.updateUserRoleForAgency.url,
       );
-      expect(body).toEqual({ error: "You need to authenticate first" });
-      expect(status).toBe(401);
+      expectToEqual(body, { error: "You need to authenticate first" });
+      expectToEqual(status, 401);
     });
 
-    it("Updates role of user form 'toReview' to 'counsellor' for given agency", async () => {
-      const body: IcUserRoleForAgencyParams = {
-        agencyId: "my-agency-id",
-        userId: "my-user-id",
-        role: "counsellor",
+    it("404 - Missing user", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const inclusionConnectedUser: InclusionConnectedUser = {
+        id: "my-user-id",
+        email: "john@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        agencyRights: [{ agency, role: "toReview" }],
       };
 
-      const agency = new AgencyDtoBuilder().withId(body.agencyId).build();
+      const updatedRole: AgencyRole = "counsellor";
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          id: body.userId,
-          email: "john@mail.com",
-          firstName: "John",
-          lastName: "Doe",
-          agencyRights: [{ agency, role: "toReview" }],
-        },
-      ]);
-
-      const response = await request
+      const { body, status } = await request
         .patch(`${adminTargets.updateUserRoleForAgency.url}`)
-        .send(body)
+        .send({
+          agencyId: agency.id,
+          userId: inclusionConnectedUser.id,
+          role: updatedRole,
+        } satisfies IcUserRoleForAgencyParams)
         .set("authorization", token);
 
-      expect(response.body).toBe("");
-      expect(response.status).toBe(200);
+      expectToEqual(body, { errors: "User with id my-user-id not found" });
+      expectToEqual(status, 404);
     });
   });
 });

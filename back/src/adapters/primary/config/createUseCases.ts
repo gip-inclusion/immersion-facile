@@ -17,7 +17,6 @@ import { UpdateAgency } from "../../../domain/convention/useCases/agencies/Updat
 import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
-import { GenerateConventionMagicLinkUseCase } from "../../../domain/convention/useCases/GenerateConventionMagicLinkUseCase";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -223,10 +222,6 @@ export const createUseCases = (
       signConvention: new SignConvention(
         uowPerformer,
         createNewEvent,
-        gateways.timeGateway,
-      ),
-      generateMagicLink: new GenerateConventionMagicLinkUseCase(
-        generateConventionJwt,
         gateways.timeGateway,
       ),
       renewConventionMagicLink: new RenewConventionMagicLink(

@@ -38,6 +38,8 @@ const simulatedAgencyDtos: AgencyRight[] = [
   },
 ];
 export class SimulatedAdminGateway implements AdminGateway {
+  public updateFeatureFlags$ = (): Observable<void> => of(undefined);
+
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
     _token: BackOfficeJwt,
@@ -70,7 +72,9 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of(url);
   }
 
-  getInclusionConnectedUsersToReview$(): Observable<InclusionConnectedUser[]> {
+  public getInclusionConnectedUsersToReview$(): Observable<
+    InclusionConnectedUser[]
+  > {
     return of([
       {
         id: "fake-user-id-1",
@@ -104,7 +108,9 @@ export class SimulatedAdminGateway implements AdminGateway {
     ]);
   }
 
-  getLastNotifications(_token: BackOfficeJwt): Observable<NotificationsByKind> {
+  public getLastNotifications$(
+    _token: BackOfficeJwt,
+  ): Observable<NotificationsByKind> {
     const notificationsByKind: NotificationsByKind = {
       emails: [],
       sms: [],
@@ -112,7 +118,7 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of(notificationsByKind);
   }
 
-  login({ user }: UserAndPassword): Observable<BackOfficeJwt> {
+  public login$({ user }: UserAndPassword): Observable<BackOfficeJwt> {
     if (user.toLowerCase() === "failed")
       return throwError(
         () =>
@@ -121,7 +127,7 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of("some-token");
   }
 
-  updateUserRoleForAgency$(
+  public updateUserRoleForAgency$(
     { agencyId }: IcUserRoleForAgencyParams,
     _token: string,
   ): Observable<void> {

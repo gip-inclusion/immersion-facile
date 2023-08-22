@@ -8,25 +8,33 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   NotificationsByKind,
+  SetFeatureFlagParam,
   UserAndPassword,
 } from "shared";
 
 export interface AdminGateway {
-  login: (params: UserAndPassword) => Observable<BackOfficeJwt>;
-  getDashboardUrl$: (
-    params: GetDashboardParams,
-    token: BackOfficeJwt,
-  ) => Observable<AbsoluteUrl>;
   addEstablishmentBatch$: (
     establishmentBatch: FormEstablishmentBatchDto,
     token: BackOfficeJwt,
   ) => Observable<EstablishmentBatchReport>;
+
+  getDashboardUrl$: (
+    params: GetDashboardParams,
+    token: BackOfficeJwt,
+  ) => Observable<AbsoluteUrl>;
   getInclusionConnectedUsersToReview$: (
     token: BackOfficeJwt,
   ) => Observable<InclusionConnectedUser[]>;
+  getLastNotifications$(token: BackOfficeJwt): Observable<NotificationsByKind>;
+
+  login$: (params: UserAndPassword) => Observable<BackOfficeJwt>;
+
+  updateFeatureFlags$: (
+    params: SetFeatureFlagParam,
+    adminToken: BackOfficeJwt,
+  ) => Observable<void>;
   updateUserRoleForAgency$(
     params: IcUserRoleForAgencyParams,
     token: BackOfficeJwt,
   ): Observable<void>;
-  getLastNotifications(token: BackOfficeJwt): Observable<NotificationsByKind>;
 }

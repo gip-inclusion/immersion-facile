@@ -1,16 +1,7 @@
 import { Observable } from "rxjs";
-import {
-  AbsoluteUrl,
-  BackOfficeJwt,
-  FeatureFlags,
-  SetFeatureFlagParam,
-} from "shared";
+import { AbsoluteUrl, FeatureFlags } from "shared";
 
 export interface TechnicalGateway {
-  setFeatureFlag: (
-    params: SetFeatureFlagParam,
-    adminToken: BackOfficeJwt,
-  ) => Observable<void>;
-  getAllFeatureFlags: () => Observable<FeatureFlags>;
+  getAllFeatureFlags$: () => Observable<FeatureFlags>;
   uploadLogo: (file: File) => Promise<AbsoluteUrl>;
 }
