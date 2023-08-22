@@ -89,11 +89,10 @@ export const prettyPrintSchedule = (
         );
       }
       if (isEndingWeek) {
-        return !(
-          dayIndex >
-            week.findLastIndex((otherDay) => otherDay.timePeriods !== null) &&
-          day.timePeriods === null
-        );
+        const lastDayIndex = week
+          .map((otherDay) => otherDay.timePeriods !== null)
+          .lastIndexOf(true);
+        return !(dayIndex > lastDayIndex && day.timePeriods === null);
       }
     });
   });
