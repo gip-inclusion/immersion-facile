@@ -15,7 +15,7 @@ const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
   erroredConventions: { kind: "dashboard", id: 101 },
   conventionStatus: { kind: "dashboard", id: 45 },
   events: { kind: "question", id: 330 },
-  establishments: { kind: "dashboard", id: 666 }, // Require Dashboard Id
+  establishments: { kind: "dashboard", id: 115 },
 };
 
 type MetabasePayload = {
