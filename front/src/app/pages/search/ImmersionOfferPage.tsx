@@ -11,11 +11,12 @@ import {
   getMapsLink,
   makeSiretDescriptionLink,
 } from "shared";
-import { MainWrapper } from "react-design-system";
+import { Loader, MainWrapper } from "react-design-system";
 import { ContactByEmail } from "src/app/components/immersion-offer/ContactByEmail";
 import { ContactByPhone } from "src/app/components/immersion-offer/ContactByPhone";
 import { ContactInPerson } from "src/app/components/immersion-offer/ContactInPerson";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { ImmersionOfferLabels } from "src/app/components/search/ImmersionOfferLabels";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { immersionOfferSelectors } from "src/core-logic/domain/immersionOffer/immersionOffer.selectors";
@@ -41,7 +42,7 @@ const renderSection = ({
   content: React.ReactNode;
 }) => (
   <div className={fr.cx("fr-mb-4w")}>
-    <h2 className={fr.cx("fr-h6", "fr-mb-1w")}>{title}</h2>
+    <h2 className={fr.cx("fr-text--md", "fr-mb-1v")}>{title}</h2>
     {content}
   </div>
 );
@@ -51,6 +52,8 @@ export const ImmersionOfferPage = () => {
   const currentImmersionOffer = useAppSelector(
     immersionOfferSelectors.currentImmersionOffer,
   );
+  const feedback = useAppSelector(immersionOfferSelectors.feedback);
+  const isLoading = useAppSelector(immersionOfferSelectors.isLoading);
   const formContactRef = useRef<HTMLDivElement | null>(null);
   const dispatch = useDispatch();
   const [showConfirmationMessage, setShowConfirmationMessage] = useState<
@@ -90,20 +93,50 @@ export const ImmersionOfferPage = () => {
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
         <>
+          {isLoading && <Loader />}
+          {!currentImmersionOffer && feedback.kind === "errored" && (
+            <>
+              <Alert
+                title="Oups !"
+                description="Nous n'avons pas trouvé d'offre correspondant à votre recherche."
+                severity="error"
+                className={fr.cx("fr-my-4w")}
+              />
+              <Button
+                type="button"
+                onClick={onGoBackClick}
+                priority="tertiary"
+                iconId="fr-icon-arrow-left-line"
+                iconPosition="left"
+                className={fr.cx("fr-mt-1w")}
+              >
+                Retour à la recherche
+              </Button>
+            </>
+          )}
           {currentImmersionOffer && showConfirmationMessage === null && (
             <>
               <div className={fr.cx("fr-mb-4w")}>
                 <Button
                   type="button"
                   onClick={onGoBackClick}
-                  priority="tertiary"
+                  priority="tertiary no outline"
                   iconId="fr-icon-arrow-left-line"
                   iconPosition="left"
                 >
                   Retour
                 </Button>
               </div>
-              <h1 className={fr.cx("fr-mb-4w")}>
+              <ImmersionOfferLabels
+                voluntaryToImmersion={
+                  currentImmersionOffer.voluntaryToImmersion
+                }
+                contactMode={currentImmersionOffer.contactMode}
+                fitForDisabledWorkers={
+                  currentImmersionOffer.fitForDisabledWorkers
+                }
+              />
+              <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
                 {currentImmersionOffer?.name}
               </h1>
               {renderSection({
@@ -111,6 +144,7 @@ export const ImmersionOfferPage = () => {
                   <>
                     <p>
                       {currentImmersionOffer?.address.streetNumberAndAddress}
+                      {", "}
                       <span>
                         {currentImmersionOffer?.address.postcode}{" "}
                         {currentImmersionOffer?.address.city}
@@ -132,23 +166,35 @@ export const ImmersionOfferPage = () => {
                 ),
               })}
               {renderSection({
-                title: `Métier${pluralFromAppellations(
-                  currentImmersionOffer?.appellations,
-                )} observable${pluralFromAppellations(
-                  currentImmersionOffer?.appellations,
-                )} :`,
+                title: `Secteur d'activité :`,
                 content: (
                   <p>
-                    {currentImmersionOffer?.appellations
-                      .map((appellation) => `${appellation.appellationLabel}`)
-                      .join(", ")}
+                    {currentImmersionOffer?.romeLabel} (
+                    {currentImmersionOffer?.rome})
                   </p>
                 ),
               })}
+              {currentImmersionOffer.appellations.length > 0 &&
+                renderSection({
+                  title: `Métier${pluralFromAppellations(
+                    currentImmersionOffer?.appellations,
+                  )} observable${pluralFromAppellations(
+                    currentImmersionOffer?.appellations,
+                  )} :`,
+                  content: (
+                    <p>
+                      {currentImmersionOffer?.appellations
+                        .map((appellation) => `${appellation.appellationLabel}`)
+                        .join(", ")}
+                    </p>
+                  ),
+                })}
               {renderSection({
                 content: (
                   <Button type="button" onClick={scrollToContactForm}>
-                    Contacter l'entreprise
+                    {currentImmersionOffer.voluntaryToImmersion
+                      ? "Contacter l'entreprise"
+                      : "Tentez votre chance"}
                   </Button>
                 ),
               })}
@@ -217,7 +263,9 @@ export const ImmersionOfferPage = () => {
                   ref={formContactRef}
                 >
                   <h2 className={fr.cx("fr-h3", "fr-mb-2w")}>
-                    Contacter l'entreprise
+                    {currentImmersionOffer.voluntaryToImmersion
+                      ? "Contacter l'entreprise"
+                      : "Tentez votre chance"}
                   </h2>
                   {match(currentImmersionOffer?.contactMode)
                     .with("EMAIL", () => (
@@ -243,7 +291,148 @@ export const ImmersionOfferPage = () => {
                     ))
                     .with(P.nullish, () => (
                       <div>
-                        <p>Il n'y a pas de contact pour cette offre</p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Cette entreprise peut recruter sur ce métier et être
+                          intéressée pour vous recevoir en immersion. Tentez
+                          votre chance en la contactant !
+                        </p>
+                        <ul className={fr.cx("fr-btns-group", "fr-mt-3w")}>
+                          <li>
+                            {currentImmersionOffer?.website && (
+                              <a
+                                className={fr.cx("fr-btn", "fr-btn--secondary")}
+                                href={currentImmersionOffer?.website}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Aller sur le site de l'entreprise
+                              </a>
+                            )}
+                          </li>
+                          <li>
+                            <a
+                              className={fr.cx("fr-btn", "fr-btn--secondary")}
+                              href={getMapsLink(currentImmersionOffer)}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Localiser l'entreprise
+                            </a>
+                          </li>
+                          {currentImmersionOffer?.urlOfPartner && (
+                            <li>
+                              <a
+                                className={fr.cx("fr-btn", "fr-btn--secondary")}
+                                href={currentImmersionOffer.urlOfPartner}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {/* eslint-disable-next-line no-irregular-whitespace */}
+                                Trouver le contact sur La Bonne Boite
+                              </a>
+                            </li>
+                          )}
+                        </ul>
+                        <hr className={fr.cx("fr-hr", "fr-mt-2w")} />
+                        <h2 className={fr.cx("fr-h5")}>
+                          Nos conseils pour cette première prise de
+                          contact&nbsp;!{" "}
+                        </h2>
+
+                        <h3 className={fr.cx("fr-h6")}>
+                          Comment présenter votre demande ?{" "}
+                        </h3>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Soyez <strong>direct, concret et courtois</strong>.
+                          Présentez-vous, présentez simplement votre projet et
+                          l’objectif que vous recherchez en effectuant une
+                          immersion.
+                        </p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          <strong>Par exemple : </strong>
+                          <span>
+                            “Je souhaite devenir mécanicien auto et je voudrais
+                            découvrir comment ce métier se pratique dans un
+                            garage comme le vôtre. Ca me permettra de vérifier
+                            que cela me plaît vraiment. La personne qui
+                            m’accueillera et me présentera le métier pourra
+                            aussi vérifier si ce métier est fait pour moi.”
+                          </span>
+                        </p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Vous pouvez indiquer à votre interlocutrice ou
+                          interlocuteur que{" "}
+                          <strong>
+                            cette immersion sera encadrée par une convention
+                            signée par l'organisme qui vous suit.
+                          </strong>
+                        </p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Indiquez lui le moment où vous aimeriez faire une
+                          immersion et pourquoi vous voulez la faire à cette
+                          date.
+                        </p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          <strong>Par exemple : </strong>
+                          <span>
+                            “il faudrait que je fasse une immersion avant de
+                            m’inscrire à une formation. “
+                          </span>
+                        </p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Indiquez également le <strong>nombre de jours</strong>{" "}
+                          que vous aimeriez faire en immersion si vous le savez
+                          déjà.
+                        </p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Concluez en lui demandant{" "}
+                          <strong>un rendez-vous</strong> pour qu’il/elle se
+                          rende compte du sérieux de votre projet.
+                        </p>
+
+                        <h3 className={fr.cx("fr-h6")}>
+                          Comment expliquer simplement ce qu’est une immersion ?
+                        </h3>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          C’est un stage d’observation, strictement encadré d’un
+                          point de vue juridique. Vous conservez votre statut et
+                          êtes couvert par votre Pôle emploi,votre Mission
+                          Locale ou le Conseil départemental (en fonction de
+                          votre situation).
+                        </p>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Le rôle de celui qui vous accueillera est de vous
+                          présenter le métier et de vérifier avec vous que ce
+                          métier vous convient en vous faisant des retours les
+                          plus objectifs possibles. Pendant la durée de votre
+                          présence, vous pouvez aider les salariés en donnant un
+                          coup de main mais vous n’êtes pas là pour remplacer un
+                          collègue absent.
+                        </p>
+
+                        <h3 className={fr.cx("fr-h6")}>
+                          Quelle est la durée d’une immersion ?
+                        </h3>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          Les immersions se font le plus souvent pendant une
+                          semaine ou deux.{" "}
+                          <strong>
+                            Il n’est pas possible de dépasser un mois
+                          </strong>
+                          . Il est possible de faire une immersion de seulement
+                          un ou deux jours mais vous ne découvrirez pas
+                          parfaitement un métier.
+                        </p>
+
+                        <h3 className={fr.cx("fr-h6")}>Bon à savoir ! </h3>
+                        <p className={fr.cx("fr-mb-2w")}>
+                          <strong>
+                            Il n’est pas nécessaire d’apporter votre CV
+                          </strong>
+                          . Vous êtes là pour demander à découvrir un métier et
+                          c’est ce projet qui est important, pas vos expériences
+                          professionnelles ni votre formation !
+                        </p>
                       </div>
                     ))
                     .exhaustive()}
@@ -260,21 +449,21 @@ export const ImmersionOfferPage = () => {
                     <p>
                       {getFeedBackMessage(currentImmersionOffer?.contactMode)}
                     </p>
-                    <Button
-                      type="button"
-                      onClick={onGoBackClick}
-                      priority="tertiary"
-                      iconId="fr-icon-arrow-left-line"
-                      iconPosition="left"
-                      className={fr.cx("fr-mt-1w")}
-                    >
-                      Retour à la recherche
-                    </Button>
                   </>
                 }
                 severity="success"
                 className={fr.cx("fr-my-4w")}
               />
+              <Button
+                type="button"
+                onClick={onGoBackClick}
+                priority="tertiary"
+                iconId="fr-icon-arrow-left-line"
+                iconPosition="left"
+                className={fr.cx("fr-mt-1w")}
+              >
+                Retour à la recherche
+              </Button>
             </>
           )}
         </>

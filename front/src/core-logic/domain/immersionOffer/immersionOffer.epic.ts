@@ -1,12 +1,21 @@
-import { filter, map, switchMap } from "rxjs";
+import { filter, map, of, switchMap } from "rxjs";
+import { SearchImmersionResultDto } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { immersionOfferSlice } from "./immersionOffer.slice";
+import {
+  ImmersionOfferPayload,
+  immersionOfferSlice,
+} from "./immersionOffer.slice";
 
 type ImmersionOfferAction = ActionOfSlice<typeof immersionOfferSlice>;
+
+const isSearchImmersionResultDto = (
+  payload: ImmersionOfferPayload | SearchImmersionResultDto,
+): payload is SearchImmersionResultDto =>
+  (payload as SearchImmersionResultDto).name !== undefined;
 
 const fetchImmersionOfferEpic: AppEpic<ImmersionOfferAction> = (
   action$,
@@ -16,7 +25,9 @@ const fetchImmersionOfferEpic: AppEpic<ImmersionOfferAction> = (
   action$.pipe(
     filter(immersionOfferSlice.actions.fetchImmersionOfferRequested.match),
     switchMap(({ payload }) =>
-      immersionOfferGateway.getImmersionOffer$(payload),
+      isSearchImmersionResultDto(payload)
+        ? of(payload)
+        : immersionOfferGateway.getImmersionOffer$(payload),
     ),
     map(immersionOfferSlice.actions.fetchImmersionOfferSucceeded),
     catchEpicError((error) =>

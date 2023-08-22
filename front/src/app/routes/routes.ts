@@ -118,6 +118,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.immersionOffer}`,
   ),
+  immersionOfferLbb: defineRoute(
+    {
+      siret: param.query.string,
+    },
+    () => `/${frontRoutes.immersionOfferLbb}`,
+  ),
   manageConvention: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.manageConvention}`,

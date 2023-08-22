@@ -6,12 +6,12 @@ import { equals } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
   addressDtoToString,
-  ContactMethod,
   frenchEstablishmentKinds,
   getMapsLink,
   SearchImmersionResultDto,
   toAbsoluteUrl,
 } from "shared";
+import { ImmersionOfferLabels } from "./ImmersionOfferLabels";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
@@ -192,21 +192,11 @@ const SearchResultComponent = ({
                 </li>
               )}
             </ul>
-            <ul className={fr.cx("fr-card__desc", "fr-badges-group")}>
-              <li>
-                <InfoLabel
-                  contactMode={contactMode}
-                  voluntaryToImmersion={voluntaryToImmersion}
-                />
-              </li>
-              {fitForDisabledWorkers && (
-                <li>
-                  <Label className={fr.cx("fr-badge--yellow-moutarde")}>
-                    Personnes en situation de handicap bienvenues
-                  </Label>
-                </li>
-              )}
-            </ul>
+            <ImmersionOfferLabels
+              voluntaryToImmersion={voluntaryToImmersion}
+              contactMode={contactMode}
+              fitForDisabledWorkers={fitForDisabledWorkers}
+            />
           </div>
           <div className={fr.cx("fr-card__footer")}>
             <Button
@@ -222,10 +212,7 @@ const SearchResultComponent = ({
                   : onButtonClick
               }
             >
-              {contactMode === "PHONE" ||
-              contactMode === "EMAIL" ||
-              contactMode === "IN_PERSON" ||
-              preview
+              {voluntaryToImmersion || contactMode !== undefined || preview
                 ? "Contacter l'entreprise"
                 : "Tentez votre chance"}
             </Button>
@@ -240,37 +227,3 @@ export const SearchResult = memo(
   SearchResultComponent,
   (prevResult, nextResult) => equals(prevResult, nextResult),
 );
-
-type InfoLabelProps = {
-  voluntaryToImmersion?: boolean;
-  contactMode?: ContactMethod;
-  className?: string;
-};
-
-const InfoLabel = ({ contactMode, voluntaryToImmersion }: InfoLabelProps) => {
-  const { cx } = useStyles();
-  const luckyGuess = typeof contactMode === "undefined";
-  const className = [
-    ...(voluntaryToImmersion ? [fr.cx("fr-badge--blue-cumulus")] : []),
-    ...(luckyGuess ? [fr.cx("fr-badge--purple-glycine")] : []),
-  ].join(" ");
-
-  const label = voluntaryToImmersion
-    ? "Entreprise accueillante"
-    : "Tentez votre chance";
-
-  return voluntaryToImmersion || luckyGuess ? (
-    <Label className={cx(className)}>{label}</Label>
-  ) : null;
-};
-
-const Label = ({
-  children,
-  className,
-}: {
-  children: string;
-  className?: string;
-}) => {
-  const { cx } = useStyles();
-  return <span className={cx(fr.cx("fr-badge"), className)}>{children}</span>;
-};

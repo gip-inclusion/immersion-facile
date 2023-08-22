@@ -10,10 +10,12 @@ type ImmersionOfferState = {
   isLoading: boolean;
 };
 
-type ImmersionOfferPayload = {
-  siret: SiretDto;
-  appellationCode: AppellationCode;
-};
+export type ImmersionOfferPayload =
+  | {
+      siret: SiretDto;
+      appellationCode: AppellationCode;
+    }
+  | SearchImmersionResultDto;
 
 export const initialState: ImmersionOfferState = {
   currentImmersionOffer: null,
