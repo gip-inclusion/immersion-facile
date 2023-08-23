@@ -46,7 +46,7 @@ export const nafDivisionSchema = z
   .string()
   .regex(nafDivisionRegex, "Division NAF incorrect");
 
-export const fromNafSubClassToNafClass = (nafSubClass: string) => {
+export const fromNafSubClassToNafClass = (nafSubClass: string): string => {
   const nafWithoutSectionId = nafSubClass.replace(/[A-Z]/gi, "");
   return [nafWithoutSectionId.slice(0, 2), nafWithoutSectionId.slice(2)].join(
     ".",

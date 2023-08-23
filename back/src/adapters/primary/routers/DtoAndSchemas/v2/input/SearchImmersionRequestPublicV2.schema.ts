@@ -1,10 +1,15 @@
 import { z } from "zod";
-import { appellationSchema, siretSchema, zToBoolean, zToNumber } from "shared";
+import {
+  appellationCodeSchema,
+  siretSchema,
+  zToBoolean,
+  zToNumber,
+} from "shared";
 import { SearchImmersionRequestPublicV2 } from "./SearchImmersionRequestPublicV2.dto";
 
 export const searchImmersionRequestPublicV2Schema: z.Schema<SearchImmersionRequestPublicV2> =
   z.object({
-    appellationCode: appellationSchema.optional(),
+    appellationCode: appellationCodeSchema.optional(),
     siret: siretSchema.optional(),
     latitude: zToNumber,
     longitude: zToNumber,

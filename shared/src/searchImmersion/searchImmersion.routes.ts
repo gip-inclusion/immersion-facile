@@ -2,12 +2,16 @@ import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
 import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import { immersionOfferInputSchema } from "../immersionOffer/immersionOffer.schema";
 import {
   contactEstablishmentRoute,
   immersionOffersRoute,
 } from "../routes/routes";
 import { searchImmersionQueryParamsSchema } from "./SearchImmersionQueryParams.schema";
-import { searchImmersionsSchema } from "./SearchImmersionResult.schema";
+import {
+  searchImmersionResultSchema,
+  searchImmersionsSchema,
+} from "./SearchImmersionResult.schema";
 
 export type SearchImmersionRoutes = typeof searchImmersionRoutes;
 export const searchImmersionRoutes = defineRoutes({
@@ -31,6 +35,16 @@ export const searchImmersionRoutes = defineRoutes({
     requestBodySchema: contactEstablishmentRequestSchema,
     responses: {
       201: z.string().max(0),
+      400: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
+  getImmersionOffer: defineRoute({
+    method: "get",
+    url: "/immersion-offer",
+    queryParamsSchema: immersionOfferInputSchema,
+    responses: {
+      200: searchImmersionResultSchema,
       400: httpErrorSchema,
       404: httpErrorSchema,
     },

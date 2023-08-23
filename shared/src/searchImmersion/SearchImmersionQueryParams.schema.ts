@@ -1,12 +1,13 @@
 import { z } from "zod";
-import { appellationSchema, romeCodeSchema } from "../rome";
+import { romeCodeSchema } from "../rome";
+import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zToBoolean, zToNumber } from "../zodUtils";
 import { SearchImmersionQueryParamsDto } from "./SearchImmersionQueryParams.dto";
 
 export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryParamsDto> =
   z.object({
-    appellationCode: appellationSchema.optional(),
+    appellationCode: appellationCodeSchema.optional(),
     siret: siretSchema.optional(),
     latitude: zToNumber,
     longitude: zToNumber,
@@ -19,7 +20,7 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
 export const searchImmersionParamsSchema: z.Schema<SearchImmersionQueryParamsDto> =
   z.object({
     rome: romeCodeSchema.optional(),
-    appellationCode: appellationSchema.optional(),
+    appellationCode: appellationCodeSchema.optional(),
     siret: siretSchema.optional(),
     latitude: zToNumber,
     longitude: zToNumber,

@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from "uuid";
 import {
   AppellationAndRomeDto,
   AppellationCode,
-  appellationSchema,
+  appellationCodeSchema,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -277,7 +277,7 @@ const appellationDtoSerializer: ValueSerializer<AppellationAndRomeDto> = {
 };
 
 export const appellationStringSerializer: ValueSerializer<AppellationCode> = {
-  parse: (raw) => appellationSchema.parse(raw),
+  parse: (raw) => appellationCodeSchema.parse(raw),
   stringify: (appellation) => appellation,
 };
 

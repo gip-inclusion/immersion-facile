@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
-import { codeAppellationSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zString, zStringCanBeEmpty, zStringPossiblyEmpty } from "../zodUtils";
 import { SearchImmersionResultDto } from "./SearchImmersionResult.dto";
@@ -33,7 +33,7 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     appellations: z.array(
       z.object({
         appellationLabel: z.string(),
-        appellationCode: codeAppellationSchema,
+        appellationCode: appellationCodeSchema,
       }),
     ),
   });

@@ -30,5 +30,13 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
     ),
   );
 
+  expressSharedRouter.getImmersionOffer(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getSearchImmersionResultBySiretAndAppellationCode.execute(
+        req.query,
+      ),
+    ),
+  );
+
   return searchImmersionRouter;
 };
