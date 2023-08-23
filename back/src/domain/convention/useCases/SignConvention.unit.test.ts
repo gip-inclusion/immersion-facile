@@ -1,5 +1,6 @@
 import {
   allRoles,
+  allSignatoryRoles,
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
@@ -10,7 +11,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   Signatories,
-  signatoryRoles,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -70,7 +70,7 @@ describe("Sign convention", () => {
   });
 
   const [allowedToSignRoles, forbiddenToSignRoles] =
-    splitCasesBetweenPassingAndFailing(allRoles, signatoryRoles);
+    splitCasesBetweenPassingAndFailing(allRoles, allSignatoryRoles);
 
   it.each(forbiddenToSignRoles.map((role) => ({ role })))(
     "$role is not allowed to sign",
