@@ -69,38 +69,36 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
 
 export const expectEmailFinalValidationConfirmationMatchingConvention = (
   recipients: string[],
-  templatedEmails: TemplatedEmail[],
+  templatedEmails: TemplatedEmail,
   agency: AgencyDto,
   convention: ConventionDto,
   config: AppConfig,
   conventionToSignLinkId: ShortLinkId,
 ) =>
-  expectToEqual(templatedEmails, [
-    {
-      kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      recipients,
-      params: {
-        conventionId: convention.id,
-        internshipKind: convention.internshipKind,
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
-        beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
-        dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
-        dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        businessName: convention.businessName,
-        immersionAppellationLabel:
-          convention.immersionAppellation.appellationLabel,
-        emergencyContactInfos: displayEmergencyContactInfos({
-          beneficiaryRepresentative:
-            convention.signatories.beneficiaryRepresentative,
-          beneficiary: convention.signatories.beneficiary,
-        }),
-        agencyLogoUrl: agency.logoUrl,
-        magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
-      },
+  expectToEqual(templatedEmails, {
+    kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+    recipients,
+    params: {
+      conventionId: convention.id,
+      internshipKind: convention.internshipKind,
+      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+      beneficiaryLastName: convention.signatories.beneficiary.lastName,
+      beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
+      dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+      dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+      establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+      businessName: convention.businessName,
+      immersionAppellationLabel:
+        convention.immersionAppellation.appellationLabel,
+      emergencyContactInfos: displayEmergencyContactInfos({
+        beneficiaryRepresentative:
+          convention.signatories.beneficiaryRepresentative,
+        beneficiary: convention.signatories.beneficiary,
+      }),
+      agencyLogoUrl: agency.logoUrl,
+      magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
     },
-  ]);
+  });
 
 export const expectNotifyConventionRejected = (
   templatedEmail: TemplatedEmail,
