@@ -9,6 +9,8 @@ import {
   AppellationDto,
   ContactMethod,
   getMapsLink,
+  makeAppellationInformationUrl,
+  makeNafClassInformationUrl,
   makeSiretDescriptionLink,
 } from "shared";
 import { Loader, MainWrapper } from "react-design-system";
@@ -34,16 +36,16 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   }
 };
 
-const renderSection = ({
+const ImmersionOfferSection = ({
   title,
-  content,
+  children,
 }: {
   title?: string;
-  content: React.ReactNode;
+  children: React.ReactNode;
 }) => (
   <div className={fr.cx("fr-mb-4w")}>
     <h2 className={fr.cx("fr-text--md", "fr-mb-1v")}>{title}</h2>
-    {content}
+    {children}
   </div>
 );
 
@@ -98,7 +100,7 @@ export const ImmersionOfferPage = () => {
             <>
               <Alert
                 title="Oups !"
-                description="Nous n'avons pas trouvé d'offre correspondant à votre recherche."
+                description="L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
                 severity="error"
                 className={fr.cx("fr-my-4w")}
               />
@@ -139,124 +141,117 @@ export const ImmersionOfferPage = () => {
               <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
                 {currentImmersionOffer?.name}
               </h1>
-              {renderSection({
-                content: (
-                  <>
-                    <p>
-                      {currentImmersionOffer?.address.streetNumberAndAddress}
-                      {", "}
-                      <span>
-                        {currentImmersionOffer?.address.postcode}{" "}
-                        {currentImmersionOffer?.address.city}
-                      </span>
-                    </p>
-                    <p>
-                      SIRET&nbsp;:{" "}
-                      <a
-                        href={makeSiretDescriptionLink(
-                          currentImmersionOffer?.siret,
-                        )}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {currentImmersionOffer?.siret}
-                      </a>
-                    </p>
-                  </>
-                ),
-              })}
-              {renderSection({
-                title: `Secteur d'activité :`,
-                content: (
+              <ImmersionOfferSection title="Addresse">
+                <>
                   <p>
-                    {currentImmersionOffer?.romeLabel} (
-                    {currentImmersionOffer?.rome})
+                    {currentImmersionOffer?.address.streetNumberAndAddress}
+                    {", "}
+                    <span>
+                      {currentImmersionOffer?.address.postcode}{" "}
+                      {currentImmersionOffer?.address.city}
+                    </span>
                   </p>
-                ),
-              })}
-              {currentImmersionOffer.appellations.length > 0 &&
-                renderSection({
-                  title: `Métier${pluralFromAppellations(
-                    currentImmersionOffer?.appellations,
-                  )} observable${pluralFromAppellations(
-                    currentImmersionOffer?.appellations,
-                  )} :`,
-                  content: (
-                    <p>
-                      {currentImmersionOffer?.appellations
-                        .map((appellation) => `${appellation.appellationLabel}`)
-                        .join(", ")}
-                    </p>
-                  ),
-                })}
-              {renderSection({
-                content: (
-                  <Button type="button" onClick={scrollToContactForm}>
-                    {currentImmersionOffer.voluntaryToImmersion
-                      ? "Contacter l'entreprise"
-                      : "Tentez votre chance"}
-                  </Button>
-                ),
-              })}
-              {renderSection({
-                title: "Nombre de salariés",
-                content: <p>{currentImmersionOffer?.numberOfEmployeeRange}</p>,
-              })}
-              {renderSection({
-                title: "Informations complémentaires",
-                content: <p>{currentImmersionOffer?.additionalInformation}</p>,
-              })}
-              {currentImmersionOffer.website &&
-                renderSection({
-                  title: "Site web",
-                  content: (
+                  <p>
+                    SIRET&nbsp;:{" "}
                     <a
-                      href={currentImmersionOffer.website}
+                      href={makeSiretDescriptionLink(
+                        currentImmersionOffer?.siret,
+                      )}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {currentImmersionOffer.website}
+                      {currentImmersionOffer?.siret}
                     </a>
-                  ),
-                })}
-              {renderSection({
-                title:
-                  "Avoir plus d'informations avant de contacter l'entreprise",
-                content: (
-                  <ul>
-                    <li>
-                      <a
-                        href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${
-                          currentImmersionOffer?.appellations.at(0)
-                            ?.appellationCode
-                        }`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        S'informer sur le métier
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${currentImmersionOffer?.rome}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        S'informer sur le domaine
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href={getMapsLink(currentImmersionOffer)}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Localiser l'entreprise
-                      </a>
-                    </li>
-                  </ul>
-                ),
-              })}
+                  </p>
+                </>
+              </ImmersionOfferSection>
+              <ImmersionOfferSection title="Secteur d'activité :">
+                <p>
+                  {currentImmersionOffer?.romeLabel} (
+                  {currentImmersionOffer?.rome})
+                </p>
+              </ImmersionOfferSection>
+
+              {currentImmersionOffer.appellations.length > 0 && (
+                <ImmersionOfferSection
+                  title={`Métier${pluralFromAppellations(
+                    currentImmersionOffer?.appellations,
+                  )} observable${pluralFromAppellations(
+                    currentImmersionOffer?.appellations,
+                  )} :`}
+                >
+                  <p>
+                    {currentImmersionOffer?.appellations
+                      .map((appellation) => `${appellation.appellationLabel}`)
+                      .join(", ")}
+                  </p>
+                </ImmersionOfferSection>
+              )}
+              <ImmersionOfferSection>
+                <Button type="button" onClick={scrollToContactForm}>
+                  {currentImmersionOffer.voluntaryToImmersion
+                    ? "Contacter l'entreprise"
+                    : "Tentez votre chance"}
+                </Button>
+              </ImmersionOfferSection>
+              <ImmersionOfferSection title="Nombre de salariés">
+                <p>{currentImmersionOffer?.numberOfEmployeeRange}</p>
+              </ImmersionOfferSection>
+
+              {currentImmersionOffer?.additionalInformation && (
+                <ImmersionOfferSection title="Informations complémentaires">
+                  <p>{currentImmersionOffer?.additionalInformation}</p>
+                </ImmersionOfferSection>
+              )}
+
+              {currentImmersionOffer.website && (
+                <ImmersionOfferSection title="Site web">
+                  <a
+                    href={currentImmersionOffer.website}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {currentImmersionOffer.website}
+                  </a>
+                </ImmersionOfferSection>
+              )}
+              <ImmersionOfferSection title="Avoir plus d'informations avant de contacter l'entreprise">
+                <ul>
+                  <li>
+                    <a
+                      href={makeAppellationInformationUrl(
+                        currentImmersionOffer.appellations[0].appellationCode,
+                        currentImmersionOffer.address.departmentCode,
+                      )}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      S'informer sur le métier
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={makeNafClassInformationUrl(
+                        currentImmersionOffer.naf,
+                      )}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      S'informer sur le domaine
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={getMapsLink(currentImmersionOffer)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Localiser l'entreprise
+                    </a>
+                  </li>
+                </ul>
+              </ImmersionOfferSection>
+
               <div>
                 <div
                   className={fr.cx("fr-card", "fr-p-4w", "fr-mt-8w")}
