@@ -184,7 +184,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     );
     if (!userAgencyRights)
       throw new ForbiddenError(
-        `User '${userId}' has no rôle on agency '${agencyId}'.`,
+        `User '${userId}' has no role on agency '${agencyId}'.`,
       );
     return user.email;
   }
