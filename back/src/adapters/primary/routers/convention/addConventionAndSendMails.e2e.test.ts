@@ -383,6 +383,8 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     "SIGNEE_HAS_SIGNED_CONVENTION",
     "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
     "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+    "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+    "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
   ]);
 
   const needsToTriggerConventionSentEmail = expectEmailOfType(
@@ -390,8 +392,6 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
   );
   expect(needsToTriggerConventionSentEmail.recipients).toEqual([
-    "beneficiary@email.fr",
-    "establishment@example.com",
     validatorEmail,
   ]);
 
