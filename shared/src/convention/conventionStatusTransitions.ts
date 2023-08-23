@@ -1,4 +1,4 @@
-import { Role, signatoryRoles } from "..";
+import { Role } from "..";
 import { ConventionStatus } from "./convention.dto";
 
 export type StatusTransitionConfig = {
@@ -6,23 +6,30 @@ export type StatusTransitionConfig = {
   validRoles: Role[];
 };
 
+export const validSignatoryRoles: Role[] = [
+  "beneficiary",
+  "beneficiary-representative",
+  "beneficiary-current-employer",
+  "establishment-representative",
+];
+
 export const statusTransitionConfigs: Record<
   ConventionStatus,
   StatusTransitionConfig
 > = {
   READY_TO_SIGN: {
     validInitialStatuses: ["DRAFT"],
-    validRoles: signatoryRoles,
+    validRoles: validSignatoryRoles,
   },
 
   PARTIALLY_SIGNED: {
     validInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
-    validRoles: signatoryRoles,
+    validRoles: validSignatoryRoles,
   },
 
   IN_REVIEW: {
     validInitialStatuses: ["PARTIALLY_SIGNED"],
-    validRoles: signatoryRoles,
+    validRoles: validSignatoryRoles,
   },
 
   ACCEPTED_BY_COUNSELLOR: {
@@ -60,7 +67,12 @@ export const statusTransitionConfigs: Record<
       "IN_REVIEW",
       "ACCEPTED_BY_COUNSELLOR",
     ],
-    validRoles: ["counsellor", "validator", "backOffice", ...signatoryRoles],
+    validRoles: [
+      "counsellor",
+      "validator",
+      "backOffice",
+      ...validSignatoryRoles,
+    ],
   },
   DEPRECATED: {
     validInitialStatuses: [

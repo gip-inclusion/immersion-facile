@@ -1,10 +1,10 @@
 import { z } from "zod";
 import {
+  allSignatoryRoles,
   ConventionJwtPayload,
   ConventionStatus,
   Role,
   SignatoryRole,
-  signatoryRoles,
   signConventionDtoWithRole,
   WithConventionIdLegacy,
 } from "shared";
@@ -30,7 +30,7 @@ const domainTopicByTargetStatusMap: Partial<
 };
 
 const isAllowedToSign = (role: Role): role is SignatoryRole =>
-  signatoryRoles.includes(role as SignatoryRole);
+  allSignatoryRoles.includes(role as SignatoryRole);
 
 export class SignConvention extends TransactionalUseCase<
   void,

@@ -9,7 +9,7 @@ import {
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
   expectToEqual,
-  signatoryRoles,
+  validSignatoryRoles,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
@@ -228,7 +228,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: originalConventionId,
       },
       expectedDomainTopic: null,
-      allowedRoles: signatoryRoles,
+      allowedRoles: validSignatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["DRAFT"],
     });
@@ -241,7 +241,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationPartiallySigned",
-      allowedRoles: signatoryRoles,
+      allowedRoles: validSignatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
@@ -254,7 +254,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: originalConventionId,
       },
       expectedDomainTopic: "ImmersionApplicationFullySigned",
-      allowedRoles: signatoryRoles,
+      allowedRoles: validSignatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });
