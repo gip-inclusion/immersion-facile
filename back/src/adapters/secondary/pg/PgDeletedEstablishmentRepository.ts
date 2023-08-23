@@ -1,19 +1,16 @@
-import { PoolClient } from "pg";
+import { Kysely } from "kysely";
 import format from "pg-format";
 import { SiretDto } from "shared";
 import {
   DeletedEstablishementDto,
   DeletedEstablishmentRepository,
 } from "../../../domain/immersionOffer/ports/DeletedEstablishmentRepository";
+import { executeKyselyRawSqlQuery, ImmersionDatabase } from "./sql/database";
 
 export class PgDeletedEstablishmentRepository
   implements DeletedEstablishmentRepository
 {
-  #client: PoolClient;
-
-  constructor(client: PoolClient) {
-    this.#client = client;
-  }
+  constructor(private transaction: Kysely<ImmersionDatabase>) {}
 
   public async areSiretsDeleted(
     siretsToCheck: SiretDto[],
@@ -23,9 +20,11 @@ export class PgDeletedEstablishmentRepository
       FROM establishments_deleted
       WHERE siret = ANY($1)
     `;
-    const result = await this.#client.query<{ siret: SiretDto }>(query, [
-      siretsToCheck,
-    ]);
+    const result = await executeKyselyRawSqlQuery<{ siret: SiretDto }>(
+      this.transaction,
+      query,
+      [siretsToCheck],
+    );
     return siretsToCheck.reduce<Record<SiretDto, boolean>>(
       (acc, siretToCheck) => ({
         ...acc,
@@ -51,6 +50,6 @@ export class PgDeletedEstablishmentRepository
       ],
     );
 
-    await this.#client.query(query);
+    await executeKyselyRawSqlQuery(this.transaction, query);
   }
 }

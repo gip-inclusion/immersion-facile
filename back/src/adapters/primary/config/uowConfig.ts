@@ -113,7 +113,7 @@ export const createPgUow = (
       new PgConventionPoleEmploiAdvisorRepository(transaction),
     conventionsToSyncRepository: new PgConventionsToSyncRepository(transaction),
     deletedEstablishmentRepository: new PgDeletedEstablishmentRepository(
-      client,
+      transaction,
     ),
     discussionAggregateRepository: new PgDiscussionAggregateRepository(
       transaction,

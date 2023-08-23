@@ -1,8 +1,10 @@
+import { Kysely, PostgresDialect } from "kysely";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { DeletedEstablishementDto } from "../../../domain/immersionOffer/ports/DeletedEstablishmentRepository";
+import { ImmersionDatabase } from "./sql/database";
 import { PgDeletedEstablishmentRepository } from "./PgDeletedEstablishmentRepository";
 
 describe("PgDeletedEstablishmentRepository", () => {
@@ -18,7 +20,9 @@ describe("PgDeletedEstablishmentRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM establishments_deleted");
     pgDeletedEstablishmentRepository = new PgDeletedEstablishmentRepository(
-      client,
+      new Kysely<ImmersionDatabase>({
+        dialect: new PostgresDialect({ pool }),
+      }),
     );
   });
 
