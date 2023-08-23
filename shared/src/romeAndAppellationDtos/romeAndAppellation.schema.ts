@@ -17,14 +17,14 @@ export const codeRomeSchema: z.Schema<RomeCode> = z
   .regex(codeRomeRegex, "Code ROME incorrect");
 
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
-export const codeAppellationSchema: z.Schema<AppellationCode> = z
+export const appellationCodeSchema: z.Schema<AppellationCode> = z
   .string()
   .regex(codeAppellationRegex, "Code appellation incorrect");
 
 export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
   romeCode: codeRomeSchema,
   romeLabel: zTrimmedString,
-  appellationCode: codeAppellationSchema,
+  appellationCode: appellationCodeSchema,
   appellationLabel: zTrimmedString,
 });
 

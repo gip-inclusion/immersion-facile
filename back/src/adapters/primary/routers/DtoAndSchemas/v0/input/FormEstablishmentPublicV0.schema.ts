@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
   addressWithPostalCodeSchema,
-  appellationSchema,
+  appellationCodeSchema,
   emailSchema,
   nafSchema,
   NotEmptyArray,
@@ -41,7 +41,7 @@ type ProfessionDtoPublicV0 = {
 
 const professionSchemaPublicV0: z.Schema<ProfessionDtoPublicV0> = z.object({
   romeCodeMetier: romeCodeSchema,
-  romeCodeAppellation: appellationSchema.optional(),
+  romeCodeAppellation: appellationCodeSchema.optional(),
   description: zTrimmedString,
 });
 
