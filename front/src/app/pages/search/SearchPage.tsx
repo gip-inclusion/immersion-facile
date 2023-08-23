@@ -154,6 +154,12 @@ export const SearchPage = ({
                     appellationLabel: formValues.appellationLabel ?? "",
                   },
                 ]}
+                onInputClear={() => {
+                  setValue("rome", "");
+                  setValue("romeLabel", "");
+                  setValue("appellationCode", "");
+                  setValue("appellationLabel", "");
+                }}
                 id={domElementIds.search.appellationAutocomplete}
               />
             </div>
