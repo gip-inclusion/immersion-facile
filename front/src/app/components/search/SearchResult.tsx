@@ -7,6 +7,7 @@ import { useStyles } from "tss-react/dsfr";
 import {
   addressDtoToString,
   ContactMethod,
+  frenchEstablishmentKinds,
   SearchImmersionResultDto,
   toAbsoluteUrl,
 } from "shared";
@@ -52,9 +53,13 @@ const SearchResultComponent = ({
   } = establishment;
 
   const distanceKm = ((distance_m ?? 0) * 0.001).toFixed(1);
-
-  const establishmentRawName =
-    customizedName && customizedName.length > 0 ? customizedName : name;
+  const isCustomizedNameValidToDisplay =
+    customizedName &&
+    customizedName.length > 0 &&
+    !frenchEstablishmentKinds.includes(customizedName.trim());
+  const establishmentRawName = isCustomizedNameValidToDisplay
+    ? customizedName
+    : name;
 
   const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
     establishmentRawName;
