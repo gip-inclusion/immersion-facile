@@ -35,6 +35,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
   let notifyNewConventionNeedsReview: NotifyNewApplicationNeedsReview;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
+  let conventionInReview: ConventionDto;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   const timeGateway = new CustomTimeGateway();
 
@@ -62,7 +63,6 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
   });
 
   describe("When application status is IN_REVIEW", () => {
-    let conventionInReview: ConventionDto;
     beforeEach(() => {
       conventionInReview = new ConventionDtoBuilder(defaultConvention)
         .withStatus("IN_REVIEW")
@@ -136,6 +136,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl: agency.logoUrl,
+              validatorName: "",
             },
           },
           {
@@ -153,6 +154,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl: agency.logoUrl,
+              validatorName: "",
             },
           },
         ],
@@ -226,6 +228,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agency.logoUrl,
+              validatorName: "",
             },
           },
           {
@@ -243,6 +246,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
               conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agency.logoUrl,
+              validatorName: "",
             },
           },
         ],
@@ -331,6 +335,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
                 conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
                 possibleRoleAction: "en considérer la validation",
                 agencyLogoUrl: agency.logoUrl,
+                validatorName: "",
               },
             },
             {
@@ -350,6 +355,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
                 conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
                 possibleRoleAction: "en considérer la validation",
                 agencyLogoUrl: agency.logoUrl,
+                validatorName: "",
               },
             },
           ],
@@ -421,6 +427,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
                 conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
                 possibleRoleAction: "en considérer la validation",
                 agencyLogoUrl: agency.logoUrl,
+                validatorName: "",
               },
             },
           ],
@@ -433,6 +440,107 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         );
 
         expectSavedNotificationsAndEvents({ emails: [] });
+      });
+    });
+  });
+
+  describe("When application status is ACCEPTED_BY_COUNSELLOR", () => {
+    beforeEach(() => {
+      conventionInReview = new ConventionDtoBuilder(defaultConvention)
+        .withStatus("ACCEPTED_BY_COUNSELLOR")
+        .withValidator({ lastname: "Doe", firstname: "John" })
+        .build();
+    });
+
+    it("Nominal case: Sends notification email to validator with counsellor name", async () => {
+      const shortLinkIds = [
+        "shortlink1",
+        "shortlink2",
+        "shortlink3",
+        "shortlink4",
+      ];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+      const validatorEmails = [
+        "aValidator@unmail.com",
+        "anotherValidator@unmail.com",
+      ];
+      const agency = new AgencyDtoBuilder(defaultAgency)
+        .withValidatorEmails(validatorEmails)
+        .build();
+
+      uow.agencyRepository.setAgencies([agency]);
+
+      await notifyNewConventionNeedsReview.execute(conventionInReview);
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[0],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[1],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
+        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[0],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+        [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[1],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+      });
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+            recipients: [validatorEmails[0]],
+            params: {
+              conventionId: conventionInReview.id,
+              internshipKind: conventionInReview.internshipKind,
+              beneficiaryFirstName:
+                conventionInReview.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                conventionInReview.signatories.beneficiary.lastName,
+              businessName: conventionInReview.businessName,
+              magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              possibleRoleAction: "en considérer la validation",
+              agencyLogoUrl: agency.logoUrl,
+              validatorName: "John Doe",
+            },
+          },
+          {
+            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+            recipients: [validatorEmails[1]],
+            params: {
+              conventionId: conventionInReview.id,
+              internshipKind: conventionInReview.internshipKind,
+              beneficiaryFirstName:
+                conventionInReview.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                conventionInReview.signatories.beneficiary.lastName,
+              businessName: conventionInReview.businessName,
+              magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              possibleRoleAction: "en considérer la validation",
+              agencyLogoUrl: agency.logoUrl,
+              validatorName: "John Doe",
+            },
+          },
+        ],
       });
     });
   });

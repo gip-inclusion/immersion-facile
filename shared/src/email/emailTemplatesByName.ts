@@ -716,6 +716,7 @@ export const emailTemplatesByName =
         internshipKind,
         magicLink,
         possibleRoleAction,
+        validatorName,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -725,11 +726,11 @@ export const emailTemplatesByName =
         content: `
       <strong>Une nouvelle demande ${
         internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-      } a été enregistrée.</strong>
+      } vous est envoyée${
+          validatorName ? ` par ${validatorName} ` : " "
+        }pour que vous l'examiniez.</strong>
 
-      Une demande ${
-        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} vous est envoyée pour que vous l'examiniez. 
+      Elle concerne le bénéficiaire ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} 
 
       Nous vous remercions d'en prendre connaissance pour ${possibleRoleAction}.
       `,

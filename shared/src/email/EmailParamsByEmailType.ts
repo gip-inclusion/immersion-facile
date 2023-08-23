@@ -212,6 +212,7 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
     magicLink: string;
     possibleRoleAction: string;
+    validatorName: string;
   };
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
     contactFirstName: string;

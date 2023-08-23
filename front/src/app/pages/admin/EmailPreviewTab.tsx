@@ -382,6 +382,7 @@ export const defaultEmailValueByEmailKind: {
     internshipKind: "immersion",
     magicLink: "MAGIC_LINK",
     possibleRoleAction: "POSSIBLE_ROLE_ACTION",
+    validatorName: "VALIDATOR_NAME",
   },
   MAGIC_LINK_RENEWAL: {
     conventionStatusLink: "CONVENTION_STATUS_LINK",

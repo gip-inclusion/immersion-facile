@@ -1,6 +1,7 @@
 import { parseISO } from "date-fns";
 import {
   AgencyDto,
+  concatValidatorNames,
   ConventionDto,
   displayEmergencyContactInfos,
   expectToEqual,
@@ -8,7 +9,6 @@ import {
   TemplatedEmail,
 } from "shared";
 import { AppConfig } from "../adapters/primary/config/appConfig";
-import { concatNames } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { ShortLinkId } from "../domain/core/ports/ShortLinkQuery";
 import { makeShortLinkUrl } from "../domain/core/ShortLink";
 
@@ -99,7 +99,7 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
       agencyLogoUrl: agency.logoUrl,
       magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
       validatorName: convention.validators?.agencyValidator
-        ? concatNames(convention.validators?.agencyValidator)
+        ? concatValidatorNames(convention.validators?.agencyValidator)
         : "",
     },
   });
