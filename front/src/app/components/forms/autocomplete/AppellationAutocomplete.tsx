@@ -139,16 +139,7 @@ export const AppellationAutocomplete = ({
           if (selectedOption) {
             setSelectedOption(selectedOption);
             setSearchTerm(selectedOption.description);
-            onAppellationSelected(
-              selectedOption
-                ? selectedOption.value
-                : {
-                    appellationCode: "",
-                    appellationLabel: "",
-                    romeCode: "",
-                    romeLabel: "",
-                  },
-            );
+            onAppellationSelected(selectedOption.value);
           }
         }}
         onInputChange={(_, newSearchTerm, reason) => {

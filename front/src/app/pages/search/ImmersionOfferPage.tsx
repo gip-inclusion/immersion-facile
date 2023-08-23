@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
+import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { match, P } from "ts-pattern";
 import { Route } from "type-route";
 import {
@@ -188,11 +189,30 @@ export const ImmersionOfferPage = () => {
                 </ImmersionOfferSection>
               )}
               <ImmersionOfferSection>
-                <Button type="button" onClick={scrollToContactForm}>
-                  {currentImmersionOffer.voluntaryToImmersion
-                    ? "Contacter l'entreprise"
-                    : "Tentez votre chance"}
-                </Button>
+                {currentImmersionOffer.voluntaryToImmersion && (
+                  <Button type="button" onClick={scrollToContactForm}>
+                    Contacter l'entreprise
+                  </Button>
+                )}
+
+                {!currentImmersionOffer.voluntaryToImmersion && (
+                  <ButtonsGroup
+                    inlineLayoutWhen="md and up"
+                    buttons={[
+                      {
+                        onClick: scrollToContactForm,
+                        children: "Voir nos conseils",
+                        priority: "secondary",
+                      },
+                      {
+                        linkProps: {
+                          href: currentImmersionOffer?.urlOfPartner,
+                        },
+                        children: "Voir l'offre sur La Bonne Boite",
+                      },
+                    ]}
+                  />
+                )}
               </ImmersionOfferSection>
               <ImmersionOfferSection title="Nombre de salariés">
                 <p>{currentImmersionOffer?.numberOfEmployeeRange}</p>
@@ -217,18 +237,20 @@ export const ImmersionOfferPage = () => {
               )}
               <ImmersionOfferSection title="Avoir plus d'informations avant de contacter l'entreprise">
                 <ul>
-                  <li>
-                    <a
-                      href={makeAppellationInformationUrl(
-                        currentImmersionOffer.appellations[0].appellationCode,
-                        currentImmersionOffer.address.departmentCode,
-                      )}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      S'informer sur le métier
-                    </a>
-                  </li>
+                  {currentImmersionOffer.appellations.length > 0 && (
+                    <li>
+                      <a
+                        href={makeAppellationInformationUrl(
+                          currentImmersionOffer.appellations[0].appellationCode,
+                          currentImmersionOffer.address.departmentCode,
+                        )}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        S'informer sur le métier
+                      </a>
+                    </li>
+                  )}
                   <li>
                     <a
                       href={makeNafClassInformationUrl(
@@ -260,7 +282,7 @@ export const ImmersionOfferPage = () => {
                   <h2 className={fr.cx("fr-h3", "fr-mb-2w")}>
                     {currentImmersionOffer.voluntaryToImmersion
                       ? "Contacter l'entreprise"
-                      : "Tentez votre chance"}
+                      : "Nos conseils pour cette première prise de contact ! "}
                   </h2>
                   {match(currentImmersionOffer?.contactMode)
                     .with("EMAIL", () => (
@@ -286,54 +308,6 @@ export const ImmersionOfferPage = () => {
                     ))
                     .with(P.nullish, () => (
                       <div>
-                        <p className={fr.cx("fr-mb-2w")}>
-                          Cette entreprise peut recruter sur ce métier et être
-                          intéressée pour vous recevoir en immersion. Tentez
-                          votre chance en la contactant !
-                        </p>
-                        <ul className={fr.cx("fr-btns-group", "fr-mt-3w")}>
-                          <li>
-                            {currentImmersionOffer?.website && (
-                              <a
-                                className={fr.cx("fr-btn", "fr-btn--secondary")}
-                                href={currentImmersionOffer?.website}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Aller sur le site de l'entreprise
-                              </a>
-                            )}
-                          </li>
-                          <li>
-                            <a
-                              className={fr.cx("fr-btn", "fr-btn--secondary")}
-                              href={getMapsLink(currentImmersionOffer)}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Localiser l'entreprise
-                            </a>
-                          </li>
-                          {currentImmersionOffer?.urlOfPartner && (
-                            <li>
-                              <a
-                                className={fr.cx("fr-btn", "fr-btn--secondary")}
-                                href={currentImmersionOffer.urlOfPartner}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {/* eslint-disable-next-line no-irregular-whitespace */}
-                                Trouver le contact sur La Bonne Boite
-                              </a>
-                            </li>
-                          )}
-                        </ul>
-                        <hr className={fr.cx("fr-hr", "fr-mt-2w")} />
-                        <h2 className={fr.cx("fr-h5")}>
-                          Nos conseils pour cette première prise de
-                          contact&nbsp;!{" "}
-                        </h2>
-
                         <h3 className={fr.cx("fr-h6")}>
                           Comment présenter votre demande ?{" "}
                         </h3>
