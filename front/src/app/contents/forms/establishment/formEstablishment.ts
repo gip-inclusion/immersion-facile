@@ -90,7 +90,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   },
   fitForDisabledWorkers: {
     label:
-      "Mon entreprise accueille en priorité des personnes en situation de handicap",
+      "Mon entreprise est prête à accueillir des personnes en situation de handicap",
     id: domElementIds.establishment.fitForDisabledWorkers,
   },
   appellations: {
