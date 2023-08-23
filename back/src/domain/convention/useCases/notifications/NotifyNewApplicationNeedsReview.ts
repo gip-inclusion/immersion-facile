@@ -1,5 +1,6 @@
 import {
   AgencyDto,
+  concatValidatorNames,
   ConventionDto,
   conventionSchema,
   ConventionStatus,
@@ -122,6 +123,9 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
               recipients.role === "counsellor"
                 ? "en vérifier l'éligibilité"
                 : "en considérer la validation",
+            validatorName: convention.validators?.agencyCounsellor
+              ? concatValidatorNames(convention.validators?.agencyCounsellor)
+              : "",
           },
         };
       }),

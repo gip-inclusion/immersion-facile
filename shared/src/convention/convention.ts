@@ -1,7 +1,15 @@
 import { keys, values } from "ramda";
 import { allSignatoryRoles, Role, SignatoryRole } from "../role/role.dto";
 import { DotNestedKeys, ExtractFromExisting } from "../utils";
-import { ConventionDto, ConventionStatus, Signatories } from "./convention.dto";
+import {
+  ConventionDto,
+  ConventionStatus,
+  ConventionValidator,
+  Signatories,
+} from "./convention.dto";
+
+export const concatValidatorNames = (validator: ConventionValidator): string =>
+  [validator.firstname, validator.lastname].join(" ").trim();
 
 export const allSignatoriesSigned = (signatories: Signatories) =>
   values(signatories).every((signatory) => !signatory || !!signatory.signedAt);
