@@ -105,6 +105,7 @@ export * from "./utils/address";
 export * from "./utils/beneficiary";
 export * from "./utils/csv";
 export * from "./utils/date";
+export * from "./utils/establishment";
 export * from "./utils/mergeObjectsExpectFalsyValues";
 export * from "./utils/postalCode";
 export * from "./utils/queryParams";
