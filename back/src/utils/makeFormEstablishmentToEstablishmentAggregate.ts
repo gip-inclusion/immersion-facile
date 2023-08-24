@@ -22,16 +22,18 @@ import { getSiretEstablishmentFromApi } from "../domain/sirene/service/getSirenE
 
 const offerFromFormScore = 10;
 
-const appelationToImmersionOfferEntity =
+const appellationToImmersionOfferEntity =
   (timeGateway: TimeGateway) =>
   ({
     romeCode,
     appellationCode,
     appellationLabel,
+    romeLabel,
   }: AppellationAndRomeDto): ImmersionOfferEntityV2 => ({
     romeCode,
     appellationCode,
     appellationLabel,
+    romeLabel,
     score: offerFromFormScore,
     createdAt: timeGateway.now(),
   });
@@ -177,7 +179,7 @@ const makeCreateEstablishmentAggregate =
 
     const immersionOffers: ImmersionOfferEntityV2[] =
       formEstablishment.appellations.map(
-        appelationToImmersionOfferEntity(timeGateway),
+        appellationToImmersionOfferEntity(timeGateway),
       );
 
     const establishment: EstablishmentEntity = {
