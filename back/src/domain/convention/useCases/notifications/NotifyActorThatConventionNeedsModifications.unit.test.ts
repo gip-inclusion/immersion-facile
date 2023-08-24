@@ -235,43 +235,39 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
   });
 
   describe("Wrong paths", () => {
-    it("Agency without counsellors", async () => {
+    it("throw when modifier role is beneficiary current employer and that is not defined in convention", async () => {
       const requesterRole: Role = "beneficiary";
-      const modifierRole: ModifierRole = "counsellor";
-      const agencyWithoutCounsellors = new AgencyDtoBuilder(agency)
-        .withCounsellorEmails([])
-        .build();
-      uow.agencyRepository.setAgencies([agencyWithoutCounsellors]);
+      const modifierRole: ModifierRole = "beneficiary-current-employer";
+
+      const conventionWithoutBeneficiaryCurrentEmployer =
+        new ConventionDtoBuilder().build();
 
       await expectPromiseToFailWith(
         usecase.execute({
-          convention,
+          convention: conventionWithoutBeneficiaryCurrentEmployer,
           justification: "OSEF",
           requesterRole,
           modifierRole,
-          agencyActorEmail: "not-existing-email@gmail.com",
         }),
-        `No actor with role ${modifierRole} for agency ${agencyWithoutCounsellors.id}`,
+        `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryCurrentEmployer.id}`,
       );
     });
 
-    it("Agency without validators", async () => {
+    it("throw when modifier role is beneficiary representative and that is not defined in convention", async () => {
       const requesterRole: Role = "beneficiary";
-      const modifierRole: ModifierRole = "validator";
-      const agencyWithoutValidators = new AgencyDtoBuilder(agency)
-        .withValidatorEmails([])
-        .build();
-      uow.agencyRepository.setAgencies([agencyWithoutValidators]);
+      const modifierRole: ModifierRole = "beneficiary-representative";
+
+      const conventionWithoutBeneficiaryRepresentative =
+        new ConventionDtoBuilder().build();
 
       await expectPromiseToFailWith(
         usecase.execute({
-          convention,
+          convention: conventionWithoutBeneficiaryRepresentative,
           justification: "OSEF",
           requesterRole,
           modifierRole,
-          agencyActorEmail: "not-existing-email@gmail.com",
         }),
-        `No actor with role ${modifierRole} for agency ${agencyWithoutValidators.id}`,
+        `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryRepresentative.id}`,
       );
     });
   });

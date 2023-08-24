@@ -48,7 +48,7 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
       );
     }
 
-    const recipientOrError = recipientByModifierRole(payload, agency);
+    const recipientOrError = recipientByModifierRole(payload);
     if (recipientOrError instanceof Error) throw recipientOrError;
 
     const requesterNameOrError = requesterNameByRole(
@@ -132,11 +132,8 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
 
 const recipientByModifierRole = (
   payload: ConventionRequiresModificationPayload,
-  agency: AgencyDto,
 ): string | Error => {
   const missingActorConventionErrorMessage = `No actor with role ${payload.modifierRole} for convention ${payload.convention.id}`;
-  const missingActorAgencyErrorMessage = `No actor with role ${payload.modifierRole} for agency ${agency.id}`;
-  const agencyEmails = [...agency.counsellorEmails, ...agency.validatorEmails];
   const strategy = match(payload)
     .with(
       { modifierRole: "beneficiary" },
@@ -150,69 +147,31 @@ const recipientByModifierRole = (
       {
         modifierRole: "beneficiary-current-employer",
         convention: {
-          signatories: {
-            beneficiaryCurrentEmployer: P.select(
-              P.when(
-                (beneficiaryCurrentEmployer) =>
-                  beneficiaryCurrentEmployer !== undefined,
-              ),
-            ),
-          },
+          signatories: P.select(),
         },
       },
-      (beneficiaryCurrentEmployer) => beneficiaryCurrentEmployer.email,
+      ({ beneficiaryCurrentEmployer }) =>
+        beneficiaryCurrentEmployer
+          ? beneficiaryCurrentEmployer.email
+          : new Error(missingActorConventionErrorMessage),
     )
     .with(
       {
         modifierRole: "beneficiary-representative",
         convention: {
-          signatories: {
-            beneficiaryRepresentative: P.select(
-              P.when(
-                (beneficiaryRepresentative) =>
-                  beneficiaryRepresentative !== undefined,
-              ),
-            ),
-          },
+          signatories: P.select(),
         },
       },
-      (beneficiaryRepresentative) => beneficiaryRepresentative.email,
-    )
-    .with(
-      {
-        modifierRole: "counsellor",
-        agencyActorEmail: P.select(
-          P.when(
-            (agencyActorEmail) =>
-              agencyActorEmail !== undefined &&
-              agencyEmails.find(
-                (agencyEmail) => agencyEmail === agencyActorEmail,
-              ),
-          ),
-        ),
-      },
-      (agencyActorEmail) => agencyActorEmail,
-    )
-    .with(
-      {
-        modifierRole: "validator",
-        agencyActorEmail: P.select(
-          P.when(
-            (agencyActorEmail) =>
-              agencyActorEmail !== undefined &&
-              agencyEmails.find(
-                (agencyEmail) => agencyEmail === agencyActorEmail,
-              ),
-          ),
-        ),
-      },
-      (agencyActorEmail) => agencyActorEmail,
+      ({ beneficiaryRepresentative }) =>
+        beneficiaryRepresentative
+          ? beneficiaryRepresentative.email
+          : new Error(missingActorConventionErrorMessage),
     )
     .with(
       { modifierRole: P.union("counsellor", "validator") },
-      () => new Error(missingActorAgencyErrorMessage),
+      (payload) => payload.agencyActorEmail,
     )
-    .otherwise(() => new Error(missingActorConventionErrorMessage));
+    .exhaustive();
 
   return strategy;
 };
