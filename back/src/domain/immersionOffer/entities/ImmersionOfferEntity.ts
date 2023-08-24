@@ -5,5 +5,6 @@ export type ImmersionOfferEntityV2 = {
   score: number;
   appellationCode: string;
   appellationLabel: string;
+  romeLabel: string;
   createdAt: Date;
 };
