@@ -453,6 +453,13 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
   consumer: "passeEmploi",
   createdAt: new Date("2021-12-20"),
   expirationDate: new Date("2022-01-01"),
+  contact: {
+    firstName: "",
+    lastName: "",
+    emails: [""],
+    phone: "",
+    job: "",
+  },
   isAuthorized: true,
 };
 

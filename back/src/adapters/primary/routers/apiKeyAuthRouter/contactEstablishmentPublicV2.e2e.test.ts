@@ -9,13 +9,13 @@ import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBui
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { TEST_POSITION } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import {
-  InMemoryEstablishmentAggregateRepository,
-  TEST_POSITION,
-} from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+  authorizedUnJeuneUneSolutionApiConsumer,
+  unauthorisedApiConsumer,
+} from "../../../secondary/InMemoryApiConsumerRepository";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
 
@@ -33,213 +33,206 @@ const contactEstablishment: ContactEstablishmentPublicV2Dto = {
 
 describe("POST contact-establishment public V2 route", () => {
   let request: SuperTest<Test>;
-  let generateApiJwt: GenerateApiConsumerJwt;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let sharedRequest: HttpClient<PublicApiV2Routes>;
   let authToken: string;
-  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
+  let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
-    const config = new AppConfigBuilder()
-      .withRepositories("IN_MEMORY")
-      .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
-      .build();
-
-    const {
-      request: testAppRequest,
-      generateApiConsumerJwt: testAppGenerateApiJwt,
-      inMemoryUow,
-    } = await buildTestApp(config);
-
-    request = testAppRequest;
-    generateApiJwt = testAppGenerateApiJwt;
-
-    authToken = generateApiJwt({
-      id: validAuthorizedApiKeyId,
+    ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp(
+      new AppConfigBuilder()
+        .withRepositories("IN_MEMORY")
+        .withAuthorizedApiKeyIds([authorizedUnJeuneUneSolutionApiConsumer.id])
+        .build(),
+    ));
+    inMemoryUow.apiConsumerRepository.consumers = [
+      authorizedUnJeuneUneSolutionApiConsumer,
+      unauthorisedApiConsumer,
+    ];
+    authToken = generateApiConsumerJwt({
+      id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });
-    establishmentAggregateRepository =
-      inMemoryUow.establishmentAggregateRepository;
-
     sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
   });
 
   it("refuses to contact if no api key is provided", async () => {
-    const response = await sharedRequest.contactEstablishment({
+    const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
         authorization: "",
       },
       body: {} as any,
     });
-    expectToEqual(response, {
-      status: 401,
-      body: { status: 401, message: "unauthenticated" },
-    });
+
+    expectToEqual(body, { status: 401, message: "unauthenticated" });
+    expectToEqual(status, 401);
   });
 
   it("returns 404 if siret not found", async () => {
-    const response = await sharedRequest.contactEstablishment({
+    const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
-        authorization: generateApiJwt(validApiConsumerJwtPayload),
+        authorization: generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
       },
       body: contactEstablishment,
     });
 
-    expectToEqual(response, {
+    expectToEqual(body, {
       status: 404,
-      body: {
-        status: 404,
-        message: `No establishment found with siret: ${contactEstablishment.siret}`,
-      },
+      message: `No establishment found with siret: ${contactEstablishment.siret}`,
     });
+    expectToEqual(status, 404);
   });
 
   it("rejects unauthorized consumer", async () => {
-    const authToken = generateApiJwt({
-      id: "my-unauthorized-id",
-    });
-
-    const response = await sharedRequest.contactEstablishment({
+    const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
-        authorization: authToken,
+        authorization: generateApiConsumerJwt({
+          id: unauthorisedApiConsumer.id,
+        }),
       },
       body: {} as any,
     });
 
-    expectToEqual(response, {
+    expectToEqual(body, {
       status: 403,
-      body: {
-        status: 403,
-        message: "unauthorised consumer Id",
-      },
+      message: "unauthorised consumer Id",
     });
+    expectToEqual(status, 403);
   });
 
   it("rejects invalid requests with error code 400", async () => {
-    const response = await sharedRequest.contactEstablishment({
+    const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
         authorization: authToken,
       },
       body: { ...contactEstablishment, siret: "wrong" },
     });
 
-    expectToEqual(response, {
+    expectToEqual(body, {
       status: 400,
-      body: {
-        status: 400,
-        message:
-          "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v2/contact-establishment",
-        issues: ["siret : SIRET doit être composé de 14 chiffres"],
-      },
+      message:
+        "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v2/contact-establishment",
+      issues: ["siret : SIRET doit être composé de 14 chiffres"],
     });
+    expectToEqual(status, 400);
   });
 
   it("rejects invalid requests with mismatching contact Mode with error code 400", async () => {
     const testEstablishmentContactMethod = "PHONE";
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(contactEstablishment.siret)
-            .withPosition(TEST_POSITION)
-            .withNumberOfEmployeeRange("10-19")
-            .withAddress(rueSaintHonoreDto)
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withContactMethod(testEstablishmentContactMethod)
-            .build(),
-        )
-        .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder()
-            .withAppellationCode(contactEstablishment.appellationCode)
-            .build(),
-        ])
-        .build(),
-    ]);
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+      [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(contactEstablishment.siret)
+              .withPosition(TEST_POSITION)
+              .withNumberOfEmployeeRange("10-19")
+              .withAddress(rueSaintHonoreDto)
+              .build(),
+          )
+          .withContact(
+            new ContactEntityBuilder()
+              .withContactMethod(testEstablishmentContactMethod)
+              .build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withAppellationCode(contactEstablishment.appellationCode)
+              .build(),
+          ])
+          .build(),
+      ],
+    );
 
-    const response = await sharedRequest.contactEstablishment({
+    const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
         authorization: authToken,
       },
       body: contactEstablishment,
     });
 
-    expectToEqual(response, {
+    expectToEqual(body, {
       status: 400,
-      body: {
-        status: 400,
-        message: `Contact mode mismatch: ${contactEstablishment.contactMode} in params. In contact (fetched with siret) : ${testEstablishmentContactMethod}`,
-      },
+      message: `Contact mode mismatch: ${contactEstablishment.contactMode} in params. In contact (fetched with siret) : ${testEstablishmentContactMethod}`,
     });
+    expectToEqual(status, 400);
   });
 
   it("rejects invalid requests with mismatching appellation Code with error code 400", async () => {
     const testEstablishmentAppellationCode = "11704";
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(contactEstablishment.siret)
-            .withPosition(TEST_POSITION)
-            .withNumberOfEmployeeRange("10-19")
-            .withAddress(rueSaintHonoreDto)
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-        )
-        .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder()
-            .withAppellationCode(testEstablishmentAppellationCode)
-            .build(),
-        ])
-        .build(),
-    ]);
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+      [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(contactEstablishment.siret)
+              .withPosition(TEST_POSITION)
+              .withNumberOfEmployeeRange("10-19")
+              .withAddress(rueSaintHonoreDto)
+              .build(),
+          )
+          .withContact(
+            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withAppellationCode(testEstablishmentAppellationCode)
+              .build(),
+          ])
+          .build(),
+      ],
+    );
 
-    const response = await sharedRequest.contactEstablishment({
+    const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
         authorization: authToken,
       },
       body: contactEstablishment,
     });
 
-    expectToEqual(response, {
+    expectToEqual(body, {
       status: 400,
-      body: {
-        status: 400,
-        message: `Establishment with siret '${contactEstablishment.siret}' doesn't have an immersion offer with appellation code '${contactEstablishment.appellationCode}'.`,
-      },
+      message: `Establishment with siret '${contactEstablishment.siret}' doesn't have an immersion offer with appellation code '${contactEstablishment.appellationCode}'.`,
     });
+    expectToEqual(status, 400);
   });
 
   it("contacts the establishment when everything goes right", async () => {
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(contactEstablishment.siret)
-            .withPosition(TEST_POSITION)
-            .withNumberOfEmployeeRange("10-19")
-            .withAddress(rueSaintHonoreDto)
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-        )
-        .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder()
-            .withAppellationCode(contactEstablishment.appellationCode)
-            .build(),
-        ])
-        .build(),
-    ]);
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+      [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(contactEstablishment.siret)
+              .withPosition(TEST_POSITION)
+              .withNumberOfEmployeeRange("10-19")
+              .withAddress(rueSaintHonoreDto)
+              .build(),
+          )
+          .withContact(
+            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withAppellationCode(contactEstablishment.appellationCode)
+              .build(),
+          ])
+          .build(),
+      ],
+    );
 
-    const response = await request
+    const { body, status } = await request
       .post(`/v2/contact-establishment`)
-      .set("Authorization", generateApiJwt(validApiConsumerJwtPayload))
+      .set(
+        "Authorization",
+        generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
+      )
       .send(contactEstablishment);
 
-    expect(response.status).toBe(201);
-    expect(response.body).toBe("");
+    expectToEqual(body, "");
+    expectToEqual(status, 201);
   });
 });

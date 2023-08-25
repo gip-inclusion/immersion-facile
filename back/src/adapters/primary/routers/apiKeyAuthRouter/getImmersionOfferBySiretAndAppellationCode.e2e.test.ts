@@ -17,7 +17,10 @@ import {
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+import {
+  authorizedUnJeuneUneSolutionApiConsumer,
+  unauthorisedApiConsumer,
+} from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
@@ -40,17 +43,20 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
   beforeEach(async () => {
     const config = new AppConfigBuilder()
       .withRepositories("IN_MEMORY")
-      .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
+      .withAuthorizedApiKeyIds([authorizedUnJeuneUneSolutionApiConsumer.id])
       .build();
     ({ request, inMemoryUow, generateApiConsumerJwt } = await buildTestApp(
       config,
     ));
     authToken = generateApiConsumerJwt({
-      id: validAuthorizedApiKeyId,
+      id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });
 
     sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
-
+    inMemoryUow.apiConsumerRepository.consumers = [
+      unauthorisedApiConsumer,
+      authorizedUnJeuneUneSolutionApiConsumer,
+    ];
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [
         new EstablishmentAggregateBuilder()
@@ -128,28 +134,27 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
   it("returns 404 if no offer can be found with such siret & appelation code", async () => {
     const siretNotInDB = "11000403200019";
 
-    const response = await sharedRequest.getOfferBySiretAndAppellationCode({
-      headers: {
-        authorization: authToken,
-      },
-      urlParams: {
-        appellationCode: styliste.appellationCode,
-        siret: siretNotInDB,
-      },
-    });
+    const { status, body } =
+      await sharedRequest.getOfferBySiretAndAppellationCode({
+        headers: {
+          authorization: authToken,
+        },
+        urlParams: {
+          appellationCode: styliste.appellationCode,
+          siret: siretNotInDB,
+        },
+      });
 
-    expectToEqual(response, {
+    expectToEqual(body, {
+      message: `No offer found for siret ${siretNotInDB} and appellation code ${styliste.appellationCode}`,
       status: 404,
-      body: {
-        message: `No offer found for siret ${siretNotInDB} and appellation code ${styliste.appellationCode}`,
-        status: 404,
-      },
     });
+    expectToEqual(status, 404);
   });
 
   it("return 403 if forbidden", async () => {
     const authToken = generateApiConsumerJwt({
-      id: "my-unauthorized-id",
+      id: unauthorisedApiConsumer.id,
     });
 
     const response = await sharedRequest.getOfferBySiretAndAppellationCode({

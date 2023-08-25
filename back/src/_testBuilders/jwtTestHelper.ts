@@ -1,16 +1,22 @@
 import {
-  ApiConsumerJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
   filterNotFalsy,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
-import { validAuthorizedApiKeyId } from "../adapters/secondary/InMemoryApiConsumerRepository";
-import { GenerateConventionJwt } from "../domain/auth/jwt";
+import {
+  GenerateApiConsumerJwt,
+  GenerateConventionJwt,
+} from "../domain/auth/jwt";
 
-export const generateConventionJwtTestFn: GenerateConventionJwt = (payload) => {
-  const { applicationId, role, iat } = payload;
-  return applicationId + ";" + role + ";" + iat;
-};
+export const generateApiConsumerJwtTestFn: GenerateApiConsumerJwt = ({ id }) =>
+  `FAKE-API-CONSUMER-JWT-${id}`;
+
+export const generateConventionJwtTestFn: GenerateConventionJwt = ({
+  applicationId,
+  emailHash,
+  role,
+  iat,
+}) => `${applicationId};${role};${iat}:${emailHash}`;
 
 export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
   email,
@@ -36,8 +42,4 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
     .filter(filterNotFalsy)
     .join("/");
   return `http://fake-magic-link/${targetRoute}/${fakeJwt}`;
-};
-
-export const validApiConsumerJwtPayload: ApiConsumerJwtPayload = {
-  id: validAuthorizedApiKeyId,
 };

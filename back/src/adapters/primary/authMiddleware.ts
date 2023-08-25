@@ -111,7 +111,11 @@ export const createApiKeyAuthMiddlewareV0 = (
   };
 };
 
-const responseError = (res: Response, message: string, status = 403) =>
+const responseError = (
+  res: Response,
+  message: string,
+  status = 403,
+): Response<any, Record<string, any>> =>
   res.status(status).json({ error: `forbidden: ${message}` });
 
 export const makeApiKeyAuthMiddlewareV1 = (

@@ -15,13 +15,12 @@ import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBui
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import {
   LegacyImmersionOfferId,
@@ -58,7 +57,7 @@ describe("Route to get immersion offer by id", () => {
     ({ request, inMemoryUow, generateApiConsumerJwt } = await buildTestApp(
       new AppConfigBuilder()
         .withRepositories("IN_MEMORY")
-        .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
+        .withAuthorizedApiKeyIds([authorizedUnJeuneUneSolutionApiConsumer.id])
         .build(),
     ));
   });
@@ -97,7 +96,12 @@ describe("Route to get immersion offer by id", () => {
 
     const response = await request
       .get(`/${getImmersionOfferByIdRoute__v0}/${immersionOfferId}`)
-      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload));
+      .set(
+        "Authorization",
+        generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
+      );
 
     expectToEqual(response.body, {
       id: immersionOfferId,
@@ -124,7 +128,12 @@ describe("Route to get immersion offer by id", () => {
 
     const response = await request
       .get(`/${getImmersionOfferByIdRoute__v0}/sfdfdsdf`)
-      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload));
+      .set(
+        "Authorization",
+        generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
+      );
 
     expectToEqual(response.statusCode, 400);
   });
@@ -136,7 +145,12 @@ describe("Route to get immersion offer by id", () => {
 
     const response = await request
       .get(`/${getImmersionOfferByIdRoute__v0}/${immersionOfferId}`)
-      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload));
+      .set(
+        "Authorization",
+        generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
+      );
 
     expectToEqual(response.statusCode, 404);
   });

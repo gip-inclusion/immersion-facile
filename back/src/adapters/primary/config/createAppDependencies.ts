@@ -86,6 +86,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateEditEstablishmentJwt,
     generateBackOfficeJwt,
     generateInclusionConnectJwt,
+    generateApiConsumerJwt,
     uowPerformer,
     uuidGenerator,
   );

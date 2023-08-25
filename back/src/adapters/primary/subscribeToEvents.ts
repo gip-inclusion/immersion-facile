@@ -108,6 +108,9 @@ const getUseCasesByTopics = (
 
   UserAuthenticatedSuccessfully: [],
   IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
+
+  //Api Consumer related:
+  ApiConsumerSaved: [],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {
