@@ -11,7 +11,10 @@ import {
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
-import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+import {
+  authorizedUnJeuneUneSolutionApiConsumer,
+  unauthorisedApiConsumer,
+} from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
@@ -33,9 +36,13 @@ describe("search-immersion route", () => {
   beforeEach(async () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
     inMemoryUow.romeRepository.appellations = [cartographeAppellationAndRome];
+    inMemoryUow.apiConsumerRepository.consumers = [
+      authorizedUnJeuneUneSolutionApiConsumer,
+      unauthorisedApiConsumer,
+    ];
     sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
     authToken = generateApiConsumerJwt({
-      id: validAuthorizedApiKeyId,
+      id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });
   });
 
@@ -56,7 +63,7 @@ describe("search-immersion route", () => {
 
       it("rejects unauthorized consumer", async () => {
         const authToken = generateApiConsumerJwt({
-          id: "my-unauthorized-id",
+          id: unauthorisedApiConsumer.id,
         });
         const response = await sharedRequest.searchImmersion({
           headers: {
@@ -129,7 +136,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: "my-authorized-id" }),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           );
         expect(response.body).toEqual(expectedResult);
         expect(response.status).toBe(200);
@@ -142,7 +151,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: "my-authorized-id" }),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           );
         expect(response.status).toBe(200);
       });
@@ -154,7 +165,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: "my-authorized-id" }),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           )
           .expect(200, []);
       });
@@ -166,7 +179,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: "my-authorized-id" }),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           )
           .expect(200, []);
       });

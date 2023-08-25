@@ -11,8 +11,11 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import {
+  authorizedUnJeuneUneSolutionApiConsumer,
+  unauthorisedApiConsumer,
+} from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
@@ -23,6 +26,10 @@ describe("search-immersion route", () => {
 
   beforeEach(async () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
+    inMemoryUow.apiConsumerRepository.consumers = [
+      authorizedUnJeuneUneSolutionApiConsumer,
+      unauthorisedApiConsumer,
+    ];
   });
 
   describe(`v1 - /v1/immersion-offers`, () => {
@@ -36,17 +43,19 @@ describe("search-immersion route", () => {
       });
 
       it("rejects unauthorized consumer", async () => {
-        await request
+        const { body, status } = await request
           .get(
             `/v1/immersion-offers?rome=XXXXX&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: "my-unauthorized-id" }),
-          )
-          .expect(403, {
-            error: "forbidden: unauthorised consumer Id",
-          });
+            generateApiConsumerJwt({ id: unauthorisedApiConsumer.id }),
+          );
+
+        expectToEqual(body, {
+          error: "forbidden: unauthorised consumer Id",
+        });
+        expectToEqual(status, 403);
       });
     });
 
@@ -80,7 +89,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt(validApiConsumerJwtPayload),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           );
         expectToEqual(response.body, [
           {
@@ -112,7 +123,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt(validApiConsumerJwtPayload),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           );
         expect(response.status).toBe(200);
       });
@@ -124,7 +137,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt(validApiConsumerJwtPayload),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           )
           .expect(200, []);
       });
@@ -136,7 +151,9 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt(validApiConsumerJwtPayload),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           )
           .expect(200, []);
       });
@@ -149,7 +166,9 @@ describe("search-immersion route", () => {
         )
         .set(
           "Authorization",
-          generateApiConsumerJwt(validApiConsumerJwtPayload),
+          generateApiConsumerJwt({
+            id: authorizedUnJeuneUneSolutionApiConsumer.id,
+          }),
         )
         .expect(400, /Code ROME incorrect/);
     });

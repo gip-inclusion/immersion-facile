@@ -1,50 +1,78 @@
 import { addYears, subYears } from "date-fns";
+import { values } from "ramda";
 import { ApiConsumer, ApiConsumerId } from "shared";
 import { ApiConsumerRepository } from "../../domain/auth/ports/ApiConsumerRepository";
+import { UuidV4Generator } from "./core/UuidGeneratorImplementations";
 
-/**
- *
- * It creates a stub that simulates it found a valid Api consumer payload
- */
+const uuidGenerator = new UuidV4Generator();
 
-export const validAuthorizedApiKeyId = "my-authorized-id";
-const unauthorizedId = "my-unauthorized-id";
-const outdatedId = "my-outdated-id";
+export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
+  id: uuidGenerator.new(),
+  consumer: "unJeuneUneSolution",
+  contact: {
+    firstName: "john",
+    lastName: "doe",
+    emails: ["mail@mail.com"],
+    job: "tech",
+    phone: "0611223344",
+  },
+  createdAt: new Date(),
+  expirationDate: addYears(new Date(), 1),
+  isAuthorized: true,
+  description: "a",
+};
 
-const now = new Date();
+export const unauthorisedApiConsumer: ApiConsumer = {
+  id: uuidGenerator.new(),
+  consumer: "unauthorised consumer",
+  contact: {
+    firstName: "john",
+    lastName: "doe",
+    emails: ["mail@mail.com"],
+    job: "tech",
+    phone: "0611223344",
+  },
+  createdAt: new Date(),
+  expirationDate: addYears(new Date(), 1),
+  isAuthorized: false,
+  description: "",
+};
+
+export const outdatedApiConsumer: ApiConsumer = {
+  id: uuidGenerator.new(),
+  consumer: "outdated consumer",
+  contact: {
+    firstName: "john",
+    lastName: "doe",
+    emails: ["mail@mail.com"],
+    job: "tech",
+    phone: "0611223344",
+  },
+  createdAt: subYears(new Date(), 2),
+  expirationDate: subYears(new Date(), 1),
+  isAuthorized: true,
+  description: "",
+};
 
 export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
-  async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
-    switch (id) {
-      case validAuthorizedApiKeyId:
-        return {
-          id: validAuthorizedApiKeyId,
-          consumer: "passeEmploi",
-          createdAt: now,
-          expirationDate: addYears(now, 1),
-          isAuthorized: true,
-        };
+  #consumers: Record<ApiConsumerId, ApiConsumer> = {};
 
-      case unauthorizedId:
-        return {
-          id: validAuthorizedApiKeyId,
-          consumer: "passeEmploi",
-          createdAt: now,
-          expirationDate: addYears(now, 1),
-          isAuthorized: false,
-        };
+  public get consumers(): ApiConsumer[] {
+    return values(this.#consumers);
+  }
 
-      case outdatedId:
-        return {
-          id: validAuthorizedApiKeyId,
-          consumer: "passeEmploi",
-          createdAt: subYears(now, 2),
-          expirationDate: subYears(now, 1),
-          isAuthorized: true,
-        };
+  public set consumers(consumers: ApiConsumer[]) {
+    this.#consumers = consumers.reduce<Record<ApiConsumerId, ApiConsumer>>(
+      (agg, consumer) => ({ ...agg, [consumer.id]: consumer }),
+      {},
+    );
+  }
 
-      default:
-        return;
-    }
+  public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
+    return this.#consumers[id];
+  }
+
+  public async save(apiConsumer: ApiConsumer): Promise<void> {
+    this.#consumers[apiConsumer.id] = apiConsumer;
   }
 }

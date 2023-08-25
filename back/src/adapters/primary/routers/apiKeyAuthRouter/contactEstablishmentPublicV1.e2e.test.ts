@@ -7,10 +7,9 @@ import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBui
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { TEST_POSITION } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV1Dto } from "../DtoAndSchemas/v1/input/ContactEstablishmentPublicV1.dto";
 
@@ -40,9 +39,12 @@ describe("POST contact-establishment public V1 route", () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp(
       new AppConfigBuilder()
         .withRepositories("IN_MEMORY")
-        .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
+        .withAuthorizedApiKeyIds([authorizedUnJeuneUneSolutionApiConsumer.id])
         .build(),
     ));
+    inMemoryUow.apiConsumerRepository.consumers = [
+      authorizedUnJeuneUneSolutionApiConsumer,
+    ];
   });
 
   it("refuses to contact if no api key is provided", async () => {
@@ -53,7 +55,12 @@ describe("POST contact-establishment public V1 route", () => {
   it("returns 404 if siret not found", async () => {
     const response = await request
       .post(`/v1/contact-establishment`)
-      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload))
+      .set(
+        "Authorization",
+        generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
+      )
       .send(contactEstablishment);
 
     expect(response.status).toBe(404);
@@ -87,7 +94,12 @@ describe("POST contact-establishment public V1 route", () => {
 
     const response = await request
       .post(`/v1/contact-establishment`)
-      .set("Authorization", generateApiConsumerJwt(validApiConsumerJwtPayload))
+      .set(
+        "Authorization",
+        generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
+      )
       .send(contactEstablishment);
 
     expect(response.body).toBe("");

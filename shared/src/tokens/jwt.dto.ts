@@ -27,5 +27,5 @@ export const currentJwtVersions: Record<PayloadKey, number> = {
 };
 
 export type JwtDto = {
-  jwt: string;
+  jwt: AppSupportedJwt;
 };

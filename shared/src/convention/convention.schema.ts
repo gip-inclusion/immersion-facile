@@ -85,7 +85,10 @@ export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
 
 const roleSchema = z.enum(allRoles);
-const phoneSchema = zString.regex(phoneRegExp, localization.invalidPhone);
+export const phoneSchema = zString.regex(
+  phoneRegExp,
+  localization.invalidPhone,
+);
 
 const modifierRolesSchema = z.enum(allModifierRoles);
 

@@ -10,10 +10,14 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
-import { validApiConsumerJwtPayload } from "../../../../_testBuilders/jwtTestHelper";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
+import {
+  authorizedUnJeuneUneSolutionApiConsumer,
+  outdatedApiConsumer,
+  unauthorisedApiConsumer,
+} from "../../../secondary/InMemoryApiConsumerRepository";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { FormEstablishmentDtoPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
@@ -29,6 +33,11 @@ describe("Add form establishment", () => {
   beforeEach(async () => {
     ({ request, inMemoryUow, generateApiConsumerJwt, gateways, eventCrawler } =
       await buildTestApp());
+    inMemoryUow.apiConsumerRepository.consumers = [
+      authorizedUnJeuneUneSolutionApiConsumer,
+      unauthorisedApiConsumer,
+      outdatedApiConsumer,
+    ];
   });
 
   describe("Route to post form establishments from front (hence, without API key)", () => {
@@ -41,12 +50,12 @@ describe("Add form establishment", () => {
         .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
         .build();
 
-      const response = await request
+      const { status, body } = await request
         .post(establishmentTargets.addFormEstablishment.url)
         .send(formEstablishment);
 
-      expectToEqual(response.status, 200);
-      expectToEqual(response.body, "");
+      expectToEqual(status, 200);
+      expectToEqual(body, "");
       expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
         formEstablishment,
       ]);
@@ -73,7 +82,7 @@ describe("Add form establishment", () => {
 
       const email = "tiredofthismess@seriously.com";
 
-      const response = await request
+      const { body, status } = await request
         .post(establishmentTargets.addFormEstablishment.url)
         .send(
           FormEstablishmentDtoBuilder.valid()
@@ -82,7 +91,8 @@ describe("Add form establishment", () => {
             .build(),
         );
 
-      expect(response.status).toBe(200);
+      expectToEqual(body, "");
+      expectToEqual(status, 200);
 
       await processEventsForEmailToBeSent(eventCrawler);
 
@@ -98,17 +108,22 @@ describe("Add form establishment", () => {
     describe("v0", () => {
       // we don't want to use variables from src/routes.ts so that we can check if contract breaks
       it("forbids access to route if no api consumer", async () => {
-        const response = await request.post(`/immersion-offers`).send({});
+        const { body, status } = await request
+          .post(`/immersion-offers`)
+          .send({});
 
-        expect(response.status).toBe(403);
+        expectToEqual(body, { errors: "Accès refusé" });
+        expectToEqual(status, 403);
       });
 
       it("support adding establishment from known api consumer", async () => {
-        const response = await request
+        const { body, status } = await request
           .post(`/immersion-offers`)
           .set(
             "Authorization",
-            generateApiConsumerJwt(validApiConsumerJwtPayload),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           )
           .send({
             businessAddress: "1 Rue du Moulin 12345 Quelque Part",
@@ -146,8 +161,8 @@ describe("Add form establishment", () => {
             ],
           } satisfies FormEstablishmentDtoPublicV0);
 
-        expect(response.body).toBe("");
-        expect(response.status).toBe(200);
+        expectToEqual(body, "");
+        expectToEqual(status, 200);
       });
     });
 
@@ -155,73 +170,80 @@ describe("Add form establishment", () => {
       const consumerv1FormEstablishmentsRoute = `/v1/form-establishments`;
 
       it("forbids access to route if no api consumer", async () => {
-        const response = await request
+        const { body, status } = await request
           .post(consumerv1FormEstablishmentsRoute)
           .send({});
-        expect(response.body).toEqual({ error: "forbidden: unauthenticated" });
-        expect(response.status).toBe(401);
+
+        expectToEqual(body, {
+          error: "forbidden: unauthenticated",
+        });
+        expectToEqual(status, 401);
       });
 
       it("forbids access to route if invalid jwt", async () => {
-        const response = await request
+        const { body, status } = await request
           .post(consumerv1FormEstablishmentsRoute)
           .set("Authorization", "jwt-invalid")
           .send({});
 
-        expect(response.body).toEqual({ error: "forbidden: incorrect Jwt" });
-        expect(response.status).toBe(401);
+        expectToEqual(body, {
+          error: "forbidden: incorrect Jwt",
+        });
+        expectToEqual(status, 401);
       });
 
       it("forbids adding establishment from unauthorized api consumer", async () => {
-        const response = await request
+        const { body, status } = await request
           .post(consumerv1FormEstablishmentsRoute)
           .set("Authorization", generateApiConsumerJwt({ id: "my-unknown-id" }))
           .send({});
 
-        expect(response.body).toEqual({
+        expectToEqual(body, {
           error: "forbidden: consumer not found",
         });
-        expect(response.status).toBe(403);
+        expectToEqual(status, 403);
       });
 
       it("forbids access to route if id is unauthorized", async () => {
-        const response = await request
+        const { body, status } = await request
           .post(consumerv1FormEstablishmentsRoute)
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: "my-unauthorized-id" }),
+            generateApiConsumerJwt({ id: unauthorisedApiConsumer.id }),
           )
           .send({});
 
-        expect(response.body).toEqual({
+        expectToEqual(body, {
           error: "forbidden: unauthorised consumer Id",
         });
-        expect(response.status).toBe(403);
+        expectToEqual(status, 403);
       });
 
       it("forbids access to route if token has expired", async () => {
         gateways.timeGateway.setNextDate(new Date());
 
-        const response = await request
+        const { body, status } = await request
           .post(consumerv1FormEstablishmentsRoute)
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: "my-outdated-id" }),
+            generateApiConsumerJwt({ id: outdatedApiConsumer.id }),
           )
           .send({});
 
-        expectToEqual(response.body, {
+        expectToEqual(body, {
           error: "forbidden: expired token",
         });
-        expect(response.status).toBe(403);
+        expectToEqual(status, 403);
       });
 
       it("support adding establishment from known api consumer (for exemple Un Jeune Une Solution)", async () => {
-        const response = await request
+        const { status, body } = await request
           .post(consumerv1FormEstablishmentsRoute)
           .set(
             "Authorization",
-            generateApiConsumerJwt(validApiConsumerJwtPayload),
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
           )
           .send({
             ...FormEstablishmentDtoBuilder.valid()
@@ -231,7 +253,8 @@ describe("Add form establishment", () => {
             businessAddress: avenueChampsElysees,
           } satisfies FormEstablishmentDtoPublicV1);
 
-        expect(response.status).toBe(200);
+        expectToEqual(body, "");
+        expectToEqual(status, 200);
       });
     });
   });

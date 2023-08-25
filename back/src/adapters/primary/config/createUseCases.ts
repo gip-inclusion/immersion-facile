@@ -3,11 +3,13 @@ import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
+  GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../../domain/auth/jwt";
+import { SaveApiConsumer } from "../../../domain/auth/useCases/SaveApiConsumer";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
 import { ListAgenciesByFilter } from "../../../domain/convention/useCases/agencies/ListAgenciesByFilter";
@@ -98,6 +100,7 @@ export const createUseCases = (
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
   generateBackOfficeJwt: GenerateBackOfficeJwt,
   generateAuthenticatedUserToken: GenerateInclusionConnectJwt,
+  generateApiConsumerJwt: GenerateApiConsumerJwt,
   uowPerformer: UnitOfWorkPerformer,
   uuidGenerator: UuidGenerator,
 ) => {
@@ -442,6 +445,11 @@ export const createUseCases = (
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
       updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
+      saveApiConsumer: new SaveApiConsumer(
+        uowPerformer,
+        createNewEvent,
+        generateApiConsumerJwt,
+      ),
     }),
     ...instantiatedUseCasesFromFunctions({
       getFeatureFlags: (_: void) =>
