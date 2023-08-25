@@ -1,9 +1,10 @@
 import { Pool, PoolClient } from "pg";
 import { ApiConsumer, expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
-describe("PG GetApiConsumerById", () => {
+describe("PgApiConsumerRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let apiConsumerRepository: PgApiConsumerRepository;
@@ -20,36 +21,53 @@ describe("PG GetApiConsumerById", () => {
     await pool.end();
   });
 
-  it("gets the ApiConsumer from it's ID", async () => {
+  it("save & getById", async () => {
     const apiConsumer: ApiConsumer = {
-      id: "11111111-1111-1111-1111-111111111111",
+      id: new UuidV4Generator().new(),
       consumer: "passeEmploi",
       description: "my description",
+      contact: {
+        firstName: "john",
+        lastName: "doe",
+        emails: ["email@mail.com"],
+        job: "job",
+        phone: "0644889977",
+      },
       createdAt: new Date(),
       expirationDate: new Date(),
       isAuthorized: true,
     };
 
-    await insertInTable(apiConsumer);
-
-    const apiConsumerFetched = await apiConsumerRepository.getById(
-      apiConsumer.id,
+    expectToEqual(
+      await apiConsumerRepository.getById(apiConsumer.id),
+      undefined,
     );
 
-    expectToEqual(apiConsumerFetched, apiConsumer);
+    await apiConsumerRepository.save(apiConsumer);
+    expectToEqual(
+      await apiConsumerRepository.getById(apiConsumer.id),
+      apiConsumer,
+    );
+
+    const updatedApiConsumer: ApiConsumer = {
+      id: apiConsumer.id,
+      consumer: "passeEmploiupdated",
+      contact: {
+        firstName: "john 5",
+        lastName: "manson",
+        emails: ["john-v@mail.com"],
+        job: "guitariste",
+        phone: "0606660666",
+      },
+      createdAt: new Date(),
+      expirationDate: new Date(),
+      isAuthorized: false,
+    };
+
+    await apiConsumerRepository.save(updatedApiConsumer);
+    expectToEqual(
+      await apiConsumerRepository.getById(apiConsumer.id),
+      updatedApiConsumer,
+    );
   });
-
-  const insertInTable = async ({
-    id,
-    consumer,
-    description,
-    isAuthorized,
-    createdAt,
-    expirationDate,
-  }: ApiConsumer) => {
-    await client.query(
-      `INSERT INTO api_consumers (id, consumer, description, is_authorized, created_at, expiration_date)
-        VALUES ('${id}', '${consumer}', '${description}', ${isAuthorized}, '${createdAt.toISOString()}', '${expirationDate.toISOString()}');`,
-    );
-  };
 });
