@@ -2,6 +2,8 @@ import { from, map, Observable } from "rxjs";
 import {
   AbsoluteUrl,
   AdminRoutes,
+  ApiConsumer,
+  ApiConsumerJwt,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -97,6 +99,10 @@ export class HttpAdminGateway implements AdminGateway {
         throw new Error(JSON.stringify(response.body));
       }),
     );
+  }
+
+  saveApiConsumer$(apiConsumer: ApiConsumer): Observable<ApiConsumerJwt> {
+    return from(this.httpClient.todo());
   }
 
   public updateUserRoleForAgency$(
