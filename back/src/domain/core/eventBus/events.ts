@@ -91,7 +91,8 @@ export type DomainEvent =
   | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>
   | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyIds: AgencyId[] }>
   | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>
-  | GenericEvent<"ApiConsumerSaved", {consumerId:string}>;
+  // API CONSUMER related
+  | GenericEvent<"ApiConsumerSaved", { consumerId: string }>;
 
 export type DomainTopic = DomainEvent["topic"];
 

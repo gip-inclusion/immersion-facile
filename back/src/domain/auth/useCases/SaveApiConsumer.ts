@@ -4,7 +4,10 @@ import {
   BackOfficeDomainPayload,
   JwtDto,
 } from "shared";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -36,7 +39,11 @@ export class SaveApiConsumer extends TransactionalUseCase<
     uow: UnitOfWork,
     payload?: BackOfficeDomainPayload,
   ): Promise<JwtDto> {
-    if (!payload) throw new ForbiddenError();
+    if (!payload) throw new UnauthorizedError();
+    if (payload.role !== "backOffice")
+      throw new ForbiddenError(
+        "Provided JWT payload does not have sufficient privileges. Received role: 'beneficiary'",
+      );
 
     await uow.apiConsumerRepository.save(input);
     await uow.outboxRepository.save(
