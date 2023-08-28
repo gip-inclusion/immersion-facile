@@ -1,4 +1,8 @@
-import { EstablishmentJwtPayload, expectPromiseToFailWithError } from "shared";
+import {
+  EstablishmentJwtPayload,
+  expectPromiseToFailWithError,
+  immersionFacileNoReplyEmailSender,
+} from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
@@ -106,6 +110,7 @@ describe("SuggestEditEstablishment", () => {
         {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
           recipients: [contactEmail],
+          sender: immersionFacileNoReplyEmailSender,
           cc: copyEmails,
           params: {
             editFrontUrl:

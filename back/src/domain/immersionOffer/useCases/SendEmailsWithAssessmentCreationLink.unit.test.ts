@@ -1,4 +1,9 @@
-import { ConventionDtoBuilder, ConventionId, expectToEqual } from "shared";
+import {
+  ConventionDtoBuilder,
+  ConventionId,
+  expectToEqual,
+  immersionFacileNoReplyEmailSender,
+} from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
@@ -8,9 +13,9 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { DomainEvent } from "../../../domain/core/eventBus/events";
-import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { DomainEvent } from "../../core/eventBus/events";
+import { SendEmailsWithAssessmentCreationLink } from "./SendEmailsWithAssessmentCreationLink";
 
 describe("SendEmailWithImmersionAssessmentCreationLink", () => {
   const id: ConventionId = "immersion-ending-tomorrow-id";
@@ -69,6 +74,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         recipients: [
           immersionApplicationEndingTomorrow.establishmentTutor.email,
         ],
+        sender: immersionFacileNoReplyEmailSender,
         params: {
           agencyLogoUrl: expectedAgency.logoUrl,
           agencyValidatorEmail: expectedAgency.validatorEmails[0],

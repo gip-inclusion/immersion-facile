@@ -1,6 +1,7 @@
 import {
   addressDtoToString,
   createEstablishmentJwtPayload,
+  immersionFacileNoReplyEmailSender,
   SiretDto,
   siretSchema,
 } from "shared";
@@ -59,6 +60,7 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
         kind: "email",
         templatedContent: {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+          sender: immersionFacileNoReplyEmailSender,
           recipients: [contact.email],
           cc: contact.copyEmails,
           params: {

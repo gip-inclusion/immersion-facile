@@ -1,4 +1,8 @@
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
+import {
+  expectPromiseToFailWithError,
+  expectToEqual,
+  immersionFacileNoReplyEmailSender,
+} from "shared";
 import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -146,10 +150,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
               email: `${discussionId1}_e@reply.my-domain.com`,
               name: `${discussion1.establishmentContact.firstName} ${discussion1.establishmentContact.lastName} - ${discussion1.businessName}`,
             },
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: immersionFacileNoReplyEmailSender,
             cc: [],
             attachments: [
               {
@@ -170,10 +171,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
               email: `${discussionId2}_b@reply.my-domain.com`,
               name: `${discussion2.potentialBeneficiary.firstName} ${discussion2.potentialBeneficiary.lastName}`,
             },
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
+            sender: immersionFacileNoReplyEmailSender,
             cc: discussion2.establishmentContact.copyEmails,
             attachments: [
               {

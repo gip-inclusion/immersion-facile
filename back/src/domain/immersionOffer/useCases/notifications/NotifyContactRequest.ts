@@ -3,6 +3,7 @@ import {
   addressDtoToString,
   ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
+  immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
   BadRequestError,
@@ -73,6 +74,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           templatedContent: {
             kind: "CONTACT_BY_EMAIL_REQUEST",
             recipients: [establishmentContact.email],
+            sender: immersionFacileNoReplyEmailSender,
             replyTo: {
               email: createOpaqueEmail(
                 payload.discussionId,
@@ -109,6 +111,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           templatedContent: {
             kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
             recipients: [potentialBeneficiary.email],
+            sender: immersionFacileNoReplyEmailSender,
             params: {
               businessName: discussion.businessName,
               contactFirstName: establishmentContact.firstName,
@@ -128,6 +131,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           templatedContent: {
             kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
             recipients: [potentialBeneficiary.email],
+            sender: immersionFacileNoReplyEmailSender,
             params: {
               businessName: discussion.businessName,
               contactFirstName: establishmentContact.firstName,
