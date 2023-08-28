@@ -1,9 +1,14 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { RootState } from "src/core-logic/storeConfig/store";
+import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const searchResults = (state: RootState) => state.search.searchResults;
+const searchState = createRootSelector((state) => state.search);
 
-const searchStatus = (state: RootState) => state.search.searchStatus;
+const searchResults = createSelector(
+  searchState,
+  (state) => state.searchResults,
+);
+
+const searchStatus = createSelector(searchState, (state) => state.searchStatus);
 
 const searchInfo = createSelector(
   searchStatus,
@@ -17,9 +22,20 @@ const searchInfo = createSelector(
     return null;
   },
 );
+const isLoading = createSelector(searchState, (state) => state.isLoading);
+
+const currentSearchResult = createSelector(
+  searchState,
+  (state) => state.currentSearchResult,
+);
+
+const feedback = createSelector(searchState, (state) => state.feedback);
 
 export const searchSelectors = {
   searchResults,
   searchStatus,
   searchInfo,
+  isLoading,
+  currentSearchResult,
+  feedback,
 };

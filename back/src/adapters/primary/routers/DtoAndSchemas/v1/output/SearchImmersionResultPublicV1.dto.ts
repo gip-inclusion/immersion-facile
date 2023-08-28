@@ -2,7 +2,7 @@ import {
   addressDtoToString,
   GeoPositionDto,
   RomeCode,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SiretDto,
 } from "shared";
 import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
@@ -29,7 +29,7 @@ export type SearchImmersionResultPublicV1 = {
 export const domainToSearchImmersionResultPublicV1 = ({
   appellations,
   ...domain
-}: SearchImmersionResultDto): SearchImmersionResultPublicV1 => ({
+}: SearchResultDto): SearchImmersionResultPublicV1 => ({
   ...domain,
   appellationLabels: appellations.map(
     (appellation) => appellation.appellationLabel,

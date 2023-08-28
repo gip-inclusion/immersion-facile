@@ -7,7 +7,7 @@ import {
   path,
   pathEq,
   replaceArrayElement,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SiretDto,
 } from "shared";
 import {
@@ -70,7 +70,7 @@ export class InMemoryEstablishmentAggregateRepository
   public async getSearchImmersionResultDtoBySiretAndAppellationCode(
     siret: SiretDto,
     appellationCode: AppellationCode,
-  ): Promise<SearchImmersionResultDto | undefined> {
+  ): Promise<SearchResultDto | undefined> {
     const aggregate = this.establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );
@@ -91,7 +91,7 @@ export class InMemoryEstablishmentAggregateRepository
   public async getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
     rome: string,
-  ): Promise<SearchImmersionResultDto | undefined> {
+  ): Promise<SearchResultDto | undefined> {
     const aggregate = this.establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );

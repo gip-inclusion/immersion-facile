@@ -9,7 +9,7 @@ import {
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
   expectToEqual,
-  SearchImmersionResultDto,
+  SearchResultDto,
 } from "shared";
 import {
   rueBitcheDto,
@@ -153,7 +153,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         // Act
-        const searchResult: SearchImmersionResultDto[] =
+        const searchResult: SearchResultDto[] =
           await pgEstablishmentAggregateRepository.searchImmersionResults({
             searchMade: searchMadeWithoutRome,
             maxResults: 1,
@@ -194,12 +194,12 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         // Act
-        const searchResult: SearchImmersionResultDto[] =
+        const searchResult: SearchResultDto[] =
           await pgEstablishmentAggregateRepository.searchImmersionResults({
             searchMade: searchMadeWithoutRome,
           });
 
-        const expectedResult: Partial<SearchImmersionResultDto>[] = [
+        const expectedResult: Partial<SearchResultDto>[] = [
           {
             rome: "A1101",
             siret: "78000403200029",
@@ -369,7 +369,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
 
       // Act
-      const searchResult: SearchImmersionResultDto[] =
+      const searchResult: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: cartographeSearchMade,
         });
@@ -377,7 +377,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Assert : one match and defined contact details
       expect(searchResult).toHaveLength(1);
 
-      const expectedResult: Partial<SearchImmersionResultDto> = {
+      const expectedResult: Partial<SearchResultDto> = {
         rome: cartographeImmersionOffer.romeCode,
         romeLabel: "Information géographique",
         appellations: [
@@ -513,7 +513,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
 
       // Act
-      const searchResult: SearchImmersionResultDto[] =
+      const searchResult: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: cartographeSearchMade,
         });

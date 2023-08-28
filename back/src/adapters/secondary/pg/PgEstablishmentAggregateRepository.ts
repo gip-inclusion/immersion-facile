@@ -6,7 +6,7 @@ import {
   AppellationCode,
   GeoPositionDto,
   RomeCode,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SearchSortedBy,
   SiretDto,
 } from "shared";
@@ -232,7 +232,7 @@ export class PgEstablishmentAggregateRepository
   public async getSearchImmersionResultDtoBySiretAndAppellationCode(
     siret: SiretDto,
     appellationCode: AppellationCode,
-  ): Promise<SearchImmersionResultDto | undefined> {
+  ): Promise<SearchResultDto | undefined> {
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
@@ -253,7 +253,7 @@ export class PgEstablishmentAggregateRepository
   public async getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
     rome: RomeCode,
-  ): Promise<SearchImmersionResultDto | undefined> {
+  ): Promise<SearchResultDto | undefined> {
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `

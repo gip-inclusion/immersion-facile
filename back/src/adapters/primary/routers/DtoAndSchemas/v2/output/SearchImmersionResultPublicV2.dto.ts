@@ -3,7 +3,7 @@ import {
   AppellationDto,
   GeoPositionDto,
   RomeCode,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SiretDto,
 } from "shared";
 import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
@@ -27,5 +27,5 @@ export type SearchImmersionResultPublicV2 = {
 };
 
 export const domainToSearchImmersionResultPublicV2 = (
-  searchImmersionResult: SearchImmersionResultDto,
+  searchImmersionResult: SearchResultDto,
 ): SearchImmersionResultPublicV2 => searchImmersionResult;

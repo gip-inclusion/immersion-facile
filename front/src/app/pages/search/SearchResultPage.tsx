@@ -19,11 +19,11 @@ import { ContactByEmail } from "src/app/components/immersion-offer/ContactByEmai
 import { ContactByPhone } from "src/app/components/immersion-offer/ContactByPhone";
 import { ContactInPerson } from "src/app/components/immersion-offer/ContactInPerson";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { ImmersionOfferLabels } from "src/app/components/search/ImmersionOfferLabels";
+import { SearchResultLabels } from "src/app/components/search/SearchResultLabels";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
-import { immersionOfferSelectors } from "src/core-logic/domain/immersionOffer/immersionOffer.selectors";
-import { immersionOfferSlice } from "src/core-logic/domain/immersionOffer/immersionOffer.slice";
+import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -37,7 +37,7 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   }
 };
 
-const ImmersionOfferSection = ({
+const SearchResultSection = ({
   title,
   children,
 }: {
@@ -50,25 +50,32 @@ const ImmersionOfferSection = ({
   </div>
 );
 
-export const ImmersionOfferPage = () => {
-  const route = useRoute() as Route<typeof routes.immersionOffer>;
-  const currentImmersionOffer = useAppSelector(
-    immersionOfferSelectors.currentImmersionOffer,
+export const SearchResultPage = () => {
+  const route = useRoute() as Route<
+    typeof routes.searchResult | typeof routes.searchResultExternal
+  >;
+  const currentSearchResult = useAppSelector(
+    searchSelectors.currentSearchResult,
   );
-  const feedback = useAppSelector(immersionOfferSelectors.feedback);
-  const isLoading = useAppSelector(immersionOfferSelectors.isLoading);
+  const feedback = useAppSelector(searchSelectors.feedback);
+  const isLoading = useAppSelector(searchSelectors.isLoading);
   const formContactRef = useRef<HTMLDivElement | null>(null);
+  const [shouldShowError, setShouldShowError] = useState<boolean>(false);
   const dispatch = useDispatch();
   const [showConfirmationMessage, setShowConfirmationMessage] = useState<
     string | null
   >(null);
   useEffect(() => {
-    dispatch(
-      immersionOfferSlice.actions.fetchImmersionOfferRequested({
-        siret: route.params.siret,
-        appellationCode: route.params.appellationCode,
-      }),
-    );
+    if ("appellationCode" in route.params) {
+      dispatch(
+        searchSlice.actions.fetchSearchResultRequested({
+          siret: route.params.siret,
+          appellationCode: route.params.appellationCode,
+        }),
+      );
+    } else {
+      setShouldShowError(true);
+    }
   }, []);
   const pluralFromAppellations = (appellations: AppellationDto[] | undefined) =>
     appellations && appellations.length > 1 ? "s" : "";
@@ -77,7 +84,7 @@ export const ImmersionOfferPage = () => {
       behavior: "smooth",
     });
     setShowConfirmationMessage(
-      getFeedBackMessage(currentImmersionOffer?.contactMode),
+      getFeedBackMessage(currentSearchResult?.contactMode),
     );
   };
   const scrollToContactForm = () => {
@@ -85,39 +92,36 @@ export const ImmersionOfferPage = () => {
       behavior: "smooth",
     });
   };
-  const onGoBackClick = () => {
-    if (window.history.length > 2) {
-      window.history.back();
-      return;
-    }
-    routes.search().push();
-  };
+  const onGoBackClick = () =>
+    window.history.length > 2 ? window.history.back() : routes.search().push();
+
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
         <>
           {isLoading && <Loader />}
-          {!currentImmersionOffer && feedback.kind === "errored" && (
-            <>
-              <Alert
-                title="Oups !"
-                description="L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
-                severity="error"
-                className={fr.cx("fr-my-4w")}
-              />
-              <Button
-                type="button"
-                onClick={onGoBackClick}
-                priority="tertiary"
-                iconId="fr-icon-arrow-left-line"
-                iconPosition="left"
-                className={fr.cx("fr-mt-1w")}
-              >
-                Retour à la recherche
-              </Button>
-            </>
-          )}
-          {currentImmersionOffer && showConfirmationMessage === null && (
+          {!currentSearchResult &&
+            (feedback.kind === "errored" || shouldShowError) && (
+              <>
+                <Alert
+                  title="Oups !"
+                  description="L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
+                  severity="error"
+                  className={fr.cx("fr-my-4w")}
+                />
+                <Button
+                  type="button"
+                  onClick={onGoBackClick}
+                  priority="tertiary"
+                  iconId="fr-icon-arrow-left-line"
+                  iconPosition="left"
+                  className={fr.cx("fr-mt-1w")}
+                >
+                  Retour à la recherche
+                </Button>
+              </>
+            )}
+          {currentSearchResult && showConfirmationMessage === null && (
             <>
               <div className={fr.cx("fr-mb-4w")}>
                 <Button
@@ -130,72 +134,67 @@ export const ImmersionOfferPage = () => {
                   Retour
                 </Button>
               </div>
-              <ImmersionOfferLabels
-                voluntaryToImmersion={
-                  currentImmersionOffer.voluntaryToImmersion
-                }
-                contactMode={currentImmersionOffer.contactMode}
+              <SearchResultLabels
+                voluntaryToImmersion={currentSearchResult.voluntaryToImmersion}
+                contactMode={currentSearchResult.contactMode}
                 fitForDisabledWorkers={
-                  currentImmersionOffer.fitForDisabledWorkers
+                  currentSearchResult.fitForDisabledWorkers
                 }
               />
               <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
-                {currentImmersionOffer?.name}
+                {currentSearchResult.name}
               </h1>
-              <ImmersionOfferSection title="Addresse">
+              <SearchResultSection title="Addresse">
                 <>
                   <p>
-                    {currentImmersionOffer?.address.streetNumberAndAddress}
+                    {currentSearchResult.address.streetNumberAndAddress}
                     {", "}
                     <span>
-                      {currentImmersionOffer?.address.postcode}{" "}
-                      {currentImmersionOffer?.address.city}
+                      {currentSearchResult.address.postcode}{" "}
+                      {currentSearchResult.address.city}
                     </span>
                   </p>
                   <p>
                     SIRET&nbsp;:{" "}
                     <a
-                      href={makeSiretDescriptionLink(
-                        currentImmersionOffer?.siret,
-                      )}
+                      href={makeSiretDescriptionLink(currentSearchResult.siret)}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {currentImmersionOffer?.siret}
+                      {currentSearchResult.siret}
                     </a>
                   </p>
                 </>
-              </ImmersionOfferSection>
-              <ImmersionOfferSection title="Secteur d'activité :">
+              </SearchResultSection>
+              <SearchResultSection title="Secteur d'activité :">
                 <p>
-                  {currentImmersionOffer?.romeLabel} (
-                  {currentImmersionOffer?.rome})
+                  {currentSearchResult.romeLabel} ({currentSearchResult.rome})
                 </p>
-              </ImmersionOfferSection>
+              </SearchResultSection>
 
-              {currentImmersionOffer.appellations.length > 0 && (
-                <ImmersionOfferSection
+              {currentSearchResult.appellations.length > 0 && (
+                <SearchResultSection
                   title={`Métier${pluralFromAppellations(
-                    currentImmersionOffer?.appellations,
+                    currentSearchResult.appellations,
                   )} observable${pluralFromAppellations(
-                    currentImmersionOffer?.appellations,
+                    currentSearchResult.appellations,
                   )} :`}
                 >
                   <p>
-                    {currentImmersionOffer?.appellations
+                    {currentSearchResult.appellations
                       .map((appellation) => `${appellation.appellationLabel}`)
                       .join(", ")}
                   </p>
-                </ImmersionOfferSection>
+                </SearchResultSection>
               )}
-              <ImmersionOfferSection>
-                {currentImmersionOffer.voluntaryToImmersion && (
+              <SearchResultSection>
+                {currentSearchResult.voluntaryToImmersion && (
                   <Button type="button" onClick={scrollToContactForm}>
                     Contacter l'entreprise
                   </Button>
                 )}
 
-                {!currentImmersionOffer.voluntaryToImmersion && (
+                {!currentSearchResult.voluntaryToImmersion && (
                   <ButtonsGroup
                     inlineLayoutWhen="md and up"
                     buttons={[
@@ -206,43 +205,44 @@ export const ImmersionOfferPage = () => {
                       },
                       {
                         linkProps: {
-                          href: currentImmersionOffer?.urlOfPartner,
+                          href: currentSearchResult.urlOfPartner,
+                          target: "_blank",
                         },
                         children: "Voir l'offre sur La Bonne Boite",
                       },
                     ]}
                   />
                 )}
-              </ImmersionOfferSection>
-              <ImmersionOfferSection title="Nombre de salariés">
-                <p>{currentImmersionOffer?.numberOfEmployeeRange}</p>
-              </ImmersionOfferSection>
+              </SearchResultSection>
+              <SearchResultSection title="Nombre de salariés">
+                <p>{currentSearchResult.numberOfEmployeeRange}</p>
+              </SearchResultSection>
 
-              {currentImmersionOffer?.additionalInformation && (
-                <ImmersionOfferSection title="Informations complémentaires">
-                  <p>{currentImmersionOffer?.additionalInformation}</p>
-                </ImmersionOfferSection>
+              {currentSearchResult.additionalInformation && (
+                <SearchResultSection title="Informations complémentaires">
+                  <p>{currentSearchResult.additionalInformation}</p>
+                </SearchResultSection>
               )}
 
-              {currentImmersionOffer.website && (
-                <ImmersionOfferSection title="Site web">
+              {currentSearchResult.website && (
+                <SearchResultSection title="Site web">
                   <a
-                    href={currentImmersionOffer.website}
+                    href={currentSearchResult.website}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {currentImmersionOffer.website}
+                    {currentSearchResult.website}
                   </a>
-                </ImmersionOfferSection>
+                </SearchResultSection>
               )}
-              <ImmersionOfferSection title="Avoir plus d'informations avant de contacter l'entreprise">
+              <SearchResultSection title="Avoir plus d'informations avant de contacter l'entreprise">
                 <ul>
-                  {currentImmersionOffer.appellations.length > 0 && (
+                  {currentSearchResult.appellations.length > 0 && (
                     <li>
                       <a
                         href={makeAppellationInformationUrl(
-                          currentImmersionOffer.appellations[0].appellationCode,
-                          currentImmersionOffer.address.departmentCode,
+                          currentSearchResult.appellations[0].appellationCode,
+                          currentSearchResult.address.departmentCode,
                         )}
                         target="_blank"
                         rel="noreferrer"
@@ -253,9 +253,7 @@ export const ImmersionOfferPage = () => {
                   )}
                   <li>
                     <a
-                      href={makeNafClassInformationUrl(
-                        currentImmersionOffer.naf,
-                      )}
+                      href={makeNafClassInformationUrl(currentSearchResult.naf)}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -264,7 +262,7 @@ export const ImmersionOfferPage = () => {
                   </li>
                   <li>
                     <a
-                      href={getMapsLink(currentImmersionOffer)}
+                      href={getMapsLink(currentSearchResult)}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -272,7 +270,7 @@ export const ImmersionOfferPage = () => {
                     </a>
                   </li>
                 </ul>
-              </ImmersionOfferSection>
+              </SearchResultSection>
 
               <div>
                 <div
@@ -280,29 +278,29 @@ export const ImmersionOfferPage = () => {
                   ref={formContactRef}
                 >
                   <h2 className={fr.cx("fr-h3", "fr-mb-2w")}>
-                    {currentImmersionOffer.voluntaryToImmersion
+                    {currentSearchResult.voluntaryToImmersion
                       ? "Contacter l'entreprise"
                       : "Nos conseils pour cette première prise de contact ! "}
                   </h2>
-                  {match(currentImmersionOffer?.contactMode)
+                  {match(currentSearchResult.contactMode)
                     .with("EMAIL", () => (
                       <ContactByEmail
-                        appellations={currentImmersionOffer.appellations}
-                        siret={currentImmersionOffer.siret}
+                        appellations={currentSearchResult.appellations}
+                        siret={currentSearchResult.siret}
                         onSubmitSuccess={onFormSubmitSuccess}
                       />
                     ))
                     .with("PHONE", () => (
                       <ContactByPhone
-                        appellations={currentImmersionOffer.appellations}
-                        siret={currentImmersionOffer.siret}
+                        appellations={currentSearchResult.appellations}
+                        siret={currentSearchResult.siret}
                         onSubmitSuccess={onFormSubmitSuccess}
                       />
                     ))
                     .with("IN_PERSON", () => (
                       <ContactInPerson
-                        appellations={currentImmersionOffer.appellations}
-                        siret={currentImmersionOffer.siret}
+                        appellations={currentSearchResult.appellations}
+                        siret={currentSearchResult.siret}
                         onSubmitSuccess={onFormSubmitSuccess}
                       />
                     ))
@@ -416,7 +414,7 @@ export const ImmersionOfferPage = () => {
                 description={
                   <>
                     <p>
-                      {getFeedBackMessage(currentImmersionOffer?.contactMode)}
+                      {getFeedBackMessage(currentSearchResult?.contactMode)}
                     </p>
                   </>
                 }

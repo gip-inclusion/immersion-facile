@@ -1,70 +1,110 @@
 import { filter as ramdaFilter } from "ramda";
-import { BehaviorSubject, delay, map, Observable, Subject } from "rxjs";
+import { delay, map, Observable, of } from "rxjs";
 import {
   AddressDto,
   ContactEstablishmentRequestDto,
   EstablishmentGroupSlug,
-  SearchImmersionQueryParamsDto,
-  SearchImmersionResultDto,
+  SearchQueryParamsDto,
+  SearchResultDto,
+  SiretAndAppellationDto,
   sleep,
 } from "shared";
-import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
+import { SearchGateway } from "src/core-logic/ports/SearchGateway";
 
-export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
-  private _error: Error | null = null;
+export class SimulatedSearchGateway implements SearchGateway {
+  #error: Error | null = null;
 
-  private readonly _results$: Subject<SearchImmersionResultDto[]>;
+  #simulatedLatency: number;
 
-  constructor(
-    private readonly seedResults?: SearchImmersionResultDto[],
-    private readonly simulatedLatency = 0,
-  ) {
-    this._results$ = seedResults
-      ? new BehaviorSubject(seedResults)
-      : new Subject<SearchImmersionResultDto[]>();
+  #seedResults?: SearchResultDto[];
+
+  #simulatedResponse: SearchResultDto = {
+    rome: "A1201",
+    romeLabel: "Aide agricole de production fruitière ou viticole",
+    appellations: [
+      {
+        appellationCode: "20552",
+        appellationLabel: "Aide agricole de production fruitière ou viticole",
+      },
+      {
+        appellationCode: "15480",
+        appellationLabel: "Ouvrier agricole polyvalent",
+      },
+    ],
+    naf: "01.11Z",
+    nafLabel:
+      "Culture de céréales (à l'exception du riz), de légumineuses et de graines oléagineuses",
+    siret: "12345678901234",
+    name: "EARL DE LA FERME",
+    voluntaryToImmersion: true,
+    fitForDisabledWorkers: true,
+    position: {
+      lat: 48.8566969,
+      lon: 2.3514616,
+    },
+    address: {
+      streetNumberAndAddress: "1 rue de la ferme",
+      city: "Paris",
+      departmentCode: "75",
+      postcode: "75001",
+    },
+    contactMode: "EMAIL",
+    distance_m: 1000,
+    numberOfEmployeeRange: "1-5",
+    website: "https://www.earl-de-la-ferme.fr",
+    additionalInformation: "Ferme bio",
+    urlOfPartner: "https://www.emploi-store.fr/portail/accueil",
+  };
+
+  constructor(seedResults?: SearchResultDto[], simulatedLatency = 0) {
+    this.#simulatedLatency = simulatedLatency;
+    this.#seedResults = seedResults;
   }
 
   public async contactEstablishment(
     _params: ContactEstablishmentRequestDto,
   ): Promise<void> {
-    await sleep(this.simulatedLatency);
-    if (this._error) throw this._error;
+    await sleep(this.#simulatedLatency);
+    if (this.#error) throw this.#error;
     return;
   }
 
-  public async getGroupOffersBySlug(
+  public async getGroupSearchResultsBySlug(
     _groupName: EstablishmentGroupSlug,
-  ): Promise<SearchImmersionResultDto[]> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
+  ): Promise<SearchResultDto[]> {
+    this.#simulatedLatency && (await sleep(this.#simulatedLatency));
     return groupOffersBySlugStub;
   }
 
-  public search(
-    searchParams: SearchImmersionQueryParamsDto,
-  ): Observable<SearchImmersionResultDto[]> {
-    if (this._error) throw this._error;
-    if (this.seedResults) return this.simulateSearch(searchParams);
+  public getSearchResult$(
+    _params: SiretAndAppellationDto,
+  ): Observable<SearchResultDto> {
+    return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
+  }
 
-    return this.simulatedLatency
-      ? this._results$.pipe(delay(this.simulatedLatency))
-      : this._results$;
+  public search$(
+    searchParams: SearchQueryParamsDto,
+  ): Observable<SearchResultDto[]> {
+    if (this.#error) throw this.#error;
+    return this.simulateSearch(searchParams);
   }
 
   // test purpose
   get searchResults$() {
-    return this._results$;
+    return of(this.#seedResults ?? seedSearchResults);
   }
 
   setError(error: Error) {
-    this._error = error;
+    this.#error = error;
   }
 
-  private simulateSearch(searchParams: SearchImmersionQueryParamsDto) {
-    if (searchParams.voluntaryToImmersion === undefined) return this._results$;
-    return this._results$.pipe(
-      delay(this.simulatedLatency),
+  private simulateSearch(searchParams: SearchQueryParamsDto) {
+    const results$ = of(this.#seedResults ?? seedSearchResults);
+    if (searchParams.voluntaryToImmersion === undefined) return results$;
+    return results$.pipe(
+      delay(this.#simulatedLatency),
       map(
-        ramdaFilter<SearchImmersionResultDto>(
+        ramdaFilter<SearchResultDto>(
           (result) =>
             result.voluntaryToImmersion === searchParams.voluntaryToImmersion,
         ),
@@ -81,7 +121,7 @@ const defaultAddress: AddressDto = {
   departmentCode: "75",
 };
 
-const groupOffersBySlugStub: SearchImmersionResultDto[] = [
+const groupOffersBySlugStub: SearchResultDto[] = [
   {
     rome: "H1204",
     siret: "30613890003613",
@@ -360,7 +400,7 @@ const groupOffersBySlugStub: SearchImmersionResultDto[] = [
   },
 ];
 
-export const seedSearchResults: SearchImmersionResultDto[] = [
+export const seedSearchResults: SearchResultDto[] = [
   {
     rome: "A0000",
     naf: defaultNaf,

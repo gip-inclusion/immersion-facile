@@ -1,5 +1,5 @@
 import {
-  SearchImmersionResultDto,
+  SearchResultDto,
   WithEstablishmentGroupSlug,
   withEstablishmentGroupSlugSchema,
 } from "shared";
@@ -8,7 +8,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 
 export class GetOffersByGroupSlug extends TransactionalUseCase<
   WithEstablishmentGroupSlug,
-  SearchImmersionResultDto[]
+  SearchResultDto[]
 > {
   protected inputSchema = withEstablishmentGroupSlugSchema;
 
@@ -19,7 +19,7 @@ export class GetOffersByGroupSlug extends TransactionalUseCase<
   public async _execute(
     { groupSlug }: WithEstablishmentGroupSlug,
     uow: UnitOfWork,
-  ): Promise<SearchImmersionResultDto[]> {
+  ): Promise<SearchResultDto[]> {
     return uow.establishmentGroupRepository.findSearchImmersionResultsBySlug(
       groupSlug,
     );

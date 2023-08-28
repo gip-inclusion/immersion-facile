@@ -2,9 +2,9 @@ import { prop, propEq } from "ramda";
 import {
   ApiConsumer,
   AppellationCode,
-  SearchImmersionParamsDto,
-  searchImmersionParamsSchema,
-  SearchImmersionResultDto,
+  searchParamsSchema,
+  SearchQueryParamsDto,
+  SearchResultDto,
   SiretDto,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
@@ -16,11 +16,11 @@ import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository
 import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export class SearchImmersion extends TransactionalUseCase<
-  SearchImmersionParamsDto,
-  SearchImmersionResultDto[],
+  SearchQueryParamsDto,
+  SearchResultDto[],
   ApiConsumer
 > {
-  protected inputSchema = searchImmersionParamsSchema;
+  protected inputSchema = searchParamsSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -41,10 +41,10 @@ export class SearchImmersion extends TransactionalUseCase<
       voluntaryToImmersion,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ...rest
-    }: SearchImmersionParamsDto,
+    }: SearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
-  ): Promise<SearchImmersionResultDto[]> {
+  ): Promise<SearchResultDto[]> {
     const searchMade: SearchMade = {
       lat,
       lon,
@@ -90,7 +90,7 @@ export class SearchImmersion extends TransactionalUseCase<
 
   #prepareVoluntaryToImmersionResults(
     results: SearchImmersionResult[],
-  ): SearchImmersionResultDto[] {
+  ): SearchResultDto[] {
     histogramSearchImmersionStoredCount.observe(results.length);
     return results.map(({ isSearchable, ...rest }) => rest);
   }

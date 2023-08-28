@@ -3,12 +3,12 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { domElementIds, SearchImmersionResultDto } from "shared";
+import { domElementIds, SearchResultDto } from "shared";
 import { useStyleUtils } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
-import { immersionOfferSlice } from "src/core-logic/domain/immersionOffer/immersionOffer.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { SearchResult } from "./SearchResult";
 
 type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
@@ -23,7 +23,7 @@ const isResultPerPageOption = (value: string): value is ResultsPerPageOptions =>
 export const SearchListResults = () => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const [displayedResults, setDisplayedResults] =
-    useState<SearchImmersionResultDto[]>(searchResults);
+    useState<SearchResultDto[]>(searchResults);
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
@@ -78,7 +78,7 @@ export const SearchListResults = () => {
                     searchResult.appellations.at(0)?.appellationCode;
                   if (appellationCode) {
                     routes
-                      .immersionOffer({
+                      .searchResult({
                         siret: searchResult.siret,
                         appellationCode,
                       })
@@ -86,12 +86,12 @@ export const SearchListResults = () => {
                     return;
                   }
                   dispatch(
-                    immersionOfferSlice.actions.fetchImmersionOfferRequested(
+                    searchSlice.actions.fetchSearchResultRequested(
                       searchResult,
                     ),
                   );
                   routes
-                    .immersionOfferLbb({
+                    .searchResultExternal({
                       siret: searchResult.siret,
                     })
                     .push();

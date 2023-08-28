@@ -1,7 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-import { FormEstablishmentDto, SearchImmersionResultDto } from "shared";
+import { FormEstablishmentDto, SearchResultDto } from "shared";
 import { SearchResult } from "../../search/SearchResult";
 
 const establishmentToSearchResultPreview = ({
@@ -14,7 +14,7 @@ const establishmentToSearchResultPreview = ({
   website,
   fitForDisabledWorkers,
   additionalInformation,
-}: FormEstablishmentDto): SearchImmersionResultDto => ({
+}: FormEstablishmentDto): SearchResultDto => ({
   rome: appellations.length > 0 ? appellations[0].romeCode : "",
   romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
   appellations,

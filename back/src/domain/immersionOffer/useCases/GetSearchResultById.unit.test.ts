@@ -11,7 +11,7 @@ import {
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { GetSearchImmersionResultBySiretAndRome } from "./GetImmersionOfferById";
+import { GetSearchResultBySiretAndRome } from "./GetSearchResultById";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 const establishmentAgg = new EstablishmentAggregateBuilder()
@@ -28,12 +28,12 @@ const establishmentAgg = new EstablishmentAggregateBuilder()
   .build();
 
 describe("GetImmersionOfferById", () => {
-  let getImmersionOfferById: GetSearchImmersionResultBySiretAndRome;
+  let getImmersionOfferById: GetSearchResultBySiretAndRome;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getImmersionOfferById = new GetSearchImmersionResultBySiretAndRome(
+    getImmersionOfferById = new GetSearchResultBySiretAndRome(
       new InMemoryUowPerformer(uow),
     );
   });

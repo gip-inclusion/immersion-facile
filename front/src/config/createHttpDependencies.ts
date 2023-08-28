@@ -5,7 +5,6 @@ import {
   conventionMagicLinkTargets,
   createManagedAxiosInstance,
   establishmentTargets,
-  immersionOfferTargets,
   inclusionConnectedAllowedTargets,
   openApiDocTargets,
   searchImmersionRoutes,
@@ -24,11 +23,10 @@ import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/Assessme
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/HttpEmailValidationGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
-import { HttpImmersionOfferGateway } from "src/core-logic/adapters/ImmersionOfferGateway/HttpImmersionOfferGateway";
-import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
 import { HttpOpenApiDocGateway } from "src/core-logic/adapters/OpenApiDocGateway/HttpOpenApiDocGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
+import { HttpSearchGateway } from "src/core-logic/adapters/SearchGateway/HttpSearchGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
 
@@ -54,10 +52,7 @@ export const createHttpDependencies = (): Dependencies => {
     immersionAssessmentGateway: new HttpImmersionAssessmentGateway(
       axiosOnSlashApi,
     ),
-    immersionOfferGateway: new HttpImmersionOfferGateway(
-      createHttpClient(immersionOfferTargets),
-    ),
-    immersionSearchGateway: new HttpImmersionSearchGateway(
+    searchGateway: new HttpSearchGateway(
       createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApi),
     ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),

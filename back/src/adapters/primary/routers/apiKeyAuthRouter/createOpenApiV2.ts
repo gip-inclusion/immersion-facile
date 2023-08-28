@@ -1,4 +1,4 @@
-import { SearchImmersionResultDto } from "shared";
+import { SearchResultDto } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { publicApiV2Routes } from "./publicApiV2.routes";
@@ -33,7 +33,7 @@ const contactInPersonExample: ContactEstablishmentPublicV2Dto = {
   contactMode: "IN_PERSON",
 };
 
-const searchImmersionResult: SearchImmersionResultDto = {
+const searchImmersionResult: SearchResultDto = {
   additionalInformation: "Some additionnal information",
   address: {
     departmentCode: "75",

@@ -31,7 +31,7 @@ export const ContactByPhone = ({
   onSubmitSuccess,
 }: ContactByPhoneProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
-  const route = useRoute() as Route<typeof routes.immersionOffer>;
+  const route = useRoute() as Route<typeof routes.searchResult>;
   const initialValues: ContactEstablishmentByPhoneDto = {
     siret,
     appellationCode:

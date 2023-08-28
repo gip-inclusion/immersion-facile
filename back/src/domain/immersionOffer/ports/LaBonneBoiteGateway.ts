@@ -1,4 +1,4 @@
-import { SearchImmersionResultDto } from "shared";
+import { SearchResultDto } from "shared";
 
 export type LaBonneBoiteRequestParams = {
   rome: string;
@@ -9,5 +9,5 @@ export type LaBonneBoiteRequestParams = {
 export interface LaBonneBoiteGateway {
   searchCompanies(
     requestParams: LaBonneBoiteRequestParams,
-  ): Promise<SearchImmersionResultDto[]>;
+  ): Promise<SearchResultDto[]>;
 }

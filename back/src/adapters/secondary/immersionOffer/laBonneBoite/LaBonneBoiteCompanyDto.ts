@@ -1,4 +1,4 @@
-import { addressStringToDto, SearchImmersionResultDto, SiretDto } from "shared";
+import { addressStringToDto, SearchResultDto, SiretDto } from "shared";
 
 export type LaBonneBoiteApiResultProps = {
   address: string;
@@ -68,7 +68,7 @@ export class LaBonneBoiteCompanyDto {
     return this.props.siret;
   }
 
-  public toSearchResult(): SearchImmersionResultDto {
+  public toSearchResult(): SearchResultDto {
     return {
       siret: this.props.siret,
       name: this.props.name,

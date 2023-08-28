@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ContactErrorKind } from "src/core-logic/ports/ImmersionSearchGateway";
+import { ContactErrorKind } from "src/core-logic/ports/SearchGateway";
 
 type ErrorTitleAndDescription = {
   title: string;

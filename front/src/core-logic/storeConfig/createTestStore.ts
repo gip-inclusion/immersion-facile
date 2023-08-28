@@ -3,7 +3,6 @@ import { Dependencies } from "src/config/dependencies";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
-import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
 import { InMemoryOpenApiDocGateway } from "src/core-logic/adapters/OpenApiDocGateway/InMemoryOpenApiDocGateway";
@@ -15,7 +14,7 @@ import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { InMemoryEmailValidationGateway } from "../adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
-import { TestImmersionOfferGateway } from "../adapters/ImmersionOfferGateway/TestImmersionOfferGateway";
+import { TestSearchGateway } from "../adapters/SearchGateway/TestSearchGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
 export type TestDependencies = ReturnType<typeof createTestDependencies>;
@@ -25,7 +24,7 @@ const createTestDependencies = () =>
     adminGateway: new TestAdminGateway(),
     immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
     siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
-    immersionSearchGateway: new InMemoryImmersionSearchGateway(),
+    searchGateway: new TestSearchGateway(),
     establishmentGateway: new TestEstablishmentGateway(),
     conventionGateway: new InMemoryConventionGateway(),
     addressGateway: new TestAddressGateway(),
@@ -39,7 +38,6 @@ const createTestDependencies = () =>
     minSearchResultsToPreventRefetch: 2,
     emailValidationGateway: new InMemoryEmailValidationGateway(),
     openApiDocGateway: new InMemoryOpenApiDocGateway(),
-    immersionOfferGateway: new TestImmersionOfferGateway(),
   } satisfies Dependencies);
 
 export const createTestStore = (preloadedState?: Partial<RootState>) => {

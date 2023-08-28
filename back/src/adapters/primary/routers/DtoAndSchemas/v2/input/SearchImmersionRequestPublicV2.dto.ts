@@ -1,8 +1,4 @@
-import {
-  AppellationCode,
-  RomeCode,
-  SearchImmersionQueryParamsDto,
-} from "shared";
+import { AppellationCode, RomeCode, SearchQueryParamsDto } from "shared";
 
 type SearchSortedBy = "distance" | "date";
 
@@ -18,4 +14,4 @@ export type SearchImmersionRequestPublicV2 = {
 
 export const searchImmersionRequestPublicV2ToDomain = (
   publicV2: SearchImmersionRequestPublicV2,
-): SearchImmersionQueryParamsDto => publicV2;
+): SearchQueryParamsDto => publicV2;

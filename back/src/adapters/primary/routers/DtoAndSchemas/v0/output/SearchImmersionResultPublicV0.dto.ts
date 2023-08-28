@@ -2,10 +2,10 @@ import {
   addressDtoToString,
   GeoPositionDto,
   RomeCode,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SiretDto,
 } from "shared";
-import { GetSearchImmersionResultBySiretAndRomePayload } from "../../../../../../domain/immersionOffer/useCases/GetImmersionOfferById";
+import { GetSearchResultBySiretAndRomePayload } from "../../../../../../domain/immersionOffer/useCases/GetSearchResultById";
 
 export type LegacyImmersionOfferId = `${SiretDto}-${RomeCode}`;
 
@@ -16,7 +16,7 @@ export const toLegacyImmersionOfferId = (
 
 export const toGetSearchImmersionResultBySiretAndRomePayload = (
   id: LegacyImmersionOfferId,
-): GetSearchImmersionResultBySiretAndRomePayload => {
+): GetSearchResultBySiretAndRomePayload => {
   const [siret, rome] = id.split("-");
   return {
     rome,
@@ -42,7 +42,7 @@ export type SearchImmersionResultPublicV0 = {
 };
 
 export const domainToSearchImmersionResultPublicV0 = (
-  domain: SearchImmersionResultDto,
+  domain: SearchResultDto,
 ): SearchImmersionResultPublicV0 => {
   const { appellations, position, website, additionalInformation, ...rest } =
     domain;

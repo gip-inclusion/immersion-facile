@@ -3,7 +3,7 @@ import {
   AppellationDto,
   expectObjectsToMatch,
   expectToEqual,
-  SearchImmersionResultDto,
+  SearchResultDto,
 } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
@@ -146,7 +146,7 @@ describe("PgEstablishmentGroupRepository", () => {
       appellations: AppellationDto[];
       rome: string;
       romeLabel: string;
-    }): SearchImmersionResultDto => ({
+    }): SearchResultDto => ({
       appellations,
       romeLabel,
       rome,
