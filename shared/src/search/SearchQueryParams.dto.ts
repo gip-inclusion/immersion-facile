@@ -4,7 +4,7 @@ import {
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type SearchSortedBy = "distance" | "date";
-export type SearchImmersionQueryParamsDto = {
+export type SearchQueryParamsDto = {
   longitude: number;
   latitude: number;
   appellationCode?: AppellationCode;
@@ -14,5 +14,3 @@ export type SearchImmersionQueryParamsDto = {
   voluntaryToImmersion?: boolean;
   place?: string;
 };
-
-export type SearchImmersionParamsDto = SearchImmersionQueryParamsDto;

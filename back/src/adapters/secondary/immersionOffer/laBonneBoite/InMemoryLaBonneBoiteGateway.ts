@@ -1,4 +1,4 @@
-import { SearchImmersionResultDto } from "shared";
+import { SearchResultDto } from "shared";
 import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
@@ -15,7 +15,7 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
   public async searchCompanies(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     { distanceKm }: LaBonneBoiteRequestParams,
-  ): Promise<SearchImmersionResultDto[]> {
+  ): Promise<SearchResultDto[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
     if (this._error) throw this._error;
     return this._results

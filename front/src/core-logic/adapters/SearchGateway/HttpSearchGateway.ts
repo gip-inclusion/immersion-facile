@@ -2,18 +2,19 @@ import { from, Observable } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
   EstablishmentGroupSlug,
-  SearchImmersionQueryParamsDto,
-  SearchImmersionResultDto,
-  SearchImmersionRoutes,
+  SearchQueryParamsDto,
+  SearchResultDto,
+  SearchRoutes,
+  SiretAndAppellationDto,
 } from "shared";
 import { HttpClient, HttpResponse } from "shared-routes";
 import {
   ContactErrorKind,
-  ImmersionSearchGateway,
-} from "src/core-logic/ports/ImmersionSearchGateway";
+  SearchGateway,
+} from "src/core-logic/ports/SearchGateway";
 
-export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
-  constructor(private readonly httpClient: HttpClient<SearchImmersionRoutes>) {}
+export class HttpSearchGateway implements SearchGateway {
+  constructor(private readonly httpClient: HttpClient<SearchRoutes>) {}
 
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
@@ -32,9 +33,9 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
     if (response.status === 409) return "alreadyContactedRecently";
   }
 
-  public async getGroupOffersBySlug(
+  public async getGroupSearchResultsBySlug(
     groupSlug: EstablishmentGroupSlug,
-  ): Promise<SearchImmersionResultDto[]> {
+  ): Promise<SearchResultDto[]> {
     const response = await this.httpClient.getOffersByGroupSlug({
       urlParams: { groupSlug },
     });
@@ -42,9 +43,24 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
     return response.body;
   }
 
-  public search(
-    searchParams: SearchImmersionQueryParamsDto,
-  ): Observable<SearchImmersionResultDto[]> {
+  public getSearchResult$(
+    params: SiretAndAppellationDto,
+  ): Observable<SearchResultDto> {
+    return from(
+      this.httpClient
+        .getImmersionOffer({
+          queryParams: params,
+        })
+        .then((result) => {
+          if (result.status === 200) return result.body;
+          throw new Error(result.body.message);
+        }),
+    );
+  }
+
+  public search$(
+    searchParams: SearchQueryParamsDto,
+  ): Observable<SearchResultDto[]> {
     return from(
       this.httpClient
         .searchImmersion({

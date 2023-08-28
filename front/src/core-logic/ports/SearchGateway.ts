@@ -2,20 +2,20 @@ import { Observable } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
   EstablishmentGroupSlug,
-  SearchImmersionQueryParamsDto,
-  SearchImmersionResultDto,
+  SearchQueryParamsDto,
+  SearchResultDto,
+  SiretAndAppellationDto,
 } from "shared";
 
 export type ContactErrorKind = "alreadyContactedRecently";
 
-export interface ImmersionSearchGateway {
-  search(
-    searchParams: SearchImmersionQueryParamsDto,
-  ): Observable<SearchImmersionResultDto[]>;
+export interface SearchGateway {
+  search$(searchParams: SearchQueryParamsDto): Observable<SearchResultDto[]>;
   contactEstablishment: (
     params: ContactEstablishmentRequestDto,
   ) => Promise<void | ContactErrorKind>;
-  getGroupOffersBySlug(
+  getGroupSearchResultsBySlug(
     groupSlug: EstablishmentGroupSlug,
-  ): Promise<SearchImmersionResultDto[]>;
+  ): Promise<SearchResultDto[]>;
+  getSearchResult$(params: SiretAndAppellationDto): Observable<SearchResultDto>;
 }

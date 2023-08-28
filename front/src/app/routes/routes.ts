@@ -106,7 +106,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionAssessment}`,
   ),
-  immersionOffer: defineRoute(
+  searchResult: defineRoute(
     {
       appellationCode: param.query.ofType(appellationStringSerializer),
       siret: param.query.string,
@@ -118,7 +118,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.immersionOffer}`,
   ),
-  immersionOfferLbb: defineRoute(
+  searchResultExternal: defineRoute(
     {
       siret: param.query.string,
     },

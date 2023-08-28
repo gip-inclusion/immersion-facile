@@ -1,10 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import {
-  EstablishmentGroupSlug,
-  SearchImmersionResultDto,
-  SiretDto,
-} from "shared";
+import { EstablishmentGroupSlug, SearchResultDto, SiretDto } from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
@@ -23,7 +19,7 @@ export class PgEstablishmentGroupRepository
 
   public async findSearchImmersionResultsBySlug(
     slug: EstablishmentGroupSlug,
-  ): Promise<SearchImmersionResultDto[]> {
+  ): Promise<SearchResultDto[]> {
     const response = await this.client.query(
       `
       SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(

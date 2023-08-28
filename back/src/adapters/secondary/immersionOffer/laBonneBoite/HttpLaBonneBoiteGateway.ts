@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { SearchImmersionResultDto } from "shared";
+import { SearchResultDto } from "shared";
 import { HttpClient } from "http-client";
 import { PoleEmploiGateway } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import {
@@ -35,7 +35,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lat,
     lon,
     rome,
-  }: LaBonneBoiteRequestParams): Promise<SearchImmersionResultDto[]> {
+  }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     const { responseBody } = await this.limiter.schedule(async () => {
       const accessToken = await this.poleEmploiGateway.getAccessToken(
         `application_${this.poleEmploiClientId} api_labonneboitev1`,

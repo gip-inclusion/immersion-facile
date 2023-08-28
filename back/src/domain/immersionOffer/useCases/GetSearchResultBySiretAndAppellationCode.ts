@@ -1,6 +1,6 @@
 import {
   ApiConsumer,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SiretAndAppellationDto,
   siretAndAppellationSchema,
 } from "shared";
@@ -8,9 +8,9 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class GetSearchImmersionResultBySiretAndAppellationCode extends TransactionalUseCase<
+export class GetSearchResultBySiretAndAppellationCode extends TransactionalUseCase<
   SiretAndAppellationDto,
-  SearchImmersionResultDto,
+  SearchResultDto,
   ApiConsumer
 > {
   protected inputSchema = siretAndAppellationSchema;
@@ -22,7 +22,7 @@ export class GetSearchImmersionResultBySiretAndAppellationCode extends Transacti
   public async _execute(
     siretAndAppellationDto: SiretAndAppellationDto,
     uow: UnitOfWork,
-  ): Promise<SearchImmersionResultDto> {
+  ): Promise<SearchResultDto> {
     const { siret, appellationCode } = siretAndAppellationDto;
 
     const searchImmersionResultDto =
@@ -30,11 +30,11 @@ export class GetSearchImmersionResultBySiretAndAppellationCode extends Transacti
         siret,
         appellationCode,
       );
-
-    if (!searchImmersionResultDto)
+    if (!searchImmersionResultDto) {
       throw new NotFoundError(
         `No offer found for siret ${siret} and appellation code ${appellationCode}`,
       );
+    }
     return searchImmersionResultDto;
   }
 }

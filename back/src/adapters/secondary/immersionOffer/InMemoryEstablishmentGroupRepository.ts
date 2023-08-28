@@ -1,13 +1,9 @@
 import { values } from "ramda";
-import {
-  EstablishmentGroupSlug,
-  SearchImmersionResultDto,
-  SiretDto,
-} from "shared";
+import { EstablishmentGroupSlug, SearchResultDto, SiretDto } from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
-export const stubSearchResult: SearchImmersionResultDto = {
+export const stubSearchResult: SearchResultDto = {
   rome: "D1101",
   siret: "11112222111122",
   distance_m: 0,
@@ -39,9 +35,7 @@ export class InMemoryEstablishmentGroupRepository
   // for test purpose
   #groupsBySlug: Record<EstablishmentGroupSlug, EstablishmentGroupEntity> = {};
 
-  public async findSearchImmersionResultsBySlug(): Promise<
-    SearchImmersionResultDto[]
-  > {
+  public async findSearchImmersionResultsBySlug(): Promise<SearchResultDto[]> {
     return [stubSearchResult];
   }
 

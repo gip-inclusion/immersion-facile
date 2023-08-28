@@ -3,8 +3,8 @@ import {
   ApiConsumer,
   AppellationAndRomeDto,
   expectToEqual,
-  SearchImmersionParamsDto,
-  SearchImmersionResultDto,
+  SearchQueryParamsDto,
+  SearchResultDto,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import {
@@ -436,14 +436,14 @@ const lbbCompanyVO = new LaBonneBoiteCompanyDtoBuilder()
   .withDistanceKm(1)
   .build();
 
-const searchInMetzParams: SearchImmersionParamsDto = {
+const searchInMetzParams: SearchQueryParamsDto = {
   distanceKm: 30,
   longitude: 6.17602,
   latitude: 49.119146,
   sortedBy: "distance",
 };
 
-const searchSecretariatInMetzRequestDto: SearchImmersionParamsDto = {
+const searchSecretariatInMetzRequestDto: SearchQueryParamsDto = {
   ...searchInMetzParams,
   appellationCode: secretariatImmersionOffer.appellationCode,
 };
@@ -463,9 +463,7 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
   isAuthorized: true,
 };
 
-const lbbToSearchResult = (
-  lbb: LaBonneBoiteCompanyDto,
-): SearchImmersionResultDto => ({
+const lbbToSearchResult = (lbb: LaBonneBoiteCompanyDto): SearchResultDto => ({
   additionalInformation: "",
   address: addressStringToDto(lbb.props.address),
   appellations: [],

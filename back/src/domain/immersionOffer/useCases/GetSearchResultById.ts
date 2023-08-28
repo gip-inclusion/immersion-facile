@@ -3,7 +3,7 @@ import {
   ApiConsumer,
   RomeCode,
   romeCodeSchema,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SiretDto,
   siretSchema,
 } from "shared";
@@ -11,33 +11,33 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-const getSearchImmersionResultBySiretAndRomeSchema: z.Schema<GetSearchImmersionResultBySiretAndRomePayload> =
+const getSearchResultBySiretAndRomeSchema: z.Schema<GetSearchResultBySiretAndRomePayload> =
   z.object({
     siret: siretSchema,
     rome: romeCodeSchema,
   });
 
-export type GetSearchImmersionResultBySiretAndRomePayload = {
+export type GetSearchResultBySiretAndRomePayload = {
   siret: SiretDto;
   rome: RomeCode;
 };
 
-export class GetSearchImmersionResultBySiretAndRome extends TransactionalUseCase<
-  GetSearchImmersionResultBySiretAndRomePayload,
-  SearchImmersionResultDto,
+export class GetSearchResultBySiretAndRome extends TransactionalUseCase<
+  GetSearchResultBySiretAndRomePayload,
+  SearchResultDto,
   ApiConsumer
 > {
-  protected inputSchema = getSearchImmersionResultBySiretAndRomeSchema;
+  protected inputSchema = getSearchResultBySiretAndRomeSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
   public async _execute(
-    { rome, siret }: GetSearchImmersionResultBySiretAndRomePayload,
+    { rome, siret }: GetSearchResultBySiretAndRomePayload,
     uow: UnitOfWork,
     _apiConsumer?: ApiConsumer,
-  ): Promise<SearchImmersionResultDto> {
+  ): Promise<SearchResultDto> {
     const searchImmersionResultDto =
       await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
         siret,

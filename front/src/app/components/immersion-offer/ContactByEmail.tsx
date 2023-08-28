@@ -9,6 +9,7 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Route } from "type-route";
 import {
+  AppellationCode,
   AppellationDto,
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailFormSchema,
@@ -40,18 +41,30 @@ Je pourrais alors vous expliquer directement mon projet. \n\
   \n\
 En vous remerciant,`;
 
+const getDefaultAppellationCode = (
+  appellations: AppellationDto[],
+  appellationInParams: AppellationCode,
+) => {
+  if (appellationInParams) {
+    return appellationInParams;
+  }
+  return appellations.length > 1 ? "" : appellations[0].appellationCode;
+};
+
 export const ContactByEmail = ({
   siret,
   appellations,
   onSubmitSuccess,
 }: ContactByEmailProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
-  const route = useRoute() as Route<typeof routes.immersionOffer>;
+  const route = useRoute() as Route<typeof routes.searchResult>;
 
   const initialValues: ContactEstablishmentByMailDto = {
     siret,
-    appellationCode:
-      appellations.length > 1 ? "" : appellations[0].appellationCode,
+    appellationCode: getDefaultAppellationCode(
+      appellations,
+      route.params.appellationCode,
+    ),
     contactMode: "EMAIL",
     potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
     potentialBeneficiaryLastName: route.params.contactLastName ?? "",

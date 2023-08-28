@@ -10,12 +10,11 @@ import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
-import { ImmersionOfferGateway } from "src/core-logic/ports/ImmersionOfferGateway";
-import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import { OpenApiDocGateway } from "src/core-logic/ports/OpenApiDocGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
+import { SearchGateway } from "src/core-logic/ports/SearchGateway";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
@@ -29,7 +28,7 @@ export type Dependencies = {
   technicalGateway: TechnicalGateway;
   establishmentGateway: EstablishmentGateway;
   conventionGateway: ConventionGateway;
-  immersionSearchGateway: ImmersionSearchGateway;
+  searchGateway: SearchGateway;
   inclusionConnectedGateway: InclusionConnectedGateway;
   romeAutocompleteGateway: RomeAutocompleteGateway;
   navigationGateway: NavigationGateway;
@@ -38,7 +37,6 @@ export type Dependencies = {
   scheduler: SchedulerLike;
   emailValidationGateway: EmailValidationGateway;
   openApiDocGateway: OpenApiDocGateway;
-  immersionOfferGateway: ImmersionOfferGateway;
 };
 
 const dependencies =
@@ -49,7 +47,7 @@ const dependencies =
 // these are exported for usages in component, we should try to have less and less (logic should go in redux)
 export const apiAddressGateway = dependencies.addressGateway;
 export const conventionGateway = dependencies.conventionGateway;
-export const immersionSearchGateway = dependencies.immersionSearchGateway;
+export const immersionSearchGateway = dependencies.searchGateway;
 export const establishmentGateway = dependencies.establishmentGateway;
 export const agencyGateway = dependencies.agencyGateway;
 export const deviceRepository = dependencies.deviceRepository;

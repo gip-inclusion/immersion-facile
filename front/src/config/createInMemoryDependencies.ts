@@ -8,17 +8,16 @@ import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/Ass
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { InMemoryEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
-import { SimulatedImmersionOfferGateway } from "src/core-logic/adapters/ImmersionOfferGateway/SimulatedImmersionOfferGateway";
-import {
-  InMemoryImmersionSearchGateway,
-  seedSearchResults,
-} from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
 import { InMemoryOpenApiDocGateway } from "src/core-logic/adapters/OpenApiDocGateway/InMemoryOpenApiDocGateway";
 import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
 } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
+import {
+  seedSearchResults,
+  SimulatedSearchGateway,
+} from "src/core-logic/adapters/SearchGateway/SimulatedSearchGateway";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 
@@ -36,10 +35,8 @@ export const createInMemoryDependencies = (): Dependencies => ({
       .build(),
   ]),
   immersionAssessmentGateway: new SimulatedImmersionAssessmentGateway(),
-  immersionOfferGateway: new SimulatedImmersionOfferGateway(
-    SIMULATED_LATENCY_MS,
-  ),
-  immersionSearchGateway: new InMemoryImmersionSearchGateway(
+
+  searchGateway: new SimulatedSearchGateway(
     seedSearchResults,
     SIMULATED_LATENCY_MS,
   ),

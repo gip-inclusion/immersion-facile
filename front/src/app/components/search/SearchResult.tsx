@@ -8,14 +8,14 @@ import {
   addressDtoToString,
   frenchEstablishmentKinds,
   getMapsLink,
-  SearchImmersionResultDto,
+  SearchResultDto,
   toAbsoluteUrl,
 } from "shared";
-import { ImmersionOfferLabels } from "./ImmersionOfferLabels";
+import { SearchResultLabels } from "./SearchResultLabels";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
-  establishment: SearchImmersionResultDto;
+  establishment: SearchResultDto;
   onButtonClick?: () => void;
   disableButton?: boolean;
   preview?: boolean;
@@ -192,7 +192,7 @@ const SearchResultComponent = ({
                 </li>
               )}
             </ul>
-            <ImmersionOfferLabels
+            <SearchResultLabels
               voluntaryToImmersion={voluntaryToImmersion}
               contactMode={contactMode}
               fitForDisabledWorkers={fitForDisabledWorkers}

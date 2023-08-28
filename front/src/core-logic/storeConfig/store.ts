@@ -39,8 +39,6 @@ import { geosearchEpics } from "../domain/geosearch/geosearch.epics";
 import { geosearchSlice } from "../domain/geosearch/geosearch.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
-import { immersionOfferEpics } from "../domain/immersionOffer/immersionOffer.epic";
-import { immersionOfferSlice } from "../domain/immersionOffer/immersionOffer.slice";
 
 const allEpics: any[] = [
   ...dashboardUrlsEpics,
@@ -61,7 +59,6 @@ const allEpics: any[] = [
   ...inclusionConnectedEpics,
   ...agencyInfoEpics,
   ...icUsersAdminEpics,
-  ...immersionOfferEpics,
 ];
 
 const rootReducer = combineReducers({
@@ -78,7 +75,6 @@ const rootReducer = combineReducers({
   [authSlice.name]: authSlice.reducer,
   [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
-  [immersionOfferSlice.name]: immersionOfferSlice.reducer,
   admin: combineReducers({
     [agencyAdminSlice.name]: agencyAdminSlice.reducer,
     [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,

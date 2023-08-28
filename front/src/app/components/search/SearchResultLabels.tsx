@@ -10,7 +10,7 @@ type ImmersionOfferLabelsProps = {
   className?: string;
 };
 
-export const ImmersionOfferLabels = ({
+export const SearchResultLabels = ({
   voluntaryToImmersion,
   fitForDisabledWorkers,
   contactMode,

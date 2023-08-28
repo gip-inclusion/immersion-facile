@@ -29,7 +29,7 @@ import { EstablishmentManageAdminPage } from "../pages/establishment/Establishme
 import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
-import { ImmersionOfferPage } from "../pages/search/ImmersionOfferPage";
+import { SearchResultPage } from "../pages/search/SearchResultPage";
 import { AdminTab, adminTabs } from "./routeParams/adminTabs";
 import {
   AuthorizedGroupSlugs,
@@ -92,8 +92,8 @@ const getPageByRouteName: {
   homeCandidates: () => <HomePage type="candidate" />,
   homeEstablishments: () => <HomePage type="establishment" />,
   immersionAssessment: (route) => <ImmersionAssessmentPage route={route} />,
-  immersionOffer: () => <ImmersionOfferPage />,
-  immersionOfferLbb: () => <ImmersionOfferPage />,
+  searchResult: () => <SearchResultPage />,
+  searchResultExternal: () => <SearchResultPage />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionAdmin: (route) => <ConventionManageAdminPage route={route} />,
   manageConventionInclusionConnected: (route) => (

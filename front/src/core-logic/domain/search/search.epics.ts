@@ -1,5 +1,10 @@
 import { concatWith, filter, map, of, switchMap, take } from "rxjs";
-import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import { SearchResultDto, searchResultSchema } from "shared";
+import {
+  SearchResultPayload,
+  searchSlice,
+} from "src/core-logic/domain/search/search.slice";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -9,16 +14,16 @@ type SearchAction = ActionOfSlice<typeof searchSlice>;
 
 type SearchEpic = AppEpic<SearchAction>;
 
-const initialSearchEpic: SearchEpic = (
-  action$,
-  _state$,
-  { immersionSearchGateway },
-) =>
+const isSearchImmersionResultDto = (
+  payload: SearchResultPayload | SearchResultDto,
+): payload is SearchResultDto => searchResultSchema.safeParse(payload).success;
+
+const initialSearchEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   action$.pipe(
     filter(searchSlice.actions.searchRequested.match),
     switchMap((action) =>
-      immersionSearchGateway
-        .search({
+      searchGateway
+        .search$({
           ...action.payload,
           voluntaryToImmersion: true,
         })
@@ -37,7 +42,7 @@ const initialSearchEpic: SearchEpic = (
 const extraFetchEpic: SearchEpic = (
   action$,
   _state$,
-  { immersionSearchGateway, minSearchResultsToPreventRefetch },
+  { searchGateway, minSearchResultsToPreventRefetch },
 ) =>
   action$.pipe(
     filter(searchSlice.actions.initialSearchSucceeded.match),
@@ -48,8 +53,8 @@ const extraFetchEpic: SearchEpic = (
     switchMap((action) =>
       of(searchSlice.actions.extraFetchRequested()).pipe(
         concatWith(
-          immersionSearchGateway
-            .search({
+          searchGateway
+            .search$({
               ...action.payload.searchParams,
               voluntaryToImmersion: false,
             })
@@ -59,4 +64,25 @@ const extraFetchEpic: SearchEpic = (
     ),
   );
 
-export const searchEpics = [initialSearchEpic, extraFetchEpic];
+const fetchSearchResultEpic: SearchEpic = (
+  action$,
+  _state$,
+  { searchGateway: immersionSearchGateway },
+) =>
+  action$.pipe(
+    filter(searchSlice.actions.fetchSearchResultRequested.match),
+    switchMap(({ payload }) =>
+      isSearchImmersionResultDto(payload)
+        ? of(payload)
+        : immersionSearchGateway.getSearchResult$(payload),
+    ),
+    map(searchSlice.actions.fetchSearchResultSucceeded),
+    catchEpicError((error) =>
+      searchSlice.actions.fetchSearchResultFailed(error.message),
+    ),
+  );
+export const searchEpics = [
+  initialSearchEpic,
+  extraFetchEpic,
+  fetchSearchResultEpic,
+];

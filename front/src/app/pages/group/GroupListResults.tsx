@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { domElementIds, SearchImmersionResultDto } from "shared";
+import { domElementIds, SearchResultDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { routes } from "src/app/routes/routes";
 
 type GroupListResultsProps = {
-  results: SearchImmersionResultDto[];
+  results: SearchResultDto[];
 };
 
 export const GroupListResults = ({ results }: GroupListResultsProps) => {
@@ -26,9 +26,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
   );
   const resultsPerPageValue = parseInt(resultsPerPage);
   const totalPages = Math.ceil(results.length / resultsPerPageValue);
-  const getSearchResultsForPage = (
-    currentPage: number,
-  ): SearchImmersionResultDto[] => {
+  const getSearchResultsForPage = (currentPage: number): SearchResultDto[] => {
     const start = currentPage * resultsPerPageValue;
     const end = start + resultsPerPageValue;
     return results.slice(start, end);
@@ -43,10 +41,11 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
               establishment={searchResult}
               onButtonClick={() => {
                 const appellationCode =
-                  searchResult.appellations.at(0)?.appellationCode;
+                  searchResult.appellations.length &&
+                  searchResult.appellations[0]?.appellationCode;
                 if (appellationCode) {
                   routes
-                    .immersionOffer({
+                    .searchResult({
                       appellationCode,
                       siret: searchResult.siret,
                     })

@@ -60,9 +60,9 @@ import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/Co
 import { DeleteEstablishment } from "../../../domain/immersionOffer/useCases/DeleteEstablishment";
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
-import { GetSearchImmersionResultBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
-import { GetSearchImmersionResultBySiretAndAppellationCode } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndAppellationCode";
 import { GetOffersByGroupSlug } from "../../../domain/immersionOffer/useCases/GetOffersByGroupSlug";
+import { GetSearchResultBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetSearchResultById";
+import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/immersionOffer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
@@ -252,9 +252,10 @@ export const createUseCases = (
       ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getSearchImmersionResultBySiretAndAppellationCode:
-        new GetSearchImmersionResultBySiretAndAppellationCode(uowPerformer),
-      getSearchImmersionResultBySiretAndRome:
-        new GetSearchImmersionResultBySiretAndRome(uowPerformer),
+        new GetSearchResultBySiretAndAppellationCode(uowPerformer),
+      getSearchImmersionResultBySiretAndRome: new GetSearchResultBySiretAndRome(
+        uowPerformer,
+      ),
 
       addFormEstablishment,
 

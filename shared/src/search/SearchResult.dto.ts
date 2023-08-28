@@ -2,13 +2,12 @@ import { AddressDto } from "../address/address.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import {
-  AppellationCode,
   AppellationDto,
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 
-export type SearchImmersionResultDto = {
+export type SearchResultDto = {
   rome: RomeCode;
   romeLabel: string;
   appellations: AppellationDto[];
@@ -27,9 +26,4 @@ export type SearchImmersionResultDto = {
   website?: string;
   additionalInformation?: string;
   urlOfPartner?: string;
-};
-
-export type WithSiretAndAppellation = {
-  siret: SiretDto;
-  appellationCode: AppellationCode;
 };

@@ -2,8 +2,8 @@ import {
   ContactEstablishmentRequestDto,
   expectArraysToMatch,
   expectToEqual,
-  SearchImmersionRoutes,
   searchImmersionRoutes,
+  SearchRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -38,7 +38,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
   let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
   let inMemoryUow: InMemoryUnitOfWork;
-  let sharedRequest: HttpClient<SearchImmersionRoutes>;
+  let sharedRequest: HttpClient<SearchRoutes>;
 
   beforeEach(async () => {
     const testAppAndDeps = await buildTestApp();

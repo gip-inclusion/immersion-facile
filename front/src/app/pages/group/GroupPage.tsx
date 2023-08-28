@@ -4,7 +4,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { makeStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
-import { SearchImmersionResultDto } from "shared";
+import { SearchResultDto } from "shared";
 import {
   Loader,
   MainWrapper,
@@ -42,18 +42,16 @@ export const GroupPage = ({ route }: GroupPageProps) => {
       },
     },
   };
-  const [initialResults, setInitialResults] = useState<
-    SearchImmersionResultDto[]
-  >([]);
+  const [initialResults, setInitialResults] = useState<SearchResultDto[]>([]);
   const [displayedResults, setDisplayedResults] =
-    useState<SearchImmersionResultDto[]>(initialResults);
+    useState<SearchResultDto[]>(initialResults);
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const filterResults = useCallback(
     (query: string) => {
       setDisplayedResults(
-        initialResults.filter((displayedResult: SearchImmersionResultDto) =>
+        initialResults.filter((displayedResult: SearchResultDto) =>
           JSON.stringify(Object.values(displayedResult))
             .toLowerCase()
             .includes(query.toLowerCase()),
@@ -70,9 +68,8 @@ export const GroupPage = ({ route }: GroupPageProps) => {
 
   const getInitialOffers = useCallback(async () => {
     setLoading(true);
-    const initialOffers = await immersionSearchGateway.getGroupOffersBySlug(
-      "decathlon",
-    );
+    const initialOffers =
+      await immersionSearchGateway.getGroupSearchResultsBySlug("decathlon");
     setInitialResults(initialOffers);
     setDisplayedResults(initialOffers);
   }, []);

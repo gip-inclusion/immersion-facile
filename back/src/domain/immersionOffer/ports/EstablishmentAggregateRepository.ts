@@ -1,7 +1,7 @@
 import {
   AppellationAndRomeDto,
   AppellationCode,
-  SearchImmersionResultDto,
+  SearchResultDto,
   SiretDto,
 } from "shared";
 import {
@@ -12,7 +12,7 @@ import { ImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
 export type OfferWithSiret = ImmersionOfferEntityV2 & { siret: SiretDto };
-export type SearchImmersionResult = SearchImmersionResultDto & {
+export type SearchImmersionResult = SearchResultDto & {
   isSearchable: boolean;
 };
 
@@ -61,7 +61,7 @@ export interface EstablishmentAggregateRepository {
   getSearchImmersionResultDtoBySiretAndAppellationCode(
     siret: SiretDto,
     appellationCode: AppellationCode,
-  ): Promise<SearchImmersionResultDto | undefined>;
+  ): Promise<SearchResultDto | undefined>;
 
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;
 
@@ -75,7 +75,7 @@ export interface EstablishmentAggregateRepository {
   getSearchImmersionResultDtoBySiretAndRome(
     siret: SiretDto,
     rome: string,
-  ): Promise<SearchImmersionResultDto | undefined>;
+  ): Promise<SearchResultDto | undefined>;
 
   searchImmersionResults(
     searchImmersionParams: SearchImmersionParams,

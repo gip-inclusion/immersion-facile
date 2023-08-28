@@ -1,4 +1,4 @@
-import { Builder, RomeCode, SearchImmersionResultDto } from "shared";
+import { Builder, RomeCode, SearchResultDto } from "shared";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { TEST_ROME_LABEL } from "../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
@@ -125,7 +125,7 @@ export const establishmentAggregateToSearchResultByRome = (
   establishmentAggregate: EstablishmentAggregate,
   romeCode: RomeCode,
   distance_m?: number,
-): SearchImmersionResultDto => ({
+): SearchResultDto => ({
   rome: romeCode,
   naf: establishmentAggregate.establishment.nafDto.code,
   nafLabel: establishmentAggregate.establishment.nafDto.nomenclature,

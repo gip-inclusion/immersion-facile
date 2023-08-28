@@ -1,8 +1,8 @@
 import { z } from "zod";
 import {
   httpErrorSchema,
-  searchImmersionResultSchema,
-  searchImmersionsSchema,
+  searchResultSchema,
+  searchResultsSchema,
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
@@ -16,7 +16,7 @@ export const publicApiV2Routes = defineRoutes({
     url: "/v2/offers/:siret/:appellationCode",
     ...withAuthorizationHeaders,
     responses: {
-      200: searchImmersionResultSchema,
+      200: searchResultSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
@@ -29,7 +29,7 @@ export const publicApiV2Routes = defineRoutes({
     queryParamsSchema: searchImmersionRequestPublicV2Schema,
     ...withAuthorizationHeaders,
     responses: {
-      200: searchImmersionsSchema,
+      200: searchResultsSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
