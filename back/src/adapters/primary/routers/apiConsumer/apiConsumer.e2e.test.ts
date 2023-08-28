@@ -1,13 +1,15 @@
-import { SuperTest, Test } from "supertest";
 import {
   adminTargets,
   ApiConsumer,
   ApiConsumerJwt,
-  apiConsumerTargets,
+  ApiConsumerRoutes,
+  apiConsumerRoutes,
   BackOfficeJwt,
   expectToEqual,
-  jwtSchema,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
@@ -22,7 +24,7 @@ import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Api Consumer router", () => {
-  let request: SuperTest<Test>;
+  let sharedRequest: HttpClient<ApiConsumerRoutes>;
   let backOfficeJwt: BackOfficeJwt;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -30,37 +32,51 @@ describe("Api Consumer router", () => {
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
-    ({ request, gateways, inMemoryUow, appConfig, generateApiConsumerJwt } =
-      await buildTestApp(
-        new AppConfigBuilder()
-          .withConfigParams({
-            BACKOFFICE_USERNAME: "user",
-            BACKOFFICE_PASSWORD: "pwd",
-          })
-          .build(),
-      ));
+    const testAppAndDeps = await buildTestApp(
+      new AppConfigBuilder()
+        .withConfigParams({
+          BACKOFFICE_USERNAME: "user",
+          BACKOFFICE_PASSWORD: "pwd",
+        })
+        .build(),
+    );
+
+    ({ gateways, inMemoryUow, appConfig, generateApiConsumerJwt } =
+      testAppAndDeps);
+
+    sharedRequest = createSupertestSharedClient(
+      apiConsumerRoutes,
+      testAppAndDeps.request,
+    );
 
     gateways.timeGateway.setNextDate(new Date());
     backOfficeJwt = (
-      await request
+      await testAppAndDeps.request
         .post(adminTargets.login.url)
         .send({ user: "user", password: "pwd" })
     ).body;
   });
 
-  describe(`${apiConsumerTargets.saveApiConsumer.method} ${apiConsumerTargets.saveApiConsumer.url}`, () => {
+  describe(`${apiConsumerRoutes.saveApiConsumer.method} ${apiConsumerRoutes.saveApiConsumer.url}`, () => {
     it("200 - save new api consumer", async () => {
-      const { body, status } = await request
-        .post(apiConsumerTargets.saveApiConsumer.url)
-        .set("authorization", backOfficeJwt)
-        .send(authorizedUnJeuneUneSolutionApiConsumer);
+      expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: backOfficeJwt },
+      });
+
+      const jwt = expectResponseAndReturnJwt(response, {
+        status: 200,
+        body: {
+          jwt: expect.any(String),
+        },
+      })!;
 
       const { id } = makeVerifyJwtES256<"apiConsumer">(
         appConfig.apiJwtPublicKey,
-      )(jwtSchema.parse(body).jwt as ApiConsumerJwt);
+      )(jwt);
 
       expectToEqual(id, authorizedUnJeuneUneSolutionApiConsumer.id);
-      expectToEqual(status, 200);
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, [
         authorizedUnJeuneUneSolutionApiConsumer,
       ]);
@@ -76,41 +92,65 @@ describe("Api Consumer router", () => {
         isAuthorized: !authorizedUnJeuneUneSolutionApiConsumer.isAuthorized,
       };
 
-      const { body, status } = await request
-        .post(apiConsumerTargets.saveApiConsumer.url)
-        .set("authorization", backOfficeJwt)
-        .send(updatedApiConsumer);
+      const response = await sharedRequest.saveApiConsumer({
+        body: updatedApiConsumer,
+        headers: { authorization: backOfficeJwt },
+      });
+
+      const jwt = expectResponseAndReturnJwt(response, {
+        status: 200,
+        body: {
+          jwt: expect.any(String),
+        },
+      })!;
 
       const { id } = makeVerifyJwtES256<"apiConsumer">(
         appConfig.apiJwtPublicKey,
-      )(jwtSchema.parse(body).jwt as ApiConsumerJwt);
+      )(jwt);
 
       expectToEqual(id, authorizedUnJeuneUneSolutionApiConsumer.id);
-      expectToEqual(status, 200);
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, [
         updatedApiConsumer,
       ]);
     });
 
     it("401 - without auth", async () => {
-      const { body, status } = await request
-        .post(apiConsumerTargets.saveApiConsumer.url)
-        .send(authorizedUnJeuneUneSolutionApiConsumer);
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: "" },
+      });
 
-      expectToEqual(body, { error: "forbidden: unauthenticated" });
-      expectToEqual(status, 401);
+      expectResponseAndReturnJwt(response, {
+        status: 401,
+        body: { error: "forbidden: unauthenticated" },
+      });
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
     });
 
     it("401 - not with backOfficeJwt", async () => {
-      const { body, status } = await request
-        .post(apiConsumerTargets.saveApiConsumer.url)
-        .set("authorization", generateApiConsumerJwt({ id: "osef" }))
-        .send(authorizedUnJeuneUneSolutionApiConsumer);
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+      });
 
-      expectToEqual(body, { error: "Provided token is invalid" });
-      expectToEqual(status, 401);
+      expectResponseAndReturnJwt(response, {
+        status: 401,
+        body: { error: "Provided token is invalid" },
+      });
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
     });
   });
 });
+
+const expectResponseAndReturnJwt = <
+  R extends ResponsesToHttpResponse<
+    ApiConsumerRoutes["saveApiConsumer"]["responses"]
+  >,
+>(
+  response: R,
+  expected: R,
+): ApiConsumerJwt | undefined => {
+  expectToEqual(response, expected);
+
+  if (response.status === 200) return response.body.jwt as ApiConsumerJwt;
+};
