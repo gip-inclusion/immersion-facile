@@ -69,6 +69,12 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           (email) => email !== establishmentContact.email,
         );
 
+        const opaqueEmail = createOpaqueEmail(
+          payload.discussionId,
+          "potentialBeneficiary",
+          this.#replyDomain,
+        );
+
         await this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
@@ -76,15 +82,12 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
             recipients: [establishmentContact.email],
             sender: immersionFacileNoReplyEmailSender,
             replyTo: {
-              email: createOpaqueEmail(
-                payload.discussionId,
-                "potentialBeneficiary",
-                this.#replyDomain,
-              ),
+              email: opaqueEmail,
               name: `${potentialBeneficiary.firstName} ${potentialBeneficiary.lastName} - via Immersion Facilitée`,
             },
             cc,
             params: {
+              replyToEmail: opaqueEmail,
               businessName: discussion.businessName,
               contactFirstName: establishmentContact.firstName,
               contactLastName: establishmentContact.lastName,

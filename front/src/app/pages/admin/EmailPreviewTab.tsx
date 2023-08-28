@@ -429,6 +429,7 @@ export const defaultEmailValueByEmailKind: {
     signatoryLastName: "SIGNATORY_LAST_NAME",
   },
   CONTACT_BY_EMAIL_REQUEST: {
+    replyToEmail: "REPLY_TO_EMAIL",
     appellationLabel: "APPELLATION_LABEL",
     businessName: "BUSINESS_NAME",
     contactFirstName: "CONTACT_FIRST_NAME",

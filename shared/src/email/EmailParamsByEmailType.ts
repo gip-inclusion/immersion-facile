@@ -5,6 +5,7 @@ import {
   InternshipKind,
 } from "../convention/convention.dto";
 import { SiretDto } from "../siret/siret";
+import { Email } from "./email.dto";
 
 export type EmailParamsByEmailType = {
   AGENCY_FIRST_REMINDER: {
@@ -66,6 +67,7 @@ export type EmailParamsByEmailType = {
     immersionObjective: ImmersionObjective | null;
     potentialBeneficiaryResumeLink?: string;
     message: string;
+    replyToEmail: Email;
   };
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: string;

@@ -98,6 +98,8 @@ describe("NotifyContactRequest", () => {
 
       const { establishmentContact } = discussion;
 
+      const expectedReplyToEmail = "discussion-id_b@reply.reply.domain.com";
+
       expectSavedNotificationsAndEvents({
         emails: [
           {
@@ -105,10 +107,11 @@ describe("NotifyContactRequest", () => {
             recipients: [establishmentContact.email],
             sender: immersionFacileNoReplyEmailSender,
             replyTo: {
-              email: "discussion-id_b@reply.reply.domain.com",
+              email: expectedReplyToEmail,
               name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName} - via Immersion Facilitée`,
             },
             params: {
+              replyToEmail: expectedReplyToEmail,
               businessName: discussion.businessName,
               contactFirstName: establishmentContact.firstName,
               contactLastName: establishmentContact.lastName,
