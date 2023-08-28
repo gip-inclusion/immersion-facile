@@ -1,23 +1,24 @@
 import { Router } from "express";
-import { apiConsumerTargets } from "shared";
+import { apiConsumerRoutes } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
 export const createApiConsumerRouter = (deps: AppDependencies): Router => {
-  const apiConsumerRouter = Router({ mergeParams: true });
+  const apiConsumerExpressRouter = Router({ mergeParams: true });
 
-  apiConsumerRouter.use(deps.adminAuthMiddleware);
+  apiConsumerExpressRouter.use(deps.adminAuthMiddleware);
 
-  apiConsumerRouter
-    .route(apiConsumerTargets.saveApiConsumer.url)
-    .post((req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.saveApiConsumer.execute(
-          req.body,
-          req.payloads?.backOffice,
-        ),
-      ),
-    );
+  const apiConsumerSharedRouter = createExpressSharedRouter(
+    apiConsumerRoutes,
+    apiConsumerExpressRouter,
+  );
 
-  return apiConsumerRouter;
+  apiConsumerSharedRouter.saveApiConsumer((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.saveApiConsumer.execute(req.body, req.payloads?.backOffice),
+    ),
+  );
+
+  return apiConsumerExpressRouter;
 };
