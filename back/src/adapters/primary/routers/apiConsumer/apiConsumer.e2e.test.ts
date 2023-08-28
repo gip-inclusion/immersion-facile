@@ -1,5 +1,5 @@
 import {
-  adminTargets,
+  adminRoutes,
   ApiConsumer,
   ApiConsumerJwt,
   ApiConsumerRoutes,
@@ -52,7 +52,7 @@ describe("Api Consumer router", () => {
     gateways.timeGateway.setNextDate(new Date());
     backOfficeJwt = (
       await testAppAndDeps.request
-        .post(adminTargets.login.url)
+        .post(adminRoutes.login.url)
         .send({ user: "user", password: "pwd" })
     ).body;
   });

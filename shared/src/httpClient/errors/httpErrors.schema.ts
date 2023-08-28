@@ -9,3 +9,7 @@ export const httpErrorSchema = z.object({
 export const legacyUnauthenticatedErrorSchema = z.object({
   error: z.string(),
 });
+
+export const legacyBadRequestErrorSchema = z.object({
+  errors: z.string(),
+});
