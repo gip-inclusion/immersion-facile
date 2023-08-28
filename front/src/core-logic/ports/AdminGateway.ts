@@ -1,6 +1,8 @@
 import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
+  ApiConsumer,
+  ApiConsumerJwt,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -37,4 +39,6 @@ export interface AdminGateway {
     params: IcUserRoleForAgencyParams,
     token: BackOfficeJwt,
   ): Observable<void>;
+
+  saveApiConsumer$(apiConsumer: ApiConsumer): Observable<ApiConsumerJwt>;
 }

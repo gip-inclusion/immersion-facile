@@ -1,6 +1,8 @@
 import { Observable, Subject } from "rxjs";
 import {
   AbsoluteUrl,
+  ApiConsumer,
+  ApiConsumerJwt,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -64,6 +66,12 @@ export class TestAdminGateway implements AdminGateway {
 
   public login$(): Observable<BackOfficeJwt> {
     return this.token$;
+  }
+
+  public saveApiConsumer$(
+    _apiConsumer: ApiConsumer,
+  ): Observable<ApiConsumerJwt> {
+    throw new Error("Method not implemented.");
   }
 
   public updateUserRoleForAgency$(
