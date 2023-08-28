@@ -3,6 +3,7 @@ import {
   ContactEstablishmentEventPayload,
   ContactMethod,
   expectPromiseToFailWithError,
+  immersionFacileNoReplyEmailSender,
 } from "shared";
 import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
 import {
@@ -102,6 +103,7 @@ describe("NotifyContactRequest", () => {
           {
             kind: "CONTACT_BY_EMAIL_REQUEST",
             recipients: [establishmentContact.email],
+            sender: immersionFacileNoReplyEmailSender,
             replyTo: {
               email: "discussion-id_b@reply.reply.domain.com",
               name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName} - via Immersion Facilitée`,
@@ -143,6 +145,7 @@ describe("NotifyContactRequest", () => {
           {
             kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
             recipients: [discussion.potentialBeneficiary.email],
+            sender: immersionFacileNoReplyEmailSender,
             params: {
               businessName: discussion.businessName,
               contactFirstName: discussion.establishmentContact.firstName,
@@ -171,6 +174,7 @@ describe("NotifyContactRequest", () => {
           {
             kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
             recipients: [discussion.potentialBeneficiary.email],
+            sender: immersionFacileNoReplyEmailSender,
             params: {
               businessName: discussion.businessName,
               contactFirstName: discussion.establishmentContact.firstName,

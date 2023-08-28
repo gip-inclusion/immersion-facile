@@ -1,6 +1,11 @@
 import { addDays } from "date-fns";
 import { z } from "zod";
-import { ConventionDto, ConventionId, frontRoutes } from "shared";
+import {
+  ConventionDto,
+  ConventionId,
+  frontRoutes,
+  immersionFacileNoReplyEmailSender,
+} from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -92,6 +97,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     await this.#notificationGateway.sendEmail({
       kind: "CREATE_IMMERSION_ASSESSMENT",
       recipients: [convention.establishmentTutor.email],
+      sender: immersionFacileNoReplyEmailSender,
       params: {
         agencyLogoUrl: agency.logoUrl,
         agencyValidatorEmail: agency.validatorEmails[0],
