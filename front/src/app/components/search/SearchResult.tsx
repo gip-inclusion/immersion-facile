@@ -56,7 +56,7 @@ const SearchResultComponent = ({
   const isCustomizedNameValidToDisplay =
     customizedName &&
     customizedName.length > 0 &&
-    !frenchEstablishmentKinds.includes(customizedName.trim());
+    !frenchEstablishmentKinds.includes(customizedName.toUpperCase().trim());
   const establishmentRawName = isCustomizedNameValidToDisplay
     ? customizedName
     : name;
