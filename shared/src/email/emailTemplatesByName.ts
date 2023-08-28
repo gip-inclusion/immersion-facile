@@ -969,6 +969,7 @@ export const emailTemplatesByName =
         businessAddress,
         potentialBeneficiaryPhone,
         potentialBeneficiaryResumeLink,
+        replyToEmail,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
@@ -991,11 +992,17 @@ export const emailTemplatesByName =
       }
       
       `,
+        buttons: [
+          {
+            label: "Écrire au candidat",
+            url: `mailto:${replyToEmail}`,
+          },
+        ],
         highlight: {
           content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis
+          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton "Écrire au candidat" ci-dessus)
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
         },
