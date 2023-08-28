@@ -4,13 +4,17 @@ import {
   createBackOfficeJwtPayload,
   expectPromiseToFailWithError,
   expectToEqual,
+  Role,
 } from "shared";
 import { generateApiConsumerJwtTestFn } from "../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
@@ -43,8 +47,8 @@ describe("SaveApiConsumer", () => {
     );
   });
 
-  describe("right paths", () => {
-    it("new api consumer if not existing", async () => {
+  describe("Right paths", () => {
+    it("Adds a new api consumer if not existing", async () => {
       const result = await saveApiConsumer.execute(
         authorizedUnJeuneUneSolutionApiConsumer,
         backOfficeJwtPayload,
@@ -70,7 +74,7 @@ describe("SaveApiConsumer", () => {
       ]);
     });
 
-    it("update existing api consumer", async () => {
+    it("Updates an existing api consumer", async () => {
       uow.apiConsumerRepository.consumers = [
         authorizedUnJeuneUneSolutionApiConsumer,
       ];
@@ -104,11 +108,27 @@ describe("SaveApiConsumer", () => {
     });
   });
 
-  describe("wrong paths", () => {
-    it("ForbiddenError on without backoffice payload", async () => {
+  describe("Wrong paths", () => {
+    it("UnauthorizedError on without JWT payload", async () => {
       await expectPromiseToFailWithError(
         saveApiConsumer.execute(authorizedUnJeuneUneSolutionApiConsumer),
-        new ForbiddenError(),
+        new UnauthorizedError(),
+      );
+
+      expectToEqual(uow.apiConsumerRepository.consumers, []);
+      expectToEqual(uow.outboxRepository.events, []);
+    });
+
+    it("ForbiddenError on if provided JWT payload is not a backoffice one", async () => {
+      const wrongRole: Role = "beneficiary";
+      await expectPromiseToFailWithError(
+        saveApiConsumer.execute(authorizedUnJeuneUneSolutionApiConsumer, {
+          role: wrongRole as any,
+          sub: "123",
+        }),
+        new ForbiddenError(
+          `Provided JWT payload does not have sufficient privileges. Received role: '${wrongRole}'`,
+        ),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, []);
