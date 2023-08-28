@@ -1,10 +1,13 @@
-import { SuperTest, Test } from "supertest";
 import {
-  adminLogin,
+  AdminRoutes,
+  adminRoutes,
   BackOfficeJwt,
   BackOfficeJwtPayload,
   expectObjectsToMatch,
+  expectToEqual,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { makeVerifyJwtES256 } from "../../../../domain/auth/jwt";
@@ -12,7 +15,7 @@ import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTim
 import { AppConfig } from "../../config/appConfig";
 
 describe("admin login", () => {
-  let request: SuperTest<Test>;
+  let sharedRequest: HttpClient<AdminRoutes>;
   let appConfig: AppConfig;
   let timeGateway: CustomTimeGateway;
 
@@ -24,35 +27,44 @@ describe("admin login", () => {
       })
       .build();
 
-    ({
-      request,
-      gateways: { timeGateway },
-    } = await buildTestApp(appConfig));
+    const deps = await buildTestApp(appConfig);
+    timeGateway = deps.gateways.timeGateway;
 
     timeGateway.setNextDate(new Date());
+
+    sharedRequest = createSupertestSharedClient(adminRoutes, deps.request);
   });
 
   it("refuses to connect with wrong credentials", async () => {
-    const response = await request.post(`/admin/${adminLogin}`).send({
-      user: "lala",
-      password: "lulu",
+    const response = await sharedRequest.login({
+      body: {
+        user: "lala",
+        password: "lulu",
+      },
     });
-    expect(response.body).toEqual({
-      errors: "Wrong credentials",
+    expectToEqual(response, {
+      status: 403,
+      body: {
+        errors: "Wrong credentials",
+      },
     });
-    expect(response.status).toBe(403);
   });
 
   it("returns token if credentials are correct", async () => {
-    const response = await request.post(`/admin/${adminLogin}`).send({
-      user: appConfig.backofficeUsername,
-      password: appConfig.backofficePassword,
+    const response = await sharedRequest.login({
+      body: {
+        user: appConfig.backofficeUsername,
+        password: appConfig.backofficePassword,
+      },
     });
 
-    const token: BackOfficeJwt = response.body;
+    expectToEqual(response, {
+      status: 200,
+      body: expect.any(String),
+    });
 
-    expect(typeof token).toBe("string");
-    expect(response.status).toBe(200);
+    if (response.status !== 200) throw new Error("Unreachable");
+    const token: BackOfficeJwt = response.body;
 
     const verify = makeVerifyJwtES256<"backOffice">(appConfig.jwtPublicKey);
     const payload: BackOfficeJwtPayload = verify(token);

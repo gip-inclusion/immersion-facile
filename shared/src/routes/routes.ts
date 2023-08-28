@@ -27,7 +27,6 @@ export const frontRoutes = {
   standard: "pages",
 };
 
-export const adminLogin = "login";
 export const agenciesRoute = "agencies";
 export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";

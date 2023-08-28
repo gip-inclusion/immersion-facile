@@ -1,7 +1,7 @@
 import { from, map, Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminTargets,
+  AdminRoutes,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -11,7 +11,7 @@ import {
   SetFeatureFlagParam,
   UserAndPassword,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {
@@ -26,7 +26,7 @@ export class HttpAdminGateway implements AdminGateway {
       }),
     ).pipe(map(() => undefined));
 
-  constructor(private readonly httpClient: HttpClient<AdminTargets>) {}
+  constructor(private readonly httpClient: HttpClient<AdminRoutes>) {}
 
   public addEstablishmentBatch$(
     establishmentBatch: FormEstablishmentBatchDto,
@@ -40,7 +40,7 @@ export class HttpAdminGateway implements AdminGateway {
           },
           body: establishmentBatch,
         })
-        .then(({ responseBody }) => responseBody),
+        .then(({ body }) => body),
     );
   }
 
@@ -59,7 +59,10 @@ export class HttpAdminGateway implements AdminGateway {
             authorization: token,
           },
         })
-        .then(({ responseBody }) => responseBody),
+        .then((response) => {
+          if (response.status === 200) return response.body;
+          throw new Error(JSON.stringify(response.body));
+        }),
     );
   }
 
@@ -72,7 +75,10 @@ export class HttpAdminGateway implements AdminGateway {
           queryParams: { agencyRole: "toReview" },
           headers: { authorization: token },
         })
-        .then(({ responseBody }) => responseBody),
+        .then((response) => {
+          if (response.status === 200) return response.body;
+          throw new Error(JSON.stringify(response.body));
+        }),
     );
   }
 
@@ -80,15 +86,16 @@ export class HttpAdminGateway implements AdminGateway {
     return from(
       this.httpClient
         .getLastNotifications({ headers: { authorization: token } })
-        .then(({ responseBody }) => responseBody),
+        .then(({ body }) => body),
     );
   }
 
   public login$(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
     return from(
-      this.httpClient
-        .login({ body: userAndPassword })
-        .then(({ responseBody }) => responseBody),
+      this.httpClient.login({ body: userAndPassword }).then((response) => {
+        if (response.status === 200) return response.body;
+        throw new Error(JSON.stringify(response.body));
+      }),
     );
   }
 
@@ -102,7 +109,10 @@ export class HttpAdminGateway implements AdminGateway {
           body: params,
           headers: { authorization: token },
         })
-        .then(({ responseBody }) => responseBody),
+        .then((response) => {
+          if (response.status === 201) return;
+          throw new Error(JSON.stringify(response.body));
+        }),
     );
   }
 }

@@ -1,6 +1,6 @@
 import { SuperTest, Test } from "supertest";
 import {
-  adminTargets,
+  adminRoutes,
   BackOfficeJwt,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
@@ -13,7 +13,7 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 
-const addFormEstablishmentBatchUrl = adminTargets.addFormEstablishmentBatch.url;
+const addFormEstablishmentBatchUrl = adminRoutes.addFormEstablishmentBatch.url;
 
 describe("POST /add-form-establishment-batch", () => {
   let request: SuperTest<Test>;

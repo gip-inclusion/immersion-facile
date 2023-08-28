@@ -1,6 +1,6 @@
 import { SuperTest, Test } from "supertest";
 import {
-  adminTargets,
+  adminRoutes,
   BackOfficeJwt,
   EmailNotification,
   SmsNotification,
@@ -8,7 +8,7 @@ import {
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
-describe(`${adminTargets.getLastNotifications.url} route`, () => {
+describe(`${adminRoutes.getLastNotifications.url} route`, () => {
   let request: SuperTest<Test>;
   let adminToken: BackOfficeJwt;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -30,7 +30,7 @@ describe(`${adminTargets.getLastNotifications.url} route`, () => {
 
   describe("private route to get last email sent", () => {
     it("Returns Forbidden if no token provided", async () => {
-      const response = await request.get(adminTargets.getLastNotifications.url);
+      const response = await request.get(adminRoutes.getLastNotifications.url);
 
       expect(response.body).toEqual({
         error: "You need to authenticate first",
@@ -77,7 +77,7 @@ describe(`${adminTargets.getLastNotifications.url} route`, () => {
 
       // Getting the application succeeds and shows that it's validated.
       const response = await request
-        .get(adminTargets.getLastNotifications.url)
+        .get(adminRoutes.getLastNotifications.url)
         .set("Authorization", adminToken);
 
       expect(response.body).toEqual({

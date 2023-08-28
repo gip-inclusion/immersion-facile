@@ -1,6 +1,6 @@
 import { firstValueFrom } from "rxjs";
-import { AdminTargets, adminTargets, createManagedAxiosInstance } from "shared";
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
+import { adminRoutes, createManagedAxiosInstance } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 
 describe("HttpAdminGateway", () => {
@@ -9,11 +9,8 @@ describe("HttpAdminGateway", () => {
     const axiosInstance = createManagedAxiosInstance({
       baseURL: "http://localhost:1234",
     });
-    const createHttpClient = configureHttpClient(
-      createAxiosHandlerCreator(axiosInstance),
-    );
     adminGateway = new HttpAdminGateway(
-      createHttpClient<AdminTargets>(adminTargets),
+      createAxiosSharedClient(adminRoutes, axiosInstance),
     );
   });
 
