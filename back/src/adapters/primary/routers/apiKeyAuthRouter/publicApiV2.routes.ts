@@ -13,7 +13,7 @@ export type PublicApiV2Routes = typeof publicApiV2Routes;
 export const publicApiV2Routes = defineRoutes({
   getOfferBySiretAndAppellationCode: defineRoute({
     method: "get",
-    url: "/v2/offers/:siret/:appellationCode",
+    url: "/v2/search/:siret/:appellationCode",
     ...withAuthorizationHeaders,
     responses: {
       200: searchResultSchema,
@@ -25,7 +25,7 @@ export const publicApiV2Routes = defineRoutes({
   }),
   searchImmersion: defineRoute({
     method: "get",
-    url: "/v2/offers",
+    url: "/v2/search",
     queryParamsSchema: searchParamsPublicV2Schema,
     ...withAuthorizationHeaders,
     responses: {

@@ -46,7 +46,9 @@ describe("search route", () => {
     });
   });
 
-  describe(`v2 - /offers`, () => {
+  describe(`${publicApiV2Routes.searchImmersion.method.toUpperCase()} ${
+    publicApiV2Routes.searchImmersion.url
+  }`, () => {
     describe("verify consumer is authenticated and authorized", () => {
       it("rejects unauthenticated requests", async () => {
         const response = await sharedRequest.searchImmersion({
@@ -143,7 +145,7 @@ describe("search route", () => {
 
         const responseWith2AppellationCodesProvided = await request
           .get(
-            `/v2/offers?appellationCodes[]=11704&appellationCodes[]=11705&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+            `/v2/search?appellationCodes[]=11704&appellationCodes[]=11705&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
           )
           .set(
             "Authorization",
@@ -159,7 +161,7 @@ describe("search route", () => {
 
         const responseWith1AppellationCodeProvided = await request
           .get(
-            `/v2/offers?appellationCodes[]=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+            `/v2/search?appellationCodes[]=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
           )
           .set(
             "Authorization",
@@ -177,7 +179,7 @@ describe("search route", () => {
       it("accept address with only city", async () => {
         const response = await request
           .get(
-            `/v2/offers?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
+            `/v2/search?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
           )
           .set(
             "Authorization",
@@ -191,7 +193,7 @@ describe("search route", () => {
       it("with no specified appellation code", async () => {
         await request
           .get(
-            `/v2/offers?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
+            `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
           .set(
             "Authorization",
@@ -205,7 +207,7 @@ describe("search route", () => {
       it("with filter voluntaryToImmersion", async () => {
         await request
           .get(
-            `/v2/offers?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
+            `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
           )
           .set(
             "Authorization",
@@ -234,7 +236,7 @@ describe("search route", () => {
             "distanceKm : Expected number, received nan",
           ],
           message:
-            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/offers",
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/search",
         },
       });
     });
