@@ -332,15 +332,6 @@ describe("Admin router", () => {
 
       const updatedRole: AgencyRole = "counsellor";
 
-      // const { body, status } = await request
-      //   .patch(`${adminRoutes.updateUserRoleForAgency.url}`)
-      //   .send({
-      //     agencyId: agency.id,
-      //     userId: inclusionConnectedUser.id,
-      //     role: updatedRole,
-      //   } satisfies IcUserRoleForAgencyParams)
-      //   .set("authorization", token);
-
       const response = await sharedRequest.updateUserRoleForAgency({
         body: {
           agencyId: agency.id,

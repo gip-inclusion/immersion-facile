@@ -68,7 +68,7 @@ export * from "./rome";
 export * from "./romeAndAppellationDtos/romeAndAppellation.dto";
 export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/addressTargets";
-export * from "./routes/agencyTargets";
+export * from "./routes/agencyRoutes";
 export * from "./routes/establishementTargets";
 export * from "./routes/openApiDocTargets";
 export * from "./routes/routes";

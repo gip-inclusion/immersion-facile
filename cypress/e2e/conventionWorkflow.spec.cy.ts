@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import {
-  agencyTargets,
+  agencyRoutes,
   conventionMagicLinkTargets,
   domElementIds,
   peParisAgencyId,
@@ -162,7 +162,7 @@ const signatorySignConvention = (magicLink) => {
   ).as("getConventionByIdRequest");
   cy.intercept(
     "GET",
-    `${baseApiRoute}${agencyTargets.getAgencyPublicInfoById.url}?agencyId=${peParisAgencyId}`,
+    `${baseApiRoute}${agencyRoutes.getAgencyPublicInfoById.url}?agencyId=${peParisAgencyId}`,
   ).as("getAgencyPublicInfoByIdRequest");
   cy.visit(magicLink);
   cy.wait("@getConventionByIdRequest");
