@@ -14,10 +14,6 @@ type SearchAction = ActionOfSlice<typeof searchSlice>;
 
 type SearchEpic = AppEpic<SearchAction>;
 
-const isSearchImmersionResultDto = (
-  payload: SearchResultPayload | SearchResultDto,
-): payload is SearchResultDto => searchResultSchema.safeParse(payload).success;
-
 const initialSearchEpic: SearchEpic = (action$, _state$, { searchGateway }) =>
   action$.pipe(
     filter(searchSlice.actions.searchRequested.match),
@@ -64,17 +60,21 @@ const extraFetchEpic: SearchEpic = (
     ),
   );
 
+const isSearchResultDto = (
+  payload: SearchResultPayload | SearchResultDto,
+): payload is SearchResultDto => searchResultSchema.safeParse(payload).success;
+
 const fetchSearchResultEpic: SearchEpic = (
   action$,
   _state$,
-  { searchGateway: immersionSearchGateway },
+  { searchGateway },
 ) =>
   action$.pipe(
     filter(searchSlice.actions.fetchSearchResultRequested.match),
     switchMap(({ payload }) =>
-      isSearchImmersionResultDto(payload)
+      isSearchResultDto(payload)
         ? of(payload)
-        : immersionSearchGateway.getSearchResult$(payload),
+        : searchGateway.getSearchResult$(payload),
     ),
     map(searchSlice.actions.fetchSearchResultSucceeded),
     catchEpicError((error) =>

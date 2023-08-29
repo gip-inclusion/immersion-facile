@@ -32,7 +32,7 @@ import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnec
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
-import { createSearchImmersionRouter } from "./routers/searchImmersion/createSearchImmersionRouter";
+import { createSearchRouter } from "./routers/search/createSearchRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 
@@ -77,7 +77,7 @@ export const createApp = async (
 
   app.use(router);
 
-  app.use(createSearchImmersionRouter(deps));
+  app.use(createSearchRouter(deps));
 
   // Those routes must be defined BEFORE the others
   app.use(createHelloWorldRouter());

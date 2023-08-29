@@ -24,7 +24,7 @@ const makeImmersionOfferUrl = (
   siret: SiretDto | undefined,
   appellationCode: AppellationCode | undefined,
 ): string =>
-  `${searchImmersionRoutes.getImmersionOffer.url}?siret=${siret}&appellationCode=${appellationCode}`;
+  `${searchImmersionRoutes.getSearchResult.url}?siret=${siret}&appellationCode=${appellationCode}`;
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 const establishmentAggregate = new EstablishmentAggregateBuilder()
@@ -80,7 +80,7 @@ describe("search-immersion route", () => {
         );
 
         // Act and assert
-        const result = await sharedRequest.searchImmersion({
+        const result = await sharedRequest.search({
           queryParams: {
             appellationCode: immersionOffer.appellationCode,
             distanceKm: 30,
@@ -103,7 +103,7 @@ describe("search-immersion route", () => {
       });
 
       it("with no specified appellationCode", async () => {
-        const result = await sharedRequest.searchImmersion({
+        const result = await sharedRequest.search({
           queryParams: {
             distanceKm: 30,
             longitude: 2.34999,
@@ -118,7 +118,7 @@ describe("search-immersion route", () => {
       });
 
       it("with filter voluntaryToImmersion", async () => {
-        const result = await sharedRequest.searchImmersion({
+        const result = await sharedRequest.search({
           queryParams: {
             distanceKm: 30,
             longitude: 2.34999,
@@ -136,7 +136,7 @@ describe("search-immersion route", () => {
     });
 
     it("rejects invalid requests with error code 400", async () => {
-      const result = await sharedRequest.searchImmersion({
+      const result = await sharedRequest.search({
         queryParams: {
           distanceKm: 30,
           longitude: 2.34999,
@@ -171,7 +171,7 @@ describe("search-immersion route", () => {
     });
   });
 
-  describe(`${searchImmersionRoutes.getImmersionOffer.method} ${searchImmersionRoutes.getImmersionOffer.url}`, () => {
+  describe(`${searchImmersionRoutes.getSearchResult.method} ${searchImmersionRoutes.getSearchResult.url}`, () => {
     let request: SuperTest<Test>;
     let inMemoryUow: InMemoryUnitOfWork;
 
@@ -236,7 +236,7 @@ describe("search-immersion route", () => {
           "siret : SIRET doit être composé de 14 chiffres",
         ],
         message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.
-Route: GET /immersion-offer`,
+Route: GET /search-result`,
         status: 400,
       });
     });

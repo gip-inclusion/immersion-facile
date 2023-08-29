@@ -48,7 +48,7 @@ export class HttpSearchGateway implements SearchGateway {
   ): Observable<SearchResultDto> {
     return from(
       this.httpClient
-        .getImmersionOffer({
+        .getSearchResult({
           queryParams: params,
         })
         .then((result) => {
@@ -63,7 +63,7 @@ export class HttpSearchGateway implements SearchGateway {
   ): Observable<SearchResultDto[]> {
     return from(
       this.httpClient
-        .searchImmersion({
+        .search({
           queryParams: searchParams,
         })
         .then((result) => {

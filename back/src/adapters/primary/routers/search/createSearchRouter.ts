@@ -4,7 +4,7 @@ import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
-export const createSearchImmersionRouter = (deps: AppDependencies) => {
+export const createSearchRouter = (deps: AppDependencies) => {
   const searchImmersionRouter = Router();
 
   const expressSharedRouter = createExpressSharedRouter(
@@ -12,7 +12,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
     searchImmersionRouter,
   );
 
-  expressSharedRouter.searchImmersion(async (req, res) =>
+  expressSharedRouter.search(async (req, res) =>
     sendHttpResponse(req, res, async () =>
       deps.useCases.searchImmersion.execute(req.query, req.apiConsumer),
     ),
@@ -30,11 +30,9 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
     ),
   );
 
-  expressSharedRouter.getImmersionOffer(async (req, res) =>
+  expressSharedRouter.getSearchResult(async (req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.getSearchImmersionResultBySiretAndAppellationCode.execute(
-        req.query,
-      ),
+      deps.useCases.getSearchResultBySiretAndAppellationCode.execute(req.query),
     ),
   );
 

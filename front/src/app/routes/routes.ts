@@ -116,13 +116,13 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       contactPhone: param.query.optional.string,
       contactMessage: param.query.optional.string,
     },
-    () => `/${frontRoutes.immersionOffer}`,
+    () => `/${frontRoutes.offer}`,
   ),
   searchResultExternal: defineRoute(
     {
       siret: param.query.string,
     },
-    () => `/${frontRoutes.immersionOfferLbb}`,
+    () => `/${frontRoutes.offerExternal}`,
   ),
   manageConvention: defineRoute(
     { jwt: param.query.string },
