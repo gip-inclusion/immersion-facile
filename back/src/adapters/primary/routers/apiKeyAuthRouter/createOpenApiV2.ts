@@ -168,8 +168,8 @@ export const createOpenApiSpecV2 = (envType: string) =>
               example: "D1102",
               description: "Code ROME à 1 lettre et 4 chiffres",
             },
-            appellationCode: {
-              example: "11573",
+            appellationCodes: {
+              example: ["11573", "38444"],
               description: "Code appellation à 5 chiffres",
             },
             distanceKm: {
