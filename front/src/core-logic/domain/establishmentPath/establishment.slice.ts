@@ -22,7 +22,7 @@ type EstablishmentFeedback = SubmitFeedBack<
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
-  jwt: EstablishmentJwt;
+  jwt: EstablishmentJwt | BackOfficeJwt;
 };
 
 export type EstablishmentDeletePayload = {

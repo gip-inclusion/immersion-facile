@@ -64,7 +64,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt,
+    jwt: EstablishmentJwt | BackOfficeJwt,
   ): Observable<void> {
     return from(
       this.httpClient

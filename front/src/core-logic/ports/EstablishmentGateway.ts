@@ -16,6 +16,6 @@ export interface EstablishmentGateway {
   ): Observable<FormEstablishmentDto>;
   updateFormEstablishment$(
     establishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt,
+    jwt: EstablishmentJwt | BackOfficeJwt,
   ): Observable<void>;
 }

@@ -47,7 +47,7 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     establishment: FormEstablishmentDto,
-    _jwt: EstablishmentJwt,
+    _jwt: EstablishmentJwt | BackOfficeJwt,
   ): Observable<void> {
     this.establishments.map((currentEstablishment) =>
       establishment.siret === currentEstablishment.siret

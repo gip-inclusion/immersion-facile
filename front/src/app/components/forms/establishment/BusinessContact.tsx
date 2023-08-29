@@ -41,7 +41,7 @@ const preferredContactMethodOptions = (
   },
 ];
 
-export const BusinessContact = ({ readOnly }: { readOnly: boolean }) => {
+export const BusinessContact = ({ readOnly }: { readOnly?: boolean }) => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { setValue, register, watch, getValues, formState } =

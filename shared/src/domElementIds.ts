@@ -337,7 +337,11 @@ export const domElementIds = {
   agencyDashboard: {},
   manageConventionAdmin: {},
   manageConventionInclusionConnected: {},
-  manageEstablishmentAdmin: {},
   offer: {},
   offerExternal: {},
+  manageEstablishmentAdmin: {
+    submitEditButton: "im-form-manage-establishment-admin__submit-edit-button",
+    submitDeleteButton:
+      "im-form-manage-establishment-admin__submit-delete-button",
+  },
 } satisfies DomElementIds;

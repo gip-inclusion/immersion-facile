@@ -4,7 +4,7 @@ import { EstablishmentForm } from "src/app/components/forms/establishment/Establ
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAdminToken } from "src/app/hooks/useAdminToken";
 
-export const EstablishmentManageAdminPage = () => {
+export const ManageEstablishmentAdminPage = () => {
   const adminToken = useAdminToken();
   return (
     <HeaderFooterLayout>
