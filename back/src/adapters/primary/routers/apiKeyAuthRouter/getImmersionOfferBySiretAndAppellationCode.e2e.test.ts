@@ -104,7 +104,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
 
   it("accepts valid authenticated requests", async () => {
     const response = await request
-      .get(`/v2/offers/${immersionOfferSiret}/${styliste.appellationCode}`)
+      .get(`/v2/search/${immersionOfferSiret}/${styliste.appellationCode}`)
       .set("Authorization", authToken);
 
     expect(response.body).toEqual({
