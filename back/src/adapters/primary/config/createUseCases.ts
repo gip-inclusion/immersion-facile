@@ -251,7 +251,7 @@ export const createUseCases = (
         uuidGenerator,
       ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
-      getSearchImmersionResultBySiretAndAppellationCode:
+      getSearchResultBySiretAndAppellationCode:
         new GetSearchResultBySiretAndAppellationCode(uowPerformer),
       getSearchImmersionResultBySiretAndRome: new GetSearchResultBySiretAndRome(
         uowPerformer,

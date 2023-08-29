@@ -17,7 +17,7 @@ export const searchImmersionRoutes = defineRoutes({
     url: `/group-offers/:groupSlug`,
     responses: { 200: searchResultsSchema },
   }),
-  searchImmersion: defineRoute({
+  search: defineRoute({
     method: "get",
     url: `/${immersionOffersRoute}`,
     queryParamsSchema: searchQueryParamsSchema,
@@ -36,9 +36,9 @@ export const searchImmersionRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  getImmersionOffer: defineRoute({
+  getSearchResult: defineRoute({
     method: "get",
-    url: "/immersion-offer",
+    url: "/search-result",
     queryParamsSchema: siretAndAppellationSchema,
     responses: {
       200: searchResultSchema,

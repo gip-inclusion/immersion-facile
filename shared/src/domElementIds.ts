@@ -338,6 +338,6 @@ export const domElementIds = {
   manageConventionAdmin: {},
   manageConventionInclusionConnected: {},
   manageEstablishmentAdmin: {},
-  immersionOffer: {},
-  immersionOfferLbb: {},
+  offer: {},
+  offerExternal: {},
 } satisfies DomElementIds;
