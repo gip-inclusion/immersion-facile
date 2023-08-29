@@ -3,6 +3,7 @@ import {
   adminRoutes,
   BackOfficeJwt,
   BackOfficeJwtPayload,
+  displayRouteName,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
@@ -14,7 +15,7 @@ import { makeVerifyJwtES256 } from "../../../../domain/auth/jwt";
 import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
 import { AppConfig } from "../../config/appConfig";
 
-describe("admin login", () => {
+describe(`${displayRouteName(adminRoutes.login)} Admin login`, () => {
   let sharedRequest: HttpClient<AdminRoutes>;
   let appConfig: AppConfig;
   let timeGateway: CustomTimeGateway;

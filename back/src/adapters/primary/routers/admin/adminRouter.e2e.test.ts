@@ -5,6 +5,7 @@ import {
   AgencyDtoBuilder,
   AgencyRole,
   BackOfficeJwt,
+  displayRouteName,
   expectToEqual,
   FeatureFlags,
   featureFlagsRoute,
@@ -57,7 +58,9 @@ describe("Admin router", () => {
     };
   });
 
-  describe(`${adminRoutes.getDashboardUrl.method} ${adminRoutes.getDashboardUrl.url}`, () => {
+  describe(`${displayRouteName(
+    adminRoutes.getDashboardUrl,
+  )} Get dashboard Absolute Url`, () => {
     it("200 - Gets the absolute Url of the events dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
         urlParams: { dashboardName: "events" },
@@ -212,7 +215,9 @@ describe("Admin router", () => {
     });
   });
 
-  describe(`${adminRoutes.updateFeatureFlags.method} ${adminRoutes.updateFeatureFlags.url}`, () => {
+  describe(`${displayRouteName(
+    adminRoutes.updateFeatureFlags,
+  )} To set or update a feature flag`, () => {
     it("201 - sets the feature flag to given value if token is valid", async () => {
       const initialFeatureFlags = await getFeatureFlags();
       expectToEqual(
@@ -291,7 +296,9 @@ describe("Admin router", () => {
     });
   });
 
-  describe(`${adminRoutes.getInclusionConnectedUsers.method} ${adminRoutes.getInclusionConnectedUsers.url}`, () => {
+  describe(`${displayRouteName(
+    adminRoutes.getInclusionConnectedUsers,
+  )} List inclusion connected user`, () => {
     it("200 - Gets the list of connected users with role 'toReview'", async () => {
       const response = await sharedRequest.getInclusionConnectedUsers({
         queryParams: { agencyRole: "toReview" },
@@ -315,7 +322,9 @@ describe("Admin router", () => {
     });
   });
 
-  describe(`${adminRoutes.updateUserRoleForAgency.method} ${adminRoutes.updateUserRoleForAgency.url}`, () => {
+  describe(`${displayRouteName(
+    adminRoutes.updateUserRoleForAgency,
+  )} Update user role for agency`, () => {
     it("201 - Updates role of user form 'toReview' to 'counsellor' for given agency", async () => {
       const agency = new AgencyDtoBuilder().build();
       const inclusionConnectedUser: InclusionConnectedUser = {
