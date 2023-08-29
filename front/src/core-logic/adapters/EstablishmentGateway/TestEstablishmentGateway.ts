@@ -44,7 +44,7 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     _formEstablishment: FormEstablishmentDto,
-    _jwt: EstablishmentJwt,
+    _jwt: EstablishmentJwt | BackOfficeJwt,
   ): Observable<void> {
     return this.editFormEstablishmentResult$;
   }

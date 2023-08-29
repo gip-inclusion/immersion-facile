@@ -51,7 +51,6 @@ import {
 import { routes, useRoute } from "src/app/routes/routes";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
-import { AdminSiretRelatedInputs } from "./AdminSiretRelatedInputs";
 import { BusinessContact } from "./BusinessContact";
 import { MultipleAppellationInput } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
@@ -203,9 +202,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   }, [feedback.kind]);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
-    match(route)
+    match({ route, adminJwt })
       .with(
-        { name: P.union("formEstablishment", "formEstablishmentForExternals") },
+        {
+          route: {
+            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+          },
+        },
         () =>
           dispatch(
             establishmentSlice.actions.establishmentCreationRequested(
@@ -213,7 +216,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             ),
           ),
       )
-      .with({ name: "editFormEstablishment" }, (route) =>
+      .with({ route: { name: "editFormEstablishment" } }, ({ route }) =>
         dispatch(
           establishmentSlice.actions.establishmentEditionRequested({
             formEstablishment,
@@ -221,14 +224,32 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           }),
         ),
       )
-      .with({ name: "manageEstablishmentAdmin" }, () =>
-        routes
-          .errorRedirect({
-            message:
-              "Vous n'avez pas le droit de modifier une entreprise dans l'admin.",
-            title: "Erreur",
-          })
-          .push(),
+      .with(
+        {
+          route: { name: "manageEstablishmentAdmin" },
+          adminJwt: P.not(P.nullish),
+        },
+        ({ adminJwt }) =>
+          dispatch(
+            establishmentSlice.actions.establishmentEditionRequested({
+              formEstablishment,
+              jwt: adminJwt,
+            }),
+          ),
+      )
+      .with(
+        {
+          route: { name: "manageEstablishmentAdmin" },
+          adminJwt: P.nullish,
+        },
+        () => {
+          routes
+            .errorRedirect({
+              message: "Accès interdit sans être connecté en admin.",
+              title: "Erreur",
+            })
+            .push();
+        },
       )
       .exhaustive();
 
@@ -296,11 +317,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 businessAddress={formValues.businessAddress}
               />
             ))
-            .with("admin", () => <AdminSiretRelatedInputs />)
+            .with("admin", () => (
+              <EditionSiretRelatedInputs
+                businessAddress={formValues.businessAddress}
+              />
+            ))
             .exhaustive()}
 
           <RadioButtons
-            disabled={isEstablishmentAdmin}
             {...formContents["isEngagedEnterprise"]}
             legend={formContents["isEngagedEnterprise"].label}
             options={booleanSelectOptions.map((option) => ({
@@ -320,7 +344,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             }))}
           />
           <RadioButtons
-            disabled={isEstablishmentAdmin}
             {...formContents["fitForDisabledWorkers"]}
             legend={formContents["fitForDisabledWorkers"].label}
             options={booleanSelectOptions.map((option) => ({
@@ -340,7 +363,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             }))}
           />
           <Input
-            disabled={isEstablishmentAdmin}
             label={formContents.website.label}
             hintText={formContents.website.hintText}
             nativeInputProps={{
@@ -350,7 +372,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             {...getFieldError("website")}
           />
           <Input
-            disabled={isEstablishmentAdmin}
             label={formContents.additionalInformation.label}
             hintText={formContents.additionalInformation.hintText}
             textArea
@@ -365,7 +386,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             Les métiers que vous proposez à l'immersion :
           </h2>
           <MultipleAppellationInput
-            disabled={isEstablishmentAdmin}
             {...formContents.appellations}
             onAppellationAdd={(appellation, index) => {
               const appellationsToUpdate = formValues.appellations;
@@ -383,7 +403,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             currentAppellations={formValues.appellations}
             error={errors?.appellations?.message}
           />
-          <BusinessContact readOnly={isEstablishmentAdmin} />
+          <BusinessContact />
 
           {mode === "edit" && (
             <Checkbox
@@ -415,7 +435,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
           {enableMaxContactPerWeek.isActive && isSearchable && (
             <Input
-              disabled={isEstablishmentAdmin}
               label={formContents.maxContactsPerWeek.label}
               nativeInputProps={{
                 ...formContents.maxContactsPerWeek,
@@ -483,38 +502,49 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               description="Veuillez nous excuser. Un problème est survenu lors de la suppression de l'entreprise."
             />
           )}
-          {feedback.kind !== "submitSuccess" && !isEstablishmentAdmin && (
-            <div className={fr.cx("fr-mt-4w")}>
-              <Button
-                iconId="fr-icon-checkbox-circle-line"
-                iconPosition="left"
-                type="submit"
-                disabled={isSubmitting}
-                nativeButtonProps={{
-                  id: domElementIds.establishment.submitButton,
-                }}
-              >
-                Enregistrer mes informations
-              </Button>
-            </div>
-          )}
-          {feedback.kind !== "deleteSuccess" && isEstablishmentAdmin && (
-            <div className={fr.cx("fr-mt-4w")}>
-              <Button
-                iconId="fr-icon-delete-bin-line"
-                priority="secondary"
-                iconPosition="left"
-                type="button"
-                disabled={isSubmitting}
-                nativeButtonProps={{
-                  id: domElementIds.establishment.deleteButton,
-                }}
-                onClick={onClickEstablishmentDeleteButton}
-              >
-                Supprimer l'entreprise
-              </Button>
-            </div>
-          )}
+          <ul
+            className={fr.cx(
+              "fr-mt-4w",
+              "fr-btns-group",
+              "fr-btns-group--inline-md",
+              "fr-btns-group--icon-left",
+            )}
+          >
+            {feedback.kind !== "submitSuccess" && (
+              <li>
+                <Button
+                  iconId="fr-icon-checkbox-circle-line"
+                  iconPosition="left"
+                  type="submit"
+                  disabled={isSubmitting}
+                  nativeButtonProps={{
+                    id: domElementIds.establishment.submitButton,
+                  }}
+                >
+                  {isEstablishmentAdmin
+                    ? "Enregistrer les modifications"
+                    : "Enregistrer mes informations"}
+                </Button>
+              </li>
+            )}
+            {feedback.kind !== "deleteSuccess" && isEstablishmentAdmin && (
+              <li>
+                <Button
+                  iconId="fr-icon-delete-bin-line"
+                  priority="secondary"
+                  iconPosition="left"
+                  type="button"
+                  disabled={isSubmitting}
+                  nativeButtonProps={{
+                    id: domElementIds.establishment.deleteButton,
+                  }}
+                  onClick={onClickEstablishmentDeleteButton}
+                >
+                  Supprimer l'entreprise
+                </Button>
+              </li>
+            )}
+          </ul>
         </form>
       </FormProvider>
     </>

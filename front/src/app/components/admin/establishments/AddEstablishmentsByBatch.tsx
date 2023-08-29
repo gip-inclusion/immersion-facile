@@ -159,7 +159,7 @@ export const AddEstablishmentsByBatch = () => {
     setFormSubmitted(false);
   };
   return (
-    <>
+    <section className={fr.cx("fr-mt-4w")}>
       {isLoading && <Loader />}
       <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
         Import en masse d'entreprises
@@ -324,7 +324,7 @@ export const AddEstablishmentsByBatch = () => {
           </div>
         </div>
       )}
-    </>
+    </section>
   );
 };
 
