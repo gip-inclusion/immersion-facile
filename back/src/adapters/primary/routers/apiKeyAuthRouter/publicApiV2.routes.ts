@@ -7,7 +7,7 @@ import {
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
-import { searchImmersionRequestPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchImmersionRequestPublicV2.schema";
+import { searchParamsPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.schema";
 
 export type PublicApiV2Routes = typeof publicApiV2Routes;
 export const publicApiV2Routes = defineRoutes({
@@ -26,7 +26,7 @@ export const publicApiV2Routes = defineRoutes({
   searchImmersion: defineRoute({
     method: "get",
     url: "/v2/offers",
-    queryParamsSchema: searchImmersionRequestPublicV2Schema,
+    queryParamsSchema: searchParamsPublicV2Schema,
     ...withAuthorizationHeaders,
     responses: {
       200: searchResultsSchema,

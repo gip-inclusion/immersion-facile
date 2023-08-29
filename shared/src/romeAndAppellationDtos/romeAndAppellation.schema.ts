@@ -21,6 +21,10 @@ export const appellationCodeSchema: z.Schema<AppellationCode> = z
   .string()
   .regex(codeAppellationRegex, "Code appellation incorrect");
 
+export const appellationCodesSchema: z.Schema<AppellationCode[]> = z.array(
+  appellationCodeSchema,
+);
+
 export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
   romeCode: codeRomeSchema,
   romeLabel: zTrimmedString,

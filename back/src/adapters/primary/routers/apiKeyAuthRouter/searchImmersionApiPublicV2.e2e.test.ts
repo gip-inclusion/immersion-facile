@@ -26,7 +26,7 @@ const cartographeAppellationAndRome: AppellationAndRomeDto = {
   appellationLabel: "Cartographe",
 };
 
-describe("search-immersion route", () => {
+describe("search route", () => {
   let request: SuperTest<Test>;
   let authToken: string;
   let sharedRequest: HttpClient<PublicApiV2Routes>;
@@ -83,15 +83,21 @@ describe("search-immersion route", () => {
 
     describe("authenticated consumer", () => {
       it("with given rome, appellation code and position", async () => {
-        const immersionOffer = new ImmersionOfferEntityV2Builder()
+        const offer1 = new ImmersionOfferEntityV2Builder()
           .withRomeCode("M1808")
           .withAppellationCode("11704")
           .build();
+
+        const offer2 = new ImmersionOfferEntityV2Builder()
+          .withRomeCode("M1808")
+          .withAppellationCode("11705")
+          .build();
+
         // Prepare
         await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
           [
             new EstablishmentAggregateBuilder()
-              .withImmersionOffers([immersionOffer])
+              .withImmersionOffers([offer1, offer2])
               .withEstablishment(
                 new EstablishmentEntityBuilder()
                   .withPosition({
@@ -118,8 +124,12 @@ describe("search-immersion route", () => {
             romeLabel: "test_rome_label",
             appellations: [
               {
-                appellationLabel: immersionOffer.appellationLabel,
-                appellationCode: immersionOffer.appellationCode,
+                appellationLabel: offer1.appellationLabel,
+                appellationCode: offer1.appellationCode,
+              },
+              {
+                appellationLabel: offer2.appellationLabel,
+                appellationCode: offer2.appellationCode,
               },
             ],
             siret: "78000403200019",
@@ -130,9 +140,10 @@ describe("search-immersion route", () => {
             position: { lat: 48.8531, lon: 2.34999 },
           },
         ];
-        const response = await request
+
+        const responseWith2AppellationCodesProvided = await request
           .get(
-            `/v2/offers?appellationCode=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+            `/v2/offers?appellationCodes[]=11704&appellationCodes[]=11705&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
           )
           .set(
             "Authorization",
@@ -140,8 +151,27 @@ describe("search-immersion route", () => {
               id: authorizedUnJeuneUneSolutionApiConsumer.id,
             }),
           );
-        expect(response.body).toEqual(expectedResult);
-        expect(response.status).toBe(200);
+
+        expect(responseWith2AppellationCodesProvided.body).toEqual(
+          expectedResult,
+        );
+        expect(responseWith2AppellationCodesProvided.status).toBe(200);
+
+        const responseWith1AppellationCodeProvided = await request
+          .get(
+            `/v2/offers?appellationCodes[]=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+          )
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
+          );
+
+        expect(responseWith1AppellationCodeProvided.body).toEqual(
+          expectedResult,
+        );
+        expect(responseWith1AppellationCodeProvided.status).toBe(200);
       });
 
       it("accept address with only city", async () => {

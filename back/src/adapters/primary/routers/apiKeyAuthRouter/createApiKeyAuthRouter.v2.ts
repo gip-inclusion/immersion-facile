@@ -11,7 +11,7 @@ import {
 import { sendHttpResponseForApiV2 } from "../../helpers/sendHttpResponse";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
-import { searchImmersionRequestPublicV2ToDomain } from "../DtoAndSchemas/v2/input/SearchImmersionRequestPublicV2.dto";
+import { searchParamsPublicV2ToDomain } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.dto";
 import { domainToSearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import { publicApiV2Routes } from "./publicApiV2.routes";
 
@@ -31,7 +31,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     sendHttpResponseForApiV2(req, res, async () =>
       pipeWithValue(
         req.query,
-        searchImmersionRequestPublicV2ToDomain,
+        searchParamsPublicV2ToDomain,
         (searchImmersionRequest) =>
           deps.useCases.searchImmersion.execute(
             searchImmersionRequest,
