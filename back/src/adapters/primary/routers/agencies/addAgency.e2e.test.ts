@@ -1,10 +1,18 @@
-import { agenciesRoute, CreateAgencyDto, expectToEqual } from "shared";
+import {
+  agencyRoutes,
+  CreateAgencyDto,
+  displayRouteName,
+  expectToEqual,
+} from "shared";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
-describe("Route to add Agency", () => {
+describe(`${displayRouteName(agencyRoutes.addAgency)} to add Agency`, () => {
   it("support posting valid agency", async () => {
     const { request, inMemoryUow } = await buildTestApp();
+    const sharedRequest = createSupertestSharedClient(agencyRoutes, request);
     inMemoryUow.agencyRepository.setAgencies([]);
+
     const parisMissionLocaleParams: CreateAgencyDto = {
       id: "some-id",
       address: {
@@ -23,9 +31,9 @@ describe("Route to add Agency", () => {
       agencySiret: "01234567891234",
     };
 
-    const response = await request
-      .post(`/${agenciesRoute}`)
-      .send(parisMissionLocaleParams);
+    const response = await sharedRequest.addAgency({
+      body: parisMissionLocaleParams,
+    });
 
     expect(response.status).toBe(200);
 

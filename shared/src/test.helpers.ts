@@ -1,4 +1,5 @@
 import { partition } from "ramda";
+import { UnknownSharedRoute } from "shared-routes";
 import { EmailType, TemplatedEmail } from "./email/email";
 
 export const expectPromiseToFail = async (promise: Promise<unknown>) => {
@@ -80,3 +81,6 @@ export const expectToEqual = <T>(actual: T, expected: T) => {
 export const expectObjectsToMatch = <T>(actual: T, expected: Partial<T>) => {
   expect(actual).toMatchObject(expected);
 };
+
+export const displayRouteName = (route: UnknownSharedRoute): string =>
+  `${route.method.toUpperCase()} ${route.url} -`;

@@ -16,6 +16,7 @@ import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclu
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { featureFlagsRoute } from "../routes/routes";
 import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
+import { emptyStringSchema } from "../zodUtils";
 import {
   icUserRoleForAgencyParamsSchema,
   userAndPasswordSchema,
@@ -57,7 +58,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: icUserRoleForAgencyParamsSchema,
     ...withAuthorizationHeaders,
     responses: {
-      201: z.string().max(0),
+      201: emptyStringSchema,
       401: legacyUnauthenticatedErrorSchema,
       404: legacyBadRequestErrorSchema,
     },
@@ -84,7 +85,7 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: setFeatureFlagSchema,
     responses: {
-      201: z.string().max(0),
+      201: emptyStringSchema,
       401: legacyUnauthenticatedErrorSchema,
     },
   }),

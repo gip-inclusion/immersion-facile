@@ -1,42 +1,38 @@
 import { Router } from "express";
-import { agencyTargets } from "shared";
+import { agencyRoutes } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
 export const createAgenciesRouter = (deps: AppDependencies) => {
-  const agenciesRouter = Router();
+  const expressRouter = Router();
 
-  agenciesRouter
-    .route(agencyTargets.getFilteredAgencies.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.listAgenciesByFilter.execute(req.query as any),
-      ),
-    );
+  const sharedAgencyRouter = createExpressSharedRouter(
+    agencyRoutes,
+    expressRouter,
+  );
 
-  agenciesRouter
-    .route(agencyTargets.addAgency.url)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.addAgency.execute(req.body),
-      ),
-    );
+  sharedAgencyRouter.getFilteredAgencies((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.listAgenciesByFilter.execute(req.query),
+    ),
+  );
 
-  agenciesRouter
-    .route(agencyTargets.getImmersionFacileAgencyId.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.getImmersionFacileAgencyIdByKind.execute(),
-      ),
-    );
+  sharedAgencyRouter.addAgency((req, res) =>
+    sendHttpResponse(req, res, () => deps.useCases.addAgency.execute(req.body)),
+  );
 
-  agenciesRouter
-    .route(agencyTargets.getAgencyPublicInfoById.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.getAgencyPublicInfoById.execute(req.query as any),
-      ),
-    );
+  sharedAgencyRouter.getImmersionFacileAgencyId((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getImmersionFacileAgencyIdByKind.execute(),
+    ),
+  );
 
-  return agenciesRouter;
+  sharedAgencyRouter.getAgencyPublicInfoById((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getAgencyPublicInfoById.execute(req.query),
+    ),
+  );
+
+  return expressRouter;
 };

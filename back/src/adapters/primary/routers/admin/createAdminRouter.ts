@@ -1,22 +1,21 @@
 import { Router } from "express";
-import {
-  adminRoutes,
-  AgencyDto,
-  AgencyId,
-  agencyTargets,
-  GetDashboardParams,
-} from "shared";
+import { adminRoutes, agencyRoutes, GetDashboardParams } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
 export const createAdminRouter = (deps: AppDependencies): Router => {
-  const adminExpressRouter = Router({ mergeParams: true });
+  const expressRouter = Router({ mergeParams: true });
 
   const sharedAdminRouter = createExpressSharedRouter(
     adminRoutes,
-    adminExpressRouter,
+    expressRouter,
+  );
+
+  const sharedAgencyRouter = createExpressSharedRouter(
+    agencyRoutes,
+    expressRouter,
   );
 
   sharedAdminRouter.login((req, res) =>
@@ -25,53 +24,34 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     ),
   );
 
-  // const { removeRouterPrefix, routerPrefix } =
-  //   createRemoveRouterPrefix("/admin");
+  expressRouter.use("/admin", deps.adminAuthMiddleware);
 
-  // adminRouter
-  //   .route(removeRouterPrefix(adminRoutes.login.url))
-  //   .post(async (req, res) =>
-  //     sendHttpResponse(req, res, () =>
-  //       deps.useCases.adminLogin.execute(req.body),
-  //     ),
-  //   );
+  sharedAgencyRouter.getAgencyAdminById((req, res) =>
+    sendHttpResponse(req, res, async () =>
+      deps.useCases.getAgencyById.execute(req.params.agencyId),
+    ),
+  );
 
-  adminExpressRouter.use("/admin", deps.adminAuthMiddleware);
-
-  adminExpressRouter
-    .route(agencyTargets.getAgencyAdminById.url)
-    .get((req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.getAgencyById.execute(req.params.agencyId),
-      ),
-    );
-
-  adminExpressRouter
-    .route(agencyTargets.updateAgencyStatus.url)
-    .patch(async (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const useCaseParams: Partial<Pick<AgencyDto, "status">> & {
-          id: AgencyId;
-        } = { id: req.params.agencyId, ...req.body };
-        return deps.useCases.updateAgencyStatus.execute(useCaseParams);
+  sharedAgencyRouter.updateAgencyStatus((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.updateAgencyStatus.execute({
+        id: req.params.agencyId,
+        ...req.body,
       }),
-    );
+    ),
+  );
 
-  adminExpressRouter
-    .route(agencyTargets.updateAgency.url)
-    .put(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgencyAdmin.execute(req.body),
-      ),
-    );
+  sharedAgencyRouter.updateAgency((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.updateAgencyAdmin.execute(req.body),
+    ),
+  );
 
-  adminExpressRouter
-    .route(agencyTargets.listAgenciesWithStatus.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.privateListAgencies.execute(req.query),
-      ),
-    );
+  sharedAgencyRouter.listAgenciesWithStatus((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.privateListAgencies.execute(req.query),
+    ),
+  );
 
   sharedAdminRouter.getDashboardUrl((req, res) =>
     sendHttpResponse(req, res, () => {
@@ -106,21 +86,18 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
 
   sharedAdminRouter.getInclusionConnectedUsers((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.getIcUsers.execute(
-        req.query as any,
-        req.payloads?.backOffice,
-      ),
+      deps.useCases.getIcUsers.execute(req.query, req.payloads?.backOffice),
     ),
   );
 
   sharedAdminRouter.updateUserRoleForAgency((req, res) =>
     sendHttpResponse(req, res.status(201), () =>
       deps.useCases.updateIcUserRoleForAgency.execute(
-        req.body as any,
+        req.body,
         req.payloads?.backOffice,
       ),
     ),
   );
 
-  return adminExpressRouter;
+  return expressRouter;
 };

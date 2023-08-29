@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
 import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
@@ -7,6 +6,7 @@ import {
   immersionOffersRoute,
 } from "../routes/routes";
 import { siretAndAppellationSchema } from "../siretAndAppellation/SiretAndAppellation.schema";
+import { emptyStringSchema } from "../zodUtils";
 import { searchQueryParamsSchema } from "./SearchQueryParams.schema";
 import { searchResultSchema, searchResultsSchema } from "./SearchResult.schema";
 
@@ -31,7 +31,7 @@ export const searchImmersionRoutes = defineRoutes({
     url: `/${contactEstablishmentRoute}`,
     requestBodySchema: contactEstablishmentRequestSchema,
     responses: {
-      201: z.string().max(0),
+      201: emptyStringSchema,
       400: httpErrorSchema,
       404: httpErrorSchema,
     },
