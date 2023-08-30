@@ -50,7 +50,7 @@ const {
   open: openRejectModal,
   close: closeRejectModal,
 } = createModal({
-  id: "reject",
+  id: domElementIds.manageConvention.rejectedModal,
   isOpenedByDefault: false,
 });
 
@@ -59,7 +59,7 @@ const {
   open: openDraftModal,
   close: closeDraftModal,
 } = createModal({
-  id: "draft",
+  id: domElementIds.manageConvention.draftModal,
   isOpenedByDefault: false,
 });
 
@@ -68,7 +68,7 @@ const {
   open: openCancelModal,
   close: closeCancelModal,
 } = createModal({
-  id: "cancel",
+  id: domElementIds.manageConvention.cancelModal,
   isOpenedByDefault: false,
 });
 
@@ -77,7 +77,7 @@ const {
   open: openDeprecateModal,
   close: closeDeprecateModal,
 } = createModal({
-  id: "deprecate",
+  id: domElementIds.manageConvention.deprecatedModal,
   isOpenedByDefault: false,
 });
 
@@ -86,7 +86,7 @@ const {
   open: openValidatorModal,
   close: closeValidatorModal,
 } = createModal({
-  id: "validator",
+  id: domElementIds.manageConvention.validatorModal,
   isOpenedByDefault: false,
 });
 

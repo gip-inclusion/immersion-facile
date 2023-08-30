@@ -1,5 +1,5 @@
 import { frontRoutes, domElementIds } from "shared";
-import { disableUrlLogging } from "../cypress/utils/log";
+import { disableUrlLogging } from "../../cypress/utils/log";
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
 
 describe("Convention Form (on dev http, prefilled forms false)", () => {
@@ -15,7 +15,7 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
     cy.get(`#${domElementIds.conventionImmersionRoute.showFormButton}`).click();
 
     // Open place / date section
-    cy.get(`#im-convention-form__step-3 .fr-accordion__btn`).click();
+    cy.get(`.fr-accordion`).eq(3).find(".fr-accordion__btn").click();
     cy.get(
       `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
     )

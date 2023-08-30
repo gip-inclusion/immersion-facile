@@ -54,7 +54,7 @@ describe("Establishment creation and modification workflow", () => {
       `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
     ).type(providedSiret);
 
-    cy.url().should("include", `/establishment?siret=${providedSiret}`);
+    cy.url().should("include", `siret=${providedSiret}`);
 
     cy.wait("@addressAutocompleteRequest")
       .its("response.statusCode")
@@ -73,10 +73,15 @@ describe("Establishment creation and modification workflow", () => {
     cy.get(
       `#${domElementIds.establishment.establishmentFormAddressAutocomplete}`,
     ).should("not.have.value", "");
-    cy.get(`#${domElementIds.establishment.appellations} .fr-input`).type(
-      "boulang",
-      defaultFieldOptions,
-    );
+
+    cy.get(`#${domElementIds.establishment.addAppellationButton}`)
+      .click()
+      .then(() => {
+        cy.get(`#${domElementIds.establishment.appellations} .fr-input`).type(
+          "boulang",
+          defaultFieldOptions,
+        );
+      });
 
     cy.wait("@autocompleteAppellationRequest");
 

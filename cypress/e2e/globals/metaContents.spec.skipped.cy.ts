@@ -3,7 +3,7 @@ import {
   metaContents,
   standardMetaContent,
 } from "front/src/app/contents/meta/metaContents";
-import { StandardPageSlugs } from "front/src/app/routes/route-params";
+import { StandardPageSlugs } from "front/src/app/routes/routeParams/standardPage";
 
 const routesNames: Array<{
   routeName: keyof typeof routes | StandardPageSlugs;

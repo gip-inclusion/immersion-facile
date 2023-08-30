@@ -1,5 +1,5 @@
 import { domElementIds, frontRoutes } from "shared";
-import { disableUrlLogging } from "../cypress/utils/log";
+import { disableUrlLogging } from "../../cypress/utils/log";
 
 describe("Simple navigation", () => {
   // TODO: do separate test for admin navigation
@@ -84,11 +84,7 @@ describe("Simple navigation", () => {
     const target = cy.get(selector);
     target.then(($element) => {
       if (!$element.is(":visible")) {
-        $element
-          .parent()
-          .parents(".fr-nav__item")
-          .find(".fr-nav__btn")
-          .trigger("click");
+        $element.parents(".fr-nav__item").find(".fr-nav__btn").trigger("click");
       }
       target.click();
       expectLocationToBe(expectedRoute);
