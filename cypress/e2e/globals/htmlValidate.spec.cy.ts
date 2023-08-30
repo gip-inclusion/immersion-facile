@@ -1,4 +1,4 @@
-import { frontRoutes } from "../../shared";
+import { frontRoutes } from "../../../shared/src";
 const selectedRoutes = [
   "/",
   frontRoutes.addAgency,

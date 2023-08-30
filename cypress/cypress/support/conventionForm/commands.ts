@@ -12,6 +12,18 @@ import {
 import { faker } from "@faker-js/faker/locale/fr";
 
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
+const possibleJobs = [
+  "Aide à domicile",
+  "Aide-soignant",
+  "Ambulancier",
+  "Boulanger",
+  "Boucher",
+  "Jongleur",
+  "Pompier",
+  "Pâtissier",
+  "Plombier",
+  "Serrurier",
+];
 const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
 let currentStep = 1;
 
@@ -143,7 +155,7 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   ).check(defaultFieldOptions);
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
-  ).type(faker.name.jobType());
+  ).type(possibleJobs[Math.floor(Math.random() * possibleJobs.length)]);
   cy.wait("@autocompleteAppellationRequest");
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
@@ -181,6 +193,6 @@ const getRandomSiret = () =>
   ];
 
 const openNextSection = () => {
-  cy.get(`#im-convention-form__step-${currentStep} .fr-accordion__btn`).click();
+  cy.get(`.fr-accordion`).eq(currentStep).find(".fr-accordion__btn").click();
   currentStep++;
 };

@@ -1,12 +1,12 @@
 import { createRouter, defineRoute, param } from "type-route";
 import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
-import { formEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
   appellationStringSerializer,
   conventionValuesFromUrl,
 } from "./routeParams/convention";
 import { groupsSerializer } from "./routeParams/establishmentGroups";
+import { formEstablishmentParamsInUrl } from "./routeParams/formEstablishment";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 
 const createInclusionConnectedParams = <

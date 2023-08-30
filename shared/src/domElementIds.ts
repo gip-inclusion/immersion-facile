@@ -58,6 +58,7 @@ export const domElementIds = {
       stats: buildFooterNavLinkId("stats"),
       sitemap: buildFooterNavLinkId("sitemap"),
       budget: buildFooterNavLinkId("budget"),
+      apiDocumentation: buildFooterNavLinkId("api-documentation"),
     },
   },
 
@@ -239,6 +240,12 @@ export const domElementIds = {
     justificationModalSubmitButton: "im-justification-modal__submit-button",
     validatorModalCancelButton: "im-validator-modal__cancel-button",
     validatorModalSubmitButton: "im-validator-modal__submit-button",
+    modifierRoleSelect: "im-validator-modal__modifier-role-select",
+    draftModal: "im-justification-modal",
+    rejectedModal: "im-rejected-modal",
+    deprecatedModal: "im-deprecate-modal",
+    validatorModal: "im-validator-modal",
+    cancelModal: "im-cancel-modal",
   },
 
   establishment: {
@@ -263,6 +270,7 @@ export const domElementIds = {
     website: "establishment-website",
     additionalInformation: "establishment-additionalInformation",
     maxContactsPerWeek: "establishment-maxContactPerWeek",
+    addAppellationButton: "im-form-add-establishment__add-appellation-button",
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
     submitButton: "im-form-add-establishment__submit-button",

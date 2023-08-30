@@ -1,12 +1,5 @@
-import { domElementIds, frontRoutes } from "../../shared";
-import { disableUrlLogging } from "../cypress/utils/log";
-const selectedRoutes = [
-  "/",
-  frontRoutes.search,
-  frontRoutes.conventionImmersionRoute,
-  frontRoutes.addAgency,
-  frontRoutes.establishment,
-];
+import { domElementIds, frontRoutes } from "../../../shared/src";
+import { disableUrlLogging } from "../../cypress/utils/log";
 
 const axeConf = {
   includedImpacts: ["serious", "critical"],

@@ -15,11 +15,11 @@ export default defineConfig({
         // Temp fix, Cypress seems to report elements as disabled when they are not https://github.com/cypress-io/cypress/issues/5827
         force: true,
       },
-      timeForEventCrawler: 10000,
+      timeForEventCrawler: 6000,
     },
   },
   e2e: {
-    specPattern: "e2e/**/*.cy.{js,jsx,ts,tsx}",
+    specPattern: "e2e/**/*.spec.cy.{js,jsx,ts,tsx}",
     setupNodeEvents(on) {
       htmlvalidate.install(on, htmlValidateConfig);
       on("task", {

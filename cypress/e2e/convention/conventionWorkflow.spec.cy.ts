@@ -5,7 +5,7 @@ import {
   domElementIds,
   peParisAgencyId,
 } from "shared";
-import { disableUrlLogging } from "../cypress/utils/log";
+import { disableUrlLogging } from "../../cypress/utils/log";
 import { addBusinessDays, format } from "date-fns";
 
 const { baseApiRoute, defaultFieldOptions, timeForEventCrawler } =
@@ -60,11 +60,14 @@ describe("Convention full workflow", () => {
         cy.get(
           `#${domElementIds.manageConvention.conventionValidationRequestEditButton}`,
         ).click();
-        cy.get("#draft-modal [name='statusJustification']").type(
-          "Raison de la demande de modification",
-        );
+        cy.fillSelect({
+          element: `#${domElementIds.manageConvention.modifierRoleSelect}`,
+        });
         cy.get(
-          `#draft-modal #${domElementIds.manageConvention.justificationModalSubmitButton}`,
+          `#${domElementIds.manageConvention.draftModal} [name='statusJustification']`,
+        ).type("Raison de la demande de modification");
+        cy.get(
+          `#${domElementIds.manageConvention.draftModal} #${domElementIds.manageConvention.justificationModalSubmitButton}`,
         ).click(defaultFieldOptions);
         cy.wait("@updateConventionRequest")
           .its("response.statusCode")
@@ -118,9 +121,9 @@ describe("Convention full workflow", () => {
           signatorySignConvention(magicLinkUrl);
         });
     });
+    cy.wait(timeForEventCrawler);
   });
   it("reviews and validate convention", () => {
-    cy.wait(timeForEventCrawler);
     cy.intercept(
       "POST",
       `${baseApiRoute}${conventionMagicLinkTargets.updateConventionStatus.url.replace(
@@ -136,6 +139,10 @@ describe("Convention full workflow", () => {
       cy.getMagicLinkInEmailWrapper($emailWrapper).click();
       cy.get(
         `#${domElementIds.manageConvention.conventionValidationValidateButton}`,
+      ).click();
+      cy.wait(1000);
+      cy.get(
+        `#${domElementIds.manageConvention.validatorModalSubmitButton}`,
       ).click();
       cy.wait("@reviewConventionRequest")
         .its("response.statusCode")
@@ -167,15 +174,13 @@ const signatorySignConvention = (magicLink) => {
   cy.visit(magicLink);
   cy.wait("@getConventionByIdRequest");
   cy.wait("@getAgencyPublicInfoByIdRequest");
-  cy.get(".im-signature-actions__checkbox input")
-    .not(":checked")
-    .check({ force: true });
+
   cy.get(`#${domElementIds.conventionToSign.submitButton}`).should(
     "not.be.disabled",
   );
-  cy.get(`#${domElementIds.conventionToSign.submitButton}`).click({
-    force: true,
-  });
+  cy.get(`#${domElementIds.conventionToSign.openSignModalButton}`).click();
+  cy.wait(1000);
+  cy.get(`#${domElementIds.conventionToSign.submitButton}`).click();
   cy.wait("@signConventionRequest")
     .its("response.statusCode")
     .should("eq", 200);
@@ -193,13 +198,13 @@ const editConventionForm = (magicLinkUrl) => {
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
   ).should("have.value", peParisAgencyId);
-  cy.get(`#im-convention-form__step-2 .fr-accordion__btn`).click();
+  cy.get(`.fr-accordion`).eq(2).find(".fr-accordion__btn").click();
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
   )
     .clear()
     .type(faker.name.jobTitle());
-  cy.get(`#im-convention-form__step-3 .fr-accordion__btn`).click();
+  cy.get(`.fr-accordion`).eq(3).find(".fr-accordion__btn").click();
   cy.get(`#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`)
     .clear()
     .type(format(addBusinessDays(new Date(), 5), "yyyy-MM-dd"));

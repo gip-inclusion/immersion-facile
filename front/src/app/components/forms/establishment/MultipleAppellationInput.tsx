@@ -2,7 +2,11 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { useStyles } from "tss-react/dsfr";
-import { AppellationAndRomeDto, emptyAppellationAndRome } from "shared";
+import {
+  AppellationAndRomeDto,
+  domElementIds,
+  emptyAppellationAndRome,
+} from "shared";
 import { AppellationAutocomplete } from "../autocomplete/AppellationAutocomplete";
 
 type MultipleAppellationInputProps = {
@@ -69,6 +73,7 @@ export const MultipleAppellationInput = ({
         type="button"
         iconId="fr-icon-add-line"
         title="Ajouter un métier"
+        id={domElementIds.establishment.addAppellationButton}
         priority="secondary"
         onClick={() => {
           onAppellationAdd(emptyAppellationAndRome, currentAppellations.length);

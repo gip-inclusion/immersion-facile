@@ -124,6 +124,7 @@ export const JustificationModalContent = ({
               options={getSignatoriesOption(convention.signatories)}
               nativeSelectProps={{
                 ...register("modifierRole"),
+                id: domElementIds.manageConvention.modifierRoleSelect,
               }}
             />
           )}

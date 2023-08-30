@@ -173,12 +173,12 @@ const bottomsLinks: NavLink[] = [
   {
     label: "Budget",
     ...routes.standard({ pagePath: "budget" }).link,
-    id: bottomsLinksIds.sitemap,
+    id: bottomsLinksIds.budget,
   },
   {
     label: "Documentation API",
     href: "/doc-api",
-    id: bottomsLinksIds.sitemap,
+    id: bottomsLinksIds.apiDocumentation,
   },
 ];
 
