@@ -170,7 +170,7 @@ export const createOpenApiSpecV2 = (envType: string) =>
             },
             appellationCodes: {
               example: ["11573", "38444"],
-              description: "Code appellation à 5 chiffres",
+              description: "Tableau de codes appellation à 5 chiffres",
             },
             distanceKm: {
               example: 10,
