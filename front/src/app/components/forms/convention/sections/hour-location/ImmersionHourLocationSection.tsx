@@ -3,12 +3,13 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { addDays, addMonths, differenceInDays, subDays } from "date-fns";
+import { addDays, addMonths, differenceInDays } from "date-fns";
 import {
   addressDtoToString,
   ConventionReadDto,
   DateIntervalDto,
   isStringDate,
+  maximumCalendarDayByInternshipKind,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
   toDateString,
@@ -31,6 +32,12 @@ export const ImmersionHourLocationSection = () => {
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
+  const [dateStartInputValue, setDateStartInputValue] = useState<string>(
+    values.dateStart,
+  );
+  const [dateEndInputValue, setDateEndInputValue] = useState<string>(
+    values.dateEnd,
+  );
   const formContents = getFormFields();
   const defaultDateMax = isStringDate(values.dateStart)
     ? new Date(values.dateStart)
@@ -42,7 +49,11 @@ export const ImmersionHourLocationSection = () => {
     values.internshipKind === "mini-stage-cci"
       ? (["dimanche"] as Weekday[])
       : [];
-  const resetSchedule = (interval: DateIntervalDto) => {
+  const resetSchedule = () => {
+    const interval: DateIntervalDto = {
+      start: new Date(values.dateStart),
+      end: new Date(values.dateEnd),
+    };
     setValue(
       "schedule",
       values.schedule.isSimple
@@ -53,6 +64,53 @@ export const ImmersionHourLocationSection = () => {
   const getFieldError = makeFieldError(formState);
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
+
+  const shouldUpdateDateAndSchedule = (dateStart: string, dateEnd: string) =>
+    differenceInDays(new Date(dateEnd), new Date(dateStart)) <=
+    maximumCalendarDayByInternshipKind[values.internshipKind];
+
+  const onDateInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const { name } = event.target;
+    const newDates: DateIntervalDto = {
+      start: new Date(dateStartInputValue),
+      end: new Date(dateEndInputValue),
+    };
+    const isDateEndAfterDateStart =
+      differenceInDays(newDates.end, newDates.start) > 0;
+
+    if (!isDateEndAfterDateStart && name === "dateStart") {
+      newDates.end = addDays(newDates.start, 1);
+    }
+
+    if (!isDateEndAfterDateStart && name === "dateEnd") {
+      newDates.start = addDays(newDates.end, -1);
+    }
+
+    if (
+      !shouldUpdateDateAndSchedule(
+        newDates.start.toISOString(),
+        newDates.end.toISOString(),
+      )
+    ) {
+      alert(
+        `Attention, votre ${
+          values.internshipKind === "immersion" ? "immersion" : "stage"
+        } ne peut pas dépasser ${
+          maximumCalendarDayByInternshipKind[values.internshipKind]
+        } jours. Veuillez modifier les dates de votre ${
+          values.internshipKind === "immersion" ? "immersion" : "stage"
+        }.`,
+      );
+      return;
+    }
+
+    setDateMax(addMonths(newDates.start, 1).toISOString());
+    setValue("dateEnd", newDates.end.toISOString());
+    setValue("dateStart", newDates.start.toISOString());
+    setDateStartInputValue(newDates.start.toISOString());
+    setDateEndInputValue(newDates.end.toISOString());
+    resetSchedule();
+  };
 
   return (
     <>
@@ -84,31 +142,14 @@ export const ImmersionHourLocationSection = () => {
           name: register("dateStart").name,
           ref: register("dateStart").ref,
           id: formContents["dateStart"].id,
-          value: toDateString(new Date(values.dateStart)),
+          value: toDateString(new Date(dateStartInputValue)),
           onChange: (event) => {
             const dateStart = event.target.value;
-            if (isStringDate(dateStart) && dateStart !== "") {
-              const newDateEnd =
-                differenceInDays(
-                  new Date(values.dateEnd),
-                  new Date(dateStart),
-                ) > 0
-                  ? new Date(values.dateEnd)
-                  : addDays(new Date(dateStart), 1);
-              resetSchedule({
-                start: new Date(dateStart),
-                end: newDateEnd,
-              });
-              setValue("dateEnd", newDateEnd.toISOString(), {
-                shouldValidate: true,
-              });
-              setValue("dateStart", dateStart, {
-                shouldValidate: true,
-              });
-              setDateMax(addMonths(new Date(dateStart), 1).toISOString());
+            if (dateStart !== "" && isStringDate(dateStart)) {
+              setDateStartInputValue(new Date(dateStart).toISOString());
             }
           },
-
+          onBlur: onDateInputBlur,
           type: "date",
         }}
         {...getFieldError("dateStart")}
@@ -121,31 +162,15 @@ export const ImmersionHourLocationSection = () => {
           ref: register("dateEnd").ref,
           id: formContents["dateEnd"].id,
           onChange: (event) => {
-            const newDateEnd = event.target.value;
-
-            if (isStringDate(newDateEnd) && newDateEnd !== "") {
-              const newDateStart =
-                differenceInDays(
-                  new Date(newDateEnd),
-                  new Date(values.dateStart),
-                ) > 0
-                  ? new Date(values.dateStart)
-                  : subDays(new Date(newDateEnd), 1);
-              setValue("dateEnd", newDateEnd, {
-                shouldValidate: true,
-              });
-              setValue("dateStart", newDateStart.toISOString(), {
-                shouldValidate: true,
-              });
-              resetSchedule({
-                start: new Date(values.dateStart),
-                end: new Date(newDateEnd),
-              });
+            const dateEnd = event.target.value;
+            if (dateEnd !== "" && isStringDate(dateEnd)) {
+              setDateEndInputValue(new Date(dateEnd).toISOString());
             }
           },
           type: "date",
           max: dateMax,
-          value: toDateString(new Date(values.dateEnd)),
+          value: toDateString(new Date(dateEndInputValue)),
+          onBlur: onDateInputBlur,
         }}
         {...getFieldError("dateEnd")}
       />
