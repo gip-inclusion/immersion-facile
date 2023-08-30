@@ -2,7 +2,7 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { makeStyles, useStyles } from "tss-react/dsfr";
-import { domElementIds, immersionFacileContactEmail } from "shared";
+import { domElementIds } from "shared";
 import {
   Footer,
   NavLink,
@@ -155,8 +155,9 @@ const bottomsLinks: NavLink[] = [
   },
   {
     label: "Nous contacter",
-    href: `mailto:${immersionFacileContactEmail}`,
+    href: "https://aide.immersion-facile.beta.gouv.fr/fr/",
     id: bottomsLinksIds.contact,
+    target: "_blank",
   },
   {
     label: "Statistiques",
