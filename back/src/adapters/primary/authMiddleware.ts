@@ -168,7 +168,13 @@ export const makeApiKeyAuthMiddlewareV1 = (
 
       req.apiConsumer = apiConsumer;
       return next();
-    } catch (_) {
+    } catch (error) {
+      logger.error(
+        {
+          error,
+        },
+        `makeApiKeyAuthMiddlewareV1 : ${(error as any).message}`,
+      );
       incTotalCountForRequest({
         authorisationStatus: "incorrectJwt",
       });
@@ -321,7 +327,13 @@ export const makeApiKeyAuthMiddlewareV2 = (
 
       req.apiConsumer = apiConsumer;
       return next();
-    } catch (_) {
+    } catch (error) {
+      logger.error(
+        {
+          error,
+        },
+        `makeApiKeyAuthMiddlewareV2 : ${(error as any).message}`,
+      );
       incTotalCountForRequest({
         authorisationStatus: "incorrectJwt",
       });
