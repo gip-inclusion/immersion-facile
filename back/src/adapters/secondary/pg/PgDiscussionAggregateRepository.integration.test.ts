@@ -4,8 +4,8 @@ import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
+import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
+import { DiscussionAggregate } from "../../../domain/offer/entities/DiscussionAggregate";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
@@ -17,7 +17,7 @@ const styliste: AppellationAndRomeDto = {
   appellationLabel: "Styliste",
 };
 
-const offer = new ImmersionOfferEntityV2Builder()
+const offer = new OfferEntityBuilder()
   .withRomeCode(styliste.romeCode)
   .withAppellationCode(styliste.appellationCode)
   .withAppellationLabel(styliste.appellationLabel)
@@ -146,7 +146,7 @@ describe("PgDiscussionAggregateRepository", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siret)
         .withContactId("12345678-1111-2222-3333-444444444444")
-        .withImmersionOffers([offer])
+        .withOffers([offer])
         .build(),
     ]);
 

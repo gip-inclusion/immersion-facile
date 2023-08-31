@@ -28,7 +28,7 @@ export class ConvertContactEstablishmentPublicV1ToDomain extends TransactionalUs
         `establishment with siret ${contactRequest.siret} not found`,
       );
 
-    const firstOfferMatchingRome = establishmentAggregate.immersionOffers.find(
+    const firstOfferMatchingRome = establishmentAggregate.offers.find(
       ({ romeCode }) => offer.romeCode === romeCode,
     );
 

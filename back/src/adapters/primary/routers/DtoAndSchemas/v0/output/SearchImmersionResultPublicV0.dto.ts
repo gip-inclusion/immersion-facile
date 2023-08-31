@@ -5,7 +5,7 @@ import {
   SearchResultDto,
   SiretDto,
 } from "shared";
-import { GetSearchResultBySiretAndRomePayload } from "../../../../../../domain/immersionOffer/useCases/GetSearchResultById";
+import { GetSearchResultBySiretAndRomePayload } from "../../../../../../domain/offer/useCases/GetSearchResultById";
 
 export type LegacyImmersionOfferId = `${SiretDto}-${RomeCode}`;
 

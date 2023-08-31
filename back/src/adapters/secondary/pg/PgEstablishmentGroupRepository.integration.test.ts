@@ -7,9 +7,9 @@ import {
 } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
+import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
+import { EstablishmentEntity } from "../../../domain/offer/entities/EstablishmentEntity";
+import { EstablishmentGroupEntity } from "../../../domain/offer/entities/EstablishmentGroupEntity";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
 
@@ -89,37 +89,36 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   it("finds search immersion results by slug", async () => {
-    const offerBoulanger = new ImmersionOfferEntityV2Builder()
+    const offerBoulanger = new OfferEntityBuilder()
       .withRomeCode("D1102")
       .withAppellationCode("11574")
       .build();
 
-    const offerAideBoulanger = new ImmersionOfferEntityV2Builder()
+    const offerAideBoulanger = new OfferEntityBuilder()
       .withRomeCode("D1102")
       .withAppellationCode("10868")
       .build();
 
-    const offerBoucher = new ImmersionOfferEntityV2Builder()
+    const offerBoucher = new OfferEntityBuilder()
       .withRomeCode("D1101")
       .withAppellationCode("11564")
       .build();
 
-    const offerVendeurEnAlimentationGenerale =
-      new ImmersionOfferEntityV2Builder()
-        .withRomeCode("D1106")
-        .withAppellationCode("20540")
-        .build();
+    const offerVendeurEnAlimentationGenerale = new OfferEntityBuilder()
+      .withRomeCode("D1106")
+      .withAppellationCode("20540")
+      .build();
 
     const establishmentAggregate1 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(carrefourGroup.sirets[0])
       .withContactId("11111111-1111-4444-1111-111111111111")
-      .withImmersionOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
+      .withOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
       .build();
 
     const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(carrefourGroup.sirets[1])
       .withContactId("22222222-2222-4444-2222-222222222222")
-      .withImmersionOffers([offerVendeurEnAlimentationGenerale])
+      .withOffers([offerVendeurEnAlimentationGenerale])
       .build();
 
     await pgEstablishmentGroupRepository.save(carrefourGroup);

@@ -6,7 +6,7 @@ import {
   GeoPositionDto,
   LookupSearchResult,
 } from "shared";
-import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
+import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { errorMessage, HttpAddressGateway } from "./HttpAddressGateway";

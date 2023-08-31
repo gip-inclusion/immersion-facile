@@ -11,8 +11,8 @@ import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domain/auth/jwt";
-import { establishmentNotFoundErrorMessage } from "../../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { formEstablishmentNotFoundErrorMessage } from "../../../../domain/immersionOffer/ports/FormEstablishmentRepository";
+import { establishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
+import { formEstablishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/FormEstablishmentRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTargets.deleteEstablishment.url}`, () => {

@@ -10,26 +10,26 @@ import {
 } from "shared";
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
-import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntity } from "../domain/offer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-} from "../domain/immersionOffer/entities/EstablishmentEntity";
-import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { AddressGateway } from "../domain/immersionOffer/ports/AddressGateway";
+} from "../domain/offer/entities/EstablishmentEntity";
+import { OfferEntity } from "../domain/offer/entities/OfferEntity";
+import { AddressGateway } from "../domain/offer/ports/AddressGateway";
 import { SiretGateway } from "../domain/sirene/ports/SirenGateway";
 import { getSiretEstablishmentFromApi } from "../domain/sirene/service/getSirenEstablishmentFromApi";
 
 const offerFromFormScore = 10;
 
-const appellationToImmersionOfferEntity =
+const appellationToOfferEntity =
   (timeGateway: TimeGateway) =>
   ({
     romeCode,
     appellationCode,
     appellationLabel,
     romeLabel,
-  }: AppellationAndRomeDto): ImmersionOfferEntityV2 => ({
+  }: AppellationAndRomeDto): OfferEntity => ({
     romeCode,
     appellationCode,
     appellationLabel,
@@ -177,10 +177,9 @@ const makeCreateEstablishmentAggregate =
       ...formEstablishment.businessContact,
     };
 
-    const immersionOffers: ImmersionOfferEntityV2[] =
-      formEstablishment.appellations.map(
-        appellationToImmersionOfferEntity(timeGateway),
-      );
+    const immersionOffers: OfferEntity[] = formEstablishment.appellations.map(
+      appellationToOfferEntity(timeGateway),
+    );
 
     const establishment: EstablishmentEntity = {
       siret: formEstablishment.siret,
@@ -206,7 +205,7 @@ const makeCreateEstablishmentAggregate =
     const establishmentAggregate: EstablishmentAggregate = {
       establishment,
       contact,
-      immersionOffers,
+      offers: immersionOffers,
     };
 
     return establishmentAggregate;

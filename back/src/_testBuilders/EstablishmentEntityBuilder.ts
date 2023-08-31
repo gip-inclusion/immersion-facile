@@ -7,7 +7,7 @@ import {
   NafDto,
   NumberEmployeesRange,
 } from "shared";
-import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
+import { EstablishmentEntity } from "../domain/offer/entities/EstablishmentEntity";
 import { avenueChampsElyseesDto } from "./addressDtos";
 
 export const defaultNafCode = "7820Z";

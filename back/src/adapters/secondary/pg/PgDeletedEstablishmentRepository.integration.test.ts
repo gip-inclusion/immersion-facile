@@ -2,7 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { DeletedEstablishementDto } from "../../../domain/immersionOffer/ports/DeletedEstablishmentRepository";
+import { DeletedEstablishementDto } from "../../../domain/offer/ports/DeletedEstablishmentRepository";
 import { PgDeletedEstablishmentRepository } from "./PgDeletedEstablishmentRepository";
 
 describe("PgDeletedEstablishmentRepository", () => {

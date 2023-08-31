@@ -9,7 +9,7 @@ import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";
+import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { createPoleEmploiTargets } from "../../secondary/poleEmploi/PoleEmploi.targets";
 import { AppConfig } from "../config/appConfig";

@@ -3,7 +3,7 @@ import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImpleme
 import {
   ContactEntity as ContactEntity,
   ContactMethod,
-} from "../domain/immersionOffer/entities/ContactEntity";
+} from "../domain/offer/entities/ContactEntity";
 
 const validContactEntityV2: ContactEntity = {
   id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",

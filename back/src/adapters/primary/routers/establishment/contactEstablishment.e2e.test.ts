@@ -14,7 +14,7 @@ import {
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -57,7 +57,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
       .withId(contactId)
       .withContactMethod("EMAIL")
       .build();
-    const immersionOffer = new ImmersionOfferEntityV2Builder().build();
+    const immersionOffer = new OfferEntityBuilder().build();
 
     inMemoryUow.romeRepository.appellations = [
       {
@@ -73,7 +73,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
         new EstablishmentAggregateBuilder()
           .withEstablishment(establishment)
           .withContact(contact)
-          .withImmersionOffers([immersionOffer])
+          .withOffers([immersionOffer])
           .build(),
       ],
     );

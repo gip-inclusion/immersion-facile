@@ -4,11 +4,11 @@ import { DiscussionId, SiretDto } from "shared";
 import {
   DiscussionAggregate,
   ExchangeEntity,
-} from "../../../domain/immersionOffer/entities/DiscussionAggregate";
+} from "../../../domain/offer/entities/DiscussionAggregate";
 import {
   DiscussionAggregateRepository,
   HasDiscussionMatchingParams,
-} from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
+} from "../../../domain/offer/ports/DiscussionAggregateRepository";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);

@@ -2,7 +2,7 @@ import { SiretDto } from "shared";
 import {
   DeletedEstablishementDto,
   DeletedEstablishmentRepository,
-} from "../../domain/immersionOffer/ports/DeletedEstablishmentRepository";
+} from "../../domain/offer/ports/DeletedEstablishmentRepository";
 
 export class InMemoryDeletedEstablishmentRepository
   implements DeletedEstablishmentRepository

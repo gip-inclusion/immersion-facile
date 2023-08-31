@@ -2,14 +2,14 @@ import { ContactMethod, expectPromiseToFailWith, expectToEqual } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   ContactEstablishmentByMailPublicV1Dto,
   ContactEstablishmentPublicV1Dto,
 } from "../../../adapters/primary/routers/DtoAndSchemas/v1/input/ContactEstablishmentPublicV1.dto";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { ConvertContactEstablishmentPublicV1ToDomain } from "./ConvertContactEstablishmentPublicV1ToDomain";
 
 const siret = "11112222333344";
@@ -17,7 +17,7 @@ const contactId = "theContactId";
 const romeCode = "M1808";
 const establishment = new EstablishmentEntityBuilder().withSiret(siret).build();
 
-const immersionOffer = new ImmersionOfferEntityV2Builder()
+const immersionOffer = new OfferEntityBuilder()
   .withRomeCode(romeCode)
   .withAppellationCode("11704")
   .build();
@@ -84,14 +84,15 @@ describe("Convert contact establishment public v1 to domain", () => {
       .withContactMethod("EMAIL")
       .build();
 
-    const immersionOfferWithMismatchingRomeCode =
-      new ImmersionOfferEntityV2Builder().withRomeCode("A1234").build();
+    const immersionOfferWithMismatchingRomeCode = new OfferEntityBuilder()
+      .withRomeCode("A1234")
+      .build();
 
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
-        .withImmersionOffers([immersionOfferWithMismatchingRomeCode])
+        .withOffers([immersionOfferWithMismatchingRomeCode])
         .build(),
     ]);
 
@@ -122,7 +123,7 @@ describe("Convert contact establishment public v1 to domain", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
-        .withImmersionOffers([immersionOffer])
+        .withOffers([immersionOffer])
         .build(),
     ]);
 
@@ -163,7 +164,7 @@ describe("Convert contact establishment public v1 to domain", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
-        .withImmersionOffers([immersionOffer])
+        .withOffers([immersionOffer])
         .build(),
     ]);
 
@@ -199,7 +200,7 @@ describe("Convert contact establishment public v1 to domain", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
-        .withImmersionOffers([immersionOffer])
+        .withOffers([immersionOffer])
         .build(),
     ]);
 

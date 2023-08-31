@@ -11,7 +11,7 @@ import {
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
 import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
 import { AppConfig } from "../config/appConfig";
 import { createAppDependencies } from "../config/createAppDependencies";
@@ -111,8 +111,8 @@ const establishmentAggregateSeed = async (
         .withName("France Merguez Distribution")
         .build(),
     )
-    .withImmersionOffers([
-      new ImmersionOfferEntityV2Builder()
+    .withOffers([
+      new OfferEntityBuilder()
         .withAppellationCode("11569")
         .withAppellationLabel("Boucher-charcutier / Bouchère-charcutière")
         .withRomeCode("D1101")

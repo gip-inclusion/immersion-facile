@@ -3,10 +3,10 @@ import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig
 import { InMemoryAddressGateway } from "../../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../../adapters/secondary/core/ConsoleAppLogger";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryPeAgenciesReferential } from "../../../../adapters/secondary/immersionOffer/peAgenciesReferential/InMemoryPeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { PeAgencyFromReferenciel } from "../../../immersionOffer/ports/PeAgenciesReferential";
+import { InMemoryPeAgenciesReferential } from "../../../../adapters/secondary/offer/peAgenciesReferential/InMemoryPeAgenciesReferential";
+import { PeAgencyFromReferenciel } from "../../../offer/ports/PeAgenciesReferential";
 import { defaultQuestionnaireUrl } from "./AddAgency";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
 

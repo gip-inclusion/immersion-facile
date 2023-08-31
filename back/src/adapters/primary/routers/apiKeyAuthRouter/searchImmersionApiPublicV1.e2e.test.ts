@@ -10,7 +10,7 @@ import {
   defaultNafCode,
   EstablishmentEntityBuilder,
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
@@ -61,11 +61,11 @@ describe("search-immersion route", () => {
 
     describe("authenficated consumer", () => {
       it("with given rome and position", async () => {
-        const immersionOffer = new ImmersionOfferEntityV2Builder()
+        const immersionOffer = new OfferEntityBuilder()
           .withRomeCode("A1000")
           .build();
         const establishmentAgg = new EstablishmentAggregateBuilder()
-          .withImmersionOffers([immersionOffer])
+          .withOffers([immersionOffer])
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withPosition({

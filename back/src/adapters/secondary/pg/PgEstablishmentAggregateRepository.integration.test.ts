@@ -22,15 +22,15 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishm
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import {
-  defaultValidImmersionOfferEntityV2,
-  ImmersionOfferEntityV2Builder,
-} from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+  defaultValidOfferEntity,
+  OfferEntityBuilder,
+} from "../../../_testBuilders/OfferEntityBuilder";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { UpdateEstablishmentsWithInseeDataParams } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+} from "../../../domain/offer/entities/EstablishmentEntity";
+import { SearchMade } from "../../../domain/offer/entities/SearchMadeEntity";
+import { UpdateEstablishmentsWithInseeDataParams } from "../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { NotFoundError } from "../../primary/helpers/httpErrors";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -54,12 +54,12 @@ import {
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
 const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";
 
-const cartographeImmersionOffer = new ImmersionOfferEntityV2Builder()
+const cartographeImmersionOffer = new OfferEntityBuilder()
   .withAppellationCode("11704")
   .withAppellationLabel("Cartographe")
   .withRomeCode("M1808")
   .build();
-const analysteEnGeomatiqueImmersionOffer = new ImmersionOfferEntityV2Builder()
+const analysteEnGeomatiqueImmersionOffer = new OfferEntityBuilder()
   .withAppellationCode("10946")
   .withAppellationLabel("Analyste en géomatique")
   .withRomeCode("M1808")
@@ -671,11 +671,11 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
-            .withImmersionOffers([new ImmersionOfferEntityV2Builder().build()])
+            .withOffers([new OfferEntityBuilder().build()])
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret2)
-            .withImmersionOffers([new ImmersionOfferEntityV2Builder().build()])
+            .withOffers([new OfferEntityBuilder().build()])
             .withGeneratedContactId()
             .build(),
         ]);
@@ -727,11 +727,11 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("adds as many row as immersion offers in table `immersion_offers`, each referencing the establishment siret and the contact uuid", async () => {
         // Arrange
-        const offer1 = new ImmersionOfferEntityV2Builder()
+        const offer1 = new OfferEntityBuilder()
           .withRomeCode("A1101")
           .withAppellationCode("19540")
           .build();
-        const offer2 = new ImmersionOfferEntityV2Builder()
+        const offer2 = new OfferEntityBuilder()
           .withRomeCode("A1201")
           .withAppellationCode("19541")
           .build();
@@ -740,7 +740,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const establishmentAggregateToInsert =
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
-            .withImmersionOffers([offer1, offer2])
+            .withOffers([offer1, offer2])
             .withContactId(contactId)
             .build();
 
@@ -807,9 +807,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siretWithRomeCodeOffer)
-          .withImmersionOffers([
-            new ImmersionOfferEntityV2Builder().withRomeCode(romeCode).build(),
-          ])
+          .withOffers([new OfferEntityBuilder().withRomeCode(romeCode).build()])
           .build(),
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siretWithoutRomeCodeOffer)
@@ -929,11 +927,11 @@ describe("PgEstablishmentAggregateRepository", () => {
       .withEmail("toto@gmail.com")
       .build();
     const offers = [
-      new ImmersionOfferEntityV2Builder()
+      new OfferEntityBuilder()
         .withRomeCode("A1101") // Code only, no appellation
         .withAppellationCode("11987")
         .build(),
-      new ImmersionOfferEntityV2Builder()
+      new OfferEntityBuilder()
         .withRomeCode("A1101")
         .withAppellationCode("12862")
         .build(),
@@ -942,7 +940,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       const aggregate = new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
-        .withImmersionOffers(offers)
+        .withOffers(offers)
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         aggregate,
@@ -1003,17 +1001,15 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
         .withAddress(rueJacquardDto)
         .build();
-      const boulangerOffer1 = new ImmersionOfferEntityV2Builder()
+      const boulangerOffer1 = new OfferEntityBuilder()
         .withRomeCode(boulangerRome)
         .withAppellationCode("10868") // Aide-boulanger / Aide-boulangère
         .build();
-      const boulangerOffer2 = new ImmersionOfferEntityV2Builder()
+      const boulangerOffer2 = new OfferEntityBuilder()
         .withRomeCode(boulangerRome)
         .withAppellationCode("12006") // Chef boulanger / boulangère
         .build();
-      const otherOffer = new ImmersionOfferEntityV2Builder()
-        .withRomeCode("H2102")
-        .build();
+      const otherOffer = new OfferEntityBuilder().withRomeCode("H2102").build();
       const contact = new ContactEntityBuilder()
         .withGeneratedContactId()
         .build();
@@ -1021,7 +1017,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(establishment)
-          .withImmersionOffers([boulangerOffer1, boulangerOffer2, otherOffer])
+          .withOffers([boulangerOffer1, boulangerOffer2, otherOffer])
           .withContact(contact)
           .build(),
       ]);
@@ -1086,17 +1082,15 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
         .withAddress(rueJacquardDto)
         .build();
-      const boulangerOffer1 = new ImmersionOfferEntityV2Builder()
+      const boulangerOffer1 = new OfferEntityBuilder()
         .withRomeCode(boulangerRome)
         .withAppellationCode("10868") // Aide-boulanger / Aide-boulangère
         .build();
-      const boulangerOffer2 = new ImmersionOfferEntityV2Builder()
+      const boulangerOffer2 = new OfferEntityBuilder()
         .withRomeCode(boulangerRome)
         .withAppellationCode("12006") // Chef boulanger / boulangère
         .build();
-      const otherOffer = new ImmersionOfferEntityV2Builder()
-        .withRomeCode("H2102")
-        .build();
+      const otherOffer = new OfferEntityBuilder().withRomeCode("H2102").build();
       const contact = new ContactEntityBuilder()
         .withGeneratedContactId()
         .build();
@@ -1104,7 +1098,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(establishment)
-          .withImmersionOffers([boulangerOffer1, boulangerOffer2, otherOffer])
+          .withOffers([boulangerOffer1, boulangerOffer2, otherOffer])
           .withContact(contact)
           .build(),
       ]);
@@ -1155,13 +1149,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
         .withAddress(rueJacquardDto)
         .build();
-      const offerWithRomeButNoAppellation = new ImmersionOfferEntityV2Builder()
+      const offerWithRomeButNoAppellation = new OfferEntityBuilder()
         .withRomeCode("H2102")
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(establishment)
-          .withImmersionOffers([offerWithRomeButNoAppellation])
+          .withOffers([offerWithRomeButNoAppellation])
           .withoutContact()
           .build(),
       ]);
@@ -1223,13 +1217,13 @@ describe("PgEstablishmentAggregateRepository", () => {
               .withUpdatedAt(new Date("2020-01-05T23:00:00"))
               .build(),
           )
-          .withImmersionOffers([
-            new ImmersionOfferEntityV2Builder()
+          .withOffers([
+            new OfferEntityBuilder()
               .withAppellationCode("10900") // Appellation given
               .withAppellationLabel("Aide-viticulteur / Aide-viticultrice")
               .withRomeCode("A1401")
               .build(),
-            new ImmersionOfferEntityV2Builder().withRomeCode("A1402").build(), // No appellation
+            new OfferEntityBuilder().withRomeCode("A1402").build(), // No appellation
           ])
           .build();
 
@@ -1252,18 +1246,18 @@ describe("PgEstablishmentAggregateRepository", () => {
       const existingSiret = "12345678901234";
       const existingEstablishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(existingSiret)
-        .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation
+        .withOffers([
+          new OfferEntityBuilder() // Offer with code A1401 and an appellation
             .withAppellationCode("10806")
             .withAppellationLabel("Aide agricole en arboriculture")
             .withRomeCode("A1401")
             .build(),
-          new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation
+          new OfferEntityBuilder() // Offer with code A1401 and an appellation
             .withAppellationCode("10900")
             .withAppellationLabel("Aide-viticulteur / Aide-viticultrice")
             .withRomeCode("A1401")
             .build(),
-          new ImmersionOfferEntityV2Builder() // Offer with code A1402 without an appellation
+          new OfferEntityBuilder() // Offer with code A1402 without an appellation
             .withRomeCode("A1402")
             .build(),
         ])
@@ -1294,13 +1288,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         // Act
         const updatedAggregate: EstablishmentAggregate = {
           ...existingEstablishmentAggregate,
-          immersionOffers: [
-            new ImmersionOfferEntityV2Builder() // New offer to create
+          offers: [
+            new OfferEntityBuilder() // New offer to create
               .withAppellationCode("17892")
               .withAppellationLabel("Porteur / Porteuse de hottes")
               .withRomeCode("A1401")
               .build(),
-            existingEstablishmentAggregate.immersionOffers[2], // Existing offer to keep
+            existingEstablishmentAggregate.offers[2], // Existing offer to keep
           ],
         };
         await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
@@ -1465,9 +1459,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new DiscussionAggregateBuilder()
               .withId("33333333-8888-3333-3333-000000000000")
               .withSiret(siret3)
-              .withAppellationCode(
-                defaultValidImmersionOfferEntityV2.appellationCode,
-              )
+              .withAppellationCode(defaultValidOfferEntity.appellationCode)
               .withCreatedAt(new Date("2021-01-01T00:00:00.000Z"))
               .build(),
           ),
@@ -1475,9 +1467,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new DiscussionAggregateBuilder()
               .withId("44444444-4444-4444-4444-000000000000")
               .withSiret(siret4)
-              .withAppellationCode(
-                defaultValidImmersionOfferEntityV2.appellationCode,
-              )
+              .withAppellationCode(defaultValidOfferEntity.appellationCode)
 
               .withCreatedAt(new Date("2021-01-03T00:00:00.000Z"))
               .build(),

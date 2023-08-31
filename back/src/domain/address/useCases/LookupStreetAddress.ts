@@ -5,7 +5,7 @@ import {
   withLookupStreetAddressQueryParamsSchema,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
+import { AddressGateway } from "../../offer/ports/AddressGateway";
 
 export class LookupStreetAddress extends UseCase<
   WithLookupAddressQueryParams,
