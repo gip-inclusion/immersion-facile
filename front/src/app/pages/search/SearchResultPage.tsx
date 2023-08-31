@@ -144,7 +144,7 @@ export const SearchResultPage = () => {
               <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
                 {currentSearchResult.name}
               </h1>
-              <SearchResultSection title="Addresse">
+              <SearchResultSection title="Adresse">
                 <>
                   <p>
                     {currentSearchResult.address.streetNumberAndAddress}
@@ -195,23 +195,30 @@ export const SearchResultPage = () => {
                 )}
 
                 {!currentSearchResult.voluntaryToImmersion && (
-                  <ButtonsGroup
-                    inlineLayoutWhen="md and up"
-                    buttons={[
-                      {
-                        onClick: scrollToContactForm,
-                        children: "Voir nos conseils",
-                        priority: "secondary",
-                      },
-                      {
-                        linkProps: {
-                          href: currentSearchResult.urlOfPartner,
-                          target: "_blank",
+                  <>
+                    <p>
+                      Cette entreprise n'est pas inscrite comme entreprise
+                      accueillante mais peut recruter sur le métier que vous
+                      souhaitez tester en immersion.
+                    </p>
+                    <ButtonsGroup
+                      inlineLayoutWhen="md and up"
+                      buttons={[
+                        {
+                          onClick: scrollToContactForm,
+                          children: "Voir nos conseils",
+                          priority: "secondary",
                         },
-                        children: "Voir l'offre sur La Bonne Boite",
-                      },
-                    ]}
-                  />
+                        {
+                          linkProps: {
+                            href: currentSearchResult.urlOfPartner,
+                            target: "_blank",
+                          },
+                          children: "Voir l'offre sur La Bonne Boite",
+                        },
+                      ]}
+                    />
+                  </>
                 )}
               </SearchResultSection>
               <SearchResultSection title="Nombre de salariés">
