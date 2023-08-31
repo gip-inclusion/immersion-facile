@@ -4,7 +4,7 @@ import {
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,
   FormEstablishmentRepository,
-} from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
+} from "../../../domain/offer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";

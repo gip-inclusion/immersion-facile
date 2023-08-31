@@ -1,19 +1,19 @@
 import { Builder, RomeCode, SearchResultDto } from "shared";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
-import { TEST_ROME_LABEL } from "../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
+import { TEST_ROME_LABEL } from "../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import { ContactEntity } from "../domain/offer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-} from "../domain/immersionOffer/entities/EstablishmentEntity";
-import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
+} from "../domain/offer/entities/EstablishmentEntity";
+import { OfferEntity } from "../domain/offer/entities/OfferEntity";
 import { ContactEntityBuilder } from "./ContactEntityBuilder";
 import { EstablishmentEntityBuilder } from "./EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "./ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "./OfferEntityBuilder";
 
 const validEstablishmentAggregate: EstablishmentAggregate = {
   establishment: new EstablishmentEntityBuilder().build(),
-  immersionOffers: [new ImmersionOfferEntityV2Builder().build()],
+  offers: [new OfferEntityBuilder().build()],
   contact: new ContactEntityBuilder().build(),
 };
 
@@ -84,13 +84,6 @@ export class EstablishmentAggregateBuilder
     return this.withContactId(new UuidV4Generator().new());
   }
 
-  public withImmersionOffers(immersionOffers: ImmersionOfferEntityV2[]) {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      immersionOffers,
-    });
-  }
-
   public withIsSearchable(isSearchable: boolean) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
@@ -110,6 +103,13 @@ export class EstablishmentAggregateBuilder
       )
         .withMaxContactsPerWeek(maxContactsPerWeek)
         .build(),
+    });
+  }
+
+  public withOffers(offers: OfferEntity[]) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      offers,
     });
   }
 
@@ -143,10 +143,10 @@ export const establishmentAggregateToSearchResultByRome = (
   distance_m,
   romeLabel: TEST_ROME_LABEL,
   website: establishmentAggregate.establishment.website,
-  appellations: establishmentAggregate.immersionOffers
-    .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
-    .map((immersionOffer) => ({
-      appellationCode: immersionOffer.appellationCode,
-      appellationLabel: immersionOffer.appellationLabel,
+  appellations: establishmentAggregate.offers
+    .filter((offer) => offer.romeCode === romeCode)
+    .map((offer) => ({
+      appellationCode: offer.appellationCode,
+      appellationLabel: offer.appellationLabel,
     })),
 });

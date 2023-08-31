@@ -10,19 +10,19 @@ import {
   SearchSortedBy,
   SiretDto,
 } from "shared";
-import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntity } from "../../../domain/offer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+} from "../../../domain/offer/entities/EstablishmentEntity";
+import { OfferEntity } from "../../../domain/offer/entities/OfferEntity";
+import { SearchMade } from "../../../domain/offer/entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
-} from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+} from "../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { createLogger } from "../../../utils/logger";
 import {
   BadRequestError,
@@ -198,7 +198,7 @@ export class PgEstablishmentAggregateRepository
             : undefined,
           voluntaryToImmersion: true,
         },
-        immersionOffers: aggregateWithStringDates.immersionOffers.map(
+        offers: aggregateWithStringDates.immersionOffers.map(
           (immersionOfferWithStringDate: any) => ({
             ...immersionOfferWithStringDate,
             createdAt: new Date(immersionOfferWithStringDate.createdAt),
@@ -351,7 +351,7 @@ export class PgEstablishmentAggregateRepository
       aggregates.reduce<OfferWithSiret[]>(
         (offersWithSiret, aggregate) => [
           ...offersWithSiret,
-          ...aggregate.immersionOffers.map((immersionOffer) => ({
+          ...aggregate.offers.map((immersionOffer) => ({
             siret: aggregate.establishment.siret,
             ...immersionOffer,
           })),
@@ -772,8 +772,8 @@ export class PgEstablishmentAggregateRepository
     existingAggregate: EstablishmentAggregate,
     updatingAggregate: EstablishmentAggregate,
   ) {
-    const updatedOffers = updatingAggregate.immersionOffers;
-    const existingOffers = existingAggregate.immersionOffers;
+    const updatedOffers = updatingAggregate.offers;
+    const existingOffers = existingAggregate.offers;
     const siret = existingAggregate.establishment.siret;
 
     const offersToAdd = updatedOffers.filter(
@@ -924,7 +924,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
       ORDER BY row_number ASC; `;
 
-const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
+const offersEqual = (a: OfferEntity, b: OfferEntity) =>
   // Only compare romeCode and appellationCode
   a.appellationCode == b.appellationCode;
 

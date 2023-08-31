@@ -15,7 +15,7 @@ import {
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
-import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
 import { ConventionRequiresModificationPayload } from "./eventPayload.dto";
 

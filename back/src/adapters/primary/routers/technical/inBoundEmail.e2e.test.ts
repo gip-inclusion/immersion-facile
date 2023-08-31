@@ -2,7 +2,7 @@ import { inboundEmailParsingRoute } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
-import { BrevoInboundBody } from "../../../../domain/immersionOffer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
+import { BrevoInboundBody } from "../../../../domain/offer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 
 const discussionId = "my-discussion-id";
 const domain = "immersion-facile.beta.gouv.fr";

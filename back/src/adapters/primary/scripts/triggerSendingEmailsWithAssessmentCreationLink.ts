@@ -3,7 +3,7 @@ import { keys } from "ramda";
 import { immersionFacileContactEmail } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
+import { SendEmailsWithAssessmentCreationLink } from "../../../domain/offer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";

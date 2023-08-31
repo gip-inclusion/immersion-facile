@@ -14,13 +14,13 @@ import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import {
   TEST_POSITION,
   TEST_ROME_LABEL,
-} from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
+} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import {
   LegacyImmersionOfferId,
@@ -41,10 +41,8 @@ const establishmentAgg = new EstablishmentAggregateBuilder()
       .build(),
   )
   .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
-  .withImmersionOffers([
-    new ImmersionOfferEntityV2Builder()
-      .withRomeCode(immersionOfferRome)
-      .build(),
+  .withOffers([
+    new OfferEntityBuilder().withRomeCode(immersionOfferRome).build(),
   ])
   .build();
 

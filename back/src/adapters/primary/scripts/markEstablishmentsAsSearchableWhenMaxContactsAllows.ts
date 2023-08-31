@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { MarkEstablishmentsAsSearchableScript } from "../../../domain/immersionOffer/useCases/MarkEstablishmentsAsSearchableScript";
+import { MarkEstablishmentsAsSearchableScript } from "../../../domain/offer/useCases/MarkEstablishmentsAsSearchableScript";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { AppConfig } from "../config/appConfig";

@@ -7,14 +7,12 @@ import {
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const establishmentAgg = new EstablishmentAggregateBuilder()
-  .withImmersionOffers([
-    new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
-  ])
+  .withOffers([new OfferEntityBuilder().withRomeCode("A1000").build()])
   .withEstablishment(
     new EstablishmentEntityBuilder()
       .withPosition({

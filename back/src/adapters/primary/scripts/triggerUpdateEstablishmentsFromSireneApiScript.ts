@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
-import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSirenApiScript";
+import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import {
   defaultMaxBackoffPeriodMs,

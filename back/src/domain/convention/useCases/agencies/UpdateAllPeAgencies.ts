@@ -12,11 +12,11 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { AddressGateway } from "../../../immersionOffer/ports/AddressGateway";
+import { AddressGateway } from "../../../offer/ports/AddressGateway";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
-} from "../../../immersionOffer/ports/PeAgenciesReferential";
+} from "../../../offer/ports/PeAgenciesReferential";
 import { defaultQuestionnaireUrl } from "./AddAgency";
 
 const counts = {

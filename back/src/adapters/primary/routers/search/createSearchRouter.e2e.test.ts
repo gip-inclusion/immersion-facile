@@ -16,8 +16,8 @@ import {
   establishmentAggregateToSearchResultByRome,
 } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { stubSearchResult } from "../../../secondary/immersionOffer/InMemoryEstablishmentGroupRepository";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
+import { stubSearchResult } from "../../../secondary/offer/InMemoryEstablishmentGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const makeImmersionOfferUrl = (
@@ -26,7 +26,7 @@ const makeImmersionOfferUrl = (
 ): string =>
   `${searchImmersionRoutes.getSearchResult.url}?siret=${siret}&appellationCode=${appellationCode}`;
 
-const immersionOffer = new ImmersionOfferEntityV2Builder().build();
+const immersionOffer = new OfferEntityBuilder().build();
 const establishmentAggregate = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder().withSiret("11112222333344").build(),
@@ -37,7 +37,7 @@ const establishmentAggregate = new EstablishmentAggregateBuilder()
       .withContactMethod("EMAIL")
       .build(),
   )
-  .withImmersionOffers([immersionOffer])
+  .withOffers([immersionOffer])
   .build();
 
 describe("search-immersion route", () => {
@@ -56,13 +56,13 @@ describe("search-immersion route", () => {
   describe(`from front - /${immersionOffersRoute}`, () => {
     describe("accepts valid requests", () => {
       it("with given appellationCode and position", async () => {
-        const immersionOffer = new ImmersionOfferEntityV2Builder()
+        const immersionOffer = new OfferEntityBuilder()
           .withRomeCode("D1202")
           .withAppellationCode("12694")
           .withAppellationLabel("Coiffeur / Coiffeuse mixte")
           .build();
         const establishmentAgg = new EstablishmentAggregateBuilder()
-          .withImmersionOffers([immersionOffer])
+          .withOffers([immersionOffer])
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withPosition({
@@ -188,7 +188,7 @@ describe("search-immersion route", () => {
       const response = await request.get(
         makeImmersionOfferUrl(
           establishmentAggregate.establishment.siret,
-          establishmentAggregate.immersionOffers[0].appellationCode,
+          establishmentAggregate.offers[0].appellationCode,
         ),
       );
 
@@ -244,8 +244,7 @@ Route: GET /search-result`,
     it(`404 - route with valid mandatory fields but offer not in repo`, async () => {
       const requestedOffer = {
         siret: establishmentAggregate.establishment.siret,
-        appellationCode:
-          establishmentAggregate.immersionOffers[0].appellationCode,
+        appellationCode: establishmentAggregate.offers[0].appellationCode,
       };
       const response = await request.get(
         makeImmersionOfferUrl(

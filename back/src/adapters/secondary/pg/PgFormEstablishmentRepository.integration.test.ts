@@ -10,7 +10,7 @@ import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import {
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,
-} from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
+} from "../../../domain/offer/ports/FormEstablishmentRepository";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
 import { PgFormEstablishmentRepository } from "./PgFormEstablishmentRepository";
 

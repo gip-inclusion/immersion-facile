@@ -8,13 +8,13 @@ import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
-import { TEST_POSITION } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorisedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
+import { TEST_POSITION } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
@@ -136,8 +136,8 @@ describe("POST contact-establishment public V2 route", () => {
               .withContactMethod(testEstablishmentContactMethod)
               .build(),
           )
-          .withImmersionOffers([
-            new ImmersionOfferEntityV2Builder()
+          .withOffers([
+            new OfferEntityBuilder()
               .withAppellationCode(contactEstablishment.appellationCode)
               .build(),
           ])
@@ -175,8 +175,8 @@ describe("POST contact-establishment public V2 route", () => {
           .withContact(
             new ContactEntityBuilder().withContactMethod("EMAIL").build(),
           )
-          .withImmersionOffers([
-            new ImmersionOfferEntityV2Builder()
+          .withOffers([
+            new OfferEntityBuilder()
               .withAppellationCode(testEstablishmentAppellationCode)
               .build(),
           ])
@@ -213,8 +213,8 @@ describe("POST contact-establishment public V2 route", () => {
           .withContact(
             new ContactEntityBuilder().withContactMethod("EMAIL").build(),
           )
-          .withImmersionOffers([
-            new ImmersionOfferEntityV2Builder()
+          .withOffers([
+            new OfferEntityBuilder()
               .withAppellationCode(contactEstablishment.appellationCode)
               .build(),
           ])

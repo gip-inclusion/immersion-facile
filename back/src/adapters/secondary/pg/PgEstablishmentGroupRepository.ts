@@ -1,8 +1,8 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { EstablishmentGroupSlug, SearchResultDto, SiretDto } from "shared";
-import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
-import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
+import { EstablishmentGroupEntity } from "../../../domain/offer/entities/EstablishmentGroupEntity";
+import { EstablishmentGroupRepository } from "../../../domain/offer/ports/EstablishmentGroupRepository";
 
 const buildAppellationsArray = `JSON_AGG(
     JSON_BUILD_OBJECT(

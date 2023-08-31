@@ -2,7 +2,7 @@ import { Builder } from "shared";
 import {
   SearchMadeEntity,
   SearchMadeId,
-} from "../domain/immersionOffer/entities/SearchMadeEntity";
+} from "../domain/offer/entities/SearchMadeEntity";
 
 const validSearchMadeEntity: SearchMadeEntity = {
   id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",

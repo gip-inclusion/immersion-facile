@@ -8,7 +8,7 @@ import {
   NumberEmployeesRange,
 } from "shared";
 import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
-import { EstablishmentAggregate } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../../../domain/offer/entities/EstablishmentEntity";
 
 type PgImmersionOfferRow = {
   rome_code: string;

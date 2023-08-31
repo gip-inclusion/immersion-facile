@@ -6,10 +6,10 @@ import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
-import { TEST_POSITION } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
+import { TEST_POSITION } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV1Dto } from "../DtoAndSchemas/v1/input/ContactEstablishmentPublicV1.dto";
 
@@ -81,8 +81,8 @@ describe("POST contact-establishment public V1 route", () => {
           .withContact(
             new ContactEntityBuilder().withContactMethod("EMAIL").build(),
           )
-          .withImmersionOffers([
-            new ImmersionOfferEntityV2Builder()
+          .withOffers([
+            new OfferEntityBuilder()
               .withRomeCode(designer.romeCode)
               .withAppellationCode(designer.appellationCode)
               .withAppellationLabel(designer.appellationLabel)

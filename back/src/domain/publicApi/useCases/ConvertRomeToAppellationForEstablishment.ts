@@ -26,7 +26,7 @@ export class ConvertRomeToAppellationForEstablishment extends TransactionalUseCa
         `No offer found for siret ${siret} and rome ${rome}`,
       );
 
-    const firstOfferMatchingRome = establishmentAggregate.immersionOffers.find(
+    const firstOfferMatchingRome = establishmentAggregate.offers.find(
       ({ romeCode }) => romeCode === rome,
     );
 

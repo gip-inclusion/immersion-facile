@@ -9,7 +9,7 @@ import {
   defaultNafCode,
   EstablishmentEntityBuilder,
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
@@ -85,12 +85,12 @@ describe("search route", () => {
 
     describe("authenticated consumer", () => {
       it("with given rome, appellation code and position", async () => {
-        const offer1 = new ImmersionOfferEntityV2Builder()
+        const offer1 = new OfferEntityBuilder()
           .withRomeCode("M1808")
           .withAppellationCode("11704")
           .build();
 
-        const offer2 = new ImmersionOfferEntityV2Builder()
+        const offer2 = new OfferEntityBuilder()
           .withRomeCode("M1808")
           .withAppellationCode("11705")
           .build();
@@ -99,7 +99,7 @@ describe("search route", () => {
         await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
           [
             new EstablishmentAggregateBuilder()
-              .withImmersionOffers([offer1, offer2])
+              .withOffers([offer1, offer2])
               .withEstablishment(
                 new EstablishmentEntityBuilder()
                   .withPosition({
