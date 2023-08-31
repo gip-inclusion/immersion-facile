@@ -1150,7 +1150,8 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withAddress(rueJacquardDto)
         .build();
       const offerWithRomeButNoAppellation = new OfferEntityBuilder()
-        .withRomeCode("H2102")
+        .withRomeCode("B1805")
+        .withRomeLabel("Stylisme")
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
@@ -1164,13 +1165,13 @@ describe("PgEstablishmentAggregateRepository", () => {
       const actualSearchResultDto =
         await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
           siret,
-          "H2102",
+          "B1805",
         );
 
       // Assert
       expectToEqual(actualSearchResultDto, {
-        rome: "H2102",
-        romeLabel: "Conduite d'équipement de production alimentaire",
+        rome: "B1805",
+        romeLabel: "Stylisme",
         appellations: [
           {
             appellationLabel: "Styliste",
@@ -1222,8 +1223,16 @@ describe("PgEstablishmentAggregateRepository", () => {
               .withAppellationCode("10900") // Appellation given
               .withAppellationLabel("Aide-viticulteur / Aide-viticultrice")
               .withRomeCode("A1401")
+              .withRomeLabel(
+                "Aide agricole de production fruitière ou viticole",
+              )
               .build(),
-            new OfferEntityBuilder().withRomeCode("A1402").build(), // No appellation
+            new OfferEntityBuilder()
+              .withRomeCode("A1402")
+              .withRomeLabel(
+                "Aide agricole de production légumière ou végétale",
+              )
+              .build(), // No appellation
           ])
           .build();
 
@@ -1251,14 +1260,17 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withAppellationCode("10806")
             .withAppellationLabel("Aide agricole en arboriculture")
             .withRomeCode("A1401")
+            .withRomeLabel("Aide agricole de production fruitière ou viticole")
             .build(),
           new OfferEntityBuilder() // Offer with code A1401 and an appellation
             .withAppellationCode("10900")
             .withAppellationLabel("Aide-viticulteur / Aide-viticultrice")
             .withRomeCode("A1401")
+            .withRomeLabel("Aide agricole de production fruitière ou viticole")
             .build(),
           new OfferEntityBuilder() // Offer with code A1402 without an appellation
             .withRomeCode("A1402")
+            .withRomeLabel("Aide agricole de production légumière ou végétale")
             .build(),
         ])
         .build();
@@ -1293,6 +1305,9 @@ describe("PgEstablishmentAggregateRepository", () => {
               .withAppellationCode("17892")
               .withAppellationLabel("Porteur / Porteuse de hottes")
               .withRomeCode("A1401")
+              .withRomeLabel(
+                "Aide agricole de production fruitière ou viticole",
+              )
               .build(),
             existingEstablishmentAggregate.offers[2], // Existing offer to keep
           ],

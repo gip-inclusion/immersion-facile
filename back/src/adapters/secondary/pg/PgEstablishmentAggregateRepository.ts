@@ -106,6 +106,7 @@ export class PgEstablishmentAggregateRepository
             JSON_AGG(
               JSON_BUILD_OBJECT(
                 'romeCode', rome_code, 
+                'romeLabel', libelle_rome,
                 'score', score, 
                 'appellationCode', appellation_code::text, 
                 'appellationLabel', pad.libelle_appellation_long::text,
@@ -119,6 +120,7 @@ export class PgEstablishmentAggregateRepository
           FROM 
             immersion_offers
           LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.appellation_code
+          LEFT JOIN public_romes_data AS prd ON prd.code_rome = immersion_offers.rome_code
           WHERE 
             siret = $1 
           GROUP BY 
