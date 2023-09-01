@@ -456,7 +456,19 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
     phone: "",
     job: "",
   },
-  isAuthorized: true,
+  rights: {
+    searchEstablishment: {
+      kinds: ["READ"],
+      scope: "no-scope",
+    },
+    convention: {
+      kinds: [],
+      scope: {
+        agencyKinds: [],
+        agencyIds: [],
+      },
+    },
+  },
 };
 
 const lbbToSearchResult = (lbb: LaBonneBoiteCompanyDto): SearchResultDto => ({

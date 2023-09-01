@@ -53,7 +53,7 @@ describe("search-immersion route", () => {
           );
 
         expectToEqual(body, {
-          error: "forbidden: unauthorised consumer Id",
+          error: "forbidden: consumer has not enough privileges",
         });
         expectToEqual(status, 403);
       });

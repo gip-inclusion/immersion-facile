@@ -40,7 +40,9 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
         "formEstablishmentCallerV1",
       );
       return sendHttpResponse(req, res, () => {
-        if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
+        if (!req.apiConsumer) {
+          throw new ForbiddenError();
+        }
 
         return pipeWithValue(
           validateAndParseZodSchema(
@@ -80,8 +82,6 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     .route(`/${immersionOffersRoute}/:siret/:rome`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
-        if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
-
         const appellationCode =
           await deps.useCases.convertRomeToAppellationForEstablishment.execute({
             siret: req.params.siret,
@@ -102,7 +102,9 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
 
   publicV1Router.route(`/${contactEstablishmentRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, async () => {
-      if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
+      if (!req.apiConsumer) {
+        throw new ForbiddenError();
+      }
       return pipeWithValue(
         await deps.useCases.convertContactEstablishmentPublicV1ToDomain.execute(
           req.body,

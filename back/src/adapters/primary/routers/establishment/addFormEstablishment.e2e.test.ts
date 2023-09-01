@@ -107,10 +107,46 @@ describe("Add form establishment", () => {
     // from external
     describe("v0", () => {
       // we don't want to use variables from src/routes.ts so that we can check if contract breaks
+      const formEstablishment = {
+        businessAddress: "1 Rue du Moulin 12345 Quelque Part",
+        businessContacts: [
+          {
+            email: "amil@mail.com",
+            firstName: "Esteban",
+            lastName: "Ocon",
+            phone: "+33012345678",
+            job: "a job",
+          },
+        ],
+        preferredContactMethods: ["EMAIL"],
+        naf: { code: "A", nomenclature: "nomenclature code A" },
+        businessName: "Mon entreprise",
+        businessNameCustomized: "Ma belle enseigne du quartier",
+        isEngagedEnterprise: false,
+        siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+        professions: [
+          {
+            romeCodeMetier: "A1111",
+            romeCodeAppellation: "11111",
+            description: "Boulangerie",
+          },
+          {
+            romeCodeMetier: "B9112",
+            romeCodeAppellation: "22222",
+            description: "Patissier",
+          },
+          {
+            romeCodeMetier: "D1103",
+            romeCodeAppellation: undefined,
+            description: "Boucherie",
+          },
+        ],
+      } satisfies FormEstablishmentDtoPublicV0;
+
       it("forbids access to route if no api consumer", async () => {
         const { body, status } = await request
           .post(`/immersion-offers`)
-          .send({});
+          .send(formEstablishment);
 
         expectToEqual(body, { errors: "Accès refusé" });
         expectToEqual(status, 403);
@@ -125,41 +161,7 @@ describe("Add form establishment", () => {
               id: authorizedUnJeuneUneSolutionApiConsumer.id,
             }),
           )
-          .send({
-            businessAddress: "1 Rue du Moulin 12345 Quelque Part",
-            businessContacts: [
-              {
-                email: "amil@mail.com",
-                firstName: "Esteban",
-                lastName: "Ocon",
-                phone: "+33012345678",
-                job: "a job",
-              },
-            ],
-            preferredContactMethods: ["EMAIL"],
-            naf: { code: "A", nomenclature: "nomenclature code A" },
-            businessName: "Mon entreprise",
-            businessNameCustomized: "Ma belle enseigne du quartier",
-            isEngagedEnterprise: false,
-            siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-            professions: [
-              {
-                romeCodeMetier: "A1111",
-                romeCodeAppellation: "11111",
-                description: "Boulangerie",
-              },
-              {
-                romeCodeMetier: "B9112",
-                romeCodeAppellation: "22222",
-                description: "Patissier",
-              },
-              {
-                romeCodeMetier: "D1103",
-                romeCodeAppellation: undefined,
-                description: "Boucherie",
-              },
-            ],
-          } satisfies FormEstablishmentDtoPublicV0);
+          .send(formEstablishment);
 
         expectToEqual(body, "");
         expectToEqual(status, 200);
@@ -214,7 +216,7 @@ describe("Add form establishment", () => {
           .send({});
 
         expectToEqual(body, {
-          error: "forbidden: unauthorised consumer Id",
+          error: "forbidden: consumer has not enough privileges",
         });
         expectToEqual(status, 403);
       });

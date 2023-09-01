@@ -31,6 +31,9 @@ import {
 } from "./agency.dto";
 
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
+export const agencyIdsSchema: z.Schema<AgencyId[]> = z
+  .array(agencyIdSchema)
+  .nonempty();
 
 export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
   z.object({
@@ -41,7 +44,7 @@ export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
 export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
   agencyIdSchema.optional();
 
-const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
+export const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
   agencyKindList,
   "Ce type de structure n'est pas supporté",
 );
@@ -152,7 +155,3 @@ export const withActiveOrRejectedAgencyStatusSchema: z.Schema<WithActiveOrReject
 export const withAgencyStatusSchema: z.Schema<WithAgencyStatus> = z.object({
   status: agencyStatusSchema,
 });
-
-export const agencyIdsSchema: z.Schema<AgencyId[]> = z
-  .array(agencyIdSchema)
-  .nonempty();

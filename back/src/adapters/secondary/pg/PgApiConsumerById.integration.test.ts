@@ -35,7 +35,19 @@ describe("PgApiConsumerRepository", () => {
       },
       createdAt: new Date(),
       expirationDate: new Date(),
-      isAuthorized: true,
+      rights: {
+        searchEstablishment: {
+          kinds: ["READ"],
+          scope: "no-scope",
+        },
+        convention: {
+          kinds: ["READ"],
+          scope: {
+            agencyKinds: [],
+            agencyIds: [],
+          },
+        },
+      },
     };
 
     expectToEqual(
@@ -61,7 +73,19 @@ describe("PgApiConsumerRepository", () => {
       },
       createdAt: new Date(),
       expirationDate: new Date(),
-      isAuthorized: false,
+      rights: {
+        searchEstablishment: {
+          kinds: ["READ"],
+          scope: "no-scope",
+        },
+        convention: {
+          kinds: ["READ"],
+          scope: {
+            agencyKinds: [],
+            agencyIds: [],
+          },
+        },
+      },
     };
 
     await apiConsumerRepository.save(updatedApiConsumer);

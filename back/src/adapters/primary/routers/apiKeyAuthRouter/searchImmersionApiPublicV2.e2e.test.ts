@@ -71,13 +71,17 @@ describe("search route", () => {
           headers: {
             authorization: authToken,
           },
-          queryParams: {} as any,
+          queryParams: {
+            longitude: 2,
+            latitude: 48,
+            distanceKm: 10,
+          },
         });
         expectToEqual(response, {
           status: 403,
           body: {
             status: 403,
-            message: "unauthorised consumer Id",
+            message: "Accès refusé",
           },
         });
       });

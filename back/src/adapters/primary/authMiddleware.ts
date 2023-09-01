@@ -6,6 +6,7 @@ import {
   ConventionJwtPayload,
   currentJwtVersions,
   ExtractFromExisting,
+  isApiConsumerAllowed,
   PayloadKey,
 } from "shared";
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
@@ -78,7 +79,13 @@ export const createApiKeyAuthMiddlewareV0 = (
       }
 
       // todo: consider notifying the caller that he cannot access privileged fields (due to possible compromised key)
-      if (!apiConsumer.isAuthorized) {
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer,
+          rightName: "searchEstablishment",
+          consumerKind: "READ",
+        })
+      ) {
         incTotalCountForRequest({
           authorisationStatus: "unauthorisedId",
           consumerName: apiConsumer.consumer,
@@ -144,12 +151,18 @@ export const makeApiKeyAuthMiddlewareV1 = (
         return responseError(res, "consumer not found");
       }
 
-      if (!apiConsumer.isAuthorized) {
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer,
+          rightName: "searchEstablishment",
+          consumerKind: "READ",
+        })
+      ) {
         incTotalCountForRequest({
           authorisationStatus: "unauthorisedId",
           consumerName: apiConsumer.consumer,
         });
-        return responseError(res, "unauthorised consumer Id");
+        return responseError(res, "consumer has not enough privileges");
       }
 
       if (apiConsumer.expirationDate < timeGateway.now()) {
@@ -277,7 +290,7 @@ export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
 const responseErrorForV2 = (res: Response, message: string, status = 403) =>
   res.status(status).json({ message, status });
 
-export const makeApiKeyAuthMiddlewareV2 = (
+export const makeConsumerMiddleware = (
   getApiConsumerById: GetApiConsumerById,
   timeGateway: TimeGateway,
   config: AppConfig,
@@ -301,14 +314,6 @@ export const makeApiKeyAuthMiddlewareV2 = (
           authorisationStatus: "consumerNotFound",
         });
         return responseErrorForV2(res, "consumer not found");
-      }
-
-      if (!apiConsumer.isAuthorized) {
-        incTotalCountForRequest({
-          authorisationStatus: "unauthorisedId",
-          consumerName: apiConsumer.consumer,
-        });
-        return responseErrorForV2(res, "unauthorised consumer Id");
       }
 
       if (apiConsumer.expirationDate < timeGateway.now()) {
