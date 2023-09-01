@@ -30,6 +30,7 @@ describe("Notify Discord", () => {
         conventionStatusLink: "http://0000conventionStatusLink00000",
         conventionId: "123",
       },
+      status: "failed-but-will-retry",
       publications: [
         {
           publishedAt: new Date().toISOString(),

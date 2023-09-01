@@ -80,6 +80,7 @@ describe("Add Convention", () => {
         topic: "ImmersionApplicationSubmittedByBeneficiary",
         payload: validConvention,
         publications: [],
+        status: "never-published",
         wasQuarantined: false,
       },
     ]);

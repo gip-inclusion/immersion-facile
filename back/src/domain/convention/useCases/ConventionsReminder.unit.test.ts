@@ -146,6 +146,7 @@ describe("RemindConventionsNeedSignature use case", () => {
             conventionId: conventionsForActors[0].id,
           },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
         {
@@ -157,6 +158,7 @@ describe("RemindConventionsNeedSignature use case", () => {
             conventionId: conventionsForActors[1].id,
           },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
         {
@@ -168,6 +170,7 @@ describe("RemindConventionsNeedSignature use case", () => {
             conventionId: conventionsForAgencies[0].id,
           },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
       ];
@@ -221,6 +224,7 @@ describe("RemindConventionsNeedSignature use case", () => {
             conventionId: convention.id,
           },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         }));
       expectToEqual(summary, {
@@ -272,6 +276,7 @@ describe("RemindConventionsNeedSignature use case", () => {
             conventionId: conventionsNeeds48[0].id,
           },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
         {
@@ -283,6 +288,7 @@ describe("RemindConventionsNeedSignature use case", () => {
             conventionId: conventionsNeeds48[1].id,
           },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
         {
@@ -294,6 +300,7 @@ describe("RemindConventionsNeedSignature use case", () => {
             conventionId: conventionsNeeds24[0].id,
           },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
       ];
