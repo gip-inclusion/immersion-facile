@@ -47,6 +47,7 @@ describe("PgOutboxRepository", () => {
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: convention,
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
+      status: "published",
     });
 
     // act
@@ -85,6 +86,7 @@ describe("PgOutboxRepository", () => {
           failures: [{ subscriptionId: "sub1", errorMessage: "has failed" }],
         },
       ],
+      status: "failed-but-will-retry",
     };
 
     // act (when event already exist, and the publication has failures)
@@ -107,6 +109,7 @@ describe("PgOutboxRepository", () => {
           failures: [],
         },
       ],
+      status: "published",
     };
 
     // act (when event already exist, and the publication is now successful)
@@ -128,6 +131,7 @@ describe("PgOutboxRepository", () => {
     const event = createNewEvent({
       topic: quarantinedTopic,
       payload: convention,
+      status: "published",
     });
 
     // act
@@ -139,6 +143,7 @@ describe("PgOutboxRepository", () => {
     expectStoredRowsToMatchEvent(storedEventRows, {
       ...event,
       wasQuarantined: true,
+      status: "published",
     });
   });
 
@@ -149,6 +154,7 @@ describe("PgOutboxRepository", () => {
     const eventFailedToRerun = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: convention,
+      status: "failed-but-will-retry",
       publications: [
         {
           publishedAt: "2021-11-15T08:00:00.000Z",
@@ -185,7 +191,7 @@ describe("PgOutboxRepository", () => {
     client
       .query(
         `
-        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
+        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
           published_at, subscription_id, error_message 
         FROM outbox  
         LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id

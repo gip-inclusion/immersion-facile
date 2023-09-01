@@ -41,7 +41,7 @@ export class PgOutboxQueries implements OutboxQueries {
     )`;
 
     const { rows } = await this.client.query<StoredEventRow>(`
-     SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
+     SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
        outbox_publications.id as publication_id, published_at,
        subscription_id, error_message
      FROM outbox
@@ -55,13 +55,13 @@ export class PgOutboxQueries implements OutboxQueries {
 
   public async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
     const { rows } = await this.client.query<StoredEventRow>(`
-    SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
+    SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
       outbox_publications.id as publication_id, published_at,
       subscription_id, error_message
     FROM outbox
     LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
     LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-    WHERE was_quarantined = false AND outbox_publications.id IS null
+    WHERE was_quarantined = false AND status IN ('never-published', 'to-republish')
     ORDER BY published_at ASC
     `);
 

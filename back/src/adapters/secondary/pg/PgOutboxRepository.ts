@@ -61,25 +61,21 @@ export class PgOutboxRepository implements OutboxRepository {
   async #storeEventInOutboxOrRecoverItIfAlreadyThere(
     event: DomainEvent,
   ): Promise<DomainEvent> {
-    const { id, occurredAt, wasQuarantined, topic, payload } = event;
+    const { id, occurredAt, wasQuarantined, topic, payload, status } = event;
 
     const eventAlreadyInDb = await this.#getEventById(event.id);
     if (eventAlreadyInDb) {
-      if (eventAlreadyInDb.wasQuarantined === event.wasQuarantined) {
-        return eventAlreadyInDb;
-      }
-
       await this.client.query(
-        "UPDATE outbox SET was_quarantined = $2 WHERE id = $1",
-        [id, wasQuarantined],
+        "UPDATE outbox SET was_quarantined = $2, status = $3 WHERE id = $1",
+        [id, wasQuarantined, status],
       );
       return { ...eventAlreadyInDb, wasQuarantined: event.wasQuarantined };
     }
 
     const query = `INSERT INTO outbox(
-        id, occurred_at, was_quarantined, topic, payload
-      ) VALUES($1, $2, $3, $4, $5)`;
-    const values = [id, occurredAt, wasQuarantined, topic, payload];
+        id, occurred_at, was_quarantined, topic, payload, status
+      ) VALUES($1, $2, $3, $4, $5, $6)`;
+    const values = [id, occurredAt, wasQuarantined, topic, payload, status];
     await this.client.query(query, values).catch((error) => {
       logger.error(
         { query, values, error },
@@ -115,7 +111,7 @@ export class PgOutboxRepository implements OutboxRepository {
   async #getEventById(id: string): Promise<DomainEvent | undefined> {
     const { rows } = await this.client.query<StoredEventRow>(
       `
-        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
+        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
           outbox_publications.id as publication_id, published_at,
           subscription_id, error_message 
         FROM outbox
