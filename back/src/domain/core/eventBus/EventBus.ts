@@ -5,6 +5,7 @@ import type {
   DomainEvent,
   DomainTopic,
   EventPublication,
+  EventStatus,
   SubscriptionId,
 } from "./events";
 
@@ -37,6 +38,7 @@ export type CreateNewEvent = <T extends DomainTopic>(params: {
   occurredAt?: DateIsoString;
   wasQuarantined?: boolean;
   publications?: EventPublication[];
+  status?: EventStatus;
 }) => NarrowEvent<T>;
 
 export const makeCreateNewEvent = ({
@@ -50,6 +52,7 @@ export const makeCreateNewEvent = ({
     occurredAt: timeGateway.now().toISOString(),
     wasQuarantined: quarantinedTopicSet.has(params.topic),
     publications: [],
+    status: "never-published",
     ...params,
   });
 };
