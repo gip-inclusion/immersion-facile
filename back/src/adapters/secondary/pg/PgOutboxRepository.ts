@@ -1,11 +1,12 @@
 import { PoolClient } from "pg";
 import { differenceWith } from "ramda";
 import { DateIsoString, propEq, replaceArrayElement } from "shared";
-import {
+import type {
   DomainEvent,
   DomainTopic,
   EventFailure,
   EventPublication,
+  EventStatus,
 } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { counterEventsSavedBeforePublish } from "../../../utils/counters";
@@ -20,6 +21,7 @@ export type StoredEventRow = {
   published_at: Date | null;
   subscription_id: string | null;
   error_message: string | null;
+  status: EventStatus;
 };
 
 const logger = createLogger(__filename);
@@ -202,4 +204,5 @@ const storedEventOutboxToDomainEvent = (row: StoredEventRow): DomainEvent => ({
   payload: row.payload,
   wasQuarantined: row.was_quarantined,
   publications: [],
+  status: row.status,
 });

@@ -67,6 +67,7 @@ describe("PgScriptsQueries", () => {
         } as any,
         occurredAt: addDays(before, 1).toISOString(),
         publications: [],
+        status: "never-published",
         wasQuarantined: false,
       });
 

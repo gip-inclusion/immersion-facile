@@ -122,6 +122,7 @@ describe("ContactEstablishment", () => {
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
         payload: { ...validEmailRequest, discussionId },
+        status: "never-published",
         publications: [],
         wasQuarantined: false,
       },
@@ -164,6 +165,7 @@ describe("ContactEstablishment", () => {
         topic: "ContactRequestedByBeneficiary",
         payload: { ...validPhoneRequest, discussionId },
         publications: [],
+        status: "never-published",
         wasQuarantined: false,
       },
     ]);
@@ -205,6 +207,7 @@ describe("ContactEstablishment", () => {
         topic: "ContactRequestedByBeneficiary",
         payload: { ...validInPersonRequest, discussionId },
         publications: [],
+        status: "never-published",
         wasQuarantined: false,
       },
     ]);

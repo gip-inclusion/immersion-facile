@@ -20,6 +20,7 @@ const domainEvt: DomainEvent = {
   payload: new ConventionDtoBuilder().build(),
   occurredAt: "a date",
   wasQuarantined: false,
+  status: "never-published",
   publications: [],
 };
 

@@ -203,6 +203,7 @@ describe("RequestUpdateFormEstablishment", () => {
       id: "123",
       topic: "NotificationAdded",
       occurredAt: initialMailDate.toISOString(),
+      status: "published",
       publications: [
         {
           publishedAt: addSeconds(initialMailDate, 1).toISOString(),

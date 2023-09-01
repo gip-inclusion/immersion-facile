@@ -69,6 +69,7 @@ describe("SaveApiConsumer", () => {
           topic: "ApiConsumerSaved",
           payload: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
       ]);
@@ -114,6 +115,7 @@ describe("SaveApiConsumer", () => {
           topic: "ApiConsumerSaved",
           payload: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
           publications: [],
+          status: "never-published",
           wasQuarantined: false,
         },
       ]);

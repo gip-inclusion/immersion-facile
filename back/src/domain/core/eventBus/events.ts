@@ -31,6 +31,13 @@ export type EventPublication = {
   failures: EventFailure[];
 };
 
+export type EventStatus =
+  | "never-published"
+  | "to-republish"
+  | "published"
+  | "failed-but-will-retry"
+  | "failed-to-many-times";
+
 type GenericEvent<T extends string, P> = {
   id: string;
   occurredAt: DateIsoString;
@@ -38,6 +45,7 @@ type GenericEvent<T extends string, P> = {
   payload: P;
   publications: EventPublication[];
   wasQuarantined: boolean;
+  status: EventStatus;
 };
 
 export type NotificationAddedEvent = GenericEvent<

@@ -1,20 +1,12 @@
 import { PoolClient } from "pg";
 import { groupBy, map, prop, values } from "ramda";
 import { pipeWithValue } from "shared";
-import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
+import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
-import { storedEventRowsToDomainEvent } from "./PgOutboxRepository";
-
-type StoredEventRow = {
-  id: string;
-  topic: DomainTopic;
-  payload: any;
-  occurred_at: Date;
-  was_quarantined: boolean;
-  published_at: Date | null;
-  subscription_id: string | null;
-  error_message: string | null;
-};
+import {
+  StoredEventRow,
+  storedEventRowsToDomainEvent,
+} from "./PgOutboxRepository";
 
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private client: PoolClient) {}
