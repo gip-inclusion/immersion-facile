@@ -142,17 +142,20 @@ const WeeksHoursIndicator = ({
   const workedHoursByWeek = calculateWeeklyHoursFromSchedule(
     schedule,
     interval,
-  );
-  const shouldShowRecap = workedHoursByWeek.some((hours) => hours > 0);
+  ).map((hours, index) => ({
+    hours,
+    id: `week-${index + 1}`,
+  }));
+  const shouldShowRecap = workedHoursByWeek.some((week) => week.hours > 0);
   return (
     <>
       {shouldShowRecap && (
         <ul>
-          {workedHoursByWeek.map((weekTotalHours, index) => (
+          {workedHoursByWeek.map((week, index) => (
             <TotalWeeklyHoursIndicator
-              key={`weeklyHoursIndicator-${index}`}
+              key={`weeklyHoursIndicator-${week.id}`}
               week={index + 1}
-              totalHours={weekTotalHours}
+              totalHours={week.hours}
             />
           ))}
         </ul>

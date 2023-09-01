@@ -39,33 +39,35 @@ export const MultipleAppellationInput = ({
     >
       <>
         {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
-        {currentAppellations.map(({ appellationCode }, index) => (
-          <div
-            className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-            key={`${appellationCode}-${index}`}
-          >
-            <div className={fr.cx("fr-col", "fr-mt-2w")}>
-              <AppellationAutocomplete
+        {currentAppellations.map(
+          ({ appellationCode, appellationLabel }, index) => (
+            <div
+              className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
+              key={`${appellationCode}-${appellationLabel}`}
+            >
+              <div className={fr.cx("fr-col", "fr-mt-2w")}>
+                <AppellationAutocomplete
+                  disabled={disabled}
+                  label={`Rechercher un métier *`}
+                  initialValue={currentAppellations[index]}
+                  onAppellationSelected={(selectedAppellation) => {
+                    onAppellationAdd(selectedAppellation, index);
+                  }}
+                  selectedAppellations={currentAppellations}
+                />
+              </div>
+              <Button
+                type="button"
+                iconId="fr-icon-delete-bin-line"
+                title="Suppression"
                 disabled={disabled}
-                label={`Rechercher un métier *`}
-                initialValue={currentAppellations[index]}
-                onAppellationSelected={(selectedAppellation) => {
-                  onAppellationAdd(selectedAppellation, index);
+                onClick={() => {
+                  onAppellationDelete(index);
                 }}
-                selectedAppellations={currentAppellations}
               />
             </div>
-            <Button
-              type="button"
-              iconId="fr-icon-delete-bin-line"
-              title="Suppression"
-              disabled={disabled}
-              onClick={() => {
-                onAppellationDelete(index);
-              }}
-            />
-          </div>
-        ))}
+          ),
+        )}
       </>
 
       <Button

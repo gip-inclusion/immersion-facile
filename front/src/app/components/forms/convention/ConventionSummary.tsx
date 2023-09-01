@@ -183,6 +183,7 @@ const prettyPrintScheduleAsJSX = (
     {prettyPrintSchedule(schedule, interval)
       .split("\n")
       .map((line, index) => (
+        // eslint-disable-next-line react/no-array-index-key
         <li key={index}>{line}</li>
       ))}
   </ul>

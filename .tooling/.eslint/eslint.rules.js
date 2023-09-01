@@ -8,7 +8,7 @@ module.exports = {
   "react/no-unescaped-entities": "off",
   "import/no-unresolved": "off",
   "import/named": "off",
-  "react/no-array-index-key": "warn",
+  "react/no-array-index-key": "error",
   "lines-between-class-members": ["error", "always"],
   "jest-formatting/padding-around-describe-blocks": "error",
   "jest-formatting/padding-around-test-blocks": "error",

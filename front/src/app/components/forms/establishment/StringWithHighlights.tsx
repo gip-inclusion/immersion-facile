@@ -28,10 +28,12 @@ export const StringWithHighlights = ({
           );
           if (bolded)
             return (
+              // eslint-disable-next-line react/no-array-index-key
               <span className={fr.cx("fr-text--bold")} key={index}>
                 {text}
               </span>
             );
+          // eslint-disable-next-line react/no-array-index-key
           return <Fragment key={index}>{text}</Fragment>;
         },
       )}
