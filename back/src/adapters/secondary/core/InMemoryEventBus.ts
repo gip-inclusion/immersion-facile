@@ -36,7 +36,51 @@ export class InMemoryEventBus implements EventBus {
     this.subscriptions = {};
   }
 
-  private async _publish(
+  public async publish(event: DomainEvent) {
+    const publishedAt = this.timeGateway.now().toISOString();
+    const publishedEvent = await this.#publish(event, publishedAt);
+    logger.info(
+      {
+        eventId: publishedEvent.id,
+        topic: publishedEvent.topic,
+        occurredAt: publishedEvent.occurredAt,
+        publicationsBefore: event.publications,
+        publicationsAfter: publishedEvent.publications,
+      },
+      "Saving published event",
+    );
+    await this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.save(publishedEvent),
+    );
+  }
+
+  public subscribe<T extends DomainTopic>(
+    domainTopic: T,
+    subscriptionId: SubscriptionId,
+    callback: EventCallback<T>,
+  ) {
+    logger.info({ domainTopic }, "subscribe");
+    if (!this.subscriptions[domainTopic]) {
+      this.subscriptions[domainTopic] = {};
+    }
+
+    // prettier-ignore
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
+
+    if (subscriptionsForTopic[subscriptionId]) {
+      logger.warn(
+        { domainTopic, subscriptionId },
+        "Subscription with this id already exists. It will be override",
+      );
+    }
+
+    if (callback) {
+      subscriptionsForTopic[subscriptionId] = callback as any;
+    }
+  }
+
+  async #publish(
     event: DomainEvent,
     publishedAt: DateIsoString,
   ): Promise<DomainEvent> {
@@ -80,12 +124,13 @@ export class InMemoryEventBus implements EventBus {
       return {
         ...event,
         publications,
+        status: "published",
       };
     }
 
     // Some subscribers have failed :
-    const wasQuarantined = event.publications.length >= 3;
-    if (wasQuarantined) {
+    const wasMaxNumberOfErrorsReached = event.publications.length >= 3;
+    if (wasMaxNumberOfErrorsReached) {
       const message = "Failed too many times, event will be Quarantined";
       logger.error({ event }, message);
       const { payload, publications, ...restEvent } = event;
@@ -100,53 +145,12 @@ export class InMemoryEventBus implements EventBus {
 
     return {
       ...event,
+      status: wasMaxNumberOfErrorsReached
+        ? "failed-to-many-times"
+        : "failed-but-will-retry",
       publications,
-      wasQuarantined,
+      wasQuarantined: wasMaxNumberOfErrorsReached,
     };
-  }
-
-  public async publish(event: DomainEvent) {
-    const publishedAt = this.timeGateway.now().toISOString();
-    const publishedEvent = await this._publish(event, publishedAt);
-    logger.info(
-      {
-        eventId: publishedEvent.id,
-        topic: publishedEvent.topic,
-        occurredAt: publishedEvent.occurredAt,
-        publicationsBefore: event.publications,
-        publicationsAfter: publishedEvent.publications,
-      },
-      "Saving published event",
-    );
-    await this.uowPerformer.perform((uow) =>
-      uow.outboxRepository.save(publishedEvent),
-    );
-  }
-
-  public subscribe<T extends DomainTopic>(
-    domainTopic: T,
-    subscriptionId: SubscriptionId,
-    callback: EventCallback<T>,
-  ) {
-    logger.info({ domainTopic }, "subscribe");
-    if (!this.subscriptions[domainTopic]) {
-      this.subscriptions[domainTopic] = {};
-    }
-
-    // prettier-ignore
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
-
-    if (subscriptionsForTopic[subscriptionId]) {
-      logger.warn(
-        { domainTopic, subscriptionId },
-        "Subscription with this id already exists. It will be override",
-      );
-    }
-
-    if (callback) {
-      subscriptionsForTopic[subscriptionId] = callback as any;
-    }
   }
 }
 
@@ -163,6 +167,7 @@ const publishEventWithNoCallbacks = (
   return {
     ...event,
     publications: [...event.publications, { publishedAt, failures: [] }],
+    status: "published",
   };
 };
 

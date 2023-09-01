@@ -55,6 +55,7 @@ describe("InMemoryEventBus", () => {
         publications: [
           { publishedAt: publishDate.toISOString(), failures: [] },
         ],
+        status: "published",
       });
     });
 
@@ -82,6 +83,7 @@ describe("InMemoryEventBus", () => {
         publications: [
           { publishedAt: publishDate.toISOString(), failures: [] },
         ],
+        status: "published",
       });
     });
   });
@@ -114,6 +116,7 @@ describe("InMemoryEventBus", () => {
       ...domainEvt,
       wasQuarantined: false,
       publications: [{ publishedAt: publishDate.toISOString(), failures: [] }],
+      status: "published",
     });
   });
 
@@ -144,6 +147,7 @@ describe("InMemoryEventBus", () => {
         ...domainEvt,
         wasQuarantined: false,
         publications: [],
+        status: "never-published",
       };
 
       expectToEqual(eventsOnFirstHandler, [expectedEvent]);
@@ -158,6 +162,7 @@ describe("InMemoryEventBus", () => {
             ],
           },
         ],
+        status: "failed-but-will-retry",
       });
     });
   });
@@ -168,6 +173,7 @@ describe("InMemoryEventBus", () => {
     const eventToRePublish: DomainEvent = {
       ...domainEvt,
       wasQuarantined: false,
+      status: "failed-but-will-retry",
       publications: [
         {
           publishedAt: initialPublishDate.toISOString(),
@@ -213,6 +219,7 @@ describe("InMemoryEventBus", () => {
             failures: [],
           },
         ],
+        status: "published",
       };
 
       expect(eventsOnInitiallyFailedHandler).toHaveLength(1);
@@ -246,6 +253,7 @@ describe("InMemoryEventBus", () => {
           ...eventToRePublish.publications,
           { publishedAt: rePublishDate.toISOString(), failures: [] },
         ],
+        status: "published",
       };
 
       expect(eventsOnFirstHandler).toHaveLength(0);
@@ -264,6 +272,7 @@ describe("InMemoryEventBus", () => {
       const eventPublished3TimesAlready: DomainEvent = {
         ...domainEvt,
         wasQuarantined: false,
+        status: "failed-but-will-retry",
         publications: [
           {
             publishedAt: new Date("2022-01-01").toISOString(),
@@ -297,6 +306,7 @@ describe("InMemoryEventBus", () => {
       const expectedEvent: DomainEvent = {
         ...domainEvt,
         wasQuarantined: true,
+        status: "failed-to-many-times",
         publications: [
           ...eventPublished3TimesAlready.publications,
           {

@@ -11,7 +11,7 @@ import {
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private client: PoolClient) {}
 
-  async getAllFailedEvents(): Promise<DomainEvent[]> {
+  public async getAllFailedEvents(): Promise<DomainEvent[]> {
     const selectEventIdsWithFailure = `(
       SELECT outbox.id
       FROM outbox_failures
@@ -53,7 +53,7 @@ export class PgOutboxQueries implements OutboxQueries {
     return convertRowsToDomainEvents(rows);
   }
 
-  async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
+  public async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
     const { rows } = await this.client.query<StoredEventRow>(`
     SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
       outbox_publications.id as publication_id, published_at,
