@@ -8,7 +8,7 @@ import {
   localization,
   zEnumValidation,
   zSchemaForType,
-  zString,
+  zStringMinLength1,
   zStringPossiblyEmpty,
   zTrimmedString,
 } from "../zodUtils";
@@ -72,7 +72,7 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
 
 const createAgencyShape = {
   id: agencyIdSchema,
-  name: zString,
+  name: zStringMinLength1,
   kind: agencyKindSchema,
   address: addressSchema,
   position: geoPositionSchema,
@@ -81,7 +81,7 @@ const createAgencyShape = {
     message: localization.atLeastOneEmail,
   }),
   questionnaireUrl: z.string().optional(),
-  signature: zString,
+  signature: zStringMinLength1,
   logoUrl: absoluteUrlSchema.optional(),
 };
 
@@ -99,7 +99,7 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = createAgencySchema.and(
   z.object({
     questionnaireUrl: z.string(),
     status: agencyStatusSchema,
-    adminEmails: z.array(zString),
+    adminEmails: z.array(zStringMinLength1),
     codeSafir: zStringPossiblyEmpty,
   }),
 );
@@ -115,7 +115,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
     z.object({
       questionnaireUrl: z.string(),
       status: agencyStatusSchema,
-      adminEmails: z.array(zString),
+      adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringPossiblyEmpty,
     }),
   );
@@ -136,12 +136,12 @@ export const updateAgencyRequestSchema: z.ZodSchema<UpdateAgencyRequestDto> =
 export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
   z.object({
     id: agencyIdSchema,
-    name: zString,
+    name: zStringMinLength1,
     address: addressSchema,
     position: geoPositionSchema,
     agencySiret: siretSchema.optional().or(z.literal("")),
     logoUrl: absoluteUrlSchema.optional(),
-    signature: zString,
+    signature: zStringMinLength1,
   });
 
 export const withActiveOrRejectedAgencyStatusSchema: z.Schema<WithActiveOrRejectedStatus> =

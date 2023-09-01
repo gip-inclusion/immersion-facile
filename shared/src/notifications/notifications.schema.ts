@@ -6,7 +6,7 @@ import { authenticatedUserIdSchema } from "../inclusionConnectedAllowed/inclusio
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
 import { dateRegExp } from "../utils/date";
-import { localization, zString } from "../zodUtils";
+import { localization, zStringMinLength1 } from "../zodUtils";
 import {
   EmailNotification,
   FollowedIds,
@@ -29,7 +29,7 @@ const followedIdsSchema: z.Schema<FollowedIds> = z.object({
 
 const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({
   id: notificationIdSchema,
-  createdAt: zString.regex(dateRegExp),
+  createdAt: zStringMinLength1.regex(dateRegExp),
   followedIds: followedIdsSchema,
 });
 

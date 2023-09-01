@@ -8,7 +8,7 @@ import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
   zBoolean,
-  zString,
+  zStringMinLength1,
   zStringPossiblyEmpty,
   zTrimmedString,
 } from "../zodUtils";
@@ -44,7 +44,7 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   lastName: zTrimmedString,
   firstName: zTrimmedString,
   job: zTrimmedString,
-  phone: zString.regex(phoneRegExp, localization.invalidPhone),
+  phone: zStringMinLength1.regex(phoneRegExp, localization.invalidPhone),
   email: emailSchema,
   contactMethod: preferredContactMethodSchema,
   copyEmails: z.array(emailSchema),
@@ -88,12 +88,12 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
 
 export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
   z.object({
-    groupName: zString,
+    groupName: zStringMinLength1,
     formEstablishments: z.array(formEstablishmentSchema),
   });
 
 export const withEstablishmentGroupSlugSchema: z.Schema<WithEstablishmentGroupSlug> =
-  z.object({ groupSlug: zString });
+  z.object({ groupSlug: zStringMinLength1 });
 
 const siretAdditionFailure: z.Schema<SiretAdditionFailure> = z.object({
   siret: siretSchema,
@@ -114,14 +114,14 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     businessNameCustomized: zStringPossiblyEmpty,
     businessName: zTrimmedString,
     businessAddress: addressWithPostalCodeSchema,
-    naf_code: zString,
-    appellations_code: zString,
+    naf_code: zStringMinLength1,
+    appellations_code: zStringMinLength1,
     isEngagedEnterprise: csvBooleanSchema,
-    businessContact_job: zString,
-    businessContact_email: zString,
-    businessContact_phone: zString,
-    businessContact_lastName: zString,
-    businessContact_firstName: zString,
+    businessContact_job: zStringMinLength1,
+    businessContact_email: zStringMinLength1,
+    businessContact_phone: zStringMinLength1,
+    businessContact_lastName: zStringMinLength1,
+    businessContact_firstName: zStringMinLength1,
     businessContact_contactMethod: preferredContactMethodSchema,
     businessContact_copyEmails: zStringPossiblyEmpty,
     isSearchable: csvBooleanSchema,

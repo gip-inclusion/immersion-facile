@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { localization, zEnumValidation, zString } from "../zodUtils";
+import { localization, zEnumValidation, zStringMinLength1 } from "../zodUtils";
 import {
   assessmentStatuses,
   ImmersionAssessmentDto,
@@ -12,5 +12,5 @@ export const immersionAssessmentSchema: z.Schema<ImmersionAssessmentDto> =
       assessmentStatuses,
       localization.expectRadioButtonSelected,
     ),
-    establishmentFeedback: zString,
+    establishmentFeedback: zStringMinLength1,
   });

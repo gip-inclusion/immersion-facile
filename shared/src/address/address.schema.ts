@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { zString, zStringCanBeEmpty } from "../zodUtils";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   AddressAndPosition,
   AddressDto,
@@ -14,9 +14,9 @@ export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
 export const addressSchema: z.Schema<AddressDto> = z.object({
   streetNumberAndAddress: zStringCanBeEmpty,
-  postcode: zString,
-  departmentCode: zString,
-  city: zString,
+  postcode: zStringMinLength1,
+  departmentCode: zStringMinLength1,
+  city: zStringMinLength1,
 });
 
 export const lookupSearchResultSchema: z.Schema<LookupSearchResult> = z.object({

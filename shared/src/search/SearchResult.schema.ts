@@ -3,7 +3,11 @@ import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zString, zStringCanBeEmpty, zStringPossiblyEmpty } from "../zodUtils";
+import {
+  zStringCanBeEmpty,
+  zStringMinLength1,
+  zStringPossiblyEmpty,
+} from "../zodUtils";
 import { SearchResultDto } from "./SearchResult.dto";
 
 export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
@@ -19,8 +23,8 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
   address: z.object({
     streetNumberAndAddress: zStringCanBeEmpty,
     postcode: zStringCanBeEmpty,
-    departmentCode: zString,
-    city: zString,
+    departmentCode: zStringMinLength1,
+    city: zStringMinLength1,
   }),
   contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),
   distance_m: z.number().optional(),

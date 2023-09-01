@@ -2,7 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencySchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
-import { zString, zTrimmedString } from "../zodUtils";
+import { zStringMinLength1, zTrimmedString } from "../zodUtils";
 import {
   AgencyRight,
   allAgencyRoles,
@@ -24,8 +24,8 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
   z.object({
     id: authenticatedUserIdSchema,
     email: emailSchema,
-    firstName: zString,
-    lastName: zString,
+    firstName: zStringMinLength1,
+    lastName: zStringMinLength1,
     agencyRights: z.array(agencyRightSchema),
     dashboardUrl: absoluteUrlSchema.optional(),
     erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zString, zTrimmedString } from "shared";
+import { zStringMinLength1, zTrimmedString } from "shared";
 import { BearerToken } from "../../../domain/peConnect/dto/BearerToken";
 import {
   peAdvisorKinds,
@@ -22,8 +22,8 @@ export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
     family_name: zTrimmedString,
     gender: z.enum(["male", "female"]),
     given_name: zTrimmedString,
-    idIdentiteExterne: zString,
-    sub: zString,
+    idIdentiteExterne: zStringMinLength1,
+    sub: zStringMinLength1,
   });
 
 export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut> =
