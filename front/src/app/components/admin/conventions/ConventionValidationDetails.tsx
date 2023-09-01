@@ -46,6 +46,7 @@ export const ConventionValidationDetails = ({
       </h4>
       {sections.map((list, index) => (
         <ConventionValidationSection
+          // eslint-disable-next-line react/no-array-index-key
           key={index}
           convention={convention}
           list={list}
@@ -105,6 +106,7 @@ const ConventionValidationSection = ({
                   {buildContent(field)}
                 </td>
               ) : (
+                // eslint-disable-next-line react/no-array-index-key
                 <td key={index}></td>
               ),
             )}
@@ -152,6 +154,7 @@ const ConventionValidationSection = ({
               <tr>
                 {list.cols &&
                   list.cols?.map((col, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
                     <th key={index} scope="col">
                       {col}
                     </th>

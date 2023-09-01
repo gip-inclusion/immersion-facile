@@ -276,6 +276,7 @@ export const AddEstablishmentsByBatch = () => {
                   <>
                     {establishment.formEstablishment && (
                       <tr
+                        // eslint-disable-next-line react/no-array-index-key
                         key={`${establishment.formEstablishment.siret}-${index}`}
                         className={cx({})}
                         style={{
@@ -289,6 +290,7 @@ export const AddEstablishmentsByBatch = () => {
                             <>
                               {establishment.formEstablishment && (
                                 <td
+                                  // eslint-disable-next-line react/no-array-index-key
                                   key={`${establishment.formEstablishment.siret}-value-${index}`}
                                   className={fr.cx("fr-text--xs")}
                                 >
@@ -302,6 +304,7 @@ export const AddEstablishmentsByBatch = () => {
                     )}
                     {establishment.formEstablishment === null && (
                       <tr
+                        // eslint-disable-next-line react/no-array-index-key
                         key={index}
                         className={cx({})}
                         style={{
@@ -311,6 +314,7 @@ export const AddEstablishmentsByBatch = () => {
                         }}
                       >
                         {establishment.zodErrors.map((error, index) => (
+                          // eslint-disable-next-line react/no-array-index-key
                           <td key={`${error.path}-${index}`}>
                             {error.path} : {error.message}
                           </td>

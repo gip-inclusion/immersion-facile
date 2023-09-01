@@ -56,6 +56,7 @@ export const ErrorPageContent = ({
         />
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
           {content.buttons.map((button: ErrorButton, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <li key={`${button.kind}-${index}`}>
               {button.onClick ? (
                 <button

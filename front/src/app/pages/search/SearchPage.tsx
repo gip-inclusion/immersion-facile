@@ -240,7 +240,7 @@ export const SearchPage = ({
                         {sortedByOptions.map((option, index) => (
                           <div
                             className={fr.cx("fr-radio-group")}
-                            key={`${domElementIds.search.searchSortOptionBase}${index}`}
+                            key={option.value}
                           >
                             <input
                               type="radio"

@@ -69,7 +69,7 @@ export const HourPicker = ({
 
           return (
             <div
-              key={name + index}
+              key={`${timePeriods[index].start}-${timePeriods[index].end}`}
               className={cx(fr.cx("fr-mt-2w"), "schedule-picker__section")}
             >
               <div className={cx("schedule-picker__row")}>

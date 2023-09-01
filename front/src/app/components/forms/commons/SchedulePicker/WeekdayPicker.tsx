@@ -60,6 +60,7 @@ export const WeekdayPicker = ({
       >
         {availableWeekDays.map((dayName, index) => (
           <DayCircle
+            // eslint-disable-next-line react/no-array-index-key
             key={dayName + index}
             name={dayName}
             disabled={isDayDisabled(index as WeekdayNumber, interval)}
