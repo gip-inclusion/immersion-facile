@@ -81,7 +81,19 @@ describe("SaveApiConsumer", () => {
 
       const updatedConsumer: ApiConsumer = {
         ...authorizedUnJeuneUneSolutionApiConsumer,
-        isAuthorized: false,
+        rights: {
+          searchEstablishment: {
+            kinds: [],
+            scope: "no-scope",
+          },
+          convention: {
+            kinds: [],
+            scope: {
+              agencyKinds: [],
+              agencyIds: [],
+            },
+          },
+        },
       };
 
       const result = await saveApiConsumer.execute(

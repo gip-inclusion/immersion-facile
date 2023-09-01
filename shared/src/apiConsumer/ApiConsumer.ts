@@ -1,4 +1,5 @@
-import { Email } from "../email/email.dto";
+import type { AgencyId, AgencyKind } from "../agency/agency.dto";
+import type { Email } from "../email/email.dto";
 import { Flavor } from "../typeFlavors";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
@@ -9,12 +10,33 @@ export type ApiConsumerJwtPayload = {
 
 export type ApiConsumerName = Flavor<string, "ApiConsumerName">;
 
+type ApiConsumerKind = (typeof apiConsumerKinds)[number];
+export const apiConsumerKinds = ["READ", "WRITE"] as const;
+
+type ApiConsumerRight<Scope> = {
+  kinds: ApiConsumerKind[];
+  scope: Scope;
+};
+
+type NoScope = "no-scope";
+
+type ApiConsumerRightName = keyof ApiConsumerRights;
+export type ApiConsumerRights = {
+  searchEstablishment: ApiConsumerRight<NoScope>;
+  convention: ApiConsumerRight<ConventionScope>;
+};
+
+type ConventionScope = {
+  agencyKinds: AgencyKind[];
+  agencyIds: AgencyId[];
+};
+
 export type ApiConsumer = {
   id: ApiConsumerId;
   consumer: ApiConsumerName;
   contact: ApiConsumerContact;
   description?: string;
-  isAuthorized: boolean;
+  rights: ApiConsumerRights;
   createdAt: Date;
   expirationDate: Date;
 };
@@ -26,3 +48,14 @@ export type ApiConsumerContact = {
   phone: string;
   emails: Email[];
 };
+
+export const isApiConsumerAllowed = ({
+  apiConsumer,
+  rightName,
+  consumerKind,
+}: {
+  apiConsumer: ApiConsumer | undefined;
+  rightName: ApiConsumerRightName;
+  consumerKind: ApiConsumerKind;
+}): boolean =>
+  !!apiConsumer && apiConsumer.rights[rightName].kinds.includes(consumerKind);

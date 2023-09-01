@@ -18,7 +18,19 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
   },
   createdAt: new Date(),
   expirationDate: addYears(new Date(), 1),
-  isAuthorized: true,
+  rights: {
+    searchEstablishment: {
+      kinds: ["READ"],
+      scope: "no-scope",
+    },
+    convention: {
+      kinds: ["READ"],
+      scope: {
+        agencyKinds: [],
+        agencyIds: [],
+      },
+    },
+  },
   description: "a",
 };
 
@@ -34,7 +46,19 @@ export const unauthorisedApiConsumer: ApiConsumer = {
   },
   createdAt: new Date(),
   expirationDate: addYears(new Date(), 1),
-  isAuthorized: false,
+  rights: {
+    searchEstablishment: {
+      kinds: [],
+      scope: "no-scope",
+    },
+    convention: {
+      kinds: [],
+      scope: {
+        agencyKinds: [],
+        agencyIds: [],
+      },
+    },
+  },
   description: "",
 };
 
@@ -50,7 +74,19 @@ export const outdatedApiConsumer: ApiConsumer = {
   },
   createdAt: subYears(new Date(), 2),
   expirationDate: subYears(new Date(), 1),
-  isAuthorized: true,
+  rights: {
+    searchEstablishment: {
+      kinds: ["READ"],
+      scope: "no-scope",
+    },
+    convention: {
+      kinds: ["READ"],
+      scope: {
+        agencyKinds: [],
+        agencyIds: [],
+      },
+    },
+  },
   description: "",
 };
 

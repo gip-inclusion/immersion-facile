@@ -169,7 +169,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
 
     expectToEqual(response, {
       status: 403,
-      body: { message: "unauthorised consumer Id", status: 403 },
+      body: { message: "Accès refusé", status: 403 },
     });
   });
 });

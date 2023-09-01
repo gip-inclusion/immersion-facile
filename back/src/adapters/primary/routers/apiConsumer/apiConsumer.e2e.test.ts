@@ -89,7 +89,19 @@ describe("Api Consumer router", () => {
 
       const updatedApiConsumer: ApiConsumer = {
         ...authorizedUnJeuneUneSolutionApiConsumer,
-        isAuthorized: !authorizedUnJeuneUneSolutionApiConsumer.isAuthorized,
+        rights: {
+          searchEstablishment: {
+            kinds: [],
+            scope: "no-scope",
+          },
+          convention: {
+            kinds: [],
+            scope: {
+              agencyKinds: [],
+              agencyIds: [],
+            },
+          },
+        },
       };
 
       const response = await sharedRequest.saveApiConsumer({

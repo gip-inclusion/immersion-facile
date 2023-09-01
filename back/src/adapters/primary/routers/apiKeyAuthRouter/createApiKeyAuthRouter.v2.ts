@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { andThen, map } from "ramda";
-import { pipeWithValue } from "shared";
+import { isApiConsumerAllowed, pipeWithValue } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -20,7 +20,7 @@ const logger = createLogger(__filename);
 export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   const publicV2Router = Router({ mergeParams: true });
 
-  publicV2Router.use("/v2", deps.apiKeyAuthMiddlewareV2);
+  publicV2Router.use("/v2", deps.apiConsumerMiddleware);
 
   const publicV2SharedRouter = createExpressSharedRouter(
     publicApiV2Routes,
@@ -28,8 +28,16 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   publicV2SharedRouter.searchImmersion((req, res) =>
-    sendHttpResponseForApiV2(req, res, async () =>
-      pipeWithValue(
+    sendHttpResponseForApiV2(req, res, async () => {
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer: req.apiConsumer,
+          rightName: "searchEstablishment",
+          consumerKind: "READ",
+        })
+      )
+        throw new ForbiddenError();
+      return pipeWithValue(
         req.query,
         searchParamsPublicV2ToDomain,
         (searchImmersionRequest) =>
@@ -38,13 +46,20 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             req.apiConsumer,
           ),
         andThen(map(domainToSearchImmersionResultPublicV2)),
-      ),
-    ),
+      );
+    }),
   );
 
   publicV2SharedRouter.getOfferBySiretAndAppellationCode((req, res) =>
     sendHttpResponseForApiV2(req, res, async () => {
-      if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer: req.apiConsumer,
+          rightName: "searchEstablishment",
+          consumerKind: "READ",
+        })
+      )
+        throw new ForbiddenError();
       return domainToSearchImmersionResultPublicV2(
         await deps.useCases.getSearchResultBySiretAndAppellationCode.execute(
           req.params,
@@ -56,7 +71,14 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
 
   publicV2SharedRouter.contactEstablishment((req, res) =>
     sendHttpResponseForApiV2(req, res.status(201), () => {
-      if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer: req.apiConsumer,
+          rightName: "searchEstablishment",
+          consumerKind: "READ",
+        })
+      )
+        throw new ForbiddenError();
       return pipeWithValue(
         validateAndParseZodSchemaV2(
           contactEstablishmentPublicV2Schema,

@@ -91,12 +91,12 @@ describe("POST contact-establishment public V2 route", () => {
           id: unauthorisedApiConsumer.id,
         }),
       },
-      body: {} as any,
+      body: contactEstablishment,
     });
 
     expectToEqual(body, {
       status: 403,
-      message: "unauthorised consumer Id",
+      message: "Accès refusé",
     });
     expectToEqual(status, 403);
   });

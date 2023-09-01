@@ -70,8 +70,9 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
       );
 
       return sendHttpResponse(req, res, () => {
-        if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
-
+        if (!req.apiConsumer) {
+          throw new ForbiddenError();
+        }
         return pipeWithValue(
           validateAndParseZodSchema(
             formEstablishmentSchemaPublicV0,
