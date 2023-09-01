@@ -67,6 +67,7 @@ export const Footer = ({
             {links && links.length > 0 && (
               <ul className={fr.cx("fr-footer__content-list")}>
                 {links.map((link, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
                   <TopLink key={index} link={link} />
                 ))}
               </ul>
@@ -78,6 +79,7 @@ export const Footer = ({
           {bottomLinks && bottomLinks.length > 0 && (
             <ul className={fr.cx("fr-footer__bottom-list")}>
               {bottomLinks.map((link, index) => (
+                // eslint-disable-next-line react/no-array-index-key
                 <BottomLink key={index} link={link} />
               ))}
             </ul>

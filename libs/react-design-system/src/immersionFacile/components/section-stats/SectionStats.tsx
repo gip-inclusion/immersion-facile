@@ -20,6 +20,7 @@ export const SectionStats = ({ stats }: SectionStatsProps) => (
           className={`${componentName}__items fr-grid-row fr-grid-row--gutters`}
         >
           {stats.map((stat, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <StatCard key={`section-stats-item-${index}`} {...stat} />
           ))}
         </div>
