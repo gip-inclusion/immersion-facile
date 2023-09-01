@@ -9,7 +9,7 @@ import {
   romeCodeSchema,
   siretSchema,
   zBoolean,
-  zString,
+  zStringMinLength1,
   zTrimmedString,
 } from "shared";
 import {
@@ -22,7 +22,10 @@ const businessContactSchemaPublicV0: z.Schema<BusinessContactDtoPublicV0> =
     lastName: zTrimmedString,
     firstName: zTrimmedString,
     job: zTrimmedString,
-    phone: zString.regex(phoneRegExp, "Numero de téléphone incorrect"),
+    phone: zStringMinLength1.regex(
+      phoneRegExp,
+      "Numero de téléphone incorrect",
+    ),
     email: emailSchema,
   });
 

@@ -1,16 +1,16 @@
 import { z } from "zod";
-import { validateEmailReasonSchema, zString } from "shared";
+import { validateEmailReasonSchema, zStringMinLength1 } from "shared";
 import {
   EmailableApiKey,
   EmailableEmailValidationParams,
   EmailableEmailValidationStatus,
 } from "./EmailableEmailValidationGateway.dto";
 
-const emailableApiKeySchema: z.Schema<EmailableApiKey> = zString;
+const emailableApiKeySchema: z.Schema<EmailableApiKey> = zStringMinLength1;
 
 export const emailableValidationTargetsQueryParamsSchema: z.Schema<EmailableEmailValidationParams> =
   z.object({
-    email: zString,
+    email: zStringMinLength1,
     api_key: emailableApiKeySchema,
   });
 

@@ -56,25 +56,27 @@ export const requiredBoolean = {
   invalid_type_error: localization.expectText,
 };
 
-export const zString = z.string(requiredText).min(1, localization.required);
+export const zStringMinLength1 = z
+  .string(requiredText)
+  .min(1, localization.required);
 export const zStringCanBeEmpty = z.string(requiredText);
 
-export const zStringPossiblyEmpty = zString
+export const zStringPossiblyEmpty = zStringMinLength1
   .optional()
   .or(z.literal("")) as z.Schema<string>;
 
 export const zStringPossiblyEmptyWithMax = (max: number) =>
-  zString
+  zStringMinLength1
     .max(max, localization.maxCharacters(max))
     .optional()
     .or(z.literal("")) as z.Schema<string>;
 
-export const zTrimmedString = zString
+export const zTrimmedString = zStringMinLength1
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, localization.required);
 
 export const zTrimmedStringWithMax = (max: number) =>
-  zString
+  zStringMinLength1
     .max(max, localization.maxCharacters(max))
     .transform((s) => s.trim())
     .refine((s) => s.length > 0, localization.required);
@@ -84,7 +86,9 @@ export const zTimeString = z
   .regex(timeHHmmRegExp, localization.invalidTimeFormat);
 
 export const makezTrimmedString = (message: string) =>
-  zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
+  zStringMinLength1
+    .transform((s) => s.trim())
+    .refine((s) => s.length > 0, message);
 
 export const zBoolean = z.boolean(requiredBoolean);
 

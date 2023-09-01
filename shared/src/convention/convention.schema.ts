@@ -20,7 +20,7 @@ import {
   localization,
   zBoolean,
   zEnumValidation,
-  zString,
+  zStringMinLength1,
   zStringPossiblyEmpty,
   zStringPossiblyEmptyWithMax,
   zTrimmedString,
@@ -85,7 +85,7 @@ export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
 
 const roleSchema = z.enum(allRoles);
-export const phoneSchema = zString.regex(
+export const phoneSchema = zStringMinLength1.regex(
   phoneRegExp,
   localization.invalidPhone,
 );
@@ -98,7 +98,7 @@ const signatorySchema = z.object({
   phone: phoneSchema,
   firstName: zTrimmedStringMax255,
   lastName: zTrimmedStringMax255,
-  signedAt: zString.regex(dateRegExp).optional(),
+  signedAt: zStringMinLength1.regex(dateRegExp).optional(),
 });
 
 const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
@@ -110,7 +110,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
       emergencyContactEmail: emailPossiblyEmptySchema,
       federatedIdentity: peConnectIdentitySchema.optional(),
       financiaryHelp: zStringPossiblyEmpty,
-      birthdate: zString.regex(dateRegExp, localization.invalidDate),
+      birthdate: zStringMinLength1.regex(dateRegExp, localization.invalidDate),
       isRqth: zBoolean.optional(),
     }),
   );
@@ -155,7 +155,7 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
       job: zStringPossiblyEmpty,
       businessSiret: siretSchema,
       businessName: zTrimmedStringMax255,
-      businessAddress: zString,
+      businessAddress: zStringMinLength1,
     }),
   );
 
@@ -181,10 +181,10 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   status: z.enum(conventionStatuses),
   statusJustification: z.string().optional(),
   agencyId: agencyIdSchema,
-  dateSubmission: zString.regex(dateRegExp, localization.invalidDate),
-  dateStart: zString.regex(dateRegExp, localization.invalidDateStart),
-  dateEnd: zString.regex(dateRegExp, localization.invalidDateEnd),
-  dateValidation: zString
+  dateSubmission: zStringMinLength1.regex(dateRegExp, localization.invalidDate),
+  dateStart: zStringMinLength1.regex(dateRegExp, localization.invalidDateStart),
+  dateEnd: zStringMinLength1.regex(dateRegExp, localization.invalidDateEnd),
+  dateValidation: zStringMinLength1
     .regex(dateRegExp, localization.invalidValidationFormatDate)
     .optional(),
   siret: siretSchema,
