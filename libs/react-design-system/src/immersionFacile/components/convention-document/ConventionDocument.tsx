@@ -23,6 +23,7 @@ export const ConventionDocument = ({
       const LogoElement = logo as ReactElement;
       const LogoElementWithClassName = React.cloneElement(LogoElement, {
         className: cx(`${componentName}__logo`),
+        // eslint-disable-next-line react/no-array-index-key
         key: `${componentName}__logo-${index}`,
       });
       return LogoElementWithClassName;

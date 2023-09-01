@@ -112,6 +112,7 @@ export const HeroHeader = ({
           <div className={cx(`${componentName}__patterns`)}>
             {Array.from(Array(3).entries()).map((_item, index) => (
               <div
+                // eslint-disable-next-line react/no-array-index-key
                 key={`${componentName}__pattern--${index}`}
                 className={cx(
                   `${componentName}__pattern`,
