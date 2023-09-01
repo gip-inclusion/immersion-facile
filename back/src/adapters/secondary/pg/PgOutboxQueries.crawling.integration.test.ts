@@ -63,6 +63,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: convention,
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
+      status: "published",
     });
 
     timeGateway.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
@@ -123,6 +124,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     const withFailureButEventuallySuccessfulEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: convention,
+      status: "published",
       publications: [
         {
           publishedAt: "2021-11-15T06:00:00.000Z",
@@ -139,6 +141,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     const failedButQuarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
       payload: convention,
+      status: "failed-but-will-retry",
       publications: [
         {
           publishedAt: "2021-11-15T09:00:00.000Z",
