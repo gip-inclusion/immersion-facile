@@ -9,7 +9,7 @@ export type ApiConsumerRoutes = typeof apiConsumerRoutes;
 export const apiConsumerRoutes = defineRoutes({
   saveApiConsumer: defineRoute({
     method: "post",
-    url: `/apiConsumers`,
+    url: `/api-consumers`,
     requestBodySchema: apiConsumerSchema,
     ...withAuthorizationHeaders,
     responses: { 200: jwtSchema, 401: legacyUnauthenticatedErrorSchema },
