@@ -3,6 +3,7 @@ import {
   AbsoluteUrl,
   AgencyDtoBuilder,
   AgencyRight,
+  ApiConsumer,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -62,6 +63,10 @@ export class SimulatedAdminGateway implements AdminGateway {
         },
       ],
     });
+  }
+
+  public getAllApiConsumers$(): Observable<ApiConsumer[]> {
+    return of(apiConsumers);
   }
 
   public getDashboardUrl$(
@@ -136,3 +141,37 @@ export class SimulatedAdminGateway implements AdminGateway {
       : of(undefined);
   }
 }
+
+const apiConsumers: ApiConsumer[] = [
+  {
+    id: "fake-api-consumer-id-1",
+    consumer: "FakeApiConsumer1",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fermentum odio nibh, quis porta mi tempus quis.",
+    contact: {
+      lastName: "FakeLastname1",
+      firstName: "FakeFirstname1",
+      job: "FakeJob1",
+      phone: "FakePhone1",
+      emails: ["fakeEmail1@mail.com"],
+    },
+    createdAt: new Date().toISOString(),
+    expirationDate: new Date().toISOString(),
+    rights: {
+      searchEstablishment: {
+        kinds: ["READ"],
+        scope: "no-scope",
+      },
+      convention: {
+        kinds: ["READ", "WRITE"],
+        scope: {
+          agencyKinds: ["pole-emploi", "mission-locale"],
+          agencyIds: [
+            "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "bbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+          ],
+        },
+      },
+    },
+  },
+];

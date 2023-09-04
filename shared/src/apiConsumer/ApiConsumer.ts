@@ -12,7 +12,7 @@ export type ApiConsumerJwtPayload = {
 
 export type ApiConsumerName = Flavor<string, "ApiConsumerName">;
 
-type ApiConsumerKind = (typeof apiConsumerKinds)[number];
+export type ApiConsumerKind = (typeof apiConsumerKinds)[number];
 export const apiConsumerKinds = ["READ", "WRITE"] as const;
 
 type ApiConsumerRight<Scope> = {
@@ -20,13 +20,13 @@ type ApiConsumerRight<Scope> = {
   scope: Scope;
 };
 
-type NoScope = "no-scope";
-
 type ApiConsumerRightName = keyof ApiConsumerRights;
 export type ApiConsumerRights = {
   searchEstablishment: ApiConsumerRight<NoScope>;
   convention: ApiConsumerRight<ConventionScope>;
 };
+
+export type NoScope = "no-scope";
 
 export type ConventionScope = Either<
   { agencyKinds: AgencyKind[] },

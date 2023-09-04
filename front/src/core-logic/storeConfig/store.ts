@@ -13,6 +13,8 @@ import { icUsersAdminEpics } from "src/core-logic/domain/admin/icUsersAdmin/icUs
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { notificationsEpics } from "src/core-logic/domain/admin/notifications/notifications.epics";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
+import { apiConsumerEpics } from "src/core-logic/domain/apiConsumer/apiConsumer.epics";
+import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
@@ -59,6 +61,7 @@ const allEpics: any[] = [
   ...inclusionConnectedEpics,
   ...agencyInfoEpics,
   ...icUsersAdminEpics,
+  ...apiConsumerEpics,
 ];
 
 const rootReducer = combineReducers({
@@ -81,6 +84,7 @@ const rootReducer = combineReducers({
     [adminAuthSlice.name]: adminAuthSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
+    [apiConsumerSlice.name]: apiConsumerSlice.reducer,
   }),
 });
 

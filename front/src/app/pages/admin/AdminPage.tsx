@@ -9,7 +9,7 @@ import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
 import { EstablishmentsTab } from "src/app/pages/admin/EstablishmentsTab";
 import { EventsTab } from "src/app/pages/admin/EventsTabs";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
-import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
+import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
 import { AdminTab, isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
 
@@ -49,7 +49,7 @@ const rawAdminTabs: Array<
   {
     label: "Options techniques",
     tabId: "technical-options",
-    content: <TechnicalOptions />,
+    content: <TechnicalOptionsTab />,
   },
 ];
 
