@@ -2,6 +2,7 @@ import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
 import { Flavor } from "../typeFlavors";
 import { Either } from "../utils";
+import { DateIsoString } from "../utils/date";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 
@@ -38,8 +39,8 @@ export type ApiConsumer = {
   contact: ApiConsumerContact;
   description?: string;
   rights: ApiConsumerRights;
-  createdAt: Date;
-  expirationDate: Date;
+  createdAt: DateIsoString;
+  expirationDate: DateIsoString;
 };
 
 export type ApiConsumerContact = {

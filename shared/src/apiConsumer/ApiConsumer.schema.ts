@@ -2,6 +2,7 @@ import { z } from "zod";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { phoneSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
+import { dateIsoStringSchema } from "../schedule/Schedule.schema";
 import { localization, zStringMinLength1 } from "../zodUtils";
 import {
   ApiConsumer,
@@ -44,7 +45,7 @@ export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
   consumer: zStringMinLength1,
   contact: apiConsumerContactSchema,
   rights: apiConsumerRightsSchema,
-  createdAt: z.coerce.date(),
-  expirationDate: z.coerce.date(),
+  createdAt: dateIsoStringSchema,
+  expirationDate: dateIsoStringSchema,
   description: z.string().optional(),
 });

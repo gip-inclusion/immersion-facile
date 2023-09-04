@@ -50,8 +50,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       )`,
       //prettier-ignore
       [
-        apiConsumer.id, apiConsumer.consumer, apiConsumer.description, JSON.stringify(apiConsumer.rights), apiConsumer.createdAt.toISOString(),
-        apiConsumer.expirationDate.toISOString(), apiConsumer.contact.emails, apiConsumer.contact.firstName, apiConsumer.contact.lastName, apiConsumer.contact.job, 
+        apiConsumer.id, apiConsumer.consumer, apiConsumer.description, JSON.stringify(apiConsumer.rights), apiConsumer.createdAt,
+        apiConsumer.expirationDate, apiConsumer.contact.emails, apiConsumer.contact.firstName, apiConsumer.contact.lastName, apiConsumer.contact.job,
         apiConsumer.contact.phone,
       ],
     );
@@ -63,8 +63,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       consumer: raw.consumer,
       description: optional(raw.description),
       rights: raw.rights,
-      createdAt: raw.created_at,
-      expirationDate: raw.expiration_date,
+      createdAt: raw.created_at.toISOString(),
+      expirationDate: raw.expiration_date.toISOString(),
       contact: {
         firstName: raw.contact_first_name,
         lastName: raw.contact_last_name,

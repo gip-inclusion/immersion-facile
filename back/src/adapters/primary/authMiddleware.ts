@@ -93,7 +93,7 @@ export const createApiKeyAuthMiddlewareV0 = (
         return next();
       }
 
-      if (apiConsumer.expirationDate < timeGateway.now()) {
+      if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         incTotalCountForRequest({
           authorisationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
@@ -165,7 +165,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
         return responseError(res, "consumer has not enough privileges");
       }
 
-      if (apiConsumer.expirationDate < timeGateway.now()) {
+      if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         incTotalCountForRequest({
           authorisationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
@@ -316,7 +316,7 @@ export const makeConsumerMiddleware = (
         return responseErrorForV2(res, "consumer not found");
       }
 
-      if (apiConsumer.expirationDate < timeGateway.now()) {
+      if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         incTotalCountForRequest({
           authorisationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,

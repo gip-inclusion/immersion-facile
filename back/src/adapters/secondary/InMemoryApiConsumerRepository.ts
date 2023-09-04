@@ -16,8 +16,8 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
     job: "tech",
     phone: "0611223344",
   },
-  createdAt: new Date(),
-  expirationDate: addYears(new Date(), 1),
+  createdAt: new Date().toISOString(),
+  expirationDate: addYears(new Date(), 1).toISOString(),
   rights: {
     searchEstablishment: {
       kinds: ["READ"],
@@ -43,8 +43,8 @@ export const unauthorisedApiConsumer: ApiConsumer = {
     job: "tech",
     phone: "0611223344",
   },
-  createdAt: new Date(),
-  expirationDate: addYears(new Date(), 1),
+  createdAt: new Date().toISOString(),
+  expirationDate: addYears(new Date(), 1).toISOString(),
   rights: {
     searchEstablishment: {
       kinds: [],
@@ -70,8 +70,8 @@ export const outdatedApiConsumer: ApiConsumer = {
     job: "tech",
     phone: "0611223344",
   },
-  createdAt: subYears(new Date(), 2),
-  expirationDate: subYears(new Date(), 1),
+  createdAt: subYears(new Date(), 2).toISOString(),
+  expirationDate: subYears(new Date(), 1).toISOString(),
   rights: {
     searchEstablishment: {
       kinds: ["READ"],
