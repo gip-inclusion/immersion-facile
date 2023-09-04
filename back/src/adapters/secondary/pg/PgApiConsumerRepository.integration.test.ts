@@ -15,8 +15,8 @@ const apiConsumer: ApiConsumer = {
     job: "job",
     phone: "0644889977",
   },
-  createdAt: new Date(),
-  expirationDate: new Date(),
+  createdAt: new Date().toISOString(),
+  expirationDate: new Date().toISOString(),
   rights: {
     searchEstablishment: {
       kinds: ["READ"],
@@ -73,8 +73,8 @@ describe("PgApiConsumerRepository", () => {
         job: "guitariste",
         phone: "0606660666",
       },
-      createdAt: new Date(),
-      expirationDate: new Date(),
+      createdAt: new Date().toISOString(),
+      expirationDate: new Date().toISOString(),
       rights: {
         searchEstablishment: {
           kinds: ["READ"],

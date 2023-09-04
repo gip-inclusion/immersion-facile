@@ -447,8 +447,8 @@ const searchSecretariatInMetzRequestDto: SearchQueryParamsDto = {
 const authenticatedApiConsumerPayload: ApiConsumer = {
   id: "my-valid-apikey-id",
   consumer: "passeEmploi",
-  createdAt: new Date("2021-12-20"),
-  expirationDate: new Date("2022-01-01"),
+  createdAt: new Date("2021-12-20").toISOString(),
+  expirationDate: new Date("2022-01-01").toISOString(),
   contact: {
     firstName: "",
     lastName: "",
