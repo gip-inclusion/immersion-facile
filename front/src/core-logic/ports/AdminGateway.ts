@@ -27,14 +27,15 @@ export interface AdminGateway {
   getInclusionConnectedUsersToReview$: (
     token: BackOfficeJwt,
   ) => Observable<InclusionConnectedUser[]>;
-  getLastNotifications$(token: BackOfficeJwt): Observable<NotificationsByKind>;
-
   login$: (params: UserAndPassword) => Observable<BackOfficeJwt>;
-
   updateFeatureFlags$: (
     params: SetFeatureFlagParam,
     adminToken: BackOfficeJwt,
   ) => Observable<void>;
+  getAllApiConsumers$: () => Observable<ApiConsumer[]>;
+
+  getLastNotifications$(token: BackOfficeJwt): Observable<NotificationsByKind>;
+
   updateUserRoleForAgency$(
     params: IcUserRoleForAgencyParams,
     token: BackOfficeJwt,

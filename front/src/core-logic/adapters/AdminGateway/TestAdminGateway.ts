@@ -14,6 +14,8 @@ import {
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
+  public apiConsumers$ = new Subject<ApiConsumer[]>();
+
   public dashboardUrl$ = new Subject<AbsoluteUrl>();
 
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
@@ -21,6 +23,8 @@ export class TestAdminGateway implements AdminGateway {
   public getAgencyUsersToReviewResponse$ = new Subject<
     InclusionConnectedUser[]
   >();
+
+  public getAllApiConsumers$ = () => this.apiConsumers$;
 
   public lastNotifications$ = new Subject<NotificationsByKind>();
 
