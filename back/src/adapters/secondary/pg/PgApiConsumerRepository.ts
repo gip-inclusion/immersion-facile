@@ -11,6 +11,11 @@ import { optional } from "./pgUtils";
 export class PgApiConsumerRepository implements ApiConsumerRepository {
   constructor(private client: PoolClient) {}
 
+  public async getAll(): Promise<ApiConsumer[]> {
+    const result = await this.client.query("SELECT * FROM api_consumers");
+    return result.rows.map((rawPg) => this.#rawPgToApiConsumer(rawPg));
+  }
+
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
     const result = await this.client.query(
       "SELECT * FROM api_consumers WHERE id = $1",

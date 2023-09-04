@@ -104,6 +104,10 @@ export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
     );
   }
 
+  public async getAll(): Promise<ApiConsumer[]> {
+    return values(this.#consumers);
+  }
+
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
     return this.#consumers[id];
   }
