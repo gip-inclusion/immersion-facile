@@ -5,6 +5,7 @@ import {
   ApiConsumerRoutes,
   apiConsumerRoutes,
   BackOfficeJwt,
+  displayRouteName,
   expectToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -57,7 +58,9 @@ describe("Api Consumer router", () => {
     ).body;
   });
 
-  describe(`${apiConsumerRoutes.saveApiConsumer.method} ${apiConsumerRoutes.saveApiConsumer.url}`, () => {
+  describe(`${displayRouteName(
+    apiConsumerRoutes.saveApiConsumer,
+  )} saves an api consumer`, () => {
     it("200 - save new api consumer", async () => {
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
       const response = await sharedRequest.saveApiConsumer({
@@ -150,6 +153,43 @@ describe("Api Consumer router", () => {
         body: { error: "Provided token is invalid" },
       });
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
+    });
+  });
+
+  describe(`${displayRouteName(
+    apiConsumerRoutes.getAllApiConsumers,
+  )} gets all api consumers`, () => {
+    it("200 - gets all api consumers", async () => {
+      const response = await sharedRequest.getAllApiConsumers({
+        headers: { authorization: backOfficeJwt },
+      });
+      expectToEqual(response, {
+        status: 200,
+        body: [],
+      });
+    });
+
+    it("401 - without auth", async () => {
+      const response = await sharedRequest.getAllApiConsumers({
+        headers: { authorization: "" },
+      });
+
+      expectToEqual(response, {
+        status: 401,
+        body: { error: "forbidden: unauthenticated" },
+      });
+    });
+
+    it("401 - not with backOfficeJwt", async () => {
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+      });
+
+      expectToEqual(response, {
+        status: 401,
+        body: { error: "Provided token is invalid" },
+      });
     });
   });
 });

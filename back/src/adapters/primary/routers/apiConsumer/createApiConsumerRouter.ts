@@ -20,5 +20,11 @@ export const createApiConsumerRouter = (deps: AppDependencies): Router => {
     ),
   );
 
+  apiConsumerSharedRouter.getAllApiConsumers((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getAllApiConsumers.execute({}),
+    ),
+  );
+
   return apiConsumerExpressRouter;
 };

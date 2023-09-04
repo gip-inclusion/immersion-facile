@@ -4,6 +4,34 @@ import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
+const apiConsumer: ApiConsumer = {
+  id: new UuidV4Generator().new(),
+  consumer: "passeEmploi",
+  description: "my description",
+  contact: {
+    firstName: "john",
+    lastName: "doe",
+    emails: ["email@mail.com"],
+    job: "job",
+    phone: "0644889977",
+  },
+  createdAt: new Date(),
+  expirationDate: new Date(),
+  rights: {
+    searchEstablishment: {
+      kinds: ["READ"],
+      scope: "no-scope",
+    },
+    convention: {
+      kinds: ["READ"],
+      scope: {
+        agencyKinds: [],
+        agencyIds: [],
+      },
+    },
+  },
+};
+
 describe("PgApiConsumerRepository", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -12,8 +40,6 @@ describe("PgApiConsumerRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    await client.query("DELETE FROM api_consumers");
-    apiConsumerRepository = new PgApiConsumerRepository(client);
   });
 
   afterAll(async () => {
@@ -21,35 +47,12 @@ describe("PgApiConsumerRepository", () => {
     await pool.end();
   });
 
-  it("save & getById", async () => {
-    const apiConsumer: ApiConsumer = {
-      id: new UuidV4Generator().new(),
-      consumer: "passeEmploi",
-      description: "my description",
-      contact: {
-        firstName: "john",
-        lastName: "doe",
-        emails: ["email@mail.com"],
-        job: "job",
-        phone: "0644889977",
-      },
-      createdAt: new Date(),
-      expirationDate: new Date(),
-      rights: {
-        searchEstablishment: {
-          kinds: ["READ"],
-          scope: "no-scope",
-        },
-        convention: {
-          kinds: ["READ"],
-          scope: {
-            agencyKinds: [],
-            agencyIds: [],
-          },
-        },
-      },
-    };
+  beforeEach(async () => {
+    await client.query("DELETE FROM api_consumers");
+    apiConsumerRepository = new PgApiConsumerRepository(client);
+  });
 
+  it("save & getById", async () => {
     expectToEqual(
       await apiConsumerRepository.getById(apiConsumer.id),
       undefined,
@@ -93,5 +96,16 @@ describe("PgApiConsumerRepository", () => {
       await apiConsumerRepository.getById(apiConsumer.id),
       updatedApiConsumer,
     );
+  });
+
+  describe("getAll", () => {
+    it("returns empty array when no consumers found", async () => {
+      expectToEqual(await apiConsumerRepository.getAll(), []);
+    });
+
+    it("returns all api consumers", async () => {
+      await apiConsumerRepository.save(apiConsumer);
+      expectToEqual(await apiConsumerRepository.getAll(), [apiConsumer]);
+    });
   });
 });
