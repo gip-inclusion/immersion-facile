@@ -61,6 +61,9 @@ export const agencyRoutes = defineRoutes({
     method: "post",
     url: `/agencies`,
     requestBodySchema: createAgencySchema,
+    responses: {
+      200: emptyStringSchema,
+    },
   }),
   getImmersionFacileAgencyId: defineRoute({
     method: "get",
