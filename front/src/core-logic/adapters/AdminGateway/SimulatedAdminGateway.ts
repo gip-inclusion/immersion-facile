@@ -4,6 +4,7 @@ import {
   AgencyDtoBuilder,
   AgencyRight,
   ApiConsumer,
+  ApiConsumerJwt,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -132,6 +133,14 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of("some-token");
   }
 
+  public saveApiConsumer$(
+    _apiConsumer: ApiConsumer,
+  ): Observable<ApiConsumerJwt> {
+    return of(
+      "fakeTokenJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk4ZDE3NTE3LWJlNDItNDY2OS04OTVkLTQ3ODE0MjBhNjhiOCIsImlhdCI6MTY5MTM5MTk4Mn0.WuGBIyvVa7rNaIxjZTgVTSIcU0LkN8GRDmFxXMYTRYFh0vK0c6ImupszTJF4VXHGpkkpE1AXasOwBWhOg",
+    );
+  }
+
   public updateUserRoleForAgency$(
     { agencyId }: IcUserRoleForAgencyParams,
     _token: string,
@@ -170,6 +179,33 @@ const apiConsumers: ApiConsumer[] = [
             "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             "bbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
           ],
+        },
+      },
+    },
+  },
+  {
+    id: "fake-api-consumer-id-2",
+    consumer: "FakeApiConsumer2",
+    description: "Temp",
+    contact: {
+      lastName: "FakeLastname2",
+      firstName: "FakeFirstname2",
+      job: "FakeJob2",
+      phone: "FakePhone2",
+      emails: ["fakeEmail2@mail.com"],
+    },
+    createdAt: new Date().toISOString(),
+    expirationDate: new Date().toISOString(),
+    rights: {
+      searchEstablishment: {
+        kinds: ["READ"],
+        scope: "no-scope",
+      },
+      convention: {
+        kinds: ["READ"],
+        scope: {
+          agencyKinds: [],
+          agencyIds: [],
         },
       },
     },

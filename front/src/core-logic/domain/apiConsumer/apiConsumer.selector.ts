@@ -12,8 +12,14 @@ const apiConsumers = createSelector(
 
 const feedback = createSelector(apiConsumerState, (state) => state.feedback);
 
+const lastCreatedToken = createSelector(
+  apiConsumerState,
+  (state) => state.lastCreatedToken,
+);
+
 export const apiConsumerSelectors = {
   isLoading,
   apiConsumers,
   feedback,
+  lastCreatedToken,
 };

@@ -16,6 +16,8 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 export class TestAdminGateway implements AdminGateway {
   public apiConsumers$ = new Subject<ApiConsumer[]>();
 
+  public createApiConsumersResponse$ = new Subject<ApiConsumerJwt>();
+
   public dashboardUrl$ = new Subject<AbsoluteUrl>();
 
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
@@ -75,7 +77,7 @@ export class TestAdminGateway implements AdminGateway {
   public saveApiConsumer$(
     _apiConsumer: ApiConsumer,
   ): Observable<ApiConsumerJwt> {
-    throw new Error("Method not implemented.");
+    return this.createApiConsumersResponse$;
   }
 
   public updateUserRoleForAgency$(

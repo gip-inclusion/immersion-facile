@@ -1,26 +1,37 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
-import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
+import Alert, { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
+import { v4 as uuidV4 } from "uuid";
 import {
+  ApiConsumer,
   ApiConsumerContact,
   ApiConsumerId,
   ApiConsumerKind,
+  apiConsumerKinds,
   ApiConsumerName,
   ApiConsumerRights,
+  apiConsumerSchema,
   ConventionScope,
   FeatureFlagName,
   NoScope,
   toDisplayedDate,
 } from "shared";
 import { Loader } from "react-design-system";
+import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { commonContent } from "src/app/contents/commonContent";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
@@ -39,7 +50,14 @@ const labelsByFeatureFlag: Record<FeatureFlagName, string> = {
   enableMaintenance: "Activer le mode maintenance",
 };
 
-type ApiConsumerRow = [ReactNode, ReactNode, string, string, ReactNode];
+type ApiConsumerRow = [
+  ReactNode,
+  ReactNode,
+  string,
+  string,
+  ReactNode,
+  ReactNode,
+];
 
 const formatApiConsumerContact = (apiConsumerContact: ApiConsumerContact) => `${
   apiConsumerContact.lastName
@@ -98,6 +116,15 @@ const formatApiConsumerScope = (scope: NoScope | ConventionScope) => {
   return <ApiConsumerConventionScopeDisplayed scope={scope} />;
 };
 
+const makeApiConsumerActionButtons = (
+  apiConsumer: ApiConsumer,
+  onClick: (apiConsumer: ApiConsumer) => void,
+) => (
+  <Button size="small" type="button" onClick={() => onClick(apiConsumer)}>
+    Éditer
+  </Button>
+);
+
 const ApiConsumerConventionScopeDisplayed = ({
   scope,
 }: {
@@ -111,6 +138,7 @@ const ApiConsumerConventionScopeDisplayed = ({
         className={fr.cx("fr-my-1w")}
         size="small"
         priority="secondary"
+        type="button"
         onClick={() => {
           setIsDisplayed(!isScopeDisplayed);
         }}
@@ -135,16 +163,62 @@ const ApiConsumerConventionScopeDisplayed = ({
   );
 };
 
+const {
+  Component: ApiConsumerModal,
+  open: openApiConsumerModal,
+  close: closeApiConsumerModal,
+} = createModal({
+  id: "consumer-api-modal",
+  isOpenedByDefault: false,
+});
+
+const defaultApiConsumerValues: ApiConsumer = {
+  id: uuidV4(),
+  consumer: "",
+  contact: {
+    lastName: "",
+    firstName: "",
+    job: "",
+    phone: "",
+    emails: [],
+  },
+  rights: {
+    searchEstablishment: {
+      kinds: [],
+      scope: "no-scope",
+    },
+    convention: {
+      kinds: [],
+      scope: {
+        agencyKinds: [],
+        agencyIds: [],
+      },
+    },
+  },
+  createdAt: new Date().toISOString(),
+  expirationDate: new Date().toISOString(),
+};
+
 export const TechnicalOptionsTab = () => {
   const { isLoading: isFeatureFlagsLoading, ...featureFlags } =
     useFeatureFlags();
   const dispatch = useDispatch();
+  const lastCreatedToken = useAppSelector(
+    apiConsumerSelectors.lastCreatedToken,
+  );
   const maintenanceMessageRef = useRef<HTMLDivElement>(null);
   const maintenanceMessage = useAppSelector(
     featureFlagSelectors.maintenanceMessage,
   );
+  const [currentApiConsumerToEdit, setCurrentApiConsumerToEdit] =
+    useState<ApiConsumer>(defaultApiConsumerValues);
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
   const isApiConsumersLoading = useAppSelector(apiConsumerSelectors.isLoading);
+
+  const onEditButtonClick = (apiConsumer: ApiConsumer) => {
+    setCurrentApiConsumerToEdit(apiConsumer);
+    openApiConsumerModal();
+  };
 
   const tableDataFromApiConsumers: ApiConsumerRow[] = apiConsumers.map(
     (apiConsumer) => [
@@ -153,6 +227,7 @@ export const TechnicalOptionsTab = () => {
       toDisplayedDate(new Date(apiConsumer.expirationDate), true),
       formatApiConsumerContact(apiConsumer.contact),
       formatApiConsumerRights(apiConsumer.rights),
+      makeApiConsumerActionButtons(apiConsumer, onEditButtonClick),
     ],
   );
 
@@ -160,11 +235,22 @@ export const TechnicalOptionsTab = () => {
     dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
   }, []);
 
+  const onConfirmTokenModalClose = () => {
+    dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
+    dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
+    closeApiConsumerModal();
+  };
+
+  const onApiConsumerAddClick = () => {
+    setCurrentApiConsumerToEdit(defaultApiConsumerValues);
+    openApiConsumerModal();
+  };
+
   return (
     <>
       {(isFeatureFlagsLoading || isApiConsumersLoading) && <Loader />}
       <div className={fr.cx("fr-container")}>
-        <h4>Les fonctionnalités optionnelles :</h4>
+        <h4>Les fonctionnalités optionnelles</h4>
         <div className={fr.cx("fr-grid-row")}>
           <div className={fr.cx("fr-col")}>
             <div className={fr.cx("fr-input-group")}>
@@ -245,12 +331,14 @@ export const TechnicalOptionsTab = () => {
         </div>
       </div>
       <div className={fr.cx("fr-container", "fr-mt-6w")}>
-        <h4>Consommateurs API :</h4>
+        <h4>Consommateurs API</h4>
+        <Button type="button" onClick={onApiConsumerAddClick}>
+          Ajouter un nouveau consommateur
+        </Button>
         <div className={fr.cx("fr-grid-row")}>
           <div className={fr.cx("fr-col")}>
             <Table
               fixed
-              caption="Résumé du tableau (accessibilité)"
               data={tableDataFromApiConsumers}
               headers={[
                 "Id (Nom)",
@@ -258,11 +346,153 @@ export const TechnicalOptionsTab = () => {
                 "Date d'expiration",
                 "Contact",
                 "Droits",
+                "Actions",
               ]}
             />
           </div>
         </div>
+        {createPortal(
+          <ApiConsumerModal title="Ajout consommateur api">
+            {lastCreatedToken && (
+              <>
+                <Alert
+                  severity="success"
+                  title="Consommateur Api ajouté !"
+                  className={"fr-mb-2w"}
+                />
+                <Input
+                  textArea
+                  label="Token généré"
+                  hintText="Ce token est à conserver précieusement, il ne sera plus affiché par la suite."
+                  nativeTextAreaProps={{
+                    readOnly: true,
+                    value: lastCreatedToken,
+                    rows: 5,
+                  }}
+                />
+                <Button type="button" onClick={onConfirmTokenModalClose}>
+                  J'ai bien copié le token, je peux fermer la fenêtre
+                </Button>
+              </>
+            )}
+            {!lastCreatedToken && (
+              <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
+            )}
+          </ApiConsumerModal>,
+          document.body,
+        )}
       </div>
     </>
+  );
+};
+
+const ApiConsumerForm = ({ initialValues }: { initialValues: ApiConsumer }) => {
+  const dispatch = useDispatch();
+  const methods = useForm<ApiConsumer>({
+    resolver: zodResolver(apiConsumerSchema),
+    mode: "onTouched",
+    defaultValues: initialValues,
+  });
+  const { getValues, register, setValue, handleSubmit, formState, reset } =
+    methods;
+
+  const getFieldError = makeFieldError(formState);
+
+  const onValidSubmit = (values: ApiConsumer) => {
+    dispatch(apiConsumerSlice.actions.saveApiConsumerRequested(values));
+  };
+
+  useEffect(() => {
+    reset(initialValues);
+  }, [initialValues]);
+
+  return (
+    <form onSubmit={handleSubmit(onValidSubmit)}>
+      <input type="hidden" {...register("id")} />
+      <Input
+        label="Nom du consommateur"
+        nativeInputProps={{
+          ...register("consumer"),
+        }}
+        {...getFieldError("consumer")}
+      />
+      <Input
+        label="Nom du contact"
+        nativeInputProps={{ ...register("contact.lastName") }}
+        {...getFieldError("contact.lastName")}
+      />
+      <Input
+        label="Prénom du contact"
+        nativeInputProps={{ ...register("contact.firstName") }}
+        {...getFieldError("contact.firstName")}
+      />
+      <Input
+        label="Poste du contact"
+        nativeInputProps={{ ...register("contact.job") }}
+        {...getFieldError("contact.job")}
+      />
+      <Input
+        label="Téléphone du contact"
+        nativeInputProps={{ ...register("contact.phone") }}
+        {...getFieldError("contact.phone")}
+      />
+      <MultipleEmailsInput
+        label="Emails du contact"
+        valuesInList={getValues().contact.emails}
+        setValues={(values) => {
+          setValue("contact.emails", values, { shouldValidate: true });
+        }}
+        {...register("contact.emails")}
+      />
+      <Input
+        label="Description"
+        textArea
+        nativeTextAreaProps={{ ...register("description") }}
+        {...getFieldError("description")}
+      />
+      <input type="hidden" {...register("createdAt")} />
+      <Input
+        label="Date d'expiration"
+        nativeInputProps={{ ...register("expirationDate"), type: "date" }}
+        {...getFieldError("expirationDate")}
+      />
+      <ul>
+        {keys(initialValues.rights).map((rightName) => (
+          <li key={rightName}>
+            {rightName}
+            <Checkbox
+              orientation="horizontal"
+              className={fr.cx("fr-mt-1w")}
+              options={apiConsumerKinds.map((apiConsumerKind) => ({
+                label: apiConsumerKind,
+                nativeInputProps: {
+                  name: register(`rights.${rightName}.kinds`).name,
+                  checked:
+                    getValues().rights[rightName].kinds.includes(
+                      apiConsumerKind,
+                    ),
+                  onChange: () => {
+                    const rightsToSet = getValues().rights[
+                      rightName
+                    ].kinds.includes(apiConsumerKind)
+                      ? getValues().rights[rightName].kinds.filter(
+                          (kind) => kind !== apiConsumerKind,
+                        )
+                      : [
+                          ...getValues().rights[rightName].kinds,
+                          apiConsumerKind,
+                        ];
+                    setValue(`rights.${rightName}.kinds`, rightsToSet, {
+                      shouldValidate: true,
+                    });
+                  },
+                },
+              }))}
+            />
+          </li>
+        ))}
+      </ul>
+      <Button>Envoyer</Button>
+    </form>
   );
 };
