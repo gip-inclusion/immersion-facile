@@ -19,7 +19,6 @@ import { InMemoryUnitOfWork } from "./config/uowConfig";
 import { createAddressRouter } from "./routers/address/createAddressRouter";
 import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
-import { createApiConsumerRouter } from "./routers/apiConsumer/createApiConsumerRouter";
 import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter";
 import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
 import { createApiKeyAuthRouterV2 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
@@ -98,7 +97,6 @@ export const createApp = async (
   app.use(createApiKeyAuthRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));
-  app.use(createApiConsumerRouter(deps));
 
   subscribeToEvents(deps);
   deps.eventCrawler.startCrawler();

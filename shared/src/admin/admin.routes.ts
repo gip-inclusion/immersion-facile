@@ -2,6 +2,7 @@ import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAgencyIdSchema } from "../agency/agency.schema";
+import { apiConsumerSchema } from "../apiConsumer/apiConsumer.schema";
 import { setFeatureFlagSchema } from "../featureFlags";
 import {
   establishmentBatchReportSchema,
@@ -15,6 +16,7 @@ import {
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { featureFlagsRoute } from "../routes/routes";
+import { jwtSchema } from "../tokens/jwt.schema";
 import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
 import { emptyStringSchema } from "../zodUtils";
 import {
@@ -86,6 +88,25 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: setFeatureFlagSchema,
     responses: {
       201: emptyStringSchema,
+      401: legacyUnauthenticatedErrorSchema,
+    },
+  }),
+  saveApiConsumer: defineRoute({
+    method: "post",
+    url: `/admin/api-consumers`,
+    requestBodySchema: apiConsumerSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: jwtSchema,
+      401: legacyUnauthenticatedErrorSchema,
+    },
+  }),
+  getAllApiConsumers: defineRoute({
+    method: "get",
+    url: `/admin/api-consumers`,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: z.array(apiConsumerSchema),
       401: legacyUnauthenticatedErrorSchema,
     },
   }),
