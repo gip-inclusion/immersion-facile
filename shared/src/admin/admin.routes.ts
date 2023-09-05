@@ -2,7 +2,10 @@ import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAgencyIdSchema } from "../agency/agency.schema";
-import { apiConsumerSchema } from "../apiConsumer/apiConsumer.schema";
+import {
+  apiConsumerJwtSchema,
+  apiConsumerSchema,
+} from "../apiConsumer/apiConsumer.schema";
 import { setFeatureFlagSchema } from "../featureFlags";
 import {
   establishmentBatchReportSchema,
@@ -16,7 +19,6 @@ import {
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { featureFlagsRoute } from "../routes/routes";
-import { jwtSchema } from "../tokens/jwt.schema";
 import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
 import { emptyStringSchema } from "../zodUtils";
 import {
@@ -97,7 +99,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: apiConsumerSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: jwtSchema,
+      200: apiConsumerJwtSchema,
       401: legacyUnauthenticatedErrorSchema,
     },
   }),

@@ -4,6 +4,7 @@ import { phoneSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
 import { dateIsoStringSchema } from "../schedule/Schedule.schema";
 import { localization, zStringMinLength1 } from "../zodUtils";
+import { ApiConsumerJwt } from "..";
 import {
   ApiConsumer,
   ApiConsumerContact,
@@ -18,6 +19,8 @@ const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
   phone: phoneSchema,
   emails: z.array(emailSchema),
 });
+
+export const apiConsumerJwtSchema: z.Schema<ApiConsumerJwt> = z.string();
 
 const apiConsumerRightsSchema: z.Schema<ApiConsumerRights> = z.object({
   searchEstablishment: z.object({

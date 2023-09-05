@@ -46,7 +46,9 @@ describe("api consumer", () => {
     it("fetches api consumer", () => {
       expectInitialStateToMatch();
 
-      store.dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
+      store.dispatch(
+        apiConsumerSlice.actions.retrieveApiConsumersRequested("admin-jwt"),
+      );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
 
       dependencies.adminGateway.apiConsumers$.next([apiConsumer1]);
@@ -62,7 +64,9 @@ describe("api consumer", () => {
     it("have feedback error on gateway error", () => {
       expectInitialStateToMatch();
 
-      store.dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
+      store.dispatch(
+        apiConsumerSlice.actions.retrieveApiConsumersRequested("admin-jwt"),
+      );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
 
       dependencies.adminGateway.apiConsumers$.error(
@@ -84,7 +88,10 @@ describe("api consumer", () => {
       expectInitialStateToMatch();
 
       store.dispatch(
-        apiConsumerSlice.actions.saveApiConsumerRequested(apiConsumer1),
+        apiConsumerSlice.actions.saveApiConsumerRequested({
+          apiConsumer: apiConsumer1,
+          adminToken: "admin-jwt",
+        }),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
 
@@ -105,7 +112,10 @@ describe("api consumer", () => {
       expectInitialStateToMatch();
 
       store.dispatch(
-        apiConsumerSlice.actions.saveApiConsumerRequested(apiConsumer1),
+        apiConsumerSlice.actions.saveApiConsumerRequested({
+          apiConsumer: apiConsumer1,
+          adminToken: "adminToken",
+        }),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
 
@@ -126,7 +136,10 @@ describe("api consumer", () => {
     expectInitialStateToMatch();
 
     store.dispatch(
-      apiConsumerSlice.actions.saveApiConsumerRequested(apiConsumer1),
+      apiConsumerSlice.actions.saveApiConsumerRequested({
+        apiConsumer: apiConsumer1,
+        adminToken: "admin-jwt",
+      }),
     );
 
     dependencies.adminGateway.createApiConsumersResponse$.next(generatedJwt);

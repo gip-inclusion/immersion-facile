@@ -32,7 +32,7 @@ export interface AdminGateway {
     params: SetFeatureFlagParam,
     adminToken: BackOfficeJwt,
   ) => Observable<void>;
-  getAllApiConsumers$: () => Observable<ApiConsumer[]>;
+  getAllApiConsumers$: (adminToken: BackOfficeJwt) => Observable<ApiConsumer[]>;
 
   getLastNotifications$(token: BackOfficeJwt): Observable<NotificationsByKind>;
 
@@ -41,5 +41,8 @@ export interface AdminGateway {
     token: BackOfficeJwt,
   ): Observable<void>;
 
-  saveApiConsumer$(apiConsumer: ApiConsumer): Observable<ApiConsumerJwt>;
+  saveApiConsumer$(
+    apiConsumer: ApiConsumer,
+    adminToken: BackOfficeJwt,
+  ): Observable<ApiConsumerJwt>;
 }

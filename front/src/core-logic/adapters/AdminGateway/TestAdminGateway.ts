@@ -26,7 +26,8 @@ export class TestAdminGateway implements AdminGateway {
     InclusionConnectedUser[]
   >();
 
-  public getAllApiConsumers$ = () => this.apiConsumers$;
+  public getAllApiConsumers$ = (_adminToken: BackOfficeJwt) =>
+    this.apiConsumers$;
 
   public lastNotifications$ = new Subject<NotificationsByKind>();
 
@@ -76,6 +77,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public saveApiConsumer$(
     _apiConsumer: ApiConsumer,
+    _adminToken: BackOfficeJwt,
   ): Observable<ApiConsumerJwt> {
     return this.createApiConsumersResponse$;
   }

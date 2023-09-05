@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ApiConsumer, ApiConsumerJwt } from "shared";
+import { ApiConsumer, ApiConsumerJwt, BackOfficeJwt } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 type ApiConsumerState = {
@@ -9,7 +9,7 @@ type ApiConsumerState = {
   lastCreatedToken: ApiConsumerJwt | null;
 };
 
-const initialState: ApiConsumerState = {
+export const apiConsumerInitialState: ApiConsumerState = {
   isLoading: false,
   feedback: { kind: "idle" },
   apiConsumers: [],
@@ -18,9 +18,12 @@ const initialState: ApiConsumerState = {
 
 export const apiConsumerSlice = createSlice({
   name: "apiConsumer",
-  initialState,
+  initialState: apiConsumerInitialState,
   reducers: {
-    retrieveApiConsumersRequested: (state) => {
+    retrieveApiConsumersRequested: (
+      state,
+      _action: PayloadAction<BackOfficeJwt>,
+    ) => {
       state.isLoading = true;
     },
     retrieveApiConsumersSucceeded: (
@@ -35,7 +38,13 @@ export const apiConsumerSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
-    saveApiConsumerRequested: (state, _action: PayloadAction<ApiConsumer>) => {
+    saveApiConsumerRequested: (
+      state,
+      _action: PayloadAction<{
+        apiConsumer: ApiConsumer;
+        adminToken: BackOfficeJwt;
+      }>,
+    ) => {
       state.isLoading = true;
     },
     saveApiConsumerSucceeded: (

@@ -46,6 +46,21 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
+  public getAllApiConsumers$(
+    adminToken: BackOfficeJwt,
+  ): Observable<ApiConsumer[]> {
+    return from(
+      this.httpClient
+        .getAllApiConsumers({
+          headers: { authorization: adminToken },
+        })
+        .then((response) => {
+          if (response.status === 200) return response.body;
+          throw new Error(JSON.stringify(response.body));
+        }),
+    );
+  }
+
   public getDashboardUrl$(
     params: GetDashboardParams,
     token: BackOfficeJwt,
@@ -101,8 +116,21 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  saveApiConsumer$(apiConsumer: ApiConsumer): Observable<ApiConsumerJwt> {
-    return from(this.httpClient.todo());
+  public saveApiConsumer$(
+    apiConsumer: ApiConsumer,
+    adminToken: BackOfficeJwt,
+  ): Observable<ApiConsumerJwt> {
+    return from(
+      this.httpClient
+        .saveApiConsumer({
+          body: apiConsumer,
+          headers: { authorization: adminToken },
+        })
+        .then((response) => {
+          if (response.status === 200) return response.body;
+          throw new Error(JSON.stringify(response.body));
+        }),
+    );
   }
 
   public updateUserRoleForAgency$(

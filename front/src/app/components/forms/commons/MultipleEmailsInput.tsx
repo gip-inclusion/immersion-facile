@@ -20,16 +20,23 @@ export const MultipleEmailsInput = (
     valuesInList: string[];
     setValues: (values: string[]) => void;
     disabled?: boolean;
+    summaryHintText?: string;
   },
 ) => {
-  const { valuesInList, setValues, disabled, ...addToListProps } = props;
+  const {
+    valuesInList,
+    setValues,
+    disabled,
+    summaryHintText,
+    ...addToListProps
+  } = props;
   const { cx } = useStyles();
   const getEmailValuesFromString = (stringToParse: string) => {
     const matches = stringToParse.match(validateMultipleEmailRegex);
     return (matches || []).map((match) => match.trim());
   };
 
-  const [inputValue, setInputValue] = useState(
+  const [inputValue, setInputValue] = useState<string>(
     addToListProps.initialValue ?? "",
   );
 
@@ -39,6 +46,11 @@ export const MultipleEmailsInput = (
     setValues(updatedValues);
     setInputValue(value);
   };
+
+  useEffect(() => {
+    if (!addToListProps.initialValue) return;
+    setInputValue(addToListProps.initialValue);
+  }, [addToListProps.initialValue]);
 
   return (
     <div className={cx(fr.cx("fr-input-group"), componentName)}>
@@ -57,6 +69,7 @@ export const MultipleEmailsInput = (
             setValues(newEmails);
             setInputValue(newEmails.join(", "));
           }}
+          summaryHintText={summaryHintText}
         />
       )}
     </div>
@@ -160,16 +173,19 @@ type EmailsValuesSummaryProps = {
   values: string[];
   onDelete: (valueToDelete: string) => void;
   disabled?: boolean;
+  summaryHintText?: string;
 };
 
 const EmailsValuesSummary = ({
   values,
+  summaryHintText,
   onDelete,
   disabled,
 }: EmailsValuesSummaryProps) => (
   <div className={`${componentName}__list-of-chip`}>
     <span className={fr.cx("fr-hint-text")}>
-      Voici les adresses emails qui seront ajoutées en copie :
+      {summaryHintText ??
+        "Voici les adresses emails qui seront ajoutées en copie :"}
     </span>
     <ul className={fr.cx("fr-tags-group", "fr-mt-1w")}>
       <li>

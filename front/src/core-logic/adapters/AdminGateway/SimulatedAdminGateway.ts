@@ -66,7 +66,9 @@ export class SimulatedAdminGateway implements AdminGateway {
     });
   }
 
-  public getAllApiConsumers$(): Observable<ApiConsumer[]> {
+  public getAllApiConsumers$(
+    _adminToken: BackOfficeJwt,
+  ): Observable<ApiConsumer[]> {
     return of(apiConsumers);
   }
 
@@ -135,6 +137,7 @@ export class SimulatedAdminGateway implements AdminGateway {
 
   public saveApiConsumer$(
     _apiConsumer: ApiConsumer,
+    _adminToken: BackOfficeJwt,
   ): Observable<ApiConsumerJwt> {
     return of(
       "fakeTokenJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk4ZDE3NTE3LWJlNDItNDY2OS04OTVkLTQ3ODE0MjBhNjhiOCIsImlhdCI6MTY5MTM5MTk4Mn0.WuGBIyvVa7rNaIxjZTgVTSIcU0LkN8GRDmFxXMYTRYFh0vK0c6ImupszTJF4VXHGpkkpE1AXasOwBWhOg",

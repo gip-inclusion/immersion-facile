@@ -54,11 +54,12 @@ describe("SaveApiConsumer", () => {
         backOfficeJwtPayload,
       );
 
-      expectToEqual(result, {
-        jwt: generateApiConsumerJwtTestFn({
+      expectToEqual(
+        result,
+        generateApiConsumerJwtTestFn({
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
         }),
-      });
+      );
       expectToEqual(uow.apiConsumerRepository.consumers, [
         authorizedUnJeuneUneSolutionApiConsumer,
       ]);
@@ -101,11 +102,12 @@ describe("SaveApiConsumer", () => {
         backOfficeJwtPayload,
       );
 
-      expectToEqual(result, {
-        jwt: generateApiConsumerJwtTestFn({
+      expectToEqual(
+        result,
+        generateApiConsumerJwtTestFn({
           id: authorizedUnJeuneUneSolutionApiConsumer.id,
         }),
-      });
+      );
       expectToEqual(uow.apiConsumerRepository.consumers, [updatedConsumer]);
       expectToEqual(uow.outboxRepository.events, [
         {
