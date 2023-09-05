@@ -464,7 +464,6 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
     convention: {
       kinds: [],
       scope: {
-        agencyKinds: [],
         agencyIds: [],
       },
     },

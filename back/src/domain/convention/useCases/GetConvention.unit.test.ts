@@ -16,10 +16,6 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  TEST_AGENCY_DEPARTMENT,
-  TEST_AGENCY_NAME,
-} from "../../../adapters/secondary/InMemoryConventionQueries";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { GetConvention } from "./GetConvention";
 
@@ -141,8 +137,8 @@ describe("Get Convention", () => {
 
       expectToEqual(fetchedConvention, {
         ...convention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+        agencyName: agency.name,
+        agencyDepartment: agency.address.departmentCode,
       });
     });
 
@@ -162,8 +158,8 @@ describe("Get Convention", () => {
 
       expectToEqual(conventionResult, {
         ...convention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+        agencyName: agency.name,
+        agencyDepartment: agency.address.departmentCode,
       });
     });
 
@@ -182,8 +178,8 @@ describe("Get Convention", () => {
 
       expectToEqual(conventionResult, {
         ...convention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+        agencyName: agency.name,
+        agencyDepartment: agency.address.departmentCode,
       });
     });
   });

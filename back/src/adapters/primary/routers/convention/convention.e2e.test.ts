@@ -28,10 +28,6 @@ import {
 import { conventionMissingMessage } from "../../../../domain/convention/entities/Convention";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
-import {
-  TEST_AGENCY_DEPARTMENT,
-  TEST_AGENCY_NAME,
-} from "../../../secondary/InMemoryConventionQueries";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
@@ -234,8 +230,8 @@ describe("convention e2e", () => {
 
         expect(response.body).toEqual({
           ...convention,
-          agencyName: TEST_AGENCY_NAME,
-          agencyDepartment: TEST_AGENCY_DEPARTMENT,
+          agencyName: peAgency.name,
+          agencyDepartment: peAgency.address.departmentCode,
         });
         expect(response.status).toBe(200);
       },

@@ -26,7 +26,6 @@ const apiConsumer: ApiConsumer = {
       kinds: ["READ"],
       scope: {
         agencyKinds: [],
-        agencyIds: [],
       },
     },
   },
@@ -85,7 +84,6 @@ describe("PgApiConsumerRepository", () => {
           kinds: ["READ"],
           scope: {
             agencyKinds: [],
-            agencyIds: [],
           },
         },
       },

@@ -17,7 +17,10 @@ import {
 import { TEST_POSITION } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
-import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
+import {
+  PublicApiV2SearchEstablishmentRoutes,
+  publicApiV2SearchEstablishmentRoutes,
+} from "./publicApiV2.routes";
 
 const contactEstablishment: ContactEstablishmentPublicV2Dto = {
   contactMode: "EMAIL",
@@ -34,7 +37,7 @@ const contactEstablishment: ContactEstablishmentPublicV2Dto = {
 describe("POST contact-establishment public V2 route", () => {
   let request: SuperTest<Test>;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
-  let sharedRequest: HttpClient<PublicApiV2Routes>;
+  let sharedRequest: HttpClient<PublicApiV2SearchEstablishmentRoutes>;
   let authToken: string;
   let inMemoryUow: InMemoryUnitOfWork;
 
@@ -52,7 +55,10 @@ describe("POST contact-establishment public V2 route", () => {
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });
-    sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
+    sharedRequest = createSupertestSharedClient(
+      publicApiV2SearchEstablishmentRoutes,
+      request,
+    );
   });
 
   it("refuses to contact if no api key is provided", async () => {

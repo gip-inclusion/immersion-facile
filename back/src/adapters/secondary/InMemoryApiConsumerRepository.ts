@@ -26,7 +26,6 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
     convention: {
       kinds: ["READ"],
       scope: {
-        agencyKinds: [],
         agencyIds: [],
       },
     },
@@ -54,7 +53,6 @@ export const unauthorisedApiConsumer: ApiConsumer = {
     convention: {
       kinds: [],
       scope: {
-        agencyKinds: [],
         agencyIds: [],
       },
     },
@@ -82,7 +80,6 @@ export const outdatedApiConsumer: ApiConsumer = {
     convention: {
       kinds: ["READ"],
       scope: {
-        agencyKinds: [],
         agencyIds: [],
       },
     },

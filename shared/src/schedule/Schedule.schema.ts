@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DateIsoString } from "../utils/date";
 import { zTimeString } from "../zodUtils";
 import {
   DailyScheduleDto,
@@ -19,8 +20,10 @@ export const timePeriodSchema: z.Schema<TimePeriodDto> = z.object({
 export const timePeriodsSchema: z.Schema<TimePeriodsDto> =
   z.array(timePeriodSchema);
 
-export const dateIsoStringSchema = z.coerce
-  .string()
+export const dateIsoStringSchema: z.Schema<DateIsoString> = (
+  z.date() as unknown as z.Schema<DateIsoString>
+) // necessary to avoid TS error: "Type 'Date' is not assignable to type 'string'"
+  .or(z.string())
   .transform((arg) => new Date(arg).toISOString());
 
 export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({

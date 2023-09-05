@@ -13,21 +13,29 @@ import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { searchParamsPublicV2ToDomain } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.dto";
 import { domainToSearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
-import { publicApiV2Routes } from "./publicApiV2.routes";
+import {
+  publicApiV2ConventionRoutes,
+  publicApiV2SearchEstablishmentRoutes,
+} from "./publicApiV2.routes";
 
 const logger = createLogger(__filename);
 
 export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
-  const publicV2Router = Router({ mergeParams: true });
+  const v2ExpressRouter = Router({ mergeParams: true });
 
-  publicV2Router.use("/v2", deps.apiConsumerMiddleware);
+  v2ExpressRouter.use("/v2", deps.apiConsumerMiddleware);
 
-  const publicV2SharedRouter = createExpressSharedRouter(
-    publicApiV2Routes,
-    publicV2Router,
+  const searchEstablishmentV2Router = createExpressSharedRouter(
+    publicApiV2SearchEstablishmentRoutes,
+    v2ExpressRouter,
   );
 
-  publicV2SharedRouter.searchImmersion((req, res) =>
+  const conventionV2Router = createExpressSharedRouter(
+    publicApiV2ConventionRoutes,
+    v2ExpressRouter,
+  );
+
+  searchEstablishmentV2Router.searchImmersion((req, res) =>
     sendHttpResponseForApiV2(req, res, async () => {
       if (
         !isApiConsumerAllowed({
@@ -50,7 +58,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  publicV2SharedRouter.getOfferBySiretAndAppellationCode((req, res) =>
+  searchEstablishmentV2Router.getOfferBySiretAndAppellationCode((req, res) =>
     sendHttpResponseForApiV2(req, res, async () => {
       if (
         !isApiConsumerAllowed({
@@ -69,7 +77,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  publicV2SharedRouter.contactEstablishment((req, res) =>
+  searchEstablishmentV2Router.contactEstablishment((req, res) =>
     sendHttpResponseForApiV2(req, res.status(201), () => {
       if (
         !isApiConsumerAllowed({
@@ -92,5 +100,16 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  return publicV2Router;
+  conventionV2Router.getConventionById((req, res) =>
+    sendHttpResponseForApiV2(req, res, async () =>
+      deps.useCases.getConventionForApiConsumer.execute(
+        {
+          conventionId: req.params.conventionId,
+        },
+        req.apiConsumer,
+      ),
+    ),
+  );
+
+  return v2ExpressRouter;
 };
