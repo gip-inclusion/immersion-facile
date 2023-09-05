@@ -4,6 +4,8 @@ import {
   adminRoutes,
   AgencyDtoBuilder,
   AgencyRole,
+  ApiConsumer,
+  ApiConsumerJwt,
   BackOfficeJwt,
   displayRouteName,
   expectToEqual,
@@ -15,12 +17,19 @@ import {
   SetFeatureFlagParam,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import {
+  GenerateApiConsumerJwt,
+  makeVerifyJwtES256,
+} from "../../../../domain/auth/jwt";
+import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
+import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Admin router", () => {
@@ -28,6 +37,8 @@ describe("Admin router", () => {
   let token: BackOfficeJwt;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
+  let appConfig: AppConfig;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let getFeatureFlags: () => Promise<FeatureFlags>;
 
   beforeEach(async () => {
@@ -40,7 +51,8 @@ describe("Admin router", () => {
         .build(),
     );
     const { request } = testDepsAndApp;
-    ({ gateways, inMemoryUow } = testDepsAndApp);
+    ({ gateways, inMemoryUow, appConfig, generateApiConsumerJwt } =
+      testDepsAndApp);
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
 
@@ -406,4 +418,152 @@ describe("Admin router", () => {
       });
     });
   });
+
+  describe(`${displayRouteName(
+    adminRoutes.saveApiConsumer,
+  )} saves an api consumer`, () => {
+    it("200 - save new api consumer", async () => {
+      expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: token },
+      });
+
+      const jwt = expectResponseAndReturnJwt(response, {
+        status: 200,
+        body: {
+          jwt: expect.any(String),
+        },
+      })!;
+
+      const { id } = makeVerifyJwtES256<"apiConsumer">(
+        appConfig.apiJwtPublicKey,
+      )(jwt);
+
+      expectToEqual(id, authorizedUnJeuneUneSolutionApiConsumer.id);
+      expectToEqual(inMemoryUow.apiConsumerRepository.consumers, [
+        authorizedUnJeuneUneSolutionApiConsumer,
+      ]);
+    });
+
+    it("200 - save existing api consumer", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [
+        authorizedUnJeuneUneSolutionApiConsumer,
+      ];
+
+      const updatedApiConsumer: ApiConsumer = {
+        ...authorizedUnJeuneUneSolutionApiConsumer,
+        rights: {
+          searchEstablishment: {
+            kinds: [],
+            scope: "no-scope",
+          },
+          convention: {
+            kinds: [],
+            scope: {
+              agencyKinds: [],
+              agencyIds: [],
+            },
+          },
+        },
+      };
+
+      const response = await sharedRequest.saveApiConsumer({
+        body: updatedApiConsumer,
+        headers: { authorization: token },
+      });
+
+      const jwt = expectResponseAndReturnJwt(response, {
+        status: 200,
+        body: {
+          jwt: expect.any(String),
+        },
+      })!;
+
+      const { id } = makeVerifyJwtES256<"apiConsumer">(
+        appConfig.apiJwtPublicKey,
+      )(jwt);
+
+      expectToEqual(id, authorizedUnJeuneUneSolutionApiConsumer.id);
+      expectToEqual(inMemoryUow.apiConsumerRepository.consumers, [
+        updatedApiConsumer,
+      ]);
+    });
+
+    it("401 - without auth", async () => {
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: "" },
+      });
+
+      expectResponseAndReturnJwt(response, {
+        status: 401,
+        body: { error: "You need to authenticate first" },
+      });
+      expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
+    });
+
+    it("401 - not with backOfficeJwt", async () => {
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+      });
+
+      expectResponseAndReturnJwt(response, {
+        status: 401,
+        body: { error: "Provided token is invalid" },
+      });
+      expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
+    });
+  });
+
+  describe(`${displayRouteName(
+    adminRoutes.getAllApiConsumers,
+  )} gets all api consumers`, () => {
+    it("200 - gets all api consumers", async () => {
+      const response = await sharedRequest.getAllApiConsumers({
+        headers: { authorization: token },
+      });
+      expectToEqual(response, {
+        status: 200,
+        body: [],
+      });
+    });
+
+    it("401 - without auth", async () => {
+      const response = await sharedRequest.getAllApiConsumers({
+        headers: { authorization: "" },
+      });
+
+      expectToEqual(response, {
+        status: 401,
+        body: { error: "You need to authenticate first" },
+      });
+    });
+
+    it("401 - not with backOfficeJwt", async () => {
+      const response = await sharedRequest.saveApiConsumer({
+        body: authorizedUnJeuneUneSolutionApiConsumer,
+        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+      });
+
+      expectToEqual(response, {
+        status: 401,
+        body: { error: "Provided token is invalid" },
+      });
+    });
+  });
 });
+
+const expectResponseAndReturnJwt = <
+  R extends ResponsesToHttpResponse<
+    AdminRoutes["saveApiConsumer"]["responses"]
+  >,
+>(
+  response: R,
+  expected: R,
+): ApiConsumerJwt | undefined => {
+  expectToEqual(response, expected);
+
+  if (response.status === 200) return response.body.jwt as ApiConsumerJwt;
+};
