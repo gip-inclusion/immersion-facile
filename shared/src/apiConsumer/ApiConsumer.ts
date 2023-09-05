@@ -20,7 +20,11 @@ type ApiConsumerRight<Scope> = {
   scope: Scope;
 };
 
-type ApiConsumerRightName = keyof ApiConsumerRights;
+type ApiConsumerRightName = (typeof apiConsumerRightNames)[number];
+export const apiConsumerRightNames = [
+  "searchEstablishment",
+  "convention",
+] as const;
 export type ApiConsumerRights = {
   searchEstablishment: ApiConsumerRight<NoScope>;
   convention: ApiConsumerRight<ConventionScope>;

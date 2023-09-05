@@ -42,37 +42,102 @@ describe("api consumer", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("fetches api consumer", () => {
-    expectInitialStateToMatch();
+  describe("retrieve api consumers", () => {
+    it("fetches api consumer", () => {
+      expectInitialStateToMatch();
 
-    store.dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
-    expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+      store.dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
 
-    dependencies.adminGateway.apiConsumers$.next([apiConsumer1]);
-    expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
-    expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-      kind: "success",
+      dependencies.adminGateway.apiConsumers$.next([apiConsumer1]);
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
+        kind: "success",
+      });
+      expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), [
+        apiConsumer1,
+      ]);
     });
-    expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), [
-      apiConsumer1,
-    ]);
+
+    it("have feedback error on gateway error", () => {
+      expectInitialStateToMatch();
+
+      store.dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.apiConsumers$.error(
+        new Error("failed retrieving api consumers"),
+      );
+
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
+        kind: "errored",
+        errorMessage: "failed retrieving api consumers",
+      });
+    });
   });
 
-  it("have feedback error on gateway error", () => {
+  describe("create api consumer", () => {
+    it("creates api consumer and get its token", () => {
+      const generatedJwt = "super-secret-jwt";
+
+      expectInitialStateToMatch();
+
+      store.dispatch(
+        apiConsumerSlice.actions.saveApiConsumerRequested(apiConsumer1),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.createApiConsumersResponse$.next(generatedJwt);
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
+        kind: "createSuccess",
+      });
+      expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBe(
+        generatedJwt,
+      );
+    });
+
+    it("fails on create api consumer gateway error", () => {
+      const errorMessage = "failed creating api consumer";
+
+      expectInitialStateToMatch();
+
+      store.dispatch(
+        apiConsumerSlice.actions.saveApiConsumerRequested(apiConsumer1),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.createApiConsumersResponse$.error(
+        new Error(errorMessage),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
+        kind: "errored",
+        errorMessage,
+      });
+    });
+  });
+
+  it("clears last created token", () => {
+    const generatedJwt = "super-secret-jwt";
     expectInitialStateToMatch();
 
-    store.dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
-    expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
-
-    dependencies.adminGateway.apiConsumers$.error(
-      new Error("failed retrieving api consumers"),
+    store.dispatch(
+      apiConsumerSlice.actions.saveApiConsumerRequested(apiConsumer1),
     );
 
-    expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
-    expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-      kind: "errored",
-      errorMessage: "failed retrieving api consumers",
-    });
+    dependencies.adminGateway.createApiConsumersResponse$.next(generatedJwt);
+
+    expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBe(
+      generatedJwt,
+    );
+
+    store.dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
+
+    expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBeNull();
   });
 
   const expectInitialStateToMatch = () => {
@@ -81,5 +146,6 @@ describe("api consumer", () => {
     expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
       kind: "idle",
     });
+    expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBeNull();
   };
 });

@@ -6,8 +6,8 @@ import {
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
 
-type ApiCOnsumerAction = ActionOfSlice<typeof apiConsumerSlice>;
-type ApiConsumerEpic = AppEpic<ApiCOnsumerAction>;
+type ApiConsumerAction = ActionOfSlice<typeof apiConsumerSlice>;
+type ApiConsumerEpic = AppEpic<ApiConsumerAction>;
 
 const retrieveApiConsumersEpic: ApiConsumerEpic = (
   action$,
@@ -23,4 +23,21 @@ const retrieveApiConsumersEpic: ApiConsumerEpic = (
     ),
   );
 
-export const apiConsumerEpics = [retrieveApiConsumersEpic];
+const createApiConsumerEpic: ApiConsumerEpic = (
+  action$,
+  _state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(apiConsumerSlice.actions.saveApiConsumerRequested.match),
+    switchMap((action) => adminGateway.saveApiConsumer$(action.payload)),
+    map(apiConsumerSlice.actions.saveApiConsumerSucceeded),
+    catchEpicError((error) =>
+      apiConsumerSlice.actions.saveApiConsumerFailed(error.message),
+    ),
+  );
+
+export const apiConsumerEpics = [
+  retrieveApiConsumersEpic,
+  createApiConsumerEpic,
+];

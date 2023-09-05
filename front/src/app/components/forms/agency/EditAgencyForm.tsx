@@ -10,11 +10,11 @@ import {
   AgencyDto,
   AgencyStatus,
   allAgencyStatuses,
+  domElementIds,
   editAgencySchema,
   emailSchema,
   toDotNotation,
 } from "shared";
-import { domElementIds } from "shared";
 import { ErrorNotifications } from "react-design-system";
 import {
   AgencyFormCommonFields,
@@ -60,14 +60,7 @@ export const EditAgencyForm = ({
     mode: "onTouched",
     defaultValues: agency,
   });
-  const {
-    register,
-    setValue,
-    handleSubmit,
-    formState,
-    watch,
-    formState: { errors, submitCount },
-  } = methods;
+  const { register, setValue, handleSubmit, formState, watch } = methods;
 
   const getFieldError = makeFieldError(formState);
 
@@ -115,8 +108,11 @@ export const EditAgencyForm = ({
         </div>
         <ErrorNotifications
           labels={getFormErrors()}
-          errors={toDotNotation(formErrorsToFlatErrors(errors))}
-          visible={submitCount !== 0 && Object.values(errors).length > 0}
+          errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+          visible={
+            formState.submitCount !== 0 &&
+            Object.values(formState.errors).length > 0
+          }
         />
 
         <div className={fr.cx("fr-mt-4w")}>
