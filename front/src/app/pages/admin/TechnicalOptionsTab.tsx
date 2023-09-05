@@ -9,9 +9,11 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { addYears } from "date-fns";
 import { keys } from "ramda";
 import { v4 as uuidV4 } from "uuid";
 import {
@@ -26,6 +28,7 @@ import {
   ConventionScope,
   FeatureFlagName,
   NoScope,
+  toDateString,
   toDisplayedDate,
 } from "shared";
 import { Loader } from "react-design-system";
@@ -33,6 +36,7 @@ import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEm
 import { commonContent } from "src/app/contents/commonContent";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
@@ -149,12 +153,15 @@ const ApiConsumerConventionScopeDisplayed = ({
         <ul className={fr.cx("fr-text--xs")}>
           {apiConsumerScopeName.map((scopeName) => (
             <li key={scopeName}>
-              {scopeName}:
-              <ul>
-                {scope[scopeName].map((value) => (
-                  <li key={value}>{value}</li>
-                ))}
-              </ul>
+              {scopeName} :{" "}
+              {scope[scopeName].length > 0 && (
+                <ul>
+                  {scope[scopeName].map((value) => (
+                    <li key={value}>{value}</li>
+                  ))}
+                </ul>
+              )}
+              {scope[scopeName].length === 0 && <span>Aucun scope</span>}
             </li>
           ))}
         </ul>
@@ -163,12 +170,8 @@ const ApiConsumerConventionScopeDisplayed = ({
   );
 };
 
-const {
-  Component: ApiConsumerModal,
-  open: openApiConsumerModal,
-  close: closeApiConsumerModal,
-} = createModal({
-  id: "consumer-api-modal",
+const apiConsumerModal = createModal({
+  id: "api-consumer-modal",
   isOpenedByDefault: false,
 });
 
@@ -195,13 +198,14 @@ const defaultApiConsumerValues: ApiConsumer = {
       },
     },
   },
-  createdAt: new Date().toISOString(),
-  expirationDate: new Date().toISOString(),
+  createdAt: toDateString(new Date()),
+  expirationDate: toDateString(addYears(new Date(), 1)),
 };
 
 export const TechnicalOptionsTab = () => {
   const { isLoading: isFeatureFlagsLoading, ...featureFlags } =
     useFeatureFlags();
+  const adminToken = useAdminToken();
   const dispatch = useDispatch();
   const lastCreatedToken = useAppSelector(
     apiConsumerSelectors.lastCreatedToken,
@@ -214,10 +218,15 @@ export const TechnicalOptionsTab = () => {
     useState<ApiConsumer>(defaultApiConsumerValues);
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
   const isApiConsumersLoading = useAppSelector(apiConsumerSelectors.isLoading);
+  const isApiConsumerModalOpened = useIsModalOpen(apiConsumerModal);
 
   const onEditButtonClick = (apiConsumer: ApiConsumer) => {
-    setCurrentApiConsumerToEdit(apiConsumer);
-    openApiConsumerModal();
+    setCurrentApiConsumerToEdit({
+      ...apiConsumer,
+      expirationDate: toDateString(new Date(apiConsumer.expirationDate)),
+      createdAt: toDateString(new Date(apiConsumer.createdAt)),
+    });
+    apiConsumerModal.open();
   };
 
   const tableDataFromApiConsumers: ApiConsumerRow[] = apiConsumers.map(
@@ -232,18 +241,33 @@ export const TechnicalOptionsTab = () => {
   );
 
   useEffect(() => {
-    dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
+    adminToken &&
+      dispatch(
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+      );
   }, []);
+
+  useEffect(() => {
+    if (isApiConsumerModalOpened) return;
+    dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
+    adminToken &&
+      dispatch(
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+      );
+  }, [isApiConsumerModalOpened]);
 
   const onConfirmTokenModalClose = () => {
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
-    dispatch(apiConsumerSlice.actions.retrieveApiConsumersRequested());
-    closeApiConsumerModal();
+    adminToken &&
+      dispatch(
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+      );
+    apiConsumerModal.close();
   };
 
   const onApiConsumerAddClick = () => {
     setCurrentApiConsumerToEdit(defaultApiConsumerValues);
-    openApiConsumerModal();
+    apiConsumerModal.open();
   };
 
   return (
@@ -352,7 +376,7 @@ export const TechnicalOptionsTab = () => {
           </div>
         </div>
         {createPortal(
-          <ApiConsumerModal title="Ajout consommateur api">
+          <apiConsumerModal.Component title="Ajout consommateur api">
             {lastCreatedToken && (
               <>
                 <Alert
@@ -378,7 +402,7 @@ export const TechnicalOptionsTab = () => {
             {!lastCreatedToken && (
               <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
             )}
-          </ApiConsumerModal>,
+          </apiConsumerModal.Component>,
           document.body,
         )}
       </div>
@@ -393,13 +417,23 @@ const ApiConsumerForm = ({ initialValues }: { initialValues: ApiConsumer }) => {
     mode: "onTouched",
     defaultValues: initialValues,
   });
+  const adminToken = useAdminToken();
+
   const { getValues, register, setValue, handleSubmit, formState, reset } =
     methods;
+
+  const values = getValues();
 
   const getFieldError = makeFieldError(formState);
 
   const onValidSubmit = (values: ApiConsumer) => {
-    dispatch(apiConsumerSlice.actions.saveApiConsumerRequested(values));
+    adminToken &&
+      dispatch(
+        apiConsumerSlice.actions.saveApiConsumerRequested({
+          apiConsumer: values,
+          adminToken,
+        }),
+      );
   };
 
   useEffect(() => {
@@ -438,11 +472,13 @@ const ApiConsumerForm = ({ initialValues }: { initialValues: ApiConsumer }) => {
       />
       <MultipleEmailsInput
         label="Emails du contact"
-        valuesInList={getValues().contact.emails}
+        valuesInList={values.contact.emails}
+        summaryHintText="Voici les emails qui seront ajoutés en contact pour ce consommateur API :"
         setValues={(values) => {
           setValue("contact.emails", values, { shouldValidate: true });
         }}
         {...register("contact.emails")}
+        initialValue={values.contact.emails.join(", ")}
       />
       <Input
         label="Description"
@@ -468,20 +504,15 @@ const ApiConsumerForm = ({ initialValues }: { initialValues: ApiConsumer }) => {
                 nativeInputProps: {
                   name: register(`rights.${rightName}.kinds`).name,
                   checked:
-                    getValues().rights[rightName].kinds.includes(
-                      apiConsumerKind,
-                    ),
+                    values.rights[rightName].kinds.includes(apiConsumerKind),
                   onChange: () => {
-                    const rightsToSet = getValues().rights[
-                      rightName
-                    ].kinds.includes(apiConsumerKind)
-                      ? getValues().rights[rightName].kinds.filter(
+                    const rightsToSet = values.rights[rightName].kinds.includes(
+                      apiConsumerKind,
+                    )
+                      ? values.rights[rightName].kinds.filter(
                           (kind) => kind !== apiConsumerKind,
                         )
-                      : [
-                          ...getValues().rights[rightName].kinds,
-                          apiConsumerKind,
-                        ];
+                      : [...values.rights[rightName].kinds, apiConsumerKind];
                     setValue(`rights.${rightName}.kinds`, rightsToSet, {
                       shouldValidate: true,
                     });

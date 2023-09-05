@@ -4,6 +4,7 @@ import { dashboardInitialState } from "src/core-logic/domain/admin/dashboardUrls
 import { icUsersAdminInitialState } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { notificationsInitialState } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import { RootState } from "src/core-logic/storeConfig/store";
+import { apiConsumerInitialState } from "../apiConsumer/apiConsumer.slice";
 
 type AdminState = RootState["admin"];
 
@@ -15,5 +16,6 @@ export const adminPreloadedState = (
   notifications: notificationsInitialState,
   agencyAdmin: agencyAdminInitialState,
   inclusionConnectedUsersAdmin: icUsersAdminInitialState,
+  apiConsumer: apiConsumerInitialState,
   ...state,
 });

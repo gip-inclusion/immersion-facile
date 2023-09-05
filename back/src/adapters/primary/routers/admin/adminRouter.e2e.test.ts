@@ -431,9 +431,7 @@ describe("Admin router", () => {
 
       const jwt = expectResponseAndReturnJwt(response, {
         status: 200,
-        body: {
-          jwt: expect.any(String),
-        },
+        body: expect.any(String),
       })!;
 
       const { id } = makeVerifyJwtES256<"apiConsumer">(
@@ -475,9 +473,7 @@ describe("Admin router", () => {
 
       const jwt = expectResponseAndReturnJwt(response, {
         status: 200,
-        body: {
-          jwt: expect.any(String),
-        },
+        body: expect.any(String),
       })!;
 
       const { id } = makeVerifyJwtES256<"apiConsumer">(
@@ -565,5 +561,5 @@ const expectResponseAndReturnJwt = <
 ): ApiConsumerJwt | undefined => {
   expectToEqual(response, expected);
 
-  if (response.status === 200) return response.body.jwt as ApiConsumerJwt;
+  if (response.status === 200) return response.body as ApiConsumerJwt;
 };

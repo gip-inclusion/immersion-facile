@@ -1,8 +1,8 @@
 import {
   ApiConsumer,
+  ApiConsumerJwt,
   apiConsumerSchema,
   BackOfficeDomainPayload,
-  JwtDto,
 } from "shared";
 import {
   ForbiddenError,
@@ -15,7 +15,7 @@ import { GenerateApiConsumerJwt } from "../jwt";
 
 export class SaveApiConsumer extends TransactionalUseCase<
   ApiConsumer,
-  JwtDto,
+  ApiConsumerJwt,
   BackOfficeDomainPayload
 > {
   protected inputSchema = apiConsumerSchema;
@@ -38,7 +38,7 @@ export class SaveApiConsumer extends TransactionalUseCase<
     input: ApiConsumer,
     uow: UnitOfWork,
     payload?: BackOfficeDomainPayload,
-  ): Promise<JwtDto> {
+  ): Promise<ApiConsumerJwt> {
     if (!payload) throw new UnauthorizedError();
     if (payload.role !== "backOffice")
       throw new ForbiddenError(
@@ -53,10 +53,8 @@ export class SaveApiConsumer extends TransactionalUseCase<
       }),
     );
 
-    return {
-      jwt: this.#generateApiConsumerJwt({
-        id: input.id,
-      }),
-    };
+    return this.#generateApiConsumerJwt({
+      id: input.id,
+    });
   }
 }
