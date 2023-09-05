@@ -17,7 +17,10 @@ import {
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
-import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
+import {
+  PublicApiV2SearchEstablishmentRoutes,
+  publicApiV2SearchEstablishmentRoutes,
+} from "./publicApiV2.routes";
 
 const cartographeAppellationAndRome: AppellationAndRomeDto = {
   romeCode: "M1808",
@@ -29,7 +32,7 @@ const cartographeAppellationAndRome: AppellationAndRomeDto = {
 describe("search route", () => {
   let request: SuperTest<Test>;
   let authToken: string;
-  let sharedRequest: HttpClient<PublicApiV2Routes>;
+  let sharedRequest: HttpClient<PublicApiV2SearchEstablishmentRoutes>;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
@@ -40,14 +43,17 @@ describe("search route", () => {
       authorizedUnJeuneUneSolutionApiConsumer,
       unauthorisedApiConsumer,
     ];
-    sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
+    sharedRequest = createSupertestSharedClient(
+      publicApiV2SearchEstablishmentRoutes,
+      request,
+    );
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });
   });
 
-  describe(`${publicApiV2Routes.searchImmersion.method.toUpperCase()} ${
-    publicApiV2Routes.searchImmersion.url
+  describe(`${publicApiV2SearchEstablishmentRoutes.searchImmersion.method.toUpperCase()} ${
+    publicApiV2SearchEstablishmentRoutes.searchImmersion.url
   }`, () => {
     describe("verify consumer is authenticated and authorized", () => {
       it("rejects unauthenticated requests", async () => {

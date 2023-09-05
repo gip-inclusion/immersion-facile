@@ -1,5 +1,6 @@
 import { propEq } from "ramda";
 import {
+  ConventionDto,
   ConventionId,
   ConventionReadDto,
   ListConventionsRequestDto,
@@ -12,6 +13,7 @@ import {
 } from "../../domain/convention/ports/ConventionQueries";
 import { createLogger } from "../../utils/logger";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
+import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 export const TEST_AGENCY_NAME = "TEST_AGENCY_NAME";
@@ -21,6 +23,7 @@ const logger = createLogger(__filename);
 export class InMemoryConventionQueries implements ConventionQueries {
   constructor(
     private readonly conventionRepository: InMemoryConventionRepository,
+    private readonly agencyRepository: InMemoryAgencyRepository,
     private readonly outboxRepository?: InMemoryOutboxRepository,
   ) {}
 
@@ -39,30 +42,22 @@ export class InMemoryConventionQueries implements ConventionQueries {
           validatedConventionStatuses.includes(convention.status) &&
           !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
       )
-      .map((convention) => ({
-        ...convention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
-      }));
+      .map((convention) => this.#addAgencyDataToConvention(convention));
   }
 
   public async getConventionById(
     id: ConventionId,
   ): Promise<ConventionReadDto | undefined> {
     logger.info("getAll");
-    const storedConvention = this.conventionRepository.conventions.find(
+    const convention = this.conventionRepository.conventions.find(
       propEq("id", id),
     );
-    return (
-      storedConvention && {
-        ...storedConvention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
-      }
-    );
+    if (!convention) return;
+
+    return this.#addAgencyDataToConvention(convention);
   }
 
-  async getConventionsByFilters({
+  public async getConventionsByFilters({
     startDateGreater,
     startDateLessOrEqual,
     withStatuses,
@@ -87,11 +82,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           return false;
         return true;
       })
-      .map((convention) => ({
-        ...convention,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
-      }));
+      .map((convention) => this.#addAgencyDataToConvention(convention));
   }
 
   public async getLatestConventions({
@@ -102,10 +93,21 @@ export class InMemoryConventionQueries implements ConventionQueries {
     return Object.values(this.conventionRepository._conventions)
       .filter((dto) => !status || dto.status === status)
       .filter((dto) => !agencyId || dto.agencyId === agencyId)
-      .map((dto) => ({
-        ...dto,
-        agencyName: TEST_AGENCY_NAME,
-        agencyDepartment: TEST_AGENCY_DEPARTMENT,
-      }));
+      .map((dto) => this.#addAgencyDataToConvention(dto));
   }
+
+  #addAgencyDataToConvention = (
+    convention: ConventionDto,
+  ): ConventionReadDto => {
+    const agency = this.agencyRepository.agencies.find(
+      (agency) => agency.id === convention.agencyId,
+    );
+
+    return {
+      ...convention,
+      agencyName: agency?.name ?? TEST_AGENCY_NAME,
+      agencyDepartment:
+        agency?.address.departmentCode ?? TEST_AGENCY_DEPARTMENT,
+    };
+  };
 }

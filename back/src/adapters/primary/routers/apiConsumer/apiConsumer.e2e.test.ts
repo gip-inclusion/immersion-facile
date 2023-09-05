@@ -100,7 +100,6 @@ describe("Api Consumer router", () => {
           convention: {
             kinds: [],
             scope: {
-              agencyKinds: [],
               agencyIds: [],
             },
           },

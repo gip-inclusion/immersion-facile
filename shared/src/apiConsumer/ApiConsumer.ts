@@ -1,6 +1,7 @@
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
 import { Flavor } from "../typeFlavors";
+import { Either } from "../utils";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 
@@ -26,10 +27,10 @@ export type ApiConsumerRights = {
   convention: ApiConsumerRight<ConventionScope>;
 };
 
-type ConventionScope = {
-  agencyKinds: AgencyKind[];
-  agencyIds: AgencyId[];
-};
+export type ConventionScope = Either<
+  { agencyKinds: AgencyKind[] },
+  { agencyIds: AgencyId[] }
+>;
 
 export type ApiConsumer = {
   id: ApiConsumerId;

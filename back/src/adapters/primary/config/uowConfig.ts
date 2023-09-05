@@ -62,13 +62,15 @@ export const createInMemoryUow = () => {
   const conventionRepository = new InMemoryConventionRepository();
   const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
   const shortLinkRepository = new InMemoryShortLinkRepository();
+  const agencyRepository = new InMemoryAgencyRepository();
 
   return {
-    agencyRepository: new InMemoryAgencyRepository(),
+    agencyRepository,
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
     authenticatedUserRepository,
     conventionQueries: new InMemoryConventionQueries(
       conventionRepository,
+      agencyRepository,
       outboxRepository,
     ),
     conventionRepository,

@@ -137,6 +137,14 @@ export type Prettify<T> = {
   //
 };
 
+export type Only<T, U> = {
+  [P in keyof T]: T[P];
+} & {
+  [P in keyof U]?: never;
+};
+
+export type Either<T, U> = Only<T, U> | Only<U, T>;
+
 export const sortByPropertyCaseInsensitive = (propertyName: string) =>
   sortBy(pipe(prop(propertyName), toLower));
 

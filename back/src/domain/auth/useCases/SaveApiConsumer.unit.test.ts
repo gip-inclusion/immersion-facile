@@ -91,7 +91,6 @@ describe("SaveApiConsumer", () => {
             kinds: [],
             scope: {
               agencyKinds: [],
-              agencyIds: [],
             },
           },
         },

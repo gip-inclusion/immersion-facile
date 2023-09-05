@@ -1,7 +1,10 @@
-import { SearchResultDto } from "shared";
+import { ConventionDtoBuilder, SearchResultDto } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
-import { publicApiV2Routes } from "./publicApiV2.routes";
+import {
+  publicApiV2ConventionRoutes,
+  publicApiV2SearchEstablishmentRoutes,
+} from "./publicApiV2.routes";
 
 const contactByEmailExample: ContactEstablishmentPublicV2Dto = {
   potentialBeneficiaryFirstName: "John",
@@ -82,6 +85,7 @@ const withAuthorizationHeader = {
 const apiKeyAuth = "apiKeyAuth";
 
 const searchSection = "Recherche d'entreprise accueillante et mise en contact";
+const conventionSection = "Accès aux conventions";
 
 const getServers = (envType: string) => {
   if (envType === "production") {
@@ -106,13 +110,21 @@ const getServers = (envType: string) => {
 
 const generateOpenApi = (envType: string) =>
   createOpenApiGenerator(
-    { [searchSection]: publicApiV2Routes },
+    {
+      [searchSection]: publicApiV2SearchEstablishmentRoutes,
+      [conventionSection]: publicApiV2ConventionRoutes,
+    },
     {
       info: {
         title: "Les API Immersion facilitée",
         description: `Ceci est la documentation pour consommer l’api d’immersion facilitée.
       Une clé API est nécessaire pour utiliser l’api. Veuillez vous mettre en contact avec l’équipe d’immersion facilitée pour l’obtenir.
-      La clé API est à fournir en authorization header de toutes les requêtes.
+      Vous aurez à préciser ce dont vous avez besoin :
+      <ul>
+      <li>la partie recherche d’entreprise</li> 
+      <li>la partie accès aux conventions (dans ce cas il nous faudra connaître les agences qui vous concernent)</li>
+      </ul>
+     La clé API est à fournir en authorization header de toutes les requêtes.
       `,
         version: "v2",
       },
@@ -339,6 +351,40 @@ export const createOpenApiSpecV2 = (envType: string) =>
             },
             "404": {
               description: "Établissement/Contact non trouvé",
+              example: error404Example,
+            },
+          },
+        },
+      },
+    },
+    [conventionSection]: {
+      getConventionById: {
+        summary: "Récupération d'une convention",
+        description: "Renvoie la convention correspondante",
+        extraDocs: {
+          responses: {
+            "200": {
+              description: "Retourne la convention",
+              example: {
+                ...new ConventionDtoBuilder().build(),
+                agencyName: "Agence de test",
+                agencyDepartment: "75",
+              },
+            },
+            "400": {
+              description: "Erreur dans le contrat d'api'",
+            },
+            "401": {
+              description: "Utilisateur non authentifié",
+              example: error401Example,
+            },
+            "403": {
+              description:
+                "Accès non autorisé (veuillez vérifier que vous avez les droits)",
+              example: error403Example,
+            },
+            "404": {
+              description: "Convention non trouvé",
               example: error404Example,
             },
           },

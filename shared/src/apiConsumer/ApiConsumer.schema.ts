@@ -25,10 +25,17 @@ const apiConsumerRightsSchema: z.Schema<ApiConsumerRights> = z.object({
   }),
   convention: z.object({
     kinds: z.array(z.enum(apiConsumerKinds)),
-    scope: z.object({
-      agencyKinds: z.array(agencyKindSchema),
-      agencyIds: z.array(agencyIdSchema),
-    }),
+    scope: z
+      .object({
+        agencyKinds: z.array(agencyKindSchema),
+        agencyIds: z.undefined(),
+      })
+      .or(
+        z.object({
+          agencyKinds: z.undefined(),
+          agencyIds: z.array(agencyIdSchema),
+        }),
+      ),
   }),
 });
 

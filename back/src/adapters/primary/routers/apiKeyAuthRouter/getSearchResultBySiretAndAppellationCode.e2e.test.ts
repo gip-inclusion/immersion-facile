@@ -23,7 +23,10 @@ import {
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
-import { PublicApiV2Routes, publicApiV2Routes } from "./publicApiV2.routes";
+import {
+  PublicApiV2SearchEstablishmentRoutes,
+  publicApiV2SearchEstablishmentRoutes,
+} from "./publicApiV2.routes";
 
 const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
@@ -38,7 +41,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
   let inMemoryUow: InMemoryUnitOfWork;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let authToken: string;
-  let sharedRequest: HttpClient<PublicApiV2Routes>;
+  let sharedRequest: HttpClient<PublicApiV2SearchEstablishmentRoutes>;
 
   beforeEach(async () => {
     const config = new AppConfigBuilder()
@@ -52,7 +55,10 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });
 
-    sharedRequest = createSupertestSharedClient(publicApiV2Routes, request);
+    sharedRequest = createSupertestSharedClient(
+      publicApiV2SearchEstablishmentRoutes,
+      request,
+    );
     inMemoryUow.apiConsumerRepository.consumers = [
       unauthorisedApiConsumer,
       authorizedUnJeuneUneSolutionApiConsumer,
