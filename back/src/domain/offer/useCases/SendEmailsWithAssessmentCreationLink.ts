@@ -5,6 +5,7 @@ import {
   ConventionId,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
+  isUrlValid,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
@@ -101,6 +102,9 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
       params: {
         agencyLogoUrl: agency.logoUrl,
         agencyValidatorEmail: agency.validatorEmails[0],
+        agencyAssessmentDocumentLink: isUrlValid(agency.questionnaireUrl)
+          ? agency.questionnaireUrl
+          : undefined,
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         conventionId: convention.id,

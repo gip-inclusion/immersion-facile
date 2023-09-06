@@ -99,6 +99,7 @@ export type EmailParamsByEmailType = {
     requesterName: string;
   };
   CREATE_IMMERSION_ASSESSMENT: {
+    agencyAssessmentDocumentLink: string | undefined;
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyValidatorEmail: string;
     beneficiaryFirstName: string;

@@ -165,3 +165,13 @@ type Primitive = string | boolean | number | undefined | null;
 
 export const arrayFromNumber = (n: number): number[] =>
   n > 0 ? Array.from(Array(n).keys()) : [];
+
+export const isUrlValid = (url: string | undefined) => {
+  if (!url) return false;
+  try {
+    const validUrl = new URL(url);
+    return validUrl.protocol === "http:" || validUrl.protocol === "https:";
+  } catch (_error) {
+    return false;
+  }
+};
