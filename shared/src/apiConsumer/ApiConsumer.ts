@@ -15,7 +15,7 @@ export type ApiConsumerName = Flavor<string, "ApiConsumerName">;
 export type ApiConsumerKind = (typeof apiConsumerKinds)[number];
 export const apiConsumerKinds = ["READ", "WRITE"] as const;
 
-type ApiConsumerRight<Scope> = {
+export type ApiConsumerRight<Scope> = {
   kinds: ApiConsumerKind[];
   scope: Scope;
 };
@@ -32,6 +32,7 @@ export type ApiConsumerRights = {
 
 export type NoScope = "no-scope";
 
+export const conventionScopeKeys = ["agencyKinds", "agencyIds"] as const;
 export type ConventionScope = Either<
   { agencyKinds: AgencyKind[] },
   { agencyIds: AgencyId[] }

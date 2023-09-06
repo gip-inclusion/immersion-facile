@@ -34,6 +34,7 @@ export type WithAgencyId = {
   agencyId: AgencyId;
 };
 
+export type AgencyKind = (typeof agencyKindList)[number];
 export const agencyKindList = [
   "pole-emploi",
   "mission-locale",
@@ -52,8 +53,6 @@ export type AgencyOption = {
   name: string;
   kind: AgencyKind;
 };
-
-export type AgencyKind = (typeof agencyKindList)[number];
 
 export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 

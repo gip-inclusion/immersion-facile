@@ -10,6 +10,8 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +19,7 @@ import { addYears } from "date-fns";
 import { keys } from "ramda";
 import { v4 as uuidV4 } from "uuid";
 import {
+  AgencyKind,
   ApiConsumer,
   ApiConsumerContact,
   ApiConsumerId,
@@ -26,12 +29,14 @@ import {
   ApiConsumerRights,
   apiConsumerSchema,
   ConventionScope,
+  conventionScopeKeys,
   FeatureFlagName,
   NoScope,
   toDateString,
   toDisplayedDate,
 } from "shared";
 import { Loader } from "react-design-system";
+import { allAgencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { commonContent } from "src/app/contents/commonContent";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -525,6 +530,74 @@ const ApiConsumerForm = ({ initialValues }: { initialValues: ApiConsumer }) => {
                 },
               }))}
             />
+            {rightName === "convention" && (
+              <>
+                <RadioButtons
+                  legend="Scopes de la convention"
+                  options={conventionScopeKeys.map((scopeKey) => ({
+                    label: scopeKey,
+                    nativeInputProps: {
+                      name: register(`rights.convention.scope`).name,
+                      checked: keys(values.rights.convention.scope).includes(
+                        scopeKey,
+                      ),
+                      onChange: () => {
+                        setValue(
+                          "rights.convention.scope",
+                          scopeKey === "agencyIds"
+                            ? { [scopeKey]: [] }
+                            : { [scopeKey]: [] },
+                          { shouldValidate: true },
+                        );
+                      },
+                    },
+                  }))}
+                />
+                {keys(values.rights.convention.scope).includes(
+                  "agencyKinds",
+                ) && (
+                  <Select
+                    label="Types d'agence autorisés"
+                    nativeSelectProps={{
+                      onChange: (event) => {
+                        const selectedOptions = (
+                          event.target as unknown as HTMLSelectElement
+                        ).selectedOptions;
+                        const selectedValues = Array.from(selectedOptions).map(
+                          (option) => (option as HTMLOptionElement).value,
+                        );
+                        setValue(
+                          "rights.convention.scope.agencyKinds",
+                          selectedValues as AgencyKind[],
+                        );
+                      },
+                      multiple: true,
+                    }}
+                    options={allAgencyListOfOptions}
+                  />
+                )}
+                {keys(values.rights.convention.scope).includes("agencyIds") && (
+                  <Input
+                    textArea
+                    label="Id des agences autorisées"
+                    nativeTextAreaProps={{
+                      name: register("rights.convention.scope.agencyIds").name,
+                      placeholder:
+                        "Veuillez entrer une liste d'id d'agences, séparés par des virgules",
+                      onChange: (event) => {
+                        setValue(
+                          "rights.convention.scope.agencyIds",
+                          event.target.value
+                            .split(",")
+                            .map((agencyId) => agencyId.trim()),
+                        );
+                      },
+                    }}
+                    {...getFieldError("rights.convention.scope.agencyIds")}
+                  />
+                )}
+              </>
+            )}
           </li>
         ))}
       </ul>
