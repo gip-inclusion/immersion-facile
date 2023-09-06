@@ -460,7 +460,6 @@ describe("Admin router", () => {
             kinds: [],
             scope: {
               agencyKinds: [],
-              agencyIds: [],
             },
           },
         },

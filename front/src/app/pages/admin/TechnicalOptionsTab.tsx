@@ -151,19 +151,25 @@ const ApiConsumerConventionScopeDisplayed = ({
       </Button>
       {isScopeDisplayed && (
         <ul className={fr.cx("fr-text--xs")}>
-          {apiConsumerScopeName.map((scopeName) => (
-            <li key={scopeName}>
-              {scopeName} :{" "}
-              {scope[scopeName].length > 0 && (
-                <ul>
-                  {scope[scopeName].map((value) => (
-                    <li key={value}>{value}</li>
-                  ))}
-                </ul>
-              )}
-              {scope[scopeName].length === 0 && <span>Aucun scope</span>}
-            </li>
-          ))}
+          {apiConsumerScopeName
+            .filter((scopeName) => !!scope[scopeName])
+            .map((scopeName) => {
+              const scopeValues = scope[scopeName];
+              if (!scopeValues) return null;
+              return (
+                <li key={scopeName}>
+                  {scopeName} :{" "}
+                  {scopeValues.length > 0 && (
+                    <ul>
+                      {scopeValues.map((value) => (
+                        <li key={value}>{value}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {scopeValues.length === 0 && <span>vide</span>}
+                </li>
+              );
+            })}
         </ul>
       )}
     </>
@@ -194,7 +200,6 @@ const defaultApiConsumerValues: ApiConsumer = {
       kinds: [],
       scope: {
         agencyKinds: [],
-        agencyIds: [],
       },
     },
   },
