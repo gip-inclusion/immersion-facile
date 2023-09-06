@@ -26,7 +26,6 @@ const apiConsumer1: ApiConsumer = {
       kinds: [],
       scope: {
         agencyKinds: [],
-        agencyIds: [],
       },
     },
   },
