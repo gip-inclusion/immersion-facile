@@ -1197,6 +1197,7 @@ export const emailTemplatesByName =
         establishmentTutorName,
         immersionAssessmentCreationLink,
         internshipKind,
+        agencyAssessmentDocumentLink,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -1229,11 +1230,13 @@ export const emailTemplatesByName =
           },
           {
             label: "Télécharger la fiche bilan",
-            url: `${
-              internshipKind === "immersion"
-                ? "https://immersion.cellar-c2.services.clever-cloud.com/PMSMP_Bilan.pdf"
-                : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
-            }`,
+            url:
+              agencyAssessmentDocumentLink ||
+              `${
+                internshipKind === "immersion"
+                  ? "https://immersion.cellar-c2.services.clever-cloud.com/PMSMP_Bilan.pdf"
+                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
+              }`,
           },
         ],
         highlight: {

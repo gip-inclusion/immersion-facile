@@ -484,6 +484,7 @@ export const defaultEmailValueByEmailKind: {
     businessAddress: "BUSINESS_ADDRESS",
   },
   CREATE_IMMERSION_ASSESSMENT: {
+    agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
     agencyValidatorEmail: "VALIDATOR_EMAIL",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",

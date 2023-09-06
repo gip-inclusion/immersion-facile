@@ -76,6 +76,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         ],
         sender: immersionFacileNoReplyEmailSender,
         params: {
+          agencyAssessmentDocumentLink: undefined,
           agencyLogoUrl: expectedAgency.logoUrl,
           agencyValidatorEmail: expectedAgency.validatorEmails[0],
           beneficiaryFirstName:
