@@ -178,10 +178,6 @@ const apiConsumers: ApiConsumer[] = [
         kinds: ["READ", "WRITE"],
         scope: {
           agencyKinds: ["pole-emploi", "mission-locale"],
-          agencyIds: [
-            "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            "bbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-          ],
         },
       },
     },
@@ -207,8 +203,7 @@ const apiConsumers: ApiConsumer[] = [
       convention: {
         kinds: ["READ"],
         scope: {
-          agencyKinds: [],
-          agencyIds: [],
+          agencyIds: ["fake-agency-id-1"],
         },
       },
     },

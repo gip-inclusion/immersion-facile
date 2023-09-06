@@ -1,4 +1,4 @@
-import { AgencyKind } from "shared";
+import { AgencyKind, agencyKindList } from "shared";
 
 export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
 
@@ -13,3 +13,23 @@ export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "operateur-cep": "Opérateur du CEP",
   autre: "Autre",
 };
+
+const allAgencyKindToLabel: Record<AgencyKind, string> = {
+  ...agencyKindToLabel,
+  "immersion-facile": "Immersion facilitée",
+};
+
+export const agencyListOfOptions = agencyKindList
+  .filter(
+    (agencyKind): agencyKind is AllowedAgencyKindToAdd =>
+      agencyKind !== "immersion-facile",
+  )
+  .map((agencyKind) => ({
+    value: agencyKind,
+    label: agencyKindToLabel[agencyKind],
+  }));
+
+export const allAgencyListOfOptions = agencyKindList.map((agencyKind) => ({
+  value: agencyKind,
+  label: allAgencyKindToLabel[agencyKind],
+}));

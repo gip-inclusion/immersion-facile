@@ -5,15 +5,11 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import {
   AddressDto,
   addressDtoToString,
-  agencyKindList,
   CreateAgencyDto,
   emailSchema,
 } from "shared";
 import { LinkHome } from "react-design-system";
-import {
-  agencyKindToLabel,
-  AllowedAgencyKindToAdd,
-} from "src/app/components/forms/agency/agencyKindToLabel";
+import { agencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
@@ -203,13 +199,3 @@ export const AgencyLogoUpload = () => {
     </>
   );
 };
-
-export const agencyListOfOptions = agencyKindList
-  .filter(
-    (agencyKind): agencyKind is AllowedAgencyKindToAdd =>
-      agencyKind !== "immersion-facile",
-  )
-  .map((agencyKind) => ({
-    value: agencyKind,
-    label: agencyKindToLabel[agencyKind],
-  }));
