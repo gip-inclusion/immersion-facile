@@ -9,6 +9,7 @@ import {
   displayEmergencyContactInfos,
   Email,
   frontRoutes,
+  isUrlValid,
   Role,
   TemplatedEmail,
 } from "shared";
@@ -169,6 +170,9 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           beneficiary,
         }),
         agencyLogoUrl: agency.logoUrl,
+        agencyAssessmentDocumentLink: isUrlValid(agency.questionnaireUrl)
+          ? agency.questionnaireUrl
+          : undefined,
         magicLink: await makeShortMagicLink(frontRoutes.conventionDocument),
         validatorName: convention.validators?.agencyValidator
           ? concatValidatorNames(convention.validators?.agencyValidator)

@@ -21,7 +21,7 @@ const emptyAgency: AgencyDto = {
   counsellorEmails: [],
   validatorEmails: [defaultValidatorEmail],
   adminEmails: [],
-  questionnaireUrl: "empty-questionnaire-url",
+  questionnaireUrl: "https://empty-questionnaire-url",
   signature: "empty-signature",
   address: emptyAddress,
   position: {
