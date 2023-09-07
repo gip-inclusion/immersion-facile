@@ -572,18 +572,25 @@ describe("ScheduleUtils", () => {
   });
 
   describe("dateIsoStringSchema schema", () => {
-    it.each(["2022-07-05", new Date("2022-07-05")])(
-      "parse '%s' is valid",
+    it.each(["2022-07-05", "Not a date", "31-07-2022"])(
+      "parse '%s' is not valid",
       (date) => {
-        expect(dateIsoStringSchema.parse(date)).toEqual(
-          new Date(date).toISOString(),
+        expect(() => dateIsoStringSchema.parse(date)).toThrow(
+          new ZodError([
+            {
+              code: "invalid_string",
+              validation: "datetime",
+              message: "Invalid datetime",
+              path: [],
+            },
+          ]),
         );
       },
     );
 
-    it.each(["Not a date", "31-07-2022"])("parse '%s' is invalid", (date) => {
-      expect(() => dateIsoStringSchema.parse(date)).toThrow(
-        "Invalid time value",
+    it.each(["2022-02-27T10:00:00.001Z"])("parse '%s' is valid", (date) => {
+      expect(dateIsoStringSchema.parse(date)).toBe(
+        new Date(date).toISOString(),
       );
     });
   });

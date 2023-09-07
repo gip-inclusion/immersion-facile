@@ -20,11 +20,9 @@ export const timePeriodSchema: z.Schema<TimePeriodDto> = z.object({
 export const timePeriodsSchema: z.Schema<TimePeriodsDto> =
   z.array(timePeriodSchema);
 
-export const dateIsoStringSchema: z.Schema<DateIsoString> = (
-  z.date() as unknown as z.Schema<DateIsoString>
-) // necessary to avoid TS error: "Type 'Date' is not assignable to type 'string'"
-  .or(z.string())
-  .transform((arg) => new Date(arg).toISOString());
+export const dateIsoStringSchema: z.Schema<DateIsoString> = z
+  .string()
+  .datetime();
 
 export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
   date: dateIsoStringSchema,
