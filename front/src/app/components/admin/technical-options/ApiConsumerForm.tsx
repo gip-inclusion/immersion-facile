@@ -179,6 +179,7 @@ export const ApiConsumerForm = ({
                           selectedValues as AgencyKind[],
                         );
                       },
+                      defaultValue: values.rights.convention.scope.agencyKinds,
                       multiple: true,
                     }}
                     options={allAgencyListOfOptions}
@@ -195,6 +196,8 @@ export const ApiConsumerForm = ({
                       name: register("rights.convention.scope.agencyIds").name,
                       placeholder:
                         "Veuillez entrer une liste d'id d'agences, séparés par des virgules",
+                      defaultValue:
+                        values.rights.convention.scope.agencyIds?.join(", "),
                       onChange: (event) => {
                         setValue(
                           "rights.convention.scope.agencyIds",
