@@ -11,8 +11,8 @@ const defaultApiConsumer: ApiConsumer = {
     job: "tech",
     phone: "0611223344",
   },
-  createdAt: new Date(),
-  expirationDate: addYears(new Date(), 1),
+  createdAt: new Date().toISOString(),
+  expirationDate: addYears(new Date(), 1).toISOString(),
   rights: {
     searchEstablishment: {
       kinds: ["READ"],

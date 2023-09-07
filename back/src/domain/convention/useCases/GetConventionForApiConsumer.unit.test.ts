@@ -33,8 +33,8 @@ const createApiConsumer = (
   id: "my-api-consumer-id",
   description: "Some description",
   consumer: "pole-emploi",
-  createdAt: new Date(),
-  expirationDate: addYears(new Date(), 2),
+  createdAt: new Date().toISOString(),
+  expirationDate: addYears(new Date(), 2).toISOString(),
   contact: {
     firstName: "John",
     lastName: "Doe",
