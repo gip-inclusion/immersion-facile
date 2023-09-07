@@ -65,7 +65,7 @@ describe("Convention routes", () => {
 
   describe(`${displayRouteName(
     publicApiV2ConventionRoutes.getConventionById,
-  )} gets a convention from it's id`, () => {
+  )} gets a convention from its id`, () => {
     it("401 - fails without apiKey", async () => {
       const { body, status } = await sharedRequest.getConventionById({
         headers: { authorization: "" },
