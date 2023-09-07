@@ -105,7 +105,13 @@ export const TechnicalOptionsTab = () => {
     apiConsumerModal.open();
   };
 
-  const tableDataFromApiConsumers = apiConsumers.map((apiConsumer) => [
+  const sortedApiConsumers = [...apiConsumers].sort(
+    (apiConsumer1, apiConsumer2) =>
+      new Date(apiConsumer2.createdAt).getTime() -
+      new Date(apiConsumer1.createdAt).getTime(),
+  );
+
+  const tableDataFromApiConsumers = sortedApiConsumers.map((apiConsumer) => [
     formatApiConsumerName(apiConsumer.id, apiConsumer.consumer),
     formatApiConsumerDescription(apiConsumer.description),
     toDisplayedDate(new Date(apiConsumer.expirationDate), true),
