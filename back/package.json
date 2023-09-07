@@ -68,7 +68,7 @@
     "querystring": "^0.2.1",
     "ramda": "^0.28.0",
     "shared": "workspace:*",
-    "shared-routes": "^0.8.12",
+    "shared-routes": "^0.8.13",
     "ts-node": "^10.9.1",
     "ts-pattern": "4.2.2",
     "uuid": "^8.3.2",
