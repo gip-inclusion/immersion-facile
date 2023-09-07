@@ -56,7 +56,7 @@ export type PublicApiV2ConventionRoutes = typeof publicApiV2ConventionRoutes;
 export const publicApiV2ConventionRoutes = defineRoutes({
   getConventionById: defineRoute({
     method: "get",
-    url: "/v2/convention/:conventionId",
+    url: "/v2/conventions/:conventionId",
     ...withAuthorizationHeaders,
     responses: {
       200: conventionReadSchema,
