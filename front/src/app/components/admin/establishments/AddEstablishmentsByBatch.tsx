@@ -187,6 +187,18 @@ export const AddEstablishmentsByBatch = () => {
           }}
           state={errors.inputFile ? "error" : "default"}
           stateRelatedMessage={errors.inputFile ? "Ce champ est requis" : ""}
+          hintText={
+            <>
+              Pour vous aider à remplir le csv, vous pouvez vous baser sur{" "}
+              <a
+                href="https://immersion.cellar-c2.services.clever-cloud.com/example-batch-establishment.csv"
+                target="_blank"
+                rel="noreferrer"
+              >
+                notre template
+              </a>
+            </>
+          }
         />
 
         <Button
