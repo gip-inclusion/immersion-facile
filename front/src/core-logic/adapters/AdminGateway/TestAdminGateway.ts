@@ -16,8 +16,6 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 export class TestAdminGateway implements AdminGateway {
   public apiConsumers$ = new Subject<ApiConsumer[]>();
 
-  public createApiConsumersResponse$ = new Subject<ApiConsumerJwt>();
-
   public dashboardUrl$ = new Subject<AbsoluteUrl>();
 
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
@@ -30,6 +28,8 @@ export class TestAdminGateway implements AdminGateway {
     this.apiConsumers$;
 
   public lastNotifications$ = new Subject<NotificationsByKind>();
+
+  public saveApiConsumersResponse$ = new Subject<ApiConsumerJwt>();
 
   public setFeatureFlagLastCalledWith: SetFeatureFlagParam | undefined =
     undefined;
@@ -79,7 +79,7 @@ export class TestAdminGateway implements AdminGateway {
     _apiConsumer: ApiConsumer,
     _adminToken: BackOfficeJwt,
   ): Observable<ApiConsumerJwt> {
-    return this.createApiConsumersResponse$;
+    return this.saveApiConsumersResponse$;
   }
 
   public updateUserRoleForAgency$(

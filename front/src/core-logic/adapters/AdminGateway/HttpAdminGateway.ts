@@ -119,7 +119,7 @@ export class HttpAdminGateway implements AdminGateway {
   public saveApiConsumer$(
     apiConsumer: ApiConsumer,
     adminToken: BackOfficeJwt,
-  ): Observable<ApiConsumerJwt> {
+  ): Observable<ApiConsumerJwt | undefined> {
     return from(
       this.httpClient
         .saveApiConsumer({
@@ -127,7 +127,10 @@ export class HttpAdminGateway implements AdminGateway {
           headers: { authorization: adminToken },
         })
         .then((response) => {
-          if (response.status === 200) return response.body;
+          if (response.status === 200) {
+            if (response.body) return response.body;
+            return;
+          }
           throw new Error(JSON.stringify(response.body));
         }),
     );

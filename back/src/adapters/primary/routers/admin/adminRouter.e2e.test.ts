@@ -472,14 +472,10 @@ describe("Admin router", () => {
 
       const jwt = expectResponseAndReturnJwt(response, {
         status: 200,
-        body: expect.any(String),
+        body: "",
       })!;
 
-      const { id } = makeVerifyJwtES256<"apiConsumer">(
-        appConfig.apiJwtPublicKey,
-      )(jwt);
-
-      expectToEqual(id, authorizedUnJeuneUneSolutionApiConsumer.id);
+      expect(jwt).toBe("");
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, [
         updatedApiConsumer,
       ]);

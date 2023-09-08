@@ -15,7 +15,7 @@ import { GenerateApiConsumerJwt } from "../jwt";
 
 export class SaveApiConsumer extends TransactionalUseCase<
   ApiConsumer,
-  ApiConsumerJwt,
+  ApiConsumerJwt | undefined,
   BackOfficeDomainPayload
 > {
   protected inputSchema = apiConsumerSchema;
@@ -38,12 +38,17 @@ export class SaveApiConsumer extends TransactionalUseCase<
     input: ApiConsumer,
     uow: UnitOfWork,
     payload?: BackOfficeDomainPayload,
-  ): Promise<ApiConsumerJwt> {
+  ): Promise<ApiConsumerJwt | undefined> {
     if (!payload) throw new UnauthorizedError();
     if (payload.role !== "backOffice")
       throw new ForbiddenError(
         "Provided JWT payload does not have sufficient privileges. Received role: 'beneficiary'",
       );
+
+    const existingApiConsumer = await uow.apiConsumerRepository.getById(
+      input.id,
+    );
+    const isNewApiConsumer = !existingApiConsumer;
 
     await uow.apiConsumerRepository.save(input);
     await uow.outboxRepository.save(
@@ -53,8 +58,11 @@ export class SaveApiConsumer extends TransactionalUseCase<
       }),
     );
 
-    return this.#generateApiConsumerJwt({
-      id: input.id,
-    });
+    if (isNewApiConsumer)
+      return this.#generateApiConsumerJwt({
+        id: input.id,
+      });
+
+    return;
   }
 }

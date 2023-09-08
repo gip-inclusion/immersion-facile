@@ -44,5 +44,5 @@ export interface AdminGateway {
   saveApiConsumer$(
     apiConsumer: ApiConsumer,
     adminToken: BackOfficeJwt,
-  ): Observable<ApiConsumerJwt>;
+  ): Observable<ApiConsumerJwt | undefined>;
 }

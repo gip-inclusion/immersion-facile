@@ -4,7 +4,7 @@ import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 type ApiConsumerState = {
   isLoading: boolean;
-  feedback: SubmitFeedBack<"success" | "createSuccess">;
+  feedback: SubmitFeedBack<"fetchSuccess" | "createSuccess" | "updateSuccess">;
   apiConsumers: ApiConsumer[];
   lastCreatedToken: ApiConsumerJwt | null;
 };
@@ -32,7 +32,7 @@ export const apiConsumerSlice = createSlice({
     ) => {
       state.isLoading = false;
       state.apiConsumers = action.payload;
-      state.feedback = { kind: "success" };
+      state.feedback = { kind: "fetchSuccess" };
     },
     retrieveApiConsumersFailed: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
@@ -47,7 +47,7 @@ export const apiConsumerSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    saveApiConsumerSucceeded: (
+    createApiConsumerSucceeded: (
       state,
       action: PayloadAction<ApiConsumerJwt>,
     ) => {
@@ -55,12 +55,19 @@ export const apiConsumerSlice = createSlice({
       state.feedback = { kind: "createSuccess" };
       state.lastCreatedToken = action.payload;
     },
+    updateApiConsumerSucceeded: (state) => {
+      state.isLoading = false;
+      state.feedback = { kind: "updateSuccess" };
+    },
     saveApiConsumerFailed: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
     clearLastCreatedToken: (state) => {
       state.lastCreatedToken = null;
+    },
+    clearFeedbackTriggered: (state) => {
+      state.feedback = { kind: "idle" };
     },
   },
 });
