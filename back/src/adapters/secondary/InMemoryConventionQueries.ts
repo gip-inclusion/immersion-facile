@@ -87,9 +87,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .map((convention) => this.#addAgencyDataToConvention(convention));
   }
 
-  public async getConventionsByScope(
-    scope: ConventionScope,
-  ): Promise<ConventionReadDto[]> {
+  public async getConventionsByScope(params: {
+    scope: ConventionScope;
+    limit: number;
+  }): Promise<ConventionReadDto[]> {
     return Object.values(this.conventionRepository._conventions)
       .filter((convention) => {
         const agency = this.agencyRepository.agencies.find(
@@ -99,8 +100,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
         if (!agency) throw new NotFoundError("agency not found");
 
         return (
-          scope.agencyKinds?.includes(agency.kind) ||
-          scope.agencyIds?.includes(agency.id)
+          params.scope.agencyKinds?.includes(agency.kind) ||
+          params.scope.agencyIds?.includes(agency.id)
         );
       })
       .map((convention) => this.#addAgencyDataToConvention(convention));
