@@ -1,5 +1,5 @@
 export class RetryableError extends Error {
-  constructor(readonly initialError: Error) {
+  constructor(public readonly initialError: Error) {
     super();
     Object.setPrototypeOf(this, RetryableError.prototype);
   }
