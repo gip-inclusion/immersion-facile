@@ -27,5 +27,8 @@ export interface ConventionQueries {
     filters: GetConventionByFiltersQueries,
   ): Promise<ConventionReadDto[]>;
 
-  getConventionsByScope(scope: ConventionScope): Promise<ConventionReadDto[]>;
+  getConventionsByScope(params: {
+    scope: ConventionScope;
+    limit: number;
+  }): Promise<ConventionReadDto[]>;
 }

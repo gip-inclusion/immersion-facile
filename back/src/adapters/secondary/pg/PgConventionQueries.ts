@@ -68,15 +68,18 @@ export class PgConventionQueries implements ConventionQueries {
     });
   }
 
-  public async getConventionsByScope(
-    scope: ConventionScope,
-  ): Promise<ConventionReadDto[]> {
+  public async getConventionsByScope(params: {
+    scope: ConventionScope;
+    limit: number;
+  }): Promise<ConventionReadDto[]> {
     return this.getConventionsWhere({
+      limit: params.limit,
       whereClauses: [
-        scope.agencyKinds
-          ? format("agencies.kind IN (%1$L)", scope.agencyKinds)
-          : format("agencies.id IN (%1$L)", scope.agencyIds),
+        params.scope.agencyKinds
+          ? format("agencies.kind IN (%1$L)", params.scope.agencyKinds)
+          : format("agencies.id IN (%1$L)", params.scope.agencyIds),
       ].filter(filterNotFalsy),
+      orderByClause: "ORDER BY conventions.date_start DESC",
     });
   }
 

@@ -393,7 +393,8 @@ export const createOpenApiSpecV2 = (envType: string) =>
       getConventions: {
         summary:
           "Récupération de conventions filtrées sur le scope du consommateur de l'api",
-        description: "Renvoie les conventions correspondantes",
+        description: `Renvoie les conventions correspondantes.
+        Les résultats sont limités à 100 et triés par date décroissante de début d'immersion`,
         extraDocs: {
           responses: {
             "200": {
