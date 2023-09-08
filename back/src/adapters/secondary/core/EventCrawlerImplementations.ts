@@ -22,7 +22,7 @@ export class BasicEventCrawler implements EventCrawler {
 
   public async processNewEvents(): Promise<void> {
     const startDate = new Date();
-    const events = await this.retrieveEvents("unpublished");
+    const events = await this.#retrieveEvents("unpublished");
     const durationInSeconds = calculateDurationInSecondsFrom(startDate);
 
     if (events.length) {
@@ -34,10 +34,35 @@ export class BasicEventCrawler implements EventCrawler {
       });
     }
 
-    await this.publishEvents(events);
+    await this.#publishEvents(events);
   }
 
-  private async publishEvents(events: DomainEvent[]) {
+  public async retryFailedEvents(): Promise<void> {
+    const startDate = new Date();
+    const events = await this.#retrieveEvents("failed");
+    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+
+    if (events.length) {
+      logger.warn(
+        {
+          durationInSeconds,
+          typeOfEvents: "failed",
+          numberOfEvent: events.length,
+          events: eventsToDebugInfo(events),
+        },
+        `retryFailedEvents | ${events.length} events to process`,
+      );
+    }
+    await this.#publishEvents(events);
+  }
+
+  startCrawler() {
+    logger.warn(
+      "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
+    );
+  }
+
+  async #publishEvents(events: DomainEvent[]) {
     const eventGroups = splitEvery(maxEventsProcessedInParallel, events);
     for (const eventGroup of eventGroups) {
       await Promise.all(
@@ -46,7 +71,7 @@ export class BasicEventCrawler implements EventCrawler {
     }
   }
 
-  private async retrieveEvents(
+  async #retrieveEvents(
     type: "unpublished" | "failed",
   ): Promise<DomainEvent[]> {
     try {
@@ -71,31 +96,6 @@ export class BasicEventCrawler implements EventCrawler {
       });
       return [];
     }
-  }
-
-  public async retryFailedEvents(): Promise<void> {
-    const startDate = new Date();
-    const events = await this.retrieveEvents("failed");
-    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-
-    if (events.length) {
-      logger.warn(
-        {
-          durationInSeconds,
-          typeOfEvents: "failed",
-          numberOfEvent: events.length,
-          events: eventsToDebugInfo(events),
-        },
-        `retryFailedEvents | ${events.length} events to process`,
-      );
-    }
-    await this.publishEvents(events);
-  }
-
-  startCrawler() {
-    logger.warn(
-      "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
-    );
   }
 }
 
