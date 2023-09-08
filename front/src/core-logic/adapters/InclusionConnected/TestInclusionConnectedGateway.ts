@@ -10,11 +10,11 @@ export class TestInclusionConnectedGateway
 
   public registerAgenciesToCurrentUserResponse$ = new Subject<undefined>();
 
-  getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
+  public getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return this.currentUser$;
   }
 
-  registerAgenciesToCurrentUser$(
+  public registerAgenciesToCurrentUser$(
     _agencyIds: AgencyId[],
     _token: string,
   ): Observable<void> {

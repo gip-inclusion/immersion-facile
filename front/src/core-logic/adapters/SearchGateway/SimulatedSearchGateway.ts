@@ -86,19 +86,10 @@ export class SimulatedSearchGateway implements SearchGateway {
     searchParams: SearchQueryParamsDto,
   ): Observable<SearchResultDto[]> {
     if (this.#error) throw this.#error;
-    return this.simulateSearch(searchParams);
+    return this.#simulateSearch(searchParams);
   }
 
-  // test purpose
-  get searchResults$() {
-    return of(this.#seedResults ?? seedSearchResults);
-  }
-
-  setError(error: Error) {
-    this.#error = error;
-  }
-
-  private simulateSearch(searchParams: SearchQueryParamsDto) {
+  #simulateSearch(searchParams: SearchQueryParamsDto) {
     const results$ = of(this.#seedResults ?? seedSearchResults);
     if (searchParams.voluntaryToImmersion === undefined) return results$;
     return results$.pipe(

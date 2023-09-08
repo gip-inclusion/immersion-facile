@@ -17,11 +17,11 @@ export class SimulatedInclusionConnectedGateway
 {
   constructor(private simulatedLatency: number = 0) {}
 
-  getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
+  public getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return of(simulatedUserConnected);
   }
 
-  registerAgenciesToCurrentUser$(
+  public registerAgenciesToCurrentUser$(
     agencyIds: AgencyId[],
     _token: string,
   ): Observable<void> {

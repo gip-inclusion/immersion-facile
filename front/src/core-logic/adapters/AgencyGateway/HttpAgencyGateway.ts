@@ -58,7 +58,7 @@ export class HttpAgencyGateway implements AgencyGateway {
       .then(({ body }) => body);
   }
 
-  getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
+  public getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
     return from(
       this.httpClient.getImmersionFacileAgencyId().then(({ body }) => body),
     );
@@ -118,7 +118,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     return this.getFilteredAgencies(request);
   }
 
-  listMiniStageAgencies(
+  public listMiniStageAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {

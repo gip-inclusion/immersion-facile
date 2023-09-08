@@ -10,58 +10,10 @@ import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 export class InMemoryAddressGateway implements AddressGateway {
   constructor(private simulatedLatencyMs: number | undefined = undefined) {}
 
-  private async lookupLocation(
-    query: LookupLocationInput,
-  ): Promise<LookupSearchResult[]> {
-    if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
-
-    if (query === "givemeanemptylistplease") return [];
-    if (query === "givemeanerrorplease") throw new Error("418 I'm a teapot");
-
-    const testLocationSet = [
-      {
-        label: "Baralle, Pas-de-Calais, France",
-        position: {
-          lat: 50.21132,
-          lon: 3.05763,
-        },
-      },
-      {
-        label: "Paris, Pas-de-Calais, France",
-        position: {
-          lat: 50.07605,
-          lon: 2.93402,
-        },
-      },
-      {
-        label: "Poitiers, Vienne, France",
-        position: {
-          lat: 50.25129,
-          lon: 2.54786,
-        },
-      },
-      {
-        label: "Saint-Emilion, Pas-de-Calais, France",
-        position: {
-          lat: 50.45684,
-          lon: 2.61748,
-        },
-      },
-      {
-        label: "Uzerches, Meuse, France",
-        position: {
-          lat: 48.77127,
-          lon: 5.16238,
-        },
-      },
-    ];
-    return testLocationSet;
-  }
-
   public lookupLocation$(
     query: LookupLocationInput,
   ): Observable<LookupSearchResult[]> {
-    return from(this.lookupLocation(query));
+    return from(this.#lookupLocation(query));
   }
 
   public async lookupStreetAddress(
@@ -112,5 +64,53 @@ export class InMemoryAddressGateway implements AddressGateway {
         position: { lat: 45.5, lon: 1.9 },
       },
     ];
+  }
+
+  async #lookupLocation(
+    query: LookupLocationInput,
+  ): Promise<LookupSearchResult[]> {
+    if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
+
+    if (query === "givemeanemptylistplease") return [];
+    if (query === "givemeanerrorplease") throw new Error("418 I'm a teapot");
+
+    const testLocationSet = [
+      {
+        label: "Baralle, Pas-de-Calais, France",
+        position: {
+          lat: 50.21132,
+          lon: 3.05763,
+        },
+      },
+      {
+        label: "Paris, Pas-de-Calais, France",
+        position: {
+          lat: 50.07605,
+          lon: 2.93402,
+        },
+      },
+      {
+        label: "Poitiers, Vienne, France",
+        position: {
+          lat: 50.25129,
+          lon: 2.54786,
+        },
+      },
+      {
+        label: "Saint-Emilion, Pas-de-Calais, France",
+        position: {
+          lat: 50.45684,
+          lon: 2.61748,
+        },
+      },
+      {
+        label: "Uzerches, Meuse, France",
+        position: {
+          lat: 48.77127,
+          lon: 5.16238,
+        },
+      },
+    ];
+    return testLocationSet;
   }
 }

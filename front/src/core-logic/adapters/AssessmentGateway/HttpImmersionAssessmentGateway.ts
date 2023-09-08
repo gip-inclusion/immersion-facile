@@ -11,7 +11,10 @@ export class HttpImmersionAssessmentGateway
 {
   constructor(private readonly httpClient: AxiosInstance) {}
 
-  createAssessment({ jwt, assessment }: AssessmentAndJwt): Observable<void> {
+  public createAssessment({
+    jwt,
+    assessment,
+  }: AssessmentAndJwt): Observable<void> {
     return from(
       this.httpClient
         .post<void>(`/auth/${immersionAssessmentRoute}`, assessment, {

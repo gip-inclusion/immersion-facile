@@ -36,7 +36,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     );
   }
 
-  isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
+  public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
     return from(
       this.httpClient
         .isSiretAlreadySaved({ urlParams: { siret } })
