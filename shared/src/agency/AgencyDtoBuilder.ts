@@ -31,8 +31,11 @@ const emptyAgency: AgencyDto = {
 };
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {
-  // Initializes all feature flags to be off.
-  constructor(readonly agency: AgencyDto = emptyAgency) {}
+  readonly #agency: AgencyDto;
+
+  constructor(agency: AgencyDto = emptyAgency) {
+    this.#agency = agency;
+  }
 
   public static create(id?: AgencyId) {
     return new AgencyDtoBuilder({
@@ -46,75 +49,75 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
   }
 
   public build() {
-    return this.agency;
+    return this.#agency;
   }
 
   public withAddress(address: AddressDto) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       address,
     });
   }
 
   public withAdminEmails(adminEmails: string[]) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       adminEmails,
     });
   }
 
   public withAgencySiret(siret: string) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       agencySiret: siret,
     });
   }
 
   public withCodeSafir(code: string) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       codeSafir: code,
     });
   }
 
   public withCounsellorEmails(counsellorEmails: Email[]) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       counsellorEmails,
     });
   }
 
   public withId(id: AgencyId) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       id,
     });
   }
 
   public withKind(kind: AgencyKind) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       kind,
     });
   }
 
   public withLogoUrl(logoUrl?: AbsoluteUrl) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       logoUrl,
     });
   }
 
   public withName(name: string) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       name,
     });
   }
 
   public withPosition(lat: number, lon: number) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       position: {
         lat,
         lon,
@@ -124,28 +127,28 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
 
   public withQuestionnaireUrl(questionnaireUrl: string) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       questionnaireUrl,
     });
   }
 
   public withSignature(signature: string) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       signature,
     });
   }
 
   public withStatus(status: AgencyStatus) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       status,
     });
   }
 
   public withValidatorEmails(validatorEmails: Email[]) {
     return new AgencyDtoBuilder({
-      ...this.agency,
+      ...this.#agency,
       validatorEmails,
     });
   }
