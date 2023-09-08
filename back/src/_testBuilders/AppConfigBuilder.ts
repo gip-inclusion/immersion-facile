@@ -30,40 +30,40 @@ const defaultConfigParams = {
 
 // See "Working with AppConfig" in back/README.md for more details.
 export class AppConfigBuilder implements Builder<AppConfig> {
-  private readonly configParams: ProcessEnv;
+  readonly #configParams: ProcessEnv;
 
   constructor(configParams: ProcessEnv = {}) {
-    this.configParams = { ...defaultConfigParams, ...configParams };
+    this.#configParams = { ...defaultConfigParams, ...configParams };
   }
 
   public build() {
-    return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);
+    return AppConfig.createFromEnv(/* readDotEnv= */ false, this.#configParams);
   }
 
   public withAuthorizedApiKeyIds(authorizedApiKeyIds: string[]) {
     return new AppConfigBuilder({
-      ...this.configParams,
+      ...this.#configParams,
       AUTHORIZED_API_KEY_IDS: authorizedApiKeyIds.join(","),
     });
   }
 
   public withConfigParams(configParams: ProcessEnv) {
     return new AppConfigBuilder({
-      ...this.configParams,
+      ...this.#configParams,
       ...configParams,
     });
   }
 
   public withRepositories(REPOSITORIES: string) {
     return new AppConfigBuilder({
-      ...this.configParams,
+      ...this.#configParams,
       REPOSITORIES,
     });
   }
 
   public withTestPresetPreviousKeys() {
     return new AppConfigBuilder({
-      ...this.configParams,
+      ...this.#configParams,
       JWT_PREVIOUS_PUBLIC_KEY:
         "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXM1fwl4kRy3ivmtJt2CdLTDx/HgS\nOeLqLQ+q+pqjLnsCJaQtiiy7kceujtxAhZcJBSh0QFBoq8JsuaZxNrrBpg==\n-----END PUBLIC KEY-----",
 
