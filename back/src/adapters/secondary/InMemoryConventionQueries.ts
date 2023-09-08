@@ -10,7 +10,7 @@ import {
 } from "shared";
 import {
   ConventionQueries,
-  GetConventionByFiltersQueries,
+  GetConventionsByFiltersQueries,
 } from "../../domain/convention/ports/ConventionQueries";
 import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../primary/helpers/httpErrors";
@@ -59,37 +59,18 @@ export class InMemoryConventionQueries implements ConventionQueries {
     return this.#addAgencyDataToConvention(convention);
   }
 
-  public async getConventionsByFilters({
-    startDateGreater,
-    startDateLessOrEqual,
-    withStatuses,
-  }: GetConventionByFiltersQueries): Promise<ConventionReadDto[]> {
+  public async getConventionsByFilters(
+    filters: GetConventionsByFiltersQueries,
+  ): Promise<ConventionReadDto[]> {
     return Object.values(this.conventionRepository._conventions)
-      .filter((convention) => {
-        if (
-          startDateLessOrEqual &&
-          new Date(convention.dateStart) > startDateLessOrEqual
-        )
-          return false;
-        if (
-          startDateGreater &&
-          new Date(convention.dateStart) <= startDateGreater
-        )
-          return false;
-        if (
-          withStatuses &&
-          withStatuses.length > 0 &&
-          !withStatuses.includes(convention.status)
-        )
-          return false;
-        return true;
-      })
+      .filter(makeApplyFiltersToConventions(filters))
       .map((convention) => this.#addAgencyDataToConvention(convention));
   }
 
   public async getConventionsByScope(params: {
     scope: ConventionScope;
     limit: number;
+    filters: GetConventionsByFiltersQueries;
   }): Promise<ConventionReadDto[]> {
     return Object.values(this.conventionRepository._conventions)
       .filter((convention) => {
@@ -104,6 +85,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           params.scope.agencyIds?.includes(agency.id)
         );
       })
+      .filter(makeApplyFiltersToConventions(params.filters))
       .map((convention) => this.#addAgencyDataToConvention(convention));
   }
 
@@ -133,3 +115,26 @@ export class InMemoryConventionQueries implements ConventionQueries {
     };
   };
 }
+
+const makeApplyFiltersToConventions =
+  ({
+    startDateLessOrEqual,
+    startDateGreater,
+    withStatuses,
+  }: GetConventionsByFiltersQueries) =>
+  (convention: ConventionDto) => {
+    if (
+      startDateLessOrEqual &&
+      new Date(convention.dateStart) > startDateLessOrEqual
+    )
+      return false;
+    if (startDateGreater && new Date(convention.dateStart) <= startDateGreater)
+      return false;
+    if (
+      withStatuses &&
+      withStatuses.length > 0 &&
+      !withStatuses.includes(convention.status)
+    )
+      return false;
+    return true;
+  };

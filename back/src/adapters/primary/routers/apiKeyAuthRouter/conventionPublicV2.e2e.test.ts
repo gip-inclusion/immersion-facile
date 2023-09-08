@@ -140,6 +140,7 @@ describe("Convention routes", () => {
     it("401 - fails without apiKey", async () => {
       const response = await sharedRequest.getConventions({
         headers: { authorization: "" },
+        queryParams: {},
       });
 
       expectToEqual(response, {
@@ -154,6 +155,7 @@ describe("Convention routes", () => {
     it("403 when the apiConsumer does not READ access on convention", async () => {
       const response = await sharedRequest.getConventions({
         headers: { authorization: conventionUnauthorizedConsumerToken },
+        queryParams: {},
       });
 
       expectToEqual(response, {
@@ -178,6 +180,7 @@ describe("Convention routes", () => {
         headers: {
           authorization: conventionReadConsumerWithAgencyIdsScopeToken,
         },
+        queryParams: {},
       });
 
       expectToEqual(response, {

@@ -25,6 +25,7 @@ const agencyMissionLocale = new AgencyDtoBuilder()
 const conventionPoleEmploi = new ConventionDtoBuilder()
   .withId("convention-pole-emploi-id")
   .withAgencyId(agencyPoleEmploi.id)
+  .withStatus("IN_REVIEW")
   .build();
 const conventionMissionLocale = new ConventionDtoBuilder()
   .withId("convention-mission-locale-id")
@@ -50,7 +51,7 @@ describe("Get Conventions for ApiConsumer", () => {
   describe("Forbidden error", () => {
     it("When no api consumer is provided", async () => {
       await expectPromiseToFailWithError(
-        getConventionsForApiConsumer.execute(),
+        getConventionsForApiConsumer.execute({}),
         new ForbiddenError("No api consumer provided"),
       );
     });
@@ -69,7 +70,7 @@ describe("Get Conventions for ApiConsumer", () => {
           .build();
 
         const conventions = await getConventionsForApiConsumer.execute(
-          undefined,
+          {},
           apiConsumer,
         );
 
@@ -87,7 +88,33 @@ describe("Get Conventions for ApiConsumer", () => {
           .build();
 
         const retrievedConventions = await getConventionsForApiConsumer.execute(
-          undefined,
+          {},
+          apiConsumer,
+        );
+
+        expectToEqual(retrievedConventions, [
+          {
+            ...conventionPoleEmploi,
+            agencyName: agencyPoleEmploi.name,
+            agencyDepartment: agencyPoleEmploi.address.departmentCode,
+          },
+        ]);
+      });
+
+      it("return convention matching agencyKinds with status IN_REVIEW", async () => {
+        const apiConsumer = new ApiConsumerBuilder()
+          .withConventionRight({
+            scope: {
+              agencyKinds: ["pole-emploi", "mission-locale"],
+            },
+            kinds: ["READ"],
+          })
+          .build();
+
+        const retrievedConventions = await getConventionsForApiConsumer.execute(
+          {
+            withStatuses: ["IN_REVIEW"],
+          },
           apiConsumer,
         );
 
@@ -113,7 +140,7 @@ describe("Get Conventions for ApiConsumer", () => {
           .build();
 
         const conventions = await getConventionsForApiConsumer.execute(
-          undefined,
+          {},
           apiConsumer,
         );
 
@@ -131,7 +158,7 @@ describe("Get Conventions for ApiConsumer", () => {
           .build();
 
         const retrievedConventions = await getConventionsForApiConsumer.execute(
-          undefined,
+          {},
           apiConsumer,
         );
 

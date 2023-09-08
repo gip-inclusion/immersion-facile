@@ -12,7 +12,7 @@ import {
 } from "shared";
 import {
   ConventionQueries,
-  GetConventionByFiltersQueries,
+  GetConventionsByFiltersQueries,
 } from "../../../domain/convention/ports/ConventionQueries";
 import {
   getReadConventionById,
@@ -48,33 +48,24 @@ export class PgConventionQueries implements ConventionQueries {
     return getReadConventionById(this.client, id);
   }
 
-  getConventionsByFilters({
-    startDateGreater,
-    startDateLessOrEqual,
-    withStatuses,
-  }: GetConventionByFiltersQueries): Promise<ConventionReadDto[]> {
+  getConventionsByFilters(
+    filters: GetConventionsByFiltersQueries,
+  ): Promise<ConventionReadDto[]> {
     return this.getConventionsWhere({
-      whereClauses: [
-        withStatuses && withStatuses.length > 0
-          ? format("conventions.status IN (%1$L)", withStatuses)
-          : undefined,
-        startDateLessOrEqual
-          ? format("conventions.date_start::date <= %1$L", startDateLessOrEqual)
-          : undefined,
-        startDateGreater
-          ? format("conventions.date_start::date > %1$L", startDateGreater)
-          : undefined,
-      ].filter(filterNotFalsy),
+      whereClauses:
+        makeQueryWhereClauseFromFilters(filters).filter(filterNotFalsy),
     });
   }
 
   public async getConventionsByScope(params: {
     scope: ConventionScope;
     limit: number;
+    filters: GetConventionsByFiltersQueries;
   }): Promise<ConventionReadDto[]> {
     return this.getConventionsWhere({
       limit: params.limit,
       whereClauses: [
+        ...makeQueryWhereClauseFromFilters(params.filters),
         params.scope.agencyKinds
           ? format("agencies.kind IN (%1$L)", params.scope.agencyKinds)
           : format("agencies.id IN (%1$L)", params.scope.agencyIds),
@@ -131,3 +122,19 @@ export class PgConventionQueries implements ConventionQueries {
     return format("conventions.date_end::date = %1$L", dateEnd);
   }
 }
+
+const makeQueryWhereClauseFromFilters = ({
+  startDateGreater,
+  startDateLessOrEqual,
+  withStatuses,
+}: GetConventionsByFiltersQueries) => [
+  withStatuses && withStatuses.length > 0
+    ? format("conventions.status IN (%1$L)", withStatuses)
+    : undefined,
+  startDateLessOrEqual
+    ? format("conventions.date_start::date <= %1$L", startDateLessOrEqual)
+    : undefined,
+  startDateGreater
+    ? format("conventions.date_start::date > %1$L", startDateGreater)
+    : undefined,
+];
