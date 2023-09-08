@@ -20,25 +20,25 @@ const defaultFlags: FeatureFlags = {
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
-  private readonly featureFlags: FeatureFlags;
+  readonly #featureFlags: FeatureFlags;
 
   constructor(featureFlags: Partial<FeatureFlags> = {}) {
-    this.featureFlags = { ...defaultFlags, ...featureFlags };
+    this.#featureFlags = { ...defaultFlags, ...featureFlags };
   }
 
-  async getAll(): Promise<FeatureFlags> {
-    return this.featureFlags;
+  public async getAll(): Promise<FeatureFlags> {
+    return this.#featureFlags;
   }
 
-  async insert(flags: FeatureFlags): Promise<void> {
+  public async insert(flags: FeatureFlags): Promise<void> {
     keys(flags).forEach((flagName) => {
-      this.featureFlags[flagName] = flags[flagName];
+      this.#featureFlags[flagName] = flags[flagName];
     });
   }
 
-  async update(params: SetFeatureFlagParam): Promise<void> {
-    this.featureFlags[params.flagName] = {
-      ...this.featureFlags[params.flagName],
+  public async update(params: SetFeatureFlagParam): Promise<void> {
+    this.#featureFlags[params.flagName] = {
+      ...this.#featureFlags[params.flagName],
       ...(params.flagContent as any),
     };
   }
