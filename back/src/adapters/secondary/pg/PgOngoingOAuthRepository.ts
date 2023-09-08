@@ -20,7 +20,7 @@ type PersistenceOngoingOAuth = {
 export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   constructor(private client: PoolClient) {}
 
-  async findByState(
+  public async findByState(
     state: string,
     provider: "inclusionConnect",
   ): Promise<OngoingOAuth | undefined> {
@@ -30,7 +30,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
         `,
       [state, provider],
     );
-    return this.toOngoingOAuth(response.rows[0]);
+    return this.#toOngoingOAuth(response.rows[0]);
   }
 
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
@@ -55,9 +55,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
     }
   }
 
-  private toOngoingOAuth(
-    raw?: PersistenceOngoingOAuth,
-  ): OngoingOAuth | undefined {
+  #toOngoingOAuth(raw?: PersistenceOngoingOAuth): OngoingOAuth | undefined {
     if (!raw) return;
     return {
       state: raw.state,
