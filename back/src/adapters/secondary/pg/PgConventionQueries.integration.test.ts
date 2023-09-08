@@ -2,6 +2,8 @@ import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
+  AgencyId,
+  AgencyKind,
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
@@ -18,8 +20,10 @@ import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 
-const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-const idB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
+const conventionIdA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+const conventionIdB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
+const agencyIdA: AgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+const agencyIdB: AgencyId = "bbbbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
@@ -52,23 +56,91 @@ describe("Pg implementation of ConventionQueries", () => {
 
   describe("PG implementation of method getConventionById", () => {
     it("Returns undefined if no convention with such id", async () => {
-      expect(await conventionQueries.getConventionById(idA)).toBeUndefined();
+      expect(
+        await conventionQueries.getConventionById(conventionIdA),
+      ).toBeUndefined();
     });
 
     it("Retrieves a convention by id exists", async () => {
       // Prepare
       const expectedConventionRead = await insertAgencyAndConvention(
-        idA,
-        idA,
+        conventionIdA,
+        conventionIdA,
         "agency A",
         "75",
+        "autre",
       );
 
       // Act
-      const result = await conventionQueries.getConventionById(idA);
+      const result = await conventionQueries.getConventionById(conventionIdA);
 
       // Assert
       expectToEqual(result, expectedConventionRead);
+    });
+  });
+
+  describe("PG implementation of method getConventionsByScope", () => {
+    let poleEmploiConvention: ConventionReadDto;
+    let cciConvention: ConventionReadDto;
+
+    beforeEach(async () => {
+      poleEmploiConvention = await insertAgencyAndConvention(
+        conventionIdA,
+        agencyIdA,
+        "agency PE",
+        "75",
+        "pole-emploi",
+      );
+      cciConvention = await insertAgencyAndConvention(
+        conventionIdB,
+        agencyIdB,
+        "agency CCI",
+        "75",
+        "cci",
+      );
+      await insertAgencyAndConvention(
+        "cccccc99-9c0b-1bbb-bb6d-6bb9bd38bbbb",
+        "cccccccc-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        "agency Mission Locale",
+        "75",
+        "mission-locale",
+      );
+    });
+
+    describe("when only agencyKinds", () => {
+      it("return empty array when no convention matching agencyKinds", async () => {
+        const result = await conventionQueries.getConventionsByScope({
+          agencyKinds: ["conseil-departemental"],
+        });
+
+        expectToEqual(result, []);
+      });
+
+      it("return conventions matching agencyKinds", async () => {
+        const result = await conventionQueries.getConventionsByScope({
+          agencyKinds: ["pole-emploi", "cci"],
+        });
+
+        expectToEqual(result, [poleEmploiConvention, cciConvention]);
+      });
+    });
+
+    describe("when only agencyIds", () => {
+      it("return empty array when no convention matching agencyIds", async () => {
+        const result = await conventionQueries.getConventionsByScope({
+          agencyIds: ["ccaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"],
+        });
+
+        expectToEqual(result, []);
+      });
+
+      it("return conventions matching agencyIds", async () => {
+        const result = await conventionQueries.getConventionsByScope({
+          agencyIds: [agencyIdA, agencyIdB],
+        });
+
+        expectToEqual(result, [poleEmploiConvention, cciConvention]);
+      });
     });
   });
 
@@ -76,8 +148,20 @@ describe("Pg implementation of ConventionQueries", () => {
     it("Gets all saved conventionAdminDtos", async () => {
       // Prepare
       const insertedConventionReadDtos = await Promise.all([
-        insertAgencyAndConvention(idA, idA, "agency A", "75"),
-        insertAgencyAndConvention(idB, idB, "agency B", "76"),
+        insertAgencyAndConvention(
+          conventionIdA,
+          conventionIdA,
+          "agency A",
+          "75",
+          "autre",
+        ),
+        insertAgencyAndConvention(
+          conventionIdB,
+          conventionIdB,
+          "agency B",
+          "76",
+          "autre",
+        ),
       ]);
       // Act
       const resultAll = await conventionQueries.getLatestConventions({});
@@ -89,13 +173,25 @@ describe("Pg implementation of ConventionQueries", () => {
     it("Gets only convention of a given agency", async () => {
       // Prepare
       const insertedConventionReadDtos = await Promise.all([
-        insertAgencyAndConvention(idA, idA, "agency A", "75"),
-        insertAgencyAndConvention(idB, idB, "agency B", "76"),
+        insertAgencyAndConvention(
+          conventionIdA,
+          conventionIdA,
+          "agency A",
+          "75",
+          "autre",
+        ),
+        insertAgencyAndConvention(
+          conventionIdB,
+          conventionIdB,
+          "agency B",
+          "76",
+          "autre",
+        ),
       ]);
 
       // Act
       const resultAll = await conventionQueries.getLatestConventions({
-        agencyId: idA,
+        agencyId: conventionIdA,
       });
 
       // Assert
@@ -335,6 +431,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyId: string,
     agencyName: string,
     agencyDepartment: string,
+    agencyKind: AgencyKind,
   ): Promise<ConventionReadDto> => {
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
@@ -395,6 +492,7 @@ describe("Pg implementation of ConventionQueries", () => {
           postcode: "75017",
           streetNumberAndAddress: "Avenue des champs Elysées",
         })
+        .withKind(agencyKind)
         .build(),
     );
 
