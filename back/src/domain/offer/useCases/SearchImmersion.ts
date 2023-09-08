@@ -39,8 +39,7 @@ export class SearchImmersion extends TransactionalUseCase<
       appellationCode,
       sortedBy,
       voluntaryToImmersion,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ...rest
+      rome,
     }: SearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
@@ -53,6 +52,7 @@ export class SearchImmersion extends TransactionalUseCase<
       voluntaryToImmersion,
       place,
       appellationCode,
+      romeCode: rome,
     };
 
     await uow.searchMadeRepository.insertSearchMade({

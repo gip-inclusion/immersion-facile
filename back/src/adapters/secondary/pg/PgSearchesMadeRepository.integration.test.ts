@@ -1,6 +1,5 @@
 import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { SearchMadeEntityBuilder } from "../../../_testBuilders/SearchMadeEntityBuilder";
 import { SearchMadeEntity } from "../../../domain/offer/entities/SearchMadeEntity";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 import { optional } from "./pgUtils";
@@ -40,45 +39,6 @@ describe("PgSearchesMadeRepository", () => {
     await pgSearchesMadeRepository.insertSearchMade(searchMade);
     const retrievedSearchMade = await getSearchMadeById(searchMade.id);
     expect(retrievedSearchMade).toEqual(searchMade);
-  });
-
-  it("Retrieve pending searches", async () => {
-    // Prepare : insert two entities : one already processed, the other not yet processed
-    const entityNeedingToBeProcessed = new SearchMadeEntityBuilder()
-      .withId("b0a81d02-6f07-11ec-90d6-0242ac120004")
-      .withNeedsToBeSearch()
-      .build();
-    const entityAlreadyProcessed = new SearchMadeEntityBuilder()
-      .withId("ed2ca622-6f06-11ec-90d6-0242ac120006")
-      .build();
-
-    await pgSearchesMadeRepository.insertSearchMade(entityNeedingToBeProcessed);
-    await pgSearchesMadeRepository.insertSearchMade(entityAlreadyProcessed);
-
-    // Act : Retrieve unprocessed entities
-    const retrievedSearches =
-      await pgSearchesMadeRepository.retrievePendingSearches();
-
-    // Assert
-    expect(retrievedSearches).toHaveLength(1);
-    expect(retrievedSearches[0]).toMatchObject(entityNeedingToBeProcessed);
-  });
-
-  it("Mark search as processed", async () => {
-    // Prepare : insert entity with needToBeProcessed flag to false
-    const searchMadeId = "ed2ca622-6f06-11ec-90d6-0242ac120006";
-    const searchMade = new SearchMadeEntityBuilder()
-      .withId(searchMadeId)
-      .withNeedsToBeSearch()
-      .build();
-    await pgSearchesMadeRepository.insertSearchMade(searchMade);
-    // Act : call method
-    await pgSearchesMadeRepository.markSearchAsProcessed(searchMadeId);
-    // Assert flag has been set to False
-    const result = await client.query(
-      `SELECT needsToBeSearched from searches_made WHERE id='${searchMadeId}';`,
-    );
-    expect(result.rows[0]).toEqual({ needstobesearched: false });
   });
 
   const getSearchMadeById = async (

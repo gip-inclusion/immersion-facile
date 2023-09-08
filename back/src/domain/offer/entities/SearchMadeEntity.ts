@@ -4,6 +4,7 @@ export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
 export type SearchMade = {
   appellationCode?: string;
+  romeCode?: string;
   distanceKm: number;
   lat: number;
   lon: number;

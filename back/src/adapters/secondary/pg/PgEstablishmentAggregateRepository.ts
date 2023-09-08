@@ -397,9 +397,10 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
-    const romeCode = await this.#getRomeCodeFromAppellationCode(
-      searchMade.appellationCode,
-    );
+    const romeCode =
+      searchMade.romeCode ??
+      (await this.#getRomeCodeFromAppellationCode(searchMade.appellationCode));
+
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
