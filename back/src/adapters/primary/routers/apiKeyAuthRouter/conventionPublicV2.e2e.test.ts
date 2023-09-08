@@ -109,6 +109,21 @@ describe("Convention routes", () => {
       expectToEqual(status, 403);
     });
 
+    it("403 when the consumer has no READ access to convention", async () => {
+      const response = await sharedRequest.getConventionById({
+        headers: { authorization: conventionUnauthorizedConsumerToken },
+        urlParams: { conventionId: convention.id },
+      });
+
+      expectToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: "Accès refusé",
+        },
+      });
+    });
+
     it("returns 200 with the convention", async () => {
       inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions({

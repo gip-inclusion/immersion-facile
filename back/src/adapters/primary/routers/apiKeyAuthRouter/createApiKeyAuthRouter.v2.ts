@@ -102,14 +102,23 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   conventionV2Router.getConventionById((req, res) =>
-    sendHttpResponseForApiV2(req, res, async () =>
-      deps.useCases.getConventionForApiConsumer.execute(
+    sendHttpResponseForApiV2(req, res, async () => {
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer: req.apiConsumer,
+          rightName: "convention",
+          consumerKind: "READ",
+        })
+      ) {
+        throw new ForbiddenError();
+      }
+      return deps.useCases.getConventionForApiConsumer.execute(
         {
           conventionId: req.params.conventionId,
         },
         req.apiConsumer,
-      ),
-    ),
+      );
+    }),
   );
 
   conventionV2Router.getConventions((req, res) =>
