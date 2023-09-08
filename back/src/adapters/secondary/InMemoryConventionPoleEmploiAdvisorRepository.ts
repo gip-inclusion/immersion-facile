@@ -12,25 +12,16 @@ import { NotFoundError } from "../primary/helpers/httpErrors";
 export class InMemoryConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository
 {
-  private _conventionPoleEmploiUsersAdvisors: ConventionPoleEmploiUserAdvisorEntity[] =
+  #conventionPoleEmploiUsersAdvisors: ConventionPoleEmploiUserAdvisorEntity[] =
     [];
-
-  private upsertWithClosedConvention = (
-    oldEntity: ConventionPoleEmploiUserAdvisorEntity,
-    newEntity: ConventionPoleEmploiUserAdvisorEntity,
-  ): void => {
-    this._conventionPoleEmploiUsersAdvisors[
-      this._conventionPoleEmploiUsersAdvisors.indexOf(oldEntity)
-    ] = newEntity;
-  };
 
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
     peExternalId: PeExternalId,
   ): Promise<ConventionAndPeExternalIds> {
     const entity: ConventionPoleEmploiUserAdvisorEntity =
-      await this.getAlreadyOpenIfExist(peExternalId);
-    this.upsertWithClosedConvention(entity, {
+      await this.#getAlreadyOpenIfExist(peExternalId);
+    this.#upsertWithClosedConvention(entity, {
       ...entity,
       conventionId,
     });
@@ -43,26 +34,13 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
 
   //test purposes only
   public get conventionPoleEmploiUsersAdvisors() {
-    return this._conventionPoleEmploiUsersAdvisors;
-  }
-
-  private async getAlreadyOpenIfExist(
-    peExternalId: PeExternalId,
-  ): Promise<ConventionPoleEmploiUserAdvisorEntity> {
-    const entity: ConventionPoleEmploiUserAdvisorEntity | undefined =
-      this._conventionPoleEmploiUsersAdvisors
-        .filter(matchPeExternalId(peExternalId))
-        .find(isOpenEntity);
-    if (entity) return entity;
-    throw new NotFoundError(
-      "There is no open pole emploi advisor entity linked to this OAuth peExternalId",
-    );
+    return this.#conventionPoleEmploiUsersAdvisors;
   }
 
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
-    return this._conventionPoleEmploiUsersAdvisors.find(
+    return this.#conventionPoleEmploiUsersAdvisors.find(
       matchConventionId(conventionId),
     );
   }
@@ -70,7 +48,7 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
   public async openSlotForNextConvention(
     peUserAndAdvisor: PeUserAndAdvisor,
   ): Promise<void> {
-    this._conventionPoleEmploiUsersAdvisors.push({
+    this.#conventionPoleEmploiUsersAdvisors.push({
       advisor: peUserAndAdvisor.advisor,
       conventionId: CONVENTION_ID_DEFAULT_UUID,
       peExternalId: peUserAndAdvisor.user.peExternalId,
@@ -82,9 +60,31 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
   public setConventionPoleEmploiUsersAdvisor(
     conventionPoleEmploiUserAdvisorEntities: ConventionPoleEmploiUserAdvisorEntity[],
   ) {
-    this._conventionPoleEmploiUsersAdvisors =
+    this.#conventionPoleEmploiUsersAdvisors =
       conventionPoleEmploiUserAdvisorEntities;
   }
+
+  async #getAlreadyOpenIfExist(
+    peExternalId: PeExternalId,
+  ): Promise<ConventionPoleEmploiUserAdvisorEntity> {
+    const entity: ConventionPoleEmploiUserAdvisorEntity | undefined =
+      this.#conventionPoleEmploiUsersAdvisors
+        .filter(matchPeExternalId(peExternalId))
+        .find(isOpenEntity);
+    if (entity) return entity;
+    throw new NotFoundError(
+      "There is no open pole emploi advisor entity linked to this OAuth peExternalId",
+    );
+  }
+
+  #upsertWithClosedConvention = (
+    oldEntity: ConventionPoleEmploiUserAdvisorEntity,
+    newEntity: ConventionPoleEmploiUserAdvisorEntity,
+  ): void => {
+    this.#conventionPoleEmploiUsersAdvisors[
+      this.#conventionPoleEmploiUsersAdvisors.indexOf(oldEntity)
+    ] = newEntity;
+  };
 }
 
 export const CONVENTION_ID_DEFAULT_UUID =
