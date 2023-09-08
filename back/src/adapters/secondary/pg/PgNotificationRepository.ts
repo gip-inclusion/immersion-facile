@@ -24,7 +24,7 @@ export class PgNotificationRepository implements NotificationRepository {
     private maxRetrievedNotifications: number = 30,
   ) {}
 
-  async deleteAllEmailAttachements(): Promise<number> {
+  public async deleteAllEmailAttachements(): Promise<number> {
     const deletedContent = "deleted-content";
     const response = await this.client.query(
       `
@@ -36,15 +36,15 @@ export class PgNotificationRepository implements NotificationRepository {
     return response.rowCount;
   }
 
-  async getByIdAndKind(
+  public async getByIdAndKind(
     id: NotificationId,
     kind: NotificationKind,
   ): Promise<Notification | undefined> {
     switch (kind) {
       case "sms":
-        return this.getSmsNotificationById(id);
+        return this.#getSmsNotificationById(id);
       case "email":
-        return this.getEmailNotificationById(id);
+        return this.#getEmailNotificationById(id);
       default:
         exhaustiveCheck(kind, {
           variableName: "notificationKind",
@@ -53,24 +53,7 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
-  private async getEmailNotificationById(
-    id: NotificationId,
-  ): Promise<EmailNotification> {
-    const response = await this.client.query(
-      `
-        SELECT ${buildEmailNotificationObject} as notif
-        FROM notifications_email e
-        LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
-        LEFT JOIN notifications_email_attachments a ON a.notifications_email_id = e.id
-        WHERE e.id = $1
-        GROUP BY e.id
-          `,
-      [id],
-    );
-    return response.rows[0]?.notif;
-  }
-
-  async getEmailsByFilters({
+  public async getEmailsByFilters({
     since,
     emailKind,
     email,
@@ -118,7 +101,7 @@ export class PgNotificationRepository implements NotificationRepository {
     return response.rows.map((row) => row.notif);
   }
 
-  async getLastNotifications(): Promise<NotificationsByKind> {
+  public async getLastNotifications(): Promise<NotificationsByKind> {
     const smsResponse = await this.client.query(
       `
         SELECT ${buildSmsNotificationObject} as notif
@@ -135,9 +118,32 @@ export class PgNotificationRepository implements NotificationRepository {
     };
   }
 
-  private async getSmsNotificationById(
-    id: NotificationId,
-  ): Promise<SmsNotification> {
+  public async save(notification: Notification): Promise<void> {
+    switch (notification.kind) {
+      case "sms":
+        return this.#saveSmsNotification(notification);
+      case "email": {
+        const recipients = uniq(notification.templatedContent.recipients);
+        return this.#saveEmailNotification({
+          ...notification,
+          templatedContent: {
+            ...notification.templatedContent,
+            recipients,
+            cc: uniq(notification.templatedContent.cc ?? []).filter(
+              (ccEmail) => !recipients.includes(ccEmail),
+            ),
+          },
+        });
+      }
+      default:
+        return exhaustiveCheck(notification, {
+          variableName: "notificationKind",
+          throwIfReached: true,
+        });
+    }
+  }
+
+  async #getSmsNotificationById(id: NotificationId): Promise<SmsNotification> {
     const response = await this.client.query(
       `
           SELECT ${buildSmsNotificationObject} as notif
@@ -149,7 +155,32 @@ export class PgNotificationRepository implements NotificationRepository {
     return response.rows[0]?.notif;
   }
 
-  private async insertEmailAttachments({
+  async #saveEmailNotification(notification: EmailNotification) {
+    await this.#insertNotificationEmail(notification);
+    await this.#insertEmailRecipients("to", notification);
+    await this.#insertEmailRecipients("cc", notification);
+    await this.#insertEmailAttachments(notification);
+  }
+
+  async #saveSmsNotification(notification: SmsNotification): Promise<void> {
+    const {
+      id,
+      createdAt,
+      followedIds,
+      templatedContent: { kind, recipientPhone, params },
+    } = notification;
+
+    await this.client.query(
+      `
+      INSERT INTO notifications_sms (id, sms_kind, recipient_phone, created_at, convention_id, establishment_siret, agency_id, params) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `,
+      // prettier-ignore
+      [ id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params ],
+    );
+  }
+
+  async #insertEmailAttachments({
     id,
     templatedContent: { attachments },
   }: EmailNotification) {
@@ -167,7 +198,7 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
-  private async insertEmailRecipients(
+  async #insertEmailRecipients(
     recipientKind: "to" | "cc",
     { id, templatedContent }: EmailNotification,
   ) {
@@ -184,7 +215,7 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
-  private async insertNotificationEmail({
+  async #insertNotificationEmail({
     id,
     createdAt,
     followedIds,
@@ -205,56 +236,21 @@ export class PgNotificationRepository implements NotificationRepository {
     });
   }
 
-  async save(notification: Notification): Promise<void> {
-    switch (notification.kind) {
-      case "sms":
-        return this.saveSmsNotification(notification);
-      case "email": {
-        const recipients = uniq(notification.templatedContent.recipients);
-        return this.saveEmailNotification({
-          ...notification,
-          templatedContent: {
-            ...notification.templatedContent,
-            recipients,
-            cc: uniq(notification.templatedContent.cc ?? []).filter(
-              (ccEmail) => !recipients.includes(ccEmail),
-            ),
-          },
-        });
-      }
-      default:
-        return exhaustiveCheck(notification, {
-          variableName: "notificationKind",
-          throwIfReached: true,
-        });
-    }
-  }
-
-  private async saveEmailNotification(notification: EmailNotification) {
-    await this.insertNotificationEmail(notification);
-    await this.insertEmailRecipients("to", notification);
-    await this.insertEmailRecipients("cc", notification);
-    await this.insertEmailAttachments(notification);
-  }
-
-  private async saveSmsNotification(
-    notification: SmsNotification,
-  ): Promise<void> {
-    const {
-      id,
-      createdAt,
-      followedIds,
-      templatedContent: { kind, recipientPhone, params },
-    } = notification;
-
-    await this.client.query(
+  async #getEmailNotificationById(
+    id: NotificationId,
+  ): Promise<EmailNotification> {
+    const response = await this.client.query(
       `
-      INSERT INTO notifications_sms (id, sms_kind, recipient_phone, created_at, convention_id, establishment_siret, agency_id, params) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    `,
-      // prettier-ignore
-      [ id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params ],
+        SELECT ${buildEmailNotificationObject} as notif
+        FROM notifications_email e
+        LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
+        LEFT JOIN notifications_email_attachments a ON a.notifications_email_id = e.id
+        WHERE e.id = $1
+        GROUP BY e.id
+          `,
+      [id],
     );
+    return response.rows[0]?.notif;
   }
 }
 
