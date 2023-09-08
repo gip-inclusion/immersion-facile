@@ -38,7 +38,7 @@ const logger = createLogger(__filename);
 const openCageDateMaxRequestsPerSeconds = 15;
 
 export class HttpAddressGateway implements AddressGateway {
-  private limiter = new Bottleneck({
+  #limiter = new Bottleneck({
     reservoir: openCageDateMaxRequestsPerSeconds,
     reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: openCageDateMaxRequestsPerSeconds,
@@ -50,37 +50,10 @@ export class HttpAddressGateway implements AddressGateway {
     private geosearchApiKey: OpenCageGeoSearchKey,
   ) {}
 
-  private featureToAddress(
-    feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-  ): AddressDto | undefined {
-    const components = feature.properties.components;
-    const city = getCityFromAliases(components);
-    const postcode = getPostcodeFromAliases(components);
-    const departmentName = getDepartmentNameFromAliases(components);
-    // OpenCageData gives the department name but not the code.
-    const departmentCode =
-      departmentName &&
-      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
-
-    return (
-      city &&
-      departmentCode &&
-      postcode && {
-        streetNumberAndAddress: makeStreetNumberAndAddress(
-          getStreetNumberFromAliases(components),
-          getStreetNameFromAliases(components),
-        ),
-        postcode,
-        departmentCode,
-        city,
-      }
-    );
-  }
-
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
-    const { responseBody } = await this.limiter.schedule(() =>
+    const { responseBody } = await this.#limiter.schedule(() =>
       this.httpClient.geocoding({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
@@ -95,7 +68,7 @@ export class HttpAddressGateway implements AddressGateway {
     const addresses: AddressDto[] = (
       responseBody as OpenCageDataFeatureCollection
     ).features
-      .map(this.featureToAddress)
+      .map(this.#featureToAddress)
       .filter(filterNotFalsy);
 
     return addresses.at(0);
@@ -110,7 +83,7 @@ export class HttpAddressGateway implements AddressGateway {
       if (query.length < queryMinLength)
         throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
 
-      const { responseBody } = await this.limiter.schedule(() =>
+      const { responseBody } = await this.#limiter.schedule(() =>
         this.httpClient.geosearch({
           headers: {
             "OpenCage-Geosearch-Key": this.geosearchApiKey,
@@ -155,7 +128,7 @@ export class HttpAddressGateway implements AddressGateway {
             lookupStreetAddressQueryMinLength,
           ),
         );
-      const { responseBody } = await this.limiter.schedule(() =>
+      const { responseBody } = await this.#limiter.schedule(() =>
         this.httpClient.geocoding({
           queryParams: {
             countrycode: franceAndAttachedTerritoryCountryCodes,
@@ -167,7 +140,7 @@ export class HttpAddressGateway implements AddressGateway {
       );
 
       return (responseBody as OpenCageDataFeatureCollection).features
-        .map((feature) => this.toAddressAndPosition(feature))
+        .map((feature) => this.#toAddressAndPosition(feature))
         .filter(filterNotFalsy);
     } finally {
       calculateDurationInSecondsFrom(startDate);
@@ -179,10 +152,10 @@ export class HttpAddressGateway implements AddressGateway {
     }
   }
 
-  private toAddressAndPosition(
+  #toAddressAndPosition(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
   ): AddressAndPosition | undefined {
-    const address = this.featureToAddress(feature);
+    const address = this.#featureToAddress(feature);
     return (
       address && {
         position: {
@@ -190,6 +163,33 @@ export class HttpAddressGateway implements AddressGateway {
           lon: feature.geometry.coordinates[0],
         },
         address,
+      }
+    );
+  }
+
+  #featureToAddress(
+    feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
+  ): AddressDto | undefined {
+    const components = feature.properties.components;
+    const city = getCityFromAliases(components);
+    const postcode = getPostcodeFromAliases(components);
+    const departmentName = getDepartmentNameFromAliases(components);
+    // OpenCageData gives the department name but not the code.
+    const departmentCode =
+      departmentName &&
+      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
+
+    return (
+      city &&
+      departmentCode &&
+      postcode && {
+        streetNumberAndAddress: makeStreetNumberAndAddress(
+          getStreetNumberFromAliases(components),
+          getStreetNameFromAliases(components),
+        ),
+        postcode,
+        departmentCode,
+        city,
       }
     );
   }
