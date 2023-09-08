@@ -1,24 +1,29 @@
 import { z } from "zod";
-import { ApiConsumer, ConventionReadDto } from "shared";
+import { ApiConsumer, ConventionReadDto, conventionStatuses } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { GetConventionsByFiltersQueries } from "../ports/ConventionQueries";
 
 const MAX_CONVENTIONS_RETURNED = 100;
 
 export class GetConventionsForApiConsumer extends TransactionalUseCase<
-  void,
+  GetConventionsByFiltersQueries,
   ConventionReadDto[],
   ApiConsumer
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = z.object({
+    startDateGreater: z.date().optional(),
+    startDateLessOrEqual: z.date().optional(),
+    withStatuses: z.array(z.enum(conventionStatuses)).optional(),
+  });
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
   protected async _execute(
-    _input: void,
+    filters: GetConventionsByFiltersQueries,
     uow: UnitOfWork,
     apiConsumer?: ApiConsumer,
   ): Promise<ConventionReadDto[]> {
@@ -27,6 +32,7 @@ export class GetConventionsForApiConsumer extends TransactionalUseCase<
     return uow.conventionQueries.getConventionsByScope({
       scope: apiConsumer.rights.convention.scope,
       limit: MAX_CONVENTIONS_RETURNED,
+      filters,
     });
   }
 }

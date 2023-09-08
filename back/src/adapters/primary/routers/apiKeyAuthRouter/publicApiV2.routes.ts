@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
+import { getConventionsByFiltersQueryParamsV2Schema } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
 import { searchParamsPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.schema";
 
 export type PublicApiV2SearchEstablishmentRoutes =
@@ -69,6 +70,7 @@ export const publicApiV2ConventionRoutes = defineRoutes({
   getConventions: defineRoute({
     method: "get",
     url: "/v2/conventions",
+    queryParamsSchema: getConventionsByFiltersQueryParamsV2Schema,
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(conventionReadSchema),

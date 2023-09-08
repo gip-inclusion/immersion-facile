@@ -7,6 +7,7 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
+  ConventionStatus,
   DATE_START,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
@@ -92,6 +93,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
         conventionStartDate: new Date("2021-01-10").toISOString(),
+        conventionStatus: "IN_REVIEW",
       });
       cciConvention = await insertAgencyAndConvention({
         conventionId: conventionIdB,
@@ -100,6 +102,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "cci",
         conventionStartDate: new Date("2021-01-15").toISOString(),
+        conventionStatus: "DRAFT",
       });
       await insertAgencyAndConvention({
         conventionId: "cccccc99-9c0b-1bbb-bb6d-6bb9bd38bbbb",
@@ -108,6 +111,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "mission-locale",
         conventionStartDate: new Date("2021-01-12").toISOString(),
+        conventionStatus: "IN_REVIEW",
       });
     });
 
@@ -118,6 +122,7 @@ describe("Pg implementation of ConventionQueries", () => {
             agencyKinds: ["conseil-departemental"],
           },
           limit: 5,
+          filters: {},
         });
 
         expectToEqual(result, []);
@@ -129,9 +134,24 @@ describe("Pg implementation of ConventionQueries", () => {
             agencyKinds: ["pole-emploi", "cci"],
           },
           limit: 5,
+          filters: {},
         });
 
         expectToEqual(result, [cciConvention, poleEmploiConvention]);
+      });
+
+      it("return conventions matching agencyKinds and status", async () => {
+        const result = await conventionQueries.getConventionsByScope({
+          scope: {
+            agencyKinds: ["pole-emploi", "cci"],
+          },
+          limit: 5,
+          filters: {
+            withStatuses: ["IN_REVIEW"],
+          },
+        });
+
+        expectToEqual(result, [poleEmploiConvention]);
       });
     });
 
@@ -142,6 +162,7 @@ describe("Pg implementation of ConventionQueries", () => {
             agencyIds: ["ccaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"],
           },
           limit: 5,
+          filters: {},
         });
 
         expectToEqual(result, []);
@@ -153,6 +174,7 @@ describe("Pg implementation of ConventionQueries", () => {
             agencyIds: [agencyIdA, agencyIdB],
           },
           limit: 5,
+          filters: {},
         });
 
         expectToEqual(result, [cciConvention, poleEmploiConvention]);
@@ -165,6 +187,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyKinds: ["pole-emploi", "cci"],
         },
         limit: 1,
+        filters: {},
       });
 
       expectToEqual(result, [cciConvention]);
@@ -460,6 +483,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment,
     agencyKind,
     conventionStartDate = DATE_START,
+    conventionStatus = "DRAFT",
   }: {
     conventionId: ConventionId;
     agencyId: string;
@@ -467,11 +491,12 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment: string;
     agencyKind: AgencyKind;
     conventionStartDate?: string;
+    conventionStatus?: ConventionStatus;
   }): Promise<ConventionReadDto> => {
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
       .withId(conventionId)
-      .withStatus("DRAFT")
+      .withStatus(conventionStatus)
       .withStatusJustification("JUSTIF...")
       .notSigned()
       .withBeneficiary({
