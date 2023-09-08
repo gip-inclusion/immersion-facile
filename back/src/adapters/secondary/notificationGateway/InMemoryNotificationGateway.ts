@@ -10,12 +10,12 @@ export const sendSmsErrorPhoneNumber = "0699999999";
 export class InMemoryNotificationGateway implements NotificationGateway {
   public attachment: Buffer = Buffer.from("");
 
-  private readonly sentEmails: {
+  readonly #sentEmails: {
     templatedEmail: TemplatedEmail;
     sentAt: DateIsoString;
   }[] = [];
 
-  private readonly sentSms: TemplatedSms[] = [];
+  readonly #sentSms: TemplatedSms[] = [];
 
   constructor(
     private readonly timeGateway: TimeGateway = new CustomTimeGateway(),
@@ -27,27 +27,12 @@ export class InMemoryNotificationGateway implements NotificationGateway {
   }
 
   // For testing.
-  getSentEmails(): TemplatedEmail[] {
-    return this.sentEmails.map(prop("templatedEmail"));
+  public getSentEmails(): TemplatedEmail[] {
+    return this.#sentEmails.map(prop("templatedEmail"));
   }
 
-  getSentSms(): TemplatedSms[] {
-    return this.sentSms;
-  }
-
-  private pushEmail(templatedEmail: TemplatedEmail) {
-    const numberOfEmailsToDrop = this.numberOfEmailToKeep
-      ? this.sentEmails.length + 1 - this.numberOfEmailToKeep
-      : 0;
-
-    if (numberOfEmailsToDrop > 0) {
-      this.sentEmails.splice(0, numberOfEmailsToDrop);
-    }
-
-    this.sentEmails.push({
-      templatedEmail,
-      sentAt: this.timeGateway.now().toISOString(),
-    });
+  public getSentSms(): TemplatedSms[] {
+    return this.#sentSms;
   }
 
   public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
@@ -55,7 +40,7 @@ export class InMemoryNotificationGateway implements NotificationGateway {
       templatedEmail.params,
       `sending email : ${templatedEmail.kind}`,
     );
-    this.pushEmail(templatedEmail);
+    this.#pushEmail(templatedEmail);
   }
 
   public async sendSms(sms: TemplatedSms): Promise<void> {
@@ -63,6 +48,21 @@ export class InMemoryNotificationGateway implements NotificationGateway {
       throw new Error(
         `Send SMS Error with phone number ${sms.recipientPhone}.`,
       );
-    this.sentSms.push(sms);
+    this.#sentSms.push(sms);
+  }
+
+  #pushEmail(templatedEmail: TemplatedEmail) {
+    const numberOfEmailsToDrop = this.numberOfEmailToKeep
+      ? this.#sentEmails.length + 1 - this.numberOfEmailToKeep
+      : 0;
+
+    if (numberOfEmailsToDrop > 0) {
+      this.#sentEmails.splice(0, numberOfEmailsToDrop);
+    }
+
+    this.#sentEmails.push({
+      templatedEmail,
+      sentAt: this.timeGateway.now().toISOString(),
+    });
   }
 }
