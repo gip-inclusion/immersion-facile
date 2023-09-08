@@ -18,7 +18,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     throw new Error("Not implemented");
   }
 
-  async getByIdAndKind(
+  public async getByIdAndKind(
     id: NotificationId,
     kind: NotificationKind,
   ): Promise<Notification | undefined> {
@@ -27,7 +27,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
       .find((notification) => notification.id === id);
   }
 
-  async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
+  public async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
     return this.notifications.filter(
       (notification): notification is EmailNotification => {
         if (notification.kind !== "email") return false;
@@ -51,7 +51,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     );
   }
 
-  async getLastNotifications() {
+  public async getLastNotifications() {
     return {
       emails: await this.getEmailsByFilters(),
       sms: this.notifications.filter(
@@ -61,7 +61,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     };
   }
 
-  async save(notification: Notification): Promise<void> {
+  public async save(notification: Notification): Promise<void> {
     this.notifications.push(notification);
   }
 }
