@@ -2,17 +2,17 @@ import { ValidateEmailStatus } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 
 export class InMemoryEmailValidationGateway implements EmailValidationGetaway {
-  private emailValidationStatus: ValidateEmailStatus | undefined;
+  #emailValidationStatus: ValidateEmailStatus | undefined;
 
   // for test purposes only
   public setEmailValidationStatusResponse(
     emailValidationStatus: ValidateEmailStatus,
   ) {
-    this.emailValidationStatus = emailValidationStatus;
+    this.#emailValidationStatus = emailValidationStatus;
   }
 
   public async validateEmail(email: string): Promise<ValidateEmailStatus> {
-    if (this.emailValidationStatus) return this.emailValidationStatus;
+    if (this.#emailValidationStatus) return this.#emailValidationStatus;
     if (email === "email-with-typo@gamil.com")
       return {
         isValid: false,
