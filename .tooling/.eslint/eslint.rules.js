@@ -13,7 +13,7 @@ module.exports = {
   "jest-formatting/padding-around-describe-blocks": "error",
   "jest-formatting/padding-around-test-blocks": "error",
   "@typescript-eslint/explicit-member-accessibility": [
-    "warn",
+    "error",
     {
       accessibility: "explicit",
       overrides: {
@@ -26,7 +26,7 @@ module.exports = {
     },
   ],
   "no-restricted-syntax": [
-    "warn",
+    "error",
     {
       selector:
         ':matches(PropertyDefinition, MethodDefinition)[accessibility="private"]',
