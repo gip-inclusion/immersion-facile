@@ -7,7 +7,7 @@ export class InMemoryShortLinkRepository
   extends InMemoryShortLinkQuery
   implements ShortLinkRepository
 {
-  async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
+  public async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
     this.shortLinks[shortLinkId] = url;
   }
 }
