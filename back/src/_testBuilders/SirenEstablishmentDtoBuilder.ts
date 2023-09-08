@@ -24,7 +24,7 @@ export class SirenEstablishmentDtoBuilder
     private dto: SiretEstablishmentDto = validSirenEstablishmentDto,
   ) {}
 
-  build(): SiretEstablishmentDto {
+  public build(): SiretEstablishmentDto {
     return this.dto;
   }
 
