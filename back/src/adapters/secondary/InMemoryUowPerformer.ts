@@ -11,7 +11,7 @@ export class InMemoryUowPerformer implements UnitOfWorkPerformer {
   }
 
   // for test only
-  setUow(newUow: Partial<UnitOfWork>) {
+  public setUow(newUow: Partial<UnitOfWork>) {
     this.uow = { ...this.uow, ...newUow };
   }
 }
