@@ -62,32 +62,32 @@ export class DiscussionAggregateBuilder
     private readonly discussionAggregate: DiscussionAggregate = defaultDiscussionAggregateV2,
   ) {}
 
-  build() {
+  public build() {
     return this.discussionAggregate;
   }
 
-  withAddress(address: AddressDto) {
+  public withAddress(address: AddressDto) {
     return new DiscussionAggregateBuilder({
       ...this.discussionAggregate,
       address,
     });
   }
 
-  withAppellationCode(appellationCode: AppellationCode) {
+  public withAppellationCode(appellationCode: AppellationCode) {
     return new DiscussionAggregateBuilder({
       ...this.discussionAggregate,
       appellationCode,
     });
   }
 
-  withCreatedAt(createdAt: Date) {
+  public withCreatedAt(createdAt: Date) {
     return new DiscussionAggregateBuilder({
       ...this.discussionAggregate,
       createdAt,
     });
   }
 
-  withEstablishmentContact(
+  public withEstablishmentContact(
     establishmentContact: Partial<DiscussionEstablishmentContact>,
   ) {
     return new DiscussionAggregateBuilder({
@@ -99,25 +99,25 @@ export class DiscussionAggregateBuilder
     });
   }
 
-  withExchanges(exchanges: ExchangeEntity[]) {
+  public withExchanges(exchanges: ExchangeEntity[]) {
     return new DiscussionAggregateBuilder({
       ...this.discussionAggregate,
       exchanges,
     });
   }
 
-  withId(id: DiscussionId) {
+  public withId(id: DiscussionId) {
     return new DiscussionAggregateBuilder({ ...this.discussionAggregate, id });
   }
 
-  withImmersionObjective(immersionObjective: ImmersionObjective | null) {
+  public withImmersionObjective(immersionObjective: ImmersionObjective | null) {
     return new DiscussionAggregateBuilder({
       ...this.discussionAggregate,
       immersionObjective,
     });
   }
 
-  withPotentialBeneficiary(
+  public withPotentialBeneficiary(
     potentialBeneficiary: Partial<DiscussionPotentialBeneficiary>,
   ) {
     return new DiscussionAggregateBuilder({
@@ -129,7 +129,7 @@ export class DiscussionAggregateBuilder
     });
   }
 
-  withSiret(siret: SiretDto) {
+  public withSiret(siret: SiretDto) {
     return new DiscussionAggregateBuilder({
       ...this.discussionAggregate,
       siret,
