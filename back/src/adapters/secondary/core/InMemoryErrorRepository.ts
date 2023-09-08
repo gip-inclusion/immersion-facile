@@ -5,13 +5,13 @@ import {
 
 export class InMemoryErrorRepository implements ErrorRepository {
   // for testing purposes
-  private _savedErrors: SavedError[] = [];
+  #savedErrors: SavedError[] = [];
 
   public async save(savedError: SavedError): Promise<void> {
-    this._savedErrors.push(savedError);
+    this.#savedErrors.push(savedError);
   }
 
   public get savedErrors(): SavedError[] {
-    return this._savedErrors;
+    return this.#savedErrors;
   }
 }
