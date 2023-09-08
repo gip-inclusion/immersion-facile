@@ -56,7 +56,7 @@ export class BasicEventCrawler implements EventCrawler {
     await this.#publishEvents(events);
   }
 
-  startCrawler() {
+  public startCrawler() {
     logger.warn(
       "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
     );
