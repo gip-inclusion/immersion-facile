@@ -13,9 +13,9 @@ const logger = createLogger(__filename);
 export class InMemoryConventionRepository implements ConventionRepository {
   public _conventions: Record<string, ConventionDto> = {};
 
-  private _nextExternalId: ConventionExternalId = "00000000001";
+  #nextExternalId: ConventionExternalId = "00000000001";
 
-  get conventions() {
+  public get conventions() {
     return Object.values(this._conventions);
   }
 
@@ -30,7 +30,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
     logger.info({ conventionWithoutExternalId }, "save");
     const convention: ConventionDto = {
       ...conventionWithoutExternalId,
-      externalId: this._nextExternalId,
+      externalId: this.#nextExternalId,
     };
     if (this._conventions[convention.id]) {
       throw new ConflictError(
@@ -42,12 +42,12 @@ export class InMemoryConventionRepository implements ConventionRepository {
   }
 
   // for test purpose
-  setConventions(conventions: Record<string, ConventionDto>) {
+  public setConventions(conventions: Record<string, ConventionDto>) {
     this._conventions = conventions;
   }
 
-  setNextExternalId(externalId: ConventionExternalId) {
-    this._nextExternalId = externalId;
+  public setNextExternalId(externalId: ConventionExternalId) {
+    this.#nextExternalId = externalId;
   }
 
   public async update(convention: ConventionDto) {
