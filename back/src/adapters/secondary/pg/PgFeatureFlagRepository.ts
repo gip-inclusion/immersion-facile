@@ -19,12 +19,12 @@ const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
 export class PgFeatureFlagRepository implements FeatureFlagRepository {
   constructor(private client: PoolClient) {}
 
-  async getAll(): Promise<FeatureFlags> {
+  public async getAll(): Promise<FeatureFlags> {
     const result = await this.client.query("SELECT * FROM feature_flags");
     return rawPgToFeatureFlags(result.rows);
   }
 
-  async insert(featureFlags: FeatureFlags): Promise<void> {
+  public async insert(featureFlags: FeatureFlags): Promise<void> {
     await Promise.all(
       keys(featureFlags).map(async (flagName) => {
         const flag = featureFlags[flagName];
@@ -41,7 +41,7 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
     );
   }
 
-  async update(params: SetFeatureFlagParam): Promise<void> {
+  public async update(params: SetFeatureFlagParam): Promise<void> {
     await this.client.query(
       "UPDATE feature_flags SET is_active = $1, value = $2 WHERE flag_name = $3",
       [
