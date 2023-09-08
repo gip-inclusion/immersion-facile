@@ -95,6 +95,7 @@ export const TechnicalOptionsTab = () => {
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
   const isApiConsumersLoading = useAppSelector(apiConsumerSelectors.isLoading);
   const isApiConsumerModalOpened = useIsModalOpen(apiConsumerModal);
+  const saveConsumerFeedback = useAppSelector(apiConsumerSelectors.feedback);
 
   const onEditButtonClick = (apiConsumer: ApiConsumer) => {
     setCurrentApiConsumerToEdit({
@@ -129,6 +130,7 @@ export const TechnicalOptionsTab = () => {
 
   useEffect(() => {
     if (isApiConsumerModalOpened) return;
+    dispatch(apiConsumerSlice.actions.clearFeedbackTriggered());
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
     adminToken &&
       dispatch(
@@ -257,31 +259,46 @@ export const TechnicalOptionsTab = () => {
         </div>
         {createPortal(
           <apiConsumerModal.Component title="Ajout consommateur api">
-            {lastCreatedToken && (
-              <>
-                <Alert
-                  severity="success"
-                  title="Consommateur Api ajouté !"
-                  className={"fr-mb-2w"}
-                />
-                <Input
-                  textArea
-                  label="Token généré"
-                  hintText="Ce token est à conserver précieusement, il ne sera plus affiché par la suite."
-                  nativeTextAreaProps={{
-                    readOnly: true,
-                    value: lastCreatedToken,
-                    rows: 5,
-                  }}
-                />
-                <Button type="button" onClick={onConfirmTokenModalClose}>
-                  J'ai bien copié le token, je peux fermer la fenêtre
-                </Button>
-              </>
-            )}
-            {!lastCreatedToken && (
-              <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
-            )}
+            {lastCreatedToken &&
+              saveConsumerFeedback.kind === "createSuccess" && (
+                <>
+                  <Alert
+                    severity="success"
+                    title="Consommateur Api ajouté !"
+                    className={"fr-mb-2w"}
+                  />
+                  <Input
+                    textArea
+                    label="Token généré"
+                    hintText="Ce token est à conserver précieusement, il ne sera plus affiché par la suite."
+                    nativeTextAreaProps={{
+                      readOnly: true,
+                      value: lastCreatedToken,
+                      rows: 5,
+                    }}
+                  />
+                  <Button type="button" onClick={onConfirmTokenModalClose}>
+                    J'ai bien copié le token, je peux fermer la fenêtre
+                  </Button>
+                </>
+              )}
+            {!lastCreatedToken &&
+              saveConsumerFeedback.kind === "updateSuccess" && (
+                <>
+                  <Alert
+                    severity="success"
+                    title="Consommateur Api mis à jour !"
+                    className={"fr-mb-2w"}
+                  />
+                  <Button type="button" onClick={onConfirmTokenModalClose}>
+                    Fermer la fenêtre
+                  </Button>
+                </>
+              )}
+            {saveConsumerFeedback.kind !== "createSuccess" &&
+              saveConsumerFeedback.kind !== "updateSuccess" && (
+                <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
+              )}
           </apiConsumerModal.Component>,
           document.body,
         )}

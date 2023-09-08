@@ -43,7 +43,7 @@ describe("api consumer", () => {
 
   describe("retrieve api consumers", () => {
     it("fetches api consumer", () => {
-      expectInitialStateToMatch();
+      expectInitialStateUnchanged();
 
       store.dispatch(
         apiConsumerSlice.actions.retrieveApiConsumersRequested("admin-jwt"),
@@ -53,7 +53,7 @@ describe("api consumer", () => {
       dependencies.adminGateway.apiConsumers$.next([apiConsumer1]);
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
       expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-        kind: "success",
+        kind: "fetchSuccess",
       });
       expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), [
         apiConsumer1,
@@ -61,7 +61,7 @@ describe("api consumer", () => {
     });
 
     it("have feedback error on gateway error", () => {
-      expectInitialStateToMatch();
+      expectInitialStateUnchanged();
 
       store.dispatch(
         apiConsumerSlice.actions.retrieveApiConsumersRequested("admin-jwt"),
@@ -84,7 +84,7 @@ describe("api consumer", () => {
     it("creates api consumer and get its token", () => {
       const generatedJwt = "super-secret-jwt";
 
-      expectInitialStateToMatch();
+      expectInitialStateUnchanged();
 
       store.dispatch(
         apiConsumerSlice.actions.saveApiConsumerRequested({
@@ -94,7 +94,7 @@ describe("api consumer", () => {
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
 
-      dependencies.adminGateway.createApiConsumersResponse$.next(generatedJwt);
+      dependencies.adminGateway.saveApiConsumersResponse$.next(generatedJwt);
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
 
       expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
@@ -105,10 +105,32 @@ describe("api consumer", () => {
       );
     });
 
+    it("updates an api consumer", () => {
+      expectInitialStateUnchanged();
+
+      store.dispatch(
+        apiConsumerSlice.actions.saveApiConsumerRequested({
+          apiConsumer: apiConsumer1,
+          adminToken: "admin-jwt",
+        }),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+      dependencies.adminGateway.saveApiConsumersResponse$.next("");
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
+        kind: "updateSuccess",
+      });
+      expect(
+        apiConsumerSelectors.lastCreatedToken(store.getState()),
+      ).toBeNull();
+    });
+
     it("fails on create api consumer gateway error", () => {
       const errorMessage = "failed creating api consumer";
 
-      expectInitialStateToMatch();
+      expectInitialStateUnchanged();
 
       store.dispatch(
         apiConsumerSlice.actions.saveApiConsumerRequested({
@@ -118,7 +140,7 @@ describe("api consumer", () => {
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
 
-      dependencies.adminGateway.createApiConsumersResponse$.error(
+      dependencies.adminGateway.saveApiConsumersResponse$.error(
         new Error(errorMessage),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
@@ -132,7 +154,7 @@ describe("api consumer", () => {
 
   it("clears last created token", () => {
     const generatedJwt = "super-secret-jwt";
-    expectInitialStateToMatch();
+    expectInitialStateUnchanged();
 
     store.dispatch(
       apiConsumerSlice.actions.saveApiConsumerRequested({
@@ -141,7 +163,7 @@ describe("api consumer", () => {
       }),
     );
 
-    dependencies.adminGateway.createApiConsumersResponse$.next(generatedJwt);
+    dependencies.adminGateway.saveApiConsumersResponse$.next(generatedJwt);
 
     expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBe(
       generatedJwt,
@@ -152,7 +174,7 @@ describe("api consumer", () => {
     expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBeNull();
   });
 
-  const expectInitialStateToMatch = () => {
+  const expectInitialStateUnchanged = () => {
     expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), []);
     expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
     expectToEqual(apiConsumerSelectors.feedback(store.getState()), {

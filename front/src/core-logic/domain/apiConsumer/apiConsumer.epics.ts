@@ -36,7 +36,11 @@ const createApiConsumerEpic: ApiConsumerEpic = (
         action.payload.adminToken,
       ),
     ),
-    map(apiConsumerSlice.actions.saveApiConsumerSucceeded),
+    map((token) =>
+      token
+        ? apiConsumerSlice.actions.createApiConsumerSucceeded(token)
+        : apiConsumerSlice.actions.updateApiConsumerSucceeded(),
+    ),
     catchEpicError((error) =>
       apiConsumerSlice.actions.saveApiConsumerFailed(error.message),
     ),

@@ -99,7 +99,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: apiConsumerSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: apiConsumerJwtSchema,
+      200: apiConsumerJwtSchema.or(emptyStringSchema),
       401: legacyUnauthenticatedErrorSchema,
     },
   }),
