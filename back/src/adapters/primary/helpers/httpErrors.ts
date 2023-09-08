@@ -2,7 +2,7 @@ import { Logger } from "pino";
 import { z } from "zod";
 
 export abstract class HttpError extends Error {
-  abstract httpCode: number;
+  public abstract httpCode: number;
 
   constructor(message?: any, public readonly issues?: string[]) {
     super(message);
@@ -11,7 +11,7 @@ export abstract class HttpError extends Error {
 }
 
 export class UnauthorizedError extends HttpError {
-  httpCode = 401;
+  public httpCode = 401;
 
   constructor() {
     super("Veuillez vous authentifier");
@@ -23,7 +23,7 @@ const makeForbiddenMessage = (reason?: string): string =>
   reason ?? "Accès refusé";
 
 export class ForbiddenError extends HttpError {
-  httpCode = 403;
+  public httpCode = 403;
 
   constructor(reason?: string) {
     super(makeForbiddenMessage(reason));
@@ -32,7 +32,7 @@ export class ForbiddenError extends HttpError {
 }
 
 export class FeatureDisabledError extends HttpError {
-  httpCode = 424;
+  public httpCode = 424;
 
   constructor(disableService?: string) {
     super(disableService + " is disabled");
@@ -41,7 +41,7 @@ export class FeatureDisabledError extends HttpError {
 }
 
 export class NotFoundError extends HttpError {
-  httpCode = 404;
+  public httpCode = 404;
 
   constructor(msg?: any) {
     super(msg);
@@ -50,7 +50,7 @@ export class NotFoundError extends HttpError {
 }
 
 export class BadRequestError extends HttpError {
-  httpCode = 400;
+  public httpCode = 400;
 
   constructor(msg?: any, issues?: string[]) {
     super(msg, issues);
@@ -59,7 +59,7 @@ export class BadRequestError extends HttpError {
 }
 
 export class ConflictError extends HttpError {
-  httpCode = 409;
+  public httpCode = 409;
 
   constructor(msg: any) {
     super(msg);
@@ -68,7 +68,7 @@ export class ConflictError extends HttpError {
 }
 
 export class TooManyRequestApiError extends HttpError {
-  httpCode = 429;
+  public httpCode = 429;
 
   constructor(public serviceName: string) {
     super(`Le service ${serviceName} a subit trop de solicitation`);
@@ -77,7 +77,7 @@ export class TooManyRequestApiError extends HttpError {
 }
 
 export class UnavailableApiError extends HttpError {
-  httpCode = 503;
+  public httpCode = 503;
 
   constructor(public serviceName: string) {
     super(`Le service ${serviceName} n'est pas disponible`);
