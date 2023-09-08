@@ -4,6 +4,7 @@ import {
   ConventionId,
   ConventionReadDto,
   conventionReadSchema,
+  ConventionScope,
   filterNotFalsy,
   Flavor,
   ListConventionsRequestDto,
@@ -63,6 +64,18 @@ export class PgConventionQueries implements ConventionQueries {
         startDateGreater
           ? format("conventions.date_start::date > %1$L", startDateGreater)
           : undefined,
+      ].filter(filterNotFalsy),
+    });
+  }
+
+  public async getConventionsByScope(
+    scope: ConventionScope,
+  ): Promise<ConventionReadDto[]> {
+    return this.getConventionsWhere({
+      whereClauses: [
+        scope.agencyKinds
+          ? format("agencies.kind IN (%1$L)", scope.agencyKinds)
+          : format("agencies.id IN (%1$L)", scope.agencyIds),
       ].filter(filterNotFalsy),
     });
   }
