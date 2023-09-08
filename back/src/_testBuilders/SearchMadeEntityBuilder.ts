@@ -18,7 +18,7 @@ export class SearchMadeEntityBuilder implements Builder<SearchMadeEntity> {
     private readonly entity: SearchMadeEntity = validSearchMadeEntity,
   ) {}
 
-  build(): SearchMadeEntity {
+  public build(): SearchMadeEntity {
     return this.entity;
   }
 
