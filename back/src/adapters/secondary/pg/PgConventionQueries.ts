@@ -33,11 +33,11 @@ export class PgConventionQueries implements ConventionQueries {
   public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,
   ): Promise<ConventionReadDto[]> {
-    return this.getConventionsWhere({
+    return this.#getConventionsWhere({
       whereClauses: [
-        this.whereConventionsDateEndMatch(dateEnd),
-        this.whereConventionsAreValidated(),
-        this.whereConventionsAssessmentEmailHasNotBeenAlreadySent(),
+        this.#whereConventionsDateEndMatch(dateEnd),
+        this.#whereConventionsAreValidated(),
+        this.#whereConventionsAssessmentEmailHasNotBeenAlreadySent(),
       ],
     });
   }
@@ -48,10 +48,10 @@ export class PgConventionQueries implements ConventionQueries {
     return getReadConventionById(this.client, id);
   }
 
-  getConventionsByFilters(
+  public getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
   ): Promise<ConventionReadDto[]> {
-    return this.getConventionsWhere({
+    return this.#getConventionsWhere({
       whereClauses:
         makeQueryWhereClauseFromFilters(filters).filter(filterNotFalsy),
     });
@@ -62,7 +62,7 @@ export class PgConventionQueries implements ConventionQueries {
     limit: number;
     filters: GetConventionsByFiltersQueries;
   }): Promise<ConventionReadDto[]> {
-    return this.getConventionsWhere({
+    return this.#getConventionsWhere({
       limit: params.limit,
       whereClauses: [
         ...makeQueryWhereClauseFromFilters(params.filters),
@@ -74,7 +74,21 @@ export class PgConventionQueries implements ConventionQueries {
     });
   }
 
-  private async getConventionsWhere({
+  public async getLatestConventions({
+    status,
+    agencyId,
+  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
+    return this.#getConventionsWhere({
+      whereClauses: [
+        status && format("conventions.status = %1$L", status),
+        agencyId && format("conventions.agency_id::text = %1$L", agencyId),
+      ].filter(filterNotFalsy),
+      orderByClause: "ORDER BY date_validation DESC",
+      limit: 10,
+    });
+  }
+
+  async #getConventionsWhere({
     whereClauses,
     orderByClause,
     limit,
@@ -94,31 +108,17 @@ export class PgConventionQueries implements ConventionQueries {
     return pgResult.rows.map((row) => conventionReadSchema.parse(row.dto));
   }
 
-  public async getLatestConventions({
-    status,
-    agencyId,
-  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
-    return this.getConventionsWhere({
-      whereClauses: [
-        status && format("conventions.status = %1$L", status),
-        agencyId && format("conventions.agency_id::text = %1$L", agencyId),
-      ].filter(filterNotFalsy),
-      orderByClause: "ORDER BY date_validation DESC",
-      limit: 10,
-    });
-  }
-
-  private whereConventionsAreValidated(): WhereClause {
+  #whereConventionsAreValidated(): WhereClause {
     return format("conventions.status IN (%1$L)", validatedConventionStatuses);
   }
 
-  private whereConventionsAssessmentEmailHasNotBeenAlreadySent(): WhereClause {
+  #whereConventionsAssessmentEmailHasNotBeenAlreadySent(): WhereClause {
     return format(
       "conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )",
     );
   }
 
-  private whereConventionsDateEndMatch(dateEnd: Date): WhereClause {
+  #whereConventionsDateEndMatch(dateEnd: Date): WhereClause {
     return format("conventions.date_end::date = %1$L", dateEnd);
   }
 }
