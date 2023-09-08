@@ -12,7 +12,9 @@ export class PgConventionsToSyncRepository
 {
   constructor(private client: PoolClient) {}
 
-  async getById(id: ConventionId): Promise<ConventionToSync | undefined> {
+  public async getById(
+    id: ConventionId,
+  ): Promise<ConventionToSync | undefined> {
     const pgConventionToSync = await selectConventionToSyncById(
       this.client,
       id,
@@ -22,7 +24,7 @@ export class PgConventionsToSyncRepository
       : undefined;
   }
 
-  async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
+  public async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
     const queryResult = await this.client.query<PgConventionToSync>(
       `
           SELECT id, status, process_date, reason
@@ -38,7 +40,7 @@ export class PgConventionsToSyncRepository
     );
   }
 
-  async save(conventionToSync: ConventionToSync): Promise<void> {
+  public async save(conventionToSync: ConventionToSync): Promise<void> {
     return (await isConventionToSyncAlreadyExists(
       this.client,
       conventionToSync.id,
