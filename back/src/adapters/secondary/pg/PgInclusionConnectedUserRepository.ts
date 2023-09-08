@@ -13,12 +13,35 @@ export class PgInclusionConnectedUserRepository
 {
   constructor(private client: PoolClient) {}
 
-  async getById(userId: string): Promise<InclusionConnectedUser | undefined> {
-    const icUsers = await this.getInclusionConnectedUsers({ userId });
+  public async getById(
+    userId: string,
+  ): Promise<InclusionConnectedUser | undefined> {
+    const icUsers = await this.#getInclusionConnectedUsers({ userId });
     return icUsers[0];
   }
 
-  private async getInclusionConnectedUsers(filters: {
+  public async getWithFilter({
+    agencyRole,
+  }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
+    return this.#getInclusionConnectedUsers({ agencyRole });
+  }
+
+  public async update(user: InclusionConnectedUser): Promise<void> {
+    await this.client.query(
+      `
+        DELETE FROM users__agencies WHERE user_id = $1
+        `,
+      [user.id],
+    );
+    await this.client.query(
+      format(
+        `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
+        user.agencyRights.map(({ agency, role }) => [user.id, agency.id, role]),
+      ),
+    );
+  }
+
+  async #getInclusionConnectedUsers(filters: {
     userId?: AuthenticatedUserId;
     agencyRole?: AgencyRole;
   }): Promise<InclusionConnectedUser[]> {
@@ -83,27 +106,6 @@ export class PgInclusionConnectedUserRepository
 
     if (response.rows.length === 0) return [];
     return response.rows.map((row) => row.inclusion_user);
-  }
-
-  public async getWithFilter({
-    agencyRole,
-  }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
-    return this.getInclusionConnectedUsers({ agencyRole });
-  }
-
-  async update(user: InclusionConnectedUser): Promise<void> {
-    await this.client.query(
-      `
-        DELETE FROM users__agencies WHERE user_id = $1
-        `,
-      [user.id],
-    );
-    await this.client.query(
-      format(
-        `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
-        user.agencyRights.map(({ agency, role }) => [user.id, agency.id, role]),
-      ),
-    );
   }
 }
 
