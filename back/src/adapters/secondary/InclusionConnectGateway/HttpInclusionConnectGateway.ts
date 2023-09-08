@@ -14,7 +14,9 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
     private inclusionConnectConfig: InclusionConnectConfig,
   ) {}
 
-  async getAccessToken(code: string): Promise<InclusionAccessTokenResponse> {
+  public async getAccessToken(
+    code: string,
+  ): Promise<InclusionAccessTokenResponse> {
     const response = await this.httpClient
       .inclusionConnectGetAccessToken({
         body: queryParamsAsString({
