@@ -18,7 +18,9 @@ export class InMemoryInclusionConnectedUserRepository
     private authenticatedUsersRepository: InMemoryAuthenticatedUserRepository,
   ) {}
 
-  async getById(userId: string): Promise<InclusionConnectedUser | undefined> {
+  public async getById(
+    userId: string,
+  ): Promise<InclusionConnectedUser | undefined> {
     const user = await this.authenticatedUsersRepository.users.find(
       (user) => user.id === userId,
     );
@@ -26,7 +28,7 @@ export class InMemoryInclusionConnectedUserRepository
     return { ...user, agencyRights: this.agencyRightsByUserId[userId] ?? [] };
   }
 
-  async getWithFilter({
+  public async getWithFilter({
     agencyRole,
   }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
     return this.authenticatedUsersRepository.users
@@ -41,7 +43,7 @@ export class InMemoryInclusionConnectedUserRepository
       }));
   }
 
-  setInclusionConnectedUsers(
+  public setInclusionConnectedUsers(
     inclusionConnectedUsers: InclusionConnectedUser[],
   ) {
     this.authenticatedUsersRepository.users = inclusionConnectedUsers.map(
@@ -56,7 +58,7 @@ export class InMemoryInclusionConnectedUserRepository
     );
   }
 
-  async update(user: InclusionConnectedUser): Promise<void> {
+  public async update(user: InclusionConnectedUser): Promise<void> {
     this.agencyRightsByUserId[user.id] = user.agencyRights;
   }
 }
