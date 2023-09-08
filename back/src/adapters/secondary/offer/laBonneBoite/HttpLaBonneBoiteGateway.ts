@@ -18,7 +18,7 @@ const MAX_DISTANCE_IN_KM = 100;
 const lbbMaxQueryPerSeconds = 1;
 
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
-  private limiter = new Bottleneck({
+  #limiter = new Bottleneck({
     reservoir: lbbMaxQueryPerSeconds,
     reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: lbbMaxQueryPerSeconds,
@@ -36,7 +36,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lon,
     rome,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
-    const { responseBody } = await this.limiter.schedule(async () => {
+    const { responseBody } = await this.#limiter.schedule(async () => {
       const accessToken = await this.poleEmploiGateway.getAccessToken(
         `application_${this.poleEmploiClientId} api_labonneboitev1`,
       );
