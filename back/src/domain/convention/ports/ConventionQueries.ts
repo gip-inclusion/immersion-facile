@@ -1,6 +1,7 @@
 import {
   ConventionId,
   ConventionReadDto,
+  ConventionScope,
   ConventionStatus,
   ListConventionsRequestDto,
 } from "shared";
@@ -12,9 +13,6 @@ export type GetConventionByFiltersQueries = {
 };
 
 export interface ConventionQueries {
-  getConventionsByFilters(
-    filters: GetConventionByFiltersQueries,
-  ): Promise<ConventionReadDto[]>;
   getLatestConventions: (
     requestDto: ListConventionsRequestDto,
   ) => Promise<ConventionReadDto[]>;
@@ -24,4 +22,10 @@ export interface ConventionQueries {
   getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink: (
     dateEnd: Date,
   ) => Promise<ConventionReadDto[]>;
+
+  getConventionsByFilters(
+    filters: GetConventionByFiltersQueries,
+  ): Promise<ConventionReadDto[]>;
+
+  getConventionsByScope(scope: ConventionScope): Promise<ConventionReadDto[]>;
 }

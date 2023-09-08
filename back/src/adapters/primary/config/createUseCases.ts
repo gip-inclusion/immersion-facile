@@ -22,6 +22,7 @@ import { CreateImmersionAssessment } from "../../../domain/convention/useCases/C
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { GetConventionForApiConsumer } from "../../../domain/convention/useCases/GetConventionForApiConsumer";
+import { GetConventionsForApiConsumer } from "../../../domain/convention/useCases/GetConventionsForApiConsumer";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../../domain/convention/useCases/notifications/NotifyActorThatConventionNeedsModifications";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -211,6 +212,9 @@ export const createUseCases = (
       ),
       getConvention: new GetConvention(uowPerformer),
       getConventionForApiConsumer: new GetConventionForApiConsumer(
+        uowPerformer,
+      ),
+      getConventionsForApiConsumer: new GetConventionsForApiConsumer(
         uowPerformer,
       ),
       linkPoleEmploiAdvisorAndRedirectToConvention:

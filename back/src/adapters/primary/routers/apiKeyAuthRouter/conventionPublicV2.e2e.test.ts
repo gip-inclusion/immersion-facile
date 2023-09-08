@@ -18,7 +18,7 @@ import {
 
 const agency = new AgencyDtoBuilder().build();
 const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
-const authorizedConsumer = new ApiConsumerBuilder()
+const conventionReadConsumerWithAgencyIdsScope = new ApiConsumerBuilder()
   .withConventionRight({
     kinds: ["READ"],
     scope: {
@@ -27,10 +27,20 @@ const authorizedConsumer = new ApiConsumerBuilder()
   })
   .build();
 
-const unauthorizedConsumer = new ApiConsumerBuilder()
-  .withId("unauthorized-consumer-id")
+const conventionReadConsumerWithNoScope = new ApiConsumerBuilder()
+  .withId("convention-read-with-no-scope-id")
   .withConventionRight({
     kinds: ["READ"],
+    scope: {
+      agencyIds: [],
+    },
+  })
+  .build();
+
+const conventionUnauthorizedConsumer = new ApiConsumerBuilder()
+  .withId("unauthorized-consumer-id")
+  .withConventionRight({
+    kinds: [],
     scope: {
       agencyIds: [],
     },
@@ -41,21 +51,26 @@ describe("Convention routes", () => {
   let request: SuperTest<Test>;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let sharedRequest: HttpClient<PublicApiV2ConventionRoutes>;
-  let authorizedApiConsumerToken: string;
-  let unauthorizedApiConsumerToken: string;
+  let conventionReadConsumerWithAgencyIdsScopeToken: string;
+  let conventionReadConsumerWithNoScopeToken: string;
+  let conventionUnauthorizedConsumerToken: string;
   let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
     inMemoryUow.apiConsumerRepository.consumers = [
-      authorizedConsumer,
-      unauthorizedConsumer,
+      conventionReadConsumerWithAgencyIdsScope,
+      conventionReadConsumerWithNoScope,
+      conventionUnauthorizedConsumer,
     ];
-    authorizedApiConsumerToken = generateApiConsumerJwt({
-      id: authorizedConsumer.id,
+    conventionReadConsumerWithAgencyIdsScopeToken = generateApiConsumerJwt({
+      id: conventionReadConsumerWithAgencyIdsScope.id,
     });
-    unauthorizedApiConsumerToken = generateApiConsumerJwt({
-      id: unauthorizedConsumer.id,
+    conventionReadConsumerWithNoScopeToken = generateApiConsumerJwt({
+      id: conventionReadConsumerWithNoScope.id,
+    });
+    conventionUnauthorizedConsumerToken = generateApiConsumerJwt({
+      id: conventionUnauthorizedConsumer.id,
     });
     sharedRequest = createSupertestSharedClient(
       publicApiV2ConventionRoutes,
@@ -76,14 +91,14 @@ describe("Convention routes", () => {
       expectToEqual(status, 401);
     });
 
-    it("403 when the apiConsumer does not have enough privileges", async () => {
+    it("403 when the apiConsumer has READ access to convention but no scope", async () => {
       inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
 
       const { body, status } = await sharedRequest.getConventionById({
-        headers: { authorization: unauthorizedApiConsumerToken },
+        headers: { authorization: conventionReadConsumerWithNoScopeToken },
         urlParams: { conventionId: convention.id },
       });
 
@@ -100,8 +115,13 @@ describe("Convention routes", () => {
         [convention.id]: convention,
       });
 
+      expect(
+        displayRouteName(publicApiV2ConventionRoutes.getConventionById),
+      ).toBe("GET /v2/conventions/:conventionId -");
       const { body, status } = await sharedRequest.getConventionById({
-        headers: { authorization: authorizedApiConsumerToken },
+        headers: {
+          authorization: conventionReadConsumerWithAgencyIdsScopeToken,
+        },
         urlParams: { conventionId: convention.id },
       });
 
@@ -111,6 +131,65 @@ describe("Convention routes", () => {
         agencyDepartment: agency.address.departmentCode,
       });
       expectToEqual(status, 200);
+    });
+  });
+
+  describe(`${displayRouteName(
+    publicApiV2ConventionRoutes.getConventions,
+  )} get convention filtered by params`, () => {
+    it("401 - fails without apiKey", async () => {
+      const response = await sharedRequest.getConventions({
+        headers: { authorization: "" },
+      });
+
+      expectToEqual(response, {
+        status: 401,
+        body: {
+          status: 401,
+          message: "unauthenticated",
+        },
+      });
+    });
+
+    it("403 when the apiConsumer does not READ access on convention", async () => {
+      const response = await sharedRequest.getConventions({
+        headers: { authorization: conventionUnauthorizedConsumerToken },
+      });
+
+      expectToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: "Accès refusé",
+        },
+      });
+    });
+
+    it("200 - returns the conventions matching agencyIds in scope", async () => {
+      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.conventionRepository.setConventions({
+        [convention.id]: convention,
+      });
+
+      expect(displayRouteName(publicApiV2ConventionRoutes.getConventions)).toBe(
+        "GET /v2/conventions -",
+      );
+      const response = await sharedRequest.getConventions({
+        headers: {
+          authorization: conventionReadConsumerWithAgencyIdsScopeToken,
+        },
+      });
+
+      expectToEqual(response, {
+        body: [
+          {
+            ...convention,
+            agencyName: agency.name,
+            agencyDepartment: agency.address.departmentCode,
+          },
+        ],
+        status: 200,
+      });
     });
   });
 });
