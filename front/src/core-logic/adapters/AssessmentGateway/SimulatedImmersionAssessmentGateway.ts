@@ -12,7 +12,7 @@ export class SimulatedImmersionAssessmentGateway
 {
   constructor(private latency: number = 0) {}
 
-  createAssessment({ assessment }: AssessmentAndJwt): Observable<void> {
+  public createAssessment({ assessment }: AssessmentAndJwt): Observable<void> {
     return assessment.conventionId === failedId
       ? throwError(failedIdError)
       : of(undefined).pipe(delay(this.latency));

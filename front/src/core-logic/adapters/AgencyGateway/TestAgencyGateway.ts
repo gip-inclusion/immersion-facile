@@ -18,8 +18,6 @@ import {
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  private _agencies: Record<string, AgencyDto> = {};
-
   public agencies$ = new Subject<AgencyOption[]>();
 
   public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
@@ -30,8 +28,10 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
-  async addAgency(createAgencyDto: CreateAgencyDto) {
-    this._agencies[createAgencyDto.id] = {
+  #agencies: Record<string, AgencyDto> = {};
+
+  public async addAgency(createAgencyDto: CreateAgencyDto) {
+    this.#agencies[createAgencyDto.id] = {
       ...createAgencyDto,
       status: "needsReview",
       adminEmails: [],
@@ -39,75 +39,71 @@ export class TestAgencyGateway implements AgencyGateway {
     };
   }
 
-  getAgencyAdminById$(
+  public getAgencyAdminById$(
     _agencyId: AgencyId,
     _adminToken: BackOfficeJwt,
   ): Observable<AgencyDto | undefined> {
     return this.fetchedAgency$;
   }
 
-  async getAgencyPublicInfoById(
+  public async getAgencyPublicInfoById(
     withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
-    const agency = this._agencies[withAgencyId.agencyId];
+    const agency = this.#agencies[withAgencyId.agencyId];
     if (agency) return toAgencyPublicDisplayDto(agency);
     throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
   }
 
-  getAgencyPublicInfoById$(
+  public getAgencyPublicInfoById$(
     _agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto> {
     return this.agencyInfo$;
   }
 
-  async getFilteredAgencies(
+  public async getFilteredAgencies(
     _filter: ListAgenciesRequestDto,
   ): Promise<AgencyOption[]> {
     throw new Error(`Not implemented`);
   }
 
-  getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
+  public getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
     return this.customAgencyId$;
   }
 
-  listAgenciesByFilter$(
+  public listAgenciesByFilter$(
     _filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]> {
     return this.agencies$;
   }
 
-  async listAgenciesNeedingReview(): Promise<AgencyDto[]> {
-    return values(this._agencies).filter(propEq("status", "needsReview"));
-  }
-
-  listAgenciesNeedingReview$(
+  public listAgenciesNeedingReview$(
     _adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
     return this.agencies$;
   }
 
-  async listImmersionAgencies(
+  public async listImmersionAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies);
+    return values(this.#agencies);
   }
 
-  async listImmersionOnlyPeAgencies(
+  public async listImmersionOnlyPeAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propEq("kind", "pole-emploi"));
+    return values(this.#agencies).filter(propEq("kind", "pole-emploi"));
   }
 
-  async listImmersionWithoutPeAgencies(
+  public async listImmersionWithoutPeAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
+    return values(this.#agencies).filter(propNotEq("kind", "pole-emploi"));
   }
 
-  async listMiniStageAgencies(
+  public async listMiniStageAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propNotEq("kind", "cci"));
+    return values(this.#agencies).filter(propNotEq("kind", "cci"));
   }
 
   public updateAgency$(
@@ -117,17 +113,17 @@ export class TestAgencyGateway implements AgencyGateway {
     return this.updateAgencyResponse$;
   }
 
-  async validateOrRejectAgency(
-    _: BackOfficeJwt,
-    agencyId: AgencyId,
-  ): Promise<void> {
-    this._agencies[agencyId].status = "active";
-  }
-
-  validateOrRejectAgency$(
+  public validateOrRejectAgency$(
     _: BackOfficeJwt,
     agencyId: AgencyId,
   ): Observable<void> {
-    return from(this.validateOrRejectAgency(_, agencyId));
+    return from(this.#validateOrRejectAgency(_, agencyId));
+  }
+
+  async #validateOrRejectAgency(
+    _: BackOfficeJwt,
+    agencyId: AgencyId,
+  ): Promise<void> {
+    this.#agencies[agencyId].status = "active";
   }
 }

@@ -26,7 +26,7 @@ export class SimulatedSiretGatewayThroughBack
   ) {}
 
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
-    const response$ = of(this.simulatedResponse(siret));
+    const response$ = of(this.#simulatedResponse(siret));
     return this.simulatedLatency
       ? response$.pipe(delay(this.simulatedLatency))
       : response$;
@@ -39,7 +39,7 @@ export class SimulatedSiretGatewayThroughBack
   }
 
   public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
-    const response = this.simulatedResponse(siret);
+    const response = this.#simulatedResponse(siret);
     const response$ = of(
       response === "Establishment with this siret is already in our DB",
     );
@@ -48,7 +48,7 @@ export class SimulatedSiretGatewayThroughBack
       : response$;
   }
 
-  private simulatedResponse(rawSiret: SiretDto): GetSiretInfo {
+  #simulatedResponse(rawSiret: SiretDto): GetSiretInfo {
     const siret = siretSchema.parse(rawSiret);
 
     if (siret === tooManySirenRequestsSiret)

@@ -15,25 +15,12 @@ export class HttpInclusionConnectedGateway
     private readonly httpClient: HttpClient<InclusionConnectedAllowedTargets>,
   ) {}
 
-  private getCurrentUser(token: string) {
-    return this.httpClient.getInclusionConnectedUser({
-      headers: { authorization: token },
-    });
-  }
-
   public getCurrentUser$(token: string): Observable<InclusionConnectedUser> {
-    return from(this.getCurrentUser(token)).pipe(
+    return from(this.#getCurrentUser(token)).pipe(
       map(({ responseBody }) =>
         inclusionConnectedUserSchema.parse(responseBody),
       ),
     );
-  }
-
-  private registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {
-    return this.httpClient.registerAgenciesToUser({
-      headers: { authorization: token },
-      body: agencyIds,
-    });
   }
 
   public registerAgenciesToCurrentUser$(
@@ -41,11 +28,24 @@ export class HttpInclusionConnectedGateway
     token: string,
   ): Observable<void> {
     return from(
-      this.registerAgenciesToCurrentUser(agencyIds, token).then(
+      this.#registerAgenciesToCurrentUser(agencyIds, token).then(
         (responseBody) => {
           responseBody;
         },
       ),
     );
+  }
+
+  #getCurrentUser(token: string) {
+    return this.httpClient.getInclusionConnectedUser({
+      headers: { authorization: token },
+    });
+  }
+
+  #registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {
+    return this.httpClient.registerAgenciesToUser({
+      headers: { authorization: token },
+      body: agencyIds,
+    });
   }
 }

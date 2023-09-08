@@ -74,7 +74,9 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .build();
 
 export class InMemoryAgencyGateway implements AgencyGateway {
-  private _agencies: Record<string, AgencyDto> = {
+  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
+
+  #agencies: Record<string, AgencyDto> = {
     [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
     [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
     [AGENCY_NEEDING_REVIEW_1.id]: AGENCY_NEEDING_REVIEW_1,
@@ -82,10 +84,8 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     [CCI_ACTIVE.id]: CCI_ACTIVE,
   };
 
-  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
-
-  async addAgency(createAgencyDto: CreateAgencyDto) {
-    this._agencies[createAgencyDto.id] = {
+  public async addAgency(createAgencyDto: CreateAgencyDto) {
+    this.#agencies[createAgencyDto.id] = {
       ...createAgencyDto,
       status: "needsReview",
       adminEmails: [],
@@ -93,31 +93,31 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     };
   }
 
-  getAgencyAdminById$(
+  public getAgencyAdminById$(
     agencyId: AgencyId,
     _adminToken: BackOfficeJwt,
   ): Observable<AgencyDto> {
-    return of(this._agencies[agencyId]);
+    return of(this.#agencies[agencyId]);
   }
 
-  async getAgencyPublicInfoById(
+  public async getAgencyPublicInfoById(
     withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
-    const agency = this._agencies[withAgencyId.agencyId];
+    const agency = this.#agencies[withAgencyId.agencyId];
     if (agency) return toAgencyPublicDisplayDto(agency);
     throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
   }
 
-  getAgencyPublicInfoById$(
+  public getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto> {
     return from(this.getAgencyPublicInfoById(agencyId));
   }
 
-  async getFilteredAgencies(
+  public async getFilteredAgencies(
     filter: ListAgenciesRequestDto,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies)
+    return values(this.#agencies)
       .filter((agency) => filter.status?.includes(agency.status) ?? true)
       .map((agency) => ({
         id: agency.id,
@@ -126,21 +126,21 @@ export class InMemoryAgencyGateway implements AgencyGateway {
       }));
   }
 
-  getImmersionFacileAgencyId$(): Observable<AgencyId> {
+  public getImmersionFacileAgencyId$(): Observable<AgencyId> {
     return of("agency-id-with-immersion-facile-kind");
   }
 
-  listAgenciesByFilter$(
+  public listAgenciesByFilter$(
     _filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]> {
-    return of(values(this._agencies));
+    return of(values(this.#agencies));
   }
 
-  listAgenciesNeedingReview$(
+  public listAgenciesNeedingReview$(
     _adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
     return of(
-      values(this._agencies)
+      values(this.#agencies)
         .filter((agency) => agency.status === "needsReview")
         .map((agency) => ({
           id: agency.id,
@@ -150,47 +150,47 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     );
   }
 
-  async listImmersionAgencies(
+  public async listImmersionAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propNotEq("kind", "cci"));
+    return values(this.#agencies).filter(propNotEq("kind", "cci"));
   }
 
-  async listImmersionOnlyPeAgencies(
+  public async listImmersionOnlyPeAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propEq("kind", "pole-emploi"));
+    return values(this.#agencies).filter(propEq("kind", "pole-emploi"));
   }
 
-  async listImmersionWithoutPeAgencies(
+  public async listImmersionWithoutPeAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies)
+    return values(this.#agencies)
       .filter(propNotEq("kind", "cci"))
       .filter(propNotEq("kind", "pole-emploi"));
   }
 
-  async listMiniStageAgencies(
+  public async listMiniStageAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propEq("kind", "cci"));
+    return values(this.#agencies).filter(propEq("kind", "cci"));
   }
 
-  updateAgency$(): Observable<void> {
+  public updateAgency$(): Observable<void> {
     return of(undefined);
-  }
-
-  async validateOrRejectAgency(
-    _: BackOfficeJwt,
-    agencyId: AgencyId,
-  ): Promise<void> {
-    this._agencies[agencyId].status = "active";
   }
 
   public validateOrRejectAgency$(
     adminToken: BackOfficeJwt,
     agencyId: AgencyId,
   ): Observable<void> {
-    return from(this.validateOrRejectAgency(adminToken, agencyId));
+    return from(this.#validateOrRejectAgency(adminToken, agencyId));
+  }
+
+  async #validateOrRejectAgency(
+    _: BackOfficeJwt,
+    agencyId: AgencyId,
+  ): Promise<void> {
+    this.#agencies[agencyId].status = "active";
   }
 }

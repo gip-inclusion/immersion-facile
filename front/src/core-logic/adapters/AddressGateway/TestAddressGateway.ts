@@ -5,11 +5,11 @@ import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 export class TestAddressGateway implements AddressGateway {
   public lookupLocationResults$ = new Subject<LookupSearchResult[]>();
 
-  lookupLocation$(): Observable<LookupSearchResult[]> {
+  public lookupLocation$(): Observable<LookupSearchResult[]> {
     return this.lookupLocationResults$;
   }
 
-  lookupStreetAddress(): Promise<AddressAndPosition[]> {
+  public lookupStreetAddress(): Promise<AddressAndPosition[]> {
     throw new Error("Method not implemented.");
   }
 }

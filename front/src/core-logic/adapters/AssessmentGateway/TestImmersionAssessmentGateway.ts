@@ -10,7 +10,7 @@ export class TestImmersionAssessmentGateway
   // test purpose
   public creationResponse$ = new Subject<void>();
 
-  createAssessment(_params: AssessmentAndJwt): Observable<void> {
+  public createAssessment(_params: AssessmentAndJwt): Observable<void> {
     return this.creationResponse$;
   }
 }

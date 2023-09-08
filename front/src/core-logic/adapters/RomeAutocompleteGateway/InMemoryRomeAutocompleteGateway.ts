@@ -5,13 +5,13 @@ import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGa
 export class InMemoryRomeAutocompleteGateway
   implements RomeAutocompleteGateway
 {
-  private readonly _romeDtos$: Subject<RomeDto[]>;
+  readonly #romeDtos$: Subject<RomeDto[]>;
 
   constructor(
     private readonly seedRomeDtos?: RomeDto[],
     private readonly simulatedLatency = 0,
   ) {
-    this._romeDtos$ = seedRomeDtos
+    this.#romeDtos$ = seedRomeDtos
       ? new BehaviorSubject(seedRomeDtos)
       : new Subject<RomeDto[]>();
   }
@@ -82,13 +82,13 @@ export class InMemoryRomeAutocompleteGateway
       throw new Error("418 I'm a teapot");
 
     return this.simulatedLatency
-      ? this._romeDtos$.pipe(delay(this.simulatedLatency))
-      : this._romeDtos$;
+      ? this.#romeDtos$.pipe(delay(this.simulatedLatency))
+      : this.#romeDtos$;
   }
 
   // for test purpose
-  get romeDtos$() {
-    return this._romeDtos$;
+  public get romeDtos$() {
+    return this.#romeDtos$;
   }
 }
 
