@@ -42,15 +42,15 @@ const ONE_HOUR_MS = ONE_SECOND_MS * 3_600;
 
 // documentation https://developers.brevo.com/reference/sendtransacemail
 export class BrevoNotificationGateway implements NotificationGateway {
-  private readonly brevoHeaders: BrevoHeaders;
+  readonly #brevoHeaders: BrevoHeaders;
 
-  private emailLimiter = new Bottleneck({
+  #emailLimiter = new Bottleneck({
     reservoir: brevoMaxEmailRequestsPerSeconds,
     reservoirRefreshInterval: ONE_SECOND_MS, // number of ms
     reservoirRefreshAmount: brevoMaxEmailRequestsPerSeconds,
   });
 
-  private smslimiter = new Bottleneck({
+  #smslimiter = new Bottleneck({
     reservoir: brevoMaxSmsRequestsPerHours,
     reservoirRefreshInterval: ONE_HOUR_MS, // number of ms
     reservoirRefreshAmount: brevoMaxSmsRequestsPerHours,
@@ -65,19 +65,11 @@ export class BrevoNotificationGateway implements NotificationGateway {
     private defaultSender: RecipientOrSender,
     private generateHtmlOptions: GenerateHtmlOptions = {},
   ) {
-    this.brevoHeaders = {
+    this.#brevoHeaders = {
       accept: "application/json",
       "content-type": "application/json",
       "api-key": apiKey,
     };
-  }
-
-  private filterAllowListAndConvertToRecipients(
-    emails: string[] = [],
-  ): RecipientOrSender[] {
-    return emails
-      .filter(this.emailAllowListPredicate)
-      .map((email) => ({ email }));
   }
 
   public async getAttachmentContent(downloadToken: string): Promise<Buffer> {
@@ -85,7 +77,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       urlParams: { downloadToken },
       headers: {
         accept: "application/octet-stream",
-        "api-key": this.brevoHeaders["api-key"],
+        "api-key": this.#brevoHeaders["api-key"],
       },
     });
     return response.responseBody;
@@ -99,10 +91,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
       );
       throw new BadRequestError("No recipient for provided email");
     }
-    const cc = this.filterAllowListAndConvertToRecipients(email.cc);
+    const cc = this.#filterAllowListAndConvertToRecipients(email.cc);
 
     const emailData: SendTransactEmailRequestBody = {
-      to: this.filterAllowListAndConvertToRecipients(email.recipients),
+      to: this.#filterAllowListAndConvertToRecipients(email.recipients),
       ...(email.replyTo ? { replyTo: email.replyTo } : {}),
       ...(cc.length ? { cc } : {}),
       ...(email.attachments ? { attachment: email.attachments } : {}),
@@ -137,7 +129,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       "sendTransactEmailTotal",
     );
 
-    return this.sendTransacEmail(emailData)
+    return this.#sendTransacEmail(emailData)
       .then((_response) => {
         counterSendTransactEmailSuccess.inc({ emailType });
         logger.info(
@@ -160,7 +152,11 @@ export class BrevoNotificationGateway implements NotificationGateway {
       });
   }
 
-  sendSms({ kind, params, recipientPhone }: TemplatedSms): Promise<void> {
+  public sendSms({
+    kind,
+    params,
+    recipientPhone,
+  }: TemplatedSms): Promise<void> {
     logger.info(
       {
         phone: recipientPhone,
@@ -168,7 +164,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       "sendTransactSmsTotal",
     );
 
-    return this.sendTransacSms({
+    return this.#sendTransacSms({
       content: smsTemplatesByName[kind].createContent(params as any),
       sender: "ImmerFacile",
       recipient: recipientPhone,
@@ -193,21 +189,29 @@ export class BrevoNotificationGateway implements NotificationGateway {
       });
   }
 
-  private async sendTransacEmail(body: SendTransactEmailRequestBody) {
-    return this.emailLimiter.schedule(() =>
+  async #sendTransacEmail(body: SendTransactEmailRequestBody) {
+    return this.#emailLimiter.schedule(() =>
       this.httpClient.sendTransactEmail({
-        headers: this.brevoHeaders,
+        headers: this.#brevoHeaders,
         body,
       }),
     );
   }
 
-  private sendTransacSms(body: SendTransactSmsRequestBody) {
-    return this.smslimiter.schedule(() =>
+  #sendTransacSms(body: SendTransactSmsRequestBody) {
+    return this.#smslimiter.schedule(() =>
       this.httpClient.sendTransactSms({
-        headers: this.brevoHeaders,
+        headers: this.#brevoHeaders,
         body,
       }),
     );
+  }
+
+  #filterAllowListAndConvertToRecipients(
+    emails: string[] = [],
+  ): RecipientOrSender[] {
+    return emails
+      .filter(this.emailAllowListPredicate)
+      .map((email) => ({ email }));
   }
 }
