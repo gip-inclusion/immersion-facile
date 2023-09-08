@@ -4,17 +4,13 @@ import {
 } from "../../../../domain/offer/ports/PeAgenciesReferential";
 
 export class InMemoryPeAgenciesReferential implements PeAgenciesReferential {
-  private _peAgencies: PeAgencyFromReferenciel[] = [];
+  #peAgencies: PeAgencyFromReferenciel[] = [];
 
-  async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
-    return this._peAgencies;
+  public async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
+    return this.#peAgencies;
   }
 
-  get peAgencies(): PeAgencyFromReferenciel[] {
-    return this._peAgencies;
-  }
-
-  setPeAgencies(peAgencies: PeAgencyFromReferenciel[]) {
-    this._peAgencies = peAgencies;
+  public setPeAgencies(peAgencies: PeAgencyFromReferenciel[]) {
+    this.#peAgencies = peAgencies;
   }
 }
