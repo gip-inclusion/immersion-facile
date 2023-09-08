@@ -390,5 +390,36 @@ export const createOpenApiSpecV2 = (envType: string) =>
           },
         },
       },
+      getConventions: {
+        summary:
+          "Récupération de conventions filtrées sur le scope du consommateur de l'api",
+        description: "Renvoie les conventions correspondantes",
+        extraDocs: {
+          responses: {
+            "200": {
+              description: "Retourne un tableau de conventions",
+              example: [
+                {
+                  ...new ConventionDtoBuilder().build(),
+                  agencyName: "Agence de test",
+                  agencyDepartment: "75",
+                },
+              ],
+            },
+            "400": {
+              description: "Erreur dans le contrat d'api'",
+            },
+            "401": {
+              description: "Utilisateur non authentifié",
+              example: error401Example,
+            },
+            "403": {
+              description:
+                "Accès non autorisé (veuillez vérifier que vous avez les droits)",
+              example: error403Example,
+            },
+          },
+        },
+      },
     },
   });

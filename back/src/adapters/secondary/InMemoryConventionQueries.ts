@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionId,
   ConventionReadDto,
+  ConventionScope,
   ListConventionsRequestDto,
   validatedConventionStatuses,
   WithConventionIdLegacy,
@@ -12,6 +13,7 @@ import {
   GetConventionByFiltersQueries,
 } from "../../domain/convention/ports/ConventionQueries";
 import { createLogger } from "../../utils/logger";
+import { NotFoundError } from "../primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
@@ -81,6 +83,25 @@ export class InMemoryConventionQueries implements ConventionQueries {
         )
           return false;
         return true;
+      })
+      .map((convention) => this.#addAgencyDataToConvention(convention));
+  }
+
+  public async getConventionsByScope(
+    scope: ConventionScope,
+  ): Promise<ConventionReadDto[]> {
+    return Object.values(this.conventionRepository._conventions)
+      .filter((convention) => {
+        const agency = this.agencyRepository.agencies.find(
+          (agency) => agency.id === convention.agencyId,
+        );
+
+        if (!agency) throw new NotFoundError("agency not found");
+
+        return (
+          scope.agencyKinds?.includes(agency.kind) ||
+          scope.agencyIds?.includes(agency.id)
+        );
       })
       .map((convention) => this.#addAgencyDataToConvention(convention));
   }

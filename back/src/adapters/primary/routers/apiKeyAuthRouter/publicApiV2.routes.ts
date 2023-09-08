@@ -66,4 +66,15 @@ export const publicApiV2ConventionRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
+  getConventions: defineRoute({
+    method: "get",
+    url: "/v2/conventions",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: z.array(conventionReadSchema),
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+    },
+  }),
 });
