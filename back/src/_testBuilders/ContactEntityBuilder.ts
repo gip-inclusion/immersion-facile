@@ -19,39 +19,27 @@ const validContactEntityV2: ContactEntity = {
 export class ContactEntityBuilder implements Builder<ContactEntity> {
   constructor(private readonly entity: ContactEntity = validContactEntityV2) {}
 
-  build() {
+  public build() {
     return this.entity;
   }
 
-  withContactMethod(contactMethod: ContactMethod) {
+  public withContactMethod(contactMethod: ContactMethod) {
     return new ContactEntityBuilder({ ...this.entity, contactMethod });
   }
 
-  withCopyEmails(copyEmails: string[]) {
+  public withCopyEmails(copyEmails: string[]) {
     return new ContactEntityBuilder({ ...this.entity, copyEmails });
   }
 
-  withEmail(email: string) {
+  public withEmail(email: string) {
     return new ContactEntityBuilder({ ...this.entity, email });
   }
 
-  withFirstname(firstName: string) {
-    return new ContactEntityBuilder({ ...this.entity, firstName });
-  }
-
-  withGeneratedContactId() {
+  public withGeneratedContactId() {
     return this.withId(new UuidV4Generator().new());
   }
 
-  withId(id: string) {
+  public withId(id: string) {
     return new ContactEntityBuilder({ ...this.entity, id });
-  }
-
-  withLastname(lastName: string) {
-    return new ContactEntityBuilder({ ...this.entity, lastName });
-  }
-
-  withPhone(phone: string) {
-    return new ContactEntityBuilder({ ...this.entity, phone });
   }
 }
