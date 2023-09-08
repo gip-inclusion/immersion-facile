@@ -33,35 +33,28 @@ export type AxiosConfig = {
 // See "Working with AppConfig" in back/README.md for more details.
 
 export class AppConfig {
-  private readonly getBooleanVariable;
+  readonly #getBooleanVariable;
 
-  private readonly throwIfNotAbsoluteUrl;
+  readonly #throwIfNotAbsoluteUrl;
 
-  private readonly throwIfNotDefinedOrDefault;
+  readonly #throwIfNotDefinedOrDefault;
 
-  private readonly throwIfNotGeosearchApiKey;
+  readonly #throwIfNotGeosearchApiKey;
 
-  private readonly throwIfNotInArray;
+  readonly #throwIfNotInArray;
 
-  public static createFromEnv(
-    readDotEnv = true,
-    configParams = process.env,
-  ): AppConfig {
-    if (readDotEnv) dotenv.config({ path: `${__dirname}/../../../../.env` });
-    return new AppConfig(configParams);
-  }
-
-  private constructor(readonly env: ProcessEnv) {
-    this.throwIfNotInArray = makeThrowIfNotInArray(env);
-    this.throwIfNotDefinedOrDefault = makeThrowIfNotDefinedOrDefault(env);
-    this.throwIfNotAbsoluteUrl = makeThrowIfNotAbsoluteUrl(env);
-    this.getBooleanVariable = makeGetBooleanVariable(env);
-    this.throwIfNotGeosearchApiKey = makeThrowIfNotOpenCageGeosearchKey(env);
+  // eslint-disable-next-line no-restricted-syntax
+  private constructor(private readonly env: ProcessEnv) {
+    this.#throwIfNotInArray = makeThrowIfNotInArray(env);
+    this.#throwIfNotDefinedOrDefault = makeThrowIfNotDefinedOrDefault(env);
+    this.#throwIfNotAbsoluteUrl = makeThrowIfNotAbsoluteUrl(env);
+    this.#getBooleanVariable = makeGetBooleanVariable(env);
+    this.#throwIfNotGeosearchApiKey = makeThrowIfNotOpenCageGeosearchKey(env);
   }
 
   // https://opencagedata.com/
   public get apiAddress() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "ADDRESS_API_GATEWAY",
       authorizedValues: ["IN_MEMORY", "OPEN_CAGE_DATA"],
     });
@@ -69,45 +62,45 @@ export class AppConfig {
 
   // https://adresse.data.gouv.fr/
   public get apiJwtPrivateKey() {
-    return this.throwIfNotDefinedOrDefault("API_JWT_PRIVATE_KEY");
+    return this.#throwIfNotDefinedOrDefault("API_JWT_PRIVATE_KEY");
   }
 
   // == Address Api gateway choice between 2 providers ==
   public get apiJwtPublicKey() {
-    return this.throwIfNotDefinedOrDefault("API_JWT_PUBLIC_KEY");
+    return this.#throwIfNotDefinedOrDefault("API_JWT_PUBLIC_KEY");
   }
 
   // == Notification gateway provider api keys ==
   public get apiKeyBrevo() {
-    return this.throwIfNotDefinedOrDefault("BREVO_API_KEY");
+    return this.#throwIfNotDefinedOrDefault("BREVO_API_KEY");
   }
 
   public get apiKeyOpenCageDataGeocoding() {
-    return this.throwIfNotDefinedOrDefault("API_KEY_OPEN_CAGE_DATA_GEOCODING");
+    return this.#throwIfNotDefinedOrDefault("API_KEY_OPEN_CAGE_DATA_GEOCODING");
   }
 
   public get apiKeyOpenCageDataGeosearch() {
-    return this.throwIfNotGeosearchApiKey("API_KEY_OPEN_CAGE_DATA_GEOSEARCH");
+    return this.#throwIfNotGeosearchApiKey("API_KEY_OPEN_CAGE_DATA_GEOSEARCH");
   }
 
   public get backofficePassword() {
-    return this.throwIfNotDefinedOrDefault("BACKOFFICE_PASSWORD");
+    return this.#throwIfNotDefinedOrDefault("BACKOFFICE_PASSWORD");
   }
 
   // == Backoffice ==
   public get backofficeUsername() {
-    return this.throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
+    return this.#throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
   }
 
   public get cellarS3Params(): S3Params | undefined {
     if (this.documentGateway === "S3") {
       return {
-        endPoint: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_HOST"),
-        accessKeyId: this.throwIfNotDefinedOrDefault("CELLAR_ADDON_KEY_ID"),
-        secretAccessKey: this.throwIfNotDefinedOrDefault(
+        endPoint: this.#throwIfNotDefinedOrDefault("CELLAR_ADDON_HOST"),
+        accessKeyId: this.#throwIfNotDefinedOrDefault("CELLAR_ADDON_KEY_ID"),
+        secretAccessKey: this.#throwIfNotDefinedOrDefault(
           "CELLAR_ADDON_KEY_SECRET",
         ),
-        bucketName: this.throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
+        bucketName: this.#throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
       };
     }
   }
@@ -117,9 +110,17 @@ export class AppConfig {
     return this.env;
   }
 
+  public static createFromEnv(
+    readDotEnv = true,
+    configParams = process.env,
+  ): AppConfig {
+    if (readDotEnv) dotenv.config({ path: `${__dirname}/../../../../.env` });
+    return new AppConfig(configParams);
+  }
+
   // == Metabase
   public get dashboard() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "DASHBOARD_GATEWAY",
       authorizedValues: ["METABASE", "NONE"],
       defaultValue: "NONE",
@@ -136,7 +137,7 @@ export class AppConfig {
   }
 
   public get documentGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       authorizedValues: ["NONE", "S3"],
       variableName: "DOCUMENT_GATEWAY",
       defaultValue: "NONE",
@@ -145,7 +146,7 @@ export class AppConfig {
 
   // == Email gateway provider api keys ==
   public get emailableApiKey(): EmailableApiKey {
-    return this.throwIfNotDefinedOrDefault("EMAILABLE_API_KEY");
+    return this.#throwIfNotDefinedOrDefault("EMAILABLE_API_KEY");
   }
 
   // == Email notifications ==
@@ -155,7 +156,7 @@ export class AppConfig {
 
   // == Email validation gateway ==
   public get emailValidationGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "EMAIL_VALIDATION_GATEWAY",
       authorizedValues: ["IN_MEMORY", "EMAILABLE"],
       defaultValue: "IN_MEMORY",
@@ -163,7 +164,7 @@ export class AppConfig {
   }
 
   public get envType() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "ENV_TYPE",
       authorizedValues: ["dev", "staging", "production", "local"],
       defaultValue: "local",
@@ -177,7 +178,7 @@ export class AppConfig {
 
   public get externalAxiosTimeout(): number {
     return parseInt(
-      this.throwIfNotDefinedOrDefault("EXTERNAL_AXIOS_TIMEOUT", "10000"),
+      this.#throwIfNotDefinedOrDefault("EXTERNAL_AXIOS_TIMEOUT", "10000"),
     );
   }
 
@@ -189,41 +190,41 @@ export class AppConfig {
   }
 
   public get immersionFacileDomain(): string {
-    return this.throwIfNotDefinedOrDefault("DOMAIN");
+    return this.#throwIfNotDefinedOrDefault("DOMAIN");
   }
 
   public get inboundEmailAllowedIps() {
     return parseStringList(
-      this.throwIfNotDefinedOrDefault("INBOUND_EMAIL_ALLOWED_IPS"),
+      this.#throwIfNotDefinedOrDefault("INBOUND_EMAIL_ALLOWED_IPS"),
     );
   }
 
   public get inclusionConnectConfig(): InclusionConnectConfig {
     return this.inclusionConnectGateway === "HTTPS"
       ? {
-          clientId: this.throwIfNotDefinedOrDefault(
+          clientId: this.#throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_ID",
           ),
-          clientSecret: this.throwIfNotDefinedOrDefault(
+          clientSecret: this.#throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_SECRET",
           ),
           immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
-          inclusionConnectBaseUri: this.throwIfNotAbsoluteUrl(
+          inclusionConnectBaseUri: this.#throwIfNotAbsoluteUrl(
             "INCLUSION_CONNECT_BASE_URI",
           ),
           scope: "openid profile email",
         }
       : {
-          clientId: this.throwIfNotDefinedOrDefault(
+          clientId: this.#throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_ID",
             "fake id",
           ),
-          clientSecret: this.throwIfNotDefinedOrDefault(
+          clientSecret: this.#throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_SECRET",
             "fake secret",
           ),
           immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
-          inclusionConnectBaseUri: this.throwIfNotDefinedOrDefault(
+          inclusionConnectBaseUri: this.#throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_BASE_URI",
             "https://fake.url",
           ) as AbsoluteUrl,
@@ -233,7 +234,7 @@ export class AppConfig {
 
   // == Inclusion Connect gateway ==
   public get inclusionConnectGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "INCLUSION_CONNECT_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
@@ -242,21 +243,21 @@ export class AppConfig {
 
   public get inseeHttpConfig(): AxiosConfig {
     return {
-      endpoint: this.throwIfNotDefinedOrDefault("SIRENE_ENDPOINT"),
-      bearerToken: this.throwIfNotDefinedOrDefault("SIRENE_BEARER_TOKEN"),
+      endpoint: this.#throwIfNotDefinedOrDefault("SIRENE_ENDPOINT"),
+      bearerToken: this.#throwIfNotDefinedOrDefault("SIRENE_BEARER_TOKEN"),
     };
   }
 
   public get jwtPrivateKey() {
-    return this.throwIfNotDefinedOrDefault("JWT_PRIVATE_KEY");
+    return this.#throwIfNotDefinedOrDefault("JWT_PRIVATE_KEY");
   }
 
   public get jwtPublicKey() {
-    return this.throwIfNotDefinedOrDefault("JWT_PUBLIC_KEY");
+    return this.#throwIfNotDefinedOrDefault("JWT_PUBLIC_KEY");
   }
 
   public get laBonneBoiteGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "LA_BONNE_BOITE_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
@@ -264,22 +265,22 @@ export class AppConfig {
 
   public get maxConventionsToSyncWithPe() {
     return parseInt(
-      this.throwIfNotDefinedOrDefault("MAX_CONVENTIONS_TO_SYNC_WITH_PE", "50"),
+      this.#throwIfNotDefinedOrDefault("MAX_CONVENTIONS_TO_SYNC_WITH_PE", "50"),
     );
   }
 
   public get metabase() {
     return {
-      metabaseUrl: this.throwIfNotDefinedOrDefault(
+      metabaseUrl: this.#throwIfNotDefinedOrDefault(
         "METABASE_URL",
       ) as AbsoluteUrl,
-      metabaseApiKey: this.throwIfNotDefinedOrDefault("METABASE_API_KEY"),
+      metabaseApiKey: this.#throwIfNotDefinedOrDefault("METABASE_API_KEY"),
     };
   }
 
   public get minimumNumberOfDaysBetweenSimilarContactRequests(): number {
     return parseInt(
-      this.throwIfNotDefinedOrDefault(
+      this.#throwIfNotDefinedOrDefault(
         "MINIMUM_NUMBER_OF_DAYS_BETWEEN_SIMILAR_CONTACT_REQUESTS",
         "7",
       ),
@@ -287,7 +288,7 @@ export class AppConfig {
   }
 
   public get nodeEnv() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "NODE_ENV",
       authorizedValues: ["test", "local", "production"],
     });
@@ -295,46 +296,46 @@ export class AppConfig {
 
   public get nodeProcessReportInterval(): number {
     return parseInt(
-      this.throwIfNotDefinedOrDefault("NODE_PROCESS_REPORT_INTERVAL", "30000"),
+      this.#throwIfNotDefinedOrDefault("NODE_PROCESS_REPORT_INTERVAL", "30000"),
     );
   }
 
   // == Notification gateway ==
   public get notificationGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "NOTIFICATION_GATEWAY",
       authorizedValues: ["IN_MEMORY", "BREVO"],
     });
   }
 
   public get passEmploiGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "PASS_EMPLOI_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
   }
 
   public get passEmploiKey() {
-    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_KEY");
+    return this.#throwIfNotDefinedOrDefault("PASS_EMPLOI_KEY");
   }
 
   public get passEmploiUrl() {
-    return this.throwIfNotDefinedOrDefault("PASS_EMPLOI_URL");
+    return this.#throwIfNotDefinedOrDefault("PASS_EMPLOI_URL");
   }
 
   public get peApiUrl(): AbsoluteUrl {
-    return this.throwIfNotAbsoluteUrl("POLE_EMPLOI_API_URL");
+    return this.#throwIfNotAbsoluteUrl("POLE_EMPLOI_API_URL");
   }
 
   public get peAuthCandidatUrl(): AbsoluteUrl {
-    return this.throwIfNotAbsoluteUrl(
+    return this.#throwIfNotAbsoluteUrl(
       "POLE_EMPLOI_AUTHENTIFICATION_CANDIDAT_URL",
     );
   }
 
   // == PE Connect gateway ==
   public get peConnectGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "PE_CONNECT_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
@@ -342,11 +343,11 @@ export class AppConfig {
   }
 
   public get peEnterpriseUrl(): AbsoluteUrl {
-    return this.throwIfNotAbsoluteUrl("POLE_EMPLOI_ENTREPRISE_URL");
+    return this.#throwIfNotAbsoluteUrl("POLE_EMPLOI_ENTREPRISE_URL");
   }
 
   public get pgImmersionDbUrl() {
-    return this.throwIfNotDefinedOrDefault("DATABASE_URL");
+    return this.#throwIfNotDefinedOrDefault("DATABASE_URL");
   }
 
   public get poleEmploiAccessTokenConfig(): AccessTokenConfig {
@@ -361,15 +362,15 @@ export class AppConfig {
   }
 
   public get poleEmploiClientId() {
-    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_ID");
+    return this.#throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_ID");
   }
 
   public get poleEmploiClientSecret() {
-    return this.throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_SECRET");
+    return this.#throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_SECRET");
   }
 
   public get poleEmploiGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "POLE_EMPLOI_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
@@ -391,7 +392,7 @@ export class AppConfig {
 
   // == Data repositories ==
   public get repositories() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "REPOSITORIES",
       authorizedValues: ["IN_MEMORY", "PG"],
       defaultValue: "IN_MEMORY",
@@ -400,7 +401,7 @@ export class AppConfig {
 
   // == Rome gateway ==
   public get romeRepository() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "ROME_GATEWAY",
       authorizedValues: ["IN_MEMORY", "PG"],
       defaultValue: "IN_MEMORY",
@@ -408,16 +409,14 @@ export class AppConfig {
   }
 
   public get shortLinkIdGeneratorGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "SHORT_LINK_ID_GENERATOR_GATEWAY",
       authorizedValues: ["NANO_ID", "DETERMINIST"],
     });
   }
 
-  // == Sirene repository ==
-
   public get siretGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "SIRENE_REPOSITORY",
       authorizedValues: [
         "IN_MEMORY",
@@ -430,11 +429,13 @@ export class AppConfig {
   }
 
   public get skipEmailAllowlist() {
-    return this.getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
+    return this.#getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
   }
 
+  // == Sirene repository ==
+
   public get timeGateway() {
-    return this.throwIfNotInArray({
+    return this.#throwIfNotInArray({
       variableName: "TIME_GATEWAY",
       authorizedValues: ["CUSTOM", "REAL"],
       defaultValue: "REAL",
@@ -444,16 +445,19 @@ export class AppConfig {
   public get updateEstablishmentFromInseeConfig() {
     return {
       maxEstablishmentsPerBatch: parseInt(
-        this.throwIfNotDefinedOrDefault("MAX_ESTABLISHMENTS_PER_BATCH", "1000"),
+        this.#throwIfNotDefinedOrDefault(
+          "MAX_ESTABLISHMENTS_PER_BATCH",
+          "1000",
+        ),
       ),
       maxEstablishmentsPerFullRun: parseInt(
-        this.throwIfNotDefinedOrDefault(
+        this.#throwIfNotDefinedOrDefault(
           "MAX_ESTABLISHMENTS_PER_FULL_RUN",
           "5000",
         ),
       ),
       numberOfDaysAgoToCheckForInseeUpdates: parseInt(
-        this.throwIfNotDefinedOrDefault(
+        this.#throwIfNotDefinedOrDefault(
           "NUMBER_OF_DAYS_AGO_TO_CHECK_FOR_INSEE_UPDATES",
           "30",
         ),
