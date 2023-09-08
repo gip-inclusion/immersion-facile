@@ -9,7 +9,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   constructor(private readonly _events: Record<string, DomainEvent> = {}) {}
 
   //test purposes
-  get events(): DomainEvent[] {
+  public get events(): DomainEvent[] {
     return values(this._events);
   }
 
