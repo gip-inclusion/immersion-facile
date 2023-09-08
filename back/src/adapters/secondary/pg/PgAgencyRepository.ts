@@ -166,7 +166,7 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
-  async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
+  public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
     const pgResult = await this.client.query(`
            SELECT id 
            FROM agencies
