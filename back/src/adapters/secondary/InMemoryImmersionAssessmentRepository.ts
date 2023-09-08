@@ -5,26 +5,26 @@ import { ImmersionAssessmentRepository } from "../../domain/convention/ports/Imm
 export class InMemoryImmersionAssessmentRepository
   implements ImmersionAssessmentRepository
 {
-  private _assessments: ImmersionAssessmentEntity[] = [];
+  #assessments: ImmersionAssessmentEntity[] = [];
 
   // test purpose
-  get assessments(): ImmersionAssessmentEntity[] {
-    return this._assessments;
+  public get assessments(): ImmersionAssessmentEntity[] {
+    return this.#assessments;
   }
 
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ImmersionAssessmentEntity | undefined> {
-    return this._assessments.find(
+    return this.#assessments.find(
       (assessment) => assessment.conventionId === conventionId,
     );
   }
 
   public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
-    this._assessments.push(assessment);
+    this.#assessments.push(assessment);
   }
 
-  setAssessments(assessments: ImmersionAssessmentEntity[]) {
-    this._assessments = assessments;
+  public setAssessments(assessments: ImmersionAssessmentEntity[]) {
+    this.#assessments = assessments;
   }
 }
