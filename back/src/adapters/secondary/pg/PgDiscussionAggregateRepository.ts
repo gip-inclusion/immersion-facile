@@ -18,13 +18,7 @@ export class PgDiscussionAggregateRepository
 {
   constructor(private client: PoolClient) {}
 
-  private async clearAllExistingExchanges(discussion: DiscussionAggregate) {
-    const query = "DELETE FROM exchanges WHERE discussion_id = $1";
-    const values = [discussion.id];
-    await this.executeQuery("clearAllExistingExchanges", query, values);
-  }
-
-  async countDiscussionsForSiretSince(
+  public async countDiscussionsForSiretSince(
     siret: SiretDto,
     since: Date,
   ): Promise<number> {
@@ -32,7 +26,7 @@ export class PgDiscussionAggregateRepository
       FROM discussions
       WHERE siret = $1 AND created_at >= $2`;
     const values = [siret, since];
-    const pgResult = await this.executeQuery(
+    const pgResult = await this.#executeQuery(
       "countDiscussionsForSiretSince",
       query,
       values,
@@ -40,21 +34,7 @@ export class PgDiscussionAggregateRepository
     return parseInt(pgResult.rows[0].count);
   }
 
-  private executeQuery<R extends QueryResultRow = any, I extends any[] = any[]>(
-    queryName: string,
-    queryTextOrConfig: string | QueryConfig<I>,
-    values?: I,
-  ): Promise<QueryResult<R>> {
-    return this.client.query(queryTextOrConfig, values).catch((error) => {
-      logger.error(
-        { query: queryTextOrConfig, values, error },
-        `PgDiscussionAggregateRepository_${queryName}_queryErrored`,
-      );
-      throw error;
-    });
-  }
-
-  async getById(
+  public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionAggregate | undefined> {
     const query = `
@@ -108,7 +88,7 @@ export class PgDiscussionAggregateRepository
     WHERE id = $1
     `;
     const values = [discussionId];
-    const pgResult = await this.executeQuery("getById", query, values);
+    const pgResult = await this.#executeQuery("getById", query, values);
     const discussion = pgResult.rows.at(0)?.discussion;
     return (
       discussion && {
@@ -144,7 +124,7 @@ export class PgDiscussionAggregateRepository
     return result.rows[0].exists;
   }
 
-  async insert(discussion: DiscussionAggregate) {
+  public async insert(discussion: DiscussionAggregate) {
     logger.info({ ...discussion }, "PgDiscussionAggregateRepository_Insert");
     const query = `INSERT INTO discussions ( 
       id, contact_method, siret, appellation_code, potential_beneficiary_first_name, 
@@ -161,31 +141,8 @@ export class PgDiscussionAggregateRepository
     )`;
     // prettier-ignore
     const values = [ discussion.id, discussion.establishmentContact.contactMethod, discussion.siret, discussion.appellationCode, discussion.potentialBeneficiary.firstName, discussion.potentialBeneficiary.lastName, discussion.potentialBeneficiary.email, discussion.potentialBeneficiary.phone, discussion.immersionObjective, discussion.potentialBeneficiary.resumeLink, discussion.createdAt.toISOString(), discussion.establishmentContact.email, discussion.establishmentContact.firstName, discussion.establishmentContact.lastName, discussion.establishmentContact.phone, discussion.establishmentContact.job, JSON.stringify(discussion.establishmentContact.copyEmails), discussion.address.streetNumberAndAddress, discussion.address.postcode, discussion.address.departmentCode, discussion.address.city, discussion.businessName, ];
-    await this.executeQuery("insert", query, values);
-    await this.insertAllExchanges(discussion.id, discussion.exchanges);
-  }
-
-  private async insertAllExchanges(
-    discussionId: DiscussionId,
-    exchanges: ExchangeEntity[],
-  ) {
-    if (exchanges.length === 0) {
-      logger.info(
-        { discussionId },
-        "PgDiscussionAggregateRepository_insertAllExchanges_SkipNoExchanges",
-      );
-      return;
-    }
-    const query = `
-    INSERT INTO exchanges (discussion_id, message, sender, recipient, sent_at, subject)
-    VALUES %L
-    `;
-    // prettier-ignore
-    const values = exchanges.map(
-      ({ message, recipient, sender, sentAt, subject }) =>
-      [ discussionId, message, sender, recipient, sentAt.toISOString(), subject],
-    );
-    await this.executeQuery("insertAllExchanges", format(query, values));
+    await this.#executeQuery("insert", query, values);
+    await this.#insertAllExchanges(discussion.id, discussion.exchanges);
   }
 
   public async update(discussion: DiscussionAggregate) {
@@ -207,8 +164,51 @@ export class PgDiscussionAggregateRepository
       discussion.id,
       discussion.businessName,
     ];
-    await this.executeQuery("update", query, values);
-    await this.clearAllExistingExchanges(discussion);
-    await this.insertAllExchanges(discussion.id, discussion.exchanges);
+    await this.#executeQuery("update", query, values);
+    await this.#clearAllExistingExchanges(discussion);
+    await this.#insertAllExchanges(discussion.id, discussion.exchanges);
+  }
+
+  async #insertAllExchanges(
+    discussionId: DiscussionId,
+    exchanges: ExchangeEntity[],
+  ) {
+    if (exchanges.length === 0) {
+      logger.info(
+        { discussionId },
+        "PgDiscussionAggregateRepository_insertAllExchanges_SkipNoExchanges",
+      );
+      return;
+    }
+    const query = `
+    INSERT INTO exchanges (discussion_id, message, sender, recipient, sent_at, subject)
+    VALUES %L
+    `;
+    // prettier-ignore
+    const values = exchanges.map(
+      ({ message, recipient, sender, sentAt, subject }) =>
+      [ discussionId, message, sender, recipient, sentAt.toISOString(), subject],
+    );
+    await this.#executeQuery("insertAllExchanges", format(query, values));
+  }
+
+  #executeQuery<R extends QueryResultRow = any, I extends any[] = any[]>(
+    queryName: string,
+    queryTextOrConfig: string | QueryConfig<I>,
+    values?: I,
+  ): Promise<QueryResult<R>> {
+    return this.client.query(queryTextOrConfig, values).catch((error) => {
+      logger.error(
+        { query: queryTextOrConfig, values, error },
+        `PgDiscussionAggregateRepository_${queryName}_queryErrored`,
+      );
+      throw error;
+    });
+  }
+
+  async #clearAllExistingExchanges(discussion: DiscussionAggregate) {
+    const query = "DELETE FROM exchanges WHERE discussion_id = $1";
+    const values = [discussion.id];
+    await this.#executeQuery("clearAllExistingExchanges", query, values);
   }
 }
