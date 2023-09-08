@@ -4,16 +4,16 @@ import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dt
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 
 export class InMemoryPeConnectGateway implements PeConnectGateway {
-  private _accessToken: AccessTokenDto | undefined = undefined;
+  #accessToken: AccessTokenDto | undefined = undefined;
 
-  private _advisors: PeConnectAdvisorDto[] = [];
+  #advisors: PeConnectAdvisorDto[] = [];
 
-  private _user: PeConnectUserDto | undefined = undefined;
+  #user: PeConnectUserDto | undefined = undefined;
 
   public async getAccessToken(
     _authorizationCode: string,
   ): Promise<AccessTokenDto | undefined> {
-    return this._accessToken;
+    return this.#accessToken;
   }
 
   public async getUserAndAdvisors(_accessToken: AccessTokenDto): Promise<
@@ -23,27 +23,27 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
       }
     | undefined
   > {
-    if (!this._user) return undefined;
+    if (!this.#user) return undefined;
     const peUserAndAdvisor: {
       user: PeConnectUserDto;
       advisors: PeConnectAdvisorDto[];
     } = {
-      advisors: this._advisors,
-      user: this._user,
+      advisors: this.#advisors,
+      user: this.#user,
     };
     return peUserAndAdvisor;
   }
 
   public setAccessToken(accessToken: AccessTokenDto) {
-    this._accessToken = accessToken;
+    this.#accessToken = accessToken;
   }
 
   public setAdvisors(advisors: PeConnectAdvisorDto[]) {
-    this._advisors = advisors;
+    this.#advisors = advisors;
   }
 
   // test
   public setUser(user: PeConnectUserDto | undefined) {
-    this._user = user;
+    this.#user = user;
   }
 }
