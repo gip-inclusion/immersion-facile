@@ -21,28 +21,7 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
     return;
   }
 
-  public async markSearchAsProcessed(
-    searchMadeId: SearchMadeId,
-  ): Promise<void> {
-    this._processedSearchesMadeIds.add(searchMadeId);
-  }
-
-  public get processedSearchesMadeIds(): Set<SearchMadeId> {
-    return this._processedSearchesMadeIds;
-  }
-
-  public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
-    return this._searchesMadeEntities.filter(
-      (entity) => !this._processedSearchesMadeIds.has(entity.id),
-    );
-  }
-
   public get searchesMade() {
     return this._searchesMadeEntities;
-  }
-
-  // for test purposes only
-  public setSearchesMade(searchesMade: SearchMadeEntity[]) {
-    this._searchesMadeEntities = searchesMade;
   }
 }

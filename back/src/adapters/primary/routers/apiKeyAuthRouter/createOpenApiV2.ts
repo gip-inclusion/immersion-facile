@@ -37,7 +37,7 @@ const contactInPersonExample: ContactEstablishmentPublicV2Dto = {
 };
 
 const searchImmersionResult: SearchResultDto = {
-  additionalInformation: "Some additionnal information",
+  additionalInformation: "Some additional information",
   address: {
     departmentCode: "75",
     postcode: "75001",

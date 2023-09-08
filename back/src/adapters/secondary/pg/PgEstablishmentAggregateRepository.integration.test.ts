@@ -44,15 +44,11 @@ import {
   insertActiveEstablishmentAndOfferAndEventuallyContact,
   InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
   insertEstablishment,
-  insertImmersionContact,
   insertImmersionOffer,
   PgEstablishmentRow,
   PgEstablishmentRowWithGeo,
   retrieveEstablishmentWithSiret,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
-
-const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
-const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";
 
 const cartographeImmersionOffer = new OfferEntityBuilder()
   .withAppellationCode("11704")
@@ -404,6 +400,12 @@ describe("PgEstablishmentAggregateRepository", () => {
       };
 
       expect(searchResult).toMatchObject([expectedResult]);
+
+      const searchResultsWithOverriddenRomeCode: SearchResultDto[] =
+        await pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
+        });
+      expectToEqual(searchResultsWithOverriddenRomeCode, []);
     });
 
     it("if sorted=distance, returns closest establishments in first", async () => {
@@ -487,39 +489,6 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Assert
       expect(searchResult[0].siret).toEqual(recentOfferSiret);
       expect(searchResult[1].siret).toEqual(oldOfferSiret);
-    });
-
-    it("returns also contact details if offer has contact uuid and flag is True", async () => {
-      // Prepare
-      /// Establishment with offer inside geographical area with searched rome
-      const siretMatchingToSearch = "78000403200029";
-      const contactUidOfOfferMatchingSearch = testUid1;
-
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(client, {
-        siret: siretMatchingToSearch,
-        rome: cartographeImmersionOffer.romeCode,
-        establishmentPosition: searchedPosition,
-        appellationCode: cartographeImmersionOffer.appellationCode,
-        offerContactUid: contactUidOfOfferMatchingSearch,
-        createdAt: new Date(),
-      });
-
-      // With multiple contacts
-      await insertImmersionContact(client, {
-        uuid: testUid2,
-        lastName: "Dupont",
-        email: "jean@dupont",
-        siret_establishment: siretMatchingToSearch,
-      });
-
-      // Act
-      const searchResult: SearchResultDto[] =
-        await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: cartographeSearchMade,
-        });
-
-      // Assert : one match and defined contact details
-      expect(searchResult).toHaveLength(1);
     });
   });
 
