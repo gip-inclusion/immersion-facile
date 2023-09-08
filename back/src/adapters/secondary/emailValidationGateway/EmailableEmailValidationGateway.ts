@@ -14,7 +14,7 @@ const logger = createLogger(__filename);
 const emailableVerifyEmailMaxRatePerSeconds = 25;
 
 export class EmailableEmailValidationGateway implements EmailValidationGetaway {
-  private limiter = new Bottleneck({
+  #limiter = new Bottleneck({
     reservoir: emailableVerifyEmailMaxRatePerSeconds,
     reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: emailableVerifyEmailMaxRatePerSeconds,
@@ -25,7 +25,33 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
     private readonly emailableApiKey: EmailableApiKey,
   ) {}
 
-  private isEmailValid(
+  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
+    return this.#limiter
+      .schedule(() =>
+        this.httpClient.validateEmail({
+          queryParams: {
+            email,
+            api_key: this.emailableApiKey,
+          },
+        }),
+      )
+      .then(({ responseBody }) => ({
+        isValid: this.#isEmailValid(responseBody.state, responseBody.reason),
+        reason: responseBody.reason,
+        ...(responseBody.did_you_mean && {
+          proposal: responseBody.did_you_mean,
+        }),
+      }))
+      .catch((error) => {
+        logger.error(
+          { email, error },
+          "validateEmail => Error while calling emailable API ",
+        );
+        throw error;
+      });
+  }
+
+  #isEmailValid(
     state: EmailableEmailValidationStatus["state"],
     reason: EmailableEmailValidationStatus["reason"],
   ): boolean {
@@ -43,31 +69,5 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
       unacceptableReasons.includes(reason)
       ? false
       : true;
-  }
-
-  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
-    return this.limiter
-      .schedule(() =>
-        this.httpClient.validateEmail({
-          queryParams: {
-            email,
-            api_key: this.emailableApiKey,
-          },
-        }),
-      )
-      .then(({ responseBody }) => ({
-        isValid: this.isEmailValid(responseBody.state, responseBody.reason),
-        reason: responseBody.reason,
-        ...(responseBody.did_you_mean && {
-          proposal: responseBody.did_you_mean,
-        }),
-      }))
-      .catch((error) => {
-        logger.error(
-          { email, error },
-          "validateEmail => Error while calling emailable API ",
-        );
-        throw error;
-      });
   }
 }
