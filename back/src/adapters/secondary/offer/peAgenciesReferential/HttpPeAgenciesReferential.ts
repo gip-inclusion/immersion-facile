@@ -11,27 +11,27 @@ import { createLogger } from "../../../../utils/logger";
 const logger = createLogger(__filename);
 
 export class HttpPeAgenciesReferential implements PeAgenciesReferential {
-  private axios: AxiosInstance;
+  #axios: AxiosInstance;
 
-  private readonly referencielAgenceUrl: AbsoluteUrl;
+  readonly #referencielAgenceUrl: AbsoluteUrl;
 
   constructor(
     peApiUrl: AbsoluteUrl,
     private readonly poleEmploiGateway: PoleEmploiGateway,
     private readonly poleEmploiClientId: string,
   ) {
-    this.axios = createAxiosInstance(logger);
-    this.referencielAgenceUrl = `${peApiUrl}/partenaire/referentielagences/v1/agences`;
+    this.#axios = createAxiosInstance(logger);
+    this.#referencielAgenceUrl = `${peApiUrl}/partenaire/referentielagences/v1/agences`;
   }
 
-  async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
+  public async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
     const accessToken = await this.poleEmploiGateway.getAccessToken(
       `application_${this.poleEmploiClientId} api_referentielagencesv1 organisationpe`,
     );
 
     if (!accessToken) throw new Error("No access token");
 
-    const result = await this.axios.get(this.referencielAgenceUrl, {
+    const result = await this.#axios.get(this.#referencielAgenceUrl, {
       headers: {
         Authorization: `Bearer ${accessToken.access_token}`,
       },
