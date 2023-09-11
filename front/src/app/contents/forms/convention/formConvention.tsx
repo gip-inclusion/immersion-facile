@@ -584,6 +584,18 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  renewed: {
+    label: "",
+    id: "",
+  },
+  "renewed.from": {
+    label: "",
+    id: "",
+  },
+  "renewed.justification": {
+    label: "",
+    id: "",
+  },
 };
 
 type SidebarStepContent = {

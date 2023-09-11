@@ -1,10 +1,21 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
+import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import Button from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { addBusinessDays, addDays } from "date-fns";
 import {
   ConventionReadDto,
+  ConventionRenewed,
   ConventionStatus,
   ConventionSupportedJwt,
+  DateIntervalDto,
+  domElementIds,
+  emptySchedule,
   Role,
   statusTransitionConfigs,
   UpdateConventionStatusRequestDto,
@@ -17,6 +28,7 @@ import {
   conventionSlice,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";
+import { ImmersionHourLocationSection } from "../../forms/convention/sections/hour-location/ImmersionHourLocationSection";
 
 type ConventionManageActionsProps = {
   jwt: ConventionSupportedJwt;
@@ -24,6 +36,21 @@ type ConventionManageActionsProps = {
   role: Role;
   submitFeedback: ConventionSubmitFeedback;
 };
+
+type ConventionRenewForm = Pick<
+  ConventionRenewed,
+  | "dateStart"
+  | "dateEnd"
+  | "schedule"
+  | "renewed"
+  | "signatories"
+  | "internshipKind"
+>;
+
+const renewModal = createModal({
+  id: domElementIds.manageConvention.renewModal,
+  isOpenedByDefault: false,
+});
 
 export const ConventionManageActions = ({
   convention,
@@ -45,6 +72,7 @@ export const ConventionManageActions = ({
           updateStatusParams,
         }),
       );
+
   const disabled = submitFeedback.kind !== "idle";
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
   return (
@@ -168,21 +196,85 @@ export const ConventionManageActions = ({
         )}
 
         {isAllowedTransition(convention.status, "CANCELLED", role) && (
-          <VerificationActionButton
-            initialStatus={convention.status}
-            newStatus="CANCELLED"
-            convention={convention}
-            onSubmit={createOnSubmitWithFeedbackKind("cancelled")}
-            disabled={disabled || convention.status != "ACCEPTED_BY_VALIDATOR"}
-            currentSignatoryRole={role}
-          >
-            {convention.status === "CANCELLED"
-              ? t.verification.conventionAlreadyCancelled
-              : t.verification.markAsCancelled}
-          </VerificationActionButton>
+          <>
+            <VerificationActionButton
+              initialStatus={convention.status}
+              newStatus="CANCELLED"
+              convention={convention}
+              onSubmit={createOnSubmitWithFeedbackKind("cancelled")}
+              disabled={
+                disabled || convention.status != "ACCEPTED_BY_VALIDATOR"
+              }
+              currentSignatoryRole={role}
+            >
+              {convention.status === "CANCELLED"
+                ? t.verification.conventionAlreadyCancelled
+                : t.verification.markAsCancelled}
+            </VerificationActionButton>
+            <Button
+              iconId="fr-icon-file-add-line"
+              className={fr.cx("fr-m-1w")}
+              priority="secondary"
+              onClick={() => renewModal.open()}
+            >
+              Renouveler la convention
+            </Button>
+          </>
+        )}
+        {createPortal(
+          <renewModal.Component title="Renouvellement de convention">
+            <RenewConventionForm convention={convention} />
+          </renewModal.Component>,
+          document.body,
         )}
       </div>
     </div>
+  );
+};
+
+export const RenewConventionForm = ({
+  convention,
+}: {
+  convention: ConventionReadDto;
+}) => {
+  const renewedDefaultDateStart = addBusinessDays(
+    new Date(convention.dateEnd),
+    1,
+  );
+  const defaultDateInterval: DateIntervalDto = {
+    start: renewedDefaultDateStart,
+    end: addDays(new Date(convention.dateEnd), convention.schedule.workedDays),
+  };
+  const methods = useForm<ConventionRenewForm>({
+    defaultValues: {
+      dateStart: defaultDateInterval.start.toISOString(),
+      dateEnd: defaultDateInterval.end.toISOString(),
+      schedule: emptySchedule(defaultDateInterval),
+      internshipKind: convention.internshipKind,
+      renewed: {
+        from: convention.id,
+        justification: "",
+      },
+      signatories: convention.signatories,
+    },
+    mode: "onTouched",
+  });
+  const onSubmit = (data: ConventionRenewForm) => {
+    console.log("onSubmit", data);
+  };
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={methods.handleSubmit(onSubmit)}>
+        <input type="hidden" {...methods.register("renewed.from")} />
+        <ImmersionHourLocationSection />
+        <Input
+          label="Motif de renouvellement"
+          textArea
+          nativeTextAreaProps={methods.register("renewed.justification")}
+        />
+        <Button>Renouveler la convention</Button>
+      </form>
+    </FormProvider>
   );
 };
 

@@ -246,6 +246,7 @@ export const domElementIds = {
     deprecatedModal: "im-deprecate-modal",
     validatorModal: "im-validator-modal",
     cancelModal: "im-cancel-modal",
+    renewModal: "im-renew-modal",
   },
 
   establishment: {

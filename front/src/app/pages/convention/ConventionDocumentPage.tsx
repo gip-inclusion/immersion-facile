@@ -3,8 +3,10 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Route } from "type-route";
 import {
+  ConventionDto,
   ConventionJwt,
   ConventionJwtPayload,
+  ConventionRenewed,
   decodeMagicLinkJwtWithoutSignatureCheck,
   isStringDate,
   makeSiretDescriptionLink,
@@ -89,7 +91,12 @@ export const ConventionDocumentPage = ({
       alt=""
     />,
   ];
-
+  const isConventionRenewed = (
+    convention: ConventionDto,
+  ): convention is ConventionRenewed => "renewed" in convention;
+  const title = isConventionRenewed(convention)
+    ? "Renouvellement de convention"
+    : "Convention";
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {canShowConvention && (
@@ -97,10 +104,20 @@ export const ConventionDocumentPage = ({
           logos={logos}
           title={
             internshipKind === "immersion"
-              ? "Convention relative à la mise en œuvre d’une période de mise en situation en milieu professionnel"
-              : "Convention de mini-stage"
+              ? `${title} relative à la mise en œuvre d’une période de mise en situation en milieu professionnel`
+              : `${title} de mini-stage`
           }
         >
+          {isConventionRenewed(convention) && (
+            <div className={fr.cx("fr-card", "fr-p-4w")}>
+              <h2 className={fr.cx("fr-h5")}>
+                Cette convention est un renouvellement de la convention
+                {convention.renewed.from} pour le motif suivant :
+              </h2>
+              <p>{convention.renewed.justification}</p>
+            </div>
+          )}
+
           <h2 className={fr.cx("fr-h4")}>
             Cette convention est établie entre :
           </h2>

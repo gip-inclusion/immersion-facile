@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { addDays, addMonths, differenceInDays } from "date-fns";
 import {
-  addressDtoToString,
   ConventionReadDto,
   DateIntervalDto,
   isStringDate,
@@ -20,18 +19,21 @@ import {
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { AddressAutocomplete } from "../../../autocomplete/AddressAutocomplete";
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
 
 export const ImmersionHourLocationSection = () => {
-  const { setValue, getValues, register, formState } =
-    useFormContext<ConventionReadDto>();
+  const { setValue, getValues, register, formState, reset } =
+    useFormContext<
+      Pick<
+        ConventionReadDto,
+        "dateStart" | "dateEnd" | "schedule" | "internshipKind" | "signatories"
+      >
+    >();
   const values = getValues();
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
+
   const [dateStartInputValue, setDateStartInputValue] = useState<string>(
     values.dateStart,
   );
@@ -51,8 +53,8 @@ export const ImmersionHourLocationSection = () => {
       : [];
   const resetSchedule = () => {
     const interval: DateIntervalDto = {
-      start: new Date(values.dateStart),
-      end: new Date(values.dateEnd),
+      start: new Date(dateStartInputValue),
+      end: new Date(dateEndInputValue),
     };
     setValue(
       "schedule",
@@ -62,8 +64,6 @@ export const ImmersionHourLocationSection = () => {
     );
   };
   const getFieldError = makeFieldError(formState);
-  const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
-  const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
 
   const shouldUpdateDateAndSchedule = (dateStart: string, dateEnd: string) =>
     differenceInDays(new Date(dateEnd), new Date(dateStart)) <=
@@ -112,6 +112,10 @@ export const ImmersionHourLocationSection = () => {
     resetSchedule();
   };
 
+  useEffect(() => {
+    reset(values);
+  }, []);
+
   return (
     <>
       {values.internshipKind === "mini-stage-cci" && (
@@ -140,9 +144,8 @@ export const ImmersionHourLocationSection = () => {
         hintText={formContents["dateStart"].hintText}
         nativeInputProps={{
           name: register("dateStart").name,
-          ref: register("dateStart").ref,
           id: formContents["dateStart"].id,
-          value: toDateString(new Date(dateStartInputValue)),
+          value: toDateString(new Date(values.dateStart)),
           onChange: (event) => {
             const dateStart = event.target.value;
             if (dateStart !== "" && isStringDate(dateStart)) {
@@ -159,7 +162,6 @@ export const ImmersionHourLocationSection = () => {
         hintText={formContents["dateEnd"].hintText}
         nativeInputProps={{
           name: register("dateEnd").name,
-          ref: register("dateEnd").ref,
           id: formContents["dateEnd"].id,
           onChange: (event) => {
             const dateEnd = event.target.value;
@@ -181,16 +183,6 @@ export const ImmersionHourLocationSection = () => {
           end: new Date(values.dateEnd),
         }}
         excludedDays={excludedDays}
-      />
-      <AddressAutocomplete
-        {...formContents["immersionAddress"]}
-        initialSearchTerm={
-          values.immersionAddress ?? establishmentInfos?.businessAddress
-        }
-        setFormValue={({ address }) =>
-          setValue("immersionAddress", addressDtoToString(address))
-        }
-        disabled={isFetchingSiret}
       />
     </>
   );
