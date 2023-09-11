@@ -14,7 +14,7 @@ import {
 export type BrevoNotificationGatewayTargets =
   typeof brevoNotificationGatewayTargets;
 
-const apiBrevoUrl: AbsoluteUrl = "https://api.brevo.com/v3";
+const apiBrevoUrl: AbsoluteUrl = "https://api.sendinblue.com/v3";
 
 const logger = createLogger(__filename);
 export const brevoNotificationGatewayTargets = createTargets({
