@@ -1,10 +1,11 @@
 import React from "react";
-import { useFormContext } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { parseISO } from "date-fns";
 import {
   calculateWeeklyHours,
   ConventionReadDto,
+  InternshipKind,
   WeeklyImmersionTimetableDto,
 } from "shared";
 import { getDayStatus } from "./utils/getDayStatus";
@@ -24,8 +25,12 @@ export const WeeklyRow = ({
   disabled,
   onChange,
 }: WeeklyRowProperties) => {
-  const { getValues } = useFormContext<ConventionReadDto>();
-  const values = getValues();
+  const [internshipKind, signatories]: [
+    InternshipKind,
+    ConventionReadDto["signatories"],
+  ] = useWatch({
+    name: ["internshipKind", "signatories"],
+  });
   return (
     <div className={fr.cx("fr-grid-row", "fr-mt-1w", "fr-grid-row--middle")}>
       {weeklyCalendar.map((dayOfWeek) => (
@@ -39,8 +44,8 @@ export const WeeklyRow = ({
       ))}
       <HourIndicator
         hours={calculateWeeklyHours(weeklyCalendar)}
-        internshipKind={values.internshipKind}
-        birthdate={values.signatories.beneficiary.birthdate}
+        internshipKind={internshipKind}
+        birthdate={signatories.beneficiary.birthdate}
       />
     </div>
   );

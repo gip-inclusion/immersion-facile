@@ -7,7 +7,12 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import { ConventionReadDto, domElementIds, toDotNotation } from "shared";
+import {
+  addressDtoToString,
+  ConventionReadDto,
+  domElementIds,
+  toDotNotation,
+} from "shared";
 import { ErrorNotifications } from "react-design-system";
 import {
   formConventionFieldsLabels,
@@ -27,6 +32,8 @@ import {
   conventionSlice,
   NumberOfSteps,
 } from "src/core-logic/domain/convention/convention.slice";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
+import { AddressAutocomplete } from "../autocomplete/AddressAutocomplete";
 import { AgencySelector } from "./sections/agency/AgencySelector";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
@@ -71,6 +78,8 @@ export const ConventionFormFields = ({
     number,
     StepSeverity
   > | null>(null);
+  const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
+  const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
 
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
@@ -231,6 +240,17 @@ export const ConventionFormFields = ({
           {...makeAccordionProps(4)}
         >
           <ImmersionHourLocationSection />
+          <AddressAutocomplete
+            {...formContents["immersionAddress"]}
+            initialSearchTerm={
+              conventionValues.immersionAddress ??
+              establishmentInfos?.businessAddress
+            }
+            setFormValue={({ address }) =>
+              setValue("immersionAddress", addressDtoToString(address))
+            }
+            disabled={isFetchingSiret}
+          />
         </Accordion>
         <Accordion
           label={renderSectionTitle(t.immersionDetailsSection.title, 5)}

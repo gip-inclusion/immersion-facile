@@ -24,7 +24,8 @@ export const TotalWeeklyHoursIndicator = ({
   week,
   totalHours,
 }: TotalWeeklyHoursIndicatorProps) => {
-  const { getValues } = useFormContext<ConventionReadDto>();
+  const { getValues } =
+    useFormContext<Pick<ConventionReadDto, "signatories" | "internshipKind">>();
   const values = getValues();
   return (
     <li className={fr.cx("fr-text--xs", "fr-my-auto")}>

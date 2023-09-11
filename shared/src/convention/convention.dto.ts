@@ -135,6 +135,15 @@ export type ConventionCommon = {
   validators?: ConventionValidators;
 };
 
+export type ConventionRenewed = ConventionDto & WithRenewed;
+
+export type WithRenewed = {
+  renewed: {
+    from: ConventionId;
+    justification: string;
+  };
+};
+
 export type ConventionValidators = {
   agencyCounsellor?: ConventionValidator;
   agencyValidator?: ConventionValidator;
