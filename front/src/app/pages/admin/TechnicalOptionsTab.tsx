@@ -11,6 +11,7 @@ import { Table } from "@codegouvfr/react-dsfr/Table";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { addYears } from "date-fns";
 import { keys } from "ramda";
+import { match, P } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 import {
   ApiConsumer,
@@ -259,31 +260,40 @@ export const TechnicalOptionsTab = () => {
         </div>
         {createPortal(
           <apiConsumerModal.Component title="Ajout consommateur api">
-            {lastCreatedToken &&
-              saveConsumerFeedback.kind === "createSuccess" && (
-                <>
-                  <Alert
-                    severity="success"
-                    title="Consommateur Api ajouté !"
-                    className={"fr-mb-2w"}
-                  />
-                  <Input
-                    textArea
-                    label="Token généré"
-                    hintText="Ce token est à conserver précieusement, il ne sera plus affiché par la suite."
-                    nativeTextAreaProps={{
-                      readOnly: true,
-                      value: lastCreatedToken,
-                      rows: 5,
-                    }}
-                  />
-                  <Button type="button" onClick={onConfirmTokenModalClose}>
-                    J'ai bien copié le token, je peux fermer la fenêtre
-                  </Button>
-                </>
-              )}
-            {!lastCreatedToken &&
-              saveConsumerFeedback.kind === "updateSuccess" && (
+            {match({
+              lastCreatedToken,
+              saveConsumerFeedbackKind: saveConsumerFeedback.kind,
+            })
+              .with(
+                {
+                  lastCreatedToken: P.not(P.nullish),
+                  saveConsumerFeedbackKind: "createSuccess",
+                },
+                ({ lastCreatedToken }) => (
+                  <>
+                    <Alert
+                      severity="success"
+                      title="Consommateur Api ajouté !"
+                      className={"fr-mb-2w"}
+                    />
+                    <Input
+                      textArea
+                      label="Token généré"
+                      hintText="Ce token est à conserver précieusement, il ne sera plus affiché par la suite."
+                      nativeTextAreaProps={{
+                        readOnly: true,
+                        value: lastCreatedToken,
+                        rows: 5,
+                      }}
+                    />
+
+                    <Button type="button" onClick={onConfirmTokenModalClose}>
+                      J'ai bien copié le token, je peux fermer la fenêtre
+                    </Button>
+                  </>
+                ),
+              )
+              .with({ saveConsumerFeedbackKind: "updateSuccess" }, () => (
                 <>
                   <Alert
                     severity="success"
@@ -294,11 +304,10 @@ export const TechnicalOptionsTab = () => {
                     Fermer la fenêtre
                   </Button>
                 </>
-              )}
-            {saveConsumerFeedback.kind !== "createSuccess" &&
-              saveConsumerFeedback.kind !== "updateSuccess" && (
+              ))
+              .otherwise(() => (
                 <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
-              )}
+              ))}
           </apiConsumerModal.Component>,
           document.body,
         )}
