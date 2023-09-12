@@ -852,18 +852,28 @@ export const emailTemplatesByName =
         internshipKind,
         conventionSignShortlink,
         signatoryName,
+        renewed,
       }) => ({
         subject:
           internshipKind === "immersion"
-            ? "Pour action : signez votre demande de convention"
-            : "Pour action : signez votre demande de mini stage",
+            ? `Pour action : ${
+                renewed ? "Immersion en entreprise prolongée," : ""
+              } signez votre demande de convention`
+            : `Pour action : ${
+                renewed ? "Mini-stage en entreprise prolongé," : ""
+              } signez votre demande de mini stage`,
         greetings: greetingsWithConventionId(conventionId, signatoryName),
         content: `Une demande de convention ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
         } vient d'être enregistrée. Vous devez maintenant la confirmer.
-        
-        Pour rappel, cette demande concerne : 
-           - Le bénéficiaire ${beneficiaryName}${
+          ${
+            renewed
+              ? `\nCette convention a été renouvelée par le conseiller depuis la convention numéro : ${renewed.from}.
+          La raison est la suivante : ${renewed.justification}.\n`
+              : ""
+          }
+          Pour rappel, cette demande concerne : 
+             - Le bénéficiaire ${beneficiaryName}${
           beneficiaryRepresentativeName
             ? `\n- ${beneficiaryRepresentativeName}`
             : ""
@@ -872,18 +882,18 @@ export const emailTemplatesByName =
             ? `\n- L'employeur actuel du bénéficiare ${beneficiaryCurrentEmployerName}`
             : ""
         }
-           - L'entreprise ${businessName} représentée par ${establishmentRepresentativeName}
-           - Le tuteur dans l'entreprise ${establishmentTutorName}
-        
-          <strong>Votre signature est obligatoire</strong> pour permettre à votre ${
-            internshipKind === "immersion"
-              ? "conseiller"
-              : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
-          } de valider la convention. Merci !
-        
-        <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
-        - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
-        - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander une modification".`,
+             - L'entreprise ${businessName} représentée par ${establishmentRepresentativeName}
+             - Le tuteur dans l'entreprise ${establishmentTutorName}
+          
+            <strong>Votre signature est obligatoire</strong> pour permettre à votre ${
+              internshipKind === "immersion"
+                ? "conseiller"
+                : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+            } de valider la convention. Merci !
+          
+          <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
+          - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
+          - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander une modification".`,
         buttons: [
           { url: conventionSignShortlink, label: "Ouvrir ma demande" },
           createConventionStatusButton(conventionStatusLink),
@@ -898,9 +908,9 @@ export const emailTemplatesByName =
             ? "conseiller"
             : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
         } vous sera transmise par mail.
-
-        ${defaultSignature(internshipKind)}
-      `,
+  
+          ${defaultSignature(internshipKind)}
+        `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [

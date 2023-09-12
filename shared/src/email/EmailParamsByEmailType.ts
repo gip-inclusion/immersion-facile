@@ -3,6 +3,7 @@ import {
   ConventionId,
   ImmersionObjective,
   InternshipKind,
+  Renewed,
 } from "../convention/convention.dto";
 import { SiretDto } from "../siret/siret";
 import { Email } from "./email.dto";
@@ -184,6 +185,7 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
     conventionSignShortlink: string;
     signatoryName: string;
+    renewed?: Renewed;
   };
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;

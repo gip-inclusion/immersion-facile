@@ -416,6 +416,11 @@ export const defaultEmailValueByEmailKind: {
     internshipKind: "immersion",
     conventionSignShortlink: "CONVENTION_SIGN_MAGIC_LINK",
     signatoryName: "SIGNATORY_NAME",
+    beneficiaryCurrentEmployerName: "CURRENT_EMPLOYER_NAME",
+    renewed: {
+      from: "11111111-1111-4111-1111-111111111111",
+      justification: "EXCELLENTE_RAISON_DE_RENOUVELLEMENT",
+    },
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
     agencyLogoUrl: defaultEmailPreviewUrl,
