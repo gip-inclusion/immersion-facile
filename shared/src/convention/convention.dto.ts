@@ -133,7 +133,7 @@ export type ConventionCommon = {
   immersionSkills: string;
   establishmentTutor: EstablishmentTutor;
   validators?: ConventionValidators;
-};
+} & Partial<WithRenewed>;
 
 export type ConventionRenewed = ConventionDto & WithRenewed;
 
@@ -319,5 +319,5 @@ export type RenewMagicLinkRequestDto = {
 
 export type RenewConventionParams = Pick<
   ConventionRenewed,
-  "dateStart" | "dateEnd" | "schedule" | "renewed"
+  "id" | "dateStart" | "dateEnd" | "schedule" | "renewed"
 >;

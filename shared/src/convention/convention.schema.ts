@@ -175,6 +175,11 @@ const conventionValidatorsSchema: z.Schema<ConventionValidators> = z.object({
   agencyValidator: conventionValidatorSchema.optional(),
 });
 
+const renewedSchema = z.object({
+  from: conventionIdSchema,
+  justification: zStringMinLength1,
+});
+
 const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
@@ -202,6 +207,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   immersionSkills: zStringPossiblyEmptyWithMax(2000),
   establishmentTutor: establishmentTutorSchema,
   validators: conventionValidatorsSchema.optional(),
+  renewed: renewedSchema.optional(),
 });
 
 export const internshipKindSchema: z.Schema<InternshipKind> =
@@ -360,13 +366,11 @@ export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatu
 
 export const renewConventionParamsSchema: z.Schema<RenewConventionParams> =
   z.object({
+    id: conventionIdSchema,
     dateStart: zStringMinLength1.regex(dateRegExp),
     dateEnd: zStringMinLength1.regex(dateRegExp),
     schedule: scheduleSchema,
-    renewed: z.object({
-      from: conventionIdSchema,
-      justification: zStringMinLength1,
-    }),
+    renewed: renewedSchema,
   });
 
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =
