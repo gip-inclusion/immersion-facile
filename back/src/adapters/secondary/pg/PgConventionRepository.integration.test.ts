@@ -124,6 +124,34 @@ describe("PgConventionRepository", () => {
     expect(fetchedConvention).toEqual(convention);
   });
 
+  it("Adds a convention renewed from another one", async () => {
+    const existingConvention = new ConventionDtoBuilder()
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withId("11111111-1111-4111-1111-111111111111")
+      .build();
+
+    await conventionRepository.save(existingConvention);
+
+    const renewedConvention = new ConventionDtoBuilder()
+      .withId("22222222-2222-4222-2222-222222222222")
+      .withStatus("READY_TO_SIGN")
+      .withRenewed({
+        from: existingConvention.id,
+        justification: "some justification",
+      })
+      .build();
+
+    const externalId = await conventionRepository.save(renewedConvention);
+
+    const fetchedConvention = await conventionRepository.getById(
+      renewedConvention.id,
+    );
+    expectToEqual(fetchedConvention, {
+      ...renewedConvention,
+      externalId,
+    });
+  });
+
   it("Adds a new convention with beneficiary extra fields", async () => {
     const extraFields = {
       isRqth: false,

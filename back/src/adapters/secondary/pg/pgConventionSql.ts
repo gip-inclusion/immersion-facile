@@ -94,7 +94,11 @@ const buildDto = `JSON_STRIP_NULLS(
       'phone', et.phone,
       'job', et.extra_fields ->> 'job'
     ),
-    'validators', validators
+    'validators', validators,
+    'renewed', CASE WHEN renewed_from IS NOT NULL THEN JSON_BUILD_OBJECT(
+      'from', renewed_from,
+      'justification', renewed_justification
+    ) ELSE NULL END
 ))`;
 
 export const selectAllConventionDtosById = `SELECT conventions.id, ${buildDto} as dto 

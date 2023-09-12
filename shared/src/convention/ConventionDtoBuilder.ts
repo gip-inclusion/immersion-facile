@@ -23,6 +23,7 @@ import {
   InternshipKind,
   isBeneficiary,
   isBeneficiaryStudent,
+  Renewed,
 } from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "a99eaca1-ee70-4c90-b3f4-668d492f7392";
@@ -564,6 +565,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
+  public withRenewed(renewed: Renewed) {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      renewed,
+    });
+  }
+
   public withSanitaryPrevention(
     sanitaryPrevention: boolean,
   ): ConventionDtoBuilder {
@@ -628,7 +636,6 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
             [validatorKind]: validator,
           },
     };
-
     return new ConventionDtoBuilder(this.dto);
   }
 
