@@ -316,3 +316,8 @@ export type RenewMagicLinkRequestDto = {
   originalUrl: string;
   expiredJwt: string;
 };
+
+export type RenewConventionParams = Pick<
+  ConventionRenewed,
+  "dateStart" | "dateEnd" | "schedule" | "renewed"
+>;

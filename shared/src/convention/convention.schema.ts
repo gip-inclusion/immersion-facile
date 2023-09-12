@@ -56,6 +56,7 @@ import {
   internshipKinds,
   levelsOfEducation,
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
+  RenewConventionParams,
   RenewMagicLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
@@ -356,6 +357,17 @@ export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatu
     updateConventionStatusWithJustificationWhithoutModierRoleSchema,
     updateConventionStatusWithJustificationWhithModierRoleSchema,
   ]);
+
+export const renewConventionParamsSchema: z.Schema<RenewConventionParams> =
+  z.object({
+    dateStart: zStringMinLength1.regex(dateRegExp),
+    dateEnd: zStringMinLength1.regex(dateRegExp),
+    schedule: scheduleSchema,
+    renewed: z.object({
+      from: conventionIdSchema,
+      justification: zStringMinLength1,
+    }),
+  });
 
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =
   z.object({

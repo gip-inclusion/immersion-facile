@@ -6,6 +6,7 @@ import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import {
   conventionReadSchema,
   conventionSchema,
+  renewConventionParamsSchema,
   renewMagicLinkRequestSchema,
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
@@ -14,17 +15,24 @@ import {
 
 export type ConventionMagicLinkTargets = typeof conventionMagicLinkTargets;
 export const conventionMagicLinkTargets = createTargets({
+  getConvention: createTarget({
+    url: "/auth/demandes-immersion/:conventionId",
+    method: "GET",
+    ...withValidateHeadersAuthorization,
+    validateResponseBody: conventionReadSchema.parse,
+  }),
   getConventionStatusDashboard: createTarget({
     url: "/auth/status-convention",
     method: "GET",
     ...withValidateHeadersAuthorization,
     validateResponseBody: absoluteUrlSchema.parse,
   }),
-  getConvention: createTarget({
-    url: "/auth/demandes-immersion/:conventionId",
-    method: "GET",
+  signConvention: createTarget({
+    url: "/auth/sign-application/:conventionId",
+    method: "POST",
+    validateRequestBody: z.void().parse,
     ...withValidateHeadersAuthorization,
-    validateResponseBody: conventionReadSchema.parse,
+    validateResponseBody: withConventionIdLegacySchema.parse,
   }),
   updateConvention: createTarget({
     url: "/auth/demandes-immersion/:conventionId",
@@ -40,12 +48,12 @@ export const conventionMagicLinkTargets = createTargets({
     ...withValidateHeadersAuthorization,
     validateResponseBody: withConventionIdLegacySchema.parse,
   }),
-  signConvention: createTarget({
-    url: "/auth/sign-application/:conventionId",
+  renewConvention: createTarget({
+    url: "/auth/renew-convention",
     method: "POST",
-    validateRequestBody: z.void().parse,
+    validateRequestBody: renewConventionParamsSchema.parse,
     ...withValidateHeadersAuthorization,
-    validateResponseBody: withConventionIdLegacySchema.parse,
+    validateResponseBody: z.void().parse,
   }),
 });
 
