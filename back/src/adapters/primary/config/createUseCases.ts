@@ -36,6 +36,7 @@ import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useC
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
+import { RenewConvention } from "../../../domain/convention/useCases/RenewConvention";
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
 import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
@@ -127,6 +128,12 @@ export const createUseCases = (
     generateConventionJwt,
   );
 
+  const addConvention = new AddConvention(
+    uowPerformer,
+    createNewEvent,
+    gateways.siret,
+  );
+
   return {
     ...instantiatedUseCasesFromClasses({
       addExchangeToDiscussionAndSendEmail:
@@ -205,11 +212,7 @@ export const createUseCases = (
         uowPerformer,
         createNewEvent,
       ),
-      addConvention: new AddConvention(
-        uowPerformer,
-        createNewEvent,
-        gateways.siret,
-      ),
+      addConvention,
       getConvention: new GetConvention(uowPerformer),
       getConventionForApiConsumer: new GetConventionForApiConsumer(
         uowPerformer,
@@ -243,6 +246,7 @@ export const createUseCases = (
         gateways.timeGateway,
         gateways.shortLinkGenerator,
       ),
+      renewConvention: new RenewConvention(uowPerformer, addConvention),
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
         gateways.timeGateway,

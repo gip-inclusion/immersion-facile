@@ -105,5 +105,17 @@ export const createMagicLinkRouter = (
       }),
     );
 
+  authenticatedRouter
+    .route(removeRouterPrefix(conventionMagicLinkTargets.renewConvention.url))
+    .post((req, res) =>
+      sendHttpResponse(req, res, () => {
+        if (!req?.payloads?.convention) throw new UnauthorizedError();
+        return deps.useCases.renewConvention.execute(
+          req.body,
+          req.payloads.convention,
+        );
+      }),
+    );
+
   return [routerPrefix, authenticatedRouter];
 };

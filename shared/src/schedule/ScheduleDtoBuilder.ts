@@ -69,6 +69,31 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
     return this.withRegularSchedule(emptyRegularSchedule);
   }
 
+  public withReasonableScheduleInInterval(
+    interval: DateIntervalDto,
+  ): ScheduleDtoBuilder {
+    const complexSchedule = emptySchedule(interval).complexSchedule.map(
+      (dailySchedule) => ({
+        date: dailySchedule.date,
+        timePeriods: [
+          {
+            start: "08:00",
+            end: "13:00",
+          },
+        ],
+      }),
+    );
+
+    return new ScheduleDtoBuilder({
+      ...this.dto,
+      workedDays: calculateNumberOfWorkedDays(complexSchedule),
+      totalHours:
+        calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
+      isSimple: true,
+      complexSchedule,
+    });
+  }
+
   public withRegularSchedule(
     regularSchedule: RegularScheduleDto,
   ): ScheduleDtoBuilder {

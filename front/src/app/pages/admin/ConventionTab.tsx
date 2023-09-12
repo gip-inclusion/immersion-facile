@@ -1,9 +1,6 @@
 import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import {
-  ConventionDtoBuilder,
-  ConventionReadDto,
-} from "../../../../../shared/src";
+import { ConventionDtoBuilder, ConventionReadDto } from "shared";
 import { RenewConventionForm } from "src/app/components/admin/conventions/ConventionManageActions";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
