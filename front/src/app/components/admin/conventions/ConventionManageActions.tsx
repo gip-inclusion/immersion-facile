@@ -10,12 +10,12 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { addBusinessDays, addDays } from "date-fns";
 import {
   ConventionReadDto,
-  ConventionRenewed,
   ConventionStatus,
   ConventionSupportedJwt,
   DateIntervalDto,
   domElementIds,
   emptySchedule,
+  RenewConventionParams,
   Role,
   statusTransitionConfigs,
   UpdateConventionStatusRequestDto,
@@ -36,16 +36,6 @@ type ConventionManageActionsProps = {
   role: Role;
   submitFeedback: ConventionSubmitFeedback;
 };
-
-type ConventionRenewForm = Pick<
-  ConventionRenewed,
-  | "dateStart"
-  | "dateEnd"
-  | "schedule"
-  | "renewed"
-  | "signatories"
-  | "internshipKind"
->;
 
 const renewModal = createModal({
   id: domElementIds.manageConvention.renewModal,
@@ -232,6 +222,9 @@ export const ConventionManageActions = ({
   );
 };
 
+type RenewConventionParamsInForm = RenewConventionParams &
+  Pick<ConventionReadDto, "internshipKind" | "signatories">;
+
 export const RenewConventionForm = ({
   convention,
 }: {
@@ -245,7 +238,7 @@ export const RenewConventionForm = ({
     start: renewedDefaultDateStart,
     end: addDays(new Date(convention.dateEnd), convention.schedule.workedDays),
   };
-  const methods = useForm<ConventionRenewForm>({
+  const methods = useForm<RenewConventionParamsInForm>({
     defaultValues: {
       dateStart: defaultDateInterval.start.toISOString(),
       dateEnd: defaultDateInterval.end.toISOString(),
@@ -259,7 +252,7 @@ export const RenewConventionForm = ({
     },
     mode: "onTouched",
   });
-  const onSubmit = (data: ConventionRenewForm) => {
+  const onSubmit = (data: RenewConventionParams) => {
     console.log("onSubmit", data);
   };
   return (
