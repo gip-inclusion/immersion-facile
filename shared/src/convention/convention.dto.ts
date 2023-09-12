@@ -137,11 +137,13 @@ export type ConventionCommon = {
 
 export type ConventionRenewed = ConventionDto & WithRenewed;
 
+export type Renewed = {
+  from: ConventionId;
+  justification: string;
+};
+
 export type WithRenewed = {
-  renewed: {
-    from: ConventionId;
-    justification: string;
-  };
+  renewed: Renewed;
 };
 
 export type ConventionValidators = {
