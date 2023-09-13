@@ -7,7 +7,10 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
+import { Route } from "type-route";
+import { v4 as uuidV4 } from "uuid";
 import {
   ConventionReadDto,
   ConventionStatus,
@@ -16,6 +19,7 @@ import {
   domElementIds,
   emptySchedule,
   RenewConventionParams,
+  renewConventionParamsSchema,
   Role,
   statusTransitionConfigs,
   UpdateConventionStatusRequestDto,
@@ -23,7 +27,9 @@ import {
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   ConventionFeedbackKind,
@@ -238,6 +244,7 @@ export const RenewConventionForm = ({
 }: {
   convention: ConventionReadDto;
 }) => {
+  const route = useRoute() as Route<typeof routes.manageConvention>;
   const dispatch = useDispatch();
   const renewedDefaultDateStart = addBusinessDays(
     new Date(convention.dateEnd),
@@ -247,37 +254,53 @@ export const RenewConventionForm = ({
     start: renewedDefaultDateStart,
     end: addDays(new Date(convention.dateEnd), convention.schedule.workedDays),
   };
-  const methods = useForm<RenewConventionParamsInForm>({
-    defaultValues: {
-      dateStart: defaultDateInterval.start.toISOString(),
-      dateEnd: defaultDateInterval.end.toISOString(),
-      schedule: emptySchedule(defaultDateInterval),
-      internshipKind: convention.internshipKind,
-      renewed: {
-        from: convention.id,
-        justification: "",
-      },
-      signatories: convention.signatories,
+  const defaultValues = {
+    id: uuidV4(),
+    dateStart: defaultDateInterval.start.toISOString(),
+    dateEnd: defaultDateInterval.end.toISOString(),
+    schedule: emptySchedule(defaultDateInterval),
+    internshipKind: convention.internshipKind,
+    renewed: {
+      from: convention.id,
+      justification: "",
     },
+    signatories: convention.signatories,
+  };
+  const methods = useForm<RenewConventionParamsInForm>({
+    defaultValues,
+    resolver: zodResolver(renewConventionParamsSchema),
     mode: "onTouched",
   });
+  const getFormErrors = makeFieldError(methods.formState);
   const onSubmit = (data: RenewConventionParams) => {
     dispatch(
       conventionSlice.actions.renewConventionRequested({
         params: data,
-        jwt: "truc",
+        jwt: route.params.jwt,
       }),
     );
+    renewModal.close();
   };
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <input type="hidden" {...methods.register("renewed.from")} />
+        <Input
+          label="Id de la convention renouvelée"
+          hintText={
+            "Il n'est pas modificable, mais vous pouvez le copier pour le garder de côté"
+          }
+          nativeInputProps={{
+            ...methods.register("renewed.from"),
+            readOnly: true,
+            value: convention.id,
+          }}
+        />
         <ImmersionHourLocationSection />
         <Input
           label="Motif de renouvellement"
           textArea
           nativeTextAreaProps={methods.register("renewed.justification")}
+          {...getFormErrors("renewed.justification")}
         />
         <Button>Renouveler la convention</Button>
       </form>
