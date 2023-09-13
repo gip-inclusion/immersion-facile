@@ -6,6 +6,8 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
+  ConventionSupportedJwt,
+  RenewConventionParams,
   ShareLinkByEmailDto,
   sleep,
   UpdateConventionStatusRequestDto,
@@ -33,6 +35,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public conventionModificationResult$ = new Subject<void>();
 
+  public conventionRenewalResult$ = new Subject<void>();
+
   public conventionSignedResult$ = new Subject<void>();
 
   public updateConventionCallCount = 0;
@@ -55,6 +59,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public getConventionStatusDashboardUrl$(_jwt: string) {
     return this.conventionDashboardUrl$;
+  }
+
+  public renewConvention$(
+    _params: RenewConventionParams,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return this.conventionRenewalResult$;
   }
 
   public async renewMagicLink(

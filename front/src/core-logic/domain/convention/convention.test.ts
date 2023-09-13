@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import {
   AbsoluteUrl,
   AgencyDtoBuilder,
@@ -9,6 +10,7 @@ import {
   EstablishmentTutor,
   expectObjectsToMatch,
   expectToEqual,
+  ScheduleDtoBuilder,
   SignatoryRole,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -22,6 +24,7 @@ import {
   ConventionState,
   ConventionSubmitFeedback,
   initialConventionState,
+  RenewConventionPayload,
 } from "./convention.slice";
 
 const conventionReadDtoRemainingProps = {
@@ -993,6 +996,57 @@ describe("Convention slice", () => {
     });
   });
 
+  describe("Convention renewal", () => {
+    const renewedDateEnd = addDays(new Date(), 1);
+    const renewedDateStart = new Date();
+    const renewedConventionPayload: RenewConventionPayload = {
+      params: {
+        id: "22222222-1111-4111-1111-111111111111",
+        dateEnd: renewedDateEnd.toISOString(),
+        dateStart: renewedDateStart.toISOString(),
+        schedule: new ScheduleDtoBuilder()
+          .withReasonableScheduleInInterval({
+            start: renewedDateStart,
+            end: renewedDateEnd,
+          })
+          .build(),
+        renewed: {
+          from: "11111111-1111-4111-1111-111111111111",
+          justification: "My justification to renew this convention",
+        },
+      },
+      jwt: "my-jwt",
+    };
+
+    it("renews a convention", () => {
+      expectConventionState(initialConventionState);
+
+      store.dispatch(
+        conventionSlice.actions.renewConventionRequested(
+          renewedConventionPayload,
+        ),
+      );
+      expectIsLoadingToBe(true);
+      feedGatewayWithRenewedConventionSuccess();
+      expectIsLoadingToBe(false);
+      expectFeedbackToBe({ kind: "renewed" });
+    });
+
+    it("gets error feedback when gateway throws an error", () => {
+      const errorMessage = "Error renewing convention";
+      expectConventionState(initialConventionState);
+      store.dispatch(
+        conventionSlice.actions.renewConventionRequested(
+          renewedConventionPayload,
+        ),
+      );
+      expectIsLoadingToBe(true);
+      feedGatewayWithRenewedConventionError(new Error(errorMessage));
+      expectIsLoadingToBe(false);
+      expectFeedbackToBe({ kind: "errored", errorMessage });
+    });
+  });
+
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
     expectObjectsToMatch(store.getState().convention, conventionState);
   };
@@ -1066,6 +1120,14 @@ describe("Convention slice", () => {
 
   const feedGatewayWithModificationFailure = (error: Error) => {
     dependencies.conventionGateway.conventionModificationResult$.error(error);
+  };
+
+  const feedGatewayWithRenewedConventionSuccess = () => {
+    dependencies.conventionGateway.conventionRenewalResult$.next(undefined);
+  };
+
+  const feedGatewayWithRenewedConventionError = (error: Error) => {
+    dependencies.conventionGateway.conventionRenewalResult$.error(error);
   };
 
   const expectIsMinorToBe = (expected: boolean) => {
