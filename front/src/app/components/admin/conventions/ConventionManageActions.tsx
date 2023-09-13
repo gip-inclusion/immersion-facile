@@ -23,6 +23,8 @@ import {
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   ConventionFeedbackKind,
   conventionSlice,
@@ -49,6 +51,7 @@ export const ConventionManageActions = ({
   jwt,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
+  const feedback = useAppSelector(conventionSelectors.feedback);
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
   >(null);
@@ -213,7 +216,12 @@ export const ConventionManageActions = ({
         )}
         {createPortal(
           <renewModal.Component title="Renouvellement de convention">
-            <RenewConventionForm convention={convention} />
+            {feedback.kind === "renewed" && (
+              <Alert title="Cool !" severity="success" />
+            )}
+            {feedback.kind !== "renewed" && (
+              <RenewConventionForm convention={convention} />
+            )}
           </renewModal.Component>,
           document.body,
         )}
@@ -230,6 +238,7 @@ export const RenewConventionForm = ({
 }: {
   convention: ConventionReadDto;
 }) => {
+  const dispatch = useDispatch();
   const renewedDefaultDateStart = addBusinessDays(
     new Date(convention.dateEnd),
     1,
@@ -253,7 +262,12 @@ export const RenewConventionForm = ({
     mode: "onTouched",
   });
   const onSubmit = (data: RenewConventionParams) => {
-    console.log("onSubmit", data);
+    dispatch(
+      conventionSlice.actions.renewConventionRequested({
+        params: data,
+        jwt: "truc",
+      }),
+    );
   };
   return (
     <FormProvider {...methods}>

@@ -4,6 +4,7 @@ import {
   ConventionDto,
   ConventionReadDto,
   ConventionSupportedJwt,
+  RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -29,4 +30,8 @@ export interface ConventionGateway {
     shareLinkByEmailDto: ShareLinkByEmailDto,
   ): Promise<boolean>;
   renewMagicLink(expiredJwt: string, originalUrl: string): Promise<void>;
+  renewConvention$(
+    params: RenewConventionParams,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void>;
 }

@@ -6,6 +6,7 @@ import {
   ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
+  RenewConventionParams,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -17,7 +18,8 @@ type ConventionValidationFeedbackKind =
   | "markedAsEligible"
   | "markedAsValidated"
   | "cancelled"
-  | "deprecated";
+  | "deprecated"
+  | "renewed";
 
 type ConventionSignatoryFeedbackKind =
   | "justSubmitted"
@@ -31,6 +33,11 @@ export type ConventionFeedbackKind =
 export type ConventionSubmitFeedback = SubmitFeedBack<ConventionFeedbackKind>;
 
 export type NumberOfSteps = 1 | 2 | 3 | 4 | 5;
+
+export type RenewConventionPayload = {
+  jwt: ConventionSupportedJwt;
+  params: RenewConventionParams;
+};
 
 export interface ConventionState {
   formUi: {
@@ -251,5 +258,16 @@ export const conventionSlice = createSlice({
     setCurrentStep: (state, { payload }: PayloadAction<NumberOfSteps>) => {
       state.formUi.currentStep = payload;
     },
+    renewConventionRequested: (
+      state,
+      _action: PayloadAction<RenewConventionPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    renewConventionSucceeded: (state) => {
+      state.isLoading = false;
+      state.feedback = { kind: "renewed" };
+    },
+    renewConventionFailed: setFeedbackAsErrored,
   },
 });
