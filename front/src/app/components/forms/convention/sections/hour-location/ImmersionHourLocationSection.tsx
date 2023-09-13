@@ -22,14 +22,14 @@ import {
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
 
 export const ImmersionHourLocationSection = () => {
-  const { setValue, getValues, register, formState, reset } =
+  const { setValue, watch, register, formState, reset } =
     useFormContext<
       Pick<
         ConventionReadDto,
         "dateStart" | "dateEnd" | "schedule" | "internshipKind" | "signatories"
       >
     >();
-  const values = getValues();
+  const values = watch();
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );

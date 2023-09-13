@@ -76,7 +76,7 @@ describe("Magic link router", () => {
       });
     });
 
-    describe("when admin sends modifiaction requests", () => {
+    describe("when admin sends modification requests", () => {
       it("works fine", async () => {
         const updatedConvention = conventionBuilder
           .withBeneficiaryFirstName("Merguez")

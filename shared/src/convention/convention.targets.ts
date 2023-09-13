@@ -53,7 +53,7 @@ export const conventionMagicLinkTargets = createTargets({
     method: "POST",
     validateRequestBody: renewConventionParamsSchema.parse,
     ...withValidateHeadersAuthorization,
-    validateResponseBody: z.void().parse,
+    validateResponseBody: z.literal("").parse,
   }),
 });
 

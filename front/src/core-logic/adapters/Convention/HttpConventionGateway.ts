@@ -5,6 +5,8 @@ import {
   ConventionDto,
   ConventionMagicLinkTargets,
   ConventionReadDto,
+  ConventionSupportedJwt,
+  RenewConventionParams,
   ShareLinkByEmailDto,
   UnauthenticatedConventionTargets,
   UpdateConventionStatusRequestDto,
@@ -36,6 +38,13 @@ export class HttpConventionGateway implements ConventionGateway {
         })
         .then(({ responseBody }) => responseBody),
     );
+  }
+
+  public renewConvention$(
+    params: RenewConventionParams,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return fromPromise(this.#renewConvention(params, jwt));
   }
 
   public async renewMagicLink(
@@ -92,6 +101,18 @@ export class HttpConventionGateway implements ConventionGateway {
         body: conventionDto,
       })
       .then(({ responseBody }) => responseBody.id);
+  }
+
+  async #renewConvention(
+    params: RenewConventionParams,
+    jwt: ConventionSupportedJwt,
+  ): Promise<void> {
+    return this.magicLinkHttpClient
+      .renewConvention({
+        body: params,
+        headers: { authorization: jwt },
+      })
+      .then(() => undefined);
   }
 
   async #retrieveFromToken(
