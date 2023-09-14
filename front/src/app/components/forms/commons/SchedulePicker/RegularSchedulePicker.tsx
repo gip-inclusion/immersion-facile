@@ -18,7 +18,7 @@ import {
   TimePeriodsDto,
 } from "shared";
 import { HourPicker } from "./HourPicker";
-import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
+import { TotalWeeklyHoursIndicator } from "./TotalWeeklylHoursIndicator";
 import { WeekdayPicker } from "./WeekdayPicker";
 
 export type RegularSchedulePickerProps = {

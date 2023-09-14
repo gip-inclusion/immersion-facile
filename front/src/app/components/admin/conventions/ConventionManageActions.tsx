@@ -208,23 +208,34 @@ export const ConventionManageActions = ({
               iconId="fr-icon-file-add-line"
               className={fr.cx("fr-m-1w")}
               priority="secondary"
+              disabled={feedback.kind === "renewed"}
               onClick={() => renewModal.open()}
             >
               Renouveler la convention
             </Button>
+            <Button
+              iconId="fr-icon-file-pdf-line"
+              className={fr.cx("fr-m-1w")}
+              priority="secondary"
+              onClick={() =>
+                routes
+                  .conventionDocument({
+                    jwt,
+                  })
+                  .push()
+              }
+            >
+              Voir la convention
+            </Button>
           </>
         )}
-        {createPortal(
-          <renewModal.Component title="Renouvellement de convention">
-            {feedback.kind === "renewed" && (
-              <Alert title="Cool !" severity="success" />
-            )}
-            {feedback.kind !== "renewed" && (
+        {feedback.kind !== "renewed" &&
+          createPortal(
+            <renewModal.Component title="Renouvellement de convention">
               <RenewConventionForm convention={convention} />
-            )}
-          </renewModal.Component>,
-          document.body,
-        )}
+            </renewModal.Component>,
+            document.body,
+          )}
       </div>
     </div>
   );
