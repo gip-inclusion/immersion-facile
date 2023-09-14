@@ -17,7 +17,6 @@ import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
 } from "../../../offer/ports/PeAgenciesReferential";
-import { defaultQuestionnaireUrl } from "./AddAgency";
 
 const counts = {
   added: 0,
@@ -165,7 +164,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       ...normalizePosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
       address: geocodedAddress,
-      questionnaireUrl: defaultQuestionnaireUrl,
+      questionnaireUrl: "",
       codeSafir: peReferentialAgency.codeSafir,
       agencySiret: peReferentialAgency.siret,
       kind: "pole-emploi",

@@ -7,7 +7,6 @@ import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemor
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryPeAgenciesReferential } from "../../../../adapters/secondary/offer/peAgenciesReferential/InMemoryPeAgenciesReferential";
 import { PeAgencyFromReferenciel } from "../../../offer/ports/PeAgenciesReferential";
-import { defaultQuestionnaireUrl } from "./AddAgency";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
 
 const address: AddressDto = {
@@ -58,7 +57,7 @@ describe("UpdateAllPeAgencies use case", () => {
           lat: 48.532571,
         },
         signature: "L'équipe de l'Agence Pôle emploi MOLSHEIM",
-        questionnaireUrl: defaultQuestionnaireUrl,
+        questionnaireUrl: "",
         agencySiret: "13000548120984",
         codeSafir: "63019",
         kind: "pole-emploi",
@@ -233,7 +232,7 @@ describe("UpdateAllPeAgencies use case", () => {
           lat: 48.532571,
         },
         signature: "L'équipe de l'Agence Pôle emploi MOLSHEIM",
-        questionnaireUrl: defaultQuestionnaireUrl,
+        questionnaireUrl: "",
         agencySiret: "13000548120984",
         codeSafir: "63019",
         kind: "pole-emploi",
