@@ -433,9 +433,7 @@ function conventionToConventionNotification(
   convention: ConventionDto,
 ): PoleEmploiConvention {
   return {
-    id: convention.externalId
-      ? convention.externalId.padStart(11, "0")
-      : "no-external-id",
+    id: "no-external-id",
     originalId: convention.id,
     peConnectId: convention.signatories.beneficiary.federatedIdentity?.token,
     statut: conventionStatusToPoleEmploiStatus[convention.status],

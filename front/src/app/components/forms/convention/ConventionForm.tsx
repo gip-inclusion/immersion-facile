@@ -12,7 +12,7 @@ import {
   Beneficiary,
   ConventionJwtPayload,
   ConventionReadDto,
-  conventionWithoutExternalIdSchema,
+  conventionSchema,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   hasBeneficiaryCurrentEmployer,
@@ -141,7 +141,7 @@ export const ConventionForm = ({
 
   const methods = useForm<ConventionReadDto>({
     defaultValues: getInitialFormValues(mode),
-    resolver: zodResolver(conventionWithoutExternalIdSchema),
+    resolver: zodResolver(conventionSchema),
     mode: "onTouched",
   });
   const { getValues, reset } = methods;

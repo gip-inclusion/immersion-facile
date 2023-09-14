@@ -150,7 +150,7 @@ export type ConventionInternshipKindSpecific<T extends InternshipKind> = {
   signatories: Signatories<T>;
 };
 
-export type ConventionDtoWithoutExternalId = ConventionCommon &
+export type ConventionDto = ConventionCommon &
   (
     | ConventionInternshipKindSpecific<"immersion">
     | ConventionInternshipKindSpecific<"mini-stage-cci">
@@ -233,10 +233,6 @@ export type EstablishmentRepresentative =
 
 export type EstablishmentTutor = GenericActor<"establishment-tutor"> & {
   job: string;
-};
-
-export type ConventionDto = ConventionDtoWithoutExternalId & {
-  externalId: ConventionExternalId;
 };
 
 export type ConventionReadDto = ConventionDto & {

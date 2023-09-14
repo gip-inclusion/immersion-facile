@@ -33,8 +33,6 @@ describe("Add Convention", () => {
   let outboxRepository: InMemoryOutboxRepository;
   let timeGateway: CustomTimeGateway;
   const validConvention = new ConventionDtoBuilder().build();
-  const { externalId, ...validConventionParams } = validConvention;
-
   let siretGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
 
@@ -65,10 +63,9 @@ describe("Add Convention", () => {
     const id = "eventId";
     timeGateway.setNextDate(occurredAt);
     uuidGenerator.setNextUuid(id);
-    conventionRepository.setNextExternalId("00000000001");
 
-    expect(await addConvention.execute(validConventionParams)).toEqual({
-      id: validConventionParams.id,
+    expect(await addConvention.execute(validConvention)).toEqual({
+      id: validConvention.id,
     });
 
     const storedInRepo = conventionRepository.conventions;
@@ -87,12 +84,12 @@ describe("Add Convention", () => {
   });
 
   it("rejects conventions where the ID is already in use", async () => {
-    await conventionRepository.save(validConventionParams);
+    await conventionRepository.save(validConvention);
 
     await expectPromiseToFailWithError(
-      addConvention.execute(validConventionParams),
+      addConvention.execute(validConvention),
       new ConflictError(
-        `Convention with id ${validConventionParams.id} already exists`,
+        `Convention with id ${validConvention.id} already exists`,
       ),
     );
   });
@@ -100,19 +97,19 @@ describe("Add Convention", () => {
   describe("Status validation", () => {
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
     it("allows applications submitted as DRAFT", async () => {
-      expect(await addConvention.execute(validConventionParams)).toEqual({
-        id: validConventionParams.id,
+      expect(await addConvention.execute(validConvention)).toEqual({
+        id: validConvention.id,
       });
     });
 
     it("allows applications submitted as READY_TO_SIGN", async () => {
       expect(
         await addConvention.execute({
-          ...validConventionParams,
+          ...validConvention,
           status: "READY_TO_SIGN",
         }),
       ).toEqual({
-        id: validConventionParams.id,
+        id: validConvention.id,
       });
     });
 
@@ -124,7 +121,7 @@ describe("Add Convention", () => {
         }
         await expectPromiseToFailWithError(
           addConvention.execute({
-            ...validConventionParams,
+            ...validConvention,
             status,
           }),
           new ForbiddenError(),
@@ -135,7 +132,7 @@ describe("Add Convention", () => {
 
   describe("SIRET validation", () => {
     const siretRawEstablishmentBuilder = new SirenEstablishmentDtoBuilder()
-      .withSiret(validConventionParams.siret)
+      .withSiret(validConvention.siret)
       .withNafDto({ code: "78.3Z", nomenclature: "Ref2" });
 
     const siretRawInactiveEstablishment = siretRawEstablishmentBuilder
@@ -157,8 +154,8 @@ describe("Add Convention", () => {
         });
         siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
 
-        expect(await addConvention.execute(validConventionParams)).toEqual({
-          id: validConventionParams.id,
+        expect(await addConvention.execute(validConvention)).toEqual({
+          id: validConvention.id,
         });
       });
     });
@@ -167,9 +164,9 @@ describe("Add Convention", () => {
       siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
-        addConvention.execute(validConventionParams),
+        addConvention.execute(validConvention),
         new BadRequestError(
-          `Ce SIRET (${validConventionParams.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
+          `Ce SIRET (${validConvention.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
         ),
       );
     });
@@ -177,8 +174,8 @@ describe("Add Convention", () => {
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
       siretGateway.setSirenEstablishment(siretRawActiveEstablishment);
 
-      expect(await addConvention.execute(validConventionParams)).toEqual({
-        id: validConventionParams.id,
+      expect(await addConvention.execute(validConvention)).toEqual({
+        id: validConvention.id,
       });
     });
 
@@ -187,7 +184,7 @@ describe("Add Convention", () => {
       siretGateway.setError(error);
 
       await expectPromiseToFailWithError(
-        addConvention.execute(validConventionParams),
+        addConvention.execute(validConvention),
         new Error("Le service Sirene API n'est pas disponible"),
       );
     });

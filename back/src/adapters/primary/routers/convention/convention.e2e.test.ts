@@ -42,7 +42,7 @@ const convention = new ConventionDtoBuilder()
   .withAgencyId(peAgency.id)
   .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
   .build();
-const { externalId, ...createConventionParams } = convention;
+
 const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
 describe("convention e2e", () => {
@@ -74,7 +74,7 @@ describe("convention e2e", () => {
 
       const response = await request
         .post(unauthenticatedConventionTargets.createConvention.url)
-        .send(createConventionParams);
+        .send(convention);
 
       expectToEqual(response.status, 200);
       expectToEqual(response.body, { id: convention.id });
@@ -96,7 +96,7 @@ describe("convention e2e", () => {
       const response = await request
         .post(unauthenticatedConventionTargets.createConvention.url)
         .send({
-          ...createConventionParams,
+          ...convention,
           email: "another@email.fr",
         });
 
@@ -342,7 +342,6 @@ describe("convention e2e", () => {
         .withId(unknownId)
         .withStatus("READY_TO_SIGN")
         .build();
-      const { externalId, ...createConventionParams } = conventionWithUnknownId;
 
       const response = await request
         .post(
@@ -363,7 +362,7 @@ describe("convention e2e", () => {
           ),
         )
         .send({
-          convention: { ...createConventionParams, externalId: "0001" },
+          convention: conventionWithUnknownId,
         });
 
       expectToEqual(response.body, {
@@ -374,6 +373,7 @@ describe("convention e2e", () => {
   });
 
   describe(`${conventionMagicLinkTargets.updateConventionStatus.method} ${conventionMagicLinkTargets.updateConventionStatus.url}`, () => {
+    const externalId = "00000000001";
     beforeEach(() => {
       inMemoryUow.agencyRepository.setAgencies([peAgency]);
       const inReviewConvention = new ConventionDtoBuilder(convention)
@@ -382,6 +382,9 @@ describe("convention e2e", () => {
       inMemoryUow.conventionRepository.setConventions({
         [inReviewConvention.id]: inReviewConvention,
       });
+      inMemoryUow.conventionExternalIdRepository.externalIdsByConventionId = {
+        [inReviewConvention.id]: externalId,
+      };
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
       ]);
@@ -452,7 +455,7 @@ describe("convention e2e", () => {
             dureeImmersion: 70,
             email: "beneficiary@email.fr",
             emailTuteur: "establishment@example.com",
-            id: "00000000001",
+            id: externalId,
             nom: "Ocon",
             nomPrenomFonctionTuteur: "Alain Prost Big Boss",
             objectifDeImmersion: 2,

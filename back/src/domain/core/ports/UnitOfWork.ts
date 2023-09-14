@@ -1,5 +1,6 @@
 import { ApiConsumerRepository } from "../../auth/ports/ApiConsumerRepository";
 import { AgencyRepository } from "../../convention/ports/AgencyRepository";
+import { ConventionExternalIdRepository } from "../../convention/ports/ConventionExternalIdRepository";
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { ConventionsToSyncRepository } from "../../convention/ports/ConventionsToSyncRepository";
@@ -28,10 +29,12 @@ export type UnitOfWork = {
   apiConsumerRepository: ApiConsumerRepository;
   authenticatedUserRepository: AuthenticatedUserRepository;
   conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
+  conventionExternalIdRepository: ConventionExternalIdRepository;
   conventionQueries: ConventionQueries;
   conventionRepository: ConventionRepository;
-  discussionAggregateRepository: DiscussionAggregateRepository;
+  conventionsToSyncRepository: ConventionsToSyncRepository;
   deletedEstablishmentRepository: DeletedEstablishmentRepository;
+  discussionAggregateRepository: DiscussionAggregateRepository;
   errorRepository: ErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   establishmentGroupRepository: EstablishmentGroupRepository;
@@ -47,7 +50,6 @@ export type UnitOfWork = {
   searchMadeRepository: SearchMadeRepository;
   shortLinkQuery: ShortLinkQuery;
   shortLinkRepository: ShortLinkRepository;
-  conventionsToSyncRepository: ConventionsToSyncRepository;
 };
 
 export interface UnitOfWorkPerformer {

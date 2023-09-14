@@ -4,8 +4,6 @@ import {
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
-  ConventionDtoWithoutExternalId,
-  ConventionExternalId,
   ConventionId,
   EstablishmentRepresentative,
   EstablishmentTutor,
@@ -34,9 +32,7 @@ export class PgConventionRepository implements ConventionRepository {
     return dto;
   }
 
-  public async save(
-    convention: ConventionDtoWithoutExternalId,
-  ): Promise<ConventionExternalId> {
+  public async save(convention: ConventionDto): Promise<void> {
     const alreadyExistingConvention = await this.getById(convention.id);
     if (alreadyExistingConvention)
       throw new ConflictError(
@@ -80,13 +76,6 @@ export class PgConventionRepository implements ConventionRepository {
     await this.client.query(query_insert_convention, [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, workConditions, internshipKind, businessAdvantages,
                                                       beneficiaryId, establishmentTutorId, establishmentRepresentativeId, beneficiaryRepresentativeId,beneficiaryCurrentEmployerId, statusJustification
     ]);
-
-    const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
-    const convention_external_id = await this.client.query(
-      query_insert_external_id,
-      [conventionId],
-    );
-    return convention_external_id.rows[0]?.external_id?.toString();
   }
 
   public async update(

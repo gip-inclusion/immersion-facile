@@ -236,7 +236,6 @@ describe("conventionDtoSchema", () => {
         ...new ConventionDtoBuilder().build(),
         agencyName: "dsfsdfsdf",
         agencyDepartment: "75",
-        externalId: "sdfsdff",
       };
       expect(() =>
         conventionReadSchema.parse(validConventionRead),
@@ -249,7 +248,6 @@ describe("conventionDtoSchema", () => {
           .build(),
         agencyName: "dsfsdfsdf",
         agencyDepartment: "90",
-        externalId: "sdfsdff",
       };
       expectConventionInvalidWithIssueMessages(
         conventionReadSchema,

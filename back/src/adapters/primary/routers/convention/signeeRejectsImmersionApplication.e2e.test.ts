@@ -1,6 +1,6 @@
 import {
+  ConventionDto,
   ConventionDtoBuilder,
-  ConventionDtoWithoutExternalId,
   conventionMagicLinkTargets,
   ConventionStatus,
   expectEmailOfType,
@@ -23,7 +23,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     const validConvention = new ConventionDtoBuilder()
       .withStatus("READY_TO_SIGN")
       .build();
-    const { externalId, ...createConventionParams } = validConvention;
+
     const appAndDeps = await buildTestApp();
 
     appAndDeps.gateways.timeGateway.setNextDate(new Date());
@@ -43,7 +43,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     const { establishmentRepJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
         appAndDeps,
-        createConventionParams,
+        validConvention,
       );
 
     await expectEstablishmentRequiresChanges(appAndDeps, establishmentRepJwt, {
@@ -58,11 +58,11 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
-  createConventionParams: ConventionDtoWithoutExternalId,
+  convention: ConventionDto,
 ) => {
   await request
     .post(unauthenticatedConventionTargets.createConvention.url)
-    .send(createConventionParams)
+    .send(convention)
     .expect(200);
 
   await expectStoreImmersionToHaveStatus(
@@ -80,8 +80,8 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     sentEmails.map((e) => e.recipients),
     [
       ["validator@mail.com"],
-      [createConventionParams.signatories.beneficiary.email],
-      [createConventionParams.signatories.establishmentRepresentative.email],
+      [convention.signatories.beneficiary.email],
+      [convention.signatories.establishmentRepresentative.email],
     ],
   );
 

@@ -71,10 +71,11 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
 
     const { beneficiary, establishmentRepresentative } = convention.signatories;
 
+    const externalId =
+      await uow.conventionExternalIdRepository.getByConventionId(convention.id);
+
     const poleEmploiConvention: PoleEmploiConvention = {
-      id: convention.externalId
-        ? convention.externalId.padStart(11, "0")
-        : "no-external-id",
+      id: externalId ?? "no-external-id",
       originalId: convention.id,
       peConnectId: beneficiary.federatedIdentity?.token,
       statut: conventionStatusToPoleEmploiStatus[convention.status],
