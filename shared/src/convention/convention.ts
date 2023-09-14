@@ -1,8 +1,9 @@
-import { keys, values } from "ramda";
+import { keys, mapObjIndexed, values } from "ramda";
 import { allSignatoryRoles, Role, SignatoryRole } from "../role/role.dto";
 import { DotNestedKeys, ExtractFromExisting } from "../utils";
 import {
   ConventionDto,
+  ConventionRenewed,
   ConventionStatus,
   ConventionValidator,
   Signatories,
@@ -127,3 +128,24 @@ export const signatoryKeyFromRole: Record<SignatoryRole, keyof Signatories> = {
 export const hasBeneficiaryCurrentEmployer = (
   convention: Pick<ConventionDto, "signatories">,
 ): boolean => !!convention.signatories.beneficiaryCurrentEmployer;
+
+export const clearSignaturesAndValidationDate = <C extends ConventionDto>(
+  convention: C,
+): C => ({
+  ...convention,
+  dateValidation: undefined,
+  signatories: mapObjIndexed(
+    (value) => ({
+      ...value,
+      signedAt: undefined,
+    }),
+    convention.signatories,
+  ),
+});
+
+export const isConventionRenewed = (
+  convention: ConventionDto,
+): convention is ConventionRenewed => {
+  const renewedKey: keyof ConventionDto = "renewed";
+  return renewedKey in convention;
+};

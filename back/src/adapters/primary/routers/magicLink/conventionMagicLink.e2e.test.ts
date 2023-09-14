@@ -242,6 +242,16 @@ describe("Magic link router", () => {
         {
           ...existingConvention,
           ...renewedConventionParams,
+          signatories: {
+            beneficiary: {
+              ...existingConvention.signatories.beneficiary,
+              signedAt: undefined,
+            },
+            establishmentRepresentative: {
+              ...existingConvention.signatories.establishmentRepresentative,
+              signedAt: undefined,
+            },
+          },
           status: "READY_TO_SIGN",
         },
       ]);

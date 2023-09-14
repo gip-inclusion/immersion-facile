@@ -1,7 +1,8 @@
 import React, { ReactNode, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-import { ConventionReadDto, path } from "shared";
+import { ConventionReadDto, isConventionRenewed, path } from "shared";
+import { ConventionRenewedInformations } from "react-design-system";
 import { sections } from "src/app/contents/admin/conventionValidation";
 import {
   ColField,
@@ -44,6 +45,9 @@ export const ConventionValidationDetails = ({
           {copyButtonLabel}
         </button>
       </h4>
+      {isConventionRenewed(convention) && (
+        <ConventionRenewedInformations renewed={convention.renewed} />
+      )}
       {sections.map((list, index) => (
         <ConventionValidationSection
           // eslint-disable-next-line react/no-array-index-key

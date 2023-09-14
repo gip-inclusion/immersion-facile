@@ -7,8 +7,10 @@ import { mergeDeepRight } from "ramda";
 import {
   ConventionDto,
   ConventionReadDto,
+  isConventionRenewed,
   UpdateConventionStatusRequestDto,
 } from "shared";
+import { ConventionRenewedInformations } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -108,6 +110,9 @@ export const ConventionSignForm = ({
         severity="info"
         className={fr.cx("fr-mb-4w")}
       />
+      {isConventionRenewed(convention) && (
+        <ConventionRenewedInformations renewed={convention.renewed} />
+      )}
       <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
       <form>
         {currentSignatory && <ConventionSummary />}

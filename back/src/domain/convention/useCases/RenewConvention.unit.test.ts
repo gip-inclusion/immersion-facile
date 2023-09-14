@@ -186,6 +186,17 @@ describe("RenewConvention", () => {
         {
           ...existingValidatedConvention,
           ...renewConventionParams,
+          signatories: {
+            beneficiary: {
+              ...existingValidatedConvention.signatories.beneficiary,
+              signedAt: undefined,
+            },
+            establishmentRepresentative: {
+              ...existingValidatedConvention.signatories
+                .establishmentRepresentative,
+              signedAt: undefined,
+            },
+          },
           status: "READY_TO_SIGN",
         },
       ]);

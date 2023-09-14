@@ -1,4 +1,5 @@
 import {
+  clearSignaturesAndValidationDate,
   ConventionDomainPayload,
   RenewConventionParams,
   renewConventionParamsSchema,
@@ -55,9 +56,8 @@ export class RenewConvention extends TransactionalUseCase<
       throw new BadRequestError(
         `This convention cannot be renewed, as it has status : '${conventionInRepo.status}'`,
       );
-
     await this.addConvention.execute({
-      ...conventionInRepo,
+      ...clearSignaturesAndValidationDate(conventionInRepo),
       ...params,
       status: "READY_TO_SIGN",
     });
