@@ -1,7 +1,7 @@
 import {
-  ConventionDtoWithoutExternalId,
+  ConventionDto,
+  conventionSchema,
   ConventionStatus,
-  conventionWithoutExternalIdSchema,
   WithConventionIdLegacy,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
@@ -12,10 +12,10 @@ import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 
 export class AddConvention extends TransactionalUseCase<
-  ConventionDtoWithoutExternalId,
+  ConventionDto,
   WithConventionIdLegacy
 > {
-  protected inputSchema = conventionWithoutExternalIdSchema;
+  protected inputSchema = conventionSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -32,14 +32,14 @@ export class AddConvention extends TransactionalUseCase<
   }
 
   protected async _execute(
-    createConventionParams: ConventionDtoWithoutExternalId,
+    convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<WithConventionIdLegacy> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
     if (
-      createConventionParams.status != "DRAFT" &&
-      createConventionParams.status != minimalValidStatus
+      convention.status != "DRAFT" &&
+      convention.status != minimalValidStatus
     ) {
       throw new ForbiddenError();
     }
@@ -48,21 +48,20 @@ export class AddConvention extends TransactionalUseCase<
     if (featureFlags.enableInseeApi.isActive) {
       await rejectsSiretIfNotAnOpenCompany(
         this.#siretGateway,
-        createConventionParams.siret,
+        convention.siret,
       );
     }
 
-    const externalId = await uow.conventionRepository.save(
-      createConventionParams,
-    );
+    await uow.conventionRepository.save(convention);
+    await uow.conventionExternalIdRepository.save(convention.id);
 
     const event = this.#createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: { ...createConventionParams, externalId },
+      payload: convention,
     });
 
     await uow.outboxRepository.save(event);
 
-    return { id: createConventionParams.id };
+    return { id: convention.id };
   }
 }

@@ -257,16 +257,15 @@ describe("Pg implementation of ConventionQueries", () => {
       .withDateEnd(new Date("2023-03-28").toISOString())
       .withSchedule(reasonableSchedule)
       .withStatus("READY_TO_SIGN")
-      .withExternalId("1")
       .withAgencyId(agencyId)
       .build();
+
     const conventionDraftAndDateStart20230330 = new ConventionDtoBuilder()
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
       .withDateStart(new Date("2023-03-30").toISOString())
       .withDateEnd(new Date("2023-03-31").toISOString())
       .withSchedule(reasonableSchedule)
       .withStatus("DRAFT")
-      .withExternalId("2")
       .withAgencyId(agencyId)
       .build();
 
@@ -429,7 +428,6 @@ describe("Pg implementation of ConventionQueries", () => {
         .withSchedule(reasonableSchedule)
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
-        .withExternalId("3")
         .build();
       const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
@@ -557,7 +555,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .build(),
     );
 
-    const externalId = await conventionRepository.save(convention);
-    return { ...convention, externalId, agencyName, agencyDepartment };
+    await conventionRepository.save(convention);
+    return { ...convention, agencyName, agencyDepartment };
   };
 });

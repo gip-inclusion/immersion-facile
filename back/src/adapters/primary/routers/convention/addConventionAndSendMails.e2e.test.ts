@@ -33,11 +33,11 @@ establishmentRepresentativeSignDate.setDate(
   establishmentRepresentativeSignDate.getDate() - 1,
 );
 const validationDate = new Date();
+const externalId = "00000000005";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid app in repository with full express app", async () => {
     const validConvention = new ConventionDtoBuilder().build();
-    const { externalId, ...validConventionParams } = validConvention;
     const { request, gateways, eventCrawler, inMemoryUow } =
       await buildTestApp();
 
@@ -52,7 +52,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     const res = await request
       .post(unauthenticatedConventionTargets.createConvention.url)
-      .send(validConventionParams);
+      .send(validConvention);
 
     expectResponseBody(res, { id: validConvention.id });
     expect(
@@ -114,6 +114,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     ]);
 
     appAndDeps.inMemoryUow.agencyRepository.setAgencies([peAgency]);
+
+    appAndDeps.inMemoryUow.conventionExternalIdRepository.nextExternalId =
+      externalId;
 
     const { beneficiarySignJwt, establishmentSignJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
@@ -180,10 +183,10 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     "shortLink3",
     "shortLink4",
   ]);
-  const { externalId, ...createConventionParams } = convention;
+
   const result = await request
     .post(unauthenticatedConventionTargets.createConvention.url)
-    .send(createConventionParams);
+    .send(convention);
 
   expect(result.status).toBe(200);
 
@@ -198,7 +201,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   expect(inMemoryUow.notificationRepository.notifications).toHaveLength(3);
   const peNotification = gateways.poleEmploiGateway.notifications[0];
-  expect(peNotification.id).toBe("00000000001");
+  expect(peNotification.id).toBe(externalId);
   expectToEqual(peNotification.statut, "DEMANDE_A_SIGNER");
   expect(peNotification.originalId).toBe(convention.id);
   expect(peNotification.email).toBe(convention.signatories.beneficiary.email);

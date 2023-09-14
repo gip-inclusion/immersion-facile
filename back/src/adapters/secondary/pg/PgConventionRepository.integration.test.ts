@@ -59,17 +59,15 @@ describe("PgConventionRepository", () => {
     const convention = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .build();
-    const { externalId, ...createConventionParams } = convention;
 
-    const savedExternalId = await conventionRepository.save(
-      createConventionParams,
+    expect(await conventionRepository.getById(convention.id)).toBeUndefined();
+
+    const savedExternalId = await conventionRepository.save(convention);
+
+    expect(await conventionRepository.getById(convention.id)).toEqual(
+      convention,
     );
-
-    expect(await conventionRepository.getById(convention.id)).toEqual({
-      ...convention,
-      externalId: savedExternalId,
-    });
-    expect(typeof savedExternalId).toBe("string");
+    expect(savedExternalId).toBeUndefined();
   });
 
   it("fails to add a convention if it already exits", async () => {
@@ -98,16 +96,14 @@ describe("PgConventionRepository", () => {
       .withSchedule(reasonableSchedule)
       .build();
 
-    const savedExternalId = await conventionRepository.save(convention);
+    await conventionRepository.save(convention);
 
-    expect(await conventionRepository.getById(convention.id)).toEqual({
-      ...convention,
-      externalId: savedExternalId,
-    });
+    expect(await conventionRepository.getById(convention.id)).toEqual(
+      convention,
+    );
 
     const updatedConvention = new ConventionDtoBuilder(convention)
       .withBeneficiaryFirstName("Marvin")
-      .withExternalId(savedExternalId)
       .build();
 
     await conventionRepository.update(updatedConvention);
@@ -122,13 +118,10 @@ describe("PgConventionRepository", () => {
       .notSigned()
       .build();
 
-    const externalId = await conventionRepository.save(convention);
+    await conventionRepository.save(convention);
 
     const fetchedConvention = await conventionRepository.getById(convention.id);
-    expect(fetchedConvention).toEqual({
-      ...convention,
-      externalId,
-    });
+    expect(fetchedConvention).toEqual(convention);
   });
 
   it("Adds a new convention with beneficiary extra fields", async () => {
@@ -389,11 +382,10 @@ describe("PgConventionRepository", () => {
       .withId(conventionId)
       .withStatus("ACCEPTED_BY_COUNSELLOR")
       .build();
-    const externalId = await conventionRepository.save(convention);
+    await conventionRepository.save(convention);
 
     const updatedConvention = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withExternalId(externalId)
       .withStatus("ACCEPTED_BY_COUNSELLOR")
       .withValidator({ firstname: "John", lastname: "Doe" })
       .withBeneficiaryEmail("some.updated@email.com")
@@ -433,11 +425,10 @@ describe("PgConventionRepository", () => {
       .withId(idA)
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .build();
-    const externalId = await conventionRepository.save(convention);
+    await conventionRepository.save(convention);
 
     const updatedConvention = new ConventionDtoBuilder()
       .withId(idA)
-      .withExternalId(externalId)
       .withStatus("CANCELLED")
       .withBeneficiaryEmail("some.updated@email.com")
       .withStatusJustification("some justification")
@@ -455,16 +446,11 @@ describe("PgConventionRepository", () => {
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
 
-    const { externalId, ...createConventionParams } = convention;
+    await conventionRepository.save(convention);
 
-    const savedExternalId = await conventionRepository.save(
-      createConventionParams,
+    expect(await conventionRepository.getById(convention.id)).toEqual(
+      convention,
     );
-    expect(await conventionRepository.getById(convention.id)).toEqual({
-      ...convention,
-      externalId: savedExternalId,
-    });
-    expect(typeof savedExternalId).toBe("string");
   });
 
   it("Updates an already saved immersion with a beneficiary representative", async () => {
@@ -473,11 +459,10 @@ describe("PgConventionRepository", () => {
       .withId(idA)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
-    const externalId = await conventionRepository.save(convention);
+    await conventionRepository.save(convention);
 
     const updatedConvention = new ConventionDtoBuilder()
       .withId(idA)
-      .withExternalId(externalId)
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withBeneficiaryEmail("some.updated@email.com")
       .withBeneficiaryRepresentative({
@@ -501,11 +486,10 @@ describe("PgConventionRepository", () => {
       .withId(idA)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
-    const externalId = await conventionRepository.save(convention);
+    await conventionRepository.save(convention);
 
     const updatedConvention = new ConventionDtoBuilder()
       .withId(idA)
-      .withExternalId(externalId)
       .withBeneficiaryRepresentative(undefined)
       .build();
 
@@ -517,11 +501,10 @@ describe("PgConventionRepository", () => {
   it("Updates an already saved immersion without beneficiary representative with a beneficiary representative", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder().withId(idA).build();
-    const externalId = await conventionRepository.save(convention);
+    await conventionRepository.save(convention);
 
     const updatedConvention = new ConventionDtoBuilder()
       .withId(idA)
-      .withExternalId(externalId)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
 

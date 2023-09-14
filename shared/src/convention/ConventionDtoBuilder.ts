@@ -13,7 +13,6 @@ import {
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
-  ConventionExternalId,
   ConventionId,
   ConventionStatus,
   ConventionValidator,
@@ -27,7 +26,6 @@ import {
 } from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "a99eaca1-ee70-4c90-b3f4-668d492f7392";
-export const CONVENTION_EXTERNAL_ID = "00000000001";
 export const VALID_EMAILS = [
   "beneficiary@email.fr",
   "establishment@example.com",
@@ -79,7 +77,6 @@ const establishmentRepresentative: EstablishmentRepresentative = {
 
 const validConvention: ConventionDto = {
   id: DEMANDE_IMMERSION_ID,
-  externalId: CONVENTION_EXTERNAL_ID,
   status: "DRAFT",
   agencyId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   immersionAddress: "169 boulevard de la villette, 75010 Paris",
@@ -475,12 +472,6 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.#establishmentTutor,
       lastName,
     });
-  }
-
-  public withExternalId(
-    externalId: ConventionExternalId,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, externalId });
   }
 
   public withFederatedIdentity(

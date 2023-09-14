@@ -35,7 +35,6 @@ import {
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   ConventionCommon,
   ConventionDto,
-  ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
   ConventionInternshipKindSpecific,
@@ -237,73 +236,67 @@ export const conventionInternshipKindSpecificSchema: z.Schema<
   }),
 ]);
 
-export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
-  conventionCommonSchema
-    .and(conventionInternshipKindSpecificSchema)
-    .refine(startDateIsBeforeEndDate, {
-      message: localization.invalidDateStartDateEnd,
-      path: [getConventionFieldName("dateEnd")],
-    })
-    .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-    .superRefine((convention, issueMaker) => {
-      const addIssue = (message: string, path: string) => {
-        issueMaker.addIssue({
-          code: z.ZodIssueCode.custom,
-          message,
-          path: [path],
-        });
-      };
-      const beneficiaryAgeAtConventionStart = differenceInYears(
-        new Date(convention.dateStart),
-        new Date(convention.signatories.beneficiary.birthdate),
-      );
-
-      addIssuesIfDuplicateSignatoriesEmails(convention, addIssue);
-      addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor(convention, addIssue);
-
-      if (convention.internshipKind === "mini-stage-cci") {
-        addIssueIfLimitedScheduleHoursExceeded(
-          convention,
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-        );
-        addIssueIfSundayIsInSchedule(
-          addIssue,
-          convention.id,
-          convention.schedule.complexSchedule,
-        );
-        addIssueIfAgeLessThanMinimumAge(
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-          MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
-        );
-      }
-
-      if (convention.internshipKind === "immersion") {
-        addIssueIfAgeLessThanMinimumAge(
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-          IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
-        );
-      }
-
-      const message = validateSchedule(convention.schedule, {
-        start: new Date(convention.dateStart),
-        end: new Date(convention.dateEnd),
+export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
+  .and(conventionInternshipKindSpecificSchema)
+  .refine(startDateIsBeforeEndDate, {
+    message: localization.invalidDateStartDateEnd,
+    path: [getConventionFieldName("dateEnd")],
+  })
+  .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
+  .superRefine((convention, issueMaker) => {
+    const addIssue = (message: string, path: string) => {
+      issueMaker.addIssue({
+        code: z.ZodIssueCode.custom,
+        message,
+        path: [path],
       });
-      if (message) {
-        addIssue(message, "schedule");
-      }
-    })
-    .refine(mustBeSignedByEveryone, {
-      message: localization.mustBeSignedByEveryone,
-      path: [getConventionFieldName("status")],
-    });
+    };
+    const beneficiaryAgeAtConventionStart = differenceInYears(
+      new Date(convention.dateStart),
+      new Date(convention.signatories.beneficiary.birthdate),
+    );
 
-export const conventionSchema: z.Schema<ConventionDto> =
-  conventionWithoutExternalIdSchema.and(
-    z.object({ externalId: externalConventionIdSchema }),
-  );
+    addIssuesIfDuplicateSignatoriesEmails(convention, addIssue);
+    addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor(convention, addIssue);
+
+    if (convention.internshipKind === "mini-stage-cci") {
+      addIssueIfLimitedScheduleHoursExceeded(
+        convention,
+        addIssue,
+        beneficiaryAgeAtConventionStart,
+      );
+      addIssueIfSundayIsInSchedule(
+        addIssue,
+        convention.id,
+        convention.schedule.complexSchedule,
+      );
+      addIssueIfAgeLessThanMinimumAge(
+        addIssue,
+        beneficiaryAgeAtConventionStart,
+        MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
+      );
+    }
+
+    if (convention.internshipKind === "immersion") {
+      addIssueIfAgeLessThanMinimumAge(
+        addIssue,
+        beneficiaryAgeAtConventionStart,
+        IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
+      );
+    }
+
+    const message = validateSchedule(convention.schedule, {
+      start: new Date(convention.dateStart),
+      end: new Date(convention.dateEnd),
+    });
+    if (message) {
+      addIssue(message, "schedule");
+    }
+  })
+  .refine(mustBeSignedByEveryone, {
+    message: localization.mustBeSignedByEveryone,
+    path: [getConventionFieldName("status")],
+  });
 
 export const conventionReadSchema: z.Schema<ConventionReadDto> =
   conventionSchema.and(
@@ -378,7 +371,7 @@ export const renewMagicLinkRequestSchema: z.Schema<RenewMagicLinkRequestDto> =
   });
 
 const addIssuesIfDuplicateSignatoriesEmails = (
-  convention: ConventionDtoWithoutExternalId,
+  convention: ConventionDto,
   addIssue: (message: string, path: string) => void,
 ) => {
   const signatoriesWithEmail = Object.entries(convention.signatories)
@@ -401,7 +394,7 @@ const addIssuesIfDuplicateSignatoriesEmails = (
 };
 
 const addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor = (
-  convention: ConventionDtoWithoutExternalId,
+  convention: ConventionDto,
   addIssue: (message: string, path: string) => void,
 ) => {
   if (
@@ -417,7 +410,7 @@ const addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor = (
 };
 
 const addIssueIfLimitedScheduleHoursExceeded = (
-  convention: ConventionDtoWithoutExternalId,
+  convention: ConventionDto,
   addIssue: (message: string, path: string) => void,
   beneficiaryAgeAtConventionStart: number,
 ) => {

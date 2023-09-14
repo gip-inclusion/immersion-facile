@@ -9,6 +9,7 @@ import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRep
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryAuthenticatedUserRepository } from "../../secondary/InMemoryAuthenticatedUserRepository";
+import { InMemoryConventionExternalIdRepository } from "../../secondary/InMemoryConventionExternalIdRepository";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
@@ -30,6 +31,7 @@ import { InMemorySearchMadeRepository } from "../../secondary/offer/InMemorySear
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/PgApiConsumerRepository";
 import { PgAuthenticatedUserRepository } from "../../secondary/pg/PgAuthenticatedUserRepository";
+import { PgConventionExternalIdRepository } from "../../secondary/pg/PgConventionExternalIdRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
@@ -97,6 +99,8 @@ export const createInMemoryUow = () => {
     shortLinkRepository,
     deletedEstablishmentRepository:
       new InMemoryDeletedEstablishmentRepository(),
+    conventionExternalIdRepository:
+      new InMemoryConventionExternalIdRepository(),
   } satisfies UnitOfWork;
 };
 
@@ -106,20 +110,23 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     agencyRepository: new PgAgencyRepository(client),
     apiConsumerRepository: new PgApiConsumerRepository(client),
     authenticatedUserRepository: new PgAuthenticatedUserRepository(client),
-    conventionRepository: new PgConventionRepository(client),
-    conventionQueries: new PgConventionQueries(client),
     conventionPoleEmploiAdvisorRepository:
       new PgConventionPoleEmploiAdvisorRepository(client),
+    conventionExternalIdRepository: new PgConventionExternalIdRepository(
+      client,
+    ),
+    conventionQueries: new PgConventionQueries(client),
+    conventionRepository: new PgConventionRepository(client),
     conventionsToSyncRepository: new PgConventionsToSyncRepository(client),
     deletedEstablishmentRepository: new PgDeletedEstablishmentRepository(
       client,
     ),
     discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
+    errorRepository: new PgErrorRepository(client),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       client,
     ),
     establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
-    errorRepository: new PgErrorRepository(client),
     featureFlagRepository: new PgFeatureFlagRepository(client),
     formEstablishmentRepository: new PgFormEstablishmentRepository(client),
     immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
@@ -128,12 +135,12 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     ),
     notificationRepository: new PgNotificationRepository(client),
     ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
-    outboxRepository: new PgOutboxRepository(client),
     outboxQueries: new PgOutboxQueries(client),
+    outboxRepository: new PgOutboxRepository(client),
     romeRepository: new PgRomeRepository(client),
     searchMadeRepository: new PgSearchMadeRepository(client),
-    shortLinkRepository,
     shortLinkQuery: shortLinkRepository,
+    shortLinkRepository,
   };
 };
 

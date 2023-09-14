@@ -5,7 +5,7 @@ import { withValidateHeadersAuthorization } from "../headers";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import {
   conventionReadSchema,
-  conventionWithoutExternalIdSchema,
+  conventionSchema,
   renewMagicLinkRequestSchema,
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
@@ -55,7 +55,7 @@ export const unauthenticatedConventionTargets = createTargets({
   createConvention: createTarget({
     url: "/demandes-immersion",
     method: "POST",
-    validateRequestBody: conventionWithoutExternalIdSchema.parse,
+    validateRequestBody: conventionSchema.parse,
     validateResponseBody: withConventionIdLegacySchema.parse,
   }),
   shareConvention: createTarget({

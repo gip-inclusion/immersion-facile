@@ -12,6 +12,7 @@ import {
 import { PeConnectImmersionAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import { PgAgencyRepository } from "./PgAgencyRepository";
+import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
 import {
   PgConventionPoleEmploiAdvisorRepository,
   PgConventionPoleEmploiUserAdvisorDto,
@@ -74,8 +75,11 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     const agencyRepository = new PgAgencyRepository(client);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(client);
-    const { externalId, ...createConventionParams } = convention;
-    await conventionRepository.save(createConventionParams);
+    const conventionExternalIdRepository = new PgConventionExternalIdRepository(
+      client,
+    );
+    await conventionRepository.save(convention);
+    await conventionExternalIdRepository.save(convention.id);
   });
 
   afterAll(async () => {

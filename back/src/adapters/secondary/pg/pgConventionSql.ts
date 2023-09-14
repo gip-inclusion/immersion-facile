@@ -57,7 +57,6 @@ const buildSignatoriesObject = `JSON_BUILD_OBJECT(
 const buildDto = `JSON_STRIP_NULLS(
   JSON_BUILD_OBJECT(
     'id', conventions.id,
-    'externalId', external_id::text,
     'status', conventions.status,
     'dateValidation', date_to_iso(date_validation),
     'dateSubmission', date_to_iso(date_submission),
@@ -107,7 +106,6 @@ export const selectAllConventionDtosById = `SELECT conventions.id, ${buildDto} a
   LEFT JOIN partners_pe_connect AS p ON p.convention_id = conventions.id
   LEFT JOIN actors as et ON et.id = conventions.establishment_tutor_id
   LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = conventions.immersion_appellation
-  LEFT JOIN convention_external_ids AS cei ON cei.convention_id = conventions.id
   LEFT JOIN agencies ON agencies.id = conventions.agency_id
 `;
 

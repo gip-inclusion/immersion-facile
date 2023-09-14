@@ -1,7 +1,7 @@
 import differenceInDays from "date-fns/differenceInDays";
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
-  ConventionDtoWithoutExternalId,
+  ConventionDto,
   ConventionStatus,
   EstablishmentTutor,
   InternshipKind,
@@ -62,8 +62,6 @@ const statusesAllowedWithoutSign: ConventionStatus[] = [
   "DEPRECATED",
 ];
 
-export const mustBeSignedByEveryone = (
-  params: ConventionDtoWithoutExternalId,
-): boolean =>
+export const mustBeSignedByEveryone = (params: ConventionDto): boolean =>
   statusesAllowedWithoutSign.includes(params.status) ||
   allSignatoriesSigned(params.signatories);
