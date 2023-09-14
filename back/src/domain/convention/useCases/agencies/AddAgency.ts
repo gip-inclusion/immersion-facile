@@ -6,9 +6,6 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 
-export const defaultQuestionnaireUrl =
-  "https://docs.google.com/document/d/1pjsCZbu0CarBCR0GVJ1AmIgwkxGIsD6T/edit";
-
 export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
   protected inputSchema = createAgencySchema;
 
@@ -30,7 +27,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
       ...params,
       adminEmails: [],
       status: "needsReview",
-      questionnaireUrl: params.questionnaireUrl || defaultQuestionnaireUrl,
+      questionnaireUrl: params.questionnaireUrl || "",
     };
 
     const newAgencyAddEvent = this.#createNewEvent({
