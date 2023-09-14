@@ -141,15 +141,12 @@ describe("PgConventionRepository", () => {
       })
       .build();
 
-    const externalId = await conventionRepository.save(renewedConvention);
+    await conventionRepository.save(renewedConvention);
 
     const fetchedConvention = await conventionRepository.getById(
       renewedConvention.id,
     );
-    expectToEqual(fetchedConvention, {
-      ...renewedConvention,
-      externalId,
-    });
+    expectToEqual(fetchedConvention, renewedConvention);
   });
 
   it("Adds a new convention with beneficiary extra fields", async () => {

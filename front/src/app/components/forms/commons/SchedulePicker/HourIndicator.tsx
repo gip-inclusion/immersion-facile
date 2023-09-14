@@ -6,7 +6,7 @@ import {
   InternshipKind,
   maxPermittedHoursPerWeek,
 } from "shared";
-import { formatHoursString } from "./TotaWeeklylHoursIndicator";
+import { formatHoursString } from "./TotalWeeklylHoursIndicator";
 
 type HourIndicatorProperties = {
   hours: number;
