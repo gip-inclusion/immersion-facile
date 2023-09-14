@@ -12,12 +12,14 @@ import { addBusinessDays, addDays } from "date-fns";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import {
+  ConventionDto,
   ConventionReadDto,
   ConventionStatus,
   ConventionSupportedJwt,
   DateIntervalDto,
   domElementIds,
   emptySchedule,
+  isConventionRenewed,
   RenewConventionParams,
   renewConventionParamsSchema,
   Role,
@@ -105,7 +107,7 @@ export const ConventionManageActions = ({
           justifyContent: "center",
         }}
       >
-        {isAllowedTransition(convention.status, "REJECTED", role) && (
+        {isAllowedTransition(convention, "REJECTED", role) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
@@ -118,7 +120,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention.status, "DEPRECATED", role) && (
+        {isAllowedTransition(convention, "DEPRECATED", role) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
@@ -131,7 +133,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention.status, "DRAFT", role) && (
+        {isAllowedTransition(convention, "DRAFT", role) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
@@ -146,11 +148,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(
-          convention.status,
-          "ACCEPTED_BY_COUNSELLOR",
-          role,
-        ) && (
+        {isAllowedTransition(convention, "ACCEPTED_BY_COUNSELLOR", role) && (
           <VerificationActionButton
             initialStatus={convention.status}
             newStatus="ACCEPTED_BY_COUNSELLOR"
@@ -168,11 +166,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(
-          convention.status,
-          "ACCEPTED_BY_VALIDATOR",
-          role,
-        ) && (
+        {isAllowedTransition(convention, "ACCEPTED_BY_VALIDATOR", role) && (
           <VerificationActionButton
             initialStatus={convention.status}
             newStatus="ACCEPTED_BY_VALIDATOR"
@@ -194,7 +188,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention.status, "CANCELLED", role) && (
+        {isAllowedTransition(convention, "CANCELLED", role) && (
           <>
             <VerificationActionButton
               initialStatus={convention.status}
@@ -290,9 +284,9 @@ export const RenewConventionForm = ({
             "Il n'est pas modificable, mais vous pouvez le copier pour le garder de côté"
           }
           nativeInputProps={{
-            ...methods.register("renewed.from"),
+            ...methods.register("id"),
             readOnly: true,
-            value: convention.id,
+            value: defaultValues.id,
           }}
         />
         <ImmersionHourLocationSection />
@@ -309,14 +303,14 @@ export const RenewConventionForm = ({
 };
 
 const isAllowedTransition = (
-  initialStatus: ConventionStatus,
+  convention: ConventionDto,
   targetStatus: ConventionStatus,
   actingRole: Role,
-) => {
+): boolean => {
   const transitionConfig = statusTransitionConfigs[targetStatus];
-
+  if (isConventionRenewed(convention) && targetStatus === "DRAFT") return false;
   return (
-    transitionConfig.validInitialStatuses.includes(initialStatus) &&
+    transitionConfig.validInitialStatuses.includes(convention.status) &&
     transitionConfig.validRoles.includes(actingRole)
   );
 };

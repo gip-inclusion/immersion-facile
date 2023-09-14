@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
+import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
@@ -11,6 +12,7 @@ import {
   domElementIds,
   getConventionFieldName,
   InternshipKind,
+  isConventionRenewed,
   Role,
   Signatory,
   SignatoryRole,
@@ -130,19 +132,24 @@ export const SignatureActions = ({
               isLoading ||
               submitFeedback.kind === "modificationsAskedFromSignatory",
           },
-          {
-            priority: "secondary",
-            children: "Annuler les signatures et demander une modification",
-            disabled: isLoading || submitFeedback.kind !== "idle",
-            onClick: openRequestModificationModal,
-            type: "button",
-            iconId: "fr-icon-edit-fill",
-            iconPosition: "left",
-            nativeButtonProps: {
-              id: domElementIds.conventionToSign
-                .openRequestModificationModalButton,
-            },
-          },
+          ...(!isConventionRenewed(convention)
+            ? [
+                {
+                  priority: "secondary",
+                  children:
+                    "Annuler les signatures et demander une modification",
+                  disabled: isLoading || submitFeedback.kind !== "idle",
+                  onClick: openRequestModificationModal,
+                  type: "button",
+                  iconId: "fr-icon-edit-fill",
+                  iconPosition: "left",
+                  nativeButtonProps: {
+                    id: domElementIds.conventionToSign
+                      .openRequestModificationModalButton,
+                  },
+                } satisfies ButtonProps,
+              ]
+            : []),
         ]}
       />
       {createPortal(
