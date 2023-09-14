@@ -272,6 +272,26 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return <Loader />;
   }
 
+  if (feedback.kind === "deleteSuccess") {
+    return (
+      <Alert
+        severity="success"
+        title="Succès de la suppression"
+        description="Succès. Nous avons bien supprimé les informations concernant l'entreprise."
+      />
+    );
+  }
+  if (feedback.kind === "submitSuccess") {
+    return (
+      <Alert
+        severity="success"
+        title="Succès de l'envoi"
+        description="Succès. Nous avons bien enregistré les informations concernant
+      votre entreprise."
+      />
+    );
+  }
+
   return (
     <>
       {!isEstablishmentAdmin && (
@@ -480,21 +500,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               }
             />
           )}
-          {feedback.kind === "submitSuccess" && (
-            <Alert
-              severity="success"
-              title="Succès de l'envoi"
-              description="Succès. Nous avons bien enregistré les informations concernant
-                votre entreprise."
-            />
-          )}
-          {feedback.kind === "deleteSuccess" && (
-            <Alert
-              severity="success"
-              title="Succès de la suppression"
-              description="Succès. Nous avons bien supprimé les informations concernant l'entreprise."
-            />
-          )}
           {feedback.kind === "deleteErrored" && (
             <Alert
               severity="error"
@@ -510,24 +515,22 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               "fr-btns-group--icon-left",
             )}
           >
-            {feedback.kind !== "submitSuccess" && (
-              <li>
-                <Button
-                  iconId="fr-icon-checkbox-circle-line"
-                  iconPosition="left"
-                  type="submit"
-                  disabled={isSubmitting}
-                  nativeButtonProps={{
-                    id: domElementIds.establishment.submitButton,
-                  }}
-                >
-                  {isEstablishmentAdmin
-                    ? "Enregistrer les modifications"
-                    : "Enregistrer mes informations"}
-                </Button>
-              </li>
-            )}
-            {feedback.kind !== "deleteSuccess" && isEstablishmentAdmin && (
+            <li>
+              <Button
+                iconId="fr-icon-checkbox-circle-line"
+                iconPosition="left"
+                type="submit"
+                disabled={isSubmitting}
+                nativeButtonProps={{
+                  id: domElementIds.establishment.submitButton,
+                }}
+              >
+                {isEstablishmentAdmin
+                  ? "Enregistrer les modifications"
+                  : "Enregistrer mes informations"}
+              </Button>
+            </li>
+            {isEstablishmentAdmin && (
               <li>
                 <Button
                   iconId="fr-icon-delete-bin-line"
