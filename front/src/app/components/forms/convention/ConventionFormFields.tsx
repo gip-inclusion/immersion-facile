@@ -37,8 +37,8 @@ import { AddressAutocomplete } from "../autocomplete/AddressAutocomplete";
 import { AgencySelector } from "./sections/agency/AgencySelector";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
-import { ImmersionHourLocationSection } from "./sections/hour-location/ImmersionHourLocationSection";
 import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
+import { ScheduleSection } from "./sections/schedule/ScheduleSection";
 import { ConventionFormMode } from "./ConventionForm";
 
 type ConventionFieldsProps = {
@@ -239,7 +239,7 @@ export const ConventionFormFields = ({
           label={renderSectionTitle(t.immersionHourLocationSection.title, 4)}
           {...makeAccordionProps(4)}
         >
-          <ImmersionHourLocationSection />
+          <ScheduleSection />
           <AddressAutocomplete
             {...formContents["immersionAddress"]}
             initialSearchTerm={

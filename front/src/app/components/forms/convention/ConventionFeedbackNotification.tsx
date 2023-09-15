@@ -76,9 +76,9 @@ export const createConventionFeedbackMessageByKind = (
       "La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail à chacun des signataires.",
   },
   renewed: {
-    title: "La convention a bien été renouvelée.",
+    title: "La demande de renouvellement est bien enregistrée.",
     message:
-      "La confirmation de ce renouvellement va être communiquée par mail à chacun des signataires.",
+      "Elle vient d'être envoyée à toutes les parties pour signature avant votre validation définitive.",
   },
   justSubmitted: {
     title: "Succès",
