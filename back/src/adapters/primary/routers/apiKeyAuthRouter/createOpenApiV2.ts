@@ -87,27 +87,6 @@ const apiKeyAuth = "apiKeyAuth";
 const searchSection = "Recherche d'entreprise accueillante et mise en contact";
 const conventionSection = "Accès aux conventions";
 
-const getServers = (envType: string) => {
-  if (envType === "production") {
-    return [
-      {
-        url: "https://staging.immersion-facile.beta.gouv.fr/api",
-        description: "Staging",
-      },
-      {
-        url: "https://immersion-facile.beta.gouv.fr/api",
-        description: "Production",
-      },
-    ];
-  }
-  return [
-    {
-      url: "/api",
-      description: envType,
-    },
-  ];
-};
-
 const generateOpenApi = (envType: string) =>
   createOpenApiGenerator(
     {
@@ -128,7 +107,12 @@ const generateOpenApi = (envType: string) =>
       `,
         version: "v2",
       },
-      servers: getServers(envType),
+      servers: [
+        {
+          url: "/api",
+          description: envType,
+        },
+      ],
       openapi: "3.1.0",
       security: [{ [apiKeyAuth]: [] }],
       components: {
