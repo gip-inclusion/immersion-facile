@@ -21,7 +21,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
 
-export const ImmersionHourLocationSection = () => {
+export const ScheduleSection = () => {
   const { setValue, watch, register, formState, reset } =
     useFormContext<
       Pick<
@@ -53,8 +53,8 @@ export const ImmersionHourLocationSection = () => {
       : [];
   const resetSchedule = () => {
     const interval: DateIntervalDto = {
-      start: new Date(dateStartInputValue),
-      end: new Date(dateEndInputValue),
+      start: new Date(values.dateStart),
+      end: new Date(values.dateEnd),
     };
     setValue(
       "schedule",
@@ -109,12 +109,15 @@ export const ImmersionHourLocationSection = () => {
     setValue("dateStart", newDates.start.toISOString());
     setDateStartInputValue(newDates.start.toISOString());
     setDateEndInputValue(newDates.end.toISOString());
-    resetSchedule();
   };
 
   useEffect(() => {
     reset(values);
   }, []);
+
+  useEffect(() => {
+    resetSchedule();
+  }, [values.dateStart, values.dateEnd]);
 
   return (
     <>
@@ -145,7 +148,7 @@ export const ImmersionHourLocationSection = () => {
         nativeInputProps={{
           name: register("dateStart").name,
           id: formContents["dateStart"].id,
-          value: toDateString(new Date(values.dateStart)),
+          value: toDateString(new Date(dateStartInputValue)),
           onChange: (event) => {
             const dateStart = event.target.value;
             if (dateStart !== "" && isStringDate(dateStart)) {
@@ -179,8 +182,8 @@ export const ImmersionHourLocationSection = () => {
 
       <SchedulePicker
         interval={{
-          start: new Date(values.dateStart),
-          end: new Date(values.dateEnd),
+          start: new Date(dateStartInputValue),
+          end: new Date(dateEndInputValue),
         }}
         excludedDays={excludedDays}
       />

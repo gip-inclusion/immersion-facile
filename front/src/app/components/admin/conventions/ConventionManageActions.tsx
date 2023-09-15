@@ -18,8 +18,8 @@ import {
   ConventionSupportedJwt,
   DateIntervalDto,
   domElementIds,
-  emptySchedule,
   isConventionRenewed,
+  reasonableSchedule,
   RenewConventionParams,
   renewConventionParamsSchema,
   Role,
@@ -38,7 +38,7 @@ import {
   conventionSlice,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";
-import { ImmersionHourLocationSection } from "../../forms/convention/sections/hour-location/ImmersionHourLocationSection";
+import { ScheduleSection } from "../../forms/convention/sections/schedule/ScheduleSection";
 
 type ConventionManageActionsProps = {
   jwt: ConventionSupportedJwt;
@@ -204,15 +204,17 @@ export const ConventionManageActions = ({
                 ? t.verification.conventionAlreadyCancelled
                 : t.verification.markAsCancelled}
             </VerificationActionButton>
-            <Button
-              iconId="fr-icon-file-add-line"
-              className={fr.cx("fr-m-1w")}
-              priority="secondary"
-              disabled={feedback.kind === "renewed"}
-              onClick={() => renewModal.open()}
-            >
-              Renouveler la convention
-            </Button>
+            {!isConventionRenewed(convention) && (
+              <Button
+                iconId="fr-icon-file-add-line"
+                className={fr.cx("fr-m-1w")}
+                priority="secondary"
+                disabled={feedback.kind === "renewed"}
+                onClick={() => renewModal.open()}
+              >
+                Renouveler la convention
+              </Button>
+            )}
             <Button
               iconId="fr-icon-file-pdf-line"
               className={fr.cx("fr-m-1w")}
@@ -263,7 +265,7 @@ export const RenewConventionForm = ({
     id: uuidV4(),
     dateStart: defaultDateInterval.start.toISOString(),
     dateEnd: defaultDateInterval.end.toISOString(),
-    schedule: emptySchedule(defaultDateInterval),
+    schedule: reasonableSchedule(defaultDateInterval),
     internshipKind: convention.internshipKind,
     renewed: {
       from: convention.id,
@@ -300,7 +302,7 @@ export const RenewConventionForm = ({
             value: defaultValues.id,
           }}
         />
-        <ImmersionHourLocationSection />
+        <ScheduleSection />
         <Input
           label="Motif de renouvellement"
           textArea
