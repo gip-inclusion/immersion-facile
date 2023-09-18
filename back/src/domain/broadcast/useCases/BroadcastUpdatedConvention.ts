@@ -2,11 +2,13 @@ import { filter } from "ramda";
 import {
   ApiConsumer,
   ConventionDto,
+  ConventionReadDto,
   conventionSchema,
   isApiConsumerAllowed,
   pipeWithValue,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { isConventionInScope } from "../../convention/entities/Convention";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
@@ -35,28 +37,40 @@ export class BroadcastUpdatedConvention extends TransactionalUseCase<
       );
     }
 
+    const conventionRead: ConventionReadDto = {
+      ...convention,
+      agencyName: agency.name,
+      agencyDepartment: agency.address.departmentCode,
+      agencyKind: agency.kind,
+    };
+
     const apiConsumers = pipeWithValue(
       await uow.apiConsumerRepository.getAll(),
-      filter<ApiConsumer>((apiConsumer) =>
-        isApiConsumerAllowed({
-          apiConsumer,
-          rightName: "convention",
-          consumerKind: "SUBSCRIPTION",
-        }
+      filter<ApiConsumer>(
+        (apiConsumer) =>
+          isApiConsumerAllowed({
+            apiConsumer,
+            rightName: "convention",
+            consumerKind: "SUBSCRIPTION",
+          }) && isConventionInScope(conventionRead, apiConsumer),
       ),
     );
 
-    apiConsumers.forEach((apiConsumers) => {
-      await this.#subscribersGateway.notifyConventionUpdated({
-        conventionRead: {
-          ...convention,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-        },
-        callbackUrl: apiConsumers.subscriptions["convention.updated"],
-        callbackHeaders: { authorization: "yo" },
-      });
-    });
+    await Promise.all(
+      apiConsumers.map((apiConsumers) => {
+        const conventionUpdatedCallbackParams =
+          apiConsumers.rights.convention.subscriptions?.["convention.updated"];
+        if (!conventionUpdatedCallbackParams) {
+          throw new Error(
+            `No callback params found for convention.updated : apiConsumer : ${apiConsumers.id} | convention : ${conventionRead.id}`,
+          );
+        }
+
+        return this.#subscribersGateway.notifyConventionUpdated({
+          conventionRead,
+          ...conventionUpdatedCallbackParams,
+        });
+      }),
+    );
   }
 }

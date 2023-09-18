@@ -31,6 +31,7 @@ const conventionReadDtoRemainingProps = {
   agencyDepartment: "75",
   agencyId: "some-agency-id",
   agencyName: "some-agency-name",
+  agencyKind: "pole-emploi" as const,
 };
 
 describe("Convention slice", () => {
@@ -170,6 +171,7 @@ describe("Convention slice", () => {
         ...convention,
         agencyName: "agency",
         agencyDepartment: "75",
+        agencyKind: "pole-emploi",
       };
       // tester l'état initiale
       expectConventionState({
@@ -212,10 +214,11 @@ describe("Convention slice", () => {
 
     it("stores the Convention if one matches in backend with magicLinkJwt", () => {
       const convention = new ConventionDtoBuilder().build();
-      const conventionRead = {
+      const conventionRead: ConventionReadDto = {
         ...convention,
         agencyName: "agency",
         agencyDepartment: "75",
+        agencyKind: "pole-emploi",
       };
       expectConventionState({
         isLoading: false,
@@ -334,10 +337,11 @@ describe("Convention slice", () => {
           const convention = new ConventionDtoBuilder()
             .withEstablishmentRepresentativeEmail("a-different@email.com")
             .build();
-          const conventionRead = {
+          const conventionRead: ConventionReadDto = {
             ...convention,
             agencyName: "agency",
             agencyDepartment: "75",
+            agencyKind: "cci",
           };
           expectConventionState({
             isLoading: false,
@@ -384,10 +388,11 @@ describe("Convention slice", () => {
             .withEstablishmentTutor(tutor)
             .withEstablishmentRepresentative(establishmentRepresentative)
             .build();
-          const conventionRead = {
+          const conventionRead: ConventionReadDto = {
             ...convention,
             agencyName: "agency",
             agencyDepartment: "75",
+            agencyKind: "cci",
           };
           expectConventionState({
             isLoading: false,
@@ -428,10 +433,11 @@ describe("Convention slice", () => {
               role: "beneficiary-representative",
             })
             .build();
-          const conventionRead = {
+          const conventionRead: ConventionReadDto = {
             ...convention,
             agencyName: "agency",
             agencyDepartment: "75",
+            agencyKind: "cci",
           };
           expectConventionState({
             isLoading: false,
@@ -464,10 +470,11 @@ describe("Convention slice", () => {
           const convention = new ConventionDtoBuilder()
             .withBeneficiaryRepresentative(undefined)
             .build();
-          const conventionRead = {
+          const conventionRead: ConventionReadDto = {
             ...convention,
             agencyName: "agency",
             agencyDepartment: "75",
+            agencyKind: "cci",
           };
           expectConventionState({
             isLoading: false,
@@ -502,10 +509,11 @@ describe("Convention slice", () => {
           const convention = new ConventionDtoBuilder()
             .withBeneficiaryCurrentEmployer(undefined)
             .build();
-          const conventionRead = {
+          const conventionRead: ConventionReadDto = {
             ...convention,
             agencyName: "agency",
             agencyDepartment: "75",
+            agencyKind: "mission-locale",
           };
           expectConventionState({
             isLoading: false,
@@ -548,10 +556,11 @@ describe("Convention slice", () => {
               businessAddress: "20 rue des merguez ",
             })
             .build();
-          const conventionRead = {
+          const conventionRead: ConventionReadDto = {
             ...convention,
             agencyName: "agency",
             agencyDepartment: "75",
+            agencyKind: "mission-locale",
           };
           expectConventionState({
             isLoading: false,
@@ -593,10 +602,11 @@ describe("Convention slice", () => {
     });
 
     it("returns null values when no there is no current signatory", () => {
-      const convention = {
+      const convention: ConventionReadDto = {
         ...new ConventionDtoBuilder().build(),
         agencyName: "My agency",
         agencyDepartment: "75",
+        agencyKind: "cap-emploi",
       };
       ({ store, dependencies } = createTestStore({
         convention: {
@@ -635,10 +645,11 @@ describe("Convention slice", () => {
         birthdate: "1990-02-21T00:00:00.000Z",
         isRqth: false,
       };
-      const convention = {
+      const convention: ConventionReadDto = {
         ...new ConventionDtoBuilder().withBeneficiary(beneficiary).build(),
         agencyName: "My agency",
         agencyDepartment: "75",
+        agencyKind: "conseil-departemental",
       };
 
       ({ store, dependencies } = createTestStore({
@@ -963,10 +974,11 @@ describe("Convention slice", () => {
   });
 
   it("Clear fetched convention", () => {
-    const convention = {
+    const convention: ConventionReadDto = {
       ...new ConventionDtoBuilder().build(),
       agencyName: "agency",
       agencyDepartment: "75",
+      agencyKind: "cci",
     };
     ({ store } = createTestStore({
       convention: {

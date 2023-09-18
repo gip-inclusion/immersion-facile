@@ -129,6 +129,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
       ...convention,
       agencyName: this.#agencies[convention.agencyId]?.name ?? "agency-name",
       agencyDepartment: "75",
+      agencyKind: "mission-locale",
     };
   }
 }

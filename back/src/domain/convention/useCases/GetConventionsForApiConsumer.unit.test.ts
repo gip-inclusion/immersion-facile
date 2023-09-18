@@ -97,6 +97,7 @@ describe("Get Conventions for ApiConsumer", () => {
             ...conventionPoleEmploi,
             agencyName: agencyPoleEmploi.name,
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
+            agencyKind: agencyPoleEmploi.kind,
           },
         ]);
       });
@@ -123,6 +124,7 @@ describe("Get Conventions for ApiConsumer", () => {
             ...conventionPoleEmploi,
             agencyName: agencyPoleEmploi.name,
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
+            agencyKind: agencyPoleEmploi.kind,
           },
         ]);
       });
@@ -165,8 +167,9 @@ describe("Get Conventions for ApiConsumer", () => {
         expectToEqual(retrievedConventions, [
           {
             ...conventionMissionLocale,
-            agencyName: agencyPoleEmploi.name,
-            agencyDepartment: agencyPoleEmploi.address.departmentCode,
+            agencyName: agencyMissionLocale.name,
+            agencyDepartment: agencyMissionLocale.address.departmentCode,
+            agencyKind: agencyMissionLocale.kind,
           },
         ]);
       });

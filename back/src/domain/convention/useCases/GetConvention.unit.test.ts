@@ -139,6 +139,7 @@ describe("Get Convention", () => {
         ...convention,
         agencyName: agency.name,
         agencyDepartment: agency.address.departmentCode,
+        agencyKind: agency.kind,
       });
     });
 
@@ -160,6 +161,7 @@ describe("Get Convention", () => {
         ...convention,
         agencyName: agency.name,
         agencyDepartment: agency.address.departmentCode,
+        agencyKind: agency.kind,
       });
     });
 
@@ -180,6 +182,7 @@ describe("Get Convention", () => {
         ...convention,
         agencyName: agency.name,
         agencyDepartment: agency.address.departmentCode,
+        agencyKind: agency.kind,
       });
     });
   });

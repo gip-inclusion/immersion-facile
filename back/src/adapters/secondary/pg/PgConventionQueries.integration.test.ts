@@ -265,6 +265,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
   describe("PG implementation of method getConventionsByFilters", () => {
     const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
+    const agency = AgencyDtoBuilder.create().withId(agencyId).build();
     const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
       .withDateStart(new Date("2023-03-27").toISOString())
@@ -284,9 +285,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     beforeEach(async () => {
-      await agencyRepo.insert(
-        AgencyDtoBuilder.create().withId(agencyId).build(),
-      );
+      await agencyRepo.insert(agency);
 
       await Promise.all(
         [
@@ -308,8 +307,9 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(resultAll, [
         {
           ...conventionCancelledAndDateStart20230327,
-          agencyDepartment: "86",
-          agencyName: "empty-name",
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
         },
       ]);
     });
@@ -329,13 +329,15 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(resultAll, [
         {
           ...conventionCancelledAndDateStart20230327,
-          agencyDepartment: "86",
-          agencyName: "empty-name",
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
         },
         {
           ...conventionDraftAndDateStart20230330,
-          agencyDepartment: "86",
-          agencyName: "empty-name",
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
         },
       ]);
     });
@@ -354,8 +356,9 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(resultAll, [
         {
           ...conventionCancelledAndDateStart20230327,
-          agencyDepartment: "86",
-          agencyName: "empty-name",
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
         },
       ]);
     });
@@ -381,8 +384,9 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(resultAll, [
         {
           ...conventionCancelledAndDateStart20230327,
-          agencyDepartment: "86",
-          agencyName: "empty-name",
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
         },
       ]);
     });
@@ -481,8 +485,9 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(queryResults, [
         {
           ...validatedImmersionEndingThe15th,
-          agencyName: "empty-name",
+          agencyName: agency.name,
           agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
         },
       ]);
     });
@@ -570,6 +575,6 @@ describe("Pg implementation of ConventionQueries", () => {
     );
 
     await conventionRepository.save(convention);
-    return { ...convention, agencyName, agencyDepartment };
+    return { ...convention, agencyName, agencyDepartment, agencyKind };
   };
 });

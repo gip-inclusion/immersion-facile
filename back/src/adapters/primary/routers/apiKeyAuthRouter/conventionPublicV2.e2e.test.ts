@@ -145,6 +145,7 @@ describe("Convention routes", () => {
         ...convention,
         agencyName: agency.name,
         agencyDepartment: agency.address.departmentCode,
+        agencyKind: agency.kind,
       });
       expectToEqual(status, 200);
     });
@@ -205,6 +206,7 @@ describe("Convention routes", () => {
             ...convention,
             agencyName: agency.name,
             agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
           },
         ],
         status: 200,
