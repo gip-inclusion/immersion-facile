@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "../AbsoluteUrl";
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
 import { Flavor } from "../typeFlavors";
@@ -15,9 +16,19 @@ export type ApiConsumerName = Flavor<string, "ApiConsumerName">;
 export type ApiConsumerKind = (typeof apiConsumerKinds)[number];
 export const apiConsumerKinds = ["READ", "WRITE", "SUBSCRIPTION"] as const;
 
-export type ApiConsumerRight<Scope> = {
+type SubscriptionParams = {
+  callbackUrl: AbsoluteUrl;
+  callbackHeaders: { authorization: string };
+};
+
+export type ApiConsumerRight<
+  Scope,
+  R extends ApiConsumerRightName,
+  Event extends string = never,
+> = {
   kinds: ApiConsumerKind[];
   scope: Scope;
+  subscriptions?: Record<`${R}.${Event}`, SubscriptionParams>;
 };
 
 type ApiConsumerRightName = (typeof apiConsumerRightNames)[number];
@@ -26,8 +37,8 @@ export const apiConsumerRightNames = [
   "convention",
 ] as const;
 export type ApiConsumerRights = {
-  searchEstablishment: ApiConsumerRight<NoScope>;
-  convention: ApiConsumerRight<ConventionScope>;
+  searchEstablishment: ApiConsumerRight<NoScope, "searchEstablishment">;
+  convention: ApiConsumerRight<ConventionScope, "convention", "updated">;
 };
 
 export type NoScope = "no-scope";
@@ -66,3 +77,7 @@ export const isApiConsumerAllowed = ({
   consumerKind: ApiConsumerKind;
 }): boolean =>
   !!apiConsumer && apiConsumer.rights[rightName].kinds.includes(consumerKind);
+
+export type CallbackHeaders = {
+  authorization: string;
+};

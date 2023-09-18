@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  absoluteUrlSchema,
   httpErrorSchema,
   searchResultSchema,
   searchResultsSchema,
@@ -74,6 +75,59 @@ export const publicApiV2ConventionRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(conventionReadPublicV2Schema),
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+    },
+  }),
+});
+
+const webhookSubscriptionSchema = z.object({
+  subscribedEvent: z.enum([
+    "conventions.updated",
+    "establishments.newOffersAdded",
+  ]),
+  callbackUrl: absoluteUrlSchema,
+  callbackHeaders: z.object({ authorization: z.string() }),
+});
+
+export const publicApiV2WebhooksRoutes = defineRoutes({
+  subscribeToWebhook: defineRoute({
+    method: "post",
+    url: "/v2/webhooks",
+    requestBodySchema: webhookSubscriptionSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      201: z.void(),
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+    },
+  }),
+  listActiveSubscriptions: defineRoute({
+    method: "get",
+    url: "/v2/webhooks",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: z.array(
+        webhookSubscriptionSchema.and(
+          z.object({
+            subscriptionId: z.string(),
+            createdAt: z.string().datetime(),
+          }),
+        ),
+      ),
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+    },
+  }),
+  unsubscribeToWebhook: defineRoute({
+    method: "delete",
+    url: "/v2/webhooks/:subscriptionId",
+    ...withAuthorizationHeaders,
+    responses: {
+      204: z.void(),
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

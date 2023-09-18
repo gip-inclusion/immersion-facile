@@ -145,6 +145,20 @@ export class PgAgencyRepository implements AgencyRepository {
     return persistenceAgencyToAgencyDto(first);
   }
 
+  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
+    const query = `SELECT id, name, status, kind, counsellor_emails, validator_emails,
+    admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
+    street_number_and_address, post_code, city, department_code, agency_siret, code_safir
+  FROM agencies
+  WHERE id = $1`;
+
+    const pgResult = await this.client.query<PersistenceAgency>(query, [id]);
+
+    const result = pgResult.rows.at(0);
+    if (!result) return undefined;
+    return persistenceAgencyToAgencyDto(result);
+  }
+
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
     const query = `SELECT id, name, status, kind, counsellor_emails, validator_emails,
     admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,

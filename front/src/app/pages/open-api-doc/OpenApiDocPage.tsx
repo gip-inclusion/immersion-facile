@@ -8,7 +8,10 @@ import "swagger-ui-react/swagger-ui.css";
 export const OpenApiDocPage = (): React.ReactElement => (
   <HeaderFooterLayout>
     <MainWrapper layout="default" vSpacing={0}>
-      <SwaggerUI url={`/api${openApiDocTargets.getOpenApiDoc.url}`} />
+      <SwaggerUI
+        url={`/api${openApiDocTargets.getOpenApiDoc.url}`}
+        supportedSubmitMethods={["get"]}
+      />
     </MainWrapper>
   </HeaderFooterLayout>
 );

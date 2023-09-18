@@ -1,4 +1,4 @@
-import { AgencyId } from "../agency/agency.dto";
+import { AgencyId, AgencyKind } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import {
@@ -249,6 +249,7 @@ export type EstablishmentTutor = GenericActor<"establishment-tutor"> & {
 export type ConventionReadDto = ConventionDto & {
   agencyName: string;
   agencyDepartment: string;
+  agencyKind: AgencyKind;
 };
 
 export type WithConventionIdLegacy = {
