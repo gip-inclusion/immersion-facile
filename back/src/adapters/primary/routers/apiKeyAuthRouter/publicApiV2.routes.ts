@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  conventionReadSchema,
   httpErrorSchema,
   searchResultSchema,
   searchResultsSchema,
@@ -8,6 +7,7 @@ import {
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
+import { conventionReadPublicV2Schema } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
 import { getConventionsByFiltersQueryParamsV2Schema } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
 import { searchParamsPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.schema";
 
@@ -60,7 +60,7 @@ export const publicApiV2ConventionRoutes = defineRoutes({
     url: "/v2/conventions/:conventionId",
     ...withAuthorizationHeaders,
     responses: {
-      200: conventionReadSchema,
+      200: conventionReadPublicV2Schema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
@@ -73,7 +73,7 @@ export const publicApiV2ConventionRoutes = defineRoutes({
     queryParamsSchema: getConventionsByFiltersQueryParamsV2Schema,
     ...withAuthorizationHeaders,
     responses: {
-      200: z.array(conventionReadSchema),
+      200: z.array(conventionReadPublicV2Schema),
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

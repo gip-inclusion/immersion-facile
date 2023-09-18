@@ -11,6 +11,7 @@ import {
 import { sendHttpResponseForApiV2 } from "../../helpers/sendHttpResponse";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
+import { conventionReadToConventionReadPublicV2 } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.dto";
 import { getConventionsByFiltersV2ToDomain } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
 import { searchParamsPublicV2ToDomain } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.dto";
 import { domainToSearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
@@ -112,11 +113,14 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       ) {
         throw new ForbiddenError();
       }
-      return deps.useCases.getConventionForApiConsumer.execute(
-        {
-          conventionId: req.params.conventionId,
-        },
-        req.apiConsumer,
+      return pipeWithValue(
+        await deps.useCases.getConventionForApiConsumer.execute(
+          {
+            conventionId: req.params.conventionId,
+          },
+          req.apiConsumer,
+        ),
+        conventionReadToConventionReadPublicV2,
       );
     }),
   );
@@ -132,9 +136,12 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       ) {
         throw new ForbiddenError();
       }
-      return deps.useCases.getConventionsForApiConsumer.execute(
-        getConventionsByFiltersV2ToDomain(req.query),
-        req.apiConsumer,
+      return pipeWithValue(
+        await deps.useCases.getConventionsForApiConsumer.execute(
+          getConventionsByFiltersV2ToDomain(req.query),
+          req.apiConsumer,
+        ),
+        map(conventionReadToConventionReadPublicV2),
       );
     }),
   );
