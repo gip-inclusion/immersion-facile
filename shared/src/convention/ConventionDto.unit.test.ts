@@ -234,8 +234,9 @@ describe("conventionDtoSchema", () => {
     it("confirm convention read schema inherit convention controls", () => {
       const validConventionRead: ConventionReadDto = {
         ...new ConventionDtoBuilder().build(),
-        agencyName: "dsfsdfsdf",
+        agencyName: "agence de test",
         agencyDepartment: "75",
+        agencyKind: "pole-emploi",
       };
       expect(() =>
         conventionReadSchema.parse(validConventionRead),
@@ -246,8 +247,9 @@ describe("conventionDtoSchema", () => {
           .withEstablishmentTutorEmail(beneficiaryRepresentative.email)
           .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .build(),
-        agencyName: "dsfsdfsdf",
+        agencyName: "agence de test",
         agencyDepartment: "90",
+        agencyKind: "pole-emploi",
       };
       expectConventionInvalidWithIssueMessages(
         conventionReadSchema,

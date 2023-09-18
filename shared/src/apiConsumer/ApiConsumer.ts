@@ -16,7 +16,7 @@ export type ApiConsumerName = Flavor<string, "ApiConsumerName">;
 export type ApiConsumerKind = (typeof apiConsumerKinds)[number];
 export const apiConsumerKinds = ["READ", "WRITE", "SUBSCRIPTION"] as const;
 
-type SubscriptionParams = {
+export type SubscriptionParams = {
   callbackUrl: AbsoluteUrl;
   callbackHeaders: { authorization: string };
 };

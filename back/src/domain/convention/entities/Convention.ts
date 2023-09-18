@@ -111,25 +111,26 @@ export const agencyMissingMessage = (convention: ConventionDto): string =>
 const isAgencyIdInConsumerScope = (
   conventionRead: ConventionReadDto,
   apiConsumer: ApiConsumer,
-) => {
+): boolean => {
   const { scope } = apiConsumer.rights.convention;
-  return scope.agencyIds && scope.agencyIds.includes(conventionRead.agencyId);
+  return scope.agencyIds
+    ? scope.agencyIds.includes(conventionRead.agencyId)
+    : false;
 };
 
 const isAgencyKindInConsumerScope = (
   conventionRead: ConventionReadDto,
   apiConsumer: ApiConsumer,
-) => {
+): boolean => {
   const { scope } = apiConsumer.rights.convention;
-  if (!scope.agencyKinds) return false;
-  return scope.agencyKinds.includes(conventionRead.agencyKind);
+  return scope.agencyKinds
+    ? scope.agencyKinds.includes(conventionRead.agencyKind)
+    : false;
 };
 
 export const isConventionInScope = (
   conventionRead: ConventionReadDto,
   apiConsumer: ApiConsumer,
-) => {
-  if (isAgencyIdInConsumerScope(conventionRead, apiConsumer)) return true;
-  if (isAgencyKindInConsumerScope(conventionRead, apiConsumer)) return true;
-  return false;
-};
+): boolean =>
+  isAgencyIdInConsumerScope(conventionRead, apiConsumer) ||
+  isAgencyKindInConsumerScope(conventionRead, apiConsumer);

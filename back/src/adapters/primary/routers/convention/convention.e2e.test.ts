@@ -260,6 +260,7 @@ describe("convention e2e", () => {
             ...convention,
             agencyName: peAgency.name,
             agencyDepartment: peAgency.address.departmentCode,
+            agencyKind: peAgency.kind,
           },
         });
       },
