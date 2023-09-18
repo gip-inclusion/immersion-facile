@@ -1,9 +1,16 @@
-import { ConventionDtoBuilder, SearchResultDto } from "shared";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+import {
+  ConventionDtoBuilder,
+  ConventionReadDto,
+  SearchResultDto,
+} from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
   publicApiV2SearchEstablishmentRoutes,
+  publicApiV2WebhooksRoutes,
 } from "./publicApiV2.routes";
 
 const contactByEmailExample: ContactEstablishmentPublicV2Dto = {
@@ -86,12 +93,14 @@ const apiKeyAuth = "apiKeyAuth";
 
 const searchSection = "Recherche d'entreprise accueillante et mise en contact";
 const conventionSection = "Accès aux conventions";
+const webhookSection = "Souscriptions aux webhooks";
 
 const generateOpenApi = (envType: string) =>
   createOpenApiGenerator(
     {
       [searchSection]: publicApiV2SearchEstablishmentRoutes,
       [conventionSection]: publicApiV2ConventionRoutes,
+      [webhookSection]: publicApiV2WebhooksRoutes,
     },
     {
       info: {
@@ -140,6 +149,12 @@ const error403Example = {
 const error404Example = {
   status: 404,
   message: "No establishment found with siret 12345678912345",
+};
+
+const conventionExample: ConventionReadDto = ({ yo: "lala" } as any) ?? {
+  ...new ConventionDtoBuilder().build(),
+  agencyName: "Agence de test",
+  agencyDepartment: "75",
 };
 
 export const createOpenApiSpecV2 = (envType: string) =>
@@ -349,11 +364,7 @@ export const createOpenApiSpecV2 = (envType: string) =>
           responses: {
             "200": {
               description: "Retourne la convention",
-              example: {
-                ...new ConventionDtoBuilder().build(),
-                agencyName: "Agence de test",
-                agencyDepartment: "75",
-              },
+              example: conventionExample,
             },
             "400": {
               description: "Erreur dans le contrat d'api'",
@@ -383,13 +394,7 @@ export const createOpenApiSpecV2 = (envType: string) =>
           responses: {
             "200": {
               description: "Retourne un tableau de conventions",
-              example: [
-                {
-                  ...new ConventionDtoBuilder().build(),
-                  agencyName: "Agence de test",
-                  agencyDepartment: "75",
-                },
-              ],
+              example: [conventionExample],
             },
             "400": {
               description: "Erreur dans le contrat d'api'",
@@ -402,6 +407,68 @@ export const createOpenApiSpecV2 = (envType: string) =>
               description:
                 "Accès non autorisé (veuillez vérifier que vous avez les droits)",
               example: error403Example,
+            },
+          },
+        },
+      },
+    },
+    [webhookSection]: {
+      listActiveSubscriptions: {} as any,
+      unsubscribeToWebhook: {} as any,
+      subscribeToWebhook: {
+        summary: "Souscription à un webhook",
+        description:
+          "Cette route permet de souscrire à un webhook. Nous vous appellerons sur l'URL fourni, avec les headers fournis avec une method POST." +
+          "Le body de la requête sera un JSON contenant les données de l'évènement. Les différents body possibles sont décrits dans l'onglet 'Callbacks'",
+        callbacks: {
+          "conventions.updated": {
+            "https://my-callback-url.com/conventions-updated": {
+              post: {
+                summary: "Votre route de callback",
+                requestBody: {
+                  required: true,
+                  content: {
+                    "application/json": {
+                      example: conventionExample,
+                      schema: zodToJsonSchema(
+                        z.object({ bob: z.literal("l'éponge") }),
+                      ) as any,
+                    },
+                  },
+                },
+                responses: { 200: "OK" },
+              },
+            } as any,
+          },
+          // "establishments.newOffersAdded": {
+          //   "https://my-callback-url.com/establishment-new-offers-added": {
+          //     post: {
+          //       summary: "Votre route de callback",
+          //       requestBody: {
+          //         required: true,
+          //         content: {
+          //           "application/json": {
+          //             example: conventionExample,
+          //             schema: zodToJsonSchema(
+          //               z.object({ bob: z.literal("l'éponge") }),
+          //             ) as any,
+          //           },
+          //         },
+          //       },
+          //       responses: { 201: "OK" },
+          //     },
+          //   } as any,
+          // },
+        },
+        extraDocs: {
+          responses: {
+            "201": { description: "Souscription réussie" },
+            "400": {
+              description: "Lorsque le format fourni, n'est pas valide",
+            },
+            "401": { description: "Lorsque vous n'êtes pas authentifié" },
+            "403": {
+              description: "Lorsque vous n'avez pas suffisamment de droits",
             },
           },
         },

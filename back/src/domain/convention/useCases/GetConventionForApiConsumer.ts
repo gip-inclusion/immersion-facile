@@ -10,6 +10,7 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { isConventionInScope } from "../entities/Convention";
 
 export class GetConventionForApiConsumer extends TransactionalUseCase<
   WithConventionId,
@@ -29,41 +30,17 @@ export class GetConventionForApiConsumer extends TransactionalUseCase<
   ): Promise<ConventionReadDto> {
     if (!apiConsumer) throw new ForbiddenError("No api consumer provided");
 
-    const convention = await uow.conventionQueries.getConventionById(
+    const conventionRead = await uow.conventionQueries.getConventionById(
       conventionId,
     );
-    if (!convention) throw noConventionFound(conventionId);
 
-    if (isAgencyIdInConsumerScope(convention, apiConsumer)) return convention;
-    if (await isAgencyKindInConsumerScope(convention, apiConsumer, uow))
-      return convention;
-
+    if (!conventionRead) throw noConventionFound(conventionId);
+    if (isConventionInScope(conventionRead, apiConsumer)) return conventionRead;
     throw new ForbiddenError(
-      `You are not allowed to access convention : ${conventionId}`,
+      `You are not allowed to access convention : ${conventionRead.id}`,
     );
   }
 }
-
-const isAgencyIdInConsumerScope = (
-  convention: ConventionReadDto,
-  apiConsumer: ApiConsumer,
-) => {
-  const { scope } = apiConsumer.rights.convention;
-  return scope.agencyIds && scope.agencyIds.includes(convention.agencyId);
-};
-
-const isAgencyKindInConsumerScope = async (
-  convention: ConventionReadDto,
-  apiConsumer: ApiConsumer,
-  uow: UnitOfWork,
-) => {
-  const { scope } = apiConsumer.rights.convention;
-  if (!scope.agencyKinds) return false;
-  const agencies = await uow.agencyRepository.getByIds([convention.agencyId]);
-  const agency = agencies.at(0);
-  if (!agency) return false;
-  return scope.agencyKinds.includes(agency.kind);
-};
 
 const noConventionFound = (conventionId: string) =>
   new NotFoundError(`No convention found with id ${conventionId}`);

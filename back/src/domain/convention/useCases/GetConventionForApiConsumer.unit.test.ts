@@ -138,6 +138,7 @@ describe("Get Convention for ApiConsumer", () => {
         ...convention,
         agencyName: agency.name,
         agencyDepartment: agency.address.departmentCode,
+        agencyKind: agency.kind,
       });
     });
 
@@ -154,6 +155,7 @@ describe("Get Convention for ApiConsumer", () => {
         ...convention,
         agencyName: agency.name,
         agencyDepartment: agency.address.departmentCode,
+        agencyKind: agency.kind,
       });
     });
   });

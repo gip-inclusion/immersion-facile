@@ -72,6 +72,26 @@ describe("PgAgencyRepository", () => {
     agencyRepository = new PgAgencyRepository(client);
   });
 
+  describe("getById", () => {
+    const agency1 = agency1builder
+      .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
+      .withAgencySiret("01234567890123")
+      .withCodeSafir("AAAAAA")
+      .build();
+
+    it("returns undefined when no agency found", async () => {
+      const retrievedAgency = await agencyRepository.getById(agency1.id);
+      expect(retrievedAgency).toBeUndefined();
+    });
+
+    it("returns existing agency", async () => {
+      await agencyRepository.insert(agency1);
+
+      const retrievedAgency = await agencyRepository.getById(agency1.id);
+      expectToEqual(retrievedAgency, agency1);
+    });
+  });
+
   describe("getByIds", () => {
     const agency1 = agency1builder
       .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")

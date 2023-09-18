@@ -158,8 +158,11 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     )[0];
   }
 
+  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
+    return this.#agencies[id];
+  }
+
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    logger.info({ id: ids, configs: this.#agencies }, "getById");
     return ids.map((id) => this.#agencies[id]).filter(Boolean);
   }
 

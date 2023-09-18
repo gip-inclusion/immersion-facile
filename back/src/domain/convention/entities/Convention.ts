@@ -1,6 +1,7 @@
 import { uniq } from "ramda";
 import {
   AgencyDto,
+  ApiConsumer,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
@@ -106,3 +107,29 @@ export const conventionMissingMessage = (conventionId: ConventionId): string =>
 
 export const agencyMissingMessage = (convention: ConventionDto): string =>
   `Agency with id '${convention.agencyId}' missing.`;
+
+const isAgencyIdInConsumerScope = (
+  conventionRead: ConventionReadDto,
+  apiConsumer: ApiConsumer,
+) => {
+  const { scope } = apiConsumer.rights.convention;
+  return scope.agencyIds && scope.agencyIds.includes(conventionRead.agencyId);
+};
+
+const isAgencyKindInConsumerScope = (
+  conventionRead: ConventionReadDto,
+  apiConsumer: ApiConsumer,
+) => {
+  const { scope } = apiConsumer.rights.convention;
+  if (!scope.agencyKinds) return false;
+  return scope.agencyKinds.includes(conventionRead.agencyKind);
+};
+
+export const isConventionInScope = (
+  conventionRead: ConventionReadDto,
+  apiConsumer: ApiConsumer,
+) => {
+  if (isAgencyIdInConsumerScope(conventionRead, apiConsumer)) return true;
+  if (isAgencyKindInConsumerScope(conventionRead, apiConsumer)) return true;
+  return false;
+};
