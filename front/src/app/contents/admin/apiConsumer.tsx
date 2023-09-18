@@ -18,6 +18,7 @@ import {
 const apiConsumerKindSeverity: Record<ApiConsumerKind, AlertProps.Severity> = {
   READ: "success",
   WRITE: "warning",
+  SUBSCRIPTION: "info",
 };
 
 const ApiConsumerConventionScopeDisplayed = ({

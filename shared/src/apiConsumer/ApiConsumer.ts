@@ -13,7 +13,7 @@ export type ApiConsumerJwtPayload = {
 export type ApiConsumerName = Flavor<string, "ApiConsumerName">;
 
 export type ApiConsumerKind = (typeof apiConsumerKinds)[number];
-export const apiConsumerKinds = ["READ", "WRITE"] as const;
+export const apiConsumerKinds = ["READ", "WRITE", "SUBSCRIPTION"] as const;
 
 export type ApiConsumerRight<Scope> = {
   kinds: ApiConsumerKind[];
