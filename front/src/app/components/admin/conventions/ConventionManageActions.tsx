@@ -9,7 +9,6 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
-import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import {
   ConventionDto,
@@ -31,7 +30,7 @@ import { VerificationActionButton } from "src/app/components/forms/convention/Ve
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   ConventionFeedbackKind,
@@ -234,7 +233,7 @@ export const ConventionManageActions = ({
         {feedback.kind !== "renewed" &&
           createPortal(
             <renewModal.Component title="Renouvellement de convention">
-              <RenewConventionForm convention={convention} />
+              <RenewConventionForm convention={convention} jwt={jwt} />
             </renewModal.Component>,
             document.body,
           )}
@@ -248,10 +247,11 @@ type RenewConventionParamsInForm = RenewConventionParams &
 
 export const RenewConventionForm = ({
   convention,
+  jwt,
 }: {
   convention: ConventionReadDto;
+  jwt: ConventionSupportedJwt;
 }) => {
-  const route = useRoute() as Route<typeof routes.manageConvention>;
   const dispatch = useDispatch();
   const renewedDefaultDateStart = addBusinessDays(
     new Date(convention.dateEnd),
@@ -283,7 +283,7 @@ export const RenewConventionForm = ({
     dispatch(
       conventionSlice.actions.renewConventionRequested({
         params: data,
-        jwt: route.params.jwt,
+        jwt,
       }),
     );
     renewModal.close();

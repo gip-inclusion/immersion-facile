@@ -65,7 +65,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return from(this.#retrieveFromToken(payload));
   }
 
-  public async shareConventionLinkByEmail(
+  public shareConventionLinkByEmail(
     conventionDto: ShareLinkByEmailDto,
   ): Promise<boolean> {
     return this.unauthenticatedHttpClient
@@ -95,7 +95,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return fromPromise(this.#updateStatus(params, jwt).then(() => undefined));
   }
 
-  async #newConvention(conventionDto: ConventionDto): Promise<string> {
+  #newConvention(conventionDto: ConventionDto): Promise<string> {
     return this.unauthenticatedHttpClient
       .createConvention({
         body: conventionDto,
@@ -103,7 +103,7 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ responseBody }) => responseBody.id);
   }
 
-  async #renewConvention(
+  #renewConvention(
     params: RenewConventionParams,
     jwt: ConventionSupportedJwt,
   ): Promise<void> {
@@ -115,7 +115,7 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(() => undefined);
   }
 
-  async #retrieveFromToken(
+  #retrieveFromToken(
     payload: FetchConventionRequestedPayload,
   ): Promise<ConventionReadDto> {
     return this.magicLinkHttpClient
@@ -126,7 +126,7 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ responseBody }) => responseBody);
   }
 
-  async #signConvention(jwt: string): Promise<WithConventionIdLegacy> {
+  #signConvention(jwt: string): Promise<WithConventionIdLegacy> {
     return this.magicLinkHttpClient
       .signConvention({
         headers: { authorization: jwt },
@@ -135,10 +135,7 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ responseBody }) => responseBody);
   }
 
-  async #updateConvention(
-    convention: ConventionDto,
-    jwt: string,
-  ): Promise<string> {
+  #updateConvention(convention: ConventionDto, jwt: string): Promise<string> {
     return this.magicLinkHttpClient
       .updateConvention({
         body: { convention },
@@ -148,7 +145,7 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ responseBody }) => responseBody.id);
   }
 
-  async #updateStatus(
+  #updateStatus(
     params: UpdateConventionStatusRequestDto,
     jwt: string,
   ): Promise<WithConventionIdLegacy> {

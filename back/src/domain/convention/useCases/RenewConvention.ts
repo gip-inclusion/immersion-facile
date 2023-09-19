@@ -1,8 +1,10 @@
 import {
+  BackOfficeJwtPayload,
   clearSignaturesAndValidationDate,
   ConventionDomainPayload,
   RenewConventionParams,
   renewConventionParamsSchema,
+  Role,
 } from "shared";
 import {
   BadRequestError,
@@ -17,7 +19,7 @@ import { AddConvention } from "./AddConvention";
 export class RenewConvention extends TransactionalUseCase<
   RenewConventionParams,
   void,
-  ConventionDomainPayload
+  ConventionDomainPayload | BackOfficeJwtPayload
 > {
   protected inputSchema = renewConventionParamsSchema;
 
@@ -31,15 +33,20 @@ export class RenewConvention extends TransactionalUseCase<
   protected async _execute(
     params: RenewConventionParams,
     uow: UnitOfWork,
-    jwtPayload?: ConventionDomainPayload,
+    jwtPayload?: ConventionDomainPayload | BackOfficeJwtPayload,
   ): Promise<void> {
+    const allowedRoles: Role[] = ["validator", "counsellor", "backOffice"];
+
     if (!jwtPayload) throw new UnauthorizedError();
-    if (jwtPayload.role !== "validator" && jwtPayload.role !== "counsellor")
+    if (!allowedRoles.includes(jwtPayload.role))
       throw new ForbiddenError(
         `The role '${jwtPayload.role}' is not allowed to renew convention`,
       );
 
-    if (params.renewed.from !== jwtPayload.applicationId)
+    if (
+      jwtPayload.role !== "backOffice" &&
+      params.renewed.from !== jwtPayload.applicationId
+    )
       throw new ForbiddenError(
         "This token is not allowed to renew this convention",
       );
