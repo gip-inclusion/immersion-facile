@@ -1,6 +1,12 @@
 import { addYears, subYears } from "date-fns";
 import { values } from "ramda";
-import { ApiConsumer, ApiConsumerId } from "shared";
+import {
+  ApiConsumer,
+  ApiConsumerId,
+  eventToRightName,
+  SubscriptionParams,
+  WebhookSubscription,
+} from "shared";
 import { ApiConsumerRepository } from "../../domain/auth/ports/ApiConsumerRepository";
 import { UuidV4Generator } from "./core/UuidGeneratorImplementations";
 
@@ -87,8 +93,42 @@ export const outdatedApiConsumer: ApiConsumer = {
   description: "",
 };
 
+export const authorizedSubscriptionApiConsumer: ApiConsumer = {
+  ...authorizedUnJeuneUneSolutionApiConsumer,
+  rights: {
+    convention: {
+      kinds: ["SUBSCRIPTION"],
+      scope: {
+        agencyKinds: [],
+      },
+    },
+    searchEstablishment: {
+      kinds: [],
+      scope: "no-scope",
+    },
+  },
+};
+
 export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
   #consumers: Record<ApiConsumerId, ApiConsumer> = {};
+
+  public async addSubscription({
+    subscription,
+    apiConsumerId,
+  }: {
+    subscription: WebhookSubscription;
+    apiConsumerId: ApiConsumerId;
+  }): Promise<void> {
+    const apiConsumer = this.#consumers[apiConsumerId];
+    const apiConsumerRightName = eventToRightName(subscription.subscribedEvent);
+    const subscriptionParams: SubscriptionParams = {
+      callbackUrl: subscription.callbackUrl,
+      callbackHeaders: subscription.callbackHeaders,
+    };
+    apiConsumer.rights[apiConsumerRightName].subscriptions = {
+      [subscription.subscribedEvent]: subscriptionParams,
+    };
+  }
 
   public get consumers(): ApiConsumer[] {
     return values(this.#consumers);

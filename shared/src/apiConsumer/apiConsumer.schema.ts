@@ -1,14 +1,16 @@
 import { z } from "zod";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { phoneSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
+import { ApiConsumerJwt } from "../tokens/jwt.dto";
 import { localization, zStringMinLength1 } from "../zodUtils";
-import { ApiConsumerJwt } from "..";
 import {
   ApiConsumer,
   ApiConsumerContact,
   apiConsumerKinds,
   ApiConsumerRights,
+  WebhookSubscription,
 } from "./ApiConsumer";
 
 const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
@@ -51,3 +53,10 @@ export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
   expirationDate: zStringMinLength1,
   description: z.string().optional(),
 });
+
+export const webhookSubscriptionSchema: z.Schema<WebhookSubscription> =
+  z.object({
+    subscribedEvent: z.enum(["convention.updated"]),
+    callbackUrl: absoluteUrlSchema,
+    callbackHeaders: z.object({ authorization: z.string() }),
+  });
