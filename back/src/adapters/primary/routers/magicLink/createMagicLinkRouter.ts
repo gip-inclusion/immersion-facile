@@ -109,11 +109,8 @@ export const createMagicLinkRouter = (
     .route(removeRouterPrefix(conventionMagicLinkTargets.renewConvention.url))
     .post((req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req?.payloads?.convention) throw new UnauthorizedError();
-        return deps.useCases.renewConvention.execute(
-          req.body,
-          req.payloads.convention,
-        );
+        const jwtPayload = req.payloads?.convention || req.payloads?.backOffice;
+        return deps.useCases.renewConvention.execute(req.body, jwtPayload);
       }),
     );
 

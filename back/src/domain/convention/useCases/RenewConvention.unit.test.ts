@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import {
+  BackOfficeJwtPayload,
   ConventionDtoBuilder,
   ConventionId,
   expectPromiseToFailWithError,
@@ -201,5 +202,45 @@ describe("RenewConvention", () => {
         },
       ]);
     });
+  });
+
+  it("renews the convention if user is admin", async () => {
+    const existingValidatedConvention = new ConventionDtoBuilder()
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .build();
+    uow.conventionRepository.setConventions({
+      [existingValidatedConvention.id]: existingValidatedConvention,
+    });
+    const backOfficeJwtPayload: BackOfficeJwtPayload = {
+      role: "backOffice",
+      sub: "my-sub",
+      version: 1,
+    };
+    const result = await renewConvention.execute(
+      renewConventionParams,
+      backOfficeJwtPayload,
+    );
+
+    expect(result).toBeUndefined();
+
+    expectToEqual(uow.conventionRepository.conventions, [
+      existingValidatedConvention,
+      {
+        ...existingValidatedConvention,
+        ...renewConventionParams,
+        signatories: {
+          beneficiary: {
+            ...existingValidatedConvention.signatories.beneficiary,
+            signedAt: undefined,
+          },
+          establishmentRepresentative: {
+            ...existingValidatedConvention.signatories
+              .establishmentRepresentative,
+            signedAt: undefined,
+          },
+        },
+        status: "READY_TO_SIGN",
+      },
+    ]);
   });
 });
