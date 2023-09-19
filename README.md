@@ -9,7 +9,7 @@ Il y a pour cela plusieurs axes de travail :
 
 ### Prérequis
 
-Pour démarrer le projet il vous faut `git`, `docker` et `node` (version 16 ) installée sur la machine.
+Pour démarrer le projet il vous faut `git`, `docker` et `node` (version 18 ) installée sur la machine.
 Nous utilisons `pnpm` comme gestionnaire de paquets (pour l'installer : `npm install -g pnpm`).
 
 ### Démarrer le projet
@@ -51,6 +51,7 @@ pnpm install
 
 ```sh
 cp .env.sample .env
+cp .env.sample back/.env
 ```
 
 #### Jouer le script pour créer les variables d'env du front :
