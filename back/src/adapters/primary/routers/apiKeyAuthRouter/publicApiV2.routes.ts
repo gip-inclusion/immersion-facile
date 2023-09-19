@@ -1,11 +1,12 @@
 import { z } from "zod";
 import {
-  absoluteUrlSchema,
+  emptyStringSchema,
   httpErrorSchema,
   searchResultSchema,
   searchResultsSchema,
   withAuthorizationHeaders,
 } from "shared";
+import { webhookSubscriptionSchema } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { conventionReadPublicV2Schema } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
@@ -82,15 +83,6 @@ export const publicApiV2ConventionRoutes = defineRoutes({
   }),
 });
 
-const webhookSubscriptionSchema = z.object({
-  subscribedEvent: z.enum([
-    "conventions.updated",
-    "establishments.newOffersAdded",
-  ]),
-  callbackUrl: absoluteUrlSchema,
-  callbackHeaders: z.object({ authorization: z.string() }),
-});
-
 export const publicApiV2WebhooksRoutes = defineRoutes({
   subscribeToWebhook: defineRoute({
     method: "post",
@@ -98,7 +90,7 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
     requestBodySchema: webhookSubscriptionSchema,
     ...withAuthorizationHeaders,
     responses: {
-      201: z.void(),
+      201: emptyStringSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

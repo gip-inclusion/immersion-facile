@@ -18,7 +18,7 @@ export const apiConsumerKinds = ["READ", "WRITE", "SUBSCRIPTION"] as const;
 
 export type SubscriptionParams = {
   callbackUrl: AbsoluteUrl;
-  callbackHeaders: { authorization: string };
+  callbackHeaders: CallbackHeaders;
 };
 
 export type ApiConsumerRight<
@@ -28,8 +28,13 @@ export type ApiConsumerRight<
 > = {
   kinds: ApiConsumerKind[];
   scope: Scope;
-  subscriptions?: Record<`${R}.${Event}`, SubscriptionParams>;
+  subscriptions?: Record<SubscriptionName<R, Event>, SubscriptionParams>;
 };
+
+export type SubscriptionName<
+  R extends ApiConsumerRightName,
+  Event extends string = never,
+> = `${R}.${Event}`;
 
 type ApiConsumerRightName = (typeof apiConsumerRightNames)[number];
 export const apiConsumerRightNames = [
@@ -40,6 +45,12 @@ export type ApiConsumerRights = {
   searchEstablishment: ApiConsumerRight<NoScope, "searchEstablishment">;
   convention: ApiConsumerRight<ConventionScope, "convention", "updated">;
 };
+
+export type WebhookSubscription = SubscriptionParams & {
+  subscribedEvent: SubscriptionEvents;
+};
+
+export type SubscriptionEvents = SubscriptionName<"convention", "updated">;
 
 export type NoScope = "no-scope";
 
@@ -80,4 +91,13 @@ export const isApiConsumerAllowed = ({
 
 export type CallbackHeaders = {
   authorization: string;
+};
+
+export const eventToRightName = (
+  event: SubscriptionEvents,
+): ApiConsumerRightName => {
+  const strategy: Record<SubscriptionEvents, ApiConsumerRightName> = {
+    "convention.updated": "convention",
+  };
+  return strategy[event];
 };

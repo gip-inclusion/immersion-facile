@@ -11,6 +11,10 @@ import { optional } from "./pgUtils";
 export class PgApiConsumerRepository implements ApiConsumerRepository {
   constructor(private client: PoolClient) {}
 
+  public addSubscription(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
   public async getAll(): Promise<ApiConsumer[]> {
     const result = await this.client.query("SELECT * FROM api_consumers");
     return result.rows.map((rawPg) => this.#rawPgToApiConsumer(rawPg));

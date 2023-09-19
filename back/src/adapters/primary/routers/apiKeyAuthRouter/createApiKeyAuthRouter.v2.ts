@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { andThen, map } from "ramda";
-import { isApiConsumerAllowed, pipeWithValue } from "shared";
+import { eventToRightName, isApiConsumerAllowed, pipeWithValue } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -18,6 +18,7 @@ import { domainToSearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/outpu
 import {
   publicApiV2ConventionRoutes,
   publicApiV2SearchEstablishmentRoutes,
+  publicApiV2WebhooksRoutes,
 } from "./publicApiV2.routes";
 
 const logger = createLogger(__filename);
@@ -34,6 +35,11 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
 
   const conventionV2Router = createExpressSharedRouter(
     publicApiV2ConventionRoutes,
+    v2ExpressRouter,
+  );
+
+  const webhooksV2Router = createExpressSharedRouter(
+    publicApiV2WebhooksRoutes,
     v2ExpressRouter,
   );
 
@@ -143,6 +149,24 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         ),
         map(conventionReadToConventionReadPublicV2),
       );
+    }),
+  );
+
+  webhooksV2Router.subscribeToWebhook((req, res) =>
+    sendHttpResponseForApiV2(req, res.status(201), async () => {
+      const event = req.body.subscribedEvent;
+      const rightNeeded = eventToRightName(event);
+
+      if (
+        !isApiConsumerAllowed({
+          apiConsumer: req.apiConsumer,
+          rightName: rightNeeded,
+          consumerKind: "SUBSCRIPTION",
+        })
+      ) {
+        throw new ForbiddenError();
+      }
+      await deps.useCases.subscribeToWebhook.execute(req.body, req.apiConsumer);
     }),
   );
 
