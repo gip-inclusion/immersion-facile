@@ -17,7 +17,7 @@ export const InclusionConnectButton = ({
   return (
     <a
       onClick={onClick}
-      href={`/api/${inclusionConnectEndpoint}`}
+      href={`/api${inclusionConnectEndpoint}`}
       className={cx(
         "inclusion-connect-button",
         `inclusion-connect-button--${layout}`,
