@@ -1,5 +1,10 @@
 import { Pool, PoolClient } from "pg";
-import { ApiConsumer, expectToEqual } from "shared";
+import {
+  ApiConsumer,
+  expectToEqual,
+  SubscriptionParams,
+  WebhookSubscription,
+} from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
@@ -104,6 +109,46 @@ describe("PgApiConsumerRepository", () => {
     it("returns all api consumers", async () => {
       await apiConsumerRepository.save(apiConsumer);
       expectToEqual(await apiConsumerRepository.getAll(), [apiConsumer]);
+    });
+  });
+
+  describe("addSubscription", () => {
+    it("add first subscription", async () => {
+      expect(apiConsumer.rights.convention.subscriptions).toBeUndefined();
+      await apiConsumerRepository.save(apiConsumer);
+      const subscriptionParams: SubscriptionParams = {
+        callbackUrl: "https://partner-callback-url",
+        callbackHeaders: { authorization: "my-cb-auth-header" },
+      };
+      const subscription: WebhookSubscription = {
+        ...subscriptionParams,
+        subscribedEvent: "convention.updated",
+      };
+
+      await apiConsumerRepository.addSubscription({
+        subscription,
+        apiConsumerId: apiConsumer.id,
+      });
+
+      const expectedApiConsumer: ApiConsumer = {
+        ...apiConsumer,
+        rights: {
+          ...apiConsumer.rights,
+          convention: {
+            kinds: ["READ"],
+            scope: {
+              agencyKinds: [],
+            },
+            subscriptions: {
+              "convention.updated": subscriptionParams,
+            },
+          },
+        },
+      };
+      const updatedConsumer = await apiConsumerRepository.getById(
+        expectedApiConsumer.id,
+      );
+      expectToEqual(updatedConsumer, expectedApiConsumer);
     });
   });
 });

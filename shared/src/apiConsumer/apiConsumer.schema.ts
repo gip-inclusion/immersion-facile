@@ -10,6 +10,7 @@ import {
   ApiConsumerContact,
   apiConsumerKinds,
   ApiConsumerRights,
+  SubscriptionParams,
   WebhookSubscription,
 } from "./ApiConsumer";
 
@@ -21,12 +22,22 @@ const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
   emails: z.array(emailSchema),
 });
 
+const subscriptionSchema: z.Schema<SubscriptionParams> = z.object({
+  callbackUrl: absoluteUrlSchema,
+  callbackHeaders: z.object({ authorization: z.string() }),
+});
+
 export const apiConsumerJwtSchema: z.Schema<ApiConsumerJwt> = z.string();
 
 const apiConsumerRightsSchema: z.Schema<ApiConsumerRights> = z.object({
   searchEstablishment: z.object({
     kinds: z.array(z.enum(apiConsumerKinds)),
     scope: z.literal("no-scope"),
+    subscriptions: z
+      .object({
+        "convention.updated": subscriptionSchema,
+      })
+      .optional(),
   }),
   convention: z.object({
     kinds: z.array(z.enum(apiConsumerKinds)),
@@ -41,6 +52,11 @@ const apiConsumerRightsSchema: z.Schema<ApiConsumerRights> = z.object({
           agencyIds: z.array(agencyIdSchema),
         }),
       ),
+    subscriptions: z
+      .object({
+        "convention.updated": subscriptionSchema,
+      })
+      .optional(),
   }),
 });
 
