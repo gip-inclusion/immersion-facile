@@ -222,6 +222,7 @@ export const ConventionManageActions = ({
                 routes
                   .conventionDocument({
                     jwt,
+                    conventionId: convention.id,
                   })
                   .push()
               }
