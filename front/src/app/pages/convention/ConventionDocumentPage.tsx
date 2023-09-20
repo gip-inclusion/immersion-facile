@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Route } from "type-route";
 import {
+  BackOfficeJwt,
   ConventionJwt,
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
@@ -47,12 +48,13 @@ type ConventionDocumentPageProps = {
 export const ConventionDocumentPage = ({
   route,
 }: ConventionDocumentPageProps) => {
-  const jwt: ConventionJwt = route.params.jwt;
+  const jwt: ConventionJwt | BackOfficeJwt = route.params.jwt;
   const { applicationId, role } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
+  const conventionId = applicationId ?? route.params.conventionId;
   const { convention, fetchConventionError, isLoading } = useConvention({
     jwt,
-    conventionId: applicationId,
+    conventionId,
   });
   const agencyInfo = useAppSelector(agencyInfoSelectors.details);
   const agencyFeedback = useAppSelector(agencyInfoSelectors.feedback);
