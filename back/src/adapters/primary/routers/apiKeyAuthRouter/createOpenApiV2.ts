@@ -421,7 +421,7 @@ export const createOpenApiSpecV2 = (envType: string) =>
           "Cette route permet de souscrire à un webhook. Nous vous appellerons sur l'URL fourni, avec les headers fournis avec une method POST." +
           "Le body de la requête sera un JSON contenant les données de l'évènement. Les différents body possibles sont décrits dans l'onglet 'Callbacks'",
         callbacks: {
-          "conventions.updated": {
+          "convention.updated": {
             "https://my-callback-url.com/conventions-updated": {
               post: {
                 summary: "Votre route de callback",
