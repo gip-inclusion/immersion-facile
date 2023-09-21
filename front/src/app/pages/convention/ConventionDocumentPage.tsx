@@ -113,6 +113,8 @@ export const ConventionDocumentPage = ({
             <ConventionRenewedInformations renewed={convention.renewed} />
           )}
 
+          <p>Identifiant de la convention: {convention.id}</p>
+
           <h2 className={fr.cx("fr-h4")}>
             Cette convention est établie entre :
           </h2>
