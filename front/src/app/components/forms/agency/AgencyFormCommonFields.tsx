@@ -33,12 +33,12 @@ type ValidationSteps = "oneStep" | "twoSteps";
 
 const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
   {
-    label: "1: La Convention est examinée et validée par la même personne",
+    label: "1: La convention est examinée et validée par la même personne",
     value: "oneStep",
   },
   {
     label:
-      "2: La Convention est examinée par une personne puis validée par quelqu’un d’autre",
+      "2: La convention est examinée par une personne puis validée par quelqu’un d’autre",
     value: "twoSteps",
   },
 ];
