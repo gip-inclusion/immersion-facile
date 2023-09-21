@@ -17,12 +17,14 @@ const defaultApiConsumer: ApiConsumer = {
     searchEstablishment: {
       kinds: ["READ"],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: ["READ"],
       scope: {
         agencyIds: [],
       },
+      subscriptions: [],
     },
   },
   description: "a",

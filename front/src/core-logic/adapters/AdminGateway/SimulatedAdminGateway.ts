@@ -173,12 +173,14 @@ const apiConsumers: ApiConsumer[] = [
       searchEstablishment: {
         kinds: ["READ"],
         scope: "no-scope",
+        subscriptions: [],
       },
       convention: {
         kinds: ["READ", "WRITE"],
         scope: {
           agencyKinds: ["pole-emploi", "mission-locale"],
         },
+        subscriptions: [],
       },
     },
   },
@@ -199,12 +201,14 @@ const apiConsumers: ApiConsumer[] = [
       searchEstablishment: {
         kinds: ["READ"],
         scope: "no-scope",
+        subscriptions: [],
       },
       convention: {
         kinds: ["READ"],
         scope: {
           agencyIds: ["fake-agency-id-1"],
         },
+        subscriptions: [],
       },
     },
   },

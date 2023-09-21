@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { andThen, map } from "ramda";
+import { andThen, keys, map } from "ramda";
 import { eventToRightName, isApiConsumerAllowed, pipeWithValue } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { createLogger } from "../../../../utils/logger";
@@ -167,6 +167,25 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         throw new ForbiddenError();
       }
       await deps.useCases.subscribeToWebhook.execute(req.body, req.apiConsumer);
+    }),
+  );
+
+  webhooksV2Router.listActiveSubscriptions((req, res) =>
+    sendHttpResponseForApiV2(req, res.status(200), async () => {
+      const apiConsumer = req.apiConsumer;
+      if (
+        !apiConsumer ||
+        (apiConsumer &&
+          keys(apiConsumer.rights).filter((rightName) =>
+            apiConsumer.rights[rightName].kinds.includes("SUBSCRIPTION"),
+          ).length === 0)
+      ) {
+        throw new ForbiddenError();
+      }
+      return deps.useCases.listActiveSubscriptions.execute(
+        undefined,
+        apiConsumer,
+      );
     }),
   );
 

@@ -102,6 +102,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .build();
 
     const appAndDeps = await buildTestApp();
+    appAndDeps.gateways.timeGateway.defaultDate = new Date();
     appAndDeps.gateways.shortLinkGenerator.addMoreShortLinkIds([
       "link1",
       "link2",

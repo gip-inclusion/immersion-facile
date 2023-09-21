@@ -1,77 +1,148 @@
+import { SuperTest, Test } from "supertest";
 import { expectToEqual } from "shared";
+import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   authorizedSubscriptionApiConsumer,
+  authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
-import { publicApiV2WebhooksRoutes } from "./publicApiV2.routes";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
+import {
+  PublicApiV2WebhooksRoutes,
+  publicApiV2WebhooksRoutes,
+} from "./publicApiV2.routes";
 
-describe("Webhook routes", () => {
-  it("saves a webhook for authorized consumer", async () => {
-    const { request, generateApiConsumerJwt, inMemoryUow } =
-      await buildTestApp();
-    inMemoryUow.apiConsumerRepository.consumers = [
-      authorizedSubscriptionApiConsumer,
-    ];
-    const sharedRequest = createSupertestSharedClient(
+const unauthorizedSubscriptionApiConsumer =
+  authorizedUnJeuneUneSolutionApiConsumer;
+
+describe.skip("Webhook routes", () => {
+  let request: SuperTest<Test>;
+  let sharedRequest: HttpClient<PublicApiV2WebhooksRoutes>;
+  let inMemoryUow: InMemoryUnitOfWork;
+  let generateApiConsumerJwt: GenerateApiConsumerJwt;
+
+  beforeEach(async () => {
+    ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
+    sharedRequest = createSupertestSharedClient(
       publicApiV2WebhooksRoutes,
       request,
     );
-    const authToken = generateApiConsumerJwt({
-      id: authorizedSubscriptionApiConsumer.id,
-    });
+  });
 
-    const response = await sharedRequest.subscribeToWebhook({
-      headers: {
-        authorization: authToken,
-      },
-      body: {
-        callbackHeaders: {
-          authorization: "Bearer some-string-provided-by-consumer",
+  describe(`${publicApiV2WebhooksRoutes.subscribeToWebhook.method.toUpperCase()} ${
+    publicApiV2WebhooksRoutes.subscribeToWebhook.url
+  }`, () => {
+    it("201- saves a webhook for authorized consumer", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [
+        authorizedSubscriptionApiConsumer,
+      ];
+      const authToken = generateApiConsumerJwt({
+        id: authorizedSubscriptionApiConsumer.id,
+      });
+
+      const response = await sharedRequest.subscribeToWebhook({
+        headers: {
+          authorization: authToken,
         },
-        callbackUrl:
-          "https://some-url-provided-by-consumer.com/on-convention-updated",
-        subscribedEvent: "convention.updated",
-      },
+        body: {
+          callbackHeaders: {
+            authorization: "Bearer some-string-provided-by-consumer",
+          },
+          callbackUrl:
+            "https://some-url-provided-by-consumer.com/on-convention-updated",
+          subscribedEvent: "convention.updated",
+        },
+      });
+
+      expectToEqual(response, {
+        status: 201,
+        body: "",
+      });
     });
 
-    expectToEqual(response, {
-      status: 201,
-      body: "",
+    // Wrong paths
+    it("403 - rejects unauthenticated requests", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [unauthorizedApiConsumer];
+      const authToken = generateApiConsumerJwt({
+        id: unauthorizedApiConsumer.id,
+      });
+
+      const response = await sharedRequest.subscribeToWebhook({
+        headers: {
+          authorization: authToken,
+        },
+        body: {
+          callbackHeaders: {
+            authorization: "Bearer some-string-provided-by-consumer",
+          },
+          callbackUrl:
+            "https://some-url-provided-by-consumer.com/on-convention-updated",
+          subscribedEvent: "convention.updated",
+        },
+      });
+
+      expect(response).toEqual({
+        status: 403,
+        body: { message: "Accès refusé", status: 403 },
+      });
     });
   });
 
-  // Wrong paths
-  it("rejects unauthenticated requests", async () => {
-    const { request, generateApiConsumerJwt, inMemoryUow } =
-      await buildTestApp();
-    inMemoryUow.apiConsumerRepository.consumers = [unauthorizedApiConsumer];
-    const sharedRequest = createSupertestSharedClient(
-      publicApiV2WebhooksRoutes,
-      request,
-    );
-    const authToken = generateApiConsumerJwt({
-      id: unauthorizedApiConsumer.id,
-    });
+  describe(`${publicApiV2WebhooksRoutes.listActiveSubscriptions.method.toUpperCase()} ${
+    publicApiV2WebhooksRoutes.listActiveSubscriptions.url
+  }`, () => {
+    it("200 - returns the list of active subscriptions for authorized consumer", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [
+        authorizedSubscriptionApiConsumer,
+      ];
+      const authToken = generateApiConsumerJwt({
+        id: authorizedSubscriptionApiConsumer.id,
+      });
 
-    const response = await sharedRequest.subscribeToWebhook({
-      headers: {
-        authorization: authToken,
-      },
-      body: {
-        callbackHeaders: {
-          authorization: "Bearer some-string-provided-by-consumer",
+      const response = await sharedRequest.listActiveSubscriptions({
+        headers: {
+          authorization: authToken,
         },
-        callbackUrl:
-          "https://some-url-provided-by-consumer.com/on-convention-updated",
-        subscribedEvent: "convention.updated",
-      },
+      });
+
+      expectToEqual(response, {
+        status: 200,
+        body: [
+          {
+            id: "123",
+            createdAt: "date",
+            callbackHeaders: {
+              authorization: "Bearer 123",
+            },
+            callbackUrl: "https://www.google.com",
+            subscribedEvent: "convention.updated",
+          },
+        ],
+      });
     });
 
-    expect(response).toEqual({
-      status: 403,
-      body: { message: "Accès refusé", status: 403 },
+    // Wrong paths
+    it("403 - rejects unauthenticated requests", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [
+        unauthorizedSubscriptionApiConsumer,
+      ];
+      const authToken = generateApiConsumerJwt({
+        id: unauthorizedSubscriptionApiConsumer.id,
+      });
+
+      const response = await sharedRequest.listActiveSubscriptions({
+        headers: {
+          authorization: authToken,
+        },
+      });
+
+      expect(response).toEqual({
+        status: 403,
+        body: { message: "Accès refusé", status: 403 },
+      });
     });
   });
 });

@@ -1,19 +1,18 @@
 import { PoolClient } from "pg";
-import { keys } from "ramda";
+import format from "pg-format";
+import { keys, mapObjIndexed } from "ramda";
 import {
   ApiConsumer,
   ApiConsumerContact,
   ApiConsumerId,
+  ApiConsumerRightName,
   ApiConsumerRights,
   apiConsumerSchema,
   DateIsoString,
   eventToRightName,
-  SubscriptionEvent,
-  SubscriptionParams,
   WebhookSubscription,
 } from "shared";
 import { ApiConsumerRepository } from "../../../domain/auth/ports/ApiConsumerRepository";
-import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 
 const jsonBuildQuery = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
       'id', c.id,
@@ -29,10 +28,13 @@ const jsonBuildQuery = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
         'emails', c.contact_emails,
         'phone', c.contact_phone
       ),
-      'subscriptions', JSONB_OBJECT_AGG(
-        s.subscribed_event, JSON_BUILD_OBJECT(
+      'subscriptions', JSON_AGG(
+        JSON_BUILD_OBJECT(
           'callbackUrl', s.callback_url,
-          'callbackHeaders', s.callback_headers
+          'callbackHeaders', s.callback_headers,
+          'createdAt', date_to_iso(s.created_at),
+          'id', s.id,
+          'subscribedEvent', s.subscribed_event
         )
       ) FILTER (WHERE s.subscribed_event IS NOT NULL)
     )) as raw_api_consumer
@@ -40,31 +42,6 @@ const jsonBuildQuery = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {
   constructor(private client: PoolClient) {}
-
-  public async addSubscription({
-    subscription,
-    apiConsumerId,
-  }: {
-    subscription: WebhookSubscription;
-    apiConsumerId: ApiConsumerId;
-  }): Promise<void> {
-    const apiConsumerRightName = eventToRightName(subscription.subscribedEvent);
-    const subscriptionId = new UuidV4Generator().new();
-    await this.client.query(
-      `
-      INSERT INTO api_consumers_subscriptions (id, right_name, consumer_id, subscribed_event, callback_url, callback_headers)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `,
-      [
-        subscriptionId,
-        apiConsumerRightName,
-        apiConsumerId,
-        subscription.subscribedEvent,
-        subscription.callbackUrl,
-        subscription.callbackHeaders,
-      ],
-    );
-  }
 
   public async getAll(): Promise<ApiConsumer[]> {
     const result = await this.client.query(`SELECT ${jsonBuildQuery}
@@ -74,7 +51,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     return result.rows.map((rawPg) => {
       const pgApiConsumer =
         "raw_api_consumer" in rawPg ? rawPg.raw_api_consumer : rawPg;
-      return this.#rawPgToApiConsumer(pgApiConsumer);
+      return pgApiConsumer;
     });
   }
 
@@ -94,11 +71,22 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     if (!rawPg) return;
     const pgApiConsumer =
       "raw_api_consumer" in rawPg ? rawPg.raw_api_consumer : rawPg;
-    return pgApiConsumer ? this.#rawPgToApiConsumer(pgApiConsumer) : undefined;
+    return this.#rawPgToApiConsumer(pgApiConsumer);
   }
 
   public async save(apiConsumer: ApiConsumer): Promise<void> {
-    await this.client.query(
+    await this.#insertApiConsumer(apiConsumer);
+    await this.#clearSubscriptionsOfConsumer(apiConsumer.id);
+    await this.#insertSubscriptions(apiConsumer);
+  }
+
+  #insertApiConsumer(apiConsumer: ApiConsumer) {
+    const { rights, ...rest } = apiConsumer;
+    const rightsWithoutSubscriptions = mapObjIndexed(
+      ({ subscriptions, ...rest }) => rest,
+      rights,
+    );
+    return this.client.query(
       `
       INSERT INTO api_consumers (
         id, consumer, description, rights, created_at, 
@@ -121,10 +109,49 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       )`,
       //prettier-ignore
       [
-        apiConsumer.id, apiConsumer.consumer, apiConsumer.description, JSON.stringify(apiConsumer.rights), apiConsumer.createdAt,
-        apiConsumer.expirationDate, apiConsumer.contact.emails, apiConsumer.contact.firstName, apiConsumer.contact.lastName, apiConsumer.contact.job,
-        apiConsumer.contact.phone,
+        rest.id, rest.consumer, rest.description, JSON.stringify(rightsWithoutSubscriptions), rest.createdAt,
+        rest.expirationDate, rest.contact.emails, rest.contact.firstName, rest.contact.lastName, rest.contact.job,
+        rest.contact.phone,
       ],
+    );
+  }
+
+  #clearSubscriptionsOfConsumer(apiConsumerId: ApiConsumerId) {
+    return this.client.query(
+      `
+    DELETE FROM api_consumers_subscriptions
+    WHERE consumer_id = $1
+    `,
+      [apiConsumerId],
+    );
+  }
+
+  #insertSubscriptions(apiConsumer: ApiConsumer) {
+    const subscriptions: WebhookSubscription[] = keys(
+      apiConsumer.rights,
+    ).flatMap(
+      (apiConsumerRightName: ApiConsumerRightName) =>
+        apiConsumer.rights[apiConsumerRightName].subscriptions,
+    );
+
+    if (subscriptions.length === 0) return;
+
+    return this.client.query(
+      format(
+        `
+    INSERT INTO api_consumers_subscriptions(
+            id, created_at, right_name, callback_url, callback_headers, consumer_id, subscribed_event
+      ) VALUES %L`,
+        subscriptions.map((subscription) => [
+          subscription.id,
+          subscription.createdAt,
+          eventToRightName(subscription.subscribedEvent),
+          subscription.callbackUrl,
+          subscription.callbackHeaders,
+          apiConsumer.id,
+          subscription.subscribedEvent,
+        ]),
+      ),
     );
   }
 
@@ -134,16 +161,13 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   }: PgRawConsumerData): ApiConsumer {
     return apiConsumerSchema.parse({
       ...rest,
-      rights: keys(subscriptions).reduce((acc, event) => {
-        const rightName = eventToRightName(event);
+      rights: subscriptions.reduce((acc, subscription) => {
+        const rightName = eventToRightName(subscription.subscribedEvent);
         return {
           ...acc,
           [rightName]: {
             ...rest.rights[rightName],
-            subscriptions: {
-              ...rest.rights[rightName].subscriptions,
-              [event]: subscriptions[event],
-            },
+            subscriptions: [...acc[rightName].subscriptions, subscription],
           },
         };
       }, rest.rights),
@@ -159,5 +183,5 @@ type PgRawConsumerData = {
   createdAt: DateIsoString;
   expirationDate: DateIsoString;
   contact: ApiConsumerContact;
-  subscriptions: Record<SubscriptionEvent, SubscriptionParams>;
+  subscriptions: WebhookSubscription[];
 };

@@ -10,6 +10,7 @@ import {
   GenerateInclusionConnectJwt,
 } from "../../../domain/auth/jwt";
 import { SaveApiConsumer } from "../../../domain/auth/useCases/SaveApiConsumer";
+import { ListActiveSubscriptions } from "../../../domain/broadcast/useCases/ListActiveSubscriptions";
 import { SubscribeToWebhook } from "../../../domain/broadcast/useCases/SubscribeToWebhook";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
@@ -449,7 +450,12 @@ export const createUseCases = (
           gateways.timeGateway,
           { resyncMode: false },
         ),
-      subscribeToWebhook: new SubscribeToWebhook(uowPerformer),
+      listActiveSubscriptions: new ListActiveSubscriptions(uowPerformer),
+      subscribeToWebhook: new SubscribeToWebhook(
+        uowPerformer,
+        uuidGenerator,
+        gateways.timeGateway,
+      ),
       shareConventionByEmail: new ShareApplicationLinkByEmail(
         uowPerformer,
         saveNotificationAndRelatedEvent,
@@ -464,6 +470,7 @@ export const createUseCases = (
         uowPerformer,
         createNewEvent,
         generateApiConsumerJwt,
+        gateways.timeGateway,
       ),
     }),
     ...instantiatedUseCasesFromFunctions({

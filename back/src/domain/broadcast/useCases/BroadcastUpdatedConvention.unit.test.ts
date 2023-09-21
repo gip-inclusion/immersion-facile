@@ -46,9 +46,14 @@ describe("Broadcast updated convention", () => {
       .withConventionRight({
         kinds: ["SUBSCRIPTION"],
         scope: { agencyIds: [agency1.id] },
-        subscriptions: {
-          "convention.updated": callbackParams1,
-        },
+        subscriptions: [
+          {
+            ...callbackParams1,
+            subscribedEvent: "convention.updated",
+            createdAt: new Date().toISOString(),
+            id: "my-subscription-id",
+          },
+        ],
       })
       .build();
 
@@ -61,9 +66,14 @@ describe("Broadcast updated convention", () => {
       .withConventionRight({
         kinds: ["SUBSCRIPTION"],
         scope: { agencyIds: [agency2.id] },
-        subscriptions: {
-          "convention.updated": callbackParams2,
-        },
+        subscriptions: [
+          {
+            ...callbackParams2,
+            subscribedEvent: "convention.updated",
+            createdAt: new Date().toISOString(),
+            id: "my-subscription-id",
+          },
+        ],
       })
       .build();
 
@@ -72,9 +82,14 @@ describe("Broadcast updated convention", () => {
       .withConventionRight({
         kinds: ["READ"],
         scope: { agencyIds: [agency1.id] },
-        subscriptions: {
-          "convention.updated": callbackParams1,
-        },
+        subscriptions: [
+          {
+            ...callbackParams1,
+            subscribedEvent: "convention.updated",
+            createdAt: new Date().toISOString(),
+            id: "my-subscription-id",
+          },
+        ],
       })
       .build();
 
