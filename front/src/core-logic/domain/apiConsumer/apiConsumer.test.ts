@@ -21,12 +21,14 @@ const apiConsumer1: ApiConsumer = {
     searchEstablishment: {
       kinds: ["READ"],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: [],
       scope: {
         agencyKinds: [],
       },
+      subscriptions: [],
     },
   },
   createdAt: new Date().toISOString(),

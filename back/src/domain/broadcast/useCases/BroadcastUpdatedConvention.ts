@@ -59,7 +59,9 @@ export class BroadcastUpdatedConvention extends TransactionalUseCase<
     await Promise.all(
       apiConsumers.map((apiConsumers) => {
         const conventionUpdatedCallbackParams =
-          apiConsumers.rights.convention.subscriptions?.["convention.updated"];
+          apiConsumers.rights.convention.subscriptions.find(
+            (sub) => sub.subscribedEvent === "convention.updated",
+          );
         if (!conventionUpdatedCallbackParams) {
           throw new Error(
             `No callback params found for convention.updated : apiConsumer : ${apiConsumers.id} | convention : ${conventionRead.id}`,
@@ -68,7 +70,8 @@ export class BroadcastUpdatedConvention extends TransactionalUseCase<
 
         return this.#subscribersGateway.notifyConventionUpdated({
           conventionRead,
-          ...conventionUpdatedCallbackParams,
+          callbackUrl: conventionUpdatedCallbackParams.callbackUrl,
+          callbackHeaders: conventionUpdatedCallbackParams.callbackHeaders,
         });
       }),
     );

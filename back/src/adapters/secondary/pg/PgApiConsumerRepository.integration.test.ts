@@ -1,10 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import {
-  ApiConsumer,
-  expectToEqual,
-  SubscriptionParams,
-  WebhookSubscription,
-} from "shared";
+import { ApiConsumer, expectToEqual, WebhookSubscription } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
@@ -26,12 +21,14 @@ const apiConsumer: ApiConsumer = {
     searchEstablishment: {
       kinds: ["READ"],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: ["READ"],
       scope: {
         agencyKinds: [],
       },
+      subscriptions: [],
     },
   },
 };
@@ -84,12 +81,14 @@ describe("PgApiConsumerRepository", () => {
         searchEstablishment: {
           kinds: ["READ"],
           scope: "no-scope",
+          subscriptions: [],
         },
         convention: {
           kinds: ["READ"],
           scope: {
             agencyKinds: [],
           },
+          subscriptions: [],
         },
       },
     };
@@ -114,41 +113,34 @@ describe("PgApiConsumerRepository", () => {
 
   describe("addSubscription", () => {
     it("add first subscription", async () => {
-      expect(apiConsumer.rights.convention.subscriptions).toBeUndefined();
+      expect(apiConsumer.rights.convention.subscriptions).toEqual([]);
       await apiConsumerRepository.save(apiConsumer);
-      const subscriptionParams: SubscriptionParams = {
+
+      const subscription: WebhookSubscription = {
         callbackUrl: "https://partner-callback-url",
         callbackHeaders: { authorization: "my-cb-auth-header" },
-      };
-      const subscription: WebhookSubscription = {
-        ...subscriptionParams,
         subscribedEvent: "convention.updated",
+        createdAt: new Date().toISOString(),
+        id: new UuidV4Generator().new(),
       };
 
-      await apiConsumerRepository.addSubscription({
-        subscription,
-        apiConsumerId: apiConsumer.id,
-      });
-
-      const expectedApiConsumer: ApiConsumer = {
+      const updatedConsumer: ApiConsumer = {
         ...apiConsumer,
         rights: {
           ...apiConsumer.rights,
           convention: {
-            kinds: ["READ"],
-            scope: {
-              agencyKinds: [],
-            },
-            subscriptions: {
-              "convention.updated": subscriptionParams,
-            },
+            ...apiConsumer.rights.convention,
+            subscriptions: [subscription],
           },
         },
       };
-      const updatedConsumer = await apiConsumerRepository.getById(
-        expectedApiConsumer.id,
+
+      await apiConsumerRepository.save(updatedConsumer);
+
+      const updatedConsumerInRepo = await apiConsumerRepository.getById(
+        updatedConsumer.id,
       );
-      expectToEqual(updatedConsumer, expectedApiConsumer);
+      expectToEqual(updatedConsumerInRepo, updatedConsumer);
     });
   });
 });

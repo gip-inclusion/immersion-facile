@@ -1,35 +1,58 @@
 import {
   ApiConsumer,
+  CreateWebhookSubscription,
+  createWebhookSubscriptionSchema,
+  eventToRightName,
   WebhookSubscription,
-  webhookSubscriptionSchema,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class SubscribeToWebhook extends TransactionalUseCase<
-  WebhookSubscription,
+  CreateWebhookSubscription,
   void,
   ApiConsumer
 > {
-  protected inputSchema = webhookSubscriptionSchema;
+  protected inputSchema = createWebhookSubscriptionSchema;
 
-  constructor(uowPerformer: UnitOfWorkPerformer) {
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private readonly uuidGenerator: UuidGenerator,
+    private readonly timeGateway: TimeGateway,
+  ) {
     super(uowPerformer);
   }
 
   protected async _execute(
-    webhookSubscription: WebhookSubscription,
+    webhookSubscription: CreateWebhookSubscription,
     uow: UnitOfWork,
     payload: ApiConsumer,
   ) {
     if (!payload) throw new ForbiddenError("No JWT payload provided");
 
-    await uow.apiConsumerRepository.addSubscription({
-      subscription: webhookSubscription,
-      apiConsumerId: payload.id,
-    });
+    const rightName = eventToRightName(webhookSubscription.subscribedEvent);
 
-    await Promise.resolve(undefined);
+    const newSubscription: WebhookSubscription = {
+      ...webhookSubscription,
+      createdAt: this.timeGateway.now().toISOString(),
+      id: this.uuidGenerator.new(),
+    };
+
+    await uow.apiConsumerRepository.save({
+      ...payload,
+      rights: {
+        ...payload.rights,
+        [rightName]: {
+          ...payload.rights[rightName],
+          subscriptions: [
+            ...payload.rights[rightName].subscriptions,
+            newSubscription,
+          ],
+        },
+      },
+    });
   }
 }

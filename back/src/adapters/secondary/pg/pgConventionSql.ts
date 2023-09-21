@@ -80,6 +80,7 @@ const buildDto = `JSON_STRIP_NULLS(
     'workConditions', work_conditions,
     'agencyId', agency_id,
     'agencyName', agencies.name,
+    'agencyKind', agencies.kind,
     'agencyDepartment', agencies.department_code,
     'individualProtection', individual_protection,
     'sanitaryPrevention', sanitary_prevention,

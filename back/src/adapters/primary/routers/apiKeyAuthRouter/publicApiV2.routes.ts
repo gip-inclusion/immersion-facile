@@ -1,12 +1,12 @@
 import { z } from "zod";
 import {
+  createWebhookSubscriptionSchema,
   emptyStringSchema,
   httpErrorSchema,
   searchResultSchema,
   searchResultsSchema,
   withAuthorizationHeaders,
 } from "shared";
-import { webhookSubscriptionSchema } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { conventionReadPublicV2Schema } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
@@ -83,11 +83,12 @@ export const publicApiV2ConventionRoutes = defineRoutes({
   }),
 });
 
+export type PublicApiV2WebhooksRoutes = typeof publicApiV2WebhooksRoutes;
 export const publicApiV2WebhooksRoutes = defineRoutes({
   subscribeToWebhook: defineRoute({
     method: "post",
     url: "/v2/webhooks",
-    requestBodySchema: webhookSubscriptionSchema,
+    requestBodySchema: createWebhookSubscriptionSchema,
     ...withAuthorizationHeaders,
     responses: {
       201: emptyStringSchema,
@@ -102,9 +103,9 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(
-        webhookSubscriptionSchema.and(
+        createWebhookSubscriptionSchema.and(
           z.object({
-            subscriptionId: z.string(),
+            id: z.string(),
             createdAt: z.string().datetime(),
           }),
         ),

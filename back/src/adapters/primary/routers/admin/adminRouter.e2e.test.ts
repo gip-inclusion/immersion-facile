@@ -20,6 +20,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { createApiConsumerParamsFromApiConsumer } from "../../../../_testBuilders/ApiConsumerBuilder";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
@@ -426,7 +427,9 @@ describe("Admin router", () => {
     it("200 - save new api consumer", async () => {
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
       const response = await sharedRequest.saveApiConsumer({
-        body: authorizedUnJeuneUneSolutionApiConsumer,
+        body: createApiConsumerParamsFromApiConsumer(
+          authorizedUnJeuneUneSolutionApiConsumer,
+        ),
         headers: { authorization: token },
       });
 
@@ -456,18 +459,20 @@ describe("Admin router", () => {
           searchEstablishment: {
             kinds: [],
             scope: "no-scope",
+            subscriptions: [],
           },
           convention: {
             kinds: [],
             scope: {
               agencyKinds: [],
             },
+            subscriptions: [],
           },
         },
       };
 
       const response = await sharedRequest.saveApiConsumer({
-        body: updatedApiConsumer,
+        body: createApiConsumerParamsFromApiConsumer(updatedApiConsumer),
         headers: { authorization: token },
       });
 
@@ -484,7 +489,9 @@ describe("Admin router", () => {
 
     it("401 - without auth", async () => {
       const response = await sharedRequest.saveApiConsumer({
-        body: authorizedUnJeuneUneSolutionApiConsumer,
+        body: createApiConsumerParamsFromApiConsumer(
+          authorizedUnJeuneUneSolutionApiConsumer,
+        ),
         headers: { authorization: "" },
       });
 
@@ -497,7 +504,9 @@ describe("Admin router", () => {
 
     it("401 - not with backOfficeJwt", async () => {
       const response = await sharedRequest.saveApiConsumer({
-        body: authorizedUnJeuneUneSolutionApiConsumer,
+        body: createApiConsumerParamsFromApiConsumer(
+          authorizedUnJeuneUneSolutionApiConsumer,
+        ),
         headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
       });
 
@@ -535,7 +544,9 @@ describe("Admin router", () => {
 
     it("401 - not with backOfficeJwt", async () => {
       const response = await sharedRequest.saveApiConsumer({
-        body: authorizedUnJeuneUneSolutionApiConsumer,
+        body: createApiConsumerParamsFromApiConsumer(
+          authorizedUnJeuneUneSolutionApiConsumer,
+        ),
         headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
       });
 

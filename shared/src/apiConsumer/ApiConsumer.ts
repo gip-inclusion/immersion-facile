@@ -2,7 +2,7 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
 import { Flavor } from "../typeFlavors";
-import { Either } from "../utils";
+import { Either, ReplaceTypeAtKey } from "../utils";
 import { DateIsoString } from "../utils/date";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
@@ -23,12 +23,11 @@ export type SubscriptionParams = {
 
 export type ApiConsumerRight<
   Scope,
-  R extends ApiConsumerRightName,
-  Event extends string = never,
+  S extends WebhookSubscription | void = WebhookSubscription,
 > = {
   kinds: ApiConsumerKind[];
   scope: Scope;
-  subscriptions?: Record<SubscriptionName<R, Event>, SubscriptionParams>;
+  subscriptions: S extends WebhookSubscription ? WebhookSubscription[] : void;
 };
 
 export type SubscriptionName<
@@ -36,21 +35,21 @@ export type SubscriptionName<
   Event extends string = never,
 > = `${R}.${Event}`;
 
-type ApiConsumerRightName = (typeof apiConsumerRightNames)[number];
+export type ApiConsumerRightName = (typeof apiConsumerRightNames)[number];
+
 export const apiConsumerRightNames = [
   "searchEstablishment",
   "convention",
 ] as const;
-export type ApiConsumerRights = {
-  searchEstablishment: ApiConsumerRight<NoScope, "searchEstablishment">;
-  convention: ApiConsumerRight<ConventionScope, "convention", "updated">;
+
+export type GenericApiConsumerRights<S extends WebhookSubscription | void> = {
+  searchEstablishment: ApiConsumerRight<NoScope, S>;
+  convention: ApiConsumerRight<ConventionScope, S>;
 };
 
-export type WebhookSubscription = SubscriptionParams & {
-  subscribedEvent: SubscriptionEvent;
-};
+export type CreateApiConsumerRights = GenericApiConsumerRights<void>;
 
-export type SubscriptionEvent = SubscriptionName<"convention", "updated">;
+export type ApiConsumerRights = GenericApiConsumerRights<WebhookSubscription>;
 
 export type NoScope = "no-scope";
 
@@ -60,14 +59,12 @@ export type ConventionScope = Either<
   { agencyIds: AgencyId[] }
 >;
 
-export type ApiConsumer = {
+export type CreateApiConsumerParams = {
   id: ApiConsumerId;
   consumer: ApiConsumerName;
   contact: ApiConsumerContact;
   description?: string;
-  rights: ApiConsumerRights;
-  createdAt: DateIsoString;
-  expirationDate: DateIsoString;
+  rights: CreateApiConsumerRights;
 };
 
 export type ApiConsumerContact = {
@@ -101,3 +98,48 @@ export const eventToRightName = (
   };
   return strategy[event];
 };
+
+export type ApiConsumerSubscriptionId = Flavor<
+  string,
+  "ApiConsumerSubscriptionId"
+>;
+
+export type SubscriptionEvent = SubscriptionName<"convention", "updated">;
+export type CreateWebhookSubscription = SubscriptionParams & {
+  subscribedEvent: SubscriptionEvent;
+};
+
+export type WebhookSubscription = CreateWebhookSubscription & {
+  id: ApiConsumerSubscriptionId;
+  createdAt: DateIsoString;
+};
+
+export type ApiConsumer = ReplaceTypeAtKey<
+  CreateApiConsumerParams,
+  "rights",
+  ApiConsumerRights
+> & {
+  createdAt: DateIsoString;
+  expirationDate: DateIsoString;
+};
+
+export const createApiConsumerParamsFromApiConsumer = (
+  apiConsumer: ApiConsumer,
+): CreateApiConsumerParams => ({
+  id: apiConsumer.id,
+  rights: {
+    convention: {
+      kinds: apiConsumer.rights.convention.kinds,
+      scope: apiConsumer.rights.convention.scope,
+      subscriptions: undefined,
+    },
+    searchEstablishment: {
+      kinds: apiConsumer.rights.searchEstablishment.kinds,
+      scope: apiConsumer.rights.searchEstablishment.scope,
+      subscriptions: undefined,
+    },
+  },
+  consumer: apiConsumer.consumer,
+  contact: apiConsumer.contact,
+  description: apiConsumer.description,
+});

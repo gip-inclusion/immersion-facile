@@ -25,6 +25,7 @@ const conventionReadConsumerWithAgencyIdsScope = new ApiConsumerBuilder()
     scope: {
       agencyIds: [agency.id],
     },
+    subscriptions: [],
   })
   .build();
 
@@ -35,6 +36,7 @@ const conventionReadConsumerWithNoScope = new ApiConsumerBuilder()
     scope: {
       agencyIds: [],
     },
+    subscriptions: [],
   })
   .build();
 
@@ -45,6 +47,7 @@ const conventionUnauthorizedConsumer = new ApiConsumerBuilder()
     scope: {
       agencyIds: [],
     },
+    subscriptions: [],
   })
   .build();
 

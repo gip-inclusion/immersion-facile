@@ -66,6 +66,7 @@ describe("Get Conventions for ApiConsumer", () => {
               agencyKinds: ["cci"],
             },
             kinds: ["READ"],
+            subscriptions: [],
           })
           .build();
 
@@ -84,6 +85,7 @@ describe("Get Conventions for ApiConsumer", () => {
               agencyKinds: ["pole-emploi"],
             },
             kinds: ["READ"],
+            subscriptions: [],
           })
           .build();
 
@@ -109,6 +111,7 @@ describe("Get Conventions for ApiConsumer", () => {
               agencyKinds: ["pole-emploi", "mission-locale"],
             },
             kinds: ["READ"],
+            subscriptions: [],
           })
           .build();
 
@@ -138,6 +141,7 @@ describe("Get Conventions for ApiConsumer", () => {
               agencyIds: ["any-agency-id"],
             },
             kinds: ["READ"],
+            subscriptions: [],
           })
           .build();
 
@@ -156,6 +160,7 @@ describe("Get Conventions for ApiConsumer", () => {
               agencyIds: [agencyMissionLocale.id],
             },
             kinds: ["READ"],
+            subscriptions: [],
           })
           .build();
 

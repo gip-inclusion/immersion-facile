@@ -37,6 +37,10 @@ export type OmitFromExistingKeys<
 // https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
 export type KeysOfUnion<T> = T extends T ? keyof T : never;
 
+export type ReplaceTypeAtKey<O, K extends keyof O, NewValue> = Omit<O, K> & {
+  [k in K]: NewValue;
+};
+
 export type RequireField<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 export const keys = <T extends string | number | symbol>(

@@ -5,6 +5,7 @@ import {
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
+  createApiConsumerParamsFromApiConsumer,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
@@ -123,7 +124,7 @@ export class HttpAdminGateway implements AdminGateway {
     return from(
       this.httpClient
         .saveApiConsumer({
-          body: apiConsumer,
+          body: createApiConsumerParamsFromApiConsumer(apiConsumer),
           headers: { authorization: adminToken },
         })
         .then((response) => {

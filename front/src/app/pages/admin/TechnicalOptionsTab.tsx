@@ -67,12 +67,14 @@ const defaultApiConsumerValues: ApiConsumer = {
     searchEstablishment: {
       kinds: [],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: [],
       scope: {
         agencyKinds: [],
       },
+      subscriptions: [],
     },
   },
   createdAt: toDateString(new Date()),

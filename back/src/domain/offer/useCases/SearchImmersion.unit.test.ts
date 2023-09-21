@@ -594,12 +594,14 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
     searchEstablishment: {
       kinds: ["READ"],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: [],
       scope: {
         agencyIds: [],
       },
+      subscriptions: [],
     },
   },
 };

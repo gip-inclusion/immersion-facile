@@ -1,6 +1,8 @@
+import { addMilliseconds, addYears } from "date-fns";
 import {
   ApiConsumer,
   BackOfficeJwtPayload,
+  createApiConsumerParamsFromApiConsumer,
   createBackOfficeJwtPayload,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -40,17 +42,22 @@ describe("SaveApiConsumer", () => {
     saveApiConsumer = new SaveApiConsumer(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
-        timeGateway: new CustomTimeGateway(),
+        timeGateway,
         uuidGenerator,
       }),
       generateApiConsumerJwtTestFn,
+      timeGateway,
     );
   });
 
   describe("Right paths", () => {
     it("Adds a new api consumer if not existing", async () => {
+      const today = new Date("2023-09-22");
+      timeGateway.setNextDates([today, addMilliseconds(today, 10)]);
       const result = await saveApiConsumer.execute(
-        authorizedUnJeuneUneSolutionApiConsumer,
+        createApiConsumerParamsFromApiConsumer(
+          authorizedUnJeuneUneSolutionApiConsumer,
+        ),
         backOfficeJwtPayload,
       );
 
@@ -61,12 +68,16 @@ describe("SaveApiConsumer", () => {
         }),
       );
       expectToEqual(uow.apiConsumerRepository.consumers, [
-        authorizedUnJeuneUneSolutionApiConsumer,
+        {
+          ...authorizedUnJeuneUneSolutionApiConsumer,
+          createdAt: today.toISOString(),
+          expirationDate: addYears(today, 2).toISOString(),
+        },
       ]);
       expectToEqual(uow.outboxRepository.events, [
         {
           id: uuidGenerator.new(),
-          occurredAt: timeGateway.now().toISOString(),
+          occurredAt: addMilliseconds(today, 10).toISOString(),
           topic: "ApiConsumerSaved",
           payload: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
           publications: [],
@@ -77,28 +88,42 @@ describe("SaveApiConsumer", () => {
     });
 
     it("Updates an existing api consumer", async () => {
+      const today = new Date("2023-09-22");
+      timeGateway.setNextDates([today, addMilliseconds(today, 10)]);
+      const authorizedApiConsumerWithSubscription: ApiConsumer = {
+        ...authorizedUnJeuneUneSolutionApiConsumer,
+        rights: {
+          ...authorizedUnJeuneUneSolutionApiConsumer.rights,
+          convention: {
+            kinds: ["SUBSCRIPTION"],
+            scope: { agencyIds: ["lala"] },
+            subscriptions: [
+              {
+                subscribedEvent: "convention.updated",
+                createdAt: today.toISOString(),
+                id: "my-subscription-id",
+                callbackUrl: "http://yo.lo",
+                callbackHeaders: { authorization: "my-token" },
+              },
+            ],
+          },
+        },
+        createdAt: today.toISOString(),
+        expirationDate: addYears(today, 2).toISOString(),
+      };
       uow.apiConsumerRepository.consumers = [
-        authorizedUnJeuneUneSolutionApiConsumer,
+        authorizedApiConsumerWithSubscription,
       ];
 
       const updatedConsumer: ApiConsumer = {
-        ...authorizedUnJeuneUneSolutionApiConsumer,
-        rights: {
-          searchEstablishment: {
-            kinds: [],
-            scope: "no-scope",
-          },
-          convention: {
-            kinds: [],
-            scope: {
-              agencyKinds: [],
-            },
-          },
-        },
+        ...authorizedApiConsumerWithSubscription,
+        description: "ma nouvelle description",
+        createdAt: today.toISOString(),
+        expirationDate: addYears(today, 2).toISOString(),
       };
 
       const result = await saveApiConsumer.execute(
-        updatedConsumer,
+        createApiConsumerParamsFromApiConsumer(updatedConsumer),
         backOfficeJwtPayload,
       );
 
@@ -107,9 +132,9 @@ describe("SaveApiConsumer", () => {
       expectToEqual(uow.outboxRepository.events, [
         {
           id: uuidGenerator.new(),
-          occurredAt: timeGateway.now().toISOString(),
+          occurredAt: addMilliseconds(today, 10).toISOString(),
           topic: "ApiConsumerSaved",
-          payload: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
+          payload: { consumerId: authorizedApiConsumerWithSubscription.id },
           publications: [],
           status: "never-published",
           wasQuarantined: false,
@@ -121,7 +146,11 @@ describe("SaveApiConsumer", () => {
   describe("Wrong paths", () => {
     it("UnauthorizedError on without JWT payload", async () => {
       await expectPromiseToFailWithError(
-        saveApiConsumer.execute(authorizedUnJeuneUneSolutionApiConsumer),
+        saveApiConsumer.execute(
+          createApiConsumerParamsFromApiConsumer(
+            authorizedUnJeuneUneSolutionApiConsumer,
+          ),
+        ),
         new UnauthorizedError(),
       );
 
@@ -132,10 +161,15 @@ describe("SaveApiConsumer", () => {
     it("ForbiddenError on if provided JWT payload is not a backoffice one", async () => {
       const wrongRole: Role = "beneficiary";
       await expectPromiseToFailWithError(
-        saveApiConsumer.execute(authorizedUnJeuneUneSolutionApiConsumer, {
-          role: wrongRole as any,
-          sub: "123",
-        }),
+        saveApiConsumer.execute(
+          createApiConsumerParamsFromApiConsumer(
+            authorizedUnJeuneUneSolutionApiConsumer,
+          ),
+          {
+            role: wrongRole as any,
+            sub: "123",
+          },
+        ),
         new ForbiddenError(
           `Provided JWT payload does not have sufficient privileges. Received role: '${wrongRole}'`,
         ),

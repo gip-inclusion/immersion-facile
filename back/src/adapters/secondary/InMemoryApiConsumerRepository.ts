@@ -1,12 +1,6 @@
-import { addYears, subYears } from "date-fns";
+import { subYears } from "date-fns";
 import { values } from "ramda";
-import {
-  ApiConsumer,
-  ApiConsumerId,
-  eventToRightName,
-  SubscriptionParams,
-  WebhookSubscription,
-} from "shared";
+import { ApiConsumer, ApiConsumerId } from "shared";
 import { ApiConsumerRepository } from "../../domain/auth/ports/ApiConsumerRepository";
 import { UuidV4Generator } from "./core/UuidGeneratorImplementations";
 
@@ -14,6 +8,8 @@ const uuidGenerator = new UuidV4Generator();
 
 export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
+  createdAt: "2023-09-22T10:00:00.000Z",
+  expirationDate: "2025-09-22T10:00:00.000Z",
   consumer: "unJeuneUneSolution",
   contact: {
     firstName: "john",
@@ -22,18 +18,18 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
     job: "tech",
     phone: "0611223344",
   },
-  createdAt: new Date().toISOString(),
-  expirationDate: addYears(new Date(), 1).toISOString(),
   rights: {
     searchEstablishment: {
       kinds: ["READ"],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: ["READ"],
       scope: {
         agencyIds: [],
       },
+      subscriptions: [],
     },
   },
   description: "a",
@@ -41,6 +37,8 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
 
 export const unauthorizedApiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
+  createdAt: "2023-09-22T10:00:00.000Z",
+  expirationDate: "2025-09-22T10:00:00.000Z",
   consumer: "unauthorised consumer",
   contact: {
     firstName: "john",
@@ -49,18 +47,19 @@ export const unauthorizedApiConsumer: ApiConsumer = {
     job: "tech",
     phone: "0611223344",
   },
-  createdAt: new Date().toISOString(),
-  expirationDate: addYears(new Date(), 1).toISOString(),
   rights: {
     searchEstablishment: {
       kinds: [],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: [],
       scope: {
         agencyIds: [],
       },
+
+      subscriptions: [],
     },
   },
   description: "",
@@ -82,12 +81,14 @@ export const outdatedApiConsumer: ApiConsumer = {
     searchEstablishment: {
       kinds: ["READ"],
       scope: "no-scope",
+      subscriptions: [],
     },
     convention: {
       kinds: ["READ"],
       scope: {
         agencyIds: [],
       },
+      subscriptions: [],
     },
   },
   description: "",
@@ -101,34 +102,18 @@ export const authorizedSubscriptionApiConsumer: ApiConsumer = {
       scope: {
         agencyKinds: [],
       },
+      subscriptions: [],
     },
     searchEstablishment: {
       kinds: [],
       scope: "no-scope",
+      subscriptions: [],
     },
   },
 };
 
 export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
   #consumers: Record<ApiConsumerId, ApiConsumer> = {};
-
-  public async addSubscription({
-    subscription,
-    apiConsumerId,
-  }: {
-    subscription: WebhookSubscription;
-    apiConsumerId: ApiConsumerId;
-  }): Promise<void> {
-    const apiConsumer = this.#consumers[apiConsumerId];
-    const apiConsumerRightName = eventToRightName(subscription.subscribedEvent);
-    const subscriptionParams: SubscriptionParams = {
-      callbackUrl: subscription.callbackUrl,
-      callbackHeaders: subscription.callbackHeaders,
-    };
-    apiConsumer.rights[apiConsumerRightName].subscriptions = {
-      [subscription.subscribedEvent]: subscriptionParams,
-    };
-  }
 
   public get consumers(): ApiConsumer[] {
     return values(this.#consumers);

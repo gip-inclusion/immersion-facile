@@ -43,7 +43,7 @@ const createApiConsumer = (
     phone: "0601010101",
   },
   rights: {
-    searchEstablishment: { kinds: [], scope: "no-scope" },
+    searchEstablishment: { kinds: [], scope: "no-scope", subscriptions: [] },
     convention: conventionRight,
   },
 });
@@ -77,6 +77,7 @@ describe("Get Convention for ApiConsumer", () => {
           const apiConsumer = createApiConsumer({
             kinds: ["READ"],
             scope: { agencyIds: ["another-agency-id"] },
+            subscriptions: [],
           });
           await expectPromiseToFailWithError(
             getConventionForApiConsumer.execute(
@@ -93,6 +94,7 @@ describe("Get Convention for ApiConsumer", () => {
           const apiConsumer = createApiConsumer({
             kinds: ["READ"],
             scope: { agencyKinds: ["mission-locale"] },
+            subscriptions: [],
           });
           await expectPromiseToFailWithError(
             getConventionForApiConsumer.execute(
@@ -116,6 +118,7 @@ describe("Get Convention for ApiConsumer", () => {
             createApiConsumer({
               kinds: ["READ"],
               scope: { agencyIds: [agency.id] },
+              subscriptions: [],
             }),
           ),
           new NotFoundError(`No convention found with id ${notFoundId}`),
@@ -131,6 +134,7 @@ describe("Get Convention for ApiConsumer", () => {
         createApiConsumer({
           kinds: ["READ"],
           scope: { agencyIds: [agency.id] },
+          subscriptions: [],
         }),
       );
 
@@ -148,6 +152,7 @@ describe("Get Convention for ApiConsumer", () => {
         createApiConsumer({
           kinds: ["READ"],
           scope: { agencyKinds: [agency.kind] },
+          subscriptions: [],
         }),
       );
 
