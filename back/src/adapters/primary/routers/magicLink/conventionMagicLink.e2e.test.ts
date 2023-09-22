@@ -3,7 +3,7 @@ import { SuperTest, Test } from "supertest";
 import {
   ConventionDtoBuilder,
   ConventionId,
-  conventionMagicLinkTargets,
+  conventionMagicLinkRoutes,
   expectToEqual,
   RenewConventionParams,
   Role,
@@ -56,7 +56,7 @@ describe("Magic link router", () => {
         });
         const response = await request
           .post(
-            conventionMagicLinkTargets.updateConvention.url.replace(
+            conventionMagicLinkRoutes.updateConvention.url.replace(
               ":conventionId",
               updatedConvention.id,
             ),
@@ -91,7 +91,7 @@ describe("Magic link router", () => {
         });
         const response = await request
           .post(
-            conventionMagicLinkTargets.updateConvention.url.replace(
+            conventionMagicLinkRoutes.updateConvention.url.replace(
               ":conventionId",
               updatedConvention.id,
             ),
@@ -153,7 +153,7 @@ describe("Magic link router", () => {
 
     it("401 - Fails if no convention magic link token is provided", async () => {
       const response = await request.post(
-        conventionMagicLinkTargets.renewConvention.url,
+        conventionMagicLinkRoutes.renewConvention.url,
       );
 
       expectToEqual(response.status, 401);
@@ -162,7 +162,7 @@ describe("Magic link router", () => {
 
     it("403 - Fails if provided token does not have enough privileges", async () => {
       const response = await request
-        .post(conventionMagicLinkTargets.renewConvention.url)
+        .post(conventionMagicLinkRoutes.renewConvention.url)
         .send(renewedConventionParams)
         .set({
           authorization: createTokenForRole({
@@ -179,7 +179,7 @@ describe("Magic link router", () => {
 
     it("400 - Fails if original convention is not ACCEPTED_BY_VALIDATOR", async () => {
       const response = await request
-        .post(conventionMagicLinkTargets.renewConvention.url)
+        .post(conventionMagicLinkRoutes.renewConvention.url)
         .send(renewedConventionParams)
         .set({
           authorization: createTokenForRole({
@@ -222,7 +222,7 @@ describe("Magic link router", () => {
         },
       };
       const response = await request
-        .post(conventionMagicLinkTargets.renewConvention.url)
+        .post(conventionMagicLinkRoutes.renewConvention.url)
         .send(renewedConventionParams)
         .set({
           authorization: generateConventionJwt({

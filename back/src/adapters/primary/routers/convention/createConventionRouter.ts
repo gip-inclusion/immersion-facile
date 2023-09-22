@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { unauthenticatedConventionTargets } from "shared";
+import { unauthenticatedConventionRoutes } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -7,7 +7,7 @@ export const createConventionRouter = (deps: AppDependencies) => {
   const conventionRouter = Router();
 
   conventionRouter
-    .route(unauthenticatedConventionTargets.shareConvention.url)
+    .route(unauthenticatedConventionRoutes.shareConvention.url)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.shareConventionByEmail.execute(req.body),
@@ -15,7 +15,7 @@ export const createConventionRouter = (deps: AppDependencies) => {
     );
 
   conventionRouter
-    .route(unauthenticatedConventionTargets.createConvention.url)
+    .route(unauthenticatedConventionRoutes.createConvention.url)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.addConvention.execute(req.body),

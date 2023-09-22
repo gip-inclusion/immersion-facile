@@ -3,13 +3,13 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  conventionMagicLinkTargets,
+  conventionMagicLinkRoutes,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectToEqual,
   Signatories,
   TemplatedEmail,
-  unauthenticatedConventionTargets,
+  unauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
   VALID_EMAILS,
 } from "shared";
@@ -51,7 +51,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     ]);
 
     const res = await request
-      .post(unauthenticatedConventionTargets.createConvention.url)
+      .post(unauthenticatedConventionRoutes.createConvention.url)
       .send(validConvention);
 
     expectResponseBody(res, { id: validConvention.id });
@@ -185,7 +185,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   ]);
 
   const result = await request
-    .post(unauthenticatedConventionTargets.createConvention.url)
+    .post(unauthenticatedConventionRoutes.createConvention.url)
     .send(convention);
 
   expect(result.status).toBe(200);
@@ -252,7 +252,7 @@ const beneficiarySignsApplication = async (
 
   const response = await request
     .post(
-      conventionMagicLinkTargets.signConvention.url.replace(
+      conventionMagicLinkRoutes.signConvention.url.replace(
         ":conventionId",
         initialConvention.id,
       ),
@@ -287,7 +287,7 @@ const establishmentSignsApplication = async (
 
   await request
     .post(
-      conventionMagicLinkTargets.signConvention.url.replace(
+      conventionMagicLinkRoutes.signConvention.url.replace(
         ":conventionId",
         initialConvention.id,
       ),
@@ -351,7 +351,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 
   await request
     .post(
-      conventionMagicLinkTargets.updateConventionStatus.url.replace(
+      conventionMagicLinkRoutes.updateConventionStatus.url.replace(
         ":conventionId",
         initialConvention.id,
       ),

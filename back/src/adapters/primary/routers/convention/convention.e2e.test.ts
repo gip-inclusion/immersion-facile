@@ -5,15 +5,20 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
-  conventionMagicLinkTargets,
+  ConventionMagicLinkRoutes,
+  conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   currentJwtVersions,
+  displayRouteName,
   expectEmailOfType,
   expectToEqual,
   InclusionConnectedUser,
   stringToMd5,
-  unauthenticatedConventionTargets,
+  UnauthenticatedConventionRoutes,
+  unauthenticatedConventionRoutes,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
@@ -47,6 +52,8 @@ const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
 describe("convention e2e", () => {
   let request: SuperTest<Test>;
+  let unauthenticatedRequest: HttpClient<UnauthenticatedConventionRoutes>;
+  let magicLinkRequest: HttpClient<ConventionMagicLinkRoutes>;
   let generateConventionJwt: GenerateConventionJwt;
   let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
@@ -65,25 +72,40 @@ describe("convention e2e", () => {
       inMemoryUow,
     } = await buildTestApp(new AppConfigBuilder().build()));
 
+    unauthenticatedRequest = createSupertestSharedClient(
+      unauthenticatedConventionRoutes,
+      request,
+    );
+
+    magicLinkRequest = createSupertestSharedClient(
+      conventionMagicLinkRoutes,
+      request,
+    );
+
     gateways.timeGateway.setNextDate(new Date());
   });
 
-  describe(`${unauthenticatedConventionTargets.createConvention.method} ${unauthenticatedConventionTargets.createConvention.url}`, () => {
+  describe(`${displayRouteName(
+    unauthenticatedConventionRoutes.createConvention,
+  )} add a new convention`, () => {
     it("200 - Create convention without auth", async () => {
       expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
-      const response = await request
-        .post(unauthenticatedConventionTargets.createConvention.url)
-        .send(convention);
+      const response = await unauthenticatedRequest.createConvention({
+        body: convention,
+      });
 
-      expectToEqual(response.status, 200);
-      expectToEqual(response.body, { id: convention.id });
+      expectToEqual(response, {
+        status: 200,
+        body: { id: convention.id },
+      });
+
       expectToEqual(inMemoryUow.conventionRepository.conventions, [convention]);
     });
 
     it("400 - Invalid body", async () => {
       const response = await request
-        .post(unauthenticatedConventionTargets.createConvention.url)
+        .post(unauthenticatedConventionRoutes.createConvention.url)
         .send({ invalid_params: true });
       expectToEqual(response.status, 400);
     });
@@ -94,7 +116,7 @@ describe("convention e2e", () => {
       });
 
       const response = await request
-        .post(unauthenticatedConventionTargets.createConvention.url)
+        .post(unauthenticatedConventionRoutes.createConvention.url)
         .send({
           ...convention,
           email: "another@email.fr",
@@ -107,7 +129,9 @@ describe("convention e2e", () => {
     });
   });
 
-  describe(`${unauthenticatedConventionTargets.shareConvention.method} ${unauthenticatedConventionTargets.shareConvention.url}`, () => {
+  describe(`${displayRouteName(
+    unauthenticatedConventionRoutes.shareConvention,
+  )} shares a conventions with a short link`, () => {
     describe("200 - Share convention without auth", () => {
       it("should successfully ask for a short link", async () => {
         const shortLinkId = "shortLink1";
@@ -116,17 +140,20 @@ describe("convention e2e", () => {
           "http://localhost:3000/demande-immersion?email=&firstName=&lastName=&phone=&financiaryHelp=&emergencyContact=&emergencyContactPhone=&isRqth=false&birthdate=&agencyDepartment=&siret=&businessName=&businessAdvantages=&etFirstName=&etLastName=&etJob=&etPhone=&etEmail=&erFirstName=&erLastName=&erPhone=&erEmail=&immersionAddress=&immersionActivities=&immersionSkills=&sanitaryPreventionDescription=&workConditions=&dateStart=2023-08-05&dateEnd=2023-08-06&schedule=%7B%22totalHours%22%3A0%2C%22workedDays%22%3A0%2C%22isSimple%22%3Atrue%2C%22selectedIndex%22%3A0%2C%22complexSchedule%22%3A%5B%7B%22date%22%3A%222023-08-05T00%3A00%3A00.000Z%22%2C%22timePeriods%22%3A%5B%5D%7D%2C%7B%22date%22%3A%222023-08-06T00%3A00%3A00.000Z%22%2C%22timePeriods%22%3A%5B%5D%7D%5D%7D";
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
-        const response = await request
-          .post(unauthenticatedConventionTargets.shareConvention.url)
-          .send({
+        const response = await unauthenticatedRequest.shareConvention({
+          body: {
             conventionLink: veryLongConventionLink,
             details: "Le message du mail",
             email: "any@email.fr",
             internshipKind: "immersion",
-          });
+          },
+        });
 
-        expectToEqual(response.status, 200);
-        expectToEqual(response.body, "");
+        expectToEqual(response, {
+          status: 200,
+          body: "",
+        });
+
         await processEventsForEmailToBeSent(eventCrawler);
 
         const sentEmails = gateways.notification.getSentEmails();
@@ -151,7 +178,7 @@ describe("convention e2e", () => {
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
         const response = await request
-          .post(unauthenticatedConventionTargets.shareConvention.url)
+          .post(unauthenticatedConventionRoutes.shareConvention.url)
           .send({
             details: "any@email.fr",
             email: "any@email.fr",
@@ -174,7 +201,9 @@ describe("convention e2e", () => {
     });
   });
 
-  describe(`${conventionMagicLinkTargets.getConvention.method} ${conventionMagicLinkTargets.getConvention.url}`, () => {
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.getConvention,
+  )} gets a convention from a magic link`, () => {
     beforeEach(() => {
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
@@ -219,28 +248,26 @@ describe("convention e2e", () => {
           )
           .exhaustive();
 
-        const response = await request
-          .get(
-            conventionMagicLinkTargets.getConvention.url.replace(
-              ":conventionId",
-              convention.id,
-            ),
-          )
-          .set("Authorization", jwt);
-
-        expect(response.body).toEqual({
-          ...convention,
-          agencyName: peAgency.name,
-          agencyDepartment: peAgency.address.departmentCode,
+        const response = await magicLinkRequest.getConvention({
+          headers: { authorization: jwt },
+          urlParams: { conventionId: convention.id },
         });
-        expect(response.status).toBe(200);
+
+        expectToEqual(response, {
+          status: 200,
+          body: {
+            ...convention,
+            agencyName: peAgency.name,
+            agencyDepartment: peAgency.address.departmentCode,
+          },
+        });
       },
     );
 
     it("403 - JWT Expired", async () => {
       const response = await request
         .get(
-          conventionMagicLinkTargets.getConvention.url.replace(
+          conventionMagicLinkRoutes.getConvention.url.replace(
             ":conventionId",
             convention.id,
           ),
@@ -280,7 +307,7 @@ describe("convention e2e", () => {
       );
       const response = await request
         .get(
-          conventionMagicLinkTargets.getConvention.url.replace(
+          conventionMagicLinkRoutes.getConvention.url.replace(
             ":conventionId",
             unknownId,
           ),
@@ -295,7 +322,9 @@ describe("convention e2e", () => {
     });
   });
 
-  describe(`${conventionMagicLinkTargets.updateConvention.method} ${conventionMagicLinkTargets.updateConvention.url}`, () => {
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.updateConvention,
+  )} updates a draft convention`, () => {
     beforeEach(() => {
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
@@ -320,21 +349,18 @@ describe("convention e2e", () => {
         }),
       );
 
-      const response = await request
-        .post(
-          conventionMagicLinkTargets.updateConvention.url.replace(
-            ":conventionId",
-            convention.id,
-          ),
-        )
-        .set("Authorization", jwt)
-        .send({
+      const response = await magicLinkRequest.updateConvention({
+        headers: { authorization: jwt },
+        urlParams: { conventionId: convention.id },
+        body: {
           convention: updatedConvention,
-        });
-      expectToEqual(response.body, {
-        id: convention.id,
+        },
       });
-      expectToEqual(response.statusCode, 200);
+
+      expectToEqual(response, {
+        status: 200,
+        body: { id: convention.id },
+      });
     });
 
     it("404 - Updating an unknown convention id", async () => {
@@ -345,7 +371,7 @@ describe("convention e2e", () => {
 
       const response = await request
         .post(
-          conventionMagicLinkTargets.updateConvention.url.replace(
+          conventionMagicLinkRoutes.updateConvention.url.replace(
             ":conventionId",
             unknownId,
           ),
@@ -372,7 +398,9 @@ describe("convention e2e", () => {
     });
   });
 
-  describe(`${conventionMagicLinkTargets.updateConventionStatus.method} ${conventionMagicLinkTargets.updateConventionStatus.url}`, () => {
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.updateConventionStatus,
+  )} updates the status of a convention`, () => {
     const externalId = "00000000001";
     beforeEach(() => {
       inMemoryUow.agencyRepository.setAgencies([peAgency]);
@@ -421,21 +449,19 @@ describe("convention e2e", () => {
           )
           .exhaustive();
 
-        const response = await request
-          .post(
-            conventionMagicLinkTargets.updateConventionStatus.url.replace(
-              ":conventionId",
-              convention.id,
-            ),
-          )
-          .set("Authorization", jwt)
-          .send({
+        const response = await magicLinkRequest.updateConventionStatus({
+          headers: { authorization: jwt },
+          body: {
             status: "REJECTED",
             statusJustification: "test-justification",
-          });
+            conventionId: convention.id,
+          },
+        });
 
-        expectToEqual(response.body, { id: convention.id });
-        expectToEqual(response.statusCode, 200);
+        expectToEqual(response, {
+          status: 200,
+          body: { id: convention.id },
+        });
 
         await eventCrawler.processNewEvents();
 
@@ -478,13 +504,8 @@ describe("convention e2e", () => {
 
     it("401 - no JWT", async () => {
       const response = await request
-        .post(
-          conventionMagicLinkTargets.updateConventionStatus.url.replace(
-            ":conventionId",
-            convention.id,
-          ),
-        )
-        .send({ status: "ACCEPTED_BY_VALIDATOR" });
+        .post(conventionMagicLinkRoutes.updateConventionStatus.url)
+        .send({ status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id });
 
       expectToEqual(response.statusCode, 401);
       expectToEqual(response.body, { error: "forbidden: unauthenticated" });
@@ -492,12 +513,7 @@ describe("convention e2e", () => {
 
     it("403 - unauthorized role for expected status update", async () => {
       const response = await request
-        .post(
-          conventionMagicLinkTargets.updateConventionStatus.url.replace(
-            ":conventionId",
-            convention.id,
-          ),
-        )
+        .post(conventionMagicLinkRoutes.updateConventionStatus.url)
         .set(
           "Authorization",
           generateConventionJwt(
@@ -509,23 +525,18 @@ describe("convention e2e", () => {
             }),
           ),
         )
-        .send({ status: "ACCEPTED_BY_VALIDATOR" });
+        .send({ status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id });
 
-      expectToEqual(response.statusCode, 403);
       expectToEqual(response.body, {
         errors:
           "establishment-representative is not allowed to go to status ACCEPTED_BY_VALIDATOR",
       });
+      expectToEqual(response.statusCode, 403);
     });
 
     it("404 - unknown convention id", async () => {
       const response = await request
-        .post(
-          conventionMagicLinkTargets.updateConventionStatus.url.replace(
-            ":conventionId",
-            unknownId,
-          ),
-        )
+        .post(conventionMagicLinkRoutes.updateConventionStatus.url)
         .set(
           "Authorization",
           generateConventionJwt(
@@ -537,12 +548,15 @@ describe("convention e2e", () => {
             }),
           ),
         )
-        .send({ status: "ACCEPTED_BY_COUNSELLOR" });
+        .send({
+          status: "ACCEPTED_BY_COUNSELLOR",
+          conventionId: unknownId,
+        });
 
-      expectToEqual(response.statusCode, 404);
       expectToEqual(response.body, {
         errors: conventionMissingMessage(unknownId),
       });
+      expectToEqual(response.statusCode, 404);
     });
   });
 });

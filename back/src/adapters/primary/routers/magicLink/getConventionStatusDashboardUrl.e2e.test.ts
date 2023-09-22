@@ -1,6 +1,6 @@
 import {
   ConventionDtoBuilder,
-  conventionMagicLinkTargets,
+  conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
 } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -37,7 +37,7 @@ describe("getConventionStatusDashboardUrl", () => {
     });
 
     const response = await request
-      .get(conventionMagicLinkTargets.getConventionStatusDashboard.url)
+      .get(conventionMagicLinkRoutes.getConventionStatusDashboard.url)
       .set("Authorization", jwt);
 
     expect(response.status).toBe(200);

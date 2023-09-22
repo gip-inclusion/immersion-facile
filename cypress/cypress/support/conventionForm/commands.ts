@@ -6,7 +6,7 @@ import {
   appellationRoute,
   addressTargets,
   domElementIds,
-  unauthenticatedConventionTargets,
+  unauthenticatedConventionRoutes,
   peParisAgencyId,
 } from "shared";
 import { faker } from "@faker-js/faker/locale/fr";
@@ -44,7 +44,7 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   );
   cy.intercept(
     "POST",
-    `${baseApiRoute}${unauthenticatedConventionTargets.createConvention.url}`,
+    `${baseApiRoute}${unauthenticatedConventionRoutes.createConvention.url}`,
   ).as("conventionAddRequest");
 
   cy.visit(conventionFormUrl);
