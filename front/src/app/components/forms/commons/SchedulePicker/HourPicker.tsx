@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
 import { ErrorMessage } from "@hookform/error-message";
 import { useStyles } from "tss-react/dsfr";
 import {
@@ -12,8 +13,8 @@ import {
 
 type HourPickerProps = {
   name: string;
-  timePeriods: Array<TimePeriodDto>;
-  onValueChange: (timePeriods: Array<TimePeriodDto>) => void;
+  timePeriods: TimePeriodDto[];
+  onValueChange: (timePeriods: TimePeriodDto[]) => void;
   disabled?: boolean;
 };
 
@@ -23,7 +24,6 @@ export const HourPicker = ({
   onValueChange,
   disabled,
 }: HourPickerProps) => {
-  const { cx } = useStyles();
   const add = () => {
     const newTimePeriods = [...timePeriods];
     let start = "09:00";
@@ -45,85 +45,17 @@ export const HourPicker = ({
   return (
     <>
       {timePeriods.length > 0 &&
-        timePeriods.map((hours, index) => {
-          const onStartChange = (index: number, value: string) => {
-            onValueChange(
-              replaceArrayElement(timePeriods, index, {
-                start: value,
-                end: timePeriods[index].end,
-              }),
-            );
-          };
-          const onEndChange = (index: number, value: string) => {
-            timePeriods[index].end = value;
-            onValueChange(
-              replaceArrayElement(timePeriods, index, {
-                start: timePeriods[index].start,
-                end: value,
-              }),
-            );
-          };
-          const remove = (index: number) => {
-            onValueChange(removeAtIndex(timePeriods, index));
-          };
-
-          return (
-            <div
-              key={`${timePeriods[index].start}-${timePeriods[index].end}`}
-              className={cx(fr.cx("fr-mt-2w"), "schedule-picker__section")}
-            >
-              <div className={cx("schedule-picker__row")}>
-                <div className={cx("date-or-time-block")}>
-                  <label htmlFor={name + index + "-start"}>Début</label>
-                  <input
-                    className={fr.cx("fr-input")}
-                    type="time"
-                    value={hours.start}
-                    max={hours.end}
-                    id={name + index + "-start"}
-                    onChange={(evt) =>
-                      onStartChange(index, evt.currentTarget.value)
-                    }
-                    disabled={disabled}
-                  />
-                  <ErrorMessage
-                    name={`hours.${index}.start`}
-                    as={"div"}
-                    className={cx("field-error")}
-                  />
-                </div>
-
-                <div className={cx("date-or-time-block")}>
-                  <label htmlFor={name + index + "-end"}>Fin</label>
-                  <input
-                    className={fr.cx("fr-input")}
-                    value={hours.end}
-                    onChange={(evt) =>
-                      onEndChange(index, evt.currentTarget.value)
-                    }
-                    id={name + index + "-end"}
-                    type="time"
-                    disabled={disabled}
-                  />
-                  <ErrorMessage
-                    name={`hours.${index}.end`}
-                    as="div"
-                    className={cx("field-error")}
-                  />
-                </div>
-
-                {!disabled && (
-                  <Button
-                    type="button"
-                    iconId="fr-icon-delete-bin-line"
-                    title="Supprimer"
-                    onClick={() => remove(index)}
-                  />
-                )}
-              </div>
-            </div>
-          );
-        })}
+        timePeriods.map((hours, index) => (
+          <TimePeriod
+            key={`${timePeriods[index].start}-${timePeriods[index].end}`}
+            hours={hours}
+            index={index}
+            timePeriods={timePeriods}
+            onValueChange={onValueChange}
+            name={name}
+            disabled={disabled}
+          />
+        ))}
       {!disabled && (
         <Button
           className={fr.cx("fr-my-2w")}
@@ -141,5 +73,101 @@ export const HourPicker = ({
         </Button>
       )}
     </>
+  );
+};
+
+const TimePeriod = ({
+  timePeriods,
+  onValueChange,
+  index,
+  hours,
+  name,
+  disabled,
+}: {
+  timePeriods: TimePeriodDto[];
+  onValueChange: (timePeriods: TimePeriodDto[]) => void;
+  index: number;
+  hours: TimePeriodDto;
+  name: string;
+  disabled?: boolean;
+}) => {
+  const { cx } = useStyles();
+  const [startHour, setStartHour] = useState(hours.start);
+  const [endHour, setEndHour] = useState(hours.end);
+  const onStartBlur = (index: number, value: string) => {
+    onValueChange(
+      replaceArrayElement(timePeriods, index, {
+        start: value,
+        end: timePeriods[index].end,
+      }),
+    );
+  };
+  const onEndBlur = (index: number, value: string) => {
+    timePeriods[index].end = value;
+    onValueChange(
+      replaceArrayElement(timePeriods, index, {
+        start: timePeriods[index].start,
+        end: value,
+      }),
+    );
+  };
+  const remove = (index: number) => {
+    onValueChange(removeAtIndex(timePeriods, index));
+  };
+  return (
+    <div className={cx(fr.cx("fr-mt-2w"), "schedule-picker__section")}>
+      <div className={cx("schedule-picker__row")}>
+        <div className={cx("date-or-time-block")}>
+          <Input
+            label="Début"
+            id={name + index + "-start"}
+            nativeInputProps={{
+              type: "time",
+              value: startHour,
+              onBlur: (event) => onStartBlur(index, event.currentTarget.value),
+              onChange: (event) => {
+                setStartHour(event.currentTarget.value);
+              },
+            }}
+            disabled={disabled}
+          />
+          <ErrorMessage
+            name={`hours.${index}.start`}
+            as={"div"}
+            className={cx("field-error")}
+          />
+        </div>
+
+        <div className={cx("date-or-time-block")}>
+          <Input
+            label="Fin"
+            id={name + index + "-end"}
+            nativeInputProps={{
+              type: "time",
+              value: endHour,
+              onBlur: (event) => onEndBlur(index, event.currentTarget.value),
+              onChange: (event) => {
+                setEndHour(event.currentTarget.value);
+              },
+            }}
+            disabled={disabled}
+          />
+          <ErrorMessage
+            name={`hours.${index}.end`}
+            as="div"
+            className={cx("field-error")}
+          />
+        </div>
+
+        {!disabled && (
+          <Button
+            type="button"
+            iconId="fr-icon-delete-bin-line"
+            title="Supprimer"
+            onClick={() => remove(index)}
+          />
+        )}
+      </div>
+    </div>
   );
 };

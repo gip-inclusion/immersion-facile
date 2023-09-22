@@ -300,10 +300,10 @@ export const RenewConventionForm = ({
           nativeInputProps={{
             ...methods.register("id"),
             readOnly: true,
-            value: defaultValues.id,
+            defaultValue: defaultValues.id,
           }}
         />
-        <ScheduleSection />
+        <ScheduleSection isManagedConventionPage />
         <Input
           label="Motif de renouvellement"
           textArea
