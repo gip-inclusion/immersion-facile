@@ -39,7 +39,7 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
   description: "a",
 };
 
-export const unauthorisedApiConsumer: ApiConsumer = {
+export const unauthorizedApiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
   consumer: "unauthorised consumer",
   contact: {

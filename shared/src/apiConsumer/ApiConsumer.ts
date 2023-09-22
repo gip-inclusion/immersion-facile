@@ -47,10 +47,10 @@ export type ApiConsumerRights = {
 };
 
 export type WebhookSubscription = SubscriptionParams & {
-  subscribedEvent: SubscriptionEvents;
+  subscribedEvent: SubscriptionEvent;
 };
 
-export type SubscriptionEvents = SubscriptionName<"convention", "updated">;
+export type SubscriptionEvent = SubscriptionName<"convention", "updated">;
 
 export type NoScope = "no-scope";
 
@@ -94,9 +94,9 @@ export type CallbackHeaders = {
 };
 
 export const eventToRightName = (
-  event: SubscriptionEvents,
+  event: SubscriptionEvent,
 ): ApiConsumerRightName => {
-  const strategy: Record<SubscriptionEvents, ApiConsumerRightName> = {
+  const strategy: Record<SubscriptionEvent, ApiConsumerRightName> = {
     "convention.updated": "convention",
   };
   return strategy[event];

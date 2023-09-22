@@ -14,7 +14,7 @@ import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
-  unauthorisedApiConsumer,
+  unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
@@ -28,7 +28,7 @@ describe("search-immersion route", () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
-      unauthorisedApiConsumer,
+      unauthorizedApiConsumer,
     ];
   });
 
@@ -49,7 +49,7 @@ describe("search-immersion route", () => {
           )
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: unauthorisedApiConsumer.id }),
+            generateApiConsumerJwt({ id: unauthorizedApiConsumer.id }),
           );
 
         expectToEqual(body, {

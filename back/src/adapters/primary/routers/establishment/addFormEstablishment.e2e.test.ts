@@ -16,7 +16,7 @@ import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplement
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
-  unauthorisedApiConsumer,
+  unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -35,7 +35,7 @@ describe("Add form establishment", () => {
       await buildTestApp());
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
-      unauthorisedApiConsumer,
+      unauthorizedApiConsumer,
       outdatedApiConsumer,
     ];
   });
@@ -211,7 +211,7 @@ describe("Add form establishment", () => {
           .post(consumerv1FormEstablishmentsRoute)
           .set(
             "Authorization",
-            generateApiConsumerJwt({ id: unauthorisedApiConsumer.id }),
+            generateApiConsumerJwt({ id: unauthorizedApiConsumer.id }),
           )
           .send({});
 

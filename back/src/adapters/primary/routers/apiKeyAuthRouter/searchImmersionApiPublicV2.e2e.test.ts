@@ -13,7 +13,7 @@ import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
-  unauthorisedApiConsumer,
+  unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
@@ -41,7 +41,7 @@ describe("search route", () => {
     inMemoryUow.romeRepository.appellations = [cartographeAppellationAndRome];
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
-      unauthorisedApiConsumer,
+      unauthorizedApiConsumer,
     ];
     sharedRequest = createSupertestSharedClient(
       publicApiV2SearchEstablishmentRoutes,
@@ -71,7 +71,7 @@ describe("search route", () => {
 
       it("rejects unauthorized consumer", async () => {
         const authToken = generateApiConsumerJwt({
-          id: unauthorisedApiConsumer.id,
+          id: unauthorizedApiConsumer.id,
         });
         const response = await sharedRequest.searchImmersion({
           headers: {
