@@ -113,11 +113,7 @@ export const ConventionDocumentPage = ({
             <ConventionRenewedInformations renewed={convention.renewed} />
           )}
 
-          <p>Identifiant de la convention: {convention.id}</p>
-
-          <h2 className={fr.cx("fr-h4")}>
-            Cette convention est établie entre :
-          </h2>
+          <h2 className={fr.cx("fr-h4")}>La convention est établie entre :</h2>
           <ul>
             <li>
               <strong>
@@ -180,6 +176,7 @@ export const ConventionDocumentPage = ({
                 </ul>
               </li>
             )}
+
             <li>
               <strong>{convention.agencyName}</strong>{" "}
               {agencyFeedback.kind === "success" && agencyInfo && (
@@ -190,6 +187,25 @@ export const ConventionDocumentPage = ({
               )}
             </li>
           </ul>
+          <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
+            Informations relatives à la convention
+          </h2>
+          <ul>
+            <li>
+              Identifiant de la convention : <strong>{convention.id}</strong>
+            </li>
+            {convention.validators?.agencyValidator && (
+              <li>
+                Validée par :{" "}
+                <strong>
+                  {convention.validators?.agencyValidator.firstname}{" "}
+                  {convention.validators?.agencyValidator.lastname}
+                </strong>{" "}
+                (conseiller valideur)
+              </li>
+            )}
+          </ul>
+
           <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
             Dispositions relatives aux conditions de réalisation{" "}
             {internshipKind === "immersion"
