@@ -25,7 +25,7 @@ export const SearchResultLabels = ({
     {fitForDisabledWorkers && (
       <li>
         <Label className={fr.cx("fr-badge--yellow-moutarde")}>
-          Priorité aux personnes en situation de handicap
+          Personnes en situation de handicap bienvenues
         </Label>
       </li>
     )}
