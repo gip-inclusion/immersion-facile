@@ -1,13 +1,13 @@
 import {
   ConventionDto,
   ConventionDtoBuilder,
-  conventionMagicLinkTargets,
+  conventionMagicLinkRoutes,
   ConventionStatus,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectsToMatch,
   expectToEqual,
-  unauthenticatedConventionTargets,
+  unauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
 } from "shared";
 import {
@@ -61,7 +61,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   convention: ConventionDto,
 ) => {
   await request
-    .post(unauthenticatedConventionTargets.createConvention.url)
+    .post(unauthenticatedConventionRoutes.createConvention.url)
     .send(convention)
     .expect(200);
 
@@ -122,7 +122,7 @@ const expectEstablishmentRequiresChanges = async (
 ) => {
   await request
     .post(
-      conventionMagicLinkTargets.updateConventionStatus.url.replace(
+      conventionMagicLinkRoutes.updateConventionStatus.url.replace(
         ":conventionId",
         params.conventionId,
       ),

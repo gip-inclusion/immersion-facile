@@ -358,9 +358,9 @@ const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatus
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z.union([
+    updateConventionStatusWithJustificationWhithoutModierRoleSchema,
     updateConventionStatusWithValidatorSchema,
     updateConventionStatusWithoutJustificationSchema,
-    updateConventionStatusWithJustificationWhithoutModierRoleSchema,
     updateConventionStatusWithJustificationWhithModierRoleSchema,
   ]);
 

@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import {
   agencyRoutes,
-  conventionMagicLinkTargets,
+  conventionMagicLinkRoutes,
   domElementIds,
   peParisAgencyId,
 } from "shared";
@@ -43,7 +43,7 @@ describe("Convention full workflow", () => {
   it("signs convention for first signatory and validator requires modification", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}${conventionMagicLinkTargets.updateConventionStatus.url.replace(
+      `${baseApiRoute}${conventionMagicLinkRoutes.updateConventionStatus.url.replace(
         ":conventionId",
         "**",
       )}`,
@@ -91,7 +91,7 @@ describe("Convention full workflow", () => {
   it("signs convention for signatories", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}${conventionMagicLinkTargets.signConvention.url.replace(
+      `${baseApiRoute}${conventionMagicLinkRoutes.signConvention.url.replace(
         ":conventionId",
         "**",
       )}`,
@@ -126,7 +126,7 @@ describe("Convention full workflow", () => {
   it("reviews and validate convention", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}${conventionMagicLinkTargets.updateConventionStatus.url.replace(
+      `${baseApiRoute}${conventionMagicLinkRoutes.updateConventionStatus.url.replace(
         ":conventionId",
         "**",
       )}`,
@@ -155,14 +155,14 @@ describe("Convention full workflow", () => {
 const signatorySignConvention = (magicLink) => {
   cy.intercept(
     "POST",
-    `${baseApiRoute}${conventionMagicLinkTargets.signConvention.url.replace(
+    `${baseApiRoute}${conventionMagicLinkRoutes.signConvention.url.replace(
       ":conventionId",
       "**",
     )}`,
   ).as("signConventionRequest");
   cy.intercept(
     "GET",
-    `${baseApiRoute}${conventionMagicLinkTargets.getConvention.url.replace(
+    `${baseApiRoute}${conventionMagicLinkRoutes.getConvention.url.replace(
       ":conventionId",
       "**",
     )}`,
@@ -189,7 +189,7 @@ const signatorySignConvention = (magicLink) => {
 const editConventionForm = (magicLinkUrl) => {
   cy.intercept(
     "POST",
-    `${baseApiRoute}${conventionMagicLinkTargets.updateConvention.url.replace(
+    `${baseApiRoute}${conventionMagicLinkRoutes.updateConvention.url.replace(
       ":conventionId",
       "**",
     )}`,

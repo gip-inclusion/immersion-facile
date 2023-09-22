@@ -3,23 +3,23 @@ import { fromPromise } from "rxjs/internal/observable/innerFrom";
 import {
   AbsoluteUrl,
   ConventionDto,
-  ConventionMagicLinkTargets,
+  ConventionMagicLinkRoutes,
   ConventionReadDto,
   ConventionSupportedJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
-  UnauthenticatedConventionTargets,
+  UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
   WithConventionIdLegacy,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 export class HttpConventionGateway implements ConventionGateway {
   constructor(
-    private readonly magicLinkHttpClient: HttpClient<ConventionMagicLinkTargets>,
-    private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionTargets>,
+    private readonly magicLinkHttpClient: HttpClient<ConventionMagicLinkRoutes>,
+    private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionRoutes>,
   ) {}
 
   public createConvention$(conventionDto: ConventionDto): Observable<void> {
@@ -36,7 +36,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .getConventionStatusDashboard({
           headers: { authorization: jwt },
         })
-        .then(({ responseBody }) => responseBody),
+        .then(({ body }) => body),
     );
   }
 
@@ -100,7 +100,7 @@ export class HttpConventionGateway implements ConventionGateway {
       .createConvention({
         body: conventionDto,
       })
-      .then(({ responseBody }) => responseBody.id);
+      .then(({ body }) => body.id);
   }
 
   #renewConvention(
@@ -123,7 +123,7 @@ export class HttpConventionGateway implements ConventionGateway {
         headers: { authorization: payload.jwt },
         urlParams: { conventionId: payload.conventionId },
       })
-      .then(({ responseBody }) => responseBody);
+      .then(({ body }) => body);
   }
 
   #signConvention(jwt: string): Promise<WithConventionIdLegacy> {
@@ -132,7 +132,7 @@ export class HttpConventionGateway implements ConventionGateway {
         headers: { authorization: jwt },
         urlParams: { conventionId: jwt }, // todo change this to conventionId,
       })
-      .then(({ responseBody }) => responseBody);
+      .then(({ body }) => body);
   }
 
   #updateConvention(convention: ConventionDto, jwt: string): Promise<string> {
@@ -142,7 +142,7 @@ export class HttpConventionGateway implements ConventionGateway {
         urlParams: { conventionId: convention.id },
         headers: { authorization: jwt },
       })
-      .then(({ responseBody }) => responseBody.id);
+      .then(({ body }) => body.id);
   }
 
   #updateStatus(
@@ -152,9 +152,8 @@ export class HttpConventionGateway implements ConventionGateway {
     return this.magicLinkHttpClient
       .updateConventionStatus({
         body: params,
-        urlParams: { conventionId: params.conventionId },
         headers: { authorization: jwt },
       })
-      .then(({ responseBody }) => responseBody);
+      .then(({ body }) => body);
   }
 }

@@ -2,14 +2,14 @@ import {
   addressTargets,
   adminRoutes,
   agencyRoutes,
-  conventionMagicLinkTargets,
+  conventionMagicLinkRoutes,
   createManagedAxiosInstance,
   establishmentTargets,
   inclusionConnectedAllowedTargets,
   openApiDocTargets,
   searchImmersionRoutes,
   siretTargets,
-  unauthenticatedConventionTargets,
+  unauthenticatedConventionRoutes,
   validateEmailsTargets,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
@@ -50,8 +50,8 @@ export const createHttpDependencies = (): Dependencies => {
       createHttpClient(establishmentTargets),
     ),
     conventionGateway: new HttpConventionGateway(
-      createHttpClient(conventionMagicLinkTargets),
-      createHttpClient(unauthenticatedConventionTargets),
+      createAxiosSharedClient(conventionMagicLinkRoutes, axiosOnSlashApi),
+      createAxiosSharedClient(unauthenticatedConventionRoutes, axiosOnSlashApi),
     ),
     immersionAssessmentGateway: new HttpImmersionAssessmentGateway(
       axiosOnSlashApi,
