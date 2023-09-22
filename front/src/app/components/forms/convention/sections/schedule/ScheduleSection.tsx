@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { addDays, addMonths, differenceInDays } from "date-fns";
+import { addMonths, differenceInDays } from "date-fns";
 import {
   ConventionReadDto,
   DateIntervalDto,
@@ -79,11 +79,11 @@ export const ScheduleSection = () => {
       differenceInDays(newDates.end, newDates.start) > 0;
 
     if (!isDateEndAfterDateStart && name === "dateStart") {
-      newDates.end = addDays(newDates.start, 1);
+      newDates.end = newDates.start;
     }
 
     if (!isDateEndAfterDateStart && name === "dateEnd") {
-      newDates.start = addDays(newDates.end, -1);
+      newDates.start = newDates.end;
     }
 
     if (
