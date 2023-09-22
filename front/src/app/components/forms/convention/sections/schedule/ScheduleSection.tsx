@@ -21,7 +21,13 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
 
-export const ScheduleSection = () => {
+type ScheduleSectionProps = {
+  isManagedConventionPage?: boolean;
+};
+
+export const ScheduleSection = ({
+  isManagedConventionPage,
+}: ScheduleSectionProps) => {
   const { setValue, watch, register, formState, reset } =
     useFormContext<
       Pick<
@@ -30,10 +36,10 @@ export const ScheduleSection = () => {
       >
     >();
   const values = watch();
+
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
-
   const [dateStartInputValue, setDateStartInputValue] = useState<string>(
     values.dateStart,
   );
@@ -116,7 +122,9 @@ export const ScheduleSection = () => {
   }, []);
 
   useEffect(() => {
-    resetSchedule();
+    setDateEndInputValue(values.dateEnd);
+    setDateStartInputValue(values.dateStart);
+    if (isManagedConventionPage) resetSchedule();
   }, [values.dateStart, values.dateEnd]);
 
   return (

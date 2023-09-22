@@ -29,9 +29,9 @@ export const SchedulePicker = ({
   const {
     setValue,
     formState: { errors },
-    getValues,
+    watch,
   } = useFormContext<ConventionReadDto>();
-  const values = getValues();
+  const values = watch();
   const onBoolRadioPickerChange = (isSimple: boolean): void => {
     const newScheduleValue = isSimple
       ? reasonableSchedule(interval, excludedDays, [])
