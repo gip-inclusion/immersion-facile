@@ -3,7 +3,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import {
   authorizedSubscriptionApiConsumer,
-  unauthorisedApiConsumer,
+  unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import { publicApiV2WebhooksRoutes } from "./publicApiV2.routes";
 
@@ -46,13 +46,13 @@ describe("Webhook routes", () => {
   it("rejects unauthenticated requests", async () => {
     const { request, generateApiConsumerJwt, inMemoryUow } =
       await buildTestApp();
-    inMemoryUow.apiConsumerRepository.consumers = [unauthorisedApiConsumer];
+    inMemoryUow.apiConsumerRepository.consumers = [unauthorizedApiConsumer];
     const sharedRequest = createSupertestSharedClient(
       publicApiV2WebhooksRoutes,
       request,
     );
     const authToken = generateApiConsumerJwt({
-      id: unauthorisedApiConsumer.id,
+      id: unauthorizedApiConsumer.id,
     });
 
     const response = await sharedRequest.subscribeToWebhook({

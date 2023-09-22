@@ -19,7 +19,7 @@ import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
-  unauthorisedApiConsumer,
+  unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import {
   TEST_POSITION,
@@ -64,7 +64,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       request,
     );
     inMemoryUow.apiConsumerRepository.consumers = [
-      unauthorisedApiConsumer,
+      unauthorizedApiConsumer,
       authorizedUnJeuneUneSolutionApiConsumer,
     ];
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
@@ -164,7 +164,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
 
   it("return 403 if forbidden", async () => {
     const authToken = generateApiConsumerJwt({
-      id: unauthorisedApiConsumer.id,
+      id: unauthorizedApiConsumer.id,
     });
 
     const response = await sharedRequest.getOfferBySiretAndAppellationCode({

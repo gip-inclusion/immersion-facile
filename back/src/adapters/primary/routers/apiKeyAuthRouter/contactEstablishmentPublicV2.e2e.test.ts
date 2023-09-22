@@ -12,7 +12,7 @@ import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
-  unauthorisedApiConsumer,
+  unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import { TEST_POSITION } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -50,7 +50,7 @@ describe("POST contact-establishment public V2 route", () => {
     ));
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
-      unauthorisedApiConsumer,
+      unauthorizedApiConsumer,
     ];
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
@@ -94,7 +94,7 @@ describe("POST contact-establishment public V2 route", () => {
     const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
         authorization: generateApiConsumerJwt({
-          id: unauthorisedApiConsumer.id,
+          id: unauthorizedApiConsumer.id,
         }),
       },
       body: contactEstablishment,
