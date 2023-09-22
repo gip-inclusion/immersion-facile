@@ -2,7 +2,7 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { Route } from "type-route";
-import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
+import { LayoutHeader } from "src/app/components/layout/LayoutHeader";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
@@ -69,7 +69,7 @@ export const AdminPage = ({
   const tabs = getAdminTabs(currentTab);
   return (
     <>
-      <ImmersionHeader />
+      <LayoutHeader />
       <div className={fr.cx("fr-container")}>
         <div
           className={fr.cx(

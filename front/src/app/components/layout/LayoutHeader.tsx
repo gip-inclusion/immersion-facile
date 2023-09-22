@@ -20,11 +20,11 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
 
-export const ImmersionHeader = () => {
+export const LayoutHeader = () => {
   const dispatch = useDispatch();
   const currentRoute = useRoute();
   const darkModeState = useIsDark();
-  const { classes } = makeStyles({ name: ImmersionHeader.displayName })(() => ({
+  const { classes } = makeStyles({ name: LayoutHeader.displayName })(() => ({
     operator: {
       boxSizing: "content-box",
       width: window.matchMedia(fr.breakpoints.up("md").replace("@media ", ""))
@@ -242,4 +242,4 @@ export const ImmersionHeader = () => {
   );
 };
 
-ImmersionHeader.displayName = "ImmersionHeader";
+LayoutHeader.displayName = "LayoutHeader";
