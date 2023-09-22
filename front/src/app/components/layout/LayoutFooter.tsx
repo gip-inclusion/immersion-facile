@@ -38,7 +38,7 @@ export const MinistereLogo = () => (
 const PartnersLogos = () => {
   const { cx } = useStyles();
   const darkModeState = useIsDark();
-  const { classes } = makeStyles({ name: ImmersionFooter.displayName })(() => ({
+  const { classes } = makeStyles({ name: LayoutFooter.displayName })(() => ({
     partnerLogo: {
       filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
     },
@@ -182,7 +182,7 @@ const bottomsLinks: NavLink[] = [
   },
 ];
 
-export const ImmersionFooter = () => (
+export const LayoutFooter = () => (
   <>
     <OverFooter cols={overFooterCols} />
     <Footer
@@ -194,4 +194,4 @@ export const ImmersionFooter = () => (
   </>
 );
 
-ImmersionFooter.displayName = "ImmersionFooter";
+LayoutFooter.displayName = "LayoutFooter";

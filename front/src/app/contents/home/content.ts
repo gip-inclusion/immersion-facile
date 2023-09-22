@@ -172,6 +172,13 @@ export const heroHeaderNavCards: (
         },
       },
     },
+    {
+      title: "Piloter mon organisme",
+      icon: "fr-icon-line-chart-line",
+      type: "agency",
+      id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
+      link: routes.agencyDashboard().link,
+    },
   ],
 });
 export const sectionStatsData: Record<UserType, Stat[]> = {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fr } from "@codegouvfr/react-dsfr";
+import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { Link } from "type-route";
 import "./HeroHeader.scss";
@@ -20,7 +20,7 @@ export type HeroHeaderProps = {
 };
 export type HeroHeaderNavCard = {
   title: string;
-  icon?: string;
+  icon?: FrIconClassName;
   overtitle?: string;
   type: UserType;
   link?: Link;
