@@ -22,14 +22,15 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     welcome:
       internshipKind === "immersion" ? (
         <>
-          <strong>Bravo !</strong>
           <p className="fr-text">
-            Vous avez trouvé votre entreprise accueillante. Complétez ce
-            formulaire avec votre entreprise accueillante et initiez une
-            convention pour réaliser votre immersion professionnelle.
+            <strong>
+              Bravo, la mise en relation entre candidat et entreprise s’est bien
+              passée !
+            </strong>
           </p>
-          <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
-            Ce formulaire vaut équivalence du CERFA 13912 * 04
+          <p className="fr-text">
+            Complétez ce formulaire pour réaliser votre immersion
+            professionnelle. <br /> Il vaut équivalence du CERFA 13912 * 04.
           </p>
         </>
       ) : (

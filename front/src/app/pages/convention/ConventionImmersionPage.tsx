@@ -43,7 +43,7 @@ export const ConventionImmersionPage = ({
                 ? t.intro.conventionSummaryTitle
                 : t.intro.conventionTitle
             }
-            theme="candidate"
+            theme="default"
           />
         }
       >
