@@ -15,7 +15,7 @@ export const ConventionMiniStagePage = () => {
     <MainWrapper
       layout={"default"}
       pageHeader={
-        <PageHeader title={t.intro.conventionTitle} theme="candidate" />
+        <PageHeader title={t.intro.conventionTitle} theme="default" />
       }
     >
       <ConventionForm internshipKind="mini-stage-cci" mode="create" />
