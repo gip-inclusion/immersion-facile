@@ -72,7 +72,7 @@ export * from "./routes/addressRoutes";
 export * from "./routes/agencyRoutes";
 export * from "./routes/establishementTargets";
 export * from "./routes/routes";
-export * from "./routes/siretTargets";
+export * from "./routes/siret.routes";
 export * from "./routes/technicalRoutes";
 export * from "./schedule/Schedule.dto";
 export * from "./schedule/Schedule.schema";

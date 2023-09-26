@@ -7,7 +7,7 @@ import {
   establishmentTargets,
   inclusionConnectedAllowedTargets,
   searchImmersionRoutes,
-  siretTargets,
+  siretRoutes,
   technicalRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
@@ -60,7 +60,7 @@ export const createHttpDependencies = (): Dependencies => {
     ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(
-      createHttpClient(siretTargets),
+      createAxiosSharedClient(siretRoutes, axiosOnSlashApi),
     ),
     technicalGateway: new HttpTechnicalGateway(
       createAxiosSharedClient(technicalRoutes, axiosOnSlashApi),

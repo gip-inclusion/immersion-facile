@@ -3,8 +3,9 @@ import {
   appellationRoute,
   romeAutocompleteInputSchema,
   romeRoute,
-  siretTargets,
+  siretRoutes,
 } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { validateAndParseZodSchema } from "../../helpers/httpErrors";
@@ -13,9 +14,9 @@ import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 const logger = createLogger(__filename);
 
 export const createFormCompletionRouter = (deps: AppDependencies) => {
-  const formCompletionRouter = Router();
+  const expressFormCompletionRouter = Router();
 
-  formCompletionRouter
+  expressFormCompletionRouter
     .route(`/${appellationRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
@@ -23,7 +24,7 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
       ),
     );
 
-  formCompletionRouter.route(`/${romeRoute}`).get(async (req, res) =>
+  expressFormCompletionRouter.route(`/${romeRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
       const query = validateAndParseZodSchema(
         romeAutocompleteInputSchema,
@@ -34,21 +35,22 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
     }),
   );
 
-  formCompletionRouter
-    .route(siretTargets.getSiretInfo.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getSiret.execute(req.params),
-      ),
-    );
+  const sharedFormCompletionRouter = createExpressSharedRouter(
+    siretRoutes,
+    expressFormCompletionRouter,
+  );
 
-  formCompletionRouter
-    .route(siretTargets.getSiretInfoIfNotAlreadySaved.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.getSiretIfNotAlreadySaved.execute(req.params),
-      ),
-    );
+  sharedFormCompletionRouter.getSiretInfo((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getSiret.execute(req.params),
+    ),
+  );
 
-  return formCompletionRouter;
+  sharedFormCompletionRouter.getSiretInfoIfNotAlreadySaved((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getSiretIfNotAlreadySaved.execute(req.params),
+    ),
+  );
+
+  return expressFormCompletionRouter;
 };

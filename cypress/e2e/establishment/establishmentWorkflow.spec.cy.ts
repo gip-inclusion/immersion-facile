@@ -4,7 +4,7 @@ import {
   appellationRoute,
   domElementIds,
   featureFlagsRoute,
-  siretTargets,
+  siretRoutes,
   establishmentTargets,
   frontRoutes,
   immersionOffersRoute,
@@ -22,7 +22,7 @@ describe("Establishment creation and modification workflow", () => {
 
     cy.intercept(
       "GET",
-      `${baseApiRoute}${siretTargets.getSiretInfoIfNotAlreadySaved.url.replace(
+      `${baseApiRoute}${siretRoutes.getSiretInfoIfNotAlreadySaved.url.replace(
         ":siret",
         providedSiret,
       )}`,
@@ -123,7 +123,7 @@ describe("Establishment creation and modification workflow", () => {
   it("modifies an existing establishment", () => {
     cy.intercept(
       "GET",
-      `${baseApiRoute}${siretTargets.getSiretInfoIfNotAlreadySaved.url.replace(
+      `${baseApiRoute}${siretRoutes.getSiretInfoIfNotAlreadySaved.url.replace(
         ":siret",
         providedSiret,
       )}`,

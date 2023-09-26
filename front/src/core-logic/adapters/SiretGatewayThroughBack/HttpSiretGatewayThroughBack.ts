@@ -6,21 +6,20 @@ import {
   siretApiMissingEstablishmentMessage,
   siretApiUnavailableSiretErrorMessage,
   SiretDto,
-  SiretTargets,
+  SiretRoutes,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient, HttpResponse } from "shared-routes";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
-  constructor(private readonly httpClient: HttpClient<SiretTargets>) {}
+  constructor(private readonly httpClient: HttpClient<SiretRoutes>) {}
 
-  // public isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {}
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
     return from(
       this.httpClient
         .getSiretInfo({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody)
+        .then(getBodyIfStatus200ElseThrow)
         .catch(handleSiretApiError),
     );
   }
@@ -31,7 +30,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .getSiretInfoIfNotAlreadySaved({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody)
+        .then(getBodyIfStatus200ElseThrow)
         .catch(handleSiretApiError),
     );
   }
@@ -40,10 +39,19 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .isSiretAlreadySaved({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody),
+        .then(getBodyIfStatus200ElseThrow),
     );
   }
 }
+
+const getBodyIfStatus200ElseThrow = <R extends HttpResponse<number, unknown>>(
+  response: R,
+): R["status"] extends 200 ? R["body"] : never => {
+  if (response.status !== 200)
+    throw new Error("Une erreur non managée est survenue (pas dans le catch)");
+
+  return response.body as any;
+};
 
 const errorMessageByCode: Partial<Record<number, GetSiretInfoError>> = {
   [429]: tooManiSirenRequestsSiretErrorMessage,

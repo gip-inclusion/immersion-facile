@@ -1,23 +1,31 @@
 import { SuperTest, Test } from "supertest";
-import { siretTargets } from "shared";
+import { expectHttpResponseToEqual, SiretRoutes, siretRoutes } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("route to check if a form's siret already exists", () => {
-  let request: SuperTest<Test>;
+  let httpClient: HttpClient<SiretRoutes>;
   let inMemoryUow: InMemoryUnitOfWork;
   const siret = "11111111111111";
 
   beforeEach(async () => {
+    let request: SuperTest<Test>;
     ({ request, inMemoryUow } = await buildTestApp());
+    httpClient = createSupertestSharedClient(siretRoutes, request);
   });
 
   it("Returns false if the siret does not exist", async () => {
-    await request
-      .get(siretTargets.isSiretAlreadySaved.url)
-      .expect(200, "false");
+    const response = await httpClient.isSiretAlreadySaved({
+      urlParams: { siret: "11112222333344" },
+    });
+    expectHttpResponseToEqual(response, {
+      status: 200,
+      body: false,
+    });
   });
 
   it("Returns true if the siret exists", async () => {
@@ -30,8 +38,14 @@ describe("route to check if a form's siret already exists", () => {
           .build(),
       ],
     );
-    await request
-      .get(siretTargets.isSiretAlreadySaved.url.replace(":siret", siret))
-      .expect(200, "true");
+
+    const response = await httpClient.isSiretAlreadySaved({
+      urlParams: { siret },
+    });
+
+    expectHttpResponseToEqual(response, {
+      status: 200,
+      body: true,
+    });
   });
 });
