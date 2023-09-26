@@ -3,29 +3,33 @@ import {
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   establishmentTargets,
-  siretTargets,
+  siretRoutes,
 } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
 export const createEstablishmentRouter = (deps: AppDependencies) => {
   const establishmentRouter = Router({ mergeParams: true });
 
+  const sharedSiretRouter = createExpressSharedRouter(
+    siretRoutes,
+    establishmentRouter,
+  );
+
+  sharedSiretRouter.isSiretAlreadySaved((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.isFormEstablishmentWithSiretAlreadySaved.execute(
+        req.params.siret,
+      ),
+    ),
+  );
+
   establishmentRouter
     .route(establishmentTargets.addFormEstablishment.url)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.addFormEstablishment.execute(req.body),
-      ),
-    );
-
-  establishmentRouter
-    .route(siretTargets.isSiretAlreadySaved.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.isFormEstablishmentWithSiretAlreadySaved.execute(
-          req.params.siret,
-        ),
       ),
     );
 
