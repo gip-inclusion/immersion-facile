@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { addMonths, differenceInDays } from "date-fns";
+import { addDays, addMonths, differenceInDays } from "date-fns";
 import {
   ConventionReadDto,
   DateIntervalDto,
@@ -21,13 +21,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
 
-type ScheduleSectionProps = {
-  isManagedConventionPage?: boolean;
-};
-
-export const ScheduleSection = ({
-  isManagedConventionPage,
-}: ScheduleSectionProps) => {
+export const ScheduleSection = () => {
   const { setValue, watch, register, formState, reset } =
     useFormContext<
       Pick<
@@ -103,18 +97,17 @@ export const ScheduleSection = ({
           values.internshipKind === "immersion" ? "immersion" : "stage"
         } ne peut pas dépasser ${
           maximumCalendarDayByInternshipKind[values.internshipKind]
-        } jours. Veuillez modifier les dates de votre ${
-          values.internshipKind === "immersion" ? "immersion" : "stage"
-        }.`,
+        } jours. Nous avons donc ajusté la date de fin.`,
       );
-      return;
+      newDates.end = addDays(
+        newDates.start,
+        maximumCalendarDayByInternshipKind[values.internshipKind],
+      );
     }
 
     setDateMax(addMonths(newDates.start, 1).toISOString());
     setValue("dateEnd", newDates.end.toISOString());
     setValue("dateStart", newDates.start.toISOString());
-    setDateStartInputValue(newDates.start.toISOString());
-    setDateEndInputValue(newDates.end.toISOString());
   };
 
   useEffect(() => {
@@ -124,7 +117,7 @@ export const ScheduleSection = ({
   useEffect(() => {
     setDateEndInputValue(values.dateEnd);
     setDateStartInputValue(values.dateStart);
-    if (isManagedConventionPage) resetSchedule();
+    resetSchedule();
   }, [values.dateStart, values.dateEnd]);
 
   return (
@@ -164,6 +157,7 @@ export const ScheduleSection = ({
             }
           },
           onBlur: onDateInputBlur,
+          min: toDateString(new Date("2000-01-01")),
           type: "date",
         }}
         {...getFieldError("dateStart")}
@@ -181,7 +175,7 @@ export const ScheduleSection = ({
             }
           },
           type: "date",
-          max: dateMax,
+          max: toDateString(new Date(dateMax)),
           value: toDateString(new Date(dateEndInputValue)),
           onBlur: onDateInputBlur,
         }}

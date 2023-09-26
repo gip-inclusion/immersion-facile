@@ -62,6 +62,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             selectedDays={selectedDaysFromComplexSchedule(
               values.schedule.complexSchedule,
             )}
+            internshipKind={values.internshipKind}
             onValueChange={(newSelectedDays: SelectedDaysOfTheWeekDto) => {
               const newSchedule = new ScheduleDtoBuilder(values.schedule)
                 .withDateInterval(props.interval)
@@ -104,7 +105,6 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
               setValue(name, schedule, {
                 shouldValidate: true,
               });
-              //setSelectedHours(newHours);
             }}
             disabled={props.disabled}
           />

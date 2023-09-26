@@ -7,6 +7,8 @@ import {
   arrayFromNumber,
   DateIntervalDto,
   frenchDayMapping,
+  InternshipKind,
+  maximumCalendarDayByInternshipKind,
   removeAtIndex,
   SelectedDaysOfTheWeekDto,
   WeekdayNumber,
@@ -20,6 +22,7 @@ type WeekdayPickerProps = {
   disabled?: boolean;
   interval: DateIntervalDto;
   availableWeekDays: Array<string>;
+  internshipKind: InternshipKind;
 };
 
 export const WeekdayPicker = ({
@@ -27,6 +30,7 @@ export const WeekdayPicker = ({
   availableWeekDays,
   selectedDays,
   interval,
+  internshipKind,
 }: WeekdayPickerProps) => {
   const { cx } = useStyles();
   const onDayClick = (day: WeekdayNumber) => {
@@ -39,8 +43,11 @@ export const WeekdayPicker = ({
     day: WeekdayNumber,
     { start, end }: DateIntervalDto,
   ) => {
+    const startEndDiff = differenceInDays(end, start);
+    if (startEndDiff > maximumCalendarDayByInternshipKind[internshipKind])
+      return false;
     const uniqueWeekDaysOnInterval = uniq(
-      arrayFromNumber(differenceInDays(end, start) + 1).map(
+      arrayFromNumber(startEndDiff + 1).map(
         (dayIndex) =>
           frenchDayMapping(addDays(new Date(start), dayIndex).toISOString())
             .frenchDay,

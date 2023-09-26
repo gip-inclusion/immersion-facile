@@ -303,7 +303,7 @@ export const RenewConventionForm = ({
             defaultValue: defaultValues.id,
           }}
         />
-        <ScheduleSection isManagedConventionPage />
+        <ScheduleSection />
         <Input
           label="Motif de renouvellement"
           textArea
