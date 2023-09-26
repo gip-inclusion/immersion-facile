@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
@@ -15,7 +15,6 @@ import {
   ScheduleDtoBuilder,
   selectedDaysFromComplexSchedule,
   SelectedDaysOfTheWeekDto,
-  TimePeriodsDto,
 } from "shared";
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotalWeeklylHoursIndicator";
@@ -31,7 +30,6 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const { setValue, getValues } = useFormContext<ConventionReadDto>();
   const values = getValues();
-  const [selectedHours, setSelectedHours] = useState<TimePeriodsDto>([]);
   const cciWeekDays = ["L", "M", "M", "J", "V", "S"];
   const immersionWeekDays = ["L", "M", "M", "J", "V", "S", "D"];
   const availableWeekDays =
@@ -39,11 +37,9 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
       ? cciWeekDays
       : immersionWeekDays;
 
-  useEffect(() => {
-    setSelectedHours(
-      regularTimePeriods(values.schedule.complexSchedule[0]?.timePeriods),
-    );
-  }, [values.schedule.complexSchedule[0]?.timePeriods]);
+  const selectedHours = regularTimePeriods(
+    values.schedule.complexSchedule[0]?.timePeriods,
+  );
 
   return (
     <>
@@ -108,7 +104,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
               setValue(name, schedule, {
                 shouldValidate: true,
               });
-              setSelectedHours(newHours);
+              //setSelectedHours(newHours);
             }}
             disabled={props.disabled}
           />
