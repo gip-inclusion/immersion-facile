@@ -382,12 +382,16 @@ export const calculateWeeklyHoursFromSchedule = (
 export const calculateWeeklyHours = (
   week: WeeklyImmersionTimetableDto,
 ): number =>
-  week.reduce(
-    (previousValue, currentDay) =>
-      currentDay.timePeriods
-        ? previousValue + minutesInDay(currentDay.timePeriods) / 60
-        : previousValue,
-    0,
+  parseFloat(
+    week
+      .reduce(
+        (previousValue, currentDay) =>
+          currentDay.timePeriods
+            ? previousValue + minutesInDay(currentDay.timePeriods) / 60
+            : previousValue,
+        0,
+      )
+      .toFixed(1),
   );
 
 export const defaultTimePeriods: TimePeriodsDto = [
@@ -402,9 +406,9 @@ export const defaultTimePeriods: TimePeriodsDto = [
 ];
 
 export const regularTimePeriods = (
-  timePeriods: TimePeriodsDto,
+  timePeriods: TimePeriodsDto | undefined,
 ): TimePeriodsDto =>
-  timePeriods.length > 0 ? timePeriods : defaultTimePeriods;
+  timePeriods && timePeriods.length > 0 ? timePeriods : defaultTimePeriods;
 
 export const emptySchedule = (
   interval: DateIntervalDto,
