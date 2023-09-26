@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { Request, Response } from "express";
 import { HttpError } from "./httpErrors";
 import { unhandledError } from "./unhandledError";
@@ -12,9 +13,13 @@ export const handleHttpJsonResponseError = (
   res: Response,
   error: any,
 ): Response<any, Record<string, any>> => {
-  if (!isManagedError(error)) return unhandledError(error, req, res);
+  if (!isManagedError(error)) {
+    Sentry.captureException(error);
+    return unhandledError(error, req, res);
+  }
 
   if (error instanceof HttpError) {
+    Sentry.captureException(error);
     res.status(error.httpCode);
     return res.json({ errors: toValidJSONObjectOrString(error) });
   }
