@@ -128,6 +128,7 @@ const TimePeriod = ({
               onChange: (event) => {
                 setStartHour(event.currentTarget.value);
               },
+              tabIndex: 0,
             }}
             disabled={disabled}
           />
@@ -145,6 +146,7 @@ const TimePeriod = ({
             nativeInputProps={{
               type: "time",
               value: endHour,
+              tabIndex: 0,
               onBlur: (event) => onEndBlur(index, event.currentTarget.value),
               onChange: (event) => {
                 setEndHour(event.currentTarget.value);
