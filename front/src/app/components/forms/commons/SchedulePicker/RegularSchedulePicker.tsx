@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
@@ -31,15 +31,19 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const { setValue, getValues } = useFormContext<ConventionReadDto>();
   const values = getValues();
-  const [selectedHours, setSelectedHours] = useState<TimePeriodsDto>(
-    regularTimePeriods(values.schedule.complexSchedule[0]?.timePeriods ?? []),
-  );
+  const [selectedHours, setSelectedHours] = useState<TimePeriodsDto>([]);
   const cciWeekDays = ["L", "M", "M", "J", "V", "S"];
   const immersionWeekDays = ["L", "M", "M", "J", "V", "S", "D"];
   const availableWeekDays =
     values.internshipKind === "mini-stage-cci"
       ? cciWeekDays
       : immersionWeekDays;
+
+  useEffect(() => {
+    setSelectedHours(
+      regularTimePeriods(values.schedule.complexSchedule[0]?.timePeriods),
+    );
+  }, [values.schedule.complexSchedule[0]?.timePeriods]);
 
   return (
     <>
