@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build backend
-        run: pnpm back build
+        run: pnpm back build ${{ inputs.tag }}
       - name: Archive build
         uses: actions/upload-artifact@v3
         with:

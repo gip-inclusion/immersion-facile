@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { createLogger } from "../../../utils/logger";
 import {
   startPeriodicNodeProcessReport,
@@ -5,6 +6,7 @@ import {
 } from "../../../utils/nodeProcessReport";
 import { AppConfig } from "../config/appConfig";
 import { createApp } from "../server";
+import { version } from "./version";
 
 const logger = createLogger(__filename);
 
@@ -14,6 +16,16 @@ const getPort = (): number => {
 };
 
 const appConfig = AppConfig.createFromEnv();
+
+const configureSentry = (appConfig: AppConfig) => {
+  Sentry.init({
+    dsn: "https://5e4e6bbc93a34f3fa4a05aed8373dfe7@sentry.gip-inclusion.cloud-ed.fr/6",
+    integrations: [],
+    release: version,
+    environment: appConfig.envType,
+    tracesSampleRate: 1,
+  });
+};
 
 createApp(appConfig).then(
   ({ app, gateways }) => {
@@ -40,6 +52,8 @@ createApp(appConfig).then(
         maxSampleSize,
       );
     });
+
+    configureSentry(appConfig);
   },
   (error: any) => {
     logger.error(error, `Server start failed`);

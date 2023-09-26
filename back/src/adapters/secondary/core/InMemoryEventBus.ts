@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
 import { DateIsoString } from "shared";
 import {
@@ -187,6 +188,7 @@ const makeExecuteCbMatchingSubscriptionId =
     try {
       await cb(event);
     } catch (error: any) {
+      Sentry.captureException(error);
       monitorErrorInCallback(error, event);
       if (throwOnPublishFailure) {
         throw new Error(
