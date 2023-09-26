@@ -55,13 +55,6 @@ export class SearchImmersion extends TransactionalUseCase<
       romeCode: rome,
     };
 
-    await uow.searchMadeRepository.insertSearchMade({
-      ...searchMade,
-      id: this.uuidGenerator.new(),
-      needsToBeSearched: true,
-      apiConsumerName: apiConsumer?.consumer,
-    });
-
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
       uow.establishmentAggregateRepository.searchImmersionResults({
         searchMade,
@@ -71,6 +64,17 @@ export class SearchImmersion extends TransactionalUseCase<
         ? this.#searchOnLbb(uow, { appellationCode, lat, lon, distanceKm })
         : Promise.resolve([]),
     ]);
+
+    await uow.searchMadeRepository.insertSearchMade({
+      ...searchMade,
+      id: this.uuidGenerator.new(),
+      needsToBeSearched: true,
+      apiConsumerName: apiConsumer?.consumer,
+      numberOfResults:
+        voluntaryToImmersion !== false
+          ? repositorySearchResults.length
+          : lbbSearchResults.length,
+    });
 
     return [
       ...(voluntaryToImmersion !== false

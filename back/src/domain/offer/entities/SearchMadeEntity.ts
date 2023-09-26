@@ -17,4 +17,5 @@ export type SearchMadeEntity = {
   id: SearchMadeId;
   needsToBeSearched: boolean;
   apiConsumerName?: ApiConsumerName;
+  numberOfResults: number;
 } & SearchMade;
