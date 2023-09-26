@@ -75,11 +75,10 @@ describe("SearchImmersionUseCase", () => {
       laBonneBoiteGateway,
       uuidGenerator,
     );
+    uuidGenerator.setNextUuid("searchMadeUuid");
   });
 
   it("stores searches made", async () => {
-    uuidGenerator.setNextUuid("searchMadeUuid");
-
     await searchImmersionUseCase.execute(searchSecretariatInMetzRequestDto);
 
     expectToEqual(uow.searchMadeRepository.searchesMade, [
@@ -91,6 +90,7 @@ describe("SearchImmersionUseCase", () => {
         distanceKm: searchInMetzParams.distanceKm,
         needsToBeSearched: true,
         sortedBy: "distance",
+        numberOfResults: 0,
       },
     ]);
   });
@@ -115,9 +115,21 @@ describe("SearchImmersionUseCase", () => {
         606885,
       ),
     ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCode: undefined,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 2,
+      },
+    ]);
   });
 
-  it("gets both form and LBB establishments if voluntaryToImmersion is not provided", async () => {
+  it("gets both search results and LBB results if voluntaryToImmersion is not provided", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
     ];
@@ -137,9 +149,21 @@ describe("SearchImmersionUseCase", () => {
       ),
       lbbToSearchResult(lbbCompanyVO),
     ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCode: secretariatOffer.appellationCode,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 1,
+      },
+    ]);
   });
 
-  it("gets only form establishments if voluntaryToImmersion is true", async () => {
+  it("gets only search results if voluntaryToImmersion is true", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
     ];
@@ -163,9 +187,21 @@ describe("SearchImmersionUseCase", () => {
         606885,
       ),
     ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 2,
+        voluntaryToImmersion: true,
+      },
+    ]);
   });
 
-  it("gets only the closest LBB establishments if voluntaryToImmersion is false, and do not query results from DB", async () => {
+  it("gets only the closest LBB results if voluntaryToImmersion is false, and do not query results from DB", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
     ];
@@ -211,9 +247,23 @@ describe("SearchImmersionUseCase", () => {
       lbbToSearchResult(companyInRange),
       lbbToSearchResult(companyJustInRange),
     ]);
+
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCode: secretariatOffer.appellationCode,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: range,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 2,
+        voluntaryToImmersion: false,
+      },
+    ]);
   });
 
-  it("gets only the form result if a company with same siret is also in LBB results", async () => {
+  it("dedpulicate results if a company with same siret is both in search results and LBB results", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
     ];
@@ -229,6 +279,7 @@ describe("SearchImmersionUseCase", () => {
       ...searchInMetzParams,
       appellationCode: secretariatOffer.appellationCode,
       sortedBy: "distance",
+      voluntaryToImmersion: undefined,
     });
 
     expectToEqual(response, [
@@ -238,9 +289,60 @@ describe("SearchImmersionUseCase", () => {
         606885,
       ),
     ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCode: secretariatOffer.appellationCode,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 1,
+      },
+    ]);
   });
 
-  it("gets only the form result if a company with same siret is also in LBB results even if establishement was previously deleted", async () => {
+  it("stores only the number of search results from our db when searching without specifying voluntary_to_immersion", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+
+    laBonneBoiteGateway.setNextResults([
+      new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret("33330000000033")
+        .withRome(secretariatOffer.romeCode)
+        .withDistanceKm(5)
+        .build(),
+      new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret("33330000000022")
+        .withRome(secretariatOffer.romeCode)
+        .withDistanceKm(5)
+        .build(),
+    ]);
+
+    await searchImmersionUseCase.execute({
+      ...searchInMetzParams,
+      appellationCode: secretariatOffer.appellationCode,
+      sortedBy: "distance",
+      voluntaryToImmersion: undefined,
+    });
+
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCode: secretariatOffer.appellationCode,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 1,
+      },
+    ]);
+  });
+
+  it("gets only the search results if a company with same siret is also in LBB results even if establishement was previously deleted", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
     ];
@@ -272,6 +374,18 @@ describe("SearchImmersionUseCase", () => {
         606885,
       ),
     ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCode: secretariatOffer.appellationCode,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 1,
+      },
+    ]);
   });
 
   describe("No result when a company is one internal & LBB results and the company is not searchable", () => {
@@ -291,6 +405,26 @@ describe("SearchImmersionUseCase", () => {
           .withSiret(notSearchableEstablishment.establishment.siret)
           .withRome(secretariatOffer.romeCode)
           .build(),
+      ]);
+    });
+
+    it("should only record number of internal search results", async () => {
+      await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        appellationCode: secretariatOffer.appellationCode,
+        sortedBy: "distance",
+      });
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          id: "searchMadeUuid",
+          appellationCode: secretariatOffer.appellationCode,
+          lon: searchInMetzParams.longitude,
+          lat: searchInMetzParams.latitude,
+          distanceKm: searchInMetzParams.distanceKm,
+          needsToBeSearched: true,
+          sortedBy: "distance",
+          numberOfResults: 1,
+        },
       ]);
     });
 

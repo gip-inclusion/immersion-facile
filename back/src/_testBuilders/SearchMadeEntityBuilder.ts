@@ -11,6 +11,7 @@ const validSearchMadeEntity: SearchMadeEntity = {
   lon: 6.17602,
   needsToBeSearched: false,
   sortedBy: "distance",
+  numberOfResults: 1,
 };
 
 export class SearchMadeEntityBuilder implements Builder<SearchMadeEntity> {

@@ -35,6 +35,7 @@ describe("PgSearchesMadeRepository", () => {
       sortedBy: "distance",
       place: "Nantes",
       voluntaryToImmersion: true,
+      numberOfResults: 1,
     };
     await pgSearchesMadeRepository.insertSearchMade(searchMade);
     const retrievedSearchMade = await getSearchMadeById(searchMade.id);
@@ -59,6 +60,7 @@ describe("PgSearchesMadeRepository", () => {
       needsToBeSearched: res.rows[0].needstobesearched,
       appellationCode: optional(res.rows[0].appellation_code),
       apiConsumerName: optional(res.rows[0].api_consumer_name),
+      numberOfResults: optional(res.rows[0].number_of_results),
     };
   };
 });
