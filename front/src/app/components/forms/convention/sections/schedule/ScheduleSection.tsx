@@ -157,7 +157,7 @@ export const ScheduleSection = () => {
             }
           },
           onBlur: onDateInputBlur,
-          min: toDateString(new Date("2000-01-01")),
+          min: toDateString(new Date("2022-01-01")),
           type: "date",
         }}
         {...getFieldError("dateStart")}
