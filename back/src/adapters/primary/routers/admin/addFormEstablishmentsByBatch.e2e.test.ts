@@ -30,7 +30,7 @@ describe("POST /add-form-establishment-batch", () => {
 
     ({ request, gateways } = await buildTestApp(appConfig));
 
-    gateways.timeGateway.setNextDate(new Date());
+    gateways.timeGateway.defaultDate = new Date();
 
     const response = await request
       .post("/admin/login")

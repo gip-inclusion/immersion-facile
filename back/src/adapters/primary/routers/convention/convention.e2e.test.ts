@@ -83,7 +83,7 @@ describe("convention e2e", () => {
       request,
     );
 
-    gateways.timeGateway.setNextDate(new Date());
+    gateways.timeGateway.defaultDate = new Date();
   });
 
   describe(`${displayRouteName(

@@ -46,12 +46,12 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   public async getAll(): Promise<ApiConsumer[]> {
     const result = await this.client.query(`SELECT ${jsonBuildQuery}
         FROM api_consumers c
-        left join api_consumers_subscriptions s on s.consumer_id = c.id
+        LEFT JOIN api_consumers_subscriptions s on s.consumer_id = c.id
         GROUP BY c.id`);
     return result.rows.map((rawPg) => {
       const pgApiConsumer =
         "raw_api_consumer" in rawPg ? rawPg.raw_api_consumer : rawPg;
-      return pgApiConsumer;
+      return this.#rawPgToApiConsumer(pgApiConsumer);
     });
   }
 
@@ -59,7 +59,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     const result = await this.client.query(
       `SELECT ${jsonBuildQuery}
       FROM api_consumers c
-      left join api_consumers_subscriptions s on s.consumer_id = c.id
+      LEFT JOIN api_consumers_subscriptions s on s.consumer_id = c.id
       WHERE c.id = $1
       GROUP BY
         c.id
@@ -159,19 +159,37 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     subscriptions,
     ...rest
   }: PgRawConsumerData): ApiConsumer {
-    return apiConsumerSchema.parse({
-      ...rest,
-      rights: subscriptions.reduce((acc, subscription) => {
+    const restWithEmptySubscription: Omit<PgRawConsumerData, "subscriptions"> =
+      {
+        ...rest,
+        rights: keys(rest.rights).reduce(
+          (acc, rightName) => ({
+            ...acc,
+            [rightName]: {
+              ...rest.rights[rightName],
+              subscriptions: [],
+            },
+          }),
+          {},
+        ) as ApiConsumerRights,
+      };
+    const apiConsumer: ApiConsumer = {
+      ...restWithEmptySubscription,
+      rights: (subscriptions || []).reduce((acc, subscription) => {
         const rightName = eventToRightName(subscription.subscribedEvent);
         return {
           ...acc,
           [rightName]: {
-            ...rest.rights[rightName],
-            subscriptions: [...acc[rightName].subscriptions, subscription],
+            ...restWithEmptySubscription.rights[rightName],
+            subscriptions: [
+              ...(acc[rightName].subscriptions || []),
+              subscription,
+            ],
           },
         };
-      }, rest.rights),
-    });
+      }, restWithEmptySubscription.rights),
+    };
+    return apiConsumerSchema.parse(apiConsumer);
   }
 }
 

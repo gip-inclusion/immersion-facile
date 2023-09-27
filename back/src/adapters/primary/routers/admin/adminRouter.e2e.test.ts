@@ -1,3 +1,4 @@
+import { addYears } from "date-fns";
 import { ZodError } from "zod";
 import {
   AdminRoutes,
@@ -7,6 +8,7 @@ import {
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
+  createApiConsumerParamsFromApiConsumer,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -20,7 +22,6 @@ import {
 import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { createApiConsumerParamsFromApiConsumer } from "../../../../_testBuilders/ApiConsumerBuilder";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
@@ -30,11 +31,13 @@ import {
   GenerateApiConsumerJwt,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
+import { EXPIRATION_IN_YEARS } from "../../../../domain/auth/useCases/SaveApiConsumer";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Admin router", () => {
+  const now = new Date();
   let sharedRequest: HttpClient<AdminRoutes>;
   let token: BackOfficeJwt;
   let gateways: InMemoryGateways;
@@ -58,7 +61,7 @@ describe("Admin router", () => {
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
 
-    gateways.timeGateway.setNextDate(new Date());
+    gateways.timeGateway.defaultDate = now;
     token = await sharedRequest
       .login({ body: { user: "user", password: "pwd" } })
       .then((response) => {
@@ -444,7 +447,11 @@ describe("Admin router", () => {
 
       expectToEqual(id, authorizedUnJeuneUneSolutionApiConsumer.id);
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, [
-        authorizedUnJeuneUneSolutionApiConsumer,
+        {
+          ...authorizedUnJeuneUneSolutionApiConsumer,
+          createdAt: now.toISOString(),
+          expirationDate: addYears(now, EXPIRATION_IN_YEARS).toISOString(),
+        },
       ]);
     });
 

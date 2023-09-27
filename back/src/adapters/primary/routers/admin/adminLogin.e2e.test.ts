@@ -31,7 +31,7 @@ describe(`${displayRouteName(adminRoutes.login)} Admin login`, () => {
     const deps = await buildTestApp(appConfig);
     timeGateway = deps.gateways.timeGateway;
 
-    timeGateway.setNextDate(new Date());
+    timeGateway.defaultDate = new Date();
 
     sharedRequest = createSupertestSharedClient(adminRoutes, deps.request);
   });

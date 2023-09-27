@@ -40,7 +40,7 @@ describe(`Agency routes`, () => {
 
     sharedRequest = createSupertestSharedClient(agencyRoutes, deps.request);
 
-    gateways.timeGateway.setNextDate(new Date());
+    gateways.timeGateway.defaultDate = new Date();
     const response = await deps.request.post("/admin/login").send({
       user: appConfig.backofficeUsername,
       password: appConfig.backofficePassword,

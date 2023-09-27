@@ -112,7 +112,7 @@ describe("ContactEstablishment", () => {
     uuidGenerator.setNextUuids([discussionId, eventId]);
 
     const now = new Date("2021-12-08T15:00");
-    timeGateway.setNextDate(now);
+    timeGateway.setNextDates([now, now]);
 
     await contactEstablishment.execute(validEmailRequest);
 
@@ -150,7 +150,7 @@ describe("ContactEstablishment", () => {
     uuidGenerator.setNextUuids([discussionId, eventId]);
 
     const now = new Date("2021-12-08T15:00");
-    timeGateway.setNextDate(now);
+    timeGateway.setNextDates([now, now]);
 
     const validPhoneRequest: ContactEstablishmentRequestDto = {
       ...validRequest,
@@ -192,7 +192,7 @@ describe("ContactEstablishment", () => {
     uuidGenerator.setNextUuids([discussionId, eventId]);
 
     const now = new Date("2021-12-08T15:00");
-    timeGateway.setNextDate(now);
+    timeGateway.setNextDates([now, now]);
 
     const validInPersonRequest: ContactEstablishmentRequestDto = {
       ...validRequest,
