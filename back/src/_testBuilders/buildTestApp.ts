@@ -18,6 +18,7 @@ import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemorySubscribersGateway } from "../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
 import {
   GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
@@ -42,6 +43,7 @@ export type InMemoryGateways = {
   timeGateway: CustomTimeGateway;
   emailValidationGateway: InMemoryEmailValidationGateway;
   shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
+  subscribersGateway: InMemorySubscribersGateway;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :

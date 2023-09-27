@@ -1,11 +1,7 @@
-import { AbsoluteUrl, CallbackHeaders, ConventionReadDto } from "shared";
-import { SubscribersGateway } from "../../../domain/broadcast/ports/SubscribersGateway";
-
-export type NotifySubscriberParams = {
-  conventionRead: ConventionReadDto;
-  callbackUrl: AbsoluteUrl;
-  callbackHeaders: CallbackHeaders;
-};
+import {
+  NotifySubscriberParams,
+  SubscribersGateway,
+} from "../../../domain/broadcast/ports/SubscribersGateway";
 
 export class InMemorySubscribersGateway implements SubscribersGateway {
   #calls: NotifySubscriberParams[] = [];

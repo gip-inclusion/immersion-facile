@@ -7,13 +7,11 @@ import {
 import { ApiConsumerBuilder } from "../../../_testBuilders/ApiConsumerBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  InMemorySubscribersGateway,
-  NotifySubscriberParams,
-} from "../../../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
-import { BroadcastUpdatedConvention } from "./BroadcastUpdatedConvention";
+import { InMemorySubscribersGateway } from "../../../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
+import { NotifySubscriberParams } from "../ports/SubscribersGateway";
+import { BroadcastToPartnersOnConventionUpdates } from "./BroadcastToPartnersOnConventionUpdates";
 
-describe("Broadcast updated convention", () => {
+describe("Broadcast to partners on updated convention", () => {
   it("broadcast updated convention", async () => {
     const uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
@@ -99,10 +97,11 @@ describe("Broadcast updated convention", () => {
       apiConsumerNotAllowedToBeNotified,
     ];
 
-    const broadcastUpdatedConvention = new BroadcastUpdatedConvention(
-      uowPerformer,
-      subscribersGateway,
-    );
+    const broadcastUpdatedConvention =
+      new BroadcastToPartnersOnConventionUpdates(
+        uowPerformer,
+        subscribersGateway,
+      );
 
     await broadcastUpdatedConvention.execute(convention1);
 
@@ -110,7 +109,7 @@ describe("Broadcast updated convention", () => {
       {
         callbackHeaders: callbackParams1.callbackHeaders,
         callbackUrl: callbackParams1.callbackUrl,
-        conventionRead: {
+        convention: {
           ...convention1,
           agencyName: agency1.name,
           agencyDepartment: agency1.address.departmentCode,
@@ -128,7 +127,7 @@ describe("Broadcast updated convention", () => {
       {
         callbackHeaders: callbackParams2.callbackHeaders,
         callbackUrl: callbackParams2.callbackUrl,
-        conventionRead: {
+        convention: {
           ...convention2,
           agencyName: agency2.name,
           agencyDepartment: agency2.address.departmentCode,

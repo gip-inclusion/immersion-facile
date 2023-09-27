@@ -110,6 +110,7 @@ export class AppConfig {
     return this.env;
   }
 
+  // == Sirene repository ==
   public static createFromEnv(
     readDotEnv = true,
     configParams = process.env,
@@ -432,7 +433,13 @@ export class AppConfig {
     return this.#getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
   }
 
-  // == Sirene repository ==
+  public get subscribersGateway() {
+    return this.#throwIfNotInArray({
+      variableName: "SUBSCRIBERS_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
 
   public get timeGateway() {
     return this.#throwIfNotInArray({

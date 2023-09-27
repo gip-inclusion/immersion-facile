@@ -10,6 +10,7 @@ import {
   GenerateInclusionConnectJwt,
 } from "../../../domain/auth/jwt";
 import { SaveApiConsumer } from "../../../domain/auth/useCases/SaveApiConsumer";
+import { BroadcastToPartnersOnConventionUpdates } from "../../../domain/broadcast/useCases/BroadcastToPartnersOnConventionUpdates";
 import { ListActiveSubscriptions } from "../../../domain/broadcast/useCases/ListActiveSubscriptions";
 import { SubscribeToWebhook } from "../../../domain/broadcast/useCases/SubscribeToWebhook";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
@@ -449,6 +450,11 @@ export const createUseCases = (
           gateways.poleEmploiGateway,
           gateways.timeGateway,
           { resyncMode: false },
+        ),
+      broadcastToPartnersOnConventionUpdates:
+        new BroadcastToPartnersOnConventionUpdates(
+          uowPerformer,
+          gateways.subscribersGateway,
         ),
       listActiveSubscriptions: new ListActiveSubscriptions(uowPerformer),
       subscribeToWebhook: new SubscribeToWebhook(
