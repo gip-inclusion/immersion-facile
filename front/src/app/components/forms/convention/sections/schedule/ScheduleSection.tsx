@@ -34,80 +34,84 @@ export const ScheduleSection = () => {
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
-  const [dateStartInputValue, setDateStartInputValue] = useState<string>(
-    values.dateStart,
-  );
-  const [dateEndInputValue, setDateEndInputValue] = useState<string>(
-    values.dateEnd,
-  );
+
   const formContents = getFormFields();
-  const defaultDateMax = isStringDate(values.dateStart)
-    ? new Date(values.dateStart)
-    : new Date();
+
   const [dateMax, setDateMax] = useState(
-    addMonths(defaultDateMax, 1).toISOString(),
+    addMonths(
+      isStringDate(values.dateStart) ? new Date(values.dateStart) : new Date(),
+      1,
+    ).toISOString(),
   );
+
   const excludedDays =
     values.internshipKind === "mini-stage-cci"
       ? (["dimanche"] as Weekday[])
       : [];
-  const resetSchedule = () => {
-    const interval: DateIntervalDto = {
-      start: new Date(values.dateStart),
-      end: new Date(values.dateEnd),
-    };
-    setValue(
-      "schedule",
-      values.schedule.isSimple
-        ? reasonableSchedule(interval, excludedDays, [])
-        : scheduleWithFirstDayActivity(interval, excludedDays),
-    );
-  };
+
   const getFieldError = makeFieldError(formState);
 
   const shouldUpdateDateAndSchedule = (dateStart: string, dateEnd: string) =>
     differenceInDays(new Date(dateEnd), new Date(dateStart)) <=
     maximumCalendarDayByInternshipKind[values.internshipKind];
 
+  const [dateStartInputValue, setDateStartInputValue] = useState<string>(
+    values.dateStart,
+  );
+  const [dateEndInputValue, setDateEndInputValue] = useState<string>(
+    values.dateEnd,
+  );
+
   const onDateInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    const { name } = event.target;
-    const newDates: DateIntervalDto = {
-      start: new Date(dateStartInputValue),
-      end: new Date(dateEndInputValue),
-    };
-    const isDateEndAfterDateStart =
-      differenceInDays(newDates.end, newDates.start) > 0;
+    const inputValue = event.target.value;
+    const inputName = event.target.name;
+    if (inputValue !== "" && isStringDate(inputValue)) {
+      const newDates: DateIntervalDto = {
+        start: new Date(values.dateStart),
+        end: new Date(values.dateEnd),
+      };
 
-    if (!isDateEndAfterDateStart && name === "dateStart") {
-      newDates.end = newDates.start;
-    }
+      if (inputName === "dateStart") {
+        newDates.start = new Date(inputValue);
+        if (differenceInDays(newDates.end, newDates.start) <= 0)
+          newDates.end = newDates.start;
+      }
 
-    if (!isDateEndAfterDateStart && name === "dateEnd") {
-      newDates.start = newDates.end;
-    }
+      if (inputName === "dateEnd") {
+        newDates.end = new Date(inputValue);
+        if (differenceInDays(newDates.end, newDates.start) <= 0)
+          newDates.start = newDates.end;
+      }
 
-    if (
-      !shouldUpdateDateAndSchedule(
-        newDates.start.toISOString(),
-        newDates.end.toISOString(),
-      )
-    ) {
-      alert(
-        `Attention, votre ${
-          values.internshipKind === "immersion" ? "immersion" : "stage"
-        } ne peut pas dépasser ${
-          maximumCalendarDayByInternshipKind[values.internshipKind]
-        } jours. Nous avons donc ajusté la date de fin.`,
+      if (
+        !shouldUpdateDateAndSchedule(
+          newDates.start.toISOString(),
+          newDates.end.toISOString(),
+        )
+      ) {
+        alert(
+          `Attention, votre ${
+            values.internshipKind === "immersion" ? "immersion" : "stage"
+          } ne peut pas dépasser ${
+            maximumCalendarDayByInternshipKind[values.internshipKind]
+          } jours. Nous avons donc ajusté la date de fin.`,
+        );
+        newDates.end = addDays(
+          newDates.start,
+          maximumCalendarDayByInternshipKind[values.internshipKind],
+        );
+      }
+
+      setDateMax(addMonths(newDates.start, 1).toISOString());
+      setValue("dateStart", newDates.start.toISOString());
+      setValue("dateEnd", newDates.end.toISOString());
+      setValue(
+        "schedule",
+        values.schedule.isSimple
+          ? reasonableSchedule(newDates, excludedDays, [])
+          : scheduleWithFirstDayActivity(newDates, excludedDays),
       );
-      newDates.end = addDays(
-        newDates.start,
-        maximumCalendarDayByInternshipKind[values.internshipKind],
-      );
     }
-
-    setDateMax(addMonths(newDates.start, 1).toISOString());
-    setValue("dateEnd", newDates.end.toISOString());
-    setValue("dateStart", newDates.start.toISOString());
   };
 
   useEffect(() => {
@@ -115,9 +119,8 @@ export const ScheduleSection = () => {
   }, []);
 
   useEffect(() => {
-    setDateEndInputValue(values.dateEnd);
-    setDateStartInputValue(values.dateStart);
-    resetSchedule();
+    setDateStartInputValue(toDateString(new Date(values.dateStart)));
+    setDateEndInputValue(toDateString(new Date(values.dateEnd)));
   }, [values.dateStart, values.dateEnd]);
 
   return (
@@ -147,18 +150,18 @@ export const ScheduleSection = () => {
         label={formContents["dateStart"].label}
         hintText={formContents["dateStart"].hintText}
         nativeInputProps={{
+          type: "date",
           name: register("dateStart").name,
           id: formContents["dateStart"].id,
-          value: toDateString(new Date(dateStartInputValue)),
+          value: dateStartInputValue,
           onChange: (event) => {
             const dateStart = event.target.value;
             if (dateStart !== "" && isStringDate(dateStart)) {
-              setDateStartInputValue(new Date(dateStart).toISOString());
+              setDateStartInputValue(dateStart);
             }
           },
           onBlur: onDateInputBlur,
           min: toDateString(new Date("2022-01-01")),
-          type: "date",
         }}
         {...getFieldError("dateStart")}
       />
@@ -166,26 +169,26 @@ export const ScheduleSection = () => {
         label={formContents["dateEnd"].label}
         hintText={formContents["dateEnd"].hintText}
         nativeInputProps={{
+          type: "date",
           name: register("dateEnd").name,
           id: formContents["dateEnd"].id,
+          value: dateEndInputValue,
           onChange: (event) => {
             const dateEnd = event.target.value;
             if (dateEnd !== "" && isStringDate(dateEnd)) {
-              setDateEndInputValue(new Date(dateEnd).toISOString());
+              setDateEndInputValue(dateEnd);
             }
           },
-          type: "date",
-          max: toDateString(new Date(dateMax)),
-          value: toDateString(new Date(dateEndInputValue)),
           onBlur: onDateInputBlur,
+          max: toDateString(new Date(dateMax)),
         }}
         {...getFieldError("dateEnd")}
       />
 
       <SchedulePicker
         interval={{
-          start: new Date(dateStartInputValue),
-          end: new Date(dateEndInputValue),
+          start: new Date(values.dateStart),
+          end: new Date(values.dateEnd),
         }}
         excludedDays={excludedDays}
       />
