@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { expectToEqual } from "shared";
+import { ApiConsumer, expectToEqual, WebhookSubscription } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -18,13 +18,13 @@ import {
 const unauthorizedSubscriptionApiConsumer =
   authorizedUnJeuneUneSolutionApiConsumer;
 
-describe.skip("Webhook routes", () => {
-  let request: SuperTest<Test>;
+describe("Webhook routes", () => {
   let sharedRequest: HttpClient<PublicApiV2WebhooksRoutes>;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
+    let request: SuperTest<Test>;
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
     sharedRequest = createSupertestSharedClient(
       publicApiV2WebhooksRoutes,
@@ -95,11 +95,37 @@ describe.skip("Webhook routes", () => {
     publicApiV2WebhooksRoutes.listActiveSubscriptions.url
   }`, () => {
     it("200 - returns the list of active subscriptions for authorized consumer", async () => {
+      const subscription: WebhookSubscription = {
+        id: "subscription-id",
+        callbackHeaders: {
+          authorization: "my-cb-auth-header",
+        },
+        callbackUrl: "https://www.my-service.com/convention-updated",
+        subscribedEvent: "convention.updated",
+        createdAt: new Date("2022-01-01T12:00:00.000Z").toISOString(),
+      };
+      const apiConsumersWithSubscriptions: ApiConsumer = {
+        ...authorizedSubscriptionApiConsumer,
+        rights: {
+          convention: {
+            kinds: ["SUBSCRIPTION"],
+            scope: {
+              agencyKinds: [],
+            },
+            subscriptions: [subscription],
+          },
+          searchEstablishment: {
+            kinds: [],
+            scope: "no-scope",
+            subscriptions: [],
+          },
+        },
+      };
       inMemoryUow.apiConsumerRepository.consumers = [
-        authorizedSubscriptionApiConsumer,
+        apiConsumersWithSubscriptions,
       ];
       const authToken = generateApiConsumerJwt({
-        id: authorizedSubscriptionApiConsumer.id,
+        id: apiConsumersWithSubscriptions.id,
       });
 
       const response = await sharedRequest.listActiveSubscriptions({
@@ -110,17 +136,7 @@ describe.skip("Webhook routes", () => {
 
       expectToEqual(response, {
         status: 200,
-        body: [
-          {
-            id: "123",
-            createdAt: "date",
-            callbackHeaders: {
-              authorization: "Bearer 123",
-            },
-            callbackUrl: "https://www.google.com",
-            subscribedEvent: "convention.updated",
-          },
-        ],
+        body: [subscription],
       });
     });
 

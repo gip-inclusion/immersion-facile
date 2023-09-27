@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import { z } from "zod";
 import { ApiConsumer, WebhookSubscription } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
@@ -18,13 +19,13 @@ export class ListActiveSubscriptions extends TransactionalUseCase<
   protected async _execute(
     _: void,
     _uow: UnitOfWork,
-    apiConsumer: ApiConsumer,
+    apiConsumer?: ApiConsumer,
   ): Promise<WebhookSubscription[]> {
-    if (!apiConsumer) throw new ForbiddenError("No JWT payload provided");
+    if (!apiConsumer) throw new ForbiddenError();
 
-    // return uow.apiConsumerSubscriptionRepository.getAllForConsumerId(
-    //   apiConsumer.id,
-    // );
-    return Promise.resolve([]);
+    const subscriptions = keys(apiConsumer.rights).flatMap(
+      (rightName) => apiConsumer.rights[rightName].subscriptions,
+    );
+    return Promise.resolve(subscriptions);
   }
 }
