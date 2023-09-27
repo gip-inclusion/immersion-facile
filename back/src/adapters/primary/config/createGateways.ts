@@ -49,6 +49,8 @@ import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/Annuai
 import { annuaireDesEntreprisesSiretTargets } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.targets";
 import { InMemorySiretGateway } from "../../secondary/siret/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
+import { HttpSubscribersGateway } from "../../secondary/subscribersGateway/HttpSubscribersGateway";
+import { InMemorySubscribersGateway } from "../../secondary/subscribersGateway/InMemorySubscribersGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 import { configureCreateHttpClientForExternalApi } from "./createHttpClientForExternalApi";
 
@@ -135,6 +137,14 @@ export const createGateways = async (config: AppConfig) => {
             config.poleEmploiClientId,
           )
         : new InMemoryLaBonneBoiteGateway(),
+    subscribersGateway:
+      config.subscribersGateway === "HTTPS"
+        ? new HttpSubscribersGateway(
+            axios.create({
+              timeout: config.externalAxiosTimeout,
+            }),
+          )
+        : new InMemorySubscribersGateway(),
     passEmploiGateway:
       config.passEmploiGateway === "HTTPS"
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)

@@ -5,6 +5,7 @@ import { phoneSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
 import { dateIsoStringSchema } from "../schedule/Schedule.schema";
 import { ApiConsumerJwt } from "../tokens/jwt.dto";
+import { dateRegExp } from "../utils/date";
 import { localization, zStringMinLength1 } from "../zodUtils";
 import {
   ApiConsumer,
@@ -103,7 +104,7 @@ export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
   consumer: zStringMinLength1,
   contact: apiConsumerContactSchema,
   rights: apiConsumerRightsSchema,
-  createdAt: dateIsoStringSchema,
-  expirationDate: dateIsoStringSchema,
+  createdAt: zStringMinLength1.regex(dateRegExp),
+  expirationDate: zStringMinLength1.regex(dateRegExp),
   description: z.string().optional(),
 });

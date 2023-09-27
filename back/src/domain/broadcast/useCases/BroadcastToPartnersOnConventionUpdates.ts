@@ -13,7 +13,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
 
-export class BroadcastUpdatedConvention extends TransactionalUseCase<
+export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<
   ConventionDto,
   void
 > {
@@ -69,7 +69,7 @@ export class BroadcastUpdatedConvention extends TransactionalUseCase<
         }
 
         return this.#subscribersGateway.notifyConventionUpdated({
-          conventionRead,
+          convention: conventionRead,
           callbackUrl: conventionUpdatedCallbackParams.callbackUrl,
           callbackHeaders: conventionUpdatedCallbackParams.callbackHeaders,
         });
