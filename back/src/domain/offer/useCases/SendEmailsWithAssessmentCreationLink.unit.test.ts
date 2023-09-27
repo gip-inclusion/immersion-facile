@@ -62,7 +62,8 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
 
     await uow.conventionRepository.save(immersionApplicationEndingTomorrow);
     await uow.conventionRepository.save(immersionApplicationEndingYesterday);
-    timeGateway.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
+    const now = new Date("2021-05-15T08:00:00.000Z");
+    timeGateway.setNextDates([now, now]);
 
     // Act
     await sendEmailWithAssessmentCreationLink.execute();
@@ -87,7 +88,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
           conventionId: immersionApplicationEndingTomorrow.id,
           establishmentTutorName: "Tom Cruise",
           internshipKind: immersionApplicationEndingTomorrow.internshipKind,
-          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/${id}/establishment-tutor/2021-05-15T08:00:00.000Z/establishment@example.com`,
+          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/${id}/establishment-tutor/${now.toISOString()}/establishment@example.com`,
         },
       },
     ]);

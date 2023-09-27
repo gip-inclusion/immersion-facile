@@ -14,15 +14,15 @@ const testResponse2: GetAccessTokenResponse = {
 
 describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
   let mockGetAccessTokenFn: jest.Mock;
-  let fakeClock: CustomTimeGateway;
+  let timeGateway: CustomTimeGateway;
   let cachedAccessTokenGateway: InMemoryCachingGateway<GetAccessTokenResponse>;
 
   beforeEach(() => {
     mockGetAccessTokenFn = jest.fn();
-    fakeClock = new CustomTimeGateway();
+    timeGateway = new CustomTimeGateway(new Date("2021-01-01T00:00:00Z"));
     cachedAccessTokenGateway =
       new InMemoryCachingGateway<GetAccessTokenResponse>(
-        fakeClock,
+        timeGateway,
         "expires_in",
       );
   });
@@ -42,7 +42,7 @@ describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
     mockGetAccessTokenFn.mockReturnValueOnce(testResponse1);
 
     // Initial call caches the token.
-    fakeClock.setNextDateStr("2021-01-01T00:00:00Z");
+    timeGateway.setNextDateStr("2021-01-01T00:00:00Z");
     const response1 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
@@ -50,7 +50,7 @@ describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
     expect(response1).toEqual(testResponse1);
 
     // Subsequent call returns the cached token.
-    fakeClock.setNextDateStr("2021-01-01T00:09:00Z");
+    timeGateway.setNextDateStr("2021-01-01T00:09:00Z");
     const response2 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
@@ -64,7 +64,7 @@ describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
       .mockReturnValueOnce(testResponse2);
 
     // Initial call caches a token.
-    fakeClock.setNextDateStr("2021-01-01T00:00:00Z");
+    timeGateway.setNextDateStr("2021-01-01T00:00:00Z");
     const response1 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
@@ -72,7 +72,10 @@ describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
     expect(response1).toEqual(testResponse1);
 
     // The TTL of the cached token is exceeded so a new one is fetched.
-    fakeClock.setNextDateStr("2021-01-01T00:10:00Z");
+    timeGateway.setNextDates([
+      new Date("2021-01-01T00:10:00Z"),
+      new Date("2021-01-01T00:10:00Z"),
+    ]);
     const response2 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
@@ -80,7 +83,7 @@ describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
     expect(response2).toEqual(testResponse2);
 
     // Subsequent calls return the refreshed token.
-    fakeClock.setNextDateStr("2021-01-01T00:19:00Z");
+    timeGateway.setNextDateStr("2021-01-01T00:19:00Z");
     const response3 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
@@ -94,7 +97,7 @@ describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
       .mockReturnValueOnce(testResponse2);
 
     // Initial call caches the token.
-    fakeClock.setNextDateStr("2021-01-01T00:00:00Z");
+    timeGateway.setNextDateStr("2021-01-01T00:00:00Z");
     const response1 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
@@ -102,14 +105,14 @@ describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
     expect(response1).toEqual(testResponse1);
 
     // Not expired yet.
-    fakeClock.setNextDateStr("2021-01-01T00:09:30Z");
+    timeGateway.setNextDateStr("2021-01-01T00:09:30Z");
     const response2 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
     expect(response2).toEqual(testResponse1);
 
     // Now it's expired.
-    fakeClock.setNextDateStr("2021-01-01T00:09:31Z");
+    timeGateway.setNextDateStr("2021-01-01T00:09:31Z");
     const response3 = await cachedAccessTokenGateway.caching("scope", () =>
       mockGetAccessTokenFn("scope"),
     );
