@@ -187,7 +187,6 @@ const renewedSchema = z.object({
 
 const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   id: conventionIdSchema,
-  externalId: externalConventionIdSchema.optional(),
   status: z.enum(conventionStatuses),
   statusJustification: z.string().optional(),
   agencyId: agencyIdSchema,
