@@ -122,11 +122,12 @@ export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
 export const emptyStringSchema = z.string().max(0);
 
 export const zEnumValidation = <T extends string>(
-  values: readonly T[],
+  values: readonly [T, ...T[]],
   errorMessage: string,
 ): z.ZodType<T, z.ZodTypeDef, T> =>
-  z.custom((val: unknown): val is T => values.includes(val as T), {
-    message: errorMessage,
+  z.enum(values, {
+    required_error: errorMessage,
+    invalid_type_error: errorMessage,
   });
 
 // Following is from https://github.com/colinhacks/zod/issues/372#issuecomment-826380330
