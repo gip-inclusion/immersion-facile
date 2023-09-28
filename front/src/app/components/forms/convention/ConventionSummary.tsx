@@ -220,6 +220,7 @@ const immersionConditionsSummary = (convention: ConventionReadDto) => {
       fields["immersionAppellation"].label,
       convention.immersionAppellation.appellationLabel,
     ],
+    [fields["workConditions"].label, convention.workConditions],
     [fields["immersionActivities"].label, convention.immersionActivities],
     [fields["businessAdvantages"].label, convention.businessAdvantages],
     [fields["immersionSkills"].label, convention.immersionSkills],
