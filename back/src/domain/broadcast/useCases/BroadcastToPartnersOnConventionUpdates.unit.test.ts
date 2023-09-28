@@ -74,6 +74,14 @@ describe("Broadcast to partners on updated convention", () => {
         ],
       })
       .build();
+    const apiConsumerWithoutSubscription = new ApiConsumerBuilder()
+      .withId("my-api-consumer-without-subscription")
+      .withConventionRight({
+        kinds: ["SUBSCRIPTION"],
+        scope: { agencyIds: [agency1.id, agency2.id] },
+        subscriptions: [],
+      })
+      .build();
 
     const apiConsumerNotAllowedToBeNotified = new ApiConsumerBuilder()
       .withId("my-api-consumer-not-allowed")
@@ -95,6 +103,7 @@ describe("Broadcast to partners on updated convention", () => {
       apiConsumer1,
       apiConsumer2,
       apiConsumerNotAllowedToBeNotified,
+      apiConsumerWithoutSubscription,
     ];
 
     const broadcastUpdatedConvention =
@@ -107,8 +116,7 @@ describe("Broadcast to partners on updated convention", () => {
 
     const expectedCallsAfterFirstExecute: NotifySubscriberParams[] = [
       {
-        callbackHeaders: callbackParams1.callbackHeaders,
-        callbackUrl: callbackParams1.callbackUrl,
+        ...callbackParams1,
         convention: {
           ...convention1,
           agencyName: agency1.name,
@@ -136,7 +144,6 @@ describe("Broadcast to partners on updated convention", () => {
       },
     ];
 
-    expectToEqual(subscribersGateway.calls.length, 2);
     expectToEqual(subscribersGateway.calls, expectedCallsAfterSecondExecute);
   });
 });
