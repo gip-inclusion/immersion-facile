@@ -3,10 +3,12 @@ import {
   AgencyDtoBuilder,
   cciAgencyId,
   ConventionDtoBuilder,
+  conventionSchema,
   FeatureFlags,
   makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   peParisAgencyId,
+  reasonableSchedule,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
@@ -137,7 +139,10 @@ const conventionSeed = async (uow: UnitOfWork) => {
     .withDateEnd(new Date("2023-03-28").toISOString())
     .withStatus("READY_TO_SIGN")
     .withAgencyId(peParisAgencyId)
+    .withSchedule(reasonableSchedule)
     .build();
+
+  conventionSchema.parse(peConvention);
 
   const cciConvention = new ConventionDtoBuilder()
     .withId("4d7f9ded-fa25-462a-a290-caeaa192c555")
@@ -146,7 +151,10 @@ const conventionSeed = async (uow: UnitOfWork) => {
     .withDateEnd(new Date("2023-05-03").toISOString())
     .withStatus("READY_TO_SIGN")
     .withAgencyId(cciAgencyId)
+    .withSchedule(reasonableSchedule)
     .build();
+
+  conventionSchema.parse(cciConvention);
 
   await Promise.all([
     uow.conventionRepository.save(peConvention),
