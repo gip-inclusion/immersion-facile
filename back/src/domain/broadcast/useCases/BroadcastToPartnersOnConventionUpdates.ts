@@ -13,6 +13,14 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
 
+const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {
+  const conventionUpdatedCallbackParams =
+    apiConsumer.rights.convention.subscriptions.find(
+      (sub) => sub.subscribedEvent === "convention.updated",
+    );
+  return !!conventionUpdatedCallbackParams;
+};
+
 export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<
   ConventionDto,
   void
@@ -52,7 +60,9 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
             apiConsumer,
             rightName: "convention",
             consumerKind: "SUBSCRIPTION",
-          }) && isConventionInScope(conventionRead, apiConsumer),
+          }) &&
+          isConventionInScope(conventionRead, apiConsumer) &&
+          isConsumerSubscribedToConventionUpdated(apiConsumer),
       ),
     );
 

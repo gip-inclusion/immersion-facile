@@ -21,8 +21,14 @@ export class HttpSubscribersGateway implements SubscribersGateway {
     callbackHeaders,
   }: NotifySubscriberParams): Promise<void> {
     try {
-      await this.#axios.post(callbackUrl, convention, {
+      const response = await this.#axios.post(callbackUrl, convention, {
         headers: callbackHeaders,
+      });
+      logger.info({
+        title: "Partner subscription notified successfully",
+        callbackUrl,
+        conventionId: convention.id,
+        status: response.status,
       });
     } catch (error: any) {
       const errorContext = {
