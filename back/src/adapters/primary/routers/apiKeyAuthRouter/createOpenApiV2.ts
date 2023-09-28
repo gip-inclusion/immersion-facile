@@ -151,10 +151,11 @@ const error404Example = {
   message: "No establishment found with siret 12345678912345",
 };
 
-const conventionExample: ConventionReadDto = ({ yo: "lala" } as any) ?? {
+const conventionExample: ConventionReadDto = {
   ...new ConventionDtoBuilder().build(),
   agencyName: "Agence de test",
   agencyDepartment: "75",
+  agencyKind: "pole-emploi",
 };
 
 export const createOpenApiSpecV2 = (envType: string) =>
@@ -413,8 +414,31 @@ export const createOpenApiSpecV2 = (envType: string) =>
       },
     },
     [webhookSection]: {
-      listActiveSubscriptions: {} as any,
-      unsubscribeToWebhook: {} as any,
+      listActiveSubscriptions: {
+        summary: "Lister les webhooks auxquels vous êtes souscrits",
+        description:
+          "Cette route permet de lister les webhook auxquels vous êtes souscrits.",
+        extraDocs: {
+          responses: {
+            "200": {
+              description: "Retourne les webhooks souscrits",
+            },
+            "400": {
+              description: "Erreur dans le contrat d'api'",
+            },
+            "401": {
+              description: "Utilisateur non authentifié",
+              example: error401Example,
+            },
+            "403": {
+              description:
+                "Accès non autorisé (veuillez vérifier que vous avez les droits)",
+              example: error403Example,
+            },
+          },
+        },
+      },
+      // unsubscribeToWebhook: {} as any,
       subscribeToWebhook: {
         summary: "Souscription à un webhook",
         description:
@@ -436,29 +460,10 @@ export const createOpenApiSpecV2 = (envType: string) =>
                     },
                   },
                 },
-                responses: { 200: "OK" },
+                responses: { 200: { description: "Souscription réussie" } },
               },
-            } as any,
+            },
           },
-          // "establishments.newOffersAdded": {
-          //   "https://my-callback-url.com/establishment-new-offers-added": {
-          //     post: {
-          //       summary: "Votre route de callback",
-          //       requestBody: {
-          //         required: true,
-          //         content: {
-          //           "application/json": {
-          //             example: conventionExample,
-          //             schema: zodToJsonSchema(
-          //               z.object({ bob: z.literal("l'éponge") }),
-          //             ) as any,
-          //           },
-          //         },
-          //       },
-          //       responses: { 201: "OK" },
-          //     },
-          //   } as any,
-          // },
         },
         extraDocs: {
           responses: {
