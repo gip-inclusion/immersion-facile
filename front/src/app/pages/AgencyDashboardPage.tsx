@@ -49,10 +49,23 @@ export const AgencyDashboardPage = () => {
           {
             label: "Conventions en erreur",
             content: (
-              <MetabaseView
-                title="Tableau de bord agence"
-                url={conventionErrorUrl}
-              />
+              <>
+                <Button
+                  priority="secondary"
+                  className={fr.cx("fr-mb-5v")}
+                  linkProps={{
+                    href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.pole-emploi.fr/documents/Immersion_facilitee/GUIDE_SAISIE_DES_CONVENTIONS.pptx",
+                    target: "_blank",
+                    rel: "noreferrer",
+                  }}
+                >
+                  Guide de saisie des conventions
+                </Button>
+                <MetabaseView
+                  title="Tableau de bord agence"
+                  url={conventionErrorUrl}
+                />
+              </>
             ),
           },
         ]
