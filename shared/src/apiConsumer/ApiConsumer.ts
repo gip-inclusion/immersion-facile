@@ -21,13 +21,10 @@ export type SubscriptionParams = {
   callbackHeaders: CallbackHeaders;
 };
 
-export type ApiConsumerRight<
-  Scope,
-  S extends WebhookSubscription | void = WebhookSubscription,
-> = {
+export type ApiConsumerRight<Scope, S extends CreateWebhookSubscription> = {
   kinds: ApiConsumerKind[];
   scope: Scope;
-  subscriptions: S extends WebhookSubscription ? WebhookSubscription[] : void;
+  subscriptions: S[];
 };
 
 export type SubscriptionName<
@@ -42,12 +39,13 @@ export const apiConsumerRightNames = [
   "convention",
 ] as const;
 
-export type GenericApiConsumerRights<S extends WebhookSubscription | void> = {
+export type GenericApiConsumerRights<S extends CreateWebhookSubscription> = {
   searchEstablishment: ApiConsumerRight<NoScope, S>;
   convention: ApiConsumerRight<ConventionScope, S>;
 };
 
-export type CreateApiConsumerRights = GenericApiConsumerRights<void>;
+export type CreateApiConsumerRights =
+  GenericApiConsumerRights<CreateWebhookSubscription>;
 
 export type ApiConsumerRights = GenericApiConsumerRights<WebhookSubscription>;
 
@@ -131,12 +129,12 @@ export const createApiConsumerParamsFromApiConsumer = (
     convention: {
       kinds: apiConsumer.rights.convention.kinds,
       scope: apiConsumer.rights.convention.scope,
-      subscriptions: undefined,
+      subscriptions: [],
     },
     searchEstablishment: {
       kinds: apiConsumer.rights.searchEstablishment.kinds,
       scope: apiConsumer.rights.searchEstablishment.scope,
-      subscriptions: undefined,
+      subscriptions: [],
     },
   },
   consumer: apiConsumer.consumer,
