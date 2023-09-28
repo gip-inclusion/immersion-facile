@@ -92,14 +92,19 @@ export const phoneSchema = zStringMinLength1.regex(
 
 const modifierRolesSchema = z.enum(allModifierRoles);
 
-const signatorySchema = z.object({
+const actorSchema = z.object({
   role: roleSchema,
   email: emailSchema,
   phone: phoneSchema,
   firstName: zTrimmedStringMax255,
   lastName: zTrimmedStringMax255,
-  signedAt: zStringMinLength1.regex(dateRegExp).optional(),
 });
+
+const signatorySchema = actorSchema.merge(
+  z.object({
+    signedAt: zStringMinLength1.regex(dateRegExp).optional(),
+  }),
+);
 
 const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
   signatorySchema.merge(
@@ -125,7 +130,7 @@ const studentBeneficiarySchema: z.Schema<Beneficiary<"mini-stage-cci">> =
   );
 
 const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
-  signatorySchema.merge(
+  actorSchema.merge(
     z.object({
       role: z.literal("establishment-tutor"),
       job: zStringPossiblyEmpty,
