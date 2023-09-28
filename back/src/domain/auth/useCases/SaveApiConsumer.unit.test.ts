@@ -87,7 +87,7 @@ describe("SaveApiConsumer", () => {
       ]);
     });
 
-    it("Updates an existing api consumer", async () => {
+    it("Updates an existing api consumer, except subscriptions", async () => {
       const today = new Date("2023-09-22");
       timeGateway.setNextDates([today, addMilliseconds(today, 10)]);
       const authorizedApiConsumerWithSubscription: ApiConsumer = {
@@ -120,15 +120,39 @@ describe("SaveApiConsumer", () => {
         description: "ma nouvelle description",
         createdAt: today.toISOString(),
         expirationDate: addYears(today, 2).toISOString(),
+        rights: {
+          ...authorizedApiConsumerWithSubscription.rights,
+          convention: {
+            ...authorizedApiConsumerWithSubscription.rights.convention,
+            subscriptions: [
+              ...authorizedApiConsumerWithSubscription.rights.convention
+                .subscriptions,
+              {
+                id: "bob",
+                createdAt: new Date().toISOString(),
+                callbackHeaders: { authorization: "yo" },
+                callbackUrl: "https://yolo.yo.com",
+                subscribedEvent: "convention.updated",
+              },
+            ],
+          },
+        },
       };
 
       const result = await saveApiConsumer.execute(
-        createApiConsumerParamsFromApiConsumer(updatedConsumer),
+        updatedConsumer,
         backOfficeJwtPayload,
       );
 
       expectToEqual(result, undefined);
-      expectToEqual(uow.apiConsumerRepository.consumers, [updatedConsumer]);
+      expectToEqual(uow.apiConsumerRepository.consumers, [
+        {
+          ...authorizedApiConsumerWithSubscription,
+          description: "ma nouvelle description",
+          createdAt: today.toISOString(),
+          expirationDate: addYears(today, 2).toISOString(),
+        },
+      ]);
       expectToEqual(uow.outboxRepository.events, [
         {
           id: uuidGenerator.new(),

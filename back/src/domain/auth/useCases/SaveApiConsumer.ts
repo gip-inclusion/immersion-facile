@@ -8,6 +8,7 @@ import {
   BackOfficeDomainPayload,
   CreateApiConsumerParams,
   createApiConsumerSchema,
+  CreateWebhookSubscription,
 } from "shared";
 import {
   ForbiddenError,
@@ -96,7 +97,7 @@ export class SaveApiConsumer extends TransactionalUseCase<
         ...input.rights[rightName],
         ...acc[rightName],
         subscriptions,
-      } satisfies ApiConsumerRight<unknown>;
+      } satisfies ApiConsumerRight<unknown, CreateWebhookSubscription>;
 
       return {
         ...acc,

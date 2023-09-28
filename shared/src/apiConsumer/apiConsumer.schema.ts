@@ -47,12 +47,23 @@ export const webhookSubscriptionSchema: z.Schema<WebhookSubscription> =
     }),
   );
 
-const searchEstablishmentRightSchema = z.object({
+const searchEstablishmentRightCommonSchema = z.object({
   kinds: z.array(z.enum(apiConsumerKinds)),
   scope: z.literal("no-scope"),
 });
 
-const conventionRightSchema = z.object({
+const createSearchEstablishmentRightSchema =
+  searchEstablishmentRightCommonSchema.and(
+    z.object({
+      subscriptions: z.array(createWebhookSubscriptionSchema),
+    }),
+  );
+
+const searchEstablishmentRightSchema = searchEstablishmentRightCommonSchema.and(
+  z.object({ subscriptions: z.array(webhookSubscriptionSchema) }),
+);
+
+const conventionRightCommonSchema = z.object({
   kinds: z.array(z.enum(apiConsumerKinds)),
   scope: z
     .object({
@@ -67,15 +78,28 @@ const conventionRightSchema = z.object({
     ),
 });
 
+const createConventionRightSchema = conventionRightCommonSchema.and(
+  z.object({
+    subscriptions: z.array(createWebhookSubscriptionSchema),
+  }),
+);
+
+const conventionRightSchema = conventionRightCommonSchema.and(
+  z.object({
+    subscriptions: z.array(webhookSubscriptionSchema),
+  }),
+);
+
 const createApiConsumerRightsSchema: z.Schema<CreateApiConsumerRights> =
   z.object({
-    searchEstablishment: searchEstablishmentRightSchema as unknown as z.Schema<
-      CreateApiConsumerRights["searchEstablishment"]
-    >,
-    convention: conventionRightSchema as unknown as z.Schema<
-      CreateApiConsumerRights["convention"]
-    >,
+    searchEstablishment: createSearchEstablishmentRightSchema,
+    convention: createConventionRightSchema,
   });
+
+const apiConsumerRightsSchema: z.Schema<ApiConsumer["rights"]> = z.object({
+  searchEstablishment: searchEstablishmentRightSchema,
+  convention: conventionRightSchema,
+});
 
 export const createApiConsumerSchema: z.Schema<CreateApiConsumerParams> =
   z.object({
@@ -85,19 +109,6 @@ export const createApiConsumerSchema: z.Schema<CreateApiConsumerParams> =
     rights: createApiConsumerRightsSchema,
     description: z.string().optional(),
   });
-
-const apiConsumerRightsSchema: z.Schema<ApiConsumer["rights"]> = z.object({
-  searchEstablishment: searchEstablishmentRightSchema.and(
-    z.object({
-      subscriptions: z.array(webhookSubscriptionSchema),
-    }),
-  ),
-  convention: conventionRightSchema.and(
-    z.object({
-      subscriptions: z.array(webhookSubscriptionSchema),
-    }),
-  ),
-});
 
 export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
   id: z.string().uuid(localization.invalidUuid),
