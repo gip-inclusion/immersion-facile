@@ -25,11 +25,6 @@ const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
   emails: z.array(emailSchema),
 });
 
-// const subscriptionSchema: z.Schema<SubscriptionParams> = z.object({
-//   callbackUrl: absoluteUrlSchema,
-//   callbackHeaders: z.object({ authorization: z.string() }),
-// });
-
 export const apiConsumerJwtSchema: z.Schema<ApiConsumerJwt> = z.string();
 
 export const createWebhookSubscriptionSchema: z.Schema<CreateWebhookSubscription> =
