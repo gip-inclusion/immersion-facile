@@ -14,6 +14,7 @@ import {
 } from "shared";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
+import { ConventionSummary } from "src/app/components/forms/convention/ConventionSummary";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { commonContent } from "../../contents/commonContent";
@@ -134,13 +135,15 @@ const ConventionSignPageContent = ({
           ),
         )
         .with({ submitFeedback: { kind: "signedSuccessfully" } }, () => (
-          <MainWrapper layout="boxed">
+          <MainWrapper layout="default">
             <Alert
               severity="success"
               {...t.conventionAlreadySigned}
               title="Convention signée"
               description={`Votre convention (${conventionId}) a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée par ${convention?.agencyName}, vous la recevrez par email.`}
+              className={fr.cx("fr-mb-5v")}
             />
+            <ConventionSummary />
           </MainWrapper>
         ))
         .with({ hasConvention: false }, () => (
