@@ -28,6 +28,8 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
   phone: "1234567",
 };
 
+const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+
 describe("PgConventionRepository", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -201,6 +203,96 @@ describe("PgConventionRepository", () => {
     );
 
     expect(conventionRetreived?.signatories.beneficiary.isRqth).toBeUndefined();
+  });
+
+  it("Adds a new convention with beneficiary with federatedIdentity with payload", async () => {
+    const extraFields = {
+      emergencyContact: "jean bon",
+    };
+    const convention = new ConventionDtoBuilder()
+      .withBeneficiary({
+        birthdate: new Date("2000-05-26").toISOString(),
+        firstName: "Jean",
+        lastName: "Bono",
+        role: "beneficiary",
+        email: "jean@bono.com",
+        phone: "0836656565",
+        ...extraFields,
+      })
+      .withFederatedIdentity({
+        provider: "peConnect",
+        token: userPeExternalId,
+        payload: {
+          email: "john@mail.com",
+          firstName: "John",
+          lastName: "Doe",
+          type: "PLACEMENT",
+        },
+      })
+      .build();
+
+    await client.query(
+      `INSERT INTO partners_pe_connect(user_pe_external_id, convention_id, firstname, lastname, email, type)
+      VALUES('${userPeExternalId}', '${convention.id}', 'John', 'Doe', 'john@mail.com', 'PLACEMENT')`,
+    );
+
+    await conventionRepository.save(convention);
+
+    const conventionRetreived = await conventionRepository.getById(
+      convention.id,
+    );
+
+    expect(
+      conventionRetreived?.signatories.beneficiary.federatedIdentity,
+    ).toStrictEqual({
+      provider: "peConnect",
+      token: userPeExternalId,
+      payload: {
+        email: "john@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        type: "PLACEMENT",
+      },
+    });
+  });
+
+  it("Adds a new convention with beneficiary with federatedIdentity without payload", async () => {
+    const extraFields = {
+      emergencyContact: "jean bon",
+    };
+    const convention = new ConventionDtoBuilder()
+      .withBeneficiary({
+        birthdate: new Date("2000-05-26").toISOString(),
+        firstName: "Jean",
+        lastName: "Bono",
+        role: "beneficiary",
+        email: "jean@bono.com",
+        phone: "0836656565",
+        ...extraFields,
+      })
+      .withFederatedIdentity({
+        provider: "peConnect",
+        token: userPeExternalId,
+      })
+      .build();
+
+    await client.query(
+      `INSERT INTO partners_pe_connect(user_pe_external_id, convention_id, firstname, lastname, email, type)
+      VALUES('${userPeExternalId}', '${convention.id}', NULL, NULL, NULL, NULL)`,
+    );
+
+    await conventionRepository.save(convention);
+
+    const conventionRetreived = await conventionRepository.getById(
+      convention.id,
+    );
+
+    expect(
+      conventionRetreived?.signatories.beneficiary.federatedIdentity,
+    ).toStrictEqual({
+      provider: "peConnect",
+      token: userPeExternalId,
+    });
   });
 
   it("Only one actor when the convention has same establisment tutor and representative", async () => {
@@ -428,7 +520,16 @@ describe("PgConventionRepository", () => {
   it("Retrieves federated identity if exists", async () => {
     const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = new ConventionDtoBuilder()
-      .withFederatedIdentity({ provider: "peConnect", token: peConnectId })
+      .withFederatedIdentity({
+        provider: "peConnect",
+        token: peConnectId,
+        payload: {
+          email: "john@mail.com",
+          firstName: "John",
+          lastName: "Doe",
+          type: "PLACEMENT",
+        },
+      })
       .build();
 
     await client.query(
