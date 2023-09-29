@@ -14,8 +14,9 @@ describe("HttpSubscribersGateway", () => {
       agencyKind: "mission-locale",
     };
 
-    const response = await httpSubscribersGateway.notifyConventionUpdated({
-      convention: conventionReadDto,
+    const response = await httpSubscribersGateway.notify({
+      payload: conventionReadDto,
+      subscribedEvent: "convention.updated",
       callbackUrl: "https://jsonplaceholder.typicode.com/posts",
       callbackHeaders: {
         authorization: "my-cb-auth-header",

@@ -3,6 +3,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import {
   ConventionDtoBuilder,
   ConventionReadDto,
+  conventionReadSchema,
   SearchResultDto,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
@@ -455,7 +456,10 @@ export const createOpenApiSpecV2 = (envType: string) =>
                     "application/json": {
                       example: conventionExample,
                       schema: zodToJsonSchema(
-                        z.object({ bob: z.literal("l'éponge") }),
+                        z.object({
+                          payload: conventionReadSchema,
+                          subscribedEvent: z.enum(["convention.updated"]),
+                        }),
                       ) as any,
                     },
                   },

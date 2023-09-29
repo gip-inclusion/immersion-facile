@@ -10,9 +10,7 @@ export class InMemorySubscribersGateway implements SubscribersGateway {
     return this.#calls;
   }
 
-  public async notifyConventionUpdated(
-    params: NotifySubscriberParams,
-  ): Promise<void> {
+  public async notify(params: NotifySubscriberParams): Promise<void> {
     this.#calls.push(params);
   }
 }
