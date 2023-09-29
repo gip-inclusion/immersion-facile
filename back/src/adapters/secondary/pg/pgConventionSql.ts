@@ -19,7 +19,18 @@ const buildSignatoriesObject = `JSON_BUILD_OBJECT(
         'emergencyContact', b.extra_fields ->> 'emergencyContact',
         'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
         'emergencyContactEmail', b.extra_fields ->> 'emergencyContactEmail',
-        'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN JSON_BUILD_OBJECT('provider','peConnect', 'token', p.user_pe_external_id) ELSE NULL END,
+        'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN JSON_BUILD_OBJECT(
+          'provider','peConnect',
+          'token', p.user_pe_external_id,
+          'payload', CASE WHEN (p.email IS NOT NULL) THEN JSON_BUILD_OBJECT(
+            'advisor', JSON_BUILD_OBJECT(
+              'email',p.email,
+              'firstName', p.firstname,
+              'lastName',p.lastname,
+              'type', p.type
+            )
+          ) ELSE NULL END 
+        ) ELSE NULL END,
         'levelOfEducation', CASE WHEN  (b.extra_fields ->> 'levelOfEducation' IS NOT NULL) THEN b.extra_fields ->> 'levelOfEducation' ELSE NULL END,
         'financiaryHelp', CASE WHEN  (b.extra_fields ->> 'financiaryHelp' IS NOT NULL) THEN b.extra_fields ->> 'financiaryHelp' ELSE NULL END,
         'birthdate', CASE WHEN  (b.extra_fields ->> 'birthdate' IS NOT NULL) THEN b.extra_fields ->> 'birthdate' ELSE '1970-01-01T12:00:00.000Z' END

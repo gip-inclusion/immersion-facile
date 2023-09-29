@@ -194,6 +194,23 @@ export const ConventionDocumentPage = ({
             <li>
               Identifiant de la convention : <strong>{convention.id}</strong>
             </li>
+            {convention.signatories.beneficiary.federatedIdentity?.provider ===
+              "peConnect" &&
+              convention.signatories.beneficiary.federatedIdentity?.payload && (
+                <li>
+                  conseiller Pôle emploi référent :{" "}
+                  <strong>
+                    {
+                      convention.signatories.beneficiary.federatedIdentity
+                        .payload.advisor.firstName
+                    }{" "}
+                    {
+                      convention.signatories.beneficiary.federatedIdentity
+                        .payload.advisor.lastName
+                    }
+                  </strong>
+                </li>
+              )}
             {convention.validators?.agencyValidator && (
               <li>
                 Validée par :{" "}

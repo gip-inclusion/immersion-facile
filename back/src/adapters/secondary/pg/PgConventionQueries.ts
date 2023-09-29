@@ -62,6 +62,12 @@ export class PgConventionQueries implements ConventionQueries {
     limit: number;
     filters: GetConventionsByFiltersQueries;
   }): Promise<ConventionReadDto[]> {
+    if (
+      (params.scope.agencyIds && params.scope.agencyIds.length === 0) ||
+      (params.scope.agencyKinds && params.scope.agencyKinds.length === 0)
+    )
+      return [];
+
     return this.#getConventionsWhere({
       limit: params.limit,
       whereClauses: [

@@ -81,6 +81,11 @@ replaceInFileSync(
 // change ts-node scripts to node scripts
 replaceInFileSync(backPackageJson, /"ts-node /g, '"node ');
 replaceInFileSync(backPackageJson, /"node (.*)(\.ts)/g, '"node $1.js');
+replaceInFileSync(
+  backPackageJson,
+  /--compilerOptions '{\\"resolveJsonModule\\": true}'/g,
+  "",
+);
 
 // change migration script from ts source files to js
 replaceInFileSync(

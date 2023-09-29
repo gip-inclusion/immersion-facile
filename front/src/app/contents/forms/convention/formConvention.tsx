@@ -114,7 +114,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   workConditions: {
     label:
       internshipKind === "immersion"
-        ? "Conditions de travail, propres au métier observé pendant l’immersion. "
+        ? "Conditions de travail, propres au métier observé pendant l’immersion "
         : "Conditions de travail, propres au métier observé pendant le stage ",
     hintText: "Précisez les conditions de travail, propres au métier observé ",
     id: conventionSectionIds.workConditions,

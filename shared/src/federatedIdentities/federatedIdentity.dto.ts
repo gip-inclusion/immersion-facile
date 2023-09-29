@@ -10,17 +10,28 @@ export const federatedIdentityProviders = [
 ] as const;
 
 type GenericFederatedIdentity<
-  P extends FederatedIdentityProvider,
+  Provider extends FederatedIdentityProvider,
   T extends PeConnectToken | InclusionConnectJwt,
+  P = void,
 > = {
-  provider: P;
+  provider: Provider;
   token: T;
+  payload?: P;
 };
 
 export const authFailed = "AuthFailed";
 export const notJobSeeker = "NotJobSeeker";
 
 export type PeExternalId = Flavor<string, "PeExternalId">;
+
+type PeConnectAdvisorForBeneficiary = {
+  advisor: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    type: "PLACEMENT" | "CAPEMPLOI" | "INDEMNISATION";
+  };
+};
 
 export type PeConnectToken =
   | PeExternalId
@@ -29,7 +40,8 @@ export type PeConnectToken =
 
 export type PeConnectIdentity = GenericFederatedIdentity<
   "peConnect",
-  PeConnectToken
+  PeConnectToken,
+  PeConnectAdvisorForBeneficiary
 >;
 export const isPeConnectIdentity = (
   federatedIdentity: FederatedIdentity | undefined,

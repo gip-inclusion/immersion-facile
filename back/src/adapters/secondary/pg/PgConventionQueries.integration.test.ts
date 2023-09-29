@@ -115,6 +115,20 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
+    describe("when no scope", () => {
+      it("returns empty array if scope is empty", async () => {
+        const result = await conventionQueries.getConventionsByScope({
+          scope: {
+            agencyKinds: [],
+          },
+          limit: 5,
+          filters: {},
+        });
+
+        expectToEqual(result, []);
+      });
+    });
+
     describe("when only agencyKinds", () => {
       it("return empty array when no convention matching agencyKinds", async () => {
         const result = await conventionQueries.getConventionsByScope({
