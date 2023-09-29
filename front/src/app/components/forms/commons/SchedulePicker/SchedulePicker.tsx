@@ -74,7 +74,7 @@ export const SchedulePicker = ({
       {scheduleErrors.map((value, index) => (
         <div
           id={`${name}${index + 1}-error-description`}
-          className={fr.cx("fr-error-text")}
+          className={fr.cx("fr-error-text", "fr-mb-2w")}
           key={`error-${value}`}
         >
           {value}
