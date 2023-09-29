@@ -1,5 +1,6 @@
 import { MigrationBuilder } from "node-pg-migrate";
-import departments from "../staticData/departements-avec-outre-mer.json";
+import { departments } from "../staticData/departements-avec-outre-mer";
+
 const tableName = "public_department_region";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {

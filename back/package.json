@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "node ./transpile-back-and-prepare-for-prod.js",
-    "db:migrate": "ts-node --compilerOptions '{\"resolveJsonModule\": true}' node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
+    "db:migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
     "db:create": "pnpm db:migrate create",
     "db:down": "pnpm db:migrate down",
     "db:up": "pnpm db:migrate up",

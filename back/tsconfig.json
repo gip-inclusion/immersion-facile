@@ -3,7 +3,6 @@
     "target": "es6",
     "lib": ["esNext", "ES2015"],
     "module": "CommonJS",
-    "resolveJsonModule": true,
     "outDir": "build",
     "strict": true,
     "strictNullChecks": true,
