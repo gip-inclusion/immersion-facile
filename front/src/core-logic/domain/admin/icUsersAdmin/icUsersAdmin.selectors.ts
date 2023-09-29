@@ -32,9 +32,11 @@ const agenciesNeedingReviewForSelectedUser = createSelector(
 const icUsersNeedingReview = createSelector(
   icUsersNeedingReviewSelector,
   (normalizedUsers): AuthenticatedUser[] =>
-    values(normalizedUsers).map(
-      ({ agencyRights, dashboardUrl, ...user }) => user,
-    ),
+    values(normalizedUsers)
+      .filter((user) =>
+        values(user.agencyRights).some((right) => right.role === "toReview"),
+      )
+      .map(({ agencyRights, dashboardUrl, ...user }) => user),
 );
 
 export const icUsersAdminSelectors = {
