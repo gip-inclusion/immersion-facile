@@ -226,6 +226,12 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     id: conventionSectionIds.isMinor,
     required: true,
   },
+  schedule: {
+    label: `Dates et horaires ${
+      internshipKind === "immersion" ? "de l'immersion" : "du stage"
+    }`,
+    id: "",
+  },
 });
 
 const beneficiarySection = (internshipKind: InternshipKind) => ({
@@ -576,10 +582,7 @@ const fieldsToExclude = {
     required: undefined,
     autoComplete: undefined,
   },
-  schedule: {
-    label: "",
-    id: "",
-  },
+
   validators: {
     label: "",
     id: "",
