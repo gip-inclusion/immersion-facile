@@ -117,11 +117,14 @@ describe("Broadcast to partners on updated convention", () => {
     const expectedCallsAfterFirstExecute: NotifySubscriberParams[] = [
       {
         ...callbackParams1,
-        convention: {
-          ...convention1,
-          agencyName: agency1.name,
-          agencyDepartment: agency1.address.departmentCode,
-          agencyKind: agency1.kind,
+        subscribedEvent: "convention.updated",
+        payload: {
+          convention: {
+            ...convention1,
+            agencyName: agency1.name,
+            agencyDepartment: agency1.address.departmentCode,
+            agencyKind: agency1.kind,
+          },
         },
       },
     ];
@@ -135,11 +138,14 @@ describe("Broadcast to partners on updated convention", () => {
       {
         callbackHeaders: callbackParams2.callbackHeaders,
         callbackUrl: callbackParams2.callbackUrl,
-        convention: {
-          ...convention2,
-          agencyName: agency2.name,
-          agencyDepartment: agency2.address.departmentCode,
-          agencyKind: agency2.kind,
+        subscribedEvent: "convention.updated",
+        payload: {
+          convention: {
+            ...convention2,
+            agencyName: agency2.name,
+            agencyDepartment: agency2.address.departmentCode,
+            agencyKind: agency2.kind,
+          },
         },
       },
     ];

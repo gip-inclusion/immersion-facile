@@ -1,15 +1,12 @@
-import { AbsoluteUrl, CallbackHeaders, ConventionReadDto } from "shared";
+import { AbsoluteUrl, CallbackHeaders, SubscriptionEvent } from "shared";
 
 export type NotifySubscriberParams = {
-  convention: ConventionReadDto;
+  subscribedEvent: SubscriptionEvent;
+  payload: unknown;
   callbackUrl: AbsoluteUrl;
   callbackHeaders: CallbackHeaders;
 };
 
 export interface SubscribersGateway {
-  notifyConventionUpdated: (params: {
-    convention: ConventionReadDto;
-    callbackUrl: AbsoluteUrl;
-    callbackHeaders: CallbackHeaders;
-  }) => Promise<void>;
+  notify: (params: NotifySubscriberParams) => Promise<void>;
 }
