@@ -527,7 +527,7 @@ export const emailTemplatesByName =
         content: `
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>
 
-      Nous vous transmettons une demande de convention d'immersion (PMSMP) qui vient d'être faite par un demandeur d'emploi que vous suivez.
+      Nous vous transmettons une demande de convention d'immersion qui vient d'être faite par un demandeur d'emploi que vous suivez.
 
       <strong>Etape 1</strong> : Si le demandeur d’emploi n’est pas reconnu par CVM, procédez à son identification afin de pouvoir traiter le mail. Vous avez les informations à la fin de cet email. 
       Consultez la procédure à suivre pour clôturer cet email : <a href="https://drive.google.com/file/d/1tWL68ua1f-NgYnPkXs979_CkukPtlGRU/view?usp=sharing">Comment traiter un mail Immersion Facilitée dans CVM ?</a>
@@ -557,7 +557,7 @@ export const emailTemplatesByName =
       - ${beneficiaryFirstName} ${beneficiaryLastName}
       - Courriel  : ${beneficiaryEmail}      
 
-      <strong>Entreprise accueillant la PMSMP :</strong>
+      <strong>Entreprise accueillant l'immersion professionnelle :</strong>
       - ${businessName}
       - ${immersionAddress}
 

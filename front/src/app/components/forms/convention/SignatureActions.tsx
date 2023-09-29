@@ -197,7 +197,7 @@ export const SignatureActions = ({
               ) m'engage à avoir pris connaissance des dispositions
               réglementaires{" "}
               {internshipKind === "immersion"
-                ? "de la PMSMP "
+                ? "de l'immersion' "
                 : "du mini-stage "}
               énoncées ci-dessous et à les respecter
             </strong>

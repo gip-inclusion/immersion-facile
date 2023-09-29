@@ -28,10 +28,8 @@ describe("Check Meta contents ", () => {
         route.routeName === "standard"
           ? `${
               standardMetaContent[`${route.params.pagePath}`].title
-            } - PMSMP: Immersion Facile`
-          : `${
-              metaContents[`${route.routeName}`].title
-            } - PMSMP: Immersion Facile`;
+            } - Immersion Facilitée`
+          : `${metaContents[`${route.routeName}`].title} - Immersion Facilitée`;
 
       const expectedDescription =
         route.routeName === "standard"

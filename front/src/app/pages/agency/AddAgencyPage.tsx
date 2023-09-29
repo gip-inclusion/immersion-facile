@@ -9,7 +9,7 @@ export const AddAgencyPage = () => (
       layout="boxed"
       pageHeader={
         <PageHeader
-          title="Ajout d'organisme encadrant les PMSMP"
+          title="Ajout d'organisme encadrant les immersions professionnelles"
           centered
           theme="agency"
         />

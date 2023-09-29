@@ -288,7 +288,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
   ],
   candidate: [
     {
-      title: "Qui peut bénéficier d'une Immersion Professionnelle (PMSMP) ?",
+      title: "Qui peut bénéficier d'une Immersion Professionnelle ?",
       description: `S’inscrivant dans une démarche préventive (bénéficiaire salarié en recherche d’emploi ou de réorientation professionnelle) et proactive (bénéficiaire privé d’emploi, inscrit ou non auprès de Pôle emploi), les périodes...`,
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-beneficier-dune-immersion-professionnelle-pmsmp-jz1af4/",
     },
@@ -314,7 +314,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
     {
       title:
         "Ma structure peut-elle accueillir des immersions professionnelles ?",
-      description: `Une immersion professionnelle (ou Période de mise en situation en milieu professionnel -PMSMP) peut se faire dans n’importe quel type d’établissement, y compris le secteur public ou associatif...`,
+      description: `Une immersion professionnelle peut se faire dans n’importe quel type d’établissement, y compris le secteur public ou associatif...`,
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/ma-structure-peut-elle-accueillir-des-immersions-professionnelles-1ccin58/",
     },
     {

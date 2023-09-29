@@ -22,7 +22,7 @@ export const MetaContent = (): JSX.Element => {
       <Helmet>
         <title>
           {contents
-            ? `${contents.title} - PMSMP: Immersion Facile`
+            ? `${contents.title} - Immersion Facilitée`
             : defaultMetaContents.title}
         </title>
         <meta

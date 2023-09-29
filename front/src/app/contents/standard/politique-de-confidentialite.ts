@@ -85,7 +85,7 @@ Ces derniers sont :
 • Les Conseils départementaux ;
 • Les organismes de « Prépa Apprentissage » ;
 • Inclusion Connect ;
-• Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux PMSMP et liés soit à Pôle emploi, soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des PMSMP sur un périmètre donné.
+• Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux immersions professionnelles et liés soit à Pôle emploi, soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des immersions professionnelles sur un périmètre donné.
 
 <strong>Quelles mesures de sécurité mettons-nous en place ?</strong>
 

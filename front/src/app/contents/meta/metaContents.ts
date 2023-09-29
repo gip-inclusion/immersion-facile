@@ -9,7 +9,7 @@ export type MetaContentType = {
 };
 
 export const defaultMetaContents: MetaContentType = {
-  title: "PMSMP: Immersion Facile",
+  title: "Immersion Facilitée",
   description: "Faciliter la réalisation des immersions professionnelles.",
 };
 
@@ -18,7 +18,7 @@ export const metaContents: Partial<
 > = {
   addAgency: {
     title: "Formulaire d'ajout d'un prescripteur",
-    description: "Devenir prescripteur de PMSMP et immersions professionnelles",
+    description: "Devenir prescripteur d'immersions professionnelles",
   },
   adminTab: {
     title: "AdminTab",
@@ -35,7 +35,7 @@ export const metaContents: Partial<
   editFormEstablishment: {
     title: "Formulaire d'édition entreprise",
     description:
-      "Modifier une entreprise accueillante de PMSMP et immersions professionnelles.",
+      "Modifier une entreprise accueillante d'immersions professionnelles.",
   },
   errorRedirect: {
     title: "Erreur",
@@ -44,36 +44,35 @@ export const metaContents: Partial<
   formEstablishment: {
     title: "Formulaire de référencement entreprise",
     description:
-      "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
+      "Devenir entreprise accueillante d'immersions professionnelles.",
   },
   formEstablishmentForExternals: {
     title: "Formulaire de référencement entreprise",
     description:
-      "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
+      "Devenir entreprise accueillante d'immersions professionnelles.",
   },
   home: {
     title: "Accueil Immersion Facilitée",
-    description:
-      "Faciliter la réalisation des immersions professionnelles et PMSMP.",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   homeCandidates: {
     title: "Accueil béneficiaires",
     description:
-      "Trouver une entreprise pour votre Immersion Professionnelle ou PMSMP et faire une demande de convention.",
+      "Trouver une entreprise pour votre Immersion Professionnelle et faire une demande de convention.",
   },
   homeEstablishments: {
     title: "Accueil entreprises",
     description:
-      "Devenir entreprise accueillante de PMSMP et immersions professionnelles ou modifier une fiche entreprise",
+      "Devenir entreprise accueillante d'immersions professionnelles ou modifier une fiche entreprise",
   },
   homeAgencies: {
     title: "Accueil prescripteurs",
-    description: "Devenir prescripteur de PMSMP et immersions professionnelles",
+    description: "Devenir prescripteur d'immersions professionnelles",
   },
   conventionImmersion: {
     title: "Formulaire de demande d'immersion",
     description:
-      "Démarrer une demande de convention pour une PMSMP ou Immersion Professionnelle.",
+      "Démarrer une demande de convention pour une Immersion Professionnelle.",
   },
   conventionMiniStage: {
     title: "Demande de mini-stage",
@@ -113,7 +112,7 @@ export const metaContents: Partial<
     title:
       "Rechercher une entreprise pour réaliser une immersion professionnelle",
     description:
-      "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles ou PMSMP",
+      "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles",
   },
 };
 

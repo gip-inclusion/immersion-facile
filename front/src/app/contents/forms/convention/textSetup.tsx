@@ -211,7 +211,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   sign: {
     title:
       internshipKind === "immersion"
-        ? "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)"
+        ? "Formulaire pour conventionner une période d'immersion professionnelle"
         : "Formulaire pour conventionner un mini stage",
     summary: `Voici la demande de convention qui vient d'être complétée.
     Relisez la bien et si cela vous convient, signez la avec le bouton "je
