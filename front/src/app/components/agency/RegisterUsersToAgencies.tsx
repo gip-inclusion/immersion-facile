@@ -29,6 +29,12 @@ export const RegisterUsersToAgencies = () => {
 
   const defaultRoleOnAssociation: AgencyRole = "validator";
 
+  useEffect(() => {
+    if (agenciesNeedingReviewForUser.length === 0) {
+      dispatch(icUsersAdminSlice.actions.inclusionConnectedUserSelected(""));
+    }
+  }, [agenciesNeedingReviewForUser]);
+
   return (
     <>
       <h5 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
@@ -39,18 +45,15 @@ export const RegisterUsersToAgencies = () => {
           <Select
             label={`Sélectionner un utilisateur (${icUsersNeedingReview.length} en attente de validation)`}
             options={[
-              {
-                value: "",
-                label: "Sélectionner un utilisateur",
-                disabled: true,
-              },
               ...icUsersNeedingReview.map((user) => ({
                 value: user.id,
                 label: `${user.firstName} ${user.lastName} - ${user.email}`,
               })),
             ]}
+            placeholder="Sélectionner un utilisateur"
             nativeSelectProps={{
               defaultValue: "",
+              value: selectedUserId || "",
               onChange: (event) => {
                 dispatch(
                   icUsersAdminSlice.actions.inclusionConnectedUserSelected(
