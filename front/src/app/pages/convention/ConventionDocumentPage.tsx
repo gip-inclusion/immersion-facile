@@ -198,15 +198,15 @@ export const ConventionDocumentPage = ({
               "peConnect" &&
               convention.signatories.beneficiary.federatedIdentity?.payload && (
                 <li>
-                  conseiller pole emploi référent :{" "}
+                  conseiller Pôle emploi référent :{" "}
                   <strong>
                     {
                       convention.signatories.beneficiary.federatedIdentity
-                        .payload.lastName
+                        .payload.advisor.firstName
                     }{" "}
                     {
                       convention.signatories.beneficiary.federatedIdentity
-                        .payload.firstName
+                        .payload.advisor.lastName
                     }
                   </strong>
                 </li>

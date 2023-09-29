@@ -22,11 +22,13 @@ const buildSignatoriesObject = `JSON_BUILD_OBJECT(
         'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN JSON_BUILD_OBJECT(
           'provider','peConnect',
           'token', p.user_pe_external_id,
-          'payload', CASE WHEN (COALESCE(p.email, p.firstname, p.lastname, p.type) IS NOT NULL) THEN JSON_BUILD_OBJECT(
-           'email',p.email,
-           'firstName', p.firstname,
-           'lastName',p.lastname,
-           'type', p.type
+          'payload', CASE WHEN (p.email IS NOT NULL) THEN JSON_BUILD_OBJECT(
+            'advisor', JSON_BUILD_OBJECT(
+              'email',p.email,
+              'firstName', p.firstname,
+              'lastName',p.lastname,
+              'type', p.type
+            )
           ) ELSE NULL END 
         ) ELSE NULL END,
         'levelOfEducation', CASE WHEN  (b.extra_fields ->> 'levelOfEducation' IS NOT NULL) THEN b.extra_fields ->> 'levelOfEducation' ELSE NULL END,

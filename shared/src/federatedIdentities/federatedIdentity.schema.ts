@@ -6,10 +6,12 @@ export const peConnectIdentitySchema: z.Schema<PeConnectIdentity> = z.object({
   token: z.string(),
   payload: z
     .object({
-      email: z.string(),
-      firstName: z.string(),
-      lastName: z.string(),
-      type: z.enum(["PLACEMENT", "CAPEMPLOI", "INDEMNISATION"]),
+      advisor: z.object({
+        email: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
+        type: z.enum(["PLACEMENT", "CAPEMPLOI", "INDEMNISATION"]),
+      }),
     })
     .optional(),
 });

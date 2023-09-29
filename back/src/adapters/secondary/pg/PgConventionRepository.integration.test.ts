@@ -205,7 +205,7 @@ describe("PgConventionRepository", () => {
     expect(conventionRetreived?.signatories.beneficiary.isRqth).toBeUndefined();
   });
 
-  it("Adds a new convention with beneficiary with federatedIdentity with payload", async () => {
+  it("Adds a new convention with a beneficiary having a federatedIdentity with a payload", async () => {
     const extraFields = {
       emergencyContact: "jean bon",
     };
@@ -223,10 +223,12 @@ describe("PgConventionRepository", () => {
         provider: "peConnect",
         token: userPeExternalId,
         payload: {
-          email: "john@mail.com",
-          firstName: "John",
-          lastName: "Doe",
-          type: "PLACEMENT",
+          advisor: {
+            email: "john@mail.com",
+            firstName: "John",
+            lastName: "Doe",
+            type: "PLACEMENT",
+          },
         },
       })
       .build();
@@ -248,15 +250,17 @@ describe("PgConventionRepository", () => {
       provider: "peConnect",
       token: userPeExternalId,
       payload: {
-        email: "john@mail.com",
-        firstName: "John",
-        lastName: "Doe",
-        type: "PLACEMENT",
+        advisor: {
+          email: "john@mail.com",
+          firstName: "John",
+          lastName: "Doe",
+          type: "PLACEMENT",
+        },
       },
     });
   });
 
-  it("Adds a new convention with beneficiary with federatedIdentity without payload", async () => {
+  it("Adds a new convention with a beneficiary having a federatedIdentity without a payload", async () => {
     const extraFields = {
       emergencyContact: "jean bon",
     };
@@ -524,10 +528,12 @@ describe("PgConventionRepository", () => {
         provider: "peConnect",
         token: peConnectId,
         payload: {
-          email: "john@mail.com",
-          firstName: "John",
-          lastName: "Doe",
-          type: "PLACEMENT",
+          advisor: {
+            email: "john@mail.com",
+            firstName: "John",
+            lastName: "Doe",
+            type: "PLACEMENT",
+          },
         },
       })
       .build();
