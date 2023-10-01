@@ -11,6 +11,7 @@ import {
   currentJwtVersions,
   displayRouteName,
   expectEmailOfType,
+  expectHttpResponseToEqual,
   expectToEqual,
   InclusionConnectedUser,
   stringToMd5,
@@ -95,7 +96,7 @@ describe("convention e2e", () => {
         body: convention,
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: { id: convention.id },
       });
@@ -149,7 +150,7 @@ describe("convention e2e", () => {
           },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: "",
         });
@@ -253,7 +254,7 @@ describe("convention e2e", () => {
           urlParams: { conventionId: convention.id },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: {
             ...convention,
@@ -357,7 +358,7 @@ describe("convention e2e", () => {
         },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: { id: convention.id },
       });
@@ -458,7 +459,7 @@ describe("convention e2e", () => {
           },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: { id: convention.id },
         });

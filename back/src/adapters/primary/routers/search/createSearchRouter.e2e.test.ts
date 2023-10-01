@@ -1,6 +1,7 @@
 import { type SuperTest, type Test } from "supertest";
 import {
   AppellationCode,
+  expectHttpResponseToEqual,
   expectToEqual,
   immersionOffersRoute,
   searchImmersionRoutes,
@@ -90,7 +91,7 @@ describe("search-immersion route", () => {
           },
         });
 
-        expectToEqual(result, {
+        expectHttpResponseToEqual(result, {
           status: 200,
           body: [
             establishmentAggregateToSearchResultByRome(
@@ -111,7 +112,7 @@ describe("search-immersion route", () => {
             sortedBy: "distance",
           },
         });
-        expectToEqual(result, {
+        expectHttpResponseToEqual(result, {
           status: 200,
           body: [],
         });
@@ -128,7 +129,7 @@ describe("search-immersion route", () => {
           },
         });
 
-        expectToEqual(result, {
+        expectHttpResponseToEqual(result, {
           status: 200,
           body: [],
         });
@@ -145,7 +146,7 @@ describe("search-immersion route", () => {
           appellationCode: "XXX",
         },
       });
-      expectToEqual(result, {
+      expectHttpResponseToEqual(result, {
         status: 400,
         body: {
           status: 400,
@@ -164,7 +165,7 @@ describe("search-immersion route", () => {
           groupSlug: "some-group-slug",
         },
       });
-      expectToEqual(result, {
+      expectHttpResponseToEqual(result, {
         status: 200,
         body: [stubSearchResult],
       });

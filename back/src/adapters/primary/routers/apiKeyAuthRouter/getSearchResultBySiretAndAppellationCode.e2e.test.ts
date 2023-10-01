@@ -1,5 +1,9 @@
 import { SuperTest, Test } from "supertest";
-import { AppellationAndRomeDto, expectToEqual } from "shared";
+import {
+  AppellationAndRomeDto,
+  expectHttpResponseToEqual,
+  expectToEqual,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
@@ -102,7 +106,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       },
     });
 
-    expectToEqual(response, {
+    expectHttpResponseToEqual(response, {
       status: 401,
       body: { status: 401, message: "unauthenticated" },
     });
@@ -173,7 +177,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       },
     });
 
-    expectToEqual(response, {
+    expectHttpResponseToEqual(response, {
       status: 403,
       body: { message: "Accès refusé", status: 403 },
     });

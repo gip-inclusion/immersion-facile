@@ -4,8 +4,8 @@ import {
   BackOfficeJwt,
   BackOfficeJwtPayload,
   displayRouteName,
+  expectHttpResponseToEqual,
   expectObjectsToMatch,
-  expectToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -43,7 +43,7 @@ describe(`${displayRouteName(adminRoutes.login)} Admin login`, () => {
         password: "lulu",
       },
     });
-    expectToEqual(response, {
+    expectHttpResponseToEqual(response, {
       status: 403,
       body: {
         errors: "Wrong credentials",
@@ -59,7 +59,7 @@ describe(`${displayRouteName(adminRoutes.login)} Admin login`, () => {
       },
     });
 
-    expectToEqual(response, {
+    expectHttpResponseToEqual(response, {
       status: 200,
       body: expect.any(String),
     });

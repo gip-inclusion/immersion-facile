@@ -25,7 +25,11 @@ export class HttpSearchGateway implements SearchGateway {
       })
       .catch((error): HttpResponse<number, string> | never => {
         if (error.httpStatusCode) {
-          return { body: error.message, status: error.httpStatusCode };
+          return {
+            body: error.message,
+            status: error.httpStatusCode,
+            headers: error.headers,
+          };
         }
         throw error;
       });

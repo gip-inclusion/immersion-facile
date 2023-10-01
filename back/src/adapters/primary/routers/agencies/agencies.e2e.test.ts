@@ -5,6 +5,7 @@ import {
   agencyRoutes,
   BackOfficeJwt,
   displayRouteName,
+  expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -91,7 +92,7 @@ describe(`Agency routes`, () => {
           queryParams: { departmentCode: "20" },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: [
             {
@@ -121,7 +122,7 @@ describe(`Agency routes`, () => {
           queryParams: { agencyId: agency1ActiveNearBy.id },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: {
             address: {
@@ -153,7 +154,7 @@ describe(`Agency routes`, () => {
           headers: { authorization: "" },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 401,
           body: { error: "You need to authenticate first" },
         });
@@ -172,7 +173,7 @@ describe(`Agency routes`, () => {
           headers: { authorization: adminToken },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: [
             {
@@ -198,7 +199,7 @@ describe(`Agency routes`, () => {
           urlParams: { agencyId: agency4NeedsReview.id },
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: "",
         });
@@ -224,7 +225,7 @@ describe(`Agency routes`, () => {
           body: {} as any,
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 401,
           body: { error: "Provided token is invalid" },
         });
@@ -246,7 +247,7 @@ describe(`Agency routes`, () => {
           body: updatedAgency,
         });
 
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 200,
           body: "",
         });

@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   displayRouteName,
+  expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -115,7 +116,7 @@ describe("Convention routes", () => {
         urlParams: { conventionId: convention.id },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 403,
         body: {
           status: 403,
@@ -158,7 +159,7 @@ describe("Convention routes", () => {
         queryParams: {},
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: {
           status: 401,
@@ -173,7 +174,7 @@ describe("Convention routes", () => {
         queryParams: {},
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 403,
         body: {
           status: 403,
@@ -198,7 +199,7 @@ describe("Convention routes", () => {
         queryParams: {},
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         body: [
           {
             ...convention,
