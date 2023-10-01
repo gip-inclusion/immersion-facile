@@ -1,5 +1,5 @@
 import { partition } from "ramda";
-import { UnknownSharedRoute } from "shared-routes";
+import type { HttpResponse, UnknownSharedRoute } from "shared-routes";
 import { EmailType, TemplatedEmail } from "./email/email";
 
 export const expectPromiseToFail = async (promise: Promise<unknown>) => {
@@ -76,6 +76,15 @@ export const expectEmailOfType = <
 
 export const expectToEqual = <T>(actual: T, expected: T) => {
   expect(actual).toEqual(expected);
+};
+
+export const expectHttpResponseToEqual = <R extends HttpResponse<any, unknown>>(
+  { headers, ...rest }: R,
+  expected: Omit<R, "headers"> & Partial<Pick<R, "headers">>,
+) => {
+  const { headers: expectedHeaders, ...expectedRest } = expected;
+  expect(rest).toEqual(expectedRest);
+  expect(headers).toMatchObject(expectedHeaders ?? {});
 };
 
 export const expectObjectsToMatch = <T>(actual: T, expected: Partial<T>) => {

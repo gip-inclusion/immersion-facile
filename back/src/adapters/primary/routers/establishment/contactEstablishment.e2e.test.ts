@@ -1,6 +1,7 @@
 import {
   ContactEstablishmentRequestDto,
   expectArraysToMatch,
+  expectHttpResponseToEqual,
   expectToEqual,
   searchImmersionRoutes,
   SearchRoutes,
@@ -82,7 +83,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
       body: validRequest,
     });
 
-    expectToEqual(result, {
+    expectHttpResponseToEqual(result, {
       status: 201,
       body: "",
     });

@@ -8,6 +8,7 @@ import {
   ApiConsumerJwt,
   BackOfficeJwt,
   displayRouteName,
+  expectHttpResponseToEqual,
   expectToEqual,
   FeatureFlags,
   featureFlagsRoute,
@@ -80,7 +81,7 @@ describe("Admin router", () => {
         queryParams: {},
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: "http://stubDashboard/events",
       });
@@ -92,7 +93,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
         queryParams: {},
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: "http://stubDashboard/establishments",
       });
@@ -104,7 +105,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
         queryParams: { agencyId: "my-agency-id" },
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: "http://stubAgencyDashboard/my-agency-id",
       });
@@ -117,7 +118,7 @@ describe("Admin router", () => {
         queryParams: {},
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 400,
         body: {
           errors: `Error: ${new ZodError([
@@ -193,7 +194,7 @@ describe("Admin router", () => {
         queryParams: {},
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 400,
         body: {
           errors:
@@ -208,7 +209,7 @@ describe("Admin router", () => {
         headers: { authorization: "" },
         queryParams: {},
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "You need to authenticate first" },
       });
@@ -220,7 +221,7 @@ describe("Admin router", () => {
         headers: { authorization: "wrong-token" },
         queryParams: {},
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "Provided token is invalid" },
       });
@@ -245,7 +246,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 201,
         body: "",
       });
@@ -279,7 +280,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 201,
         body: "",
       });
@@ -301,7 +302,7 @@ describe("Admin router", () => {
         },
         headers: { authorization: "wrong-token" },
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "Provided token is invalid" },
       });
@@ -316,7 +317,7 @@ describe("Admin router", () => {
         queryParams: { agencyRole: "toReview" },
         headers: { authorization: token },
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: [],
       });
@@ -327,7 +328,7 @@ describe("Admin router", () => {
         queryParams: { agencyRole: "toReview" },
         headers: { authorization: "" },
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "You need to authenticate first" },
       });
@@ -362,7 +363,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 201,
         body: "",
       });
@@ -385,7 +386,7 @@ describe("Admin router", () => {
         headers: { authorization: "" },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "You need to authenticate first" },
       });
@@ -412,7 +413,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 404,
         body: { errors: "User with id my-user-id not found" },
       });
@@ -515,7 +516,7 @@ describe("Admin router", () => {
       const response = await sharedRequest.getAllApiConsumers({
         headers: { authorization: token },
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: [],
       });
@@ -526,7 +527,7 @@ describe("Admin router", () => {
         headers: { authorization: "" },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "You need to authenticate first" },
       });
@@ -538,7 +539,7 @@ describe("Admin router", () => {
         headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "Provided token is invalid" },
       });
@@ -552,9 +553,9 @@ const expectResponseAndReturnJwt = <
   >,
 >(
   response: R,
-  expected: R,
+  expected: Omit<R, "headers">,
 ): ApiConsumerJwt | undefined => {
-  expectToEqual(response, expected);
+  expectHttpResponseToEqual(response, expected);
 
   if (response.status === 200) return response.body as ApiConsumerJwt;
 };

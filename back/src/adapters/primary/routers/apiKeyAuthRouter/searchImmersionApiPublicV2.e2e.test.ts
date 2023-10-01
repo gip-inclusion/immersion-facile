@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { AppellationAndRomeDto, expectToEqual } from "shared";
+import { AppellationAndRomeDto, expectHttpResponseToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
@@ -63,7 +63,7 @@ describe("search route", () => {
           },
           queryParams: {} as any,
         });
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 401,
           body: { message: "unauthenticated", status: 401 },
         });
@@ -83,7 +83,7 @@ describe("search route", () => {
             distanceKm: 10,
           },
         });
-        expectToEqual(response, {
+        expectHttpResponseToEqual(response, {
           status: 403,
           body: {
             status: 403,
@@ -236,7 +236,7 @@ describe("search route", () => {
         },
         queryParams: {} as any,
       });
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 400,
         body: {
           status: 400,
