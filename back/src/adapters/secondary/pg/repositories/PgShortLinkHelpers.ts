@@ -21,7 +21,7 @@ export const pgGetShortLinkByIdResultsSchema: z.Schema<
 > = z.array(pgShortLinkRepositorySchema);
 
 export const pgShortLinkRepositoryStructure = {
-  tableName: "short_link_repository",
+  tableName: "short_links",
   columnNames: {
     shortLinkId: "short_link_id",
     url: "url",
