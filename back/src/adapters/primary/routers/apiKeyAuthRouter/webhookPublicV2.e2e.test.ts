@@ -1,5 +1,9 @@
 import { SuperTest, Test } from "supertest";
-import { ApiConsumer, expectToEqual, WebhookSubscription } from "shared";
+import {
+  ApiConsumer,
+  expectHttpResponseToEqual,
+  WebhookSubscription,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -57,7 +61,7 @@ describe("Webhook routes", () => {
         },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 201,
         body: "",
       });
@@ -84,7 +88,7 @@ describe("Webhook routes", () => {
         },
       });
 
-      expect(response).toEqual({
+      expectHttpResponseToEqual(response, {
         status: 403,
         body: { message: "Accès refusé", status: 403 },
       });
@@ -134,7 +138,7 @@ describe("Webhook routes", () => {
         },
       });
 
-      expectToEqual(response, {
+      expectHttpResponseToEqual(response, {
         status: 200,
         body: [subscription],
       });
@@ -155,7 +159,7 @@ describe("Webhook routes", () => {
         },
       });
 
-      expect(response).toEqual({
+      expectHttpResponseToEqual(response, {
         status: 403,
         body: { message: "Accès refusé", status: 403 },
       });
