@@ -1,13 +1,8 @@
 import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
-import {
-  featureFlagsRoute,
-  inboundEmailParsingRoute,
-  renewMagicLinkRoute,
-  shortLinkRoute,
-  uploadFileRoute,
-} from "shared";
+import { technicalRoutes, uploadFileRoute } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
@@ -19,19 +14,6 @@ export const createTechnicalRouter = (
   inboundEmailAllowIps: string[],
 ) => {
   const technicalRouter = Router();
-  technicalRouter
-    .route(`/${renewMagicLinkRoute}`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.renewConventionMagicLink.execute(req.query as any),
-      ),
-    );
-
-  technicalRouter
-    .route(`/${featureFlagsRoute}`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, deps.useCases.getFeatureFlags.execute),
-    );
 
   const upload = multer({ storage: multer.memoryStorage() });
 
@@ -44,23 +26,12 @@ export const createTechnicalRouter = (
       }),
     );
 
-  technicalRouter
-    .route(`/${shortLinkRoute}/:shortLinkId`)
-    .get(async (req, res) =>
-      sendRedirectResponse(req, res, () =>
-        deps.useCases.getLink.execute(req.params.shortLinkId),
-      ),
-    );
+  const technicalSharedRouter = createExpressSharedRouter(
+    technicalRoutes,
+    technicalRouter,
+  );
 
-  technicalRouter
-    .route(`/open-api-spec`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        Promise.resolve(createOpenApiSpecV2(deps.config.envType)),
-      ),
-    );
-
-  technicalRouter.route(`/${inboundEmailParsingRoute}`).post(
+  technicalSharedRouter.inboundEmailParsing(
     IpFilter(inboundEmailAllowIps, {
       mode: "allow",
       logLevel: "deny",
@@ -77,6 +48,37 @@ export const createTechnicalRouter = (
       sendHttpResponse(req, res, () =>
         deps.useCases.addExchangeToDiscussionAndSendEmail.execute(req.body),
       ),
+  );
+
+  technicalSharedRouter.openApiSpec(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      Promise.resolve(createOpenApiSpecV2(deps.config.envType)),
+    ),
+  );
+
+  technicalSharedRouter.shortLink(async (req, res) =>
+    sendRedirectResponse(req, res, () =>
+      deps.useCases.getLink.execute(req.params.shortLinkId),
+    ),
+  );
+
+  technicalSharedRouter.featureFlags(async (req, res) =>
+    sendHttpResponse(req, res, deps.useCases.getFeatureFlags.execute),
+  );
+
+  technicalSharedRouter.renewMagicLink(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.renewConventionMagicLink.execute(req.query),
+    ),
+  );
+
+  technicalSharedRouter.htmlToPdf(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.htmlToPdf.execute(
+        req.body.htmlContent,
+        req.payloads?.convention,
+      ),
+    ),
   );
 
   return technicalRouter;

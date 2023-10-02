@@ -10,12 +10,14 @@ export type ConventionDocumentProperties = {
   children: React.ReactNode;
   logos: React.ReactNode[];
   title: string;
+  customActions?: React.ReactNode[];
 };
 
 export const ConventionDocument = ({
   children,
   logos,
   title,
+  customActions,
 }: ConventionDocumentProperties) => {
   const { cx } = useStyles();
   const renderLogos = () =>
@@ -31,6 +33,7 @@ export const ConventionDocument = ({
   return (
     <section className={cx(componentName)}>
       <div className={cx(`${componentName}__tools`)}>
+        {customActions}
         <Button onClick={window.print} type="button">
           Imprimer la convention
         </Button>

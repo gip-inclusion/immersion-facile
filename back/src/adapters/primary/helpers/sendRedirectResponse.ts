@@ -3,7 +3,7 @@ import { AbsoluteUrl } from "shared";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 export const sendRedirectResponse = async (
-  request: Request,
+  request: Request<any, any, any, any, any>,
   response: Response,
   redirectUrlCallback: () => Promise<AbsoluteUrl>,
 ) => {

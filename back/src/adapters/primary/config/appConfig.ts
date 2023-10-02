@@ -324,6 +324,13 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("PASS_EMPLOI_URL");
   }
 
+  public get pdfGeneratorGateway() {
+    return this.#throwIfNotInArray({
+      variableName: "PDF_GENERATOR_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "PUPPETEER"],
+    });
+  }
+
   public get peApiUrl(): AbsoluteUrl {
     return this.#throwIfNotAbsoluteUrl("POLE_EMPLOI_API_URL");
   }

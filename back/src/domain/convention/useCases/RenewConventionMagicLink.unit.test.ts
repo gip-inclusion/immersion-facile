@@ -10,7 +10,6 @@ import {
   frontRoutes,
   RenewMagicLinkRequestDto,
   Role,
-  shortLinkRoute,
 } from "shared";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
@@ -145,8 +144,8 @@ describe("RenewConventionMagicLink use case", () => {
         expectToEqual(
           [dispatchedPayload.magicLink, dispatchedPayload.conventionStatusLink],
           [
-            `${config.immersionFacileBaseUrl}/api/${shortLinkRoute}/${shortLinks[0]}`,
-            `${config.immersionFacileBaseUrl}/api/${shortLinkRoute}/${shortLinks[1]}`,
+            `${config.immersionFacileBaseUrl}/api/to/${shortLinks[0]}`,
+            `${config.immersionFacileBaseUrl}/api/to/${shortLinks[1]}`,
           ],
         );
 

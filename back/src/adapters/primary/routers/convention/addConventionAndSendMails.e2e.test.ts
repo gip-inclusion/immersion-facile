@@ -8,11 +8,13 @@ import {
   expectJwtInMagicLinkAndGetIt,
   expectToEqual,
   Signatories,
+  technicalRoutes,
   TemplatedEmail,
   unauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
   VALID_EMAILS,
 } from "shared";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import {
   buildTestApp,
   TestAppAndDeps,
@@ -177,6 +179,10 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   convention: ConventionDto,
   submitDate: Date,
 ) => {
+  const technicalRoutesClient = createSupertestSharedClient(
+    technicalRoutes,
+    request,
+  );
   gateways.timeGateway.setNextDate(submitDate);
   gateways.shortLinkGenerator.addMoreShortLinkIds([
     "shortLink1",
@@ -225,12 +231,12 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   const beneficiarySignLink = await shortLinkRedirectToLinkWithValidation(
     beneficiaryShortLinkSignEmail.params.conventionSignShortlink,
-    request,
+    technicalRoutesClient,
   );
 
   const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
     establishmentShortLinkSignEmail.params.conventionSignShortlink,
-    request,
+    technicalRoutesClient,
   );
 
   const beneficiarySignJwt = expectJwtInMagicLinkAndGetIt(beneficiarySignLink);
@@ -284,6 +290,10 @@ const establishmentSignsApplication = async (
   establishmentSignJwt: string,
   initialConvention: ConventionDto,
 ) => {
+  const technicalRoutesClient = createSupertestSharedClient(
+    technicalRoutes,
+    request,
+  );
   gateways.timeGateway.setNextDate(establishmentRepresentativeSignDate);
 
   await request
@@ -331,7 +341,7 @@ const establishmentSignsApplication = async (
     validatorReviewJwt: expectJwtInMagicLinkAndGetIt(
       await shortLinkRedirectToLinkWithValidation(
         needsReviewEmail.params.magicLink,
-        request,
+        technicalRoutesClient,
       ),
     ),
   };
@@ -342,6 +352,10 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   validatorReviewJwt: string,
   initialConvention: ConventionDto,
 ) => {
+  const technicalRoutesClient = createSupertestSharedClient(
+    technicalRoutes,
+    request,
+  );
   const params: UpdateConventionStatusRequestDto = {
     status: "ACCEPTED_BY_VALIDATOR",
     conventionId: initialConvention.id,
@@ -402,7 +416,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   expectJwtInMagicLinkAndGetIt(
     await shortLinkRedirectToLinkWithValidation(
       needsToTriggerConventionSentEmail.params.magicLink,
-      request,
+      technicalRoutesClient,
     ),
   );
 };

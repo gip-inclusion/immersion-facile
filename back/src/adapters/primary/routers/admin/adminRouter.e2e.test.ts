@@ -13,11 +13,11 @@ import {
   expectHttpResponseToEqual,
   expectToEqual,
   FeatureFlags,
-  featureFlagsRoute,
   InclusionConnectedUser,
   makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   SetFeatureFlagParam,
+  technicalRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
@@ -70,7 +70,7 @@ describe("Admin router", () => {
       });
 
     getFeatureFlags = async () => {
-      const { body } = await request.get(`/${featureFlagsRoute}`);
+      const { body } = await request.get(technicalRoutes.featureFlags.url);
       return body;
     };
   });

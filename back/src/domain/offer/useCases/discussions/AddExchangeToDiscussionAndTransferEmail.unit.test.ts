@@ -1,4 +1,5 @@
 import {
+  BrevoInboundBody,
   expectPromiseToFailWithError,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
@@ -19,10 +20,7 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { InMemoryDiscussionAggregateRepository } from "../../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import {
-  AddExchangeToDiscussionAndTransferEmail,
-  BrevoInboundBody,
-} from "./AddExchangeToDiscussionAndTransferEmail";
+import { AddExchangeToDiscussionAndTransferEmail } from "./AddExchangeToDiscussionAndTransferEmail";
 
 const domain = "my-domain.com";
 const replyDomain = `reply.${domain}`;

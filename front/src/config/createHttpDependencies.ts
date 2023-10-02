@@ -9,6 +9,7 @@ import {
   openApiDocTargets,
   searchImmersionRoutes,
   siretTargets,
+  technicalRoutes,
   unauthenticatedConventionRoutes,
   validateEmailsTargets,
 } from "shared";
@@ -63,7 +64,10 @@ export const createHttpDependencies = (): Dependencies => {
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(
       createHttpClient(siretTargets),
     ),
-    technicalGateway: new HttpTechnicalGateway(axiosOnSlashApi),
+    technicalGateway: new HttpTechnicalGateway(
+      createAxiosSharedClient(technicalRoutes, axiosOnSlashApi),
+      axiosOnSlashApi,
+    ),
     emailValidationGateway: new HttpEmailValidationGateway(
       createHttpClient(validateEmailsTargets),
     ),

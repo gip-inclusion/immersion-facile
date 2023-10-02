@@ -330,7 +330,9 @@ export const domElementIds = {
 
   conventionStatusDashboard: {},
   group: {},
-  conventionDocument: {},
+  conventionDocument: {
+    downloadPdfButton: "im-convention-document__download-pdf-button",
+  },
   landingEstablishment: {},
   conventionToSign: {
     submitButton: "im-convention-to-sign__submit-button",

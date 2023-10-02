@@ -1,5 +1,7 @@
-import { z } from "zod";
 import {
+  BrevoEmailItem,
+  BrevoInboundBody,
+  brevoInboundBodySchema,
   DiscussionId,
   ExchangeRole,
   immersionFacileContactEmail,
@@ -22,83 +24,6 @@ import {
   createOpaqueEmail,
   ExchangeEntity,
 } from "../../entities/DiscussionAggregate";
-
-type BrevoAttachment = {
-  Name: string;
-  ContentType: string;
-  ContentLength: number;
-  ContentID: string;
-  DownloadToken: string;
-};
-
-type BrevoRecipient = {
-  Name: string | null;
-  Address: string;
-};
-
-type BrevoEmailItem = {
-  Uuid: string[];
-  MessageId: string;
-  InReplyTo: string | null;
-  From: BrevoRecipient;
-  To: BrevoRecipient[];
-  Cc: BrevoRecipient[];
-  ReplyTo: BrevoRecipient | null;
-  SentAtDate: string;
-  Subject: string;
-  Attachments: BrevoAttachment[];
-  RawHtmlBody: string | null;
-  RawTextBody: string | null;
-};
-
-export type BrevoInboundBody = {
-  items: BrevoEmailItem[];
-};
-
-const brevoInboundBodySchema: z.Schema<BrevoInboundBody> = z.object({
-  items: z.array(
-    z.object({
-      Uuid: z.array(z.string()),
-      MessageId: z.string(),
-      InReplyTo: z.string().nullable(),
-      From: z.object({
-        Name: z.string().nullable(),
-        Address: z.string(),
-      }),
-      To: z.array(
-        z.object({
-          Name: z.string().nullable(),
-          Address: z.string(),
-        }),
-      ),
-      Cc: z.array(
-        z.object({
-          Name: z.string().nullable(),
-          Address: z.string(),
-        }),
-      ),
-      ReplyTo: z
-        .object({
-          Name: z.string().nullable(),
-          Address: z.string(),
-        })
-        .nullable(),
-      SentAtDate: z.string(),
-      Subject: z.string(),
-      Attachments: z.array(
-        z.object({
-          Name: z.string(),
-          ContentType: z.string(),
-          ContentLength: z.number(),
-          ContentID: z.string(),
-          DownloadToken: z.string(),
-        }),
-      ),
-      RawHtmlBody: z.string().nullable(),
-      RawTextBody: z.string().nullable(),
-    }),
-  ),
-});
 
 export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundBody> {
   protected inputSchema = brevoInboundBodySchema;

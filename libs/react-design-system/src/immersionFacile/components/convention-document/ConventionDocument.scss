@@ -20,6 +20,7 @@
       padding: 0;
       box-shadow: none;
       max-width: 100%;
+      line-height: 1.4;
       h1 {
         font-size: 18pt !important;
       }
@@ -35,7 +36,7 @@
       p,
       ul,
       li {
-        font-size: 11pt !important;
+        font-size: 10pt !important;
       }
       footer p,
       footer ul,
@@ -55,5 +56,10 @@
   &__logo {
     max-height: 8rem;
     max-width: 8rem;
+  }
+}
+.tally-popup {
+  @include for-print {
+    display: none !important;
   }
 }

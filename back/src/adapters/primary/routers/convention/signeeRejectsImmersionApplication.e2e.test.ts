@@ -7,9 +7,11 @@ import {
   expectJwtInMagicLinkAndGetIt,
   expectObjectsToMatch,
   expectToEqual,
+  technicalRoutes,
   unauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
 } from "shared";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import {
   buildTestApp,
   TestAppAndDeps,
@@ -94,14 +96,16 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
 
+  const httpClient = createSupertestSharedClient(technicalRoutes, request);
+
   const beneficiarySignLink = await shortLinkRedirectToLinkWithValidation(
     beneficiarySignEmail.params.conventionSignShortlink,
-    request,
+    httpClient,
   );
 
   const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
     establishmentSignEmail.params.conventionSignShortlink,
-    request,
+    httpClient,
   );
 
   const beneficiaryJwt = expectJwtInMagicLinkAndGetIt(beneficiarySignLink);
@@ -146,9 +150,11 @@ const expectEstablishmentRequiresChanges = async (
     "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
   );
 
+  const httpClient = createSupertestSharedClient(technicalRoutes, request);
+
   const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
     establishmentEditEmail.params.magicLink,
-    request,
+    httpClient,
   );
 
   const establishmentEditJwt = expectJwtInMagicLinkAndGetIt(
