@@ -14,14 +14,18 @@ describe("HttpSubscribersGateway", () => {
       agencyKind: "mission-locale",
     };
 
-    const response = await httpSubscribersGateway.notify({
-      payload: conventionReadDto,
-      subscribedEvent: "convention.updated",
-      callbackUrl: "https://jsonplaceholder.typicode.com/posts",
-      callbackHeaders: {
-        authorization: "my-cb-auth-header",
+    const response = await httpSubscribersGateway.notify(
+      {
+        payload: { convention: conventionReadDto },
+        subscribedEvent: "convention.updated",
       },
-    });
+      {
+        callbackUrl: "https://jsonplaceholder.typicode.com/posts",
+        callbackHeaders: {
+          authorization: "my-cb-auth-header",
+        },
+      },
+    );
 
     expect(response).toBeUndefined();
   });

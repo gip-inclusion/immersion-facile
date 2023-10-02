@@ -1,16 +1,25 @@
+import { SubscriptionParams } from "shared";
 import {
-  NotifySubscriberParams,
+  ConventionUpdatedSubscriptionCallbackBody,
   SubscribersGateway,
 } from "../../../domain/broadcast/ports/SubscribersGateway";
 
-export class InMemorySubscribersGateway implements SubscribersGateway {
-  #calls: NotifySubscriberParams[] = [];
+export type CallbackParams = {
+  body: ConventionUpdatedSubscriptionCallbackBody;
+  subscriptionParams: SubscriptionParams;
+};
 
-  public get calls(): NotifySubscriberParams[] {
+export class InMemorySubscribersGateway implements SubscribersGateway {
+  #calls: CallbackParams[] = [];
+
+  public get calls(): CallbackParams[] {
     return this.#calls;
   }
 
-  public async notify(params: NotifySubscriberParams): Promise<void> {
-    this.#calls.push(params);
+  public async notify(
+    body: ConventionUpdatedSubscriptionCallbackBody,
+    subscriptionParams: SubscriptionParams,
+  ): Promise<void> {
+    this.#calls.push({ body, subscriptionParams });
   }
 }

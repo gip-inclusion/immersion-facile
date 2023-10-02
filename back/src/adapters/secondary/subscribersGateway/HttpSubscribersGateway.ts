@@ -1,6 +1,7 @@
 import { AxiosInstance } from "axios";
+import { SubscriptionParams } from "shared";
 import {
-  NotifySubscriberParams,
+  ConventionUpdatedSubscriptionCallbackBody,
   SubscribersGateway,
 } from "../../../domain/broadcast/ports/SubscribersGateway";
 import { createLogger } from "../../../utils/logger";
@@ -15,12 +16,10 @@ export class HttpSubscribersGateway implements SubscribersGateway {
     this.#axios = axios;
   }
 
-  public async notify({
-    payload,
-    callbackUrl,
-    callbackHeaders,
-    subscribedEvent,
-  }: NotifySubscriberParams): Promise<void> {
+  public async notify(
+    { payload, subscribedEvent }: ConventionUpdatedSubscriptionCallbackBody,
+    { callbackUrl, callbackHeaders }: SubscriptionParams,
+  ): Promise<void> {
     try {
       const response = await this.#axios.post(
         callbackUrl,

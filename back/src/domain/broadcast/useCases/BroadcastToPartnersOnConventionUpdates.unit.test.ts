@@ -7,8 +7,10 @@ import {
 import { ApiConsumerBuilder } from "../../../_testBuilders/ApiConsumerBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemorySubscribersGateway } from "../../../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
-import { NotifySubscriberParams } from "../ports/SubscribersGateway";
+import {
+  CallbackParams,
+  InMemorySubscribersGateway,
+} from "../../../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
 import { BroadcastToPartnersOnConventionUpdates } from "./BroadcastToPartnersOnConventionUpdates";
 
 describe("Broadcast to partners on updated convention", () => {
@@ -34,7 +36,7 @@ describe("Broadcast to partners on updated convention", () => {
       [convention2.id]: convention2,
     });
 
-    const callbackParams1: SubscriptionParams = {
+    const subscriptionParams: SubscriptionParams = {
       callbackHeaders: { authorization: "my-cb-auth-header" },
       callbackUrl: "https://www.my-service.com/convention-updated",
     };
@@ -46,7 +48,7 @@ describe("Broadcast to partners on updated convention", () => {
         scope: { agencyIds: [agency1.id] },
         subscriptions: [
           {
-            ...callbackParams1,
+            ...subscriptionParams,
             subscribedEvent: "convention.updated",
             createdAt: new Date().toISOString(),
             id: "my-subscription-id",
@@ -90,7 +92,7 @@ describe("Broadcast to partners on updated convention", () => {
         scope: { agencyIds: [agency1.id] },
         subscriptions: [
           {
-            ...callbackParams1,
+            ...subscriptionParams,
             subscribedEvent: "convention.updated",
             createdAt: new Date().toISOString(),
             id: "my-subscription-id",
@@ -114,18 +116,20 @@ describe("Broadcast to partners on updated convention", () => {
 
     await broadcastUpdatedConvention.execute(convention1);
 
-    const expectedCallsAfterFirstExecute: NotifySubscriberParams[] = [
+    const expectedCallsAfterFirstExecute: CallbackParams[] = [
       {
-        ...callbackParams1,
-        subscribedEvent: "convention.updated",
-        payload: {
-          convention: {
-            ...convention1,
-            agencyName: agency1.name,
-            agencyDepartment: agency1.address.departmentCode,
-            agencyKind: agency1.kind,
+        body: {
+          subscribedEvent: "convention.updated",
+          payload: {
+            convention: {
+              ...convention1,
+              agencyName: agency1.name,
+              agencyDepartment: agency1.address.departmentCode,
+              agencyKind: agency1.kind,
+            },
           },
         },
+        subscriptionParams,
       },
     ];
 
@@ -133,19 +137,23 @@ describe("Broadcast to partners on updated convention", () => {
 
     await broadcastUpdatedConvention.execute(convention2);
 
-    const expectedCallsAfterSecondExecute: NotifySubscriberParams[] = [
+    const expectedCallsAfterSecondExecute: CallbackParams[] = [
       ...expectedCallsAfterFirstExecute,
       {
-        callbackHeaders: callbackParams2.callbackHeaders,
-        callbackUrl: callbackParams2.callbackUrl,
-        subscribedEvent: "convention.updated",
-        payload: {
-          convention: {
-            ...convention2,
-            agencyName: agency2.name,
-            agencyDepartment: agency2.address.departmentCode,
-            agencyKind: agency2.kind,
+        body: {
+          subscribedEvent: "convention.updated",
+          payload: {
+            convention: {
+              ...convention2,
+              agencyName: agency2.name,
+              agencyDepartment: agency2.address.departmentCode,
+              agencyKind: agency2.kind,
+            },
           },
+        },
+        subscriptionParams: {
+          callbackHeaders: callbackParams2.callbackHeaders,
+          callbackUrl: callbackParams2.callbackUrl,
         },
       },
     ];

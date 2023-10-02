@@ -78,14 +78,18 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
           );
         }
 
-        return this.#subscribersGateway.notify({
-          payload: {
-            convention: conventionRead,
+        return this.#subscribersGateway.notify(
+          {
+            payload: {
+              convention: conventionRead,
+            },
+            subscribedEvent: "convention.updated",
           },
-          subscribedEvent: "convention.updated",
-          callbackUrl: conventionUpdatedCallbackParams.callbackUrl,
-          callbackHeaders: conventionUpdatedCallbackParams.callbackHeaders,
-        });
+          {
+            callbackUrl: conventionUpdatedCallbackParams.callbackUrl,
+            callbackHeaders: conventionUpdatedCallbackParams.callbackHeaders,
+          },
+        );
       }),
     );
   }
