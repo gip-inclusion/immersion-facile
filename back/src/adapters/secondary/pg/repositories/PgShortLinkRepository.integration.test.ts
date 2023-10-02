@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { AbsoluteUrl, expectPromiseToFailWithError } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
+import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import {
   deleteShortLinkByIdQuery,
   getShortLinkByIdQuery,
@@ -12,6 +13,7 @@ import { PgShortLinkRepository } from "./PgShortLinkRepository";
 describe("PgShortLinkRepository", () => {
   let pool: Pool;
   let client: PoolClient;
+  let transaction: KyselyDb;
   let pgShortLinkRepository: PgShortLinkRepository;
 
   const testShortLinkId: ShortLinkId = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -21,11 +23,12 @@ describe("PgShortLinkRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+    transaction = makeKyselyDb(pool);
     await client.query(deleteShortLinkByIdQuery(testShortLinkId));
   });
 
   beforeEach(() => {
-    pgShortLinkRepository = new PgShortLinkRepository(client);
+    pgShortLinkRepository = new PgShortLinkRepository(transaction);
   });
 
   afterAll(async () => {

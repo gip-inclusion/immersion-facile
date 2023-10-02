@@ -1,11 +1,11 @@
-import { Kysely, Transaction } from "kysely";
+import { Kysely } from "kysely";
 import { Pool } from "pg";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
-import { makeKyselyDb } from "./kysely/kyselyUtils";
+import { KyselyDb, makeKyselyDb } from "./kysely/kyselyUtils";
 import { Database } from "./kysely/model/database";
 
 const logger = createLogger(__filename);
@@ -15,7 +15,7 @@ export class PgUowPerformer implements UnitOfWorkPerformer {
 
   constructor(
     pool: Pool,
-    private createPgUow: (transaction: Transaction<Database>) => UnitOfWork,
+    private createPgUow: (transaction: KyselyDb) => UnitOfWork,
   ) {
     this.#db = makeKyselyDb(pool);
   }
