@@ -11,6 +11,7 @@ import {
   InclusionConnectedUser,
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 
@@ -59,8 +60,9 @@ describe("PgInclusionConnectedUserRepository", () => {
     await client.query("DELETE FROM users__agencies");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    icUserRepository = new PgInclusionConnectedUserRepository(client);
-    agencyRepository = new PgAgencyRepository(client);
+    const transaction = makeKyselyDb(pool);
+    icUserRepository = new PgInclusionConnectedUserRepository(transaction);
+    agencyRepository = new PgAgencyRepository(transaction);
   });
 
   describe("getById", () => {

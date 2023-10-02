@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import format from "pg-format";
 import { keys, mapObjIndexed } from "ramda";
 import {
@@ -13,6 +12,7 @@ import {
   WebhookSubscription,
 } from "shared";
 import { ApiConsumerRepository } from "../../../../domain/auth/ports/ApiConsumerRepository";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 const jsonBuildQuery = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
       'id', c.id,
@@ -41,13 +41,16 @@ const jsonBuildQuery = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
     `;
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getAll(): Promise<ApiConsumer[]> {
-    const result = await this.client.query(`SELECT ${jsonBuildQuery}
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
+      `SELECT ${jsonBuildQuery}
         FROM api_consumers c
         LEFT JOIN api_consumers_subscriptions s on s.consumer_id = c.id
-        GROUP BY c.id`);
+        GROUP BY c.id`,
+    );
     return result.rows.map((rawPg) => {
       const pgApiConsumer =
         "raw_api_consumer" in rawPg ? rawPg.raw_api_consumer : rawPg;
@@ -56,7 +59,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   }
 
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
-    const result = await this.client.query(
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT ${jsonBuildQuery}
       FROM api_consumers c
       LEFT JOIN api_consumers_subscriptions s on s.consumer_id = c.id
@@ -86,7 +90,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
       ({ subscriptions, ...rest }) => rest,
       rights,
     );
-    return this.client.query(
+    return executeKyselyRawSqlQuery(
+      this.transaction,
       `
       INSERT INTO api_consumers (
         id, consumer, description, rights, created_at, 
@@ -117,7 +122,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   }
 
   #clearSubscriptionsOfConsumer(apiConsumerId: ApiConsumerId) {
-    return this.client.query(
+    return executeKyselyRawSqlQuery(
+      this.transaction,
       `
     DELETE FROM api_consumers_subscriptions
     WHERE consumer_id = $1
@@ -136,7 +142,8 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
 
     if (subscriptions.length === 0) return;
 
-    return this.client.query(
+    return executeKyselyRawSqlQuery(
+      this.transaction,
       format(
         `
     INSERT INTO api_consumers_subscriptions(

@@ -8,6 +8,7 @@ import {
 } from "../../../../domain/core/eventBus/events";
 import { CustomTimeGateway } from "../../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/UuidGeneratorImplementations";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";
 
 describe("PgOutboxRepository", () => {
@@ -39,7 +40,7 @@ describe("PgOutboxRepository", () => {
     await client.query("DELETE FROM outbox_publications");
     await client.query("DELETE FROM outbox");
 
-    outboxRepository = new PgOutboxRepository(client);
+    outboxRepository = new PgOutboxRepository(makeKyselyDb(pool));
   });
 
   it("saves an event with published data", async () => {

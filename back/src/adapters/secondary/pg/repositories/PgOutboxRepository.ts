@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import { differenceWith } from "ramda";
 import { DateIsoString, propEq, replaceArrayElement } from "shared";
 import type {
@@ -11,6 +10,7 @@ import type {
 import { OutboxRepository } from "../../../../domain/core/ports/OutboxRepository";
 import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 export type StoredEventRow = {
   id: string;
@@ -27,7 +27,7 @@ export type StoredEventRow = {
 const logger = createLogger(__filename);
 
 export class PgOutboxRepository implements OutboxRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async save(event: DomainEvent): Promise<void> {
     const eventInDb = await this.#storeEventInOutboxOrRecoverItIfAlreadyThere(
@@ -65,7 +65,8 @@ export class PgOutboxRepository implements OutboxRepository {
 
     const eventAlreadyInDb = await this.#getEventById(event.id);
     if (eventAlreadyInDb) {
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         "UPDATE outbox SET was_quarantined = $2, status = $3 WHERE id = $1",
         [id, wasQuarantined, status],
       );
@@ -76,13 +77,15 @@ export class PgOutboxRepository implements OutboxRepository {
         id, occurred_at, was_quarantined, topic, payload, status
       ) VALUES($1, $2, $3, $4, $5, $6)`;
     const values = [id, occurredAt, wasQuarantined, topic, payload, status];
-    await this.client.query(query, values).catch((error) => {
-      logger.error(
-        { query, values, error },
-        "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
-      );
-      throw error;
-    });
+    await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
+      (error) => {
+        logger.error(
+          { query, values, error },
+          "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
+        );
+        throw error;
+      },
+    );
 
     return { ...event, publications: [] }; // publications will be added after in process
   }
@@ -91,7 +94,8 @@ export class PgOutboxRepository implements OutboxRepository {
     eventId: string,
     { publishedAt, failures }: EventPublication,
   ) {
-    const { rows } = await this.client.query(
+    const { rows } = await executeKyselyRawSqlQuery(
+      this.transaction,
       "INSERT INTO outbox_publications(event_id, published_at) VALUES($1, $2) RETURNING id",
       [eventId, publishedAt],
     );
@@ -100,7 +104,8 @@ export class PgOutboxRepository implements OutboxRepository {
 
     await Promise.all(
       failures.map(({ subscriptionId, errorMessage }) =>
-        this.client.query(
+        executeKyselyRawSqlQuery(
+          this.transaction,
           "INSERT INTO outbox_failures(publication_id, subscription_id, error_message) VALUES($1, $2, $3)",
           [publicationId, subscriptionId, errorMessage],
         ),
@@ -109,7 +114,8 @@ export class PgOutboxRepository implements OutboxRepository {
   }
 
   async #getEventById(id: string): Promise<DomainEvent | undefined> {
-    const { rows } = await this.client.query<StoredEventRow>(
+    const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
+      this.transaction,
       `
         SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
           outbox_publications.id as publication_id, published_at,

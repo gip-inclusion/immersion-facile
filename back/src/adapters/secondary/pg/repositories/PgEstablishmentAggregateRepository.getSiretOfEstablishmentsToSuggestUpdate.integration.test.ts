@@ -4,6 +4,7 @@ import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
+import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 import { PgOutboxRepository } from "./PgOutboxRepository";
@@ -11,6 +12,7 @@ import { PgOutboxRepository } from "./PgOutboxRepository";
 describe("PgScriptsQueries", () => {
   let pool: Pool;
   let client: PoolClient;
+  let transaction: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
   let pgOutboxRepository: PgOutboxRepository;
   let pgNotificationRepository: PgNotificationRepository;
@@ -18,6 +20,7 @@ describe("PgScriptsQueries", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+    transaction = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
@@ -28,10 +31,10 @@ describe("PgScriptsQueries", () => {
     await client.query("DELETE FROM outbox");
     await client.query("DELETE FROM notifications_email_recipients");
     await client.query("DELETE FROM notifications_email");
-    pgOutboxRepository = new PgOutboxRepository(client);
-    pgNotificationRepository = new PgNotificationRepository(client);
+    pgOutboxRepository = new PgOutboxRepository(transaction);
+    pgNotificationRepository = new PgNotificationRepository(transaction);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      client,
+      transaction,
     );
   });
 

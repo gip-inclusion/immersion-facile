@@ -1,7 +1,7 @@
-import { PoolClient } from "pg";
 import { keys } from "ramda";
 import { FeatureFlags, hasFeatureFlagValue, SetFeatureFlagParam } from "shared";
 import { FeatureFlagRepository } from "../../../../domain/core/ports/FeatureFlagRepository";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
   raw.reduce(
@@ -17,10 +17,13 @@ const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
   );
 
 export class PgFeatureFlagRepository implements FeatureFlagRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getAll(): Promise<FeatureFlags> {
-    const result = await this.client.query("SELECT * FROM feature_flags");
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
+      "SELECT * FROM feature_flags",
+    );
     return rawPgToFeatureFlags(result.rows);
   }
 
@@ -28,7 +31,8 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
     await Promise.all(
       keys(featureFlags).map(async (flagName) => {
         const flag = featureFlags[flagName];
-        await this.client.query(
+        await executeKyselyRawSqlQuery(
+          this.transaction,
           "INSERT INTO feature_flags (flag_name, is_active, kind, value) VALUES ($1, $2, $3, $4)",
           [
             flagName,
@@ -42,7 +46,8 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
   }
 
   public async update(params: SetFeatureFlagParam): Promise<void> {
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       "UPDATE feature_flags SET is_active = $1, value = $2 WHERE flag_name = $3",
       [
         params.flagContent.isActive,

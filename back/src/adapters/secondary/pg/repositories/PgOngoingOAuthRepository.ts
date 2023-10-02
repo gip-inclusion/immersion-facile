@@ -1,9 +1,9 @@
-import { PoolClient } from "pg";
 import {
   IdentityProvider,
   OngoingOAuth,
 } from "../../../../domain/generic/OAuth/entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../../../../domain/generic/OAuth/ports/OngoingOAuthRepositiory";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 
 type PersistenceOngoingOAuth = {
@@ -18,13 +18,14 @@ type PersistenceOngoingOAuth = {
 };
 
 export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async findByState(
     state: string,
     provider: "inclusionConnect",
   ): Promise<OngoingOAuth | undefined> {
-    const response = await this.client.query(
+    const response = await executeKyselyRawSqlQuery<PersistenceOngoingOAuth>(
+      this.transaction,
       `
         SELECT * FROM ongoing_oauths WHERE state=$1 AND provider = $2
         `,
@@ -37,7 +38,8 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
     const { state, nonce, provider, userId, externalId, accessToken } =
       ongoingOAuth;
     if (await this.findByState(state, provider)) {
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         `
         UPDATE ongoing_oauths
         SET state=$1, nonce=$2, provider=$3, user_id=$4, external_id=$5, access_token=$6, updated_at=now() 
@@ -46,7 +48,8 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
         [state, nonce, provider, userId, externalId, accessToken],
       );
     } else {
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         `
       INSERT INTO ongoing_oauths(state, nonce, provider, user_id, external_id, access_token) VALUES ($1, $2, $3, $4, $5, $6 )
       `,

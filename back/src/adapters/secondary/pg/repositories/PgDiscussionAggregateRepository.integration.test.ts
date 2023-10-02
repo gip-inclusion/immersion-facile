@@ -6,6 +6,7 @@ import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establi
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { DiscussionAggregate } from "../../../../domain/offer/entities/DiscussionAggregate";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
@@ -41,10 +42,13 @@ describe("PgDiscussionAggregateRepository", () => {
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM discussions");
     await client.query("DELETE FROM exchanges");
+    const transaction = makeKyselyDb(pool);
     pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(
-      client,
+      transaction,
     );
-    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(client);
+    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
+      transaction,
+    );
   });
 
   afterAll(async () => {

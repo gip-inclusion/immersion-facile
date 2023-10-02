@@ -14,6 +14,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { ConflictError } from "../../../primary/helpers/httpErrors";
+import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import {
   beneficiaryCurrentEmployerIdColumnName,
@@ -34,11 +35,13 @@ describe("PgConventionRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let conventionRepository: PgConventionRepository;
+  let transaction: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    const agencyRepository = new PgAgencyRepository(client);
+    transaction = makeKyselyDb(pool);
+    const agencyRepository = new PgAgencyRepository(transaction);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
   });
 
@@ -54,7 +57,7 @@ describe("PgConventionRepository", () => {
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
     );
-    conventionRepository = new PgConventionRepository(client);
+    conventionRepository = new PgConventionRepository(transaction);
   });
 
   it("Adds a new convention", async () => {

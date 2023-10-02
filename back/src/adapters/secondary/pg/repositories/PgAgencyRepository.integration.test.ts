@@ -7,6 +7,7 @@ import {
   GeoPositionDto,
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
 const agency1builder = AgencyDtoBuilder.create(
@@ -69,7 +70,7 @@ describe("PgAgencyRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    agencyRepository = new PgAgencyRepository(client);
+    agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
   });
 
   describe("getById", () => {

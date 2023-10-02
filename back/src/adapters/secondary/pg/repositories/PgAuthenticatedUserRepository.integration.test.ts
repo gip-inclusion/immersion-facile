@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { AuthenticatedUser, expectToEqual } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 
 describe("PgAuthenticatedUserRepository", () => {
@@ -11,7 +12,9 @@ describe("PgAuthenticatedUserRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(client);
+    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(
+      makeKyselyDb(pool),
+    );
     await client.query("DELETE FROM authenticated_users");
   });
   afterAll(async () => {

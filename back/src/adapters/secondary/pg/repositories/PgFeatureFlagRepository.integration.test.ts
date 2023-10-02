@@ -7,6 +7,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { FeatureFlagRepository } from "../../../../domain/core/ports/FeatureFlagRepository";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
 describe("PG getFeatureFlags", () => {
@@ -18,7 +19,7 @@ describe("PG getFeatureFlags", () => {
     pool = getTestPgPool();
     client = await pool.connect();
     await client.query("DELETE FROM feature_flags");
-    featureFlagRepository = new PgFeatureFlagRepository(client);
+    featureFlagRepository = new PgFeatureFlagRepository(makeKyselyDb(pool));
   });
 
   afterEach(async () => {

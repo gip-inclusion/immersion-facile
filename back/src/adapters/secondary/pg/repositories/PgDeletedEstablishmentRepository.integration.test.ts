@@ -3,6 +3,7 @@ import { expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { DeletedEstablishementDto } from "../../../../domain/offer/ports/DeletedEstablishmentRepository";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgDeletedEstablishmentRepository } from "./PgDeletedEstablishmentRepository";
 
 describe("PgDeletedEstablishmentRepository", () => {
@@ -18,7 +19,7 @@ describe("PgDeletedEstablishmentRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM establishments_deleted");
     pgDeletedEstablishmentRepository = new PgDeletedEstablishmentRepository(
-      client,
+      makeKyselyDb(pool),
     );
   });
 

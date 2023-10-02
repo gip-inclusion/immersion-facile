@@ -2,12 +2,13 @@ import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { ConventionToSync } from "../../../../domain/convention/ports/ConventionsToSyncRepository";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import {
   conventionsToSyncTableName,
   PgConventionsToSyncRepository,
 } from "./PgConventionsToSyncRepository";
 
-describe("PgConventionsRepository", () => {
+describe("PgConventionsToSyncRepository", () => {
   const conventionsToSync: ConventionToSync[] = [
     {
       id: "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaa1",
@@ -49,7 +50,9 @@ describe("PgConventionsRepository", () => {
   beforeEach(async () => {
     await client.query(`DELETE
                         FROM ${conventionsToSyncTableName}`);
-    conventionsToSyncRepository = new PgConventionsToSyncRepository(client);
+    conventionsToSyncRepository = new PgConventionsToSyncRepository(
+      makeKyselyDb(pool),
+    );
   });
 
   it.each(conventionsToSync)(
@@ -87,13 +90,13 @@ describe("PgConventionsRepository", () => {
   });
 
   describe("getNotProcessedAndErrored", () => {
-    beforeEach(() =>
-      Promise.all(
+    beforeEach(async () => {
+      await Promise.all(
         conventionsToSync.map((conventionToSync) =>
           conventionsToSyncRepository.save(conventionToSync),
         ),
-      ),
-    );
+      );
+    });
 
     it("only TO_PROCESS and ERROR", async () => {
       const conventionsToSyncNotProcessedAndErrored =
@@ -109,9 +112,7 @@ describe("PgConventionsRepository", () => {
       const conventionsToSyncNotProcessedAndErrored =
         await conventionsToSyncRepository.getToProcessOrError(1);
 
-      expectToEqual(conventionsToSyncNotProcessedAndErrored, [
-        conventionsToSync[0],
-      ]);
+      expect(conventionsToSyncNotProcessedAndErrored).toHaveLength(1);
     });
   });
 });

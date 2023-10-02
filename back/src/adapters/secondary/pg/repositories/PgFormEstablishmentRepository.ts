@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import { FormEstablishmentDto, SiretDto } from "shared";
 import {
   formEstablishementUpdateFailedErrorMessage,
@@ -11,13 +10,14 @@ import {
   ConflictError,
   NotFoundError,
 } from "../../../primary/helpers/httpErrors";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 
 const logger = createLogger(__filename);
 export class PgFormEstablishmentRepository
   implements FormEstablishmentRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async create(
     formEstablishmentDto: FormEstablishmentDto,
@@ -32,7 +32,11 @@ export class PgFormEstablishmentRepository
 
     // prettier-ignore
     try {
-      await this.client.query(query, [siret, source, businessName, businessNameCustomized, businessAddress, website, additionalInformation, isEngagedEnterprise, naf, JSON.stringify(professions), JSON.stringify(businessContact), fitForDisabledWorkers, maxContactsPerWeek]);
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        query,
+        [siret, source, businessName, businessNameCustomized, businessAddress, website, additionalInformation, isEngagedEnterprise, naf, JSON.stringify(professions), JSON.stringify(businessContact), fitForDisabledWorkers, maxContactsPerWeek]
+      );
     } catch (error: any) {
       logger.error({error}, "Cannot save form establishment ")
       notifyObjectDiscord({
@@ -44,7 +48,8 @@ export class PgFormEstablishmentRepository
   }
 
   public async delete(siret: SiretDto): Promise<void> {
-    const pgResult = await this.client.query<{ siret?: SiretDto }>(
+    const pgResult = await executeKyselyRawSqlQuery<{ siret?: SiretDto }>(
+      this.transaction,
       `DELETE
        FROM form_establishments
        WHERE siret = $1
@@ -57,7 +62,8 @@ export class PgFormEstablishmentRepository
   }
 
   public async getAll(): Promise<FormEstablishmentDto[]> {
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       "SELECT * FROM form_establishments",
     );
     return pgResult.rows.map((formEstablishment) =>
@@ -68,7 +74,8 @@ export class PgFormEstablishmentRepository
   public async getBySiret(
     siret: SiretDto,
   ): Promise<FormEstablishmentDto | undefined> {
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT * FROM form_establishments
       WHERE siret = $1`,
       [siret],
@@ -91,7 +98,7 @@ export class PgFormEstablishmentRepository
         RETURNING siret
     `;
 
-    const pgResult = await this.client.query(query, [
+    const pgResult = await executeKyselyRawSqlQuery(this.transaction, query, [
       formEstablishmentDto.siret,
       formEstablishmentDto.source,
       formEstablishmentDto.businessName,
