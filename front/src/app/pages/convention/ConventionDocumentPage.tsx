@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import { Route } from "type-route";
 import {
   ConventionId,
   ConventionJwtPayload,
   ConventionSupportedJwt,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  domElementIds,
   isConventionRenewed,
   isStringDate,
   makeSiretDescriptionLink,
@@ -25,11 +27,14 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
+import { technicalGateway } from "src/config/dependencies";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
 import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
 
-import logoIf from "/assets/img/logo-if.svg";
-import logoRf from "/assets/img/logo-rf.svg";
+const logoIfUrl =
+  "https://immersion-facile.beta.gouv.fr/assets/img/logo-if.svg";
+const logoRfUrl =
+  "https://immersion-facile.beta.gouv.fr/assets/img/logo-rf.svg";
 
 const throwOnMissingSignDate = (signedAt: string | undefined): string => {
   if (!signedAt) throw new Error("Signature date is missing.");
@@ -61,6 +66,8 @@ export const ConventionDocumentPage = ({
   const agencyFeedback = useAppSelector(agencyInfoSelectors.feedback);
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const dispatch = useDispatch();
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
+
   useEffect(() => {
     if (convention?.agencyId) {
       dispatch(
@@ -87,19 +94,33 @@ export const ConventionDocumentPage = ({
   } = convention.signatories;
   const { internshipKind } = convention;
   const logos = [
-    <img key="logo-rf" src={logoRf} alt="Logo RF" />,
+    <img key="logo-rf" src={logoRfUrl} alt="Logo RF" />,
     <img
       key={`logo-${agencyInfo?.name}`}
-      src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf}
+      src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIfUrl}
       alt=""
     />,
   ];
+
+  const onDownloadPdfClick = async () => {
+    setIsPdfLoading(true);
+    const pdfContent = await technicalGateway.htmlToPdf(
+      document.documentElement.outerHTML,
+      jwt,
+    );
+    const downloadLink = document.createElement("a");
+    downloadLink.href = "data:application/pdf;base64," + pdfContent;
+    downloadLink.download = `convention-immersion-${convention.id}.pdf`;
+    downloadLink.click();
+    setIsPdfLoading(false);
+  };
 
   const title = isConventionRenewed(convention)
     ? "Renouvellement de convention"
     : "Convention";
   return (
     <MainWrapper layout="default" vSpacing={8}>
+      {isPdfLoading && <Loader />}
       {canShowConvention && (
         <ConventionDocument
           logos={logos}
@@ -108,6 +129,17 @@ export const ConventionDocumentPage = ({
               ? `${title} relative à la mise en œuvre d’une période de mise en situation en milieu professionnel`
               : `${title} de mini-stage`
           }
+          customActions={[
+            <Button
+              key={"htmlToPdfButton"}
+              priority="secondary"
+              onClick={onDownloadPdfClick}
+              className={fr.cx("fr-mr-1w")}
+              id={domElementIds.conventionDocument.downloadPdfButton}
+            >
+              Télécharger en PDF
+            </Button>,
+          ]}
         >
           {isConventionRenewed(convention) && (
             <ConventionRenewedInformations renewed={convention.renewed} />
@@ -366,7 +398,7 @@ export const ConventionDocumentPage = ({
           <div className={fr.cx("fr-card", "fr-p-2w")}>
             <ul>
               <li>
-                ✅ Le bénéficiaire,{" "}
+                ✔ Le bénéficiaire,{" "}
                 <strong>
                   {beneficiary.firstName} {beneficiary.lastName}
                 </strong>{" "}
@@ -378,7 +410,7 @@ export const ConventionDocumentPage = ({
               </li>
               {beneficiaryRepresentative && (
                 <li>
-                  ✅ Le représentant légal du bénéficiaire,{" "}
+                  ✔ Le représentant légal du bénéficiaire,{" "}
                   <strong>
                     {beneficiaryRepresentative.firstName}{" "}
                     {beneficiaryRepresentative.lastName}
@@ -396,7 +428,7 @@ export const ConventionDocumentPage = ({
               )}
               {beneficiaryCurrentEmployer && (
                 <li>
-                  ✅ Le représentant de l'entreprise employant actuellement le
+                  ✔ Le représentant de l'entreprise employant actuellement le
                   bénéficiaire,{" "}
                   <strong>
                     {beneficiaryCurrentEmployer.firstName}{" "}
@@ -414,7 +446,7 @@ export const ConventionDocumentPage = ({
                 </li>
               )}
               <li>
-                ✅ Le représentant de l'entreprise d'accueil,{" "}
+                ✔ Le représentant de l'entreprise d'accueil,{" "}
                 <strong>
                   {establishmentRepresentative.firstName}{" "}
                   {establishmentRepresentative.lastName}
@@ -430,7 +462,7 @@ export const ConventionDocumentPage = ({
                 )
               </li>
               <li>
-                ✅ L'agence prescriptrice{" "}
+                ✔ L'agence prescriptrice{" "}
                 {internshipKind === "immersion"
                   ? "de l'immersion"
                   : "du mini-stage"}

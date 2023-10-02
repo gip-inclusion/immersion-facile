@@ -15,6 +15,7 @@ import {
   expectToEqual,
   InclusionConnectedUser,
   stringToMd5,
+  technicalRoutes,
   UnauthenticatedConventionRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
@@ -164,10 +165,14 @@ describe("convention e2e", () => {
           "SHARE_DRAFT_CONVENTION_BY_LINK",
         );
 
+        const technicalRoutesClient = createSupertestSharedClient(
+          technicalRoutes,
+          request,
+        );
         const sharedConventionLink =
           await shortLinkRedirectToLinkWithValidation(
             conventionShortLinkEmail.params.conventionFormUrl,
-            request,
+            technicalRoutesClient,
           );
 
         expectToEqual(veryLongConventionLink, sharedConventionLink);

@@ -1,17 +1,22 @@
-import supertest from "supertest";
-import { shortLinkRoute } from "shared";
+import { expectHttpResponseToEqual, TechnicalRoutes } from "shared";
+import { HttpClient } from "shared-routes";
 
 export const shortLinkRedirectToLinkWithValidation = async (
   shortLink: string,
-  request: supertest.SuperTest<supertest.Test>,
+  httpClient: HttpClient<TechnicalRoutes>,
 ): Promise<string> => {
-  const shortLinkResult = await request
-    .get(makeShortLinkForE2e(shortLink))
-    .send();
-  expect(shortLinkResult.status).toBe(302);
+  const shortLinkResult = await httpClient.shortLink({
+    urlParams: { shortLinkId: makeShortLinkForE2e(shortLink) },
+  });
+
+  expectHttpResponseToEqual(shortLinkResult, {
+    body: {},
+    status: 302,
+  });
+
   expect(typeof shortLinkResult.headers.location === "string").toBeTruthy();
   return shortLinkResult.headers.location as string;
 };
 
 const makeShortLinkForE2e = (shortLinkInEmail: string): string =>
-  `/${shortLinkRoute}${shortLinkInEmail.split(shortLinkRoute)[1]}`;
+  `${shortLinkInEmail.split("to/")[1]}`;

@@ -58,6 +58,7 @@ import { ValidateEmail } from "../../../domain/emailValidation/useCases/Validate
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { SetFeatureFlag } from "../../../domain/generic/featureFlag/SetFeatureFlag";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
+import { HtmlToPdf } from "../../../domain/generic/htmlToPdf/HtmlToPdf";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
 import { AuthenticateWithInclusionCode } from "../../../domain/inclusionConnect/useCases/AuthenticateWithInclusionCode";
@@ -192,6 +193,7 @@ export const createUseCases = (
         gateways.documentGateway,
         uuidGenerator,
       ),
+      htmlToPdf: new HtmlToPdf(gateways.pdfGeneratorGateway),
 
       // Address
       lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),

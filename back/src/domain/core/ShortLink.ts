@@ -1,7 +1,6 @@
 import {
   AbsoluteUrl,
   CreateConventionMagicLinkPayloadProperties,
-  shortLinkRoute,
 } from "shared";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../adapters/primary/config/magicLinkUrl";
@@ -12,8 +11,7 @@ import { UnitOfWork } from "./ports/UnitOfWork";
 export const makeShortLinkUrl = (
   config: AppConfig,
   shortLinkId: ShortLinkId,
-): AbsoluteUrl =>
-  `${config.immersionFacileBaseUrl}/api/${shortLinkRoute}/${shortLinkId}`;
+): AbsoluteUrl => `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`;
 
 export const shortLinkNotFoundMessage = (shortLinkId: ShortLinkId): string =>
   `Short link '${shortLinkId}' not found.`;

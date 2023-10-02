@@ -8,6 +8,7 @@ import {
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
@@ -37,6 +38,8 @@ import { InMemoryLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/
 import { createLbbTargets } from "../../secondary/offer/laBonneBoite/LaBonneBoiteTargets";
 import { HttpPassEmploiGateway } from "../../secondary/offer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/offer/passEmploi/InMemoryPassEmploiGateway";
+import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
+import { PuppeteerPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/PuppeteerPdfGeneratorGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/peConnectApi.targets";
@@ -86,8 +89,11 @@ export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T
   ? T
   : never;
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const createGateways = async (config: AppConfig) => {
+export const createGateways = async (
+  config: AppConfig,
+  uuidGenerator: UuidGenerator,
+  // eslint-disable-next-line @typescript-eslint/require-await
+) => {
   logger.info({
     notificationGateway: config.notificationGateway,
     repositories: config.repositories,
@@ -149,6 +155,10 @@ export const createGateways = async (config: AppConfig) => {
       config.passEmploiGateway === "HTTPS"
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
         : new InMemoryPassEmploiGateway(),
+    pdfGeneratorGateway:
+      config.pdfGeneratorGateway === "PUPPETEER"
+        ? new PuppeteerPdfGeneratorGateway(uuidGenerator)
+        : new InMemoryPdfGeneratorGateway(),
     peConnectGateway: createPoleEmploiConnectGateway(config),
     poleEmploiGateway,
     timeGateway,

@@ -36,7 +36,7 @@ export type AppDependencies = ReturnType<
 
 export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createGetPgPoolFn(config);
-  const gateways = await createGateways(config);
+  const gateways = await createGateways(config, uuidGenerator);
 
   const { uowPerformer, inMemoryUow } = createUowPerformer(config, getPgPoolFn);
 

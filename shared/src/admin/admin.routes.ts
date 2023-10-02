@@ -19,7 +19,6 @@ import {
 } from "../httpClient/errors/httpErrors.schema";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
-import { featureFlagsRoute } from "../routes/routes";
 import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
 import { emptyStringSchema } from "../zodUtils";
 import {
@@ -86,7 +85,7 @@ export const adminRoutes = defineRoutes({
   }),
   updateFeatureFlags: defineRoute({
     method: "post",
-    url: `/admin/${featureFlagsRoute}`,
+    url: `/admin/feature-flags`,
     ...withAuthorizationHeaders,
     requestBodySchema: setFeatureFlagSchema,
     responses: {

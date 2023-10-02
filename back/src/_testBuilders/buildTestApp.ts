@@ -14,6 +14,7 @@ import { InMemoryInclusionConnectGateway } from "../adapters/secondary/Inclusion
 import type { InMemoryNotificationGateway } from "../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
+import { InMemoryPdfGeneratorGateway } from "../adapters/secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
@@ -33,6 +34,7 @@ export type InMemoryGateways = {
   notification: InMemoryNotificationGateway;
   peConnectGateway: InMemoryPeConnectGateway;
   siret: InMemorySiretGateway;
+  pdfGeneratorGateway: InMemoryPdfGeneratorGateway;
   laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
@@ -86,6 +88,7 @@ export const buildTestApp = async (
     LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
     PASS_EMPLOI_GATEWAY: "IN_MEMORY",
     PE_CONNECT_GATEWAY: "IN_MEMORY",
+    PDF_GENERATOR_GATEWAY: "IN_MEMORY",
     REPORTING_GATEWAY: "EXCEL",
     REPOSITORIES: "IN_MEMORY",
     SKIP_EMAIL_ALLOW_LIST: "TRUE",
