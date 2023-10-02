@@ -1,40 +1,37 @@
-import { Pool, PoolClient } from "pg";
+import { Kysely, Transaction } from "kysely";
+import { Pool } from "pg";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
+import { makeKyselyDb } from "./kysely/kyselyUtils";
+import { Database } from "./kysely/model/database";
 
 const logger = createLogger(__filename);
 
 export class PgUowPerformer implements UnitOfWorkPerformer {
+  #db: Kysely<Database>;
+
   constructor(
-    private pool: Pool,
-    private createPgUow: (client: PoolClient) => UnitOfWork,
-  ) {}
+    pool: Pool,
+    private createPgUow: (transaction: Transaction<Database>) => UnitOfWork,
+  ) {
+    this.#db = makeKyselyDb(pool);
+  }
 
   public async perform<T>(cb: (uow: UnitOfWork) => Promise<T>): Promise<T> {
-    const client = await this.pool.connect();
-    const uow = this.createPgUow(client);
-
-    try {
-      await client.query("BEGIN");
-      const result = await cb(uow);
-      await client.query("COMMIT");
-      return result;
-    } catch (error: any) {
-      if (error instanceof Error) {
-        logger.error({ error }, `Error in transaction: ${error.message}`);
-      } else {
-        logger.error(
-          { unknownError: JSON.stringify(error) },
-          `Unknown Error in transaction`,
-        );
-      }
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
-    }
+    return this.#db
+      .transaction()
+      .execute<T>((transaction) => cb(this.createPgUow(transaction)))
+      .catch((error: any) => {
+        error instanceof Error
+          ? logger.error({ error }, `Error in transaction: ${error.message}`)
+          : logger.error(
+              { unknownError: JSON.stringify(error) },
+              `Unknown Error in transaction`,
+            );
+        throw error;
+      });
   }
 }

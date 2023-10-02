@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { Transaction } from "kysely";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -28,6 +28,7 @@ import { InMemoryDiscussionAggregateRepository } from "../../secondary/offer/InM
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentGroupRepository } from "../../secondary/offer/InMemoryEstablishmentGroupRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/offer/InMemorySearchMadeRepository";
+import { Database } from "../../secondary/pg/kysely/model/database";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { PgAgencyRepository } from "../../secondary/pg/repositories/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/repositories/PgApiConsumerRepository";
@@ -104,41 +105,47 @@ export const createInMemoryUow = () => {
   } satisfies UnitOfWork;
 };
 
-export const createPgUow = (client: PoolClient): UnitOfWork => {
-  const shortLinkRepository = new PgShortLinkRepository(client);
+export const createPgUow = (transaction: Transaction<Database>): UnitOfWork => {
+  const shortLinkRepository = new PgShortLinkRepository(transaction);
   return {
-    agencyRepository: new PgAgencyRepository(client),
-    apiConsumerRepository: new PgApiConsumerRepository(client),
-    authenticatedUserRepository: new PgAuthenticatedUserRepository(client),
+    agencyRepository: new PgAgencyRepository(transaction),
+    apiConsumerRepository: new PgApiConsumerRepository(transaction),
+    authenticatedUserRepository: new PgAuthenticatedUserRepository(transaction),
     conventionPoleEmploiAdvisorRepository:
-      new PgConventionPoleEmploiAdvisorRepository(client),
+      new PgConventionPoleEmploiAdvisorRepository(transaction),
     conventionExternalIdRepository: new PgConventionExternalIdRepository(
-      client,
+      transaction,
     ),
-    conventionQueries: new PgConventionQueries(client),
-    conventionRepository: new PgConventionRepository(client),
-    conventionsToSyncRepository: new PgConventionsToSyncRepository(client),
+    conventionQueries: new PgConventionQueries(transaction),
+    conventionRepository: new PgConventionRepository(transaction),
+    conventionsToSyncRepository: new PgConventionsToSyncRepository(transaction),
     deletedEstablishmentRepository: new PgDeletedEstablishmentRepository(
-      client,
+      transaction,
     ),
-    discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
-    errorRepository: new PgErrorRepository(client),
+    discussionAggregateRepository: new PgDiscussionAggregateRepository(
+      transaction,
+    ),
+    errorRepository: new PgErrorRepository(transaction),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
-      client,
+      transaction,
     ),
-    establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
-    featureFlagRepository: new PgFeatureFlagRepository(client),
-    formEstablishmentRepository: new PgFormEstablishmentRepository(client),
-    immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
+    establishmentGroupRepository: new PgEstablishmentGroupRepository(
+      transaction,
+    ),
+    featureFlagRepository: new PgFeatureFlagRepository(transaction),
+    formEstablishmentRepository: new PgFormEstablishmentRepository(transaction),
+    immersionAssessmentRepository: new PgImmersionAssessmentRepository(
+      transaction,
+    ),
     inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
-      client,
+      transaction,
     ),
-    notificationRepository: new PgNotificationRepository(client),
-    ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
-    outboxQueries: new PgOutboxQueries(client),
-    outboxRepository: new PgOutboxRepository(client),
-    romeRepository: new PgRomeRepository(client),
-    searchMadeRepository: new PgSearchMadeRepository(client),
+    notificationRepository: new PgNotificationRepository(transaction),
+    ongoingOAuthRepository: new PgOngoingOAuthRepository(transaction),
+    outboxQueries: new PgOutboxQueries(transaction),
+    outboxRepository: new PgOutboxRepository(transaction),
+    romeRepository: new PgRomeRepository(transaction),
+    searchMadeRepository: new PgSearchMadeRepository(transaction),
     shortLinkQuery: shortLinkRepository,
     shortLinkRepository,
   };
