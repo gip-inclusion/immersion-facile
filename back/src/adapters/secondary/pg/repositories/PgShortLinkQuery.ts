@@ -1,10 +1,10 @@
-import { PoolClient } from "pg";
 import { AbsoluteUrl } from "shared";
 import {
   ShortLinkId,
   ShortLinkQuery,
 } from "../../../../domain/core/ports/ShortLinkQuery";
 import { createLogger } from "../../../../utils/logger";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import {
   pgGetShortLinkByIdResultsSchema,
   PgShortLinkRepositoryDto,
@@ -14,15 +14,15 @@ import {
 const logger = createLogger(__filename);
 
 export class PgShortLinkQuery implements ShortLinkQuery {
-  constructor(protected client: PoolClient) {}
+  constructor(protected transaction: KyselyDb) {}
 
   public getById(shortLinkId: ShortLinkId): Promise<AbsoluteUrl> {
     logger.info({ shortLinkId }, "PgShortLinkQueryGetByIdTotal");
-    return this.client
-      .query<PgShortLinkRepositoryDto>({
-        text: `SELECT * FROM ${pgShortLinkRepositoryStructure.tableName} WHERE ${pgShortLinkRepositoryStructure.columnNames.shortLinkId} = $1`,
-        values: [shortLinkId],
-      })
+    return executeKyselyRawSqlQuery<PgShortLinkRepositoryDto>(
+      this.transaction,
+      `SELECT * FROM ${pgShortLinkRepositoryStructure.tableName} WHERE ${pgShortLinkRepositoryStructure.columnNames.shortLinkId} = $1`,
+      [shortLinkId],
+    )
       .then(({ rows }) => {
         const result = pgGetShortLinkByIdResultsSchema.parse(rows).at(0);
         if (!result)

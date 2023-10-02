@@ -1,4 +1,3 @@
-import { Transaction } from "kysely";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -28,7 +27,7 @@ import { InMemoryDiscussionAggregateRepository } from "../../secondary/offer/InM
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentGroupRepository } from "../../secondary/offer/InMemoryEstablishmentGroupRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/offer/InMemorySearchMadeRepository";
-import { Database } from "../../secondary/pg/kysely/model/database";
+import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { PgAgencyRepository } from "../../secondary/pg/repositories/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/repositories/PgApiConsumerRepository";
@@ -105,7 +104,7 @@ export const createInMemoryUow = () => {
   } satisfies UnitOfWork;
 };
 
-export const createPgUow = (transaction: Transaction<Database>): UnitOfWork => {
+export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);
   return {
     agencyRepository: new PgAgencyRepository(transaction),
