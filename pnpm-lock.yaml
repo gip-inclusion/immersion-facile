@@ -95,6 +95,12 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.0
+      kysely:
+        specifier: ^0.26.3
+        version: 0.26.3
+      kysely-codegen:
+        specifier: ^0.10.1
+        version: 0.10.1(kysely@0.26.3)(pg@8.11.1)
       multer:
         specifier: ^1.4.4
         version: 1.4.4
@@ -8920,7 +8926,6 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
-    dev: true
 
   /char-regex@1.0.2:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
@@ -12488,6 +12493,35 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /kysely-codegen@0.10.1(kysely@0.26.3)(pg@8.11.1):
+    resolution: {integrity: sha512-8Bslh952gN5gtucRv4jTZDFD18RBioS6M50zHfe5kwb5iSyEAunU4ZYMdHzkHraa4zxjg5/183XlOryBCXLRIw==}
+    hasBin: true
+    peerDependencies:
+      better-sqlite3: '>=7.6.2'
+      kysely: '>=0.19.12'
+      mysql2: ^2.3.3 || ^3.0.0
+      pg: ^8.8.0
+    peerDependenciesMeta:
+      better-sqlite3:
+        optional: true
+      mysql2:
+        optional: true
+      pg:
+        optional: true
+    dependencies:
+      chalk: 4.1.2
+      dotenv: 16.0.3
+      kysely: 0.26.3
+      micromatch: 4.0.5
+      minimist: 1.2.8
+      pg: 8.11.1
+    dev: false
+
+  /kysely@0.26.3:
+    resolution: {integrity: sha512-yWSgGi9bY13b/W06DD2OCDDHQmq1kwTGYlQ4wpZkMOJqMGCstVCFIvxCCVG4KfY1/3G0MhDAcZsip/Lw8/vJWw==}
+    engines: {node: '>=14.0.0'}
+    dev: false
+
   /lazy-ass@1.6.0:
     resolution: {integrity: sha512-cc8oEVoctTvsFZ/Oje/kGnHbpWHYBe8IAJe4C0QNc3t8uM/0Y8+erSz/7Y1ALuXTEZTMvxXwO6YbX1ey3ujiZw==}
     engines: {node: '> 0.8'}
@@ -13184,7 +13218,6 @@ packages:
     dependencies:
       braces: 3.0.2
       picomatch: 2.3.1
-    dev: true
 
   /mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
@@ -15834,7 +15867,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       has-flag: 4.0.0
-    dev: true
 
   /supports-color@8.1.1:
     resolution: {integrity: sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q==}

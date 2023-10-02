@@ -37,7 +37,8 @@
     "lint": "pnpm -w lintconfig:glob ./back/src",
     "typecheck": "tsc --noEmit",
     "migrate": "pnpm db:migrate",
-    "fullcheck": "pnpm -w fullcheck --filter=back"
+    "fullcheck": "pnpm -w fullcheck --filter=back",
+    "kysely-codegen": "kysely-codegen --dialect postgres"
   },
   "keywords": [],
   "author": "",
@@ -57,6 +58,8 @@
     "html-templates": "workspace:*",
     "http-client": "workspace:*",
     "jsonwebtoken": "^9.0.0",
+    "kysely": "^0.26.3",
+    "kysely-codegen": "^0.10.1",
     "multer": "^1.4.4",
     "nanoid": "^3.3.4",
     "node-pg-migrate": "^6.2.1",
