@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { SearchMadeEntity } from "../../../../domain/offer/entities/SearchMadeEntity";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 
@@ -16,7 +17,7 @@ describe("PgSearchesMadeRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM searches_made");
-    pgSearchesMadeRepository = new PgSearchMadeRepository(client);
+    pgSearchesMadeRepository = new PgSearchMadeRepository(makeKyselyDb(pool));
   });
 
   afterAll(async () => {
