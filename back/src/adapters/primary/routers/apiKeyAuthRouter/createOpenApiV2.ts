@@ -4,9 +4,11 @@ import {
   ConventionDtoBuilder,
   ConventionReadDto,
   conventionReadSchema,
+  CreateWebhookSubscription,
   SearchResultDto,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
+import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domain/broadcast/ports/SubscribersGateway";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
@@ -157,6 +159,25 @@ const conventionExample: ConventionReadDto = {
   agencyName: "Agence de test",
   agencyDepartment: "75",
   agencyKind: "pole-emploi",
+};
+
+const callbackBodySchema: z.Schema<ConventionUpdatedSubscriptionCallbackBody> =
+  z.object({
+    payload: z.object({ convention: conventionReadSchema }),
+    subscribedEvent: z.enum(["convention.updated"]),
+  });
+
+const callbackBodyExample: ConventionUpdatedSubscriptionCallbackBody = {
+  payload: { convention: conventionExample },
+  subscribedEvent: "convention.updated",
+};
+
+const subscribeToWebhookExample: CreateWebhookSubscription = {
+  callbackUrl: "https://my-callback-url.com/conventions-updated",
+  subscribedEvent: "convention.updated",
+  callbackHeaders: {
+    authorization: "my-token",
+  },
 };
 
 export const createOpenApiSpecV2 = (envType: string) =>
@@ -447,20 +468,15 @@ export const createOpenApiSpecV2 = (envType: string) =>
           "Le body de la requête sera un JSON contenant les données de l'évènement. Les différents body possibles sont décrits dans l'onglet 'Callbacks'",
         callbacks: {
           "convention.updated": {
-            "https://my-callback-url.com/conventions-updated": {
+            [subscribeToWebhookExample.callbackUrl]: {
               post: {
                 summary: "Votre route de callback",
                 requestBody: {
                   required: true,
                   content: {
                     "application/json": {
-                      example: conventionExample,
-                      schema: zodToJsonSchema(
-                        z.object({
-                          payload: conventionReadSchema,
-                          subscribedEvent: z.enum(["convention.updated"]),
-                        }),
-                      ) as any,
+                      example: callbackBodyExample,
+                      schema: zodToJsonSchema(callbackBodySchema) as any,
                     },
                   },
                 },
@@ -470,8 +486,13 @@ export const createOpenApiSpecV2 = (envType: string) =>
           },
         },
         extraDocs: {
+          body: {
+            example: subscribeToWebhookExample,
+          },
           responses: {
-            "201": { description: "Souscription réussie" },
+            "201": {
+              description: "Souscription réussie",
+            },
             "400": {
               description: "Lorsque le format fourni, n'est pas valide",
             },
