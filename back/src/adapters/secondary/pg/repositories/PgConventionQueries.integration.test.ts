@@ -17,6 +17,7 @@ import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
 import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../core/UuidGeneratorImplementations";
+import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
@@ -33,6 +34,7 @@ describe("Pg implementation of ConventionQueries", () => {
   let conventionQueries: PgConventionQueries;
   let agencyRepo: PgAgencyRepository;
   let conventionRepository: PgConventionRepository;
+  let transaction: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -45,10 +47,11 @@ describe("Pg implementation of ConventionQueries", () => {
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
     );
     await client.query("DELETE FROM agencies");
+    transaction = makeKyselyDb(pool);
 
-    conventionQueries = new PgConventionQueries(client);
-    agencyRepo = new PgAgencyRepository(client);
-    conventionRepository = new PgConventionRepository(client);
+    conventionQueries = new PgConventionQueries(transaction);
+    agencyRepo = new PgAgencyRepository(transaction);
+    conventionRepository = new PgConventionRepository(transaction);
   });
 
   afterAll(async () => {
@@ -409,7 +412,7 @@ describe("Pg implementation of ConventionQueries", () => {
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     const agency = AgencyDtoBuilder.create().build();
     beforeEach(async () => {
-      const agencyRepository = new PgAgencyRepository(client);
+      const agencyRepository = new PgAgencyRepository(transaction);
       await agencyRepository.insert(agency);
       await client.query("DELETE FROM outbox_failures");
       await client.query("DELETE FROM outbox_publications");
@@ -418,8 +421,8 @@ describe("Pg implementation of ConventionQueries", () => {
 
     it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
-      const conventionRepo = new PgConventionRepository(client);
-      const outboxRepo = new PgOutboxRepository(client);
+      const conventionRepo = new PgConventionRepository(transaction);
+      const outboxRepo = new PgOutboxRepository(transaction);
       const dateStart = new Date("2022-05-10").toISOString();
       const dateEnd14 = new Date("2022-05-14").toISOString();
       const dateEnd15 = new Date("2022-05-15").toISOString();

@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import format from "pg-format";
 import { equals, keys } from "ramda";
 import {
@@ -28,6 +27,7 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../primary/helpers/httpErrors";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 
 const logger = createLogger(__filename);
@@ -35,7 +35,7 @@ const logger = createLogger(__filename);
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async createImmersionOffersToEstablishments(
     offersWithSiret: OfferWithSiret[],
@@ -57,7 +57,7 @@ export class PgEstablishmentAggregateRepository
         ) VALUES %L`,
       immersionOfferFields,
     );
-    await this.client.query(query);
+    await executeKyselyRawSqlQuery(this.transaction, query);
   }
 
   public async delete(siret: string): Promise<void> {
@@ -66,7 +66,8 @@ export class PgEstablishmentAggregateRepository
 
       await this.#deleteEstablishmentContactBySiret(siret);
 
-      const { rowCount } = await this.client.query(
+      const { numAffectedRows } = await executeKyselyRawSqlQuery(
+        this.transaction,
         `
         DELETE
         FROM establishments
@@ -74,7 +75,7 @@ export class PgEstablishmentAggregateRepository
       `,
         [siret],
       );
-      if (rowCount !== 1)
+      if (Number(numAffectedRows) !== 1)
         throw new NotFoundError(
           `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
         );
@@ -92,7 +93,8 @@ export class PgEstablishmentAggregateRepository
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
     const aggregateWithStringDates = (
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         `WITH unique_establishments__immersion_contacts AS (
           SELECT 
             DISTINCT ON (establishment_siret) establishment_siret, 
@@ -214,7 +216,8 @@ export class PgEstablishmentAggregateRepository
   public async getOffersAsAppellationDtoEstablishment(
     siret: string,
   ): Promise<AppellationAndRomeDto[]> {
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
        FROM immersion_offers io
        JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
@@ -280,7 +283,8 @@ export class PgEstablishmentAggregateRepository
   public async getSiretOfEstablishmentsToSuggestUpdate(
     before: Date,
   ): Promise<SiretDto[]> {
-    const response = await this.client.query(
+    const response = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT DISTINCT e.siret 
        FROM establishments e
        WHERE e.update_date < $1 
@@ -313,7 +317,8 @@ export class PgEstablishmentAggregateRepository
         "Querying getSiretsOfEstablishmentsNotCheckedAtInseeSince, maxResults must be <= 1000",
       );
 
-    const result = await this.client.query(
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
         SELECT siret
         FROM establishments
@@ -329,7 +334,8 @@ export class PgEstablishmentAggregateRepository
   public async getSiretsOfEstablishmentsWithRomeCode(
     rome: string,
   ): Promise<string[]> {
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT siret FROM immersion_offers WHERE rome_code = $1`,
       [rome],
     );
@@ -337,7 +343,8 @@ export class PgEstablishmentAggregateRepository
   }
 
   public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);`,
       [siret],
     );
@@ -376,7 +383,8 @@ export class PgEstablishmentAggregateRepository
       GROUP BY e.siret HAVING COUNT(*) >= e.max_contacts_per_week
       `;
 
-    const result = await this.client.query(
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
         UPDATE establishments
         SET is_searchable = true 
@@ -387,7 +395,7 @@ export class PgEstablishmentAggregateRepository
       [since],
     );
 
-    return result.rowCount;
+    return Number(result.numAffectedRows);
   }
 
   public async searchImmersionResults({
@@ -530,7 +538,7 @@ export class PgEstablishmentAggregateRepository
       propertiesToUpdate.siret,
     ];
     const formatedQuery = format(updateQuery, ...queryArgs);
-    await this.client.query(formatedQuery);
+    await executeKyselyRawSqlQuery(this.transaction, formatedQuery);
   }
 
   public async updateEstablishmentAggregate(
@@ -602,11 +610,12 @@ export class PgEstablishmentAggregateRepository
       );
     });
 
-    await this.client.query(queries.join("\n"));
+    await executeKyselyRawSqlQuery(this.transaction, queries.join("\n"));
   }
 
   async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       `
       DELETE
       FROM immersion_contacts
@@ -626,7 +635,8 @@ export class PgEstablishmentAggregateRepository
   ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         selectedOffersSubQuery,
       ),
@@ -695,7 +705,7 @@ export class PgEstablishmentAggregateRepository
         ),
       );
 
-      await this.client.query(query);
+      await executeKyselyRawSqlQuery(this.transaction, query);
     } catch (e: any) {
       logger.error(e, "Error inserting establishments");
       throw e;
@@ -742,8 +752,11 @@ export class PgEstablishmentAggregateRepository
         establishmentContactFields,
       );
 
-      await this.client.query(insertContactsQuery);
-      await this.client.query(insertEstablishmentsContactsQuery);
+      await executeKyselyRawSqlQuery(this.transaction, insertContactsQuery);
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        insertEstablishmentsContactsQuery,
+      );
     } catch (e: any) {
       logger.error(e, "Error inserting contacts");
       throw e;
@@ -755,7 +768,8 @@ export class PgEstablishmentAggregateRepository
   ): Promise<RomeCode | undefined> {
     if (!appellationCode) return;
 
-    const result = await this.client.query(
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
       `SELECT code_rome
         from public_appellations_data
         where ogr_appellation = $1`,
@@ -787,7 +801,8 @@ export class PgEstablishmentAggregateRepository
     );
 
     if (offersToAdd.length > 0)
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         format(
           `INSERT INTO immersion_offers (
             rome_code, appellation_code, score, created_at, siret
@@ -818,7 +833,10 @@ export class PgEstablishmentAggregateRepository
         siret,
         offersToRemoveByRomeCode,
       );
-      await this.client.query(queryToRemoveOffersFromRome);
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        queryToRemoveOffersFromRome,
+      );
     }
 
     const offersToRemoveByRomeAppellation = offersToRemove
@@ -831,7 +849,10 @@ export class PgEstablishmentAggregateRepository
         siret,
         offersToRemoveByRomeAppellation,
       );
-      await this.client.query(queryToRemoveOffersFromAppellationCode);
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        queryToRemoveOffersFromAppellationCode,
+      );
     }
   }
 
@@ -845,7 +866,8 @@ export class PgEstablishmentAggregateRepository
       !!updatedAggregate.contact &&
       !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
     ) {
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         `UPDATE immersion_contacts 
        SET lastname = $1, 
             firstname = $2, 

@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { ConventionDtoBuilder } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
+import { executeKyselyRawSqlQuery, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -21,12 +22,16 @@ describe("PgConventionExternalIdRepository", () => {
 
   beforeEach(async () => {
     client = await pool.connect();
-    pgConventionRepository = new PgConventionRepository(client);
+    const transaction = makeKyselyDb(pool);
+    pgConventionRepository = new PgConventionRepository(transaction);
     pgConventionExternalIdRepository = new PgConventionExternalIdRepository(
-      client,
+      transaction,
     );
-    await client.query("DELETE FROM convention_external_ids");
-    await client.query("DELETE FROM conventions");
+    await executeKyselyRawSqlQuery(
+      transaction,
+      "DELETE FROM convention_external_ids",
+    );
+    await executeKyselyRawSqlQuery(transaction, "DELETE FROM conventions");
   });
 
   describe("save", () => {

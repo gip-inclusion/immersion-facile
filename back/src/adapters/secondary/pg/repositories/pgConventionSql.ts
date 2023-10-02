@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import {
   ConventionId,
   ConventionReadDto,
@@ -6,6 +5,7 @@ import {
   parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 const buildSignatoriesObject = `JSON_BUILD_OBJECT(
       'beneficiary' , JSON_BUILD_OBJECT(
@@ -129,10 +129,11 @@ const getReadConventionByIdQuery = `
   ${selectAllConventionDtosById} WHERE conventions.id = $1`;
 
 export const getReadConventionById = async (
-  client: PoolClient,
+  transaction: KyselyDb,
   conventionId: ConventionId,
 ): Promise<ConventionReadDto | undefined> => {
-  const pgResult = await client.query<{ dto: unknown }>(
+  const pgResult = await executeKyselyRawSqlQuery<{ dto: unknown }>(
+    transaction,
     getReadConventionByIdQuery,
     [conventionId],
   );

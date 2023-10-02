@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { createLogger } from "../../../utils/logger";
+import { makeKyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNotificationRepository";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -12,13 +13,13 @@ const executeTriggerDeleteEmailAttachements = async () => {
   const pool = new Pool({
     connectionString: dbUrl,
   });
-  const client = await pool.connect();
+  const kyselyDb = makeKyselyDb(pool);
 
-  const pgNotificationRepository = new PgNotificationRepository(client);
+  const pgNotificationRepository = new PgNotificationRepository(kyselyDb);
   const numberOfDeletedAttachements =
     await pgNotificationRepository.deleteAllEmailAttachements();
 
-  client.release();
+  await kyselyDb.destroy();
   await pool.end();
 
   return {

@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import {
   AssessmentStatus,
   ConventionId,
@@ -6,6 +5,7 @@ import {
 } from "shared";
 import { ImmersionAssessmentEntity } from "../../../../domain/convention/entities/ImmersionAssessmentEntity";
 import { ImmersionAssessmentRepository } from "../../../../domain/convention/ports/ImmersionAssessmentRepository";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 interface PgImmersionAssessment {
   convention_id: string;
@@ -16,12 +16,13 @@ interface PgImmersionAssessment {
 export class PgImmersionAssessmentRepository
   implements ImmersionAssessmentRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ImmersionAssessmentEntity | undefined> {
-    const result = await this.client.query<PgImmersionAssessment>(
+    const result = await executeKyselyRawSqlQuery<PgImmersionAssessment>(
+      this.transaction,
       "SELECT * FROM immersion_assessments WHERE convention_id = $1",
       [conventionId],
     );
@@ -43,19 +44,18 @@ export class PgImmersionAssessmentRepository
   public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
     const { status, conventionId, establishmentFeedback } = assessment;
 
-    await this.client
-      .query(
-        `INSERT INTO immersion_assessments(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      `INSERT INTO immersion_assessments(
         convention_id, status, establishment_feedback
       ) VALUES($1, $2, $3)`,
-        [conventionId, status, establishmentFeedback],
-      )
-      .catch((error) => {
-        if (error?.message.includes(noConventionMatchingErrorMessage))
-          throw new Error(`No convention found for id ${conventionId}`);
+      [conventionId, status, establishmentFeedback],
+    ).catch((error) => {
+      if (error?.message.includes(noConventionMatchingErrorMessage))
+        throw new Error(`No convention found for id ${conventionId}`);
 
-        throw error;
-      });
+      throw error;
+    });
   }
 }
 

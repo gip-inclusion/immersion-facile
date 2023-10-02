@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import {
   ConventionId,
   parseZodSchemaAndLogErrorOnParsingFailure,
@@ -16,6 +15,7 @@ import {
 } from "../../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { conventionPoleEmploiUserAdvisorDtoSchema } from "../../../../domain/peConnect/port/PeConnect.schema";
 import { createLogger } from "../../../../utils/logger";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
 
@@ -24,13 +24,14 @@ const logger = createLogger(__filename);
 export class PgConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
     peExternalId: PeExternalId,
   ): Promise<ConventionAndPeExternalIds> {
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
       UPDATE partners_pe_connect
       SET convention_id = $1
@@ -39,9 +40,9 @@ export class PgConventionPoleEmploiAdvisorRepository
       [conventionId, peExternalId, CONVENTION_ID_DEFAULT_UUID],
     );
 
-    if (pgResult.rowCount != 1)
+    if (Number(pgResult.numAffectedRows) != 1)
       throw new Error(
-        `Association between Convention and userAdvisor failed. rowCount: ${pgResult.rowCount}, conventionId: ${conventionId}, peExternalId: ${peExternalId}`,
+        `Association between Convention and userAdvisor failed. rowCount: ${pgResult.rows.length}, conventionId: ${conventionId}, peExternalId: ${peExternalId}`,
       );
 
     return {
@@ -54,7 +55,8 @@ export class PgConventionPoleEmploiAdvisorRepository
     conventionId: ConventionId,
   ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
     const pgResult =
-      await this.client.query<PgConventionPoleEmploiUserAdvisorDto>(
+      await executeKyselyRawSqlQuery<PgConventionPoleEmploiUserAdvisorDto>(
+        this.transaction,
         `SELECT *
        FROM partners_pe_connect
        WHERE convention_id = $1`,
@@ -83,14 +85,18 @@ export class PgConventionPoleEmploiAdvisorRepository
   ): Promise<void> {
     const { user, advisor } = peUserAndAdvisor;
 
-    await this.client.query(upsertOnCompositePrimaryKeyConflict, [
-      user.peExternalId,
-      CONVENTION_ID_DEFAULT_UUID,
-      advisor?.firstName ?? null,
-      advisor?.lastName ?? null,
-      advisor?.email ?? null,
-      advisor?.type ?? null,
-    ]);
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      upsertOnCompositePrimaryKeyConflict,
+      [
+        user.peExternalId,
+        CONVENTION_ID_DEFAULT_UUID,
+        advisor?.firstName ?? null,
+        advisor?.lastName ?? null,
+        advisor?.email ?? null,
+        advisor?.type ?? null,
+      ],
+    );
   }
 }
 

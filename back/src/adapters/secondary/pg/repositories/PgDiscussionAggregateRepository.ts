@@ -1,4 +1,5 @@
-import { PoolClient, QueryConfig, QueryResult, QueryResultRow } from "pg";
+import type { QueryResult } from "kysely";
+import { QueryResultRow } from "pg";
 import format from "pg-format";
 import { DiscussionId, SiretDto } from "shared";
 import {
@@ -10,13 +11,14 @@ import {
   HasDiscussionMatchingParams,
 } from "../../../../domain/offer/ports/DiscussionAggregateRepository";
 import { createLogger } from "../../../../utils/logger";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 const logger = createLogger(__filename);
 
 export class PgDiscussionAggregateRepository
   implements DiscussionAggregateRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async countDiscussionsForSiretSince(
     siret: SiretDto,
@@ -111,7 +113,8 @@ export class PgDiscussionAggregateRepository
     potentialBeneficiaryEmail,
     since,
   }: HasDiscussionMatchingParams): Promise<boolean> {
-    const result = await this.client.query(
+    const result = await executeKyselyRawSqlQuery(
+      this.transaction,
       `
         SELECT EXISTS (SELECT 1 FROM discussions 
             WHERE siret = $1
@@ -192,12 +195,16 @@ export class PgDiscussionAggregateRepository
     await this.#executeQuery("insertAllExchanges", format(query, values));
   }
 
-  #executeQuery<R extends QueryResultRow = any, I extends any[] = any[]>(
+  #executeQuery<I extends any[] = any[]>(
     queryName: string,
-    queryTextOrConfig: string | QueryConfig<I>,
+    queryTextOrConfig: string,
     values?: I,
-  ): Promise<QueryResult<R>> {
-    return this.client.query(queryTextOrConfig, values).catch((error) => {
+  ): Promise<QueryResult<QueryResultRow>> {
+    return executeKyselyRawSqlQuery(
+      this.transaction,
+      queryTextOrConfig,
+      values,
+    ).catch((error) => {
       logger.error(
         { query: queryTextOrConfig, values, error },
         `PgDiscussionAggregateRepository_${queryName}_queryErrored`,

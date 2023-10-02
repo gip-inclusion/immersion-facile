@@ -10,6 +10,7 @@ import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { EstablishmentEntity } from "../../../../domain/offer/entities/EstablishmentEntity";
 import { EstablishmentGroupEntity } from "../../../../domain/offer/entities/EstablishmentGroupEntity";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
 
@@ -39,9 +40,12 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   beforeEach(async () => {
-    pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(client);
+    const transaction = makeKyselyDb(pool);
+    pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(
+      transaction,
+    );
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      client,
+      transaction,
     );
     await client.query("DELETE FROM establishment_groups__sirets");
     await client.query("DELETE FROM establishment_groups");

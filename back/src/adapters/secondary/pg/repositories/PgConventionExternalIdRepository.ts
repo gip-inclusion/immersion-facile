@@ -1,16 +1,17 @@
-import { PoolClient } from "pg";
 import { ConventionExternalId, ConventionId } from "shared";
 import { ConventionExternalIdRepository } from "../../../../domain/convention/ports/ConventionExternalIdRepository";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 export class PgConventionExternalIdRepository
   implements ConventionExternalIdRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ConventionExternalId | undefined> {
-    const results = await this.client.query(
+    const results = await executeKyselyRawSqlQuery(
+      this.transaction,
       "SELECT external_id FROM convention_external_ids WHERE convention_id = $1 LIMIT 1",
       [conventionId],
     );
@@ -22,7 +23,8 @@ export class PgConventionExternalIdRepository
   }
 
   public async save(conventionId: ConventionId): Promise<void> {
-    await this.client.query(
+    await executeKyselyRawSqlQuery(
+      this.transaction,
       "INSERT INTO convention_external_ids(convention_id) VALUES($1)",
       [conventionId],
     );

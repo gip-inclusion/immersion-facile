@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { MarkEstablishmentsAsSearchableScript } from "../../../domain/offer/useCases/MarkEstablishmentsAsSearchableScript";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
+import { makeKyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/repositories/PgEstablishmentAggregateRepository";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -13,10 +14,9 @@ const startScript = async () => {
   const pool = new Pool({
     connectionString: dbUrl,
   });
-  const client = await pool.connect();
 
   const establishmentAggregateRepository =
-    new PgEstablishmentAggregateRepository(client);
+    new PgEstablishmentAggregateRepository(makeKyselyDb(pool));
 
   const markAsSearchableScript = new MarkEstablishmentsAsSearchableScript(
     establishmentAggregateRepository,

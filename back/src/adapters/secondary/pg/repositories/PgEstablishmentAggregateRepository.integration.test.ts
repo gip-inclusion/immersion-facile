@@ -32,6 +32,7 @@ import {
 import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsWithInseeDataParams } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
+import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
@@ -71,11 +72,13 @@ const hydrographeAppellationAndRome: AppellationAndRomeDto = {
 describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let client: PoolClient;
+  let transaction: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+    transaction = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
@@ -84,7 +87,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     await client.query("DELETE FROM establishments");
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      client,
+      transaction,
     );
   });
 
@@ -1382,7 +1385,9 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       beforeEach(async () => {
         await client.query("DELETE FROM discussions");
-        pgDiscussionRepository = new PgDiscussionAggregateRepository(client);
+        pgDiscussionRepository = new PgDiscussionAggregateRepository(
+          transaction,
+        );
         const establishment1 = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret1)
           .withIsSearchable(false)

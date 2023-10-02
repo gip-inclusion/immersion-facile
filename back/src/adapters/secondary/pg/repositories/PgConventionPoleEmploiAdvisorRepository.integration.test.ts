@@ -11,6 +11,7 @@ import {
 } from "../../../../domain/peConnect/dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../../domain/peConnect/dto/PeConnectUser.dto";
+import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
 import {
@@ -62,21 +63,23 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let conventionPoleEmploiAdvisorRepository: PgConventionPoleEmploiAdvisorRepository;
+  let transaction: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+    transaction = makeKyselyDb(pool);
     await client.query("DELETE FROM partners_pe_connect");
     // REVIEW I had to add this not to have an error
     // TODO Remove when https://git.beta.pole-emploi.fr/jburkard/immersion-facile/-/merge_requests/967 is merged ?
     await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    const agencyRepository = new PgAgencyRepository(client);
+    const agencyRepository = new PgAgencyRepository(transaction);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
-    const conventionRepository = new PgConventionRepository(client);
+    const conventionRepository = new PgConventionRepository(transaction);
     const conventionExternalIdRepository = new PgConventionExternalIdRepository(
-      client,
+      transaction,
     );
     await conventionRepository.save(convention);
     await conventionExternalIdRepository.save(convention.id);
@@ -90,7 +93,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM partners_pe_connect");
     conventionPoleEmploiAdvisorRepository =
-      new PgConventionPoleEmploiAdvisorRepository(client);
+      new PgConventionPoleEmploiAdvisorRepository(transaction);
   });
 
   describe("openSlotForNextConvention", () => {

@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { ApiConsumer, expectToEqual, WebhookSubscription } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { UuidV4Generator } from "../../core/UuidGeneratorImplementations";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
 const apiConsumer: ApiConsumer = {
@@ -50,7 +51,7 @@ describe("PgApiConsumerRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM api_consumers");
-    apiConsumerRepository = new PgApiConsumerRepository(client);
+    apiConsumerRepository = new PgApiConsumerRepository(makeKyselyDb(pool));
   });
 
   it("save & getById", async () => {

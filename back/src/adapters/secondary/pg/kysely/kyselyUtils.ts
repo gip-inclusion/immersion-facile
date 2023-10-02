@@ -1,4 +1,4 @@
-import { CompiledQuery, Kysely, PostgresDialect, Transaction } from "kysely";
+import { CompiledQuery, Kysely, PostgresDialect } from "kysely";
 import { Pool, QueryResultRow } from "pg";
 import { Database } from "./model/database";
 
@@ -14,4 +14,3 @@ export const makeKyselyDb = (pool: Pool): Kysely<Database> =>
   });
 
 export type KyselyDb = Kysely<Database>;
-export type TransactionDb = Transaction<Database>;

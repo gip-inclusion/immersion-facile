@@ -1,6 +1,6 @@
-import { PoolClient } from "pg";
 import { AuthenticatedUser } from "shared";
 import { AuthenticatedUserRepository } from "../../../../domain/generic/OAuth/ports/AuthenticatedUserRepositiory";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 type PersistenceAuthenticatedUser = {
   id: string;
@@ -12,17 +12,19 @@ type PersistenceAuthenticatedUser = {
 export class PgAuthenticatedUserRepository
   implements AuthenticatedUserRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async findByEmail(
     email: string,
   ): Promise<AuthenticatedUser | undefined> {
-    const response = await this.client.query(
-      `
+    const response =
+      await executeKyselyRawSqlQuery<PersistenceAuthenticatedUser>(
+        this.transaction,
+        `
       SELECT * FROM authenticated_users WHERE email = $1
       `,
-      [email],
-    );
+        [email],
+      );
     return toAuthenticatedUser(response.rows[0]);
   }
 
@@ -36,7 +38,8 @@ export class PgAuthenticatedUserRepository
       )
         return;
 
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         `
         UPDATE authenticated_users
         SET first_name=$2, last_name=$3, updated_at=now()
@@ -45,7 +48,8 @@ export class PgAuthenticatedUserRepository
         [email, firstName, lastName],
       );
     } else {
-      await this.client.query(
+      await executeKyselyRawSqlQuery(
+        this.transaction,
         `
       INSERT INTO authenticated_users(id, email, first_name, last_name) VALUES ($1, $2, $3, $4 )
       `,

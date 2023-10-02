@@ -1,4 +1,3 @@
-import { PoolClient } from "pg";
 import format from "pg-format";
 import {
   AgencyDto,
@@ -16,6 +15,7 @@ import {
 import { AgencyRepository } from "../../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../../utils/logger";
 import { validateAndParseZodSchema } from "../../../primary/helpers/httpErrors";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 
 const logger = createLogger(__filename);
@@ -84,7 +84,7 @@ const makeStatusFilterSQL = (
 };
 
 export class PgAgencyRepository implements AgencyRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getAgencies({
     filters = {},
@@ -120,7 +120,10 @@ export class PgAgencyRepository implements AgencyRepository {
       ...(limitClause ? [limitClause] : []),
     ].join("\n");
 
-    const pgResult = await this.client.query(query);
+    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
+      this.transaction,
+      query,
+    );
     return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
@@ -131,7 +134,8 @@ export class PgAgencyRepository implements AgencyRepository {
     const councellorEmailsIncludesProvidedEmail =
       "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
 
-    const pgResult = await this.client.query(
+    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
+      this.transaction,
       `SELECT id, name, status, kind, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
         street_number_and_address, post_code, city, department_code
        FROM public.agencies
@@ -152,7 +156,11 @@ export class PgAgencyRepository implements AgencyRepository {
   FROM agencies
   WHERE id = $1`;
 
-    const pgResult = await this.client.query<PersistenceAgency>(query, [id]);
+    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
+      this.transaction,
+      query,
+      [id],
+    );
 
     const result = pgResult.rows.at(0);
     if (!result) return undefined;
@@ -166,27 +174,31 @@ export class PgAgencyRepository implements AgencyRepository {
   FROM agencies
   WHERE id IN (%L)`;
 
-    const pgResult = await this.client
-      .query(format(query, ids))
-      .catch((error) => {
-        logger.error(
-          { query, values: ids, error },
-          "PgAgencyRepository_getByIds_QueryErrored",
-        );
-        throw error;
-      });
+    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
+      this.transaction,
+      format(query, ids),
+    ).catch((error) => {
+      logger.error(
+        { query, values: ids, error },
+        "PgAgencyRepository_getByIds_QueryErrored",
+      );
+      throw error;
+    });
 
     if (pgResult.rows.length === 0) return [];
     return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
   public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
-    const pgResult = await this.client.query(`
+    const pgResult = await executeKyselyRawSqlQuery(
+      this.transaction,
+      `
            SELECT id 
            FROM agencies
            WHERE agencies.kind = 'immersion-facile'
            LIMIT 1
-           `);
+           `,
+    );
 
     return pgResult.rows[0]?.id;
   }
@@ -198,7 +210,10 @@ export class PgAgencyRepository implements AgencyRepository {
       street_number_and_address, post_code, city, department_code
     ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
     try {
-      await this.client.query(format(query, ...entityToPgArray(agency)));
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        format(query, ...entityToPgArray(agency)),
+      );
     } catch (error: any) {
       // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
       // See https://www.postgresql.org/docs/10/errcodes-appendix.html
@@ -235,7 +250,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const params = entityToPgArray(agency);
     params[10] =
       agency.position && `POINT(${agency.position.lon} ${agency.position.lat})`;
-    await this.client.query(format(query, ...params));
+    await executeKyselyRawSqlQuery(this.transaction, format(query, ...params));
   }
 }
 

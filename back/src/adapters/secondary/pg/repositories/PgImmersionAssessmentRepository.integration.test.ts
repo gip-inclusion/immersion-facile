@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { ImmersionAssessmentEntity } from "../../../../domain/convention/entities/ImmersionAssessmentEntity";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "./PgImmersionAssessmentRepository";
@@ -33,9 +34,10 @@ describe("PgImmersionAssessmentRepository", () => {
     client = await pool.connect();
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    const agencyRepository = new PgAgencyRepository(client);
+    const transaction = makeKyselyDb(pool);
+    const agencyRepository = new PgAgencyRepository(transaction);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
-    const conventionRepository = new PgConventionRepository(client);
+    const conventionRepository = new PgConventionRepository(transaction);
     await conventionRepository.save(convention);
   });
 
@@ -46,7 +48,9 @@ describe("PgImmersionAssessmentRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_assessments");
-    immersionAssessmentRepository = new PgImmersionAssessmentRepository(client);
+    immersionAssessmentRepository = new PgImmersionAssessmentRepository(
+      makeKyselyDb(pool),
+    );
   });
 
   describe("save", () => {

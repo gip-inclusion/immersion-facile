@@ -1,4 +1,3 @@
-import { PoolClient, QueryResult } from "pg";
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
@@ -13,6 +12,7 @@ import {
 } from "shared";
 import { ConventionRepository } from "../../../../domain/convention/ports/ConventionRepository";
 import { ConflictError } from "../../../primary/helpers/httpErrors";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import { getReadConventionById } from "./pgConventionSql";
 
 export const beneficiaryCurrentEmployerIdColumnName =
@@ -21,12 +21,12 @@ export const beneficiaryCurrentEmployerIdColumnName =
 const beneficiaryRepresentativeIdColumnName = "beneficiary_representative_id";
 
 export class PgConventionRepository implements ConventionRepository {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getById(
     conventionId: ConventionId,
   ): Promise<ConventionDto | undefined> {
-    const readDto = await getReadConventionById(this.client, conventionId);
+    const readDto = await getReadConventionById(this.transaction, conventionId);
     if (!readDto) return;
     const { agencyName, agencyDepartment, agencyKind, ...dto } = readDto;
     return dto;
@@ -73,7 +73,10 @@ export class PgConventionRepository implements ConventionRepository {
         ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)`;
 
     // prettier-ignore
-    await this.client.query(query_insert_convention, [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, workConditions, internshipKind, businessAdvantages,
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      query_insert_convention,
+      [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, workConditions, internshipKind, businessAdvantages,
                                                       beneficiaryId, establishmentTutorId, establishmentRepresentativeId, beneficiaryRepresentativeId,beneficiaryCurrentEmployerId, statusJustification, renewed?.from, renewed?.justification
     ]);
   }
@@ -126,10 +129,14 @@ export class PgConventionRepository implements ConventionRepository {
     SELECT establishment_tutor_id,establishment_representative_id
     FROM conventions
     WHERE id=$1`;
-    const queryReturn = await this.client.query<{
+    const queryReturn = await executeKyselyRawSqlQuery<{
       establishment_tutor_id: number;
       establishment_representative_id: number;
-    }>(getConventionEstablishmentTutorAndRepresentativeQuery, [id]);
+    }>(
+      this.transaction,
+      getConventionEstablishmentTutorAndRepresentativeQuery,
+      [id],
+    );
     const result = queryReturn.rows.at(0);
     if (result)
       return (
@@ -146,13 +153,13 @@ export class PgConventionRepository implements ConventionRepository {
         FROM conventions 
         WHERE conventions.id=$1
         `;
-    // prettier-ignore
-    const getResult = await this.client.query<{
-      beneficiary_current_employer_id:number|null
-    }>(getBeneficiaryCurrentEmployerQuery, [ id]);
+
+    const getResult = await executeKyselyRawSqlQuery<{
+      beneficiary_current_employer_id: number | null;
+    }>(this.transaction, getBeneficiaryCurrentEmployerQuery, [id]);
     const result = getResult.rows.at(0);
     if (result) return result.beneficiary_current_employer_id;
-    throw new Error(missingReturningRowError(getResult));
+    throw missingReturningRowError();
   }
 
   async #getBeneficiaryRepresentativeId(id: ConventionId) {
@@ -162,12 +169,12 @@ export class PgConventionRepository implements ConventionRepository {
         WHERE conventions.id=$1
         `;
     // prettier-ignore
-    const getResult = await this.client.query<{
+    const getResult = await executeKyselyRawSqlQuery<{
       beneficiary_representative_id:number|null
-    }>(getBeneficiaryRepresentativeQuery, [ id]);
+    }>(this.transaction, getBeneficiaryRepresentativeQuery, [ id]);
     const result = getResult.rows.at(0);
     if (result) return result.beneficiary_representative_id;
-    throw new Error(missingReturningRowError(getResult));
+    throw missingReturningRowError();
   }
 
   async #getEstablishmentRepresentativeId({
@@ -220,10 +227,13 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING id;
       `;
     // prettier-ignore
-    const insertReturn = await this.client.query<{id:number}>(query_insert_beneficiary, [ beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone, beneficiary.birthdate, beneficiary.emergencyContactEmail,levelOfEducation, beneficiary.financiaryHelp, beneficiary.isRqth]);
+    const insertReturn = await executeKyselyRawSqlQuery<{id:number}>(
+      this.transaction,
+      query_insert_beneficiary,
+      [ beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone, beneficiary.birthdate, beneficiary.emergencyContactEmail,levelOfEducation, beneficiary.financiaryHelp, beneficiary.isRqth]);
     const result = insertReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
+    throw missingReturningRowError();
   }
 
   async #insertBeneficiaryCurrentEmployer(
@@ -234,7 +244,8 @@ export class PgConventionRepository implements ConventionRepository {
         VALUES($1, $2, $3, $4, $5, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('businessName', $6::text,'businessSiret', $7::text,'job', $8::text, 'businessAddress', $9::text)))
         RETURNING id;
       `;
-    const insertReturn = await this.client.query<{ id: number }>(
+    const insertReturn = await executeKyselyRawSqlQuery<{ id: number }>(
+      this.transaction,
       query_insert_beneficiary_current_employer,
       [
         beneficiaryCurrentEmployer.firstName,
@@ -250,7 +261,7 @@ export class PgConventionRepository implements ConventionRepository {
     );
     const result = insertReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
+    throw missingReturningRowError();
   }
 
   async #insertBeneficiaryRepresentative(
@@ -262,10 +273,10 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING id;
       `;
     // prettier-ignore
-    const insertReturn = await this.client.query<{ id: number }>( query_insert_beneficiary_representative, [ beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
+    const insertReturn = await executeKyselyRawSqlQuery<{ id: number }>( this.transaction, query_insert_beneficiary_representative, [ beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
     const result = insertReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
+    throw missingReturningRowError();
   }
 
   async #insertEstablishmentRepresentative(
@@ -277,10 +288,10 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING id;
       `;
     // prettier-ignore
-    const insertReturn = await this.client.query<{ id: number }>(query_insert_establishment_representative,[ establishmentRepresentative.firstName, establishmentRepresentative.lastName, establishmentRepresentative.email, establishmentRepresentative.phone, establishmentRepresentative.signedAt, ]);
+    const insertReturn = await executeKyselyRawSqlQuery<{ id: number }>( this.transaction, query_insert_establishment_representative,[ establishmentRepresentative.firstName, establishmentRepresentative.lastName, establishmentRepresentative.email, establishmentRepresentative.phone, establishmentRepresentative.signedAt, ]);
     const result = insertReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
+    throw missingReturningRowError();
   }
 
   async #insertEstablishmentTutor(
@@ -292,10 +303,13 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING id;
       `;
     // prettier-ignore
-    const insertReturn = await this.client.query<{ id: number }>(query_insert_establishment_tutor,[ establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, ]);
+    const insertReturn = await executeKyselyRawSqlQuery<{ id: number }>(
+      this.transaction,
+      query_insert_establishment_tutor,
+      [ establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, ]);
     const result = insertReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(insertReturn));
+    throw missingReturningRowError();
   }
 
   async #insertOrUpdateBeneficiaryCurrentEmployerIfExists(
@@ -347,7 +361,10 @@ export class PgConventionRepository implements ConventionRepository {
       FROM conventions 
       WHERE conventions.id=$1 AND actors.id = conventions.beneficiary_id`;
     // prettier-ignore
-    await this.client.query(updateBeneficiaryQuery, [ id, beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone, beneficiary.birthdate, beneficiary.emergencyContactEmail, levelOfEducation, beneficiary.financiaryHelp, beneficiary.isRqth ]);
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      updateBeneficiaryQuery,
+      [ id, beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone, beneficiary.birthdate, beneficiary.emergencyContactEmail, levelOfEducation, beneficiary.financiaryHelp, beneficiary.isRqth ]);
   }
 
   async #updateBeneficiaryCurrentEmployer(
@@ -361,7 +378,8 @@ export class PgConventionRepository implements ConventionRepository {
         WHERE conventions.id=$1 AND actors.id = conventions.${beneficiaryCurrentEmployerIdColumnName}
         RETURNING actors.id
         `;
-    const updateReturn = await this.client.query(
+    const updateReturn = await executeKyselyRawSqlQuery(
+      this.transaction,
       updateBeneficiaryCurrentEmployerQuery,
       [
         id,
@@ -378,7 +396,7 @@ export class PgConventionRepository implements ConventionRepository {
     );
     const result = updateReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(updateReturn));
+    throw missingReturningRowError();
   }
 
   async #updateBeneficiaryRepresentative(
@@ -393,10 +411,13 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING actors.id`;
 
     // prettier-ignore
-    const queryResult = await this.client.query<{id: number}>(updateBeneficiaryRepresentativeQuery, [ id, beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
+    const queryResult = await executeKyselyRawSqlQuery<{ id: number }>(
+      this.transaction,
+      updateBeneficiaryRepresentativeQuery,
+      [ id, beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
     const result = queryResult.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(queryResult));
+    throw missingReturningRowError();
   }
 
   async #updateConvention({
@@ -425,7 +446,11 @@ export class PgConventionRepository implements ConventionRepository {
             establishment_tutor_id=$20, establishment_representative_id=$21, ${beneficiaryCurrentEmployerIdColumnName}=$22, ${beneficiaryRepresentativeIdColumnName}=$23, business_advantages=$24, validators=$26
       WHERE id=$1`;
     // prettier-ignore
-    await this.client.query(updateConventionQuery, [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id, beneficiary_representative_id,convention.businessAdvantages,convention.statusJustification, convention.validators ]);
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      updateConventionQuery,
+      [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id, beneficiary_representative_id,convention.businessAdvantages,convention.statusJustification, convention.validators ]
+    );
   }
 
   async #updateEstablishmentRepresentative(
@@ -440,10 +465,14 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING actors.id
     `;
     // prettier-ignore
-    const updateReturn = await this.client.query<{ id: number }>( updateEstablishmentRepresentativeQuery, [ id, establishmentRepresentative.firstName, establishmentRepresentative.lastName, establishmentRepresentative.email, establishmentRepresentative.phone, establishmentRepresentative.signedAt, ]);
+    const updateReturn = await executeKyselyRawSqlQuery<{ id: number }>(
+      this.transaction,
+      updateEstablishmentRepresentativeQuery,
+      [ id, establishmentRepresentative.firstName, establishmentRepresentative.lastName, establishmentRepresentative.email, establishmentRepresentative.phone, establishmentRepresentative.signedAt, ]
+    );
     const result = updateReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(updateReturn));
+    throw missingReturningRowError();
   }
 
   async #updateEstablishmentTutor(
@@ -460,11 +489,15 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING actors.id
     `;
     // prettier-ignore
-    const updateReturn = await this.client.query<{ id: number }>( updateEstablishmentTutorQuery,[ id, establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, signedAt]);
+    const updateReturn = await executeKyselyRawSqlQuery<{ id: number }>(
+      this.transaction,
+      updateEstablishmentTutorQuery,
+      [ id, establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, signedAt]
+    );
     const result = updateReturn.rows.at(0);
     if (result) return result.id;
-    throw new Error(missingReturningRowError(updateReturn));
+    throw missingReturningRowError();
   }
 }
-const missingReturningRowError = (updateReturn: QueryResult<any>): string =>
-  `Missing rows on update return: ${JSON.stringify(updateReturn.rows)}`;
+const missingReturningRowError = (): Error =>
+  new Error(`Missing rows on update return`);

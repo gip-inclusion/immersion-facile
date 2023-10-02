@@ -9,6 +9,7 @@ import {
   TemplatedSms,
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
 const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";
@@ -97,7 +98,7 @@ describe("PgNotificationRepository", () => {
 
   beforeEach(async () => {
     pgNotificationRepository = new PgNotificationRepository(
-      client,
+      makeKyselyDb(pool),
       maxRetrievedNotifications,
     );
     await client.query("DELETE FROM notifications_sms");

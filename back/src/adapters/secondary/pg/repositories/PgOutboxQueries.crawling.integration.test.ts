@@ -8,6 +8,7 @@ import {
 } from "../../../../domain/core/eventBus/events";
 import { CustomTimeGateway } from "../../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/UuidGeneratorImplementations";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgOutboxQueries } from "./PgOutboxQueries";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 
@@ -40,7 +41,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     await client.query("DELETE FROM outbox_publications");
     await client.query("DELETE FROM outbox");
 
-    outboxQueries = new PgOutboxQueries(client);
+    outboxQueries = new PgOutboxQueries(makeKyselyDb(pool));
   });
 
   it("finds all events to be processed", async () => {
@@ -175,7 +176,9 @@ describe("PgOutboxQueries for crawling purposes", () => {
 
   const storeInOutbox = async (events: DomainEvent[]) => {
     await Promise.all(
-      events.map((event) => new PgOutboxRepository(client).save(event)),
+      events.map((event) =>
+        new PgOutboxRepository(makeKyselyDb(pool)).save(event),
+      ),
     );
   };
 });

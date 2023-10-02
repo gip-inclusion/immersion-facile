@@ -1,15 +1,15 @@
-import { PoolClient } from "pg";
 import { groupBy, map, prop, values } from "ramda";
 import { pipeWithValue } from "shared";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { OutboxQueries } from "../../../../domain/core/ports/OutboxQueries";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import {
   StoredEventRow,
   storedEventRowsToDomainEvent,
 } from "./PgOutboxRepository";
 
 export class PgOutboxQueries implements OutboxQueries {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getAllFailedEvents(): Promise<DomainEvent[]> {
     const selectEventIdsWithFailure = `(
@@ -40,7 +40,9 @@ export class PgOutboxQueries implements OutboxQueries {
       GROUP BY outbox_publications.event_id
     )`;
 
-    const { rows } = await this.client.query<StoredEventRow>(`
+    const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
+      this.transaction,
+      `
      SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
        outbox_publications.id as publication_id, published_at,
        subscription_id, error_message
@@ -48,13 +50,16 @@ export class PgOutboxQueries implements OutboxQueries {
      LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
      LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
      WHERE outbox.id IN ${selectEventIdsStillFailing}
-    `);
+    `,
+    );
 
     return convertRowsToDomainEvents(rows);
   }
 
   public async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
-    const { rows } = await this.client.query<StoredEventRow>(`
+    const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
+      this.transaction,
+      `
     SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
       outbox_publications.id as publication_id, published_at,
       subscription_id, error_message
@@ -63,7 +68,8 @@ export class PgOutboxQueries implements OutboxQueries {
     LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
     WHERE was_quarantined = false AND status IN ('never-published', 'to-republish')
     ORDER BY published_at ASC
-    `);
+    `,
+    );
 
     return convertRowsToDomainEvents(rows);
   }

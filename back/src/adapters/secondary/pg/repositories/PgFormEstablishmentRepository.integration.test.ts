@@ -15,6 +15,7 @@ import {
   ConflictError,
   NotFoundError,
 } from "../../../primary/helpers/httpErrors";
+import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgFormEstablishmentRepository } from "./PgFormEstablishmentRepository";
 
 describe("PgFormEstablishmentRepository", () => {
@@ -35,7 +36,9 @@ describe("PgFormEstablishmentRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM form_establishments");
-    formEstablishmentRepository = new PgFormEstablishmentRepository(client);
+    formEstablishmentRepository = new PgFormEstablishmentRepository(
+      makeKyselyDb(pool),
+    );
   });
 
   afterAll(async () => {

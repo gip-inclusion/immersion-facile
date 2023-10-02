@@ -1,22 +1,22 @@
-import { PoolClient } from "pg";
 import { ConventionId } from "shared";
 import {
   ConventionsToSyncRepository,
   ConventionToSync,
 } from "../../../../domain/convention/ports/ConventionsToSyncRepository";
+import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 export const conventionsToSyncTableName = "conventions_to_sync_with_pe";
 
 export class PgConventionsToSyncRepository
   implements ConventionsToSyncRepository
 {
-  constructor(private client: PoolClient) {}
+  constructor(private transaction: KyselyDb) {}
 
   public async getById(
     id: ConventionId,
   ): Promise<ConventionToSync | undefined> {
     const pgConventionToSync = await selectConventionToSyncById(
-      this.client,
+      this.transaction,
       id,
     );
     return pgConventionToSync
@@ -25,7 +25,8 @@ export class PgConventionsToSyncRepository
   }
 
   public async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
-    const queryResult = await this.client.query<PgConventionToSync>(
+    const queryResult = await executeKyselyRawSqlQuery<PgConventionToSync>(
+      this.transaction,
       `
           SELECT id, status, process_date, reason
           FROM ${conventionsToSyncTableName}
@@ -42,11 +43,11 @@ export class PgConventionsToSyncRepository
 
   public async save(conventionToSync: ConventionToSync): Promise<void> {
     return (await isConventionToSyncAlreadyExists(
-      this.client,
+      this.transaction,
       conventionToSync.id,
     ))
-      ? updateConventionToSync(this.client, conventionToSync)
-      : insertConventionToSync(this.client, conventionToSync);
+      ? updateConventionToSync(this.transaction, conventionToSync)
+      : insertConventionToSync(this.transaction, conventionToSync);
   }
 }
 
@@ -68,23 +69,29 @@ const pgResultToConventionToSync = (
   } as ConventionToSync);
 
 const isConventionToSyncAlreadyExists = async (
-  client: PoolClient,
+  transaction: KyselyDb,
   conventionId: ConventionId,
-): Promise<boolean> =>
-  (
-    await client.query(
+): Promise<boolean> => {
+  const rows = (
+    await executeKyselyRawSqlQuery(
+      transaction,
       `SELECT EXISTS(SELECT 1
                      FROM ${conventionsToSyncTableName}
                      WHERE id = $1)`,
       [conventionId],
     )
-  ).rows.at(0).exists;
+  ).rows;
+  const result = rows.at(0);
+  if (!result) return false;
+  return result.exists;
+};
 
 const updateConventionToSync = async (
-  client: PoolClient,
+  transaction: KyselyDb,
   conventionToSync: ConventionToSync,
 ): Promise<void> => {
-  await client.query(
+  await executeKyselyRawSqlQuery(
+    transaction,
     `
         UPDATE ${conventionsToSyncTableName}
         SET status       = $2,
@@ -106,10 +113,11 @@ const updateConventionToSync = async (
 };
 
 const insertConventionToSync = async (
-  client: PoolClient,
+  transaction: KyselyDb,
   conventionToSync: ConventionToSync,
 ): Promise<void> => {
-  await client.query(
+  await executeKyselyRawSqlQuery(
+    transaction,
     `
         INSERT INTO ${conventionsToSyncTableName} (id,
                                                    status,
@@ -131,11 +139,12 @@ const insertConventionToSync = async (
 };
 
 const selectConventionToSyncById = async (
-  client: PoolClient,
+  transaction: KyselyDb,
   conventionId: ConventionId,
 ): Promise<PgConventionToSync | undefined> =>
   (
-    await client.query<PgConventionToSync>(
+    await executeKyselyRawSqlQuery<PgConventionToSync>(
+      transaction,
       `
           SELECT id, status, process_date, reason
           FROM ${conventionsToSyncTableName}
