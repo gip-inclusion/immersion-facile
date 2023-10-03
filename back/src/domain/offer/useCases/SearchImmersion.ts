@@ -76,19 +76,18 @@ export class SearchImmersion extends TransactionalUseCase<
           : lbbSearchResults.length,
     });
 
+    const isDeletedBySiret =
+      await uow.deletedEstablishmentRepository.areSiretsDeleted(
+        lbbSearchResults.map((result) => result.siret),
+      );
+
     return [
       ...(voluntaryToImmersion !== false
         ? this.#prepareVoluntaryToImmersionResults(repositorySearchResults)
         : []),
       ...lbbSearchResults
         .filter(isSiretAlreadyInStoredResults(repositorySearchResults))
-        .filter(
-          isEstablishmentNotDeleted(
-            await uow.deletedEstablishmentRepository.areSiretsDeleted(
-              lbbSearchResults.map((result) => result.siret),
-            ),
-          ),
-        ),
+        .filter(isEstablishmentNotDeleted(isDeletedBySiret)),
     ].filter(isSiretIsNotInNotSeachableResults(repositorySearchResults));
   }
 
