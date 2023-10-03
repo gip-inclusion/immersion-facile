@@ -297,7 +297,11 @@ export const makeConsumerMiddleware = (
 ) => {
   const verifyJwt = makeVerifyJwtES256<"apiConsumer">(config.apiJwtPublicKey);
 
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (
+    req: Request<any, any, any, any>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
     if (!req.headers.authorization) {
       incTotalCountForRequest({ authorisationStatus: "unauthenticated" });

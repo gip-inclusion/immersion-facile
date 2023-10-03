@@ -66,7 +66,7 @@ describe("POST contact-establishment public V2 route", () => {
       headers: {
         authorization: "",
       },
-      body: {} as any,
+      body: contactEstablishment,
     });
 
     expectToEqual(body, { status: 401, message: "unauthenticated" });

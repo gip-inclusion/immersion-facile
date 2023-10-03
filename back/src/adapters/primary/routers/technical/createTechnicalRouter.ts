@@ -72,13 +72,15 @@ export const createTechnicalRouter = (
     ),
   );
 
-  technicalSharedRouter.htmlToPdf(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.htmlToPdf.execute(
-        req.body.htmlContent,
-        req.payloads?.convention,
+  technicalSharedRouter.htmlToPdf(
+    deps.applicationMagicLinkAuthMiddleware,
+    async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.htmlToPdf.execute(
+          req.body.htmlContent,
+          req.payloads?.convention,
+        ),
       ),
-    ),
   );
 
   return technicalRouter;

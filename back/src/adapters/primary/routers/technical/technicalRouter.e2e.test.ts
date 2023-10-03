@@ -81,9 +81,9 @@ describe("technical router", () => {
           authorization: validatorJwt,
         },
       });
+      expectToEqual(response.body, 'PDF_OF >> "<p>some html content</p>"');
 
       expectToEqual(response.status, 200);
-      expectToEqual(response.body, 'PDF_OF >> "<p>some html content</p>"');
     });
   });
 

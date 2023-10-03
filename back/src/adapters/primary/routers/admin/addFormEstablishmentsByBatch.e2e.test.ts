@@ -2,6 +2,7 @@ import { SuperTest, Test } from "supertest";
 import {
   adminRoutes,
   BackOfficeJwt,
+  expectToEqual,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
@@ -16,6 +17,12 @@ import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySire
 const addFormEstablishmentBatchUrl = adminRoutes.addFormEstablishmentBatch.url;
 
 describe("POST /add-form-establishment-batch", () => {
+  const formEstablishment1: FormEstablishmentDto =
+    FormEstablishmentDtoBuilder.valid().build();
+  const payload: FormEstablishmentBatchDto = {
+    groupName: "Tesla",
+    formEstablishments: [formEstablishment1],
+  };
   let request: SuperTest<Test>;
   let token: BackOfficeJwt;
   let gateways: InMemoryGateways;
@@ -39,24 +46,34 @@ describe("POST /add-form-establishment-batch", () => {
     token = response.body;
   });
 
-  it("throws 401 if not authenticated", async () => {
-    const response = await request.post(addFormEstablishmentBatchUrl);
+  it("throws 401 if invalid token", async () => {
+    const badBackOfficeJwt: BackOfficeJwt = "Invalid";
+    const response = await request
+      .post(addFormEstablishmentBatchUrl)
+      .set("authorization", badBackOfficeJwt)
+      .send(payload);
+    expectToEqual(response.body, { error: "Provided token is invalid" });
     expect(response.status).toBe(401);
   });
 
-  it("returns 200 if everything work", async () => {
-    const formEstablishment1: FormEstablishmentDto =
-      FormEstablishmentDtoBuilder.valid().build();
+  it("throws 400 if missing token", async () => {
+    const response = await request
+      .post(addFormEstablishmentBatchUrl)
+      .send(payload);
+    expectToEqual(response.body, {
+      issues: ["authorization : Required"],
+      message:
+        "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /admin/add-form-establishment-batch",
+      status: 400,
+    });
+    expect(response.status).toBe(400);
+  });
 
+  it("returns 200 if everything work", async () => {
     gateways.siret.setSirenEstablishment({
       ...TEST_OPEN_ESTABLISHMENT_1,
       siret: formEstablishment1.siret,
     });
-
-    const payload: FormEstablishmentBatchDto = {
-      groupName: "Tesla",
-      formEstablishments: [formEstablishment1],
-    };
 
     const response = await request
       .post(addFormEstablishmentBatchUrl)

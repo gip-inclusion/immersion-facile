@@ -219,10 +219,16 @@ describe(`Agency routes`, () => {
       agencyRoutes.updateAgency,
     )} to update an agency data`, () => {
       it("fails if provided token is not valid", async () => {
+        const updatedAgency = new AgencyDtoBuilder()
+          .withId(agency4NeedsReview.id)
+          .withValidatorEmails(["this-is-a-new-validator@mail.com"])
+          .withCodeSafir("1234")
+          .build();
+
         const response = await sharedRequest.updateAgency({
           headers: { authorization: "wrong-token" },
           urlParams: { agencyId: "test-agency-4" },
-          body: {} as any,
+          body: updatedAgency,
         });
 
         expectHttpResponseToEqual(response, {

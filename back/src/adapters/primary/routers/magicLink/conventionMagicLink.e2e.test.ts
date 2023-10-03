@@ -151,13 +151,18 @@ describe("Magic link router", () => {
         emailHash: "my-hash",
       });
 
-    it("401 - Fails if no convention magic link token is provided", async () => {
-      const response = await request.post(
-        conventionMagicLinkRoutes.renewConvention.url,
-      );
+    it("400 - Fails if no convention magic link token is provided", async () => {
+      const response = await request
+        .post(conventionMagicLinkRoutes.renewConvention.url)
+        .send(renewedConventionParams);
 
-      expectToEqual(response.status, 401);
-      expectToEqual(response.body, { error: "forbidden: unauthenticated" });
+      expectToEqual(response.body, {
+        issues: ["authorization : Required"],
+        message:
+          "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /auth/renew-convention",
+        status: 400,
+      });
+      expectToEqual(response.status, 400);
     });
 
     it("403 - Fails if provided token does not have enough privileges", async () => {

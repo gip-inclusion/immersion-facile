@@ -1,15 +1,18 @@
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
-describe("Hello world route", () => {
+describe("/", () => {
   let request: SuperTest<Test>;
 
   beforeEach(async () => {
     ({ request } = await buildTestApp());
   });
 
-  it("says hello", async () => {
+  it("provide API doc URL", async () => {
     const response = await request.get("/");
-    expect(response.body).toEqual({ message: "Hello World !" });
+    expect(response.body).toEqual({
+      message:
+        "Api documentation is here : https://immersion-facile.beta.gouv.fr/doc-api",
+    });
   });
 });
