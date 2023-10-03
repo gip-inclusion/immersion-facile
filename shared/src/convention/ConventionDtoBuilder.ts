@@ -15,8 +15,8 @@ import {
   ConventionDto,
   ConventionId,
   ConventionStatus,
-  ConventionValidator,
-  ConventionValidators,
+  ConventionValidatorInputName,
+  ConventionValidatorInputNames,
   EstablishmentRepresentative,
   EstablishmentTutor,
   ImmersionObjective,
@@ -620,8 +620,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withValidator(validator: ConventionValidator): ConventionDtoBuilder {
-    const validatorKind: keyof ConventionValidators =
+  public withValidator(
+    validator: ConventionValidatorInputName,
+  ): ConventionDtoBuilder {
+    const validatorKind: keyof ConventionValidatorInputNames =
       this.dto.status === "ACCEPTED_BY_COUNSELLOR"
         ? "agencyCounsellor"
         : "agencyValidator";
@@ -639,7 +641,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder(this.dto);
   }
 
-  get #validators(): ConventionValidators | undefined {
+  get #validators(): ConventionValidatorInputNames | undefined {
     return this.dto.validators;
   }
 

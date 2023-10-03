@@ -5,12 +5,13 @@ import {
   ConventionDto,
   ConventionRenewed,
   ConventionStatus,
-  ConventionValidator,
+  ConventionValidatorInputName,
   Signatories,
 } from "./convention.dto";
 
-export const concatValidatorNames = (validator: ConventionValidator): string =>
-  [validator.firstname, validator.lastname].join(" ").trim();
+export const concatValidatorNames = (
+  validator: ConventionValidatorInputName,
+): string => [validator.firstname, validator.lastname].join(" ").trim();
 
 export const allSignatoriesSigned = (signatories: Signatories) =>
   values(signatories).every((signatory) => !signatory || !!signatory.signedAt);
