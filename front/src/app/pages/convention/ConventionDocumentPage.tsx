@@ -31,10 +31,8 @@ import { technicalGateway } from "src/config/dependencies";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
 import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
 
-const logoIfUrl =
-  "https://immersion-facile.beta.gouv.fr/assets/img/logo-if.svg";
-const logoRfUrl =
-  "https://immersion-facile.beta.gouv.fr/assets/img/logo-rf.svg";
+import logoIf from "/assets/img/logo-if.svg";
+import logoRf from "/assets/img/logo-rf.svg";
 
 const throwOnMissingSignDate = (signedAt: string | undefined): string => {
   if (!signedAt) throw new Error("Signature date is missing.");
@@ -94,25 +92,43 @@ export const ConventionDocumentPage = ({
   } = convention.signatories;
   const { internshipKind } = convention;
   const logos = [
-    <img key="logo-rf" src={logoRfUrl} alt="Logo RF" />,
+    <img key="logo-rf" src={logoRf} alt="Logo RF" />,
     <img
       key={`logo-${agencyInfo?.name}`}
-      src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIfUrl}
+      src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf}
       alt=""
     />,
   ];
 
+  const replaceContentsUrlWithAbsoluteUrl = (htmlContent: string): string =>
+    htmlContent
+      .replaceAll(
+        new RegExp(/<link rel="stylesheet" href="\//gm),
+        `<link rel="stylesheet" href="${window.location.origin}/`,
+      )
+      .replaceAll(
+        new RegExp(/<img src="\//gm),
+        `<img src="${window.location.origin}/`,
+      );
+
   const onDownloadPdfClick = async () => {
-    setIsPdfLoading(true);
-    const pdfContent = await technicalGateway.htmlToPdf(
-      document.documentElement.outerHTML,
-      jwt,
-    );
-    const downloadLink = document.createElement("a");
-    downloadLink.href = "data:application/pdf;base64," + pdfContent;
-    downloadLink.download = `convention-immersion-${convention.id}.pdf`;
-    downloadLink.click();
-    setIsPdfLoading(false);
+    try {
+      setIsPdfLoading(true);
+      const pdfContent = await technicalGateway.htmlToPdf(
+        replaceContentsUrlWithAbsoluteUrl(document.documentElement.outerHTML),
+        jwt,
+      );
+      const downloadLink = document.createElement("a");
+      downloadLink.href = "data:application/pdf;base64," + pdfContent;
+      downloadLink.download = `convention-immersion-${convention.id}.pdf`;
+      downloadLink.click();
+    } catch (e) {
+      alert(`Erreur lors de la génération du PDF >> voir la console.`);
+      // eslint-disable-next-line no-console
+      console.error(JSON.stringify(e));
+    } finally {
+      setIsPdfLoading(false);
+    }
   };
 
   const title = isConventionRenewed(convention)

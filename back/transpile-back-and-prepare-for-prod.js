@@ -17,12 +17,12 @@ execSync("tsc -b tsconfig.prod.json");
 const path = "build/back/src/adapters/primary/scripts/version.js";
 replaceInFileSync(path, /"__VERSION__"/, `"${version}"`);
 
-console.log("Coping package.json of back, shared and libs for prod");
+console.log("Copying package.json of root, shared and libs for prod");
 fs.copyFileSync("../package.json", "build/package.json");
 fs.copyFileSync("../pnpm-lock.yaml", "build/pnpm-lock.yaml");
 fs.copyFileSync("../pnpm-workspace.yaml", "build/pnpm-workspace.yaml");
 
-// Copy back package.json to build/back directory
+console.log("Copying package.json of back for prod");
 fs.copyFileSync("./package.json", "build/back/package.json");
 
 execSync(
@@ -31,14 +31,8 @@ execSync(
 
 // Copy dependencies package.json files to build directory
 fs.copyFileSync("../shared/package.json", "build/shared/package.json");
-fs.copyFileSync(
-  "../libs/http-client/package.json",
-  "build/libs/http-client/package.json",
-);
-fs.copyFileSync(
-  "../libs/html-templates/package.json",
-  "build/libs/html-templates/package.json",
-);
+fs.copyFileSync( "../libs/http-client/package.json", "build/libs/http-client/package.json");
+fs.copyFileSync( "../libs/html-templates/package.json", "build/libs/html-templates/package.json" );
 
 const removeFromFileLinesThatInclude = (filePath, regex) => {
   let data = fs.readFileSync(filePath, "utf8");
@@ -63,19 +57,19 @@ removeFromFileLinesThatInclude(httpPackageJson, /"types": "src\/index.ts",?/);
 replaceInFileSync(
   httpPackageJson,
   /"main": "src\/index.ts"/,
-  '"main": "src/index.js"',
+  '"main": "src/index.js"'
 );
 removeFromFileLinesThatInclude(htmlPackageJson, /"types": "src\/index.ts",?/);
 replaceInFileSync(
   htmlPackageJson,
   /"main": "src\/index.ts"/,
-  '"main": "src/index.js"',
+  '"main": "src/index.js"'
 );
 removeFromFileLinesThatInclude(sharedPackageJson, /"types": "src\/index.ts",?/);
 replaceInFileSync(
   sharedPackageJson,
   /"main": "src\/index.ts"/,
-  '"main": "src/index.js"',
+  '"main": "src/index.js"'
 );
 
 // change ts-node scripts to node scripts
@@ -84,14 +78,14 @@ replaceInFileSync(backPackageJson, /"node (.*)(\.ts)/g, '"node $1.js');
 replaceInFileSync(
   backPackageJson,
   /--compilerOptions '{\\"resolveJsonModule\\": true}'/g,
-  "",
+  ""
 );
 
 // change migration script from ts source files to js
 replaceInFileSync(
   backPackageJson,
   /"node_modules\/node-pg-migrate\/bin\/node-pg-migrate -j ts"/g,
-  '"node_modules/node-pg-migrate/bin/node-pg-migrate"',
+  '"node_modules/node-pg-migrate/bin/node-pg-migrate"'
 );
 execSync("cp -r -v scalingo/. build/");
 
