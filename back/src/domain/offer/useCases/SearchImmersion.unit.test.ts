@@ -342,16 +342,16 @@ describe("SearchImmersionUseCase", () => {
     ]);
   });
 
-  it("gets only the search results if a company with same siret is also in LBB results even if establishement was previously deleted", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment,
-    ];
+  it("gets only the search results if a company with same siret is also in LBB results even if establishement was previously deleted, than added again", async () => {
     uow.deletedEstablishmentRepository.deletedEstablishments = [
       {
         siret: establishment.establishment.siret,
         createdAt: new Date(),
         deletedAt: new Date(),
       },
+    ];
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
     ];
 
     laBonneBoiteGateway.setNextResults([
