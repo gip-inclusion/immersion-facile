@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express, { Express, Router } from "express";
+import express, { Express } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
 import {
@@ -26,7 +26,7 @@ import { createConventionRouter } from "./routers/convention/createConventionRou
 import { createValidateEmailRouter } from "./routers/emailValidation/createValidateEmailRouter";
 import { createEstablishmentRouter } from "./routers/establishment/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
-import { createHelloWorldRouter } from "./routers/helloWorld/createHelloWorldRouter";
+import { createRootApiRouter } from "./routers/helloWorld/createRootApiRouter";
 import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
@@ -60,7 +60,6 @@ export const createApp = async (
   config: AppConfig,
 ): Promise<CreateAppProperties> => {
   const app = express();
-  const router = Router();
   app.use(
     PinoHttp({
       logger,
@@ -74,17 +73,15 @@ export const createApp = async (
 
   const deps = await createAppDependencies(config);
 
-  app.use(router);
-
   app.use(createSearchRouter(deps));
 
   // Those routes must be defined BEFORE the others
-  app.use(createHelloWorldRouter());
+  app.use(createRootApiRouter());
   app.use(createMagicLinkRouter(deps));
   app.use(createAdminRouter(deps));
-  app.use("/v1", createApiKeyAuthRouterV1(deps));
+  app.use(createApiKeyAuthRouterV1(deps));
   app.use(createApiKeyAuthRouterV2(deps));
-  app.use(...createInclusionConnectedAllowedRouter(deps));
+  app.use(createInclusionConnectedAllowedRouter(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
   app.use(createTechnicalRouter(deps, config.inboundEmailAllowedIps));

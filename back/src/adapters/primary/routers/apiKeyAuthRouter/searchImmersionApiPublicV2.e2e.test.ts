@@ -61,7 +61,11 @@ describe("search route", () => {
           headers: {
             authorization: "",
           },
-          queryParams: {} as any,
+          queryParams: {
+            longitude: 2,
+            latitude: 48,
+            distanceKm: 10,
+          },
         });
         expectHttpResponseToEqual(response, {
           status: 401,

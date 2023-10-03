@@ -24,12 +24,10 @@ const logger = createLogger(__filename);
 export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   const publicV1Router = Router({ mergeParams: true });
 
-  publicV1Router.use(deps.apiKeyAuthMiddlewareV1);
-
   // Form establishments routes
   publicV1Router
-    .route(establishmentTargets.addFormEstablishment.url)
-    .post(async (req, res) => {
+    .route(`/v1${establishmentTargets.addFormEstablishment.url}`)
+    .post(deps.apiKeyAuthMiddlewareV1, async (req, res) => {
       counterFormEstablishmentCallerV1.inc({
         referer: req.get("Referrer"),
       });
@@ -62,25 +60,27 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     });
 
   // Immersion offers routes
-  publicV1Router.route(`/${immersionOffersRoute}`).get(async (req, res) =>
-    sendHttpResponse(req, res, async () => {
-      const searchImmersionRequest = searchImmersionRequestPublicV1ToDomain(
-        req.query as any,
-      );
-      const searchImmersionResultDtos =
-        await deps.useCases.searchImmersion.execute(
-          searchImmersionRequest,
-          req.apiConsumer,
+  publicV1Router
+    .route(`/v1/${immersionOffersRoute}`)
+    .get(deps.apiKeyAuthMiddlewareV1, async (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const searchImmersionRequest = searchImmersionRequestPublicV1ToDomain(
+          req.query as any,
         );
-      return searchImmersionResultDtos.map(
-        domainToSearchImmersionResultPublicV1,
-      );
-    }),
-  );
+        const searchImmersionResultDtos =
+          await deps.useCases.searchImmersion.execute(
+            searchImmersionRequest,
+            req.apiConsumer,
+          );
+        return searchImmersionResultDtos.map(
+          domainToSearchImmersionResultPublicV1,
+        );
+      }),
+    );
 
   publicV1Router
-    .route(`/${immersionOffersRoute}/:siret/:rome`)
-    .get(async (req, res) =>
+    .route(`/v1/${immersionOffersRoute}/:siret/:rome`)
+    .get(deps.apiKeyAuthMiddlewareV1, async (req, res) =>
       sendHttpResponse(req, res, async () => {
         const appellationCode =
           await deps.useCases.convertRomeToAppellationForEstablishment.execute({
@@ -100,20 +100,22 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
       }),
     );
 
-  publicV1Router.route(`/${contactEstablishmentRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, async () => {
-      if (!req.apiConsumer) {
-        throw new ForbiddenError();
-      }
-      return pipeWithValue(
-        await deps.useCases.convertContactEstablishmentPublicV1ToDomain.execute(
-          req.body,
-        ),
-        (contactRequest) =>
-          deps.useCases.contactEstablishment.execute(contactRequest),
-      );
-    }),
-  );
+  publicV1Router
+    .route(`/v1/${contactEstablishmentRoute}`)
+    .post(deps.apiKeyAuthMiddlewareV1, async (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        if (!req.apiConsumer) {
+          throw new ForbiddenError();
+        }
+        return pipeWithValue(
+          await deps.useCases.convertContactEstablishmentPublicV1ToDomain.execute(
+            req.body,
+          ),
+          (contactRequest) =>
+            deps.useCases.contactEstablishment.execute(contactRequest),
+        );
+      }),
+    );
 
   return publicV1Router;
 };

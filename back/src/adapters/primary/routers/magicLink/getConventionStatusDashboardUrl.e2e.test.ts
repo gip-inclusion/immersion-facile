@@ -2,14 +2,23 @@ import {
   ConventionDtoBuilder,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
+  expectToEqual,
 } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("getConventionStatusDashboardUrl", () => {
-  it("fails if token does not match convention id", async () => {
+  it("fails if no token is provided", async () => {
     const { request } = await buildTestApp();
-    const response = await request.get("/auth/statut-convention");
-    expect(response.status).toBe(401);
+    const response = await request.get(
+      conventionMagicLinkRoutes.getConventionStatusDashboard.url,
+    );
+    expect(response.status).toBe(400);
+    expectToEqual(response.body, {
+      issues: ["authorization : Required"],
+      message:
+        "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /auth/status-convention",
+      status: 400,
+    });
   });
 
   it("gets the dashboard url if token is correct", async () => {

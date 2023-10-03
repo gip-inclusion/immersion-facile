@@ -26,8 +26,6 @@ const logger = createLogger(__filename);
 export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   const v2ExpressRouter = Router({ mergeParams: true });
 
-  v2ExpressRouter.use("/v2", deps.apiConsumerMiddleware);
-
   const searchEstablishmentV2Router = createExpressSharedRouter(
     publicApiV2SearchEstablishmentRoutes,
     v2ExpressRouter,
@@ -43,72 +41,78 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     v2ExpressRouter,
   );
 
-  searchEstablishmentV2Router.searchImmersion((req, res) =>
-    sendHttpResponseForApiV2(req, res, async () => {
-      if (
-        !isApiConsumerAllowed({
-          apiConsumer: req.apiConsumer,
-          rightName: "searchEstablishment",
-          consumerKind: "READ",
-        })
-      )
-        throw new ForbiddenError();
-      return pipeWithValue(
-        req.query,
-        searchParamsPublicV2ToDomain,
-        (searchImmersionRequest) =>
-          deps.useCases.searchImmersion.execute(
-            searchImmersionRequest,
+  searchEstablishmentV2Router.searchImmersion(
+    deps.apiConsumerMiddleware,
+    async (req, res) =>
+      sendHttpResponseForApiV2(req, res, async () => {
+        if (
+          !isApiConsumerAllowed({
+            apiConsumer: req.apiConsumer,
+            rightName: "searchEstablishment",
+            consumerKind: "READ",
+          })
+        )
+          throw new ForbiddenError();
+        return pipeWithValue(
+          req.query,
+          searchParamsPublicV2ToDomain,
+          (searchImmersionRequest) =>
+            deps.useCases.searchImmersion.execute(
+              searchImmersionRequest,
+              req.apiConsumer,
+            ),
+          andThen(map(domainToSearchImmersionResultPublicV2)),
+        );
+      }),
+  );
+
+  searchEstablishmentV2Router.getOfferBySiretAndAppellationCode(
+    deps.apiConsumerMiddleware,
+    (req, res) =>
+      sendHttpResponseForApiV2(req, res, async () => {
+        if (
+          !isApiConsumerAllowed({
+            apiConsumer: req.apiConsumer,
+            rightName: "searchEstablishment",
+            consumerKind: "READ",
+          })
+        )
+          throw new ForbiddenError();
+        return domainToSearchImmersionResultPublicV2(
+          await deps.useCases.getSearchResultBySiretAndAppellationCode.execute(
+            req.params,
             req.apiConsumer,
           ),
-        andThen(map(domainToSearchImmersionResultPublicV2)),
-      );
-    }),
+        );
+      }),
   );
 
-  searchEstablishmentV2Router.getOfferBySiretAndAppellationCode((req, res) =>
-    sendHttpResponseForApiV2(req, res, async () => {
-      if (
-        !isApiConsumerAllowed({
-          apiConsumer: req.apiConsumer,
-          rightName: "searchEstablishment",
-          consumerKind: "READ",
-        })
-      )
-        throw new ForbiddenError();
-      return domainToSearchImmersionResultPublicV2(
-        await deps.useCases.getSearchResultBySiretAndAppellationCode.execute(
-          req.params,
-          req.apiConsumer,
-        ),
-      );
-    }),
+  searchEstablishmentV2Router.contactEstablishment(
+    deps.apiConsumerMiddleware,
+    (req, res) =>
+      sendHttpResponseForApiV2(req, res.status(201), () => {
+        if (
+          !isApiConsumerAllowed({
+            apiConsumer: req.apiConsumer,
+            rightName: "searchEstablishment",
+            consumerKind: "READ",
+          })
+        )
+          throw new ForbiddenError();
+        return pipeWithValue(
+          validateAndParseZodSchemaV2(
+            contactEstablishmentPublicV2Schema,
+            req.body,
+            logger,
+          ),
+          contactEstablishmentPublicV2ToDomain,
+          (contactRequest) =>
+            deps.useCases.contactEstablishment.execute(contactRequest),
+        );
+      }),
   );
 
-  searchEstablishmentV2Router.contactEstablishment((req, res) =>
-    sendHttpResponseForApiV2(req, res.status(201), () => {
-      if (
-        !isApiConsumerAllowed({
-          apiConsumer: req.apiConsumer,
-          rightName: "searchEstablishment",
-          consumerKind: "READ",
-        })
-      )
-        throw new ForbiddenError();
-      return pipeWithValue(
-        validateAndParseZodSchemaV2(
-          contactEstablishmentPublicV2Schema,
-          req.body,
-          logger,
-        ),
-        contactEstablishmentPublicV2ToDomain,
-        (contactRequest) =>
-          deps.useCases.contactEstablishment.execute(contactRequest),
-      );
-    }),
-  );
-
-  conventionV2Router.getConventionById((req, res) =>
+  conventionV2Router.getConventionById(deps.apiConsumerMiddleware, (req, res) =>
     sendHttpResponseForApiV2(req, res, async () => {
       if (
         !isApiConsumerAllowed({
@@ -131,7 +135,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  conventionV2Router.getConventions((req, res) =>
+  conventionV2Router.getConventions(deps.apiConsumerMiddleware, (req, res) =>
     sendHttpResponseForApiV2(req, res, async () => {
       if (
         !isApiConsumerAllowed({
@@ -152,7 +156,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  webhooksV2Router.subscribeToWebhook((req, res) =>
+  webhooksV2Router.subscribeToWebhook(deps.apiConsumerMiddleware, (req, res) =>
     sendHttpResponseForApiV2(req, res.status(201), async () => {
       const event = req.body.subscribedEvent;
       const rightNeeded = eventToRightName(event);
@@ -170,23 +174,25 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  webhooksV2Router.listActiveSubscriptions((req, res) =>
-    sendHttpResponseForApiV2(req, res.status(200), async () => {
-      const apiConsumer = req.apiConsumer;
-      if (
-        !apiConsumer ||
-        (apiConsumer &&
-          keys(apiConsumer.rights).filter((rightName) =>
-            apiConsumer.rights[rightName].kinds.includes("SUBSCRIPTION"),
-          ).length === 0)
-      ) {
-        throw new ForbiddenError();
-      }
-      return deps.useCases.listActiveSubscriptions.execute(
-        undefined,
-        apiConsumer,
-      );
-    }),
+  webhooksV2Router.listActiveSubscriptions(
+    deps.apiConsumerMiddleware,
+    (req, res) =>
+      sendHttpResponseForApiV2(req, res.status(200), async () => {
+        const apiConsumer = req.apiConsumer;
+        if (
+          !apiConsumer ||
+          (apiConsumer &&
+            keys(apiConsumer.rights).filter((rightName) =>
+              apiConsumer.rights[rightName].kinds.includes("SUBSCRIPTION"),
+            ).length === 0)
+        ) {
+          throw new ForbiddenError();
+        }
+        return deps.useCases.listActiveSubscriptions.execute(
+          undefined,
+          apiConsumer,
+        );
+      }),
   );
 
   return v2ExpressRouter;

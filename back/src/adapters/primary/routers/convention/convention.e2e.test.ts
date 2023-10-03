@@ -509,13 +509,18 @@ describe("convention e2e", () => {
       },
     );
 
-    it("401 - no JWT", async () => {
+    it("400 - no JWT", async () => {
       const response = await request
         .post(conventionMagicLinkRoutes.updateConventionStatus.url)
         .send({ status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id });
 
-      expectToEqual(response.statusCode, 401);
-      expectToEqual(response.body, { error: "forbidden: unauthenticated" });
+      expectToEqual(response.statusCode, 400);
+      expectToEqual(response.body, {
+        issues: ["authorization : Required"],
+        message:
+          "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /auth/update-application-status",
+        status: 400,
+      });
     });
 
     it("403 - unauthorized role for expected status update", async () => {

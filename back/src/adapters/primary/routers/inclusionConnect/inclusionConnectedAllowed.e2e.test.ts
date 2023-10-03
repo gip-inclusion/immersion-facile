@@ -8,35 +8,6 @@ import { InclusionConnectedUser } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("Router for users authenticated with Inclusion Connect", () => {
-  // <<<<----- Test to delete when getAgencyDashboard is obsolete
-  it("Right path getAgencyDashboard : HTTP 200 with dashboard url on response body", async () => {
-    const { request, generateInclusionConnectJwt, inMemoryUow } =
-      await buildTestApp();
-    const userId = "123";
-    const agency = new AgencyDtoBuilder().build();
-    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      {
-        id: userId,
-        email: "joe@mail.com",
-        firstName: "Joe",
-        lastName: "Doe",
-        agencyRights: [{ agency, role: "validator" }],
-      },
-    ]);
-    const token = generateInclusionConnectJwt({
-      userId,
-      version: currentJwtVersions.inclusion,
-    });
-
-    const response = await request
-      .get(inclusionConnectedAllowedTargets.getAgencyDashboard.url)
-      .set("Authorization", token);
-
-    expect(response.body).toBe(`http://stubAgencyDashboard/${agency.id}`);
-    expect(response.status).toBe(200);
-  });
-  // end of test to delete when getAgencyDashboard is obsolete ----->>>>
-
   describe("GET getInclusionConnectedUser", () => {
     it("throws unauthorized if no token provided", async () => {
       const { request } = await buildTestApp();

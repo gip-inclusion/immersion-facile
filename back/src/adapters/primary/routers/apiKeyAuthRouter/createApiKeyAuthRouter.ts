@@ -27,11 +27,9 @@ const logger = createLogger(__filename);
 export const createApiKeyAuthRouter = (deps: AppDependencies) => {
   const authenticatedRouter = Router({ mergeParams: true });
 
-  authenticatedRouter.use(deps.apiKeyAuthMiddlewareV0);
-
   authenticatedRouter
     .route(`/${searchImmersionRoute__v0}`)
-    .post(async (req, res) =>
+    .post(deps.apiKeyAuthMiddlewareV0, async (req, res) =>
       sendHttpResponse(req, res, async () =>
         (
           await deps.useCases.searchImmersion.execute(
@@ -44,7 +42,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
 
   authenticatedRouter
     .route(`/${getImmersionOfferByIdRoute__v0}/:id`)
-    .get(async (req, res) =>
+    .get(deps.apiKeyAuthMiddlewareV0, async (req, res) =>
       sendHttpResponse(req, res, async () =>
         domainToSearchImmersionResultPublicV0(
           await deps.useCases.getSearchImmersionResultBySiretAndRome.execute(
@@ -58,7 +56,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
     );
   authenticatedRouter
     .route(`/${immersionOffersApiAuthRoute__v0}`)
-    .post(async (req, res) => {
+    .post(deps.apiKeyAuthMiddlewareV0, async (req, res) => {
       counterFormEstablishmentCaller.inc({
         referer: req.get("Referrer"),
       });

@@ -3,6 +3,7 @@ import {
   adminRoutes,
   BackOfficeJwt,
   EmailNotification,
+  expectToEqual,
   SmsNotification,
 } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -29,13 +30,16 @@ describe(`${adminRoutes.getLastNotifications.url} route`, () => {
   });
 
   describe("private route to get last email sent", () => {
-    it("Returns Forbidden if no token provided", async () => {
+    it("throws 400 if missing token", async () => {
       const response = await request.get(adminRoutes.getLastNotifications.url);
 
-      expect(response.body).toEqual({
-        error: "You need to authenticate first",
+      expectToEqual(response.body, {
+        issues: ["authorization : Required"],
+        message:
+          "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /admin/notifications",
+        status: 400,
       });
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
     it("Returns last notifications", async () => {

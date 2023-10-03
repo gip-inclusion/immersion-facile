@@ -24,10 +24,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     ),
   );
 
-  // should keep login route above middleware
-  expressRouter.use("/admin", deps.adminAuthMiddleware);
-
-  sharedAdminRouter.getDashboardUrl((req, res) =>
+  sharedAdminRouter.getDashboardUrl(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () => {
       if (req.params.dashboardName === "agency" && !req.query.agencyId)
         throw new BadRequestError(
@@ -42,56 +39,62 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     }),
   );
 
-  sharedAdminRouter.getLastNotifications((req, res) =>
+  sharedAdminRouter.getLastNotifications(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, deps.useCases.getLastNotifications.execute),
   );
 
-  sharedAdminRouter.updateFeatureFlags((req, res) =>
+  sharedAdminRouter.updateFeatureFlags(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res.status(201), () =>
       deps.useCases.setFeatureFlag.execute(req.body),
     ),
   );
 
-  sharedAdminRouter.addFormEstablishmentBatch((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.addFormEstablishmentBatch.execute(req.body),
-    ),
-  );
-
-  sharedAdminRouter.getInclusionConnectedUsers((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.getIcUsers.execute(req.query, req.payloads?.backOffice),
-    ),
-  );
-
-  sharedAdminRouter.updateUserRoleForAgency((req, res) =>
-    sendHttpResponse(req, res.status(201), () =>
-      deps.useCases.updateIcUserRoleForAgency.execute(
-        req.body,
-        req.payloads?.backOffice,
+  sharedAdminRouter.addFormEstablishmentBatch(
+    deps.adminAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.addFormEstablishmentBatch.execute(req.body),
       ),
-    ),
   );
 
-  sharedAdminRouter.saveApiConsumer((req, res) =>
+  sharedAdminRouter.getInclusionConnectedUsers(
+    deps.adminAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getIcUsers.execute(req.query, req.payloads?.backOffice),
+      ),
+  );
+
+  sharedAdminRouter.updateUserRoleForAgency(
+    deps.adminAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res.status(201), () =>
+        deps.useCases.updateIcUserRoleForAgency.execute(
+          req.body,
+          req.payloads?.backOffice,
+        ),
+      ),
+  );
+
+  sharedAdminRouter.saveApiConsumer(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.saveApiConsumer.execute(req.body, req.payloads?.backOffice),
     ),
   );
 
-  sharedAdminRouter.getAllApiConsumers((req, res) =>
+  sharedAdminRouter.getAllApiConsumers(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.getAllApiConsumers.execute({}),
     ),
   );
 
-  sharedAgencyRouter.getAgencyAdminById((req, res) =>
+  sharedAgencyRouter.getAgencyAdminById(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, async () =>
       deps.useCases.getAgencyById.execute(req.params.agencyId),
     ),
   );
 
-  sharedAgencyRouter.updateAgencyStatus((req, res) =>
+  sharedAgencyRouter.updateAgencyStatus(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.updateAgencyStatus.execute({
         id: req.params.agencyId,
@@ -100,16 +103,18 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     ),
   );
 
-  sharedAgencyRouter.updateAgency((req, res) =>
+  sharedAgencyRouter.updateAgency(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.updateAgencyAdmin.execute(req.body),
     ),
   );
 
-  sharedAgencyRouter.listAgenciesWithStatus((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.privateListAgencies.execute(req.query),
-    ),
+  sharedAgencyRouter.listAgenciesWithStatus(
+    deps.adminAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.privateListAgencies.execute(req.query),
+      ),
   );
 
   return expressRouter;
