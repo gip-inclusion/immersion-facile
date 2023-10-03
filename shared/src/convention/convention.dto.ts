@@ -132,7 +132,7 @@ export type ConventionCommon = {
   immersionActivities: string;
   immersionSkills: string;
   establishmentTutor: EstablishmentTutor;
-  validators?: ConventionValidators;
+  validators?: ConventionValidatorInputNames;
 } & Partial<WithRenewed>;
 
 export type ConventionRenewed = ConventionDto & WithRenewed;
@@ -146,12 +146,12 @@ export type WithRenewed = {
   renewed: Renewed;
 };
 
-export type ConventionValidators = {
-  agencyCounsellor?: ConventionValidator;
-  agencyValidator?: ConventionValidator;
+export type ConventionValidatorInputNames = {
+  agencyCounsellor?: ConventionValidatorInputName;
+  agencyValidator?: ConventionValidatorInputName;
 };
 
-export type ConventionValidator = {
+export type ConventionValidatorInputName = {
   firstname?: string;
   lastname?: string;
 };

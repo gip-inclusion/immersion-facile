@@ -45,8 +45,8 @@ import {
   conventionStatusesWithJustificationWithoutModifierRole,
   conventionStatusesWithoutJustificationNorValidator,
   conventionStatusesWithValidator,
-  ConventionValidator,
-  ConventionValidators,
+  ConventionValidatorInputName,
+  ConventionValidatorInputNames,
   EstablishmentRepresentative,
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
@@ -170,15 +170,17 @@ const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
     localization.invalidImmersionObjective,
   );
 
-const conventionValidatorSchema: z.Schema<ConventionValidator> = z.object({
-  firstname: z.string().optional(),
-  lastname: z.string().optional(),
-});
+const conventionValidatorSchema: z.Schema<ConventionValidatorInputName> =
+  z.object({
+    firstname: z.string().optional(),
+    lastname: z.string().optional(),
+  });
 
-const conventionValidatorsSchema: z.Schema<ConventionValidators> = z.object({
-  agencyCounsellor: conventionValidatorSchema.optional(),
-  agencyValidator: conventionValidatorSchema.optional(),
-});
+const conventionValidatorsSchema: z.Schema<ConventionValidatorInputNames> =
+  z.object({
+    agencyCounsellor: conventionValidatorSchema.optional(),
+    agencyValidator: conventionValidatorSchema.optional(),
+  });
 
 const renewedSchema = z.object({
   from: conventionIdSchema,
