@@ -8,7 +8,7 @@ const logger = createLogger(__filename);
 export class PgRomeRepository implements RomeRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async appellationToCodeMetier(
+  public appellationToCodeMetier(
     romeCodeAppellation: string,
   ): Promise<string | undefined> {
     return executeKyselyRawSqlQuery(
@@ -52,9 +52,7 @@ export class PgRomeRepository implements RomeRepository {
     return rows.map(convertRowToAppellationDto);
   }
 
-  public async searchAppellation(
-    query: string,
-  ): Promise<AppellationAndRomeDto[]> {
+  public searchAppellation(query: string): Promise<AppellationAndRomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
 
     return executeKyselyRawSqlQuery(
@@ -75,7 +73,7 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 
-  public async searchRome(query: string): Promise<RomeDto[]> {
+  public searchRome(query: string): Promise<RomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
     return executeKyselyRawSqlQuery(
       this.transaction,

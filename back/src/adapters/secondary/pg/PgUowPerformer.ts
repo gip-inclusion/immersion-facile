@@ -20,7 +20,7 @@ export class PgUowPerformer implements UnitOfWorkPerformer {
     this.#db = makeKyselyDb(pool);
   }
 
-  public async perform<T>(cb: (uow: UnitOfWork) => Promise<T>): Promise<T> {
+  public perform<T>(cb: (uow: UnitOfWork) => Promise<T>): Promise<T> {
     return this.#db
       .transaction()
       .execute<T>((transaction) => cb(this.createPgUow(transaction)))
