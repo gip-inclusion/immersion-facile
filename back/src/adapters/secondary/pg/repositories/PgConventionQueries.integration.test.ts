@@ -331,13 +331,13 @@ describe("Pg implementation of ConventionQueries", () => {
       // Assert
       expectToEqual(resultAll, [
         {
-          ...conventionCancelledAndDateStart20230327,
+          ...conventionDraftAndDateStart20230330,
           agencyDepartment: agency.address.departmentCode,
           agencyName: agency.name,
           agencyKind: agency.kind,
         },
         {
-          ...conventionDraftAndDateStart20230330,
+          ...conventionCancelledAndDateStart20230327,
           agencyDepartment: agency.address.departmentCode,
           agencyName: agency.name,
           agencyKind: agency.kind,

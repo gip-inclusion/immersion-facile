@@ -23,7 +23,7 @@ type WhereClause = Flavor<string, "WhereClause">;
 
 type GetConventionsRequestProperties = {
   whereClauses?: WhereClause[];
-  orderByClause?: string;
+  orderByClause: string;
   limit?: number;
 };
 
@@ -34,6 +34,7 @@ export class PgConventionQueries implements ConventionQueries {
     dateEnd: Date,
   ): Promise<ConventionReadDto[]> {
     return this.#getConventionsWhere({
+      orderByClause: "ORDER BY conventions.date_start DESC",
       whereClauses: [
         this.#whereConventionsDateEndMatch(dateEnd),
         this.#whereConventionsAreValidated(),
@@ -52,6 +53,7 @@ export class PgConventionQueries implements ConventionQueries {
     filters: GetConventionsByFiltersQueries,
   ): Promise<ConventionReadDto[]> {
     return this.#getConventionsWhere({
+      orderByClause: "ORDER BY conventions.date_start DESC",
       whereClauses:
         makeQueryWhereClauseFromFilters(filters).filter(filterNotFalsy),
     });
