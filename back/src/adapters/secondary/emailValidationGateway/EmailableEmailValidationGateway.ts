@@ -64,6 +64,7 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
       "invalid_smtp",
       "rejected_email",
       "unexpected_error",
+      "no_connect",
     ];
     return unacceptableStates.includes(state) ||
       unacceptableReasons.includes(reason)

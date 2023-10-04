@@ -12,7 +12,6 @@ import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway"
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
-import { OpenApiDocGateway } from "src/core-logic/ports/OpenApiDocGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import { SearchGateway } from "src/core-logic/ports/SearchGateway";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
@@ -36,7 +35,6 @@ export type Dependencies = {
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
   emailValidationGateway: EmailValidationGateway;
-  openApiDocGateway: OpenApiDocGateway;
 };
 
 const dependencies =

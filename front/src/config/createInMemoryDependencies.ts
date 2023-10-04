@@ -9,7 +9,6 @@ import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/In
 import { InMemoryEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
 import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
-import { InMemoryOpenApiDocGateway } from "src/core-logic/adapters/OpenApiDocGateway/InMemoryOpenApiDocGateway";
 import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
@@ -50,7 +49,6 @@ export const createInMemoryDependencies = (): Dependencies => ({
   emailValidationGateway: new InMemoryEmailValidationGateway(
     SIMULATED_LATENCY_MS,
   ),
-  openApiDocGateway: new InMemoryOpenApiDocGateway(),
   ...createCommonDependencies(),
 });
 

@@ -5,7 +5,6 @@ import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/In
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
-import { InMemoryOpenApiDocGateway } from "src/core-logic/adapters/OpenApiDocGateway/InMemoryOpenApiDocGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
@@ -37,7 +36,6 @@ const createTestDependencies = () =>
     scheduler: new VirtualTimeScheduler(),
     minSearchResultsToPreventRefetch: 2,
     emailValidationGateway: new InMemoryEmailValidationGateway(),
-    openApiDocGateway: new InMemoryOpenApiDocGateway(),
   } satisfies Dependencies);
 
 export const createTestStore = (preloadedState?: Partial<RootState>) => {

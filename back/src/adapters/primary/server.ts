@@ -26,11 +26,11 @@ import { createConventionRouter } from "./routers/convention/createConventionRou
 import { createValidateEmailRouter } from "./routers/emailValidation/createValidateEmailRouter";
 import { createEstablishmentRouter } from "./routers/establishment/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
-import { createRootApiRouter } from "./routers/helloWorld/createRootApiRouter";
 import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
+import { createRootApiRouter } from "./routers/rootApi/createRootApiRouter";
 import { createSearchRouter } from "./routers/search/createSearchRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { startCrawler } from "./startCrawler";
