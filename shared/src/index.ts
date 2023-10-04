@@ -71,7 +71,6 @@ export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/addressTargets";
 export * from "./routes/agencyRoutes";
 export * from "./routes/establishementTargets";
-export * from "./routes/openApiDocTargets";
 export * from "./routes/routes";
 export * from "./routes/siretTargets";
 export * from "./routes/technicalRoutes";

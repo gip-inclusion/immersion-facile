@@ -14,6 +14,9 @@ const htmlToPdfRequestSchema = z.object({
   htmlContent: zStringMinLength1,
 });
 
+// @TODO: This should be a proper OpenAPI schema
+const openApiSpecResponseSchema = z.any();
+
 export type TechnicalRoutes = typeof technicalRoutes;
 
 export const technicalRoutes = defineRoutes({
@@ -27,6 +30,7 @@ export const technicalRoutes = defineRoutes({
   openApiSpec: defineRoute({
     method: "get",
     url: `/open-api-spec`,
+    responses: { 200: openApiSpecResponseSchema },
   }),
   shortLink: defineRoute({
     method: "get",

@@ -11,6 +11,7 @@ export const validateEmailReason = [
   "rejected_email",
   "unavailable_smtp",
   "unexpected_error",
+  "no_connect",
 ] as const;
 
 export type ValidateEmailReason = (typeof validateEmailReason)[number];

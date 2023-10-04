@@ -32,6 +32,8 @@ const feedbackMessages = (
     : defaultErrorMessage,
   invalid_smtp: defaultErrorMessage,
   unavailable_smtp: defaultErrorMessage,
+  no_connect:
+    "Il y a un problème de connexion qui ne nous permet pas de vérifier votre email.  Si vous êtes sûr de ne pas avoir fait d'erreur, vous pouvez tout de même faire une demande de convention.",
 });
 
 const getStateRelatedFromStatus = (
