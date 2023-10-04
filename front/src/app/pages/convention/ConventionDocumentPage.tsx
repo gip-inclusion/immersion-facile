@@ -6,6 +6,7 @@ import { Route } from "type-route";
 import {
   ConventionId,
   ConventionJwtPayload,
+  ConventionReadDto,
   ConventionSupportedJwt,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
@@ -46,6 +47,40 @@ const isStartingByVowel = (string: string): boolean => {
 
 type ConventionDocumentPageProps = {
   route: Route<typeof routes.conventionDocument>;
+};
+
+type FormattedScheduleByWeek = {
+  formattedHours: string;
+  formattedDaySchedules: string[];
+}[];
+
+const formatSchedule = (convention: ConventionReadDto) => {
+  const scheduleByWeek: FormattedScheduleByWeek = [];
+  prettyPrintSchedule(convention.schedule, {
+    start: new Date(convention.dateStart),
+    end: new Date(convention.dateEnd),
+  })
+    .split("\n")
+    .forEach((line: string) => {
+      if (line.includes("Heures de travail hebdomadaires : ")) {
+        scheduleByWeek.push({
+          formattedHours: line,
+          formattedDaySchedules: [],
+        });
+      } else {
+        const lastWeek = scheduleByWeek[scheduleByWeek.length - 1];
+        lastWeek.formattedDaySchedules.push(line);
+      }
+    });
+
+  return scheduleByWeek.map((schedule) => (
+    <ul key={schedule.formattedHours}>
+      {schedule.formattedHours}
+      {schedule.formattedDaySchedules.map((day) => (
+        <li key={day}>{day}</li>
+      ))}
+    </ul>
+  ));
 };
 
 export const ConventionDocumentPage = ({
@@ -321,20 +356,13 @@ export const ConventionDocumentPage = ({
             se déroulera du {toDisplayedDate(new Date(convention.dateStart))} au{" "}
             {toDisplayedDate(new Date(convention.dateEnd))}.
           </p>
-          <p>
+          <div>
             Les horaires{" "}
             {internshipKind === "immersion"
               ? "de l'immersion"
               : "du mini-stage"}{" "}
-            seront :{" "}
-            {prettyPrintSchedule(convention.schedule, {
-              start: new Date(convention.dateStart),
-              end: new Date(convention.dateEnd),
-            })
-              .split("\n")
-              .join(", ")}
-            .
-          </p>
+            seront : {formatSchedule(convention)}.
+          </div>
           <h4 className={fr.cx("fr-h6")}>
             Conditions d'observation de l’activité
           </h4>
