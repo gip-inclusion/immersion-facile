@@ -1,16 +1,38 @@
-import { SearchMadeEntity } from "../../../../domain/offer/entities/SearchMadeEntity";
+import format from "pg-format";
+import { AppellationCode } from "shared";
+import {
+  SearchMadeEntity,
+  SearchMadeId,
+} from "../../../../domain/offer/entities/SearchMadeEntity";
 import { SearchMadeRepository } from "../../../../domain/offer/ports/SearchMadeRepository";
+import { createLogger } from "../../../../utils/logger";
 import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+
+const logger = createLogger(__filename);
 
 export class PgSearchMadeRepository implements SearchMadeRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async insertSearchMade(searchMade: SearchMadeEntity) {
-    await executeKyselyRawSqlQuery(
+    const insertResult = await this.#insertSearchMade(searchMade);
+    if (Number(insertResult.numAffectedRows) === 0) {
+      logger.error("SearchMade not inserted in DB");
+      return;
+    }
+    if (searchMade.appellationCodes) {
+      await this.#insertAppellationCode(
+        searchMade.id,
+        searchMade.appellationCodes,
+      );
+    }
+  }
+
+  #insertSearchMade(searchMade: SearchMadeEntity) {
+    return executeKyselyRawSqlQuery(
       this.transaction,
       `INSERT INTO searches_made (
-         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name, sorted_by, address, appellation_code, number_of_results
-       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10, $11, $12, $13)`,
+         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name, sorted_by, address, number_of_results
+       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10, $11, $12)`,
       [
         searchMade.id,
         searchMade.romeCode, // soon : no need to store ROME as we now store appellation_code
@@ -23,9 +45,21 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         searchMade.apiConsumerName,
         searchMade.sortedBy,
         searchMade.place,
-        searchMade.appellationCode,
         searchMade.numberOfResults,
       ],
+    );
+  }
+
+  #insertAppellationCode(
+    id: SearchMadeId,
+    appellationCodes: AppellationCode[],
+  ) {
+    return executeKyselyRawSqlQuery(
+      this.transaction,
+      format(
+        `INSERT INTO searches_made__appellation_code(search_made_id, appellation_code) VALUES %L`,
+        appellationCodes.map((appellationCode) => [id, appellationCode]),
+      ),
     );
   }
 }

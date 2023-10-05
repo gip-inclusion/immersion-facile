@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import { AppellationCode } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { SearchMadeEntity } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
@@ -28,7 +29,7 @@ describe("PgSearchesMadeRepository", () => {
   it("Insert search", async () => {
     const searchMade: SearchMadeEntity = {
       id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
-      appellationCode: "19365",
+      appellationCodes: ["19365"],
       distanceKm: 30,
       lat: 48.119146,
       lon: 4.17602,
@@ -49,6 +50,12 @@ describe("PgSearchesMadeRepository", () => {
     const res = await client.query("SELECT * FROM searches_made WHERE id=$1", [
       id,
     ]);
+    const appellationCodes: AppellationCode[] = await client
+      .query(
+        "SELECT * FROM searches_made__appellation_code WHERE search_made_id=$1",
+        [id],
+      )
+      .then(({ rows }) => rows.map(({ appellation_code }) => appellation_code));
     if (res.rows.length === 0) return;
     return {
       id: res.rows[0].id,
@@ -59,7 +66,7 @@ describe("PgSearchesMadeRepository", () => {
       voluntaryToImmersion: res.rows[0].voluntary_to_immersion,
       place: res.rows[0].address,
       needsToBeSearched: res.rows[0].needstobesearched,
-      appellationCode: optional(res.rows[0].appellation_code),
+      appellationCodes: optional(appellationCodes),
       apiConsumerName: optional(res.rows[0].api_consumer_name),
       numberOfResults: optional(res.rows[0].number_of_results),
     };
