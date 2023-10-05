@@ -84,7 +84,6 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
-        appellationCode: secretariatOffer.appellationCode,
         appellationCodes: [secretariatOffer.appellationCode],
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
@@ -130,6 +129,51 @@ describe("SearchImmersionUseCase", () => {
     ]);
   });
 
+  it("gets both search results and LBB results when multiple appellationCodes", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+    const response = await searchImmersionUseCase.execute({
+      ...searchInMetzParams,
+      sortedBy: "distance",
+      appellationCodes: [
+        secretariatOffer.appellationCode,
+        boulangerOffer.appellationCode,
+      ],
+    });
+
+    expectToEqual(response, [
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+      lbbToSearchResult(lbbCompanyVO),
+    ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCodes: [
+          secretariatOffer.appellationCode,
+          boulangerOffer.appellationCode,
+        ],
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 2,
+      },
+    ]);
+  });
+
   it("gets both search results and LBB results if voluntaryToImmersion is not provided", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
@@ -154,7 +198,6 @@ describe("SearchImmersionUseCase", () => {
       {
         id: "searchMadeUuid",
         appellationCodes: [secretariatOffer.appellationCode],
-        appellationCode: secretariatOffer.appellationCode,
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
         distanceKm: searchInMetzParams.distanceKm,
@@ -254,7 +297,6 @@ describe("SearchImmersionUseCase", () => {
       {
         id: "searchMadeUuid",
         appellationCodes: [secretariatOffer.appellationCode],
-        appellationCode: secretariatOffer.appellationCode,
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
         distanceKm: range,
@@ -295,7 +337,6 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
-        appellationCode: secretariatOffer.appellationCode,
         appellationCodes: [secretariatOffer.appellationCode],
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
@@ -335,7 +376,6 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
-        appellationCode: secretariatOffer.appellationCode,
         appellationCodes: [secretariatOffer.appellationCode],
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
@@ -382,7 +422,6 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
-        appellationCode: secretariatOffer.appellationCode,
         appellationCodes: [secretariatOffer.appellationCode],
         lon: searchInMetzParams.longitude,
         lat: searchInMetzParams.latitude,
@@ -423,7 +462,6 @@ describe("SearchImmersionUseCase", () => {
       expectToEqual(uow.searchMadeRepository.searchesMade, [
         {
           id: "searchMadeUuid",
-          appellationCode: secretariatOffer.appellationCode,
           appellationCodes: [secretariatOffer.appellationCode],
           lon: searchInMetzParams.longitude,
           lat: searchInMetzParams.latitude,
