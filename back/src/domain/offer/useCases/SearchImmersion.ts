@@ -44,7 +44,6 @@ export class SearchImmersion extends TransactionalUseCase<
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchResultDto[]> {
-    const appellationCode = appellationCodes && appellationCodes[0];
     const searchMade: SearchMade = {
       lat,
       lon,
@@ -53,7 +52,6 @@ export class SearchImmersion extends TransactionalUseCase<
       voluntaryToImmersion,
       place,
       appellationCodes,
-      appellationCode,
       romeCode: rome,
     };
 
@@ -62,8 +60,13 @@ export class SearchImmersion extends TransactionalUseCase<
         searchMade,
         maxResults: 100,
       }),
-      shouldFetchLBB(appellationCode, voluntaryToImmersion)
-        ? this.#searchOnLbb(uow, { appellationCode, lat, lon, distanceKm })
+      shouldFetchLBB(appellationCodes, voluntaryToImmersion)
+        ? this.#searchOnLbb(uow, {
+            appellationCodes: appellationCodes as AppellationCode[],
+            lat,
+            lon,
+            distanceKm,
+          })
         : Promise.resolve([]),
     ]);
 
@@ -103,26 +106,26 @@ export class SearchImmersion extends TransactionalUseCase<
   async #searchOnLbb(
     uow: UnitOfWork,
     {
-      appellationCode,
+      appellationCodes,
       lat,
       lon,
       distanceKm,
     }: {
-      appellationCode: AppellationCode;
+      appellationCodes: AppellationCode[];
       lat: number;
       lon: number;
       distanceKm: number;
     },
   ) {
     const matches =
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-        appellationCode,
-      ]);
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
+        appellationCodes,
+      );
 
     const romeCode = matches.at(0)?.romeCode;
     if (!romeCode)
       throw new Error(
-        `No Rome code matching appellation code ${appellationCode}`,
+        `No Rome code matching appellation codes ${appellationCodes}`,
       );
 
     return this.laBonneBoiteAPI.searchCompanies({
@@ -135,10 +138,12 @@ export class SearchImmersion extends TransactionalUseCase<
 }
 
 const shouldFetchLBB = (
-  appellationCode: AppellationCode | undefined,
+  appellationCodes: AppellationCode[] | undefined,
   voluntaryToImmersion?: boolean | undefined,
-): appellationCode is string =>
-  !!appellationCode && voluntaryToImmersion !== true;
+) =>
+  !!appellationCodes &&
+  appellationCodes.length > 0 &&
+  voluntaryToImmersion !== true;
 
 const isSiretAlreadyInStoredResults =
   (searchImmersionQueryResults: SearchImmersionResult[]) =>
