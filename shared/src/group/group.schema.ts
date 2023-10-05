@@ -20,7 +20,7 @@ const groupOptionsSchema = z.object({
   tintColor: z.string(),
 });
 
-const groupSchema: z.Schema<Group> = z.object({
+export const groupSchema: z.Schema<Group> = z.object({
   slug: groupSlugSchema,
   name: zStringMinLength1,
   options: groupOptionsSchema,

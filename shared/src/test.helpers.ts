@@ -91,5 +91,12 @@ export const expectObjectsToMatch = <T>(actual: T, expected: Partial<T>) => {
   expect(actual).toMatchObject(expected);
 };
 
+export const expectObjectInArrayToMatch = <T>(
+  actual: T[],
+  expected: Partial<T>[],
+) => {
+  expect(actual).toMatchObject(expected);
+};
+
 export const displayRouteName = (route: UnknownSharedRoute): string =>
   `${route.method.toUpperCase()} ${route.url} -`;

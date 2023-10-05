@@ -175,7 +175,7 @@ describe("search-immersion route", () => {
               heroHeader: {
                 description: "yo",
                 title: "yo",
-                logoUrl: "yo",
+                logoUrl: "https://yolo.com",
               },
               tintColor: "lala",
             },

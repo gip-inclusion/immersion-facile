@@ -1,8 +1,10 @@
-import { GroupSlug, SearchResultDto, SiretDto } from "shared";
+import { GroupSlug, GroupWithResults, SiretDto } from "shared";
 import { GroupEntity } from "../entities/GroupEntity";
 
 export interface GroupRepository {
   groupsWithSiret(siret: SiretDto): Promise<GroupEntity[]>;
-  findSearchResultsBySlug(slug: GroupSlug): Promise<SearchResultDto[]>;
+  getGroupWithSearchResultsBySlug(
+    slug: GroupSlug,
+  ): Promise<GroupWithResults | undefined>;
   save(group: GroupEntity): Promise<void>;
 }

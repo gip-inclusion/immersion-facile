@@ -1,8 +1,11 @@
 import { Pool, PoolClient } from "pg";
 import {
   AppellationDto,
+  expectObjectInArrayToMatch,
   expectObjectsToMatch,
   expectToEqual,
+  Group,
+  GroupOptions,
   SearchResultDto,
 } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
@@ -10,15 +13,30 @@ import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { EstablishmentEntity } from "../../../../domain/offer/entities/EstablishmentEntity";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgGroupRepository } from "./PgGroupRepository";
 
+const groupOptions: GroupOptions = {
+  heroHeader: {
+    title: "My hero header title",
+    description: "My hero header description",
+    logoUrl: "https://my-logo-url.com",
+    backgroundColor: "blue",
+  },
+  tintColor: "red",
+};
+
 const siret1 = "11112222111122";
 const siret2 = "33334444333344";
-const carrefourGroup: GroupEntity = {
+
+const carrefourGroup: Group = {
   slug: "carrefour",
   name: "Carrefour",
+  options: groupOptions,
+};
+const carrefourGroupEntity: GroupEntity = {
+  ...carrefourGroup,
   sirets: [siret1, siret2],
 };
 
@@ -26,6 +44,7 @@ const laMieCalineGroup: GroupEntity = {
   slug: "l-amie-caline",
   name: "L'amie caline",
   sirets: [],
+  options: groupOptions,
 };
 
 describe("PgEstablishmentGroupRepository", () => {
@@ -33,6 +52,7 @@ describe("PgEstablishmentGroupRepository", () => {
   let client: PoolClient;
   let pgEstablishmentGroupRepository: PgGroupRepository;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -40,15 +60,15 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   beforeEach(async () => {
-    const transaction = makeKyselyDb(pool);
-    pgEstablishmentGroupRepository = new PgGroupRepository(transaction);
+    db = makeKyselyDb(pool);
+    pgEstablishmentGroupRepository = new PgGroupRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      transaction,
+      db,
     );
-    await client.query("DELETE FROM establishment_groups__sirets");
-    await client.query("DELETE FROM establishment_groups");
+    await db.deleteFrom("groups__sirets").execute();
+    await db.deleteFrom("groups").execute();
     await client.query("DELETE FROM immersion_contacts");
-    await client.query("DELETE FROM discussions");
+    await db.deleteFrom("discussions").execute();
     await client.query("DELETE FROM establishments");
   });
 
@@ -59,9 +79,9 @@ describe("PgEstablishmentGroupRepository", () => {
 
   it("creates an EstablishmentGroup and the links with sirets", async () => {
     await pgEstablishmentGroupRepository.save(laMieCalineGroup);
-    await pgEstablishmentGroupRepository.save(carrefourGroup);
+    await pgEstablishmentGroupRepository.save(carrefourGroupEntity);
 
-    expectObjectsToMatch(await getAllGroups(), [
+    expectObjectInArrayToMatch(await getAllGroups(), [
       { name: "L'amie caline", slug: "l-amie-caline" },
       { name: "Carrefour", slug: "carrefour" },
     ]);
@@ -72,16 +92,17 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   it("updates the group when one with the same slug already exists", async () => {
-    await pgEstablishmentGroupRepository.save(carrefourGroup);
+    await pgEstablishmentGroupRepository.save(carrefourGroupEntity);
     const updatedGroup: GroupEntity = {
-      slug: carrefourGroup.slug,
-      name: carrefourGroup.name,
+      slug: carrefourGroupEntity.slug,
+      name: carrefourGroupEntity.name,
       sirets: ["55556666555566", "77778888777788"],
+      options: groupOptions,
     };
 
     await pgEstablishmentGroupRepository.save(updatedGroup);
 
-    expectObjectsToMatch(await getAllGroups(), [
+    expectObjectInArrayToMatch(await getAllGroups(), [
       { name: "Carrefour", slug: "carrefour" },
     ]);
     expectObjectsToMatch(await getAllGroupsSirets(), [
@@ -112,18 +133,18 @@ describe("PgEstablishmentGroupRepository", () => {
       .build();
 
     const establishmentAggregate1 = new EstablishmentAggregateBuilder()
-      .withEstablishmentSiret(carrefourGroup.sirets[0])
+      .withEstablishmentSiret(carrefourGroupEntity.sirets[0])
       .withContactId("11111111-1111-4444-1111-111111111111")
       .withOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
       .build();
 
     const establishmentAggregate2 = new EstablishmentAggregateBuilder()
-      .withEstablishmentSiret(carrefourGroup.sirets[1])
+      .withEstablishmentSiret(carrefourGroupEntity.sirets[1])
       .withContactId("22222222-2222-4444-2222-222222222222")
       .withOffers([offerVendeurEnAlimentationGenerale])
       .build();
 
-    await pgEstablishmentGroupRepository.save(carrefourGroup);
+    await pgEstablishmentGroupRepository.save(carrefourGroupEntity);
     await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
       establishmentAggregate1,
       establishmentAggregate2,
@@ -132,9 +153,9 @@ describe("PgEstablishmentGroupRepository", () => {
     const { establishment: establishment1 } = establishmentAggregate1;
     const { establishment: establishment2 } = establishmentAggregate2;
 
-    const searchImmersionResults =
-      await pgEstablishmentGroupRepository.findSearchResultsBySlug(
-        carrefourGroup.slug,
+    const groupWithResults =
+      await pgEstablishmentGroupRepository.getGroupWithSearchResultsBySlug(
+        carrefourGroupEntity.slug,
       );
 
     const createSearchResult = ({
@@ -167,42 +188,48 @@ describe("PgEstablishmentGroupRepository", () => {
       website: establishment.website,
     });
 
-    expectToEqual(searchImmersionResults, [
-      createSearchResult({
-        establishment: establishment1,
-        rome: "D1101",
-        romeLabel: "Boucherie",
-        appellations: [
-          { appellationLabel: "Boucher / Bouchère", appellationCode: "11564" },
-        ],
-      }),
-      createSearchResult({
-        establishment: establishment1,
-        rome: "D1102",
-        romeLabel: "Boulangerie - viennoiserie",
-        appellations: [
-          {
-            appellationLabel: "Aide-boulanger / Aide-boulangère",
-            appellationCode: "10868",
-          },
-          {
-            appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
-            appellationCode: "11574",
-          },
-        ],
-      }),
-      createSearchResult({
-        establishment: establishment2,
-        rome: "D1106",
-        romeLabel: "Vente en alimentation",
-        appellations: [
-          {
-            appellationLabel: "Vendeur / Vendeuse en alimentation générale",
-            appellationCode: "20540",
-          },
-        ],
-      }),
-    ]);
+    expectToEqual(groupWithResults, {
+      group: carrefourGroup,
+      results: [
+        createSearchResult({
+          establishment: establishment1,
+          rome: "D1101",
+          romeLabel: "Boucherie",
+          appellations: [
+            {
+              appellationLabel: "Boucher / Bouchère",
+              appellationCode: "11564",
+            },
+          ],
+        }),
+        createSearchResult({
+          establishment: establishment1,
+          rome: "D1102",
+          romeLabel: "Boulangerie - viennoiserie",
+          appellations: [
+            {
+              appellationLabel: "Aide-boulanger / Aide-boulangère",
+              appellationCode: "10868",
+            },
+            {
+              appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
+              appellationCode: "11574",
+            },
+          ],
+        }),
+        createSearchResult({
+          establishment: establishment2,
+          rome: "D1106",
+          romeLabel: "Vente en alimentation",
+          appellations: [
+            {
+              appellationLabel: "Vendeur / Vendeuse en alimentation générale",
+              appellationCode: "20540",
+            },
+          ],
+        }),
+      ],
+    });
   });
 
   describe("groupsWithSiret", () => {
@@ -210,24 +237,27 @@ describe("PgEstablishmentGroupRepository", () => {
       name: "group1",
       sirets: [siret1],
       slug: "group1",
+      options: groupOptions,
     };
 
     const group2WithSiret1: GroupEntity = {
       name: "group2",
       sirets: [siret1],
       slug: "group2",
+      options: groupOptions,
     };
 
-    const group3WithoutSiret1: GroupEntity = {
+    const group3WithAnotherSiret: GroupEntity = {
       name: "group3",
       sirets: ["another-siret"],
       slug: "group3",
+      options: groupOptions,
     };
 
     it("Retreive groups with siret", async () => {
       await Promise.all(
-        [group1WithSiret1, group2WithSiret1, group3WithoutSiret1].map((group) =>
-          pgEstablishmentGroupRepository.save(group),
+        [group1WithSiret1, group2WithSiret1, group3WithAnotherSiret].map(
+          (group) => pgEstablishmentGroupRepository.save(group),
         ),
       );
 
@@ -239,8 +269,8 @@ describe("PgEstablishmentGroupRepository", () => {
 
     it("Retreive no groups when they don't have siret", async () => {
       await Promise.all(
-        [group1WithSiret1, group2WithSiret1, group3WithoutSiret1].map((group) =>
-          pgEstablishmentGroupRepository.save(group),
+        [group1WithSiret1, group2WithSiret1, group3WithAnotherSiret].map(
+          (group) => pgEstablishmentGroupRepository.save(group),
         ),
       );
 
@@ -251,15 +281,9 @@ describe("PgEstablishmentGroupRepository", () => {
     });
   });
 
-  const getAllGroups = async () => {
-    const { rows } = await client.query(`SELECT * FROM establishment_groups`);
-    return rows;
-  };
+  const getAllGroups = async () =>
+    db.selectFrom("groups").selectAll().execute();
 
-  const getAllGroupsSirets = async () => {
-    const { rows } = await client.query(
-      `SELECT * FROM establishment_groups__sirets`,
-    );
-    return rows;
-  };
+  const getAllGroupsSirets = async () =>
+    db.selectFrom("groups__sirets").selectAll().execute();
 });

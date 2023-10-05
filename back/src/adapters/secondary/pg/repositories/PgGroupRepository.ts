@@ -1,5 +1,5 @@
-import format from "pg-format";
-import { GroupSlug, SearchResultDto, SiretDto } from "shared";
+import { Expression, RawBuilder, Simplify, sql } from "kysely";
+import { groupSchema, GroupSlug, GroupWithResults, SiretDto } from "shared";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { GroupRepository } from "../../../../domain/offer/ports/GroupRepository";
 import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
@@ -15,10 +15,32 @@ const buildAppellationsArray = `JSON_AGG(
 export class PgGroupRepository implements GroupRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async findSearchResultsBySlug(
+  public async getGroupWithSearchResultsBySlug(
     slug: GroupSlug,
-  ): Promise<SearchResultDto[]> {
-    const response = await executeKyselyRawSqlQuery(
+  ): Promise<GroupWithResults | undefined> {
+    const rawGroup = await this.transaction
+      .selectFrom("groups")
+      .where("slug", "=", slug)
+      .selectAll()
+      .executeTakeFirst();
+
+    if (!rawGroup) return;
+
+    const group = groupSchema.parse({
+      name: rawGroup.name,
+      slug: rawGroup.slug,
+      options: {
+        heroHeader: {
+          title: rawGroup.hero_header_title,
+          description: rawGroup.hero_header_description,
+          logoUrl: rawGroup.hero_header_logo_url,
+          backgroundColor: rawGroup.hero_header_background_color,
+        },
+        tintColor: rawGroup.tint_color,
+      },
+    });
+
+    const resultsResponse = await executeKyselyRawSqlQuery(
       this.transaction,
       `
       SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
@@ -45,97 +67,137 @@ export class PgGroupRepository implements GroupRepository {
         'contactMode', ic.contact_mode,
         'numberOfEmployeeRange', e.number_employees 
       )) as search_result_dto
-      FROM "establishment_groups__sirets"
-      LEFT JOIN "establishment_groups" g ON g.slug = establishment_groups__sirets.group_slug
-      LEFT JOIN "establishments" e ON e.siret = establishment_groups__sirets.siret
+      FROM "groups__sirets"
+      LEFT JOIN "groups" g ON g.slug = groups__sirets.group_slug
+      LEFT JOIN "establishments" e ON e.siret = groups__sirets.siret
       LEFT JOIN "immersion_offers" io ON io.siret = e.siret
       LEFT JOIN "establishments__immersion_contacts" AS eic ON eic.establishment_siret = e.siret
       LEFT JOIN "immersion_contacts" AS ic ON ic.uuid = eic.contact_uuid
       LEFT JOIN "public_appellations_data" ap ON ap.ogr_appellation = io.appellation_code
       LEFT JOIN "public_romes_data" r ON io.rome_code = r.code_rome
       LEFT JOIN "public_naf_classes_2008" ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      WHERE establishment_groups__sirets.group_slug = $1 AND e.is_open AND e.is_searchable
+      WHERE groups__sirets.group_slug = $1 AND e.is_open AND e.is_searchable
       GROUP BY(e.siret, io.rome_code, r.libelle_rome, public_naf_classes_2008.class_label, ic.contact_mode)
     `,
       [slug],
     );
 
-    return response.rows.map((row) => row.search_result_dto);
+    const results = resultsResponse.rows.map((row) => row.search_result_dto);
+
+    return {
+      group,
+      results,
+    };
   }
 
   public async groupsWithSiret(siret: SiretDto): Promise<GroupEntity[]> {
-    const { rows } = await executeKyselyRawSqlQuery<{
-      slug: string;
-      name: string;
-      sirets: string[];
-    }>(
-      this.transaction,
-      `
-      SELECT g.slug, g.name, array_agg(establishment_groups__sirets.siret) as sirets
-      FROM establishment_groups g
-      LEFT JOIN establishment_groups__sirets ON g.slug = establishment_groups__sirets.group_slug
-      INNER JOIN (
-        SELECT DISTINCT group_slug
-        FROM establishment_groups__sirets
-        WHERE siret = $1
-      ) est_groups ON g.slug = est_groups.group_slug
-      GROUP BY g.slug, g.name
-      ORDER BY g.slug;
-    `,
-      [siret],
-    );
-    return rows.map(
-      (row) =>
-        ({
-          name: row.name,
-          sirets: row.sirets,
-          slug: row.slug,
-        } satisfies GroupEntity),
-    );
+    return this.transaction
+      .with("uniq_groups", (qb) =>
+        qb
+          .selectFrom("groups__sirets")
+          .select("groups__sirets.group_slug")
+          .distinct()
+          .where("siret", "=", siret),
+      )
+      .selectFrom("groups as g")
+      .leftJoin("groups__sirets", "slug", "groups__sirets.group_slug")
+      .innerJoin("uniq_groups", "g.slug", "uniq_groups.group_slug")
+      .groupBy(["g.slug", "g.name"])
+      .orderBy("g.slug")
+      .select(({ fn, ref }) => [
+        "g.slug",
+        "g.name",
+        fn.agg<string[]>("ARRAY_AGG", ["groups__sirets.siret"]).as("sirets"),
+        jsonStripNulls(
+          jsonBuildObject({
+            heroHeader: jsonBuildObject({
+              title: ref("hero_header_title"),
+              description: ref("hero_header_description"),
+              logoUrl: ref("hero_header_logo_url"),
+              backgroundColor: ref("hero_header_background_color"),
+            }),
+            tintColor: ref("tint_color"),
+          }),
+        ).as("options"),
+      ])
+      .execute();
   }
 
   public async save(group: GroupEntity): Promise<void> {
-    const { rows } = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `SELECT * FROM establishment_groups WHERE slug = $1`,
-      [group.slug],
-    );
-    const establishmentGroupAlreadyExists = !!rows.length;
-    if (establishmentGroupAlreadyExists) {
+    const pgGroups = await this.transaction
+      .selectFrom("groups")
+      .selectAll()
+      .where("slug", "=", group.slug)
+      .execute();
+
+    const groupAlreadyExists = !!pgGroups.length;
+
+    if (groupAlreadyExists) {
       await this.#clearExistingSiretsForGroup(group.slug);
-      await this.#insertEstablishmentGroupSirets(group);
+      await this.#insertGroupSirets(group);
     } else {
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        `
-            INSERT INTO establishment_groups (slug, name) VALUES ($1, $2)
-        `,
-        [group.slug, group.name],
-      );
-      await this.#insertEstablishmentGroupSirets(group);
+      await this.transaction
+        .insertInto("groups")
+        .values({
+          name: group.name,
+          slug: group.slug,
+          tint_color: group.options.tintColor,
+          hero_header_title: group.options.heroHeader.title,
+          hero_header_description: group.options.heroHeader.description,
+          hero_header_background_color:
+            group.options.heroHeader.backgroundColor,
+          hero_header_logo_url: group.options.heroHeader.logoUrl,
+        })
+        .execute();
+      await this.#insertGroupSirets(group);
     }
   }
 
-  async #insertEstablishmentGroupSirets(group: GroupEntity) {
+  async #insertGroupSirets(group: GroupEntity) {
     if (!group.sirets.length) return;
-    const groupAndSiretPairs: [string, SiretDto][] = group.sirets.map(
-      (siret) => [group.slug, siret],
-    );
 
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      format(
-        `INSERT INTO establishment_groups__sirets (group_slug, siret) VALUES %L`,
-        groupAndSiretPairs,
-      ),
-    );
+    const groupAndSiretPairs = group.sirets.map((siret) => ({
+      group_slug: group.slug,
+      siret,
+    }));
+
+    await this.transaction
+      .insertInto("groups__sirets")
+      .values(groupAndSiretPairs)
+      .execute();
   }
 
   async #clearExistingSiretsForGroup(groupSlug: GroupSlug) {
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
-      [groupSlug],
-    );
+    await this.transaction
+      .deleteFrom("groups__sirets")
+      .where("group_slug", "=", groupSlug)
+      .execute();
   }
+}
+
+// @TODO remove / move in utils when merged
+export function jsonBuildObject<O extends Record<string, Expression<unknown>>>(
+  obj: O,
+): RawBuilder<
+  Simplify<{
+    [K in keyof O]: O[K] extends Expression<infer V> ? V : never;
+  }>
+> {
+  return sql`json_build_object(${sql.join(
+    Object.keys(obj).flatMap((k) => [sql.lit(k), obj[k]]),
+  )})`;
+}
+
+type NullableToUndefined<A> = A extends null ? Exclude<A, null> | undefined : A;
+
+type StripNullRecursive<T> = {
+  [K in keyof T]: T[K] extends Record<any, unknown>
+    ? StripNullRecursive<T[K]>
+    : NullableToUndefined<T[K]>;
+};
+
+export function jsonStripNulls<T>(
+  obj: RawBuilder<T>,
+): RawBuilder<StripNullRecursive<T>> {
+  return sql`json_strip_nulls(${obj})`;
 }

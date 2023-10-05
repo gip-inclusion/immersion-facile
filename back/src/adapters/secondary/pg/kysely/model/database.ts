@@ -1,8 +1,11 @@
 import { ColumnType, Generated } from "kysely";
+import { AbsoluteUrl } from "shared";
 
 export interface Database {
   discussions: Discussions;
   exchanges: Exchanges;
+  groups: Groups;
+  groups__sirets: GroupsSirets;
 }
 
 export type JsonArray = JsonValue[];
@@ -55,4 +58,21 @@ interface Exchanges {
   sent_at: Timestamp;
   subject: Generated<string>;
   id: Generated<number>;
+}
+
+export interface Groups {
+  slug: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp>;
+  name: string;
+  hero_header_title: string;
+  hero_header_description: string;
+  hero_header_logo_url: AbsoluteUrl | null;
+  hero_header_background_color: string | null;
+  tint_color: string | null;
+}
+
+export interface GroupsSirets {
+  group_slug: string;
+  siret: string;
 }

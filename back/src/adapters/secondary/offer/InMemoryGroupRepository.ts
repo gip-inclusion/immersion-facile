@@ -1,5 +1,5 @@
 import { values } from "ramda";
-import { GroupSlug, SearchResultDto, SiretDto } from "shared";
+import { GroupSlug, GroupWithResults, SearchResultDto, SiretDto } from "shared";
 import { GroupEntity } from "../../../domain/offer/entities/GroupEntity";
 import { GroupRepository } from "../../../domain/offer/ports/GroupRepository";
 
@@ -33,8 +33,11 @@ export class InMemoryGroupRepository implements GroupRepository {
   // for test purpose
   #groupsBySlug: Record<GroupSlug, GroupEntity> = {};
 
-  public async findSearchResultsBySlug(): Promise<SearchResultDto[]> {
-    return [stubSearchResult];
+  public async getGroupWithSearchResultsBySlug(
+    slug: GroupSlug,
+  ): Promise<GroupWithResults> {
+    const { sirets, ...group } = this.#groupsBySlug[slug];
+    return { group, results: [stubSearchResult] };
   }
 
   public async groupsWithSiret(siret: SiretDto): Promise<GroupEntity[]> {
