@@ -68,7 +68,7 @@ export * from "./role/role.utils";
 export * from "./rome";
 export * from "./romeAndAppellationDtos/romeAndAppellation.dto";
 export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
-export * from "./routes/addressTargets";
+export * from "./routes/addressRoutes";
 export * from "./routes/agencyRoutes";
 export * from "./routes/establishementTargets";
 export * from "./routes/routes";

@@ -1,11 +1,13 @@
-import { SuperTest, Test } from "supertest";
-import { ZodError } from "zod";
 import {
-  addressTargets,
+  AddressRoutes,
+  addressRoutes,
+  expectHttpResponseToEqual,
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { InMemoryAddressGateway } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
@@ -17,101 +19,98 @@ const lookupAddressQueryParam = "lookup";
 const lookupLocationQueryParam = "query";
 
 const lookupStreetAddressUrl = (lookup: LookupAddress): string =>
-  `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=${lookup}`;
+  `${addressRoutes.lookupStreetAddress.url}?${lookupAddressQueryParam}=${lookup}`;
 
 const lookupLocationUrl = (lookupLocationInput: LookupLocationInput): string =>
-  `${addressTargets.lookupLocation.url}?${lookupLocationQueryParam}=${lookupLocationInput}`;
+  `${addressRoutes.lookupLocation.url}?${lookupLocationQueryParam}=${lookupLocationInput}`;
 
 describe("addressRouter", () => {
-  let request: SuperTest<Test>;
+  let httpClient: HttpClient<AddressRoutes>;
   let addressGateway: InMemoryAddressGateway;
 
   beforeEach(async () => {
-    const testAppAndDeps = await buildTestApp();
-    request = testAppAndDeps.request;
-    addressGateway = testAppAndDeps.gateways.addressApi;
+    const { request, gateways } = await buildTestApp();
+    httpClient = createSupertestSharedClient(addressRoutes, request);
+    addressGateway = gateways.addressApi;
   });
 
-  describe(`${addressTargets.lookupStreetAddress.url} route`, () => {
+  describe(`${addressRoutes.lookupStreetAddress.url} route`, () => {
     it(`GET 200 ${lookupStreetAddressUrl(query8bdduportLookup)}`, async () => {
       addressGateway.setAddressAndPosition(
         expected8bdduportAddressAndPositions,
       );
-      const response = await request.get(
-        `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=${query8bdduportLookup}`,
-      );
+      const response = await httpClient.lookupStreetAddress({
+        queryParams: {
+          lookup: query8bdduportLookup,
+        },
+      });
       expect(response.body).toEqual(expected8bdduportAddressAndPositions);
       expect(response.status).toBe(200);
     });
 
     describe("bad queries", () => {
       it(`GET 400 '${lookupStreetAddressUrl("1")}'`, async () => {
-        const response = await request.get(
-          `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=1`,
-        );
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({
-          errors: `Error: ${new ZodError([
-            {
-              code: "too_small",
-              minimum: 2,
-              type: "string",
-              inclusive: true,
-              exact: false,
-              message: "String must contain at least 2 character(s)",
-              path: ["lookup"],
-            },
-            {
-              code: "custom",
-              message:
-                "String must contain at least 2 character(s), excluding special chars",
-              path: ["lookup"],
-            },
-          ]).toString()}`,
+        const response = await httpClient.lookupStreetAddress({
+          queryParams: {
+            lookup: "1",
+          },
+        });
+        expectHttpResponseToEqual(response, {
+          status: 400,
+          body: {
+            issues: [
+              "lookup : String must contain at least 2 character(s)",
+              "lookup : String must contain at least 2 character(s), excluding special chars",
+            ],
+            message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /address/lookupStreetAddress`,
+            status: 400,
+          },
         });
       });
 
       it(`GET 400 '${lookupStreetAddressUrl(
         "a a a a a a a a a a a a a a a a a a a",
       )}'`, async () => {
-        const response = await request.get(
-          `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=a a a a a a a a a a a a a a a a a a a`,
-        );
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({
-          errors: `Error: ${new ZodError([
-            {
-              code: "custom",
-              message: "String must contain a maximum of 18 words",
-              path: ["lookup"],
-            },
-          ]).toString()}`,
+        const response = await httpClient.lookupStreetAddress({
+          queryParams: {
+            lookup: "a a a a a a a a a a a a a a a a a a a",
+          },
+        });
+        expectHttpResponseToEqual(response, {
+          status: 400,
+          body: {
+            issues: ["lookup : String must contain a maximum of 18 words"],
+            message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /address/lookupStreetAddress`,
+            status: 400,
+          },
         });
       });
 
-      it.each(["1,", "1, ", "⠀  , 125 ", " )),$,#                  "])(
+      it.each(["1,", "1, ", "⠀  , a ", " )),$,#                  "])(
         `GET 400 '${lookupStreetAddressUrl("%s")}'`,
-        async () => {
-          const response = await request.get(
-            `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=1,`,
-          );
-          expect(response.status).toBe(400);
-          expect(response.body).toEqual({
-            errors: `Error: ${new ZodError([
-              {
-                code: "custom",
-                message:
-                  "String must contain at least 2 character(s), excluding special chars",
-                path: ["lookup"],
-              },
-            ]).toString()}`,
+        async (lookup) => {
+          const response = await httpClient.lookupStreetAddress({
+            queryParams: {
+              lookup,
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
+            status: 400,
+            body: {
+              issues: [
+                "lookup : String must contain at least 2 character(s), excluding special chars",
+              ],
+              message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /address/lookupStreetAddress`,
+              status: 400,
+            },
           });
         },
       );
     });
   });
 
-  describe(`${addressTargets.lookupLocation.url} route`, () => {
+  describe(`${addressRoutes.lookupLocation.url} route`, () => {
     const exampleQuery = "Saint-Emil";
     const expectedLookupSearchResults: LookupSearchResult[] = [
       {
@@ -125,7 +124,11 @@ describe("addressRouter", () => {
 
     it(`GET ${lookupLocationUrl(exampleQuery)}`, async () => {
       addressGateway.setLookupSearchResults(expectedLookupSearchResults);
-      const response = await request.get(lookupLocationUrl(exampleQuery));
+      const response = await httpClient.lookupLocation({
+        queryParams: {
+          query: exampleQuery,
+        },
+      });
       expect(response.body).toEqual(expectedLookupSearchResults);
       expect(response.status).toBe(200);
     });

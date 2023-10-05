@@ -1,5 +1,5 @@
 import {
-  addressTargets,
+  addressRoutes,
   adminRoutes,
   agencyRoutes,
   conventionMagicLinkRoutes,
@@ -35,7 +35,9 @@ export const createHttpDependencies = (): Dependencies => {
   const createHttpClient = configureHttpClient(handlerCreator);
 
   return {
-    addressGateway: new HttpAddressGateway(createHttpClient(addressTargets)),
+    addressGateway: new HttpAddressGateway(
+      createAxiosSharedClient(addressRoutes, axiosOnSlashApi),
+    ),
     adminGateway: new HttpAdminGateway(
       createAxiosSharedClient(adminRoutes, axiosOnSlashApi),
     ),
