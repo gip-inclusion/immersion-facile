@@ -12,6 +12,7 @@
     "db:create": "pnpm back db:create",
     "db:down": "pnpm back db:down",
     "db:up": "pnpm back db:up",
+    "db:redo": "pnpm back db:redo",
     "db:seed": "pnpm back db:seed",
     "prepare": "if [[ -z $CI ]]; then husky install && chmod a+x .husky/pre-commit && chmod a+x .husky/pre-push; fi;",
     "generate-front-envfile": "grep 'VITE_' .env > ./front/.env",
