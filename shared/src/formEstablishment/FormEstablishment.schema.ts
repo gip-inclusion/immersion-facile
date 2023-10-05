@@ -23,7 +23,6 @@ import {
   FormEstablishmentSource,
   ImmersionContactInEstablishmentId,
   SiretAdditionFailure,
-  WithEstablishmentGroupSlug,
 } from "./FormEstablishment.dto";
 
 // prettier-ignore
@@ -91,9 +90,6 @@ export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
     groupName: zStringMinLength1,
     formEstablishments: z.array(formEstablishmentSchema),
   });
-
-export const withEstablishmentGroupSlugSchema: z.Schema<WithEstablishmentGroupSlug> =
-  z.object({ groupSlug: zStringMinLength1 });
 
 const siretAdditionFailure: z.Schema<SiretAdditionFailure> = z.object({
   siret: siretSchema,

@@ -1,7 +1,7 @@
 import { values } from "ramda";
-import { EstablishmentGroupSlug, SearchResultDto, SiretDto } from "shared";
-import { EstablishmentGroupEntity } from "../../../domain/offer/entities/EstablishmentGroupEntity";
-import { EstablishmentGroupRepository } from "../../../domain/offer/ports/EstablishmentGroupRepository";
+import { GroupSlug, SearchResultDto, SiretDto } from "shared";
+import { GroupEntity } from "../../../domain/offer/entities/GroupEntity";
+import { GroupRepository } from "../../../domain/offer/ports/GroupRepository";
 
 export const stubSearchResult: SearchResultDto = {
   rome: "D1101",
@@ -29,20 +29,16 @@ export const stubSearchResult: SearchResultDto = {
 };
 
 /* eslint-disable @typescript-eslint/require-await */
-export class InMemoryEstablishmentGroupRepository
-  implements EstablishmentGroupRepository
-{
+export class InMemoryGroupRepository implements GroupRepository {
   // for test purpose
-  #groupsBySlug: Record<EstablishmentGroupSlug, EstablishmentGroupEntity> = {};
+  #groupsBySlug: Record<GroupSlug, GroupEntity> = {};
 
-  public async findSearchImmersionResultsBySlug(): Promise<SearchResultDto[]> {
+  public async findSearchResultsBySlug(): Promise<SearchResultDto[]> {
     return [stubSearchResult];
   }
 
-  public async groupsWithSiret(
-    siret: SiretDto,
-  ): Promise<EstablishmentGroupEntity[]> {
-    return values(this.#groupsBySlug).reduce<EstablishmentGroupEntity[]>(
+  public async groupsWithSiret(siret: SiretDto): Promise<GroupEntity[]> {
+    return values(this.#groupsBySlug).reduce<GroupEntity[]>(
       (acc, group) => [
         ...acc,
         ...(group.sirets.includes(siret) ? [group] : []),
@@ -51,18 +47,18 @@ export class InMemoryEstablishmentGroupRepository
     );
   }
 
-  public async save(group: EstablishmentGroupEntity) {
+  public async save(group: GroupEntity) {
     this.#groupsBySlug[group.slug] = group;
   }
 
-  public get groups(): EstablishmentGroupEntity[] {
+  public get groups(): GroupEntity[] {
     return Object.values(this.#groupsBySlug);
   }
 
-  public set groups(groups: EstablishmentGroupEntity[]) {
+  public set groups(groups: GroupEntity[]) {
     this.#groupsBySlug = groups.reduce(
       (acc, group) => ({ ...acc, [group.slug]: group }),
-      {} satisfies Record<EstablishmentGroupSlug, EstablishmentGroupEntity>,
+      {} satisfies Record<GroupSlug, GroupEntity>,
     );
   }
 }

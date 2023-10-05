@@ -85,7 +85,7 @@ export const HomePage = ({ type }: HomePageProps) => {
           subtitle="ouvre ses portes aux nouveaux talents, pourquoi pas vous ?"
           link={
             routes.group({
-              groupName: "decathlon",
+              groupSlug: "decathlon",
             }).link
           }
         />

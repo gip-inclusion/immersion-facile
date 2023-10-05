@@ -5,7 +5,6 @@ import {
   appellationStringSerializer,
   conventionValuesFromUrl,
 } from "./routeParams/convention";
-import { groupsSerializer } from "./routeParams/establishmentGroups";
 import { formEstablishmentParamsInUrl } from "./routeParams/formEstablishment";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 
@@ -92,8 +91,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (params) => `/etablissement/${params.consumer}`,
   ),
   group: defineRoute(
-    { groupName: param.path.ofType(groupsSerializer) },
-    (params) => `/${frontRoutes.group}/${params.groupName}`,
+    { groupSlug: param.path.string },
+    (params) => `/${frontRoutes.group}/${params.groupSlug}`,
   ),
   home: defineRoute("/"),
   homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),

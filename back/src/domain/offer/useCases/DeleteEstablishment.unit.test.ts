@@ -124,7 +124,7 @@ describe("Delete Establishment", () => {
       uow.formEstablishmentRepository.setFormEstablishments([
         formEstablishment,
       ]);
-      uow.establishmentGroupRepository.groups = [
+      uow.groupRepository.groups = [
         {
           name: "group",
           sirets: [formEstablishment.siret, "siret2"],
@@ -144,7 +144,7 @@ describe("Delete Establishment", () => {
         [],
       );
       expectToEqual(await uow.formEstablishmentRepository.getAll(), []);
-      expectToEqual(uow.establishmentGroupRepository.groups, [
+      expectToEqual(uow.groupRepository.groups, [
         {
           name: "group",
           sirets: ["siret2"],

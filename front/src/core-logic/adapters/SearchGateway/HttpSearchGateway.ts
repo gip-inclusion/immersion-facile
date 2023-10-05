@@ -1,7 +1,8 @@
 import { from, Observable } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
-  EstablishmentGroupSlug,
+  GroupSlug,
+  GroupWithResults,
   SearchQueryParamsDto,
   SearchResultDto,
   SearchRoutes,
@@ -37,10 +38,8 @@ export class HttpSearchGateway implements SearchGateway {
     if (response.status === 409) return "alreadyContactedRecently";
   }
 
-  public async getGroupSearchResultsBySlug(
-    groupSlug: EstablishmentGroupSlug,
-  ): Promise<SearchResultDto[]> {
-    const response = await this.httpClient.getOffersByGroupSlug({
+  public async getGroupBySlug(groupSlug: GroupSlug): Promise<GroupWithResults> {
+    const response = await this.httpClient.getGroupBySlug({
       urlParams: { groupSlug },
     });
 

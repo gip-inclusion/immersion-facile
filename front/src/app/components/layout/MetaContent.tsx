@@ -9,7 +9,6 @@ import {
   MetaContentType,
   standardMetaContent,
 } from "src/app/contents/meta/metaContents";
-import { AuthorizedGroupSlugs } from "src/app/routes/routeParams/establishmentGroups";
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { routes, useRoute } from "src/app/routes/routes";
 
@@ -44,7 +43,7 @@ const getMetaContents = (
       return standardMetaContent[route.params.pagePath as StandardPageSlugs];
     }
     if (route.name === "group") {
-      return groupMetaContent(route.params.groupName as AuthorizedGroupSlugs);
+      return groupMetaContent(route.params.groupSlug);
     }
     if (route.name === "adminTab") {
       return adminMetaContent[route.params.tab];

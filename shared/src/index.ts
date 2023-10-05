@@ -41,6 +41,8 @@ export * from "./formEstablishment/FormEstablishment.schema";
 export * from "./formEstablishment/FormEstablishmentDtoBuilder";
 export * from "./geoPosition/geoPosition.dto";
 export * from "./geoPosition/geoPosition.schema";
+export * from "./group/group.dto";
+export * from "./group/group.schema";
 export * from "./headers";
 export * from "./http/httpStatus";
 export { HttpClientError as LegacyHttpClientError } from "./httpClient/errors/4xxClientError.error";

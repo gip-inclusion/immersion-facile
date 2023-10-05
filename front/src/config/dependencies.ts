@@ -43,7 +43,7 @@ const dependencies =
 // these are exported for usages in component, we should try to have less and less (logic should go in redux)
 export const apiAddressGateway = dependencies.addressGateway;
 export const conventionGateway = dependencies.conventionGateway;
-export const immersionSearchGateway = dependencies.searchGateway;
+export const searchGateway = dependencies.searchGateway;
 export const establishmentGateway = dependencies.establishmentGateway;
 export const agencyGateway = dependencies.agencyGateway;
 export const deviceRepository = dependencies.deviceRepository;

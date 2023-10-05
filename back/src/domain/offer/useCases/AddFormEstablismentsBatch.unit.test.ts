@@ -17,7 +17,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryEstablishmentGroupRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentGroupRepository";
+import { InMemoryGroupRepository } from "../../../adapters/secondary/offer/InMemoryGroupRepository";
 import {
   InMemorySiretGateway,
   TEST_OPEN_ESTABLISHMENT_1,
@@ -50,7 +50,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   let addFormEstablishmentBatch: AddFormEstablishmentBatch;
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
-  let establishmentGroupRepository: InMemoryEstablishmentGroupRepository;
+  let groupRepository: InMemoryGroupRepository;
   let siretGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
   let uuidGenerator: TestUuidGenerator;
@@ -61,7 +61,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     uow = createInMemoryUow();
     siretGateway = new InMemorySiretGateway();
     formEstablishmentRepo = uow.formEstablishmentRepository;
-    establishmentGroupRepository = uow.establishmentGroupRepository;
+    groupRepository = uow.groupRepository;
     outboxRepo = uow.outboxRepository;
     uow.romeRepository.appellations =
       defaultValidFormEstablishment.appellations;
@@ -156,8 +156,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     await addFormEstablishmentBatch.execute(formEstablishmentBatch);
 
-    expect(establishmentGroupRepository.groups).toHaveLength(1);
-    expectToEqual(establishmentGroupRepository.groups[0], {
+    expect(groupRepository.groups).toHaveLength(1);
+    expectToEqual(groupRepository.groups[0], {
       slug: "l-amie-caline",
       name: formEstablishmentBatch.groupName,
       sirets: [
@@ -169,7 +169,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
   it("updates Group if it already exists", async () => {
     const slug = "l-amie-caline";
-    await establishmentGroupRepository.save({
+    await groupRepository.save({
       slug,
       name: formEstablishmentBatch.groupName,
       sirets: [formEstablishmentBatch.formEstablishments[0].siret],
@@ -195,7 +195,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       ],
     });
 
-    expectToEqual(establishmentGroupRepository.groups, [
+    expectToEqual(groupRepository.groups, [
       {
         slug,
         name: formEstablishmentBatch.groupName,

@@ -18,7 +18,7 @@ import {
 } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
-import { stubSearchResult } from "../../../secondary/offer/InMemoryEstablishmentGroupRepository";
+import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const makeImmersionOfferUrl = (
@@ -160,14 +160,28 @@ describe("search-immersion route", () => {
 
   describe("GET getOffersByGroupSlug", () => {
     it("should get the stubbed data", async () => {
-      const result = await sharedRequest.getOffersByGroupSlug({
+      const result = await sharedRequest.getGroupBySlug({
         urlParams: {
           groupSlug: "some-group-slug",
         },
       });
       expectHttpResponseToEqual(result, {
         status: 200,
-        body: [stubSearchResult],
+        body: {
+          group: {
+            name: "yo",
+            slug: "lala",
+            options: {
+              heroHeader: {
+                description: "yo",
+                title: "yo",
+                logoUrl: "yo",
+              },
+              tintColor: "lala",
+            },
+          },
+          results: [stubSearchResult],
+        },
       });
     });
   });

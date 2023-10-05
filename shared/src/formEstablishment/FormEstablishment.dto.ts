@@ -1,5 +1,6 @@
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { Email } from "../email/email.dto";
+import type { GroupName } from "../group/group.dto";
 import { NafDto } from "../naf";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
@@ -74,18 +75,12 @@ export type EstablishmentCSVRow = {
   fitForDisabledWorkers?: CSVBoolean;
 };
 
-export type EstablishmentGroupName = Flavor<string, "EstablishmentGroupName">;
-export type EstablishmentGroupSlug = Flavor<string, "EstablishmentGroupSlug">;
-export type WithEstablishmentGroupSlug = {
-  groupSlug: EstablishmentGroupSlug;
-};
+export type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
 
 export type FormEstablishmentBatchDto = {
-  groupName: EstablishmentGroupName;
+  groupName: GroupName;
   formEstablishments: FormEstablishmentDto[];
 };
-
-export type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
 
 export type EstablishmentBatchReport = {
   numberOfEstablishmentsProcessed: number;

@@ -8,7 +8,7 @@ import {
 } from "shared";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UseCase } from "../../core/UseCase";
-import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
+import { GroupEntity } from "../entities/GroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 
 export class AddFormEstablishmentBatch extends UseCase<
@@ -29,14 +29,12 @@ export class AddFormEstablishmentBatch extends UseCase<
     formEstablishments,
     groupName,
   }: FormEstablishmentBatchDto): Promise<EstablishmentBatchReport> {
-    const group: EstablishmentGroupEntity = {
+    const group: GroupEntity = {
       slug: slugify(groupName),
       name: groupName,
       sirets: formEstablishments.map(({ siret }) => siret),
     };
-    await this.uowPerformer.perform((uow) =>
-      uow.establishmentGroupRepository.save(group),
-    );
+    await this.uowPerformer.perform((uow) => uow.groupRepository.save(group));
 
     const sizeOfChunk = 15;
     const chunksOfFormEstablishments = splitInChunks(

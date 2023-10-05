@@ -12,10 +12,8 @@ import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
 } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
-import {
-  seedSearchResults,
-  SimulatedSearchGateway,
-} from "src/core-logic/adapters/SearchGateway/SimulatedSearchGateway";
+import { seedSearchResults } from "src/core-logic/adapters/SearchGateway/simulatedSearchData";
+import { SimulatedSearchGateway } from "src/core-logic/adapters/SearchGateway/SimulatedSearchGateway";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 

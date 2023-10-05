@@ -1,7 +1,8 @@
 import { Observable } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
-  EstablishmentGroupSlug,
+  GroupSlug,
+  GroupWithResults,
   SearchQueryParamsDto,
   SearchResultDto,
   SiretAndAppellationDto,
@@ -14,8 +15,6 @@ export interface SearchGateway {
   contactEstablishment: (
     params: ContactEstablishmentRequestDto,
   ) => Promise<void | ContactErrorKind>;
-  getGroupSearchResultsBySlug(
-    groupSlug: EstablishmentGroupSlug,
-  ): Promise<SearchResultDto[]>;
+  getGroupBySlug(groupSlug: GroupSlug): Promise<GroupWithResults>;
   getSearchResult$(params: SiretAndAppellationDto): Observable<SearchResultDto>;
 }

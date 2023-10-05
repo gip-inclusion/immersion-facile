@@ -46,8 +46,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
   ): Promise<void> {
     if (!jwtPayload) throw new ForbiddenError();
 
-    const groupsWithSiret =
-      await uow.establishmentGroupRepository.groupsWithSiret(siret);
+    const groupsWithSiret = await uow.groupRepository.groupsWithSiret(siret);
 
     const groupsUpdatedWithoutSiret = groupsWithSiret.map((group) => ({
       ...group,
@@ -65,7 +64,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
       uow.establishmentAggregateRepository.delete(siret),
       uow.formEstablishmentRepository.delete(siret),
       ...groupsUpdatedWithoutSiret.map((group) =>
-        uow.establishmentGroupRepository.save(group),
+        uow.groupRepository.save(group),
       ),
       uow.deletedEstablishmentRepository.save({
         siret,
