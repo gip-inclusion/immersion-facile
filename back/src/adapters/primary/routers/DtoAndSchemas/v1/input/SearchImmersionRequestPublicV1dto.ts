@@ -16,9 +16,10 @@ export type SearchImmersionRequestPublicV1 = {
 export const searchImmersionRequestPublicV1ToDomain = (
   publicV1: SearchImmersionRequestPublicV1,
 ): SearchQueryParamsDto => {
-  const { distance_km, ...rest } = publicV1;
+  const { distance_km, appellationCode, ...rest } = publicV1;
   return {
     ...rest,
     distanceKm: distance_km,
+    appellationCodes: appellationCode ? [appellationCode] : undefined,
   };
 };

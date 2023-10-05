@@ -36,7 +36,7 @@ export class SearchImmersion extends TransactionalUseCase<
       latitude: lat,
       longitude: lon,
       place,
-      appellationCode,
+      appellationCodes,
       sortedBy,
       voluntaryToImmersion,
       rome,
@@ -44,6 +44,7 @@ export class SearchImmersion extends TransactionalUseCase<
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchResultDto[]> {
+    const appellationCode = appellationCodes && appellationCodes[0];
     const searchMade: SearchMade = {
       lat,
       lon,
@@ -51,6 +52,7 @@ export class SearchImmersion extends TransactionalUseCase<
       sortedBy,
       voluntaryToImmersion,
       place,
+      appellationCodes,
       appellationCode,
       romeCode: rome,
     };
