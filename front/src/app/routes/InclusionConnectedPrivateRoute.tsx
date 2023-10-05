@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Route } from "type-route";
-import { inclusionConnectImmersionTargets } from "shared";
+import { inclusionConnectImmersionRoutes } from "shared";
 import {
   InclusionConnectButton,
   LoginForm,
@@ -65,8 +65,8 @@ export const InclusionConnectedPrivateRoute = ({
                 authComponent: (
                   <InclusionConnectButton
                     inclusionConnectEndpoint={
-                      inclusionConnectImmersionTargets
-                        .startInclusionConnectLogin.url
+                      inclusionConnectImmersionRoutes.startInclusionConnectLogin
+                        .url
                     }
                   />
                 ),
