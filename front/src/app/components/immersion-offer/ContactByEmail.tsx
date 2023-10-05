@@ -21,7 +21,7 @@ import { useContactEstablishmentError } from "src/app/components/search/useConta
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
-import { immersionSearchGateway } from "src/config/dependencies";
+import { searchGateway } from "src/config/dependencies";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
@@ -98,7 +98,7 @@ export const ContactByEmail = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
-    const errorKind = await immersionSearchGateway.contactEstablishment({
+    const errorKind = await searchGateway.contactEstablishment({
       ...values,
       message: removeMotivationPlaceholder(values.message),
     });

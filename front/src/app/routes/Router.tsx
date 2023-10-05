@@ -32,10 +32,6 @@ import { ImmersionAssessmentPage } from "../pages/immersion-assessment/Immersion
 import { SearchResultPage } from "../pages/search/SearchResultPage";
 import { AdminTab, adminTabs } from "./routeParams/adminTabs";
 import {
-  AuthorizedGroupSlugs,
-  authorizedGroupSlugs,
-} from "./routeParams/establishmentGroups";
-import {
   StandardPageSlugs,
   standardPageSlugs,
 } from "./routeParams/standardPage";
@@ -79,14 +75,7 @@ const getPageByRouteName: {
   formEstablishmentForExternals: (route) => (
     <EstablishmentFormPageForExternals route={route} />
   ),
-  group: (route) =>
-    authorizedGroupSlugs.includes(
-      route.params.groupName as AuthorizedGroupSlugs,
-    ) ? (
-      <GroupPage route={route} />
-    ) : (
-      <ErrorPage type="httpClientNotFoundError" />
-    ),
+  group: (route) => <GroupPage route={route} />,
   home: () => <HomePage type="default" />,
   homeAgencies: () => <HomePage type="agency" />,
   homeCandidates: () => <HomePage type="candidate" />,

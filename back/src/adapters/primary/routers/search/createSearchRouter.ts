@@ -24,8 +24,8 @@ export const createSearchRouter = (deps: AppDependencies) => {
     ),
   );
 
-  expressSharedRouter.getOffersByGroupSlug(async (req, res) =>
-    sendHttpResponse(req, res, async () =>
+  expressSharedRouter.getGroupBySlug(async (req, res) =>
+    sendHttpResponse(req, res, () =>
       deps.useCases.getOffersByGroupSlug.execute(req.params),
     ),
   );

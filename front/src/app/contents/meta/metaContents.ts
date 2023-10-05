@@ -1,5 +1,5 @@
+import { GroupName } from "shared";
 import { AdminTab } from "src/app/routes/routeParams/adminTabs";
-import { AuthorizedGroupSlugs } from "src/app/routes/routeParams/establishmentGroups";
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { routes } from "src/app/routes/routes";
 
@@ -148,9 +148,7 @@ export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
   },
 };
 
-export const groupMetaContent = (
-  groupName: AuthorizedGroupSlugs,
-): MetaContentType => ({
+export const groupMetaContent = (groupName: GroupName): MetaContentType => ({
   title: `${groupName} - toutes les immersions`,
   description: `Toutes les immersions proposées par ${groupName}`,
 });

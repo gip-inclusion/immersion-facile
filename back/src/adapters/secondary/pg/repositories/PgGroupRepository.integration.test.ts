@@ -9,20 +9,20 @@ import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establi
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { EstablishmentEntity } from "../../../../domain/offer/entities/EstablishmentEntity";
-import { EstablishmentGroupEntity } from "../../../../domain/offer/entities/EstablishmentGroupEntity";
+import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
-import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
+import { PgGroupRepository } from "./PgGroupRepository";
 
 const siret1 = "11112222111122";
 const siret2 = "33334444333344";
-const carrefourGroup: EstablishmentGroupEntity = {
+const carrefourGroup: GroupEntity = {
   slug: "carrefour",
   name: "Carrefour",
   sirets: [siret1, siret2],
 };
 
-const laMieCalineGroup: EstablishmentGroupEntity = {
+const laMieCalineGroup: GroupEntity = {
   slug: "l-amie-caline",
   name: "L'amie caline",
   sirets: [],
@@ -31,7 +31,7 @@ const laMieCalineGroup: EstablishmentGroupEntity = {
 describe("PgEstablishmentGroupRepository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let pgEstablishmentGroupRepository: PgEstablishmentGroupRepository;
+  let pgEstablishmentGroupRepository: PgGroupRepository;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
 
   beforeAll(async () => {
@@ -41,9 +41,7 @@ describe("PgEstablishmentGroupRepository", () => {
 
   beforeEach(async () => {
     const transaction = makeKyselyDb(pool);
-    pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(
-      transaction,
-    );
+    pgEstablishmentGroupRepository = new PgGroupRepository(transaction);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       transaction,
     );
@@ -75,7 +73,7 @@ describe("PgEstablishmentGroupRepository", () => {
 
   it("updates the group when one with the same slug already exists", async () => {
     await pgEstablishmentGroupRepository.save(carrefourGroup);
-    const updatedGroup: EstablishmentGroupEntity = {
+    const updatedGroup: GroupEntity = {
       slug: carrefourGroup.slug,
       name: carrefourGroup.name,
       sirets: ["55556666555566", "77778888777788"],
@@ -135,7 +133,7 @@ describe("PgEstablishmentGroupRepository", () => {
     const { establishment: establishment2 } = establishmentAggregate2;
 
     const searchImmersionResults =
-      await pgEstablishmentGroupRepository.findSearchImmersionResultsBySlug(
+      await pgEstablishmentGroupRepository.findSearchResultsBySlug(
         carrefourGroup.slug,
       );
 
@@ -208,19 +206,19 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   describe("groupsWithSiret", () => {
-    const group1WithSiret1: EstablishmentGroupEntity = {
+    const group1WithSiret1: GroupEntity = {
       name: "group1",
       sirets: [siret1],
       slug: "group1",
     };
 
-    const group2WithSiret1: EstablishmentGroupEntity = {
+    const group2WithSiret1: GroupEntity = {
       name: "group2",
       sirets: [siret1],
       slug: "group2",
     };
 
-    const group3WithoutSiret1: EstablishmentGroupEntity = {
+    const group3WithoutSiret1: GroupEntity = {
       name: "group3",
       sirets: ["another-siret"],
       slug: "group3",

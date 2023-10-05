@@ -10,7 +10,7 @@ export const frontRoutes = {
   editFormEstablishmentRoute: "edition-etablissement",
   error: "error",
   establishment: "establishment",
-  group: "enseigne",
+  group: "groupe",
   homeAgencies: "accueil-prescripteurs",
   homeCandidates: "accueil-beneficiaires",
   homeEstablishments: "accueil-entreprises",

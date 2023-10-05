@@ -1,7 +1,8 @@
 import { Observable, Subject } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
-  EstablishmentGroupSlug,
+  GroupSlug,
+  GroupWithResults,
   SearchQueryParamsDto,
   SearchResultDto,
   SiretAndAppellationDto,
@@ -23,9 +24,7 @@ export class TestSearchGateway implements SearchGateway {
     throw new Error("Method not implemented.");
   }
 
-  public getGroupSearchResultsBySlug(
-    _groupSlug: EstablishmentGroupSlug,
-  ): Promise<SearchResultDto[]> {
+  public getGroupBySlug(_groupSlug: GroupSlug): Promise<GroupWithResults> {
     throw new Error("Method not implemented.");
   }
 

@@ -1,5 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
+import { groupWithResultsSchema } from "../group/group.schema";
 import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
 import {
   contactEstablishmentRoute,
@@ -12,10 +13,10 @@ import { searchResultSchema, searchResultsSchema } from "./SearchResult.schema";
 
 export type SearchRoutes = typeof searchImmersionRoutes;
 export const searchImmersionRoutes = defineRoutes({
-  getOffersByGroupSlug: defineRoute({
+  getGroupBySlug: defineRoute({
     method: "get",
-    url: `/group-offers/:groupSlug`,
-    responses: { 200: searchResultsSchema },
+    url: `/groups/:groupSlug`,
+    responses: { 200: groupWithResultsSchema },
   }),
   search: defineRoute({
     method: "get",

@@ -25,7 +25,7 @@ import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRe
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryEstablishmentGroupRepository } from "../../secondary/offer/InMemoryEstablishmentGroupRepository";
+import { InMemoryGroupRepository } from "../../secondary/offer/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/offer/InMemorySearchMadeRepository";
 import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
@@ -41,9 +41,9 @@ import { PgDeletedEstablishmentRepository } from "../../secondary/pg/repositorie
 import { PgDiscussionAggregateRepository } from "../../secondary/pg/repositories/PgDiscussionAggregateRepository";
 import { PgErrorRepository } from "../../secondary/pg/repositories/PgErrorRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/repositories/PgEstablishmentAggregateRepository";
-import { PgEstablishmentGroupRepository } from "../../secondary/pg/repositories/PgEstablishmentGroupRepository";
 import { PgFeatureFlagRepository } from "../../secondary/pg/repositories/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/repositories/PgFormEstablishmentRepository";
+import { PgGroupRepository } from "../../secondary/pg/repositories/PgGroupRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/repositories/PgImmersionAssessmentRepository";
 import { PgInclusionConnectedUserRepository } from "../../secondary/pg/repositories/PgInclusionConnectedUserRepository";
 import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNotificationRepository";
@@ -82,7 +82,7 @@ export const createInMemoryUow = () => {
     discussionAggregateRepository: new InMemoryDiscussionAggregateRepository(),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
-    establishmentGroupRepository: new InMemoryEstablishmentGroupRepository(),
+    groupRepository: new InMemoryGroupRepository(),
     errorRepository: new InMemoryErrorRepository(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
@@ -128,9 +128,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       transaction,
     ),
-    establishmentGroupRepository: new PgEstablishmentGroupRepository(
-      transaction,
-    ),
+    groupRepository: new PgGroupRepository(transaction),
     featureFlagRepository: new PgFeatureFlagRepository(transaction),
     formEstablishmentRepository: new PgFormEstablishmentRepository(transaction),
     immersionAssessmentRepository: new PgImmersionAssessmentRepository(

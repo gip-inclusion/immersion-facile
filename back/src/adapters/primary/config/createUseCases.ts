@@ -72,7 +72,7 @@ import { ContactEstablishment } from "../../../domain/offer/useCases/ContactEsta
 import { DeleteEstablishment } from "../../../domain/offer/useCases/DeleteEstablishment";
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/offer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/offer/useCases/EditFormEstablishment";
-import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetOffersByGroupSlug";
+import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupBySlug";
 import { GetSearchResultBySiretAndRome } from "../../../domain/offer/useCases/GetSearchResultById";
 import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";

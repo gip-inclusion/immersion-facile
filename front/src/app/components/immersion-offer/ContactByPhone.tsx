@@ -17,7 +17,7 @@ import { useContactEstablishmentError } from "src/app/components/search/useConta
 import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
-import { immersionSearchGateway } from "src/config/dependencies";
+import { searchGateway } from "src/config/dependencies";
 
 type ContactByPhoneProps = {
   siret: SiretDto;
@@ -65,7 +65,7 @@ export const ContactByPhone = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByPhoneDto) => {
-    const errorKind = await immersionSearchGateway.contactEstablishment(values);
+    const errorKind = await searchGateway.contactEstablishment(values);
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };

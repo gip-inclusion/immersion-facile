@@ -1,7 +1,7 @@
 import format from "pg-format";
-import { EstablishmentGroupSlug, SearchResultDto, SiretDto } from "shared";
-import { EstablishmentGroupEntity } from "../../../../domain/offer/entities/EstablishmentGroupEntity";
-import { EstablishmentGroupRepository } from "../../../../domain/offer/ports/EstablishmentGroupRepository";
+import { GroupSlug, SearchResultDto, SiretDto } from "shared";
+import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
+import { GroupRepository } from "../../../../domain/offer/ports/GroupRepository";
 import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
 const buildAppellationsArray = `JSON_AGG(
@@ -12,13 +12,11 @@ const buildAppellationsArray = `JSON_AGG(
     ORDER BY ogr_appellation
   )`;
 
-export class PgEstablishmentGroupRepository
-  implements EstablishmentGroupRepository
-{
+export class PgGroupRepository implements GroupRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async findSearchImmersionResultsBySlug(
-    slug: EstablishmentGroupSlug,
+  public async findSearchResultsBySlug(
+    slug: GroupSlug,
   ): Promise<SearchResultDto[]> {
     const response = await executeKyselyRawSqlQuery(
       this.transaction,
@@ -65,9 +63,7 @@ export class PgEstablishmentGroupRepository
     return response.rows.map((row) => row.search_result_dto);
   }
 
-  public async groupsWithSiret(
-    siret: SiretDto,
-  ): Promise<EstablishmentGroupEntity[]> {
+  public async groupsWithSiret(siret: SiretDto): Promise<GroupEntity[]> {
     const { rows } = await executeKyselyRawSqlQuery<{
       slug: string;
       name: string;
@@ -94,11 +90,11 @@ export class PgEstablishmentGroupRepository
           name: row.name,
           sirets: row.sirets,
           slug: row.slug,
-        } satisfies EstablishmentGroupEntity),
+        } satisfies GroupEntity),
     );
   }
 
-  public async save(group: EstablishmentGroupEntity): Promise<void> {
+  public async save(group: GroupEntity): Promise<void> {
     const { rows } = await executeKyselyRawSqlQuery(
       this.transaction,
       `SELECT * FROM establishment_groups WHERE slug = $1`,
@@ -120,7 +116,7 @@ export class PgEstablishmentGroupRepository
     }
   }
 
-  async #insertEstablishmentGroupSirets(group: EstablishmentGroupEntity) {
+  async #insertEstablishmentGroupSirets(group: GroupEntity) {
     if (!group.sirets.length) return;
     const groupAndSiretPairs: [string, SiretDto][] = group.sirets.map(
       (siret) => [group.slug, siret],
@@ -135,7 +131,7 @@ export class PgEstablishmentGroupRepository
     );
   }
 
-  async #clearExistingSiretsForGroup(groupSlug: EstablishmentGroupSlug) {
+  async #clearExistingSiretsForGroup(groupSlug: GroupSlug) {
     await executeKyselyRawSqlQuery(
       this.transaction,
       `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
