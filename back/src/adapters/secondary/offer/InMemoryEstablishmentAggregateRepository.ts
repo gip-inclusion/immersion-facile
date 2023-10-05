@@ -44,6 +44,17 @@ export class InMemoryEstablishmentAggregateRepository
     this.#establishmentAggregates.splice(formEstablishmentIndex, 1);
   }
 
+  // for test purposes only :
+  public get establishmentAggregates() {
+    return this.#establishmentAggregates;
+  }
+
+  public set establishmentAggregates(
+    establishmentAggregates: EstablishmentAggregate[],
+  ) {
+    this.#establishmentAggregates = establishmentAggregates;
+  }
+
   public async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
@@ -168,7 +179,7 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async searchImmersionResults({
-    searchMade: { lat, lon, appellationCode },
+    searchMade: { lat, lon, appellationCodes },
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this.#establishmentAggregates
@@ -177,7 +188,8 @@ export class InMemoryEstablishmentAggregateRepository
         uniqBy((offer) => offer.romeCode, aggregate.offers)
           .filter(
             (offer) =>
-              !appellationCode || appellationCode === offer.appellationCode,
+              !appellationCodes ||
+              appellationCodes.includes(offer.appellationCode),
           )
           .map((offer) =>
             buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
@@ -248,17 +260,6 @@ export class InMemoryEstablishmentAggregateRepository
           : aggregate;
       },
     );
-  }
-
-  // for test purposes only :
-  public get establishmentAggregates() {
-    return this.#establishmentAggregates;
-  }
-
-  public set establishmentAggregates(
-    establishmentAggregates: EstablishmentAggregate[],
-  ) {
-    this.#establishmentAggregates = establishmentAggregates;
   }
 }
 
