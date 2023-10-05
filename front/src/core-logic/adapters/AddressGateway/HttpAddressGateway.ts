@@ -1,18 +1,15 @@
 import { from, Observable } from "rxjs";
 import {
   AddressAndPosition,
-  addressAndPositionListSchema,
-  AddressTargets,
+  AddressRoutes,
   LookupLocationInput,
   LookupSearchResult,
-  lookupSearchResultsSchema,
-  withLookupStreetAddressQueryParamsSchema,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export class HttpAddressGateway implements AddressGateway {
-  constructor(private readonly httpClient: HttpClient<AddressTargets>) {}
+  constructor(private readonly httpClient: HttpClient<AddressRoutes>) {}
 
   public lookupLocation$(
     query: LookupLocationInput,
@@ -24,11 +21,12 @@ export class HttpAddressGateway implements AddressGateway {
     lookup: string,
   ): Promise<AddressAndPosition[]> {
     const response = await this.httpClient.lookupStreetAddress({
-      queryParams: withLookupStreetAddressQueryParamsSchema.parse({
+      queryParams: {
         lookup,
-      }),
+      },
     });
-    return addressAndPositionListSchema.parse(response.responseBody);
+    if (response.status === 200) return response.body;
+    throw new Error(JSON.stringify(response));
   }
 
   async #lookupLocation(
@@ -39,6 +37,7 @@ export class HttpAddressGateway implements AddressGateway {
         query,
       },
     });
-    return lookupSearchResultsSchema.parse(response.responseBody);
+    if (response.status === 200) return response.body;
+    throw new Error(JSON.stringify(response));
   }
 }

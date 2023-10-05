@@ -39,19 +39,20 @@ export const lookupStreetAddressQueryMinLength = 2;
 export const lookupStreetAddressQueryMaxWordLength = 18;
 
 export const lookupStreetAddressSpecialCharsRegex =
-  /[&/\\#,+()&$~%€.":`*?<>{}]|[{d}\s,]/g;
+  /[&/\\#,+()&$~%€.":`*?<>{}⠀]|[{d}\s,]/g;
 export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddressQueryParams> =
   z.object({
     lookup: z
       .string()
       .min(lookupStreetAddressQueryMinLength)
       .trim()
-      .refine(
-        (arg) =>
-          arg.replace(lookupStreetAddressSpecialCharsRegex, "").length >=
-          lookupStreetAddressQueryMinLength,
-        "String must contain at least 2 character(s), excluding special chars",
-      )
+      .refine((arg) => {
+        const withoutSpecialChars = arg.replace(
+          lookupStreetAddressSpecialCharsRegex,
+          "",
+        );
+        return withoutSpecialChars.length >= lookupStreetAddressQueryMinLength;
+      }, "String must contain at least 2 character(s), excluding special chars")
       .refine(
         (arg) => arg.split(" ").length <= lookupStreetAddressQueryMaxWordLength,
         "String must contain a maximum of 18 words",
