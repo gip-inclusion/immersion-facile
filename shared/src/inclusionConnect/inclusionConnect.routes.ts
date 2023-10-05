@@ -1,19 +1,26 @@
-import { createTarget, createTargets } from "http-client";
-import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { z } from "zod";
+import { defineRoute, defineRoutes } from "shared-routes";
 import { authenticateWithInclusionCodeSchema } from "./inclusionConnect.schema";
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
 
-export const inclusionConnectImmersionTargets = createTargets({
-  startInclusionConnectLogin: createTarget({
-    method: "GET",
+export type InclusionConnectImmersionRoutes =
+  typeof inclusionConnectImmersionRoutes;
+export const inclusionConnectImmersionRoutes = defineRoutes({
+  startInclusionConnectLogin: defineRoute({
+    method: "get",
     url: "/inclusion-connect-start-login",
-    validateResponseBody: absoluteUrlSchema.parse,
+    responses: {
+      302: z.object({}),
+    },
   }),
-  afterLoginRedirection: createTarget({
-    method: "GET",
+  afterLoginRedirection: defineRoute({
+    method: "get",
     url: "/inclusion-connect-after-login",
-    validateQueryParams: authenticateWithInclusionCodeSchema.parse,
+    queryParamsSchema: authenticateWithInclusionCodeSchema,
+    responses: {
+      302: z.object({}),
+    },
   }),
 });
 

@@ -1,16 +1,21 @@
+import { SuperTest, Test } from "supertest";
 import {
   AbsoluteUrl,
   AuthenticateWithInclusionCodeConnectParams,
   decodeJwtWithoutSignatureCheck,
+  expectHttpResponseToEqual,
   frontRoutes,
-  inclusionConnectImmersionTargets,
-  queryParamsAsString,
+  InclusionConnectImmersionRoutes,
+  inclusionConnectImmersionRoutes,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
-  TestAppAndDeps,
+  InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import { UuidGenerator } from "../../../../domain/core/ports/UuidGenerator";
 import {
   defaultInclusionAccessTokenResponse,
   jwtGeneratedTokenFromFakeInclusionPayload,
@@ -27,11 +32,14 @@ const inclusionConnectBaseUri: AbsoluteUrl =
   "http://fake-inclusion-connect-uri.com";
 
 describe("inclusion connection flow", () => {
-  let testAppAndDeps: TestAppAndDeps;
+  let httpClient: HttpClient<InclusionConnectImmersionRoutes>;
+  let uuidGenerator: UuidGenerator;
+  let gateways: InMemoryGateways;
 
   describe("Right path", () => {
     it("does successfully the complete inclusion connect flow", async () => {
-      testAppAndDeps = await buildTestApp(
+      let request: SuperTest<Test>;
+      ({ uuidGenerator, gateways, request } = await buildTestApp(
         new AppConfigBuilder({
           INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
           INCLUSION_CONNECT_CLIENT_SECRET: clientSecret,
@@ -39,6 +47,10 @@ describe("inclusion connection flow", () => {
           INCLUSION_CONNECT_BASE_URI: inclusionConnectBaseUri,
           DOMAIN: domain,
         }).build(),
+      ));
+      httpClient = createSupertestSharedClient(
+        inclusionConnectImmersionRoutes,
+        request,
       );
 
       await expectTriggeringInclusionConnectFlowToRedirectToCorrectUrl();
@@ -48,30 +60,30 @@ describe("inclusion connection flow", () => {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, jest/no-disabled-tests
-  describe.skip("Wrong path", () => {});
+  describe.skip("Wrong path 🤪", () => {});
 
   const expectTriggeringInclusionConnectFlowToRedirectToCorrectUrl =
     async () => {
       const uuids = [nonce, state];
-      testAppAndDeps.uuidGenerator.new = () =>
-        uuids.shift() ?? "no-uuid-provided";
+      uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
-      const response = await testAppAndDeps.request.get(
-        inclusionConnectImmersionTargets.startInclusionConnectLogin.url,
-      );
+      const response = await httpClient.startInclusionConnectLogin();
 
-      expect(response.status).toBe(302);
-      expect(response.header).toMatchObject({
-        location: encodeURI(
-          `${inclusionConnectBaseUri}/auth?${[
-            `client_id=${clientId}`,
-            `nonce=${nonce}`,
-            `redirect_uri=https://${domain}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
-            `response_type=${responseType}`,
-            `scope=${scope}`,
-            `state=${state}`,
-          ].join("&")}`,
-        ),
+      expectHttpResponseToEqual(response, {
+        body: {},
+        status: 302,
+        headers: {
+          location: encodeURI(
+            `${inclusionConnectBaseUri}/auth?${[
+              `client_id=${clientId}`,
+              `nonce=${nonce}`,
+              `redirect_uri=https://${domain}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
+              `response_type=${responseType}`,
+              `scope=${scope}`,
+              `state=${state}`,
+            ].join("&")}`,
+          ),
+        },
       });
     };
 
@@ -79,29 +91,29 @@ describe("inclusion connection flow", () => {
     params: AuthenticateWithInclusionCodeConnectParams,
   ) => {
     const inclusionToken = "inclusion-token";
-    testAppAndDeps.gateways.inclusionConnectGateway.setAccessTokenResponse({
+    gateways.inclusionConnectGateway.setAccessTokenResponse({
       ...defaultInclusionAccessTokenResponse,
       access_token: inclusionToken,
       id_token: jwtGeneratedTokenFromFakeInclusionPayload,
     });
-    const response = await testAppAndDeps.request.get(
-      `${
-        inclusionConnectImmersionTargets.afterLoginRedirection.url
-      }?${queryParamsAsString(params)}`,
-    );
+    const response = await httpClient.afterLoginRedirection({
+      queryParams: params,
+    });
 
-    expect(response.status).toBe(302);
-    expect(response.header.location).toContain(
-      `https://${domain}/${frontRoutes.agencyDashboard}?token=`,
-    );
+    expectHttpResponseToEqual(response, {
+      body: {},
+      status: 302,
+    });
 
-    const token = response.header.location.replace(
-      `https://${domain}/${frontRoutes.agencyDashboard}?token=`,
-      "",
-    );
+    if (response.status !== 302) throw new Error("Response must be 302");
+    const locationHeader = response.headers.location as string;
+    const locationPrefix = `https://${domain}/${frontRoutes.agencyDashboard}?token=`;
 
+    expect(locationHeader).toContain(locationPrefix);
     expect(
-      typeof decodeJwtWithoutSignatureCheck<{ userId: string }>(token).userId,
+      typeof decodeJwtWithoutSignatureCheck<{ userId: string }>(
+        locationHeader.replace(locationPrefix, ""),
+      ).userId,
     ).toBe("string");
   };
 });

@@ -3,7 +3,7 @@ import { trim } from "ramda";
 import {
   AbsoluteUrl,
   filterNotFalsy,
-  inclusionConnectImmersionTargets,
+  inclusionConnectImmersionRoutes,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefinedOrDefault,
@@ -209,7 +209,7 @@ export class AppConfig {
           clientSecret: this.#throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_CLIENT_SECRET",
           ),
-          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
+          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
           inclusionConnectBaseUri: this.#throwIfNotAbsoluteUrl(
             "INCLUSION_CONNECT_BASE_URI",
           ),
@@ -224,7 +224,7 @@ export class AppConfig {
             "INCLUSION_CONNECT_CLIENT_SECRET",
             "fake secret",
           ),
-          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
+          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
           inclusionConnectBaseUri: this.#throwIfNotDefinedOrDefault(
             "INCLUSION_CONNECT_BASE_URI",
             "https://fake.url",
