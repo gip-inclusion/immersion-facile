@@ -96,12 +96,12 @@ describe("PgEstablishmentAggregateRepository", () => {
     await pool.end();
   });
 
-  describe("Pg implementation of method searchImmersionResults", () => {
+  describe("searchImmersionResults", () => {
     const searchedPosition = { lat: 49, lon: 6 };
     const notMatchingRome = "B1805";
     const farFromSearchedPosition = { lat: 32, lon: 89 };
     const cartographeSearchMade: SearchMade = {
-      appellationCode: cartographeImmersionOffer.appellationCode,
+      appellationCodes: [cartographeImmersionOffer.appellationCode],
       ...searchedPosition,
       distanceKm: 30,
       sortedBy: "distance",
@@ -432,12 +432,12 @@ describe("PgEstablishmentAggregateRepository", () => {
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
         siret: closeSiret,
-        appellationCode: cartographeSearchMade.appellationCode!,
+        appellationCode: cartographeSearchMade.appellationCodes![0],
       });
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
         siret: farSiret,
-        appellationCode: cartographeSearchMade.appellationCode!,
+        appellationCode: cartographeSearchMade.appellationCodes![0],
       });
       // Act
       const searchResult =
@@ -471,13 +471,13 @@ describe("PgEstablishmentAggregateRepository", () => {
       await Promise.all([
         insertImmersionOffer(client, {
           romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCode!,
+          appellationCode: cartographeSearchMade.appellationCodes![0],
           siret: recentOfferSiret,
           offerCreatedAt: new Date("2022-05-05"),
         }),
         insertImmersionOffer(client, {
           romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCode!,
+          appellationCode: cartographeSearchMade.appellationCodes![0],
           siret: oldOfferSiret,
           offerCreatedAt: new Date("2022-05-02"),
         }),
@@ -493,9 +493,60 @@ describe("PgEstablishmentAggregateRepository", () => {
       expect(searchResult[0].siret).toEqual(recentOfferSiret);
       expect(searchResult[1].siret).toEqual(oldOfferSiret);
     });
+
+    it("when multiple appellationCodes, returns the two related immersion-offers", async () => {
+      // Prepare : establishment in geographical area but not active
+      const establishmentSiret1 = "99000403200029";
+      const establishmentSiret2 = "11000403200029";
+
+      await Promise.all([
+        insertEstablishment(client, {
+          siret: establishmentSiret1,
+          position: searchedPosition,
+          createdAt: new Date(),
+        }),
+        insertEstablishment(client, {
+          siret: establishmentSiret2,
+          position: searchedPosition,
+          createdAt: new Date(),
+        }),
+      ]);
+
+      await Promise.all([
+        insertImmersionOffer(client, {
+          romeCode: cartographeImmersionOffer.romeCode,
+          appellationCode: cartographeImmersionOffer.appellationCode,
+          siret: establishmentSiret1,
+          offerCreatedAt: new Date("2022-05-05"),
+        }),
+        insertImmersionOffer(client, {
+          romeCode: analysteEnGeomatiqueImmersionOffer.romeCode,
+          appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
+          siret: establishmentSiret2,
+          offerCreatedAt: new Date("2022-05-02"),
+        }),
+      ]);
+
+      // Act
+      const searchResult =
+        await pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            ...cartographeSearchMade,
+            sortedBy: "date",
+            appellationCodes: [
+              cartographeImmersionOffer.appellationCode,
+              analysteEnGeomatiqueImmersionOffer.appellationCode,
+            ],
+          },
+        });
+
+      // Assert
+      expect(searchResult[0].siret).toEqual(establishmentSiret1);
+      expect(searchResult[1].siret).toEqual(establishmentSiret2);
+    });
   });
 
-  describe("Pg implementation of method updateEstablishment", () => {
+  describe("updateEstablishment", () => {
     const position = { lon: 2, lat: 3 };
 
     it("Updates the parameter `updatedAt`, `fitForDisabledWorkers` and `isActive if given", async () => {
@@ -586,7 +637,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("pg implementation of method insertEstablishmentAggregates", () => {
+  describe("insertEstablishmentAggregates", () => {
     const siret1 = "11111111111111";
     const siret2 = "22222222222222";
 
@@ -743,7 +794,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("Pg implementation of method hasEstablishmentFromFormWithSiret", () => {
+  describe("hasEstablishmentFromFormWithSiret", () => {
     const siret = "12345678901234";
 
     it("returns false if no establishment from form with given siret exists", async () => {
@@ -770,7 +821,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("Pg implementation of method getSiretsOfEstablishmentsWithRomeCode", () => {
+  describe("getSiretsOfEstablishmentsWithRomeCode", () => {
     it("Returns a list of establishment sirets that have an offer with given rome", async () => {
       // Prepare
       const romeCode = "A1101";
@@ -799,7 +850,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("Pg implementation of method delete", () => {
+  describe("delete", () => {
     it("Throws on missing establishment", async () => {
       const siretNotInTable = "11111111111111";
 
@@ -889,7 +940,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("Pg implementation of method  getOffersAsAppelationDtoForFormEstablishment", () => {
+  describe("getOffersAsAppelationDtoForFormEstablishment", () => {
     const siretInTable = "12345678901234";
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siretInTable)
@@ -951,7 +1002,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("Pg implementation of method getSearchImmersionResultDtoBySiretAndAppellation", () => {
+  describe("getSearchImmersionResultDtoBySiretAndAppellation", () => {
     it("Returns undefined when no matching establishment or appellation code", async () => {
       const siretNotInTable = "11111111111111";
 
@@ -1032,7 +1083,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("Pg implementation of method getSearchImmersionResultDtoBySiretAndRome", () => {
+  describe("getSearchImmersionResultDtoBySiretAndRome", () => {
     it("Returns undefined when no matching establishment", async () => {
       const siretNotInTable = "11111111111111";
 

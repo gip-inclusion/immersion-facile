@@ -405,9 +405,9 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
-    const romeCode =
+    const romeCodes =
       searchMade.romeCode ??
-      (await this.#getRomeCodeFromAppellationCode(searchMade.appellationCode));
+      (await this.#getRomeCodeFromAppellationCode(searchMade.appellationCodes));
 
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
@@ -426,12 +426,12 @@ export class PgEstablishmentAggregateRepository
             LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
             LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
             LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-            ${romeCode ? "WHERE rome_code = %1$L" : ""}
+            ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
             GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
           )
         SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
         LIMIT $3`,
-      romeCode,
+      romeCodes,
     ); // Formats optional litterals %1$L
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -764,25 +764,30 @@ export class PgEstablishmentAggregateRepository
   }
 
   async #getRomeCodeFromAppellationCode(
-    appellationCode: AppellationCode | undefined,
-  ): Promise<RomeCode | undefined> {
-    if (!appellationCode) return;
+    appellationCodes: AppellationCode[] | undefined,
+  ): Promise<RomeCode[] | undefined> {
+    if (!appellationCodes) return;
 
     const result = await executeKyselyRawSqlQuery(
       this.transaction,
-      `SELECT code_rome
+      format(
+        `SELECT code_rome
         from public_appellations_data
-        where ogr_appellation = $1`,
-      [appellationCode],
+        where ogr_appellation in (%L)`,
+        appellationCodes,
+      ),
     );
 
-    const romeCode: RomeCode | undefined = result.rows[0]?.code_rome;
-    if (!romeCode)
+    const romeCodes: RomeCode[] | undefined =
+      result.rows.length > 0
+        ? result.rows.map(({ code_rome }) => code_rome)
+        : undefined;
+    if (!romeCodes)
       throw new Error(
-        `No Rome code found for appellation code ${appellationCode}`,
+        `No Rome code found for appellation codes ${appellationCodes}`,
       );
 
-    return romeCode;
+    return romeCodes;
   }
 
   async #updateImmersionOffersFromAggregates(
