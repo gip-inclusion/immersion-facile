@@ -2,7 +2,7 @@ import { immersionFacileContactEmail } from "shared";
 
 export default {
   title: "Mentions légales",
-  content: `<strong>Editeur de la Plateforme</strong>
+  content: `<strong>Éditeur de la Plateforme</strong>
   La Plateforme « Immersion Facilitée » est éditée par :
 
   Le Groupement d’intérêt public « Plateforme de l’inclusion » situé : 

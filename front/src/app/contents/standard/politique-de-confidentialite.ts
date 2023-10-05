@@ -36,11 +36,11 @@ Cette mission d’intérêt public ou relevant de l’exercice de l’autorité 
 
 Données relatives au formulaire de demande d’immersion professionnelle:
 
-• Si la personne concernée a signé une convention d’immersion professionnelle, <strong>dans un délai de 5 ans</strong> à compter de la signature de la convention ou de l’accord d’immersion professionnelle avec l’entreprise partenaire.
+• Si la personne concernée a signé une convention d’immersion professionnelle, <strong>dans un délai de 5 ans (durée de conservation)</strong> à compter de la signature de la convention ou de l’accord d’immersion professionnelle avec l’entreprise partenaire.
 
-• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse positive du prescripteur, durant toute la durée de la recherche d’immersion professionnelle, et <strong>dans un délai de 2 ans après la dernière recherche</strong>
+• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse positive du prescripteur, durant toute la durée de la recherche d’immersion professionnelle, et <strong>dans un délai de 2 ans après la dernière recherche (durée de conservation)</strong>
 
-• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse négative du prescripteur, <strong>dans un délai de 2 ans à compter du refus</strong> de la demande d’immersion professionnelle. 
+• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse négative du prescripteur, <strong>dans un délai de 2 ans à compter du refus (durée de conservation)</strong> de la demande d’immersion professionnelle. 
 
 Données relatives aux représentants des entreprises structures d’accueil de l’immersion, signataires de la convention y compris les tuteurs ou tutrices des structures d’accueil d’immersion:
 
