@@ -51,7 +51,7 @@ type ConventionDocumentPageProps = {
 
 type FormattedScheduleByWeek = {
   formattedHours: string;
-  formattedDaySchedules: string[];
+  formattedDaySchedules: string;
 }[];
 
 const formatSchedule = (convention: ConventionReadDto) => {
@@ -65,22 +65,27 @@ const formatSchedule = (convention: ConventionReadDto) => {
       if (line.includes("Heures de travail hebdomadaires : ")) {
         scheduleByWeek.push({
           formattedHours: line,
-          formattedDaySchedules: [],
+          formattedDaySchedules: "",
         });
       } else {
         const lastWeek = scheduleByWeek[scheduleByWeek.length - 1];
-        lastWeek.formattedDaySchedules.push(line);
+        lastWeek.formattedDaySchedules =
+          lastWeek.formattedDaySchedules.length > 0
+            ? `${lastWeek.formattedDaySchedules}, ${line}`
+            : line;
       }
     });
 
-  return scheduleByWeek.map((schedule) => (
-    <ul key={schedule.formattedHours}>
-      {schedule.formattedHours}
-      {schedule.formattedDaySchedules.map((day) => (
-        <li key={day}>{day}</li>
+  return (
+    <ul>
+      {scheduleByWeek.map((schedule) => (
+        <li key={schedule.formattedHours}>
+          <div>{schedule.formattedHours}</div>
+          <div>{schedule.formattedDaySchedules}</div>
+        </li>
       ))}
     </ul>
-  ));
+  );
 };
 
 export const ConventionDocumentPage = ({
