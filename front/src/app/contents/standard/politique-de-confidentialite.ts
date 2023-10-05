@@ -1,5 +1,3 @@
-import { immersionFacileContactEmail } from "shared";
-
 export default {
   title: "Politique de confidentialité Immersion Facilitée",
   content: `
@@ -8,7 +6,7 @@ export default {
 
 Immersion Facilitée est développée par le GIP Plateforme de l’inclusion représenté par Monsieur Arnaud Denoix, Directeur du GIP de l’inclusion.
 
-<strong>Pourquoi manipulons-nous ces données ?</strong>
+<strong>Pourquoi traitons-nous ces données ?</strong>
 
 Immersion Facilitée a pour objectif de faciliter les immersions professionnelles, celles-ci étant un levier puissant d’accompagnement à l’emploi.
 
@@ -17,13 +15,13 @@ Elle peut traiter des données à caractère personnel pour les finalités suiva
 • Construire et développer une base entreprises immersions contenant les entreprises volontaires pour accueillir les personnes ;
 • Aider et faciliter la tâche des prescripteurs dans la décision et le suivi des personnes.
 
-<strong>Quelles sont les données que nous manipulons ?</strong>
+<strong>Quelles sont les données que nous traitons ?</strong>
 
 La plateforme Immersion Facilitée peut traiter les données à caractère personnel suivantes :
 
 • Données relatives au formulaire de demande d’immersion (nom, prénom, numéro de téléphone) ;
 
-• Données relatives aux représentants des entreprises structures d’accueil de l’immersion, signataires de la convention et aux tuteurs ou tutrices des structures d’accueil d’immersion (nom, prénom, fonction du tuteur, adresse e-mail, téléphone professionnel). Ces données sont susceptibles d'être partagées avec la Mission Interministérielle pour l'Apprentissage et le Groupement d’Intérêt Public Les entreprises s’engagent à des fins de proposition de recueil d’offres de recrutement en alternance ou d’actions pour renforcer l’inclusion dans les entreprises ;
+• Données relatives aux représentants des entreprises structures d’accueil de l’immersion, signataires de la convention y compris les tuteurs ou tutrices des structures d’accueil d’immersion (nom, prénom, fonctions, adresse e-mail, téléphone professionnel). Ces données sont susceptibles d'être partagées avec la « Mission interministérielle pour l’apprentissage » et le Groupement d’Intérêt Public « Les Entreprises s’engagent » à des fins de proposition de recueil d’offres de recrutement en alternance ou d’actions pour renforcer l’inclusion dans les entreprises ;
 
 • Données d’identification Pôle Emploi (nom, date de naissance).
 
@@ -38,13 +36,13 @@ Cette mission d’intérêt public ou relevant de l’exercice de l’autorité 
 
 Données relatives au formulaire de demande d’immersion professionnelle:
 
-• Si la personne concernée a signé une convention d’immersion professionnelle, <strong>dans un délai de 5 ans (durée de conservation)</strong> à compter de la signature de la convention ou de l’accord d’immersion professionnelle avec l’entreprise partenaire.
+• Si la personne concernée a signé une convention d’immersion professionnelle, <strong>dans un délai de 5 ans</strong> à compter de la signature de la convention ou de l’accord d’immersion professionnelle avec l’entreprise partenaire.
 
-• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse positive du prescripteur, durant toute la durée de la recherche d’immersion professionnelle, et <strong>dans un délai de 2 ans (durée de conservation) après la dernière recherche</strong>
+• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse positive du prescripteur, durant toute la durée de la recherche d’immersion professionnelle, et <strong>dans un délai de 2 ans après la dernière recherche</strong>
 
-• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse négative du prescripteur, <strong>dans un délai de 2 ans (durée de conservation) à compter du refus</strong> de la demande d’immersion professionnelle. 
+• Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse négative du prescripteur, <strong>dans un délai de 2 ans à compter du refus</strong> de la demande d’immersion professionnelle. 
 
- Données relatives aux tuteurs et tutrices des structures d’immersion professionnelle
+Données relatives aux représentants des entreprises structures d’accueil de l’immersion, signataires de la convention y compris les tuteurs ou tutrices des structures d’accueil d’immersion:
 
 • <strong>Jusqu’à la fin du contrat du tuteur ou de la tutrice avec la structure d’immersion professionnelle</strong> ou le cas échéant, jusqu’à la dissolution de la structure, dès lors qu’Immersion Facilitée en prend connaissance.
 
@@ -52,12 +50,12 @@ Données relatives au formulaire de demande d’immersion professionnelle:
 
 Vous disposez des droits suivants concernant vos données à caractère personnel :
 • Droit d’information et droit d’accès aux données ;
-• Droit de rectification, et le cas échéant de suppression des données ;
-• Droit à la limitation du traitement ;
+• Droit de rectification de vos données ;
 • Droit d’opposition ;
-• Droit à la portabilité de vos données.
+• Droit à la limitation du traitement de vos données.
 
-Pour les exercer, faites-nous parvenir une demande en précisant la date et l’heure précise de la requête – ces éléments sont indispensables pour nous permettre de retrouver votre recherche – par voie électronique à l’adresse suivante : <a href="mailto:${immersionFacileContactEmail}">contact@immersion-facile.beta.gouv.fr</a>
+
+Pour les exercer, faites-nous parvenir une demande en précisant la date et l’heure précise de la requête – ces éléments sont indispensables pour nous permettre de retrouver votre recherche – par voie électronique à l’adresse suivante : <a href="mailto:dpo@numericite.eu">dpo@numericite.eu</a>
 
 Par voie postale :
 
@@ -85,13 +83,15 @@ Ces derniers sont :
 • Les Conseils départementaux ;
 • Les organismes de « Prépa Apprentissage » ;
 • Inclusion Connect ;
-• Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux PMSMP et liés soit à Pôle emploi, soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des PMSMP sur un périmètre donné.
+• Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux PMSMP et liés soit à Pôle emploi, soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des PMSMP sur un périmètre donné ;
+• La Mission interministérielle pour l’apprentissage ;
+• Le Groupement d’intérêt public « Les Entreprises s’engagent ».
 
 <strong>Quelles mesures de sécurité mettons-nous en place ?</strong>
 
 Les mesures techniques et organisationnelles de sécurité adoptées pour assurer la confidentialité, l’intégrité et protéger l’accès des données sont notamment : 
 • Stockage des données en base de données
-• Mots de passe sont stockés en base de façon hachée afin de le rendre illisibles
+• Stockage des mots de passe en base sont hachés
 • Cloisonnement des données
 • Mesures de traçabilité
 • Surveillance
@@ -114,7 +114,29 @@ Certaines des données sont envoyées à des sous-traitants pour réaliser certa
   Traitement réalisé : Chat en ligne
   Garanties : <a href="https://crisp.chat/fr/terms/" target="_blank">https://crisp.chat/fr/terms/</a>
 
+  Partenaire : Matomo
+  Pays destinataire : Union Européenne
+  Traitement réalisé : Mesure d’audience
+  Garanties : <a href="https://fr.matomo.org/privacy-policy/" target="_blank">https://fr.matomo.org/privacy-policy/</a>
+
+  Partenaire : Brevo
+  Pays destinataire : Union Européenne et non-UE
+  Traitement réalisé : Envoi de mails
+  Garanties : <a href="https://www.brevo.com/fr/legal/privacypolicy/" target="_blank">https://www.brevo.com/fr/legal/privacypolicy/</a>
+
+  Partenaire : Airtable
+  Pays destinataire : États-Unis
+  Traitement réalisé : Base de données No Code
+  Garanties : <a href="https://www.airtable.com/privacy" target="_blank">https://www.airtable.com/privacy</a>
+
+  Partenaire : Metabase
+  Pays destinataire : Union Européenne
+  Traitement réalisé : Centralisation de tableaux de bords 
+  Garanties : <a href="https://www.metabase.com/license/hosting" target="_blank">https://www.metabase.com/license/hosting</a>
+
 <strong>Cookies</strong>
+
+Un cookie est un fichier déposé sur votre terminal lors de la visite d’un site. Il a pour but de collecter des informations relatives à votre navigation et de vous adresser des services adaptés à votre terminal (ordinateur, mobile ou tablette).
 
 En application de l’article 5(3) de la directive 2002/58/CE modifiée concernant le traitement des données à caractère personnel et la protection de la vie privée dans le secteur des communications électroniques, transposée à l’article 82 de la loi n°78-17 du 6 janvier 1978 relative à l’informatique, aux fichiers et aux libertés, les traceurs ou cookies suivent deux régimes distincts.
 
@@ -124,14 +146,14 @@ Les cookies n’étant pas strictement nécessaires au service ou n’ayant pas 
 
 Ce consentement de la personne concernée pour une ou plusieurs finalités spécifiques constitue une base légale au sens du RGPD et doit être entendu au sens de l'article 6-a du Règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016 relatif à la protection des personnes physiques à l'égard du traitement des données à caractère personnel et à la libre circulation de ces données.
 
-Un cookie est un fichier déposé sur votre terminal lors de la visite d’un site. Il a pour but de collecter des informations relatives à votre navigation et de vous adresser des services adaptés à votre terminal (ordinateur, mobile ou tablette).
-À tout moment, vous pouvez refuser l’utilisation des cookies et désactiver le dépôt sur votre ordinateur.
+À tout moment, vous pouvez refuser l’utilisation des cookies et désactiver le dépôt sur votre ordinateur en utilisant la fonction dédiée de votre navigateur (fonction disponible notamment sur Microsoft Internet Explorer 11, Google Chrome, Mozilla Firefox, Apple Safari et Opera). L’utilisateur peut, à tout moment, autoriser ou interdire le suivi des cookies grâce au panneau de gestion des cookies « tarteaucitron » en bas de l’écran.
+
+Immersion Facilitée utilise Matomo configuré en mode exempté et ne nécessite donc pas le consentement des personnes concernées conformément aux recommandations de la CNIL.
+
+Il convient d'indiquer que :
+Les cookies ne permettent pas de suivre la navigation de l’internaute sur d’autres sites.
 
 Pour aller plus loin, vous pouvez consulter les ﬁches proposées par la Commission Nationale de l'Informatique et des Libertés (CNIL) :
 • <a href="https://www.cnil.fr/fr/cookies-traceurs-que-dit-la-loi" target="_blank">Cookies & traceurs : que dit la loi ?</a>
-• <a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs/comment-se-proteger/maitriser-votre-navigateur" target="_blank">Cookies : les outils pour les maîtriser</a>
-
-La plateforme Immersion Facilitée utilise Matomo de manière anonymisée et ne nécessite donc pas le consentement conformément aux recommandations de la CNIL.
-
-`,
+• <a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs/comment-se-proteger/maitriser-votre-navigateur" target="_blank">Cookies : les outils pour les maîtriser</a>`,
 };
