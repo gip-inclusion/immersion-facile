@@ -11,13 +11,13 @@ export type WithGroupSlug = {
 type GroupHeroHeader = {
   title: string;
   description: string;
-  logoUrl: AbsoluteUrl;
+  logoUrl?: AbsoluteUrl;
   backgroundColor?: string;
 };
 
-type GroupOptions = {
+export type GroupOptions = {
   heroHeader: GroupHeroHeader;
-  tintColor: string;
+  tintColor?: string;
 };
 
 export type Group = {
