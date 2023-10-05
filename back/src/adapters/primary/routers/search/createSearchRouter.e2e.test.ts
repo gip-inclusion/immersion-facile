@@ -85,7 +85,11 @@ describe("search-immersion route", () => {
         // Act and assert
         const result = await sharedRequest.search({
           queryParams: {
-            appellationCode: immersionOffer.appellationCode,
+            appellationCodes: [
+              immersionOffer.appellationCode,
+              //TODO: there should be only one element in this array, remove next line when shared-route is updated
+              immersionOffer.appellationCode,
+            ],
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
@@ -145,14 +149,15 @@ describe("search-immersion route", () => {
           longitude: 2.34999,
           latitude: 48.8531,
           sortedBy: "distance",
-          appellationCode: "XXX",
+          //TODO: there should be only one element in this array, remove second element when shared-route is updated
+          appellationCodes: ["XXX", "12694"],
         },
       });
       expectHttpResponseToEqual(result, {
         status: 400,
         body: {
           status: 400,
-          issues: ["appellationCode : Code appellation incorrect"],
+          issues: ["appellationCodes.0 : Code appellation incorrect"],
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
         },

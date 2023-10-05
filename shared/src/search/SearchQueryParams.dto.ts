@@ -7,7 +7,7 @@ export type SearchSortedBy = "distance" | "date";
 export type SearchQueryParamsDto = {
   longitude: number;
   latitude: number;
-  appellationCode?: AppellationCode;
+  appellationCodes?: AppellationCode[];
   rome?: RomeCode;
   distanceKm: number;
   sortedBy?: SearchSortedBy;
