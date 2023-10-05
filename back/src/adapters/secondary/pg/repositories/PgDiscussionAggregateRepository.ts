@@ -1,7 +1,6 @@
-import type { QueryResult } from "kysely";
-import { QueryResultRow } from "pg";
-import format from "pg-format";
-import { DiscussionId, SiretDto } from "shared";
+import type { Expression, InsertObject, RawBuilder, Simplify } from "kysely";
+import { sql } from "kysely";
+import { ContactMethod, DiscussionId, SiretDto } from "shared";
 import {
   DiscussionAggregate,
   ExchangeEntity,
@@ -10,10 +9,8 @@ import {
   DiscussionAggregateRepository,
   HasDiscussionMatchingParams,
 } from "../../../../domain/offer/ports/DiscussionAggregateRepository";
-import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
-
-const logger = createLogger(__filename);
+import { KyselyDb } from "../kysely/kyselyUtils";
+import { Database } from "../kysely/model/database";
 
 export class PgDiscussionAggregateRepository
   implements DiscussionAggregateRepository
@@ -24,74 +21,88 @@ export class PgDiscussionAggregateRepository
     siret: SiretDto,
     since: Date,
   ): Promise<number> {
-    const query = `SELECT COUNT(*) 
-      FROM discussions
-      WHERE siret = $1 AND created_at >= $2`;
-    const values = [siret, since];
-    const pgResult = await this.#executeQuery(
-      "countDiscussionsForSiretSince",
-      query,
-      values,
-    );
-    return parseInt(pgResult.rows[0].count);
+    const result = await this.transaction
+      .selectFrom("discussions")
+      .select(({ fn }) => [fn.count<string>("id").as("count")])
+      .where("siret", "=", siret)
+      .where("created_at", ">=", since)
+      .executeTakeFirst();
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return parseInt(result!.count);
   }
 
   public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionAggregate | undefined> {
-    const query = `
-    WITH exchanges_by_id AS (
-      SELECT discussion_id, 
-      ARRAY_AGG(
-        JSON_BUILD_OBJECT(
-          'message', message,
-          'recipient', recipient,
-          'sender', sender,
-          'sentAt', sent_at,
-          'subject', subject
-        ) ) AS exchanges
-      FROM exchanges 
-      GROUP BY discussion_id
-    )
-    SELECT 
-      JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
-        'id', id, 
-        'createdAt', created_at,
-        'siret', siret,
-        'businessName', business_name,
-        'appellationCode', appellation_code::text,
-        'immersionObjective', immersion_objective,
-        'potentialBeneficiary', JSON_BUILD_OBJECT(
-          'firstName',  potential_beneficiary_first_name,
-          'lastName',  potential_beneficiary_last_name,
-          'email',  potential_beneficiary_email,
-          'phone', potential_beneficiary_phone,
-          'resumeLink', potential_beneficiary_resume_link
-        ),
-        'establishmentContact', JSON_BUILD_OBJECT(
-          'contactMethod', contact_method,
-          'firstName',  establishment_contact_first_name,
-          'lastName',  establishment_contact_last_name,
-          'email',  establishment_contact_email,
-          'phone', establishment_contact_phone,
-          'job', establishment_contact_job,
-          'copyEmails', establishment_contact_copy_emails
-        ),
-        'address', JSON_BUILD_OBJECT(
-          'streetNumberAndAddress', street_number_and_address,
-          'postcode', postcode,
-          'departmentCode', department_code,
-          'city', city
-        ),
-        'exchanges', exchanges
-    )) AS discussion
-    FROM discussions 
-    LEFT JOIN exchanges_by_id ON exchanges_by_id.discussion_id = discussions.id
-    WHERE id = $1
-    `;
-    const values = [discussionId];
-    const pgResult = await this.#executeQuery("getById", query, values);
-    const discussion = pgResult.rows.at(0)?.discussion;
+    const pgResult = await this.transaction
+      .with("exchanges_by_id", (db) =>
+        db
+          .selectFrom("exchanges")
+          .where("discussion_id", "=", discussionId)
+          .groupBy("discussion_id")
+          .select(({ ref, fn }) => [
+            "discussion_id",
+            fn
+              .agg<ExchangeEntity[]>("array_agg", [
+                jsonBuildObject({
+                  subject: ref("subject"),
+                  message: ref("message"),
+                  recipient: ref("recipient"),
+                  sender: ref("sender"),
+                  sentAt: ref("sent_at"),
+                }),
+              ])
+              .as("exchanges"),
+          ]),
+      )
+      .selectFrom("discussions")
+      .leftJoin("exchanges_by_id", "discussion_id", "id")
+      .where("id", "=", discussionId)
+      .select((qb) => [
+        jsonStripNulls(
+          jsonBuildObject({
+            id: qb.ref("id"),
+            createdAt: qb.ref("created_at"),
+            siret: qb.ref("siret"),
+            businessName: qb.ref("business_name"),
+            appellationCode: sql<string>`CAST(${qb.ref(
+              "appellation_code",
+            )} AS text)`,
+            immersionObjective: qb.ref("immersion_objective"),
+            potentialBeneficiary: jsonBuildObject({
+              firstName: qb.ref("potential_beneficiary_first_name"),
+              lastName: qb.ref("potential_beneficiary_last_name"),
+              email: qb.ref("potential_beneficiary_email"),
+              phone: qb.ref("potential_beneficiary_phone"),
+              resumeLink: qb.ref("potential_beneficiary_resume_link"),
+            }),
+            establishmentContact: jsonBuildObject({
+              contactMethod: sql<ContactMethod>`${qb.ref("contact_method")}`,
+              firstName: qb.ref("establishment_contact_first_name"),
+              lastName: qb.ref("establishment_contact_last_name"),
+              email: qb.ref("establishment_contact_email"),
+              phone: qb.ref("establishment_contact_phone"),
+              job: qb.ref("establishment_contact_job"),
+              copyEmails: sql<string[]>`${qb.ref(
+                "establishment_contact_copy_emails",
+              )}`,
+            }),
+            address: jsonBuildObject({
+              streetNumberAndAddress: qb.ref("street_number_and_address"),
+              postcode: qb.ref("postcode"),
+              departmentCode: qb.ref("department_code"),
+              city: qb.ref("city"),
+            }),
+            exchanges: qb.ref("exchanges"),
+          }),
+        ).as("discussion"),
+      ])
+      .executeTakeFirst();
+
+    if (!pgResult) return;
+    const { discussion } = pgResult;
+
     return (
       discussion && {
         ...discussion,
@@ -113,61 +124,42 @@ export class PgDiscussionAggregateRepository
     potentialBeneficiaryEmail,
     since,
   }: HasDiscussionMatchingParams): Promise<boolean> {
-    const result = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-        SELECT EXISTS (SELECT 1 FROM discussions 
-            WHERE siret = $1
-                AND appellation_code = $2
-                AND potential_beneficiary_email = $3
-                AND created_at >= $4)`,
-      [siret, appellationCode, potentialBeneficiaryEmail, since.toISOString()],
-    );
+    const result = await this.transaction
+      .selectFrom("discussions")
+      .select(({ exists, selectFrom, lit }) => [
+        exists(
+          selectFrom("discussions")
+            .select(lit(1).as("one"))
+            .where("siret", "=", siret)
+            .where("appellation_code", "=", +appellationCode)
+            .where(
+              "potential_beneficiary_email",
+              "=",
+              potentialBeneficiaryEmail,
+            )
+            .where("created_at", ">=", since),
+        ).as("exists"),
+      ])
+      .execute();
 
-    return result.rows[0].exists;
+    return result[0].exists as boolean;
   }
 
   public async insert(discussion: DiscussionAggregate) {
-    logger.info({ ...discussion }, "PgDiscussionAggregateRepository_Insert");
-    const query = `INSERT INTO discussions ( 
-      id, contact_method, siret, appellation_code, potential_beneficiary_first_name, 
-      potential_beneficiary_last_name, potential_beneficiary_email, potential_beneficiary_phone, immersion_objective, potential_beneficiary_resume_link, 
-      created_at, establishment_contact_email, establishment_contact_first_name, establishment_contact_last_name, establishment_contact_phone, 
-      establishment_contact_job, establishment_contact_copy_emails, street_number_and_address, postcode, department_code, 
-      city, business_name
-    ) VALUES (
-      $1, $2, $3, $4, $5, 
-      $6, $7, $8, $9, $10, 
-      $11, $12, $13, $14, $15,
-      $16, $17, $18, $19, $20, 
-      $21, $22
-    )`;
-    // prettier-ignore
-    const values = [ discussion.id, discussion.establishmentContact.contactMethod, discussion.siret, discussion.appellationCode, discussion.potentialBeneficiary.firstName, discussion.potentialBeneficiary.lastName, discussion.potentialBeneficiary.email, discussion.potentialBeneficiary.phone, discussion.immersionObjective, discussion.potentialBeneficiary.resumeLink, discussion.createdAt.toISOString(), discussion.establishmentContact.email, discussion.establishmentContact.firstName, discussion.establishmentContact.lastName, discussion.establishmentContact.phone, discussion.establishmentContact.job, JSON.stringify(discussion.establishmentContact.copyEmails), discussion.address.streetNumberAndAddress, discussion.address.postcode, discussion.address.departmentCode, discussion.address.city, discussion.businessName, ];
-    await this.#executeQuery("insert", query, values);
+    await this.transaction
+      .insertInto("discussions")
+      .values(discussionAggregateToPg(discussion))
+      .execute();
+
     await this.#insertAllExchanges(discussion.id, discussion.exchanges);
   }
 
   public async update(discussion: DiscussionAggregate) {
-    logger.info({ ...discussion }, "PgDiscussionAggregateRepository_Update");
-    const query = `
-    UPDATE discussions SET
-      contact_method = $1, siret = $2, appellation_code = $3, potential_beneficiary_first_name = $4, potential_beneficiary_last_name = $5,
-      potential_beneficiary_email = $6, potential_beneficiary_phone = $7, immersion_objective = $8, potential_beneficiary_resume_link = $9, created_at = $10,
-      establishment_contact_email = $11, establishment_contact_first_name = $12, establishment_contact_last_name = $13, establishment_contact_phone = $14, establishment_contact_job = $15,
-      establishment_contact_copy_emails = $16, street_number_and_address = $17, postcode = $18, department_code = $19, city = $20,
-      business_name = $22
-    WHERE id = $21`;
-    // prettier-ignore
-    const values = [
-      discussion.establishmentContact.contactMethod, discussion.siret, discussion.appellationCode, discussion.potentialBeneficiary.firstName, discussion.potentialBeneficiary.lastName,
-      discussion.potentialBeneficiary.email, discussion.potentialBeneficiary.phone, discussion.immersionObjective, discussion.potentialBeneficiary.resumeLink, discussion.createdAt.toISOString(),
-      discussion.establishmentContact.email, discussion.establishmentContact.firstName, discussion.establishmentContact.lastName, discussion.establishmentContact.phone, discussion.establishmentContact.job,
-      JSON.stringify(discussion.establishmentContact.copyEmails), discussion.address.streetNumberAndAddress, discussion.address.postcode, discussion.address.departmentCode, discussion.address.city,
-      discussion.id,
-      discussion.businessName,
-    ];
-    await this.#executeQuery("update", query, values);
+    await this.transaction
+      .updateTable("discussions")
+      .set(discussionAggregateToPg(discussion))
+      .where("id", "=", discussion.id)
+      .execute();
     await this.#clearAllExistingExchanges(discussion);
     await this.#insertAllExchanges(discussion.id, discussion.exchanges);
   }
@@ -176,46 +168,82 @@ export class PgDiscussionAggregateRepository
     discussionId: DiscussionId,
     exchanges: ExchangeEntity[],
   ) {
-    if (exchanges.length === 0) {
-      logger.info(
-        { discussionId },
-        "PgDiscussionAggregateRepository_insertAllExchanges_SkipNoExchanges",
-      );
-      return;
-    }
-    const query = `
-    INSERT INTO exchanges (discussion_id, message, sender, recipient, sent_at, subject)
-    VALUES %L
-    `;
-    // prettier-ignore
-    const values = exchanges.map(
-      ({ message, recipient, sender, sentAt, subject }) =>
-      [ discussionId, message, sender, recipient, sentAt.toISOString(), subject],
-    );
-    await this.#executeQuery("insertAllExchanges", format(query, values));
-  }
+    if (exchanges.length === 0) return;
 
-  #executeQuery<I extends any[] = any[]>(
-    queryName: string,
-    queryTextOrConfig: string,
-    values?: I,
-  ): Promise<QueryResult<QueryResultRow>> {
-    return executeKyselyRawSqlQuery(
-      this.transaction,
-      queryTextOrConfig,
-      values,
-    ).catch((error) => {
-      logger.error(
-        { query: queryTextOrConfig, values, error },
-        `PgDiscussionAggregateRepository_${queryName}_queryErrored`,
-      );
-      throw error;
-    });
+    await this.transaction
+      .insertInto("exchanges")
+      .values(
+        exchanges.map((exchange) => ({
+          subject: exchange.subject,
+          discussion_id: discussionId,
+          message: exchange.message,
+          sender: exchange.sender,
+          recipient: exchange.recipient,
+          sent_at: exchange.sentAt.toISOString(),
+        })),
+      )
+      .execute();
   }
 
   async #clearAllExistingExchanges(discussion: DiscussionAggregate) {
-    const query = "DELETE FROM exchanges WHERE discussion_id = $1";
-    const values = [discussion.id];
-    await this.#executeQuery("clearAllExistingExchanges", query, values);
+    await this.transaction
+      .deleteFrom("exchanges")
+      .where("discussion_id", "=", discussion.id)
+      .execute();
   }
+}
+
+const discussionAggregateToPg = (
+  discussion: DiscussionAggregate,
+): InsertObject<Database, "discussions"> => ({
+  id: discussion.id,
+  appellation_code: +discussion.appellationCode,
+  business_name: discussion.businessName,
+  city: discussion.address.city,
+  created_at: discussion.createdAt,
+  department_code: discussion.address.departmentCode,
+  establishment_contact_copy_emails: JSON.stringify(
+    discussion.establishmentContact.copyEmails,
+  ),
+  establishment_contact_email: discussion.establishmentContact.email,
+  establishment_contact_first_name: discussion.establishmentContact.firstName,
+  establishment_contact_job: discussion.establishmentContact.job,
+  establishment_contact_last_name: discussion.establishmentContact.lastName,
+  establishment_contact_phone: discussion.establishmentContact.phone,
+  immersion_objective: discussion.immersionObjective,
+  postcode: discussion.address.postcode,
+  potential_beneficiary_email: discussion.potentialBeneficiary.email,
+  potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
+  potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
+  potential_beneficiary_resume_link: discussion.potentialBeneficiary.resumeLink,
+  street_number_and_address: discussion.address.streetNumberAndAddress,
+  siret: discussion.siret,
+  contact_method: discussion.establishmentContact.contactMethod,
+  potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
+});
+
+export function jsonBuildObject<O extends Record<string, Expression<unknown>>>(
+  obj: O,
+): RawBuilder<
+  Simplify<{
+    [K in keyof O]: O[K] extends Expression<infer V> ? V : never;
+  }>
+> {
+  return sql`json_build_object(${sql.join(
+    Object.keys(obj).flatMap((k) => [sql.lit(k), obj[k]]),
+  )})`;
+}
+
+type NullableToUndefined<A> = A extends null ? Exclude<A, null> | undefined : A;
+
+type StripNullRecursive<T> = {
+  [K in keyof T]: T[K] extends Record<any, unknown>
+    ? StripNullRecursive<T[K]>
+    : NullableToUndefined<T[K]>;
+};
+
+export function jsonStripNulls<T>(
+  obj: RawBuilder<T>,
+): RawBuilder<StripNullRecursive<T>> {
+  return sql`json_strip_nulls(${obj})`;
 }
