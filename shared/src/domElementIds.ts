@@ -318,8 +318,10 @@ export const domElementIds = {
       internshipKindSelect: "email-preview-internshipKind-select",
     },
     addEstablishmentByBatchTab: {
-      groupNameInput: "groupName-input",
-      inputFileInput: "inputFile-input",
+      titleInput: "im-form-add-by-batch__title-input",
+      descriptionInput: "im-form-add-by-batch__description-input",
+      groupNameInput: "im-form-add-by-batch__group-name-input",
+      inputFileInput: "im-form-add-by-batch__input-file-input",
     },
     adminPrivateRoute: {
       formLoginUserInput: "im-login__user-input",

@@ -14,10 +14,10 @@ const groupOptionsSchema = z.object({
   heroHeader: z.object({
     title: zStringMinLength1,
     description: zStringMinLength1,
-    logoUrl: absoluteUrlSchema,
+    logoUrl: absoluteUrlSchema.optional(),
     backgroundColor: z.string().optional(),
   }),
-  tintColor: z.string(),
+  tintColor: z.string().optional(),
 });
 
 export const groupSchema: z.Schema<Group> = z.object({
