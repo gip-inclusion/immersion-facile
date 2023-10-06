@@ -35,8 +35,10 @@ export class InMemoryGroupRepository implements GroupRepository {
 
   public async getGroupWithSearchResultsBySlug(
     slug: GroupSlug,
-  ): Promise<GroupWithResults> {
-    const { sirets, ...group } = this.#groupsBySlug[slug];
+  ): Promise<GroupWithResults | undefined> {
+    const groupEntity = this.#groupsBySlug[slug];
+    if (!groupEntity) return;
+    const { sirets, ...group } = groupEntity;
     return { group, results: [stubSearchResult] };
   }
 
@@ -54,16 +56,14 @@ export class InMemoryGroupRepository implements GroupRepository {
     this.#groupsBySlug[group.slug] = group;
   }
 
-  public get groups(): GroupEntity[] {
+  public get groupEntities(): GroupEntity[] {
     return Object.values(this.#groupsBySlug);
   }
 
-  public set groups(groups: GroupEntity[]) {
+  public set groupEntities(groups: GroupEntity[]) {
     this.#groupsBySlug = groups.reduce(
       (acc, group) => ({ ...acc, [group.slug]: group }),
       {} satisfies Record<GroupSlug, GroupEntity>,
     );
   }
 }
-
-/* eslint-enable @typescript-eslint/require-await */
