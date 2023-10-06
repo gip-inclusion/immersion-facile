@@ -16,7 +16,10 @@ export const searchImmersionRoutes = defineRoutes({
   getGroupBySlug: defineRoute({
     method: "get",
     url: `/groups/:groupSlug`,
-    responses: { 200: groupWithResultsSchema },
+    responses: {
+      200: groupWithResultsSchema,
+      404: httpErrorSchema,
+    },
   }),
   search: defineRoute({
     method: "get",

@@ -9,6 +9,7 @@ import {
   SiretAndAppellationDto,
 } from "shared";
 import { HttpClient, HttpResponse } from "shared-routes";
+import { routes } from "src/app/routes/routes";
 import {
   ContactErrorKind,
   SearchGateway,
@@ -39,9 +40,26 @@ export class HttpSearchGateway implements SearchGateway {
   }
 
   public async getGroupBySlug(groupSlug: GroupSlug): Promise<GroupWithResults> {
-    const response = await this.httpClient.getGroupBySlug({
-      urlParams: { groupSlug },
-    });
+    const response = await this.httpClient
+      .getGroupBySlug({
+        urlParams: { groupSlug },
+      })
+      .catch((error) => {
+        if (error.httpStatusCode === 404) {
+          routes
+            .errorRedirect({
+              title: "Groupe introuvable",
+              message: `Nous n'avons pas trouvé le groupe: '${groupSlug}'`,
+            })
+            .push();
+        }
+        return {
+          body: error.response?.message ?? error.message,
+          status: error?.response?.status,
+        };
+      });
+
+    if (response.status !== 200) throw new Error(response.body);
 
     return response.body;
   }

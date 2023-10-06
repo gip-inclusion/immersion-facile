@@ -20,6 +20,8 @@ import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatc
 
 type AddEstablishmentByBatchTabForm = {
   groupName: string;
+  title: string;
+  description: string;
   inputFile: FileList;
 };
 
@@ -120,29 +122,34 @@ export const AddEstablishmentsByBatch = () => {
               succès
             </li>
           )}
-          {addBatchResponse.failures && addBatchResponse.failures.length && (
-            <li>
-              <span>
-                {addBatchResponse.failures.length} erreurs lors d'ajout
-                d'établissements
-              </span>
-              <ul>
-                {addBatchResponse.failures.map((failure) => (
-                  <li key={failure.siret}>
-                    <strong>{failure.siret}</strong> : {failure.errorMessage}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          )}
+          {addBatchResponse.failures &&
+            addBatchResponse.failures.length > 0 && (
+              <li>
+                <span>
+                  {addBatchResponse.failures.length} erreurs lors d'ajout
+                  d'établissements
+                </span>
+                <ul>
+                  {addBatchResponse.failures.map((failure) => (
+                    <li key={failure.siret}>
+                      <strong>{failure.siret}</strong> : {failure.errorMessage}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            )}
         </ul>
       )}
     </>
   );
+
   const onEstablishmentsImportClick = () => {
+    const values = getValues();
     dispatch(
       establishmentBatchSlice.actions.addEstablishmentBatchRequested({
-        groupName: getValues().groupName,
+        groupName: values.groupName,
+        title: values.title,
+        description: values.description,
         formEstablishments:
           candidateEstablishments
             .filter((establishment) => establishment.zodErrors.length === 0)
@@ -175,6 +182,30 @@ export const AddEstablishmentsByBatch = () => {
           }}
           state={errors.groupName ? "error" : "default"}
           stateRelatedMessage={errors.groupName ? "Ce champ est requis" : ""}
+        />
+        <Input
+          label="Renseignez un titre (qui apparaitra dans la page du groupe) *"
+          nativeInputProps={{
+            ...register("title", { required: true }),
+            id: domElementIds.admin.addEstablishmentByBatchTab.titleInput,
+            placeholder: "Ex: Semaine de l'agro-alimentaire 2023",
+            readOnly: formSubmitted,
+          }}
+          state={errors.title ? "error" : "default"}
+          stateRelatedMessage={errors.title ? "Ce champ est requis" : ""}
+        />
+        <Input
+          textArea
+          label="Renseignez une description (qui apparaitra dans la page du groupe) *"
+          nativeTextAreaProps={{
+            ...register("description", { required: true }),
+            id: domElementIds.admin.addEstablishmentByBatchTab.descriptionInput,
+            placeholder:
+              "Ex: La super semaine de l'agro-alimentaire, du 12 au 16 novembre, etc... Rencontrez des entreprises sympas !",
+            readOnly: formSubmitted,
+          }}
+          state={errors.description ? "error" : "default"}
+          stateRelatedMessage={errors.description ? "Ce champ est requis" : ""}
         />
         <Input
           label="Uploadez votre CSV *"

@@ -19,6 +19,8 @@ import {
 const defaultEstablishment = FormEstablishmentDtoBuilder.valid().build();
 const establishmentBatch: FormEstablishmentBatchDto = {
   groupName: "L'amie caline",
+  title: "My title",
+  description: "My description",
   formEstablishments: [defaultEstablishment],
 };
 
