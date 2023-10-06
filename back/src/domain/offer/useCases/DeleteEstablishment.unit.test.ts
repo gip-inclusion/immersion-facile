@@ -4,6 +4,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   FormEstablishmentDtoBuilder,
+  GroupOptions,
 } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import {
@@ -27,6 +28,16 @@ import { ContactEntity } from "../entities/ContactEntity";
 import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../ports/FormEstablishmentRepository";
 import { DeleteEstablishment } from "./DeleteEstablishment";
+
+const groupOptions: GroupOptions = {
+  heroHeader: {
+    title: "My hero header title",
+    description: "My hero header description",
+    logoUrl: "https://my-logo-url.com",
+    backgroundColor: "blue",
+  },
+  tintColor: "red",
+};
 
 describe("Delete Establishment", () => {
   const contact: ContactEntity = {
@@ -129,6 +140,7 @@ describe("Delete Establishment", () => {
           name: "group",
           sirets: [formEstablishment.siret, "siret2"],
           slug: "group",
+          options: groupOptions,
         },
       ];
 
@@ -149,6 +161,7 @@ describe("Delete Establishment", () => {
           name: "group",
           sirets: ["siret2"],
           slug: "group",
+          options: groupOptions,
         },
       ]);
       expectToEqual(uow.deletedEstablishmentRepository.deletedEstablishments, [

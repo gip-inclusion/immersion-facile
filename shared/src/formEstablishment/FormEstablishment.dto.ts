@@ -79,6 +79,8 @@ export type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
 
 export type FormEstablishmentBatchDto = {
   groupName: GroupName;
+  title: string;
+  description: string;
   formEstablishments: FormEstablishmentDto[];
 };
 
