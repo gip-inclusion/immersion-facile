@@ -5,7 +5,7 @@ import {
   conventionMagicLinkRoutes,
   createManagedAxiosInstance,
   establishmentTargets,
-  inclusionConnectedAllowedTargets,
+  inclusionConnectedAllowedRoutes,
   searchImmersionRoutes,
   siretRoutes,
   technicalRoutes,
@@ -29,8 +29,9 @@ import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/H
 
 export const createHttpDependencies = (): Dependencies => {
   const axiosOnSlashApi = createManagedAxiosInstance({ baseURL: "/api" });
-  const handlerCreator = createAxiosHandlerCreator(axiosOnSlashApi);
-  const createHttpClient = configureHttpClient(handlerCreator);
+  const createHttpClient = configureHttpClient(
+    createAxiosHandlerCreator(axiosOnSlashApi),
+  );
 
   return {
     addressGateway: new HttpAddressGateway(
@@ -43,7 +44,7 @@ export const createHttpDependencies = (): Dependencies => {
       createAxiosSharedClient(agencyRoutes, axiosOnSlashApi),
     ),
     inclusionConnectedGateway: new HttpInclusionConnectedGateway(
-      createHttpClient(inclusionConnectedAllowedTargets),
+      createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
     ),
     establishmentGateway: new HttpEstablishmentGateway(
       createHttpClient(establishmentTargets),
