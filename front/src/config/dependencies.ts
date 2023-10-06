@@ -7,7 +7,6 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
-import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
@@ -34,7 +33,6 @@ export type Dependencies = {
   deviceRepository: DeviceRepository;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
-  emailValidationGateway: EmailValidationGateway;
 };
 
 const dependencies =
@@ -51,7 +49,6 @@ export const agencyGateway = dependencies.agencyGateway;
 export const deviceRepository = dependencies.deviceRepository;
 export const technicalGateway = dependencies.technicalGateway;
 export const romeAutocompleteGateway = dependencies.romeAutocompleteGateway;
-export const emailValidationGateway = dependencies.emailValidationGateway;
 
 export const store = createStore({
   dependencies,

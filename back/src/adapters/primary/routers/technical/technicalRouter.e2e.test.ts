@@ -5,6 +5,7 @@ import {
   BrevoInboundBody,
   ConventionDtoBuilder,
   createConventionMagicLinkPayload,
+  displayRouteName,
   expectEmailOfType,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
@@ -12,6 +13,7 @@ import {
   frontRoutes,
   TechnicalRoutes,
   technicalRoutes,
+  ValidateEmailStatus,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -63,8 +65,10 @@ describe("technical router", () => {
     httpClient = createSupertestSharedClient(technicalRoutes, request);
   });
 
-  describe("htmlToPdf", () => {
-    it("200 - Should get PDF content from html string", async () => {
+  describe("/auth/html-to-pdf", () => {
+    it(`${displayRouteName(
+      technicalRoutes.htmlToPdf,
+    )} 200 - Should get PDF content from html string`, async () => {
       const validatorJwt = generateConventionJwt({
         exp: new Date().getTime() / 1000 + 1000,
         iat: new Date().getTime() / 1000,
@@ -87,8 +91,10 @@ describe("technical router", () => {
     });
   });
 
-  describe("inboundEmail", () => {
-    it("200 - when IP is allowed and body is correct", async () => {
+  describe("/inbound-email-parsing", () => {
+    it(`${displayRouteName(
+      technicalRoutes.inboundEmailParsing,
+    )} 200 - when IP is allowed and body is correct`, async () => {
       inMemoryUow.discussionAggregateRepository.discussionAggregates = [
         new DiscussionAggregateBuilder().withId(discussionId).build(),
       ];
@@ -104,7 +110,9 @@ describe("technical router", () => {
       });
     });
 
-    it("400 - when IP is allowed and body is wrong", async () => {
+    it(`${displayRouteName(
+      technicalRoutes.inboundEmailParsing,
+    )} 400 - when IP is allowed and body is wrong`, async () => {
       const response = await httpClient.inboundEmailParsing({
         body: { yolo: "wrong body" } as any,
         headers: { "X-Forwarded-For": appConfig.inboundEmailAllowedIps[0] },
@@ -121,7 +129,9 @@ describe("technical router", () => {
       });
     });
 
-    it("403 - when IP is not allowed", async () => {
+    it(`${displayRouteName(
+      technicalRoutes.inboundEmailParsing,
+    )} 403 - when IP is not allowed`, async () => {
       const unallowedIp = "245.10.12.54";
       const response = await httpClient.inboundEmailParsing({
         body: correctBrevoResponse,
@@ -135,8 +145,10 @@ describe("technical router", () => {
     });
   });
 
-  describe("renewMagicLink", () => {
-    it("200 - sends the updated magic link", async () => {
+  describe("/renewMagicLink", () => {
+    it(`${displayRouteName(
+      technicalRoutes.renewMagicLink,
+    )} 200 - sends the updated magic link`, async () => {
       const validConvention = new ConventionDtoBuilder().build();
 
       const agency = AgencyDtoBuilder.create(validConvention.agencyId)
@@ -208,10 +220,12 @@ describe("technical router", () => {
     });
   });
 
-  describe("shortLink", () => {
+  describe("/to/:shortLinkId", () => {
     const expectedShortLinkId: ShortLinkId = "shortLinkId";
 
-    it("302 - Redirect on existing short link", async () => {
+    it(`${displayRouteName(
+      technicalRoutes.shortLink,
+    )} 302 - Redirect on existing short link`, async () => {
       const expectedLongLink: AbsoluteUrl = "http://longLink";
       inMemoryUow.shortLinkQuery.setShortLinks({
         [expectedShortLinkId]: expectedLongLink,
@@ -228,7 +242,9 @@ describe("technical router", () => {
       });
     });
 
-    it("404 - Not found on missing short link", async () => {
+    it(`${displayRouteName(
+      technicalRoutes.shortLink,
+    )} 404 - Not found on missing short link`, async () => {
       const response = await httpClient.shortLink({
         urlParams: { shortLinkId: expectedShortLinkId },
       });
@@ -236,6 +252,50 @@ describe("technical router", () => {
       expect(response.status).toBe(404);
       expectObjectsToMatch(response.body, {
         errors: shortLinkNotFoundMessage(expectedShortLinkId),
+      });
+    });
+  });
+
+  describe(`/validate-email`, () => {
+    const candidateEmail = "enguerran.weiss@beta.gouv.fr";
+    const expectedStatus: ValidateEmailStatus = {
+      isValid: true,
+      proposal: null,
+      reason: "accepted_email",
+    };
+
+    it(`${displayRouteName(
+      technicalRoutes.validateEmail,
+    )} 200 with '?email=enguerran.weiss@beta.gouv.fr'`, async () => {
+      gateways.emailValidationGateway.setEmailValidationStatusResponse(
+        expectedStatus,
+      );
+      const response = await httpClient.validateEmail({
+        queryParams: { email: candidateEmail },
+      });
+      expectHttpResponseToEqual(response, {
+        body: expectedStatus,
+        status: 200,
+      });
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.validateEmail,
+    )} 400 with '?email="invalid-email"`, async () => {
+      const invalidEmail = "invalid-email";
+      const response = await httpClient.validateEmail({
+        queryParams: {
+          email: invalidEmail,
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        body: {
+          issues: ["email : invalide - valeur fournie : invalid-email"],
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /validate-email",
+          status: 400,
+        },
+        status: 400,
       });
     });
   });

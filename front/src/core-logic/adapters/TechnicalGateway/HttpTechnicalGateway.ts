@@ -3,9 +3,11 @@ import { from, map, Observable } from "rxjs";
 import {
   AbsoluteUrl,
   ConventionSupportedJwt,
+  Email,
   FeatureFlags,
   TechnicalRoutes,
   uploadFileRoute,
+  ValidateEmailStatus,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
@@ -18,6 +20,16 @@ export class HttpTechnicalGateway implements TechnicalGateway {
     private readonly httpClient: HttpClient<TechnicalRoutes>,
     private readonly axiosClient: AxiosInstance,
   ) {}
+
+  public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
+    const response = await this.httpClient.validateEmail({
+      queryParams: {
+        email,
+      },
+    });
+    if (response.status === 200) return response.body;
+    throw new Error(JSON.stringify(response.body));
+  }
 
   public async htmlToPdf(
     htmlContent: string,

@@ -11,7 +11,6 @@ import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
-import { InMemoryEmailValidationGateway } from "../adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
 import { TestSearchGateway } from "../adapters/SearchGateway/TestSearchGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
@@ -35,7 +34,6 @@ const createTestDependencies = () =>
     navigationGateway: new InMemoryNavigationGateway(),
     scheduler: new VirtualTimeScheduler(),
     minSearchResultsToPreventRefetch: 2,
-    emailValidationGateway: new InMemoryEmailValidationGateway(),
   } satisfies Dependencies);
 
 export const createTestStore = (preloadedState?: Partial<RootState>) => {

@@ -83,5 +83,11 @@ export const createTechnicalRouter = (
       ),
   );
 
+  technicalSharedRouter.validateEmail(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.validateEmail.execute(req.query),
+    ),
+  );
+
   return technicalRouter;
 };

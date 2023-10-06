@@ -6,7 +6,6 @@ import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/Simu
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
-import { InMemoryEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
 import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
 import {
@@ -46,9 +45,6 @@ export const createInMemoryDependencies = (): Dependencies => ({
   siretGatewayThroughBack: getSimulatedSiretGatewayThroughBack(),
   technicalGateway: new SimulatedTechnicalGateway(),
   inclusionConnectedGateway: new SimulatedInclusionConnectedGateway(),
-  emailValidationGateway: new InMemoryEmailValidationGateway(
-    SIMULATED_LATENCY_MS,
-  ),
   ...createCommonDependencies(),
 });
 
