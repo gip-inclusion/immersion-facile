@@ -8,7 +8,6 @@ import { Group, GroupWithResults, SearchResultDto } from "shared";
 import {
   Loader,
   MainWrapper,
-  PageHeader,
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
@@ -61,9 +60,15 @@ export const GroupPage = ({ route }: GroupPageProps) => {
 };
 
 const GroupPageContent = ({ group, results }: GroupWithResults) => {
-  const { classes } = useStyles(() => ({
-    root: {
-      backgroundColor: group.options.tintColor,
+  const { classes, cx } = useStyles(() => ({
+    searchBar: {
+      background: group.options.tintColor,
+    },
+    searchBarTitle: {
+      color: "#fff",
+    },
+    heroHeader: {
+      background: group.options.heroHeader.backgroundColor,
     },
   }))();
   const [query, setQuery] = useState<string>("");
@@ -92,31 +97,52 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
 
   return (
     <>
-      <PageHeader
-        title={`${group.name} : toutes les immersions`}
-        theme="establishment"
-        classes={classes}
-      >
-        <form
-          className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-          onSubmit={onFilterSubmit}
+      <section className={cx(fr.cx("fr-py-16w"), classes.heroHeader)}>
+        <div
+          className={fr.cx(
+            "fr-grid-row",
+            "fr-grid-row--middle",
+            "fr-container",
+          )}
         >
-          <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
-            <Input
-              label={`Cherchez dans les immersions proposées par ${group.name}`}
-              hideLabel
-              nativeInputProps={{
-                onChange: (event) => setQuery(event.currentTarget.value),
-                placeholder:
-                  "Filtrer les résultats en tapant le nom d'un métier ou d'une ville",
-              }}
-            />
+          <div className={fr.cx("fr-col")}>
+            <h1>{group.options.heroHeader.title}</h1>
+            <p>{group.options.heroHeader.description}</p>
+            <Button>TODO Trouver une immersion</Button>
           </div>
-          <div className={fr.cx("fr-col-12", "fr-col-lg-3")}>
-            <Button>Filtrer les résultats</Button>
-          </div>
-        </form>
-      </PageHeader>
+          {group.options.heroHeader.logoUrl && (
+            <div className={fr.cx("fr-col", "fr-col-lg-3")}>
+              <img src={group.options.heroHeader.logoUrl} alt={group.name} />
+            </div>
+          )}
+        </div>
+      </section>
+      <section className={cx(fr.cx("fr-py-6w"), classes.searchBar)}>
+        <div className={fr.cx("fr-container")}>
+          <h2 className={cx(classes.searchBarTitle)}>
+            {group.name} : toutes les immersions
+          </h2>
+          <form
+            className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
+            onSubmit={onFilterSubmit}
+          >
+            <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+              <Input
+                label={`Cherchez dans les immersions proposées par ${group.name}`}
+                hideLabel
+                nativeInputProps={{
+                  onChange: (event) => setQuery(event.currentTarget.value),
+                  placeholder:
+                    "Filtrer les résultats en tapant le nom d'un métier ou d'une ville",
+                }}
+              />
+            </div>
+            <div className={fr.cx("fr-col-12", "fr-col-lg-3")}>
+              <Button>Filtrer les résultats</Button>
+            </div>
+          </form>
+        </div>
+      </section>
       <div className={fr.cx("fr-mt-6w")}>
         <GroupListResults results={displayedResults} />
         <SectionAccordion />
