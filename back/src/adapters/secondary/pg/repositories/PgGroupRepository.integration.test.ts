@@ -22,7 +22,6 @@ const groupOptions: GroupOptions = {
     title: "My hero header title",
     description: "My hero header description",
     logoUrl: "https://my-logo-url.com",
-    backgroundColor: "blue",
   },
   tintColor: "red",
 };

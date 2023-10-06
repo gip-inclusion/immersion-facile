@@ -1,5 +1,11 @@
 import { Expression, RawBuilder, Simplify, sql } from "kysely";
-import { groupSchema, GroupSlug, GroupWithResults, SiretDto } from "shared";
+import {
+  Group,
+  groupSchema,
+  GroupSlug,
+  GroupWithResults,
+  SiretDto,
+} from "shared";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { GroupRepository } from "../../../../domain/offer/ports/GroupRepository";
 import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
@@ -33,12 +39,12 @@ export class PgGroupRepository implements GroupRepository {
         heroHeader: {
           title: rawGroup.hero_header_title,
           description: rawGroup.hero_header_description,
-          logoUrl: rawGroup.hero_header_logo_url,
-          backgroundColor: rawGroup.hero_header_background_color,
+          logoUrl: rawGroup.hero_header_logo_url ?? undefined,
+          backgroundColor: rawGroup.hero_header_background_color ?? undefined,
         },
-        tintColor: rawGroup.tint_color,
+        tintColor: rawGroup.tint_color ?? undefined,
       },
-    });
+    } satisfies Group);
 
     const resultsResponse = await executeKyselyRawSqlQuery(
       this.transaction,
