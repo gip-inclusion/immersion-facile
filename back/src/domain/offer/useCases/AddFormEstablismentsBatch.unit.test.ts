@@ -166,8 +166,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     await addFormEstablishmentBatch.execute(formEstablishmentBatch);
 
-    expect(groupRepository.groups).toHaveLength(1);
-    expectToEqual(groupRepository.groups[0], {
+    expect(groupRepository.groupEntities).toHaveLength(1);
+    expectToEqual(groupRepository.groupEntities[0], {
       slug: "l-amie-caline",
       name: formEstablishmentBatch.groupName,
       sirets: [
@@ -207,7 +207,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       ],
     });
 
-    expectToEqual(groupRepository.groups, [
+    expectToEqual(groupRepository.groupEntities, [
       {
         slug,
         name: formEstablishmentBatch.groupName,

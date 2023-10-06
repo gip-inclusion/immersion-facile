@@ -3,6 +3,7 @@ import {
   AppellationCode,
   expectHttpResponseToEqual,
   expectToEqual,
+  Group,
   immersionOffersRoute,
   searchImmersionRoutes,
   SearchRoutes,
@@ -18,6 +19,7 @@ import {
 } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
+import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
@@ -158,28 +160,35 @@ describe("search-immersion route", () => {
     });
   });
 
-  describe("GET getOffersByGroupSlug", () => {
+  describe("GET getGroupBySlug", () => {
     it("should get the stubbed data", async () => {
+      const group: Group = {
+        name: "Décathlon",
+        slug: "decathlon",
+        options: {
+          heroHeader: {
+            title: "Décathlon de ouf",
+            description: "À fond la forme",
+            logoUrl: "https://logo-decathlon.com",
+          },
+          tintColor: "red",
+        },
+      };
+      const groupEntity: GroupEntity = {
+        ...group,
+        sirets: [stubSearchResult.siret],
+      };
+
+      inMemoryUow.groupRepository.groupEntities = [groupEntity];
       const result = await sharedRequest.getGroupBySlug({
         urlParams: {
-          groupSlug: "some-group-slug",
+          groupSlug: groupEntity.slug,
         },
       });
       expectHttpResponseToEqual(result, {
         status: 200,
         body: {
-          group: {
-            name: "yo",
-            slug: "lala",
-            options: {
-              heroHeader: {
-                description: "yo",
-                title: "yo",
-                logoUrl: "https://yolo.com",
-              },
-              tintColor: "lala",
-            },
-          },
+          group,
           results: [stubSearchResult],
         },
       });
