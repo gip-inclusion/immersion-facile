@@ -1,5 +1,11 @@
 import { Subject } from "rxjs";
-import { AbsoluteUrl, ConventionSupportedJwt, FeatureFlags } from "shared";
+import {
+  AbsoluteUrl,
+  ConventionSupportedJwt,
+  Email,
+  FeatureFlags,
+  ValidateEmailStatus,
+} from "shared";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class TestTechnicalGateway implements TechnicalGateway {
@@ -19,4 +25,25 @@ export class TestTechnicalGateway implements TechnicalGateway {
     console.log("file uploaded : ", file);
     return `http://${file.name}-url`;
   };
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
+    const emailWithErrorStatus: ValidateEmailStatus = {
+      isValid: false,
+      proposal: "",
+      reason: "invalid_email",
+    };
+    const emailWithTypoStatus: ValidateEmailStatus = {
+      isValid: false,
+      proposal: "email-with-typo@gmail.com",
+      reason: "invalid_email",
+    };
+    if (email === "email-with-error@example.com") return emailWithErrorStatus;
+    if (email === "email-with-typo@gamil.com") return emailWithTypoStatus;
+    return {
+      isValid: true,
+      reason: "accepted_email",
+      proposal: null,
+    };
+  }
 }

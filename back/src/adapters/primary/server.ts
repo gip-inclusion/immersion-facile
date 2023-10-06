@@ -23,7 +23,6 @@ import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyA
 import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
 import { createApiKeyAuthRouterV2 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
-import { createValidateEmailRouter } from "./routers/emailValidation/createValidateEmailRouter";
 import { createEstablishmentRouter } from "./routers/establishment/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
 import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
@@ -90,7 +89,6 @@ export const createApp = async (
   app.use(createAgenciesRouter(deps));
   app.use(createPeConnectRouter(deps));
   app.use(createInclusionConnectRouter(deps));
-  app.use(createValidateEmailRouter(deps));
   app.use(createApiKeyAuthRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));

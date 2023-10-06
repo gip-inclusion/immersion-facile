@@ -10,7 +10,6 @@ import {
   siretTargets,
   technicalRoutes,
   unauthenticatedConventionRoutes,
-  validateEmailsTargets,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
@@ -21,7 +20,6 @@ import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdmin
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
-import { HttpEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/HttpEmailValidationGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
@@ -67,9 +65,6 @@ export const createHttpDependencies = (): Dependencies => {
     technicalGateway: new HttpTechnicalGateway(
       createAxiosSharedClient(technicalRoutes, axiosOnSlashApi),
       axiosOnSlashApi,
-    ),
-    emailValidationGateway: new HttpEmailValidationGateway(
-      createHttpClient(validateEmailsTargets),
     ),
     ...createCommonDependencies(),
   };

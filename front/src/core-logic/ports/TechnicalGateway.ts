@@ -1,5 +1,11 @@
 import { Observable } from "rxjs";
-import { AbsoluteUrl, ConventionSupportedJwt, FeatureFlags } from "shared";
+import {
+  AbsoluteUrl,
+  ConventionSupportedJwt,
+  Email,
+  FeatureFlags,
+  ValidateEmailStatus,
+} from "shared";
 
 export interface TechnicalGateway {
   getAllFeatureFlags$: () => Observable<FeatureFlags>;
@@ -8,4 +14,5 @@ export interface TechnicalGateway {
     htmlContent: string,
     jwt: ConventionSupportedJwt,
   ) => Promise<string>;
+  getEmailStatus(email: Email): Promise<ValidateEmailStatus>;
 }

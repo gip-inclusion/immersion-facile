@@ -74,7 +74,6 @@ export * from "./routes/establishementTargets";
 export * from "./routes/routes";
 export * from "./routes/siretTargets";
 export * from "./routes/technicalRoutes";
-export * from "./routes/validateEmailTargets";
 export * from "./schedule/Schedule.dto";
 export * from "./schedule/Schedule.schema";
 export * from "./schedule/ScheduleDtoBuilder";

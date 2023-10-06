@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { renewMagicLinkRequestSchema } from "../convention/convention.schema";
+import {
+  validateEmailInputSchema,
+  validateEmailResponseSchema,
+} from "../email/validateEmail.schema";
 import { featureFlagsSchema } from "../featureFlags";
 import { withAuthorizationHeaders } from "../headers";
 import {
@@ -58,6 +62,15 @@ export const technicalRoutes = defineRoutes({
       200: z.literal(""),
       400: httpErrorSchema,
       403: z.object({}),
+    },
+  }),
+  validateEmail: defineRoute({
+    method: "get",
+    url: "/validate-email",
+    queryParamsSchema: validateEmailInputSchema,
+    responses: {
+      200: validateEmailResponseSchema,
+      400: httpErrorSchema,
     },
   }),
 });
