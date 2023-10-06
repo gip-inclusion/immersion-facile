@@ -21,6 +21,8 @@ describe("POST /add-form-establishment-batch", () => {
     FormEstablishmentDtoBuilder.valid().build();
   const payload: FormEstablishmentBatchDto = {
     groupName: "Tesla",
+    title: "My title",
+    description: "My description",
     formEstablishments: [formEstablishment1],
   };
   let request: SuperTest<Test>;

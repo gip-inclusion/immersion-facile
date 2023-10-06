@@ -88,6 +88,8 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
 export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
   z.object({
     groupName: zStringMinLength1,
+    title: zStringMinLength1,
+    description: zStringMinLength1,
     formEstablishments: z.array(formEstablishmentSchema),
   });
 

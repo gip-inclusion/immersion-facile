@@ -28,11 +28,19 @@ export class AddFormEstablishmentBatch extends UseCase<
   protected async _execute({
     formEstablishments,
     groupName,
+    description,
+    title,
   }: FormEstablishmentBatchDto): Promise<EstablishmentBatchReport> {
     const group: GroupEntity = {
       slug: slugify(groupName),
       name: groupName,
       sirets: formEstablishments.map(({ siret }) => siret),
+      options: {
+        heroHeader: {
+          title,
+          description,
+        },
+      },
     };
     await this.uowPerformer.perform((uow) => uow.groupRepository.save(group));
 

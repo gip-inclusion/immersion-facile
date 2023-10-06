@@ -1,9 +1,5 @@
-import {
-  Group,
-  GroupWithResults,
-  WithGroupSlug,
-  withGroupSlugSchema,
-} from "shared";
+import { GroupWithResults, WithGroupSlug, withGroupSlugSchema } from "shared";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
@@ -21,6 +17,12 @@ export class GetOffersByGroupSlug extends TransactionalUseCase<
     { groupSlug }: WithGroupSlug,
     uow: UnitOfWork,
   ): Promise<GroupWithResults> {
-    return uow.groupRepository.getGroupWithSearchResultsBySlug(groupSlug);
+    const groupWithResults =
+      await uow.groupRepository.getGroupWithSearchResultsBySlug(groupSlug);
+
+    if (!groupWithResults)
+      throw new NotFoundError(`Group with slug ${groupSlug} not found`);
+
+    return groupWithResults;
   }
 }

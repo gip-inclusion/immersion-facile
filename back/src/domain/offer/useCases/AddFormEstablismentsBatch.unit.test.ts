@@ -5,6 +5,7 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
+  GroupOptions,
   makeBooleanFeatureFlag,
 } from "shared";
 import {
@@ -27,6 +28,13 @@ import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
 
+const groupOptions: GroupOptions = {
+  heroHeader: {
+    title: "My title",
+    description: "My description",
+  },
+};
+
 const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
   const formEstablishment1: FormEstablishmentDto =
     FormEstablishmentDtoBuilder.valid()
@@ -41,6 +49,8 @@ const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
 
   return {
     groupName: "L'amie caliné",
+    title: groupOptions.heroHeader.title,
+    description: groupOptions.heroHeader.description,
     formEstablishments: [formEstablishment1, formEstablishment2],
   };
 };
@@ -164,6 +174,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
         formEstablishmentBatch.formEstablishments[0].siret,
         formEstablishmentBatch.formEstablishments[1].siret,
       ],
+      options: groupOptions,
     });
   });
 
@@ -173,6 +184,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       slug,
       name: formEstablishmentBatch.groupName,
       sirets: [formEstablishmentBatch.formEstablishments[0].siret],
+      options: groupOptions,
     });
     await formEstablishmentRepo.setFormEstablishments([
       formEstablishmentBatch.formEstablishments[0],
@@ -203,6 +215,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
           formEstablishmentBatch.formEstablishments[0].siret,
           formEstablishmentBatch.formEstablishments[1].siret,
         ],
+        options: groupOptions,
       },
     ]);
   });
