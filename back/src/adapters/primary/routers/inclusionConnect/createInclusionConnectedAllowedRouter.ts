@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { inclusionConnectedAllowedTargets } from "shared";
+import { inclusionConnectedAllowedRoutes } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { createInclusionConnectedMiddleware } from "./createInclusionConnectedMiddleware";
@@ -9,8 +10,12 @@ export const createInclusionConnectedAllowedRouter = (
 ): Router => {
   const inclusionConnectedRouter = Router({ mergeParams: true });
 
-  inclusionConnectedRouter.get(
-    inclusionConnectedAllowedTargets.getInclusionConnectedUser.url,
+  const inclusionConnectedSharedRoutes = createExpressSharedRouter(
+    inclusionConnectedAllowedRoutes,
+    inclusionConnectedRouter,
+  );
+
+  inclusionConnectedSharedRoutes.getInclusionConnectedUser(
     createInclusionConnectedMiddleware(deps.config.jwtPublicKey),
     (req, res) =>
       sendHttpResponse(req, res, async () =>
@@ -21,8 +26,7 @@ export const createInclusionConnectedAllowedRouter = (
       ),
   );
 
-  inclusionConnectedRouter.post(
-    inclusionConnectedAllowedTargets.registerAgenciesToUser.url,
+  inclusionConnectedSharedRoutes.registerAgenciesToUser(
     createInclusionConnectedMiddleware(deps.config.jwtPublicKey),
     (req, res) =>
       sendHttpResponse(req, res, () =>
