@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
+import { emptyObjectSchema } from "../zodUtils";
 import { authenticateWithInclusionCodeSchema } from "./inclusionConnect.schema";
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
@@ -11,7 +11,7 @@ export const inclusionConnectImmersionRoutes = defineRoutes({
     method: "get",
     url: "/inclusion-connect-start-login",
     responses: {
-      302: z.object({}),
+      302: emptyObjectSchema,
     },
   }),
   afterLoginRedirection: defineRoute({
@@ -19,7 +19,7 @@ export const inclusionConnectImmersionRoutes = defineRoutes({
     url: "/inclusion-connect-after-login",
     queryParamsSchema: authenticateWithInclusionCodeSchema,
     responses: {
-      302: z.object({}),
+      302: emptyObjectSchema,
     },
   }),
 });

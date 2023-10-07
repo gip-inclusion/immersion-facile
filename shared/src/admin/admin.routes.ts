@@ -20,7 +20,7 @@ import {
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
-import { emptyStringSchema } from "../zodUtils";
+import { expressEmptyResponseBody } from "../zodUtils";
 import {
   icUserRoleForAgencyParamsSchema,
   userAndPasswordSchema,
@@ -62,7 +62,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: icUserRoleForAgencyParamsSchema,
     ...withAuthorizationHeaders,
     responses: {
-      201: emptyStringSchema,
+      201: expressEmptyResponseBody,
       401: legacyUnauthenticatedErrorSchema,
       404: legacyBadRequestErrorSchema,
     },
@@ -89,7 +89,7 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: setFeatureFlagSchema,
     responses: {
-      201: emptyStringSchema,
+      201: expressEmptyResponseBody,
       401: legacyUnauthenticatedErrorSchema,
     },
   }),
@@ -99,7 +99,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: createApiConsumerSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: apiConsumerJwtSchema.or(emptyStringSchema),
+      200: apiConsumerJwtSchema.or(expressEmptyResponseBody),
       401: legacyUnauthenticatedErrorSchema,
     },
   }),

@@ -12,7 +12,11 @@ import {
   legacyBadRequestErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
-import { zStringMinLength1 } from "../zodUtils";
+import {
+  emptyObjectSchema,
+  expressEmptyResponseBody,
+  zStringMinLength1,
+} from "../zodUtils";
 
 const htmlToPdfRequestSchema = z.object({
   htmlContent: zStringMinLength1,
@@ -40,7 +44,7 @@ export const technicalRoutes = defineRoutes({
     method: "get",
     url: `/to/:shortLinkId`,
     responses: {
-      302: z.object({}),
+      302: emptyObjectSchema,
       404: legacyBadRequestErrorSchema,
     },
   }),
@@ -59,9 +63,9 @@ export const technicalRoutes = defineRoutes({
     url: `/inbound-email-parsing`,
     requestBodySchema: brevoInboundBodySchema,
     responses: {
-      200: z.literal(""),
+      200: expressEmptyResponseBody,
       400: httpErrorSchema,
-      403: z.object({}),
+      403: emptyObjectSchema,
     },
   }),
   validateEmail: defineRoute({

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
   createWebhookSubscriptionSchema,
-  emptyStringSchema,
+  expressEmptyResponseBody,
   httpErrorSchema,
   searchResultSchema,
   searchResultsSchema,
@@ -91,7 +91,7 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
     requestBodySchema: createWebhookSubscriptionSchema,
     ...withAuthorizationHeaders,
     responses: {
-      201: emptyStringSchema,
+      201: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
