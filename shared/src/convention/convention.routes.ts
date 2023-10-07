@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAuthorizationHeaders } from "../headers";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
+import { expressEmptyResponseBody } from "../zodUtils";
 import {
   conventionReadSchema,
   conventionSchema,
@@ -52,7 +52,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     method: "post",
     requestBodySchema: renewConventionParamsSchema,
     ...withAuthorizationHeaders,
-    responses: { 200: z.literal("") },
+    responses: { 200: expressEmptyResponseBody },
   }),
 });
 
@@ -71,12 +71,12 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     url: "/share-immersion-demand",
     method: "post",
     requestBodySchema: shareLinkByEmailSchema,
-    responses: { 200: z.literal("") },
+    responses: { 200: expressEmptyResponseBody },
   }),
   renewMagicLink: defineRoute({
     url: "/renew-magic-link",
     method: "get",
     queryParamsSchema: renewMagicLinkRequestSchema,
-    responses: { 200: z.literal("") },
+    responses: { 200: expressEmptyResponseBody },
   }),
 });

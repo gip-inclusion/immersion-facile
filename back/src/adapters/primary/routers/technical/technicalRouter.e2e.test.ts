@@ -105,8 +105,8 @@ describe("technical router", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: "",
         status: 200,
+        body: "",
       });
     });
 

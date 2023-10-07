@@ -4,10 +4,10 @@ import {
   handleHttpJsonResponseErrorForApiV2,
 } from "./handleHttpJsonResponseError";
 
-export const sendHttpResponse = async (
+export const sendHttpResponse = async <T>(
   request: Request<any, any, any, any, any>,
-  response: Response,
-  callback: () => Promise<unknown>,
+  response: Response<T>,
+  callback: () => Promise<T>,
 ) => {
   try {
     const useCaseResult = await callback();

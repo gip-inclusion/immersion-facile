@@ -6,7 +6,7 @@ import {
   immersionOffersRoute,
 } from "../routes/routes";
 import { siretAndAppellationSchema } from "../siretAndAppellation/SiretAndAppellation.schema";
-import { emptyStringSchema } from "../zodUtils";
+import { expressEmptyResponseBody } from "../zodUtils";
 import { searchQueryParamsSchema } from "./SearchQueryParams.schema";
 import { searchResultSchema, searchResultsSchema } from "./SearchResult.schema";
 
@@ -31,7 +31,7 @@ export const searchImmersionRoutes = defineRoutes({
     url: `/${contactEstablishmentRoute}`,
     requestBodySchema: contactEstablishmentRequestSchema,
     responses: {
-      201: emptyStringSchema,
+      201: expressEmptyResponseBody,
       400: httpErrorSchema,
       404: httpErrorSchema,
     },

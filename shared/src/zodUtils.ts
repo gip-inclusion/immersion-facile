@@ -119,7 +119,11 @@ export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
   }
 };
 
-export const emptyStringSchema = z.string().max(0);
+export const emptyObjectSchema: z.Schema<Record<string, never>> = z
+  .object({})
+  .strict();
+
+export const expressEmptyResponseBody = z.void().or(z.literal(""));
 
 export const zEnumValidation = <T extends string>(
   values: readonly [T, ...T[]],
