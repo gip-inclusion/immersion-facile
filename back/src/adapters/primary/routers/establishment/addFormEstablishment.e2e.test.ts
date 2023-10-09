@@ -1,10 +1,15 @@
 import { SuperTest, Test } from "supertest";
 import {
   defaultValidFormEstablishment,
-  establishmentTargets,
+  displayRouteName,
+  EstablishmentRoutes,
+  establishmentRoutes,
+  expectHttpResponseToEqual,
   expectToEqual,
   FormEstablishmentDtoBuilder,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { avenueChampsElysees } from "../../../../_testBuilders/addressDtos";
 import {
   buildTestApp,
@@ -25,6 +30,7 @@ import { FormEstablishmentDtoPublicV1 } from "../DtoAndSchemas/v1/input/FormEsta
 
 describe("Add form establishment", () => {
   let request: SuperTest<Test>;
+  let httpClient: HttpClient<EstablishmentRoutes>;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let gateways: InMemoryGateways;
@@ -33,6 +39,7 @@ describe("Add form establishment", () => {
   beforeEach(async () => {
     ({ request, inMemoryUow, generateApiConsumerJwt, gateways, eventCrawler } =
       await buildTestApp());
+    httpClient = createSupertestSharedClient(establishmentRoutes, request);
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
       unauthorizedApiConsumer,
@@ -40,9 +47,13 @@ describe("Add form establishment", () => {
     ];
   });
 
-  describe("Route to post form establishments from front (hence, without API key)", () => {
+  describe(`${displayRouteName(
+    establishmentRoutes.addFormEstablishment,
+  )} Route to post form establishments from front (hence, without API key)`, () => {
     // from front
-    it("support posting valid establishment from front", async () => {
+    it(`${displayRouteName(
+      establishmentRoutes.addFormEstablishment,
+    )} 200 support posting valid establishment from front`, async () => {
       inMemoryUow.romeRepository.appellations =
         defaultValidFormEstablishment.appellations;
 
@@ -50,18 +61,22 @@ describe("Add form establishment", () => {
         .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
         .build();
 
-      const { status, body } = await request
-        .post(establishmentTargets.addFormEstablishment.url)
-        .send(formEstablishment);
+      const response = await httpClient.addFormEstablishment({
+        body: formEstablishment,
+      });
 
-      expectToEqual(status, 200);
-      expectToEqual(body, "");
+      expectHttpResponseToEqual(response, {
+        body: "",
+        status: 200,
+      });
       expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
         formEstablishment,
       ]);
     });
 
-    it("Check if email notification has been sent and published after FormEstablishment added", async () => {
+    it(`${displayRouteName(
+      establishmentRoutes.addFormEstablishment,
+    )} 200 Check if email notification has been sent and published after FormEstablishment added`, async () => {
       gateways.addressApi.setAddressAndPosition([
         {
           position: {
@@ -82,17 +97,17 @@ describe("Add form establishment", () => {
 
       const email = "tiredofthismess@seriously.com";
 
-      const { body, status } = await request
-        .post(establishmentTargets.addFormEstablishment.url)
-        .send(
-          FormEstablishmentDtoBuilder.valid()
-            .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-            .withBusinessContactEmail(email)
-            .build(),
-        );
+      const response = await httpClient.addFormEstablishment({
+        body: FormEstablishmentDtoBuilder.valid()
+          .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
+          .withBusinessContactEmail(email)
+          .build(),
+      });
 
-      expectToEqual(body, "");
-      expectToEqual(status, 200);
+      expectHttpResponseToEqual(response, {
+        body: "",
+        status: 200,
+      });
 
       await processEventsForEmailToBeSent(eventCrawler);
 

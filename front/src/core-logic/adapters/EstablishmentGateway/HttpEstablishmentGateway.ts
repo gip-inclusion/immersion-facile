@@ -2,25 +2,26 @@ import { from, Observable } from "rxjs";
 import {
   BackOfficeJwt,
   EstablishmentJwt,
-  EstablishmentTargets,
+  EstablishmentRoutes,
   FormEstablishmentDto,
   SiretDto,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class HttpEstablishmentGateway implements EstablishmentGateway {
-  constructor(private readonly httpClient: HttpClient<EstablishmentTargets>) {}
+  constructor(private readonly httpClient: HttpClient<EstablishmentRoutes>) {}
 
   public addFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
   ): Observable<void> {
     return from(
       this.httpClient
-        .addFormEstablishment({
-          body: formEstablishment,
-        })
-        .then((response) => response.responseBody),
+        .addFormEstablishment({ body: formEstablishment })
+        .then(({ status, body }) => {
+          if (status === 200) return;
+          throw new Error(body);
+        }),
     );
   }
 
@@ -34,7 +35,10 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
           urlParams: { siret },
           headers: { authorization: jwt },
         })
-        .then((response) => response.responseBody),
+        .then(({ body, status }) => {
+          if (status === 204) return;
+          throw new Error(JSON.stringify(body));
+        }),
     );
   }
 
@@ -48,7 +52,10 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
           urlParams: { siret },
           headers: { authorization: jwt },
         })
-        .then((response) => response.responseBody),
+        .then(({ body, status }) => {
+          if (status === 200) return body;
+          throw new Error(JSON.stringify(body));
+        }),
     );
   }
 
@@ -58,7 +65,10 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
         .requestEmailToUpdateFormRoute({
           urlParams: { siret },
         })
-        .then((response) => response.responseBody),
+        .then(({ body, status }) => {
+          if (status === 201) return;
+          throw new Error(JSON.stringify(body));
+        }),
     );
   }
 
@@ -74,7 +84,10 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             authorization: jwt,
           },
         })
-        .then((response) => response.responseBody),
+        .then(({ body, status }) => {
+          if (status === 200) return;
+          throw new Error(JSON.stringify(body));
+        }),
     );
   }
 }

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   contactEstablishmentRoute,
-  establishmentTargets,
+  establishmentRoutes,
   immersionOffersRoute,
   pipeWithValue,
   SiretAndAppellationDto,
@@ -26,7 +26,7 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
 
   // Form establishments routes
   publicV1Router
-    .route(`/v1${establishmentTargets.addFormEstablishment.url}`)
+    .route(`/v1${establishmentRoutes.addFormEstablishment.url}`)
     .post(deps.apiKeyAuthMiddlewareV1, async (req, res) => {
       counterFormEstablishmentCallerV1.inc({
         referer: req.get("Referrer"),

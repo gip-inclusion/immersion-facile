@@ -70,7 +70,7 @@ export * from "./romeAndAppellationDtos/romeAndAppellation.dto";
 export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/addressRoutes";
 export * from "./routes/agencyRoutes";
-export * from "./routes/establishementTargets";
+export * from "./routes/establishementRoutes";
 export * from "./routes/routes";
 export * from "./routes/siret.routes";
 export * from "./routes/technicalRoutes";
