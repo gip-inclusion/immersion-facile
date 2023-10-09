@@ -1,4 +1,4 @@
-import type { Expression, InsertObject, RawBuilder, Simplify } from "kysely";
+import type { InsertObject } from "kysely";
 import { sql } from "kysely";
 import { ContactMethod, DiscussionId, SiretDto } from "shared";
 import {
@@ -9,7 +9,11 @@ import {
   DiscussionAggregateRepository,
   HasDiscussionMatchingParams,
 } from "../../../../domain/offer/ports/DiscussionAggregateRepository";
-import { KyselyDb } from "../kysely/kyselyUtils";
+import {
+  jsonBuildObject,
+  jsonStripNulls,
+  KyselyDb,
+} from "../kysely/kyselyUtils";
 import { Database } from "../kysely/model/database";
 
 export class PgDiscussionAggregateRepository
@@ -221,29 +225,3 @@ const discussionAggregateToPg = (
   contact_method: discussion.establishmentContact.contactMethod,
   potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
 });
-
-export function jsonBuildObject<O extends Record<string, Expression<unknown>>>(
-  obj: O,
-): RawBuilder<
-  Simplify<{
-    [K in keyof O]: O[K] extends Expression<infer V> ? V : never;
-  }>
-> {
-  return sql`json_build_object(${sql.join(
-    Object.keys(obj).flatMap((k) => [sql.lit(k), obj[k]]),
-  )})`;
-}
-
-type NullableToUndefined<A> = A extends null ? Exclude<A, null> | undefined : A;
-
-type StripNullRecursive<T> = {
-  [K in keyof T]: T[K] extends Record<any, unknown>
-    ? StripNullRecursive<T[K]>
-    : NullableToUndefined<T[K]>;
-};
-
-export function jsonStripNulls<T>(
-  obj: RawBuilder<T>,
-): RawBuilder<StripNullRecursive<T>> {
-  return sql`json_strip_nulls(${obj})`;
-}
