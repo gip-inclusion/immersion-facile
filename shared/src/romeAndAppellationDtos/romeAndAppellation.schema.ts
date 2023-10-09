@@ -21,6 +21,10 @@ export const appellationCodeSchema: z.Schema<AppellationCode> = z
   .string()
   .regex(codeAppellationRegex, "Code appellation incorrect");
 
+export const appellationCodeSchemaOptional: z.Schema<
+  AppellationCode | undefined
+> = z.union([appellationCodeSchema, z.undefined()]);
+
 export const appellationCodesSchema: z.Schema<AppellationCode[]> = z.array(
   appellationCodeSchema,
 );
