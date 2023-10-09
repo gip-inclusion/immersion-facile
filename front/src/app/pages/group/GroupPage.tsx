@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -60,6 +60,7 @@ export const GroupPage = ({ route }: GroupPageProps) => {
 };
 
 const GroupPageContent = ({ group, results }: GroupWithResults) => {
+  const searchBarRef = useRef<HTMLDivElement>(null);
   const { classes, cx } = useStyles(() => ({
     searchBar: {
       background: group.options.tintColor,
@@ -95,9 +96,16 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
     filterResults(query);
   };
 
+  const onHeroHeaderCtaClick = () => {
+    if (searchBarRef.current) {
+      searchBarRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   return (
     <>
-      <section className={cx(fr.cx("fr-py-16w"), classes.heroHeader)}>
+      <section
+        className={cx(fr.cx("fr-py-8w", "fr-py-md-16w"), classes.heroHeader)}
+      >
         <div
           className={fr.cx(
             "fr-grid-row",
@@ -105,19 +113,32 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
             "fr-container",
           )}
         >
-          <div className={fr.cx("fr-col")}>
+          <div className={fr.cx("fr-col", "fr-col-12", "fr-col-md-8")}>
             <h1>{group.options.heroHeader.title}</h1>
             <p>{group.options.heroHeader.description}</p>
-            <Button>TODO Trouver une immersion</Button>
+            <Button priority="secondary" onClick={onHeroHeaderCtaClick}>
+              Trouver une immersion
+            </Button>
           </div>
           {group.options.heroHeader.logoUrl && (
-            <div className={fr.cx("fr-col", "fr-col-lg-3")}>
+            <div
+              className={fr.cx(
+                "fr-col-12",
+                "fr-col-md-3",
+                "fr-col-offset-md-1",
+                "fr-hidden",
+                "fr-unhidden-md",
+              )}
+            >
               <img src={group.options.heroHeader.logoUrl} alt={group.name} />
             </div>
           )}
         </div>
       </section>
-      <section className={cx(fr.cx("fr-py-6w"), classes.searchBar)}>
+      <section
+        ref={searchBarRef}
+        className={cx(fr.cx("fr-py-6w"), classes.searchBar)}
+      >
         <div className={fr.cx("fr-container")}>
           <h2 className={cx(classes.searchBarTitle)}>
             {group.name} : toutes les immersions
@@ -126,7 +147,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
             className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
             onSubmit={onFilterSubmit}
           >
-            <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+            <div className={fr.cx("fr-col-12", "fr-col-sm-8")}>
               <Input
                 label={`Cherchez dans les immersions proposées par ${group.name}`}
                 hideLabel
@@ -137,7 +158,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
                 }}
               />
             </div>
-            <div className={fr.cx("fr-col-12", "fr-col-lg-3")}>
+            <div className={fr.cx("fr-col-12", "fr-col-sm-4")}>
               <Button>Filtrer les résultats</Button>
             </div>
           </form>
