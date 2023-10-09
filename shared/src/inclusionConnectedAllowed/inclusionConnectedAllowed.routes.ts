@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { agencyIdsSchema } from "../agency/agency.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import { expressEmptyResponseBody } from "../zodUtils";
 import { inclusionConnectedUserSchema } from "./inclusionConnectedAllowed.schema";
 
 export type InclusionConnectedAllowedRoutes =
@@ -24,7 +24,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: agencyIdsSchema,
     responses: {
-      200: z.literal(""),
+      200: expressEmptyResponseBody,
       400: httpErrorSchema,
     },
   }),

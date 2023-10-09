@@ -128,10 +128,7 @@ export class HttpAdminGateway implements AdminGateway {
           headers: { authorization: adminToken },
         })
         .then((response) => {
-          if (response.status === 200) {
-            if (response.body) return response.body;
-            return;
-          }
+          if (response.status === 200) return response.body || undefined;
           throw new Error(JSON.stringify(response.body));
         }),
     );
