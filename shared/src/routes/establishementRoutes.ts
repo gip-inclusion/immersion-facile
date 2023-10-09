@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { renewMagicLinkResponseSchema } from "../convention/convention.schema";
 import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
@@ -8,6 +7,7 @@ import {
   legacyBadRequestErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
+import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
 const formEstablishmentsUrl = "/form-establishments";
 
@@ -18,7 +18,7 @@ export const establishmentRoutes = defineRoutes({
     url: formEstablishmentsUrl,
     requestBodySchema: formEstablishmentSchema,
     responses: {
-      200: z.literal(""),
+      200: expressEmptyResponseBody,
     },
   }),
   updateFormEstablishment: defineRoute({
@@ -27,7 +27,7 @@ export const establishmentRoutes = defineRoutes({
     requestBodySchema: formEstablishmentSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: z.literal(""),
+      200: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
       403: renewMagicLinkResponseSchema,
@@ -53,7 +53,7 @@ export const establishmentRoutes = defineRoutes({
     url: `${formEstablishmentsUrl}/:siret`,
     ...withAuthorizationHeaders,
     responses: {
-      204: z.object({}),
+      204: emptyObjectSchema,
       400: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
       404: legacyBadRequestErrorSchema,
