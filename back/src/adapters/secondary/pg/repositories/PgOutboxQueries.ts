@@ -50,6 +50,7 @@ export class PgOutboxQueries implements OutboxQueries {
      LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
      LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
      WHERE outbox.id IN ${selectEventIdsStillFailing}
+     ORDER BY outbox_failures.subscription_id ASC
     `,
     );
 
