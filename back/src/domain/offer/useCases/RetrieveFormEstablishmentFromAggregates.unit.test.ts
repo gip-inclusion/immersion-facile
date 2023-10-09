@@ -3,32 +3,22 @@ import {
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   expectPromiseToFailWithError,
-  FormEstablishmentDto,
+  expectToEqual,
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RetrieveFormEstablishmentFromAggregates } from "../useCases/RetrieveFormEstablishmentFromAggregates";
-
-const prepareUseCase = () => {
-  const uow = createInMemoryUow();
-  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
-  const useCase = new RetrieveFormEstablishmentFromAggregates(
-    new InMemoryUowPerformer(uow),
-  );
-
-  return {
-    useCase,
-    establishmentAggregateRepository,
-  };
-};
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
   const siret = "12345678901234";
@@ -46,9 +36,17 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     role: "backOffice",
     sub: "admin",
   };
+  let useCase: RetrieveFormEstablishmentFromAggregates;
+  let uow: InMemoryUnitOfWork;
+
+  beforeEach(() => {
+    uow = createInMemoryUow();
+    useCase = new RetrieveFormEstablishmentFromAggregates(
+      new InMemoryUowPerformer(uow),
+    );
+  });
 
   it("throws an error if there is no jwt", async () => {
-    const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
       useCase.execute(establishmentJwtPayload.siret),
       new ForbiddenError("Accès refusé"),
@@ -56,7 +54,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   });
 
   it("throws an error if there is no establishment with this siret", async () => {
-    const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
       useCase.execute(establishmentJwtPayload.siret, establishmentJwtPayload),
       new BadRequestError("No establishment found with siret 12345678901234."),
@@ -65,7 +62,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
   it("throws an error if there is no establishment from form with this siret", async () => {
     // Prepare : there is an establishment with the siret, but from LBB
-    const { useCase } = prepareUseCase();
     // Act and assert
     await expectPromiseToFailWithError(
       useCase.execute(establishmentJwtPayload.siret, establishmentJwtPayload),
@@ -74,7 +70,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   });
 
   it("returns a reconstructed form if establishment with siret exists with dataSource=form & establishment jwt payload", async () => {
-    const { useCase, establishmentAggregateRepository } = prepareUseCase();
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
@@ -84,7 +79,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       .withAppellationCode("11987")
       .build();
 
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
@@ -98,8 +93,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     );
 
     // Assert
-    expect(retrievedForm).toBeDefined();
-    const expectedForm: FormEstablishmentDto = {
+    expectToEqual(retrievedForm, {
       siret,
       source: "immersion-facile",
       businessName: establishment.name,
@@ -109,22 +103,20 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       naf: establishment.nafDto,
       appellations: [
         {
-          appellationLabel: "test_appellation_label",
-          romeLabel: "test_rome_label",
-          romeCode: "A1101",
-          appellationCode: "11987",
+          romeCode: offer.romeCode,
+          romeLabel: offer.romeLabel,
+          appellationCode: offer.appellationCode,
+          appellationLabel: offer.appellationLabel,
         },
       ],
       businessContact: contact,
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
       maxContactsPerWeek: establishment.maxContactsPerWeek,
-    };
-    expect(retrievedForm).toMatchObject(expectedForm);
+    });
   });
 
   it("returns a reconstructed form if establishment with siret exists with dataSource=form & backoffice jwt payload", async () => {
-    const { useCase, establishmentAggregateRepository } = prepareUseCase();
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
@@ -134,7 +126,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       .withAppellationCode("11987")
       .build();
 
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
@@ -145,8 +137,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     const retrievedForm = await useCase.execute(siret, backOfficeJwtPayload);
 
     // Assert
-    expect(retrievedForm).toBeDefined();
-    const expectedForm: FormEstablishmentDto = {
+    expectToEqual(retrievedForm, {
       siret,
       source: "immersion-facile",
       businessName: establishment.name,
@@ -156,17 +147,16 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       naf: establishment.nafDto,
       appellations: [
         {
-          appellationLabel: "test_appellation_label",
-          romeLabel: "test_rome_label",
-          romeCode: "A1101",
-          appellationCode: "11987",
+          romeCode: offer.romeCode,
+          romeLabel: offer.romeLabel,
+          appellationCode: offer.appellationCode,
+          appellationLabel: offer.appellationLabel,
         },
       ],
       businessContact: contact,
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
       maxContactsPerWeek: establishment.maxContactsPerWeek,
-    };
-    expect(retrievedForm).toMatchObject(expectedForm);
+    });
   });
 });

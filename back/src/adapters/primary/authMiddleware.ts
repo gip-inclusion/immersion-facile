@@ -265,9 +265,7 @@ const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
   logger.info({ err }, "unsupported or expired magic link used");
   res.status(403);
   const message =
-    err?.message === "jwt expired"
-      ? "Le lien magique est périmé"
-      : err?.message;
+    err.message === "jwt expired" ? "Le lien magique est périmé" : err.message;
 
   return res.json({
     message,

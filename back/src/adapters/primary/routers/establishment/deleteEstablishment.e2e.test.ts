@@ -1,10 +1,15 @@
 import { SuperTest, Test } from "supertest";
 import {
   currentJwtVersions,
-  establishmentTargets,
+  displayRouteName,
+  EstablishmentRoutes,
+  establishmentRoutes,
+  expectHttpResponseToEqual,
   expectToEqual,
   FormEstablishmentDtoBuilder,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import {
@@ -15,51 +20,53 @@ import { establishmentNotFoundErrorMessage } from "../../../../domain/offer/port
 import { formEstablishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/FormEstablishmentRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
-describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTargets.deleteEstablishment.url}`, () => {
+describe(`Delete form establishment`, () => {
   const establishmentAggregate = new EstablishmentAggregateBuilder().build();
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(establishmentAggregate.establishment.siret)
     .build();
-  const deleteUrlWithSiret =
-    establishmentTargets.deleteEstablishment.url.replace(
-      ":siret",
-      establishmentAggregate.establishment.siret,
-    );
 
-  let request: SuperTest<Test>;
+  let httpClient: HttpClient<EstablishmentRoutes>;
   let uow: InMemoryUnitOfWork;
   let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
 
   beforeEach(async () => {
+    let request: SuperTest<Test>;
     ({
       request,
       inMemoryUow: uow,
       generateBackOfficeJwt,
       generateEditEstablishmentJwt,
     } = await buildTestApp());
+    httpClient = createSupertestSharedClient(establishmentRoutes, request);
   });
 
-  it("204 - Establishment Aggregate & Form deleted with back office JWT", async () => {
+  it(`${displayRouteName(
+    establishmentRoutes.deleteEstablishment,
+  )} 204 - Establishment Aggregate & Form deleted with back office JWT`, async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishmentAggregate,
     ];
     uow.formEstablishmentRepository.setFormEstablishments([formEstablishment]);
 
-    const response = await request
-      .delete(deleteUrlWithSiret)
-      .set(
-        "Authorization",
-        generateBackOfficeJwt({
+    const response = await httpClient.deleteEstablishment({
+      urlParams: {
+        siret: establishmentAggregate.establishment.siret,
+      },
+      headers: {
+        authorization: generateBackOfficeJwt({
           role: "backOffice",
           sub: "",
           version: currentJwtVersions.backOffice,
         }),
-      )
-      .send();
+      },
+    });
 
-    expectToEqual(response.body, {});
-    expectToEqual(response.status, 204);
+    expectHttpResponseToEqual(response, {
+      body: {},
+      status: 204,
+    });
     expectToEqual(
       uow.establishmentAggregateRepository.establishmentAggregates,
       [],
@@ -67,97 +74,129 @@ describe(`${establishmentTargets.deleteEstablishment.method} ${establishmentTarg
     expectToEqual(await uow.formEstablishmentRepository.getAll(), []);
   });
 
-  it("401 - Unauthenticated", async () => {
-    const response = await request.delete(deleteUrlWithSiret).send();
-
-    expectToEqual(response.body, {
-      error: "forbidden: unauthenticated",
+  it(`${displayRouteName(
+    establishmentRoutes.deleteEstablishment,
+  )} 400 - Unauthenticated`, async () => {
+    const response = await httpClient.deleteEstablishment({
+      urlParams: {
+        siret: establishmentAggregate.establishment.siret,
+      },
+      headers: {} as any,
     });
-    expectToEqual(response.status, 401);
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        issues: ["authorization : Required"],
+        message:
+          "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: DELETE /form-establishments/:siret",
+        status: 400,
+      },
+      status: 400,
+    });
   });
 
-  it("403 - Jwt expired", async () => {
-    const response = await request
-      .delete(deleteUrlWithSiret)
-      .set(
-        "Authorization",
-        generateBackOfficeJwt({
+  it(`${displayRouteName(
+    establishmentRoutes.deleteEstablishment,
+  )} 403 - Jwt expired`, async () => {
+    const response = await httpClient.deleteEstablishment({
+      urlParams: {
+        siret: establishmentAggregate.establishment.siret,
+      },
+      headers: {
+        authorization: generateBackOfficeJwt({
           role: "backOffice",
           sub: "",
           version: currentJwtVersions.backOffice,
           exp: Math.round((new Date().getTime() - 48 * 3600 * 1000) / 1000),
         }),
-      )
-      .send();
-
-    expectToEqual(response.body, {
-      message: "Le lien magique est périmé",
-      needsNewMagicLink: true,
+      },
     });
-    expectToEqual(response.status, 403);
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        message: "Le lien magique est périmé",
+        needsNewMagicLink: true,
+      },
+      status: 403,
+    });
   });
 
-  it("403 - Access refused with edit establishment JWT", async () => {
-    const response = await request
-      .delete(deleteUrlWithSiret)
-      .set(
-        "Authorization",
-        generateEditEstablishmentJwt({
+  it(`${displayRouteName(
+    establishmentRoutes.deleteEstablishment,
+  )} 403 - Access refused with edit establishment JWT`, async () => {
+    const response = await httpClient.deleteEstablishment({
+      urlParams: {
+        siret: establishmentAggregate.establishment.siret,
+      },
+      headers: {
+        authorization: generateEditEstablishmentJwt({
           siret: establishmentAggregate.establishment.siret,
           version: currentJwtVersions.establishment,
         }),
-      )
-      .send();
-
-    expectToEqual(response.body, {
-      errors: "Accès refusé",
+      },
     });
-    expectToEqual(response.status, 403);
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        errors: "Accès refusé",
+      },
+      status: 403,
+    });
   });
 
-  it("404 - Establishment Aggregate not found", async () => {
-    const response = await request
-      .delete(deleteUrlWithSiret)
-      .set(
-        "Authorization",
-        generateBackOfficeJwt({
+  it(`${displayRouteName(
+    establishmentRoutes.deleteEstablishment,
+  )} 404 - Establishment Aggregate not found`, async () => {
+    const response = await httpClient.deleteEstablishment({
+      urlParams: {
+        siret: establishmentAggregate.establishment.siret,
+      },
+      headers: {
+        authorization: generateBackOfficeJwt({
           role: "backOffice",
           sub: "",
           version: currentJwtVersions.backOffice,
         }),
-      )
-      .send();
-
-    expectToEqual(response.body, {
-      errors: establishmentNotFoundErrorMessage(
-        establishmentAggregate.establishment.siret,
-      ),
+      },
     });
-    expectToEqual(response.status, 404);
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        errors: establishmentNotFoundErrorMessage(
+          establishmentAggregate.establishment.siret,
+        ),
+      },
+      status: 404,
+    });
   });
 
-  it("404 - Establishment Form not found", async () => {
+  it(`${displayRouteName(
+    establishmentRoutes.deleteEstablishment,
+  )} 404 - Establishment Form not found`, async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishmentAggregate,
     ];
 
-    const response = await request
-      .delete(deleteUrlWithSiret)
-      .set(
-        "Authorization",
-        generateBackOfficeJwt({
+    const response = await httpClient.deleteEstablishment({
+      urlParams: {
+        siret: establishmentAggregate.establishment.siret,
+      },
+      headers: {
+        authorization: generateBackOfficeJwt({
           role: "backOffice",
           sub: "",
           version: currentJwtVersions.backOffice,
         }),
-      )
-      .send();
-
-    expectToEqual(response.body, {
-      errors: formEstablishmentNotFoundErrorMessage(
-        establishmentAggregate.establishment.siret,
-      ),
+      },
     });
-    expectToEqual(response.status, 404);
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        errors: formEstablishmentNotFoundErrorMessage(
+          establishmentAggregate.establishment.siret,
+        ),
+      },
+      status: 404,
+    });
   });
 });
