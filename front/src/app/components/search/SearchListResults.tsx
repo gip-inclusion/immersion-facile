@@ -74,8 +74,11 @@ export const SearchListResults = () => {
                 key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
                 establishment={searchResult}
                 onButtonClick={() => {
+                  const appellations = searchResult.appellations;
                   const appellationCode =
-                    searchResult.appellations.at(0)?.appellationCode;
+                    appellations && appellations.length
+                      ? appellations[0].appellationCode
+                      : null;
                   if (appellationCode) {
                     routes
                       .searchResult({
