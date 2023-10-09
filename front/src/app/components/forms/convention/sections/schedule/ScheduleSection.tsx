@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { addDays, addMonths, differenceInDays } from "date-fns";
+import { addDays, differenceInDays } from "date-fns";
 import {
   ConventionReadDto,
   DateIntervalDto,
@@ -38,9 +38,9 @@ export const ScheduleSection = () => {
   const formContents = getFormFields();
 
   const [dateMax, setDateMax] = useState(
-    addMonths(
+    addDays(
       isStringDate(values.dateStart) ? new Date(values.dateStart) : new Date(),
-      1,
+      maximumCalendarDayByInternshipKind[values.internshipKind],
     ).toISOString(),
   );
 
@@ -102,7 +102,12 @@ export const ScheduleSection = () => {
         );
       }
 
-      setDateMax(addMonths(newDates.start, 1).toISOString());
+      setDateMax(
+        addDays(
+          newDates.start,
+          maximumCalendarDayByInternshipKind[values.internshipKind],
+        ).toISOString(),
+      );
       setValue("dateStart", newDates.start.toISOString());
       setValue("dateEnd", newDates.end.toISOString());
       setValue(
