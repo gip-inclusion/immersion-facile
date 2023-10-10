@@ -12,7 +12,6 @@ import {
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
 import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
@@ -29,9 +28,6 @@ import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/H
 
 export const createHttpDependencies = (): Dependencies => {
   const axiosOnSlashApi = createManagedAxiosInstance({ baseURL: "/api" });
-  const createHttpClient = configureHttpClient(
-    createAxiosHandlerCreator(axiosOnSlashApi),
-  );
 
   return {
     addressGateway: new HttpAddressGateway(
