@@ -21,8 +21,6 @@ type GroupPageProps = {
 };
 const useStyles = makeStyles({ name: "GroupPage" });
 
-// type GroupTheme = Record<AuthorizedGroupSlugs, Group>;
-
 export const GroupPage = ({ route }: GroupPageProps) => {
   const { groupSlug } = route.params;
   const [initialResults, setInitialResults] = useState<SearchResultDto[]>([]);
@@ -30,7 +28,7 @@ export const GroupPage = ({ route }: GroupPageProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [group, setGroup] = useState<Group | null>(null);
 
-  const getInitialOffers = useCallback(async () => {
+  const getInitialGroupData = useCallback(async () => {
     setLoading(true);
     const response = await searchGateway.getGroupBySlug(groupSlug);
     const { group, results } = response;
@@ -39,13 +37,10 @@ export const GroupPage = ({ route }: GroupPageProps) => {
   }, []);
 
   useEffect(() => {
-    getInitialOffers().finally(() => {
+    getInitialGroupData().finally(() => {
       setLoading(false);
     });
   }, []);
-
-  if (!group || loading) return <Loader />;
-
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
