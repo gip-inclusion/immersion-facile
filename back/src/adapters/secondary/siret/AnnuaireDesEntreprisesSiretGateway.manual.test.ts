@@ -52,6 +52,23 @@ describe("HttpSirenGateway", () => {
     });
   });
 
+  it("returns non diffusible open establishments", async () => {
+    const response = await siretGateway.getEstablishmentBySiret(
+      "80327462000043",
+    );
+    expectToEqual(response, {
+      businessAddress: "127 RUE DE NANTES 85800 LE FENOUILLER",
+      businessName: "LUCIE LEBOURDAIS",
+      isOpen: true,
+      nafDto: {
+        code: "8690D",
+        nomenclature: "NAFRev2",
+      },
+      numberEmployeesRange: "",
+      siret: "80327462000043",
+    });
+  });
+
   it("returns undefined when no establishment found", async () => {
     const response = await siretGateway.getEstablishmentBySiret(
       "00000000000000",
