@@ -2,7 +2,7 @@ import React from "react";
 import { Route } from "type-route";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
-import { AgencyDashboardPage } from "src/app/pages/AgencyDashboardPage";
+import { AgencyDashboardPage } from "src/app/pages/agencyDashboard/AgencyDashboardPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionManageInclusionConnectedPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";

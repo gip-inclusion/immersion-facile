@@ -59,6 +59,7 @@ import {
   InternshipKind,
   internshipKinds,
   levelsOfEducation,
+  MarkPartnersErroredConventionAsHandledRequest,
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
@@ -422,6 +423,10 @@ export const renewMagicLinkResponseSchema: z.Schema<RenewMagicLinkResponse> =
   z.object({
     message: z.literal("Le lien magique est périmé"),
     needsNewMagicLink: z.boolean(),
+  });
+export const markPartnersErroredConventionAsHandledRequestSchema: z.Schema<MarkPartnersErroredConventionAsHandledRequest> =
+  z.object({
+    conventionId: conventionIdSchema,
   });
 
 const addIssuesIfDuplicateSignatoriesEmails = (

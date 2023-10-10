@@ -14,7 +14,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { RegisterAgenciesForm } from "../components/forms/register-agencies/RegisterAgenciesForm";
+import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
+import { MarkPartnersErroredConventionAsHandledFormSection } from "./MarkPartnersErroredConventionAsHandledFormSection";
 
 export const AgencyDashboardPage = () => {
   // the Layout (Header, Footer...) is given by InclusionConnectedPrivateRoute (higher order component)
@@ -65,6 +66,7 @@ export const AgencyDashboardPage = () => {
                   title="Tableau de bord agence"
                   url={conventionErrorUrl}
                 />
+                <MarkPartnersErroredConventionAsHandledFormSection />
               </>
             ),
           },

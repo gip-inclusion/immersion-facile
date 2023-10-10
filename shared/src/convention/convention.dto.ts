@@ -333,3 +333,7 @@ export type RenewConventionParams = Pick<
   ConventionRenewed,
   "id" | "dateStart" | "dateEnd" | "schedule" | "renewed"
 >;
+
+export type MarkPartnersErroredConventionAsHandledRequest = {
+  conventionId: ConventionId;
+};
