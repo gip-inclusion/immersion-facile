@@ -8,7 +8,12 @@ import {
 export const useSearchUseCase = () => {
   const dispatch = useDispatch();
   return (values: SearchPageParams) => {
-    dispatch(searchSlice.actions.searchRequested(values));
+    const appellationCodes = values.appellations?.map(
+      (appellation) => appellation.appellationCode,
+    );
+    dispatch(
+      searchSlice.actions.searchRequested({ ...values, appellationCodes }),
+    );
     routes.search(values).replace();
   };
 };

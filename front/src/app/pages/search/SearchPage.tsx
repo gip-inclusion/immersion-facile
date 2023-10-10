@@ -57,10 +57,7 @@ export const SearchPage = ({
     distanceKm: 10,
     place: "",
     sortedBy: "distance",
-    appellationCode: undefined,
-    appellationLabel: undefined,
-    rome: undefined,
-    romeLabel: undefined,
+    appellations: undefined,
   };
   const availableForSearchRequest = (
     searchStatus: SearchStatus,
@@ -134,31 +131,21 @@ export const SearchPage = ({
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
               <AppellationAutocomplete
                 label="Je recherche le métier :"
-                initialValue={{
-                  romeCode: formValues.rome ?? "",
-                  romeLabel: formValues.romeLabel ?? "",
-                  appellationLabel: formValues.appellationLabel ?? "",
-                  appellationCode: formValues.appellationCode ?? "",
+                initialValue={
+                  formValues.appellations
+                    ? formValues.appellations[0]
+                    : undefined
+                }
+                onAppellationSelected={(newAppellationAndRome) => {
+                  setValue("appellations", [newAppellationAndRome]);
                 }}
-                onAppellationSelected={(newValue) => {
-                  setValue("rome", newValue.romeCode);
-                  setValue("romeLabel", newValue.romeLabel);
-                  setValue("appellationCode", newValue.appellationCode);
-                  setValue("appellationLabel", newValue.appellationLabel);
-                }}
-                selectedAppellations={[
-                  {
-                    romeLabel: formValues.romeLabel ?? "",
-                    romeCode: formValues.rome ?? "",
-                    appellationCode: formValues.appellationCode ?? "",
-                    appellationLabel: formValues.appellationLabel ?? "",
-                  },
-                ]}
+                selectedAppellations={
+                  formValues.appellations
+                    ? [formValues.appellations[0]]
+                    : undefined
+                }
                 onInputClear={() => {
-                  setValue("rome", "");
-                  setValue("romeLabel", "");
-                  setValue("appellationCode", "");
-                  setValue("appellationLabel", "");
+                  setValue("appellations", undefined);
                 }}
                 id={domElementIds.search.appellationAutocomplete}
               />
@@ -282,23 +269,24 @@ export const SearchPage = ({
                         <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
                           {getSearchResultsSummary(searchResults.length)}
                         </h2>
-                        {route.params.rome && route.params.romeLabel && (
-                          <span className={cx(fr.cx("fr-text--xs"))}>
-                            pour la recherche{" "}
-                            <strong className={fr.cx("fr-text--bold")}>
-                              {routeParams.appellationLabel}
-                            </strong>
-                            , étendue au secteur{" "}
-                            <a
-                              href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${routeParams.rome}`}
-                              target="_blank"
-                              className={fr.cx("fr-text--bold")}
-                              rel="noreferrer"
-                            >
-                              {routeParams.romeLabel}
-                            </a>
-                          </span>
-                        )}
+                        {routeParams.appellations &&
+                          routeParams.appellations.length > 0 && (
+                            <span className={cx(fr.cx("fr-text--xs"))}>
+                              pour la recherche{" "}
+                              <strong className={fr.cx("fr-text--bold")}>
+                                {routeParams.appellations[0].appellationLabel}
+                              </strong>
+                              , étendue au secteur{" "}
+                              <a
+                                href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${routeParams.appellations[0].romeCode}`}
+                                target="_blank"
+                                className={fr.cx("fr-text--bold")}
+                                rel="noreferrer"
+                              >
+                                {routeParams.appellations[0].romeLabel}
+                              </a>
+                            </span>
+                          )}
                       </>
                     )}
                   </div>
