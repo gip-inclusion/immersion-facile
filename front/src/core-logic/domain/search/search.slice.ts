@@ -13,12 +13,17 @@ export type SearchResultPayload = SiretAndAppellationDto | SearchResultDto;
 export type SearchParams = OmitFromExistingKeys<
   SearchQueryParamsDto,
   "voluntaryToImmersion"
-> &
-  Partial<AppellationAndRomeDto>;
+>;
+// > ;
 
 type SearchFeedback = SubmitFeedBack<"success">;
 
-export type SearchPageParams = Exclude<SearchParams, "romeCode">;
+export type SearchPageParams = OmitFromExistingKeys<
+  SearchParams,
+  "appellationCodes" | "rome"
+> & {
+  appellations?: AppellationAndRomeDto[];
+};
 
 export type SearchStatus =
   | "noSearchMade"

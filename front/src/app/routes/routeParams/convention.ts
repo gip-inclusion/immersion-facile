@@ -5,6 +5,7 @@ import {
   AppellationAndRomeDto,
   AppellationCode,
   appellationCodeSchema,
+  AppellationDto,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -271,7 +272,13 @@ const scheduleSerializer: ValueSerializer<ScheduleDto> = {
   stringify: (schedule) => JSON.stringify(schedule),
 };
 
-const appellationDtoSerializer: ValueSerializer<AppellationAndRomeDto> = {
+export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRomeDto> =
+  {
+    parse: (raw) => JSON.parse(raw),
+    stringify: (appellationDto) => JSON.stringify(appellationDto),
+  };
+
+export const appellationDtoSerializer: ValueSerializer<AppellationDto> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (appellationDto) => JSON.stringify(appellationDto),
 };
@@ -342,7 +349,9 @@ export const conventionValuesFromUrl = {
   dateEnd: param.query.optional.string,
 
   schedule: param.query.optional.ofType(scheduleSerializer),
-  immersionAppellation: param.query.optional.ofType(appellationDtoSerializer),
+  immersionAppellation: param.query.optional.ofType(
+    appellationAndRomeDtoSerializer,
+  ),
 };
 
 export type ConventionParamsInUrl = Partial<{

@@ -2,6 +2,7 @@ import { createRouter, defineRoute, param } from "type-route";
 import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
 import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
+  appellationAndRomeDtoSerializer,
   appellationStringSerializer,
   conventionValuesFromUrl,
 } from "./routeParams/convention";
@@ -149,12 +150,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       distanceKm: param.query.optional.number,
       latitude: param.query.optional.number,
       longitude: param.query.optional.number,
-      place: param.query.optional.string,
-      rome: param.query.optional.string,
-      romeLabel: param.query.optional.string,
+      appellations: param.query.optional.array.ofType(
+        appellationAndRomeDtoSerializer,
+      ),
       sortedBy: param.query.optional.string,
-      appellationLabel: param.query.optional.string,
-      appellationCode: param.query.optional.string,
+      place: param.query.optional.string,
     },
     () => `/${frontRoutes.search}`,
   ),

@@ -85,11 +85,7 @@ describe("search-immersion route", () => {
         // Act and assert
         const result = await sharedRequest.search({
           queryParams: {
-            appellationCodes: [
-              immersionOffer.appellationCode,
-              //TODO: there should be only one element in this array, remove next line when shared-route is updated
-              immersionOffer.appellationCode,
-            ],
+            appellationCodes: [immersionOffer.appellationCode],
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
