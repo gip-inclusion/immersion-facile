@@ -231,7 +231,7 @@ export const makeMagicLinkAuthMiddleware = (
           : { [payloadKey]: payload };
 
       next();
-    } catch (err: any) {
+    } catch (err: unknown) {
       const unsafePayload = jwt.decode(maybeJwt) as ConventionJwtPayload;
       if (err instanceof TokenExpiredError) {
         logger.warn(
@@ -261,16 +261,18 @@ const sendAuthenticationError = (res: Response, err: Error) => {
   });
 };
 
-const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
+const sendNeedsRenewedLinkError = (res: Response, err: unknown) => {
   logger.info({ err }, "unsupported or expired magic link used");
   res.status(403);
-  const message =
-    err.message === "jwt expired" ? "Le lien magique est périmé" : err.message;
-
-  return res.json({
-    message,
-    needsNewMagicLink: true,
-  });
+  return err instanceof Error
+    ? res.json({
+        message:
+          err.message === "jwt expired"
+            ? "Le lien magique est périmé"
+            : err.message,
+        needsNewMagicLink: true,
+      })
+    : res.json({ message: JSON.stringify(err), needsNewMagicLink: true });
 };
 
 export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
