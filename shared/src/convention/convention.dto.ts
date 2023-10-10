@@ -320,6 +320,11 @@ export type RenewMagicLinkRequestDto = {
   expiredJwt: string;
 };
 
+export type RenewMagicLinkResponse = {
+  message: "Le lien magique est périmé";
+  needsNewMagicLink: boolean;
+};
+
 export type RenewConventionParams = Pick<
   ConventionRenewed,
   "id" | "dateStart" | "dateEnd" | "schedule" | "renewed"

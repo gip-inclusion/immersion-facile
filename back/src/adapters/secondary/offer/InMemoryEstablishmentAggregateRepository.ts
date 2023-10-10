@@ -61,8 +61,8 @@ export class InMemoryEstablishmentAggregateRepository
         ?.offers.map((offer) => ({
           romeCode: offer.romeCode,
           appellationCode: offer.appellationCode?.toString() ?? "", // Should not be undefined though
-          romeLabel: TEST_ROME_LABEL,
-          appellationLabel: TEST_APPELLATION_LABEL,
+          romeLabel: offer.romeLabel,
+          appellationLabel: offer.appellationLabel,
         })) ?? []
     );
   }

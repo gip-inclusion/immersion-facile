@@ -1,25 +1,25 @@
 import { from, map, Observable } from "rxjs";
 import {
   AgencyId,
-  InclusionConnectedAllowedTargets,
+  InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
-  inclusionConnectedUserSchema,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 export class HttpInclusionConnectedGateway
   implements InclusionConnectedGateway
 {
   constructor(
-    private readonly httpClient: HttpClient<InclusionConnectedAllowedTargets>,
+    private readonly httpClient: HttpClient<InclusionConnectedAllowedRoutes>,
   ) {}
 
   public getCurrentUser$(token: string): Observable<InclusionConnectedUser> {
     return from(this.#getCurrentUser(token)).pipe(
-      map(({ responseBody }) =>
-        inclusionConnectedUserSchema.parse(responseBody),
-      ),
+      map(({ body, status }) => {
+        if (status === 200) return body;
+        throw new Error(JSON.stringify(body));
+      }),
     );
   }
 

@@ -58,6 +58,7 @@ import {
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
+  RenewMagicLinkResponse,
   Signatories,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
@@ -391,6 +392,12 @@ export const renewMagicLinkRequestSchema: z.Schema<RenewMagicLinkRequestDto> =
   z.object({
     originalUrl: z.string(),
     expiredJwt: z.string(),
+  });
+
+export const renewMagicLinkResponseSchema: z.Schema<RenewMagicLinkResponse> =
+  z.object({
+    message: z.literal("Le lien magique est périmé"),
+    needsNewMagicLink: z.boolean(),
   });
 
 const addIssuesIfDuplicateSignatoriesEmails = (

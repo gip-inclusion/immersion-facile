@@ -2,7 +2,7 @@ import { Request, Router } from "express";
 import {
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
-  establishmentTargets,
+  establishmentRoutes,
   siretRoutes,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
@@ -25,55 +25,55 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
     ),
   );
 
-  establishmentRouter
-    .route(establishmentTargets.addFormEstablishment.url)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.addFormEstablishment.execute(req.body),
-      ),
-    );
+  const establishmentSharedRouter = createExpressSharedRouter(
+    establishmentRoutes,
+    establishmentRouter,
+  );
 
-  establishmentRouter
-    .route(establishmentTargets.requestEmailToUpdateFormRoute.url)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.requestEditFormEstablishment.execute(req.params.siret),
-      ),
-    );
+  establishmentSharedRouter.addFormEstablishment((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.addFormEstablishment.execute(req.body),
+    ),
+  );
 
-  establishmentRouter
-    .route(establishmentTargets.getFormEstablishment.url)
-    .get(deps.establishmentMagicLinkAuthMiddleware, async (req, res) =>
+  establishmentSharedRouter.requestEmailToUpdateFormRoute((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.requestEditFormEstablishment.execute(req.params.siret),
+    ),
+  );
+
+  establishmentSharedRouter.getFormEstablishment(
+    deps.establishmentMagicLinkAuthMiddleware,
+    (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
           req.params.siret,
           getEstablishmentPayload(req) ?? getBackOfficePayload(req),
         ),
       ),
-    );
+  );
 
-  establishmentRouter
-    .route(establishmentTargets.updateFormEstablishment.url)
-    .put(deps.establishmentMagicLinkAuthMiddleware, async (req, res) =>
+  establishmentSharedRouter.updateFormEstablishment(
+    deps.establishmentMagicLinkAuthMiddleware,
+    (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.editFormEstablishment.execute(
           req.body,
           getEstablishmentPayload(req) ?? getBackOfficePayload(req),
         ),
       ),
-    );
+  );
 
-  establishmentRouter
-    .route(establishmentTargets.deleteEstablishment.url)
-    .delete(deps.establishmentMagicLinkAuthMiddleware, async (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        await deps.useCases.deleteEstablishment.execute(
+  establishmentSharedRouter.deleteEstablishment(
+    deps.establishmentMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res.status(204), () =>
+        deps.useCases.deleteEstablishment.execute(
           req.params,
           getBackOfficePayload(req),
         ),
-          res.status(204);
-      }),
-    );
+      ),
+  );
 
   return establishmentRouter;
 };
