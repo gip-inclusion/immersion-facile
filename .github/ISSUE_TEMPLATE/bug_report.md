@@ -1,7 +1,7 @@
 ---
 name: Rapport d'anomalie
 about: Modèle de rapport d'anomalie
-title: Un titre court svp
+title: ETQ 'qui?', un titre court svp
 labels: bug
 ---
 
