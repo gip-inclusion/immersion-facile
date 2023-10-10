@@ -1,9 +1,9 @@
 import { Expression, RawBuilder, Simplify, sql } from "kysely";
 import {
   Group,
-  groupSchema,
   GroupSlug,
   GroupWithResults,
+  groupWithResultsSchema,
   SiretDto,
 } from "shared";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
@@ -32,7 +32,7 @@ export class PgGroupRepository implements GroupRepository {
 
     if (!rawGroup) return;
 
-    const group = groupSchema.parse({
+    const group: Group = {
       name: rawGroup.name,
       slug: rawGroup.slug,
       options: {
@@ -44,7 +44,7 @@ export class PgGroupRepository implements GroupRepository {
         },
         tintColor: rawGroup.tint_color ?? undefined,
       },
-    } satisfies Group);
+    };
 
     const resultsResponse = await executeKyselyRawSqlQuery(
       this.transaction,
@@ -90,10 +90,10 @@ export class PgGroupRepository implements GroupRepository {
 
     const results = resultsResponse.rows.map((row) => row.search_result_dto);
 
-    return {
+    return groupWithResultsSchema.parse({
       group,
       results,
-    };
+    });
   }
 
   public async groupsWithSiret(siret: SiretDto): Promise<GroupEntity[]> {

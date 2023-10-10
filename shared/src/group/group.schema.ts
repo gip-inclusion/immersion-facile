@@ -2,15 +2,21 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { searchResultSchema } from "../search/SearchResult.schema";
 import { zStringMinLength1 } from "../zodUtils";
-import { Group, GroupWithResults, WithGroupSlug } from "./group.dto";
+import {
+  Group,
+  GroupOptions,
+  GroupSlug,
+  GroupWithResults,
+  WithGroupSlug,
+} from "./group.dto";
 
-const groupSlugSchema = zStringMinLength1;
+const groupSlugSchema: z.Schema<GroupSlug> = zStringMinLength1;
 
 export const withGroupSlugSchema: z.Schema<WithGroupSlug> = z.object({
   groupSlug: groupSlugSchema,
 });
 
-const groupOptionsSchema = z.object({
+const groupOptionsSchema: z.Schema<GroupOptions> = z.object({
   heroHeader: z.object({
     title: zStringMinLength1,
     description: zStringMinLength1,
