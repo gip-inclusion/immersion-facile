@@ -18,9 +18,9 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     return from(
       this.httpClient
         .addFormEstablishment({ body: formEstablishment })
-        // eslint-disable-next-line arrow-body-style
-        .then(() => {
-          return;
+        .then(({ status, body }) => {
+          if (status === 200) return;
+          throw new Error(JSON.stringify(body));
         }),
     );
   }
