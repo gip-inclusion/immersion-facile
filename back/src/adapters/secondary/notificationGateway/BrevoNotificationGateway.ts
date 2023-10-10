@@ -122,7 +122,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       {
         to: emailData.to,
         type: email.kind,
-        subject: emailData.subject ?? "Sans object",
+        subject: emailData.subject ?? "Sans objet",
         cc: emailData.cc,
         params: email.params,
       },
