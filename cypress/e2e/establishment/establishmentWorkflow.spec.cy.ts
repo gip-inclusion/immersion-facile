@@ -1,13 +1,14 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import {
-  addressTargets,
+  addressRoutes,
   appellationRoute,
   domElementIds,
-  featureFlagsRoute,
+  technicalRoutes,
   siretRoutes,
-  establishmentTargets,
+  establishmentRoutes,
   frontRoutes,
   immersionOffersRoute,
+  makeUrlWithParams,
 } from "shared";
 
 const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
@@ -16,21 +17,24 @@ const providedLocation = "Tain-l'Hermitage";
 
 describe("Establishment creation and modification workflow", () => {
   it("creates a new establishment", () => {
-    cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
-      "featureFlagsRequest",
-    );
+    cy.intercept(
+      "GET",
+      `${baseApiRoute}${technicalRoutes.featureFlags.url}`,
+    ).as("featureFlagsRequest");
 
     cy.intercept(
       "GET",
-      `${baseApiRoute}${siretRoutes.getSiretInfoIfNotAlreadySaved.url.replace(
-        ":siret",
-        providedSiret,
+      `${baseApiRoute}${makeUrlWithParams(
+        siretRoutes.getSiretInfoIfNotAlreadySaved,
+        {
+          siret: providedSiret,
+        },
       )}`,
     ).as("siretIfNotAlreadySavedRequest");
 
     cy.intercept(
       "GET",
-      `${baseApiRoute}${addressTargets.lookupStreetAddress.url}?**`,
+      `${baseApiRoute}${addressRoutes.lookupStreetAddress.url}?**`,
     ).as("addressAutocompleteRequest");
 
     cy.intercept("GET", `${baseApiRoute}${appellationRoute}?**`).as(
@@ -39,7 +43,7 @@ describe("Establishment creation and modification workflow", () => {
 
     cy.intercept(
       "POST",
-      `${baseApiRoute}${establishmentTargets.addFormEstablishment.url}`,
+      `${baseApiRoute}${establishmentRoutes.addFormEstablishment.url}`,
     ).as("addFormEstablishmentRequest");
 
     // home
@@ -123,23 +127,27 @@ describe("Establishment creation and modification workflow", () => {
   it("modifies an existing establishment", () => {
     cy.intercept(
       "GET",
-      `${baseApiRoute}${siretRoutes.getSiretInfoIfNotAlreadySaved.url.replace(
-        ":siret",
-        providedSiret,
+      `${baseApiRoute}${makeUrlWithParams(
+        siretRoutes.getSiretInfoIfNotAlreadySaved,
+        {
+          siret: providedSiret,
+        },
       )}`,
     ).as("siretIfNotAlreadySavedRequest");
 
     cy.intercept(
       "POST",
-      `${baseApiRoute}${establishmentTargets.requestEmailToUpdateFormRoute.url.replace(
-        ":siret",
-        providedSiret,
+      `${baseApiRoute}${makeUrlWithParams(
+        establishmentRoutes.requestEmailToUpdateFormRoute,
+        {
+          siret: providedSiret,
+        },
       )}`,
     ).as("requestEmailToUpdateEstablishmentRequest");
 
     cy.intercept(
       "PUT",
-      `${baseApiRoute}${establishmentTargets.addFormEstablishment.url}`,
+      `${baseApiRoute}${establishmentRoutes.addFormEstablishment.url}`,
     ).as("addFormEstablishmentRequest");
     requestEstablishmentModification();
     cy.connectToAdmin();
@@ -161,7 +169,7 @@ describe("Establishment creation and modification workflow", () => {
     cy.visit(frontRoutes.search);
     cy.intercept(
       "GET",
-      `${baseApiRoute}${addressTargets.lookupLocation.url}?query=**`,
+      `${baseApiRoute}${addressRoutes.lookupLocation.url}?query=**`,
     ).as("lookupLocationRequest");
 
     cy.intercept("GET", `${baseApiRoute}${immersionOffersRoute}?**`).as(
@@ -189,6 +197,41 @@ describe("Establishment creation and modification workflow", () => {
     cy.get(
       `.im-search-result[data-establishment-siret=${providedSiret}]`,
     ).should("have.length", 1);
+  });
+  it("removes an existing establishment in admin", () => {
+    cy.intercept(
+      "GET",
+      `${baseApiRoute}${makeUrlWithParams(
+        establishmentRoutes.getFormEstablishment,
+        {
+          siret: providedSiret,
+        },
+      )}`,
+    ).as("getFormEstablishmentRequest");
+    cy.intercept(
+      "GET",
+      `${baseApiRoute}${makeUrlWithParams(
+        establishmentRoutes.deleteEstablishment,
+        {
+          siret: providedSiret,
+        },
+      )}`,
+    ).as("deleteFormEstablishmentRequest");
+    cy.connectToAdmin();
+    cy.goToAdminTab("Établissements");
+    cy.get(`#${domElementIds.admin.manageEstablishment.siretInput}`).type(
+      providedSiret,
+    );
+    cy.get(`#${domElementIds.admin.manageEstablishment.searchButton}`).click();
+    cy.wait("@getFormEstablishmentRequest")
+      .its("response.statusCode")
+      .should("be.oneOf", [200, 304]);
+    cy.get(
+      `#${domElementIds.admin.manageEstablishment.submitDeleteButton}`,
+    ).click();
+    cy.wait("@deleteFormEstablishmentRequest")
+      .its("response.statusCode")
+      .should("be.oneOf", [200, 304]);
   });
 });
 

@@ -3,6 +3,7 @@ import {
   agencyRoutes,
   conventionMagicLinkRoutes,
   domElementIds,
+  makeUrlWithParams,
   peParisAgencyId,
 } from "shared";
 import { disableUrlLogging } from "../../cypress/utils/log";
@@ -43,9 +44,11 @@ describe("Convention full workflow", () => {
   it("signs convention for first signatory and validator requires modification", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}${conventionMagicLinkRoutes.updateConventionStatus.url.replace(
-        ":conventionId",
-        "**",
+      `${baseApiRoute}${makeUrlWithParams(
+        conventionMagicLinkRoutes.updateConventionStatus,
+        {
+          conventionId: "**",
+        },
       )}`,
     ).as("updateConventionRequest");
     signatorySignConvention(conventionData.magicLinks[0]);
@@ -91,9 +94,11 @@ describe("Convention full workflow", () => {
   it("signs convention for signatories", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}${conventionMagicLinkRoutes.signConvention.url.replace(
-        ":conventionId",
-        "**",
+      `${baseApiRoute}${makeUrlWithParams(
+        conventionMagicLinkRoutes.signConvention,
+        {
+          conventionId: "**",
+        },
       )}`,
     ).as("signConventionRequest");
     cy.connectToAdmin();
@@ -126,9 +131,11 @@ describe("Convention full workflow", () => {
   it("reviews and validate convention", () => {
     cy.intercept(
       "POST",
-      `${baseApiRoute}${conventionMagicLinkRoutes.updateConventionStatus.url.replace(
-        ":conventionId",
-        "**",
+      `${baseApiRoute}${makeUrlWithParams(
+        conventionMagicLinkRoutes.updateConventionStatus,
+        {
+          conventionId: "**",
+        },
       )}`,
     ).as("reviewConventionRequest");
     cy.connectToAdmin();
@@ -155,16 +162,20 @@ describe("Convention full workflow", () => {
 const signatorySignConvention = (magicLink) => {
   cy.intercept(
     "POST",
-    `${baseApiRoute}${conventionMagicLinkRoutes.signConvention.url.replace(
-      ":conventionId",
-      "**",
+    `${baseApiRoute}${makeUrlWithParams(
+      conventionMagicLinkRoutes.signConvention,
+      {
+        conventionId: "**",
+      },
     )}`,
   ).as("signConventionRequest");
   cy.intercept(
     "GET",
-    `${baseApiRoute}${conventionMagicLinkRoutes.getConvention.url.replace(
-      ":conventionId",
-      "**",
+    `${baseApiRoute}${makeUrlWithParams(
+      conventionMagicLinkRoutes.getConvention,
+      {
+        conventionId: "**",
+      },
     )}`,
   ).as("getConventionByIdRequest");
   cy.intercept(
@@ -189,9 +200,11 @@ const signatorySignConvention = (magicLink) => {
 const editConventionForm = (magicLinkUrl) => {
   cy.intercept(
     "POST",
-    `${baseApiRoute}${conventionMagicLinkRoutes.updateConvention.url.replace(
-      ":conventionId",
-      "**",
+    `${baseApiRoute}${makeUrlWithParams(
+      conventionMagicLinkRoutes.updateConvention,
+      {
+        conventionId: "**",
+      },
     )}`,
   ).as("conventionEditRequest");
   cy.visit(magicLinkUrl);

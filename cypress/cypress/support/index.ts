@@ -26,5 +26,6 @@ declare namespace Cypress {
     getMagicLinkInEmailWrapper(
       $element: JQuery<HTMLElement>,
     ): Chainable<JQuery<HTMLElement>>;
+    goToAdminTab(tabContent): void;
   }
 }

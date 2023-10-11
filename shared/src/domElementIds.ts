@@ -275,7 +275,6 @@ export const domElementIds = {
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
     submitButton: "im-form-add-establishment__submit-button",
-    deleteButton: "im-form-delete-establishment__delete-button",
     manageButton: "im-form-manage-establishment__manage-button",
   },
 
@@ -317,11 +316,17 @@ export const domElementIds = {
       emailTemplateNameSelect: "selectTemplateName",
       internshipKindSelect: "email-preview-internshipKind-select",
     },
-    addEstablishmentByBatchTab: {
+    manageEstablishment: {
+      siretInput: "im-manage-establishment__siret-input",
+      searchButton: "im-manage-establishment__search-button",
       titleInput: "im-form-add-by-batch__title-input",
       descriptionInput: "im-form-add-by-batch__description-input",
       groupNameInput: "im-form-add-by-batch__group-name-input",
       inputFileInput: "im-form-add-by-batch__input-file-input",
+      submitEditButton:
+        "im-form-manage-establishment-admin__submit-edit-button",
+      submitDeleteButton:
+        "im-form-manage-establishment-admin__submit-delete-button",
     },
     adminPrivateRoute: {
       formLoginUserInput: "im-login__user-input",
@@ -352,9 +357,5 @@ export const domElementIds = {
   manageConventionInclusionConnected: {},
   offer: {},
   offerExternal: {},
-  manageEstablishmentAdmin: {
-    submitEditButton: "im-form-manage-establishment-admin__submit-edit-button",
-    submitDeleteButton:
-      "im-form-manage-establishment-admin__submit-delete-button",
-  },
+  manageEstablishmentAdmin: {},
 } satisfies DomElementIds;

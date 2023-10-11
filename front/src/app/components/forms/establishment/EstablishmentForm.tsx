@@ -522,7 +522,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 type="submit"
                 disabled={isSubmitting}
                 nativeButtonProps={{
-                  id: domElementIds.establishment.submitButton,
+                  id: isEstablishmentAdmin
+                    ? domElementIds.admin.manageEstablishment.submitEditButton
+                    : domElementIds.establishment.submitButton,
                 }}
               >
                 {isEstablishmentAdmin
@@ -539,7 +541,8 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   type="button"
                   disabled={isSubmitting}
                   nativeButtonProps={{
-                    id: domElementIds.establishment.deleteButton,
+                    id: domElementIds.admin.manageEstablishment
+                      .submitDeleteButton,
                   }}
                   onClick={onClickEstablishmentDeleteButton}
                 >
