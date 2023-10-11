@@ -131,6 +131,7 @@ export const domElementIds = {
     codeSafirInput: "agency-codeSafir",
     questionnaireUrlInput: "agency-questionnaireUrl",
     agencySiretInput: "agency-agencySiret",
+    agencyRefersToInput: "im-form-add-agency__refers-to-agency-input",
     stepsForValidationInput: "steps-for-validation",
     submitButton: "im-form-add-agency__submit-button",
   },

@@ -125,19 +125,21 @@ describe(`Agency routes`, () => {
         expectHttpResponseToEqual(response, {
           status: 200,
           body: {
+            id: "test-agency-1",
+            name: "Test Agency 1",
+            kind: "autre",
             address: {
               city: "Paris",
               departmentCode: "20",
               postcode: "75002",
               streetNumberAndAddress: "",
             },
-            id: "test-agency-1",
-            name: "Test Agency 1",
             position: {
               lat: 10.11,
               lon: 10.12,
             },
             signature: "empty-signature",
+            refersToAgency: agency1ActiveNearBy.refersToAgency,
           },
         });
       });

@@ -323,6 +323,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyRefersToOtherAgency: agency.refersToAgency && {
+            id: agency.refersToAgency.id,
+            name: agency.refersToAgency.name,
+          },
         },
       ]);
     });
@@ -346,6 +350,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyRefersToOtherAgency: agency.refersToAgency && {
+            id: agency.refersToAgency.id,
+            name: agency.refersToAgency.name,
+          },
         },
         {
           ...conventionCancelledAndDateStart20230327,
@@ -353,6 +361,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyRefersToOtherAgency: agency.refersToAgency && {
+            id: agency.refersToAgency.id,
+            name: agency.refersToAgency.name,
+          },
         },
       ]);
     });
@@ -375,6 +387,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyRefersToOtherAgency: agency.refersToAgency && {
+            id: agency.refersToAgency.id,
+            name: agency.refersToAgency.name,
+          },
         },
       ]);
     });
@@ -404,6 +420,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyRefersToOtherAgency: agency.refersToAgency && {
+            id: agency.refersToAgency.id,
+            name: agency.refersToAgency.name,
+          },
         },
       ]);
     });
@@ -506,6 +526,10 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyRefersToOtherAgency: agency.refersToAgency && {
+            id: agency.refersToAgency.id,
+            name: agency.refersToAgency.name,
+          },
         },
       ]);
     });
@@ -580,20 +604,20 @@ describe("Pg implementation of ConventionQueries", () => {
       .withDateStart(conventionStartDate)
       .build();
 
-    await agencyRepo.insert(
-      AgencyDtoBuilder.create()
-        .withId(agencyId)
-        .withName(agencyName)
-        .withAddress({
-          city: "Paris",
-          departmentCode: agencyDepartment,
-          postcode: "75017",
-          streetNumberAndAddress: "Avenue des champs Elysées",
-        })
-        .withAgencySiret(agencySiret)
-        .withKind(agencyKind)
-        .build(),
-    );
+    const agency = AgencyDtoBuilder.create()
+      .withId(agencyId)
+      .withName(agencyName)
+      .withAddress({
+        city: "Paris",
+        departmentCode: agencyDepartment,
+        postcode: "75017",
+        streetNumberAndAddress: "Avenue des champs Elysées",
+      })
+      .withAgencySiret(agencySiret)
+      .withKind(agencyKind)
+      .build();
+
+    await agencyRepo.insert(agency);
 
     await conventionRepository.save(convention);
     return {
@@ -602,6 +626,10 @@ describe("Pg implementation of ConventionQueries", () => {
       agencyDepartment,
       agencyKind,
       agencySiret,
+      agencyRefersToOtherAgency: agency.refersToAgency && {
+        id: agency.refersToAgency.id,
+        name: agency.refersToAgency.name,
+      },
     };
   };
 });

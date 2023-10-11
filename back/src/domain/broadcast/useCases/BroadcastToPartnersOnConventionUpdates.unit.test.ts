@@ -127,6 +127,10 @@ describe("Broadcast to partners on updated convention", () => {
               agencyDepartment: agency1.address.departmentCode,
               agencyKind: agency1.kind,
               agencySiret: agency1.agencySiret,
+              agencyRefersToOtherAgency: agency1.refersToAgency && {
+                id: agency1.refersToAgency.id,
+                name: agency1.refersToAgency.name,
+              },
             },
           },
         },
@@ -150,6 +154,10 @@ describe("Broadcast to partners on updated convention", () => {
               agencyDepartment: agency2.address.departmentCode,
               agencyKind: agency2.kind,
               agencySiret: agency2.agencySiret,
+              agencyRefersToOtherAgency: agency2.refersToAgency && {
+                id: agency2.refersToAgency.id,
+                name: agency2.refersToAgency.name,
+              },
             },
           },
         },

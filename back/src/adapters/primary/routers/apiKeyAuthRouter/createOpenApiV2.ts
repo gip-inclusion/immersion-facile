@@ -160,6 +160,7 @@ const conventionExample: ConventionReadDto = {
   agencyDepartment: "75",
   agencyKind: "pole-emploi",
   agencySiret: "11112222000033",
+  agencyRefersToOtherAgency: undefined,
 };
 
 const callbackBodySchema: z.Schema<ConventionUpdatedSubscriptionCallbackBody> =
