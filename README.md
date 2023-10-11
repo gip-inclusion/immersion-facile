@@ -121,3 +121,16 @@ Voir [Documentation frontend - Sass to TS](./front/README.md#sass-to-ts)
 #### Turbo
 
 TODO DOC
+
+### Métier
+
+Le projet a deux grandes parties :
+
+- les conventions dématérialisées
+- les ajouts d'entreprises ainsi que les recherches associées
+
+## Convention dématérialisée
+
+Le flux des statuts de convention est le suivant :
+
+![img.png](doc/flux de statuts de convention.png)

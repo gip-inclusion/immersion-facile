@@ -46,9 +46,9 @@ export const statusTransitionConfigs: Record<
   // rare edge case that can be addressed at a later stage.
   REJECTED: {
     validInitialStatuses: [
-      "IN_REVIEW",
       "READY_TO_SIGN",
       "PARTIALLY_SIGNED",
+      "IN_REVIEW",
       "ACCEPTED_BY_COUNSELLOR",
     ],
     validRoles: ["counsellor", "validator", "backOffice"],
