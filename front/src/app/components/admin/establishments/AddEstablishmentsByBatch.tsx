@@ -176,7 +176,7 @@ export const AddEstablishmentsByBatch = () => {
           label="Renseignez un nom de groupe d'entreprises *"
           nativeInputProps={{
             ...register("groupName", { required: true }),
-            id: domElementIds.admin.addEstablishmentByBatchTab.groupNameInput,
+            id: domElementIds.admin.manageEstablishment.groupNameInput,
             placeholder: "Le nom de votre groupement d'entreprise",
             readOnly: formSubmitted,
           }}
@@ -187,7 +187,7 @@ export const AddEstablishmentsByBatch = () => {
           label="Renseignez un titre (qui apparaitra dans la page du groupe) *"
           nativeInputProps={{
             ...register("title", { required: true }),
-            id: domElementIds.admin.addEstablishmentByBatchTab.titleInput,
+            id: domElementIds.admin.manageEstablishment.titleInput,
             placeholder: "Ex: Semaine de l'agro-alimentaire 2023",
             readOnly: formSubmitted,
           }}
@@ -199,7 +199,7 @@ export const AddEstablishmentsByBatch = () => {
           label="Renseignez une description (qui apparaitra dans la page du groupe) *"
           nativeTextAreaProps={{
             ...register("description", { required: true }),
-            id: domElementIds.admin.addEstablishmentByBatchTab.descriptionInput,
+            id: domElementIds.admin.manageEstablishment.descriptionInput,
             placeholder:
               "Ex: La super semaine de l'agro-alimentaire, du 12 au 16 novembre, etc... Rencontrez des entreprises sympas !",
             readOnly: formSubmitted,
@@ -211,7 +211,7 @@ export const AddEstablishmentsByBatch = () => {
           label="Uploadez votre CSV *"
           nativeInputProps={{
             ...register("inputFile", { required: true }),
-            id: domElementIds.admin.addEstablishmentByBatchTab.inputFileInput,
+            id: domElementIds.admin.manageEstablishment.inputFileInput,
             readOnly: formSubmitted,
             type: "file",
             accept: ".csv",

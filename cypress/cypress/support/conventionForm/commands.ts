@@ -2,9 +2,9 @@ import { addBusinessDays, format } from "date-fns";
 import {
   frontRoutes,
   agencyRoutes,
-  featureFlagsRoute,
+  technicalRoutes,
   appellationRoute,
-  addressTargets,
+  addressRoutes,
   domElementIds,
   unauthenticatedConventionRoutes,
   peParisAgencyId,
@@ -28,7 +28,7 @@ const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
 let currentStep = 1;
 
 Cypress.Commands.add("submitBasicConventionForm", () => {
-  cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
+  cy.intercept("GET", `${baseApiRoute}${technicalRoutes.featureFlags.url}`).as(
     "featureFlagsRequest",
   );
   cy.intercept(
@@ -37,7 +37,7 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
   ).as("agenciesRequest");
   cy.intercept(
     "GET",
-    `${baseApiRoute}${addressTargets.lookupStreetAddress.url}?**`,
+    `${baseApiRoute}${addressRoutes.lookupStreetAddress.url}?**`,
   ).as("autocompleteAddressRequest");
   cy.intercept("GET", `${baseApiRoute}${appellationRoute}?**`).as(
     "autocompleteAppellationRequest",

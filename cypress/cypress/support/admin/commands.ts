@@ -18,7 +18,7 @@ Cypress.Commands.add("connectToAdmin", () => {
 });
 
 Cypress.Commands.add("openEmailInAdmin", ({ emailType, elementIndex = 0 }) => {
-  cy.get(".fr-tabs__tab").contains("Notifications").click();
+  cy.goToAdminTab("Notifications");
   const accordionButton = cy
     .get(`.fr-accordion__btn:contains(${emailType})`)
     .eq(elementIndex);
@@ -32,4 +32,8 @@ Cypress.Commands.add("getMagicLinkInEmailWrapper", ($emailWrapper) => {
     .next()
     .find("a");
   return cy.wrap($link);
+});
+
+Cypress.Commands.add("goToAdminTab", (tabName) => {
+  cy.get(`.fr-tabs__tab:contains('${tabName}')`).click();
 });

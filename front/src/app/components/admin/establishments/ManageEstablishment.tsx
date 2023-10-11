@@ -32,7 +32,7 @@ export const ManageEstablishment = (): JSX.Element => {
               label="Siret de l'entreprise"
               nativeInputProps={{
                 ...register("siret"),
-                id: "manageEstablishmentAdminForm-siret",
+                id: domElementIds.admin.manageEstablishment.siretInput,
                 placeholder: "ex: 1234567891234 ",
               }}
               className={fr.cx("fr-col-12", "fr-col-lg-6")}
@@ -40,7 +40,7 @@ export const ManageEstablishment = (): JSX.Element => {
             />
           </div>
           <Button
-            id={domElementIds.establishment.manageButton}
+            id={domElementIds.admin.manageEstablishment.searchButton}
             disabled={!formState.isValid}
             className={fr.cx("fr-mt-2w")}
           >
