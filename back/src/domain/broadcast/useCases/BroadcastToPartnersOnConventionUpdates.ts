@@ -21,10 +21,7 @@ const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {
   return !!conventionUpdatedCallbackParams;
 };
 
-export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<
-  ConventionDto,
-  void
-> {
+export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<ConventionDto> {
   protected inputSchema = conventionSchema;
 
   readonly #subscribersGateway: SubscribersGateway;
@@ -50,6 +47,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
       agencyName: agency.name,
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,
+      agencySiret: agency.agencySiret,
     };
 
     const apiConsumers = pipeWithValue(

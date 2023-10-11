@@ -469,6 +469,10 @@ const establishmentRepresentativeSection = (
 });
 
 const fieldsToExclude = {
+  agencySiret: {
+    label: "",
+    id: "",
+  },
   agencyName: {
     label: "",
     hintText: undefined,

@@ -82,6 +82,7 @@ const buildDto = `JSON_STRIP_NULLS(
     'agencyName', agencies.name,
     'agencyKind', agencies.kind,
     'agencyDepartment', agencies.department_code,
+    'agencySiret', agencies.agency_siret,
     'individualProtection', individual_protection,
     'sanitaryPrevention', sanitary_prevention,
     'sanitaryPreventionDescription', sanitary_prevention_description,

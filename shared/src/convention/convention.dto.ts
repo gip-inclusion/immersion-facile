@@ -250,6 +250,7 @@ export type ConventionReadDto = ConventionDto & {
   agencyName: string;
   agencyDepartment: string;
   agencyKind: AgencyKind;
+  agencySiret?: SiretDto;
 };
 
 export type WithConventionIdLegacy = {

@@ -130,6 +130,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
       agencyName: this.#agencies[convention.agencyId]?.name ?? "agency-name",
       agencyDepartment: "75",
       agencyKind: "mission-locale",
+      agencySiret: "22220000222200",
     };
   }
 }
