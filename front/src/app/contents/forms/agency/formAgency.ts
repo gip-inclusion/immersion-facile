@@ -106,6 +106,11 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.agencySiretInput,
     required: true,
   },
+  refersToAgency: {
+    label: "Agence prescriptrice référente",
+    id: domElementIds.addAgency.agencySiretInput,
+    required: true,
+  },
   stepsForValidation: {
     id: domElementIds.addAgency.stepsForValidationInput,
     label: "Combien d'étapes de validation des immersions y a-t-il ?",

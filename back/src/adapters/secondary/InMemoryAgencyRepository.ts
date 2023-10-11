@@ -40,6 +40,7 @@ const testAgencies: AgencyDto[] = [
       lon: 114.189505,
     },
     logoUrl: "http://LOGO AGENCY IF URL",
+    refersToAgency: undefined,
   },
   {
     id: "test-agency-1-back",
@@ -62,6 +63,7 @@ const testAgencies: AgencyDto[] = [
       lon: 2,
     },
     logoUrl: "http://LOGO AGENCY 1 URL",
+    refersToAgency: undefined,
   },
   {
     id: "test-agency-2-back",
@@ -84,6 +86,7 @@ const testAgencies: AgencyDto[] = [
       lon: 50,
     },
     logoUrl: "http://LOGO AGENCY 2 URL",
+    refersToAgency: undefined,
   },
   {
     id: "test-agency-3-back",
@@ -106,6 +109,7 @@ const testAgencies: AgencyDto[] = [
       lon: 89.9999,
     },
     logoUrl: "http://LOGO AGENCY 3 URL",
+    refersToAgency: undefined,
   },
 ];
 

@@ -473,6 +473,10 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  agencyRefersToOtherAgency: {
+    label: "",
+    id: "",
+  },
   agencyName: {
     label: "",
     hintText: undefined,

@@ -28,6 +28,7 @@ const emptyAgency: AgencyDto = {
     lat: 48.866667, // Paris lat/lon
     lon: 2.333333,
   },
+  refersToAgency: undefined,
 };
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {

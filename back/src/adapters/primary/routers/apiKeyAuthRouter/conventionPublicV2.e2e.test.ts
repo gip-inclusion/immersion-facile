@@ -150,6 +150,10 @@ describe("Convention routes", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyRefersToOtherAgency: agency.refersToAgency && {
+          id: agency.refersToAgency.id,
+          name: agency.refersToAgency.name,
+        },
       });
       expectToEqual(status, 200);
     });
@@ -212,6 +216,10 @@ describe("Convention routes", () => {
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
+            agencyRefersToOtherAgency: agency.refersToAgency && {
+              id: agency.refersToAgency.id,
+              name: agency.refersToAgency.name,
+            },
           },
         ],
         status: 200,

@@ -15,16 +15,49 @@ export const allAgencyStatuses = [
   "from-api-PE",
 ] as const;
 
+export type CreateAgencyDto = {
+  id: AgencyId;
+  kind: AgencyKind;
+  name: string;
+  address: AddressDto;
+  position: GeoPositionDto;
+  counsellorEmails: Email[];
+  validatorEmails: Email[];
+  questionnaireUrl?: string;
+  agencySiret?: SiretDto;
+  logoUrl?: AbsoluteUrl;
+  signature: string;
+  refersToAgencyId?: AgencyId;
+};
+
+export type AgencyPublicDisplayDtoWithoutRefersToAgency = Pick<
+  CreateAgencyDto,
+  | "id"
+  | "name"
+  | "kind"
+  | "address"
+  | "position"
+  | "agencySiret"
+  | "logoUrl"
+  | "signature"
+>;
+
+type WithOptionalRefersToAgency = {
+  refersToAgency?: AgencyPublicDisplayDtoWithoutRefersToAgency;
+};
+
+export type AgencyPublicDisplayDto =
+  AgencyPublicDisplayDtoWithoutRefersToAgency & WithOptionalRefersToAgency;
+
 export type AgencyDto = Omit<
   RequireField<CreateAgencyDto, "questionnaireUrl">,
-  "agencySiret"
-> & {
-  kind: AgencyKind;
-  status: AgencyStatus;
-  adminEmails: string[];
-  codeSafir?: string;
-  agencySiret?: SiretDto;
-};
+  "refersToAgencyId"
+> &
+  WithOptionalRefersToAgency & {
+    status: AgencyStatus;
+    adminEmails: string[];
+    codeSafir?: string;
+  };
 
 export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
 
@@ -81,30 +114,10 @@ export type PrivateListAgenciesRequestDto = {
   status?: AgencyStatus;
 };
 
-export type AgencyPublicDisplayDto = Pick<
-  CreateAgencyDto,
-  "id" | "name" | "address" | "position" | "logoUrl" | "signature"
->;
-
 // TODO Rename into UpdateAgencyRequestStatusDto ?
 export type UpdateAgencyRequestDto = Partial<Pick<AgencyDto, "status">> & {
   // | "name" | "logoUrl" | "address" (coming soon.)
   id: AgencyId;
-};
-
-export type CreateAgencyDto = {
-  id: AgencyId;
-  kind: AgencyKind;
-  name: string;
-  address: AddressDto;
-  position: GeoPositionDto;
-  counsellorEmails: Email[];
-  validatorEmails: Email[];
-  // adminEmails: string[];
-  questionnaireUrl?: string;
-  agencySiret: SiretDto;
-  logoUrl?: AbsoluteUrl;
-  signature: string;
 };
 
 export type WithAgencyStatus = { status: AgencyStatus };
