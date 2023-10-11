@@ -113,6 +113,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
       agencyDepartment:
         agency?.address.departmentCode ?? TEST_AGENCY_DEPARTMENT,
       agencyKind: agency?.kind ?? "autre",
+      agencySiret: agency?.agencySiret,
     };
   };
 }

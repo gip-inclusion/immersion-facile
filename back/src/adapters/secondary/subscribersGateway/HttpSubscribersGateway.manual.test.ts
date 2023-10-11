@@ -12,6 +12,7 @@ describe("HttpSubscribersGateway", () => {
       agencyName: "Agence de test",
       agencyDepartment: "75",
       agencyKind: "mission-locale",
+      agencySiret: "11112222000033",
     };
 
     const response = await httpSubscribersGateway.notify(

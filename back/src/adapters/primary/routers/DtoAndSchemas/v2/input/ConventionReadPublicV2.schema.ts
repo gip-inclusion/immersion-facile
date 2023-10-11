@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { agencyKindSchema, ConventionReadDto, conventionSchema } from "shared";
+import {
+  agencyKindSchema,
+  ConventionReadDto,
+  conventionSchema,
+  siretSchema,
+} from "shared";
 
 export const conventionReadPublicV2Schema: z.Schema<ConventionReadDto> =
   conventionSchema.and(
@@ -7,5 +12,6 @@ export const conventionReadPublicV2Schema: z.Schema<ConventionReadDto> =
       agencyName: z.string(),
       agencyDepartment: z.string(),
       agencyKind: agencyKindSchema,
+      agencySiret: siretSchema.optional(),
     }),
   );

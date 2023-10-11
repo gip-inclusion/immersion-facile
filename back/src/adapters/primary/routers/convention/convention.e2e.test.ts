@@ -266,6 +266,7 @@ describe("convention e2e", () => {
             agencyName: peAgency.name,
             agencyDepartment: peAgency.address.departmentCode,
             agencyKind: peAgency.kind,
+            agencySiret: peAgency.agencySiret,
           },
         });
       },
