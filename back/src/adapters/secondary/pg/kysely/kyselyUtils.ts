@@ -1,6 +1,7 @@
 import {
   CompiledQuery,
   Expression,
+  ExpressionWrapper,
   Kysely,
   PostgresDialect,
   RawBuilder,
@@ -42,5 +43,8 @@ export const makeKyselyDb = (pool: Pool): Kysely<Database> =>
   new Kysely<Database>({
     dialect: new PostgresDialect({ pool }),
   });
+
+export const cast = <Cast>(query: ExpressionWrapper<any, any, any>) =>
+  sql<Cast>`${query}`;
 
 export type KyselyDb = Kysely<Database>;
