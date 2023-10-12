@@ -10,5 +10,6 @@ export const toAgencyPublicDisplayDto = (
   position: agency.position,
   signature: agency.signature,
   logoUrl: agency.logoUrl,
+  agencySiret: agency.agencySiret,
   refersToAgency: agency.refersToAgency,
 });

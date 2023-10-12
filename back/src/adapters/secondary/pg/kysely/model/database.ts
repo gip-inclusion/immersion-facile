@@ -6,6 +6,7 @@ export interface Database {
   exchanges: Exchanges;
   groups: Groups;
   groups__sirets: GroupsSirets;
+  agencies: Agencies;
 }
 
 export type JsonArray = JsonValue[];
@@ -75,4 +76,28 @@ export interface Groups {
 export interface GroupsSirets {
   group_slug: string;
   siret: string;
+}
+
+export interface Agencies {
+  id: string;
+  name: string;
+  counsellor_emails: Json;
+  validator_emails: Json;
+  admin_emails: Json;
+  questionnaire_url: string;
+  email_signature: string;
+  legacy_address: string | null;
+  position: Generated<string>;
+  created_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp>;
+  status: Generated<string>;
+  kind: string;
+  agency_siret: string | null;
+  code_safir: string | null;
+  logo_url: string | null;
+  street_number_and_address: string;
+  post_code: string;
+  city: string;
+  department_code: string;
+  refers_to_agency_id: string | null;
 }

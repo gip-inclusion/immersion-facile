@@ -4,6 +4,7 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyKind,
+  AgencyPublicDisplayDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
@@ -82,6 +83,29 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getConventionById(conventionIdA);
 
       // Assert
+      expectToEqual(result, expectedConventionRead);
+    });
+
+    it("Retrieves a convention by id exists with refersToAgency", async () => {
+      const refersToAgencyId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
+      const referringAgency = new AgencyDtoBuilder()
+        .withName("Agence référente")
+        .withId(refersToAgencyId)
+        .withAgencySiret("55552222000055")
+        .build();
+      await agencyRepo.insert(referringAgency);
+
+      const expectedConventionRead = await insertAgencyAndConvention({
+        conventionId: conventionIdA,
+        agencyId: conventionIdA,
+        agencyName: "Agency A",
+        agencyDepartment: "75",
+        agencyKind: "autre",
+        agencySiret: "11112222000033",
+        withRefersToAgency: referringAgency,
+      });
+
+      const result = await conventionQueries.getConventionById(conventionIdA);
       expectToEqual(result, expectedConventionRead);
     });
   });
@@ -542,6 +566,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment,
     agencyKind,
     agencySiret,
+    withRefersToAgency,
     conventionStartDate = DATE_START,
     conventionStatus = "DRAFT",
   }: {
@@ -551,6 +576,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment: string;
     agencyKind: AgencyKind;
     agencySiret: SiretDto;
+    withRefersToAgency?: AgencyPublicDisplayDto;
     conventionStartDate?: string;
     conventionStatus?: ConventionStatus;
   }): Promise<ConventionReadDto> => {
@@ -615,6 +641,7 @@ describe("Pg implementation of ConventionQueries", () => {
       })
       .withAgencySiret(agencySiret)
       .withKind(agencyKind)
+      .withRefersToAgency(withRefersToAgency)
       .build();
 
     await agencyRepo.insert(agency);
