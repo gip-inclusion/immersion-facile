@@ -1,7 +1,8 @@
 import {
-  BackOfficeJwtPayload,
   clearSignaturesAndValidationDate,
-  ConventionDomainPayload,
+  ConventionDto,
+  ConventionId,
+  ConventionRelatedJwtPayload,
   RenewConventionParams,
   renewConventionParamsSchema,
   Role,
@@ -19,7 +20,7 @@ import { AddConvention } from "./AddConvention";
 export class RenewConvention extends TransactionalUseCase<
   RenewConventionParams,
   void,
-  ConventionDomainPayload | BackOfficeJwtPayload
+  ConventionRelatedJwtPayload
 > {
   protected inputSchema = renewConventionParamsSchema;
 
@@ -31,42 +32,82 @@ export class RenewConvention extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: RenewConventionParams,
+    { dateEnd, dateStart, id, renewed, schedule }: RenewConventionParams,
     uow: UnitOfWork,
-    jwtPayload?: ConventionDomainPayload | BackOfficeJwtPayload,
+    jwtPayload?: ConventionRelatedJwtPayload,
   ): Promise<void> {
     const allowedRoles: Role[] = ["validator", "counsellor", "backOffice"];
 
     if (!jwtPayload) throw new UnauthorizedError();
-    if (!allowedRoles.includes(jwtPayload.role))
-      throw new ForbiddenError(
-        `The role '${jwtPayload.role}' is not allowed to renew convention`,
-      );
-
-    if (
-      jwtPayload.role !== "backOffice" &&
-      params.renewed.from !== jwtPayload.applicationId
-    )
-      throw new ForbiddenError(
-        "This token is not allowed to renew this convention",
-      );
 
     const conventionInRepo = await uow.conventionRepository.getById(
-      params.renewed.from,
+      renewed.from,
     );
     if (!conventionInRepo)
-      throw new NotFoundError(
-        `Convention with id '${params.renewed.from}' not found`,
+      throw new NotFoundError(`Convention with id '${renewed.from}' not found`);
+
+    const role = await this.#roleByPayload(
+      jwtPayload,
+      uow,
+      conventionInRepo,
+      renewed.from,
+    );
+
+    if (!allowedRoles.includes(role))
+      throw new ForbiddenError(
+        `The role '${role}' is not allowed to renew convention`,
       );
 
     if (conventionInRepo.status !== "ACCEPTED_BY_VALIDATOR")
       throw new BadRequestError(
         `This convention cannot be renewed, as it has status : '${conventionInRepo.status}'`,
       );
+
+    //Ohh boy
+    //TODO : should use event instead of sub usecase execution
     await this.addConvention.execute({
       ...clearSignaturesAndValidationDate(conventionInRepo),
-      ...params,
+      id,
+      dateStart,
+      dateEnd,
+      schedule,
+      renewed,
       status: "READY_TO_SIGN",
     });
+  }
+
+  async #roleByPayload(
+    jwtPayload: ConventionRelatedJwtPayload,
+    uow: UnitOfWork,
+    convention: ConventionDto,
+    from: ConventionId,
+  ): Promise<Role> {
+    if ("role" in jwtPayload) {
+      if (jwtPayload.role !== "backOffice" && from !== jwtPayload.applicationId)
+        throw new ForbiddenError(
+          "This token is not allowed to renew this convention",
+        );
+      return jwtPayload.role;
+    }
+
+    const inclusionConnectedUser =
+      await uow.inclusionConnectedUserRepository.getById(jwtPayload.userId);
+    if (!inclusionConnectedUser)
+      throw new NotFoundError(
+        `Inclusion connected user '${jwtPayload.userId}' not found.`,
+      );
+
+    const agencyRights = inclusionConnectedUser.agencyRights.find(
+      (agencyRight) => agencyRight.agency.id === convention.agencyId,
+    );
+    if (
+      !agencyRights ||
+      agencyRights.role === "agencyOwner" ||
+      agencyRights.role === "toReview"
+    )
+      throw new ForbiddenError(
+        `You don't have suffisiant rights on agency '${convention.agencyId}'.`,
+      );
+    return agencyRights.role;
   }
 }
