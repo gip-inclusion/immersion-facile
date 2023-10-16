@@ -347,7 +347,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersToOtherAgency: agency.refersToAgency && {
+          agencyRefersTo: agency.refersToAgency && {
             id: agency.refersToAgency.id,
             name: agency.refersToAgency.name,
           },
@@ -374,7 +374,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersToOtherAgency: agency.refersToAgency && {
+          agencyRefersTo: agency.refersToAgency && {
             id: agency.refersToAgency.id,
             name: agency.refersToAgency.name,
           },
@@ -385,7 +385,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersToOtherAgency: agency.refersToAgency && {
+          agencyRefersTo: agency.refersToAgency && {
             id: agency.refersToAgency.id,
             name: agency.refersToAgency.name,
           },
@@ -411,7 +411,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersToOtherAgency: agency.refersToAgency && {
+          agencyRefersTo: agency.refersToAgency && {
             id: agency.refersToAgency.id,
             name: agency.refersToAgency.name,
           },
@@ -444,7 +444,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersToOtherAgency: agency.refersToAgency && {
+          agencyRefersTo: agency.refersToAgency && {
             id: agency.refersToAgency.id,
             name: agency.refersToAgency.name,
           },
@@ -550,7 +550,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersToOtherAgency: agency.refersToAgency && {
+          agencyRefersTo: agency.refersToAgency && {
             id: agency.refersToAgency.id,
             name: agency.refersToAgency.name,
           },
@@ -653,7 +653,7 @@ describe("Pg implementation of ConventionQueries", () => {
       agencyDepartment,
       agencyKind,
       agencySiret,
-      agencyRefersToOtherAgency: agency.refersToAgency && {
+      agencyRefersTo: agency.refersToAgency && {
         id: agency.refersToAgency.id,
         name: agency.refersToAgency.name,
       },

@@ -267,7 +267,7 @@ describe("convention e2e", () => {
             agencyDepartment: peAgency.address.departmentCode,
             agencyKind: peAgency.kind,
             agencySiret: peAgency.agencySiret,
-            agencyRefersToOtherAgency: peAgency.refersToAgency && {
+            agencyRefersTo: peAgency.refersToAgency && {
               id: peAgency.refersToAgency.id,
               name: peAgency.refersToAgency.name,
             },

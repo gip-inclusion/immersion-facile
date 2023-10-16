@@ -101,7 +101,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
             agencyKind: agencyPoleEmploi.kind,
             agencySiret: agencyPoleEmploi.agencySiret,
-            agencyRefersToOtherAgency: agencyPoleEmploi.refersToAgency && {
+            agencyRefersTo: agencyPoleEmploi.refersToAgency && {
               id: agencyPoleEmploi.refersToAgency.id,
               name: agencyPoleEmploi.refersToAgency.name,
             },
@@ -134,7 +134,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
             agencyKind: agencyPoleEmploi.kind,
             agencySiret: agencyPoleEmploi.agencySiret,
-            agencyRefersToOtherAgency: agencyPoleEmploi.refersToAgency && {
+            agencyRefersTo: agencyPoleEmploi.refersToAgency && {
               id: agencyPoleEmploi.refersToAgency.id,
               name: agencyPoleEmploi.refersToAgency.name,
             },
@@ -186,7 +186,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyMissionLocale.address.departmentCode,
             agencyKind: agencyMissionLocale.kind,
             agencySiret: agencyMissionLocale.agencySiret,
-            agencyRefersToOtherAgency: agencyMissionLocale.refersToAgency && {
+            agencyRefersTo: agencyMissionLocale.refersToAgency && {
               id: agencyMissionLocale.refersToAgency.id,
               name: agencyMissionLocale.refersToAgency.name,
             },

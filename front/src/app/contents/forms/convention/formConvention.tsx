@@ -473,7 +473,7 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
-  agencyRefersToOtherAgency: {
+  agencyRefersTo: {
     label: "",
     id: "",
   },
