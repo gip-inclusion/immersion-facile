@@ -83,7 +83,7 @@ const buildDto = `JSON_STRIP_NULLS(
     'agencyKind', agencies.kind,
     'agencyDepartment', agencies.department_code,
     'agencySiret', agencies.agency_siret,
-    'agencyRefersToOtherAgency', CASE WHEN agencies.refers_to_agency_id IS NOT NULL 
+    'agencyRefersTo', CASE WHEN agencies.refers_to_agency_id IS NOT NULL 
       THEN JSON_BUILD_OBJECT(
         'id', agencies.refers_to_agency_id,
         'name', referring_agencies.name

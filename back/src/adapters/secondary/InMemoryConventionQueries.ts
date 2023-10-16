@@ -114,7 +114,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         agency?.address.departmentCode ?? TEST_AGENCY_DEPARTMENT,
       agencyKind: agency?.kind ?? "autre",
       agencySiret: agency?.agencySiret,
-      agencyRefersToOtherAgency: agency?.refersToAgency && {
+      agencyRefersTo: agency?.refersToAgency && {
         id: agency.refersToAgency.id,
         name: agency.refersToAgency.name,
       },
