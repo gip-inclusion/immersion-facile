@@ -1,4 +1,3 @@
-import { Pool } from "pg";
 import { filterNotFalsy } from "shared";
 import { ConventionsReminder } from "../../../domain/convention/useCases/ConventionsReminder";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
@@ -6,6 +5,7 @@ import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { AppConfig } from "../config/appConfig";
+import { createGetPgPoolFn } from "../config/createGateways";
 import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -15,15 +15,9 @@ const config = AppConfig.createFromEnv();
 const executeConventionReminder = () => {
   logger.info("Starting convention reminder script");
   const timeGateway = new RealTimeGateway();
-  const { uowPerformer } = createUowPerformer(
-    config,
-    () =>
-      new Pool({
-        connectionString: config.pgImmersionDbUrl,
-      }),
-  );
+
   return new ConventionsReminder(
-    uowPerformer,
+    createUowPerformer(config, createGetPgPoolFn(config)).uowPerformer,
     timeGateway,
     makeCreateNewEvent({
       timeGateway,
