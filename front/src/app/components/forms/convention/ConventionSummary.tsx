@@ -3,6 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { useStyles } from "tss-react/dsfr";
 import {
+  AddressDto,
   AgencyPublicDisplayDto,
   ConventionReadDto,
   DateIntervalDto,
@@ -85,10 +86,20 @@ const agencySummary = (
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
+  const displayAddress = (address: AddressDto) =>
+    `${address.streetNumberAndAddress} ${address.postcode} ${address.city}`;
+
   const rows: ConventionSummaryRow[] = [
     [
       fields["agencyId"].label,
-      `${agency.name} (${agency.address.streetNumberAndAddress} ${agency.address.postcode} ${agency.address.city})`,
+      `${agency.name} (${displayAddress(agency.address)})`,
+    ],
+    [
+      fields["agencyRefersTo"].label,
+      agency.refersToAgency &&
+        `${agency.refersToAgency.name} (${displayAddress(
+          agency.refersToAgency.address,
+        )})`,
     ],
   ];
   return rows.filter(filterEmptyRows);
