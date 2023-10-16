@@ -1,25 +1,22 @@
-import { Pool } from "pg";
 import { createLogger } from "../../../utils/logger";
 import { makeKyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNotificationRepository";
 import { AppConfig } from "../config/appConfig";
+import { createGetPgPoolFn } from "../config/createGateways";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const executeTriggerDeleteEmailAttachements = async () => {
-  const dbUrl = config.pgImmersionDbUrl;
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
-  const kyselyDb = makeKyselyDb(pool);
+  const pool = createGetPgPoolFn(config)();
+  const client = await pool.connect();
 
-  const pgNotificationRepository = new PgNotificationRepository(kyselyDb);
-  const numberOfDeletedAttachements =
-    await pgNotificationRepository.deleteAllEmailAttachements();
+  const numberOfDeletedAttachements = await new PgNotificationRepository(
+    makeKyselyDb(pool),
+  ).deleteAllEmailAttachements();
 
-  await kyselyDb.destroy();
+  await client.release();
   await pool.end();
 
   return {
@@ -29,7 +26,7 @@ const executeTriggerDeleteEmailAttachements = async () => {
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
-  "conventionReminderScript",
+  "deleteEmailAttachements",
   config,
   executeTriggerDeleteEmailAttachements,
   ({ numberOfDeletedAttachements }) =>
