@@ -145,8 +145,7 @@ describe("search-immersion route", () => {
           longitude: 2.34999,
           latitude: 48.8531,
           sortedBy: "distance",
-          //TODO: there should be only one element in this array, remove second element when shared-route is updated
-          appellationCodes: ["XXX", "12694"],
+          appellationCodes: ["XXX"],
         },
       });
       expectHttpResponseToEqual(result, {
