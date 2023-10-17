@@ -1,5 +1,5 @@
-import axios from "axios";
 import { expectToEqual } from "shared";
+import { createPeAxiosSharedClient } from "../../../../_testBuilders/manuel.test.utils";
 import { GetAccessTokenResponse } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../../../domain/offer/ports/LaBonneBoiteGateway";
@@ -8,7 +8,6 @@ import { configureCreateHttpClientForExternalApi } from "../../../primary/config
 import { InMemoryCachingGateway } from "../../core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "../../poleEmploi/HttpPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../poleEmploi/PoleEmploi.targets";
 import { HttpLaBonneBoiteGateway } from "./HttpLaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDtoBuilder } from "./LaBonneBoiteCompanyDtoBuilder";
 import { createLbbTargets } from "./LaBonneBoiteTargets";
@@ -21,15 +20,14 @@ describe("HttpLaBonneBoiteGateway", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
+    const axiosHttpClient = createPeAxiosSharedClient(config);
 
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
       configureCreateHttpClientForExternalApi()(
         createLbbTargets(config.peApiUrl),
       ),
       new HttpPoleEmploiGateway(
-        configureCreateHttpClientForExternalApi(
-          axios.create({ timeout: config.externalAxiosTimeout }),
-        )(createPoleEmploiTargets(config.peApiUrl)),
+        axiosHttpClient,
         new InMemoryCachingGateway<GetAccessTokenResponse>(
           new RealTimeGateway(),
           "expires_in",
