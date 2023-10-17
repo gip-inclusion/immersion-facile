@@ -6,8 +6,8 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { addressDtoToString, ConventionDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { AddressAutocomplete } from "../../../autocomplete/AddressAutocomplete";
 
@@ -15,7 +15,7 @@ export const BeneficiaryCurrentEmployerFields = (): JSX.Element => {
   const { setValue, getValues, register, formState } =
     useFormContext<ConventionDto>();
   const values = getValues();
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formFields = getFormFields();

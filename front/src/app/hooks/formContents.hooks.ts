@@ -11,7 +11,7 @@ export type FormFieldsObjectForContent<T> = Record<
   FormFieldAttributesForContent
 >;
 
-export const useFormContents = <T>(
+export const getFormContents = <T>(
   formFieldsLabels: FormFieldsObjectForContent<T>,
 ) => ({
   getFormFields: getFormFields(formFieldsLabels),

@@ -3,7 +3,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { ConventionDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   useSiretFetcher,
@@ -40,7 +40,7 @@ export const EstablishmentBusinessFields = ({
   useSiretRelatedField("businessName", {
     disabled: values.status !== "DRAFT",
   });
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();

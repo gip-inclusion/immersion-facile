@@ -5,8 +5,8 @@ import { ConventionDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
@@ -18,7 +18,7 @@ export const EstablishementTutorFields = (): JSX.Element => {
   const { register, getValues, formState } = useFormContext<ConventionDto>();
   const values = getValues();
   const getFieldError = makeFieldError(formState);
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
@@ -19,8 +19,8 @@ import {
   formAgencyFieldsLabels,
 } from "src/app/contents/forms/agency/formAgency";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes } from "src/app/routes/routes";
@@ -60,12 +60,12 @@ export const AgencyFormCommonFields = ({
   const [validationSteps, setValidationSteps] = useState<
     "oneStep" | "twoSteps"
   >(defaultValidationStepsValue);
+  const shouldResetCounsellorEmails =
+    validationSteps === "oneStep" && formValues.counsellorEmails.length > 0;
 
-  useEffect(() => {
-    if (validationSteps === "oneStep") setValue("counsellorEmails", []);
-  }, [validationSteps]);
+  if (shouldResetCounsellorEmails) setValue("counsellorEmails", []);
 
-  const { getFormFields } = useFormContents(formAgencyFieldsLabels);
+  const { getFormFields } = getFormContents(formAgencyFieldsLabels);
   const fieldsContent = getFormFields();
   const getFieldError = makeFieldError(formState);
   const agencyErrorMessage = (
@@ -180,7 +180,7 @@ export const AgencyFormCommonFields = ({
 export const AgencyLogoUpload = () => {
   const { getValues, setValue } = useFormContext<CreateAgencyDto>();
   const { enableLogoUpload } = useFeatureFlags();
-  const { getFormFields } = useFormContents(formAgencyFieldsLabels);
+  const { getFormFields } = getFormContents(formAgencyFieldsLabels);
   const fieldsContent: FormAgencyFieldsLabels = getFormFields();
   const formValues = getValues();
 

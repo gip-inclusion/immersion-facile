@@ -4,14 +4,14 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { ConventionReadDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 
 export const BeneficiaryEmergencyContactFields = (): JSX.Element => {
   const { watch, register, formState } = useFormContext<ConventionReadDto>();
 
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(watch().internshipKind),
   );
   const getFieldError = makeFieldError(formState);

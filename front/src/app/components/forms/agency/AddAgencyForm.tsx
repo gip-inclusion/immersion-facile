@@ -22,7 +22,7 @@ import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNot
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   formErrorsToFlatErrors,
-  useFormContents,
+  getFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -35,7 +35,7 @@ export const AddAgencyForm = (): JSX.Element => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
-  const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
+  const { getFormErrors } = getFormContents(formAgencyFieldsLabels);
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: zodResolver(createAgencySchema),
     mode: "onTouched",

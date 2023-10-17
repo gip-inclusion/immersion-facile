@@ -16,8 +16,8 @@ import {
 } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { SchedulePicker } from "../../../commons/SchedulePicker/SchedulePicker";
 
@@ -31,7 +31,7 @@ export const ScheduleSection = () => {
     >();
   const values = watch();
 
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
 

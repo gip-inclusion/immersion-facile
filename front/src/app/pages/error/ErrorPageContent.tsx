@@ -27,12 +27,9 @@ export const ErrorPageContent = ({
   message,
 }: ErrorPageContentProps): React.ReactElement => {
   const { cx } = useStyles();
+  const redirectAction = useRedirectToConventionWithoutIdentityProvider();
   const content: HTTPFrontErrorContents = type
-    ? contentsMapper(
-        useRedirectToConventionWithoutIdentityProvider(),
-        message,
-        title,
-      )[type]
+    ? contentsMapper(redirectAction, message, title)[type]
     : unexpectedErrorContent(title ?? "", message ?? "");
   return (
     <div

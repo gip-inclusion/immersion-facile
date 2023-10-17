@@ -8,8 +8,8 @@ import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEm
 import { RadioButtonOption } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { EmailValidationInput } from "../commons/EmailValidationInput";
 
@@ -42,7 +42,7 @@ const preferredContactMethodOptions = (
 ];
 
 export const BusinessContact = ({ readOnly }: { readOnly?: boolean }) => {
-  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { setValue, register, watch, getValues, formState } =
     useFormContext<FormEstablishmentDto>();

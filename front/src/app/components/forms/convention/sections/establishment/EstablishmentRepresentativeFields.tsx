@@ -5,7 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { ConventionDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 type EstablishmentRepresentativeFieldsProperties = {
@@ -17,7 +17,7 @@ export const EstablishmentRepresentativeFields = ({
 }: EstablishmentRepresentativeFieldsProperties): JSX.Element => {
   const { getValues, register } = useFormContext<ConventionDto>();
   const values = getValues();
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();

@@ -15,8 +15,8 @@ import { ConventionEmailWarning } from "src/app/components/forms/convention/Conv
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -45,7 +45,7 @@ export const BeneficiaryFormSection = ({
   const values = getValues();
   const dispatch = useDispatch();
   const getFieldError = makeFieldError(formState);
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
