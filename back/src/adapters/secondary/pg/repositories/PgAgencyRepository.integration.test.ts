@@ -141,7 +141,7 @@ describe("PgAgencyRepository", () => {
         agency1.id,
         agency3.id,
       ]);
-      expectToEqual(agencies, [agency1, agency3]);
+      expectToEqual(agencies, [agency3, agency1]);
     });
 
     it("returns empty array when no agencies are found", async () => {

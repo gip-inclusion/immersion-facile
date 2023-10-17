@@ -173,6 +173,7 @@ export class PgAgencyRepository implements AgencyRepository {
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
     return this.#getAgencyWithJsonBuiltQueryBuilder()
       .where("a.id", "in", ids)
+      .orderBy("a.updated_at", "desc")
       .execute()
       .then(map((row) => row.agency));
   }
