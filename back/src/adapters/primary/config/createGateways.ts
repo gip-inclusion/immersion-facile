@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
+import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
@@ -10,9 +11,10 @@ import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGatewa
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
+import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
-import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
@@ -81,6 +83,17 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   };
 };
 
+const configureCreateAxiosHttpClientForExternalAPIs =
+  (config: AppConfig) =>
+  <R extends Record<string, UnknownSharedRoute>>(routes: R) =>
+    createAxiosSharedClient(
+      routes,
+      axios.create({
+        timeout: config.externalAxiosTimeout,
+      }),
+      { skipResponseValidation: true },
+    );
+
 // prettier-ignore
 export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T>
   ? T
@@ -99,6 +112,9 @@ export const createGateways = async (
     apiAddress: config.apiAddress,
   });
 
+  const createAxiosHttpClientForExternalAPIs =
+    configureCreateAxiosHttpClientForExternalAPIs(config);
+
   const timeGateway =
     config.timeGateway === "CUSTOM"
       ? new CustomTimeGateway()
@@ -107,10 +123,8 @@ export const createGateways = async (
   const poleEmploiGateway =
     config.poleEmploiGateway === "HTTPS"
       ? new HttpPoleEmploiGateway(
-          createAxiosSharedClient(
+          createAxiosHttpClientForExternalAPIs(
             createPoleEmploiRoutes(config.peApiUrl),
-            axios.create({ timeout: config.externalAxiosTimeout }),
-            { skipResponseValidation: true },
           ),
           new InMemoryCachingGateway<GetAccessTokenResponse>(
             timeGateway,
@@ -122,14 +136,53 @@ export const createGateways = async (
         )
       : new InMemoryPoleEmploiGateway();
 
+  const peConnectGateway: PeConnectGateway =
+    config.peConnectGateway === "HTTPS"
+      ? new HttpPeConnectGateway(
+          createAxiosHttpClientForExternalAPIs(
+            makePeConnectExternalRoutes({
+              peApiUrl: config.peApiUrl,
+              peAuthCandidatUrl: config.peAuthCandidatUrl,
+            }),
+          ),
+          {
+            immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+            poleEmploiClientId: config.poleEmploiClientId,
+            poleEmploiClientSecret: config.poleEmploiClientSecret,
+          },
+        )
+      : new InMemoryPeConnectGateway();
+
+  const inclusionConnectGateway: InclusionConnectGateway =
+    config.inclusionConnectGateway === "HTTPS"
+      ? new HttpInclusionConnectGateway(
+          createAxiosHttpClientForExternalAPIs(
+            makeInclusionConnectExternalRoutes(
+              config.inclusionConnectConfig.inclusionConnectBaseUri,
+            ),
+          ),
+          config.inclusionConnectConfig,
+        )
+      : new InMemoryInclusionConnectGateway();
+
+  const addressGateway = {
+    IN_MEMORY: () => new InMemoryAddressGateway(),
+    OPEN_CAGE_DATA: () =>
+      new HttpAddressGateway(
+        createAxiosHttpClientForExternalAPIs(addressesExternalRoutes),
+        config.apiKeyOpenCageDataGeocoding,
+        config.apiKeyOpenCageDataGeosearch,
+      ),
+  }[config.apiAddress]();
+
   return {
-    addressApi: createAddressGateway(config),
+    addressApi: addressGateway,
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
     notification: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
 
-    inclusionConnectGateway: createInclusionConnectGateway(config),
+    inclusionConnectGateway,
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(
@@ -158,7 +211,7 @@ export const createGateways = async (
       config.pdfGeneratorGateway === "PUPPETEER"
         ? new PuppeteerPdfGeneratorGateway(uuidGenerator)
         : new InMemoryPdfGeneratorGateway(),
-    peConnectGateway: createPoleEmploiConnectGateway(config),
+    peConnectGateway,
     poleEmploiGateway,
     timeGateway,
     siret: getSiretGateway(config.siretGateway, config, timeGateway),
@@ -226,61 +279,6 @@ const createNotificationGateway = (
     throwIfReached: true,
   });
 };
-
-const createPoleEmploiConnectGateway = (config: AppConfig) =>
-  config.peConnectGateway === "HTTPS"
-    ? new HttpPeConnectGateway(
-        createAxiosSharedClient(
-          makePeConnectExternalRoutes({
-            peApiUrl: config.peApiUrl,
-            peAuthCandidatUrl: config.peAuthCandidatUrl,
-          }),
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-          { skipResponseValidation: true },
-        ),
-        {
-          immersionFacileBaseUrl: config.immersionFacileBaseUrl,
-          poleEmploiClientId: config.poleEmploiClientId,
-          poleEmploiClientSecret: config.poleEmploiClientSecret,
-        },
-      )
-    : new InMemoryPeConnectGateway();
-
-const createInclusionConnectGateway = (
-  config: AppConfig,
-): InclusionConnectGateway =>
-  config.inclusionConnectGateway === "HTTPS"
-    ? new HttpInclusionConnectGateway(
-        createAxiosSharedClient(
-          makeInclusionConnectExternalRoutes(
-            config.inclusionConnectConfig.inclusionConnectBaseUri,
-          ),
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-          { skipResponseValidation: true },
-        ),
-
-        config.inclusionConnectConfig,
-      )
-    : new InMemoryInclusionConnectGateway();
-
-const createAddressGateway = (config: AppConfig) =>
-  ({
-    IN_MEMORY: () => new InMemoryAddressGateway(),
-    OPEN_CAGE_DATA: () =>
-      new HttpAddressGateway(
-        configureCreateHttpClientForExternalApi(
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-        )(addressesExternalRoutes),
-        config.apiKeyOpenCageDataGeocoding,
-        config.apiKeyOpenCageDataGeosearch,
-      ),
-  }[config.apiAddress]());
 
 const createEmailValidationGateway = (config: AppConfig) =>
   ({

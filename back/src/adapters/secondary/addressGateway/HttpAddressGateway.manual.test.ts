@@ -237,13 +237,13 @@ describe("HttpOpenCageDataAddressGateway", () => {
           const firstResult: AddressAndPosition | undefined =
             resultMetropolitanFrance.at(0);
           expectToEqual(firstResult?.address, expectedResult.address);
-        expect(expectedResult.position.lon).toBeCloseTo(
-          expectedResult.position.lon,
-        );
-        expect(expectedResult.position.lat).toBeCloseTo(
-          expectedResult.position.lat,
-          3,
-        );
+          expect(expectedResult.position.lon).toBeCloseTo(
+            expectedResult.position.lon,
+          );
+          expect(expectedResult.position.lat).toBeCloseTo(
+            expectedResult.position.lat,
+            3,
+          );
         },
         10000,
       );
@@ -297,7 +297,6 @@ describe("HttpOpenCageDataAddressGateway", () => {
             address: {
               streetNumberAndAddress: "Route des Lacs",
               postcode: "38750",
-              streetNumberAndAddress: "Route d'Huez",
               departmentCode: "38",
               city: "Huez",
             },
