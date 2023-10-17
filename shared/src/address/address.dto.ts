@@ -139,6 +139,7 @@ export const departmentNameToDepartmentCode: Record<
   Guyane: "973",
   "La Réunion": "974",
   Mayotte: "976",
+  "Saint-Martin": "971",
 };
 
 export const getDepartmentCodeFromDepartmentNameOrCity: Record<
