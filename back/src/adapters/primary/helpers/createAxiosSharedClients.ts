@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createPoleEmploiRoutes } from "../adapters/secondary/poleEmploi/PoleEmploiRoutes";
+import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRoutes";
+import { AppConfig } from "../config/appConfig";
 
 export const createPeAxiosSharedClient = (
   config: AppConfig,

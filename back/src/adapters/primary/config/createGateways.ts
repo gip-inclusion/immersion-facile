@@ -12,7 +12,7 @@ import { NotificationGateway } from "../../../domain/generic/notifications/ports
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
-import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
@@ -276,7 +276,7 @@ const createAddressGateway = (config: AppConfig) =>
           axios.create({
             timeout: config.externalAxiosTimeout,
           }),
-        )(addressesExternalTargets),
+        )(addressesExternalRoutes),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
       ),

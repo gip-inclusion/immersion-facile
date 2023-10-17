@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { OpenCageGeoSearchKey } from "shared";
-import { createTarget, createTargets } from "http-client";
-import { createLogger } from "../../../utils/logger";
-import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
+import { defineRoute, defineRoutes } from "shared-routes";
 import { GeoCodingQueryParams } from "./HttpAddressGateway.dto";
 import {
   openCageDataFeatureCollectionSchema,
@@ -47,31 +45,19 @@ const geoSearchHeadersSchema: z.Schema<GeoSearchHeaders> = z.object({
 
 const openCageDataBaseUrl = "https://api.opencagedata.com" as const;
 
-const logger = createLogger(__filename);
-
-export type AddressesTargets = typeof addressesExternalTargets;
-export const addressesExternalTargets = createTargets({
-  geocoding: createTarget({
-    method: "GET",
+export type AddressesRoutes = typeof addressesExternalRoutes;
+export const addressesExternalRoutes = defineRoutes({
+  geocoding: defineRoute({
+    method: "get",
     url: `${openCageDataBaseUrl}/geocode/v1/geojson`,
-    validateQueryParams: geoCodingQueryParamsSchema.parse,
-    validateResponseBody: (responseBody) =>
-      validateAndParseZodSchema(
-        openCageDataFeatureCollectionSchema,
-        responseBody,
-        logger,
-      ),
+    queryParamsSchema: geoCodingQueryParamsSchema,
+    responses: { 200: openCageDataFeatureCollectionSchema },
   }),
-  geosearch: createTarget({
-    method: "GET",
+  geosearch: defineRoute({
+    method: "get",
     url: `${openCageDataBaseUrl}/geosearch`,
-    validateQueryParams: geoSearchQueryParamsSchema.parse,
-    validateHeaders: geoSearchHeadersSchema.parse,
-    validateResponseBody: (responseBody) =>
-      validateAndParseZodSchema(
-        openCageDataSearchResultCollectionSchema,
-        responseBody,
-        logger,
-      ),
+    queryParamsSchema: geoSearchQueryParamsSchema,
+    headersSchema: geoSearchHeadersSchema,
+    responses: { 200: openCageDataSearchResultCollectionSchema },
   }),
 });
