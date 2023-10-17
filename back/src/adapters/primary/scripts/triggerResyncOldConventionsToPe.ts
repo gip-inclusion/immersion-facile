@@ -1,5 +1,4 @@
 import { Pool } from "pg";
-import { createPeAxiosSharedClient } from "../../../_testBuilders/manuel.test.utils";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { ResyncOldConventionsToPe } from "../../../domain/convention/useCases/ResyncOldConventionsToPe";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
@@ -9,6 +8,7 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";
+import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

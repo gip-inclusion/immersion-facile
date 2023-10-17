@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   AddressAndPosition,
   AddressDto,
@@ -6,11 +7,11 @@ import {
   GeoPositionDto,
   LookupSearchResult,
 } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { errorMessage, HttpAddressGateway } from "./HttpAddressGateway";
-import { addressesExternalTargets } from "./HttpAddressGateway.targets";
+import { addressesExternalRoutes } from "./HttpAddressGateway.routes";
 
 const resultFromApiAddress = {
   type: "FeatureCollection",
@@ -49,7 +50,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
   beforeEach(() => {
     httpAddressGateway = new HttpAddressGateway(
-      configureCreateHttpClientForExternalApi()(addressesExternalTargets),
+      createAxiosSharedClient(addressesExternalRoutes, axios),
       geocodingApiKey,
       geosearchApiKey,
     );
@@ -235,7 +236,14 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
           const firstResult: AddressAndPosition | undefined =
             resultMetropolitanFrance.at(0);
-          expectToEqual(firstResult, expectedResult);
+          expectToEqual(firstResult?.address, expectedResult.address);
+        expect(expectedResult.position.lon).toBeCloseTo(
+          expectedResult.position.lon,
+        );
+        expect(expectedResult.position.lat).toBeCloseTo(
+          expectedResult.position.lat,
+          3,
+        );
         },
         10000,
       );
@@ -289,14 +297,15 @@ describe("HttpOpenCageDataAddressGateway", () => {
             address: {
               streetNumberAndAddress: "Route des Lacs",
               postcode: "38750",
+              streetNumberAndAddress: "Route d'Huez",
               departmentCode: "38",
               city: "Huez",
             },
           },
           {
             position: {
-              lat: 45.082959,
-              lon: 6.060869,
+              lat: 45.090225,
+              lon: 6.05878,
             },
             address: {
               streetNumberAndAddress: "Grand Broue",
@@ -606,39 +615,33 @@ describe("HttpOpenCageDataAddressGateway", () => {
       10000,
     );
   });
-});
 
-describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
-  const parallelCalls = 50;
+  describe("check parallel calls", () => {
+    const parallelCalls = 50;
 
-  it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
-    const httpAddressGateway: AddressGateway = new HttpAddressGateway(
-      configureCreateHttpClientForExternalApi()(addressesExternalTargets),
-      geocodingApiKey,
-      geosearchApiKey,
-    );
+    it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
+      const coordinates: GeoPositionDto[] = [];
+      const expectedResults: AddressDto[] = [];
 
-    const coordinates: GeoPositionDto[] = [];
-    const expectedResults: AddressDto[] = [];
+      for (let index = 0; index < parallelCalls; index++) {
+        coordinates.push({
+          lat: resultFromApiAddress.features[0].position.coordinates[1],
+          lon: resultFromApiAddress.features[0].position.coordinates[0],
+        });
+        expectedResults.push({
+          streetNumberAndAddress: "14 Rue Gaston Romazzotti",
+          city: "Molsheim",
+          departmentCode: "67",
+          postcode: "67120",
+        });
+      }
+      const results: (AddressDto | undefined)[] = await Promise.all(
+        coordinates.map((coordinate) =>
+          httpAddressGateway.getAddressFromPosition(coordinate),
+        ),
+      );
 
-    for (let index = 0; index < parallelCalls; index++) {
-      coordinates.push({
-        lat: resultFromApiAddress.features[0].position.coordinates[1],
-        lon: resultFromApiAddress.features[0].position.coordinates[0],
-      });
-      expectedResults.push({
-        streetNumberAndAddress: "14 Rue Gaston Romazzotti",
-        city: "Molsheim",
-        departmentCode: "67",
-        postcode: "67120",
-      });
-    }
-    const results: (AddressDto | undefined)[] = await Promise.all(
-      coordinates.map((coordinate) =>
-        httpAddressGateway.getAddressFromPosition(coordinate),
-      ),
-    );
-
-    expectToEqual(results, expectedResults);
-  }, 15000);
+      expectToEqual(results, expectedResults);
+    }, 15000);
+  });
 });

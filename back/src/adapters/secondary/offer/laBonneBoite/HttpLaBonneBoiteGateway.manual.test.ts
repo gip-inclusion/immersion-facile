@@ -1,10 +1,10 @@
 import { expectToEqual } from "shared";
-import { createPeAxiosSharedClient } from "../../../../_testBuilders/manuel.test.utils";
 import { GetAccessTokenResponse } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../../../domain/offer/ports/LaBonneBoiteGateway";
 import { AppConfig } from "../../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
+import { createPeAxiosSharedClient } from "../../../primary/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../../core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "../../poleEmploi/HttpPoleEmploiGateway";

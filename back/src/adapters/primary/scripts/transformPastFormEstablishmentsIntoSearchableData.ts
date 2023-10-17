@@ -1,12 +1,14 @@
+import axios from "axios";
 import { Pool } from "pg";
 import { FormEstablishmentDto, random, sleep } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
-import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.routes";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
@@ -17,7 +19,6 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createPgUow } from "../config/uowConfig";
 
 const logger = createLogger(__filename);
@@ -44,7 +45,10 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   });
   const clientDestination = await poolDestination.connect();
   const addressAPI = new HttpAddressGateway(
-    configureCreateHttpClientForExternalApi()(addressesExternalTargets),
+    createAxiosSharedClient(
+      addressesExternalRoutes,
+      axios.create({ timeout: 10_000 }),
+    ),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );
