@@ -1,16 +1,16 @@
 import { queryParamsAsString } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { InclusionAccessTokenResponse } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { createLogger } from "../../../utils/logger";
-import { InclusionConnectExternalTargets } from "./inclusionConnectExternal.targets";
+import { InclusionConnectExternalRoutes } from "./inclusionConnectExternalRoutes";
 
 const logger = createLogger(__filename);
 
 export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   constructor(
-    private httpClient: HttpClient<InclusionConnectExternalTargets>,
+    private httpClient: HttpClient<InclusionConnectExternalRoutes>,
     private inclusionConnectConfig: InclusionConnectConfig,
   ) {}
 
@@ -38,7 +38,7 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
         throw error;
       });
 
-    return response.responseBody;
+    return response.body;
   }
 }
 

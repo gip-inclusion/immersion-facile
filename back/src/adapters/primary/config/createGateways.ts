@@ -1,10 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
-import {
-  exhaustiveCheck,
-  immersionFacileContactEmail,
-  pipeWithValue,
-} from "shared";
+import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
@@ -29,7 +25,7 @@ import { EmailableEmailValidationGateway } from "../../secondary/emailValidation
 import { emailableValidationTargets } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.targets";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
-import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionConnectGateway/inclusionConnectExternal.targets";
+import { makeInclusionConnectExternalRoutes } from "../../secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
 import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
@@ -257,15 +253,16 @@ const createInclusionConnectGateway = (
 ): InclusionConnectGateway =>
   config.inclusionConnectGateway === "HTTPS"
     ? new HttpInclusionConnectGateway(
-        pipeWithValue(
-          config.inclusionConnectConfig.inclusionConnectBaseUri,
-          makeInclusionConnectExternalTargets,
-          configureCreateHttpClientForExternalApi(
-            axios.create({
-              timeout: config.externalAxiosTimeout,
-            }),
+        createAxiosSharedClient(
+          makeInclusionConnectExternalRoutes(
+            config.inclusionConnectConfig.inclusionConnectBaseUri,
           ),
+          axios.create({
+            timeout: config.externalAxiosTimeout,
+          }),
+          { skipResponseValidation: true },
         ),
+
         config.inclusionConnectConfig,
       )
     : new InMemoryInclusionConnectGateway();
