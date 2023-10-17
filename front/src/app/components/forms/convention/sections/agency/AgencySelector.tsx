@@ -21,7 +21,7 @@ import {
   AllowedAgencyKindToAdd,
 } from "src/app/components/forms/agency/agencyKindToLabel";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useRoute } from "src/app/routes/routes";
 import { agencyGateway } from "src/config/dependencies";
@@ -45,7 +45,7 @@ export const AgencySelector = ({
   defaultAgencyId,
   shouldListAll,
 }: AgencySelectorProps) => {
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(internshipKind),
   );
   const route = useRoute();

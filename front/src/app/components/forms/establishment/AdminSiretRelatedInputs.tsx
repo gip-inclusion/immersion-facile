@@ -3,12 +3,12 @@ import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
 export const AdminSiretRelatedInputs = () => {
   const featureFlags = useFeatureFlags();
-  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { register } = useFormContext();
   return (

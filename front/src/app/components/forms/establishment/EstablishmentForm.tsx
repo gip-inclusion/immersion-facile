@@ -22,7 +22,6 @@ import {
   formEstablishmentSchema,
   immersionFacileContactEmail,
   noContactPerWeek,
-  objectToDependencyList,
   removeAtIndex,
   toDotNotation,
 } from "shared";
@@ -36,8 +35,8 @@ import {
 } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   formErrorsToFlatErrors,
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
@@ -86,7 +85,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     establishmentSelectors.formEstablishment,
   );
 
-  const { getFormErrors, getFormFields } = useFormContents(
+  const { getFormErrors, getFormFields } = getFormContents(
     formEstablishmentFieldsLabels,
   );
 
@@ -108,6 +107,8 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const formValues = getValues();
   const formContents = getFormFields();
   const getFieldError = makeFieldError(methods.formState);
+
+  const debouncedFormValues = useDebounce(formValues);
 
   const [isSearchable, setIsSearchable] = useState(
     initialFormEstablishment.maxContactsPerWeek > noContactPerWeek,
@@ -174,21 +175,23 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
-  }, []);
+  }, [route, adminJwt, dispatch]);
 
   useEffect(() => {
     reset(initialFormEstablishment);
-  }, [initialFormEstablishment]);
+  }, [initialFormEstablishment, reset]);
 
   useEffect(() => {
     if (isEstablishmentCreation) {
       routes
         .formEstablishment(
-          formEstablishmentDtoToFormEstablishmentQueryParams(formValues),
+          formEstablishmentDtoToFormEstablishmentQueryParams(
+            debouncedFormValues,
+          ),
         )
         .replace();
     }
-  }, useDebounce(objectToDependencyList(formValues)));
+  }, [debouncedFormValues, isEstablishmentCreation]);
 
   useEffect(() => {
     if (feedback.kind === "errored") {

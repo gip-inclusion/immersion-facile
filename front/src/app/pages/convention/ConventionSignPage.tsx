@@ -99,13 +99,13 @@ const ConventionSignPageContent = ({
     dispatch(
       conventionSlice.actions.currentSignatoryRoleChanged(extractRole(jwt)),
     );
-  }, [jwt]);
+  }, [jwt, dispatch]);
 
   useExistingSiret(convention?.siret);
 
-  const t = convention
-    ? useConventionTexts(convention.internshipKind)
-    : useConventionTexts("immersion");
+  const t = useConventionTexts(
+    convention ? convention.internshipKind : "immersion",
+  );
 
   return (
     <>

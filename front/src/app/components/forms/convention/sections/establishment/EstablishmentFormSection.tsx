@@ -9,7 +9,7 @@ import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useTutorIsEstablishmentRepresentative } from "src/app/hooks/convention.hooks";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -29,7 +29,7 @@ export const EstablishmentFormSection = (): JSX.Element => {
   const values = getValues();
   const t = useConventionTexts(getValues().internshipKind);
 
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();

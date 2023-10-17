@@ -5,8 +5,8 @@ import { ConventionReadDto, filterNotFalsy } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
@@ -19,7 +19,7 @@ export const BeneficiaryRepresentativeFields = ({
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const currentValues = watch();
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const beneficiaryRepresentativeFirstName =

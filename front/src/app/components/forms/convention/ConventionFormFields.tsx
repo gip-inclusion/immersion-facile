@@ -21,7 +21,7 @@ import {
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
   formErrorsToFlatErrors,
-  useFormContents,
+  getFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -64,7 +64,7 @@ export const ConventionFormFields = ({
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionValues = getValues();
   const { enablePeConnectApi } = useFeatureFlags();
-  const { getFormFields, getFormErrors } = useFormContents(
+  const { getFormFields, getFormErrors } = getFormContents(
     formConventionFieldsLabels(conventionValues.internshipKind),
   );
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);

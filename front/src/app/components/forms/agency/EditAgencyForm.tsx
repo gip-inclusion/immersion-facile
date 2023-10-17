@@ -24,8 +24,8 @@ import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEm
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   formErrorsToFlatErrors,
+  getFormContents,
   makeFieldError,
-  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -54,7 +54,7 @@ export const EditAgencyForm = ({
 }: EditAgencyFormProperties): JSX.Element => {
   const dispatch = useDispatch();
   const agencyState = useAppSelector(agencyAdminSelectors.agencyState);
-  const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
+  const { getFormErrors } = getFormContents(formAgencyFieldsLabels);
   const methods = useForm<AgencyDto>({
     resolver: zodResolver(editAgencySchema),
     mode: "onTouched",

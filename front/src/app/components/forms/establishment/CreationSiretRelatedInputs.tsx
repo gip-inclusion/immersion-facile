@@ -12,7 +12,7 @@ import {
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -35,7 +35,7 @@ export const CreationSiretRelatedInputs = () => {
     register,
     formState: { touchedFields },
   } = useFormContext<FormEstablishmentDto>();
-  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
 
   useEffect(() => {

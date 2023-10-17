@@ -13,7 +13,7 @@ import {
 } from "shared";
 import { Loader } from "react-design-system";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { agencyGateway } from "src/config/dependencies";
@@ -28,7 +28,7 @@ const filterEmptyRows = (row: ConventionSummaryRow) =>
   row[1] !== undefined && row[1] !== "";
 
 const signatoriesSummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
@@ -81,7 +81,7 @@ const agencySummary = (
   convention: ConventionReadDto,
   agency: AgencyPublicDisplayDto,
 ) => {
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
@@ -95,7 +95,7 @@ const agencySummary = (
 };
 
 const beneficiarySummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
@@ -164,7 +164,7 @@ const beneficiarySummary = (convention: ConventionReadDto) => {
 };
 
 const establishmentSummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
@@ -189,7 +189,7 @@ const prettyPrintScheduleAsJSX = (
   </ul>
 );
 const immersionConditionsSummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = useFormContents(
+  const { getFormFields } = getFormContents(
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
@@ -263,14 +263,16 @@ export const ConventionSummary = () => {
   const { cx } = useStyles();
   useEffect(() => {
     if (convention) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       agencyGateway
         .getAgencyPublicInfoById({
           agencyId: convention.agencyId,
         })
-        .then(setAgency);
+        .then(setAgency)
+        .catch((_) => {
+          setAgency(null);
+        });
     }
-  }, []);
+  }, [convention]);
   useScrollToTop(true);
   if (!convention) return null;
   if (!agency) return <Loader />;
