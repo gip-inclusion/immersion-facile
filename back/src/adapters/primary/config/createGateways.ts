@@ -5,6 +5,7 @@ import {
   immersionFacileContactEmail,
   pipeWithValue,
 } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
@@ -45,7 +46,7 @@ import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMem
 import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/peConnectApi.targets";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/poleEmploi/InMemoryPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../secondary/poleEmploi/PoleEmploi.targets";
+import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRoutes";
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
@@ -110,9 +111,10 @@ export const createGateways = async (
   const poleEmploiGateway =
     config.poleEmploiGateway === "HTTPS"
       ? new HttpPoleEmploiGateway(
-          configureCreateHttpClientForExternalApi(
+          createAxiosSharedClient(
+            createPoleEmploiRoutes(config.peApiUrl),
             axios.create({ timeout: config.externalAxiosTimeout }),
-          )(createPoleEmploiTargets(config.peApiUrl)),
+          ),
           new InMemoryCachingGateway<GetAccessTokenResponse>(
             timeGateway,
             "expires_in",

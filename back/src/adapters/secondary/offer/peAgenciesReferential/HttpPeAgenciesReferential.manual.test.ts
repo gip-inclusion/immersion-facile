@@ -1,22 +1,19 @@
-import axios from "axios";
+import { createPeAxiosSharedClient } from "../../../../_testBuilders/manuel.test.utils";
 import { GetAccessTokenResponse } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { AppConfig } from "../../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
 import { InMemoryCachingGateway } from "../../core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "../../poleEmploi/HttpPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../poleEmploi/PoleEmploi.targets";
 import { HttpPeAgenciesReferential } from "./HttpPeAgenciesReferential";
 
 const config = AppConfig.createFromEnv();
+const axiosHttpClient = createPeAxiosSharedClient(config);
 
 const referencielAgencesPE = new HttpPeAgenciesReferential(
   config.peApiUrl,
   new HttpPoleEmploiGateway(
-    configureCreateHttpClientForExternalApi(
-      axios.create({ timeout: config.externalAxiosTimeout }),
-    )(createPoleEmploiTargets(config.peApiUrl)),
+    axiosHttpClient,
     new InMemoryCachingGateway<GetAccessTokenResponse>(
       new RealTimeGateway(),
       "expires_in",
