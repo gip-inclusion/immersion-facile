@@ -178,15 +178,16 @@ export class HttpAddressGateway implements AddressGateway {
     const departmentCode =
       departmentName &&
       getDepartmentCodeFromDepartmentNameOrCity[departmentName];
-
+    const streetNumberAndAddress = makeStreetNumberAndAddress(
+      getStreetNumberFromAliases(components),
+      getStreetNameFromAliases(components),
+    );
     return (
       city &&
       departmentCode &&
       postcode && {
-        streetNumberAndAddress: makeStreetNumberAndAddress(
-          getStreetNumberFromAliases(components),
-          getStreetNameFromAliases(components),
-        ),
+        streetNumberAndAddress:
+          streetNumberAndAddress === city ? "" : streetNumberAndAddress,
         postcode,
         departmentCode,
         city,
@@ -225,7 +226,8 @@ const getCityFromAliases = (
   components.city ??
   components.town ??
   components.township ??
-  components.village;
+  components.village ??
+  components.place;
 
 // We have the best results for department when merging 'county' and 'state' related keys
 const getDepartmentNameFromAliases = (
