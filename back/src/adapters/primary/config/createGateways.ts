@@ -43,7 +43,7 @@ import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway
 import { PuppeteerPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/PuppeteerPdfGeneratorGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/peConnectApi.targets";
+import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRoutes";
@@ -114,6 +114,7 @@ export const createGateways = async (
           createAxiosSharedClient(
             createPoleEmploiRoutes(config.peApiUrl),
             axios.create({ timeout: config.externalAxiosTimeout }),
+            { skipResponseValidation: true },
           ),
           new InMemoryCachingGateway<GetAccessTokenResponse>(
             timeGateway,
@@ -233,17 +234,15 @@ const createNotificationGateway = (
 const createPoleEmploiConnectGateway = (config: AppConfig) =>
   config.peConnectGateway === "HTTPS"
     ? new HttpPeConnectGateway(
-        pipeWithValue(
-          {
+        createAxiosSharedClient(
+          makePeConnectExternalRoutes({
             peApiUrl: config.peApiUrl,
             peAuthCandidatUrl: config.peAuthCandidatUrl,
-          },
-          makePeConnectExternalTargets,
-          configureCreateHttpClientForExternalApi(
-            axios.create({
-              timeout: config.externalAxiosTimeout,
-            }),
-          ),
+          }),
+          axios.create({
+            timeout: config.externalAxiosTimeout,
+          }),
+          { skipResponseValidation: true },
         ),
         {
           immersionFacileBaseUrl: config.immersionFacileBaseUrl,

@@ -6,7 +6,7 @@ import {
   parseZodSchemaAndLogErrorOnParsingFailure,
   queryParamsAsString,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
@@ -30,16 +30,16 @@ import {
 } from "./peConnectApi.dto";
 import { peConnectErrorStrategy as peConnectAxiosErrorStrategy } from "./peConnectApi.error";
 import {
+  PeConnectExternalRoutes,
+  toAccessToken,
+  toPeConnectAdvisorDto,
+  toPeConnectUserDto,
+} from "./peConnectApi.routes";
+import {
   externalPeConnectAdvisorsSchema,
   externalPeConnectUserSchema,
   externalPeConnectUserStatutSchema,
 } from "./peConnectApi.schema";
-import {
-  PeConnectExternalTargets,
-  toAccessToken,
-  toPeConnectAdvisorDto,
-  toPeConnectUserDto,
-} from "./peConnectApi.targets";
 
 const logger = createLogger(__filename);
 
@@ -85,7 +85,7 @@ const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
 // TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS PE
 export class HttpPeConnectGateway implements PeConnectGateway {
   constructor(
-    private httpClient: HttpClient<PeConnectExternalTargets>,
+    private httpClient: HttpClient<PeConnectExternalRoutes>,
     private configs: PeConnectOauthConfig,
   ) {}
 
@@ -118,7 +118,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       }
       const externalAccessToken = parseZodSchemaAndLogErrorOnParsingFailure(
         externalAccessTokenSchema,
-        response.responseBody,
+        response.body,
         logger,
         {
           token: authorizationCode,
@@ -199,7 +199,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       }
       const externalPeConnectStatut = parseZodSchemaAndLogErrorOnParsingFailure(
         externalPeConnectUserStatutSchema,
-        response.responseBody,
+        response.body,
         logger,
         {
           token: headers.Authorization,
@@ -248,7 +248,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       }
       const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
         externalPeConnectUserSchema,
-        response.responseBody,
+        response.body,
         logger,
         {
           token: headers.Authorization,
@@ -294,7 +294,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       const externalPeConnectAdvisors =
         parseZodSchemaAndLogErrorOnParsingFailure(
           externalPeConnectAdvisorsSchema,
-          response.responseBody,
+          response.body,
           logger,
           {
             token: headers.Authorization,
@@ -329,7 +329,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
 const managePeConnectError = (
   error: unknown,
-  targetKind: keyof PeConnectExternalTargets,
+  routeName: keyof PeConnectExternalRoutes,
   context: Record<string, string>,
 ): never => {
   if (!(error instanceof Error))
@@ -340,14 +340,14 @@ const managePeConnectError = (
   if (axios.isAxiosError(error)) {
     logger.error(
       {
-        targetKind,
+        routeName,
         context,
         message: error?.message,
         body: error?.response?.data,
       },
       "PE CONNECT ERROR",
     );
-    const handledError = peConnectAxiosErrorStrategy(error, targetKind).get(
+    const handledError = peConnectAxiosErrorStrategy(error, routeName).get(
       true,
     );
     if (handledError) throw handledError;
@@ -356,7 +356,7 @@ const managePeConnectError = (
   throw new UnhandledError(
     `Non axios error - ${
       error.message
-    } - targetKind: ${targetKind} - context: ${JSON.stringify(context)}`,
+    } - routeName: ${routeName} - context: ${JSON.stringify(context)}`,
     error,
   );
 };
