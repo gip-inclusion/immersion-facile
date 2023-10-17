@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { AbsoluteUrl, queryParamsAsString } from "shared";
-import { createTarget, createTargets } from "http-client";
+import { defineRoute, defineRoutes } from "shared-routes";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
@@ -27,50 +27,50 @@ const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
     "statut",
   ].join(" ");
 
-type PeConnectTargetsConfig = {
+type PeConnectRoutesConfig = {
   peApiUrl: AbsoluteUrl;
   peAuthCandidatUrl: AbsoluteUrl;
 };
 
-export type PeConnectExternalTargets = ReturnType<
-  typeof makePeConnectExternalTargets
+export type PeConnectExternalRoutes = ReturnType<
+  typeof makePeConnectExternalRoutes
 >;
 
-const forceUnknownResponseBody = (responseBody: unknown): unknown =>
+const _forceUnknownResponseBody = (responseBody: unknown): unknown =>
   responseBody;
 // forceUnknownResponseBody is to avoid changing all the behavior related to peResponses being validated in the gateways
 // TODO : move the validation here, and adapt the gateways
 // explicitely : replace forceUnknownResponseBody by validation code made actually on adapter
 
-export const makePeConnectExternalTargets = ({
+export const makePeConnectExternalRoutes = ({
   peApiUrl,
   peAuthCandidatUrl,
-}: PeConnectTargetsConfig) =>
-  createTargets({
-    getAdvisorsInfo: createTarget({
-      method: "GET",
+}: PeConnectRoutesConfig) =>
+  defineRoutes({
+    getAdvisorsInfo: defineRoute({
+      method: "get",
       url: `${peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
-      validateHeaders: peConnectHeadersSchema.parse,
-      validateResponseBody: forceUnknownResponseBody,
+      headersSchema: peConnectHeadersSchema,
+      responses: { 200: z.any() },
     }),
-    getUserInfo: createTarget({
-      method: "GET",
+    getUserInfo: defineRoute({
+      method: "get",
       url: `${peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
-      validateHeaders: peConnectHeadersSchema.parse,
-      validateResponseBody: forceUnknownResponseBody,
+      headersSchema: peConnectHeadersSchema,
+      responses: { 200: z.any() },
     }),
-    getUserStatutInfo: createTarget({
-      method: "GET",
+    getUserStatutInfo: defineRoute({
+      method: "get",
       url: `${peApiUrl}/partenaire/peconnect-statut/v1/statut`,
-      validateHeaders: peConnectHeadersSchema.parse,
-      validateResponseBody: forceUnknownResponseBody,
+      headersSchema: peConnectHeadersSchema,
+      responses: { 200: z.any() },
     }),
-    exchangeCodeForAccessToken: createTarget({
-      method: "POST",
+    exchangeCodeForAccessToken: defineRoute({
+      method: "post",
       url: `${peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
-      validateHeaders: peConnectAccessTokenHeadersSchema.parse,
-      validateRequestBody: z.string().parse,
-      validateResponseBody: forceUnknownResponseBody,
+      requestBodySchema: z.string(),
+      headersSchema: peConnectAccessTokenHeadersSchema,
+      responses: { 200: z.any() },
     }),
   });
 
