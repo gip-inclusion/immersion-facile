@@ -46,9 +46,24 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
       provider: "inclusionConnect",
     });
 
+    // the following is made in order to support both the old and the new InclusionConnect urls:
+    // Base Url was : https://connect.inclusion.beta.gouv.fr/realms/inclusion-connect/protocol/openid-connect
+    // OLD : "https://connect.inclusion.beta.gouv.fr/realms/inclusion-connect/protocol/openid-connect/auth"
+
+    // Base Url will be : https://connect.inclusion.beta.gouv.fr/auth
+    // NEW : "https://connect.inclusion.beta.gouv.fr/auth/authorize"
+    // or : "https://recette.connect.inclusion.beta.gouv.fr/auth/authorize"
+
+    const authorizeInPath =
+      this.inclusionConnectConfig.inclusionConnectBaseUri.includes(
+        "connect.inclusion.beta.gouv.fr/auth",
+      )
+        ? "authorize"
+        : "auth";
+
     return `${
       this.inclusionConnectConfig.inclusionConnectBaseUri
-    }/auth?${queryParamsAsString<InclusionConnectUrlParams>({
+    }/${authorizeInPath}?${queryParamsAsString<InclusionConnectUrlParams>({
       client_id: this.inclusionConnectConfig.clientId,
       nonce,
       redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,

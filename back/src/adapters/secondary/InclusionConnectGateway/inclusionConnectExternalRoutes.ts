@@ -20,17 +20,18 @@ export const makeInclusionConnectExternalRoutes = (
   inclusionConnectBaseUrl: AbsoluteUrl,
 ) =>
   defineRoutes({
-    // url should be of form: "https://{hostname}/realms/{realm-name}/protocol/openid-connect" then we add auth | token | logout,
+    // url should be of form: "https://{hostname}/auth" then we add  /token | /logout,
+    // documentation is here : https://github.com/gip-inclusion/inclusion-connect/blob/main/docs/inclusion_connect.md
     inclusionConnectGetAccessToken: defineRoute({
       method: "post",
-      url: `${inclusionConnectBaseUrl}/token`,
+      url: `${inclusionConnectBaseUrl}/token/`,
       requestBodySchema: z.string(),
       headersSchema: withContentTypeUrlEncodedSchema.passthrough(),
       responses: { 200: inclusionAccessTokenResponseSchema },
     }),
     inclusionConnectLogout: defineRoute({
       method: "get",
-      url: `${inclusionConnectBaseUrl}/logout`,
+      url: `${inclusionConnectBaseUrl}/logout/`,
       queryParamsSchema: inclusionConnectLogoutQueryParamsSchema,
     }),
   });
