@@ -309,6 +309,76 @@ describe("ScheduleUtils", () => {
         "dimanche : libre",
       ]);
     });
+
+    describe("prints schedules on specific dates", () => {
+      it("with winter time change", () => {
+        expectToEqual(
+          prettyPrintSchedule(
+            new ScheduleDtoBuilder()
+              .withDateInterval(winterDateChangeInterval)
+              .withRegularSchedule({
+                selectedDays: [0, 1, 2, 3, 4],
+                timePeriods: [
+                  { start: "09:00", end: "12:00" },
+                  { start: "13:00", end: "17:00" },
+                ],
+              })
+              .build(),
+            winterDateChangeInterval,
+          ).split("\n"),
+          [
+            "Heures de travail hebdomadaires : 35",
+            "lundi : 09:00-12:00, 13:00-17:00",
+            "mardi : 09:00-12:00, 13:00-17:00",
+            "mercredi : 09:00-12:00, 13:00-17:00",
+            "jeudi : 09:00-12:00, 13:00-17:00",
+            "vendredi : 09:00-12:00, 13:00-17:00",
+            "samedi : libre",
+            "dimanche : libre",
+            "Heures de travail hebdomadaires : 35",
+            "lundi : 09:00-12:00, 13:00-17:00",
+            "mardi : 09:00-12:00, 13:00-17:00",
+            "mercredi : 09:00-12:00, 13:00-17:00",
+            "jeudi : 09:00-12:00, 13:00-17:00",
+            "vendredi : 09:00-12:00, 13:00-17:00",
+          ],
+        );
+      });
+
+      it("with summer time change", () => {
+        expectToEqual(
+          prettyPrintSchedule(
+            new ScheduleDtoBuilder()
+              .withDateInterval(summerDateChangeInterval)
+              .withRegularSchedule({
+                selectedDays: [0, 1, 2, 3, 4],
+                timePeriods: [
+                  { start: "09:00", end: "12:00" },
+                  { start: "13:00", end: "17:00" },
+                ],
+              })
+              .build(),
+            summerDateChangeInterval,
+          ).split("\n"),
+          [
+            "Heures de travail hebdomadaires : 35",
+            "lundi : 09:00-12:00, 13:00-17:00",
+            "mardi : 09:00-12:00, 13:00-17:00",
+            "mercredi : 09:00-12:00, 13:00-17:00",
+            "jeudi : 09:00-12:00, 13:00-17:00",
+            "vendredi : 09:00-12:00, 13:00-17:00",
+            "samedi : libre",
+            "dimanche : libre",
+            "Heures de travail hebdomadaires : 35",
+            "lundi : 09:00-12:00, 13:00-17:00",
+            "mardi : 09:00-12:00, 13:00-17:00",
+            "mercredi : 09:00-12:00, 13:00-17:00",
+            "jeudi : 09:00-12:00, 13:00-17:00",
+            "vendredi : 09:00-12:00, 13:00-17:00",
+          ],
+        );
+      });
+    });
   });
 
   describe("calculateTotalDurationInDays", () => {
@@ -597,35 +667,187 @@ describe("ScheduleUtils", () => {
 
   describe("french hour changes (changement d'heure)", () => {
     it("schedule with 26th March", () => {
-      const interval = {
-        start: new Date("2023-03-21"),
-        end: new Date("2023-03-30"),
-      };
       const schedule = new ScheduleDtoBuilder()
-        .withDateInterval(interval)
+        .withDateInterval(summerDateChangeInterval)
         .withRegularSchedule({
-          selectedDays: [6],
-          timePeriods: [{ start: "08:00", end: "12:00" }],
+          selectedDays: [0, 1, 2, 3, 4, 5, 6],
+          timePeriods: [{ start: "09:00", end: "10:00" }],
         })
         .build();
       expectToEqual(schedule.complexSchedule, [
         {
-          date: "2023-03-26T00:00:00.000Z",
-          timePeriods: [
-            {
-              start: "08:00",
-              end: "12:00",
-            },
-          ],
+          date: new Date("2023-03-20").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-21").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-22").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-23").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-24").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-25").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-26").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-27").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-28").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-29").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-30").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-03-31").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
         },
       ]);
       expectToEqual(
         calculateTotalImmersionHoursFromComplexSchedule(
           schedule.complexSchedule,
         ),
-        4,
+        12,
       );
-      expectToEqual(calculateNumberOfWorkedDays(schedule.complexSchedule), 1);
+      expectToEqual(calculateNumberOfWorkedDays(schedule.complexSchedule), 12);
+    });
+
+    it("schedule with 30th October", () => {
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(winterDateChangeInterval)
+        .withRegularSchedule({
+          selectedDays: [0, 1, 2, 3, 4, 5, 6],
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        })
+        .build();
+      expectToEqual(schedule.complexSchedule, [
+        {
+          date: new Date("2023-10-23").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-24").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-25").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-26").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-27").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-28").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-29").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-30").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-10-31").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-11-01").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-11-02").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: new Date("2023-11-03").toISOString(),
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+      ]);
+      expectToEqual(schedule.complexSchedule, [
+        {
+          date: "2023-10-23T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-24T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-25T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-26T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-27T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-28T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-29T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-30T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-10-31T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-11-01T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-11-02T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+        {
+          date: "2023-11-03T00:00:00.000Z",
+          timePeriods: [{ start: "09:00", end: "10:00" }],
+        },
+      ]);
+      expectToEqual(
+        calculateTotalImmersionHoursFromComplexSchedule(
+          schedule.complexSchedule,
+        ),
+        12,
+      );
+      expectToEqual(calculateNumberOfWorkedDays(schedule.complexSchedule), 12);
     });
   });
 
@@ -916,3 +1138,13 @@ const longRegularSchedule = () =>
       ],
     })
     .build();
+
+const winterDateChangeInterval: DateIntervalDto = {
+  start: new Date("2023-10-23"),
+  end: new Date("2023-11-03"),
+};
+
+const summerDateChangeInterval: DateIntervalDto = {
+  start: new Date("2023-03-20"),
+  end: new Date("2023-03-31"),
+};
