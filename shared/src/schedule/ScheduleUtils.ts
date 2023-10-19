@@ -75,36 +75,8 @@ export const prettyPrintSchedule = (
   displayFreeDays = true,
 ): string =>
   makeImmersionTimetable(schedule.complexSchedule, interval)
-    .map((week, weekIndex, weeks) => {
-      const isStartingWeek = weekIndex === 0;
-      const isEndingWeek = weekIndex === weeks.length - 1;
-      return week
-        .filter((_, index) =>
-          isStartingWeek
-            ? index >= week.findIndex(({ timePeriods }) => timePeriods !== null)
-            : true,
-        )
-        .filter((_, index) => {
-          const lastDayWithoutTimePeriodIndex = week
-            .map((otherDay) => otherDay.timePeriods !== null)
-            .lastIndexOf(true);
-          return isEndingWeek ? index <= lastDayWithoutTimePeriodIndex : true;
-        });
-    })
-    .flatMap((week) => [
-      `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
-      ...week
-        .filter(({ timePeriods, date }) => {
-          const shouldRemoveDay = !timePeriods && !displayFreeDays;
-          return isWithinInterval(new Date(date), interval) && !shouldRemoveDay;
-        })
-        .map(
-          ({ date, timePeriods }) =>
-            `${frenchDayMapping(date).frenchDayName} : ${prettyPrintDaySchedule(
-              timePeriods,
-            )}`,
-        ),
-    ])
+    .map((week, weekIndex, weeks) => removeEmptyDays(weekIndex, weeks, week))
+    .flatMap((week) => makeWeeklyPrettyPrint(week, displayFreeDays, interval))
     .join("\n");
 
 const reasonableTimePeriods: TimePeriodsDto = [
@@ -481,4 +453,44 @@ export const isSundayInSchedule = (complexSchedule: DailyScheduleDto[]) => {
     (week) =>
       getDay(parseISO(week.date)) === sunday && week.timePeriods.length > 0,
   );
+};
+
+const makeWeeklyPrettyPrint = (
+  week: DailyImmersionTimetableDto[],
+  displayFreeDays: boolean,
+  interval: DateIntervalDto,
+): string | readonly string[] => [
+  `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
+  ...week
+    .filter(({ timePeriods, date }) => {
+      const shouldRemoveDay = !timePeriods && !displayFreeDays;
+      return isWithinInterval(new Date(date), interval) && !shouldRemoveDay;
+    })
+    .map(
+      ({ date, timePeriods }) =>
+        `${frenchDayMapping(date).frenchDayName} : ${prettyPrintDaySchedule(
+          timePeriods,
+        )}`,
+    ),
+];
+
+const removeEmptyDays = (
+  weekIndex: number,
+  weeks: WeeklyImmersionTimetableDto[],
+  week: WeeklyImmersionTimetableDto,
+) => {
+  const isStartingWeek = weekIndex === 0;
+  const isEndingWeek = weekIndex === weeks.length - 1;
+  return week
+    .filter((_, index) =>
+      isStartingWeek
+        ? index >= week.findIndex(({ timePeriods }) => timePeriods !== null)
+        : true,
+    )
+    .filter((_, index) => {
+      const lastDayWithoutTimePeriodIndex = week
+        .map((otherDay) => otherDay.timePeriods !== null)
+        .lastIndexOf(true);
+      return isEndingWeek ? index <= lastDayWithoutTimePeriodIndex : true;
+    });
 };
