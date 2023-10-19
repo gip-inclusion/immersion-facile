@@ -26,9 +26,8 @@ export const InclusionConnectedPrivateRoute = ({
     authSelectors.isInclusionConnected,
   );
 
-  const { token, email = "", firstName = "", lastName = "" } = route.params;
-
   useEffect(() => {
+    const { token, email = "", firstName = "", lastName = "" } = route.params;
     if (token) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
@@ -41,7 +40,7 @@ export const InclusionConnectedPrivateRoute = ({
       );
       routes.agencyDashboard().replace();
     }
-  }, [token]);
+  }, [route.params, dispatch]);
 
   if (!isInclusionConnected)
     return (

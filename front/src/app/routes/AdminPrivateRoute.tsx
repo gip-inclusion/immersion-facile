@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -46,15 +46,14 @@ export const LoginForm = ({
     dispatch(adminAuthSlice.actions.loginRequested(values));
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      routes
-        .adminTab({
-          tab: redirectRouteName || "conventions",
-        })
-        .push();
-    }
-  }, [isAuthenticated]);
+  if (isAuthenticated) {
+    routes
+      .adminTab({
+        tab: redirectRouteName || "conventions",
+      })
+      .push();
+  }
+
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">

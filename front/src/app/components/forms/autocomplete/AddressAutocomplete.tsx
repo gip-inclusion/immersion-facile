@@ -47,7 +47,7 @@ export const AddressAutocomplete = ({
         setIsSearching,
         setSelectedOption,
       ),
-    [initialSearchTerm],
+    [initialSearchTerm, selectedOption],
   );
 
   useEffect(
@@ -59,7 +59,7 @@ export const AddressAutocomplete = ({
         setOptions,
         setIsSearching,
       ),
-    [debounceSearchTerm],
+    [debounceSearchTerm, initialSearchTerm, selectedOption],
   );
 
   const noOptionText =

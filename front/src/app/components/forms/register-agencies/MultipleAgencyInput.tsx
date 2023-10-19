@@ -141,7 +141,7 @@ const AgencyAutocomplete = ({
           ),
         );
       });
-  }, [inputQuery]);
+  }, [excludeAgencies, inputQuery]);
   return (
     <Autocomplete
       disablePortal

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
@@ -30,14 +30,9 @@ export const EmailPreviewTab = () => {
     "AGENCY_WAS_ACTIVATED",
   );
 
-  const defaultEmailVariableForTemplate =
-    defaultEmailValueByEmailKind[currentTemplate];
   const [emailVariables, setEmailVariables] = useState(
-    defaultEmailVariableForTemplate,
+    defaultEmailValueByEmailKind[currentTemplate],
   );
-  useEffect(() => {
-    setEmailVariables(defaultEmailVariableForTemplate);
-  }, [currentTemplate]);
 
   const fakeContent = configureGenerateHtmlFromTemplate(
     emailTemplatesByName,
@@ -52,6 +47,11 @@ export const EmailPreviewTab = () => {
   )(currentTemplate, emailVariables, {
     skipHead: true,
   });
+
+  const onTemplateChange = (templateName: TemplateName) => {
+    setCurrentTemplate(templateName);
+    setEmailVariables(defaultEmailValueByEmailKind[templateName]);
+  };
 
   return (
     <div className={cx("admin-tab__email-preview")}>
@@ -70,7 +70,7 @@ export const EmailPreviewTab = () => {
                 id: domElementIds.admin.emailPreviewTab.emailTemplateNameSelect,
                 name: "templateName",
                 onChange: (event) =>
-                  setCurrentTemplate(event.currentTarget.value),
+                  onTemplateChange(event.currentTarget.value),
               }}
             />
 

@@ -129,7 +129,7 @@ export const TechnicalOptionsTab = () => {
       dispatch(
         apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
       );
-  }, []);
+  }, [adminToken, dispatch]);
 
   useEffect(() => {
     if (isApiConsumerModalOpened) return;
@@ -139,7 +139,7 @@ export const TechnicalOptionsTab = () => {
       dispatch(
         apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
       );
-  }, [isApiConsumerModalOpened]);
+  }, [isApiConsumerModalOpened, dispatch, adminToken]);
 
   const onConfirmTokenModalClose = () => {
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());

@@ -55,7 +55,7 @@ export const ApiConsumerForm = ({
 
   useEffect(() => {
     reset(initialValues);
-  }, [initialValues]);
+  }, [initialValues, reset]);
 
   return (
     <form onSubmit={handleSubmit(onValidSubmit)}>

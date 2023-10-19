@@ -34,7 +34,7 @@ const useClearConventionOnUnmount = () => {
     () => () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
     },
-    [],
+    [dispatch],
   );
 };
 

@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 type MatomoTagManagerProps = {
   containerUrl: string;
 };
 
 export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
-  const appendMatomoScript = () => {
+  const appendMatomoScript = useCallback(() => {
     const _mtm = ((window as any)._mtm = (window as any)._mtm || []);
     _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
     // to debug, go to http://localhost:3000/?mtmPreviewMode=gXlljpZ7&mtmSetDebugFlag=1
@@ -15,7 +15,7 @@ export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
     script.src = containerUrl;
 
     document.getElementsByTagName("head")[0].appendChild(script);
-  };
+  }, [containerUrl]);
 
   useEffect(() => {
     if (containerUrl) {
@@ -24,7 +24,7 @@ export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
         window.addEventListener("load", appendMatomoScript, !1);
       }
     }
-  }, [containerUrl]);
+  }, [containerUrl, appendMatomoScript]);
 
   return null;
 };

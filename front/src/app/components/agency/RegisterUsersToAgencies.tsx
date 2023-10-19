@@ -25,7 +25,7 @@ export const RegisterUsersToAgencies = () => {
     dispatch(
       icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
     );
-  }, []);
+  }, [dispatch]);
 
   const defaultRoleOnAssociation: AgencyRole = "validator";
 
@@ -33,7 +33,7 @@ export const RegisterUsersToAgencies = () => {
     if (agenciesNeedingReviewForUser.length === 0) {
       dispatch(icUsersAdminSlice.actions.inclusionConnectedUserSelected(""));
     }
-  }, [agenciesNeedingReviewForUser]);
+  }, [agenciesNeedingReviewForUser, dispatch]);
 
   return (
     <>

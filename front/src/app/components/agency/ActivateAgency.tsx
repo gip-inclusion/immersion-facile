@@ -23,7 +23,7 @@ const useFetchAgenciesNeedingReview = () => {
 
   useEffect(() => {
     dispatch(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested());
-  }, []);
+  }, [dispatch]);
 
   return {
     agencyNeedingReviewOptions,

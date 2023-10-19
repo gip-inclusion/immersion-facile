@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
@@ -48,13 +48,17 @@ export const AppellationAutocomplete = ({
   id = "im-appellation-autocomplete",
   disabled = false,
 }: AppellationAutocompleteProps) => {
-  const initialOption: Option | null = initialValue
-    ? {
-        value: initialValue,
-        description: initialValue?.appellationLabel ?? "",
-        matchRanges: [],
-      }
-    : null;
+  const initialOption: Option | null = useMemo(
+    () =>
+      initialValue
+        ? {
+            value: initialValue,
+            description: initialValue?.appellationLabel ?? "",
+            matchRanges: [],
+          }
+        : null,
+    [initialValue],
+  );
 
   const [selectedOption, setSelectedOption] = useState<Option | null>(
     initialOption,
@@ -71,7 +75,7 @@ export const AppellationAutocomplete = ({
     if (initialOption && selectedOption === null) {
       setSelectedOption(initialOption);
     }
-  }, [initialOption]);
+  }, [initialOption, selectedOption]);
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {

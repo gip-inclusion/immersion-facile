@@ -22,7 +22,7 @@ export const NotificationsTab = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(notificationsSlice.actions.getLastNotificationsRequested());
-  }, []);
+  }, [dispatch]);
   const latestEmails = useAppSelector(adminSelectors.notifications.emails);
   const latestSms = useAppSelector(adminSelectors.notifications.sms);
   const errorMessage = useAppSelector(adminSelectors.notifications.error);

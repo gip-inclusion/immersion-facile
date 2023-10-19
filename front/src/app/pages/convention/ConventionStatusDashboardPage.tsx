@@ -30,7 +30,7 @@ const useConventionStatusDashboardUrl = (jwt: string) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(conventionSlice.actions.conventionStatusDashboardRequested(jwt));
-  }, []);
+  }, [dispatch, jwt]);
 
   const conventionStatusDashboardUrl = useAppSelector(
     conventionSelectors.conventionStatusDashboardUrl,

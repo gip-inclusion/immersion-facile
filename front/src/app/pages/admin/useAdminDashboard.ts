@@ -11,7 +11,7 @@ export const useAdminDashboard = (params: GetAdminDashboardParams) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(dashboardUrlsSlice.actions.dashboardUrlRequested(params));
-  }, [params.name]);
+  }, [params, dispatch]);
 
   return {
     url: dashboardUrls[params.name] ?? undefined,

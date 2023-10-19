@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
@@ -32,15 +32,18 @@ export const SearchListResults = () => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const resultsPerPageValue = parseInt(resultsPerPage);
   const totalPages = Math.ceil(searchResults.length / resultsPerPageValue);
-  const getSearchResultsForPage = (currentPage: number) => {
-    const start = currentPage * resultsPerPageValue;
-    const end = start + resultsPerPageValue;
-    return searchResults.slice(start, end);
-  };
+  const getSearchResultsForPage = useCallback(
+    (currentPage: number) => {
+      const start = currentPage * resultsPerPageValue;
+      const end = start + resultsPerPageValue;
+      return searchResults.slice(start, end);
+    },
+    [searchResults, resultsPerPageValue],
+  );
 
   useEffect(() => {
     setDisplayedResults(getSearchResultsForPage(currentPage));
-  }, [currentPage, resultsPerPage]);
+  }, [currentPage, resultsPerPage, getSearchResultsForPage]);
   const hasResults = displayedResults.length > 0;
   return (
     <>

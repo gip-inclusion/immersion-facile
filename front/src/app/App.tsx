@@ -17,7 +17,7 @@ const useAppIsReady = () => {
   const dispatch = useDispatch();
   useLayoutEffect(() => {
     dispatch(appIsReadyAction());
-  }, []);
+  }, [dispatch]);
 };
 
 export const App = () => {

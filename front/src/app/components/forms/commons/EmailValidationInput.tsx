@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
 import { Email, ValidateEmailReason, ValidateEmailStatus } from "shared";
@@ -54,20 +54,13 @@ const getStateRelatedFromStatus = (
 };
 
 export const EmailValidationInput = (props: EmailValidationInputProps) => {
-  const [stateRelated, setStateRelated] = useState<StateRelated>({
-    state: props.state,
-    stateRelatedMessage: props.stateRelatedMessage,
-  });
   const [currentInputValue, setCurrentInputValue] = useState<string>("");
   const { trigger } = useFormContext();
-  useEffect(() => {
-    const { state, stateRelatedMessage } = props;
-    setStateRelated({
-      state,
-      stateRelatedMessage,
-    });
-  }, [props.state, props.stateRelatedMessage]);
-
+  const { state, stateRelatedMessage } = props;
+  const [stateRelated, setStateRelated] = useState<StateRelated>({
+    state,
+    stateRelatedMessage,
+  });
   const onInputBlur = async () => {
     try {
       const isFieldValid = await trigger(props.nativeInputProps?.name);

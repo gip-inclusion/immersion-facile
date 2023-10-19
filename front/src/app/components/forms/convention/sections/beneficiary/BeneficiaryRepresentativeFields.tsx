@@ -37,14 +37,18 @@ export const BeneficiaryRepresentativeFields = ({
         .filter(filterNotFalsy)
         .join(" ") || undefined,
     );
-  }, [beneficiaryRepresentativeFirstName, beneficiaryRepresentativeLastName]);
+  }, [
+    beneficiaryRepresentativeFirstName,
+    beneficiaryRepresentativeLastName,
+    setValue,
+  ]);
 
   useEffect(() => {
     setValue(
       "signatories.beneficiary.emergencyContactPhone",
       beneficiaryRepresentativePhone || "",
     );
-  }, [beneficiaryRepresentativePhone]);
+  }, [beneficiaryRepresentativePhone, setValue]);
 
   const formContents = getFormFields();
   return (
