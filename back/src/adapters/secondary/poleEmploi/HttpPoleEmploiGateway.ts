@@ -3,7 +3,7 @@ import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
 import querystring from "querystring";
 import { AbsoluteUrl } from "shared";
-import { HttpClient, HttpResponse } from "http-client";
+import { HttpClient } from "shared-routes";
 import {
   GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
@@ -23,7 +23,7 @@ import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { AccessTokenConfig } from "../../primary/config/appConfig";
 import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";
-import { getPeTestPrefix, PoleEmploiTargets } from "./PoleEmploi.targets";
+import { getPeTestPrefix, PoleEmploiRoutes } from "./PoleEmploiRoutes";
 
 const logger = createLogger(__filename);
 
@@ -38,7 +38,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
   #peTestPrefix: "test" | "";
 
-  readonly #httpClient: HttpClient<PoleEmploiTargets>;
+  readonly #httpClient: HttpClient<PoleEmploiRoutes>;
 
   readonly #caching: InMemoryCachingGateway<GetAccessTokenResponse>;
 
@@ -47,7 +47,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   readonly #retryStrategy: RetryStrategy;
 
   constructor(
-    httpClient: HttpClient<PoleEmploiTargets>,
+    httpClient: HttpClient<PoleEmploiRoutes>,
     caching: InMemoryCachingGateway<GetAccessTokenResponse>,
     peApiUrl: AbsoluteUrl,
     accessTokenConfig: AccessTokenConfig,
@@ -171,9 +171,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       });
   }
 
-  async #postPoleEmploiConvention(
-    poleEmploiConvention: PoleEmploiConvention,
-  ): Promise<HttpResponse<void>> {
+  async #postPoleEmploiConvention(poleEmploiConvention: PoleEmploiConvention) {
     const accessTokenResponse = await this.getAccessToken(
       `echangespmsmp api_${this.#peTestPrefix}immersion-prov2`,
     );

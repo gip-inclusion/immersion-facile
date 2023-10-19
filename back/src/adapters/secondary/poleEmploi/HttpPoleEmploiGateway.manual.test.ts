@@ -6,11 +6,10 @@ import {
 } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
+import { createPeAxiosSharedClient } from "../../primary/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
-import { createPoleEmploiTargets } from "./PoleEmploi.targets";
 
 const config = AppConfig.createFromEnv();
 const cachingGateway = new InMemoryCachingGateway<GetAccessTokenResponse>(
@@ -19,12 +18,10 @@ const cachingGateway = new InMemoryCachingGateway<GetAccessTokenResponse>(
 );
 
 const getAPI = () => {
-  const httpClient = configureCreateHttpClientForExternalApi()(
-    createPoleEmploiTargets(config.peApiUrl),
-  );
+  const peAxiosHttpClient = createPeAxiosSharedClient(config);
 
   return new HttpPoleEmploiGateway(
-    httpClient,
+    peAxiosHttpClient,
     cachingGateway,
     config.peApiUrl,
     config.poleEmploiAccessTokenConfig,

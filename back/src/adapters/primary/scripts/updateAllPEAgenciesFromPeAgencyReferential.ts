@@ -1,30 +1,30 @@
 import axios from "axios";
 import { Pool } from "pg";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/agencies/UpdateAllPeAgencies";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
-import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.routes";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../secondary/poleEmploi/PoleEmploi.targets";
 import { AppConfig } from "../config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createUowPerformer } from "../config/uowConfig";
+import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 
 const updateAllPeAgenciesScript = async () => {
   const config = AppConfig.createFromEnv();
+  const axiosInstance = axios.create({ timeout: config.externalAxiosTimeout });
+  const peAxiosHttpClient = createPeAxiosSharedClient(config, axiosInstance);
 
   const httpPeAgenciesReferential = new HttpPeAgenciesReferential(
     config.peApiUrl,
     new HttpPoleEmploiGateway(
-      configureCreateHttpClientForExternalApi(
-        axios.create({ timeout: config.externalAxiosTimeout }),
-      )(createPoleEmploiTargets(config.peApiUrl)),
+      peAxiosHttpClient,
       new InMemoryCachingGateway<GetAccessTokenResponse>(
         new RealTimeGateway(),
         "expires_in",
@@ -36,8 +36,8 @@ const updateAllPeAgenciesScript = async () => {
     config.poleEmploiClientId,
   );
 
-  const adressAPI = new HttpAddressGateway(
-    configureCreateHttpClientForExternalApi()(addressesExternalTargets),
+  const addressGateway = new HttpAddressGateway(
+    createAxiosSharedClient(addressesExternalRoutes, axiosInstance),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );
@@ -52,7 +52,7 @@ const updateAllPeAgenciesScript = async () => {
   const updateAllPeAgencies = new UpdateAllPeAgencies(
     uowPerformer,
     httpPeAgenciesReferential,
-    adressAPI,
+    addressGateway,
     new UuidV4Generator(),
     new ConsoleAppLogger(),
   );

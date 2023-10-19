@@ -1,9 +1,9 @@
 import { AxiosError } from "axios";
 import { HTTP_STATUS, ManagedRedirectError, RawRedirectError } from "shared";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
-import { PeConnectExternalTargets } from "./peConnectApi.targets";
+import { PeConnectExternalRoutes } from "./peConnectApi.routes";
 
-type PeConnectTargetsKind = keyof PeConnectExternalTargets;
+type PeConnectTargetsKind = keyof PeConnectExternalRoutes;
 
 class ConnectionRefusedError extends Error {
   constructor(

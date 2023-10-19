@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { AbsoluteUrl } from "shared";
-import { createTarget, createTargets } from "http-client";
+import { defineRoute, defineRoutes } from "shared-routes";
 import { inclusionAccessTokenResponseSchema } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
 
 const withContentTypeUrlEncodedSchema = z.object({
@@ -12,25 +12,25 @@ const inclusionConnectLogoutQueryParamsSchema = z.object({
   id_token_hint: z.string(),
 });
 
-export type InclusionConnectExternalTargets = ReturnType<
-  typeof makeInclusionConnectExternalTargets
+export type InclusionConnectExternalRoutes = ReturnType<
+  typeof makeInclusionConnectExternalRoutes
 >;
 
-export const makeInclusionConnectExternalTargets = (
+export const makeInclusionConnectExternalRoutes = (
   inclusionConnectBaseUrl: AbsoluteUrl,
 ) =>
-  createTargets({
+  defineRoutes({
     // url should be of form: "https://{hostname}/realms/{realm-name}/protocol/openid-connect" then we add auth | token | logout,
-    inclusionConnectGetAccessToken: createTarget({
-      method: "POST",
+    inclusionConnectGetAccessToken: defineRoute({
+      method: "post",
       url: `${inclusionConnectBaseUrl}/token`,
-      validateHeaders: withContentTypeUrlEncodedSchema.passthrough().parse,
-      validateRequestBody: z.string().parse,
-      validateResponseBody: inclusionAccessTokenResponseSchema.parse,
+      requestBodySchema: z.string(),
+      headersSchema: withContentTypeUrlEncodedSchema.passthrough(),
+      responses: { 200: inclusionAccessTokenResponseSchema },
     }),
-    inclusionConnectLogout: createTarget({
-      method: "GET",
+    inclusionConnectLogout: defineRoute({
+      method: "get",
       url: `${inclusionConnectBaseUrl}/logout`,
-      validateQueryParams: inclusionConnectLogoutQueryParamsSchema.parse,
+      queryParamsSchema: inclusionConnectLogoutQueryParamsSchema,
     }),
   });

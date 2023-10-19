@@ -17,16 +17,15 @@ import {
   Postcode,
   StreetNumberAndAddress,
 } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   OpenCageDataAddressComponents,
-  OpenCageDataFeatureCollection,
   OpenCageDataProperties,
   OpenCageDataSearchResultCollection,
 } from "./HttpAddressGateway.dto";
-import { AddressesTargets } from "./HttpAddressGateway.targets";
+import { AddressesRoutes } from "./HttpAddressGateway.routes";
 
 export const errorMessage = {
   minimumCharErrorMessage: (minLength: number) =>
@@ -45,7 +44,7 @@ export class HttpAddressGateway implements AddressGateway {
   });
 
   constructor(
-    private readonly httpClient: HttpClient<AddressesTargets>,
+    private readonly httpClient: HttpClient<AddressesRoutes>,
     private geocodingApiKey: string,
     private geosearchApiKey: OpenCageGeoSearchKey,
   ) {}
@@ -53,7 +52,7 @@ export class HttpAddressGateway implements AddressGateway {
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
-    const { responseBody } = await this.#limiter.schedule(() =>
+    const { body } = await this.#limiter.schedule(() =>
       this.httpClient.geocoding({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
@@ -65,9 +64,7 @@ export class HttpAddressGateway implements AddressGateway {
       }),
     );
 
-    const addresses: AddressDto[] = (
-      responseBody as OpenCageDataFeatureCollection
-    ).features
+    const addresses: AddressDto[] = body.features
       .map(this.#featureToAddress)
       .filter(filterNotFalsy);
 
@@ -83,7 +80,7 @@ export class HttpAddressGateway implements AddressGateway {
       if (query.length < queryMinLength)
         throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
 
-      const { responseBody } = await this.#limiter.schedule(() =>
+      const { body } = await this.#limiter.schedule(() =>
         this.httpClient.geosearch({
           headers: {
             "OpenCage-Geosearch-Key": this.geosearchApiKey,
@@ -99,11 +96,7 @@ export class HttpAddressGateway implements AddressGateway {
         }),
       );
 
-      return lookupSearchResultsSchema.parse(
-        toLookupSearchResults(
-          responseBody as OpenCageDataSearchResultCollection,
-        ),
-      );
+      return lookupSearchResultsSchema.parse(toLookupSearchResults(body));
     } finally {
       calculateDurationInSecondsFrom(startDate);
       logger.info({
@@ -128,7 +121,7 @@ export class HttpAddressGateway implements AddressGateway {
             lookupStreetAddressQueryMinLength,
           ),
         );
-      const { responseBody } = await this.#limiter.schedule(() =>
+      const { body } = await this.#limiter.schedule(() =>
         this.httpClient.geocoding({
           queryParams: {
             countrycode: franceAndAttachedTerritoryCountryCodes,
@@ -139,7 +132,7 @@ export class HttpAddressGateway implements AddressGateway {
         }),
       );
 
-      return (responseBody as OpenCageDataFeatureCollection).features
+      return body.features
         .map((feature) => this.#toAddressAndPosition(feature))
         .filter(filterNotFalsy);
     } finally {
@@ -178,15 +171,16 @@ export class HttpAddressGateway implements AddressGateway {
     const departmentCode =
       departmentName &&
       getDepartmentCodeFromDepartmentNameOrCity[departmentName];
-
+    const streetNumberAndAddress = makeStreetNumberAndAddress(
+      getStreetNumberFromAliases(components),
+      getStreetNameFromAliases(components),
+    );
     return (
       city &&
       departmentCode &&
       postcode && {
-        streetNumberAndAddress: makeStreetNumberAndAddress(
-          getStreetNumberFromAliases(components),
-          getStreetNameFromAliases(components),
-        ),
+        streetNumberAndAddress:
+          streetNumberAndAddress === city ? "" : streetNumberAndAddress,
         postcode,
         departmentCode,
         city,
@@ -225,7 +219,8 @@ const getCityFromAliases = (
   components.city ??
   components.town ??
   components.township ??
-  components.village;
+  components.village ??
+  components.place;
 
 // We have the best results for department when merging 'county' and 'state' related keys
 const getDepartmentNameFromAliases = (

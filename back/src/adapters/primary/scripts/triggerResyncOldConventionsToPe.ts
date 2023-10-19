@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Pool } from "pg";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { ResyncOldConventionsToPe } from "../../../domain/convention/useCases/ResyncOldConventionsToPe";
@@ -7,10 +6,9 @@ import { createLogger } from "../../../utils/logger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../secondary/poleEmploi/PoleEmploi.targets";
 import { AppConfig } from "../config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createUowPerformer } from "../config/uowConfig";
+import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
@@ -19,11 +17,10 @@ const config = AppConfig.createFromEnv();
 
 const executeUsecase = async () => {
   const timeGateway = new RealTimeGateway();
+  const peAxiosHttpClient = createPeAxiosSharedClient(config);
 
   const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
-    configureCreateHttpClientForExternalApi(
-      axios.create({ timeout: config.externalAxiosTimeout }),
-    )(createPoleEmploiTargets(config.peApiUrl)),
+    peAxiosHttpClient,
     new InMemoryCachingGateway<GetAccessTokenResponse>(
       timeGateway,
       "expires_in",

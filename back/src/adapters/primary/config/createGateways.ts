@@ -1,10 +1,8 @@
 import axios from "axios";
 import { Pool } from "pg";
-import {
-  exhaustiveCheck,
-  immersionFacileContactEmail,
-  pipeWithValue,
-} from "shared";
+import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
+import type { UnknownSharedRoute } from "shared-routes";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
@@ -13,9 +11,10 @@ import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGatewa
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
+import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
-import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
@@ -28,7 +27,7 @@ import { EmailableEmailValidationGateway } from "../../secondary/emailValidation
 import { emailableValidationTargets } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.targets";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
-import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionConnectGateway/inclusionConnectExternal.targets";
+import { makeInclusionConnectExternalRoutes } from "../../secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
 import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
@@ -42,10 +41,10 @@ import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway
 import { PuppeteerPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/PuppeteerPdfGeneratorGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/peConnectApi.targets";
+import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/poleEmploi/InMemoryPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../secondary/poleEmploi/PoleEmploi.targets";
+import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRoutes";
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
@@ -84,6 +83,17 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   };
 };
 
+const configureCreateAxiosHttpClientForExternalAPIs =
+  (config: AppConfig) =>
+  <R extends Record<string, UnknownSharedRoute>>(routes: R) =>
+    createAxiosSharedClient(
+      routes,
+      axios.create({
+        timeout: config.externalAxiosTimeout,
+      }),
+      { skipResponseValidation: true },
+    );
+
 // prettier-ignore
 export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T>
   ? T
@@ -102,6 +112,9 @@ export const createGateways = async (
     apiAddress: config.apiAddress,
   });
 
+  const createAxiosHttpClientForExternalAPIs =
+    configureCreateAxiosHttpClientForExternalAPIs(config);
+
   const timeGateway =
     config.timeGateway === "CUSTOM"
       ? new CustomTimeGateway()
@@ -110,9 +123,9 @@ export const createGateways = async (
   const poleEmploiGateway =
     config.poleEmploiGateway === "HTTPS"
       ? new HttpPoleEmploiGateway(
-          configureCreateHttpClientForExternalApi(
-            axios.create({ timeout: config.externalAxiosTimeout }),
-          )(createPoleEmploiTargets(config.peApiUrl)),
+          createAxiosHttpClientForExternalAPIs(
+            createPoleEmploiRoutes(config.peApiUrl),
+          ),
           new InMemoryCachingGateway<GetAccessTokenResponse>(
             timeGateway,
             "expires_in",
@@ -123,14 +136,53 @@ export const createGateways = async (
         )
       : new InMemoryPoleEmploiGateway();
 
+  const peConnectGateway: PeConnectGateway =
+    config.peConnectGateway === "HTTPS"
+      ? new HttpPeConnectGateway(
+          createAxiosHttpClientForExternalAPIs(
+            makePeConnectExternalRoutes({
+              peApiUrl: config.peApiUrl,
+              peAuthCandidatUrl: config.peAuthCandidatUrl,
+            }),
+          ),
+          {
+            immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+            poleEmploiClientId: config.poleEmploiClientId,
+            poleEmploiClientSecret: config.poleEmploiClientSecret,
+          },
+        )
+      : new InMemoryPeConnectGateway();
+
+  const inclusionConnectGateway: InclusionConnectGateway =
+    config.inclusionConnectGateway === "HTTPS"
+      ? new HttpInclusionConnectGateway(
+          createAxiosHttpClientForExternalAPIs(
+            makeInclusionConnectExternalRoutes(
+              config.inclusionConnectConfig.inclusionConnectBaseUri,
+            ),
+          ),
+          config.inclusionConnectConfig,
+        )
+      : new InMemoryInclusionConnectGateway();
+
+  const addressGateway = {
+    IN_MEMORY: () => new InMemoryAddressGateway(),
+    OPEN_CAGE_DATA: () =>
+      new HttpAddressGateway(
+        createAxiosHttpClientForExternalAPIs(addressesExternalRoutes),
+        config.apiKeyOpenCageDataGeocoding,
+        config.apiKeyOpenCageDataGeosearch,
+      ),
+  }[config.apiAddress]();
+
   return {
-    addressApi: createAddressGateway(config),
+    addressApi: addressGateway,
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
     notification: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
 
-    inclusionConnectGateway: createInclusionConnectGateway(config),
+    inclusionConnectGateway,
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(
@@ -159,7 +211,7 @@ export const createGateways = async (
       config.pdfGeneratorGateway === "PUPPETEER"
         ? new PuppeteerPdfGeneratorGateway(uuidGenerator)
         : new InMemoryPdfGeneratorGateway(),
-    peConnectGateway: createPoleEmploiConnectGateway(config),
+    peConnectGateway,
     poleEmploiGateway,
     timeGateway,
     siret: getSiretGateway(config.siretGateway, config, timeGateway),
@@ -227,62 +279,6 @@ const createNotificationGateway = (
     throwIfReached: true,
   });
 };
-
-const createPoleEmploiConnectGateway = (config: AppConfig) =>
-  config.peConnectGateway === "HTTPS"
-    ? new HttpPeConnectGateway(
-        pipeWithValue(
-          {
-            peApiUrl: config.peApiUrl,
-            peAuthCandidatUrl: config.peAuthCandidatUrl,
-          },
-          makePeConnectExternalTargets,
-          configureCreateHttpClientForExternalApi(
-            axios.create({
-              timeout: config.externalAxiosTimeout,
-            }),
-          ),
-        ),
-        {
-          immersionFacileBaseUrl: config.immersionFacileBaseUrl,
-          poleEmploiClientId: config.poleEmploiClientId,
-          poleEmploiClientSecret: config.poleEmploiClientSecret,
-        },
-      )
-    : new InMemoryPeConnectGateway();
-
-const createInclusionConnectGateway = (
-  config: AppConfig,
-): InclusionConnectGateway =>
-  config.inclusionConnectGateway === "HTTPS"
-    ? new HttpInclusionConnectGateway(
-        pipeWithValue(
-          config.inclusionConnectConfig.inclusionConnectBaseUri,
-          makeInclusionConnectExternalTargets,
-          configureCreateHttpClientForExternalApi(
-            axios.create({
-              timeout: config.externalAxiosTimeout,
-            }),
-          ),
-        ),
-        config.inclusionConnectConfig,
-      )
-    : new InMemoryInclusionConnectGateway();
-
-const createAddressGateway = (config: AppConfig) =>
-  ({
-    IN_MEMORY: () => new InMemoryAddressGateway(),
-    OPEN_CAGE_DATA: () =>
-      new HttpAddressGateway(
-        configureCreateHttpClientForExternalApi(
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-        )(addressesExternalTargets),
-        config.apiKeyOpenCageDataGeocoding,
-        config.apiKeyOpenCageDataGeosearch,
-      ),
-  }[config.apiAddress]());
 
 const createEmailValidationGateway = (config: AppConfig) =>
   ({

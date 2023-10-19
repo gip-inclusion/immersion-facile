@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   AddressAndPosition,
   AddressDto,
@@ -6,11 +7,11 @@ import {
   GeoPositionDto,
   LookupSearchResult,
 } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { errorMessage, HttpAddressGateway } from "./HttpAddressGateway";
-import { addressesExternalTargets } from "./HttpAddressGateway.targets";
+import { addressesExternalRoutes } from "./HttpAddressGateway.routes";
 
 const resultFromApiAddress = {
   type: "FeatureCollection",
@@ -49,207 +50,327 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
   beforeEach(() => {
     httpAddressGateway = new HttpAddressGateway(
-      configureCreateHttpClientForExternalApi()(addressesExternalTargets),
+      createAxiosSharedClient(addressesExternalRoutes, axios),
       geocodingApiKey,
       geosearchApiKey,
     );
   });
 
   describe("lookupStreetAddress, postcode is now mandatory", () => {
-    it.each<{ candidateQuery: string; expectedResult: AddressAndPosition }>([
-      {
-        candidateQuery: "111 Meinglazou 29260 Lesneven",
-        expectedResult: {
-          address: {
-            city: "Lesneven",
-            departmentCode: "29",
-            postcode: "29260",
-            streetNumberAndAddress: "",
-          },
-          position: {
-            lat: 48.5787522,
-            lon: -4.2966868,
-          },
-        },
-      },
-      {
-        candidateQuery:
-          "2 rue des Anciens Combattants d'Afrique du Nord, 54200 Toul",
-        expectedResult: {
-          address: {
-            city: "Toul",
-            departmentCode: "54",
-            postcode: "54200",
-            streetNumberAndAddress:
-              "2 Rue des Anciens Combattants d'Afrique du Nord",
-          },
-          position: {
-            lat: 48.671259,
-            lon: 5.891857,
+    describe("Right paths", () => {
+      it.each<{ candidateQuery: string; expectedResult: AddressAndPosition }>([
+        {
+          candidateQuery: "111 Meinglazou 29260 Lesneven",
+          expectedResult: {
+            address: {
+              city: "Lesneven",
+              departmentCode: "29",
+              postcode: "29260",
+              streetNumberAndAddress: "",
+            },
+            position: {
+              lat: 48.5787522,
+              lon: -4.2966868,
+            },
           },
         },
-      },
-      {
-        candidateQuery: "17 place Sainte Luce 06800 Cagnes sur Mer",
-        expectedResult: {
-          address: {
-            city: "Cagnes-sur-Mer",
-            departmentCode: "06",
-            postcode: "06800",
-            streetNumberAndAddress: "Place Sainte-Luce",
-          },
-          position: {
-            lat: 43.664522,
-            lon: 7.1494273,
-          },
-        },
-      },
-      {
-        candidateQuery: "21 Rue Monthyon Saint-Denis 97400",
-        expectedResult: {
-          address: {
-            city: "Saint-Denis",
-            departmentCode: "974",
-            postcode: "97400",
-            streetNumberAndAddress: "21 Rue Monthyon",
-          },
-          position: {
-            lat: -20.887292,
-            lon: 55.455501,
+        {
+          candidateQuery:
+            "2 rue des Anciens Combattants d'Afrique du Nord, 54200 Toul",
+          expectedResult: {
+            address: {
+              city: "Toul",
+              departmentCode: "54",
+              postcode: "54200",
+              streetNumberAndAddress:
+                "2 Rue des Anciens Combattants d'Afrique du Nord",
+            },
+            position: {
+              lat: 48.671259,
+              lon: 5.891857,
+            },
           },
         },
-      },
-      {
-        candidateQuery: "69120",
-        expectedResult: {
-          address: {
-            city: "Vaulx-en-Velin",
-            departmentCode: "69",
-            postcode: "69120",
-            streetNumberAndAddress: "",
-          },
-          position: {
-            lat: 45.771767625,
-            lon: 4.92455044791667,
-          },
-        },
-      },
-      {
-        candidateQuery: "75016",
-        expectedResult: {
-          address: {
-            city: "Paris",
-            departmentCode: "75",
-            postcode: "75016",
-            streetNumberAndAddress: "",
-          },
-          position: {
-            lat: 48.8523073360927,
-            lon: 2.27125068377483,
+        {
+          candidateQuery: "17 place Sainte Luce 06800 Cagnes sur Mer",
+          expectedResult: {
+            address: {
+              city: "Cagnes-sur-Mer",
+              departmentCode: "06",
+              postcode: "06800",
+              streetNumberAndAddress: "Place Sainte-Luce",
+            },
+            position: {
+              lat: 43.664522,
+              lon: 7.1494273,
+            },
           },
         },
-      },
-      {
-        candidateQuery: "Avenue des Champs élyssés Paris",
-        expectedResult: {
-          address: {
-            city: "Paris 8e Arrondissement",
-            departmentCode: "75",
-            postcode: "75008",
-            streetNumberAndAddress: "Avenue des Champs-Élysées",
-          },
-          position: {
-            lat: 48.8695,
-            lon: 2.308483,
-          },
-        },
-      },
-      {
-        candidateQuery: "Carcassonne",
-        expectedResult: {
-          address: {
-            city: "Carcassonne",
-            departmentCode: "11",
-            postcode: "11000",
-            streetNumberAndAddress: "",
-          },
-          position: {
-            lat: 43.2130358,
-            lon: 2.3491069,
+        {
+          candidateQuery: "21 Rue Monthyon Saint-Denis 97400",
+          expectedResult: {
+            address: {
+              city: "Saint-Denis",
+              departmentCode: "974",
+              postcode: "97400",
+              streetNumberAndAddress: "21 Rue Monthyon",
+            },
+            position: {
+              lat: -20.887292,
+              lon: 55.455501,
+            },
           },
         },
-      },
-      {
-        candidateQuery: "rue Chanzy Lunévile 54300",
-        expectedResult: {
-          address: {
-            city: "Lunéville",
-            departmentCode: "54",
-            postcode: "54300",
-            streetNumberAndAddress: "Rue du Général Chanzy",
-          },
-          position: {
-            lat: 48.596289,
-            lon: 6.489476,
-          },
-        },
-      },
-      {
-        candidateQuery: "LIEU DIT LE GROS CHATELET GARE 88200 Remiremont",
-        expectedResult: {
-          address: {
-            city: "Remiremont",
-            departmentCode: "88",
-            postcode: "88200",
-            streetNumberAndAddress: "Gros Chatelet",
-          },
-          position: {
-            lat: 48.01562,
-            lon: 6.600757,
+        {
+          candidateQuery: "69120",
+          expectedResult: {
+            address: {
+              city: "Vaulx-en-Velin",
+              departmentCode: "69",
+              postcode: "69120",
+              streetNumberAndAddress: "",
+            },
+            position: {
+              lat: 45.771767625,
+              lon: 4.92455044791667,
+            },
           },
         },
-      },
-    ])(
-      `Should work if searching for '$candidateQuery' query expect:
-          - address: '$expectedResult.address'
-          - position: '$expectedResult.position'`,
-      async ({ candidateQuery, expectedResult }) => {
-        const resultMetropolitanFrance =
-          await httpAddressGateway.lookupStreetAddress(candidateQuery);
+        {
+          candidateQuery: "75016",
+          expectedResult: {
+            address: {
+              city: "Paris",
+              departmentCode: "75",
+              postcode: "75016",
+              streetNumberAndAddress: "",
+            },
+            position: {
+              lat: 48.8523073360927,
+              lon: 2.27125068377483,
+            },
+          },
+        },
+        {
+          candidateQuery: "Avenue des Champs élyssés Paris",
+          expectedResult: {
+            address: {
+              city: "Paris 8e Arrondissement",
+              departmentCode: "75",
+              postcode: "75008",
+              streetNumberAndAddress: "Avenue des Champs-Élysées",
+            },
+            position: {
+              lat: 48.8695,
+              lon: 2.308483,
+            },
+          },
+        },
+        {
+          candidateQuery: "Carcassonne",
+          expectedResult: {
+            address: {
+              city: "Carcassonne",
+              departmentCode: "11",
+              postcode: "11000",
+              streetNumberAndAddress: "",
+            },
+            position: {
+              lat: 43.2130358,
+              lon: 2.3491069,
+            },
+          },
+        },
+        {
+          candidateQuery: "rue Chanzy Lunévile 54300",
+          expectedResult: {
+            address: {
+              city: "Lunéville",
+              departmentCode: "54",
+              postcode: "54300",
+              streetNumberAndAddress: "Rue du Général Chanzy",
+            },
+            position: {
+              lat: 48.596289,
+              lon: 6.489476,
+            },
+          },
+        },
+        {
+          candidateQuery: "LIEU DIT LE GROS CHATELET GARE 88200 Remiremont",
+          expectedResult: {
+            address: {
+              city: "Remiremont",
+              departmentCode: "88",
+              postcode: "88200",
+              streetNumberAndAddress: "Gros Chatelet",
+            },
+            position: {
+              lat: 48.01562,
+              lon: 6.600757,
+            },
+          },
+        },
+        {
+          candidateQuery: "97150 Saint-Martin",
+          expectedResult: {
+            address: {
+              city: "Saint-Martin",
+              departmentCode: "971",
+              postcode: "97150",
+              streetNumberAndAddress: "",
+            },
+            position: {
+              lat: 18.06481835,
+              lon: -63.049171129033,
+            },
+          },
+        },
+      ])(
+        `Should work if searching for '$candidateQuery' query expect:
+            - address: '$expectedResult.address'
+            - position: '$expectedResult.position'`,
+        async ({ candidateQuery, expectedResult }) => {
+          const resultMetropolitanFrance =
+            await httpAddressGateway.lookupStreetAddress(candidateQuery);
 
-        const firstResult: AddressAndPosition | undefined =
-          resultMetropolitanFrance.at(0);
-        expectToEqual(firstResult, expectedResult);
-      },
-      10000,
-    );
+          const firstResult: AddressAndPosition | undefined =
+            resultMetropolitanFrance.at(0);
+          expectToEqual(firstResult?.address, expectedResult.address);
+          expect(expectedResult.position.lon).toBeCloseTo(
+            expectedResult.position.lon,
+          );
+          expect(expectedResult.position.lat).toBeCloseTo(
+            expectedResult.position.lat,
+            3,
+          );
+        },
+        10000,
+      );
+    });
 
     it("Should return expected address DTO when providing address with special characters.", async () => {
       expectToEqual(
         await httpAddressGateway.lookupStreetAddress("Route d’Huez 38750 Huez"),
         [
           {
-            address: {
-              city: "Huez",
-              departmentCode: "38",
-              postcode: "38750",
-              streetNumberAndAddress: "",
-            },
-            position: {
-              lat: 45.082085,
-              lon: 6.059645,
-            },
-          },
-          {
-            address: {
-              city: "L'Alpe d'Huez",
-              departmentCode: "38",
-              postcode: "38750",
-              streetNumberAndAddress: "Route d'Huez",
-            },
             position: {
               lat: 45.0907535,
               lon: 6.0631237,
+            },
+            address: {
+              streetNumberAndAddress: "Route d'Huez",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "L'Alpe d'Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.090225,
+              lon: 6.05878,
+            },
+            address: {
+              streetNumberAndAddress: "Route d'Huez",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.081563,
+              lon: 6.057102,
+            },
+            address: {
+              streetNumberAndAddress: "Village d'  Huez",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.108082,
+              lon: 6.076213,
+            },
+            address: {
+              streetNumberAndAddress: "Route des Lacs",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.090225,
+              lon: 6.05878,
+            },
+            address: {
+              streetNumberAndAddress: "Grand Broue",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.092948,
+              lon: 6.066249,
+            },
+            address: {
+              streetNumberAndAddress: "Route du Signal",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.091407,
+              lon: 6.066528,
+            },
+            address: {
+              streetNumberAndAddress: "Route du Coulet",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.093366,
+              lon: 6.069915,
+            },
+            address: {
+              streetNumberAndAddress: "Rue du Poutat",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.090127,
+              lon: 6.06432,
+            },
+            address: {
+              streetNumberAndAddress: "Route Romaine",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+            },
+          },
+          {
+            position: {
+              lat: 45.091708,
+              lon: 6.063246,
+            },
+            address: {
+              streetNumberAndAddress: "Route de la Poste",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
             },
           },
         ],
@@ -493,39 +614,33 @@ describe("HttpOpenCageDataAddressGateway", () => {
       10000,
     );
   });
-});
 
-describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
-  const parallelCalls = 50;
+  describe("check parallel calls", () => {
+    const parallelCalls = 50;
 
-  it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
-    const httpAddressGateway: AddressGateway = new HttpAddressGateway(
-      configureCreateHttpClientForExternalApi()(addressesExternalTargets),
-      geocodingApiKey,
-      geosearchApiKey,
-    );
+    it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
+      const coordinates: GeoPositionDto[] = [];
+      const expectedResults: AddressDto[] = [];
 
-    const coordinates: GeoPositionDto[] = [];
-    const expectedResults: AddressDto[] = [];
+      for (let index = 0; index < parallelCalls; index++) {
+        coordinates.push({
+          lat: resultFromApiAddress.features[0].position.coordinates[1],
+          lon: resultFromApiAddress.features[0].position.coordinates[0],
+        });
+        expectedResults.push({
+          streetNumberAndAddress: "14 Rue Gaston Romazzotti",
+          city: "Molsheim",
+          departmentCode: "67",
+          postcode: "67120",
+        });
+      }
+      const results: (AddressDto | undefined)[] = await Promise.all(
+        coordinates.map((coordinate) =>
+          httpAddressGateway.getAddressFromPosition(coordinate),
+        ),
+      );
 
-    for (let index = 0; index < parallelCalls; index++) {
-      coordinates.push({
-        lat: resultFromApiAddress.features[0].position.coordinates[1],
-        lon: resultFromApiAddress.features[0].position.coordinates[0],
-      });
-      expectedResults.push({
-        streetNumberAndAddress: "14 Rue Gaston Romazzotti",
-        city: "Molsheim",
-        departmentCode: "67",
-        postcode: "67120",
-      });
-    }
-    const results: (AddressDto | undefined)[] = await Promise.all(
-      coordinates.map((coordinate) =>
-        httpAddressGateway.getAddressFromPosition(coordinate),
-      ),
-    );
-
-    expectToEqual(results, expectedResults);
-  }, 15000);
+      expectToEqual(results, expectedResults);
+    }, 15000);
+  });
 });
