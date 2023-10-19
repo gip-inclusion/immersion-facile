@@ -34,13 +34,14 @@ export const GroupPage = ({ route }: GroupPageProps) => {
     const { group, results } = response;
     setGroup(group);
     setInitialResults(results);
-  }, []);
+  }, [groupSlug]);
 
   useEffect(() => {
     getInitialGroupData().finally(() => {
       setLoading(false);
     });
-  }, []);
+  }, [getInitialGroupData]);
+
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -67,28 +68,22 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
       background: group.options.heroHeader.backgroundColor,
     },
   }))();
-  const [query, setQuery] = useState<string>("");
   const [displayedResults, setDisplayedResults] =
     useState<SearchResultDto[]>(results);
-  const filterResults = useCallback(
-    (query: string) => {
-      setDisplayedResults(
-        results.filter((displayedResult: SearchResultDto) =>
-          JSON.stringify(Object.values(displayedResult))
-            .toLowerCase()
-            .includes(query.toLowerCase()),
-        ),
-      );
-    },
-    [results],
-  );
-  useEffect(() => {
-    filterResults(query);
-  }, [query]);
+
+  const filterResults = useCallback((query: string) => {
+    setDisplayedResults((results) =>
+      results.filter((displayedResult: SearchResultDto) =>
+        JSON.stringify(Object.values(displayedResult))
+          .toLowerCase()
+          .includes(query.toLowerCase()),
+      ),
+    );
+  }, []);
 
   const onFilterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    filterResults(query);
+    filterResults(event.currentTarget.value);
   };
 
   const onHeroHeaderCtaClick = () => {
@@ -96,6 +91,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
       searchBarRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
   return (
     <>
       <section
@@ -147,7 +143,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
                 label={`Cherchez dans les immersions proposées par ${group.name}`}
                 hideLabel
                 nativeInputProps={{
-                  onChange: (event) => setQuery(event.currentTarget.value),
+                  onChange: (event) => filterResults(event.currentTarget.value),
                   placeholder:
                     "Filtrer les résultats en tapant le nom d'un métier ou d'une ville",
                 }}

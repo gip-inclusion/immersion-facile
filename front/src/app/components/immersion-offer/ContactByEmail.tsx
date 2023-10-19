@@ -18,7 +18,6 @@ import {
   SiretDto,
 } from "shared";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
-import { usePotentialBeneficiaryValues } from "src/app/components/search/usePotentialBeneficiaryValues";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { searchGateway } from "src/config/dependencies";
@@ -92,8 +91,6 @@ export const ContactByEmail = ({
     formState,
     formState: { isSubmitting },
   } = methods;
-
-  usePotentialBeneficiaryValues(initialValues, methods, appellations);
 
   const getFieldError = makeFieldError(formState);
 

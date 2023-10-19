@@ -119,7 +119,7 @@ const InputContainer = ({
   useEffect(() => {
     if (!value || !error) return;
     setError(getInputError(value));
-  }, [error, value]);
+  }, [error, getInputError, value]);
 
   return (
     <div

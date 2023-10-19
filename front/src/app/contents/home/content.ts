@@ -5,6 +5,7 @@ import type { UserType } from "src/app/pages/home/HomePage";
 import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
 import heroHeaderCandidateIllustration from "/src/assets/img/illustration-candidate-hero.webp";
@@ -63,124 +64,124 @@ export const heroHeaderNavCards: (
 ) => Record<UserType, HeroHeaderNavCard[]> = (
   storeDispatch: Dispatch,
   openSiretModal,
-) => ({
-  default: [
-    {
-      overtitle: "Candidat",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "candidate",
-      id: domElementIds.home.heroHeader.candidate,
-      link: routes.homeCandidates().link,
-    },
-    {
-      overtitle: "Entreprise",
-      title: "Vous représentez une entreprise",
-      icon: "fr-icon-building-line",
-      id: domElementIds.home.heroHeader.establishment,
-      type: "establishment",
-      link: routes.homeEstablishments().link,
-    },
-    {
-      overtitle: "Prescripteur",
-      title: "Vous êtes prescripteur",
-      icon: "fr-icon-map-pin-user-line",
-      id: domElementIds.home.heroHeader.agency,
-      type: "agency",
-      link: routes.homeAgencies().link,
-    },
-  ],
-  candidate: [
-    {
-      title: "Rechercher une entreprise accueillante",
-      icon: "fr-icon-search-line",
-      type: "candidate",
-      id: domElementIds.homeCandidates.heroHeader.search,
-      link: routes.search().link,
-    },
-    {
-      title: "Remplir la demande de convention",
-      icon: "fr-icon-file-line",
-      type: "candidate",
-      id: domElementIds.homeCandidates.heroHeader.formConvention,
-      link: routes.conventionImmersion().link,
-    },
-  ],
-  establishment: [
-    {
-      title: "Référencer mon entreprise",
-      icon: "fr-icon-hotel-line",
-      type: "establishment",
-      id: domElementIds.homeEstablishments.heroHeader.addEstablishmentForm,
-      link: {
-        href: "",
-        onClick: (event) => {
-          event.preventDefault();
-          openSiretModal();
-          storeDispatch(establishmentSlice.actions.gotReady());
+) => {
+  const onSiretModalOpenClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    openSiretModal();
+    storeDispatch(establishmentSlice.actions.gotReady());
+    storeDispatch(siretSlice.actions.siretModified(""));
+  };
+  return {
+    default: [
+      {
+        overtitle: "Candidat",
+        title: "Vous êtes candidat pour une immersion",
+        icon: "fr-icon-user-line",
+        type: "candidate",
+        id: domElementIds.home.heroHeader.candidate,
+        link: routes.homeCandidates().link,
+      },
+      {
+        overtitle: "Entreprise",
+        title: "Vous représentez une entreprise",
+        icon: "fr-icon-building-line",
+        id: domElementIds.home.heroHeader.establishment,
+        type: "establishment",
+        link: routes.homeEstablishments().link,
+      },
+      {
+        overtitle: "Prescripteur",
+        title: "Vous êtes prescripteur",
+        icon: "fr-icon-map-pin-user-line",
+        id: domElementIds.home.heroHeader.agency,
+        type: "agency",
+        link: routes.homeAgencies().link,
+      },
+    ],
+    candidate: [
+      {
+        title: "Rechercher une entreprise accueillante",
+        icon: "fr-icon-search-line",
+        type: "candidate",
+        id: domElementIds.homeCandidates.heroHeader.search,
+        link: routes.search().link,
+      },
+      {
+        title: "Remplir la demande de convention",
+        icon: "fr-icon-file-line",
+        type: "candidate",
+        id: domElementIds.homeCandidates.heroHeader.formConvention,
+        link: routes.conventionImmersion().link,
+      },
+    ],
+    establishment: [
+      {
+        title: "Référencer mon entreprise",
+        icon: "fr-icon-hotel-line",
+        type: "establishment",
+        id: domElementIds.homeEstablishments.heroHeader.addEstablishmentForm,
+        link: {
+          href: "",
+          onClick: onSiretModalOpenClick,
         },
       },
-    },
-    {
-      title: "Modifier mes informations",
-      icon: "fr-icon-edit-line",
-      type: "establishment",
-      id: domElementIds.homeEstablishments.heroHeader.editEstablishmentForm,
-      link: {
-        href: "",
-        onClick: (event) => {
-          event.preventDefault();
-          openSiretModal();
-          storeDispatch(establishmentSlice.actions.gotReady());
+      {
+        title: "Modifier mes informations",
+        icon: "fr-icon-edit-line",
+        type: "establishment",
+        id: domElementIds.homeEstablishments.heroHeader.editEstablishmentForm,
+        link: {
+          href: "",
+          onClick: onSiretModalOpenClick,
         },
       },
-    },
-    {
-      title: "Remplir la demande de convention",
-      icon: "fr-icon-file-text-line",
-      type: "establishment",
-      id: domElementIds.homeEstablishments.heroHeader.formConvention,
-      link: {
-        href: "",
-        onClick: (event) => {
-          event.preventDefault();
-          storeDispatch(authSlice.actions.federatedIdentityProvided(null));
-          routes.conventionImmersion().push();
+      {
+        title: "Remplir la demande de convention",
+        icon: "fr-icon-file-text-line",
+        type: "establishment",
+        id: domElementIds.homeEstablishments.heroHeader.formConvention,
+        link: {
+          href: "",
+          onClick: (event) => {
+            event.preventDefault();
+            storeDispatch(authSlice.actions.federatedIdentityProvided(null));
+            routes.conventionImmersion().push();
+          },
         },
       },
-    },
-  ],
-  agency: [
-    {
-      title: "Référencer mon organisme",
-      icon: "fr-icon-hotel-line",
-      type: "agency",
-      id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
-      link: routes.addAgency().link,
-    },
-    {
-      title: "Remplir la demande de convention",
-      icon: "fr-icon-file-text-line",
-      id: domElementIds.homeAgencies.heroHeader.formConvention,
-      type: "agency",
-      link: {
-        href: "",
-        onClick: (event) => {
-          event.preventDefault();
-          storeDispatch(authSlice.actions.federatedIdentityProvided(null));
-          routes.conventionImmersion().push();
+    ],
+    agency: [
+      {
+        title: "Référencer mon organisme",
+        icon: "fr-icon-hotel-line",
+        type: "agency",
+        id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
+        link: routes.addAgency().link,
+      },
+      {
+        title: "Remplir la demande de convention",
+        icon: "fr-icon-file-text-line",
+        id: domElementIds.homeAgencies.heroHeader.formConvention,
+        type: "agency",
+        link: {
+          href: "",
+          onClick: (event) => {
+            event.preventDefault();
+            storeDispatch(authSlice.actions.federatedIdentityProvided(null));
+            routes.conventionImmersion().push();
+          },
         },
       },
-    },
-    {
-      title: "Piloter mon organisme",
-      icon: "fr-icon-line-chart-line",
-      type: "agency",
-      id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
-      link: routes.agencyDashboard().link,
-    },
-  ],
-});
+      {
+        title: "Piloter mon organisme",
+        icon: "fr-icon-line-chart-line",
+        type: "agency",
+        id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
+        link: routes.agencyDashboard().link,
+      },
+    ],
+  };
+};
 export const sectionStatsData: Record<UserType, Stat[]> = {
   default: [
     {

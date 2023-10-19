@@ -90,7 +90,7 @@ export const AddEstablishmentsByBatch = () => {
         ),
       );
     }
-  }, [csvRowsParsed]);
+  }, [csvRowsParsed, dispatch]);
   const onFullscreenClick = async () => {
     isFullscreen
       ? await document.exitFullscreen()

@@ -112,7 +112,8 @@ export const ConventionDocumentPage = ({
         agencyInfoSlice.actions.fetchAgencyInfoRequested(convention.agencyId),
       );
     }
-  }, [convention?.agencyId]);
+  }, [convention?.agencyId, dispatch]);
+
   if (fetchConventionError)
     return (
       <ShowErrorOrRedirectToRenewMagicLink

@@ -80,7 +80,7 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
       ),
     );
     setReduxFormUiReady(true);
-  }, []);
+  }, [dispatch, initialValues]);
 
   return reduxFormUiReady;
 };
@@ -180,13 +180,13 @@ export const ConventionForm = ({
       dispatch(conventionSlice.actions.clearFetchedConvention());
       dispatch(conventionSlice.actions.clearFeedbackTriggered());
     };
-  }, []);
+  }, [dispatch, mode, route.params.jwt]);
 
   useEffect(() => {
     if (fetchedConvention) {
       reset(fetchedConvention);
     }
-  }, [fetchedConvention]);
+  }, [fetchedConvention, reset]);
 
   const onConfirmSubmit = () => {
     if (!fetchedConvention) return;

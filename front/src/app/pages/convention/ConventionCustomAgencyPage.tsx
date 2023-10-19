@@ -15,7 +15,7 @@ export const ConventionCustomAgencyPage = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
-  }, []);
+  }, [dispatch]);
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">

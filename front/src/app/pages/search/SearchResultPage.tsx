@@ -65,18 +65,18 @@ export const SearchResultPage = () => {
   const [showConfirmationMessage, setShowConfirmationMessage] = useState<
     string | null
   >(null);
+
   useEffect(() => {
-    if ("appellationCode" in route.params) {
-      dispatch(
-        searchSlice.actions.fetchSearchResultRequested({
-          siret: route.params.siret,
-          appellationCode: route.params.appellationCode,
-        }),
-      );
-    } else {
-      setShouldShowError(true);
-    }
-  }, []);
+    "appellationCode" in route.params
+      ? dispatch(
+          searchSlice.actions.fetchSearchResultRequested({
+            siret: route.params.siret,
+            appellationCode: route.params.appellationCode,
+          }),
+        )
+      : setShouldShowError(true);
+  }, [route.params, dispatch]);
+
   const pluralFromAppellations = (appellations: AppellationDto[] | undefined) =>
     appellations && appellations.length > 1 ? "s" : "";
   const onFormSubmitSuccess = () => {

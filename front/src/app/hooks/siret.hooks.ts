@@ -19,16 +19,22 @@ export const useSiretRelatedField = <K extends keyof SiretEstablishmentDto>(
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const { setValue } = useFormContext();
   useEffect(() => {
-    if (options?.disabled) return;
-    if (!establishmentInfos) return;
-    setValue(
-      fieldNameToUpdate,
-      establishmentInfos && establishmentInfos[fieldFromInfo],
-      {
-        shouldValidate: true,
-      },
-    );
-  }, [establishmentInfos]);
+    if (establishmentInfos && !options?.disabled) {
+      setValue(
+        fieldNameToUpdate,
+        establishmentInfos && establishmentInfos[fieldFromInfo],
+        {
+          shouldValidate: true,
+        },
+      );
+    }
+  }, [
+    establishmentInfos,
+    setValue,
+    options?.disabled,
+    fieldNameToUpdate,
+    fieldFromInfo,
+  ]);
 };
 
 type SiretFetcherOptions = {
@@ -57,7 +63,11 @@ export const useSiretFetcher = ({
           shouldFetchEvenIfAlreadySaved,
         ),
       );
-  }, [storeShouldFetchEvenIfAlreadySaved]);
+  }, [
+    storeShouldFetchEvenIfAlreadySaved,
+    shouldFetchEvenIfAlreadySaved,
+    dispatch,
+  ]);
 
   return {
     currentSiret,
@@ -79,7 +89,7 @@ export const useInitialSiret = (siret?: string) => {
     if (siret && siret !== currentSiret) {
       dispatch(siretSlice.actions.siretModified(siret));
     }
-  }, []);
+  }, [siret, currentSiret, dispatch]);
 };
 
 export const useExistingSiret = (siret?: SiretDto | null) => {
@@ -87,7 +97,7 @@ export const useExistingSiret = (siret?: SiretDto | null) => {
 
   useEffect(() => {
     if (siret) dispatch(siretSlice.actions.siretModified(siret));
-  }, [siret]);
+  }, [siret, dispatch]);
 };
 
 export const useEstablishmentSiret = (

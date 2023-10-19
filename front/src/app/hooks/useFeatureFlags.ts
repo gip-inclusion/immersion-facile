@@ -8,7 +8,7 @@ export const useFetchFeatureFlags = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(featureFlagsSlice.actions.retrieveFeatureFlagsRequested());
-  }, []);
+  }, [dispatch]);
 };
 
 export const useFeatureFlags = () =>

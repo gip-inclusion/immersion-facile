@@ -66,16 +66,16 @@ export const ShareForm = ({
     }),
     resolver: zodResolver(shareLinkByEmailSchema),
   });
-  const { register, handleSubmit, formState } = methods;
+  const { register, handleSubmit, formState, reset } = methods;
 
   useEffect(() => {
-    methods.reset(
+    reset(
       makeInitialValues({
         ...conventionFormData,
         link: window.location.href,
       }),
     );
-  }, [conventionFormData]);
+  }, [conventionFormData, reset]);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <input type="hidden" {...register("conventionLink")} />

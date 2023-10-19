@@ -3,7 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   ConventionReadDto,
-  EstablishmentRepresentative,
   getSignatoryKey,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
@@ -26,7 +25,7 @@ export const useConvention = (payload: FetchConventionRequestedPayload) => {
     return () => {
       dispatch(conventionSlice.actions.clearFeedbackTriggered());
     };
-  }, []);
+  }, [dispatch]);
 
   return { convention, submitFeedback, fetchConventionError, isLoading };
 };
@@ -38,19 +37,12 @@ export const useTutorIsEstablishmentRepresentative = () => {
   const convention = useAppSelector(conventionSelectors.convention);
   const { getValues, setValue } = useFormContext<ConventionReadDto>();
   const values = getValues();
-  const setEstablishmentRepresentative = (
-    establishmentRepresentative: EstablishmentRepresentative,
-  ) =>
-    setValue(
-      getSignatoryKey("signatories.establishmentRepresentative"),
-      establishmentRepresentative,
-    );
 
   const { firstName, lastName, email, phone } = values.establishmentTutor;
 
   useEffect(() => {
     if (isTutorEstablismentRepresentative) {
-      setEstablishmentRepresentative({
+      setValue(getSignatoryKey("signatories.establishmentRepresentative"), {
         role: "establishment-representative",
         firstName,
         lastName,
@@ -63,10 +55,17 @@ export const useTutorIsEstablishmentRepresentative = () => {
     if (!convention) return;
 
     if (!isEstablishmentTutorIsEstablishmentRepresentative(convention))
-      setEstablishmentRepresentative(
+      setValue(
+        getSignatoryKey("signatories.establishmentRepresentative"),
         convention.signatories.establishmentRepresentative,
       );
-  }, [isTutorEstablismentRepresentative, firstName, lastName, email, phone]);
-
-  return setEstablishmentRepresentative;
+  }, [
+    isTutorEstablismentRepresentative,
+    firstName,
+    lastName,
+    email,
+    phone,
+    convention,
+    setValue,
+  ]);
 };

@@ -59,7 +59,7 @@ export const ConventionManageContent = ({
     () => () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
     },
-    [],
+    [dispatch],
   );
 
   if (fetchConventionError) {

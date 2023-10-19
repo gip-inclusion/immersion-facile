@@ -60,7 +60,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const isSharedConvention = useMemo(
     // depends on initial (on page load) route params, shouldn't change on re-render
     () => Object.keys(route.params).length > 0,
-    [],
+    [route.params],
   );
   const mode: ConventionFormMode = "jwt" in route.params ? "edit" : "create";
   useFederatedIdentityFromUrl(route);
@@ -127,5 +127,5 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
         }),
       );
     }
-  }, [fedId, fedIdProvider, email, firstName, lastName]);
+  }, [fedId, fedIdProvider, email, firstName, lastName, dispatch]);
 };
