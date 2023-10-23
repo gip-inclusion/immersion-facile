@@ -1,5 +1,9 @@
-import { delay, Observable, of, throwError } from "rxjs";
-import { AgencyId, InclusionConnectedUser } from "shared";
+import { delay, Observable, of, Subject, throwError } from "rxjs";
+import {
+  AgencyId,
+  InclusionConnectedUser,
+  MarkPartnersErroredConventionAsHandledRequest,
+} from "shared";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 const simulatedUserConnected: InclusionConnectedUser = {
@@ -15,10 +19,19 @@ export const nonExisitingAgencyId: AgencyId = "not-found-agency-id";
 export class SimulatedInclusionConnectedGateway
   implements InclusionConnectedGateway
 {
+  public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
+
   constructor(private simulatedLatency: number = 0) {}
 
   public getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return of(simulatedUserConnected);
+  }
+
+  public markPartnersErroredConventionAsHandled$(
+    _params: MarkPartnersErroredConventionAsHandledRequest,
+    _jwt: string,
+  ): Observable<void> {
+    return this.markPartnersErroredConventionAsHandledResult$;
   }
 
   public registerAgenciesToCurrentUser$(

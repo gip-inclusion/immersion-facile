@@ -1,15 +1,28 @@
 import { Pool, PoolClient } from "pg";
+import {
+  ConventionId,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
-import { SavedError } from "../../../../domain/core/ports/ErrorRepository";
+import {
+  broadcastToPeServiceName,
+  SavedError,
+} from "../../../../domain/core/ports/ErrorRepository";
+import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgErrorRepository } from "./PgErrorRepository";
 
-const savedError: SavedError = {
-  serviceName: "SomeService",
+const makeSavedError = (
+  serviceName: string,
+  conventionId: ConventionId,
+): SavedError => ({
+  serviceName,
   message: "Some message",
-  params: { someId: "123", httpStatus: 500 },
-  occurredAt: new Date("2021-01-01"),
-};
+  params: { conventionId, httpStatus: 500 },
+  occurredAt: new Date(),
+  handledByAgency: false,
+});
 
 describe("PgErrorRepository", () => {
   let pool: Pool;
@@ -32,10 +45,72 @@ describe("PgErrorRepository", () => {
   });
 
   it("saves an error in the repository", async () => {
+    const savedError = makeSavedError("osef", "someId");
     await pgErrorRepository.save(savedError);
     const response = await client.query("SELECT * FROM saved_errors");
     expect(response.rows).toHaveLength(1);
     expect(response.rows[0].service_name).toBe(savedError.serviceName);
     expect(response.rows[0].params).toEqual(savedError.params);
+  });
+
+  describe("markPartnersErroredConventionAsHandled", () => {
+    const conventionId1 = "d07af28e-9c7b-4845-91ee-71020860faa8";
+
+    it(`mark errored convention as handle when convention exist and service name is '${broadcastToPeServiceName}'`, async () => {
+      const conventionId2 = "someId";
+      const savedError1 = makeSavedError(
+        broadcastToPeServiceName,
+        conventionId1,
+      );
+      const savedError2 = makeSavedError(
+        broadcastToPeServiceName,
+        conventionId1,
+      );
+      const savedError3 = makeSavedError("osef", conventionId1);
+      const savedError4 = makeSavedError(
+        broadcastToPeServiceName,
+        conventionId2,
+      );
+
+      await pgErrorRepository.save(savedError1);
+      await pgErrorRepository.save(savedError2);
+      await pgErrorRepository.save(savedError3);
+      await pgErrorRepository.save(savedError4);
+
+      await pgErrorRepository.markPartnersErroredConventionAsHandled(
+        conventionId1,
+      );
+
+      const response = await client.query(
+        "SELECT * FROM saved_errors ORDER BY id",
+      );
+      expectToEqual(
+        response.rows.map(
+          (row) =>
+            ({
+              handledByAgency: row.handled_by_agency,
+              message: row.message,
+              occurredAt: row.occurred_at,
+              params: row.params,
+              serviceName: row.service_name,
+            } satisfies SavedError),
+        ),
+        [
+          { ...savedError1, handledByAgency: true },
+          { ...savedError2, handledByAgency: true },
+          savedError3,
+          savedError4,
+        ],
+      );
+    });
+
+    it("Throw when there is no error for convention", async () => {
+      await expectPromiseToFailWithError(
+        pgErrorRepository.markPartnersErroredConventionAsHandled(conventionId1),
+        new NotFoundError(
+          `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId1}'.`,
+        ),
+      );
+    });
   });
 });

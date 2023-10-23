@@ -1,0 +1,96 @@
+import {
+  AuthenticatedUserId,
+  ConventionId,
+  InclusionConnectDomainJwtPayload,
+  MarkPartnersErroredConventionAsHandledRequest,
+  markPartnersErroredConventionAsHandledRequestSchema,
+} from "shared";
+import {
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../../../../adapters/primary/helpers/httpErrors";
+import { CreateNewEvent } from "../../../core/eventBus/EventBus";
+import { DomainTopic } from "../../../core/eventBus/events";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
+import { conventionMissingMessage } from "../../entities/Convention";
+
+export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase<
+  MarkPartnersErroredConventionAsHandledRequest,
+  void,
+  InclusionConnectDomainJwtPayload
+> {
+  protected inputSchema = markPartnersErroredConventionAsHandledRequestSchema;
+
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private readonly createNewEvent: CreateNewEvent,
+    private readonly timeGateway: TimeGateway,
+  ) {
+    super(uowPerformer);
+  }
+
+  public async _execute(
+    params: MarkPartnersErroredConventionAsHandledRequest,
+    uow: UnitOfWork,
+    payload: InclusionConnectDomainJwtPayload,
+  ): Promise<void> {
+    if (!payload) {
+      throw new UnauthorizedError();
+    }
+    const { userId } = payload;
+    const conventionToMarkAsHandled = await uow.conventionRepository.getById(
+      params.conventionId,
+    );
+    if (!conventionToMarkAsHandled)
+      throw new NotFoundError(conventionMissingMessage(params.conventionId));
+
+    const icUser = await uow.inclusionConnectedUserRepository.getById(userId);
+    if (!icUser)
+      throw new NotFoundError(
+        `User '${userId}' not found on inclusion connected user repository.`,
+      );
+    const userAgencyRights = icUser.agencyRights.find(
+      (agencyRight) =>
+        agencyRight.agency.id === conventionToMarkAsHandled.agencyId,
+    );
+    if (!userAgencyRights)
+      throw new ForbiddenError(
+        `User '${userId}' has no role on agency '${conventionToMarkAsHandled.agencyId}'.`,
+      );
+
+    const conventionMarkAsHandledAt = this.timeGateway.now().toISOString();
+
+    await uow.errorRepository.markPartnersErroredConventionAsHandled(
+      params.conventionId,
+    );
+
+    await uow.outboxRepository.save({
+      ...this.#createEvent(
+        params.conventionId,
+        userId,
+        "PartnerErroredConventionMarkAsHandled",
+      ),
+      occurredAt: conventionMarkAsHandledAt,
+    });
+  }
+
+  #createEvent(
+    conventionId: ConventionId,
+    userId: AuthenticatedUserId,
+    domainTopic: DomainTopic,
+  ) {
+    return this.createNewEvent({
+      topic: domainTopic,
+      payload: {
+        conventionId,
+        userId,
+      },
+    });
+  }
+}

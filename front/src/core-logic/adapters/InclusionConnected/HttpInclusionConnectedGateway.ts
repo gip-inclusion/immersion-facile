@@ -3,6 +3,7 @@ import {
   AgencyId,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
+  MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
@@ -23,6 +24,17 @@ export class HttpInclusionConnectedGateway
     );
   }
 
+  public markPartnersErroredConventionAsHandled$(
+    params: MarkPartnersErroredConventionAsHandledRequest,
+    jwt: string,
+  ): Observable<void> {
+    return from(
+      this.#markPartnersErroredConventionAsHandled(params, jwt).then(
+        () => undefined,
+      ),
+    );
+  }
+
   public registerAgenciesToCurrentUser$(
     agencyIds: AgencyId[],
     token: string,
@@ -40,6 +52,18 @@ export class HttpInclusionConnectedGateway
     return this.httpClient.getInclusionConnectedUser({
       headers: { authorization: token },
     });
+  }
+
+  #markPartnersErroredConventionAsHandled(
+    params: MarkPartnersErroredConventionAsHandledRequest,
+    jwt: string,
+  ): Promise<void> {
+    return this.httpClient
+      .markPartnersErroredConventionAsHandled({
+        body: params,
+        headers: { authorization: jwt },
+      })
+      .then(() => undefined);
   }
 
   #registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {

@@ -1,5 +1,6 @@
 import { ConventionDto, conventionSchema, ImmersionObjective } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
@@ -125,10 +126,11 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
 
     if (!isBroadcastResponseOk(response)) {
       await uow.errorRepository.save({
-        serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
+        serviceName: broadcastToPeServiceName,
         message: response.message,
         params: { conventionId: convention.id, httpStatus: response.status },
         occurredAt: this.timeGateway.now(),
+        handledByAgency: false,
       });
     }
   }
