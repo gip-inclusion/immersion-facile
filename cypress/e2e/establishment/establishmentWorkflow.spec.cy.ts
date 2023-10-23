@@ -11,7 +11,8 @@ import {
   makeUrlWithParams,
 } from "shared";
 
-const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
+const { baseApiRoute, defaultFieldOptions, timeForEventCrawler } =
+  Cypress.env("config");
 const providedSiret = "41433740200039";
 const providedLocation = "Tain-l'Hermitage";
 
@@ -122,6 +123,7 @@ describe("Establishment creation and modification workflow", () => {
       .its("response.statusCode")
       .should("eq", 200);
     cy.get(".fr-alert--success").should("exist");
+    cy.wait(timeForEventCrawler);
   });
 
   it("modifies an existing establishment", () => {
