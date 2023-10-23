@@ -325,7 +325,7 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       agencyRefersTo: z
         .object({
           id: refersToAgencyIdSchema,
-          name: z.string(),
+          name: zStringMinLength1,
         })
         .optional(),
     }),
