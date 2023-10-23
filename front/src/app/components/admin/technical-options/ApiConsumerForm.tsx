@@ -20,7 +20,7 @@ import {
 import { allAgencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { useAdminToken } from "src/app/hooks/useAdminToken";
+import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 
 export const ApiConsumerForm = ({

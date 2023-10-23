@@ -16,6 +16,7 @@ import {
   ConventionStatus,
   ConventionSupportedJwt,
   DateIntervalDto,
+  decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   isConventionRenewed,
   reasonableSchedule,
@@ -218,14 +219,17 @@ export const ConventionManageActions = ({
               iconId="fr-icon-file-pdf-line"
               className={fr.cx("fr-m-1w")}
               priority="secondary"
-              onClick={() =>
-                routes
+              onClick={() => {
+                const payload = decodeMagicLinkJwtWithoutSignatureCheck(jwt);
+                const isConventionMagicLinkJwt =
+                  "role" in payload && payload.role !== "backOffice";
+                return routes
                   .conventionDocument({
-                    jwt,
+                    jwt: isConventionMagicLinkJwt ? jwt : undefined,
                     conventionId: convention.id,
                   })
-                  .push()
-              }
+                  .push();
+              }}
             >
               Voir la convention
             </Button>
