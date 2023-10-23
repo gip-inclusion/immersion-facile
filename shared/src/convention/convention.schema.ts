@@ -150,7 +150,6 @@ const beneficiaryRepresentativeSchema: z.Schema<BeneficiaryRepresentative> =
   signatorySchema.merge(
     z.object({
       role: z.literal("beneficiary-representative"),
-      job: zStringPossiblyEmpty,
     }),
   );
 
