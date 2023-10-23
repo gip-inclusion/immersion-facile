@@ -12,6 +12,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
+import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 
 const prepareUseCase = async ({
@@ -130,13 +131,14 @@ describe("Broadcasts events to pole-emploi", () => {
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
     expectToEqual(uow.errorRepository.savedErrors, [
       {
-        serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
+        serviceName: broadcastToPeServiceName,
         params: {
           conventionId: convention.id,
           httpStatus: 404,
         },
         message: "Ops, something is bad",
         occurredAt: now,
+        handledByAgency: false,
       },
     ]);
   });

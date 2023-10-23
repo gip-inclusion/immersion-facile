@@ -1,7 +1,9 @@
 import { Router } from "express";
+import { match, P } from "ts-pattern";
 import { inclusionConnectedAllowedRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { AppDependencies } from "../../config/createAppDependencies";
+import { UnauthorizedError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { createInclusionConnectedMiddleware } from "./createInclusionConnectedMiddleware";
 
@@ -34,6 +36,23 @@ export const createInclusionConnectedAllowedRouter = (
           req.body,
           req.payloads?.inclusion,
         ),
+      ),
+  );
+
+  inclusionConnectedSharedRoutes.markPartnersErroredConventionAsHandled(
+    deps.applicationMagicLinkAuthMiddleware,
+    async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        match(req.payloads)
+          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
+            deps.useCases.markPartnersErroredConventionAsHandled.execute(
+              req.body,
+              inclusion,
+            ),
+          )
+          .otherwise(() => {
+            throw new UnauthorizedError();
+          }),
       ),
   );
 

@@ -1,5 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { agencyIdsSchema } from "../agency/agency.schema";
+import { markPartnersErroredConventionAsHandledRequestSchema } from "../convention/convention.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
@@ -27,5 +28,13 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
     },
+  }),
+
+  markPartnersErroredConventionAsHandled: defineRoute({
+    url: "/auth/mark-errored-convention-as-handled",
+    method: "post",
+    requestBodySchema: markPartnersErroredConventionAsHandledRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: { 200: expressEmptyResponseBody },
   }),
 });

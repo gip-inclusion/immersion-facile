@@ -39,6 +39,7 @@ import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useC
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
+import { MarkPartnersErroredConventionAsHandled } from "../../../domain/convention/useCases/partnersErroredConvention/MarkPartnersErroredConventionAsHandled";
 import { RenewConvention } from "../../../domain/convention/useCases/RenewConvention";
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
@@ -260,6 +261,13 @@ export const createUseCases = (
         gateways.shortLinkGenerator,
         config,
       ),
+
+      markPartnersErroredConventionAsHandled:
+        new MarkPartnersErroredConventionAsHandled(
+          uowPerformer,
+          createNewEvent,
+          gateways.timeGateway,
+        ),
 
       // immersionOffer
       searchImmersion: new SearchImmersion(

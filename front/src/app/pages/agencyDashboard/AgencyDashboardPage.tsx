@@ -12,8 +12,10 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selector";
 import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
 import { MarkPartnersErroredConventionAsHandledFormSection } from "./MarkPartnersErroredConventionAsHandledFormSection";
 
@@ -21,8 +23,13 @@ export const AgencyDashboardPage = () => {
   // the Layout (Header, Footer...) is given by InclusionConnectedPrivateRoute (higher order component)
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const feedback = useAppSelector(inclusionConnectedSelectors.feedback);
+  const markErroredConventionAsHandledFeedback = useAppSelector(
+    partnersErroredConventionSelectors.feedback,
+  );
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
-
+  const inclusionConnectedJwt = useAppSelector(
+    authSelectors.inclusionConnectToken,
+  );
   const dispatch = useDispatch();
 
   type AgencyDashboardTab = {
@@ -66,7 +73,29 @@ export const AgencyDashboardPage = () => {
                   title="Tableau de bord agence"
                   url={conventionErrorUrl}
                 />
-                <MarkPartnersErroredConventionAsHandledFormSection />
+                {inclusionConnectedJwt ? (
+                  <>
+                    <MarkPartnersErroredConventionAsHandledFormSection
+                      jwt={inclusionConnectedJwt}
+                    />
+                    <SubmitFeedbackNotification
+                      submitFeedback={markErroredConventionAsHandledFeedback}
+                      messageByKind={{
+                        markedAsHandled: {
+                          title: "Succès",
+                          message:
+                            "La convention a bien été marquée comme traité.",
+                        },
+                      }}
+                    />
+                  </>
+                ) : (
+                  <Alert
+                    severity="error"
+                    title="Non autorisé"
+                    description="Cette page est reservée aux utilisateurs connectés avec Inclusion Connect, et dont l'agence est responsable de cette convention."
+                  />
+                )}
               </>
             ),
           },

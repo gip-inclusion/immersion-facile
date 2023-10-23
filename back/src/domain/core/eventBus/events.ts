@@ -4,6 +4,7 @@ import {
   AuthenticatedUserId,
   ContactEstablishmentEventPayload,
   ConventionDto,
+  ConventionId,
   DateIsoString,
   EstablishmentJwtPayload,
   Flavor,
@@ -100,7 +101,9 @@ export type DomainEvent =
   | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyIds: AgencyId[] }>
   | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>
   // API CONSUMER related
-  | GenericEvent<"ApiConsumerSaved", { consumerId: string }>;
+  | GenericEvent<"ApiConsumerSaved", { consumerId: string }>
+  // ERRORED CONVENTION RELATED
+  | GenericEvent<"PartnerErroredConventionMarkAsHandled", { conventionId: ConventionId, userId: AuthenticatedUserId }>;
 
 export type DomainTopic = DomainEvent["topic"];
 
