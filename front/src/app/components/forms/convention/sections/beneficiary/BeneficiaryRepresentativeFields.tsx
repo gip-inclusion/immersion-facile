@@ -28,6 +28,8 @@ export const BeneficiaryRepresentativeFields = ({
     currentValues.signatories.beneficiaryRepresentative?.lastName;
   const beneficiaryRepresentativePhone =
     currentValues.signatories.beneficiaryRepresentative?.phone;
+  const beneficiaryRepresentativeEmail =
+    currentValues.signatories.beneficiaryRepresentative?.email;
   const getFieldError = makeFieldError(formState);
 
   useEffect(() => {
@@ -49,6 +51,13 @@ export const BeneficiaryRepresentativeFields = ({
       beneficiaryRepresentativePhone || "",
     );
   }, [beneficiaryRepresentativePhone, setValue]);
+
+  useEffect(() => {
+    setValue(
+      "signatories.beneficiary.emergencyContactEmail",
+      beneficiaryRepresentativeEmail || "",
+    );
+  }, [beneficiaryRepresentativeEmail]);
 
   const formContents = getFormFields();
   return (
