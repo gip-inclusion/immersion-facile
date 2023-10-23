@@ -1,4 +1,8 @@
-import { ConventionJwtPayload, zStringMinLength1 } from "shared";
+import {
+  ConventionJwtPayload,
+  ConventionRelatedJwtPayload,
+  zStringMinLength1,
+} from "shared";
 import { UnauthorizedError } from "../../../adapters/primary/helpers/httpErrors";
 import { UseCase } from "../../core/UseCase";
 import { PdfGeneratorGateway } from "./PdfGeneratorGateway";
@@ -12,7 +16,7 @@ export class HtmlToPdf extends UseCase<string, string, ConventionJwtPayload> {
 
   protected async _execute(
     htmlContent: string,
-    jwtPayload?: ConventionJwtPayload,
+    jwtPayload?: ConventionRelatedJwtPayload,
   ): Promise<string> {
     if (!jwtPayload) throw new UnauthorizedError();
     return this.pdfGeneratorGateway.make(htmlContent);

@@ -222,7 +222,6 @@ export const makeMagicLinkAuthMiddleware = (
           ),
         );
       }
-
       req.payloads =
         "role" in payload && payload.role === "backOffice"
           ? {

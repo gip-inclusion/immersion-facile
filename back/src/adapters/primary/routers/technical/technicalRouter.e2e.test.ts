@@ -25,6 +25,7 @@ import {
 import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import {
+  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
@@ -41,6 +42,7 @@ const domain = "immersion-facile.beta.gouv.fr";
 
 describe("technical router", () => {
   let generateConventionJwt: GenerateConventionJwt;
+  let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let httpClient: HttpClient<TechnicalRoutes>;
   let appConfig: AppConfig;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -52,6 +54,7 @@ describe("technical router", () => {
     ({
       request,
       generateConventionJwt,
+      generateBackOfficeJwt,
       appConfig,
       inMemoryUow,
       gateways,
@@ -76,6 +79,29 @@ describe("technical router", () => {
         role: "validator",
         emailHash: "my-hash",
         applicationId: "convention-id",
+      });
+      const response = await httpClient.htmlToPdf({
+        body: {
+          htmlContent: "<p>some html content</p>",
+        },
+        headers: {
+          authorization: validatorJwt,
+        },
+      });
+      expectToEqual(response.body, 'PDF_OF >> "<p>some html content</p>"');
+
+      expectToEqual(response.status, 200);
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.htmlToPdf,
+    )} 200 - Should get PDF content from html string with admin token`, async () => {
+      const validatorJwt = generateBackOfficeJwt({
+        exp: new Date().getTime() / 1000 + 1000,
+        iat: new Date().getTime() / 1000,
+        sub: "admin",
+        version: 1,
+        role: "backOffice",
       });
       const response = await httpClient.htmlToPdf({
         body: {
