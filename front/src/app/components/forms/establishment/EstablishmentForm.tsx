@@ -175,11 +175,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
-  }, [route, adminJwt, dispatch]);
+  }, []);
 
   useEffect(() => {
     reset(initialFormEstablishment);
-  }, [initialFormEstablishment, reset]);
+  }, [initialFormEstablishment]);
 
   useEffect(() => {
     if (isEstablishmentCreation) {
