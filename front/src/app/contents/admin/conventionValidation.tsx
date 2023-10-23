@@ -276,7 +276,6 @@ const agencyFields: ColField[] = [
   },
 ];
 
-// TODO :
 const agencyRefersToFields: ColField[] = [
   {
     key: "agencyRefersTo.name",
