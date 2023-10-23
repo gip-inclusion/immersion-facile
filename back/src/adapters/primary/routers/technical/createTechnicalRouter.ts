@@ -78,7 +78,7 @@ export const createTechnicalRouter = (
       sendHttpResponse(req, res, () =>
         deps.useCases.htmlToPdf.execute(
           req.body.htmlContent,
-          req.payloads?.convention,
+          req.payloads?.backOffice ?? req.payloads?.convention,
         ),
       ),
   );
