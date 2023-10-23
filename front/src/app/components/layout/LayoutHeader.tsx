@@ -10,18 +10,26 @@ import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { makeStyles } from "tss-react/dsfr";
 import { domElementIds } from "shared";
+import { MaintenanceCallout } from "react-design-system";
+import { commonContent } from "src/app/contents/commonContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes, useRoute } from "src/app/routes/routes";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
 
 export const LayoutHeader = () => {
   const dispatch = useDispatch();
+  const { enableMaintenance } = useFeatureFlags();
+  const maintenanceMessage = useAppSelector(
+    featureFlagSelectors.maintenanceMessage,
+  );
   const currentRoute = useRoute();
   const darkModeState = useIsDark();
   const { classes } = makeStyles({ name: LayoutHeader.displayName })(() => ({
@@ -216,6 +224,15 @@ export const LayoutHeader = () => {
 
   return (
     <>
+      {enableMaintenance.isActive && (
+        <MaintenanceCallout
+          message={
+            maintenanceMessage || maintenanceMessage !== ""
+              ? maintenanceMessage
+              : commonContent.maintenanceMessage
+          }
+        />
+      )}
       <Header
         classes={classes}
         brandTop={
