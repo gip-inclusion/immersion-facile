@@ -5,6 +5,7 @@ import {
   AgencyDtoBuilder,
   expectToEqual,
   GeoPositionDto,
+  toAgencyPublicDisplayDto,
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
@@ -76,7 +77,7 @@ describe("PgAgencyRepository", () => {
   describe("getById", () => {
     const agency1 = agency1builder
       .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
-      .withAgencySiret("01234567890123")
+      .withAgencySiret("10000002222999")
       .withCodeSafir("AAAAAA")
       .build();
 
@@ -90,6 +91,17 @@ describe("PgAgencyRepository", () => {
 
       const retrievedAgency = await agencyRepository.getById(agency1.id);
       expectToEqual(retrievedAgency, agency1);
+    });
+
+    it("returns existing agency, with link to a refering one if it exists", async () => {
+      const agency2 = agency2builder
+        .withRefersToAgency(toAgencyPublicDisplayDto(agency1))
+        .build();
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+
+      const retrievedAgency = await agencyRepository.getById(agency2.id);
+      expectToEqual(retrievedAgency, agency2);
     });
   });
 
@@ -129,7 +141,7 @@ describe("PgAgencyRepository", () => {
         agency1.id,
         agency3.id,
       ]);
-      expectToEqual(agencies, [agency1, agency3]);
+      expectToEqual(agencies, [agency3, agency1]);
     });
 
     it("returns empty array when no agencies are found", async () => {

@@ -124,6 +124,7 @@ export const ConventionDocumentPage = ({
 
   if (isLoading) return <Loader />;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
+  if (!agencyInfo) return <p>Pas d'agence correspondante trouvée</p>;
 
   const {
     beneficiary,
@@ -135,8 +136,8 @@ export const ConventionDocumentPage = ({
   const logos = [
     <img key="logo-rf" src={logoRf} alt="Logo RF" />,
     <img
-      key={`logo-${agencyInfo?.name}`}
-      src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf}
+      key={`logo-${agencyInfo.name}`}
+      src={agencyInfo.logoUrl ? agencyInfo.logoUrl : logoIf}
       alt=""
     />,
   ];
@@ -175,6 +176,9 @@ export const ConventionDocumentPage = ({
   const title = isConventionRenewed(convention)
     ? "Renouvellement de convention"
     : "Convention";
+
+  const agencyIsLoaded = agencyFeedback.kind === "success" && agencyInfo;
+
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {isPdfLoading && <Loader />}
@@ -266,15 +270,31 @@ export const ConventionDocumentPage = ({
               </li>
             )}
 
-            <li>
-              <strong>{convention.agencyName}</strong>{" "}
-              {agencyFeedback.kind === "success" && agencyInfo && (
-                <>
-                  ({agencyInfo.address.streetNumberAndAddress},{" "}
-                  {agencyInfo.address.postcode} {agencyInfo.address.city} {})
-                </>
-              )}
-            </li>
+            {agencyIsLoaded && agencyInfo.refersToAgency && (
+              <>
+                <li>
+                  <strong>{agencyInfo.name}</strong> (
+                  {agencyInfo.address.streetNumberAndAddress},{" "}
+                  {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
+                  qualité d' <strong>agence accompagnante.</strong>
+                </li>
+                <li>
+                  <strong>{agencyInfo.refersToAgency.name}</strong> (
+                  {agencyInfo.refersToAgency.address.streetNumberAndAddress},{" "}
+                  {agencyInfo.refersToAgency.address.postcode}{" "}
+                  {agencyInfo.refersToAgency.address.city} {}) en qualité d'{" "}
+                  <strong>agence prescriptrice.</strong>
+                </li>
+              </>
+            )}
+            {agencyIsLoaded && !agencyInfo.refersToAgency && (
+              <li>
+                <strong>{agencyInfo.name}</strong> (
+                {agencyInfo.address.streetNumberAndAddress},{" "}
+                {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
+                qualité d' <strong>agence accompagnante.</strong>
+              </li>
+            )}
           </ul>
           <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
             Informations relatives à la convention
@@ -511,17 +531,34 @@ export const ConventionDocumentPage = ({
                 )}
                 )
               </li>
-              <li>
-                ✔ L'agence prescriptrice{" "}
-                {internshipKind === "immersion"
-                  ? "de l'immersion"
-                  : "du mini-stage"}
-                , <strong>{convention.agencyName}</strong> (validé le{" "}
-                {toDisplayedDate(
-                  new Date(throwOnMissingSignDate(convention.dateValidation)),
-                )}
-                )
-              </li>
+              {!convention.agencyRefersTo && (
+                <li>
+                  ✔ L'agence prescriptrice{" "}
+                  {internshipKind === "immersion"
+                    ? "de l'immersion"
+                    : "du mini-stage"}
+                  , <strong>{convention.agencyName}</strong> (validée le{" "}
+                  {toDisplayedDate(
+                    new Date(throwOnMissingSignDate(convention.dateValidation)),
+                  )}
+                  )
+                </li>
+              )}
+              {convention.agencyRefersTo && (
+                <li>
+                  ✔ L'agence prescriptrice{" "}
+                  {internshipKind === "immersion"
+                    ? "de l'immersion"
+                    : "du mini-stage"}
+                  , <strong>{convention.agencyRefersTo.name}</strong> (validée
+                  le{" "}
+                  {toDisplayedDate(
+                    new Date(throwOnMissingSignDate(convention.dateValidation)),
+                  )}
+                  ). La personne bénéficiaire est accompagnée par :{" "}
+                  <strong>{convention.agencyName}</strong>
+                </li>
+              )}
             </ul>
           </div>
 

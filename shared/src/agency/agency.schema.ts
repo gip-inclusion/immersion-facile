@@ -20,6 +20,7 @@ import {
   agencyKindList,
   AgencyOption,
   AgencyPublicDisplayDto,
+  AgencyPublicDisplayDtoWithoutRefersToAgency,
   allAgencyStatuses,
   CreateAgencyDto,
   ListAgenciesRequestDto,
@@ -31,6 +32,7 @@ import {
 } from "./agency.dto";
 
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
+export const refersToAgencyIdSchema: z.ZodSchema<AgencyId> = z.string();
 export const agencyIdsSchema: z.Schema<AgencyId[]> = z
   .array(agencyIdSchema)
   .nonempty();
@@ -73,7 +75,7 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
       .optional(),
   });
 
-const createAgencyShape = {
+const commonAgencyShape = {
   id: agencyIdSchema,
   name: zStringMinLength1,
   kind: agencyKindSchema,
@@ -86,13 +88,24 @@ const createAgencyShape = {
   questionnaireUrl: z.string().optional(),
   signature: zStringMinLength1,
   logoUrl: absoluteUrlSchema.optional(),
+  agencySiret: siretSchema,
 };
 
+const agencyPublicDisplayDtoWithoutRefersToAgencySchema: z.Schema<AgencyPublicDisplayDtoWithoutRefersToAgency> =
+  z.object({
+    id: agencyIdSchema,
+    name: zStringMinLength1,
+    kind: agencyKindSchema,
+    address: addressSchema,
+    position: geoPositionSchema,
+    signature: zStringMinLength1,
+  });
+
 export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
-  .object(createAgencyShape)
+  .object(commonAgencyShape)
   .and(
     z.object({
-      agencySiret: siretSchema,
+      refersToAgencyId: refersToAgencyIdSchema.optional(),
     }),
   );
 
@@ -108,8 +121,8 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = createAgencySchema.and(
 );
 
 export const agencySchema: z.ZodSchema<AgencyDto> = z
-  .object(createAgencyShape)
-  .and(
+  .object(commonAgencyShape)
+  .merge(
     z.object({
       agencySiret: siretSchema.optional().or(z.literal("")),
     }),
@@ -120,10 +133,10 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringPossiblyEmpty,
+      refersToAgency:
+        agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
     }),
   );
-
-export const agenciesSchema: z.ZodSchema<AgencyDto[]> = z.array(agencySchema);
 
 export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
   z.object({
@@ -140,11 +153,13 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
   z.object({
     id: agencyIdSchema,
     name: zStringMinLength1,
+    kind: agencyKindSchema,
     address: addressSchema,
     position: geoPositionSchema,
     agencySiret: siretSchema.optional().or(z.literal("")),
     logoUrl: absoluteUrlSchema.optional(),
     signature: zStringMinLength1,
+    refersToAgency: agencyPublicDisplayDtoWithoutRefersToAgencySchema,
   });
 
 export const withActiveOrRejectedAgencyStatusSchema: z.Schema<WithActiveOrRejectedStatus> =

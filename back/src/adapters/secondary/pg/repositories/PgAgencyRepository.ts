@@ -1,12 +1,18 @@
+import { InsertObject, sql } from "kysely";
 import format from "pg-format";
+import { map } from "ramda";
 import {
+  AbsoluteUrl,
   AgencyDto,
   AgencyId,
+  AgencyKind,
   AgencyKindFilter,
   AgencyPositionFilter,
+  AgencyPublicDisplayDtoWithoutRefersToAgency,
   agencySchema,
   AgencyStatus,
   DepartmentCode,
+  Email,
   filterNotFalsy,
   GeoPositionDto,
   GetAgenciesFilter,
@@ -15,12 +21,20 @@ import {
 import { AgencyRepository } from "../../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../../utils/logger";
 import { validateAndParseZodSchema } from "../../../primary/helpers/httpErrors";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import {
+  cast,
+  executeKyselyRawSqlQuery,
+  jsonBuildObject,
+  jsonStripNulls,
+  KyselyDb,
+} from "../kysely/kyselyUtils";
+import { Database } from "../kysely/model/database";
 import { optional } from "../pgUtils";
 
 const logger = createLogger(__filename);
 
 const MAX_AGENCIES_RETURNED = 200;
+type InsertPgAgency = InsertObject<Database, "agencies">;
 
 type AgencyColumns =
   | "admin_emails"
@@ -150,70 +164,55 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
-    const query = `SELECT id, name, status, kind, counsellor_emails, validator_emails,
-    admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
-    street_number_and_address, post_code, city, department_code, agency_siret, code_safir
-  FROM agencies
-  WHERE id = $1`;
-
-    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
-      this.transaction,
-      query,
-      [id],
-    );
-
-    const result = pgResult.rows.at(0);
-    if (!result) return undefined;
-    return persistenceAgencyToAgencyDto(result);
+    return this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("a.id", "=", id)
+      .executeTakeFirst()
+      .then((row) => row?.agency);
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    const query = `SELECT id, name, status, kind, counsellor_emails, validator_emails,
-    admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
-    street_number_and_address, post_code, city, department_code, agency_siret, code_safir
-  FROM agencies
-  WHERE id IN (%L)`;
-
-    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
-      this.transaction,
-      format(query, ids),
-    ).catch((error) => {
-      logger.error(
-        { query, values: ids, error },
-        "PgAgencyRepository_getByIds_QueryErrored",
-      );
-      throw error;
-    });
-
-    if (pgResult.rows.length === 0) return [];
-    return pgResult.rows.map(persistenceAgencyToAgencyDto);
+    return this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("a.id", "in", ids)
+      .orderBy("a.updated_at", "desc")
+      .execute()
+      .then(map((row) => row.agency));
   }
 
   public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
-    const pgResult = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-           SELECT id 
-           FROM agencies
-           WHERE agencies.kind = 'immersion-facile'
-           LIMIT 1
-           `,
-    );
-
-    return pgResult.rows[0]?.id;
+    return this.transaction
+      .selectFrom("agencies")
+      .select("id")
+      .where("kind", "=", "immersion-facile")
+      .executeTakeFirst()
+      .then((row) => row?.id);
   }
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
-    const query = `INSERT INTO agencies(
-      id, name, status, kind, counsellor_emails, validator_emails, admin_emails, 
-      questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir,
-      street_number_and_address, post_code, city, department_code
-    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
+    const pgAgency: InsertPgAgency = {
+      id: agency.id,
+      name: agency.name,
+      status: agency.status,
+      kind: agency.kind,
+      counsellor_emails:
+        agency.counsellorEmails && JSON.stringify(agency.counsellorEmails),
+      validator_emails:
+        agency.validatorEmails && JSON.stringify(agency.validatorEmails),
+      admin_emails: agency.adminEmails && JSON.stringify(agency.adminEmails),
+      questionnaire_url: agency.questionnaireUrl,
+      email_signature: agency.signature,
+      logo_url: agency.logoUrl,
+      position: sql`ST_MakePoint(${agency.position.lon}, ${agency.position.lat})`,
+      agency_siret: agency.agencySiret,
+      code_safir: agency.codeSafir,
+      street_number_and_address: agency.address?.streetNumberAndAddress,
+      post_code: agency.address?.postcode,
+      city: agency.address?.city,
+      department_code: agency.address?.departmentCode,
+      refers_to_agency_id: agency.refersToAgency?.id,
+    };
+
     try {
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        format(query, ...entityToPgArray(agency)),
-      );
+      await this.transaction.insertInto("agencies").values(pgAgency).execute();
     } catch (error: any) {
       // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
       // See https://www.postgresql.org/docs/10/errcodes-appendix.html
@@ -223,59 +222,115 @@ export class PgAgencyRepository implements AgencyRepository {
       }
       throw error;
     }
+
     return agency.id;
   }
 
   public async update(agency: PartialAgencyDto): Promise<void> {
-    const query = `UPDATE agencies SET
-      name = COALESCE(%2$L, name),
-      status = COALESCE(%3$L, status),
-      kind= COALESCE(%4$L, kind),
-      counsellor_emails= COALESCE(%5$L, counsellor_emails),
-      validator_emails= COALESCE(%6$L, validator_emails),
-      admin_emails= COALESCE(%7$L, admin_emails),
-      questionnaire_url= COALESCE(%8$L, questionnaire_url),
-      email_signature = COALESCE(%9$L, email_signature),
-      logo_url = COALESCE(%10$L, logo_url),
-      ${agency.position ? "position = ST_GeographyFromText(%11$L)," : ""}
-      agency_siret = COALESCE(%12$L, agency_siret),
-      code_safir = COALESCE(%13$L, code_safir),
-      street_number_and_address = COALESCE(%14$L, street_number_and_address),
-      post_code = COALESCE(%15$L, post_code),
-      city = COALESCE(%16$L, city),
-      department_code = COALESCE(%17$L, department_code),
-      updated_at = NOW()
-    WHERE id = %1$L`;
-
-    const params = entityToPgArray(agency);
-    params[10] =
-      agency.position && `POINT(${agency.position.lon} ${agency.position.lat})`;
-    await executeKyselyRawSqlQuery(this.transaction, format(query, ...params));
+    await this.transaction
+      .updateTable("agencies")
+      .set({
+        name: agency.name,
+        status: agency.status,
+        kind: agency.kind,
+        counsellor_emails:
+          agency.counsellorEmails && JSON.stringify(agency.counsellorEmails),
+        validator_emails:
+          agency.validatorEmails && JSON.stringify(agency.validatorEmails),
+        admin_emails: agency.adminEmails && JSON.stringify(agency.adminEmails),
+        questionnaire_url: agency.questionnaireUrl,
+        email_signature: agency.signature,
+        logo_url: agency.logoUrl,
+        position: agency.position
+          ? sql`ST_MakePoint(${agency.position.lon}, ${agency.position.lat})`
+          : undefined,
+        agency_siret: agency.agencySiret,
+        code_safir: agency.codeSafir,
+        street_number_and_address: agency.address?.streetNumberAndAddress,
+        post_code: agency.address?.postcode,
+        city: agency.address?.city,
+        department_code: agency.address?.departmentCode,
+        refers_to_agency_id: agency.refersToAgency?.id,
+        updated_at: sql`NOW()`,
+      })
+      .where("id", "=", agency.id)
+      .execute();
   }
+
+  #getAgencyWithJsonBuiltQueryBuilder = () =>
+    this.transaction
+      .selectFrom("agencies as a")
+      .leftJoin("agencies as ra", "a.refers_to_agency_id", "ra.id")
+      .select(({ eb, ref }) => [
+        jsonStripNulls(
+          jsonBuildObject({
+            id: cast<AgencyId>(ref("a.id")),
+            // id: sql<AgencyId>`${ref("a.id")}`,
+            name: ref("a.name"),
+            status: cast<AgencyStatus>(ref("a.status")),
+            kind: cast<AgencyKind>(ref("a.kind")),
+            counsellorEmails: sql<Email[]>`${ref("a.counsellor_emails")}`,
+            validatorEmails: sql<Email[]>`${ref("a.validator_emails")}`,
+            questionnaireUrl: ref("a.questionnaire_url"),
+            logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
+            position: jsonBuildObject({
+              lat: sql<number>`(ST_AsGeoJSON(${ref(
+                "a.position",
+              )})::json->'coordinates'->>1)::numeric`,
+              lon: sql<number>`(ST_AsGeoJSON(${ref(
+                "a.position",
+              )})::json->'coordinates'->>0)::numeric`,
+            }),
+            address: jsonBuildObject({
+              streetNumberAndAddress: ref("a.street_number_and_address"),
+              postcode: ref("a.post_code"),
+              city: ref("a.city"),
+              departmentCode: ref("a.department_code"),
+            }),
+            agencySiret: ref("a.agency_siret"),
+            codeSafir: ref("a.code_safir"),
+            adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
+            signature: ref("a.email_signature"),
+            refersToAgency: cast<AgencyPublicDisplayDtoWithoutRefersToAgency>(
+              eb
+                .case()
+                .when("ra.id", "is not", null)
+                .then(
+                  jsonBuildObject({
+                    id: cast<AgencyId>(ref("ra.id")),
+                    name: ref("ra.name"),
+                    kind: cast<AgencyKind>(ref("ra.kind")),
+                    position: jsonBuildObject({
+                      lat: sql<number>`(ST_AsGeoJSON(${ref(
+                        "ra.position",
+                      )})::json->'coordinates'->>1)::numeric`,
+                      lon: sql<number>`(ST_AsGeoJSON(${ref(
+                        "ra.position",
+                      )})::json->'coordinates'->>0)::numeric`,
+                    }),
+                    address: jsonBuildObject({
+                      streetNumberAndAddress: ref(
+                        "ra.street_number_and_address",
+                      ),
+                      postcode: ref("ra.post_code"),
+                      city: ref("ra.city"),
+                      departmentCode: ref("ra.department_code"),
+                    }),
+                    agencySiret: ref("ra.agency_siret"),
+                    logoUrl: ref("ra.logo_url"),
+                    signature: ref("ra.email_signature"),
+                  }),
+                )
+                .else(null)
+                .end(),
+            ),
+          }),
+        ).as("agency"),
+      ]);
 }
 
 const STPointStringFromPosition = (position: GeoPositionDto) =>
   `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
-
-const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
-  agency.id,
-  agency.name,
-  agency.status,
-  agency.kind,
-  agency.counsellorEmails && JSON.stringify(agency.counsellorEmails),
-  agency.validatorEmails && JSON.stringify(agency.validatorEmails),
-  agency.adminEmails && JSON.stringify(agency.adminEmails),
-  agency.questionnaireUrl,
-  agency.signature,
-  agency.logoUrl,
-  agency.position && STPointStringFromPosition(agency.position),
-  agency.agencySiret,
-  agency.codeSafir,
-  agency.address?.streetNumberAndAddress,
-  agency.address?.postcode,
-  agency.address?.city,
-  agency.address?.departmentCode,
-];
 
 const persistenceAgencyToAgencyDto = (params: PersistenceAgency): AgencyDto =>
   validateAndParseZodSchema(

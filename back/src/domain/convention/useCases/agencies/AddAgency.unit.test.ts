@@ -30,6 +30,7 @@ const parisMissionLocaleParams: CreateAgencyDto = {
   signature: "Super signature of the agency",
   logoUrl: "https://www.myUrl.com",
   agencySiret: "01234567891234",
+  refersToAgencyId: undefined,
 };
 
 describe("AddAgency use case", () => {

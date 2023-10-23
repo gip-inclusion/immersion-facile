@@ -246,11 +246,14 @@ export type EstablishmentTutor = GenericActor<"establishment-tutor"> & {
   job: string;
 };
 
+export type AgencyRefersToInConvention = { id: AgencyId; name: string };
+
 export type ConventionReadDto = ConventionDto & {
   agencyName: string;
   agencyDepartment: string;
   agencyKind: AgencyKind;
   agencySiret?: SiretDto;
+  agencyRefersTo?: AgencyRefersToInConvention;
 };
 
 export type WithConventionIdLegacy = {

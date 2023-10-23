@@ -270,6 +270,21 @@ const agencyFields: ColField[] = [
     key: "dateValidation",
     colLabel: "Date de validation",
     value: (convention) =>
+      !convention.agencyRefersTo && convention.dateValidation
+        ? toDisplayedDate(new Date(convention.dateValidation))
+        : " N/A ",
+  },
+];
+
+const agencyRefersToFields: ColField[] = [
+  {
+    key: "agencyRefersTo.name",
+    colLabel: "Nom de la structure",
+  },
+  {
+    key: "dateValidation",
+    colLabel: "Date de validation",
+    value: (convention) =>
       convention.dateValidation
         ? toDisplayedDate(new Date(convention.dateValidation))
         : "",
@@ -400,6 +415,9 @@ export const sections: FieldsAndTitle[] = [
     rowFields: [
       {
         fields: agencyFields,
+      },
+      {
+        fields: agencyRefersToFields,
       },
     ],
     additionalClasses: "fr-table--layout-fixed fr-table--blue-ecume",

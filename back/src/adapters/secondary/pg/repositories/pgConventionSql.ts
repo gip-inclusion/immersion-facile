@@ -83,6 +83,13 @@ const buildDto = `JSON_STRIP_NULLS(
     'agencyKind', agencies.kind,
     'agencyDepartment', agencies.department_code,
     'agencySiret', agencies.agency_siret,
+    'agencyRefersTo', CASE WHEN agencies.refers_to_agency_id IS NOT NULL 
+      THEN JSON_BUILD_OBJECT(
+        'id', agencies.refers_to_agency_id,
+        'name', referring_agencies.name
+        ) 
+      ELSE NULL 
+      END,
     'individualProtection', individual_protection,
     'sanitaryPrevention', sanitary_prevention,
     'sanitaryPreventionDescription', sanitary_prevention_description,
@@ -124,6 +131,7 @@ export const selectAllConventionDtosById = `SELECT conventions.id, ${buildDto} a
   LEFT JOIN actors as et ON et.id = conventions.establishment_tutor_id
   LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = conventions.immersion_appellation
   LEFT JOIN agencies ON agencies.id = conventions.agency_id
+  LEFT JOIN agencies as referring_agencies ON agencies.refers_to_agency_id = referring_agencies.id
 `;
 
 const getReadConventionByIdQuery = `

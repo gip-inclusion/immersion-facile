@@ -141,6 +141,10 @@ describe("Get Convention", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyRefersTo: agency.refersToAgency && {
+          id: agency.refersToAgency.id,
+          name: agency.refersToAgency.name,
+        },
       });
     });
 
@@ -164,6 +168,10 @@ describe("Get Convention", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyRefersTo: agency.refersToAgency && {
+          id: agency.refersToAgency.id,
+          name: agency.refersToAgency.name,
+        },
       });
     });
 
@@ -186,6 +194,10 @@ describe("Get Convention", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyRefersTo: agency.refersToAgency && {
+          id: agency.refersToAgency.id,
+          name: agency.refersToAgency.name,
+        },
       });
     });
   });

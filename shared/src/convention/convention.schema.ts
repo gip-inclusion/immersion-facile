@@ -1,6 +1,10 @@
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
-import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
+import {
+  agencyIdSchema,
+  agencyKindSchema,
+  refersToAgencyIdSchema,
+} from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { allModifierRoles, allRoles } from "../role/role.dto";
@@ -317,7 +321,13 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       agencyName: z.string(),
       agencyDepartment: z.string(),
       agencyKind: agencyKindSchema,
-      agencySiret: siretSchema.optional(),
+      agencySiret: z.string().optional(),
+      agencyRefersTo: z
+        .object({
+          id: refersToAgencyIdSchema,
+          name: zStringMinLength1,
+        })
+        .optional(),
     }),
   );
 

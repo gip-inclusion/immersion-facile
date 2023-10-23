@@ -1,4 +1,4 @@
-import { AgencyDtoBuilder } from "shared";
+import { AgencyDtoBuilder, AgencyPublicDisplayDto } from "shared";
 import {
   createTestStore,
   TestDependencies,
@@ -26,9 +26,10 @@ describe("Agency info in store", () => {
     const expectedFeedback: AgencyInfoState["feedback"] = {
       kind: "success",
     };
-    const expectedAgencyInfos = {
+    const expectedAgencyInfos: AgencyPublicDisplayDto = {
       id: agency.id,
       name: agency.name,
+      kind: agency.kind,
       address: agency.address,
       position: agency.position,
       signature: agency.signature,
@@ -40,6 +41,7 @@ describe("Agency info in store", () => {
     dependencies.agencyGateway.agencyInfo$.next({
       id: expectedAgencyInfos.id,
       name: expectedAgencyInfos.name,
+      kind: expectedAgencyInfos.kind,
       address: expectedAgencyInfos.address,
       position: expectedAgencyInfos.position,
       signature: expectedAgencyInfos.signature,

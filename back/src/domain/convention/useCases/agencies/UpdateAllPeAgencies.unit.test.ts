@@ -62,6 +62,7 @@ describe("UpdateAllPeAgencies use case", () => {
         codeSafir: "63019",
         kind: "pole-emploi",
         status: "from-api-PE",
+        refersToAgency: undefined,
       },
     ]);
   });
@@ -90,6 +91,7 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
+        refersToAgency: undefined,
       };
       agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
@@ -133,6 +135,7 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
+        refersToAgency: undefined,
       };
       agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
@@ -171,6 +174,7 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
+        refersToAgency: undefined,
       };
       agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
@@ -212,6 +216,7 @@ describe("UpdateAllPeAgencies use case", () => {
       questionnaireUrl: "some-url",
       kind: "mission-locale",
       status: "active",
+      refersToAgency: undefined,
     };
     agencyRepository.setAgencies([initialAgency]);
     uuid.setNextUuid("other-uuid");

@@ -2,6 +2,7 @@ import {
   agencyRoutes,
   CreateAgencyDto,
   displayRouteName,
+  expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -29,13 +30,17 @@ describe(`${displayRouteName(agencyRoutes.addAgency)} to add Agency`, () => {
       questionnaireUrl: "www.myUrl.com",
       signature: "Super signature of the agency",
       agencySiret: "01234567891234",
+      refersToAgencyId: undefined,
     };
 
     const response = await sharedRequest.addAgency({
       body: parisMissionLocaleParams,
     });
 
-    expect(response.status).toBe(200);
+    expectHttpResponseToEqual(response, {
+      status: 200,
+      body: "",
+    });
 
     const inRepo = inMemoryUow.agencyRepository.agencies;
     expectToEqual(inRepo, [

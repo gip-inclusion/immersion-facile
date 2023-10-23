@@ -13,6 +13,7 @@ describe("HttpSubscribersGateway", () => {
       agencyDepartment: "75",
       agencyKind: "mission-locale",
       agencySiret: "11112222000033",
+      agencyRefersTo: undefined,
     };
 
     const response = await httpSubscribersGateway.notify(

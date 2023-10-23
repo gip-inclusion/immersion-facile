@@ -81,6 +81,7 @@ export const ConventionManageContent = ({
   if (isLoading) return <Loader />;
   if (!role) return <p>Pas de role correspondant</p>;
   if (!convention) return <p>Pas de conventions correspondante trouvée</p>;
+
   return (
     <>
       <ConventionValidation convention={convention} />

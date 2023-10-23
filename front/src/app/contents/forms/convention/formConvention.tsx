@@ -74,6 +74,10 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Veuillez sélectionner une structure d'accompagnement"
         : "Veuillez sélectionner un point orientation",
   },
+  agencyRefersTo: {
+    label: "Votre structure prescriptrice",
+    id: "",
+  },
   dateStart: {
     label:
       internshipKind === "immersion"
@@ -469,6 +473,14 @@ const establishmentRepresentativeSection = (
 });
 
 const fieldsToExclude = {
+  "agencyRefersTo.id": {
+    label: "",
+    id: "",
+  },
+  "agencyRefersTo.name": {
+    label: "",
+    id: "",
+  },
   agencySiret: {
     label: "",
     id: "",
