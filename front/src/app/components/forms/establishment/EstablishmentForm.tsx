@@ -38,9 +38,9 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
+import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
-import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {

@@ -29,8 +29,8 @@ import {
   makeApiConsumerActionButtons,
 } from "src/app/contents/admin/apiConsumer";
 import { commonContent } from "src/app/contents/commonContent";
+import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";

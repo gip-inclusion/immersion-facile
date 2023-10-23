@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Route } from "type-route";
 import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { useAdminToken } from "src/app/hooks/useAdminToken";
+import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { routes } from "src/app/routes/routes";
 import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 

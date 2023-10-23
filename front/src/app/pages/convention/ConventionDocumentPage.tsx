@@ -5,10 +5,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Route } from "type-route";
 import {
   ConventionId,
-  ConventionJwtPayload,
   ConventionReadDto,
-  ConventionSupportedJwt,
-  decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   isConventionRenewed,
   isStringDate,
@@ -25,6 +22,7 @@ import {
   NPSForm,
 } from "react-design-system";
 import { useConvention } from "src/app/hooks/convention.hooks";
+import { useJwt } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
@@ -91,14 +89,11 @@ const formatSchedule = (convention: ConventionReadDto) => {
 export const ConventionDocumentPage = ({
   route,
 }: ConventionDocumentPageProps) => {
-  const jwt: ConventionSupportedJwt = route.params.jwt;
   const routeConventionId: ConventionId | undefined = route.params.conventionId;
-  const { applicationId, role } = routeConventionId
-    ? { applicationId: routeConventionId, role: "backOffice" }
-    : decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
+  const { jwt, jwtPayload } = useJwt(route);
   const { convention, fetchConventionError, isLoading } = useConvention({
     jwt,
-    conventionId: applicationId,
+    conventionId: routeConventionId ?? jwtPayload.applicationId,
   });
   const agencyInfo = useAppSelector(agencyInfoSelectors.details);
   const agencyFeedback = useAppSelector(agencyInfoSelectors.feedback);
@@ -879,7 +874,7 @@ export const ConventionDocumentPage = ({
             formId={npsFormIds.conventionValidated}
             conventionInfos={{
               id: convention.id,
-              role,
+              role: jwtPayload.role,
               status: convention.status,
             }}
           />
