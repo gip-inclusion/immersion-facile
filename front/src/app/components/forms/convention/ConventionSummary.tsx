@@ -279,8 +279,10 @@ export const ConventionSummary = () => {
           agencyId: convention.agencyId,
         })
         .then(setAgency)
-        .catch((_) => {
+        .catch((error) => {
           setAgency(null);
+          // eslint-disable-next-line no-console
+          console.error(error);
         });
     }
   }, [convention]);

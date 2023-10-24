@@ -121,7 +121,6 @@ describe(`Agency routes`, () => {
         const response = await sharedRequest.getAgencyPublicInfoById({
           queryParams: { agencyId: agency1ActiveNearBy.id },
         });
-
         expectHttpResponseToEqual(response, {
           status: 200,
           body: {
@@ -140,6 +139,37 @@ describe(`Agency routes`, () => {
             },
             signature: "empty-signature",
             refersToAgency: agency1ActiveNearBy.refersToAgency,
+          },
+        });
+      });
+
+      it("Returns agency public info without refersToAgency", async () => {
+        const { refersToAgency, ...agencyWithoutRefersTo } =
+          agency1ActiveNearBy;
+        // Prepare
+        await inMemoryUow.agencyRepository.insert(agencyWithoutRefersTo);
+
+        // Act and assert
+        const response = await sharedRequest.getAgencyPublicInfoById({
+          queryParams: { agencyId: agencyWithoutRefersTo.id },
+        });
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: {
+            id: "test-agency-1",
+            name: "Test Agency 1",
+            kind: "autre",
+            address: {
+              city: "Paris",
+              departmentCode: "20",
+              postcode: "75002",
+              streetNumberAndAddress: "",
+            },
+            position: {
+              lat: 10.11,
+              lon: 10.12,
+            },
+            signature: "empty-signature",
           },
         });
       });
