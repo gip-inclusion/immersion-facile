@@ -24,6 +24,12 @@ const possibleJobs = [
   "Plombier",
   "Serrurier",
 ];
+const possibleAddressQueries = [
+  "1 rue de la paix",
+  "rue des mimosas",
+  "avenue des champs elysées",
+  "rue de la république",
+];
 const { baseApiRoute, defaultFieldOptions } = Cypress.env("config");
 let currentStep = 1;
 
@@ -133,7 +139,11 @@ Cypress.Commands.add("submitBasicConventionForm", () => {
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
   )
     .clear()
-    .type(faker.address.streetAddress(true));
+    .type(
+      possibleAddressQueries[
+        Math.floor(Math.random() * possibleAddressQueries.length)
+      ],
+    );
   cy.wait("@autocompleteAddressRequest");
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,

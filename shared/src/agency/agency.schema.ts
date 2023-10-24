@@ -159,7 +159,8 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
     agencySiret: siretSchema.optional().or(z.literal("")),
     logoUrl: absoluteUrlSchema.optional(),
     signature: zStringMinLength1,
-    refersToAgency: agencyPublicDisplayDtoWithoutRefersToAgencySchema,
+    refersToAgency:
+      agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
   });
 
 export const withActiveOrRejectedAgencyStatusSchema: z.Schema<WithActiveOrRejectedStatus> =
