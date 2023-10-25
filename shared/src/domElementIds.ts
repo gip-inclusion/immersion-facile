@@ -134,6 +134,7 @@ export const domElementIds = {
     agencyRefersToInput: "im-form-add-agency__refers-to-agency-input",
     stepsForValidationInput: "steps-for-validation",
     submitButton: "im-form-add-agency__submit-button",
+    refersToAgencyId: "im-form-add-agency__refers-to-agency-id",
   },
 
   conventionImmersionRoute: {
