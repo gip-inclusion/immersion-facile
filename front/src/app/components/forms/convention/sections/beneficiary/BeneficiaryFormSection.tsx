@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
+import { differenceInYears } from "date-fns";
 import { keys } from "ramda";
 import {
   ConventionReadDto,
@@ -33,7 +34,8 @@ type beneficiaryFormSectionProperties = {
 export const BeneficiaryFormSection = ({
   internshipKind,
 }: beneficiaryFormSectionProperties): JSX.Element => {
-  const isMinor = useAppSelector(conventionSelectors.isMinor);
+  const [isMinorAccordingToAge, setIsMinorAccordingToAge] = useState(false);
+  const isMinorOrProtected = useAppSelector(conventionSelectors.isMinor);
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
   );
@@ -62,22 +64,19 @@ export const BeneficiaryFormSection = ({
   }, [userFieldsAreFilled]);
 
   useEffect(() => {
-    // TODO : do this in Redux ?
-
     const initialValues = values.signatories.beneficiaryRepresentative;
     setValue(
       "signatories.beneficiaryRepresentative",
-      isMinor && initialValues
+      isMinorOrProtected && initialValues
         ? {
             ...initialValues,
             role: "beneficiary-representative",
           }
         : undefined,
     );
-  }, [isMinor]);
+  }, [isMinorOrProtected]);
 
   useEffect(() => {
-    // TODO : do this in Redux ?
     const initialValues = values.signatories.beneficiaryCurrentEmployer;
     setValue(
       "signatories.beneficiaryCurrentEmployer",
@@ -125,6 +124,15 @@ export const BeneficiaryFormSection = ({
         nativeInputProps={{
           ...formContents["signatories.beneficiary.birthdate"],
           ...register("signatories.beneficiary.birthdate"),
+          onBlur: (event) => {
+            const age = differenceInYears(
+              new Date(values.dateStart),
+              new Date(event.target.value),
+            );
+            const newIsMinor = age < 18;
+            setIsMinorAccordingToAge(newIsMinor);
+            dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
+          },
           type: "date",
           max: "9999-12-31",
         }}
@@ -182,25 +190,30 @@ export const BeneficiaryFormSection = ({
         }}
         {...getFieldError("signatories.beneficiary.financiaryHelp")}
       />
-      <RadioButtons
-        legend={formContents.isMinor.label}
-        hintText={formContents.isMinor.hintText}
-        options={booleanSelectOptions.map((option) => ({
-          ...option,
-          nativeInputProps: {
-            ...option.nativeInputProps,
-            checked: Boolean(option.nativeInputProps.value) === isMinor,
-            onChange: () => {
-              dispatch(
-                conventionSlice.actions.isMinorChanged(
-                  Boolean(option.nativeInputProps.value),
-                ),
-              );
+
+      {!isMinorAccordingToAge && (
+        <RadioButtons
+          legend={formContents.isMinor.label}
+          hintText={formContents.isMinor.hintText}
+          options={booleanSelectOptions.map((option) => ({
+            ...option,
+            nativeInputProps: {
+              ...option.nativeInputProps,
+              checked:
+                Boolean(option.nativeInputProps.value) === isMinorOrProtected,
+              onChange: () => {
+                dispatch(
+                  conventionSlice.actions.isMinorChanged(
+                    Boolean(option.nativeInputProps.value),
+                  ),
+                );
+              },
             },
-          },
-        }))}
-      />
-      {isMinor && <BeneficiaryRepresentativeFields />}
+          }))}
+        />
+      )}
+
+      {isMinorOrProtected && <BeneficiaryRepresentativeFields />}
 
       <RadioButtons
         legend={formContents["signatories.beneficiary.isRqth"].label}
@@ -223,7 +236,7 @@ export const BeneficiaryFormSection = ({
         }))}
       />
 
-      {!isMinor && <BeneficiaryEmergencyContactFields />}
+      {!isMinorOrProtected && <BeneficiaryEmergencyContactFields />}
 
       {internshipKind !== "mini-stage-cci" && (
         <>
