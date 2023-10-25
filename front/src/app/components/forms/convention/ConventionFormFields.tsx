@@ -34,7 +34,7 @@ import {
 } from "src/core-logic/domain/convention/convention.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { AddressAutocomplete } from "../autocomplete/AddressAutocomplete";
-import { AgencySelector } from "./sections/agency/AgencySelector";
+import { ConventionAgencySelector } from "./sections/agency/ConventionAgencySelector";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
@@ -213,7 +213,7 @@ export const ConventionFormFields = ({
             label={renderSectionTitle(t.agencySection.title, 1)}
             {...makeAccordionProps(1)}
           >
-            <AgencySelector
+            <ConventionAgencySelector
               internshipKind={conventionValues.internshipKind}
               defaultAgencyId={conventionValues.agencyId}
               shouldListAll={!enablePeConnectApi.isActive}

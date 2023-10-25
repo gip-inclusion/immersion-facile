@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { match } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 import {
   AgencyDto,
@@ -18,8 +20,10 @@ import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
 } from "src/app/components/forms/agency/AgencyFormCommonFields";
+import { ConventionAgencySelector } from "src/app/components/forms/convention/sections/agency/ConventionAgencySelector";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
+import { RadioButtonOption } from "src/app/contents/forms/common/values";
 import {
   formErrorsToFlatErrors,
   getFormContents,
@@ -31,11 +35,49 @@ type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";
 };
 
-export const AddAgencyForm = (): JSX.Element => {
+export const AddAgencyForm = () => {
+  const [hasAgencyReferral, setHasAgencyReferral] = useState<
+    boolean | undefined
+  >(undefined);
+
+  const agencyRefersToOptions: RadioButtonOption[] = [
+    {
+      label: "Prescripteur",
+      nativeInputProps: {
+        value: 1,
+        onClick: () => setHasAgencyReferral(false),
+      },
+    },
+    {
+      label: "Structure d'accompagnement",
+      nativeInputProps: {
+        value: 0,
+        onClick: () => setHasAgencyReferral(true),
+      },
+    },
+  ];
+  return (
+    <>
+      <RadioButtons
+        legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
+        options={agencyRefersToOptions}
+      />
+      {match(hasAgencyReferral)
+        .with(true, () => <AgencyForm hasAgencyReferral={true} />)
+        .with(false, () => <AgencyForm hasAgencyReferral={false} />)
+        .with(undefined, () => null)
+        .exhaustive()}
+    </>
+  );
+};
+
+const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
-  const { getFormErrors } = getFormContents(formAgencyFieldsLabels);
+  const { getFormErrors, getFormFields } = getFormContents(
+    formAgencyFieldsLabels,
+  );
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: zodResolver(createAgencySchema),
     mode: "onTouched",
@@ -60,13 +102,18 @@ export const AddAgencyForm = (): JSX.Element => {
         setSubmitFeedback(e);
       });
   };
-
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onFormValid)}>
         <p className={fr.cx("fr-text--xs")}>
           Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>
+        {hasAgencyReferral && (
+          <ConventionAgencySelector
+            internshipKind="immersion"
+            shouldListAll={true}
+          />
+        )}
         <AgencyFormCommonFields />
         <AgencyLogoUpload />
 
