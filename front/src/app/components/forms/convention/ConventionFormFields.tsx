@@ -9,11 +9,21 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
 import {
   addressDtoToString,
+  AgencyOption,
   ConventionReadDto,
+  DepartmentCode,
   domElementIds,
+  FederatedIdentity,
+  InternshipKind,
+  isPeConnectIdentity,
+  miniStageRestrictedDepartments,
   toDotNotation,
 } from "shared";
 import { ErrorNotifications } from "react-design-system";
+import {
+  AgencySelector,
+  departmentOptions,
+} from "src/app/components/forms/commons/AgencySelector";
 import {
   formConventionFieldsLabels,
   formUiSections,
@@ -26,7 +36,8 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
-import { deviceRepository } from "src/config/dependencies";
+import { agencyGateway, deviceRepository } from "src/config/dependencies";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   conventionSlice,
@@ -34,7 +45,6 @@ import {
 } from "src/core-logic/domain/convention/convention.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { AddressAutocomplete } from "../autocomplete/AddressAutocomplete";
-import { ConventionAgencySelector } from "./sections/agency/ConventionAgencySelector";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
@@ -80,6 +90,12 @@ export const ConventionFormFields = ({
   > | null>(null);
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
+
+  const {
+    agencyId: agencyIdField,
+    agencyDepartment: agencyDepartmentField,
+    agencyKind: agencyKindField,
+  } = getFormFields();
 
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
@@ -200,6 +216,17 @@ export const ConventionFormFields = ({
       [step]: getStepStatus(),
     };
   };
+  const shouldLockToPeAgencies = !!(
+    route.name === "conventionImmersion" &&
+    route.params.jwt &&
+    isPeConnectIdentity(
+      conventionValues?.signatories.beneficiary.federatedIdentity,
+    )
+  );
+
+  const shouldListAllAgencies = !enablePeConnectApi.isActive;
+
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   return (
     <>
@@ -213,10 +240,29 @@ export const ConventionFormFields = ({
             label={renderSectionTitle(t.agencySection.title, 1)}
             {...makeAccordionProps(1)}
           >
-            <ConventionAgencySelector
-              internshipKind={conventionValues.internshipKind}
-              defaultAgencyId={conventionValues.agencyId}
-              shouldListAll={!enablePeConnectApi.isActive}
+            <AgencySelector
+              fields={{
+                agencyDepartmentField,
+                agencyIdField,
+                agencyKindField,
+              }}
+              initialAgencies={[]}
+              shouldLockToPeAgencies={shouldLockToPeAgencies}
+              shouldShowAgencyKindField={
+                conventionValues?.internshipKind === "immersion"
+              }
+              agencyDepartmentOptions={
+                conventionValues?.internshipKind === "immersion"
+                  ? departmentOptions
+                  : departmentOptions.filter((department) =>
+                      miniStageRestrictedDepartments.includes(department.value),
+                    )
+              }
+              agenciesRetriever={agenciesRetriever({
+                internshipKind: conventionValues.internshipKind,
+                shouldListAll: shouldListAllAgencies,
+                federatedIdentity,
+              })}
             />
           </Accordion>
         )}
@@ -311,4 +357,25 @@ export const ConventionFormFields = ({
       </div>
     </>
   );
+};
+
+const agenciesRetriever = ({
+  internshipKind,
+  shouldListAll,
+  federatedIdentity,
+}: {
+  internshipKind: InternshipKind;
+  shouldListAll: boolean;
+  federatedIdentity: FederatedIdentity | null;
+}): ((departmentCode: DepartmentCode) => Promise<AgencyOption[]>) => {
+  if (internshipKind === "mini-stage-cci")
+    return (departmentCode) =>
+      agencyGateway.listMiniStageAgencies(departmentCode);
+  if (shouldListAll)
+    return (departmentCode) =>
+      agencyGateway.listImmersionAgencies(departmentCode);
+  return federatedIdentity && isPeConnectIdentity(federatedIdentity)
+    ? (departmentCode) =>
+        agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
+    : (departmentCode) => agencyGateway.listImmersionAgencies(departmentCode);
 };

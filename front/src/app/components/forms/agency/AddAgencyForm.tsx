@@ -20,7 +20,10 @@ import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
 } from "src/app/components/forms/agency/AgencyFormCommonFields";
-import { ConventionAgencySelector } from "src/app/components/forms/convention/sections/agency/ConventionAgencySelector";
+import {
+  AgencySelector,
+  departmentOptions,
+} from "src/app/components/forms/commons/AgencySelector";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { RadioButtonOption } from "src/app/contents/forms/common/values";
@@ -78,6 +81,7 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
   const { getFormErrors, getFormFields } = getFormContents(
     formAgencyFieldsLabels,
   );
+  const { refersToAgencyId: refersToAgencyIdField } = getFormFields();
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: zodResolver(createAgencySchema),
     mode: "onTouched",
@@ -109,11 +113,40 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
           Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>
         {hasAgencyReferral && (
-          <ConventionAgencySelector
-            internshipKind="immersion"
-            shouldListAll={true}
-          />
+          <>
+            <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
+              Prescripteur lié (signataire des conventions)
+            </h2>
+            <AgencySelector
+              fields={{
+                agencyDepartmentField: {
+                  name: "refersToAgencyDepartment",
+                  label: "Département",
+                  required: true,
+                  id: "refersToAgencyDepartment",
+                  placeholder: "Sélectionnez un département",
+                },
+                agencyIdField: refersToAgencyIdField,
+                agencyKindField: {
+                  name: "refersToAgencyKind",
+                  label: "Type d'organisme",
+                  required: true,
+                  id: "refersToAgencyKind",
+                },
+              }}
+              initialAgencies={[]}
+              shouldLockToPeAgencies={false}
+              shouldShowAgencyKindField
+              agencyDepartmentOptions={departmentOptions}
+              agenciesRetriever={(departementCode) =>
+                agencyGateway.listImmersionAgencies(departementCode)
+              }
+            />
+          </>
         )}
+        <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
+          Structure d'accompagnement
+        </h2>
         <AgencyFormCommonFields />
         <AgencyLogoUpload />
 

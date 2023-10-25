@@ -1,4 +1,4 @@
-import { AddressDto, AgencyDto, CreateAgencyDto, domElementIds } from "shared";
+import { AddressDto, CreateAgencyDto, domElementIds } from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
 
@@ -8,7 +8,6 @@ export type FormAgencyFieldsLabels = FormFieldsObjectForContent<
       | keyof CreateAgencyDto
       | "stepsForValidation"
       | `address.${keyof AddressDto}`
-      
     >,
     FormFieldAttributesForContent
   >
@@ -65,10 +64,6 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     hintText:
       "Les personnes ou emails génériques suivants valideront les conventions préalablement examinées.",
   },
-  adminEmails: {
-    label: "Emails des administrateurs de la structure",
-    id: domElementIds.addAgency.adminEmailsInput,
-  },
   signature: {
     label: "Texte de signature",
     id: domElementIds.addAgency.signatureInput,
@@ -77,10 +72,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
       "Quel texte de signature souhaitez-vous pour les mails automatisés ?",
     placeholder: "L’équipe de l’agence de Boulogne-Billancourt",
   },
-  status: {
-    label: "Statut de la structure",
-    id: domElementIds.addAgency.statusInput,
-  },
+
   kind: {
     label: "Type de structure",
     id: domElementIds.addAgency.kindSelect,
@@ -94,10 +86,6 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     hintText:
       "Les personnes ou emails génériques suivants recevront en premier les demandes de convention à examiner.",
   },
-  codeSafir: {
-    label: "Code SAFIR",
-    id: domElementIds.addAgency.codeSafirInput,
-  },
   questionnaireUrl: {
     id: domElementIds.addAgency.questionnaireUrlInput,
     label: "Lien vers le document de support du bilan de fin d’immersion ",
@@ -109,11 +97,10 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.agencySiretInput,
     required: true,
   },
- 
   refersToAgencyId: {
     label: "Agence prescriptrice référente",
-    id:domElementIds.addAgency.refersToAgencyId,
-    required:
+    id: domElementIds.addAgency.refersToAgencyId,
+    required: true,
   },
   stepsForValidation: {
     id: domElementIds.addAgency.stepsForValidationInput,
