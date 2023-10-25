@@ -752,6 +752,56 @@ describe("conventionDtoSchema", () => {
         "L'âge du bénéficiaire doit être au minimum de 10ans",
       ]);
     });
+
+    describe("convention with no beneficiary representative for a beneficiary under 18", () => {
+      it("rejects when beneficiary is minor (when immersion starts) and no beneficiary representative was provided", () => {
+        const immersionStartDate = new Date("2023-11-01");
+        const beneficiary: Beneficiary<"immersion"> = {
+          birthdate: subYears(immersionStartDate, 16).toISOString(),
+          email: "a@a.com",
+          firstName: "sdfgf",
+          lastName: "sdfs",
+          phone: "0011223344",
+          role: "beneficiary",
+        };
+
+        const convention = new ConventionDtoBuilder()
+          .withDateSubmission("2023-10-30")
+          .withDateStart(immersionStartDate.toISOString())
+          .withDateEnd(addDays(immersionStartDate, 4).toISOString())
+          .withSchedule(reasonableSchedule, ["dimanche"])
+          .withBeneficiary(beneficiary)
+          .withBeneficiaryRepresentative(undefined)
+          .build();
+
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+          "Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait 16 ans au démarrage de la convention.",
+        ]);
+      });
+
+      it("works if convention was submitted before the rule applies", () => {
+        const immersionStartDate = new Date("2023-11-01");
+        const beneficiary: Beneficiary<"immersion"> = {
+          birthdate: subYears(immersionStartDate, 16).toISOString(),
+          email: "a@a.com",
+          firstName: "sdfgf",
+          lastName: "sdfs",
+          phone: "0011223344",
+          role: "beneficiary",
+        };
+
+        const convention = new ConventionDtoBuilder()
+          .withDateSubmission("2023-10-27")
+          .withDateStart(immersionStartDate.toISOString())
+          .withDateEnd(addDays(immersionStartDate, 4).toISOString())
+          .withSchedule(reasonableSchedule, ["dimanche"])
+          .withBeneficiary(beneficiary)
+          .withBeneficiaryRepresentative(undefined)
+          .build();
+
+        expectConventionDtoToBeValid(convention);
+      });
+    });
   });
 
   describe("when sunday is in schedule", () => {

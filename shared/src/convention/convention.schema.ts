@@ -76,6 +76,7 @@ import {
 import {
   getConventionTooLongMessageAndPath,
   isTutorEmailDifferentThanBeneficiaryRelatedEmails,
+  minorBeneficiaryHasRepresentative,
   mustBeSignedByEveryone,
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
@@ -260,6 +261,19 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
     path: [getConventionFieldName("dateEnd")],
   })
   .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
+  .refine(
+    minorBeneficiaryHasRepresentative,
+    ({ dateStart, signatories: { beneficiary } }) => {
+      const beneficiaryAgeAtConventionStart = differenceInYears(
+        new Date(dateStart),
+        new Date(beneficiary.birthdate),
+      );
+      return {
+        message: `Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait ${beneficiaryAgeAtConventionStart} ans au démarrage de la convention.`,
+        path: [getConventionFieldName("signatories.beneficiaryRepresentative")],
+      };
+    },
+  )
   .superRefine((convention, issueMaker) => {
     const addIssue = (message: string, path: string) => {
       issueMaker.addIssue({

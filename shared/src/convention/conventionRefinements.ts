@@ -1,3 +1,4 @@
+import { differenceInYears } from "date-fns";
 import differenceInDays from "date-fns/differenceInDays";
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
@@ -51,6 +52,27 @@ export const isTutorEmailDifferentThanBeneficiaryRelatedEmails = (
     signatories.beneficiaryCurrentEmployer?.email,
   ];
   return !emails.includes(establishmentTutor.email);
+};
+
+export const minorBeneficiaryHasRepresentative = ({
+  dateStart,
+  signatories,
+  dateSubmission,
+}: ConventionDto) => {
+  const beneficiaryAgeAtConventionStart = differenceInYears(
+    new Date(dateStart),
+    new Date(signatories.beneficiary.birthdate),
+  );
+
+  const ruleAppliesFrom = new Date("2023-10-28");
+  const conventionWasSubmittedBeforeRuleApplies =
+    new Date(dateSubmission).getTime() < ruleAppliesFrom.getTime();
+
+  return (
+    conventionWasSubmittedBeforeRuleApplies ||
+    beneficiaryAgeAtConventionStart >= 18 ||
+    !!signatories.beneficiaryRepresentative
+  );
 };
 
 const statusesAllowedWithoutSign: ConventionStatus[] = [
