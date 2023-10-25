@@ -1,82 +1,93 @@
-import React, { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import { uniqBy } from "ramda";
-import {
-  AgencyOption,
-  ConventionReadDto,
-  DepartmentCode,
-  departmentNameToDepartmentCode,
-  FederatedIdentity,
-  InternshipKind,
-  isPeConnectIdentity,
-  keys,
-  miniStageRestrictedDepartments,
-  sortByPropertyCaseInsensitive,
-} from "shared";
+import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import { keys, uniqBy } from "ramda";
+import React, { useState } from "react";
 import { Loader } from "react-design-system";
 import {
-  agencyKindToLabel,
+  AgencyDto,
+  AgencyOption,
+  ConventionReadDto,
+  CreateAgencyDto,
+  departmentNameToDepartmentCode,
+  miniStageRestrictedDepartments,
+} from "shared";
+import {
   AllowedAgencyKindToAdd,
+  agencyKindToLabel,
 } from "src/app/components/forms/agency/agencyKindToLabel";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { getFormContents } from "src/app/hooks/formContents.hooks";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useRoute } from "src/app/routes/routes";
-import { agencyGateway } from "src/config/dependencies";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { FormFieldAttributes } from "src/app/contents/forms/types";
 import { AgencyErrorText } from "./AgencyErrorText";
+import { useFormContext } from "react-hook-form";
 
 type AgencySelectorProps = {
-  internshipKind: InternshipKind;
+  isLoading: boolean;
+  showError: boolean;
+  shouldLockToPeAgencies: boolean;
+  shouldShowAgencyKindField: boolean;
+  initialAgencies: AgencyOption[];
   disabled?: boolean;
-  defaultAgencyId?: string;
-  shouldListAll: boolean;
+  fields: {
+    agencyDepartmentField: FormFieldAttributes;
+    agencyKindField: FormFieldAttributes;
+    agencyIdField: FormFieldAttributes;
+  };
+  initialAgencyDepartment: string;
+  agencyDepartmentOptions: SelectProps.Option<string>[];
 };
-
 type AgencyKindForSelector = AllowedAgencyKindToAdd | "all";
 
+type SupportedFormsDto = ConventionReadDto | CreateAgencyDto;
+
 export const AgencySelector = ({
-  internshipKind,
+  isLoading,
+  showError,
+  shouldLockToPeAgencies,
+  shouldShowAgencyKindField,
+  initialAgencies,
   disabled,
-  defaultAgencyId,
-  shouldListAll,
+  fields: { agencyDepartmentField, agencyKindField, agencyIdField },
+  initialAgencyDepartment,
+  agencyDepartmentOptions,
 }: AgencySelectorProps) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(internshipKind),
+  const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
+  const [agencies, setAgencies] = useState<AgencyOption[]>(initialAgencies);
+  const [agencyDepartment, setAgencyDepartment] = useState<string>(
+    initialAgencyDepartment,
   );
-  const route = useRoute();
-  const {
-    agencyId: agencyIdField,
-    agencyDepartment: agencyDepartmentField,
-    agencyKind: agencyKindField,
-  } = getFormFields();
+  const agencyPlaceholder = getAgencyPlaceholder(
+    agencyDepartment,
+    agencies.length,
+  );
+
+  const agencyOptionsInSelector = agencyOptionsInSelectorFromAgencies(
+    agencies,
+    agencyKind,
+  );
+  const isAgencySelectionDisabled =
+    disabled ||
+    isLoading ||
+    !agencyDepartment ||
+    agencyOptionsInSelector.length === 0;
+
+  type AgencyKindOptions = {
+    label: string;
+    value: AgencyKindForSelector;
+  }[];
+
   const {
     register,
     getValues,
     setValue,
     formState: { errors, touchedFields },
-  } = useFormContext<ConventionReadDto>();
-  const agencyDepartmentStored = useAppSelector(
-    conventionSelectors.agencyDepartment,
-  );
-  const convention = useAppSelector(conventionSelectors.convention);
-  const agencyDepartment = getValues("agencyDepartment");
-  const [isLoading, setIsLoading] = useState(false);
-  const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
-  const [loadingError, setLoadingError] = useState(false);
-  const dispatch = useDispatch();
-  const [agencies, setAgencies] = useState<AgencyOption[]>([]);
-  const shouldLockToPeAgencies = !!(
-    route.name === "conventionImmersion" &&
-    route.params.jwt &&
-    isPeConnectIdentity(convention?.signatories.beneficiary.federatedIdentity)
-  );
-  const agencyKindOptions = [
-    ...(shouldLockToPeAgencies ? [] : [{ label: "Toutes", value: "all" }]),
+  } = useFormContext<SupportedFormsDto>();
+
+  const agencyIdFieldName = agencyIdField.name as Pick<SupportedFormsDto, "">;
+  const agencyDepartmentFieldName =
+    agencyDepartmentField.name as keyof SupportedFormsDto;
+
+  const agencyKindOptions: AgencyKindOptions = [
+    ...((shouldLockToPeAgencies
+      ? []
+      : [{ label: "Toutes", value: "all" }]) satisfies AgencyKindOptions),
     ...uniqBy((agencyOption) => agencyOption.kind, agencies)
       .map((agencyOption) => agencyOption.kind)
       .filter((kind): kind is AllowedAgencyKindToAdd =>
@@ -84,88 +95,15 @@ export const AgencySelector = ({
           ? kind === "pole-emploi"
           : kind !== "immersion-facile",
       )
-      .map((agencyKind): { label: string; value: AgencyKindForSelector } => ({
+      .map((agencyKind) => ({
         label: agencyKindToLabel[agencyKind],
         value: agencyKind,
       })),
   ];
 
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const agencyIdName = agencyIdField.name as keyof ConventionReadDto;
-  const agencyDepartmentName =
-    agencyDepartmentField.name as keyof ConventionReadDto;
-
-  useEffect(() => {
-    if (!agencyDepartment) return;
-    if (shouldLockToPeAgencies) {
-      setAgencyKind("pole-emploi");
-    }
-    dispatch(
-      conventionSlice.actions.agencyDepartementChangeRequested(
-        agencyDepartment,
-      ),
-    );
-    setIsLoading(true);
-    agenciesRetriever({
-      internshipKind,
-      shouldListAll,
-      departmentCode: agencyDepartment,
-      federatedIdentity,
-    })
-      .then((retrievedAgencies) => {
-        setAgencies(sortByPropertyCaseInsensitive("name")(retrievedAgencies));
-        if (
-          defaultAgencyId &&
-          isDefaultAgencyOnAgenciesAndEnabled(
-            disabled,
-            defaultAgencyId,
-            retrievedAgencies,
-          )
-        )
-          setValue(agencyIdName, defaultAgencyId);
-        else setValue(agencyIdName, "");
-        setLoadingError(false);
-      })
-      .catch((e: any) => {
-        //eslint-disable-next-line no-console
-        console.log("AgencySelector", e);
-        setAgencies([]);
-        setLoadingError(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [agencyDepartment]);
-
-  useEffect(() => {
-    if (agencyDepartmentStored) {
-      setValue(agencyDepartmentName, agencyDepartmentStored);
-    }
-  }, [agencyDepartmentStored]);
-
-  const error = errors[agencyIdName];
-  const touched = touchedFields[agencyIdName];
-  const userError = touched && error;
-  const showError = userError || loadingError;
-
-  const agencyPlaceholder = getAgencyPlaceholder(
-    agencyDepartment,
-    agencies.length,
-  );
-
-  const agencyOptionsInSelector = agencies
-    .filter(({ kind }) => (agencyKind === "all" ? true : kind === agencyKind))
-    .map(({ id, name }) => ({
-      label: name,
-      value: id,
-    }));
-
-  const isAgencySelectionDisabled =
-    disabled ||
-    isLoading ||
-    !agencyDepartment ||
-    agencyOptionsInSelector.length === 0;
-
+  if (shouldLockToPeAgencies && agencyKind !== "pole-emploi") {
+    setAgencyKind("pole-emploi");
+  }
   return (
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
@@ -173,23 +111,17 @@ export const AgencySelector = ({
       <Select
         label={agencyDepartmentField.label}
         hint={agencyDepartmentField.hintText}
-        options={
-          internshipKind === "immersion"
-            ? departmentOptions
-            : departmentOptions.filter((department) =>
-                miniStageRestrictedDepartments.includes(department.value),
-              )
-        }
+        options={agencyDepartmentOptions}
         placeholder={agencyDepartmentField.placeholder}
         nativeSelectProps={{
           ...agencyDepartmentField,
           value: agencyDepartment as string,
           onChange: (event) =>
-            setValue(agencyDepartmentName, event.currentTarget.value),
+            setValue(agencyDepartmentFieldName, event.currentTarget.value),
         }}
       />
 
-      {internshipKind === "immersion" && (
+      {shouldShowAgencyKindField && (
         <Select
           label={agencyKindField.label}
           hint={
@@ -207,8 +139,7 @@ export const AgencySelector = ({
           nativeSelectProps={{
             ...agencyKindField,
             value: agencyKind,
-            onChange: (event) =>
-              setAgencyKind(event.currentTarget.value as AgencyKindForSelector),
+            onChange: (event) => setAgencyKind(event.currentTarget.value),
           }}
         />
       )}
@@ -221,8 +152,8 @@ export const AgencySelector = ({
         placeholder={agencyPlaceholder}
         nativeSelectProps={{
           ...agencyIdField,
-          ...register(agencyIdName),
-          value: getValues(agencyIdName) as string,
+          ...register(agencyIdFieldName),
+          value: getValues(agencyIdFieldName),
         }}
       />
       {showError && (
@@ -237,37 +168,12 @@ export const AgencySelector = ({
   );
 };
 
-const departmentOptions = keys(departmentNameToDepartmentCode).map(
+export const departmentOptions = keys(departmentNameToDepartmentCode).map(
   (departmentName: string): SelectProps.Option<string> => ({
     label: `${departmentNameToDepartmentCode[departmentName]} - ${departmentName}`,
     value: departmentNameToDepartmentCode[departmentName],
   }),
 );
-
-const isDefaultAgencyOnAgenciesAndEnabled = (
-  disabled: boolean | undefined,
-  defaultAgencyId: string,
-  agencies: AgencyOption[],
-) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
-
-const agenciesRetriever = ({
-  internshipKind,
-  departmentCode,
-  shouldListAll,
-  federatedIdentity,
-}: {
-  internshipKind: InternshipKind;
-  departmentCode: DepartmentCode;
-  shouldListAll: boolean;
-  federatedIdentity: FederatedIdentity | null;
-}): Promise<AgencyOption[]> => {
-  if (internshipKind === "mini-stage-cci")
-    return agencyGateway.listMiniStageAgencies(departmentCode);
-  if (shouldListAll) return agencyGateway.listImmersionAgencies(departmentCode);
-  return federatedIdentity && isPeConnectIdentity(federatedIdentity)
-    ? agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
-    : agencyGateway.listImmersionAgencies(departmentCode);
-};
 
 const getAgencyPlaceholder = (
   agencyDepartment: string,
@@ -277,3 +183,14 @@ const getAgencyPlaceholder = (
   if (numberOfAgencies === 0) return "Aucune agence dans ce département";
   return "Veuillez sélectionner une structure";
 };
+
+const agencyOptionsInSelectorFromAgencies = (
+  agencies: AgencyOption[],
+  agencyKind: AgencyKindForSelector,
+) =>
+  agencies
+    .filter(({ kind }) => (agencyKind === "all" ? true : kind === agencyKind))
+    .map(({ id, name }) => ({
+      label: name,
+      value: id,
+    }));

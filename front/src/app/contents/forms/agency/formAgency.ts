@@ -1,11 +1,14 @@
-import { AddressDto, AgencyDto, domElementIds } from "shared";
+import { AddressDto, AgencyDto, CreateAgencyDto, domElementIds } from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
 
 export type FormAgencyFieldsLabels = FormFieldsObjectForContent<
   Record<
     Partial<
-      keyof AgencyDto | "stepsForValidation" | `address.${keyof AddressDto}`
+      | keyof CreateAgencyDto
+      | "stepsForValidation"
+      | `address.${keyof AddressDto}`
+      
     >,
     FormFieldAttributesForContent
   >
@@ -106,10 +109,11 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.agencySiretInput,
     required: true,
   },
-  refersToAgency: {
+ 
+  refersToAgencyId: {
     label: "Agence prescriptrice référente",
-    id: domElementIds.addAgency.agencySiretInput,
-    required: true,
+    id:domElementIds.addAgency.refersToAgencyId,
+    required:
   },
   stepsForValidation: {
     id: domElementIds.addAgency.stepsForValidationInput,
