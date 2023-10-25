@@ -226,7 +226,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       "Ex : navettes jusqu'au lieu de travail, panier repas, hébergement... (optionnel)",
   },
   isMinor: {
-    label: "Êtes-vous mineur ou majeur protégé ?",
+    label: "Êtes-vous majeur protégé ?",
     id: conventionSectionIds.isMinor,
     required: true,
   },
