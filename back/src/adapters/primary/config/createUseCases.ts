@@ -63,6 +63,7 @@ import { HtmlToPdf } from "../../../domain/generic/htmlToPdf/HtmlToPdf";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
 import { AuthenticateWithInclusionCode } from "../../../domain/inclusionConnect/useCases/AuthenticateWithInclusionCode";
+import { GetInclusionConnectLogoutUrl } from "../../../domain/inclusionConnect/useCases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { GetInclusionConnectedUser } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUser";
 import { GetInclusionConnectedUsers } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUsers";
@@ -184,6 +185,10 @@ export const createUseCases = (
         uuidGenerator,
         generateAuthenticatedUserToken,
         config.immersionFacileBaseUrl,
+      ),
+      inclusionConnectLogout: new GetInclusionConnectLogoutUrl(
+        config.immersionFacileBaseUrl,
+        config.inclusionConnectConfig,
       ),
       bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
         uowPerformer,

@@ -1,5 +1,6 @@
 import { from, map, Observable } from "rxjs";
 import {
+  AbsoluteUrl,
   AgencyId,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
@@ -21,6 +22,14 @@ export class HttpInclusionConnectedGateway
         if (status === 200) return body;
         throw new Error(JSON.stringify(body));
       }),
+    );
+  }
+
+  public getLogoutUrl$(): Observable<AbsoluteUrl> {
+    return from(
+      this.httpClient
+        .getInclusionConnectLogoutUrl()
+        .then((response) => response.body),
     );
   }
 

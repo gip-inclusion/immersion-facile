@@ -1,6 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import {
-  AgencyId,
+import { AbsoluteUrl, AgencyId,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
@@ -12,12 +11,18 @@ export class TestInclusionConnectedGateway
   // for test purpose
   public currentUser$ = new Subject<InclusionConnectedUser>();
 
+  public getLogoutUrlResponse$ = new Subject<AbsoluteUrl>();
+
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
   public registerAgenciesToCurrentUserResponse$ = new Subject<undefined>();
 
   public getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return this.currentUser$;
+  }
+
+  public getLogoutUrl$() {
+    return this.getLogoutUrlResponse$;
   }
 
   public markPartnersErroredConventionAsHandled$(

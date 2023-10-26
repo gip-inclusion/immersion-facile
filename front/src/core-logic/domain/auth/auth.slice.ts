@@ -33,9 +33,10 @@ export const authSlice = createSlice({
       _action: PayloadAction<FederatedIdentityWithUser | null>,
     ) => state,
     federatedIdentityNotFoundInDevice: (state) => state,
-    federatedIdentityDeletionTriggered: (state) => {
+    federatedIdentityDeletionTriggered: (state) => state,
+    federatedIdentityInDeviceDeletionSucceeded: (state) => {
       state.federatedIdentityWithUser = null;
     },
-    federatedIdentityInDeviceDeletionSucceeded: (state) => state,
+    loggedOutSuccessfullyFromInclusionConnect: (state) => state,
   },
 });

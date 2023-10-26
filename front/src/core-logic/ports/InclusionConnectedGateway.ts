@@ -1,6 +1,5 @@
 import { Observable } from "rxjs";
-import {
-  AgencyId,
+import { AbsoluteUrl, AgencyId,
   ConventionSupportedJwt,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
@@ -16,4 +15,5 @@ export interface InclusionConnectedGateway {
     params: MarkPartnersErroredConventionAsHandledRequest,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
+  getLogoutUrl$(): Observable<AbsoluteUrl>;
 }

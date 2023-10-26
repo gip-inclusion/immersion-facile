@@ -1,6 +1,5 @@
-import { delay, Observable, of, Subject, throwError } from "rxjs";
-import {
-  AgencyId,
+import { delay, Observable, of, Subject,throwError } from "rxjs";
+import { AbsoluteUrl, AgencyId,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
@@ -32,6 +31,10 @@ export class SimulatedInclusionConnectedGateway
     _jwt: string,
   ): Observable<void> {
     return this.markPartnersErroredConventionAsHandledResult$;
+  }
+
+  public getLogoutUrl$(): Observable<AbsoluteUrl> {
+    return of("http://fake-logout.com");
   }
 
   public registerAgenciesToCurrentUser$(
