@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
@@ -88,6 +88,7 @@ export const ContactByEmail = ({
   const {
     register,
     handleSubmit,
+    reset,
     formState,
     formState: { isSubmitting },
   } = methods;
@@ -102,6 +103,13 @@ export const ContactByEmail = ({
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };
+
+  useEffect(() => {
+    reset({
+      ...initialValues,
+      siret,
+    });
+  }, [siret]);
 
   return (
     <FormProvider {...methods}>
@@ -125,7 +133,6 @@ export const ContactByEmail = ({
           <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
             Votre email de motivation
           </h2>
-
           <Select
             label={
               "Objet de la période de mise en situation en milieu professionnel *"
