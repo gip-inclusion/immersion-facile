@@ -2,6 +2,7 @@ import { addDays, subDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -43,7 +44,9 @@ describe("PgConventionRepository", () => {
     client = await pool.connect();
     transaction = makeKyselyDb(pool);
     const agencyRepository = new PgAgencyRepository(transaction);
-    await agencyRepository.insert(AgencyDtoBuilder.create().build());
+    await agencyRepository.insert(
+      agencyDtoToSaveAgencyParams(AgencyDtoBuilder.create().build()),
+    );
   });
 
   afterAll(async () => {

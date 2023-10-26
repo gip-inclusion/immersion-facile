@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   BackOfficeJwtPayload,
   ConventionDtoBuilder,
   ConventionJwtPayload,
@@ -21,6 +22,7 @@ import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
   const agency = new AgencyDtoBuilder().build();
+  const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
   const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
   let getConvention: GetConvention;
   let uow: InMemoryUnitOfWork;
@@ -64,7 +66,7 @@ describe("Get Convention", () => {
           agencyRights: [{ role: "toReview", agency }],
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
@@ -97,7 +99,7 @@ describe("Get Convention", () => {
       });
 
       it("When if user is not on inclusion connected users", async () => {
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
@@ -113,7 +115,7 @@ describe("Get Convention", () => {
 
   describe("Right paths", () => {
     beforeEach(() => {
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([agencySaveParams]);
       uow.conventionRepository.setConventions({ [convention.id]: convention });
     });
 

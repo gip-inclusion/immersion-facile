@@ -1,6 +1,7 @@
 import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   expectToEqual,
@@ -21,6 +22,7 @@ import { ResyncOldConventionsToPe } from "./ResyncOldConventionsToPe";
 
 describe("ResyncOldConventionsToPe use case", () => {
   const agencyPE = new AgencyDtoBuilder().withKind("pole-emploi").build();
+  const agencyPESaveParams = agencyDtoToSaveAgencyParams(agencyPE);
   const conventionToSync1 = new ConventionDtoBuilder()
     .withId("6f59c7b7-c2c9-4a31-a3eb-377ea83ae08b")
     .withAgencyId(agencyPE.id)
@@ -58,7 +60,7 @@ describe("ResyncOldConventionsToPe use case", () => {
 
   describe("Right paths", () => {
     it("broadcast two conventions to pe", async () => {
-      uow.agencyRepository.setAgencies([agencyPE]);
+      uow.agencyRepository.setAgencies([agencyPESaveParams]);
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
         [conventionToSync2.id]: conventionToSync2,
@@ -105,7 +107,7 @@ describe("ResyncOldConventionsToPe use case", () => {
     });
 
     it("broadcast one convention to pe", async () => {
-      uow.agencyRepository.setAgencies([agencyPE]);
+      uow.agencyRepository.setAgencies([agencyPESaveParams]);
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
       });
@@ -155,10 +157,11 @@ describe("ResyncOldConventionsToPe use case", () => {
 
     it("when agency is not kind pole-emploi", async () => {
       const agencyCCI = new AgencyDtoBuilder().withKind("cci").build();
+      const agencyCCISaveParams = agencyDtoToSaveAgencyParams(agencyCCI);
       const conventionToSync = new ConventionDtoBuilder()
         .withAgencyId(agencyCCI.id)
         .build();
-      uow.agencyRepository.setAgencies([agencyCCI]);
+      uow.agencyRepository.setAgencies([agencyCCISaveParams]);
       uow.conventionRepository.setConventions({
         [conventionToSync.id]: conventionToSync,
       });
@@ -198,7 +201,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           isActive: false,
         },
       });
-      uow.agencyRepository.setAgencies([agencyPE]);
+      uow.agencyRepository.setAgencies([agencyPESaveParams]);
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
       });
@@ -233,7 +236,7 @@ describe("ResyncOldConventionsToPe use case", () => {
     });
 
     it("only process convention with status TO_PROCESS and ERROR", async () => {
-      uow.agencyRepository.setAgencies([agencyPE]);
+      uow.agencyRepository.setAgencies([agencyPESaveParams]);
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
         [conventionToSync2.id]: conventionToSync2,
@@ -308,7 +311,7 @@ describe("ResyncOldConventionsToPe use case", () => {
     });
 
     it("should consider limit", async () => {
-      uow.agencyRepository.setAgencies([agencyPE]);
+      uow.agencyRepository.setAgencies([agencyPESaveParams]);
       uow.conventionRepository.setConventions({
         [conventionToSync1.id]: conventionToSync1,
         [conventionToSync2.id]: conventionToSync2,
@@ -360,7 +363,7 @@ describe("ResyncOldConventionsToPe use case", () => {
 
   describe("Wrong paths", () => {
     it("when no convention in conventionRepository should not sync convention", async () => {
-      uow.agencyRepository.setAgencies([agencyPE]);
+      uow.agencyRepository.setAgencies([agencyPESaveParams]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,

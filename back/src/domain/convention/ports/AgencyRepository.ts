@@ -2,12 +2,13 @@ import {
   AgencyDto,
   AgencyId,
   GetAgenciesFilter,
-  PartialAgencyDto,
+  PartialAgencySaveParams,
+  SaveAgencyParams,
 } from "shared";
 
 export interface AgencyRepository {
-  insert: (config: AgencyDto) => Promise<AgencyId | undefined>;
-  update: (config: PartialAgencyDto) => Promise<void>;
+  insert: (agency: SaveAgencyParams) => Promise<AgencyId | undefined>;
+  update: (partialAgency: PartialAgencySaveParams) => Promise<void>;
   getByIds: (ids: AgencyId[]) => Promise<AgencyDto[]>;
   getById: (ids: AgencyId) => Promise<AgencyDto | undefined>;
   getImmersionFacileAgencyId: () => Promise<AgencyId | undefined>;

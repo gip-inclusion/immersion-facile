@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   AuthenticatedUser,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -33,7 +34,9 @@ const user: AuthenticatedUser = {
 };
 
 const agency1 = new AgencyDtoBuilder().withId(agencyId1).build();
+const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
 const agency2 = new AgencyDtoBuilder().withId(agencyId2).build();
+const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
 
 describe("RegisterAgencyToInclusionConnectUser use case", () => {
   let registerAgencyToInclusionConnectUser: RegisterAgencyToInclusionConnectUser;
@@ -83,7 +86,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   });
 
   it("fails if user already has agency rights", async () => {
-    agencyRepository.setAgencies([agency1]);
+    agencyRepository.setAgencies([agency1SaveParams]);
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         ...user,
@@ -101,7 +104,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   describe("When User and agencies exist", () => {
     beforeEach(() => {
       userRepository.users = [user];
-      agencyRepository.setAgencies([agency1, agency2]);
+      agencyRepository.setAgencies([agency1SaveParams, agency2SaveParams]);
     });
 
     it("makes the link between user and provided agency id, and saves the corresponding event", async () => {

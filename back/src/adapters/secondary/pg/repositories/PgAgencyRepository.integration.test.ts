@@ -3,8 +3,10 @@ import {
   activeAgencyStatuses,
   AgencyDto,
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   expectToEqual,
   GeoPositionDto,
+  SaveAgencyParams,
   toAgencyPublicDisplayDto,
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
@@ -52,6 +54,7 @@ const inactiveAgency = AgencyDtoBuilder.create(
   .withStatus("needsReview")
   .withPosition(48.7, 6.2)
   .build();
+const inactiveAgencySaveParams = agencyDtoToSaveAgencyParams(inactiveAgency);
 
 describe("PgAgencyRepository", () => {
   let pool: Pool;
@@ -80,16 +83,21 @@ describe("PgAgencyRepository", () => {
       .withAgencySiret("10000002222999")
       .withCodeSafir("AAAAAA")
       .build();
+    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
 
     it("returns undefined when no agency found", async () => {
-      const retrievedAgency = await agencyRepository.getById(agency1.id);
+      const retrievedAgency = await agencyRepository.getById(
+        agency1SaveParams.id,
+      );
       expect(retrievedAgency).toBeUndefined();
     });
 
     it("returns existing agency", async () => {
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency1SaveParams);
 
-      const retrievedAgency = await agencyRepository.getById(agency1.id);
+      const retrievedAgency = await agencyRepository.getById(
+        agency1SaveParams.id,
+      );
       expectToEqual(retrievedAgency, agency1);
     });
 
@@ -97,8 +105,9 @@ describe("PgAgencyRepository", () => {
       const agency2 = agency2builder
         .withRefersToAgency(toAgencyPublicDisplayDto(agency1))
         .build();
-      await agencyRepository.insert(agency1);
-      await agencyRepository.insert(agency2);
+      const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
+      await agencyRepository.insert(agency1SaveParams);
+      await agencyRepository.insert(agency2SaveParams);
 
       const retrievedAgency = await agencyRepository.getById(agency2.id);
       expectToEqual(retrievedAgency, agency2);
@@ -111,9 +120,10 @@ describe("PgAgencyRepository", () => {
       .withAgencySiret("01234567890123")
       .withCodeSafir("AAAAAA")
       .build();
+    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
 
     it("returns existing agency", async () => {
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency1SaveParams);
 
       const agencies = await agencyRepository.getByIds([agency1.id]);
       expectToEqual(agencies, [agency1]);
@@ -125,16 +135,18 @@ describe("PgAgencyRepository", () => {
         .withAgencySiret("00000000000000")
         .withCodeSafir("BBBBBB")
         .build();
+      const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
       const agency3 = agency1builder
         .withId("cccccccc-cccc-4ccc-cccc-cccccccccccc")
         .withAgencySiret("11111111111111")
         .withCodeSafir("CCCCCC")
         .build();
+      const agency3SaveParams = agencyDtoToSaveAgencyParams(agency3);
 
       await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
-        agencyRepository.insert(agency3),
+        agencyRepository.insert(agency1SaveParams),
+        agencyRepository.insert(agency2SaveParams),
+        agencyRepository.insert(agency3SaveParams),
       ]);
 
       const agencies = await agencyRepository.getByIds([
@@ -161,15 +173,21 @@ describe("PgAgencyRepository", () => {
     // TODO Casser le découplage
 
     const agency1PE = agency1builder.withKind("pole-emploi").build();
+    const agency1PESaveParams = agencyDtoToSaveAgencyParams(agency1PE);
     const agency2MissionLocale = agency2builder
       .withKind("mission-locale")
       .build();
+    const agency2MissionLocaleSaveParams =
+      agencyDtoToSaveAgencyParams(agency2MissionLocale);
     const agencyAddedFromPeReferenciel = agency1builder
       .withId("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")
       .withName("Agency from PE referenciel")
       .withStatus("from-api-PE")
       .withPosition(48.8415502, 2.4019552)
       .build();
+    const agencyAddedFromPeReferencielSaveParams = agencyDtoToSaveAgencyParams(
+      agencyAddedFromPeReferenciel,
+    );
 
     const agenciesByName = [
       AgencyDtoBuilder.empty()
@@ -185,6 +203,9 @@ describe("PgAgencyRepository", () => {
         .withName("Agence Pôle emploi VITROLLES")
         .build(),
     ];
+    const agenciesByNameSaveParams = agenciesByName.map(
+      agencyDtoToSaveAgencyParams,
+    );
 
     const agencyCciInParis = new AgencyDtoBuilder()
       .withId("55555555-5555-5555-5555-555555555555")
@@ -196,6 +217,8 @@ describe("PgAgencyRepository", () => {
         streetNumberAndAddress: "OSEF",
       })
       .build();
+    const agencyCciInParisSaveParams =
+      agencyDtoToSaveAgencyParams(agencyCciInParis);
 
     it("returns empty list for empty table", async () => {
       const agencies = await agencyRepository.getAgencies({});
@@ -204,10 +227,10 @@ describe("PgAgencyRepository", () => {
 
     it("returns all agencies filtered on statuses", async () => {
       await Promise.all([
-        agencyRepository.insert(agency1PE),
-        agencyRepository.insert(agency2MissionLocale),
-        agencyRepository.insert(agencyAddedFromPeReferenciel),
-        agencyRepository.insert(inactiveAgency),
+        agencyRepository.insert(agency1PESaveParams),
+        agencyRepository.insert(agency2MissionLocaleSaveParams),
+        agencyRepository.insert(agencyAddedFromPeReferencielSaveParams),
+        agencyRepository.insert(inactiveAgencySaveParams),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
@@ -222,10 +245,10 @@ describe("PgAgencyRepository", () => {
 
     it("returns all agencies filtered on statuses, respecting provided limit and position", async () => {
       await Promise.all([
-        agencyRepository.insert(agency1PE),
-        agencyRepository.insert(agency2MissionLocale),
-        agencyRepository.insert(agencyAddedFromPeReferenciel),
-        agencyRepository.insert(inactiveAgency),
+        agencyRepository.insert(agency1PESaveParams),
+        agencyRepository.insert(agency2MissionLocaleSaveParams),
+        agencyRepository.insert(agencyAddedFromPeReferencielSaveParams),
+        agencyRepository.insert(inactiveAgencySaveParams),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
@@ -242,8 +265,8 @@ describe("PgAgencyRepository", () => {
 
     it("if agencyKindFilter = 'immersionPeOnly', returns only pe agencies", async () => {
       await Promise.all([
-        agencyRepository.insert(agency1PE),
-        agencyRepository.insert(agency2MissionLocale),
+        agencyRepository.insert(agency1PESaveParams),
+        agencyRepository.insert(agency2MissionLocaleSaveParams),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
@@ -254,8 +277,8 @@ describe("PgAgencyRepository", () => {
 
     it("if agencyKindFilter = 'miniStageOnly', returns only cci agencies", async () => {
       await Promise.all([
-        agencyRepository.insert(agencyCciInParis),
-        agencyRepository.insert(agency1PE),
+        agencyRepository.insert(agencyCciInParisSaveParams),
+        agencyRepository.insert(agency1PESaveParams),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
@@ -266,8 +289,8 @@ describe("PgAgencyRepository", () => {
 
     it("if agencyKindFilter = 'miniStageExcluded', returns agencies that are not kind cci", async () => {
       await Promise.all([
-        agencyRepository.insert(agencyCciInParis),
-        agencyRepository.insert(agency1PE),
+        agencyRepository.insert(agencyCciInParisSaveParams),
+        agencyRepository.insert(agency1PESaveParams),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
@@ -278,9 +301,9 @@ describe("PgAgencyRepository", () => {
 
     it("returns all agencies filtered by name", async () => {
       await Promise.all([
-        agencyRepository.insert(agenciesByName[0]),
-        agencyRepository.insert(agenciesByName[1]),
-        agencyRepository.insert(agenciesByName[2]),
+        agencyRepository.insert(agenciesByNameSaveParams[0]),
+        agencyRepository.insert(agenciesByNameSaveParams[1]),
+        agencyRepository.insert(agenciesByNameSaveParams[2]),
       ]);
       const agencies = await agencyRepository.getAgencies({
         filters: { nameIncludes: "Vitry" },
@@ -293,10 +316,10 @@ describe("PgAgencyRepository", () => {
 
     it("returns agencies filtered by departmentCode", async () => {
       await Promise.all([
-        agencyRepository.insert(agenciesByName[0]),
-        agencyRepository.insert(agenciesByName[1]),
-        agencyRepository.insert(agenciesByName[2]),
-        agencyRepository.insert(agencyCciInParis),
+        agencyRepository.insert(agenciesByNameSaveParams[0]),
+        agencyRepository.insert(agenciesByNameSaveParams[1]),
+        agencyRepository.insert(agenciesByNameSaveParams[2]),
+        agencyRepository.insert(agencyCciInParisSaveParams),
       ]);
       const agencies = await agencyRepository.getAgencies({
         filters: { departmentCode: "75" },
@@ -307,6 +330,7 @@ describe("PgAgencyRepository", () => {
 
   describe("getAgencyWithValidatorEmail", () => {
     const agency1 = agency1builder.build();
+    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
 
     it("returns undefined for empty table", async () => {
       const result = await agencyRepository.getAgencyWhereEmailMatches(
@@ -319,10 +343,13 @@ describe("PgAgencyRepository", () => {
       const agencyWithMatchingValidator = agency2builder
         .withValidatorEmails(["matching.validator@mail.com"])
         .build();
+      const agencyWithMatchingValidatorSaveParams = agencyDtoToSaveAgencyParams(
+        agencyWithMatchingValidator,
+      );
 
       await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agencyWithMatchingValidator),
+        agencyRepository.insert(agency1SaveParams),
+        agencyRepository.insert(agencyWithMatchingValidatorSaveParams),
       ]);
 
       const matched = await agencyRepository.getAgencyWhereEmailMatches(
@@ -335,10 +362,12 @@ describe("PgAgencyRepository", () => {
       const agencyWithMatchingCounsellor = agency2builder
         .withCounsellorEmails(["matching.counsellor@mail.com"])
         .build();
+      const agencyWithMatchingCounsellorSaveParams =
+        agencyDtoToSaveAgencyParams(agencyWithMatchingCounsellor);
 
       await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agencyWithMatchingCounsellor),
+        agencyRepository.insert(agency1SaveParams),
+        agencyRepository.insert(agencyWithMatchingCounsellorSaveParams),
       ]);
 
       const matched = await agencyRepository.getAgencyWhereEmailMatches(
@@ -359,11 +388,13 @@ describe("PgAgencyRepository", () => {
         .withName("Nancy agency")
         .withPosition(48.697851, 6.20157)
         .build();
+      const nancyAgencySaveParams = agencyDtoToSaveAgencyParams(nancyAgency);
 
       const epinalAgency = agency2builder
         .withName("Epinal agency")
         .withPosition(48.179552, 6.441447)
         .build();
+      const epinalAgencySaveParams = agencyDtoToSaveAgencyParams(epinalAgency);
 
       const dijonAgency = AgencyDtoBuilder.create(
         "33333333-3333-3333-3333-333333333333",
@@ -371,12 +402,13 @@ describe("PgAgencyRepository", () => {
         .withName("Dijon agency")
         .withPosition(47.365086, 5.051027)
         .build();
+      const dijonAgencySaveParams = agencyDtoToSaveAgencyParams(dijonAgency);
 
       await Promise.all([
-        agencyRepository.insert(nancyAgency),
-        agencyRepository.insert(epinalAgency),
-        agencyRepository.insert(dijonAgency),
-        agencyRepository.insert(inactiveAgency),
+        agencyRepository.insert(nancyAgencySaveParams),
+        agencyRepository.insert(epinalAgencySaveParams),
+        agencyRepository.insert(dijonAgencySaveParams),
+        agencyRepository.insert(inactiveAgencySaveParams),
       ]);
 
       // Act
@@ -401,6 +433,8 @@ describe("PgAgencyRepository", () => {
         .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
         .withStatus("active")
         .build();
+      const peNancyAgencySaveParams =
+        agencyDtoToSaveAgencyParams(peNancyAgency);
 
       const capEmploiNancyAgency = agency2builder
         .withName("Nancy CAP EMPLOI agency")
@@ -408,10 +442,12 @@ describe("PgAgencyRepository", () => {
         .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
         .withStatus("active")
         .build();
+      const capEmploiNancyAgencySaveParams =
+        agencyDtoToSaveAgencyParams(capEmploiNancyAgency);
 
       await Promise.all([
-        agencyRepository.insert(peNancyAgency),
-        agencyRepository.insert(capEmploiNancyAgency),
+        agencyRepository.insert(peNancyAgencySaveParams),
+        agencyRepository.insert(capEmploiNancyAgencySaveParams),
       ]);
 
       // Act
@@ -436,6 +472,8 @@ describe("PgAgencyRepository", () => {
         .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
         .withStatus("active")
         .build();
+      const peNancyAgencySaveParams =
+        agencyDtoToSaveAgencyParams(peNancyAgency);
 
       const capEmploiNancyAgency = agency2builder
         .withName("Nancy CAP EMPLOI agency")
@@ -443,6 +481,8 @@ describe("PgAgencyRepository", () => {
         .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
         .withStatus("active")
         .build();
+      const capEmploiNancyAgencySaveParams =
+        agencyDtoToSaveAgencyParams(capEmploiNancyAgency);
 
       const cciAgency = agency1builder
         .withId("33333333-3333-3333-3333-333333333333")
@@ -451,11 +491,12 @@ describe("PgAgencyRepository", () => {
         .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
         .withStatus("active")
         .build();
+      const cciAgencySaveParams = agencyDtoToSaveAgencyParams(cciAgency);
 
       await Promise.all([
-        agencyRepository.insert(peNancyAgency),
-        agencyRepository.insert(capEmploiNancyAgency),
-        agencyRepository.insert(cciAgency),
+        agencyRepository.insert(peNancyAgencySaveParams),
+        agencyRepository.insert(capEmploiNancyAgencySaveParams),
+        agencyRepository.insert(cciAgencySaveParams),
       ]);
 
       // Act
@@ -486,6 +527,7 @@ describe("PgAgencyRepository", () => {
           streetNumberAndAddress: "",
         })
         .build();
+      const cergyAgencySaveParams = agencyDtoToSaveAgencyParams(cergyAgency);
 
       const parisAgency = agency1builder
         .withId("11111111-1111-1111-1111-111211111112")
@@ -497,10 +539,11 @@ describe("PgAgencyRepository", () => {
           streetNumberAndAddress: "",
         })
         .build();
+      const parisAgencySaveParams = agencyDtoToSaveAgencyParams(parisAgency);
 
       await Promise.all([
-        agencyRepository.insert(parisAgency),
-        agencyRepository.insert(cergyAgency),
+        agencyRepository.insert(parisAgencySaveParams),
+        agencyRepository.insert(cergyAgencySaveParams),
       ]);
 
       // Act
@@ -520,23 +563,27 @@ describe("PgAgencyRepository", () => {
   describe("insert", () => {
     let agency1: AgencyDto;
     let agency2: AgencyDto;
+    let agency1SaveParams: SaveAgencyParams;
+    let agency2SaveParams: SaveAgencyParams;
     beforeEach(() => {
       agency1 = agency1builder
         .withAgencySiret("11110000111100")
         .withCodeSafir("123")
         .build();
       agency2 = agency2builder.build();
+      agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
+      agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
     });
 
     it("inserts unknown entities", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency1SaveParams);
       const allActiveAgencies = await agencyRepository.getAgencies({});
       expect(allActiveAgencies).toHaveLength(1);
       expect(allActiveAgencies[0]).toEqual(agency1);
 
-      await agencyRepository.insert(agency2);
+      await agencyRepository.insert(agency2SaveParams);
       expect(await agencyRepository.getAgencies({})).toHaveLength(2);
     });
   });
@@ -546,11 +593,12 @@ describe("PgAgencyRepository", () => {
       .withPosition(40, 2)
       .withStatus("needsReview")
       .build();
+    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
 
     it("updates the entire entity", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency1SaveParams);
       expect(await agencyRepository.getAgencies({})).toHaveLength(1);
 
       const updatedAgency1 = agency1builder
@@ -567,7 +615,9 @@ describe("PgAgencyRepository", () => {
         })
         .build();
 
-      await agencyRepository.update(updatedAgency1);
+      await agencyRepository.update(
+        agencyDtoToSaveAgencyParams(updatedAgency1),
+      );
       const inDb = await agencyRepository.getAgencies({});
       expect(inDb).toHaveLength(1);
       expectToEqual(inDb[0], updatedAgency1);
@@ -576,7 +626,7 @@ describe("PgAgencyRepository", () => {
     it("updates the only some fields", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
-      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency1SaveParams);
       expect(await agencyRepository.getAgencies({})).toHaveLength(1);
 
       await agencyRepository.update({
@@ -591,15 +641,17 @@ describe("PgAgencyRepository", () => {
 
   it("doesn't insert entities with existing ids", async () => {
     const agency1a = agency1builder.withName("agency1a").build();
+    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1a);
 
     const agency1b = agency1builder.withName("agency1b").build();
+    const agency1bSaveParams = agencyDtoToSaveAgencyParams(agency1b);
 
     expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
-    await agencyRepository.insert(agency1a);
+    await agencyRepository.insert(agency1SaveParams);
     expect(await agencyRepository.getAgencies({})).toHaveLength(1);
 
-    const id1b = await agencyRepository.insert(agency1b);
+    const id1b = await agencyRepository.insert(agency1bSaveParams);
     expect(id1b).toBeUndefined();
 
     const [storedAgency] = await agencyRepository.getByIds([agency1a.id]);

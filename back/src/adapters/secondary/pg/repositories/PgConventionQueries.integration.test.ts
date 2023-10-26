@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   AgencyId,
   AgencyKind,
   AgencyPublicDisplayDto,
@@ -93,7 +94,9 @@ describe("Pg implementation of ConventionQueries", () => {
         .withId(refersToAgencyId)
         .withAgencySiret("55552222000055")
         .build();
-      await agencyRepo.insert(referringAgency);
+      const referringAgencySaveParams =
+        agencyDtoToSaveAgencyParams(referringAgency);
+      await agencyRepo.insert(referringAgencySaveParams);
 
       const expectedConventionRead = await insertAgencyAndConvention({
         conventionId: conventionIdA,
@@ -302,6 +305,7 @@ describe("Pg implementation of ConventionQueries", () => {
   describe("PG implementation of method getConventionsByFilters", () => {
     const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
     const agency = AgencyDtoBuilder.create().withId(agencyId).build();
+    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
     const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
       .withDateStart(new Date("2023-03-27").toISOString())
@@ -321,7 +325,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     beforeEach(async () => {
-      await agencyRepo.insert(agency);
+      await agencyRepo.insert(agencySaveParams);
 
       await Promise.all(
         [
@@ -469,9 +473,10 @@ describe("Pg implementation of ConventionQueries", () => {
 
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     const agency = AgencyDtoBuilder.create().build();
+    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
     beforeEach(async () => {
       const agencyRepository = new PgAgencyRepository(transaction);
-      await agencyRepository.insert(agency);
+      await agencyRepository.insert(agencySaveParams);
       await client.query("DELETE FROM outbox_failures");
       await client.query("DELETE FROM outbox_publications");
       await client.query("DELETE FROM outbox");
@@ -643,8 +648,9 @@ describe("Pg implementation of ConventionQueries", () => {
       .withKind(agencyKind)
       .withRefersToAgency(withRefersToAgency)
       .build();
+    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-    await agencyRepo.insert(agency);
+    await agencyRepo.insert(agencySaveParams);
 
     await conventionRepository.save(convention);
     return {

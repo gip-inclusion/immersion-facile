@@ -49,17 +49,30 @@ type WithOptionalRefersToAgency = {
 export type AgencyPublicDisplayDto =
   AgencyPublicDisplayDtoWithoutRefersToAgency & WithOptionalRefersToAgency;
 
-export type AgencyDto = Omit<
-  RequireField<CreateAgencyDto, "questionnaireUrl">,
-  "refersToAgencyId"
-> &
-  WithOptionalRefersToAgency & {
-    status: AgencyStatus;
-    adminEmails: string[];
-    codeSafir?: string;
-  };
+export type AgencyDtoSensitiveFields = {
+  adminEmails: Email[];
+  status: AgencyStatus;
+  codeSafir?: string;
+};
+
+export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
+  refersToAgencyId?: never;
+} & WithOptionalRefersToAgency &
+  AgencyDtoSensitiveFields;
 
 export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
+
+export type SaveAgencyParams = RequireField<
+  CreateAgencyDto,
+  "questionnaireUrl"
+> &
+  AgencyDtoSensitiveFields & {
+    refersToAgency?: never;
+  };
+
+export type PartialAgencySaveParams = Partial<SaveAgencyParams> & {
+  id: AgencyId;
+};
 
 export type AgencyId = Flavor<string, "AgencyId">;
 export type AgencyIdResponse = AgencyId | undefined;

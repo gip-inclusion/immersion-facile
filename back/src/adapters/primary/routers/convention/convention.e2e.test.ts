@@ -2,6 +2,7 @@ import { SuperTest, Test } from "supertest";
 import { match } from "ts-pattern";
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -38,6 +39,8 @@ import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplement
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
+const peAgencySaveParams = agencyDtoToSaveAgencyParams(peAgency);
+
 const inclusionConnectedUser: InclusionConnectedUser = {
   id: "my-user-id",
   email: "my-user@email.com",
@@ -214,7 +217,7 @@ describe("convention e2e", () => {
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
-      inMemoryUow.agencyRepository.setAgencies([peAgency]);
+      inMemoryUow.agencyRepository.setAgencies([peAgencySaveParams]);
     });
 
     it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
@@ -415,7 +418,7 @@ describe("convention e2e", () => {
   )} updates the status of a convention`, () => {
     const externalId = "00000000001";
     beforeEach(() => {
-      inMemoryUow.agencyRepository.setAgencies([peAgency]);
+      inMemoryUow.agencyRepository.setAgencies([peAgencySaveParams]);
       const inReviewConvention = new ConventionDtoBuilder(convention)
         .withStatus("IN_REVIEW")
         .build();

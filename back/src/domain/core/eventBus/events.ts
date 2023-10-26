@@ -11,6 +11,7 @@ import {
   FormEstablishmentDto,
   IcUserRoleForAgencyParams,
   ImmersionAssessmentDto,
+  SaveAgencyParams,
   WithConventionIdLegacy,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -84,7 +85,7 @@ export type DomainEvent =
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>
 
   // AGENCY RELATED
-  | GenericEvent<"NewAgencyAdded", AgencyDto>
+  | GenericEvent<"NewAgencyAdded", SaveAgencyParams>
   | GenericEvent<"AgencyActivated", { agency: AgencyDto }>
   | GenericEvent<"AgencyUpdated", { agency: AgencyDto }>
 

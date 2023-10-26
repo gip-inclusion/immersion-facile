@@ -1,4 +1,4 @@
-import { AgencyDtoBuilder } from "shared";
+import { AgencyDtoBuilder, agencyDtoToSaveAgencyParams } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -41,7 +41,7 @@ describe("Update agency status", () => {
     const existingAgency = AgencyDtoBuilder.create("agency-123")
       .withStatus("needsReview")
       .build();
-    agencyRepository.setAgencies([existingAgency]);
+    agencyRepository.setAgencies([agencyDtoToSaveAgencyParams(existingAgency)]);
 
     // Act
     await useCase.execute({ id: "agency-123", status: "active" });

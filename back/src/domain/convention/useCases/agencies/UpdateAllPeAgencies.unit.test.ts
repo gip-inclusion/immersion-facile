@@ -1,4 +1,9 @@
-import { AddressDto, AgencyDto, expectToEqual } from "shared";
+import {
+  AddressDto,
+  AgencyDto,
+  agencyDtoToSaveAgencyParams,
+  expectToEqual,
+} from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../../adapters/secondary/core/ConsoleAppLogger";
@@ -93,7 +98,9 @@ describe("UpdateAllPeAgencies use case", () => {
         status: "active",
         refersToAgency: undefined,
       };
-      agencyRepository.setAgencies([initialAgency]);
+      const initialAgencySaveParams =
+        agencyDtoToSaveAgencyParams(initialAgency);
+      agencyRepository.setAgencies([initialAgencySaveParams]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
@@ -137,7 +144,10 @@ describe("UpdateAllPeAgencies use case", () => {
         status: "active",
         refersToAgency: undefined,
       };
-      agencyRepository.setAgencies([initialAgency]);
+      const initialAgencySaveParams =
+        agencyDtoToSaveAgencyParams(initialAgency);
+
+      agencyRepository.setAgencies([initialAgencySaveParams]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
@@ -176,7 +186,10 @@ describe("UpdateAllPeAgencies use case", () => {
         status: "active",
         refersToAgency: undefined,
       };
-      agencyRepository.setAgencies([initialAgency]);
+      const initialAgencySaveParams =
+        agencyDtoToSaveAgencyParams(initialAgency);
+
+      agencyRepository.setAgencies([initialAgencySaveParams]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
@@ -218,7 +231,9 @@ describe("UpdateAllPeAgencies use case", () => {
       status: "active",
       refersToAgency: undefined,
     };
-    agencyRepository.setAgencies([initialAgency]);
+    const initialAgencySaveParams = agencyDtoToSaveAgencyParams(initialAgency);
+
+    agencyRepository.setAgencies([initialAgencySaveParams]);
     uuid.setNextUuid("other-uuid");
     addressApi.setNextAddress(address);
     await updateAllPeAgencies.execute();

@@ -1,4 +1,8 @@
-import { AgencyDto, AgencyPublicDisplayDto } from "./agency.dto";
+import {
+  AgencyDto,
+  AgencyPublicDisplayDto,
+  SaveAgencyParams,
+} from "./agency.dto";
 
 export const toAgencyPublicDisplayDto = (
   agency: AgencyDto,
@@ -12,4 +16,12 @@ export const toAgencyPublicDisplayDto = (
   logoUrl: agency.logoUrl,
   agencySiret: agency.agencySiret,
   refersToAgency: agency.refersToAgency,
+});
+
+export const agencyDtoToSaveAgencyParams = ({
+  refersToAgency,
+  ...agency
+}: AgencyDto): SaveAgencyParams => ({
+  ...agency,
+  refersToAgencyId: refersToAgency?.id,
 });

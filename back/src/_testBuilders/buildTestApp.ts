@@ -1,5 +1,9 @@
 import supertest from "supertest";
-import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
+import {
+  AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
+  ConventionDtoBuilder,
+} from "shared";
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { Gateways } from "../adapters/primary/config/createGateways";
 import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
@@ -77,6 +81,7 @@ export const buildTestApp = async (
     .withQuestionnaireUrl("TEST-questionnaireUrl")
     .withSignature("TEST-signature")
     .build();
+  const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
   const appConfig = new AppConfigBuilder({
     ADDRESS_API_GATEWAY: "IN_MEMORY",
@@ -126,7 +131,7 @@ export const buildTestApp = async (
   /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
   const inMemoryUow = uow!;
 
-  await inMemoryUow.agencyRepository.insert(agency);
+  await inMemoryUow.agencyRepository.insert(agencySaveParams);
 
   return {
     request,
