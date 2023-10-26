@@ -293,21 +293,18 @@ export const SearchResultPage = () => {
                     .with("EMAIL", () => (
                       <ContactByEmail
                         appellations={currentSearchResult.appellations}
-                        siret={currentSearchResult.siret}
                         onSubmitSuccess={onFormSubmitSuccess}
                       />
                     ))
                     .with("PHONE", () => (
                       <ContactByPhone
                         appellations={currentSearchResult.appellations}
-                        siret={currentSearchResult.siret}
                         onSubmitSuccess={onFormSubmitSuccess}
                       />
                     ))
                     .with("IN_PERSON", () => (
                       <ContactInPerson
                         appellations={currentSearchResult.appellations}
-                        siret={currentSearchResult.siret}
                         onSubmitSuccess={onFormSubmitSuccess}
                       />
                     ))
