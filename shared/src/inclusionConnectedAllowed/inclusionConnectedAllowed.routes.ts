@@ -31,10 +31,10 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
   }),
 
   markPartnersErroredConventionAsHandled: defineRoute({
-    url: "/auth/mark-errored-convention-as-handled",
+    url: "/inclusion-connected/mark-errored-convention-as-handled",
     method: "post",
-    requestBodySchema: markPartnersErroredConventionAsHandledRequestSchema,
     ...withAuthorizationHeaders,
-    responses: { 200: expressEmptyResponseBody },
+    requestBodySchema: markPartnersErroredConventionAsHandledRequestSchema,
+    responses: { 200: expressEmptyResponseBody, 400: httpErrorSchema },
   }),
 });

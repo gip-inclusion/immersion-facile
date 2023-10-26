@@ -1,6 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
+  ConventionDtoBuilder,
   currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
@@ -13,6 +14,7 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { GenerateInclusionConnectJwt } from "../../../../domain/auth/jwt";
+import { broadcastToPeServiceName } from "../../../../domain/core/ports/ErrorRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("InclusionConnectedAllowedRoutes", () => {
@@ -163,6 +165,104 @@ describe("InclusionConnectedAllowedRoutes", () => {
         },
         status: 400,
       });
+    });
+  });
+
+  describe("Mark partners errored convention as handled", () => {
+    it(`${displayRouteName(
+      inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
+    )} 400 without headers`, async () => {
+      const response = await httpClient.markPartnersErroredConventionAsHandled({
+        headers: {} as any,
+        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+      });
+      expectHttpResponseToEqual(response, {
+        body: {
+          issues: ["authorization : Required"],
+          message:
+            "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /inclusion-connected/mark-errored-convention-as-handled",
+          status: 400,
+        },
+        status: 400,
+      });
+    });
+
+    it(`${displayRouteName(
+      inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
+    )} 403 with bad token`, async () => {
+      const response = await httpClient.markPartnersErroredConventionAsHandled({
+        headers: { authorization: "wrong-token" },
+        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+      });
+      expect(response.body).toEqual({ error: "jwt malformed" });
+      expect(response.status).toBe(403);
+    });
+
+    it(`${displayRouteName(
+      inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
+    )} 403 with expired token`, async () => {
+      const userId = "123";
+      const token = generateInclusionConnectJwt(
+        { userId, version: currentJwtVersions.inclusion },
+        0,
+      );
+      const response = await httpClient.markPartnersErroredConventionAsHandled({
+        headers: { authorization: token },
+        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+      });
+      expect(response.body).toEqual({ error: "jwt expired" });
+      expect(response.status).toBe(403);
+    });
+
+    it("mark partners errored convention as handled", async () => {
+      const userId = "123456ab";
+      const conventionId = "11111111-1111-4111-1111-111111111111";
+      const agency = new AgencyDtoBuilder().build();
+      const user: InclusionConnectedUser = {
+        id: userId,
+        email: "joe@mail.com",
+        firstName: "Joe",
+        lastName: "Doe",
+        agencyRights: [{ agency, role: "validator" }],
+      };
+      const convention = new ConventionDtoBuilder()
+        .withId(conventionId)
+        .withAgencyId(agency.id)
+        .build();
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        user,
+      ]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.conventionRepository.setConventions({
+        [convention.id]: convention,
+      });
+      await inMemoryUow.errorRepository.save({
+        serviceName: broadcastToPeServiceName,
+        message: "Some message",
+        params: { conventionId, httpStatus: 500 },
+        occurredAt: new Date("2023-10-26T12:00:00.000"),
+        handledByAgency: false,
+      });
+      const token = generateInclusionConnectJwt({
+        userId,
+        version: currentJwtVersions.inclusion,
+      });
+
+      const response = await httpClient.markPartnersErroredConventionAsHandled({
+        headers: { authorization: token },
+        body: { conventionId: convention.id },
+      });
+      expect(response.body).toBe("");
+      expect(response.status).toBe(200);
+      expectToEqual(inMemoryUow.errorRepository.savedErrors, [
+        {
+          serviceName: broadcastToPeServiceName,
+          message: "Some message",
+          params: { conventionId, httpStatus: 500 },
+          occurredAt: new Date("2023-10-26T12:00:00.000"),
+          handledByAgency: true,
+        },
+      ]);
     });
   });
 });
