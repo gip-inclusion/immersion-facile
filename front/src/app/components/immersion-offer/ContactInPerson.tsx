@@ -11,7 +11,6 @@ import {
   ContactEstablishmentInPersonDto,
   contactEstablishmentInPersonSchema,
   domElementIds,
-  SiretDto,
 } from "shared";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -19,13 +18,11 @@ import { routes, useRoute } from "src/app/routes/routes";
 import { searchGateway } from "src/config/dependencies";
 
 type ContactInPersonProps = {
-  siret: SiretDto;
   appellations: AppellationDto[];
   onSubmitSuccess: () => void;
 };
 
 export const ContactInPerson = ({
-  siret,
   appellations,
   onSubmitSuccess,
 }: ContactInPersonProps) => {
@@ -33,7 +30,7 @@ export const ContactInPerson = ({
   const route = useRoute() as Route<typeof routes.searchResult>;
 
   const initialValues: ContactEstablishmentInPersonDto = {
-    siret,
+    siret: route.params.siret,
     appellationCode:
       appellations.length > 1 ? "" : appellations[0].appellationCode,
     contactMode: "IN_PERSON",

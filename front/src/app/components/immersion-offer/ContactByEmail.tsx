@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
@@ -15,7 +15,6 @@ import {
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
-  SiretDto,
 } from "shared";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -24,7 +23,6 @@ import { searchGateway } from "src/config/dependencies";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
-  siret: SiretDto;
   appellations: AppellationDto[];
   onSubmitSuccess: () => void;
 };
@@ -51,28 +49,30 @@ const getDefaultAppellationCode = (
 };
 
 export const ContactByEmail = ({
-  siret,
   appellations,
   onSubmitSuccess,
 }: ContactByEmailProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
 
-  const initialValues: ContactEstablishmentByMailDto = {
-    siret,
-    appellationCode: getDefaultAppellationCode(
-      appellations,
-      route.params.appellationCode,
-    ),
-    contactMode: "EMAIL",
-    potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
-    potentialBeneficiaryLastName: route.params.contactLastName ?? "",
-    potentialBeneficiaryEmail: route.params.contactEmail ?? "",
-    message: route.params.contactMessage ?? initialMessage,
-    immersionObjective: null,
-    potentialBeneficiaryResumeLink: "",
-    potentialBeneficiaryPhone: route.params.contactPhone ?? "",
-  };
+  const initialValues = useMemo<ContactEstablishmentByMailDto>(
+    () => ({
+      siret: route.params.siret,
+      appellationCode: getDefaultAppellationCode(
+        appellations,
+        route.params.appellationCode,
+      ),
+      contactMode: "EMAIL",
+      potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
+      potentialBeneficiaryLastName: route.params.contactLastName ?? "",
+      potentialBeneficiaryEmail: route.params.contactEmail ?? "",
+      message: route.params.contactMessage ?? initialMessage,
+      immersionObjective: null,
+      potentialBeneficiaryResumeLink: "",
+      potentialBeneficiaryPhone: route.params.contactPhone ?? "",
+    }),
+    [appellations, route.params],
+  );
 
   const appellationListOfOptions = appellations.map((appellation) => ({
     value: appellation.appellationCode,
@@ -88,7 +88,6 @@ export const ContactByEmail = ({
   const {
     register,
     handleSubmit,
-    reset,
     formState,
     formState: { isSubmitting },
   } = methods;
@@ -103,13 +102,6 @@ export const ContactByEmail = ({
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };
-
-  useEffect(() => {
-    reset({
-      ...initialValues,
-      siret,
-    });
-  }, [siret]);
 
   return (
     <FormProvider {...methods}>
@@ -129,7 +121,6 @@ export const ContactByEmail = ({
               motivation.
             </a>
           </CallOut>
-
           <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
             Votre email de motivation
           </h2>
@@ -144,7 +135,6 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("immersionObjective")}
           />
-
           <Select
             disabled={appellations.length === 1}
             label={"Métier sur lequel porte la demande d'immersion *"}
@@ -155,7 +145,6 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("appellationCode")}
           />
-
           <Input
             label="Votre message à l’entreprise *"
             textArea
@@ -166,7 +155,6 @@ export const ContactByEmail = ({
             {...getFieldError("message")}
           />
           <h2 className={fr.cx("fr-h6")}>Vos informations</h2>
-
           <Input
             label="Prénom *"
             nativeInputProps={register("potentialBeneficiaryFirstName")}
@@ -184,7 +172,6 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("potentialBeneficiaryEmail")}
           />
-
           <Input
             label="Téléphone *"
             nativeInputProps={{
@@ -193,7 +180,6 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("potentialBeneficiaryPhone")}
           />
-
           <Input
             label="Page LinkedIn ou CV en ligne (facultatif)"
             nativeInputProps={{
@@ -201,7 +187,6 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("potentialBeneficiaryResumeLink")}
           />
-
           <ButtonsGroup
             className={fr.cx()}
             alignment="right"
@@ -218,7 +203,6 @@ export const ContactByEmail = ({
               },
             ]}
           />
-
           {activeError.isActive && (
             <Alert
               severity="error"
