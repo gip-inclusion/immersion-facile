@@ -111,14 +111,16 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
 
 const agencyStatusSchema = z.enum(allAgencyStatuses);
 
-export const editAgencySchema: z.ZodSchema<AgencyDto> = createAgencySchema.and(
-  z.object({
-    questionnaireUrl: z.string(),
-    status: agencyStatusSchema,
-    adminEmails: z.array(zStringMinLength1),
-    codeSafir: zStringPossiblyEmpty,
-  }),
-);
+export const editAgencySchema: z.ZodSchema<AgencyDto> = z
+  .object(commonAgencyShape)
+  .and(
+    z.object({
+      questionnaireUrl: z.string(),
+      status: agencyStatusSchema,
+      adminEmails: z.array(zStringMinLength1),
+      codeSafir: zStringPossiblyEmpty,
+    }),
+  );
 
 export const agencySchema: z.ZodSchema<AgencyDto> = z
   .object(commonAgencyShape)

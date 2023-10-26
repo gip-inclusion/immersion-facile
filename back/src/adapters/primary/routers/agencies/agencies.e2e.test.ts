@@ -1,6 +1,7 @@
 import {
   AddressDto,
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   AgencyRoutes,
   agencyRoutes,
   BackOfficeJwt,
@@ -54,6 +55,8 @@ describe(`Agency routes`, () => {
     .withPosition(10.11, 10.12)
     .withAddress({ ...defaultAddress, departmentCode: "20" })
     .build();
+  const agency1ActiveNearBySaveParams =
+    agencyDtoToSaveAgencyParams(agency1ActiveNearBy);
 
   const agency2ActiveNearBy = AgencyDtoBuilder.create("test-agency-2")
     .withName("Test Agency 2")
@@ -61,6 +64,8 @@ describe(`Agency routes`, () => {
     .withPosition(10, 10)
     .withAddress({ ...defaultAddress, departmentCode: "20" })
     .build();
+  const agency2ActiveNearBySaveParams =
+    agencyDtoToSaveAgencyParams(agency2ActiveNearBy);
 
   const agency3ActiveFarAway = AgencyDtoBuilder.create("test-agency-3")
     .withName("Test Agency 3")
@@ -68,12 +73,17 @@ describe(`Agency routes`, () => {
     .withPosition(1, 2)
     .withAddress(defaultAddress)
     .build();
+  const agency3ActiveFarAwaySaveParams =
+    agencyDtoToSaveAgencyParams(agency3ActiveFarAway);
+
   const agency4NeedsReview = AgencyDtoBuilder.create("test-agency-4")
     .withName("Test Agency 4")
     .withStatus("needsReview")
     .withValidatorEmails(["emmanuelle@email.com"])
     .withAddress(defaultAddress)
     .build();
+  const agency4NeedsReviewSaveParams =
+    agencyDtoToSaveAgencyParams(agency4NeedsReview);
 
   describe("Public Routes", () => {
     describe(`${displayRouteName(
@@ -82,10 +92,10 @@ describe(`Agency routes`, () => {
       it("Returns agency list with name and position nearby a given position", async () => {
         // Prepare
         inMemoryUow.agencyRepository.setAgencies([
-          agency1ActiveNearBy,
-          agency2ActiveNearBy,
-          agency3ActiveFarAway,
-          agency4NeedsReview,
+          agency1ActiveNearBySaveParams,
+          agency2ActiveNearBySaveParams,
+          agency3ActiveFarAwaySaveParams,
+          agency4NeedsReviewSaveParams,
         ]);
 
         const response = await sharedRequest.getFilteredAgencies({
@@ -115,7 +125,9 @@ describe(`Agency routes`, () => {
     )} to get agency public info by id`, () => {
       it("Returns agency public info", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agency1ActiveNearBy);
+        await inMemoryUow.agencyRepository.insert(
+          agency1ActiveNearBySaveParams,
+        );
 
         // Act and assert
         const response = await sharedRequest.getAgencyPublicInfoById({
@@ -195,8 +207,9 @@ describe(`Agency routes`, () => {
       it("Returns all agency dtos with a given status", async () => {
         // Prepare
         await Promise.all(
-          [agency1ActiveNearBy, agency4NeedsReview].map(async (agencyDto) =>
-            inMemoryUow.agencyRepository.insert(agencyDto),
+          [agency1ActiveNearBySaveParams, agency4NeedsReviewSaveParams].map(
+            async (saveAgencyParams) =>
+              inMemoryUow.agencyRepository.insert(saveAgencyParams),
           ),
         );
 
@@ -223,7 +236,7 @@ describe(`Agency routes`, () => {
     )} to update an agency status`, () => {
       it("Updates the agency status, sends an email to validators and returns code 200", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
+        await inMemoryUow.agencyRepository.insert(agency4NeedsReviewSaveParams);
 
         const response = await sharedRequest.updateAgencyStatus({
           headers: { authorization: adminToken },
@@ -271,7 +284,7 @@ describe(`Agency routes`, () => {
 
       it("Updates the agency and returns code 200", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
+        await inMemoryUow.agencyRepository.insert(agency4NeedsReviewSaveParams);
 
         const updatedAgency = new AgencyDtoBuilder()
           .withId(agency4NeedsReview.id)

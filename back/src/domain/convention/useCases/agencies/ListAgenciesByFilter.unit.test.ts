@@ -1,4 +1,9 @@
-import { AddressDto, AgencyDtoBuilder, expectToEqual } from "shared";
+import {
+  AddressDto,
+  AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
+  expectToEqual,
+} from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { ListAgenciesByFilter, toAgencyOption } from "./ListAgenciesByFilter";
@@ -58,7 +63,7 @@ describe("Query: List agencies by filter", () => {
     peAgency1InParis,
     peAgency2InParis,
   ];
-  agencyRepository.setAgencies(allAgencies);
+  agencyRepository.setAgencies(allAgencies.map(agencyDtoToSaveAgencyParams));
 
   describe("No filters", () => {
     it("List all agencies", async () => {

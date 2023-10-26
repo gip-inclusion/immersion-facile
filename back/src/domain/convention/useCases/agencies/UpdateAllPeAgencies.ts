@@ -3,6 +3,8 @@ import {
   activeAgencyStatuses,
   AddressDto,
   AgencyDto,
+  agencyDtoToSaveAgencyParams,
+  SaveAgencyParams,
   WithGeoPosition,
 } from "shared";
 import { AppLogger } from "../../../core/ports/AppLogger";
@@ -113,7 +115,8 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
             peReferentialAgency,
             geocodedAddress,
           );
-          await uow.agencyRepository.insert(newAgency);
+          const newAgencySaveParams = agencyDtoToSaveAgencyParams(newAgency);
+          await uow.agencyRepository.insert(newAgencySaveParams);
           counts.added++;
           break;
         }
@@ -210,7 +213,7 @@ const updateAgency = async (
   peReferentialAgency: PeAgencyFromReferenciel,
 ): Promise<void> => {
   counts.updated++;
-  const updatedAgency: AgencyDto = {
+  const updatedAgency: SaveAgencyParams = agencyDtoToSaveAgencyParams({
     ...existingAgency,
     ...normalizePosition(peReferentialAgency),
     ...updateEmails({
@@ -220,7 +223,7 @@ const updateAgency = async (
     }),
     agencySiret: peReferentialAgency.siret,
     codeSafir: peReferentialAgency.codeSafir,
-  };
+  });
   await uow.agencyRepository.update(updatedAgency);
 };
 

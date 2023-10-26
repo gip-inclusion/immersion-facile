@@ -1,6 +1,7 @@
 import {
   AgencyDto,
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   expectToEqual,
@@ -81,12 +82,14 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     config = new AppConfigBuilder().build();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([
-      agencyWithCounsellors,
-      agencyWithOnlyValidator,
-      agencyWithConsellorsAndValidator,
-      agencyPeWithCouncellors,
-    ]);
+    uow.agencyRepository.setAgencies(
+      [
+        agencyWithCounsellors,
+        agencyWithOnlyValidator,
+        agencyWithConsellorsAndValidator,
+        agencyPeWithCouncellors,
+      ].map(agencyDtoToSaveAgencyParams),
+    );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,

@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -17,16 +18,22 @@ const agencyPoleEmploi = new AgencyDtoBuilder()
   .withId("agency-pole-emploi")
   .withKind("pole-emploi")
   .build();
+const agencyPoleEmploiSaveParams =
+  agencyDtoToSaveAgencyParams(agencyPoleEmploi);
+
 const agencyMissionLocale = new AgencyDtoBuilder()
   .withId("agency-mission-locale")
   .withKind("mission-locale")
   .build();
+const agencyMissionLocaleSaveParams =
+  agencyDtoToSaveAgencyParams(agencyMissionLocale);
 
 const conventionPoleEmploi = new ConventionDtoBuilder()
   .withId("convention-pole-emploi-id")
   .withAgencyId(agencyPoleEmploi.id)
   .withStatus("IN_REVIEW")
   .build();
+
 const conventionMissionLocale = new ConventionDtoBuilder()
   .withId("convention-mission-locale-id")
   .withAgencyId(agencyMissionLocale.id)
@@ -38,7 +45,10 @@ describe("Get Conventions for ApiConsumer", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([agencyPoleEmploi, agencyMissionLocale]);
+    uow.agencyRepository.setAgencies([
+      agencyPoleEmploiSaveParams,
+      agencyMissionLocaleSaveParams,
+    ]);
     uow.conventionRepository.setConventions({
       [conventionPoleEmploi.id]: conventionPoleEmploi,
       [conventionMissionLocale.id]: conventionMissionLocale,

@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   expectToEqual,
   SubscriptionParams,
@@ -20,7 +21,11 @@ describe("Broadcast to partners on updated convention", () => {
     const subscribersGateway = new InMemorySubscribersGateway();
 
     const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
+    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
+
     const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
+    const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
+
     const convention1 = new ConventionDtoBuilder()
       .withId("11111111-ee70-4c90-b3f4-668d492f7395")
       .withAgencyId(agency1.id)
@@ -30,7 +35,7 @@ describe("Broadcast to partners on updated convention", () => {
       .withAgencyId(agency2.id)
       .build();
 
-    uow.agencyRepository.setAgencies([agency1, agency2]);
+    uow.agencyRepository.setAgencies([agency1SaveParams, agency2SaveParams]);
     uow.conventionRepository.setConventions({
       [convention1.id]: convention1,
       [convention2.id]: convention2,

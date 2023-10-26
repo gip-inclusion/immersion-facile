@@ -1,4 +1,5 @@
 import {
+  AgencyDto,
   CreateAgencyDto,
   expectObjectsToMatch,
   expectPromiseToFail,
@@ -57,14 +58,17 @@ describe("AddAgency use case", () => {
   it("save the agency in repo, with the default admin mail and the status to be reviewed", async () => {
     agencyRepo.setAgencies([]);
     await addAgency.execute(parisMissionLocaleParams);
-    expectToEqual(agencyRepo.agencies, [
-      {
-        ...parisMissionLocaleParams,
-        questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
-        adminEmails: [],
-        status: "needsReview",
-      },
-    ]);
+    const {
+      refersToAgencyId,
+      ...parisMissionLocaleParamsWithoutRefersToAgencyId
+    } = parisMissionLocaleParams;
+    const expectedAgencyDto: AgencyDto = {
+      ...parisMissionLocaleParamsWithoutRefersToAgencyId,
+      adminEmails: [],
+      status: "needsReview",
+      questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
+    };
+    expectToEqual(agencyRepo.agencies, [expectedAgencyDto]);
   });
 
   it("sets an events to be dispatched with the added agency", async () => {
@@ -86,13 +90,14 @@ describe("AddAgency use case", () => {
       ...parisMissionLocaleParams,
       questionnaireUrl: "",
     };
-
+    const { refersToAgencyId, ...poleEmploiParisWithoutRefersToAgencyId } =
+      poleEmploiParis;
     agencyRepo.setAgencies([]);
     await addAgency.execute(poleEmploiParis);
 
     expectToEqual(agencyRepo.agencies, [
       {
-        ...poleEmploiParis,
+        ...poleEmploiParisWithoutRefersToAgencyId,
         adminEmails: [],
         status: "needsReview",
         questionnaireUrl: "",

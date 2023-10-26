@@ -42,10 +42,15 @@ describe(`${displayRouteName(agencyRoutes.addAgency)} to add Agency`, () => {
       body: "",
     });
 
+    const {
+      refersToAgencyId,
+      ...parisMissionLocaleParamsWithoutRefersToAgencyId
+    } = parisMissionLocaleParams;
+
     const inRepo = inMemoryUow.agencyRepository.agencies;
     expectToEqual(inRepo, [
       {
-        ...parisMissionLocaleParams,
+        ...parisMissionLocaleParamsWithoutRefersToAgencyId,
         questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
         adminEmails: [],
         status: "needsReview",

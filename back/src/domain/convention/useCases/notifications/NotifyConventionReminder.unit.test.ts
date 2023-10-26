@@ -2,6 +2,7 @@ import {
   AbsoluteUrl,
   AgencyDto,
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   conventionStatuses,
@@ -150,6 +151,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withCounsellorEmails([councellor1Email, councellor2Email])
           .withValidatorEmails([validator1Email, validator2Email])
           .build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
@@ -158,7 +160,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
         const shortLinkIds = ["link1", "link2", "link3", "link4"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
@@ -235,6 +237,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       it.each(forbiddenAgencyStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
+
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
@@ -242,7 +246,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         const type: ReminderKind = "FirstReminderForAgency";
 
@@ -277,6 +281,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withCounsellorEmails([councellor1Email, councellor2Email])
           .withValidatorEmails([validator1Email, validator2Email])
           .build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
+
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
@@ -284,7 +290,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
         const shortLinkIds = ["link1", "link2", "link3", "link4"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
@@ -357,6 +363,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       it.each(forbiddenAgencyStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
@@ -364,7 +371,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         const type: ReminderKind = "FirstReminderForAgency";
         //Act
@@ -401,6 +408,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
@@ -419,7 +427,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -475,6 +483,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
@@ -495,7 +504,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -561,6 +570,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
@@ -571,7 +581,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -629,6 +639,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       it.each(forbiddenSignatoryStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
+
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
@@ -636,7 +648,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         //Act & Assert
         await expectPromiseToFailWithError(
@@ -662,6 +674,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
@@ -681,7 +694,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
@@ -733,6 +746,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
@@ -751,7 +765,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
@@ -813,6 +827,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       it.each(forbiddenSignatoryStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
@@ -820,7 +835,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         //Act & Assert
         await expectPromiseToFailWithError(
@@ -934,6 +949,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       async (mobilePhone, internationalMobilePhone) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
@@ -946,7 +962,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
         });
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([agencySaveParams]);
 
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);

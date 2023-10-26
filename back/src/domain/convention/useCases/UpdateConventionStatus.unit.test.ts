@@ -3,6 +3,7 @@
 
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   ConventionId,
   createConventionMagicLinkPayload,
@@ -191,8 +192,9 @@ describe("UpdateConventionStatus", () => {
       const requesterRole = "counsellor";
 
       const agency = new AgencyDtoBuilder().build();
+      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([agencySaveParams]);
 
       const conventionBuilder = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")

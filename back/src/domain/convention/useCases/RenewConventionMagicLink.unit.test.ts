@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -55,6 +56,7 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
+const defaultAgencySaveParams = agencyDtoToSaveAgencyParams(defaultAgency);
 const email = "some email";
 
 describe("RenewConventionMagicLink use case", () => {
@@ -73,7 +75,7 @@ describe("RenewConventionMagicLink use case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([defaultAgency]);
+    uow.agencyRepository.setAgencies([defaultAgencySaveParams]);
     uow.conventionRepository.setConventions({
       [validConvention.id]: validConvention,
     });

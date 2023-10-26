@@ -1,6 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   displayRouteName,
   expectHttpResponseToEqual,
@@ -18,6 +19,8 @@ import {
 } from "./publicApiV2.routes";
 
 const agency = new AgencyDtoBuilder().build();
+const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
+
 const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
 const conventionReadConsumerWithAgencyIdsScope = new ApiConsumerBuilder()
   .withConventionRight({
@@ -96,7 +99,7 @@ describe("Convention routes", () => {
     });
 
     it("403 when the apiConsumer has READ access to convention but no scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
@@ -129,7 +132,7 @@ describe("Convention routes", () => {
     });
 
     it("returns 200 with the convention", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
@@ -193,7 +196,7 @@ describe("Convention routes", () => {
     });
 
     it("200 - returns the conventions matching agencyIds in scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });

@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   AgencyId,
   AgencyRight,
   AgencyRole,
@@ -33,11 +34,13 @@ const agency1 = new AgencyDtoBuilder()
   .withId("11111111-1111-4bbb-1111-111111111111")
   .withName("Agence 1")
   .build();
+const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
 
 const agency2 = new AgencyDtoBuilder()
   .withId("22222222-2222-4bbb-2222-222222222222")
   .withName("Agence 2")
   .build();
+const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
 
 describe("PgInclusionConnectedUserRepository", () => {
   let pool: Pool;
@@ -79,8 +82,8 @@ describe("PgInclusionConnectedUserRepository", () => {
 
     it("gets the Inclusion Connected User from its Id with the connected agencies", async () => {
       await Promise.all([
-        await agencyRepository.insert(agency1),
-        await agencyRepository.insert(agency2),
+        await agencyRepository.insert(agency1SaveParams),
+        await agencyRepository.insert(agency2SaveParams),
         await insertAuthenticatedUser(authenticatedUser1),
       ]);
 
@@ -113,7 +116,7 @@ describe("PgInclusionConnectedUserRepository", () => {
 
     describe("addAgencyToUser", () => {
       it("adds an element in users__agencies table", async () => {
-        await agencyRepository.insert(agency1);
+        await agencyRepository.insert(agency1SaveParams);
         await insertAuthenticatedUser(authenticatedUser1);
         const icUserToSave: InclusionConnectedUser = {
           ...authenticatedUser1,
@@ -133,7 +136,7 @@ describe("PgInclusionConnectedUserRepository", () => {
   describe("getWithFilters", () => {
     it("returns empty array if no filters are given", async () => {
       await Promise.all([
-        agencyRepository.insert(agency1),
+        agencyRepository.insert(agency1SaveParams),
         insertAuthenticatedUser(authenticatedUser1),
       ]);
 
@@ -149,8 +152,8 @@ describe("PgInclusionConnectedUserRepository", () => {
 
     it("fetches Inclusion Connected Users with status 'toReview'", async () => {
       await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
+        agencyRepository.insert(agency1SaveParams),
+        agencyRepository.insert(agency2SaveParams),
         insertAuthenticatedUser(authenticatedUser1),
         insertAuthenticatedUser(authenticatedUser2),
       ]);

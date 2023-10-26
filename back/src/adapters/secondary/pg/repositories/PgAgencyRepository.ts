@@ -16,7 +16,8 @@ import {
   filterNotFalsy,
   GeoPositionDto,
   GetAgenciesFilter,
-  PartialAgencyDto,
+  PartialAgencySaveParams,
+  SaveAgencyParams,
 } from "shared";
 import { AgencyRepository } from "../../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../../utils/logger";
@@ -187,7 +188,7 @@ export class PgAgencyRepository implements AgencyRepository {
       .then((row) => row?.id);
   }
 
-  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
+  public async insert(agency: SaveAgencyParams): Promise<AgencyId | undefined> {
     const pgAgency: InsertPgAgency = {
       id: agency.id,
       name: agency.name,
@@ -208,7 +209,7 @@ export class PgAgencyRepository implements AgencyRepository {
       post_code: agency.address?.postcode,
       city: agency.address?.city,
       department_code: agency.address?.departmentCode,
-      refers_to_agency_id: agency.refersToAgency?.id,
+      refers_to_agency_id: agency.refersToAgencyId,
     };
 
     try {
@@ -226,7 +227,7 @@ export class PgAgencyRepository implements AgencyRepository {
     return agency.id;
   }
 
-  public async update(agency: PartialAgencyDto): Promise<void> {
+  public async update(agency: PartialAgencySaveParams): Promise<void> {
     await this.transaction
       .updateTable("agencies")
       .set({
@@ -250,7 +251,7 @@ export class PgAgencyRepository implements AgencyRepository {
         post_code: agency.address?.postcode,
         city: agency.address?.city,
         department_code: agency.address?.departmentCode,
-        refers_to_agency_id: agency.refersToAgency?.id,
+        refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
       })
       .where("id", "=", agency.id)

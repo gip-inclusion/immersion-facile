@@ -1,4 +1,4 @@
-import { AgencyDto, expectToEqual } from "shared";
+import { expectToEqual, SaveAgencyParams } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
@@ -20,14 +20,14 @@ describe("PrivateListAgencies use case", () => {
       id: "1",
       name: "Agency needing review",
       status: "needsReview",
-    } as AgencyDto;
+    } as SaveAgencyParams;
     agencyRepository.setAgencies([
       expectedAgency,
       {
         id: "3",
         name: "Agency active",
         status: "active",
-      } as AgencyDto,
+      } as SaveAgencyParams,
     ]);
     const fetchedAgencies = await privateListAgencies.execute({
       status: "needsReview",

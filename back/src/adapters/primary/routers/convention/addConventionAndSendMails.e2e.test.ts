@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import {
   AgencyDtoBuilder,
+  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   conventionMagicLinkRoutes,
@@ -116,7 +117,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "link8",
     ]);
 
-    appAndDeps.inMemoryUow.agencyRepository.setAgencies([peAgency]);
+    appAndDeps.inMemoryUow.agencyRepository.setAgencies([
+      agencyDtoToSaveAgencyParams(peAgency),
+    ]);
 
     appAndDeps.inMemoryUow.conventionExternalIdRepository.nextExternalId =
       externalId;

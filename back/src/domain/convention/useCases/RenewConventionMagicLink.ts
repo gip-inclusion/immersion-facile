@@ -70,7 +70,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       this.#extractValidPayload(expiredJwt),
     );
 
-    const convention = await this.#getconvention(uow, applicationId);
+    const convention = await this.#getConvention(uow, applicationId);
     const emails = conventionEmailsByRole(
       role,
       convention,
@@ -151,7 +151,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     throw new BadRequestError(convention.agencyId);
   }
 
-  async #getconvention(uow: UnitOfWork, applicationId: ConventionId) {
+  async #getConvention(uow: UnitOfWork, applicationId: ConventionId) {
     const convention = await uow.conventionRepository.getById(applicationId);
     if (convention) return convention;
     throw new NotFoundError(applicationId);
