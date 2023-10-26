@@ -40,7 +40,7 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedSharedRoutes.markPartnersErroredConventionAsHandled(
-    deps.applicationMagicLinkAuthMiddleware,
+    createInclusionConnectedMiddleware(deps.config.jwtPublicKey),
     async (req, res) =>
       sendHttpResponse(req, res, () =>
         match(req.payloads)
