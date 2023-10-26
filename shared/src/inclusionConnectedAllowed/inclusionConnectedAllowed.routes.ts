@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyIdsSchema } from "../agency/agency.schema";
 import { markPartnersErroredConventionAsHandledRequestSchema } from "../convention/convention.schema";
 import { withAuthorizationHeaders } from "../headers";
@@ -27,6 +28,13 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
+    },
+  }),
+  getInclusionConnectLogoutUrl: defineRoute({
+    method: "get",
+    url: "/inclusion-connect-logout",
+    responses: {
+      200: absoluteUrlSchema,
     },
   }),
 

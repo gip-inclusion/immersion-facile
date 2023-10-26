@@ -7,10 +7,10 @@ const withContentTypeUrlEncodedSchema = z.object({
   "Content-Type": z.literal("application/x-www-form-urlencoded"),
 });
 
-const inclusionConnectLogoutQueryParamsSchema = z.object({
-  state: z.string(),
-  id_token_hint: z.string(),
-});
+export type InclusionConnectLogoutQueryParams = {
+  client_id: string;
+  post_logout_redirect_uri: AbsoluteUrl;
+};
 
 export type InclusionConnectExternalRoutes = ReturnType<
   typeof makeInclusionConnectExternalRoutes
@@ -28,10 +28,5 @@ export const makeInclusionConnectExternalRoutes = (
       requestBodySchema: z.string(),
       headersSchema: withContentTypeUrlEncodedSchema.passthrough(),
       responses: { 200: inclusionAccessTokenResponseSchema },
-    }),
-    inclusionConnectLogout: defineRoute({
-      method: "get",
-      url: `${inclusionConnectBaseUrl}/logout/`,
-      queryParamsSchema: inclusionConnectLogoutQueryParamsSchema,
     }),
   });

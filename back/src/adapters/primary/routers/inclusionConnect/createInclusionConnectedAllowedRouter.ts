@@ -42,6 +42,12 @@ export const createInclusionConnectedAllowedRouter = (
       ),
   );
 
+  inclusionConnectedSharedRoutes.getInclusionConnectLogoutUrl((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.inclusionConnectLogout.execute(undefined),
+    ),
+  );
+
   inclusionConnectedSharedRoutes.markPartnersErroredConventionAsHandled(
     inclusionConnectedMiddleware,
     (req, res) =>

@@ -43,25 +43,29 @@ describe("Auth slice", () => {
   it("stores the federated identity when someones connects (in store and in device)", () => {
     expectFederatedIdentityToEqual(null);
     store.dispatch(
-      authSlice.actions.federatedIdentityProvided(
-        inclusionConnectedFederatedIdentity,
-      ),
+      authSlice.actions.federatedIdentityProvided(peConnectedFederatedIdentity),
     );
-    expectFederatedIdentityToEqual(inclusionConnectedFederatedIdentity);
-    expectFederatedIdentityInDevice(inclusionConnectedFederatedIdentity);
+    expectFederatedIdentityToEqual(peConnectedFederatedIdentity);
+    expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
   });
 
-  it("deletes federatedIdentity stored in device and in store when asked for", () => {
+  it("deletes federatedIdentity stored in device and in store when asked for, and redirects to provider logout page", () => {
     ({ store, dependencies } = createTestStore({
-      auth: { federatedIdentityWithUser: peConnectedFederatedIdentity },
+      auth: { federatedIdentityWithUser: inclusionConnectedFederatedIdentity },
     }));
     dependencies.deviceRepository.set(
       "federatedIdentityWithUser",
-      peConnectedFederatedIdentity,
+      inclusionConnectedFederatedIdentity,
     );
     store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
+    dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
+      "http://yolo-logout.com",
+    );
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
+    expectToEqual(dependencies.navigationGateway.wentToUrls, [
+      "http://yolo-logout.com",
+    ]);
   });
 
   it("retrieves federatedIdentity if stored in device", () => {

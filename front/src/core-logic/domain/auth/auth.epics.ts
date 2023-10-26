@@ -1,4 +1,5 @@
 import { filter, map, tap } from "rxjs";
+import { switchMap } from "rxjs/operators";
 import {
   ActionOfSlice,
   AppEpic,
@@ -42,6 +43,25 @@ const deleteFederatedIdentityFromDevice: AuthEpic = (
     map(() => authSlice.actions.federatedIdentityInDeviceDeletionSucceeded()),
   );
 
+const logoutFromInclusionConnect: AuthEpic = (
+  action$,
+  state$,
+  { inclusionConnectedGateway, navigationGateway },
+) =>
+  action$.pipe(
+    filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
+    filter(
+      () =>
+        state$.value.auth.federatedIdentityWithUser?.provider ===
+        "inclusionConnect",
+    ),
+    switchMap(() => inclusionConnectedGateway.getLogoutUrl$()),
+    map((logoutUrl) => {
+      navigationGateway.goToUrl(logoutUrl);
+      return authSlice.actions.loggedOutSuccessfullyFromInclusionConnect();
+    }),
+  );
+
 const checkConnectedWithFederatedIdentity: AuthEpic = (
   action$,
   _,
@@ -62,5 +82,6 @@ const checkConnectedWithFederatedIdentity: AuthEpic = (
 export const authEpics = [
   storeFederatedIdentityInDevice,
   checkConnectedWithFederatedIdentity,
+  logoutFromInclusionConnect,
   deleteFederatedIdentityFromDevice,
 ];
