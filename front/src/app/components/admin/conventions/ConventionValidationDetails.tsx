@@ -76,8 +76,8 @@ const ConventionValidationSection = ({
     let value;
     if (field && field.key) {
       value = path(field.key, convention) as string;
-      if (field.value) {
-        value = field.value(convention);
+      if (field.getValue) {
+        value = field.getValue(convention);
       }
     }
     return value;
@@ -87,10 +87,10 @@ const ConventionValidationSection = ({
       (row) =>
         row.fields.filter(
           (field) =>
-            (field && path(field.key, convention) !== undefined) ||
-            (field &&
-              field.key === "additionnalInfos" &&
-              path(field.key, convention) !== undefined),
+            field &&
+            path(field.key, convention) !== undefined &&
+            field.getValue &&
+            field.getValue(convention),
         ).length,
     );
 

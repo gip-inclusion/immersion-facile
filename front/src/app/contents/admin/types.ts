@@ -34,5 +34,5 @@ export type RowFields = {
 export type ColField = {
   key: ConventionField | "additionnalInfos";
   colLabel: string;
-  value?: (convention: ConventionReadDto) => string | ReactNode;
+  getValue?: (convention: ConventionReadDto) => string | ReactNode;
 } | null;
