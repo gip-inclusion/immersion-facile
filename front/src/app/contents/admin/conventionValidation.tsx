@@ -48,13 +48,13 @@ const beneficiaryFields: ColField[] = [
   {
     key: "signatories.beneficiary.signedAt",
     colLabel: "Signé",
-    value: (convention) =>
+    getValue: (convention) =>
       signToBooleanDisplay(convention.signatories.beneficiary.signedAt),
   },
   {
     key: "signatories.beneficiary.email",
     colLabel: "Mail de demandeur",
-    value: (convention) =>
+    getValue: (convention) =>
       renderEmail(convention.signatories.beneficiary.email),
   },
   {
@@ -72,7 +72,7 @@ const beneficiaryFields: ColField[] = [
   {
     key: "additionnalInfos",
     colLabel: "Infos additionnelles",
-    value: (convention) => (
+    getValue: (convention) => (
       <span>
         <div className={fr.cx("fr-text--xs")}>
           Date de naissance :{" "}
@@ -111,7 +111,7 @@ const beneficiaryRepresentativeFields: ColField[] = [
   {
     key: "signatories.beneficiaryRepresentative.signedAt",
     colLabel: "Signé",
-    value: (convention) =>
+    getValue: (convention) =>
       signToBooleanDisplay(
         convention.signatories.beneficiaryRepresentative?.signedAt,
       ),
@@ -119,7 +119,7 @@ const beneficiaryRepresentativeFields: ColField[] = [
   {
     key: "signatories.beneficiaryRepresentative.email",
     colLabel: "Mail du représentant",
-    value: (convention) =>
+    getValue: (convention) =>
       convention.signatories.beneficiaryRepresentative
         ? renderEmail(convention.signatories.beneficiaryRepresentative.email)
         : "",
@@ -143,7 +143,7 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
   {
     key: "signatories.beneficiaryCurrentEmployer.signedAt",
     colLabel: "Signé",
-    value: (convention) =>
+    getValue: (convention) =>
       signToBooleanDisplay(
         convention.signatories.beneficiaryCurrentEmployer?.signedAt,
       ),
@@ -151,7 +151,7 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
   {
     key: "signatories.beneficiaryCurrentEmployer.email",
     colLabel: "Mail du représentant",
-    value: (convention) =>
+    getValue: (convention) =>
       convention.signatories.beneficiaryCurrentEmployer
         ? renderEmail(convention.signatories.beneficiaryCurrentEmployer.email)
         : "",
@@ -171,7 +171,7 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
   {
     key: "additionnalInfos",
     colLabel: "Infos additionnelles",
-    value: (convention) =>
+    getValue: (convention) =>
       convention.signatories.beneficiaryCurrentEmployer ? (
         <span>
           {renderSiret(
@@ -191,7 +191,7 @@ const establishmentRepresentativeFields: ColField[] = [
   {
     key: "signatories.establishmentRepresentative.signedAt",
     colLabel: "Signé",
-    value: (convention) =>
+    getValue: (convention) =>
       signToBooleanDisplay(
         convention.signatories.establishmentRepresentative.signedAt,
       ),
@@ -199,7 +199,7 @@ const establishmentRepresentativeFields: ColField[] = [
   {
     key: "signatories.establishmentRepresentative.email",
     colLabel: "Mail du représentant",
-    value: (convention) =>
+    getValue: (convention) =>
       convention.signatories.establishmentRepresentative
         ? renderEmail(convention.signatories.establishmentRepresentative.email)
         : "",
@@ -219,7 +219,7 @@ const establishmentRepresentativeFields: ColField[] = [
   {
     key: "siret",
     colLabel: "Siret",
-    value: (convention) => renderSiret(convention.siret),
+    getValue: (convention) => renderSiret(convention.siret),
   },
 ];
 
@@ -231,14 +231,14 @@ const enterpriseFields: ColField[] = [
   {
     key: "siret",
     colLabel: "Siret",
-    value: (convention) => renderSiret(convention.siret),
+    getValue: (convention) => renderSiret(convention.siret),
   },
 ];
 const establishmentTutorFields: ColField[] = [
   {
     key: "establishmentTutor.email",
     colLabel: "Mail du tuteur",
-    value: (convention) =>
+    getValue: (convention) =>
       convention.establishmentTutor
         ? renderEmail(convention.establishmentTutor.email)
         : "",
@@ -269,7 +269,7 @@ const agencyFields: ColField[] = [
   {
     key: "dateValidation",
     colLabel: "Date de validation",
-    value: (convention) =>
+    getValue: (convention) =>
       !convention.agencyRefersTo && convention.dateValidation
         ? toDisplayedDate(new Date(convention.dateValidation))
         : " N/A ",
@@ -284,8 +284,8 @@ const agencyRefersToFields: ColField[] = [
   {
     key: "dateValidation",
     colLabel: "Date de validation",
-    value: (convention) =>
-      convention.dateValidation
+    getValue: (convention) =>
+      convention.dateValidation && convention.agencyRefersTo?.id
         ? toDisplayedDate(new Date(convention.dateValidation))
         : "",
   },
@@ -295,17 +295,18 @@ const immersionPlaceDateFields: ColField[] = [
   {
     key: "dateSubmission",
     colLabel: "Date de soumission",
-    value: (convention) => toDisplayedDate(new Date(convention.dateSubmission)),
+    getValue: (convention) =>
+      toDisplayedDate(new Date(convention.dateSubmission)),
   },
   {
     key: "dateStart",
     colLabel: "Début",
-    value: (convention) => toDisplayedDate(new Date(convention.dateStart)),
+    getValue: (convention) => toDisplayedDate(new Date(convention.dateStart)),
   },
   {
     key: "dateEnd",
     colLabel: "Fin",
-    value: (convention) => toDisplayedDate(new Date(convention.dateEnd)),
+    getValue: (convention) => toDisplayedDate(new Date(convention.dateEnd)),
   },
   {
     key: "immersionAddress",
@@ -314,7 +315,7 @@ const immersionPlaceDateFields: ColField[] = [
   {
     key: "schedule",
     colLabel: "Horaires",
-    value: (convention) => renderSchedule(convention),
+    getValue: (convention) => renderSchedule(convention),
   },
 ];
 
@@ -322,7 +323,7 @@ const immersionJobFields: ColField[] = [
   {
     key: "immersionAppellation",
     colLabel: "Métier observé",
-    value: (convention) => convention.immersionAppellation.appellationLabel,
+    getValue: (convention) => convention.immersionAppellation.appellationLabel,
   },
   {
     key: "immersionActivities",
@@ -343,12 +344,12 @@ const immersionJobFields: ColField[] = [
   {
     key: "individualProtection",
     colLabel: "Protection individuelle",
-    value: (convention) => booleanToCheck(convention.individualProtection),
+    getValue: (convention) => booleanToCheck(convention.individualProtection),
   },
   {
     key: "sanitaryPrevention",
     colLabel: "Mesures de prévention sanitaire",
-    value: (convention) => booleanToCheck(convention.sanitaryPrevention),
+    getValue: (convention) => booleanToCheck(convention.sanitaryPrevention),
   },
   {
     key: "workConditions",
