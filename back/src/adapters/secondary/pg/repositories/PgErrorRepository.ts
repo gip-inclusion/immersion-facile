@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { ConventionId } from "shared";
 import {
   broadcastToPeServiceName,
@@ -5,7 +6,7 @@ import {
   SavedError,
 } from "../../../../domain/core/ports/ErrorRepository";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb } from "../kysely/kyselyUtils";
 
 export class PgErrorRepository implements ErrorRepository {
   constructor(private transaction: KyselyDb) {}
@@ -13,30 +14,32 @@ export class PgErrorRepository implements ErrorRepository {
   public async markPartnersErroredConventionAsHandled(
     conventionId: ConventionId,
   ): Promise<void> {
-    const query = `UPDATE saved_errors SET
-    handled_by_agency = true
-    WHERE(params ->> 'conventionId') = $1
-    AND service_name = $2`;
-    const result = await executeKyselyRawSqlQuery(this.transaction, query, [
-      conventionId,
-      broadcastToPeServiceName,
-    ]);
+    const result = await this.transaction
+      .updateTable("saved_errors")
+      .set({ handled_by_agency: true })
+      .where(sql`(params ->> 'conventionId')`, "=", conventionId)
+      .where("service_name", "=", broadcastToPeServiceName)
+      .executeTakeFirst();
 
-    if (Number(result.numAffectedRows) === 0)
+    if (Number(result.numUpdatedRows) === 0)
       throw new NotFoundError(
         `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId}'.`,
       );
   }
 
   public async save(savedError: SavedError): Promise<void> {
-    // prettier-ignore
-    const { serviceName, message, params, occurredAt } = savedError;
-    // prettier-ignore
-    await executeKyselyRawSqlQuery( this.transaction,
-      `INSERT INTO saved_errors (
-            service_name, message, params, occurred_at
-        ) VALUES ($1, $2, $3, $4)`,
-      [serviceName, message, params, occurredAt],
-    )
+    const { serviceName, message, params, occurredAt, handledByAgency } =
+      savedError;
+
+    await this.transaction
+      .insertInto("saved_errors")
+      .values({
+        service_name: serviceName,
+        message,
+        params: JSON.stringify(params),
+        occurred_at: occurredAt,
+        handled_by_agency: handledByAgency,
+      })
+      .execute();
   }
 }
