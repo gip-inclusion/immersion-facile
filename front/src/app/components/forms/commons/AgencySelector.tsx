@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys, uniqBy } from "ramda";
@@ -21,7 +21,6 @@ import { AgencyErrorText } from "../convention/sections/agency/AgencyErrorText";
 type AgencySelectorProps = {
   shouldLockToPeAgencies: boolean;
   shouldShowAgencyKindField: boolean;
-  initialAgencies: AgencyOption[];
   fields: {
     agencyDepartmentField: FormFieldAttributes;
     agencyKindField: FormFieldAttributes;
@@ -41,7 +40,6 @@ type SupportedFormsDto = ConventionReadDto | CreateAgencyDto;
 export const AgencySelector = ({
   shouldLockToPeAgencies,
   shouldShowAgencyKindField,
-  initialAgencies,
   disabled,
   fields: { agencyDepartmentField, agencyKindField, agencyIdField },
   agencyDepartmentOptions,
@@ -55,12 +53,17 @@ export const AgencySelector = ({
     formState: { errors, touchedFields },
   } = useFormContext<SupportedFormsDto>();
   const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
-  const [agencies, setAgencies] = useState<AgencyOption[]>(initialAgencies);
+  const [agencies, setAgencies] = useState<AgencyOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const agencyIdFieldName = agencyIdField.name as keyof SupportedFormsDto;
-  const agencyDepartmentFieldName =
-    agencyDepartmentField.name as keyof SupportedFormsDto;
+  const agencyIdFieldName = useMemo(
+    () => agencyIdField.name as keyof SupportedFormsDto,
+    [agencyIdField.name],
+  );
+  const agencyDepartmentFieldName = useMemo(
+    () => agencyDepartmentField.name as keyof SupportedFormsDto,
+    [agencyDepartmentField.name],
+  );
 
   const agencyDepartment = getValues(agencyDepartmentFieldName) as string;
 
@@ -140,6 +143,18 @@ export const AgencySelector = ({
         setIsLoading(false);
       });
   };
+
+  const resetSelector = useCallback(() => {
+    setValue(agencyDepartmentFieldName, "");
+    setValue(agencyIdFieldName, "");
+  }, [agencyDepartmentFieldName, agencyIdFieldName, setValue]);
+
+  useEffect(
+    () => () => {
+      resetSelector();
+    },
+    [resetSelector],
+  );
 
   return (
     <div

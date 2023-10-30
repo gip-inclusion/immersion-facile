@@ -27,41 +27,45 @@ import { routes } from "src/app/routes/routes";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
+  hasAgencyReferral: boolean;
 };
 
-type ValidationSteps = "oneStep" | "twoSteps";
+type ValidationSteps = "validatorsOnly" | "counsellorsAndValidators";
 
 const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
   {
     label: "1: La convention est examinée et validée par la même personne",
-    value: "oneStep",
+    value: "validatorsOnly",
   },
   {
     label:
       "2: La convention est examinée par une personne puis validée par quelqu’un d’autre",
-    value: "twoSteps",
+    value: "counsellorsAndValidators",
   },
 ];
 
-const descriptionByValidationSteps = {
-  oneStep: formAgencyFieldsLabels.counsellorEmails.hintText,
-  twoSteps: formAgencyFieldsLabels.validatorEmails.hintText,
+const descriptionByValidationSteps: Record<ValidationSteps, React.ReactNode> = {
+  validatorsOnly: formAgencyFieldsLabels.counsellorEmails.hintText,
+  counsellorsAndValidators: formAgencyFieldsLabels.validatorEmails.hintText,
 };
 
 export const AgencyFormCommonFields = ({
   addressInitialValue,
+  hasAgencyReferral,
 }: AgencyFormCommonFieldsProps) => {
   const { getValues, setValue, register, formState, watch } =
     useFormContext<CreateAgencyDto>();
   const formValues = getValues();
-  const defaultValidationStepsValue = formValues.counsellorEmails.length
-    ? "twoSteps"
-    : "oneStep";
-  const [validationSteps, setValidationSteps] = useState<
-    "oneStep" | "twoSteps"
-  >(defaultValidationStepsValue);
+  const defaultValidationStepsValue: ValidationSteps =
+    formValues.counsellorEmails.length || hasAgencyReferral
+      ? "counsellorsAndValidators"
+      : "validatorsOnly";
+  const [validationSteps, setValidationSteps] = useState<ValidationSteps>(
+    defaultValidationStepsValue,
+  );
   const shouldResetCounsellorEmails =
-    validationSteps === "oneStep" && formValues.counsellorEmails.length > 0;
+    validationSteps === "validatorsOnly" &&
+    formValues.counsellorEmails.length > 0;
 
   if (shouldResetCounsellorEmails) setValue("counsellorEmails", []);
 
@@ -96,7 +100,6 @@ export const AgencyFormCommonFields = ({
           watch("kind") === "pole-emploi" ? agencyErrorMessage : undefined
         }
       />
-
       <Input
         label={fieldsContent.name.label}
         hintText={fieldsContent.name.hintText}
@@ -116,14 +119,17 @@ export const AgencyFormCommonFields = ({
           setValue("address", address);
         }}
       />
-      <RadioGroup
-        {...fieldsContent.stepsForValidation}
-        options={numberOfStepsOptions}
-        currentValue={validationSteps}
-        setCurrentValue={setValidationSteps}
-        groupLabel={fieldsContent.stepsForValidation.label}
-      />
-      {validationSteps === "twoSteps" && (
+      {!hasAgencyReferral && (
+        <RadioGroup
+          {...fieldsContent.stepsForValidation}
+          options={numberOfStepsOptions}
+          currentValue={validationSteps}
+          setCurrentValue={setValidationSteps}
+          groupLabel={fieldsContent.stepsForValidation.label}
+        />
+      )}
+      {(validationSteps === "counsellorsAndValidators" ||
+        hasAgencyReferral) && (
         <MultipleEmailsInput
           {...fieldsContent.counsellorEmails}
           initialValue={formValues.counsellorEmails.join(", ")}
@@ -132,16 +138,16 @@ export const AgencyFormCommonFields = ({
           validationSchema={emailSchema}
         />
       )}
-
-      <MultipleEmailsInput
-        {...fieldsContent.validatorEmails}
-        initialValue={formValues.validatorEmails.join(", ")}
-        description={descriptionByValidationSteps[validationSteps]}
-        valuesInList={watch("validatorEmails")}
-        setValues={(values) => setValue("validatorEmails", values)}
-        validationSchema={emailSchema}
-      />
-
+      {!hasAgencyReferral && (
+        <MultipleEmailsInput
+          {...fieldsContent.validatorEmails}
+          initialValue={formValues.validatorEmails.join(", ")}
+          description={descriptionByValidationSteps[validationSteps]}
+          valuesInList={watch("validatorEmails")}
+          setValues={(values) => setValue("validatorEmails", values)}
+          validationSchema={emailSchema}
+        />
+      )}
       {formValues.kind !== "pole-emploi" && (
         <Input
           label={fieldsContent.questionnaireUrl.label}
@@ -153,7 +159,6 @@ export const AgencyFormCommonFields = ({
           {...getFieldError("questionnaireUrl")}
         />
       )}
-
       <Input
         label={fieldsContent.signature.label}
         hintText={fieldsContent.signature.hintText}
@@ -163,7 +168,6 @@ export const AgencyFormCommonFields = ({
         }}
         {...getFieldError("signature")}
       />
-
       <Input
         label={fieldsContent.agencySiret.label}
         hintText={fieldsContent.agencySiret.hintText}
