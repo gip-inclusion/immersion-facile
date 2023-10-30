@@ -35,6 +35,6 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     method: "post",
     ...withAuthorizationHeaders,
     requestBodySchema: markPartnersErroredConventionAsHandledRequestSchema,
-    responses: { 200: expressEmptyResponseBody, 400: httpErrorSchema },
+    responses: { 200: expressEmptyResponseBody, 404: httpErrorSchema },
   }),
 });

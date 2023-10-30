@@ -14,16 +14,17 @@ export class InMemoryErrorRepository implements ErrorRepository {
     conventionId: ConventionId,
   ): Promise<void> {
     const hasConventionErrorToMarkAsHandled = this.#savedErrors.some(
-      (savedError) => isSavedErrorForConvention(savedError, conventionId),
+      (savedError) =>
+        isUnhandledSavedErrorForConvention(savedError, conventionId),
     );
 
     if (!hasConventionErrorToMarkAsHandled)
       throw new NotFoundError(
-        `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId}'.`,
+        `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
       );
 
     this.#savedErrors = this.#savedErrors.map((savedError) => {
-      if (isSavedErrorForConvention(savedError, conventionId)) {
+      if (isUnhandledSavedErrorForConvention(savedError, conventionId)) {
         return { ...savedError, handledByAgency: true };
       }
       return savedError;
@@ -39,10 +40,11 @@ export class InMemoryErrorRepository implements ErrorRepository {
   }
 }
 
-const isSavedErrorForConvention = (
+const isUnhandledSavedErrorForConvention = (
   savedError: SavedError,
   conventionId: ConventionId,
 ) =>
   "conventionId" in savedError.params &&
   savedError.params.conventionId === conventionId &&
-  savedError.serviceName === broadcastToPeServiceName;
+  savedError.serviceName === broadcastToPeServiceName &&
+  savedError.handledByAgency === false;

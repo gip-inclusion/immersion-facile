@@ -215,7 +215,40 @@ describe("mark partners errored convention as handled", () => {
         },
         icJwtDomainPayload,
       ),
-      `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId}'.`,
+      `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
+    );
+  });
+
+  it("Throw when convention is errored but already handled", async () => {
+    const conventionRepository = uow.conventionRepository;
+    const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
+    const savedErrorsRepository = uow.errorRepository;
+
+    const savedHandledErrorConvention = {
+      serviceName: broadcastToPeServiceName,
+      params: {
+        conventionId,
+        httpStatus: 404,
+      },
+      message: "Ops, something is bad",
+      occurredAt: timeGateway.now(),
+      handledByAgency: true,
+    };
+
+    await conventionRepository.save(convention);
+    await savedErrorsRepository.save(savedHandledErrorConvention);
+    await inclusionConnectRepository.setInclusionConnectedUsers([
+      icUserWithAgencyRights,
+    ]);
+
+    await expectPromiseToFailWith(
+      markPartnersErroredConventionAsHandled.execute(
+        {
+          conventionId,
+        },
+        icJwtDomainPayload,
+      ),
+      `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
     );
   });
 

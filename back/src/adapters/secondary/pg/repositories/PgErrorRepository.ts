@@ -19,11 +19,12 @@ export class PgErrorRepository implements ErrorRepository {
       .set({ handled_by_agency: true })
       .where(sql`(params ->> 'conventionId')`, "=", conventionId)
       .where("service_name", "=", broadcastToPeServiceName)
+      .where("handled_by_agency", "=", false)
       .executeTakeFirst();
 
     if (Number(result.numUpdatedRows) === 0)
       throw new NotFoundError(
-        `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId}'.`,
+        `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
       );
   }
 
