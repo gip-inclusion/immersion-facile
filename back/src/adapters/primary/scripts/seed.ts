@@ -106,6 +106,7 @@ const establishmentAggregateSeed = async (
   await client.query("DELETE FROM discussions");
   await client.query("DELETE FROM immersion_contacts");
   await client.query("DELETE FROM establishments CASCADE");
+  await client.query("DELETE FROM groups CASCADE");
   const franceMerguez = new EstablishmentAggregateBuilder()
     .withEstablishment(
       new EstablishmentEntityBuilder()
@@ -123,9 +124,44 @@ const establishmentAggregateSeed = async (
     .withContact(new ContactEntityBuilder().build())
     .build();
 
+  const decathlon = new EstablishmentAggregateBuilder()
+    .withEstablishment(
+      new EstablishmentEntityBuilder()
+        .withSiret("50056940501696")
+        .withName("Decathlon france")
+        .build(),
+    )
+    .withOffers([
+      new OfferEntityBuilder()
+        .withAppellationCode("20552")
+        .withAppellationLabel("Vendeur / Vendeuse en articles de sport")
+        .withRomeCode("D1211")
+        .build(),
+    ])
+    .withContact(
+      new ContactEntityBuilder()
+        .withId("cccccccc-cccc-caaa-cccc-cccccccccccc")
+        .build(),
+    )
+    .build();
+
   await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
     franceMerguez,
+    decathlon,
   ]);
+
+  await uow.groupRepository.save({
+    slug: "decathlon",
+    sirets: [decathlon.establishment.siret],
+    options: {
+      heroHeader: {
+        title: "Bienvenue chez Decathlon",
+        description: "À fond la forme !",
+      },
+      tintColor: "#007DBC",
+    },
+    name: "Decathlon",
+  });
   console.log("done");
 };
 
