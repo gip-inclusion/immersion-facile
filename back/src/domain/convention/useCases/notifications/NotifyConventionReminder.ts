@@ -107,10 +107,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     )
       return this.#onSignatoriesReminder(reminderKind, conventionRead, uow);
 
-    const [agency] = await uow.agencyRepository.getByIds([
-      conventionRead.agencyId,
-    ]);
-
+    const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
     if (!agency) throw new NotFoundError(missingAgencyMessage(conventionRead));
 
     return this.#onAgencyReminder(reminderKind, conventionRead, agency, uow);

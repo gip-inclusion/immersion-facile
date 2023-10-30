@@ -69,9 +69,7 @@ export async function retrieveConventionWithAgency(
   );
   if (!convention)
     throw new NotFoundError(conventionMissingMessage(conventionEvent.id));
-  const agency = (
-    await uow.agencyRepository.getByIds([convention.agencyId])
-  ).at(0);
+  const agency = await uow.agencyRepository.getById(convention.agencyId);
   if (!agency) throw new NotFoundError(agencyMissingMessage(convention));
   return { agency, convention };
 }

@@ -1,7 +1,6 @@
 import { PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   cciAgencyId,
   ConventionDtoBuilder,
   conventionSchema,
@@ -76,7 +75,6 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
       streetNumberAndAddress: "1 rue de Rivoli",
     })
     .build();
-  const peParisAgencySaveParams = agencyDtoToSaveAgencyParams(peParisAgency);
 
   const cciAgency = new AgencyDtoBuilder()
     .withId(cciAgencyId)
@@ -92,11 +90,10 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
       streetNumberAndAddress: "5 Kerhueno",
     })
     .build();
-  const cciAgencySaveParams = agencyDtoToSaveAgencyParams(cciAgency);
 
   await Promise.all([
-    uow.agencyRepository.insert(peParisAgencySaveParams),
-    uow.agencyRepository.insert(cciAgencySaveParams),
+    uow.agencyRepository.insert(peParisAgency),
+    uow.agencyRepository.insert(cciAgency),
   ]);
   console.log("done");
 };

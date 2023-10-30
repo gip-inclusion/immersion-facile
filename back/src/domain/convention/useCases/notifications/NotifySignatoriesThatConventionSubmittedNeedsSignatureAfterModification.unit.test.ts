@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
@@ -295,9 +294,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
   describe("Wrong paths", () => {
     it("Convention missing", async () => {
       const convention = new ConventionDtoBuilder().build();
-      uow.agencyRepository.setAgencies([
-        agencyDtoToSaveAgencyParams(new AgencyDtoBuilder().build()),
-      ]);
+      uow.agencyRepository.setAgencies([new AgencyDtoBuilder().build()]);
 
       await expectPromiseToFailWithError(
         useCase.execute(convention),
@@ -333,9 +330,8 @@ const prepareScenario = (
   shortLinks: ShortLinkId[],
 ) => {
   const agency = new AgencyDtoBuilder().build();
-  const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-  uow.agencyRepository.setAgencies([agencySaveParams]);
+  uow.agencyRepository.setAgencies([agency]);
   uow.conventionRepository.setConventions({
     [convention.id]: new ConventionDtoBuilder(convention)
       .withAgencyId(agency.id)

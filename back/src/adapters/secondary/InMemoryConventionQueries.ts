@@ -107,6 +107,13 @@ export class InMemoryConventionQueries implements ConventionQueries {
       (agency) => agency.id === convention.agencyId,
     );
 
+    const referedAgency =
+      agency &&
+      agency.refersToAgencyId &&
+      this.agencyRepository.agencies.find(
+        (agency) => agency.id === agency.refersToAgencyId,
+      );
+
     return {
       ...convention,
       agencyName: agency?.name ?? TEST_AGENCY_NAME,
@@ -114,9 +121,9 @@ export class InMemoryConventionQueries implements ConventionQueries {
         agency?.address.departmentCode ?? TEST_AGENCY_DEPARTMENT,
       agencyKind: agency?.kind ?? "autre",
       agencySiret: agency?.agencySiret,
-      agencyRefersTo: agency?.refersToAgency && {
-        id: agency.refersToAgency.id,
-        name: agency.refersToAgency.name,
+      agencyRefersTo: referedAgency && {
+        id: referedAgency.id,
+        name: referedAgency.name,
       },
     };
   };

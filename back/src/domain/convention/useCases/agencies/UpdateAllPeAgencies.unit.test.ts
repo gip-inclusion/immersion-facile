@@ -1,9 +1,4 @@
-import {
-  AddressDto,
-  AgencyDto,
-  agencyDtoToSaveAgencyParams,
-  expectToEqual,
-} from "shared";
+import { AddressDto, AgencyDto, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../../adapters/secondary/core/ConsoleAppLogger";
@@ -67,7 +62,7 @@ describe("UpdateAllPeAgencies use case", () => {
         codeSafir: "63019",
         kind: "pole-emploi",
         status: "from-api-PE",
-        refersToAgency: undefined,
+        refersToAgencyId: undefined,
       },
     ]);
   });
@@ -96,11 +91,10 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
-        refersToAgency: undefined,
+        refersToAgencyId: undefined,
       };
-      const initialAgencySaveParams =
-        agencyDtoToSaveAgencyParams(initialAgency);
-      agencyRepository.setAgencies([initialAgencySaveParams]);
+
+      agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
@@ -142,12 +136,10 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
-        refersToAgency: undefined,
+        refersToAgencyId: undefined,
       };
-      const initialAgencySaveParams =
-        agencyDtoToSaveAgencyParams(initialAgency);
 
-      agencyRepository.setAgencies([initialAgencySaveParams]);
+      agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
@@ -184,12 +176,10 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
-        refersToAgency: undefined,
+        refersToAgencyId: undefined,
       };
-      const initialAgencySaveParams =
-        agencyDtoToSaveAgencyParams(initialAgency);
 
-      agencyRepository.setAgencies([initialAgencySaveParams]);
+      agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
@@ -229,11 +219,10 @@ describe("UpdateAllPeAgencies use case", () => {
       questionnaireUrl: "some-url",
       kind: "mission-locale",
       status: "active",
-      refersToAgency: undefined,
+      refersToAgencyId: undefined,
     };
-    const initialAgencySaveParams = agencyDtoToSaveAgencyParams(initialAgency);
 
-    agencyRepository.setAgencies([initialAgencySaveParams]);
+    agencyRepository.setAgencies([initialAgency]);
     uuid.setNextUuid("other-uuid");
     addressApi.setNextAddress(address);
     await updateAllPeAgencies.execute();

@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   AuthenticatedUser,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -20,6 +19,7 @@ import { InMemoryAuthenticatedUserRepository } from "../../../../adapters/second
 import { InMemoryInclusionConnectedUserRepository } from "../../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { someAgenciesMissingMessage } from "../../ports/AgencyRepository";
 import { RegisterAgencyToInclusionConnectUser } from "./RegisterAgencyToInclusionConnectUser";
 
 const userId = "456";
@@ -34,9 +34,7 @@ const user: AuthenticatedUser = {
 };
 
 const agency1 = new AgencyDtoBuilder().withId(agencyId1).build();
-const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
 const agency2 = new AgencyDtoBuilder().withId(agencyId2).build();
-const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
 
 describe("RegisterAgencyToInclusionConnectUser use case", () => {
   let registerAgencyToInclusionConnectUser: RegisterAgencyToInclusionConnectUser;
@@ -79,14 +77,12 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     userRepository.users = [user];
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agencyId1], { userId }),
-      new NotFoundError(
-        `Some agencies not found with ids : ${agencyId1}. No agencies found.`,
-      ),
+      new NotFoundError(someAgenciesMissingMessage([agencyId1])),
     );
   });
 
   it("fails if user already has agency rights", async () => {
-    agencyRepository.setAgencies([agency1SaveParams]);
+    agencyRepository.setAgencies([agency1]);
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         ...user,
@@ -104,7 +100,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   describe("When User and agencies exist", () => {
     beforeEach(() => {
       userRepository.users = [user];
-      agencyRepository.setAgencies([agency1SaveParams, agency2SaveParams]);
+      agencyRepository.setAgencies([agency1, agency2]);
     });
 
     it("makes the link between user and provided agency id, and saves the corresponding event", async () => {

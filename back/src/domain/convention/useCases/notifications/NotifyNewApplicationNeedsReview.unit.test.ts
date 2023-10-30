@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   expectToEqual,
@@ -85,9 +84,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withCounsellorEmails(counsellorEmails)
         .build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       await notifyNewConventionNeedsReview.execute(conventionInReview);
 
@@ -171,9 +169,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withValidatorEmails(validatorEmails)
         .build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
       const shortLinkIds = [
         "shortlink1",
         "shortlink2",
@@ -282,9 +279,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         const agency = new AgencyDtoBuilder(defaultAgency)
           .withValidatorEmails(validatorEmails)
           .build();
-        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-        uow.agencyRepository.setAgencies([agencySaveParams]);
+        uow.agencyRepository.setAgencies([agency]);
 
         await notifyNewConventionNeedsReview.execute(
           acceptedByCounsellorConvention,
@@ -391,9 +387,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         const agency = new AgencyDtoBuilder(defaultAgency)
           .withAdminEmails([adminEmail])
           .build();
-        const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-        uow.agencyRepository.setAgencies([agencySaveParams]);
+        uow.agencyRepository.setAgencies([agency]);
 
         await notifyNewConventionNeedsReview.execute(
           acceptedByValidatorConvention,
@@ -475,9 +470,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withValidatorEmails(validatorEmails)
         .build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       await notifyNewConventionNeedsReview.execute(conventionInReview);
 

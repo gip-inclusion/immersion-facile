@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -126,9 +125,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         ];
 
       const agency = new AgencyDtoBuilder(defaultAgency).build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 
@@ -208,9 +206,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
         ];
       const agency = new AgencyDtoBuilder(defaultAgency).build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
         validConvention,
@@ -299,9 +296,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
         ];
       const agency = new AgencyDtoBuilder(defaultAgency).build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
         validConvention,
@@ -390,9 +386,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         ];
 
       const agency = new AgencyDtoBuilder(defaultAgency).build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 
@@ -496,9 +491,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       );
 
       const agency = new AgencyDtoBuilder(defaultAgency).build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 
@@ -585,9 +579,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       );
 
       const agency = new AgencyDtoBuilder(defaultAgency).build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 

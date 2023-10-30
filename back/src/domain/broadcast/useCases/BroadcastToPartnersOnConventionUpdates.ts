@@ -11,6 +11,7 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { isConventionInScope } from "../../convention/entities/Convention";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { getReferedAgency } from "../entities/agency";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
 
 const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {
@@ -48,10 +49,9 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
-      agencyRefersTo: agency.refersToAgency && {
-        id: agency.refersToAgency.id,
-        name: agency.refersToAgency.name,
-      },
+      agencyRefersTo: agency.refersToAgencyId
+        ? await getReferedAgency(uow, agency.refersToAgencyId)
+        : undefined,
     };
 
     const apiConsumers = pipeWithValue(

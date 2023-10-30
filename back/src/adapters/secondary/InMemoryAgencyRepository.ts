@@ -9,17 +9,18 @@ import {
   DepartmentCode,
   GeoPositionDto,
   GetAgenciesFilter as GetAgenciesFilters,
-  PartialAgencySaveParams,
-  SaveAgencyParams,
+  isTruthy,
+  PartialAgencyDto,
   WithGeoPosition,
 } from "shared";
-import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
+import {
+  AgencyRepository,
+  someAgenciesMissingMessage,
+} from "../../domain/convention/ports/AgencyRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
-import { createLogger } from "../../utils/logger";
+import { NotFoundError } from "../primary/helpers/httpErrors";
 
-const logger = createLogger(__filename);
-
-const testAgencies: SaveAgencyParams[] = [
+const testAgencies: AgencyDto[] = [
   {
     id: "immersion-facile-agency",
     name: "Immersion Facile Agency (back)",
@@ -161,20 +162,17 @@ const testAgencies: SaveAgencyParams[] = [
 ];
 
 export class InMemoryAgencyRepository implements AgencyRepository {
-  #agencies: Partial<{ [id: string]: SaveAgencyParams }> = {};
+  #agencies: Partial<{ [id: string]: AgencyDto }> = {};
 
-  constructor(agencyList: SaveAgencyParams[] = testAgencies) {
+  constructor(agencyList: AgencyDto[] = testAgencies) {
     agencyList.forEach((agency) => {
       this.#agencies[agency.id] = agency;
     });
-    logger.info(this.#agencies);
   }
 
   // test purpose only
   public get agencies(): AgencyDto[] {
-    return values(this.#agencies)
-      .filter(isSaveAgencyParams)
-      .map((agency) => this.#saveAgencyParamsToAgencyDto(agency));
+    return values(this.#agencies).filter(isTruthy);
   }
 
   public async getAgencies({
@@ -185,7 +183,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     limit?: number;
   }): Promise<AgencyDto[]> {
     const filteredAgencies = Object.values(this.#agencies)
-      .filter((agency: SaveAgencyParams | undefined) =>
+      .filter((agency: AgencyDto | undefined) =>
         !agency
           ? false
           : ![
@@ -196,24 +194,19 @@ export class InMemoryAgencyRepository implements AgencyRepository {
               agencyIsOfStatus(agency, filters?.status),
             ].includes(false),
       )
-      .filter(isSaveAgencyParams)
+      .filter(isTruthy)
       .slice(0, limit);
-    const filteredAgenciesDto = filteredAgencies.map((filteredAgency) =>
-      this.#saveAgencyParamsToAgencyDto(filteredAgency),
-    );
 
-    if (!filters?.position) return filteredAgenciesDto;
-    return filteredAgenciesDto.sort(
-      sortByNearestFrom(filters.position.position),
-    );
+    return filters?.position
+      ? filteredAgencies.sort(sortByNearestFrom(filters.position.position))
+      : filteredAgencies;
   }
 
   public async getAgencyWhereEmailMatches(
     email: string,
   ): Promise<AgencyDto | undefined> {
     return values(this.#agencies)
-      .filter(isSaveAgencyParams)
-      .map((agency) => this.#saveAgencyParamsToAgencyDto(agency))
+      .filter(isTruthy)
       .find(
         (agency) =>
           agency.validatorEmails.includes(email) ||
@@ -222,57 +215,59 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 
   public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
-    const requestedAgency = this.#agencies[id];
-    return (
-      requestedAgency && this.#saveAgencyParamsToAgencyDto(requestedAgency)
-    );
+    return this.#agencies[id];
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    return ids
-      .map((id) => this.#agencies[id])
-      .filter(isSaveAgencyParams)
-      .map((agency) => this.#saveAgencyParamsToAgencyDto(agency));
+    const result = ids.reduce<{
+      agencies: AgencyDto[];
+      missingIds: AgencyId[];
+    }>(
+      (prev, id) => {
+        const agency = this.#agencies[id];
+        return {
+          agencies: agency ? [...prev.agencies, agency] : prev.agencies,
+          missingIds: !agency ? [...prev.missingIds, id] : prev.missingIds,
+        };
+      },
+      {
+        agencies: [],
+        missingIds: [],
+      },
+    );
+    if (result.missingIds.length)
+      throw new NotFoundError(someAgenciesMissingMessage(result.missingIds));
+    return result.agencies;
   }
 
   public async getImmersionFacileAgencyId(): Promise<AgencyId> {
     return "immersion-facile-agency";
   }
 
-  public async insert(agency: SaveAgencyParams): Promise<AgencyId | undefined> {
-    logger.info({ config: agency, configs: this.#agencies }, "insert");
+  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
     if (this.#agencies[agency.id]) return undefined;
     this.#agencies[agency.id] = agency;
     return agency.id;
   }
 
-  public setAgencies(agencyList: SaveAgencyParams[]) {
+  public setAgencies(agencyList: AgencyDto[]) {
     this.#agencies = {};
     agencyList.forEach((agency) => {
       this.#agencies[agency.id] = agency;
     });
   }
 
-  public async update(agency: PartialAgencySaveParams) {
+  public async update(agency: PartialAgencyDto) {
     const agencyToUdpate = this.#agencies[agency.id];
     if (!agencyToUdpate) {
       throw new Error(`Agency ${agency.id} does not exist`);
     }
     this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
   }
-
-  #saveAgencyParamsToAgencyDto = ({
-    refersToAgencyId,
-    ...agency
-  }: SaveAgencyParams): AgencyDto => ({
-    ...agency,
-    refersToAgency: refersToAgencyId && this.#agencies[refersToAgencyId],
-  });
 }
 
-const isImmersionPeOnly = (agency: SaveAgencyParams) =>
-  agency.kind === "pole-emploi";
-const isAgencyCci = (agency: SaveAgencyParams) => agency.kind === "cci";
+const isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";
+const isAgencyCci = (agency: AgencyDto) => agency.kind === "cci";
 
 const sortByNearestFrom =
   (position: GeoPositionDto) =>
@@ -291,7 +286,7 @@ const sortByNearestFrom =
     );
 
 const agencyIsOfKind = (
-  agency: SaveAgencyParams,
+  agency: AgencyDto,
   agencyKindFilter?: AgencyKindFilter,
 ): boolean => {
   if (agencyKindFilter === "immersionPeOnly") return isImmersionPeOnly(agency);
@@ -305,7 +300,7 @@ const agencyIsOfKind = (
 };
 
 const agencyIsOfStatus = (
-  agency: SaveAgencyParams,
+  agency: AgencyDto,
   statuses?: AgencyStatus[],
 ): boolean => {
   if (!statuses) return true;
@@ -313,20 +308,20 @@ const agencyIsOfStatus = (
 };
 
 const agencyHasDepartmentCode = (
-  agency: SaveAgencyParams,
+  agency: AgencyDto,
   departmentCode?: DepartmentCode,
 ): boolean => {
   if (!departmentCode) return true;
   return departmentCode === agency.address.departmentCode;
 };
 
-const agencyHasName = (agency: SaveAgencyParams, name?: string): boolean => {
+const agencyHasName = (agency: AgencyDto, name?: string): boolean => {
   if (!name) return true;
   return agency.name.toLowerCase().includes(name.toLowerCase());
 };
 
 const agencyIsOfPosition = (
-  agency: SaveAgencyParams,
+  agency: AgencyDto,
   positionFilter?: AgencyPositionFilter,
 ): boolean => {
   if (!positionFilter) return true;
@@ -340,7 +335,3 @@ const agencyIsOfPosition = (
     positionFilter.distance_km * 1000
   );
 };
-
-const isSaveAgencyParams = (
-  agency: SaveAgencyParams | undefined,
-): agency is SaveAgencyParams => agency !== undefined;

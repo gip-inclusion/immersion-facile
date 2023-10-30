@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -29,6 +28,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { makeGenerateJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 
@@ -56,7 +56,6 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
-const defaultAgencySaveParams = agencyDtoToSaveAgencyParams(defaultAgency);
 const email = "some email";
 
 describe("RenewConventionMagicLink use case", () => {
@@ -75,7 +74,7 @@ describe("RenewConventionMagicLink use case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([defaultAgencySaveParams]);
+    uow.agencyRepository.setAgencies([defaultAgency]);
     uow.conventionRepository.setConventions({
       [validConvention.id]: validConvention,
     });
@@ -228,7 +227,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        new BadRequestError(storedUnknownId),
+        new NotFoundError(someAgenciesMissingMessage([storedUnknownId])),
       );
     });
 

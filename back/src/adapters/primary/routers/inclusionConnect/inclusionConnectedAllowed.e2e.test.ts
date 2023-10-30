@@ -1,7 +1,6 @@
 import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   currentJwtVersions,
   displayRouteName,
@@ -21,7 +20,6 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 describe("InclusionConnectedAllowedRoutes", () => {
   const userId = "123";
   const agency = new AgencyDtoBuilder().build();
-  const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
   const inclusionConnectedUserWithoutRights: InclusionConnectedUser = {
     id: userId,
     email: "joe@mail.com",
@@ -126,7 +124,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUserWithoutRights,
       ]);
-      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
 
       const response = await httpClient.registerAgenciesToUser({
         headers: {
@@ -234,7 +232,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         user,
       ]);
-      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });

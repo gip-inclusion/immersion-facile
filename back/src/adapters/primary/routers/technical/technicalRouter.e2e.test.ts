@@ -2,7 +2,6 @@ import { SuperTest, Test } from "supertest";
 import {
   AbsoluteUrl,
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   BrevoInboundBody,
   ConventionDtoBuilder,
   createConventionMagicLinkPayload,
@@ -184,13 +183,12 @@ describe("technical router", () => {
         .withQuestionnaireUrl("TEST-questionnaireUrl")
         .withSignature("TEST-signature")
         .build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
       const convention = new ConventionDtoBuilder().build();
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
-      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
 
       gateways.timeGateway.setNextDate(new Date());
 

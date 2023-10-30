@@ -105,6 +105,7 @@ export * from "./tokens/jwt.utils";
 export * from "./tokens/jwtPayload.dto";
 export * from "./tokens/jwtPayload.schema";
 export * from "./typeFlavors";
+export * from "./typeGuard";
 export * from "./utils";
 export * from "./utils/address";
 export * from "./utils/beneficiary";

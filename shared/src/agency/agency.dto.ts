@@ -55,24 +55,13 @@ export type AgencyDtoSensitiveFields = {
   codeSafir?: string;
 };
 
-export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
-  refersToAgencyId?: never;
-} & WithOptionalRefersToAgency &
+export type WithAgencyDto = {
+  agency: AgencyDto;
+};
+export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> &
   AgencyDtoSensitiveFields;
 
 export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
-
-export type SaveAgencyParams = RequireField<
-  CreateAgencyDto,
-  "questionnaireUrl"
-> &
-  AgencyDtoSensitiveFields & {
-    refersToAgency?: never;
-  };
-
-export type PartialAgencySaveParams = Partial<SaveAgencyParams> & {
-  id: AgencyId;
-};
 
 export type AgencyId = Flavor<string, "AgencyId">;
 export type AgencyIdResponse = AgencyId | undefined;

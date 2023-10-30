@@ -1,7 +1,6 @@
 import {
   AbsoluteUrl,
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   CreateConventionMagicLinkPayloadProperties,
   Email,
@@ -63,7 +62,6 @@ const agency = new AgencyDtoBuilder()
   .withValidatorEmails([agencyActorEmail, "d@d.com"])
   .withId(convention.agencyId)
   .build();
-const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
 describe("NotifyActorThatConventionNeedsModifications", () => {
   let usecase: NotifyActorThatConventionNeedsModifications;
@@ -77,7 +75,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
     config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
     uow.conventionRepository.setConventions({ [convention.id]: convention });
-    uow.agencyRepository.setAgencies([agencySaveParams]);
+    uow.agencyRepository.setAgencies([agency]);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,

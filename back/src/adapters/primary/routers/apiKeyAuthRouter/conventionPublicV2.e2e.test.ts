@@ -1,7 +1,6 @@
 import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   displayRouteName,
   expectHttpResponseToEqual,
@@ -19,7 +18,6 @@ import {
 } from "./publicApiV2.routes";
 
 const agency = new AgencyDtoBuilder().build();
-const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
 const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
 const conventionReadConsumerWithAgencyIdsScope = new ApiConsumerBuilder()
@@ -99,7 +97,7 @@ describe("Convention routes", () => {
     });
 
     it("403 when the apiConsumer has READ access to convention but no scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
@@ -132,7 +130,7 @@ describe("Convention routes", () => {
     });
 
     it("returns 200 with the convention", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
@@ -140,25 +138,23 @@ describe("Convention routes", () => {
       expect(
         displayRouteName(publicApiV2ConventionRoutes.getConventionById),
       ).toBe("GET /v2/conventions/:conventionId -");
-      const { body, status } = await sharedRequest.getConventionById({
+      const response = await sharedRequest.getConventionById({
         headers: {
           authorization: conventionReadConsumerWithAgencyIdsScopeToken,
         },
         urlParams: { conventionId: convention.id },
       });
 
-      expectToEqual(body, {
-        ...convention,
-        agencyName: agency.name,
-        agencyDepartment: agency.address.departmentCode,
-        agencyKind: agency.kind,
-        agencySiret: agency.agencySiret,
-        agencyRefersTo: agency.refersToAgency && {
-          id: agency.refersToAgency.id,
-          name: agency.refersToAgency.name,
+      expectHttpResponseToEqual(response, {
+        body: {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
         },
+        status: 200,
       });
-      expectToEqual(status, 200);
     });
   });
 
@@ -196,7 +192,7 @@ describe("Convention routes", () => {
     });
 
     it("200 - returns the conventions matching agencyIds in scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
@@ -219,10 +215,6 @@ describe("Convention routes", () => {
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
-            agencyRefersTo: agency.refersToAgency && {
-              id: agency.refersToAgency.id,
-              name: agency.refersToAgency.name,
-            },
           },
         ],
         status: 200,

@@ -1,4 +1,4 @@
-import { AgencyDto, agencyDtoToSaveAgencyParams, agencySchema } from "shared";
+import { AgencyDto, agencySchema } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
@@ -21,14 +21,12 @@ export class UpdateAgency extends TransactionalUseCase<AgencyDto> {
   }
 
   public async _execute(agency: AgencyDto, uow: UnitOfWork): Promise<void> {
-    await uow.agencyRepository
-      .update(agencyDtoToSaveAgencyParams(agency))
-      .catch((error) => {
-        if (error.message === `Agency ${agency.id} does not exist`) {
-          throw new NotFoundError(`No agency found with id : ${agency.id}`);
-        }
-        throw error;
-      });
+    await uow.agencyRepository.update(agency).catch((error) => {
+      if (error.message === `Agency ${agency.id} does not exist`) {
+        throw new NotFoundError(`No agency found with id : ${agency.id}`);
+      }
+      throw error;
+    });
 
     await uow.outboxRepository.save(
       this.#createNewEvent({

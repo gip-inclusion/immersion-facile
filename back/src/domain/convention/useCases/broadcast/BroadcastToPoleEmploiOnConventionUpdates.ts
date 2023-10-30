@@ -55,7 +55,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
           })
         : undefined;
 
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
       throw new NotFoundError(
         `Agency with id ${convention.agencyId} missing in agencyRepository`,

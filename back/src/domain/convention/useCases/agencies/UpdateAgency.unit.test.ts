@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   expectObjectsToMatch,
   expectPromiseToFail,
   expectPromiseToFailWith,
@@ -17,8 +16,6 @@ import { UpdateAgency } from "./UpdateAgency";
 
 describe("Update agency", () => {
   const initialAgencyInRepo = new AgencyDtoBuilder().build();
-  const initialAgencyInRepoSaveParams =
-    agencyDtoToSaveAgencyParams(initialAgencyInRepo);
 
   let agencyRepository: InMemoryAgencyRepository;
   let outboxRepository: InMemoryOutboxRepository;
@@ -50,7 +47,7 @@ describe("Update agency", () => {
   });
 
   it("Fails to add agency if address components are empty", async () => {
-    agencyRepository.setAgencies([initialAgencyInRepoSaveParams]);
+    agencyRepository.setAgencies([initialAgencyInRepo]);
     const updatedAgency = new AgencyDtoBuilder()
       .withId(initialAgencyInRepo.id)
       .withName("L'agence modifié")
@@ -67,7 +64,7 @@ describe("Update agency", () => {
 
   it("Fails to add agency if geo components are 0,0", async () => {
     const initialAgencyInRepo = new AgencyDtoBuilder().build();
-    agencyRepository.setAgencies([initialAgencyInRepoSaveParams]);
+    agencyRepository.setAgencies([initialAgencyInRepo]);
     const updatedAgency = new AgencyDtoBuilder()
       .withId(initialAgencyInRepo.id)
       .withName("L'agence modifié")
@@ -80,7 +77,7 @@ describe("Update agency", () => {
 
   it("Updates agency and create corresponding event", async () => {
     const initialAgencyInRepo = new AgencyDtoBuilder().build();
-    agencyRepository.setAgencies([initialAgencyInRepoSaveParams]);
+    agencyRepository.setAgencies([initialAgencyInRepo]);
 
     const updatedAgency = new AgencyDtoBuilder()
       .withId(initialAgencyInRepo.id)

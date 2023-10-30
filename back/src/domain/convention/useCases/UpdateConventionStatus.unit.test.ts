@@ -1,9 +1,5 @@
-/* eslint-disable jest/require-top-level-describe */
-/* eslint-disable jest/consistent-test-it */
-
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   ConventionId,
   createConventionMagicLinkPayload,
@@ -19,6 +15,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { conventionMissingMessage } from "../entities/Convention";
+import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
   executeUpdateConventionStatusUseCase,
@@ -166,7 +163,7 @@ describe("UpdateConventionStatus", () => {
             emailHash: "osef",
           },
         ),
-        `No agency found with id ${agency.id}`,
+        someAgenciesMissingMessage([agency.id]),
       );
     });
 
@@ -192,9 +189,8 @@ describe("UpdateConventionStatus", () => {
       const requesterRole = "counsellor";
 
       const agency = new AgencyDtoBuilder().build();
-      const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-      uow.agencyRepository.setAgencies([agencySaveParams]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const conventionBuilder = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")

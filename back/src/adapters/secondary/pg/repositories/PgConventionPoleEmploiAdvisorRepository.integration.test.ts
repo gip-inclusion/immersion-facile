@@ -1,7 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   expectObjectsToMatch,
 } from "shared";
@@ -77,9 +76,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
     const agencyRepository = new PgAgencyRepository(transaction);
-    await agencyRepository.insert(
-      agencyDtoToSaveAgencyParams(AgencyDtoBuilder.create().build()),
-    );
+    await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(transaction);
     const conventionExternalIdRepository = new PgConventionExternalIdRepository(
       transaction,

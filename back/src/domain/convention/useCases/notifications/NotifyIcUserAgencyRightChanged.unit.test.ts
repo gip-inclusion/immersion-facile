@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   expectPromiseToFailWith,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
@@ -67,8 +66,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       .withId("agency-1")
       .withName("Agence de limoges ")
       .build();
-    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
-    uow.agencyRepository.setAgencies([agencySaveParams]);
+    uow.agencyRepository.setAgencies([agency]);
 
     await expectPromiseToFailWith(
       notifyIcUserAgencyRightChanged.execute(icUserRoleParams),
@@ -85,8 +83,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       .withId("agency-1")
       .withName("Agence de limoges")
       .build();
-    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
-    uow.agencyRepository.setAgencies([agencySaveParams]);
+    uow.agencyRepository.setAgencies([agency]);
 
     const icUser: InclusionConnectedUser = {
       email: "fake-user@inclusion-connect.fr",
@@ -121,8 +118,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       .withId("agency-1")
       .withName("Agence de limoges")
       .build();
-    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
-    uow.agencyRepository.setAgencies([agencySaveParams]);
+    uow.agencyRepository.setAgencies([agency]);
 
     const icUser: InclusionConnectedUser = {
       email: "fake-user@inclusion-connect.fr",
