@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   ConventionId,
   expectObjectsToMatch,
@@ -41,8 +40,7 @@ const prepareUseCase = async ({
     .withId("some-pe-agency")
     .withKind("pole-emploi")
     .build();
-  const peAgencySaveParams = agencyDtoToSaveAgencyParams(peAgency);
-  await agencyRepository.setAgencies([peAgencySaveParams]);
+  await agencyRepository.setAgencies([peAgency]);
 
   return {
     broadcastToPe,
@@ -61,8 +59,7 @@ describe("Broadcasts events to pole-emploi", () => {
     });
 
     const agency = new AgencyDtoBuilder().withKind("mission-locale").build();
-    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
-    await uow.agencyRepository.setAgencies([agencySaveParams]);
+    await uow.agencyRepository.setAgencies([agency]);
 
     // Act
     const convention = new ConventionDtoBuilder()

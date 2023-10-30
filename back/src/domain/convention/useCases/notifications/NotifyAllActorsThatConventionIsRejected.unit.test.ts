@@ -1,11 +1,9 @@
 import {
   AgencyDto,
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDtoBuilder,
-  SaveAgencyParams,
 } from "shared";
 import { EmailNotification } from "shared";
 import { expectNotifyConventionRejected } from "../../../../_testBuilders/emailAssertions";
@@ -76,17 +74,15 @@ const agencyWithSameEmailAdressForCounsellorAndValidator =
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
   let agency: AgencyDto;
-  let agencySaveParams: SaveAgencyParams;
 
   let useCase: NotifyAllActorsThatConventionIsRejected;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     agency = defaultAgency;
-    agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([agencySaveParams]);
+    uow.agencyRepository.setAgencies([agency]);
 
     const timeGateway = new CustomTimeGateway();
     const uuidGenerator = new UuidV4Generator();
@@ -132,9 +128,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
 
   it("doesn't send duplicated rejection emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
     uow.agencyRepository.setAgencies([
-      agencyDtoToSaveAgencyParams(
-        agencyWithSameEmailAdressForCounsellorAndValidator,
-      ),
+      agencyWithSameEmailAdressForCounsellorAndValidator,
     ]);
 
     await useCase.execute(rejectedConventionWithDuplicatedEmails);

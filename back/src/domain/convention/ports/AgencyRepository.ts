@@ -2,13 +2,12 @@ import {
   AgencyDto,
   AgencyId,
   GetAgenciesFilter,
-  PartialAgencySaveParams,
-  SaveAgencyParams,
+  PartialAgencyDto,
 } from "shared";
 
 export interface AgencyRepository {
-  insert: (agency: SaveAgencyParams) => Promise<AgencyId | undefined>;
-  update: (partialAgency: PartialAgencySaveParams) => Promise<void>;
+  insert: (agency: AgencyDto) => Promise<AgencyId | undefined>;
+  update: (partialAgency: PartialAgencyDto) => Promise<void>;
   getByIds: (ids: AgencyId[]) => Promise<AgencyDto[]>;
   getById: (ids: AgencyId) => Promise<AgencyDto | undefined>;
   getImmersionFacileAgencyId: () => Promise<AgencyId | undefined>;
@@ -18,3 +17,6 @@ export interface AgencyRepository {
   }) => Promise<AgencyDto[]>;
   getAgencyWhereEmailMatches: (email: string) => Promise<AgencyDto | undefined>;
 }
+
+export const someAgenciesMissingMessage = (agencyIds: AgencyId[]) =>
+  `Some agencies not found with ids : ${agencyIds.map((id) => `'${id}'`)}.`;

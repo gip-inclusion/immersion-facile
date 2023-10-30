@@ -30,7 +30,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     params: IcUserRoleForAgencyParams,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [agency] = await uow.agencyRepository.getByIds([params.agencyId]);
+    const agency = await uow.agencyRepository.getById(params.agencyId);
     if (!agency) {
       throw new NotFoundError(
         `Unable to send mail. No agency config found for ${params.agencyId}`,

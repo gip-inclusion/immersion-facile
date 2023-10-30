@@ -3,8 +3,6 @@ import {
   activeAgencyStatuses,
   AddressDto,
   AgencyDto,
-  agencyDtoToSaveAgencyParams,
-  SaveAgencyParams,
   WithGeoPosition,
 } from "shared";
 import { AppLogger } from "../../../core/ports/AppLogger";
@@ -115,8 +113,8 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
             peReferentialAgency,
             geocodedAddress,
           );
-          const newAgencySaveParams = agencyDtoToSaveAgencyParams(newAgency);
-          await uow.agencyRepository.insert(newAgencySaveParams);
+
+          await uow.agencyRepository.insert(newAgency);
           counts.added++;
           break;
         }
@@ -172,7 +170,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       agencySiret: peReferentialAgency.siret,
       kind: "pole-emploi",
       status: "from-api-PE",
-      refersToAgency: undefined,
+      refersToAgencyId: undefined,
     };
   }
 }
@@ -213,7 +211,7 @@ const updateAgency = async (
   peReferentialAgency: PeAgencyFromReferenciel,
 ): Promise<void> => {
   counts.updated++;
-  const updatedAgency: SaveAgencyParams = agencyDtoToSaveAgencyParams({
+  const updatedAgency: AgencyDto = {
     ...existingAgency,
     ...normalizePosition(peReferentialAgency),
     ...updateEmails({
@@ -223,7 +221,7 @@ const updateAgency = async (
     }),
     agencySiret: peReferentialAgency.siret,
     codeSafir: peReferentialAgency.codeSafir,
-  });
+  };
   await uow.agencyRepository.update(updatedAgency);
 };
 

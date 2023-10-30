@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -18,15 +17,11 @@ const agencyPoleEmploi = new AgencyDtoBuilder()
   .withId("agency-pole-emploi")
   .withKind("pole-emploi")
   .build();
-const agencyPoleEmploiSaveParams =
-  agencyDtoToSaveAgencyParams(agencyPoleEmploi);
 
 const agencyMissionLocale = new AgencyDtoBuilder()
   .withId("agency-mission-locale")
   .withKind("mission-locale")
   .build();
-const agencyMissionLocaleSaveParams =
-  agencyDtoToSaveAgencyParams(agencyMissionLocale);
 
 const conventionPoleEmploi = new ConventionDtoBuilder()
   .withId("convention-pole-emploi-id")
@@ -45,10 +40,7 @@ describe("Get Conventions for ApiConsumer", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([
-      agencyPoleEmploiSaveParams,
-      agencyMissionLocaleSaveParams,
-    ]);
+    uow.agencyRepository.setAgencies([agencyPoleEmploi, agencyMissionLocale]);
     uow.conventionRepository.setConventions({
       [conventionPoleEmploi.id]: conventionPoleEmploi,
       [conventionMissionLocale.id]: conventionMissionLocale,
@@ -111,10 +103,6 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
             agencyKind: agencyPoleEmploi.kind,
             agencySiret: agencyPoleEmploi.agencySiret,
-            agencyRefersTo: agencyPoleEmploi.refersToAgency && {
-              id: agencyPoleEmploi.refersToAgency.id,
-              name: agencyPoleEmploi.refersToAgency.name,
-            },
           },
         ]);
       });
@@ -144,10 +132,6 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
             agencyKind: agencyPoleEmploi.kind,
             agencySiret: agencyPoleEmploi.agencySiret,
-            agencyRefersTo: agencyPoleEmploi.refersToAgency && {
-              id: agencyPoleEmploi.refersToAgency.id,
-              name: agencyPoleEmploi.refersToAgency.name,
-            },
           },
         ]);
       });
@@ -196,10 +180,6 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyMissionLocale.address.departmentCode,
             agencyKind: agencyMissionLocale.kind,
             agencySiret: agencyMissionLocale.agencySiret,
-            agencyRefersTo: agencyMissionLocale.refersToAgency && {
-              id: agencyMissionLocale.refersToAgency.id,
-              name: agencyMissionLocale.refersToAgency.name,
-            },
           },
         ]);
       });

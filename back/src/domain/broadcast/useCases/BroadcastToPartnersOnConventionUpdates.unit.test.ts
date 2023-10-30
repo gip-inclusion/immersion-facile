@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   expectToEqual,
   SubscriptionParams,
@@ -21,10 +20,7 @@ describe("Broadcast to partners on updated convention", () => {
     const subscribersGateway = new InMemorySubscribersGateway();
 
     const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
-    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
-
     const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
-    const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
 
     const convention1 = new ConventionDtoBuilder()
       .withId("11111111-ee70-4c90-b3f4-668d492f7395")
@@ -35,7 +31,7 @@ describe("Broadcast to partners on updated convention", () => {
       .withAgencyId(agency2.id)
       .build();
 
-    uow.agencyRepository.setAgencies([agency1SaveParams, agency2SaveParams]);
+    uow.agencyRepository.setAgencies([agency1, agency2]);
     uow.conventionRepository.setConventions({
       [convention1.id]: convention1,
       [convention2.id]: convention2,
@@ -132,10 +128,6 @@ describe("Broadcast to partners on updated convention", () => {
               agencyDepartment: agency1.address.departmentCode,
               agencyKind: agency1.kind,
               agencySiret: agency1.agencySiret,
-              agencyRefersTo: agency1.refersToAgency && {
-                id: agency1.refersToAgency.id,
-                name: agency1.refersToAgency.name,
-              },
             },
           },
         },
@@ -159,10 +151,6 @@ describe("Broadcast to partners on updated convention", () => {
               agencyDepartment: agency2.address.departmentCode,
               agencyKind: agency2.kind,
               agencySiret: agency2.agencySiret,
-              agencyRefersTo: agency2.refersToAgency && {
-                id: agency2.refersToAgency.id,
-                name: agency2.refersToAgency.name,
-              },
             },
           },
         },

@@ -1,7 +1,6 @@
 import { addYears } from "date-fns";
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ApiConsumer,
   ApiConsumerRights,
   ConventionDtoBuilder,
@@ -24,7 +23,6 @@ const agency = new AgencyDtoBuilder()
   .withId(agencyIdInScope)
   .withKind("pole-emploi")
   .build();
-const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
 const convention = new ConventionDtoBuilder()
   .withAgencyId(agencyIdInScope)
@@ -60,7 +58,7 @@ describe("Get Convention for ApiConsumer", () => {
     getConventionForApiConsumer = new GetConventionForApiConsumer(
       new InMemoryUowPerformer(uow),
     );
-    uow.agencyRepository.setAgencies([agencySaveParams]);
+    uow.agencyRepository.setAgencies([agency]);
     uow.conventionRepository.setConventions({
       [convention.id]: convention,
     });
@@ -147,10 +145,6 @@ describe("Get Convention for ApiConsumer", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
-        agencyRefersTo: agency.refersToAgency && {
-          id: agency.refersToAgency.id,
-          name: agency.refersToAgency.name,
-        },
       });
     });
 
@@ -170,10 +164,6 @@ describe("Get Convention for ApiConsumer", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
-        agencyRefersTo: agency.refersToAgency && {
-          id: agency.refersToAgency.id,
-          name: agency.refersToAgency.name,
-        },
       });
     });
   });

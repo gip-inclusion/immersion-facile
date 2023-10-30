@@ -8,7 +8,6 @@ import {
   AgencyKind,
   AgencyKindFilter,
   AgencyPositionFilter,
-  AgencyPublicDisplayDtoWithoutRefersToAgency,
   agencySchema,
   AgencyStatus,
   DepartmentCode,
@@ -16,12 +15,17 @@ import {
   filterNotFalsy,
   GeoPositionDto,
   GetAgenciesFilter,
-  PartialAgencySaveParams,
-  SaveAgencyParams,
+  PartialAgencyDto,
 } from "shared";
-import { AgencyRepository } from "../../../../domain/convention/ports/AgencyRepository";
+import {
+  AgencyRepository,
+  someAgenciesMissingMessage,
+} from "../../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../../utils/logger";
-import { validateAndParseZodSchema } from "../../../primary/helpers/httpErrors";
+import {
+  NotFoundError,
+  validateAndParseZodSchema,
+} from "../../../primary/helpers/httpErrors";
 import {
   cast,
   executeKyselyRawSqlQuery,
@@ -174,11 +178,18 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    return this.#getAgencyWithJsonBuiltQueryBuilder()
+    const agencies = await this.#getAgencyWithJsonBuiltQueryBuilder()
       .where("a.id", "in", ids)
       .orderBy("a.updated_at", "desc")
       .execute()
       .then(map((row) => row.agency));
+    const missingIds = ids.filter(
+      (id) => !agencies.some((agency) => agency.id === id),
+    );
+
+    if (missingIds.length)
+      throw new NotFoundError(someAgenciesMissingMessage(missingIds));
+    return agencies;
   }
 
   public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
@@ -190,7 +201,7 @@ export class PgAgencyRepository implements AgencyRepository {
       .then((row) => row?.id);
   }
 
-  public async insert(agency: SaveAgencyParams): Promise<AgencyId | undefined> {
+  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
     const pgAgency: InsertPgAgency = {
       id: agency.id,
       name: agency.name,
@@ -229,7 +240,7 @@ export class PgAgencyRepository implements AgencyRepository {
     return agency.id;
   }
 
-  public async update(agency: PartialAgencySaveParams): Promise<void> {
+  public async update(agency: PartialAgencyDto): Promise<void> {
     await this.transaction
       .updateTable("agencies")
       .set({
@@ -261,75 +272,39 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   #getAgencyWithJsonBuiltQueryBuilder = () =>
-    this.transaction
-      .selectFrom("agencies as a")
-      .leftJoin("agencies as ra", "a.refers_to_agency_id", "ra.id")
-      .select(({ eb, ref }) => [
-        jsonStripNulls(
-          jsonBuildObject({
-            id: cast<AgencyId>(ref("a.id")),
-            // id: sql<AgencyId>`${ref("a.id")}`,
-            name: ref("a.name"),
-            status: cast<AgencyStatus>(ref("a.status")),
-            kind: cast<AgencyKind>(ref("a.kind")),
-            counsellorEmails: sql<Email[]>`${ref("a.counsellor_emails")}`,
-            validatorEmails: sql<Email[]>`${ref("a.validator_emails")}`,
-            questionnaireUrl: ref("a.questionnaire_url"),
-            logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
-            position: jsonBuildObject({
-              lat: sql<number>`(ST_AsGeoJSON(${ref(
-                "a.position",
-              )})::json->'coordinates'->>1)::numeric`,
-              lon: sql<number>`(ST_AsGeoJSON(${ref(
-                "a.position",
-              )})::json->'coordinates'->>0)::numeric`,
-            }),
-            address: jsonBuildObject({
-              streetNumberAndAddress: ref("a.street_number_and_address"),
-              postcode: ref("a.post_code"),
-              city: ref("a.city"),
-              departmentCode: ref("a.department_code"),
-            }),
-            agencySiret: ref("a.agency_siret"),
-            codeSafir: ref("a.code_safir"),
-            adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
-            signature: ref("a.email_signature"),
-            refersToAgency: cast<AgencyPublicDisplayDtoWithoutRefersToAgency>(
-              eb
-                .case()
-                .when("ra.id", "is not", null)
-                .then(
-                  jsonBuildObject({
-                    id: cast<AgencyId>(ref("ra.id")),
-                    name: ref("ra.name"),
-                    kind: cast<AgencyKind>(ref("ra.kind")),
-                    position: jsonBuildObject({
-                      lat: sql<number>`(ST_AsGeoJSON(${ref(
-                        "ra.position",
-                      )})::json->'coordinates'->>1)::numeric`,
-                      lon: sql<number>`(ST_AsGeoJSON(${ref(
-                        "ra.position",
-                      )})::json->'coordinates'->>0)::numeric`,
-                    }),
-                    address: jsonBuildObject({
-                      streetNumberAndAddress: ref(
-                        "ra.street_number_and_address",
-                      ),
-                      postcode: ref("ra.post_code"),
-                      city: ref("ra.city"),
-                      departmentCode: ref("ra.department_code"),
-                    }),
-                    agencySiret: ref("ra.agency_siret"),
-                    logoUrl: ref("ra.logo_url"),
-                    signature: ref("ra.email_signature"),
-                  }),
-                )
-                .else(null)
-                .end(),
-            ),
+    this.transaction.selectFrom("agencies as a").select(({ ref }) => [
+      jsonStripNulls(
+        jsonBuildObject({
+          id: cast<AgencyId>(ref("a.id")),
+          name: ref("a.name"),
+          status: cast<AgencyStatus>(ref("a.status")),
+          kind: cast<AgencyKind>(ref("a.kind")),
+          counsellorEmails: sql<Email[]>`${ref("a.counsellor_emails")}`,
+          validatorEmails: sql<Email[]>`${ref("a.validator_emails")}`,
+          questionnaireUrl: ref("a.questionnaire_url"),
+          logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
+          position: jsonBuildObject({
+            lat: sql<number>`(ST_AsGeoJSON(${ref(
+              "a.position",
+            )})::json->'coordinates'->>1)::numeric`,
+            lon: sql<number>`(ST_AsGeoJSON(${ref(
+              "a.position",
+            )})::json->'coordinates'->>0)::numeric`,
           }),
-        ).as("agency"),
-      ]);
+          address: jsonBuildObject({
+            streetNumberAndAddress: ref("a.street_number_and_address"),
+            postcode: ref("a.post_code"),
+            city: ref("a.city"),
+            departmentCode: ref("a.department_code"),
+          }),
+          agencySiret: ref("a.agency_siret"),
+          codeSafir: ref("a.code_safir"),
+          adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
+          signature: ref("a.email_signature"),
+          refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
+        }),
+      ).as("agency"),
+    ]);
 }
 
 const STPointStringFromPosition = (position: GeoPositionDto) =>

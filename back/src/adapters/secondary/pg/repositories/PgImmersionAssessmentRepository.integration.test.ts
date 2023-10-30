@@ -1,7 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDtoBuilder,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -37,9 +36,7 @@ describe("PgImmersionAssessmentRepository", () => {
     await client.query("DELETE FROM agencies");
     const transaction = makeKyselyDb(pool);
     const agencyRepository = new PgAgencyRepository(transaction);
-    await agencyRepository.insert(
-      agencyDtoToSaveAgencyParams(AgencyDtoBuilder.create().build()),
-    );
+    await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(transaction);
     await conventionRepository.save(convention);
   });

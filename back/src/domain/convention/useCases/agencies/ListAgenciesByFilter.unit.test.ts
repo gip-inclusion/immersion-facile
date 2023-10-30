@@ -1,9 +1,4 @@
-import {
-  AddressDto,
-  AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
-  expectToEqual,
-} from "shared";
+import { AddressDto, AgencyDtoBuilder, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { ListAgenciesByFilter, toAgencyOption } from "./ListAgenciesByFilter";
@@ -52,7 +47,7 @@ const peAgency2InParis = new AgencyDtoBuilder()
   .withAddress(parisAddress)
   .build();
 const otherAgencyWithRefersToInCergy = new AgencyDtoBuilder()
-  .withRefersToAgency(peAgency2InParis)
+  .withRefersToAgencyId(peAgency2InParis.id)
   .withId("5")
   .withName("Agence avec refersTo")
   .withAddress(cergyAddress)
@@ -70,7 +65,7 @@ describe("Query: List agencies by filter", () => {
     peAgency2InParis,
     otherAgencyWithRefersToInCergy,
   ];
-  agencyRepository.setAgencies(allAgencies.map(agencyDtoToSaveAgencyParams));
+  agencyRepository.setAgencies(allAgencies);
 
   describe("No filters", () => {
     it("List all agencies", async () => {
@@ -119,7 +114,7 @@ describe("Query: List agencies by filter", () => {
       expectToEqual(
         await useCase.execute({ kind: "withoutRefersToAgency" }, undefined),
         allAgencies
-          .filter((agency) => agency.refersToAgency === undefined)
+          .filter((agency) => agency.refersToAgencyId === undefined)
           .map(toAgencyOption),
       );
     });

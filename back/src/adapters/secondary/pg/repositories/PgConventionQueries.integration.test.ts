@@ -1,11 +1,10 @@
 import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import {
+  AgencyDto,
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   AgencyId,
   AgencyKind,
-  AgencyPublicDisplayDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
@@ -94,9 +93,8 @@ describe("Pg implementation of ConventionQueries", () => {
         .withId(refersToAgencyId)
         .withAgencySiret("55552222000055")
         .build();
-      const referringAgencySaveParams =
-        agencyDtoToSaveAgencyParams(referringAgency);
-      await agencyRepo.insert(referringAgencySaveParams);
+
+      await agencyRepo.insert(referringAgency);
 
       const expectedConventionRead = await insertAgencyAndConvention({
         conventionId: conventionIdA,
@@ -305,7 +303,6 @@ describe("Pg implementation of ConventionQueries", () => {
   describe("PG implementation of method getConventionsByFilters", () => {
     const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
     const agency = AgencyDtoBuilder.create().withId(agencyId).build();
-    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
     const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
       .withDateStart(new Date("2023-03-27").toISOString())
@@ -325,7 +322,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     beforeEach(async () => {
-      await agencyRepo.insert(agencySaveParams);
+      await agencyRepo.insert(agency);
 
       await Promise.all(
         [
@@ -351,10 +348,6 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersTo: agency.refersToAgency && {
-            id: agency.refersToAgency.id,
-            name: agency.refersToAgency.name,
-          },
         },
       ]);
     });
@@ -378,10 +371,6 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersTo: agency.refersToAgency && {
-            id: agency.refersToAgency.id,
-            name: agency.refersToAgency.name,
-          },
         },
         {
           ...conventionCancelledAndDateStart20230327,
@@ -389,10 +378,6 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersTo: agency.refersToAgency && {
-            id: agency.refersToAgency.id,
-            name: agency.refersToAgency.name,
-          },
         },
       ]);
     });
@@ -415,10 +400,6 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersTo: agency.refersToAgency && {
-            id: agency.refersToAgency.id,
-            name: agency.refersToAgency.name,
-          },
         },
       ]);
     });
@@ -448,10 +429,6 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersTo: agency.refersToAgency && {
-            id: agency.refersToAgency.id,
-            name: agency.refersToAgency.name,
-          },
         },
       ]);
     });
@@ -473,10 +450,9 @@ describe("Pg implementation of ConventionQueries", () => {
 
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     const agency = AgencyDtoBuilder.create().build();
-    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
     beforeEach(async () => {
       const agencyRepository = new PgAgencyRepository(transaction);
-      await agencyRepository.insert(agencySaveParams);
+      await agencyRepository.insert(agency);
       await client.query("DELETE FROM outbox_failures");
       await client.query("DELETE FROM outbox_publications");
       await client.query("DELETE FROM outbox");
@@ -555,10 +531,6 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
-          agencyRefersTo: agency.refersToAgency && {
-            id: agency.refersToAgency.id,
-            name: agency.refersToAgency.name,
-          },
         },
       ]);
     });
@@ -581,7 +553,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment: string;
     agencyKind: AgencyKind;
     agencySiret: SiretDto;
-    withRefersToAgency?: AgencyPublicDisplayDto;
+    withRefersToAgency?: AgencyDto;
     conventionStartDate?: string;
     conventionStatus?: ConventionStatus;
   }): Promise<ConventionReadDto> => {
@@ -646,23 +618,27 @@ describe("Pg implementation of ConventionQueries", () => {
       })
       .withAgencySiret(agencySiret)
       .withKind(agencyKind)
-      .withRefersToAgency(withRefersToAgency)
+      .withRefersToAgencyId(
+        withRefersToAgency ? withRefersToAgency.id : undefined,
+      )
       .build();
-    const agencySaveParams = agencyDtoToSaveAgencyParams(agency);
 
-    await agencyRepo.insert(agencySaveParams);
+    if (withRefersToAgency) await agencyRepo.insert(withRefersToAgency);
+
+    await agencyRepo.insert(agency);
 
     await conventionRepository.save(convention);
+
     return {
       ...convention,
       agencyName,
       agencyDepartment,
       agencyKind,
       agencySiret,
-      agencyRefersTo: agency.refersToAgency && {
-        id: agency.refersToAgency.id,
-        name: agency.refersToAgency.name,
+      agencyRefersTo: withRefersToAgency && {
+        id: withRefersToAgency.id,
+        name: withRefersToAgency.name,
       },
-    };
+    } satisfies ConventionReadDto;
   };
 });

@@ -5,8 +5,7 @@ import {
   InternshipKind,
 } from "../convention/convention.dto";
 import { pipeWithValue } from "../pipeWithValue";
-
-const isTruthy = <T>(t: T | null | undefined): t is T => !!t;
+import { isTruthy } from "../typeGuard";
 
 const getEmergencyContactInfos = ({
   fullName,

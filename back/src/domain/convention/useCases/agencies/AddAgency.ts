@@ -1,4 +1,4 @@
-import { CreateAgencyDto, createAgencySchema, SaveAgencyParams } from "shared";
+import { AgencyDto, CreateAgencyDto, createAgencySchema } from "shared";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
@@ -23,7 +23,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
     params: CreateAgencyDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const agency: SaveAgencyParams = {
+    const agency: AgencyDto = {
       ...params,
       adminEmails: [],
       status: "needsReview",

@@ -1,27 +1,39 @@
-import {
-  AgencyDto,
-  AgencyPublicDisplayDto,
-  SaveAgencyParams,
-} from "./agency.dto";
+import { AgencyDto, AgencyPublicDisplayDto } from "./agency.dto";
 
 export const toAgencyPublicDisplayDto = (
   agency: AgencyDto,
-): AgencyPublicDisplayDto => ({
-  id: agency.id,
-  name: agency.name,
-  kind: agency.kind,
-  address: agency.address,
-  position: agency.position,
-  signature: agency.signature,
-  logoUrl: agency.logoUrl,
-  agencySiret: agency.agencySiret,
-  refersToAgency: agency.refersToAgency,
-});
+  referedAgency?: AgencyDto,
+): AgencyPublicDisplayDto => {
+  if (
+    agency.refersToAgencyId &&
+    referedAgency &&
+    agency.id !== referedAgency.id
+  )
+    throw new Error(
+      "Agency.refersToAgencyId and referedAgency.id are not identical.",
+    );
 
-export const agencyDtoToSaveAgencyParams = ({
-  refersToAgency,
-  ...agency
-}: AgencyDto): SaveAgencyParams => ({
-  ...agency,
-  refersToAgencyId: refersToAgency?.id,
-});
+  return {
+    id: agency.id,
+    name: agency.name,
+    kind: agency.kind,
+    address: agency.address,
+    position: agency.position,
+    signature: agency.signature,
+    logoUrl: agency.logoUrl,
+    agencySiret: agency.agencySiret,
+    refersToAgency:
+      agency.refersToAgencyId && referedAgency
+        ? {
+            id: referedAgency.id,
+            address: referedAgency.address,
+            kind: referedAgency.kind,
+            name: referedAgency.name,
+            position: referedAgency.position,
+            signature: referedAgency.signature,
+            agencySiret: referedAgency.agencySiret,
+            logoUrl: referedAgency.logoUrl,
+          }
+        : undefined,
+  };
+};

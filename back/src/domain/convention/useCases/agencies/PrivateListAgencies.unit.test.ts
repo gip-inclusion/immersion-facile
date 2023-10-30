@@ -1,4 +1,4 @@
-import { expectToEqual, SaveAgencyParams } from "shared";
+import { AgencyDtoBuilder, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
@@ -16,27 +16,26 @@ describe("PrivateListAgencies use case", () => {
   });
 
   it("should return agencies needing review as id an name object", async () => {
-    const expectedAgency = {
-      id: "1",
-      name: "Agency needing review",
-      status: "needsReview",
-    } as SaveAgencyParams;
+    const expectedAgency = AgencyDtoBuilder.create("1")
+      .withName("Agency needing review")
+      .withStatus("needsReview")
+      .build();
     agencyRepository.setAgencies([
       expectedAgency,
-      {
-        id: "3",
-        name: "Agency active",
-        status: "active",
-      } as SaveAgencyParams,
+      AgencyDtoBuilder.create("3")
+        .withName("Agency active")
+        .withStatus("active")
+        .build(),
     ]);
     const fetchedAgencies = await privateListAgencies.execute({
       status: "needsReview",
     });
-    expect(fetchedAgencies).toHaveLength(1);
-    expectToEqual(fetchedAgencies[0], {
-      id: expectedAgency.id,
-      name: expectedAgency.name,
-      kind: expectedAgency.kind,
-    });
+    expectToEqual(fetchedAgencies, [
+      {
+        id: expectedAgency.id,
+        kind: expectedAgency.kind,
+        name: expectedAgency.name,
+      },
+    ]);
   });
 });

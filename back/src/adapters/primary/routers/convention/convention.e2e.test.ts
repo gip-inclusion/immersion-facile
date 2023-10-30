@@ -2,7 +2,6 @@ import { SuperTest, Test } from "supertest";
 import { match } from "ts-pattern";
 import {
   AgencyDtoBuilder,
-  agencyDtoToSaveAgencyParams,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -39,7 +38,6 @@ import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplement
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
-const peAgencySaveParams = agencyDtoToSaveAgencyParams(peAgency);
 
 const inclusionConnectedUser: InclusionConnectedUser = {
   id: "my-user-id",
@@ -217,7 +215,7 @@ describe("convention e2e", () => {
       inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
-      inMemoryUow.agencyRepository.setAgencies([peAgencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([peAgency]);
     });
 
     it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
@@ -270,10 +268,6 @@ describe("convention e2e", () => {
             agencyDepartment: peAgency.address.departmentCode,
             agencyKind: peAgency.kind,
             agencySiret: peAgency.agencySiret,
-            agencyRefersTo: peAgency.refersToAgency && {
-              id: peAgency.refersToAgency.id,
-              name: peAgency.refersToAgency.name,
-            },
           },
         });
       },
@@ -418,7 +412,7 @@ describe("convention e2e", () => {
   )} updates the status of a convention`, () => {
     const externalId = "00000000001";
     beforeEach(() => {
-      inMemoryUow.agencyRepository.setAgencies([peAgencySaveParams]);
+      inMemoryUow.agencyRepository.setAgencies([peAgency]);
       const inReviewConvention = new ConventionDtoBuilder(convention)
         .withStatus("IN_REVIEW")
         .build();

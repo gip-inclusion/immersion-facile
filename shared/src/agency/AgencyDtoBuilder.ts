@@ -2,13 +2,7 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto } from "../address/address.dto";
 import { Builder } from "../Builder";
 import { Email } from "../email/email.dto";
-import {
-  AgencyDto,
-  AgencyId,
-  AgencyKind,
-  AgencyPublicDisplayDto,
-  AgencyStatus,
-} from "./agency.dto";
+import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
 
 const emptyAddress: AddressDto = {
   streetNumberAndAddress: "26 rue de l'adresse par défaut",
@@ -34,7 +28,6 @@ const emptyAgency: AgencyDto = {
     lat: 48.866667, // Paris lat/lon
     lon: 2.333333,
   },
-  refersToAgency: undefined,
 };
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {
@@ -139,12 +132,10 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withRefersToAgency(
-    refersToAgency: AgencyPublicDisplayDto | undefined,
-  ) {
+  public withRefersToAgencyId(refersToAgencyId: AgencyId | undefined) {
     return new AgencyDtoBuilder({
       ...this.#agency,
-      refersToAgency,
+      refersToAgencyId,
     });
   }
 
