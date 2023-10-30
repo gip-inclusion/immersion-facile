@@ -23,6 +23,24 @@ const beneficiaryRepresentativeIdColumnName = "beneficiary_representative_id";
 export class PgConventionRepository implements ConventionRepository {
   constructor(private transaction: KyselyDb) {}
 
+  public async deprecateConventionsWithoutDefinitiveStatusEndedSince(
+    endedSince: Date,
+  ) {
+    await executeKyselyRawSqlQuery(
+      this.transaction,
+      `
+      UPDATE conventions
+      SET status = 'DEPRECATED', status_justification = 'Devenu obsolète car status ' || status || ' alors que la date de fin est dépassé depuis longtemps'
+      WHERE id IN (
+        SELECT id FROM conventions
+        WHERE date_end <= $1
+        AND status NOT IN ('REJECTED','CANCELLED','DEPRECATED','ACCEPTED_BY_VALIDATOR')
+      )
+      `,
+      [endedSince],
+    );
+  }
+
   public async getById(
     conventionId: ConventionId,
   ): Promise<ConventionDto | undefined> {

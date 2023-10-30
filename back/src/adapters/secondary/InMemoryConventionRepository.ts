@@ -12,6 +12,10 @@ export class InMemoryConventionRepository implements ConventionRepository {
     return Object.values(this._conventions);
   }
 
+  public async deprecateConventionsWithoutDefinitiveStatusEndedSince() {
+    throw new Error("not implemented");
+  }
+
   public async getById(id: ConventionId) {
     logger.info({ id }, "getById");
     return this._conventions[id];
