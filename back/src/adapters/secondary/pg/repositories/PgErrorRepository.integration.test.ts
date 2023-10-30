@@ -16,12 +16,13 @@ import { PgErrorRepository } from "./PgErrorRepository";
 const makeSavedError = (
   serviceName: string,
   conventionId: ConventionId,
+  handledByAgency?: boolean,
 ): SavedError => ({
   serviceName,
   message: "Some message",
   params: { conventionId, httpStatus: 500 },
   occurredAt: new Date(),
-  handledByAgency: false,
+  handledByAgency: handledByAgency ? handledByAgency : false,
 });
 
 describe("PgErrorRepository", () => {
@@ -109,6 +110,22 @@ describe("PgErrorRepository", () => {
         pgErrorRepository.markPartnersErroredConventionAsHandled(conventionId1),
         new NotFoundError(
           `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId1}'.`,
+        ),
+      );
+    });
+
+    it("Throw when the saved error is already mark as handle", async () => {
+      const savedError1 = makeSavedError(
+        broadcastToPeServiceName,
+        conventionId1,
+        true,
+      );
+      await pgErrorRepository.save(savedError1);
+
+      await expectPromiseToFailWithError(
+        pgErrorRepository.markPartnersErroredConventionAsHandled(conventionId1),
+        new NotFoundError(
+          `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId1}'.`,
         ),
       );
     });

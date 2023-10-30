@@ -63,7 +63,14 @@ export class HttpInclusionConnectedGateway
         body: params,
         headers: { authorization: jwt },
       })
-      .then(() => undefined);
+      .then(() => undefined)
+      .catch((error) => {
+        if (error?.httpStatusCode === 404)
+          throw new Error(
+            "L'erreur sur la convention que vous cherchez à traiter n'existe pas, peut-être est-elle déjà marquée comme traitée. Rechargez la page pour mettre à jour le tableau.",
+          );
+        throw error;
+      });
   }
 
   #registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {
