@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 import {
   AgencyDto,
@@ -47,18 +47,19 @@ export const AddAgencyForm = () => {
     {
       label: "Prescripteur",
       nativeInputProps: {
-        value: 1,
-        onClick: () => setHasAgencyReferral(false),
+        onClick: () => {
+          setHasAgencyReferral(false);
+        },
       },
     },
     {
       label: "Structure d'accompagnement",
       nativeInputProps: {
-        value: 0,
         onClick: () => setHasAgencyReferral(true),
       },
     },
   ];
+
   return (
     <>
       <RadioButtons
@@ -66,8 +67,9 @@ export const AddAgencyForm = () => {
         options={agencyRefersToOptions}
       />
       {match(hasAgencyReferral)
-        .with(true, () => <AgencyForm hasAgencyReferral={true} />)
-        .with(false, () => <AgencyForm hasAgencyReferral={false} />)
+        .with(P.boolean, (hasAgencyReferral) => (
+          <AgencyForm hasAgencyReferral={hasAgencyReferral} />
+        ))
         .with(undefined, () => null)
         .exhaustive()}
     </>
@@ -82,13 +84,20 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
     formAgencyFieldsLabels,
   );
   const { refersToAgencyId: refersToAgencyIdField } = getFormFields();
+  const formInitialValues = useMemo(
+    () => ({
+      ...initialValues(uuidV4()),
+      validatorEmails: hasAgencyReferral ? ["temp@temp.com"] : [],
+    }),
+    [hasAgencyReferral],
+  );
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: zodResolver(createAgencySchema),
     mode: "onTouched",
-    defaultValues: initialValues(uuidV4()),
+    defaultValues: formInitialValues,
   });
 
-  const { handleSubmit, formState } = methods;
+  const { handleSubmit, formState, reset } = methods;
 
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");
@@ -106,6 +115,11 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
         setSubmitFeedback(e);
       });
   };
+
+  useEffect(() => {
+    reset(formInitialValues);
+  }, [reset, formInitialValues]);
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onFormValid)}>
@@ -134,12 +148,14 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
                   id: "refersToAgencyKind",
                 },
               }}
-              initialAgencies={[]}
               shouldLockToPeAgencies={false}
               shouldShowAgencyKindField
               agencyDepartmentOptions={departmentOptions}
-              agenciesRetriever={(departementCode) =>
-                agencyGateway.listImmersionAgencies(departementCode)
+              agenciesRetriever={(departmentCode) =>
+                agencyGateway.getFilteredAgencies({
+                  departmentCode,
+                  kind: "withoutRefersToAgency",
+                })
               }
             />
           </>
@@ -147,7 +163,7 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
         <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
           Structure d'accompagnement
         </h2>
-        <AgencyFormCommonFields />
+        <AgencyFormCommonFields hasAgencyReferral={hasAgencyReferral} />
         <AgencyLogoUpload />
 
         <ErrorNotifications

@@ -58,7 +58,6 @@ export const ConventionAgencySelector = ({
         agencyIdField,
         agencyKindField,
       }}
-      initialAgencies={[]}
       shouldLockToPeAgencies={shouldLockToPeAgencies}
       shouldShowAgencyKindField={internshipKind === "immersion"}
       agencyDepartmentOptions={

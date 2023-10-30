@@ -82,7 +82,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   counsellorEmails: {
     id: domElementIds.addAgency.counsellorEmailsInput,
     label: "Emails pour examen préalable de la demande de convention",
-    placeholder: "Ex : conseiller.dupont@mail.com (optionnel)",
+    placeholder: "Ex : conseiller.dupont@mail.com",
     hintText:
       "Les personnes ou emails génériques suivants recevront en premier les demandes de convention à examiner.",
   },
@@ -90,7 +90,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.questionnaireUrlInput,
     label: "Lien vers le document de support du bilan de fin d’immersion ",
     placeholder:
-      "Ex : https://docs.google.com/document/d/mon-document-pour-bilan (optionnel)",
+      "Ex : https://docs.google.com/document/d/mon-document-pour-bilan",
   },
   agencySiret: {
     label: "SIRET de la structure",
