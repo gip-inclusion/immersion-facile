@@ -7,6 +7,7 @@ export interface Database {
   groups: Groups;
   groups__sirets: GroupsSirets;
   agencies: Agencies;
+  saved_errors: SavedErrors;
 }
 
 export type JsonArray = JsonValue[];
@@ -100,4 +101,13 @@ export interface Agencies {
   city: string;
   department_code: string;
   refers_to_agency_id: string | null;
+}
+
+export interface SavedErrors {
+  id: Generated<number>;
+  service_name: string;
+  message: string;
+  params: Json | null;
+  occurred_at: Timestamp;
+  handled_by_agency: Generated<boolean>;
 }
