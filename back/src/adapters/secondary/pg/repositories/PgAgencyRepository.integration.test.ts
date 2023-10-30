@@ -56,6 +56,19 @@ const inactiveAgency = AgencyDtoBuilder.create(
   .build();
 const inactiveAgencySaveParams = agencyDtoToSaveAgencyParams(inactiveAgency);
 
+const agency1 = agency1builder
+  .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
+  .withAgencySiret("01234567890123")
+  .withCodeSafir("AAAAAA")
+  .build();
+const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
+
+const agencyWithRefersTo = agency2builder
+  .withRefersToAgency(toAgencyPublicDisplayDto(agency1))
+  .build();
+const agencyWithRefersToSaveParams =
+  agencyDtoToSaveAgencyParams(agencyWithRefersTo);
+
 describe("PgAgencyRepository", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -78,13 +91,6 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getById", () => {
-    const agency1 = agency1builder
-      .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
-      .withAgencySiret("10000002222999")
-      .withCodeSafir("AAAAAA")
-      .build();
-    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
-
     it("returns undefined when no agency found", async () => {
       const retrievedAgency = await agencyRepository.getById(
         agency1SaveParams.id,
@@ -102,26 +108,17 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns existing agency, with link to a refering one if it exists", async () => {
-      const agency2 = agency2builder
-        .withRefersToAgency(toAgencyPublicDisplayDto(agency1))
-        .build();
-      const agency2SaveParams = agencyDtoToSaveAgencyParams(agency2);
       await agencyRepository.insert(agency1SaveParams);
-      await agencyRepository.insert(agency2SaveParams);
+      await agencyRepository.insert(agencyWithRefersToSaveParams);
 
-      const retrievedAgency = await agencyRepository.getById(agency2.id);
-      expectToEqual(retrievedAgency, agency2);
+      const retrievedAgency = await agencyRepository.getById(
+        agencyWithRefersTo.id,
+      );
+      expectToEqual(retrievedAgency, agencyWithRefersTo);
     });
   });
 
   describe("getByIds", () => {
-    const agency1 = agency1builder
-      .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
-      .withAgencySiret("01234567890123")
-      .withCodeSafir("AAAAAA")
-      .build();
-    const agency1SaveParams = agencyDtoToSaveAgencyParams(agency1);
-
     it("returns existing agency", async () => {
       await agencyRepository.insert(agency1SaveParams);
 
@@ -297,6 +294,18 @@ describe("PgAgencyRepository", () => {
         filters: { kind: "miniStageExcluded" },
       });
       expect(sortById(agencies)).toEqual([agency1PE]);
+    });
+
+    it("if agencyKindFilter = 'withoutRefersToAgency', returns agencies that have no refersToAgency", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1SaveParams),
+        agencyRepository.insert(agencyWithRefersToSaveParams),
+      ]);
+
+      const agencies = await agencyRepository.getAgencies({
+        filters: { kind: "withoutRefersToAgency" },
+      });
+      expect(sortById(agencies)).toEqual([agency1]);
     });
 
     it("returns all agencies filtered by name", async () => {

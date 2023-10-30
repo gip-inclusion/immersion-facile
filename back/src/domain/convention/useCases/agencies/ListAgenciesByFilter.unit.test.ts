@@ -51,6 +51,12 @@ const peAgency2InParis = new AgencyDtoBuilder()
   .withKind("pole-emploi")
   .withAddress(parisAddress)
   .build();
+const otherAgencyWithRefersToInCergy = new AgencyDtoBuilder()
+  .withRefersToAgency(peAgency2InParis)
+  .withId("5")
+  .withName("Agence avec refersTo")
+  .withAddress(cergyAddress)
+  .build();
 
 describe("Query: List agencies by filter", () => {
   const uow = createInMemoryUow();
@@ -62,6 +68,7 @@ describe("Query: List agencies by filter", () => {
     cciAgency2InParis,
     peAgency1InParis,
     peAgency2InParis,
+    otherAgencyWithRefersToInCergy,
   ];
   agencyRepository.setAgencies(allAgencies.map(agencyDtoToSaveAgencyParams));
 
@@ -83,7 +90,9 @@ describe("Query: List agencies by filter", () => {
     it("List immersionWithoutPe agencies", async () => {
       expectToEqual(
         await useCase.execute({ kind: "immersionWithoutPe" }, undefined),
-        [otherAgencyInParis].map(toAgencyOption),
+        [otherAgencyInParis, otherAgencyWithRefersToInCergy].map(
+          toAgencyOption,
+        ),
       );
     });
 
@@ -97,9 +106,21 @@ describe("Query: List agencies by filter", () => {
     it("List miniStageExcluded agencies", async () => {
       expectToEqual(
         await useCase.execute({ kind: "miniStageExcluded" }, undefined),
-        [otherAgencyInParis, peAgency1InParis, peAgency2InParis].map(
-          toAgencyOption,
-        ),
+        [
+          otherAgencyInParis,
+          peAgency1InParis,
+          peAgency2InParis,
+          otherAgencyWithRefersToInCergy,
+        ].map(toAgencyOption),
+      );
+    });
+
+    it("List withoutRefersToAgency agencies", async () => {
+      expectToEqual(
+        await useCase.execute({ kind: "withoutRefersToAgency" }, undefined),
+        allAgencies
+          .filter((agency) => agency.refersToAgency === undefined)
+          .map(toAgencyOption),
       );
     });
   });
@@ -108,7 +129,7 @@ describe("Query: List agencies by filter", () => {
     it("List agencies with department code 95", async () => {
       expectToEqual(
         await useCase.execute({ departmentCode: "95" }, undefined),
-        [cciAgency1InCergy].map(toAgencyOption),
+        [cciAgency1InCergy, otherAgencyWithRefersToInCergy].map(toAgencyOption),
       );
     });
 
