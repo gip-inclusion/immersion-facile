@@ -17,8 +17,12 @@ export const createInclusionConnectedAllowedRouter = (
     inclusionConnectedRouter,
   );
 
+  const inclusionConnectedMiddleware = createInclusionConnectedMiddleware(
+    deps.config.jwtPublicKey,
+  );
+
   inclusionConnectedSharedRoutes.getInclusionConnectedUser(
-    createInclusionConnectedMiddleware(deps.config.jwtPublicKey),
+    inclusionConnectedMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getUserAgencyDashboardUrl.execute(
@@ -29,7 +33,7 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedSharedRoutes.registerAgenciesToUser(
-    createInclusionConnectedMiddleware(deps.config.jwtPublicKey),
+    inclusionConnectedMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.registerAgencyToInclusionConnectUser.execute(
@@ -40,7 +44,7 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedSharedRoutes.markPartnersErroredConventionAsHandled(
-    createInclusionConnectedMiddleware(deps.config.jwtPublicKey),
+    inclusionConnectedMiddleware,
     async (req, res) =>
       sendHttpResponse(req, res, () =>
         match(req.payloads)
