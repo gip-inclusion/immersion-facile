@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { match, P } from "ts-pattern";
 import { inclusionConnectedAllowedRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { AppDependencies } from "../../config/createAppDependencies";
@@ -45,19 +44,15 @@ export const createInclusionConnectedAllowedRouter = (
 
   inclusionConnectedSharedRoutes.markPartnersErroredConventionAsHandled(
     inclusionConnectedMiddleware,
-    async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        match(req.payloads)
-          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
-            deps.useCases.markPartnersErroredConventionAsHandled.execute(
-              req.body,
-              inclusion,
-            ),
-          )
-          .otherwise(() => {
-            throw new UnauthorizedError();
-          }),
-      ),
+    (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const inclusion = req.payloads?.inclusion;
+        if (!inclusion) throw new UnauthorizedError();
+        await deps.useCases.markPartnersErroredConventionAsHandled.execute(
+          req.body,
+          inclusion,
+        );
+      }),
   );
 
   return inclusionConnectedRouter;
