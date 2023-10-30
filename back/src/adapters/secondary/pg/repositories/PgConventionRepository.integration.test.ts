@@ -1,3 +1,4 @@
+import { addDays, subDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -648,6 +649,101 @@ describe("PgConventionRepository", () => {
     expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
   });
 
+  describe("deprecateConventionsWithoutDefinitiveStatusEndedSince", () => {
+    it("changes status of convention with date end before given date to deprecated with justification", async () => {
+      const dateSince = new Date("2023-08-30");
+
+      const conventionBuilderWithDateInRange = new ConventionDtoBuilder()
+        .withDateStart(subDays(dateSince, 3).toISOString())
+        .withDateEnd(subDays(dateSince, 1).toISOString())
+        .withSchedule(reasonableSchedule);
+
+      const convention1ToMarkAsDeprecated = conventionBuilderWithDateInRange
+        .withId("11111111-1111-4111-1111-111111111111")
+        .withStatus("PARTIALLY_SIGNED")
+        .build();
+
+      const convention2ToKeepAsIs = new ConventionDtoBuilder()
+        .withId("22221111-1111-4111-1111-111111112222")
+        .withDateStart(subDays(dateSince, 2).toISOString())
+        .withDateEnd(addDays(dateSince, 1).toISOString())
+        .withSchedule(reasonableSchedule)
+        .withStatus("PARTIALLY_SIGNED")
+        .build();
+
+      const convention3ToKeepAsIs = conventionBuilderWithDateInRange
+        .withId("33331111-1111-4111-1111-111111113333")
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .build();
+
+      const convention4ToKeepAsIs = conventionBuilderWithDateInRange
+        .withId("44441111-1111-4111-1111-111111114444")
+        .withStatus("CANCELLED")
+        .build();
+
+      const convention5ToKeepAsIs = conventionBuilderWithDateInRange
+        .withId("55551111-1111-4111-1111-111111115555")
+        .withStatus("REJECTED")
+        .build();
+
+      const convention6ToKeepAsIs = conventionBuilderWithDateInRange
+        .withId("66661111-1111-4111-1111-111111116666")
+        .withStatus("DEPRECATED")
+        .build();
+
+      const convention7ToMarkAsDeprecated = conventionBuilderWithDateInRange
+        .withId("77771111-1111-4111-1111-111111117777")
+        .withStatus("ACCEPTED_BY_COUNSELLOR")
+        .build();
+
+      const convention8ToMarkAsDeprecated = conventionBuilderWithDateInRange
+        .withId("88881111-1111-4111-1111-111111118888")
+        .withStatus("IN_REVIEW")
+        .build();
+
+      const convention9ToMarkAsDeprecated = conventionBuilderWithDateInRange
+        .withId("99991111-1111-4111-1111-111111119999")
+        .withStatus("READY_TO_SIGN")
+        .build();
+
+      const convention10ToMarkAsDeprecated = conventionBuilderWithDateInRange
+        .withId("10101111-1111-4111-1111-111111111010")
+        .withStatus("DRAFT")
+        .build();
+
+      await Promise.all([
+        conventionRepository.save(convention1ToMarkAsDeprecated),
+        conventionRepository.save(convention2ToKeepAsIs),
+        conventionRepository.save(convention3ToKeepAsIs),
+        conventionRepository.save(convention4ToKeepAsIs),
+        conventionRepository.save(convention5ToKeepAsIs),
+        conventionRepository.save(convention6ToKeepAsIs),
+        conventionRepository.save(convention7ToMarkAsDeprecated),
+        conventionRepository.save(convention8ToMarkAsDeprecated),
+        conventionRepository.save(convention9ToMarkAsDeprecated),
+        conventionRepository.save(convention10ToMarkAsDeprecated),
+      ]);
+
+      await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
+        dateSince,
+      );
+
+      await expectConventionInRepoToBeDeprecated(convention1ToMarkAsDeprecated);
+      await expectConventionInRepoToBeDeprecated(convention7ToMarkAsDeprecated);
+      await expectConventionInRepoToBeDeprecated(convention8ToMarkAsDeprecated);
+      await expectConventionInRepoToBeDeprecated(convention9ToMarkAsDeprecated);
+      await expectConventionInRepoToBeDeprecated(
+        convention10ToMarkAsDeprecated,
+      );
+
+      await expectConventionInRepoToEqual(convention2ToKeepAsIs);
+      await expectConventionInRepoToEqual(convention3ToKeepAsIs);
+      await expectConventionInRepoToEqual(convention4ToKeepAsIs);
+      await expectConventionInRepoToEqual(convention5ToKeepAsIs);
+      await expectConventionInRepoToEqual(convention6ToKeepAsIs);
+    });
+  });
+
   const tutorIdAndRepIdFromConventionId = (conventionId: ConventionId) =>
     client.query<{
       establishment_tutor_id: number;
@@ -728,5 +824,22 @@ describe("PgConventionRepository", () => {
     expect(establishment_representative_id !== establishment_tutor_id).toBe(
       true,
     );
+  };
+
+  const expectConventionInRepoToEqual = async (convention: ConventionDto) => {
+    expectToEqual(
+      await conventionRepository.getById(convention.id),
+      convention,
+    );
+  };
+
+  const expectConventionInRepoToBeDeprecated = async (
+    convention: ConventionDto,
+  ) => {
+    expectToEqual(await conventionRepository.getById(convention.id), {
+      ...convention,
+      status: "DEPRECATED",
+      statusJustification: `Devenu obsolète car status ${convention.status} alors que la date de fin est dépassé depuis longtemps`,
+    });
   };
 });
