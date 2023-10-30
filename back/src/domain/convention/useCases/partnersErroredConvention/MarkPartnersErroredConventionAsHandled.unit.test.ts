@@ -113,7 +113,7 @@ describe("mark partners errored convention as handled", () => {
 
     expectToEqual(outboxRepo.events, [
       createNewEvent({
-        topic: "PartnerErroredConventionMarkAsHandled",
+        topic: "PartnerErroredConventionMarkedAsHandled",
         payload: {
           conventionId,
           userId,
@@ -190,7 +190,7 @@ describe("mark partners errored convention as handled", () => {
 
     expectToEqual(outboxRepo.events, [
       createNewEvent({
-        topic: "PartnerErroredConventionMarkAsHandled",
+        topic: "PartnerErroredConventionMarkedAsHandled",
         payload: {
           conventionId,
           userId,

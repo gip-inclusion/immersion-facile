@@ -126,7 +126,7 @@ const getUseCasesByTopics = (
   //Api Consumer related:
   ApiConsumerSaved: [],
   //partnersErroredConvention related
-  PartnerErroredConventionMarkAsHandled: [],
+  PartnerErroredConventionMarkedAsHandled: [],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

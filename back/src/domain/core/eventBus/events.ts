@@ -103,7 +103,7 @@ export type DomainEvent =
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string }>
   // ERRORED CONVENTION RELATED
-  | GenericEvent<"PartnerErroredConventionMarkAsHandled", { conventionId: ConventionId, userId: AuthenticatedUserId }>;
+  | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId, userId: AuthenticatedUserId }>;
 
 export type DomainTopic = DomainEvent["topic"];
 

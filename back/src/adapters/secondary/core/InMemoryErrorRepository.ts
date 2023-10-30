@@ -11,25 +11,23 @@ export class InMemoryErrorRepository implements ErrorRepository {
   #savedErrors: SavedError[] = [];
 
   public async markPartnersErroredConventionAsHandled(
-    id: ConventionId,
+    conventionId: ConventionId,
   ): Promise<void> {
-    let erroredConventionMarked = false;
+    const hasConventionErrorToMarkAsHandled = this.#savedErrors.some(
+      (savedError) => isSavedErrorForConvention(savedError, conventionId),
+    );
+
+    if (!hasConventionErrorToMarkAsHandled)
+      throw new NotFoundError(
+        `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId}'.`,
+      );
+
     this.#savedErrors = this.#savedErrors.map((savedError) => {
-      if (
-        "conventionId" in savedError.params &&
-        savedError.params.conventionId === id &&
-        savedError.serviceName === broadcastToPeServiceName
-      ) {
-        erroredConventionMarked = true;
+      if (isSavedErrorForConvention(savedError, conventionId)) {
         return { ...savedError, handledByAgency: true };
       }
-
       return savedError;
     });
-    if (!erroredConventionMarked)
-      throw new NotFoundError(
-        `There's no ${broadcastToPeServiceName} errors for convention id '${id}'.`,
-      );
   }
 
   public async save(savedError: SavedError): Promise<void> {
@@ -40,3 +38,11 @@ export class InMemoryErrorRepository implements ErrorRepository {
     return this.#savedErrors;
   }
 }
+
+const isSavedErrorForConvention = (
+  savedError: SavedError,
+  conventionId: ConventionId,
+) =>
+  "conventionId" in savedError.params &&
+  savedError.params.conventionId === conventionId &&
+  savedError.serviceName === broadcastToPeServiceName;

@@ -1,6 +1,4 @@
 import {
-  AuthenticatedUserId,
-  ConventionId,
   InclusionConnectDomainJwtPayload,
   MarkPartnersErroredConventionAsHandledRequest,
   markPartnersErroredConventionAsHandledRequestSchema,
@@ -11,7 +9,6 @@ import {
   UnauthorizedError,
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
-import { DomainTopic } from "../../../core/eventBus/events";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
@@ -70,27 +67,15 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
       params.conventionId,
     );
 
-    await uow.outboxRepository.save({
-      ...this.#createEvent(
-        params.conventionId,
-        userId,
-        "PartnerErroredConventionMarkAsHandled",
-      ),
-      occurredAt: conventionMarkAsHandledAt,
-    });
-  }
-
-  #createEvent(
-    conventionId: ConventionId,
-    userId: AuthenticatedUserId,
-    domainTopic: DomainTopic,
-  ) {
-    return this.createNewEvent({
-      topic: domainTopic,
-      payload: {
-        conventionId,
-        userId,
-      },
-    });
+    await uow.outboxRepository.save(
+      this.createNewEvent({
+        topic: "PartnerErroredConventionMarkedAsHandled",
+        payload: {
+          conventionId: params.conventionId,
+          userId,
+        },
+        occurredAt: conventionMarkAsHandledAt,
+      }),
+    );
   }
 }
