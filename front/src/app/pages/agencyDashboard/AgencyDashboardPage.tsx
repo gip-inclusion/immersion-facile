@@ -60,7 +60,6 @@ export const AgencyDashboardPage = () => {
               <>
                 <Button
                   priority="secondary"
-                  className={fr.cx("fr-mb-5v")}
                   linkProps={{
                     href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.pole-emploi.fr/documents/Immersion_facilitee/GUIDE_SAISIE_DES_CONVENTIONS.pptx",
                     target: "_blank",
@@ -69,10 +68,6 @@ export const AgencyDashboardPage = () => {
                 >
                   Guide de saisie des conventions
                 </Button>
-                <MetabaseView
-                  title="Tableau de bord agence"
-                  url={conventionErrorUrl}
-                />
                 {inclusionConnectedJwt ? (
                   <>
                     <MarkPartnersErroredConventionAsHandledFormSection
@@ -96,6 +91,11 @@ export const AgencyDashboardPage = () => {
                     description="Cette page est reservée aux utilisateurs connectés avec Inclusion Connect, et dont l'agence est responsable de cette convention."
                   />
                 )}
+
+                <MetabaseView
+                  title="Tableau de bord agence"
+                  url={conventionErrorUrl}
+                />
               </>
             ),
           },
