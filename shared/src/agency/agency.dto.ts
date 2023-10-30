@@ -102,11 +102,15 @@ export type AgencyOption = {
 
 export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 
-export type AgencyKindFilter =
-  | "immersionPeOnly"
-  | "immersionWithoutPe"
-  | "miniStageOnly"
-  | "miniStageExcluded";
+export const agencyKindFilters = [
+  "immersionPeOnly",
+  "immersionWithoutPe",
+  "miniStageOnly",
+  "miniStageExcluded",
+  "withoutRefersToAgency",
+] as const;
+
+export type AgencyKindFilter = (typeof agencyKindFilters)[number];
 
 export type AgencyPositionFilter = {
   position: GeoPositionDto;

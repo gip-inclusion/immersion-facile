@@ -58,7 +58,7 @@ type AgencyColumns =
 
 type PersistenceAgency = Record<AgencyColumns, any>;
 
-const makeAgencyKindFiterSQL = (
+const makeAgencyKindFilterSQL = (
   agencyKindFilter?: AgencyKindFilter,
 ): string | undefined => {
   if (agencyKindFilter === "immersionPeOnly") return "kind = 'pole-emploi'";
@@ -66,6 +66,8 @@ const makeAgencyKindFiterSQL = (
     return "kind != 'pole-emploi' AND kind != 'cci'";
   if (agencyKindFilter === "miniStageOnly") return "kind = 'cci'";
   if (agencyKindFilter === "miniStageExcluded") return "kind != 'cci'";
+  if (agencyKindFilter === "withoutRefersToAgency")
+    return "refers_to_agency_id IS NULL";
 };
 
 const makeNameFilterSQL = (name?: string): string | undefined => {
@@ -80,7 +82,7 @@ const makeDepartmentCodeFilterSQL = (
   return format("department_code =%1$L", departmentCode);
 };
 
-const makePositionFiterSQL = (
+const makePositionFilterSQL = (
   positionFilter?: AgencyPositionFilter,
 ): string | undefined => {
   if (!positionFilter) return;
@@ -111,8 +113,8 @@ export class PgAgencyRepository implements AgencyRepository {
     const filtersSQL = [
       makeDepartmentCodeFilterSQL(filters.departmentCode),
       makeNameFilterSQL(filters.nameIncludes),
-      makeAgencyKindFiterSQL(filters.kind),
-      makePositionFiterSQL(filters.position),
+      makeAgencyKindFilterSQL(filters.kind),
+      makePositionFilterSQL(filters.position),
       makeStatusFilterSQL(filters.status),
     ].filter(filterNotFalsy);
 

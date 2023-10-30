@@ -17,6 +17,7 @@ import {
   AgencyId,
   AgencyIdResponse,
   AgencyKind,
+  agencyKindFilters,
   agencyKindList,
   AgencyOption,
   AgencyPublicDisplayDto,
@@ -65,14 +66,7 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
-    kind: z
-      .enum([
-        "immersionPeOnly",
-        "immersionWithoutPe",
-        "miniStageOnly",
-        "miniStageExcluded",
-      ])
-      .optional(),
+    kind: z.enum(agencyKindFilters).optional(),
   });
 
 const commonAgencyShape = {
@@ -107,7 +101,20 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
     z.object({
       refersToAgencyId: refersToAgencyIdSchema.optional(),
     }),
-  );
+  )
+  .superRefine((createAgency, context) => {
+    if (
+      createAgency.refersToAgencyId &&
+      !createAgency.counsellorEmails.length
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["counsellorEmails"],
+        message:
+          "Une structure d'accompagnement doit avoir au moins un email de conseiller pour examen préabable",
+      });
+    }
+  });
 
 const agencyStatusSchema = z.enum(allAgencyStatuses);
 
