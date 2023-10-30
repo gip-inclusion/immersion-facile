@@ -71,15 +71,18 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
   const [displayedResults, setDisplayedResults] =
     useState<SearchResultDto[]>(results);
 
-  const filterResults = useCallback((query: string) => {
-    setDisplayedResults((results) =>
-      results.filter((displayedResult: SearchResultDto) =>
-        JSON.stringify(Object.values(displayedResult))
-          .toLowerCase()
-          .includes(query.toLowerCase()),
-      ),
-    );
-  }, []);
+  const filterResults = useCallback(
+    (query: string) => {
+      setDisplayedResults(
+        results.filter((displayedResult: SearchResultDto) =>
+          JSON.stringify(Object.values(displayedResult))
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+        ),
+      );
+    },
+    [results],
+  );
 
   const onFilterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
