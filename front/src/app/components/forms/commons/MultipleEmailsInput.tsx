@@ -21,6 +21,7 @@ export const MultipleEmailsInput = (
     setValues: (values: string[]) => void;
     disabled?: boolean;
     summaryHintText?: string;
+    hintText?: React.ReactNode;
   },
 ) => {
   const {
@@ -28,6 +29,7 @@ export const MultipleEmailsInput = (
     setValues,
     disabled,
     summaryHintText,
+    hintText,
     ...addToListProps
   } = props;
   const { cx } = useStyles();
@@ -48,8 +50,9 @@ export const MultipleEmailsInput = (
   };
 
   useEffect(() => {
-    if (!addToListProps.initialValue) return;
-    setInputValue(addToListProps.initialValue);
+    if (addToListProps.initialValue !== undefined) {
+      setInputValue(addToListProps.initialValue);
+    }
   }, [addToListProps.initialValue]);
 
   return (
@@ -59,6 +62,7 @@ export const MultipleEmailsInput = (
         value={inputValue}
         onInputChange={onInputChange}
         disabled={disabled}
+        description={hintText}
       />
       {valuesInList.length > 0 && (
         <EmailsValuesSummary
