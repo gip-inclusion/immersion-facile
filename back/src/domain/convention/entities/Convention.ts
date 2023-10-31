@@ -15,6 +15,7 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork } from "../../core/ports/UnitOfWork";
+import { agencyMissingMessage } from "../ports/AgencyRepository";
 
 const throwIfStatusTransitionNotPossible = ({
   initialStatus,
@@ -70,7 +71,8 @@ export async function retrieveConventionWithAgency(
   if (!convention)
     throw new NotFoundError(conventionMissingMessage(conventionEvent.id));
   const agency = await uow.agencyRepository.getById(convention.agencyId);
-  if (!agency) throw new NotFoundError(agencyMissingMessage(convention));
+  if (!agency)
+    throw new NotFoundError(agencyMissingMessage(convention.agencyId));
   return { agency, convention };
 }
 
@@ -102,9 +104,6 @@ export const getAllConventionRecipientsEmail = (
 
 export const conventionMissingMessage = (conventionId: ConventionId): string =>
   `Convention with id '${conventionId}' missing.`;
-
-export const agencyMissingMessage = (convention: ConventionDto): string =>
-  `Agency with id '${convention.agencyId}' missing.`;
 
 const isAgencyIdInConsumerScope = (
   conventionRead: ConventionReadDto,

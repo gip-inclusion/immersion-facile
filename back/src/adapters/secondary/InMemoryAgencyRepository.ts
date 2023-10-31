@@ -202,6 +202,12 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       : filteredAgencies;
   }
 
+  public async getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]> {
+    return values(this.#agencies)
+      .filter(isTruthy)
+      .filter((agency) => agency.refersToAgencyId === id);
+  }
+
   public async getAgencyWhereEmailMatches(
     email: string,
   ): Promise<AgencyDto | undefined> {
