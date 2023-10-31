@@ -11,6 +11,7 @@ import {
 } from "shared";
 import { HttpClient, HttpResponse } from "shared-routes";
 import type { ResponsesToHttpResponse } from "shared-routes/defineRoutes";
+import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
@@ -61,12 +62,6 @@ const handleSiretResponses = (
       ({ status }) => errorMessageByCode[status],
     )
     .otherwise(otherwiseThrow);
-
-const otherwiseThrow = (unhandledResponse: never): never => {
-  throw new Error("Une erreur non gérée est survenue", {
-    cause: unhandledResponse,
-  });
-};
 
 const getBodyIfStatus200ElseThrow = <R extends HttpResponse<number, unknown>>(
   response: R,
