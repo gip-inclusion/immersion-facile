@@ -59,7 +59,6 @@
     "express-ipfilter": "^1.3.1",
     "express-prometheus-middleware": "^1.2.0",
     "html-templates": "workspace:*",
-    "http-client": "workspace:*",
     "jsonwebtoken": "^9.0.0",
     "kysely": "^0.26.3",
     "kysely-codegen": "^0.10.1",
