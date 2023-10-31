@@ -48,13 +48,12 @@ import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRou
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
-import { annuaireDesEntreprisesSiretTargets } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.targets";
+import { annuaireDesEntreprisesSiretRoutes } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.routes";
 import { InMemorySiretGateway } from "../../secondary/siret/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { HttpSubscribersGateway } from "../../secondary/subscribersGateway/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../secondary/subscribersGateway/InMemorySubscribersGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
-import { configureCreateHttpClientForExternalApi } from "./createHttpClientForExternalApi";
 
 const logger = createLogger(__filename);
 
@@ -215,6 +214,28 @@ export const createGateways = async (
     });
   };
 
+  const getSiretGateway = (
+    provider: AppConfig["siretGateway"],
+    config: AppConfig,
+    timeGateway: TimeGateway,
+  ) => {
+    const gatewayByProvider = {
+      HTTPS: () =>
+        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+      INSEE: () =>
+        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+      IN_MEMORY: () => new InMemorySiretGateway(),
+      ANNUAIRE_DES_ENTREPRISES: () =>
+        new AnnuaireDesEntreprisesSiretGateway(
+          createAxiosHttpClientForExternalAPIs(
+            annuaireDesEntreprisesSiretRoutes,
+          ),
+          new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+        ),
+    };
+    return gatewayByProvider[provider]();
+  };
+
   return {
     addressApi: addressGateway,
     dashboardGateway: createDashboardGateway(config),
@@ -258,30 +279,6 @@ export const createGateways = async (
         ? new NanoIdShortLinkIdGeneratorGateway()
         : new DeterministShortLinkIdGeneratorGateway(),
   };
-};
-
-const getSiretGateway = (
-  provider: AppConfig["siretGateway"],
-  config: AppConfig,
-  timeGateway: TimeGateway,
-) => {
-  const gatewayByProvider = {
-    HTTPS: () =>
-      new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
-    INSEE: () =>
-      new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
-    IN_MEMORY: () => new InMemorySiretGateway(),
-    ANNUAIRE_DES_ENTREPRISES: () =>
-      new AnnuaireDesEntreprisesSiretGateway(
-        configureCreateHttpClientForExternalApi(
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-        )(annuaireDesEntreprisesSiretTargets),
-        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
-      ),
-  };
-  return gatewayByProvider[provider]();
 };
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTarget, createTargets } from "http-client";
+import { defineRoute, defineRoutes } from "shared-routes";
 
 const adeEstablishmentSchema = z.object({
   matching_etablissements: z
@@ -47,15 +47,20 @@ type AnnuaireDesEntreprisesSiretGatewayResponse = {
   total_pages: number;
 };
 
-export const annuaireDesEntreprisesSiretTargets = createTargets({
-  search: createTarget({
-    method: "GET",
+const annuaireDesEntreprisesQueryParamsSchema: z.Schema<{ q: string }> =
+  z.any();
+
+export const annuaireDesEntreprisesSiretRoutes = defineRoutes({
+  search: defineRoute({
+    method: "get",
     url: "https://recherche-entreprises.api.gouv.fr/search",
-    validateQueryParams: (queryParams) => queryParams as { q: string },
-    validateResponseBody:
-      annuaireDesEntreprisesSiretGatewayResponseSchema.parse,
+
+    queryParamsSchema: annuaireDesEntreprisesQueryParamsSchema,
+    responses: {
+      200: annuaireDesEntreprisesSiretGatewayResponseSchema,
+    },
   }),
 });
 
-export type AnnuaireDesEntreprisesSiretTargets =
-  typeof annuaireDesEntreprisesSiretTargets;
+export type AnnuaireDesEntreprisesSiretRoutes =
+  typeof annuaireDesEntreprisesSiretRoutes;
