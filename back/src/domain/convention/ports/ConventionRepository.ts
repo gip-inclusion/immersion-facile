@@ -7,5 +7,5 @@ export interface ConventionRepository {
   update: (conventionDto: ConventionDto) => Promise<ConventionId | undefined>;
   deprecateConventionsWithoutDefinitiveStatusEndedSince: (
     endedSince: Date,
-  ) => Promise<void>;
+  ) => Promise<number>;
 }

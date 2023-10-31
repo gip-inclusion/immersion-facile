@@ -26,7 +26,7 @@ export class PgConventionRepository implements ConventionRepository {
   public async deprecateConventionsWithoutDefinitiveStatusEndedSince(
     endedSince: Date,
   ) {
-    await executeKyselyRawSqlQuery(
+    const result = await executeKyselyRawSqlQuery(
       this.transaction,
       `
       UPDATE conventions
@@ -39,6 +39,7 @@ export class PgConventionRepository implements ConventionRepository {
       `,
       [endedSince],
     );
+    return Number(result.numAffectedRows);
   }
 
   public async getById(
