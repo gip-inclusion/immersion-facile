@@ -1,16 +1,17 @@
+import axios from "axios";
 import { expectToEqual } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../../../domain/offer/ports/LaBonneBoiteGateway";
 import { AppConfig } from "../../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
 import { createPeAxiosSharedClient } from "../../../primary/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../../core/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "../../poleEmploi/HttpPoleEmploiGateway";
 import { HttpLaBonneBoiteGateway } from "./HttpLaBonneBoiteGateway";
+import { createLbbRoutes } from "./LaBonneBoite.routes";
 import { LaBonneBoiteCompanyDtoBuilder } from "./LaBonneBoiteCompanyDtoBuilder";
-import { createLbbTargets } from "./LaBonneBoiteTargets";
 
 const benodetLonLat = { lat: 47.8667, lon: -4.1167 };
 const boulangerRome = "D1102";
@@ -23,9 +24,7 @@ describe("HttpLaBonneBoiteGateway", () => {
     const axiosHttpClient = createPeAxiosSharedClient(config);
 
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
-      configureCreateHttpClientForExternalApi()(
-        createLbbTargets(config.peApiUrl),
-      ),
+      createAxiosSharedClient(createLbbRoutes(config.peApiUrl), axios),
       new HttpPoleEmploiGateway(
         axiosHttpClient,
         new InMemoryCachingGateway<GetAccessTokenResponse>(

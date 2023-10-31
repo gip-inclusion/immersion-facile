@@ -1,6 +1,6 @@
-import { AbsoluteUrl } from "shared";
-import { withValidateHeadersAuthorization } from "shared";
-import { createTarget, createTargets } from "http-client";
+import { z } from "zod";
+import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import { defineRoute, defineRoutes } from "shared-routes";
 import { LaBonneBoiteApiResultProps } from "./LaBonneBoiteCompanyDto";
 
 type HttpGetLaBonneBoiteCompanyParams = {
@@ -22,20 +22,21 @@ type HttpGetLaBonneBoiteCompanyResponse = {
   companies: LaBonneBoiteApiResultProps[];
 };
 
-export type LaBonneBoiteTargets = ReturnType<typeof createLbbTargets>;
+export type LaBonneBoiteRoutes = ReturnType<typeof createLbbRoutes>;
 
-export const createLbbTargets = (peApiUrl: AbsoluteUrl) => {
-  const url: AbsoluteUrl = `${peApiUrl}/partenaire/labonneboite/v1/company/`;
+const lbbQueryParamsSchema: z.Schema<HttpGetLaBonneBoiteCompanyParams> =
+  z.any();
+const lbbResponseSchema: z.Schema<HttpGetLaBonneBoiteCompanyResponse> = z.any();
 
-  return createTargets({
-    getCompany: createTarget({
-      method: "GET",
-      url,
-      validateQueryParams: (params) =>
-        params as HttpGetLaBonneBoiteCompanyParams,
-      ...withValidateHeadersAuthorization,
-      validateResponseBody: (response) =>
-        response as HttpGetLaBonneBoiteCompanyResponse,
+export const createLbbRoutes = (peApiUrl: AbsoluteUrl) =>
+  defineRoutes({
+    getCompany: defineRoute({
+      method: "get",
+      url: `${peApiUrl}/partenaire/labonneboite/v1/company/`,
+      queryParamsSchema: lbbQueryParamsSchema,
+      ...withAuthorizationHeaders,
+      responses: {
+        200: lbbResponseSchema,
+      },
     }),
   });
-};
