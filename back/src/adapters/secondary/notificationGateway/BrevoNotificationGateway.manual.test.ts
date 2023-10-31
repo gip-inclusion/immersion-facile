@@ -1,7 +1,8 @@
+import axios from "axios";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
-import { brevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targets";
+import { brevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 
 describe("BrevoNotificationGateway manual", () => {
   let notificationGateway: BrevoNotificationGateway;
@@ -9,9 +10,7 @@ describe("BrevoNotificationGateway manual", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     notificationGateway = new BrevoNotificationGateway(
-      configureCreateHttpClientForExternalApi()(
-        brevoNotificationGatewayTargets,
-      ),
+      createAxiosSharedClient(brevoNotificationGatewayRoutes, axios),
       (_) => true,
       config.apiKeyBrevo,
       { email: "bob@fake.mail", name: "Bob" },
