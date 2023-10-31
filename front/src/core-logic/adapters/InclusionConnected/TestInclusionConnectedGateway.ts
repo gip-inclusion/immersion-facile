@@ -1,5 +1,7 @@
 import { Observable, Subject } from "rxjs";
-import { AbsoluteUrl, AgencyId,
+import {
+  AbsoluteUrl,
+  AgencyId,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
