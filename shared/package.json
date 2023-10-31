@@ -23,7 +23,6 @@
     "babel-jest": "^29.5.0",
     "date-fns": "2.28.0",
     "html-templates": "workspace:*",
-    "http-client": "workspace:*",
     "jest": "^29.5.0",
     "js-base64": "^3.7.3",
     "pino": "^7.9.1",
