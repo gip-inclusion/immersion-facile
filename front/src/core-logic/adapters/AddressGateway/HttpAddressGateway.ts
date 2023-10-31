@@ -32,7 +32,7 @@ export class HttpAddressGateway implements AddressGateway {
       .with({ status: 400 }, ({ body }) => {
         // eslint-disable-next-line no-console
         console.error(body);
-        throw new Error(body.errors);
+        throw new Error(body.message);
       })
       .otherwise((unhandledResponse) => {
         throw new Error(JSON.stringify(unhandledResponse));

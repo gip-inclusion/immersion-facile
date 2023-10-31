@@ -20,6 +20,7 @@ export const siretInfoErrors = [
   siretApiUnavailableSiretErrorMessage,
   siretApiMissingEstablishmentMessage,
   "Establishment with this siret is already in our DB",
+  "Erreur sur le siret fourni",
 ] as const;
 
 export type SiretDto = Flavor<string, "SiretDto">;

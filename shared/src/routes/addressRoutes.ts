@@ -5,7 +5,7 @@ import {
   withLookupLocationInputQueryParamsSchema,
   withLookupStreetAddressQueryParamsSchema,
 } from "../address/address.schema";
-import { legacyBadRequestErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
 
 export type AddressRoutes = typeof addressRoutes;
 export const addressRoutes = defineRoutes({
@@ -23,7 +23,7 @@ export const addressRoutes = defineRoutes({
     queryParamsSchema: withLookupStreetAddressQueryParamsSchema,
     responses: {
       200: addressAndPositionListSchema,
-      400: legacyBadRequestErrorSchema,
+      400: httpErrorSchema,
     },
   }),
 });
