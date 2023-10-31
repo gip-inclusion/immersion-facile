@@ -1,9 +1,8 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import Card from "@codegouvfr/react-dsfr/Card";
 import { keys } from "ramda";
-import { domElementIds, loginPeConnect } from "shared";
-import { ConventionRequirements, PeConnectButton } from "react-design-system";
+import { loginPeConnect } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { useRoute } from "src/app/routes/routes";
@@ -19,103 +18,96 @@ const storeConventionRouteParamsOnDevice = (
 };
 
 type InitiateConventionCardProps = {
-  title: string;
-  peConnectNotice: string;
-  showFormButtonLabel: string;
-  otherCaseNotice: string;
-  useSection?: boolean;
   onNotPeConnectButtonClick: () => void;
 };
 
 export const InitiateConventionCard = ({
-  title,
-  peConnectNotice,
-  showFormButtonLabel,
-  otherCaseNotice,
-  useSection = true,
   onNotPeConnectButtonClick,
 }: InitiateConventionCardProps) => {
   const { enablePeConnectApi } = useFeatureFlags();
   const currentRoute = useRoute();
-  const cardContent = (
+
+  return (
     <div>
-      {enablePeConnectApi.isActive ? (
-        <>
-          <div>
-            <p className={fr.cx("fr-h6", "fr-mb-2w")}>
-              J’ai des identifiants Pôle emploi
-            </p>
-            <p dangerouslySetInnerHTML={{ __html: peConnectNotice }}></p>
-            <div className={fr.cx("fr-mb-4w")}>
-              <PeConnectButton
-                onClick={() => {
-                  if (currentRoute.name === "conventionImmersion")
-                    storeConventionRouteParamsOnDevice(currentRoute.params);
-                }}
-                peConnectEndpoint={loginPeConnect}
-              />
-              <a
-                className={fr.cx("fr-text--sm", "fr-mt-1v")}
-                href="https://candidat.pole-emploi.fr/compte/identifiant/saisieinformations"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Je ne connais pas mes identifiants
-              </a>
-            </div>
-          </div>
-
-          <strong className={fr.cx("fr-text--lead", "fr-hr-or")}>ou</strong>
-          <div>
-            <p className={fr.cx("fr-h6", "fr-mb-2w")}>
-              Je suis dans une autre situation
-            </p>
-            <p dangerouslySetInnerHTML={{ __html: otherCaseNotice }}></p>
-
-            <Button
-              type="button"
-              onClick={onNotPeConnectButtonClick}
-              nativeButtonProps={{
-                id: domElementIds.conventionImmersionRoute.showFormButton,
-              }}
-            >
-              {showFormButtonLabel}
-            </Button>
-          </div>
-        </>
-      ) : (
-        <Button
-          type="button"
-          onClick={onNotPeConnectButtonClick}
-          nativeButtonProps={{
-            id: domElementIds.conventionImmersionRoute.showFormButton,
-          }}
-        >
-          {showFormButtonLabel}
-        </Button>
-      )}
-    </div>
-  );
-  const section = (
-    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
+      <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
         <div
-          className={fr.cx(
-            "fr-card",
-            "fr-card--grey",
-            "fr-card--no-border",
-            "fr-px-12w",
-            "fr-py-8w",
-          )}
+          className={fr.cx("fr-col-12", "fr-col-lg-4")}
+          onClick={onNotPeConnectButtonClick}
         >
-          <p className={fr.cx("fr-h4", "fr-mb-5w")}>{title}</p>
-          {cardContent}
+          <Card
+            background
+            border
+            desc="Je suis une entreprise, un candidat sans identifiants Pôle emploi, un conseiller accompagnant un candidat."
+            enlargeLink
+            imageAlt=""
+            imageUrl="/src/assets/img/fill-convention-form.png"
+            linkProps={{
+              href: "#",
+            }}
+            size="medium"
+            title="Je remplis une convention sans identifiants Pôle emploi"
+            titleAs="h2"
+          />
+        </div>
+        {enablePeConnectApi && (
+          <div
+            className={fr.cx("fr-col-12", "fr-col-lg-4")}
+            onClick={() => {
+              if (currentRoute.name === "conventionImmersion")
+                storeConventionRouteParamsOnDevice(currentRoute.params);
+            }}
+          >
+            <Card
+              background
+              border
+              desc="Je suis un candidat inscrit à Pôle emploi. Je me connecte avec Pôle emploi pour accélérer les démarches."
+              enlargeLink
+              imageAlt=""
+              imageUrl="/src/assets/img/fill-convention-pe.png"
+              linkProps={{
+                href: `/api/${loginPeConnect}`,
+              }}
+              size="medium"
+              title="Je remplis une convention avec mes identifiants Pôle emploi"
+              titleAs="h2"
+            />
+          </div>
+        )}
+        <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+          <Card
+            background
+            border
+            desc="Je ne reçois pas le lien de signature, je me suis trompé dans les informations, je souhaite modifier ou renouveler une convention."
+            enlargeLink
+            imageAlt=""
+            imageUrl="/src/assets/img/fill-convention-help.png"
+            linkProps={{
+              href: "https://tally.so/r/mBdQQe",
+            }}
+            size="medium"
+            title="J’ai déjà rempli une demande de convention mais j’ai un problème"
+            titleAs="h2"
+          />
         </div>
       </div>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-5")}>
-        <ConventionRequirements />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+        }}
+        className={fr.cx("fr-mt-5w")}
+      >
+        <a
+          href="https://tally.so/r/w2X7xV"
+          className={fr.cx(
+            "fr-link",
+            "fr-icon-arrow-right-line",
+            "fr-link--icon-right",
+          )}
+        >
+          Je ne sais pas si je peux remplir une convention en ligne dans mon cas
+        </a>
       </div>
     </div>
   );
-  return useSection ? section : cardContent;
 };

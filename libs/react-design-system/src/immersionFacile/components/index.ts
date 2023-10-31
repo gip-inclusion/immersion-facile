@@ -2,7 +2,6 @@ export * from "./convention-document";
 export * from "./convention-form-layout";
 export * from "./convention-form-sidebar";
 export * from "./convention-renewed-informations";
-export * from "./convention-requirements";
 export * from "./crisp-chat";
 export * from "./error-notifications";
 export * from "./field";
