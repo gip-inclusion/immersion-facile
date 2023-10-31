@@ -24,7 +24,7 @@ import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashb
 import { NotImplementedDocumentGateway } from "../../secondary/documentGateway/NotImplementedDocumentGateway";
 import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGateway";
 import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
-import { emailableValidationTargets } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.targets";
+import { emailableValidationRoutes } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { makeInclusionConnectExternalRoutes } from "../../secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
@@ -165,6 +165,16 @@ export const createGateways = async (
         )
       : new InMemoryInclusionConnectGateway();
 
+  const createEmailValidationGateway = (config: AppConfig) =>
+    ({
+      IN_MEMORY: () => new InMemoryEmailValidationGateway(),
+      EMAILABLE: () =>
+        new EmailableEmailValidationGateway(
+          createAxiosHttpClientForExternalAPIs(emailableValidationRoutes),
+          config.emailableApiKey,
+        ),
+    }[config.emailValidationGateway]());
+
   const addressGateway = {
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
@@ -279,20 +289,6 @@ const createNotificationGateway = (
     throwIfReached: true,
   });
 };
-
-const createEmailValidationGateway = (config: AppConfig) =>
-  ({
-    IN_MEMORY: () => new InMemoryEmailValidationGateway(),
-    EMAILABLE: () =>
-      new EmailableEmailValidationGateway(
-        configureCreateHttpClientForExternalApi(
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-        )(emailableValidationTargets),
-        config.emailableApiKey,
-      ),
-  }[config.emailValidationGateway]());
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
   switch (config.documentGateway) {

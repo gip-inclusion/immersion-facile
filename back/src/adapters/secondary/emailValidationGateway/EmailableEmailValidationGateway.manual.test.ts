@@ -1,9 +1,10 @@
+import axios from "axios";
 import { ValidateEmailStatus } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { EmailableEmailValidationGateway } from "./EmailableEmailValidationGateway";
-import { emailableValidationTargets } from "./EmailableEmailValidationGateway.targets";
+import { emailableValidationRoutes } from "./EmailableEmailValidationGateway.routes";
 
 describe("Emailable email validation gateway", () => {
   let emailableEmailValidationGateway: EmailValidationGetaway;
@@ -12,7 +13,7 @@ describe("Emailable email validation gateway", () => {
     const apiKeyEmailable = AppConfig.createFromEnv().emailableApiKey;
 
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
-      configureCreateHttpClientForExternalApi()(emailableValidationTargets),
+      createAxiosSharedClient(emailableValidationRoutes, axios),
       apiKeyEmailable,
     );
   });

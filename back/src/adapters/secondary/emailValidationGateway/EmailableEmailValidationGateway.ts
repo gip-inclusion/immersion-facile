@@ -1,13 +1,13 @@
 import Bottleneck from "bottleneck";
 import { ValidateEmailStatus } from "shared";
-import { type HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   EmailableApiKey,
   EmailableEmailValidationStatus,
 } from "./EmailableEmailValidationGateway.dto";
-import { EmailableValidationTargets } from "./EmailableEmailValidationGateway.targets";
+import { EmailableValidationRoutes } from "./EmailableEmailValidationGateway.routes";
 
 const logger = createLogger(__filename);
 
@@ -21,7 +21,7 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   });
 
   constructor(
-    private readonly httpClient: HttpClient<EmailableValidationTargets>,
+    private readonly httpClient: HttpClient<EmailableValidationRoutes>,
     private readonly emailableApiKey: EmailableApiKey,
   ) {}
 
@@ -35,11 +35,11 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
           },
         }),
       )
-      .then(({ responseBody }) => ({
-        isValid: this.#isEmailValid(responseBody.state, responseBody.reason),
-        reason: responseBody.reason,
-        ...(responseBody.did_you_mean && {
-          proposal: responseBody.did_you_mean,
+      .then(({ body }) => ({
+        isValid: this.#isEmailValid(body.state, body.reason),
+        reason: body.reason,
+        ...(body.did_you_mean && {
+          proposal: body.did_you_mean,
         }),
       }))
       .catch((error) => {
