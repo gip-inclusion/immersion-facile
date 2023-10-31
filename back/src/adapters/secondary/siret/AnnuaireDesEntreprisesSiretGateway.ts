@@ -1,11 +1,11 @@
 import Bottleneck from "bottleneck";
 import { SiretDto, SiretEstablishmentDto } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
 import {
   AnnuaireDesEntreprisesSiretEstablishment,
-  type AnnuaireDesEntreprisesSiretTargets,
-} from "./AnnuaireDesEntreprisesSiretGateway.targets";
+  type AnnuaireDesEntreprisesSiretRoutes,
+} from "./AnnuaireDesEntreprisesSiretGateway.routes";
 
 const adeMaxQueryPerSeconds = 7;
 export const nonDiffusibleEstablishmentName = "NON-DIFFUSIBLE";
@@ -16,12 +16,12 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
     reservoirRefreshAmount: adeMaxQueryPerSeconds,
   });
 
-  #httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>;
+  #httpClient: HttpClient<AnnuaireDesEntreprisesSiretRoutes>;
 
   #fallbackGateway: SiretGateway;
 
   constructor(
-    httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>,
+    httpClient: HttpClient<AnnuaireDesEntreprisesSiretRoutes>,
     fallbackGateway: SiretGateway,
   ) {
     this.#httpClient = httpClient;
@@ -41,7 +41,7 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
       }),
     );
 
-    const result = response.responseBody.results[0];
+    const result = response.body.results[0];
     if (!result) return;
     const formattedResult =
       convertAdeEstablishmentToSirenEstablishmentDto(result);

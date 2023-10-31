@@ -1,6 +1,6 @@
 import { expectToEqual } from "shared";
 import { convertAdeEstablishmentToSirenEstablishmentDto } from "./AnnuaireDesEntreprisesSiretGateway";
-import { AnnuaireDesEntreprisesSiretEstablishment } from "./AnnuaireDesEntreprisesSiretGateway.targets";
+import { AnnuaireDesEntreprisesSiretEstablishment } from "./AnnuaireDesEntreprisesSiretGateway.routes";
 
 const validEstablishment: AnnuaireDesEntreprisesSiretEstablishment = {
   activite_principale: "78.3Z",
