@@ -1,4 +1,5 @@
 import { from, Observable } from "rxjs";
+import { match } from "ts-pattern";
 import {
   AddressAndPosition,
   AddressRoutes,
@@ -25,8 +26,17 @@ export class HttpAddressGateway implements AddressGateway {
         lookup,
       },
     });
-    if (response.status === 200) return response.body;
-    throw new Error(JSON.stringify(response));
+
+    return match(response)
+      .with({ status: 200 }, ({ body }) => body)
+      .with({ status: 400 }, ({ body }) => {
+        // eslint-disable-next-line no-console
+        console.error(body);
+        throw new Error(body.errors);
+      })
+      .otherwise((unhandledResponse) => {
+        throw new Error(JSON.stringify(unhandledResponse));
+      });
   }
 
   async #lookupLocation(
@@ -37,7 +47,12 @@ export class HttpAddressGateway implements AddressGateway {
         query,
       },
     });
-    if (response.status === 200) return response.body;
-    throw new Error(JSON.stringify(response));
+
+    return match(response)
+      .with({ status: 200 }, ({ body }) => body)
+
+      .otherwise((unhandledResponse) => {
+        throw new Error(JSON.stringify(unhandledResponse));
+      });
   }
 }
