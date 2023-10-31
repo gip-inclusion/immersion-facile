@@ -264,5 +264,17 @@ describe("InclusionConnectedAllowedRoutes", () => {
         },
       ]);
     });
+
+    describe(`${displayRouteName(
+      inclusionConnectedAllowedRoutes.getInclusionConnectLogoutUrl,
+    )} returns the logout url`, () => {
+      it("returns a correct logout url with status 200", async () => {
+        const response = await httpClient.getInclusionConnectLogoutUrl();
+        expectHttpResponseToEqual(response, {
+          body: "https://fake-inclusion.com/logout/?client_id=inclusion-client-id&post_logout_redirect_uri=https://my-domain/agence-dashboard",
+          status: 200,
+        });
+      });
+    });
   });
 });
