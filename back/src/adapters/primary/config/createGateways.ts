@@ -30,7 +30,7 @@ import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGat
 import { makeInclusionConnectExternalRoutes } from "../../secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
-import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
+import { brevoNotificationGatewayRoutes } from "../../secondary/notificationGateway/BrevoNotificationGateway.routes";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
 import { HttpLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/HttpLaBonneBoiteGateway";
 import { InMemoryLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
@@ -185,6 +185,36 @@ export const createGateways = async (
       ),
   }[config.apiAddress]();
 
+  const createNotificationGateway = (
+    config: AppConfig,
+    timeGateway: TimeGateway,
+  ): NotificationGateway => {
+    if (config.notificationGateway === "IN_MEMORY")
+      return new InMemoryNotificationGateway(timeGateway);
+
+    const brevoNotificationGateway = new BrevoNotificationGateway(
+      createAxiosHttpClientForExternalAPIs(brevoNotificationGatewayRoutes),
+      makeEmailAllowListPredicate({
+        skipEmailAllowList: config.skipEmailAllowlist,
+        emailAllowList: config.emailAllowList,
+      }),
+      config.apiKeyBrevo,
+      {
+        name: "Immersion Facilitée",
+        email: immersionFacileContactEmail,
+      },
+    );
+
+    if (config.notificationGateway === "BREVO") {
+      return brevoNotificationGateway;
+    }
+
+    return exhaustiveCheck(config.notificationGateway, {
+      variableName: "config.notificationGateway",
+      throwIfReached: true,
+    });
+  };
+
   return {
     addressApi: addressGateway,
     dashboardGateway: createDashboardGateway(config),
@@ -254,40 +284,6 @@ const getSiretGateway = (
       ),
   };
   return gatewayByProvider[provider]();
-};
-
-const createNotificationGateway = (
-  config: AppConfig,
-  timeGateway: TimeGateway,
-): NotificationGateway => {
-  if (config.notificationGateway === "IN_MEMORY")
-    return new InMemoryNotificationGateway(timeGateway);
-
-  const brevoNotificationGateway = new BrevoNotificationGateway(
-    configureCreateHttpClientForExternalApi(
-      axios.create({
-        timeout: config.externalAxiosTimeout,
-      }),
-    )(brevoNotificationGatewayTargets),
-    makeEmailAllowListPredicate({
-      skipEmailAllowList: config.skipEmailAllowlist,
-      emailAllowList: config.emailAllowList,
-    }),
-    config.apiKeyBrevo,
-    {
-      name: "Immersion Facilitée",
-      email: immersionFacileContactEmail,
-    },
-  );
-
-  if (config.notificationGateway === "BREVO") {
-    return brevoNotificationGateway;
-  }
-
-  return exhaustiveCheck(config.notificationGateway, {
-    variableName: "config.notificationGateway",
-    throwIfReached: true,
-  });
 };
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {

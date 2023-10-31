@@ -6,6 +6,7 @@ import {
   type TemplatedEmail,
   type TemplatedSms,
 } from "shared";
+import { HttpClient } from "shared-routes";
 import {
   configureGenerateHtmlFromTemplate,
   GenerateHtmlOptions,
@@ -14,7 +15,6 @@ import {
   cciCustomHtmlFooter,
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
-import { HttpClient } from "http-client";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import {
   counterSendTransactEmailError,
@@ -23,6 +23,7 @@ import {
 } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
+import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {
   ApiKey,
   BrevoHeaders,
@@ -30,7 +31,6 @@ import {
   SendTransactEmailRequestBody,
   SendTransactSmsRequestBody,
 } from "./BrevoNotificationGateway.schemas";
-import { BrevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targets";
 
 const logger = createLogger(__filename);
 
@@ -59,7 +59,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   });
 
   constructor(
-    private readonly httpClient: HttpClient<BrevoNotificationGatewayTargets>,
+    private readonly httpClient: HttpClient<BrevoNotificationGatewayRoutes>,
     private emailAllowListPredicate: (recipient: string) => boolean,
     apiKey: ApiKey,
     private defaultSender: RecipientOrSender,
@@ -80,7 +80,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
         "api-key": this.#brevoHeaders["api-key"],
       },
     });
-    return response.responseBody;
+    return response.body;
   }
 
   public async sendEmail(email: TemplatedEmail) {

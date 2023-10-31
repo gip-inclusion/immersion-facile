@@ -3,21 +3,21 @@ import {
   expectToEqual,
   immersionFacileContactEmail,
 } from "shared";
+import { HttpClient } from "shared-routes";
 import { ignoreTabs } from "html-templates";
-import { HttpClient } from "http-client";
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
+import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {
   BrevoHeaders,
   SendTransactEmailRequestBody,
 } from "./BrevoNotificationGateway.schemas";
-import { BrevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targets";
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 
 describe("SendingBlueHtmlNotificationGateway unit", () => {
-  let fakeHttpClient: HttpClient<BrevoNotificationGatewayTargets>;
+  let fakeHttpClient: HttpClient<BrevoNotificationGatewayRoutes>;
   let allowListPredicate;
   let notificationGateway: BrevoNotificationGateway;
   let sentEmails: {
@@ -32,7 +32,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       sendTransactEmail(email: any) {
         sentEmails.push(email);
       },
-    } as unknown as HttpClient<BrevoNotificationGatewayTargets>;
+    } as unknown as HttpClient<BrevoNotificationGatewayRoutes>;
 
     allowListPredicate = makeEmailAllowListPredicate({
       emailAllowList: [
