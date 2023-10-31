@@ -724,9 +724,12 @@ describe("PgConventionRepository", () => {
         conventionRepository.save(convention10ToMarkAsDeprecated),
       ]);
 
-      await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
-        dateSince,
-      );
+      const numberOfUpdatedConventions =
+        await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
+          dateSince,
+        );
+
+      expectToEqual(numberOfUpdatedConventions, 5);
 
       await expectConventionInRepoToBeDeprecated(convention1ToMarkAsDeprecated);
       await expectConventionInRepoToBeDeprecated(convention7ToMarkAsDeprecated);

@@ -21,11 +21,12 @@ const triggerMarkOldConventionAsDeprecated = async () => {
 
   const deprecateSince = subMonths(new Date(), 2);
 
-  await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
-    deprecateSince,
-  );
+  const numberOfUpdatedConventions =
+    await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
+      deprecateSince,
+    );
 
-  return { numberOfUpdatedConventions: 0 };
+  return { numberOfUpdatedConventions };
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
