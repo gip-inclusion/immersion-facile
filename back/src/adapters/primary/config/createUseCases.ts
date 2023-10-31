@@ -19,6 +19,7 @@ import { ListAgenciesByFilter } from "../../../domain/convention/useCases/agenci
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
 import { RegisterAgencyToInclusionConnectUser } from "../../../domain/convention/useCases/agencies/RegisterAgencyToInclusionConnectUser";
 import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
+import { UpdateAgencyReferingToUpdatedAgency } from "../../../domain/convention/useCases/agencies/UpdateAgencyReferingToUpdatedAgency";
 import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
@@ -360,6 +361,8 @@ export const createUseCases = (
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
+      updateAgencyReferingToUpdatedAgency:
+        new UpdateAgencyReferingToUpdatedAgency(uowPerformer, createNewEvent),
       // METABASE
       ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
       // notifications

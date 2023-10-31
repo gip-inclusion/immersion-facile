@@ -28,6 +28,7 @@ import {
   PrivateListAgenciesRequestDto,
   UpdateAgencyRequestDto,
   WithActiveOrRejectedStatus,
+  WithAgencyDto,
   WithAgencyId,
   WithAgencyStatus,
 } from "./agency.dto";
@@ -146,6 +147,10 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
         agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
     }),
   );
+
+export const withAgencySchema: z.ZodSchema<WithAgencyDto> = z.object({
+  agency: agencySchema,
+});
 
 export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
   z.object({
