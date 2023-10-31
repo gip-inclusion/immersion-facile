@@ -30,14 +30,6 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       400: httpErrorSchema,
     },
   }),
-  getInclusionConnectLogoutUrl: defineRoute({
-    method: "get",
-    url: "/inclusion-connect-logout",
-    responses: {
-      200: absoluteUrlSchema,
-    },
-  }),
-
   markPartnersErroredConventionAsHandled: defineRoute({
     url: "/inclusion-connected/mark-errored-convention-as-handled",
     method: "post",
@@ -47,6 +39,13 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       200: expressEmptyResponseBody,
       404: httpErrorSchema,
       400: httpErrorSchema,
+    },
+  }),
+  getInclusionConnectLogoutUrl: defineRoute({
+    method: "get",
+    url: "/inclusion-connect-logout",
+    responses: {
+      200: absoluteUrlSchema,
     },
   }),
 });
