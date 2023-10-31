@@ -9,6 +9,7 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   NotificationsByKind,
+  RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -28,6 +29,8 @@ export class TestAdminGateway implements AdminGateway {
     this.apiConsumers$;
 
   public lastNotifications$ = new Subject<NotificationsByKind>();
+
+  public rejectUserToAgencyResponse$ = new Subject<void>();
 
   public saveApiConsumersResponse$ = new Subject<ApiConsumerJwt>();
 
@@ -73,6 +76,13 @@ export class TestAdminGateway implements AdminGateway {
 
   public login$(): Observable<BackOfficeJwt> {
     return this.token$;
+  }
+
+  public rejectUserForAgency$(
+    _params: RejectIcUserRoleForAgencyParams,
+    _token: string,
+  ): Observable<void> {
+    return this.rejectUserToAgencyResponse$;
   }
 
   public saveApiConsumer$(

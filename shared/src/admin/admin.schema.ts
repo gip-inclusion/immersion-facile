@@ -11,6 +11,7 @@ import {
   IcUserRoleForAgencyParams,
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
+  RejectIcUserRoleForAgencyParams,
   UserAndPassword,
   WithAgencyRole,
 } from "./admin.dto";
@@ -25,6 +26,13 @@ export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams
     agencyId: agencyIdSchema,
     userId: authenticatedUserIdSchema,
     role: agencyRoleSchema,
+  });
+
+export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleForAgencyParams> =
+  z.object({
+    agencyId: agencyIdSchema,
+    userId: authenticatedUserIdSchema,
+    justification: zTrimmedString,
   });
 
 export const withAgencyRoleSchema: z.Schema<WithAgencyRole> = z.object({

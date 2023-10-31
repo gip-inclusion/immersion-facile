@@ -6,6 +6,7 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   OmitFromExistingKeys,
+  RejectIcUserRoleForAgencyParams,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
@@ -23,7 +24,8 @@ export type NormalizedIcUserById = Record<
 
 type IcUsersAdminFeedbackKind =
   | "usersToReviewFetchSuccess"
-  | "agencyRegisterToUserSuccess";
+  | "agencyRegisterToUserSuccess"
+  | "agencyRejectToUserSuccess";
 
 export type IcUsersAdminFeedback = SubmitFeedBack<IcUsersAdminFeedbackKind>;
 
@@ -89,6 +91,25 @@ export const icUsersAdminSlice = createSlice({
       state.icUsersNeedingReview[userId].agencyRights[agencyId].role = role;
     },
     registerAgencyWithRoleToUserFailed: (
+      state,
+      action: PayloadAction<string>,
+    ) => {
+      state.isUpdatingIcUserAgency = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+    rejectAgencyWithRoleToUserRequested: (
+      state,
+      _action: PayloadAction<RejectIcUserRoleForAgencyParams>,
+    ) => {
+      state.isUpdatingIcUserAgency = true;
+    },
+
+    rejectAgencyWithRoleToUserSucceeded: (state) => {
+      state.isUpdatingIcUserAgency = false;
+      state.feedback.kind = "agencyRejectToUserSuccess";
+    },
+
+    rejectAgencyWithRoleToUserFailed: (
       state,
       action: PayloadAction<string>,
     ) => {

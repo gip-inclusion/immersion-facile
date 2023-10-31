@@ -5,6 +5,7 @@ import {
   AuthenticatedUserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { SiretDto } from "../siret/siret";
+import { OmitFromExistingKeys } from "../utils";
 
 export type UserAndPassword = {
   user: string;
@@ -15,6 +16,13 @@ export type IcUserRoleForAgencyParams = {
   agencyId: AgencyId;
   role: AgencyRole;
   userId: AuthenticatedUserId;
+};
+
+export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<
+  IcUserRoleForAgencyParams,
+  "role"
+> & {
+  justification: string;
 };
 
 export type WithAgencyRole = {

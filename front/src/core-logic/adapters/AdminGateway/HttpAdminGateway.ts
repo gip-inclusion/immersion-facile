@@ -11,6 +11,7 @@ import {
   GetDashboardParams,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
+  RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserAndPassword,
 } from "shared";
@@ -114,6 +115,23 @@ export class HttpAdminGateway implements AdminGateway {
         if (response.status === 200) return response.body;
         throw new Error(JSON.stringify(response.body));
       }),
+    );
+  }
+
+  public rejectUserForAgency$(
+    params: RejectIcUserRoleForAgencyParams,
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .deleteIcUserForAgency({
+          body: params,
+          headers: { authorization: token },
+        })
+        .then((response) => {
+          if (response.status === 201) return;
+          throw new Error(JSON.stringify(response.body));
+        }),
     );
   }
 
