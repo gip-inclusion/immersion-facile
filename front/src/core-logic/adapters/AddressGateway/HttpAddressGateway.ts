@@ -50,7 +50,6 @@ export class HttpAddressGateway implements AddressGateway {
 
     return match(response)
       .with({ status: 200 }, ({ body }) => body)
-
       .otherwise((unhandledResponse) => {
         throw new Error(JSON.stringify(unhandledResponse));
       });
