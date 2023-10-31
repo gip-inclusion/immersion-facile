@@ -80,7 +80,6 @@ module.exports = {
           "shared",
           "react-design-system",
           "html-templates",
-          "http-client",
           "^src/",
           "^\\u0000",
           "^\\.\\.(?!/?$)",

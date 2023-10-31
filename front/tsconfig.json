@@ -18,8 +18,7 @@
     "baseUrl": "./src",
     "paths": {
       "src/*": ["./*"],
-      "shared": ["../../shared/src/index.ts"],
-      "http-client": ["../libs/http-client/src/index.ts"]
+      "shared": ["../../shared/src/index.ts"]
     }
   },
   "include": ["./src"]
