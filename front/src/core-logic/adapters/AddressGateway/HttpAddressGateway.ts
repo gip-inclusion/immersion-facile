@@ -7,6 +7,7 @@ import {
   LookupSearchResult,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export class HttpAddressGateway implements AddressGateway {
@@ -34,9 +35,7 @@ export class HttpAddressGateway implements AddressGateway {
         console.error(body);
         throw new Error(body.message);
       })
-      .otherwise((unhandledResponse) => {
-        throw new Error(JSON.stringify(unhandledResponse));
-      });
+      .otherwise(otherwiseThrow);
   }
 
   async #lookupLocation(
@@ -50,8 +49,6 @@ export class HttpAddressGateway implements AddressGateway {
 
     return match(response)
       .with({ status: 200 }, ({ body }) => body)
-      .otherwise((unhandledResponse) => {
-        throw new Error(JSON.stringify(unhandledResponse));
-      });
+      .otherwise(otherwiseThrow);
   }
 }

@@ -43,7 +43,13 @@ describe("/siret route", () => {
     const response = await httpClient.getSiretInfo({
       urlParams: { siret: "not_a_valid_siret" },
     });
-    expect(response.status).toBe(400);
+    expectHttpResponseToEqual(response, {
+      status: 400,
+      body: {
+        errors:
+          'Error: [\n  {\n    "validation": "regex",\n    "code": "invalid_string",\n    "message": "SIRET doit être composé de 14 chiffres",\n    "path": [\n      "siret"\n    ]\n  }\n]',
+      },
+    });
   });
 
   it("returns 404 Not Found for unknown siret", async () => {
