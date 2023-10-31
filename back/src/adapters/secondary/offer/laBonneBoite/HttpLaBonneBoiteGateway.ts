@@ -1,16 +1,16 @@
 import Bottleneck from "bottleneck";
 import { SearchResultDto } from "shared";
-import { HttpClient } from "http-client";
+import { HttpClient } from "shared-routes";
 import { PoleEmploiGateway } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
 } from "../../../../domain/offer/ports/LaBonneBoiteGateway";
+import { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
 import {
   LaBonneBoiteApiResultProps,
   LaBonneBoiteCompanyDto,
 } from "./LaBonneBoiteCompanyDto";
-import { LaBonneBoiteTargets } from "./LaBonneBoiteTargets";
 
 const MAX_PAGE_SIZE = 100;
 const MAX_DISTANCE_IN_KM = 100;
@@ -25,7 +25,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   });
 
   constructor(
-    private readonly httpClient: HttpClient<LaBonneBoiteTargets>,
+    private readonly httpClient: HttpClient<LaBonneBoiteRoutes>,
     private readonly poleEmploiGateway: PoleEmploiGateway,
     private readonly poleEmploiClientId: string,
   ) {}
@@ -36,7 +36,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lon,
     rome,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
-    const { responseBody } = await this.#limiter.schedule(async () => {
+    const { body } = await this.#limiter.schedule(async () => {
       const accessToken = await this.poleEmploiGateway.getAccessToken(
         `application_${this.poleEmploiClientId} api_labonneboitev1`,
       );
@@ -57,7 +57,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
       });
     });
 
-    return responseBody.companies
+    return body.companies
       .map(
         (props: LaBonneBoiteApiResultProps) =>
           new LaBonneBoiteCompanyDto(props),

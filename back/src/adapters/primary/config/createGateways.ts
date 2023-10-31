@@ -34,7 +34,7 @@ import { brevoNotificationGatewayRoutes } from "../../secondary/notificationGate
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
 import { HttpLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/HttpLaBonneBoiteGateway";
 import { InMemoryLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
-import { createLbbTargets } from "../../secondary/offer/laBonneBoite/LaBonneBoiteTargets";
+import { createLbbRoutes } from "../../secondary/offer/laBonneBoite/LaBonneBoite.routes";
 import { HttpPassEmploiGateway } from "../../secondary/offer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
@@ -226,11 +226,9 @@ export const createGateways = async (
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(
-            configureCreateHttpClientForExternalApi(
-              axios.create({
-                timeout: config.externalAxiosTimeout,
-              }),
-            )(createLbbTargets(config.peApiUrl)),
+            createAxiosHttpClientForExternalAPIs(
+              createLbbRoutes(config.peApiUrl),
+            ),
             poleEmploiGateway,
             config.poleEmploiClientId,
           )
