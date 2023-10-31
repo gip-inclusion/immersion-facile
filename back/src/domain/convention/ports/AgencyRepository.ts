@@ -20,3 +20,5 @@ export interface AgencyRepository {
 
 export const someAgenciesMissingMessage = (agencyIds: AgencyId[]) =>
   `Some agencies not found with ids : ${agencyIds.map((id) => `'${id}'`)}.`;
+export const referedAgencyMissingMessage = (refersToAgencyId: AgencyId) =>
+  `Refered agency with id '${refersToAgencyId}' missing on agency repository.`;
