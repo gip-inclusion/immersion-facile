@@ -148,6 +148,14 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
+  public getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]> {
+    return this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("a.refers_to_agency_id", "=", id)
+      .orderBy("a.updated_at", "desc")
+      .execute()
+      .then(map((row) => row.agency));
+  }
+
   public async getAgencyWhereEmailMatches(email: string) {
     const positionAsCoordinates = "ST_AsGeoJSON(position) AS position";
     const validatorEmailsIncludesProvidedEmail =

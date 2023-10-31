@@ -360,6 +360,27 @@ describe("PgAgencyRepository", () => {
     });
   });
 
+  describe("getAgenciesRelatedToAgency", () => {
+    it("found related agencies", async () => {
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agencyWithRefersTo);
+
+      expectToEqual(
+        await agencyRepository.getAgenciesRelatedToAgency(agency1.id),
+        [agencyWithRefersTo],
+      );
+    });
+
+    it("empty when there is no related agencies", async () => {
+      await agencyRepository.insert(agency1);
+
+      expectToEqual(
+        await agencyRepository.getAgenciesRelatedToAgency(agency1.id),
+        [],
+      );
+    });
+  });
+
   describe("to get agencies near by a given location", () => {
     const placeStanislasPosition: GeoPositionDto = {
       lat: 48.693339,
