@@ -109,7 +109,7 @@ describe("PgErrorRepository", () => {
       await expectPromiseToFailWithError(
         pgErrorRepository.markPartnersErroredConventionAsHandled(conventionId1),
         new NotFoundError(
-          `There's no ${broadcastToPeServiceName} errors for convention id '${conventionId1}'.`,
+          `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId1}'.`,
         ),
       );
     });
