@@ -229,6 +229,53 @@ describe("Agency registration for authenticated users", () => {
     });
   });
 
+  describe("Reject user registration for agency", () => {
+    it("rejects succesfully the user for agency", () => {
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        icUsersAdminInitialState,
+      );
+      store.dispatch(
+        icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested({
+          agencyId: "rejected-user-for-this-agency",
+          justification: "osef",
+          userId: "user-to-reject-id",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+
+      dependencies.adminGateway.rejectUserToAgencyResponse$.next();
+
+      expectIsUpdatingUserAgencyToBe(false);
+      expectFeedbackToEqual({ kind: "agencyRejectToUserSuccess" });
+    });
+
+    it("Fail to rejects the user for agency", () => {
+      const errorMessage = "reject user for agency failed";
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        icUsersAdminInitialState,
+      );
+      store.dispatch(
+        icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested({
+          agencyId: "rejected-user-for-this-agency",
+          justification: "osef",
+          userId: "user-to-reject-id",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+
+      dependencies.adminGateway.rejectUserToAgencyResponse$.error(
+        new Error(errorMessage),
+      );
+
+      expectIsUpdatingUserAgencyToBe(false);
+      expectFeedbackToEqual({ kind: "errored", errorMessage });
+    });
+  });
+
   const expectIsUpdatingUserAgencyToBe = (expected: boolean) => {
     expect(
       store.getState().admin.inclusionConnectedUsersAdmin

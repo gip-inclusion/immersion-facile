@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { match, P } from "ts-pattern";
-import { AgencyRole, allAgencyRoles, AuthenticatedUserId } from "shared";
+import { AuthenticatedUserId } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { IcUserAgenciesToReview } from "./RejectIcUserRegistrationToAgencyForm";
 
 export const RegisterUsersToAgencies = () => {
   const dispatch = useDispatch();
@@ -26,8 +26,6 @@ export const RegisterUsersToAgencies = () => {
       icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
     );
   }, [dispatch]);
-
-  const defaultRoleOnAssociation: AgencyRole = "validator";
 
   useEffect(() => {
     if (agenciesNeedingReviewForUser.length === 0) {
@@ -63,7 +61,7 @@ export const RegisterUsersToAgencies = () => {
               },
             }}
           />
-          {match({ agenciesNeedingReviewForUser, feedback })
+          {match({ agenciesNeedingReviewForUser, feedback, selectedUserId })
             .with(
               {
                 agenciesNeedingReviewForUser: P.when(
@@ -75,77 +73,13 @@ export const RegisterUsersToAgencies = () => {
                     feedback.kind === "agencyRegisterToUserSuccess" ||
                     feedback.kind === "usersToReviewFetchSuccess",
                 ),
+                selectedUserId: P.not(P.nullish),
               },
-              () => (
-                <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-                  {agenciesNeedingReviewForUser.map(({ agency }) => (
-                    <div key={agency.id} className={fr.cx("fr-col-4")}>
-                      <div className={fr.cx("fr-card")}>
-                        <div className={fr.cx("fr-card__body")}>
-                          <div className={fr.cx("fr-card__content")}>
-                            <h3 className={fr.cx("fr-card__title")}>
-                              {agency.name}
-                            </h3>
-                            <p className={fr.cx("fr-card__desc")}>
-                              {agency.address.streetNumberAndAddress}{" "}
-                              {agency.address.postcode} {agency.address.city}
-                            </p>
-                            <p className={fr.cx("fr-card__desc")}>
-                              <DisplayEmailList
-                                emailKind={"conseillers"}
-                                emails={agency.counsellorEmails}
-                              />
-                              <DisplayEmailList
-                                emailKind={"validateurs"}
-                                emails={agency.validatorEmails}
-                              />
-                            </p>
-                            <div className={fr.cx("fr-card__desc")}>
-                              <Select
-                                label="Sélectionner un rôle"
-                                disabled={true}
-                                options={[
-                                  {
-                                    value: "",
-                                    label: "Sélectionner un rôle",
-                                    disabled: true,
-                                  },
-                                  ...allAgencyRoles.map((roleValue) => ({
-                                    value: roleValue,
-                                    label: labelByRole[roleValue],
-                                  })),
-                                ]}
-                                nativeSelectProps={{
-                                  value: defaultRoleOnAssociation, // change to role when feature ready
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <div className={fr.cx("fr-card__footer")}>
-                            <Button
-                              size="small"
-                              type="button"
-                              onClick={() => {
-                                if (!selectedUserId) return;
-                                dispatch(
-                                  icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested(
-                                    {
-                                      agencyId: agency.id,
-                                      userId: selectedUserId,
-                                      role: defaultRoleOnAssociation,
-                                    },
-                                  ),
-                                );
-                              }}
-                            >
-                              Associer à cette agence
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              ({ selectedUserId }) => (
+                <IcUserAgenciesToReview
+                  agenciesNeedingReviewForUser={agenciesNeedingReviewForUser}
+                  selectedUserId={selectedUserId}
+                />
               ),
             )
             .with(
@@ -209,30 +143,4 @@ export const RegisterUsersToAgencies = () => {
       </div>
     </>
   );
-};
-
-const DisplayEmailList = ({
-  emails,
-  emailKind,
-}: {
-  emailKind: string;
-  emails: string[];
-}) => {
-  if (emails.length === 0) return null;
-
-  return (
-    <ul>
-      <strong>Email {emailKind} :</strong>
-      {emails.map((email) => (
-        <li key={email}>{email}</li>
-      ))}
-    </ul>
-  );
-};
-
-const labelByRole: Record<AgencyRole, string> = {
-  counsellor: "Conseiller",
-  validator: "Validateur",
-  agencyOwner: "Administrateur d'agence",
-  toReview: "À valider",
 };

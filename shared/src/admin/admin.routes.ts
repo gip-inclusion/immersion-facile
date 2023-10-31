@@ -23,6 +23,7 @@ import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
   icUserRoleForAgencyParamsSchema,
+  rejectIcUserRoleForAgencyParamsSchema,
   userAndPasswordSchema,
   withAgencyRoleSchema,
 } from "./admin.schema";
@@ -60,6 +61,17 @@ export const adminRoutes = defineRoutes({
     method: "patch",
     url: "/admin/inclusion-connected/users",
     requestBodySchema: icUserRoleForAgencyParamsSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      201: expressEmptyResponseBody,
+      401: legacyUnauthenticatedErrorSchema,
+      404: legacyBadRequestErrorSchema,
+    },
+  }),
+  deleteUserToAgency: defineRoute({
+    method: "delete",
+    url: "/admin/inclusion-connected/users",
+    requestBodySchema: rejectIcUserRoleForAgencyParamsSchema,
     ...withAuthorizationHeaders,
     responses: {
       201: expressEmptyResponseBody,

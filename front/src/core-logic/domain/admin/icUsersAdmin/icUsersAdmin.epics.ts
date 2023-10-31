@@ -6,6 +6,7 @@ import {
   AgencyRight,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
+  RejectIcUserRoleForAgencyParams,
 } from "shared";
 import {
   icUsersAdminSlice,
@@ -72,6 +73,30 @@ const registerAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
     ),
   );
 
+const rejectAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested.match),
+    switchMap((action: PayloadAction<RejectIcUserRoleForAgencyParams>) =>
+      adminGateway
+        .rejectUserForAgency$(
+          action.payload,
+          state$.value.admin.adminAuth.adminToken ?? "",
+        )
+        .pipe(
+          map(icUsersAdminSlice.actions.rejectAgencyWithRoleToUserSucceeded),
+        ),
+    ),
+    catchEpicError((error) =>
+      icUsersAdminSlice.actions.rejectAgencyWithRoleToUserFailed(
+        error?.message,
+      ),
+    ),
+  );
+
 const normalizeUsers = (
   users: InclusionConnectedUser[],
 ): NormalizedIcUserById =>
@@ -95,4 +120,5 @@ const normalizeUsers = (
 export const icUsersAdminEpics = [
   fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic,
   registerAgencyToUserEpic,
+  rejectAgencyToUserEpic,
 ];

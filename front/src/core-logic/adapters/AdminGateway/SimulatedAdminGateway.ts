@@ -12,6 +12,7 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   NotificationsByKind,
+  RejectIcUserRoleForAgencyParams,
   UserAndPassword,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -133,6 +134,15 @@ export class SimulatedAdminGateway implements AdminGateway {
           new Error("Impossible de vous authentifier (SimulatedAdminGateway)"),
       );
     return of("some-token");
+  }
+
+  public rejectUserForAgency$(
+    { agencyId }: RejectIcUserRoleForAgencyParams,
+    _token: string,
+  ): Observable<void> {
+    return agencyId === "non-existing-agency-id"
+      ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
+      : of(undefined);
   }
 
   public saveApiConsumer$(

@@ -10,6 +10,7 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   NotificationsByKind,
+  RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserAndPassword,
 } from "shared";
@@ -38,6 +39,11 @@ export interface AdminGateway {
 
   updateUserRoleForAgency$(
     params: IcUserRoleForAgencyParams,
+    token: BackOfficeJwt,
+  ): Observable<void>;
+
+  rejectUserForAgency$(
+    params: RejectIcUserRoleForAgencyParams,
     token: BackOfficeJwt,
   ): Observable<void>;
 
