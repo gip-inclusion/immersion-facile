@@ -19,6 +19,9 @@ export const siretRoutes = defineRoutes({
       200: getSiretInfoSchema,
       400: legacyBadRequestErrorSchema,
       404: legacyBadRequestErrorSchema,
+      409: legacyBadRequestErrorSchema,
+      429: legacyBadRequestErrorSchema,
+      503: legacyBadRequestErrorSchema,
     },
   }),
   getSiretInfoIfNotAlreadySaved: defineRoute({
@@ -26,7 +29,11 @@ export const siretRoutes = defineRoutes({
     url: `/siret-if-not-saved/:siret`,
     responses: {
       200: getSiretInfoSchema,
+      400: legacyBadRequestErrorSchema,
+      404: legacyBadRequestErrorSchema,
       409: legacyBadRequestErrorSchema,
+      429: legacyBadRequestErrorSchema,
+      503: legacyBadRequestErrorSchema,
     },
   }),
 });

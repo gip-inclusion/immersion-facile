@@ -1,5 +1,5 @@
-import axios from "axios";
 import { from, Observable } from "rxjs";
+import { match, P } from "ts-pattern";
 import {
   GetSiretInfo,
   GetSiretInfoError,
@@ -10,6 +10,7 @@ import {
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
 import { HttpClient, HttpResponse } from "shared-routes";
+import type { ResponsesToHttpResponse } from "shared-routes/defineRoutes";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
@@ -19,8 +20,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .getSiretInfo({ urlParams: { siret } })
-        .then(getBodyIfStatus200ElseThrow)
-        .catch(handleSiretApiError),
+        .then(handleSiretResponses),
     );
   }
 
@@ -30,8 +30,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .getSiretInfoIfNotAlreadySaved({ urlParams: { siret } })
-        .then(getBodyIfStatus200ElseThrow)
-        .catch(handleSiretApiError),
+        .then(handleSiretResponses),
     );
   }
 
@@ -44,6 +43,31 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   }
 }
 
+const handleSiretResponses = (
+  response: ResponsesToHttpResponse<
+    | SiretRoutes["getSiretInfo"]["responses"]
+    | SiretRoutes["getSiretInfoIfNotAlreadySaved"]["responses"]
+  >,
+) =>
+  match(response)
+    .with({ status: 200 }, ({ body }) => body)
+    .with({ status: 400 }, ({ body, status }) => {
+      // eslint-disable-next-line no-console
+      console.error(body.errors);
+      return errorMessageByCode[status];
+    })
+    .with(
+      { status: P.union(404, 409, 429, 503) },
+      ({ status }) => errorMessageByCode[status],
+    )
+    .otherwise(otherwiseThrow);
+
+const otherwiseThrow = (unhandledResponse: never): never => {
+  throw new Error("Une erreur non gérée est survenue", {
+    cause: unhandledResponse,
+  });
+};
+
 const getBodyIfStatus200ElseThrow = <R extends HttpResponse<number, unknown>>(
   response: R,
 ): R["status"] extends 200 ? R["body"] : never => {
@@ -53,20 +77,10 @@ const getBodyIfStatus200ElseThrow = <R extends HttpResponse<number, unknown>>(
   return response.body as any;
 };
 
-const errorMessageByCode: Partial<Record<number, GetSiretInfoError>> = {
+const errorMessageByCode = {
   [429]: tooManiSirenRequestsSiretErrorMessage,
   [503]: siretApiUnavailableSiretErrorMessage,
   [404]: siretApiMissingEstablishmentMessage,
+  [400]: "Erreur sur le siret fourni",
   [409]: "Establishment with this siret is already in our DB",
-};
-
-const handleSiretApiError = (error: Error) => {
-  if (axios.isAxiosError(error.cause) && error.cause.response?.status) {
-    const errorMessage = errorMessageByCode[error.cause.response?.status];
-    if (errorMessage) return errorMessage;
-  }
-
-  throw new Error("Une erreur non managée est survenue", {
-    cause: error,
-  });
-};
+} satisfies Record<number, GetSiretInfoError>;

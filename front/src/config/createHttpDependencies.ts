@@ -70,7 +70,7 @@ export const createHttpDependencies = (): Dependencies => {
       axiosOnSlashApiLegacy,
     ),
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(
-      createAxiosSharedClient(siretRoutes, axiosOnSlashApiLegacy),
+      createAxiosSharedClient(siretRoutes, axiosOnSlashApi),
     ),
     technicalGateway: new HttpTechnicalGateway(
       createAxiosSharedClient(technicalRoutes, axiosOnSlashApiLegacy),
