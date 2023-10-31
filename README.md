@@ -34,7 +34,6 @@ Le projet Immersion Facilitée est un monorepo composé des projets suivants :
 - libs/ :
   - react-design-system : les composants d'interfaces spécifiques Immersion Facilitée (hors DSFR)
   - html-templates : lib maison de génération de contenus HTML (pour les emails par ex)
-  - http-client : le client HTTP de l'app
   - scss-mapper : un générateur de fichier TS à partir de fichier Sass (\*.scss)
 
 #### Installer les dépendances nodes

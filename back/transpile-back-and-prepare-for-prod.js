@@ -31,7 +31,6 @@ execSync(
 
 // Copy dependencies package.json files to build directory
 fs.copyFileSync("../shared/package.json", "build/shared/package.json");
-fs.copyFileSync( "../libs/http-client/package.json", "build/libs/http-client/package.json");
 fs.copyFileSync( "../libs/html-templates/package.json", "build/libs/html-templates/package.json" );
 
 const removeFromFileLinesThatInclude = (filePath, regex) => {
