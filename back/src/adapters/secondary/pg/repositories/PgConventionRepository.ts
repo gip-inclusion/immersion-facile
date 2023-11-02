@@ -30,7 +30,7 @@ export class PgConventionRepository implements ConventionRepository {
       this.transaction,
       `
       UPDATE conventions
-      SET status = 'DEPRECATED', status_justification = 'Devenu obsolète car status ' || status || ' alors que la date de fin est dépassé depuis longtemps'
+      SET status = 'DEPRECATED', status_justification = 'Devenu obsolète car statut ' || status || ' alors que la date de fin est dépassée depuis longtemps'
       WHERE id IN (
         SELECT id FROM conventions
         WHERE date_end <= $1

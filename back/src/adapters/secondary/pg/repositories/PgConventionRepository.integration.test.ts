@@ -842,7 +842,7 @@ describe("PgConventionRepository", () => {
     expectToEqual(await conventionRepository.getById(convention.id), {
       ...convention,
       status: "DEPRECATED",
-      statusJustification: `Devenu obsolète car status ${convention.status} alors que la date de fin est dépassé depuis longtemps`,
+      statusJustification: `Devenu obsolète car statut ${convention.status} alors que la date de fin est dépassée depuis longtemps`,
     });
   };
 });
