@@ -1,4 +1,5 @@
 import { from, Observable } from "rxjs";
+import { match, P } from "ts-pattern";
 import {
   BackOfficeJwt,
   EstablishmentJwt,
@@ -8,6 +9,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
+import { otherwiseThrow } from "../otherwiseThrow";
 
 export class HttpEstablishmentGateway implements EstablishmentGateway {
   constructor(private readonly httpClient: HttpClient<EstablishmentRoutes>) {}
@@ -18,10 +20,13 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     return from(
       this.httpClient
         .addFormEstablishment({ body: formEstablishment })
-        .then(({ status, body }) => {
-          if (status === 200) return;
-          throw new Error(JSON.stringify(body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => {
+              /* void */
+            })
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -35,10 +40,16 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
           urlParams: { siret },
           headers: { authorization: jwt },
         })
-        .then(({ body, status }) => {
-          if (status === 204) return;
-          throw new Error(JSON.stringify(body));
-        })
+        .then((response) =>
+          match(response)
+            .with({ status: 204 }, () => {
+              /* void */
+            })
+            .with({ status: P.union(404, 400, 403) }, ({ body }) => {
+              throw new Error(JSON.stringify(body));
+            })
+            .otherwise(otherwiseThrow),
+        )
         .catch((error) => {
           //Todo temporary fix due to probable shared route bug
           if (
@@ -62,10 +73,14 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
           urlParams: { siret },
           headers: { authorization: jwt },
         })
-        .then(({ body, status }) => {
-          if (status === 200) return body;
-          throw new Error(JSON.stringify(body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: P.union(400, 401) }, ({ body }) => {
+              throw new Error(JSON.stringify(body));
+            })
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -75,10 +90,11 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
         .requestEmailToUpdateFormRoute({
           urlParams: { siret },
         })
-        .then(({ body, status }) => {
-          if (status === 201) return;
-          throw new Error(JSON.stringify(body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -94,10 +110,16 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             authorization: jwt,
           },
         })
-        .then(({ body, status }) => {
-          if (status === 200) return;
-          throw new Error(JSON.stringify(body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => {
+              /* void */
+            })
+            .with({ status: P.union(400, 401, 403, 409) }, ({ body }) => {
+              throw new Error(JSON.stringify(body));
+            })
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 }
