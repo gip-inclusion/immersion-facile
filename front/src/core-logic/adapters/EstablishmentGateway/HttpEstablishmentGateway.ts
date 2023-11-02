@@ -38,6 +38,16 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
         .then(({ body, status }) => {
           if (status === 204) return;
           throw new Error(JSON.stringify(body));
+        })
+        .catch((error) => {
+          //Todo temporary fix due to probable shared route bug
+          if (
+            error instanceof Error &&
+            error.message.includes("Received status: 204.")
+          ) {
+            return;
+          }
+          throw error;
         }),
     );
   }
