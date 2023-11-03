@@ -24,6 +24,9 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
   ): Promise<AgencyPublicDisplayDto> {
     const [agencyDto] = await uow.agencyRepository.getByIds([agencyId]);
     if (!agencyDto) throw new NotFoundError(agencyId);
-    return toAgencyPublicDisplayDto(agencyDto);
+    const referedAgency =
+      agencyDto.refersToAgencyId &&
+      (await uow.agencyRepository.getById(agencyDto.refersToAgencyId));
+    return toAgencyPublicDisplayDto(agencyDto, referedAgency);
   }
 }

@@ -64,7 +64,7 @@ export const EditAgencyForm = ({
 
   const getFieldError = makeFieldError(formState);
 
-  const hasAgencyReferral = !!agency.refersToAgencyId;
+  const refersToOtherAgency = !!agency.refersToAgencyId;
   return (
     <FormProvider {...methods}>
       <form
@@ -76,7 +76,7 @@ export const EditAgencyForm = ({
         <div className={fr.cx("fr-mb-4w")}>
           <AgencyFormCommonFields
             addressInitialValue={agency.address}
-            hasAgencyReferral={hasAgencyReferral}
+            refersToOtherAgency={refersToOtherAgency}
           />
           <MultipleEmailsInput
             name="agency-admin-emails"

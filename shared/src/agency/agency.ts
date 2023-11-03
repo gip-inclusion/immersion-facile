@@ -2,7 +2,7 @@ import { AgencyDto, AgencyPublicDisplayDto } from "./agency.dto";
 
 export const toAgencyPublicDisplayDto = (
   agency: AgencyDto,
-  referedAgency?: AgencyDto,
+  referedAgency: AgencyDto | undefined,
 ): AgencyPublicDisplayDto => {
   if (
     agency.refersToAgencyId &&

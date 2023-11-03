@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { from, Observable, Subject } from "rxjs";
+import { firstValueFrom, from, Observable, Subject } from "rxjs";
 import {
   AgencyDto,
   AgencyId,
@@ -12,7 +12,6 @@ import {
   ListAgenciesRequestDto,
   propEq,
   propNotEq,
-  toAgencyPublicDisplayDto,
   WithAgencyId,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
@@ -49,9 +48,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public async getAgencyPublicInfoById(
     withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
-    const agency = this.#agencies[withAgencyId.agencyId];
-    if (agency) return toAgencyPublicDisplayDto(agency);
-    throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
+    return firstValueFrom(this.getAgencyPublicInfoById$(withAgencyId));
   }
 
   public getAgencyPublicInfoById$(

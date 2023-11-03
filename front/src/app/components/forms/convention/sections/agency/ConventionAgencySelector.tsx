@@ -1,8 +1,5 @@
 import React from "react";
 import {
-  AgencyOption,
-  DepartmentCode,
-  FederatedIdentity,
   InternshipKind,
   isPeConnectIdentity,
   miniStageRestrictedDepartments,
@@ -15,9 +12,9 @@ import { formConventionFieldsLabels } from "src/app/contents/forms/convention/fo
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useRoute } from "src/app/routes/routes";
-import { agencyGateway } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionAgenciesRetriever } from "src/core-logic/ports/AgencyGateway";
 
 type ConventionAgencySelectorProps = {
   internshipKind: InternshipKind;
@@ -67,7 +64,7 @@ export const ConventionAgencySelector = ({
               miniStageRestrictedDepartments.includes(department.value),
             )
       }
-      agenciesRetriever={agenciesRetriever({
+      agenciesRetriever={conventionAgenciesRetriever({
         internshipKind,
         shouldListAll,
         federatedIdentity,
@@ -75,25 +72,4 @@ export const ConventionAgencySelector = ({
       disabled={disabled}
     />
   );
-};
-
-const agenciesRetriever = ({
-  internshipKind,
-  shouldListAll,
-  federatedIdentity,
-}: {
-  internshipKind: InternshipKind;
-  shouldListAll: boolean;
-  federatedIdentity: FederatedIdentity | null;
-}): ((departmentCode: DepartmentCode) => Promise<AgencyOption[]>) => {
-  if (internshipKind === "mini-stage-cci")
-    return (departmentCode) =>
-      agencyGateway.listMiniStageAgencies(departmentCode);
-  if (shouldListAll)
-    return (departmentCode) =>
-      agencyGateway.listImmersionAgencies(departmentCode);
-  return federatedIdentity && isPeConnectIdentity(federatedIdentity)
-    ? (departmentCode) =>
-        agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
-    : (departmentCode) => agencyGateway.listImmersionAgencies(departmentCode);
 };

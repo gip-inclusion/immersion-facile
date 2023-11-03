@@ -183,18 +183,17 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     limit?: number;
   }): Promise<AgencyDto[]> {
     const filteredAgencies = Object.values(this.#agencies)
-      .filter((agency: AgencyDto | undefined) =>
-        !agency
-          ? false
-          : ![
-              agencyHasDepartmentCode(agency, filters?.departmentCode),
-              agencyHasName(agency, filters?.nameIncludes),
-              agencyIsOfKind(agency, filters?.kind),
-              agencyIsOfPosition(agency, filters?.position),
-              agencyIsOfStatus(agency, filters?.status),
-            ].includes(false),
-      )
       .filter(isTruthy)
+      .filter(
+        (agency) =>
+          ![
+            agencyHasDepartmentCode(agency, filters?.departmentCode),
+            agencyHasName(agency, filters?.nameIncludes),
+            agencyIsOfKind(agency, filters?.kind),
+            agencyIsOfPosition(agency, filters?.position),
+            agencyIsOfStatus(agency, filters?.status),
+          ].includes(false),
+      )
       .slice(0, limit);
 
     return filters?.position

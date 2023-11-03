@@ -240,7 +240,7 @@ const agencyOptionsInSelectorFromAgencies = (
   agencyKind: AgencyKindForSelector,
 ) =>
   agencies
-    .filter(({ kind }) => (agencyKind === "all" ? true : kind === agencyKind))
+    .filter(({ kind }) => agencyKind === "all" || kind === agencyKind)
     .map(({ id, name }) => ({
       label: name,
       value: id,
