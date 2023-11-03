@@ -1,9 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
+import { keys } from "ramda";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
-import { FederatedIdentityProvider, isPeConnectIdentity } from "shared";
-import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import {
+  FederatedIdentityProvider,
+  isPeConnectIdentity,
+  loginPeConnect,
+} from "shared";
+import {
+  Loader,
+  MainWrapper,
+  PageHeader,
+  SimpleSection,
+} from "react-design-system";
 import {
   ConventionForm,
   ConventionFormMode,
@@ -14,7 +24,8 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { routes } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
+import { deviceRepository } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -27,28 +38,85 @@ interface ConventionImmersionPageProps {
   route: ConventionImmersionPageRoute;
 }
 
+const storeConventionRouteParamsOnDevice = (
+  routeParams: ConventionImmersionPageRoute["params"],
+) => {
+  const { fedId, fedIdProvider, jwt, ...partialConvention } = routeParams;
+  if (keys(partialConvention).length) {
+    deviceRepository.set("partialConventionInUrl", partialConvention);
+  }
+};
+
 export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => {
+  const currentRoute = useRoute();
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
+  const isSharedConvention = useMemo(
+    () => Object.keys(route.params).length > 0,
+    [route.params],
+  );
+  const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
+    useState(isSharedConvention);
+  const { enablePeConnectApi } = useFeatureFlags();
+  const continueWithPEConnect = enablePeConnectApi && {
+    link: {
+      href: `/api/${loginPeConnect}`,
+      label:
+        "Ou continuer avec mes identifiants Pôle emploi (candidats inscrits à Pôle emploi)",
+    },
+  };
+
+  useEffect(() => {
+    if (enablePeConnectApi && currentRoute.name === "conventionImmersion") {
+      storeConventionRouteParamsOnDevice(currentRoute.params);
+    }
+  }, []);
+
   return (
     <HeaderFooterLayout>
-      <MainWrapper
-        layout={"default"}
-        pageHeader={
-          <PageHeader
-            title={
-              showSummary
-                ? t.intro.conventionSummaryTitle
-                : t.intro.conventionTitle
-            }
-            theme="default"
-          />
-        }
-      >
-        <PageContent route={route} />
-      </MainWrapper>
+      {displaySharedConventionMessage && (
+        <MainWrapper layout={"default"}>
+          <SimpleSection
+            button={{
+              label: "Continuer",
+              onClick: () => {
+                setDisplaySharedConventionMessage(false);
+              },
+            }}
+            illustrationUrl="#"
+            {...continueWithPEConnect}
+          >
+            <h1>
+              Quelqu'un a partagé une demande de convention d'immersion avec
+              vous
+            </h1>
+            <p>
+              Une entreprise ou un candidat a rempli ses informations dans le
+              formulaire de demande de convention. Vous n'avez plus qu'à remplir
+              vos informations et à valider le formulaire en quelques clics.
+            </p>
+          </SimpleSection>
+        </MainWrapper>
+      )}
+      {!displaySharedConventionMessage && (
+        <MainWrapper
+          layout={"default"}
+          pageHeader={
+            <PageHeader
+              title={
+                showSummary
+                  ? t.intro.conventionSummaryTitle
+                  : t.intro.conventionTitle
+              }
+              theme="default"
+            />
+          }
+        >
+          <PageContent route={route} />
+        </MainWrapper>
+      )}
     </HeaderFooterLayout>
   );
 };
@@ -67,9 +135,10 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   useScrollToTop(shouldShowForm);
   useEffect(() => {
     setShouldShowForm(
-      enablePeConnectApi.isActive &&
-        !!federatedIdentity &&
-        isPeConnectIdentity(federatedIdentity),
+      isSharedConvention ||
+        (enablePeConnectApi.isActive &&
+          !!federatedIdentity &&
+          isPeConnectIdentity(federatedIdentity)),
     );
   }, [enablePeConnectApi.isActive, federatedIdentity]);
 

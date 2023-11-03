@@ -1,21 +1,8 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Card from "@codegouvfr/react-dsfr/Card";
-import { keys } from "ramda";
 import { loginPeConnect } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
-import { useRoute } from "src/app/routes/routes";
-import { deviceRepository } from "src/config/dependencies";
-
-const storeConventionRouteParamsOnDevice = (
-  routeParams: ConventionImmersionPageRoute["params"],
-) => {
-  const { fedId, fedIdProvider, jwt, ...partialConvention } = routeParams;
-  if (keys(partialConvention).length) {
-    deviceRepository.set("partialConventionInUrl", partialConvention);
-  }
-};
 
 type InitiateConventionCardProps = {
   onNotPeConnectButtonClick: () => void;
@@ -25,7 +12,6 @@ export const InitiateConventionCard = ({
   onNotPeConnectButtonClick,
 }: InitiateConventionCardProps) => {
   const { enablePeConnectApi } = useFeatureFlags();
-  const currentRoute = useRoute();
 
   return (
     <div>
@@ -50,13 +36,7 @@ export const InitiateConventionCard = ({
           />
         </div>
         {enablePeConnectApi && (
-          <div
-            className={fr.cx("fr-col-12", "fr-col-lg-4")}
-            onClick={() => {
-              if (currentRoute.name === "conventionImmersion")
-                storeConventionRouteParamsOnDevice(currentRoute.params);
-            }}
-          >
+          <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
             <Card
               background
               border
