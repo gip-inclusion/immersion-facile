@@ -55,7 +55,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             />
           </div>
           <Button
-            title="Marquer la convention comme traitée"
+            title="Marquer la convention comme saisie dans les applicatifs PE"
             disabled={!formState.isValid}
             className={fr.cx("fr-mt-2w")}
           >
