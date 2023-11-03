@@ -1,9 +1,12 @@
+import { addDays } from "date-fns";
+import subDays from "date-fns/subDays";
 import { propEq } from "ramda";
 import {
   ConventionDto,
   ConventionId,
   ConventionReadDto,
   ConventionScope,
+  FindSimilarConventionsParams,
   ListConventionsRequestDto,
   validatedConventionStatuses,
   WithConventionIdLegacy,
@@ -28,6 +31,29 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly agencyRepository: InMemoryAgencyRepository,
     private readonly outboxRepository?: InMemoryOutboxRepository,
   ) {}
+
+  public async findSimilarConventions(
+    params: FindSimilarConventionsParams,
+  ): Promise<ConventionId[]> {
+    const dateStartToMatch = new Date(params.dateStart);
+
+    return this.conventionRepository.conventions
+      .filter(
+        ({
+          siret,
+          immersionAppellation,
+          dateStart,
+          signatories: { beneficiary },
+        }) =>
+          siret === params.siret &&
+          immersionAppellation.appellationCode === params.codeAppellation &&
+          beneficiary.birthdate === params.beneficiaryBirthdate &&
+          beneficiary.lastName === params.beneficiaryLastName &&
+          dateStartToMatch >= subDays(new Date(dateStart), 7) &&
+          dateStartToMatch <= addDays(new Date(dateStart), 7),
+      )
+      .map((convention) => convention.id);
+  }
 
   public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,

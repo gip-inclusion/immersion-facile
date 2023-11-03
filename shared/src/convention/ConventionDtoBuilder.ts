@@ -8,6 +8,7 @@ import {
   Weekday,
 } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
+import { SiretDto } from "../siret/siret";
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
@@ -239,6 +240,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     throw new Error(
       `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
     );
+  }
+
+  public withBeneficiaryBirthdate(birthdate: string): ConventionDtoBuilder {
+    return this.withBeneficiary({
+      ...this.#beneficiary,
+      birthdate,
+    });
   }
 
   public withBeneficiaryCurrentEmployer(
@@ -607,6 +615,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
         excludedDays,
       ),
     });
+  }
+
+  public withSiret(siret: SiretDto): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, siret });
   }
 
   public withStatus(status: ConventionStatus): ConventionDtoBuilder {
