@@ -27,7 +27,7 @@ import { routes } from "src/app/routes/routes";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
-  hasAgencyReferral: boolean;
+  refersToOtherAgency: boolean;
 };
 
 type ValidationSteps = "validatorsOnly" | "counsellorsAndValidators";
@@ -51,13 +51,13 @@ const descriptionByValidationSteps: Record<ValidationSteps, React.ReactNode> = {
 
 export const AgencyFormCommonFields = ({
   addressInitialValue,
-  hasAgencyReferral,
+  refersToOtherAgency,
 }: AgencyFormCommonFieldsProps) => {
   const { getValues, setValue, register, formState, watch } =
     useFormContext<CreateAgencyDto>();
   const formValues = getValues();
   const defaultValidationStepsValue: ValidationSteps =
-    formValues.counsellorEmails.length || hasAgencyReferral
+    formValues.counsellorEmails.length || refersToOtherAgency
       ? "counsellorsAndValidators"
       : "validatorsOnly";
   const [validationSteps, setValidationSteps] = useState<ValidationSteps>(
@@ -119,7 +119,7 @@ export const AgencyFormCommonFields = ({
           setValue("address", address);
         }}
       />
-      {!hasAgencyReferral && (
+      {!refersToOtherAgency && (
         <RadioGroup
           {...fieldsContent.stepsForValidation}
           options={numberOfStepsOptions}
@@ -129,7 +129,7 @@ export const AgencyFormCommonFields = ({
         />
       )}
       {(validationSteps === "counsellorsAndValidators" ||
-        hasAgencyReferral) && (
+        refersToOtherAgency) && (
         <MultipleEmailsInput
           {...fieldsContent.counsellorEmails}
           initialValue={formValues.counsellorEmails.join(", ")}
@@ -138,7 +138,7 @@ export const AgencyFormCommonFields = ({
           validationSchema={emailSchema}
         />
       )}
-      {!hasAgencyReferral && (
+      {!refersToOtherAgency && (
         <MultipleEmailsInput
           {...fieldsContent.validatorEmails}
           initialValue={formValues.validatorEmails.join(", ")}

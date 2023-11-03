@@ -104,7 +104,12 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
     const agency = this.#agencies[withAgencyId.agencyId];
-    if (agency) return toAgencyPublicDisplayDto(agency);
+
+    if (agency)
+      return toAgencyPublicDisplayDto(
+        agency,
+        this.#agencies[MISSION_LOCAL_AGENCY_ACTIVE.id],
+      );
     throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
   }
 

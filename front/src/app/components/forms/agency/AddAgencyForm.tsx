@@ -39,23 +39,23 @@ type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
 };
 
 export const AddAgencyForm = () => {
-  const [hasAgencyReferral, setHasAgencyReferral] = useState<
+  const [refersToOtherAgency, setRefersToOtherAgency] = useState<
     boolean | undefined
   >(undefined);
 
-  const agencyRefersToOptions: RadioButtonOption[] = [
+  const refersToOtherAgencyOptions: RadioButtonOption[] = [
     {
       label: "Prescripteur",
       nativeInputProps: {
         onClick: () => {
-          setHasAgencyReferral(false);
+          setRefersToOtherAgency(false);
         },
       },
     },
     {
       label: "Structure d'accompagnement",
       nativeInputProps: {
-        onClick: () => setHasAgencyReferral(true),
+        onClick: () => setRefersToOtherAgency(true),
       },
     },
   ];
@@ -64,11 +64,11 @@ export const AddAgencyForm = () => {
     <>
       <RadioButtons
         legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
-        options={agencyRefersToOptions}
+        options={refersToOtherAgencyOptions}
       />
-      {match(hasAgencyReferral)
-        .with(P.boolean, (hasAgencyReferral) => (
-          <AgencyForm hasAgencyReferral={hasAgencyReferral} />
+      {match(refersToOtherAgency)
+        .with(P.boolean, (refersToOtherAgency) => (
+          <AgencyForm refersToOtherAgency={refersToOtherAgency} />
         ))
         .with(undefined, () => null)
         .exhaustive()}
@@ -76,7 +76,11 @@ export const AddAgencyForm = () => {
   );
 };
 
-const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
+type AgencyFormProps = {
+  refersToOtherAgency: boolean;
+};
+
+const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
@@ -87,9 +91,9 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
   const formInitialValues = useMemo(
     () => ({
       ...initialValues(uuidV4()),
-      validatorEmails: hasAgencyReferral ? ["temp@temp.com"] : [],
+      validatorEmails: refersToOtherAgency ? ["temp@temp.com"] : [],
     }),
-    [hasAgencyReferral],
+    [refersToOtherAgency],
   );
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: zodResolver(createAgencySchema),
@@ -126,7 +130,7 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
         <p className={fr.cx("fr-text--xs")}>
           Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>
-        {hasAgencyReferral && (
+        {refersToOtherAgency && (
           <>
             <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
               Prescripteur lié (signataire des conventions)
@@ -163,7 +167,7 @@ const AgencyForm = ({ hasAgencyReferral }: { hasAgencyReferral: boolean }) => {
         <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
           Structure d'accompagnement
         </h2>
-        <AgencyFormCommonFields hasAgencyReferral={hasAgencyReferral} />
+        <AgencyFormCommonFields refersToOtherAgency={refersToOtherAgency} />
         <AgencyLogoUpload />
 
         <ErrorNotifications
