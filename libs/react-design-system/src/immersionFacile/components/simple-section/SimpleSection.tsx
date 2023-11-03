@@ -9,7 +9,7 @@ export type SimpleSectionProps = {
     onClick: () => void;
   };
   illustrationUrl: string;
-  link: {
+  link?: {
     href: string;
     label: string;
   };
@@ -21,11 +21,13 @@ export const SimpleSection = (props: SimpleSectionProps) => (
     <div className={"im-simple-section__content"}>
       {props.children}
       <Button onClick={props.button.onClick}>{props.button.label}</Button>
-      <div className={fr.cx("fr-mt-2w")}>
-        <a href={props.link.href} className={fr.cx("fr-link")}>
-          {props.link.label}
-        </a>
-      </div>
+      {props.link && (
+        <div className={fr.cx("fr-mt-2w")}>
+          <a href={props.link.href} className={fr.cx("fr-link")}>
+            {props.link.label}
+          </a>
+        </div>
+      )}
     </div>
     <div className={"im-simple-section__illustration"}>
       <img src={props.illustrationUrl} alt="" />
