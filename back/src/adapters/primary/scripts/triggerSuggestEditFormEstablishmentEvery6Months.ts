@@ -27,9 +27,12 @@ const startScript = async (): Promise<Report> => {
   });
   const uowPerformer = new PgUowPerformer(pool, createPgUow);
 
+  const numberOfDaysBeforeExpiration = 7;
+  const expiresInSeconds = numberOfDaysBeforeExpiration * 24 * 60 * 60;
+
   const generateEditEstablishmentJwt = makeGenerateJwtES256<"establishment">(
     config.jwtPrivateKey,
-    3600 * 24,
+    expiresInSeconds,
   );
 
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
