@@ -85,7 +85,7 @@ export const ConventionImmersionPage = ({
                 setDisplaySharedConventionMessage(false);
               },
             }}
-            illustrationUrl="#"
+            illustrationUrl="/src/assets/img/share-convention.png"
             {...continueWithPEConnect}
           >
             <h1>
