@@ -1,5 +1,12 @@
 import { keys } from "ramda";
-import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
+import {
+  AgencyId,
+  ApiConsumerId,
+  FindSimilarConventionsParams,
+  FindSimilarConventionsResponseDto,
+  SiretDto,
+  sleep,
+} from "shared";
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
@@ -530,6 +537,13 @@ export const createUseCases = (
         uowPerformer.perform((uow) =>
           uow.notificationRepository.getLastNotifications(),
         ),
+      findSimilarConventions: (
+        params: FindSimilarConventionsParams,
+      ): Promise<FindSimilarConventionsResponseDto> =>
+        uowPerformer.perform(async (uow) => ({
+          similarConventionIds:
+            await uow.conventionQueries.findSimilarConventions(params),
+        })),
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };

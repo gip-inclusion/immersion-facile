@@ -3,6 +3,7 @@ import {
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
+  FindSimilarConventionsParams,
   ListConventionsRequestDto,
 } from "shared";
 
@@ -32,4 +33,7 @@ export interface ConventionQueries {
     limit: number;
     filters: GetConventionsByFiltersQueries;
   }): Promise<ConventionReadDto[]>;
+  findSimilarConventions(
+    params: FindSimilarConventionsParams,
+  ): Promise<ConventionId[]>;
 }

@@ -22,5 +22,13 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
     );
 
+  conventionRouter
+    .route(unauthenticatedConventionRoutes.findSimilarConventions.url)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.findSimilarConventions.execute(req.query as any),
+      ),
+    );
+
   return conventionRouter;
 };

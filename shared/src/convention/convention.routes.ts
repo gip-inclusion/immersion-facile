@@ -6,6 +6,8 @@ import { expressEmptyResponseBody } from "../zodUtils";
 import {
   conventionReadSchema,
   conventionSchema,
+  findSimilarConventionsParamsSchema,
+  findSimilarConventionsResponseSchema,
   renewConventionParamsSchema,
   renewMagicLinkRequestSchema,
   updateConventionRequestSchema,
@@ -78,5 +80,11 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     method: "get",
     queryParamsSchema: renewMagicLinkRequestSchema,
     responses: { 200: expressEmptyResponseBody },
+  }),
+  findSimilarConventions: defineRoute({
+    url: "/find-similar-immersion",
+    method: "get",
+    queryParamsSchema: findSimilarConventionsParamsSchema,
+    responses: { 200: findSimilarConventionsResponseSchema },
   }),
 });

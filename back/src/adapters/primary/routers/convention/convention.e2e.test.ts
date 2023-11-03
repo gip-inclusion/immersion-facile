@@ -209,6 +209,26 @@ describe("convention e2e", () => {
   });
 
   describe(`${displayRouteName(
+    unauthenticatedConventionRoutes.findSimilarConventions,
+  )} finds similar conventions`, () => {
+    it("find no conventions ids when none have similar data", async () => {
+      const response = await unauthenticatedRequest.findSimilarConventions({
+        queryParams: {
+          dateStart: "2021-01-06",
+          siret: "11112222333311",
+          codeAppellation: "017751",
+          beneficiaryBirthdate: "2002-10-05",
+          beneficiaryLastName: "Martin",
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: { similarConventionIds: [] },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
     conventionMagicLinkRoutes.getConvention,
   )} gets a convention from a magic link`, () => {
     beforeEach(() => {

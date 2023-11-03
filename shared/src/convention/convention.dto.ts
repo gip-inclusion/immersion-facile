@@ -7,7 +7,10 @@ import {
   Role,
   SignatoryRole,
 } from "../role/role.dto";
-import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import {
+  AppellationAndRomeDto,
+  AppellationCode,
+} from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
@@ -336,4 +339,16 @@ export type RenewConventionParams = Pick<
 
 export type MarkPartnersErroredConventionAsHandledRequest = {
   conventionId: ConventionId;
+};
+
+export type FindSimilarConventionsParams = {
+  siret: SiretDto;
+  codeAppellation: AppellationCode;
+  dateStart: string; // Date iso string
+  beneficiaryBirthdate: string; // Date iso string
+  beneficiaryLastName: string;
+};
+
+export type FindSimilarConventionsResponseDto = {
+  similarConventionIds: ConventionId[];
 };

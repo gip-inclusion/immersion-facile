@@ -5,6 +5,7 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyKind,
+  AppellationCode,
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
@@ -445,6 +446,130 @@ describe("Pg implementation of ConventionQueries", () => {
 
       // Assert
       expectToEqual(resultAll, []);
+    });
+  });
+
+  describe("findSimilarConventions", () => {
+    const matchingSiret: SiretDto = "11112222333344";
+    const matchingAppellation: AppellationCode = "140927";
+    const matchingBirthDate = new Date("1992-01-01").toISOString();
+    const matchingBeneficiaryLastname = "Dupont";
+    const matchingDateStart = new Date("2021-01-09").toISOString();
+    const someMatchingStatus = "DRAFT";
+    const conventionMatchingId: ConventionId =
+      "11111111-1111-4111-1111-111111111111";
+
+    beforeEach(async () => {
+      const agency = AgencyDtoBuilder.create().build();
+      const conventionBuilderInitialMatching = new ConventionDtoBuilder()
+        .withAgencyId(agency.id)
+        .withSiret(matchingSiret)
+        .withImmersionAppelation({
+          appellationCode: matchingAppellation,
+          romeCode: "11111",
+          appellationLabel: "osef",
+          romeLabel: "osef",
+        })
+        .withBeneficiaryBirthdate(matchingBirthDate)
+        .withBeneficiaryLastName(matchingBeneficiaryLastname)
+        .withDateStart(matchingDateStart)
+        .withDateEnd(new Date("2021-01-25").toISOString())
+        .withStatus(someMatchingStatus);
+
+      const conventionMatching = conventionBuilderInitialMatching
+        .withId(conventionMatchingId)
+        .build();
+
+      const conventionWithWrongSiret = conventionBuilderInitialMatching
+        .withId("22222222-2222-4222-2222-222222222222")
+        .withSiret("40400000000404")
+        .build();
+
+      const conventionWithWrongAppellation = conventionBuilderInitialMatching
+        .withId("33333333-3333-4333-3333-333333333333")
+        .withImmersionAppelation({
+          appellationCode: "17010",
+          romeCode: "11111",
+          appellationLabel: "osef",
+          romeLabel: "osef",
+        })
+        .build();
+
+      const conventionWithWrongBeneficiaryBirthdate =
+        conventionBuilderInitialMatching
+          .withId("44444444-4444-4444-4444-444444444444")
+          .withBeneficiaryBirthdate(new Date("1993-03-03").toISOString())
+          .build();
+
+      const conventionWithWrongBeneficiaryLastname =
+        conventionBuilderInitialMatching
+          .withId("55555555-5555-4555-5555-555555555555")
+          .withBeneficiaryLastName("Test")
+          .build();
+
+      const conventionWithDateStartToLate = conventionBuilderInitialMatching
+        .withId("66666666-6666-4666-6666-666666666666")
+        .withDateStart(new Date("2021-01-18").toISOString())
+        .build();
+
+      const conventionWithDateStartToEarly = conventionBuilderInitialMatching
+        .withId("66660000-0000-4666-6666-000066660000")
+        .withDateStart(new Date("2021-01-01").toISOString())
+        .build();
+
+      const conventionDeprecated = conventionBuilderInitialMatching
+        .withId("77777777-7777-4777-7777-777777777777")
+        .withStatus("DEPRECATED")
+        .build();
+      const conventionRejected = conventionBuilderInitialMatching
+        .withId("88888888-8888-4888-8888-888888888888")
+        .withStatus("REJECTED")
+        .build();
+      const conventionCancelled = conventionBuilderInitialMatching
+        .withId("99999999-9999-4999-9999-999999999999")
+        .withStatus("CANCELLED")
+        .build();
+
+      await agencyRepo.insert(agency);
+
+      await Promise.all([
+        conventionRepository.save(conventionWithWrongSiret),
+        conventionRepository.save(conventionWithWrongAppellation),
+        conventionRepository.save(conventionWithWrongBeneficiaryBirthdate),
+        conventionRepository.save(conventionWithWrongBeneficiaryLastname),
+        conventionRepository.save(conventionWithDateStartToEarly),
+        conventionRepository.save(conventionWithDateStartToLate),
+        conventionRepository.save(conventionDeprecated),
+        conventionRepository.save(conventionRejected),
+        conventionRepository.save(conventionCancelled),
+        conventionRepository.save(conventionMatching),
+      ]);
+    });
+
+    it("finds no similar conventions when there is no convention matching", async () => {
+      const similarConventionIdsFound =
+        await conventionQueries.findSimilarConventions({
+          dateStart: new Date("2021-01-01").toISOString(),
+          siret: "12345678901234",
+          beneficiaryBirthdate: new Date("1990-01-01").toISOString(),
+          beneficiaryLastName: "Dupont",
+          codeAppellation: "1234567",
+        });
+
+      expectToEqual(similarConventionIdsFound, []);
+    });
+
+    it("finds similar conventions", async () => {
+      const similarConventionIdsFound =
+        await conventionQueries.findSimilarConventions({
+          dateStart: matchingDateStart,
+          siret: matchingSiret,
+          beneficiaryBirthdate: matchingBirthDate,
+          beneficiaryLastName: matchingBeneficiaryLastname,
+          codeAppellation: matchingAppellation,
+        });
+
+      expectToEqual(similarConventionIdsFound, [conventionMatchingId]);
     });
   });
 

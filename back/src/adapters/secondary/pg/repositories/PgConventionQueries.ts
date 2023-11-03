@@ -1,10 +1,13 @@
+import { addDays, subDays } from "date-fns";
 import format from "pg-format";
 import {
   ConventionId,
   ConventionReadDto,
   conventionReadSchema,
   ConventionScope,
+  ConventionStatus,
   filterNotFalsy,
+  FindSimilarConventionsParams,
   Flavor,
   ListConventionsRequestDto,
   validatedConventionStatuses,
@@ -29,6 +32,46 @@ type GetConventionsRequestProperties = {
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
+
+  public async findSimilarConventions(
+    params: FindSimilarConventionsParams,
+  ): Promise<ConventionId[]> {
+    const dateStartToMatch = new Date(params.dateStart);
+    const numberOfDaysTolerance = 7;
+    const statusesToIgnore: ConventionStatus[] = [
+      "DEPRECATED",
+      "REJECTED",
+      "CANCELLED",
+    ];
+
+    const conventions = await this.#getConventionsWhere({
+      whereClauses: [
+        format("conventions.siret = %1$L", params.siret),
+        format(
+          "conventions.immersion_appellation = %1$L",
+          params.codeAppellation,
+        ),
+        format(
+          "(b.extra_fields ->> 'birthdate') = %1$L",
+          params.beneficiaryBirthdate,
+        ),
+        format("b.last_name = %1$L", params.beneficiaryLastName),
+        format(
+          "conventions.date_start::date <= %1$L",
+          addDays(dateStartToMatch, numberOfDaysTolerance),
+        ),
+        format(
+          "conventions.date_start::date >= %1$L",
+          subDays(dateStartToMatch, numberOfDaysTolerance),
+        ),
+        format("conventions.status not in (%L)", statusesToIgnore),
+      ],
+      orderByClause: "ORDER BY conventions.date_start DESC",
+      limit: 20,
+    });
+
+    return conventions.map((c) => c.id);
+  }
 
   public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,

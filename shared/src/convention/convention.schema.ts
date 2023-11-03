@@ -8,9 +8,15 @@ import {
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { allModifierRoles, allRoles } from "../role/role.dto";
-import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import {
+  appellationCodeSchema,
+  appellationDtoSchema,
+} from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { DailyScheduleDto } from "../schedule/Schedule.dto";
-import { scheduleSchema } from "../schedule/Schedule.schema";
+import {
+  dateIsoStringSchema,
+  scheduleSchema,
+} from "../schedule/Schedule.schema";
 import {
   calculateWeeklyHoursFromSchedule,
   isSundayInSchedule,
@@ -53,6 +59,8 @@ import {
   ConventionValidatorInputNames,
   EstablishmentRepresentative,
   EstablishmentTutor,
+  FindSimilarConventionsParams,
+  FindSimilarConventionsResponseDto,
   GenerateMagicLinkRequestDto,
   IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   ImmersionObjective,
@@ -514,3 +522,17 @@ const addIssueIfSundayIsInSchedule = (
     );
   }
 };
+
+export const findSimilarConventionsParamsSchema: z.Schema<FindSimilarConventionsParams> =
+  z.object({
+    siret: siretSchema,
+    codeAppellation: appellationCodeSchema,
+    dateStart: dateIsoStringSchema,
+    beneficiaryBirthdate: dateIsoStringSchema,
+    beneficiaryLastName: zStringMinLength1,
+  });
+
+export const findSimilarConventionsResponseSchema: z.Schema<FindSimilarConventionsResponseDto> =
+  z.object({
+    similarConventionIds: z.array(conventionIdSchema),
+  });
