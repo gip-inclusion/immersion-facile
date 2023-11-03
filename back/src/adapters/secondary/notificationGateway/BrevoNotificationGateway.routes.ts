@@ -22,7 +22,7 @@ export const brevoNotificationGatewayRoutes = defineRoutes({
     headersSchema: brevoHeaderSchema,
     requestBodySchema: sendTransactEmailRequestBodySchema,
     responses: {
-      200: sendTransactEmailResponseSchema,
+      201: sendTransactEmailResponseSchema,
     },
   }),
   sendTransactSms: defineRoute({
@@ -31,7 +31,7 @@ export const brevoNotificationGatewayRoutes = defineRoutes({
     headersSchema: brevoHeaderSchema,
     requestBodySchema: sendTransactSmsRequestBodySchema,
     responses: {
-      200: sendTransactSmsResponseSchema,
+      201: sendTransactSmsResponseSchema,
     },
   }),
   getAttachmentContent: defineRoute({

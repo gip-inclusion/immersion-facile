@@ -18,7 +18,7 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 // Requires the following environment variables to be set for the tests to pass:
 // - SIRENE_ENDPOINT
 // - SIRENE_BEARER_TOKEN
-describe("HttpSirenGateway", () => {
+describe("AnnuaireDesEntreprisesSiretGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
   const config = AppConfig.createFromEnv();
 
