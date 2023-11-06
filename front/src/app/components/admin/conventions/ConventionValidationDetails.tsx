@@ -85,13 +85,15 @@ const ConventionValidationSection = ({
   const renderRows = (rowFields: RowFields[]) => {
     const relevantRows = rowFields.filter(
       (row) =>
-        row.fields.filter(
-          (field) =>
-            field &&
-            path(field.key, convention) !== undefined &&
-            field.getValue &&
-            field.getValue(convention),
-        ).length,
+        row.fields.filter((field) => {
+          if (!field) return false;
+
+          const pathValue = path(field.key, convention);
+          const fieldValue = field?.getValue?.(convention);
+
+          if (pathValue === undefined) return false;
+          return fieldValue ?? pathValue;
+        }).length,
     );
 
     return relevantRows.map(
