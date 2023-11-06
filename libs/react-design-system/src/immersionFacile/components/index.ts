@@ -26,7 +26,6 @@ export * from "./section-convention-next-steps";
 export * from "./section-faq";
 export * from "./section-stats";
 export * from "./section-text-embed";
-export * from "./simple-section";
 export * from "./skip-links";
 export * from "./submit-confirmation-section";
 export * from "./tooltip";
