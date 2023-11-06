@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
@@ -8,12 +10,7 @@ import {
   isPeConnectIdentity,
   loginPeConnect,
 } from "shared";
-import {
-  Loader,
-  MainWrapper,
-  PageHeader,
-  SimpleSection,
-} from "react-design-system";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import {
   ConventionForm,
   ConventionFormMode,
@@ -60,13 +57,6 @@ export const ConventionImmersionPage = ({
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
     useState(isSharedConvention);
   const { enablePeConnectApi } = useFeatureFlags();
-  const continueWithPEConnect = enablePeConnectApi && {
-    link: {
-      href: `/api/${loginPeConnect}`,
-      label:
-        "Ou continuer avec mes identifiants Pôle emploi (candidats inscrits à Pôle emploi)",
-    },
-  };
 
   useEffect(() => {
     if (enablePeConnectApi && currentRoute.name === "conventionImmersion") {
@@ -78,26 +68,45 @@ export const ConventionImmersionPage = ({
     <HeaderFooterLayout>
       {displaySharedConventionMessage && (
         <MainWrapper layout={"default"}>
-          <SimpleSection
-            button={{
-              label: "Continuer",
-              onClick: () => {
-                setDisplaySharedConventionMessage(false);
-              },
-            }}
-            illustrationUrl="/src/assets/img/share-convention.png"
-            {...continueWithPEConnect}
-          >
-            <h1>
-              Quelqu'un a partagé une demande de convention d'immersion avec
-              vous
-            </h1>
-            <p>
-              Une entreprise ou un candidat a rempli ses informations dans le
-              formulaire de demande de convention. Vous n'avez plus qu'à remplir
-              vos informations et à valider le formulaire en quelques clics.
-            </p>
-          </SimpleSection>
+          <div className={fr.cx("fr-grid-row")}>
+            <div className={fr.cx("fr-col-8")}>
+              <h1>
+                Quelqu'un a partagé une demande de convention d'immersion avec
+                vous
+              </h1>
+              <p>
+                Une entreprise ou un candidat a rempli ses informations dans le
+                formulaire de demande de convention. Vous n'avez plus qu'à
+                remplir vos informations et à valider le formulaire en quelques
+                clics.
+              </p>
+              <Button
+                onClick={() => setDisplaySharedConventionMessage(false)}
+                iconId="fr-icon-arrow-right-line"
+                iconPosition="right"
+              >
+                Continuer
+              </Button>
+              {enablePeConnectApi && (
+                <p className={fr.cx("fr-mt-2w")}>
+                  <a
+                    href={`/api/${loginPeConnect}`}
+                    className={fr.cx(
+                      "fr-link",
+                      "fr-icon-arrow-right-line",
+                      "fr-link--icon-right",
+                    )}
+                  >
+                    Ou continuer avec mes identifiants Pôle emploi (candidats
+                    inscrits à Pôle emploi)
+                  </a>
+                </p>
+              )}
+            </div>
+            <div className={fr.cx("fr-col-4")}>
+              <img src="/src/assets/img/share-convention.png" alt="" />
+            </div>
+          </div>
         </MainWrapper>
       )}
       {!displaySharedConventionMessage && (
