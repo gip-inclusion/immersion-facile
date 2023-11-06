@@ -40,6 +40,14 @@ describe("Add form establishment", () => {
     ({ request, inMemoryUow, generateApiConsumerJwt, gateways, eventCrawler } =
       await buildTestApp());
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
+    await inMemoryUow.featureFlagRepository.update({
+      flagName: "enableApiV0",
+      flagContent: { isActive: true },
+    });
+    await inMemoryUow.featureFlagRepository.update({
+      flagName: "enableApiV1",
+      flagContent: { isActive: true },
+    });
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
       unauthorizedApiConsumer,

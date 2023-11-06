@@ -26,6 +26,10 @@ describe("search-immersion route", () => {
 
   beforeEach(async () => {
     ({ request, generateApiConsumerJwt, inMemoryUow } = await buildTestApp());
+    await inMemoryUow.featureFlagRepository.update({
+      flagName: "enableApiV1",
+      flagContent: { isActive: true },
+    });
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
       unauthorizedApiConsumer,

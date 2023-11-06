@@ -2,15 +2,18 @@ import { Router } from "express";
 import {
   contactEstablishmentRoute,
   establishmentRoutes,
+  FeatureFlags,
   immersionOffersRoute,
   pipeWithValue,
   SiretAndAppellationDto,
 } from "shared";
 import { counterFormEstablishmentCallerV1 } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
+import { AppConfig } from "../../config/appConfig";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
   ForbiddenError,
+  UpgradeRequired,
   validateAndParseZodSchema,
 } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
@@ -20,6 +23,18 @@ import { searchImmersionRequestPublicV1ToDomain } from "../DtoAndSchemas/v1/inpu
 import { domainToSearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
 const logger = createLogger(__filename);
+const config = AppConfig.createFromEnv();
+
+const throwUpgradeRequiredIfEnableApiV1IsNotActive = async (
+  getFeatureFlags: () => Promise<FeatureFlags>,
+) => {
+  const featureFlags = await getFeatureFlags();
+  if (!featureFlags.enableApiV1.isActive) {
+    throw new UpgradeRequired(
+      `The V1 API is deprecated. Please use API V2 instead (documentation available at ${config.immersionFacileBaseUrl}/doc-api)`,
+    );
+  }
+};
 
 export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   const publicV1Router = Router({ mergeParams: true });
@@ -28,6 +43,9 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   publicV1Router
     .route(`/v1${establishmentRoutes.addFormEstablishment.url}`)
     .post(deps.apiKeyAuthMiddlewareV1, async (req, res) => {
+      await throwUpgradeRequiredIfEnableApiV1IsNotActive(() =>
+        deps.useCases.getFeatureFlags.execute(),
+      );
       counterFormEstablishmentCallerV1.inc({
         referer: req.get("Referrer"),
       });
@@ -64,6 +82,9 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     .route(`/v1/${immersionOffersRoute}`)
     .get(deps.apiKeyAuthMiddlewareV1, async (req, res) =>
       sendHttpResponse(req, res, async () => {
+        await throwUpgradeRequiredIfEnableApiV1IsNotActive(() =>
+          deps.useCases.getFeatureFlags.execute(),
+        );
         const searchImmersionRequest = searchImmersionRequestPublicV1ToDomain(
           req.query as any,
         );
@@ -82,6 +103,9 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     .route(`/v1/${immersionOffersRoute}/:siret/:rome`)
     .get(deps.apiKeyAuthMiddlewareV1, async (req, res) =>
       sendHttpResponse(req, res, async () => {
+        await throwUpgradeRequiredIfEnableApiV1IsNotActive(() =>
+          deps.useCases.getFeatureFlags.execute(),
+        );
         const appellationCode =
           await deps.useCases.convertRomeToAppellationForEstablishment.execute({
             siret: req.params.siret,

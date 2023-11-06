@@ -59,6 +59,10 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
         .build(),
     ));
 
+    await inMemoryUow.featureFlagRepository.update({
+      flagName: "enableApiV1",
+      flagContent: { isActive: true },
+    });
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
     ];
