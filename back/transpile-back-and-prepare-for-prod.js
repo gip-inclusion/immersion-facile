@@ -43,7 +43,6 @@ const removeFromFileLinesThatInclude = (filePath, regex) => {
 };
 
 const rootPackageJson = "build/package.json";
-const httpPackageJson = "build/libs/http-client/package.json";
 const htmlPackageJson = "build/libs/html-templates/package.json";
 const sharedPackageJson = "build/shared/package.json";
 const backPackageJson = "build/back/package.json";
@@ -52,12 +51,6 @@ const backPackageJson = "build/back/package.json";
 removeFromFileLinesThatInclude(rootPackageJson, /"prepare":.*/);
 
 // change dependencies to use js instead of ts
-removeFromFileLinesThatInclude(httpPackageJson, /"types": "src\/index.ts",?/);
-replaceInFileSync(
-  httpPackageJson,
-  /"main": "src\/index.ts"/,
-  '"main": "src/index.js"'
-);
 removeFromFileLinesThatInclude(htmlPackageJson, /"types": "src\/index.ts",?/);
 replaceInFileSync(
   htmlPackageJson,
