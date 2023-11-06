@@ -24,17 +24,17 @@ import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashb
 import { NotImplementedDocumentGateway } from "../../secondary/documentGateway/NotImplementedDocumentGateway";
 import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGateway";
 import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
-import { emailableValidationTargets } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.targets";
+import { emailableValidationRoutes } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { makeInclusionConnectExternalRoutes } from "../../secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
-import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
+import { brevoNotificationGatewayRoutes } from "../../secondary/notificationGateway/BrevoNotificationGateway.routes";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
 import { HttpLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/HttpLaBonneBoiteGateway";
 import { InMemoryLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
-import { createLbbTargets } from "../../secondary/offer/laBonneBoite/LaBonneBoiteTargets";
+import { createLbbRoutes } from "../../secondary/offer/laBonneBoite/LaBonneBoite.routes";
 import { HttpPassEmploiGateway } from "../../secondary/offer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
@@ -48,13 +48,12 @@ import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRou
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
-import { annuaireDesEntreprisesSiretTargets } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.targets";
+import { annuaireDesEntreprisesSiretRoutes } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.routes";
 import { InMemorySiretGateway } from "../../secondary/siret/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { HttpSubscribersGateway } from "../../secondary/subscribersGateway/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../secondary/subscribersGateway/InMemorySubscribersGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
-import { configureCreateHttpClientForExternalApi } from "./createHttpClientForExternalApi";
 
 const logger = createLogger(__filename);
 
@@ -165,6 +164,16 @@ export const createGateways = async (
         )
       : new InMemoryInclusionConnectGateway();
 
+  const createEmailValidationGateway = (config: AppConfig) =>
+    ({
+      IN_MEMORY: () => new InMemoryEmailValidationGateway(),
+      EMAILABLE: () =>
+        new EmailableEmailValidationGateway(
+          createAxiosHttpClientForExternalAPIs(emailableValidationRoutes),
+          config.emailableApiKey,
+        ),
+    }[config.emailValidationGateway]());
+
   const addressGateway = {
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
@@ -174,6 +183,58 @@ export const createGateways = async (
         config.apiKeyOpenCageDataGeosearch,
       ),
   }[config.apiAddress]();
+
+  const createNotificationGateway = (
+    config: AppConfig,
+    timeGateway: TimeGateway,
+  ): NotificationGateway => {
+    if (config.notificationGateway === "IN_MEMORY")
+      return new InMemoryNotificationGateway(timeGateway);
+
+    const brevoNotificationGateway = new BrevoNotificationGateway(
+      createAxiosHttpClientForExternalAPIs(brevoNotificationGatewayRoutes),
+      makeEmailAllowListPredicate({
+        skipEmailAllowList: config.skipEmailAllowlist,
+        emailAllowList: config.emailAllowList,
+      }),
+      config.apiKeyBrevo,
+      {
+        name: "Immersion Facilitée",
+        email: immersionFacileContactEmail,
+      },
+    );
+
+    if (config.notificationGateway === "BREVO") {
+      return brevoNotificationGateway;
+    }
+
+    return exhaustiveCheck(config.notificationGateway, {
+      variableName: "config.notificationGateway",
+      throwIfReached: true,
+    });
+  };
+
+  const getSiretGateway = (
+    provider: AppConfig["siretGateway"],
+    config: AppConfig,
+    timeGateway: TimeGateway,
+  ) => {
+    const gatewayByProvider = {
+      HTTPS: () =>
+        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+      INSEE: () =>
+        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+      IN_MEMORY: () => new InMemorySiretGateway(),
+      ANNUAIRE_DES_ENTREPRISES: () =>
+        new AnnuaireDesEntreprisesSiretGateway(
+          createAxiosHttpClientForExternalAPIs(
+            annuaireDesEntreprisesSiretRoutes,
+          ),
+          new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+        ),
+    };
+    return gatewayByProvider[provider]();
+  };
 
   return {
     addressApi: addressGateway,
@@ -186,11 +247,9 @@ export const createGateways = async (
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(
-            configureCreateHttpClientForExternalApi(
-              axios.create({
-                timeout: config.externalAxiosTimeout,
-              }),
-            )(createLbbTargets(config.peApiUrl)),
+            createAxiosHttpClientForExternalAPIs(
+              createLbbRoutes(config.peApiUrl),
+            ),
             poleEmploiGateway,
             config.poleEmploiClientId,
           )
@@ -221,78 +280,6 @@ export const createGateways = async (
         : new DeterministShortLinkIdGeneratorGateway(),
   };
 };
-
-const getSiretGateway = (
-  provider: AppConfig["siretGateway"],
-  config: AppConfig,
-  timeGateway: TimeGateway,
-) => {
-  const gatewayByProvider = {
-    HTTPS: () =>
-      new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
-    INSEE: () =>
-      new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
-    IN_MEMORY: () => new InMemorySiretGateway(),
-    ANNUAIRE_DES_ENTREPRISES: () =>
-      new AnnuaireDesEntreprisesSiretGateway(
-        configureCreateHttpClientForExternalApi(
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-        )(annuaireDesEntreprisesSiretTargets),
-        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
-      ),
-  };
-  return gatewayByProvider[provider]();
-};
-
-const createNotificationGateway = (
-  config: AppConfig,
-  timeGateway: TimeGateway,
-): NotificationGateway => {
-  if (config.notificationGateway === "IN_MEMORY")
-    return new InMemoryNotificationGateway(timeGateway);
-
-  const brevoNotificationGateway = new BrevoNotificationGateway(
-    configureCreateHttpClientForExternalApi(
-      axios.create({
-        timeout: config.externalAxiosTimeout,
-      }),
-    )(brevoNotificationGatewayTargets),
-    makeEmailAllowListPredicate({
-      skipEmailAllowList: config.skipEmailAllowlist,
-      emailAllowList: config.emailAllowList,
-    }),
-    config.apiKeyBrevo,
-    {
-      name: "Immersion Facilitée",
-      email: immersionFacileContactEmail,
-    },
-  );
-
-  if (config.notificationGateway === "BREVO") {
-    return brevoNotificationGateway;
-  }
-
-  return exhaustiveCheck(config.notificationGateway, {
-    variableName: "config.notificationGateway",
-    throwIfReached: true,
-  });
-};
-
-const createEmailValidationGateway = (config: AppConfig) =>
-  ({
-    IN_MEMORY: () => new InMemoryEmailValidationGateway(),
-    EMAILABLE: () =>
-      new EmailableEmailValidationGateway(
-        configureCreateHttpClientForExternalApi(
-          axios.create({
-            timeout: config.externalAxiosTimeout,
-          }),
-        )(emailableValidationTargets),
-        config.emailableApiKey,
-      ),
-  }[config.emailValidationGateway]());
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
   switch (config.documentGateway) {

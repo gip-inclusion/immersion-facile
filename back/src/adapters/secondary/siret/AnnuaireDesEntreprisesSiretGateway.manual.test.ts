@@ -1,13 +1,14 @@
+import axios from "axios";
 import { expectToEqual } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import {
   AnnuaireDesEntreprisesSiretGateway,
   nonDiffusibleEstablishmentName,
 } from "./AnnuaireDesEntreprisesSiretGateway";
-import { annuaireDesEntreprisesSiretTargets } from "./AnnuaireDesEntreprisesSiretGateway.targets";
+import { annuaireDesEntreprisesSiretRoutes } from "./AnnuaireDesEntreprisesSiretGateway.routes";
 import { InseeSiretGateway } from "./InseeSiretGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
@@ -17,15 +18,13 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 // Requires the following environment variables to be set for the tests to pass:
 // - SIRENE_ENDPOINT
 // - SIRENE_BEARER_TOKEN
-describe("HttpSirenGateway", () => {
+describe("AnnuaireDesEntreprisesSiretGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
   const config = AppConfig.createFromEnv();
 
   beforeEach(() => {
     siretGateway = new AnnuaireDesEntreprisesSiretGateway(
-      configureCreateHttpClientForExternalApi()(
-        annuaireDesEntreprisesSiretTargets,
-      ),
+      createAxiosSharedClient(annuaireDesEntreprisesSiretRoutes, axios),
       new InseeSiretGateway(
         config.inseeHttpConfig,
         new RealTimeGateway(),

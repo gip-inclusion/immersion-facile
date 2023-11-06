@@ -1,6 +1,8 @@
+import axios from "axios";
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { immersionFacileContactEmail } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/offer/useCases/SendEmailsWithAssessmentCreationLink";
@@ -8,10 +10,9 @@ import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
-import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
+import { brevoNotificationGatewayRoutes } from "../../secondary/notificationGateway/BrevoNotificationGateway.routes";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -31,9 +32,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const notificationGateway =
     config.notificationGateway === "BREVO"
       ? new BrevoNotificationGateway(
-          configureCreateHttpClientForExternalApi()(
-            brevoNotificationGatewayTargets,
-          ),
+          createAxiosSharedClient(brevoNotificationGatewayRoutes, axios),
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
