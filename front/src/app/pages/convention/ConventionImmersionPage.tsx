@@ -15,13 +15,14 @@ import {
   ConventionForm,
   ConventionFormMode,
 } from "src/app/components/forms/convention/ConventionForm";
-import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
+import { InitiateConventionSection } from "src/app/components/InitiateConventionSection";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
+import illustrationShareConvention from "src/assets/img/share-convention.svg";
 import { deviceRepository } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -51,7 +52,7 @@ export const ConventionImmersionPage = ({
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
   const isSharedConvention = useMemo(
-    () => Object.keys(route.params).length > 0,
+    () => keys(route.params).length > 0,
     [route.params],
   );
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
@@ -62,14 +63,14 @@ export const ConventionImmersionPage = ({
     if (enablePeConnectApi && currentRoute.name === "conventionImmersion") {
       storeConventionRouteParamsOnDevice(currentRoute.params);
     }
-  }, []);
+  }, [currentRoute.name, currentRoute.params, enablePeConnectApi]);
 
   return (
     <HeaderFooterLayout>
       {displaySharedConventionMessage && (
         <MainWrapper layout={"default"}>
-          <div className={fr.cx("fr-grid-row")}>
-            <div className={fr.cx("fr-col-8")}>
+          <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
+            <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
               <h1>
                 Quelqu'un a partagé une demande de convention d'immersion avec
                 vous
@@ -88,7 +89,7 @@ export const ConventionImmersionPage = ({
                 Continuer
               </Button>
               {enablePeConnectApi && (
-                <p className={fr.cx("fr-mt-2w")}>
+                <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
                   <a
                     href={`/api/${loginPeConnect}`}
                     className={fr.cx(
@@ -103,8 +104,16 @@ export const ConventionImmersionPage = ({
                 </p>
               )}
             </div>
-            <div className={fr.cx("fr-col-4")}>
-              <img src="/src/assets/img/share-convention.png" alt="" />
+            <div
+              className={fr.cx(
+                "fr-col-12",
+                "fr-col-md-4",
+                "fr-hidden",
+                "fr-unhidden-md",
+                "fr-mb-6w",
+              )}
+            >
+              <img src={illustrationShareConvention} alt="" />
             </div>
           </div>
         </MainWrapper>
@@ -133,23 +142,20 @@ export const ConventionImmersionPage = ({
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const [shouldShowForm, setShouldShowForm] = useState(false);
   const isSharedConvention = useMemo(
     // depends on initial (on page load) route params, shouldn't change on re-render
-    () => Object.keys(route.params).length > 0,
+    () => keys(route.params).length > 0,
     [route.params],
+  );
+  const [shouldShowForm, setShouldShowForm] = useState(
+    isSharedConvention ||
+      (enablePeConnectApi.isActive &&
+        !!federatedIdentity &&
+        isPeConnectIdentity(federatedIdentity)),
   );
   const mode: ConventionFormMode = "jwt" in route.params ? "edit" : "create";
   useFederatedIdentityFromUrl(route);
   useScrollToTop(shouldShowForm);
-  useEffect(() => {
-    setShouldShowForm(
-      isSharedConvention ||
-        (enablePeConnectApi.isActive &&
-          !!federatedIdentity &&
-          isPeConnectIdentity(federatedIdentity)),
-    );
-  }, [enablePeConnectApi.isActive, federatedIdentity]);
 
   return match({
     isLoading,
@@ -158,7 +164,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   })
     .with({ isLoading: true }, () => <Loader />)
     .with({ mode: "create", shouldShowForm: false }, () => (
-      <InitiateConventionCard
+      <InitiateConventionSection
         onNotPeConnectButtonClick={() => setShouldShowForm(true)}
       />
     ))
