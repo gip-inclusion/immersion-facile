@@ -1,5 +1,6 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import { match, P } from "ts-pattern";
 import {
   ConventionReadDto,
   displayEmergencyContactInfos,
@@ -270,9 +271,16 @@ const agencyFields: ColField[] = [
     key: "dateValidation",
     colLabel: "Date de validation",
     getValue: (convention) =>
-      !convention.agencyRefersTo && convention.dateValidation
-        ? toDisplayedDate(new Date(convention.dateValidation))
-        : " N/A ",
+      match({
+        agencyRefersTo: convention.agencyRefersTo,
+        dateValidation: convention.dateValidation,
+      })
+        .with({ agencyRefersTo: P.not(P.nullish) }, () => " N/A ")
+        .with({ dateValidation: undefined }, () => "")
+        .with({ dateValidation: P.string }, ({ dateValidation }) =>
+          toDisplayedDate(new Date(dateValidation)),
+        )
+        .exhaustive(),
   },
 ];
 
