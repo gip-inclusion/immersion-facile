@@ -3,30 +3,39 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Card from "@codegouvfr/react-dsfr/Card";
 import { loginPeConnect } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import illustrationForm from "src/assets/img/fill-convention-form.svg";
+import illustrationHelp from "src/assets/img/fill-convention-help.svg";
+import illustrationPe from "src/assets/img/fill-convention-pe.svg";
 
 type InitiateConventionCardProps = {
   onNotPeConnectButtonClick: () => void;
 };
 
-export const InitiateConventionCard = ({
+export const InitiateConventionSection = ({
   onNotPeConnectButtonClick,
 }: InitiateConventionCardProps) => {
   const { enablePeConnectApi } = useFeatureFlags();
 
   return (
-    <div>
+    <section>
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
         <div
-          className={fr.cx("fr-col-12", "fr-col-lg-4")}
+          className={fr.cx("fr-col-12", "fr-col-md-4")}
           onClick={onNotPeConnectButtonClick}
         >
           <Card
             background
             border
-            desc="Je suis une entreprise, un candidat sans identifiants Pôle emploi, un conseiller accompagnant un candidat."
+            desc={
+              <>
+                Je suis <strong>une entreprise</strong>,{" "}
+                <strong>un candidat</strong> sans identifiants Pôle emploi,{" "}
+                <strong>un conseiller accompagnant un candidat</strong>.
+              </>
+            }
             enlargeLink
             imageAlt=""
-            imageUrl="/src/assets/img/fill-convention-form.png"
+            imageUrl={illustrationForm}
             linkProps={{
               href: "#",
             }}
@@ -36,14 +45,19 @@ export const InitiateConventionCard = ({
           />
         </div>
         {enablePeConnectApi && (
-          <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+          <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
             <Card
               background
               border
-              desc="Je suis un candidat inscrit à Pôle emploi. Je me connecte avec Pôle emploi pour accélérer les démarches."
+              desc={
+                <>
+                  Je suis <strong>un candidat inscrit à Pôle emploi</strong>. Je
+                  me connecte avec Pôle emploi pour accélérer les démarches.
+                </>
+              }
               enlargeLink
               imageAlt=""
-              imageUrl="/src/assets/img/fill-convention-pe.png"
+              imageUrl={illustrationPe}
               linkProps={{
                 href: `/api/${loginPeConnect}`,
               }}
@@ -53,16 +67,23 @@ export const InitiateConventionCard = ({
             />
           </div>
         )}
-        <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+        <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
           <Card
             background
             border
-            desc="Je ne reçois pas le lien de signature, je me suis trompé dans les informations, je souhaite modifier ou renouveler une convention."
+            desc={
+              <>
+                <strong>Je ne reçois pas le lien de signature</strong>, je me
+                suis <strong>trompé dans les informations</strong>, je souhaite{" "}
+                <strong>modifier ou renouveler une convention</strong>.
+              </>
+            }
             enlargeLink
             imageAlt=""
-            imageUrl="/src/assets/img/fill-convention-help.png"
+            imageUrl={illustrationHelp}
             linkProps={{
               href: "https://tally.so/r/mBdQQe",
+              target: "_blank",
             }}
             size="medium"
             title="J’ai déjà rempli une demande de convention mais j’ai un problème"
@@ -71,11 +92,7 @@ export const InitiateConventionCard = ({
         </div>
       </div>
       <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-        className={fr.cx("fr-mt-5w")}
+        className={fr.cx("fr-mt-5w", "fr-btns-group", "fr-btns-group--center")}
       >
         <a
           href="https://tally.so/r/w2X7xV"
@@ -88,6 +105,6 @@ export const InitiateConventionCard = ({
           Je ne sais pas si je peux remplir une convention en ligne dans mon cas
         </a>
       </div>
-    </div>
+    </section>
   );
 };
