@@ -124,7 +124,7 @@ export class HttpAdminGateway implements AdminGateway {
   ): Observable<void> {
     return from(
       this.httpClient
-        .deleteIcUserForAgency({
+        .rejectIcUserForAgency({
           body: params,
           headers: { authorization: token },
         })

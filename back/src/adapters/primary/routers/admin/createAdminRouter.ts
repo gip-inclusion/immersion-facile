@@ -76,6 +76,17 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
+  sharedAdminRouter.rejectIcUserForAgency(
+    deps.adminAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res.status(201), () =>
+        deps.useCases.rejectIcUserForAgency.execute(
+          req.body,
+          req.payloads?.backOffice,
+        ),
+      ),
+  );
+
   sharedAdminRouter.saveApiConsumer(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.saveApiConsumer.execute(req.body, req.payloads?.backOffice),

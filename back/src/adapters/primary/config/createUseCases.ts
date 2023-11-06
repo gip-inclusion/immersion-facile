@@ -75,6 +75,7 @@ import { GetInclusionConnectLogoutUrl } from "../../../domain/inclusionConnect/u
 import { InitiateInclusionConnect } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { GetInclusionConnectedUser } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUser";
 import { GetInclusionConnectedUsers } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUsers";
+import { RejectIcUserForAgency } from "../../../domain/inclusionConnectedUsers/useCases/RejectIcUserForAgency";
 import { UpdateIcUserRoleForAgency } from "../../../domain/inclusionConnectedUsers/useCases/UpdateIcUserRoleForAgency";
 import { AddFormEstablishment } from "../../../domain/offer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/offer/useCases/AddFormEstablismentsBatch";
@@ -174,6 +175,10 @@ export const createUseCases = (
       notifyIcUserAgencyRightChanged: new NotifyIcUserAgencyRightChanged(
         uowPerformer,
         saveNotificationAndRelatedEvent,
+      ),
+      rejectIcUserForAgency: new RejectIcUserForAgency(
+        uowPerformer,
+        createNewEvent,
       ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(

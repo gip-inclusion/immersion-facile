@@ -68,7 +68,7 @@ export const adminRoutes = defineRoutes({
       404: legacyBadRequestErrorSchema,
     },
   }),
-  deleteUserToAgency: defineRoute({
+  rejectIcUserForAgency: defineRoute({
     method: "delete",
     url: "/admin/inclusion-connected/users",
     requestBodySchema: rejectIcUserRoleForAgencyParamsSchema,

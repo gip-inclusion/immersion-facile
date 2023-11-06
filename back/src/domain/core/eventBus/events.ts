@@ -11,6 +11,7 @@ import {
   FormEstablishmentDto,
   IcUserRoleForAgencyParams,
   ImmersionAssessmentDto,
+  RejectIcUserRoleForAgencyParams,
   WithAgencyDto,
   WithConventionIdLegacy,
 } from "shared";
@@ -101,6 +102,7 @@ export type DomainEvent =
   | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>
   | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyIds: AgencyId[] }>
   | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>
+  | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams>
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string }>
   // ERRORED CONVENTION RELATED
