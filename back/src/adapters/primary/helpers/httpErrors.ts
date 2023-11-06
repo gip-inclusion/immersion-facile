@@ -76,6 +76,15 @@ export class TooManyRequestApiError extends HttpError {
   }
 }
 
+export class UpgradeRequired extends HttpError {
+  public httpCode = 426;
+
+  constructor(msg: any) {
+    super(msg);
+    Object.setPrototypeOf(this, ConflictError.prototype);
+  }
+}
+
 export class UnavailableApiError extends HttpError {
   public httpCode = 503;
 

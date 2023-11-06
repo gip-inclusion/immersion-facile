@@ -29,6 +29,10 @@ describe("search-immersion route", () => {
 
   beforeEach(async () => {
     ({ request, inMemoryUow } = await buildTestApp());
+    await inMemoryUow.featureFlagRepository.update({
+      flagName: "enableApiV0",
+      flagContent: { isActive: true },
+    });
   });
 
   describe(`v0 - /${searchImmersionRoute__v0}`, () => {

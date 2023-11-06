@@ -58,6 +58,10 @@ describe("Route to get immersion offer by id", () => {
         .withAuthorizedApiKeyIds([authorizedUnJeuneUneSolutionApiConsumer.id])
         .build(),
     ));
+    await inMemoryUow.featureFlagRepository.update({
+      flagName: "enableApiV0",
+      flagContent: { isActive: true },
+    });
   });
 
   it("accepts valid unauthenticated requests", async () => {
