@@ -9,6 +9,8 @@ const featureFlagNames = [
   "enableTemporaryOperation",
   "enableMaxContactPerWeek",
   "enableMaintenance",
+  "enableApiV0",
+  "enableApiV1",
 ] as const;
 
 type FeatureFlagKind = (typeof featureFlagKinds)[number];
@@ -52,6 +54,8 @@ export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enableTemporaryOperation: featureFlagSchema,
   enableMaxContactPerWeek: featureFlagSchema,
   enableMaintenance: featureFlagSchema,
+  enableApiV0: featureFlagSchema,
+  enableApiV1: featureFlagSchema,
 });
 
 export type SetFeatureFlagParam = {
