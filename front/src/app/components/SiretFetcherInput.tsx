@@ -25,6 +25,7 @@ export const SiretFetcherInput = ({
   } = useEstablishmentSiret({
     shouldFetchEvenIfAlreadySaved: false,
   });
+
   const shouldShowInputError = !isSiretAlreadySaved && currentSiret !== "";
   return (
     <>
@@ -38,55 +39,48 @@ export const SiretFetcherInput = ({
         onChange={(e) => updateSiret(e.target.value)}
       />
       {isSiretAlreadySaved && !modifyLinkWasSent && (
-        <ModifyEstablishmentRequestForMailUpdate
-          onClick={() => sendModifyEstablishmentLink(currentSiret)}
-        />
+        <>
+          <p className={fr.cx("fr-valid-text", "fr-mb-2w")}>
+            Nous avons bien trouvé votre établissement dans notre base de
+            donnée.
+          </p>
+          <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
+            <Button
+              type="button"
+              onClick={() => sendModifyEstablishmentLink(currentSiret)}
+              priority="secondary"
+              nativeButtonProps={{
+                id: domElementIds.homeEstablishments.siretModal
+                  .editEstablishmentButton,
+              }}
+            >
+              Recevoir le mail de modification
+            </Button>
+          </div>
+        </>
       )}
-      {modifyLinkWasSent && <ModifyEstablishmentRequestNotification />}
+      {modifyLinkWasSent && (
+        <>
+          <span className={fr.cx("fr-valid-text", "fr-text--md", "fr-mb-2w")}>
+            Demande envoyée
+          </span>
+          <p>
+            Un e-mail a été envoyé au référent de cet établissement avec un lien
+            permettant la mise à jour des informations. Le lien est valable 24h.
+          </p>
+        </>
+      )}
       {sendModifyLinkFeedback.kind === "errored" && (
         <p className={fr.cx("fr-error-text")}>
           {sendModifyLinkFeedback.errorMessage}
         </p>
       )}
+      {sendModifyLinkFeedback.kind === "sendModificationLinkErrored" && (
+        <p className={fr.cx("fr-error-text")}>
+          Une erreur est survenue lors de l'envoi de la demande de modification
+          d'entreprise.
+        </p>
+      )}
     </>
   );
 };
-
-const ModifyEstablishmentRequestNotification = () => (
-  <>
-    <span className={fr.cx("fr-valid-text", "fr-text--md", "fr-mb-2w")}>
-      Demande envoyée
-    </span>
-    <p>
-      Un e-mail a été envoyé au référent de cet établissement avec un lien
-      permettant la mise à jour des informations. Le lien est valable 24h.
-    </p>
-  </>
-);
-
-type ModifyEstablishmentRequestForMailUpdateProps = {
-  onClick: () => void;
-};
-
-const ModifyEstablishmentRequestForMailUpdate = ({
-  onClick,
-}: ModifyEstablishmentRequestForMailUpdateProps) => (
-  <>
-    <p className={fr.cx("fr-valid-text", "fr-mb-2w")}>
-      Nous avons bien trouvé votre établissement dans notre base de donnée.
-    </p>
-    <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
-      <Button
-        type="button"
-        onClick={onClick}
-        priority="secondary"
-        nativeButtonProps={{
-          id: domElementIds.homeEstablishments.siretModal
-            .editEstablishmentButton,
-        }}
-      >
-        Recevoir le mail de modification
-      </Button>
-    </div>
-  </>
-);

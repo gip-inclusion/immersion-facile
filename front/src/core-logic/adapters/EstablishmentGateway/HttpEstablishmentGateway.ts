@@ -92,7 +92,12 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
         })
         .then((response) =>
           match(response)
-            .with({ status: 201 }, ({ body }) => body)
+            .with({ status: 201 }, () => {
+              /* void */
+            })
+            .with({ status: 400 }, ({ body }) => {
+              throw new Error(JSON.stringify(body));
+            })
             .otherwise(otherwiseThrow),
         ),
     );
