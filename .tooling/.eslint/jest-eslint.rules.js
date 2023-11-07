@@ -12,6 +12,7 @@ module.exports = {
       max: 4,
     },
   ],
+  "jest/no-disabled-tests": "error",
   "jest/no-alias-methods": "error",
   "jest/no-commented-out-tests": "off",
   "jest/no-duplicate-hooks": "error",

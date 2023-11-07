@@ -114,7 +114,4 @@ describe("inclusion connection flow", () => {
       ).toBe("string");
     });
   });
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, jest/no-disabled-tests
-  describe.skip("Wrong path 🤪", () => {});
 });
