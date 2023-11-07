@@ -18,7 +18,7 @@ import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
-export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
+export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
   ConventionDto,
   void
 > {
