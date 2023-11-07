@@ -57,7 +57,7 @@ export class SignConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     { applicationId, role }: ConventionJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    logger.debug({ applicationId, role });
+    logger.debug({ conventionId: applicationId, role });
 
     if (!isAllowedToSign(role))
       throw new ForbiddenError(

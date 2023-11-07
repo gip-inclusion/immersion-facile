@@ -89,7 +89,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   });
 
   // eslint-disable-next-line jest/expect-expect
-  it("Scenario: application submitted, then signed, then validated", async () => {
+  it("Scenario: convention submitted, then signed, then validated", async () => {
     const peAgency = new AgencyDtoBuilder()
       .withKind("pole-emploi")
       .withValidatorEmails(["validator@mail.com"])

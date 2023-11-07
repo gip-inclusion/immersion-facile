@@ -11,7 +11,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
 
   expressRouter
     .route(`/auth/${immersionAssessmentRoute}`)
-    .post(deps.applicationMagicLinkAuthMiddleware, async (req, res) =>
+    .post(deps.conventionMagicLinkAuthMiddleware, async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.createImmersionAssessment.execute(
           req.body,
@@ -26,7 +26,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   );
 
   sharedRouter.getConvention(
-    deps.applicationMagicLinkAuthMiddleware,
+    deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getConvention.execute(
@@ -39,7 +39,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   );
 
   sharedRouter.updateConvention(
-    deps.applicationMagicLinkAuthMiddleware,
+    deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!(req.payloads?.backOffice || req.payloads?.convention))
@@ -49,7 +49,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   );
 
   sharedRouter.updateConventionStatus(
-    deps.applicationMagicLinkAuthMiddleware,
+    deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
       sendHttpResponse(req, res, () =>
         match(req.payloads)
@@ -69,7 +69,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   );
 
   sharedRouter.signConvention(
-    deps.applicationMagicLinkAuthMiddleware,
+    deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req?.payloads?.convention) throw new UnauthorizedError();
@@ -81,7 +81,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   );
 
   sharedRouter.getConventionStatusDashboard(
-    deps.applicationMagicLinkAuthMiddleware,
+    deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req?.payloads?.convention) throw new UnauthorizedError();
@@ -93,7 +93,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   );
 
   sharedRouter.renewConvention(
-    deps.applicationMagicLinkAuthMiddleware,
+    deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
         const jwtPayload = req.payloads?.convention || req.payloads?.backOffice;
