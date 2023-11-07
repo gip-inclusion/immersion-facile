@@ -21,11 +21,11 @@ const getUseCasesByTopics = (
 ): UseCaseSubscriptionsByTopics => ({
   NotificationAdded: [useCases.sendNotification],
   // "Happy case" for immersion application.
-  ImmersionApplicationSubmittedByBeneficiary: [
+  ConventionSubmittedByBeneficiary: [
     useCases.bindConventionToFederatedIdentity,
   ],
 
-  // ImmersionApplication Federated Identities
+  // Convention Federated Identities
   FederatedIdentityBoundToConvention: [
     useCases.notifyToAgencyConventionSubmitted,
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,
@@ -43,31 +43,31 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
-  ImmersionApplicationPartiallySigned: [
+  ConventionPartiallySigned: [
     useCases.notifyLastSigneeThatConventionHasBeenSigned,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
-  ImmersionApplicationFullySigned: [
+  ConventionFullySigned: [
     useCases.notifyLastSigneeThatConventionHasBeenSigned,
     useCases.notifyNewConventionNeedsReview,
     useCases.notifyPoleEmploiUserAdvisorOnConventionFullySigned,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
-  ImmersionApplicationAcceptedByCounsellor: [
+  ConventionAcceptedByCounsellor: [
     useCases.notifyNewConventionNeedsReview,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
-  ImmersionApplicationAcceptedByValidator: [
+  ConventionAcceptedByValidator: [
     useCases.notifyAllActorsOfFinalConventionValidation,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
 
   // Edge cases for immersion application.
-  ImmersionApplicationRequiresModification: [
+  ConventionRequiresModification: [
     useCases.notifyActorThatConventionNeedsModifications,
     {
       useCaseName: "BroadcastToPartners",
@@ -80,12 +80,12 @@ const getUseCasesByTopics = (
         useCases.broadcastToPoleEmploiOnConventionUpdates.execute(convention),
     },
   ],
-  ImmersionApplicationRejected: [
+  ConventionRejected: [
     useCases.notifyAllActorsThatConventionIsRejected,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
-  ImmersionApplicationCancelled: [
+  ConventionCancelled: [
     useCases.notifyAllActorsThatConventionIsCancelled,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,

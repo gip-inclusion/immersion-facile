@@ -60,18 +60,18 @@ export type DomainEvent =
   | NotificationAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
-  | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
+  | GenericEvent<"ConventionSubmittedByBeneficiary", ConventionDto>
   | GenericEvent<"ConventionSubmittedAfterModification", ConventionDto>
-  | GenericEvent<"ImmersionApplicationPartiallySigned", ConventionDto>
-  | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
-  | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>
-  | GenericEvent<"ImmersionApplicationAcceptedByValidator", ConventionDto>
+  | GenericEvent<"ConventionPartiallySigned", ConventionDto>
+  | GenericEvent<"ConventionFullySigned", ConventionDto>
+  | GenericEvent<"ConventionAcceptedByCounsellor", ConventionDto>
+  | GenericEvent<"ConventionAcceptedByValidator", ConventionDto>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
 
   // UNHAPPY PATHS
-  | GenericEvent<"ImmersionApplicationRejected", ConventionDto>
-  | GenericEvent<"ImmersionApplicationCancelled", ConventionDto>
-  | GenericEvent<"ImmersionApplicationRequiresModification", ConventionRequiresModificationPayload>
+  | GenericEvent<"ConventionRejected", ConventionDto>
+  | GenericEvent<"ConventionCancelled", ConventionDto>
+  | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload>
   | GenericEvent<"ConventionDeprecated", ConventionDto>
 
   // MAGIC LINK RENEWAL

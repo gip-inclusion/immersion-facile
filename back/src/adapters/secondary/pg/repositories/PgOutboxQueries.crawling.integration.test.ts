@@ -18,7 +18,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
   let outboxQueries: PgOutboxQueries;
   const uuidGenerator = new TestUuidGenerator();
   const timeGateway = new CustomTimeGateway();
-  const quarantinedTopic: DomainTopic = "ImmersionApplicationRejected";
+  const quarantinedTopic: DomainTopic = "ConventionRejected";
 
   const createNewEvent = makeCreateNewEvent({
     uuidGenerator,
@@ -50,21 +50,21 @@ describe("PgOutboxQueries for crawling purposes", () => {
     timeGateway.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
     const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
-      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      topic: "ConventionSubmittedByBeneficiary",
       payload: convention,
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const event2 = createNewEvent({
-      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      topic: "ConventionSubmittedByBeneficiary",
       payload: convention,
     });
 
     timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const alreadyProcessedEvent = createNewEvent({
-      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      topic: "ConventionSubmittedByBeneficiary",
       payload: convention,
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
       status: "published",
@@ -97,14 +97,14 @@ describe("PgOutboxQueries for crawling purposes", () => {
     timeGateway.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
     const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
-      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      topic: "ConventionSubmittedByBeneficiary",
       payload: convention,
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const eventFailedToRerun = createNewEvent({
-      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      topic: "ConventionSubmittedByBeneficiary",
       payload: convention,
       publications: [
         {
@@ -126,7 +126,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const withFailureButEventuallySuccessfulEvent = createNewEvent({
-      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      topic: "ConventionSubmittedByBeneficiary",
       payload: convention,
       status: "published",
       publications: [
