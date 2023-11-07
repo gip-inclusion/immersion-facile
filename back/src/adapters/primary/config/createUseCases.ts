@@ -36,15 +36,15 @@ import { NotifyAllActorsThatConventionIsRejected } from "../../../domain/convent
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
 import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightChanged";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
-import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { NotifyNewConventionNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewConventionNeedsReview";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
-import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
+import { NotifyToAgencyConventionSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyConventionSubmitted";
 import { MarkPartnersErroredConventionAsHandled } from "../../../domain/convention/useCases/partnersErroredConvention/MarkPartnersErroredConventionAsHandled";
 import { RenewConvention } from "../../../domain/convention/useCases/RenewConvention";
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
-import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
+import { ShareConventionLinkByEmail } from "../../../domain/convention/useCases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
 import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
 import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
@@ -400,7 +400,7 @@ export const createUseCases = (
           gateways.shortLinkGenerator,
           config,
         ),
-      notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
+      notifyNewConventionNeedsReview: new NotifyNewConventionNeedsReview(
         uowPerformer,
         saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
@@ -408,7 +408,7 @@ export const createUseCases = (
         gateways.shortLinkGenerator,
         config,
       ),
-      notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
+      notifyToAgencyConventionSubmitted: new NotifyToAgencyConventionSubmitted(
         uowPerformer,
         saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
@@ -480,7 +480,7 @@ export const createUseCases = (
         uuidGenerator,
         gateways.timeGateway,
       ),
-      shareConventionByEmail: new ShareApplicationLinkByEmail(
+      shareConventionByEmail: new ShareConventionLinkByEmail(
         uowPerformer,
         saveNotificationAndRelatedEvent,
         gateways.shortLinkGenerator,

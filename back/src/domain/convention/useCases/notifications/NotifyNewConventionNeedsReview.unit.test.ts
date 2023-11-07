@@ -22,7 +22,7 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import { NotifyNewApplicationNeedsReview } from "./NotifyNewApplicationNeedsReview";
+import { NotifyNewConventionNeedsReview } from "./NotifyNewConventionNeedsReview";
 
 const defaultConvention = new ConventionDtoBuilder().build();
 const validatorEmail = "myValidator@bob.yolo";
@@ -30,9 +30,9 @@ const defaultAgency = AgencyDtoBuilder.create(defaultConvention.agencyId)
   .withValidatorEmails([validatorEmail])
   .build();
 
-describe("NotifyImmersionApplicationNeedsReview", () => {
+describe("NotifyConventionNeedsReview", () => {
   let uow: InMemoryUnitOfWork;
-  let notifyNewConventionNeedsReview: NotifyNewApplicationNeedsReview;
+  let notifyNewConventionNeedsReview: NotifyNewConventionNeedsReview;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
   let conventionInReview: ConventionDto;
@@ -52,7 +52,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       uuidGenerator,
       timeGateway,
     );
-    notifyNewConventionNeedsReview = new NotifyNewApplicationNeedsReview(
+    notifyNewConventionNeedsReview = new NotifyNewConventionNeedsReview(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
@@ -62,7 +62,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     );
   });
 
-  describe("When application status is IN_REVIEW", () => {
+  describe("When convention status is IN_REVIEW", () => {
     beforeEach(() => {
       conventionInReview = new ConventionDtoBuilder(defaultConvention)
         .withStatus("IN_REVIEW")
@@ -259,7 +259,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectSavedNotificationsAndEvents({ emails: [] });
     });
 
-    describe("When application status is ACCEPTED_BY_COUNSELLOR", () => {
+    describe("When convention status is ACCEPTED_BY_COUNSELLOR", () => {
       let acceptedByCounsellorConvention: ConventionDto;
       beforeEach(() => {
         acceptedByCounsellorConvention = new ConventionDtoBuilder(
@@ -447,7 +447,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
   });
 
-  describe("When application status is ACCEPTED_BY_COUNSELLOR", () => {
+  describe("When convention status is ACCEPTED_BY_COUNSELLOR", () => {
     beforeEach(() => {
       conventionInReview = new ConventionDtoBuilder(defaultConvention)
         .withStatus("ACCEPTED_BY_COUNSELLOR")

@@ -24,9 +24,9 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import { NotifyToAgencyApplicationSubmitted } from "./NotifyToAgencyApplicationSubmitted";
+import { NotifyToAgencyConventionSubmitted } from "./NotifyToAgencyConventionSubmitted";
 
-describe("NotifyToAgencyApplicationSubmitted", () => {
+describe("NotifyToAgencyConventionSubmitted", () => {
   const councellorEmail = "councellor@email.fr";
   const councellorEmail2 = "councellor2@email.fr";
   const validatorEmail = "validator@mail.com";
@@ -70,7 +70,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     lastName: convention.signatories.beneficiary.lastName,
   });
 
-  let notifyToAgencyApplicationSubmitted: NotifyToAgencyApplicationSubmitted;
+  let notifyToAgencyConventionSubmitted: NotifyToAgencyConventionSubmitted;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
   let config: AppConfig;
@@ -102,7 +102,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       timeGateway,
     );
 
-    notifyToAgencyApplicationSubmitted = new NotifyToAgencyApplicationSubmitted(
+    notifyToAgencyConventionSubmitted = new NotifyToAgencyConventionSubmitted(
       uowPerformer,
       saveNotificationAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
@@ -124,7 +124,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       .withAgencyId(agencyWithCounsellors.id)
       .build();
 
-    await notifyToAgencyApplicationSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute(validConvention);
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -195,7 +195,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       .withAgencyId(agencyWithOnlyValidator.id)
       .build();
 
-    await notifyToAgencyApplicationSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute(validConvention);
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -244,7 +244,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       .withAgencyId(agencyWithConsellorsAndValidator.id)
       .build();
 
-    await notifyToAgencyApplicationSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute(validConvention);
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -339,7 +339,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       ],
     );
 
-    await notifyToAgencyApplicationSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute(validConvention);
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
