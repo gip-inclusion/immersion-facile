@@ -25,11 +25,6 @@ const immersionAssessmentGateways: ImmersionAssessmentGateway[] = [
   http,
 ];
 
-const successImmersionAssessment: ImmersionAssessmentDto = {
-  conventionId: "0000000",
-  status: "ABANDONED",
-  establishmentFeedback: "",
-};
 const failedImmersionAssessment: ImmersionAssessmentDto = {
   conventionId: failedId,
   status: "ABANDONED",
@@ -39,17 +34,6 @@ const jwt = "UNKNOWN";
 
 immersionAssessmentGateways.forEach((assessmentGateway) => {
   describe(`${assessmentGateway.constructor.name} - manual`, () => {
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip("createAssessment - Success", async () => {
-      const response = await firstValueFrom(
-        assessmentGateway.createAssessment({
-          assessment: successImmersionAssessment,
-          jwt,
-        }),
-      );
-      expect(response).toBeUndefined();
-    });
-
     it("createAssessment - Failure", async () => {
       await expectPromiseToFailWithError(
         firstValueFrom(
