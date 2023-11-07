@@ -16,7 +16,7 @@ import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 
 const domainEvt: DomainEvent = {
   id: "anId",
-  topic: "ImmersionApplicationSubmittedByBeneficiary",
+  topic: "ConventionSubmittedByBeneficiary",
   payload: new ConventionDtoBuilder().build(),
   occurredAt: "a date",
   wasQuarantined: false,
@@ -65,7 +65,7 @@ describe("InMemoryEventBus", () => {
       timeGateway.setNextDate(publishDate);
       const publishedEvents = spyOnTopic(
         anEventBus,
-        "ImmersionApplicationSubmittedByBeneficiary",
+        "ConventionSubmittedByBeneficiary",
         "subscription1",
       );
 
@@ -94,12 +94,12 @@ describe("InMemoryEventBus", () => {
     timeGateway.setNextDate(publishDate);
     const eventsOnFirstHandler = spyOnTopic(
       anEventBus,
-      "ImmersionApplicationSubmittedByBeneficiary",
+      "ConventionSubmittedByBeneficiary",
       "subscription1",
     );
     const eventsOnSecondHandler = spyOnTopic(
       anEventBus,
-      "ImmersionApplicationSubmittedByBeneficiary",
+      "ConventionSubmittedByBeneficiary",
       "subscription2",
     );
 
@@ -127,12 +127,12 @@ describe("InMemoryEventBus", () => {
       timeGateway.setNextDate(publishDate);
       const eventsOnFirstHandler = spyOnTopic(
         anEventBus,
-        "ImmersionApplicationSubmittedByBeneficiary",
+        "ConventionSubmittedByBeneficiary",
         "workingSubscription",
       );
 
       anEventBus.subscribe(
-        "ImmersionApplicationSubmittedByBeneficiary",
+        "ConventionSubmittedByBeneficiary",
         "failingSubscription",
         async (_) => {
           throw new Error("Failed");
@@ -193,7 +193,7 @@ describe("InMemoryEventBus", () => {
       timeGateway.setNextDate(rePublishDate);
       const eventsOnInitiallyFailedHandler = spyOnTopic(
         anEventBus,
-        "ImmersionApplicationSubmittedByBeneficiary",
+        "ConventionSubmittedByBeneficiary",
         failedSubscriptionId,
       );
 
@@ -233,12 +233,12 @@ describe("InMemoryEventBus", () => {
       timeGateway.setNextDate(rePublishDate);
       const eventsOnFirstHandler = spyOnTopic(
         anEventBus,
-        "ImmersionApplicationSubmittedByBeneficiary",
+        "ConventionSubmittedByBeneficiary",
         "workingSubscription",
       );
       const eventsOnInitiallyFailedHandler = spyOnTopic(
         anEventBus,
-        "ImmersionApplicationSubmittedByBeneficiary",
+        "ConventionSubmittedByBeneficiary",
         failedSubscriptionId,
       );
 
@@ -292,7 +292,7 @@ describe("InMemoryEventBus", () => {
       const rePublishDate = new Date("2022-01-04");
       timeGateway.setNextDate(rePublishDate);
       anEventBus.subscribe(
-        "ImmersionApplicationSubmittedByBeneficiary",
+        "ConventionSubmittedByBeneficiary",
         failedSubscriptionId,
         () => {
           throw new Error("4th failure");

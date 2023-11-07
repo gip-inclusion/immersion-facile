@@ -106,14 +106,14 @@ const makeUserIdMapInclusionConnectedUser: Record<
 type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
 
 type ConventionDomainTopic = ExtractFromDomainTopics<
-  | "ImmersionApplicationSubmittedByBeneficiary"
-  | "ImmersionApplicationPartiallySigned"
-  | "ImmersionApplicationFullySigned"
-  | "ImmersionApplicationAcceptedByCounsellor"
-  | "ImmersionApplicationAcceptedByValidator"
-  | "ImmersionApplicationRejected"
-  | "ImmersionApplicationRequiresModification"
-  | "ImmersionApplicationCancelled"
+  | "ConventionSubmittedByBeneficiary"
+  | "ConventionPartiallySigned"
+  | "ConventionFullySigned"
+  | "ConventionAcceptedByCounsellor"
+  | "ConventionAcceptedByValidator"
+  | "ConventionRejected"
+  | "ConventionRequiresModification"
+  | "ConventionCancelled"
   | "ConventionDeprecated"
 > | null; // null is used to indicate that no domain event should be sent
 
@@ -298,7 +298,7 @@ const makeTestAcceptsStatusUpdate =
 
     expectToEqual(storedConvention, expectedConvention);
 
-    if (expectedDomainTopic === "ImmersionApplicationRequiresModification") {
+    if (expectedDomainTopic === "ConventionRequiresModification") {
       if (updateStatusParams.status !== "DRAFT")
         throw new Error(
           `Expected domain topic ${expectedDomainTopic} not supported with convention status ${updateStatusParams.status}`,
@@ -340,7 +340,7 @@ const makeTestAcceptsStatusUpdate =
       await expectNewEvent(
         expectedDomainTopic,
         {
-          topic: "ImmersionApplicationRequiresModification",
+          topic: "ConventionRequiresModification",
           payload,
         },
         outboxRepository,

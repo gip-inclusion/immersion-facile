@@ -56,7 +56,7 @@ export class AddConvention extends TransactionalUseCase<
     await uow.conventionExternalIdRepository.save(convention.id);
 
     const event = this.#createNewEvent({
-      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      topic: "ConventionSubmittedByBeneficiary",
       payload: convention,
     });
 

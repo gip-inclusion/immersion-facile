@@ -74,7 +74,7 @@ describe("Add Convention", () => {
       {
         id,
         occurredAt: occurredAt.toISOString(),
-        topic: "ImmersionApplicationSubmittedByBeneficiary",
+        topic: "ConventionSubmittedByBeneficiary",
         payload: validConvention,
         publications: [],
         status: "never-published",

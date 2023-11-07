@@ -25,8 +25,8 @@ const logger = createLogger(__filename);
 const domainTopicByTargetStatusMap: Partial<
   Record<ConventionStatus, DomainTopic>
 > = {
-  PARTIALLY_SIGNED: "ImmersionApplicationPartiallySigned",
-  IN_REVIEW: "ImmersionApplicationFullySigned",
+  PARTIALLY_SIGNED: "ConventionPartiallySigned",
+  IN_REVIEW: "ConventionFullySigned",
 };
 
 const isAllowedToSign = (role: Role): role is SignatoryRole =>

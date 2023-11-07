@@ -185,7 +185,7 @@ describe("Sign convention", () => {
     expectConventionInDbToEqual(expectedConvention);
     expectEventsInOutbox([
       {
-        topic: "ImmersionApplicationPartiallySigned",
+        topic: "ConventionPartiallySigned",
         payload: expectedConvention,
       },
     ]);
@@ -231,7 +231,7 @@ describe("Sign convention", () => {
     expectConventionInDbToEqual(expectedConvention);
     expectEventsInOutbox([
       {
-        topic: "ImmersionApplicationPartiallySigned",
+        topic: "ConventionPartiallySigned",
         payload: expectedConvention,
       },
     ]);
@@ -271,7 +271,7 @@ describe("Sign convention", () => {
     expectConventionInDbToEqual(expectedConvention);
     expectEventsInOutbox([
       {
-        topic: "ImmersionApplicationFullySigned",
+        topic: "ConventionFullySigned",
         payload: expectedConvention,
       },
     ]);

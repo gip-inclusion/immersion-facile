@@ -62,7 +62,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     ).toEqual(validConvention);
     expectEventsInOutbox(inMemoryUow.outboxRepository, [
       {
-        topic: "ImmersionApplicationSubmittedByBeneficiary",
+        topic: "ConventionSubmittedByBeneficiary",
         payload: validConvention,
         publications: [],
       },

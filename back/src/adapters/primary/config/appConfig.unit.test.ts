@@ -14,9 +14,8 @@ describe("appConfig", () => {
     ).toEqual([]);
     expect(
       createAppConfig({
-        QUARANTINED_TOPICS:
-          "ImmersionApplicationRejected,FormEstablishmentAdded",
+        QUARANTINED_TOPICS: "ConventionRejected,FormEstablishmentAdded",
       }).quarantinedTopics,
-    ).toEqual(["ImmersionApplicationRejected", "FormEstablishmentAdded"]);
+    ).toEqual(["ConventionRejected", "FormEstablishmentAdded"]);
   });
 });
