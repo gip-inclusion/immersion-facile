@@ -73,7 +73,7 @@ export const createTechnicalRouter = (
   );
 
   technicalSharedRouter.htmlToPdf(
-    deps.applicationMagicLinkAuthMiddleware,
+    deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.htmlToPdf.execute(

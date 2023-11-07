@@ -67,7 +67,6 @@ const updateSignatoriesOnSignature = (
   }
 };
 
-// Returns an application signed by provided roles.
 export const signConventionDtoWithRole = (
   convention: ConventionDto,
   role: SignatoryRole,

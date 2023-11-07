@@ -109,9 +109,9 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
           verifyDeprecatedJwt(expiredJwt);
           // If the above didn't throw, this is a JWT that we issued. Renew it.
           // However, we cannot trust the contents of it, as the private key was potentially
-          // compromised. Therefore, only use the application ID and the role from it, and fill
+          // compromised. Therefore, only use the convention ID and the role from it, and fill
           // the remaining data from the database to prevent a hacker from getting magic links
-          // for any application form.
+          // for any convention form.
           payloadToExtract = decode(expiredJwt);
         } catch (_) {
           // We don't want to renew this JWT.
@@ -151,16 +151,16 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     throw new BadRequestError(convention.agencyId);
   }
 
-  async #getConvention(uow: UnitOfWork, applicationId: ConventionId) {
-    const convention = await uow.conventionRepository.getById(applicationId);
+  async #getConvention(uow: UnitOfWork, conventionId: ConventionId) {
+    const convention = await uow.conventionRepository.getById(conventionId);
     if (convention) return convention;
-    throw new NotFoundError(applicationId);
+    throw new NotFoundError(conventionId);
   }
 
   async #onEmails(
     emails: string[],
     emailHash: string | undefined,
-    applicationId: ConventionId,
+    conventionId: ConventionId,
     role: Role,
     route: string,
     uow: UnitOfWork,
@@ -173,7 +173,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
 
         const makeMagicShortLink = prepareMagicShortLinkMaker({
           conventionMagicLinkPayload: {
-            id: applicationId,
+            id: conventionId,
             role,
             email,
             now: this.#timeGateway.now(),
@@ -195,7 +195,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
               conventionStatusLink: await makeMagicShortLink(
                 frontRoutes.conventionStatusDashboard,
               ),
-              conventionId: applicationId,
+              conventionId,
             },
           }),
         );
