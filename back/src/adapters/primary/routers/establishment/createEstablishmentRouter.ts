@@ -37,7 +37,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   );
 
   establishmentSharedRouter.requestEmailToUpdateFormRoute((req, res) =>
-    sendHttpResponse(req, res, () =>
+    sendHttpResponse(req, res.status(201), () =>
       deps.useCases.requestEditFormEstablishment.execute(req.params.siret),
     ),
   );

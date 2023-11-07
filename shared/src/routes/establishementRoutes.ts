@@ -47,6 +47,10 @@ export const establishmentRoutes = defineRoutes({
   requestEmailToUpdateFormRoute: defineRoute({
     method: "post",
     url: "/request-email-to-update-form/:siret",
+    responses: {
+      201: expressEmptyResponseBody,
+      400: legacyBadRequestErrorSchema,
+    },
   }),
   deleteEstablishment: defineRoute({
     method: "delete",
