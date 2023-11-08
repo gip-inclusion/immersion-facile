@@ -145,6 +145,10 @@ export type EmailParamsByEmailType = {
   IC_USER_RIGHTS_HAS_CHANGED: {
     agencyName: string;
   };
+  IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
+    agencyName: string;
+    justification: string;
+  };
   MAGIC_LINK_RENEWAL: {
     conventionId: ConventionId | undefined;
     conventionStatusLink: string;

@@ -519,6 +519,10 @@ export const defaultEmailValueByEmailKind: {
   IC_USER_RIGHTS_HAS_CHANGED: {
     agencyName: "AGENCY_NAME",
   },
+  IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
+    agencyName: "AGENCY_NAME",
+    justification: "REASON",
+  },
   DEPRECATED_CONVENTION_NOTIFICATION: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",

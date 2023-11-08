@@ -84,6 +84,20 @@ export const RegisterUsersToAgencies = () => {
             )
             .with(
               {
+                feedback: P.when(
+                  (feedback) => feedback.kind === "agencyRejectToUserSuccess",
+                ),
+              },
+              () => (
+                <Alert
+                  severity="success"
+                  title="Beau travail !"
+                  description="Le rattachement de cet utilisateur a l'agence a bien été rejetté"
+                />
+              ),
+            )
+            .with(
+              {
                 agenciesNeedingReviewForUser: P.when(
                   (agenciesNeedingReviewForUser) =>
                     agenciesNeedingReviewForUser.length === 0,

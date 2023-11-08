@@ -425,6 +425,87 @@ describe("Admin router", () => {
   });
 
   describe(`${displayRouteName(
+    adminRoutes.rejectIcUserForAgency,
+  )} Reject user registration to agency`, () => {
+    it("201 - Reject user registration to agency", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const inclusionConnectedUser: InclusionConnectedUser = {
+        id: "my-user-id",
+        email: "john@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        agencyRights: [{ agency, role: "toReview" }],
+      };
+
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        inclusionConnectedUser,
+      ]);
+
+      const response = await sharedRequest.rejectIcUserForAgency({
+        body: {
+          agencyId: agency.id,
+          userId: inclusionConnectedUser.id,
+          justification: "osef",
+        },
+        headers: { authorization: token },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 201,
+        body: "",
+      });
+
+      expectToEqual(
+        inMemoryUow.inclusionConnectedUserRepository.agencyRightsByUserId,
+        {
+          [inclusionConnectedUser.id]: [],
+        },
+      );
+    });
+
+    it("401 - missing admin token", async () => {
+      const response = await sharedRequest.rejectIcUserForAgency({
+        body: {
+          agencyId: "yo",
+          userId: "yolo",
+          justification: "yolo",
+        },
+        headers: { authorization: "" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: { error: "You need to authenticate first" },
+      });
+    });
+
+    it("404 - Missing user", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const inclusionConnectedUser: InclusionConnectedUser = {
+        id: "my-user-id",
+        email: "john@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        agencyRights: [{ agency, role: "toReview" }],
+      };
+
+      const response = await sharedRequest.rejectIcUserForAgency({
+        body: {
+          agencyId: agency.id,
+          userId: inclusionConnectedUser.id,
+          justification: "osef",
+        },
+        headers: { authorization: token },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: { errors: "No user found with id: my-user-id" },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
     adminRoutes.saveApiConsumer,
   )} saves an api consumer`, () => {
     it("200 - save new api consumer", async () => {

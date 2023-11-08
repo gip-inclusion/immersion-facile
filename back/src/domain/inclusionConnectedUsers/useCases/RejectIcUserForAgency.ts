@@ -57,6 +57,7 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
     const updatedAgencyRights = icUser.agencyRights.filter(
       (agencyRight) => agencyRight.agency.id !== params.agencyId,
     );
+
     const updatedIcUser: InclusionConnectedUser = {
       ...icUser,
       agencyRights: updatedAgencyRights,

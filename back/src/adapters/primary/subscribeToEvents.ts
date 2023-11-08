@@ -122,7 +122,7 @@ const getUseCasesByTopics = (
 
   UserAuthenticatedSuccessfully: [],
   IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
-
+  IcUserAgencyRightRejected: [useCases.notifyIcUserAgencyRightRejected],
   //Api Consumer related:
   ApiConsumerSaved: [],
   //partnersErroredConvention related

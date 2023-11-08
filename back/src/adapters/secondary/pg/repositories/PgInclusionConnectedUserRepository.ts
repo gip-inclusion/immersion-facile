@@ -34,13 +34,18 @@ export class PgInclusionConnectedUserRepository
         `,
       [user.id],
     );
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      format(
-        `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
-        user.agencyRights.map(({ agency, role }) => [user.id, agency.id, role]),
-      ),
-    );
+    if (user.agencyRights.length > 0)
+      await executeKyselyRawSqlQuery(
+        this.transaction,
+        format(
+          `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
+          user.agencyRights.map(({ agency, role }) => [
+            user.id,
+            agency.id,
+            role,
+          ]),
+        ),
+      );
   }
 
   async #getInclusionConnectedUsers(filters: {
