@@ -6,6 +6,7 @@ import {
   ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
+  FindSimilarConventionsParams,
   RenewConventionParams,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
@@ -56,6 +57,7 @@ export interface ConventionState {
   fetchError: string | null;
   feedback: ConventionSubmitFeedback;
   currentSignatoryRole: SignatoryRole | null;
+  similarConventionIds: ConventionId[];
 }
 
 export const initialConventionState: ConventionState = {
@@ -75,6 +77,7 @@ export const initialConventionState: ConventionState = {
   fetchError: null,
   feedback: { kind: "idle" },
   currentSignatoryRole: null,
+  similarConventionIds: [],
 };
 
 export type FetchConventionRequestedPayload = {
@@ -269,5 +272,21 @@ export const conventionSlice = createSlice({
       state.feedback = { kind: "renewed" };
     },
     renewConventionFailed: setFeedbackAsErrored,
+
+    // Get similar conventions
+    getSimilarConventionsRequested: (
+      state,
+      _action: PayloadAction<FindSimilarConventionsParams>,
+    ) => {
+      state.isLoading = true;
+    },
+    getSimilarConventionsSucceeded: (
+      state,
+      { payload }: PayloadAction<ConventionId[]>,
+    ) => {
+      state.isLoading = false;
+      state.similarConventionIds = payload;
+    },
+    getSimilarConventionsFailed: setFeedbackAsErrored,
   },
 });

@@ -24,6 +24,11 @@ const fetchError = createSelector(
 
 const isLoading = createSelector(conventionState, ({ isLoading }) => isLoading);
 
+const similarConventionIds = createSelector(
+  conventionState,
+  ({ similarConventionIds }) => similarConventionIds,
+);
+
 const isMinor = createSelector(conventionState, ({ formUi }) => formUi.isMinor);
 
 const showSummary = createSelector(
@@ -88,6 +93,7 @@ export const conventionSelectors = {
   currentStep,
   showSummary,
   agencyDepartment,
+  similarConventionIds,
 };
 
 export const signatoryDataFromConvention = (
