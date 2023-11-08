@@ -33,7 +33,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: originalConventionId,
         modifierRole: "beneficiary",
       },
-      expectedDomainTopic: "ImmersionApplicationRequiresModification",
+      expectedDomainTopic: "ConventionRequiresModification",
       updatedFields: {
         statusJustification: "test justification",
         establishmentRepresentativeSignedAt: undefined,
@@ -60,7 +60,7 @@ describe("UpdateConventionStatus", () => {
       ],
     });
 
-    it("ImmersionApplicationRequiresModification event only has the role of the user that requested the change", async () => {
+    it("ConventionRequiresModification event only has the role of the user that requested the change", async () => {
       const uow = createInMemoryUow();
 
       const outboxRepo = uow.outboxRepository;
@@ -107,7 +107,7 @@ describe("UpdateConventionStatus", () => {
       expectToEqual(
         outboxRepo.events[0],
         createNewEvent({
-          topic: "ImmersionApplicationRequiresModification",
+          topic: "ConventionRequiresModification",
           payload: {
             convention,
             justification: "because",
@@ -238,7 +238,7 @@ describe("UpdateConventionStatus", () => {
         status: "PARTIALLY_SIGNED",
         conventionId: originalConventionId,
       },
-      expectedDomainTopic: "ImmersionApplicationPartiallySigned",
+      expectedDomainTopic: "ConventionPartiallySigned",
       allowedRoles: validSignatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
@@ -251,7 +251,7 @@ describe("UpdateConventionStatus", () => {
         status: "IN_REVIEW",
         conventionId: originalConventionId,
       },
-      expectedDomainTopic: "ImmersionApplicationFullySigned",
+      expectedDomainTopic: "ConventionFullySigned",
       allowedRoles: validSignatoryRoles,
       allowedInclusionConnectedUsers: [],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
@@ -264,7 +264,7 @@ describe("UpdateConventionStatus", () => {
         status: "ACCEPTED_BY_COUNSELLOR",
         conventionId: originalConventionId,
       },
-      expectedDomainTopic: "ImmersionApplicationAcceptedByCounsellor",
+      expectedDomainTopic: "ConventionAcceptedByCounsellor",
       allowedRoles: ["counsellor"],
       allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],
       allowedInitialStatuses: ["IN_REVIEW"],
@@ -278,7 +278,7 @@ describe("UpdateConventionStatus", () => {
         status: "ACCEPTED_BY_VALIDATOR",
         conventionId: originalConventionId,
       },
-      expectedDomainTopic: "ImmersionApplicationAcceptedByValidator",
+      expectedDomainTopic: "ConventionAcceptedByValidator",
       allowedRoles: ["validator"],
       allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
@@ -294,7 +294,7 @@ describe("UpdateConventionStatus", () => {
         statusJustification: "my rejection justification",
         conventionId: originalConventionId,
       },
-      expectedDomainTopic: "ImmersionApplicationRejected",
+      expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
       allowedRoles: ["backOffice", "validator", "counsellor"],
       allowedInclusionConnectedUsers: [
@@ -317,7 +317,7 @@ describe("UpdateConventionStatus", () => {
         statusJustification: "Cancelled justification",
         conventionId: originalConventionId,
       },
-      expectedDomainTopic: "ImmersionApplicationCancelled",
+      expectedDomainTopic: "ConventionCancelled",
       updatedFields: { statusJustification: "Cancelled justification" },
       allowedRoles: ["validator", "backOffice"],
       allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],

@@ -10,7 +10,7 @@ import { makeShortLink } from "../../core/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
-export class ShareApplicationLinkByEmail extends TransactionalUseCase<ShareLinkByEmailDto> {
+export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareLinkByEmailDto> {
   protected inputSchema = shareLinkByEmailSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;

@@ -34,13 +34,13 @@ const domainTopicByTargetStatusMap: Record<
   DomainTopic | null
 > = {
   READY_TO_SIGN: null,
-  PARTIALLY_SIGNED: "ImmersionApplicationPartiallySigned",
-  IN_REVIEW: "ImmersionApplicationFullySigned",
-  ACCEPTED_BY_COUNSELLOR: "ImmersionApplicationAcceptedByCounsellor",
-  ACCEPTED_BY_VALIDATOR: "ImmersionApplicationAcceptedByValidator",
-  REJECTED: "ImmersionApplicationRejected",
-  CANCELLED: "ImmersionApplicationCancelled",
-  DRAFT: "ImmersionApplicationRequiresModification",
+  PARTIALLY_SIGNED: "ConventionPartiallySigned",
+  IN_REVIEW: "ConventionFullySigned",
+  ACCEPTED_BY_COUNSELLOR: "ConventionAcceptedByCounsellor",
+  ACCEPTED_BY_VALIDATOR: "ConventionAcceptedByValidator",
+  REJECTED: "ConventionRejected",
+  CANCELLED: "ConventionCancelled",
+  DRAFT: "ConventionRequiresModification",
   DEPRECATED: "ConventionDeprecated",
 };
 
@@ -210,7 +210,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     payload: ConventionRequiresModificationPayload,
   ) {
     return this.createNewEvent({
-      topic: "ImmersionApplicationRequiresModification",
+      topic: "ConventionRequiresModification",
       payload,
     });
   }

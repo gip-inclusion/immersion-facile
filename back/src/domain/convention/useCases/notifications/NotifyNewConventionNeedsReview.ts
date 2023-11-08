@@ -23,7 +23,7 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 
 const logger = createLogger(__filename);
 
-export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<ConventionDto> {
+export class NotifyNewConventionNeedsReview extends TransactionalUseCase<ConventionDto> {
   protected inputSchema = conventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -73,7 +73,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     if (!recipients) {
       logger.error(
         {
-          applicationId: convention.id,
+          conventionId: convention.id,
           status: convention.status,
           agencyId: convention.agencyId,
         },
@@ -85,7 +85,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     logger.info(
       {
         recipients,
-        applicationId: convention.id,
+        conventionId: convention.id,
       },
       "Sending Mail to review an immersion",
     );

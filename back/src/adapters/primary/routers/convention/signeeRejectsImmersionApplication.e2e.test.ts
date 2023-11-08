@@ -21,7 +21,7 @@ import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTest
 import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
-  it("saves valid applications in the repository, and ask for establishment edition", async () => {
+  it("saves valid conventions in the repository, and ask for establishment edition", async () => {
     const validConvention = new ConventionDtoBuilder()
       .withStatus("READY_TO_SIGN")
       .build();

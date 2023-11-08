@@ -41,12 +41,6 @@ describe("Home user flow", () => {
     cy.get(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`).click();
     expectLocationToBe(`/${frontRoutes.addAgency}`);
   });
-  it.skip("User flow: Agency -> edit form", () => {
-    cy.visit("/");
-    cy.get(`#${domElementIds.home.heroHeader.agency}`).click();
-    cy.get(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`).click();
-    expectLocationToBe(`/${frontRoutes.addAgency}`);
-  });
   it("User flow: Agency -> convention form", () => {
     cy.visit("/");
     cy.get(`#${domElementIds.home.heroHeader.agency}`).click();
