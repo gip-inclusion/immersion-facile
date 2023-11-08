@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys, uniqBy } from "ramda";
 import {
+  AgencyId,
   AgencyOption,
   ConventionReadDto,
   CreateAgencyDto,
@@ -31,7 +32,6 @@ type AgencySelectorProps = {
     departmentCode: DepartmentCode,
   ) => Promise<AgencyOption[]>;
   disabled?: boolean;
-  defaultAgencyId?: string;
 };
 type AgencyKindForSelector = AllowedAgencyKindToAdd | "all";
 
@@ -44,13 +44,12 @@ export const AgencySelector = ({
   fields: { agencyDepartmentField, agencyKindField, agencyIdField },
   agencyDepartmentOptions,
   agenciesRetriever,
-  defaultAgencyId,
 }: AgencySelectorProps) => {
   const {
     register,
     setValue,
-    getValues,
     formState: { errors, touchedFields },
+    control,
   } = useFormContext<SupportedFormsDto>();
   const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
   const [agencies, setAgencies] = useState<AgencyOption[]>([]);
@@ -64,8 +63,15 @@ export const AgencySelector = ({
     () => agencyDepartmentField.name as keyof SupportedFormsDto,
     [agencyDepartmentField.name],
   );
+  const agenciesRetrieverMemoized = useCallback(
+    (departmentCode: DepartmentCode) => agenciesRetriever(departmentCode),
+    [agenciesRetriever],
+  );
 
-  const agencyDepartment = getValues(agencyDepartmentFieldName) as string;
+  const agencyDepartment = useWatch({
+    name: agencyDepartmentFieldName,
+    control,
+  }) as string;
 
   const agencyPlaceholder = getAgencyPlaceholder(
     agencyDepartment,
@@ -110,44 +116,46 @@ export const AgencySelector = ({
         value: agencyKind,
       })),
   ];
+  const agencyIdValue = useWatch({
+    name: agencyIdFieldName,
+    control,
+  }) as AgencyId;
 
   if (shouldLockToPeAgencies && agencyKind !== "pole-emploi") {
     setAgencyKind("pole-emploi");
   }
 
-  const onAgencyDepartmentChange = (department: string) => {
-    setValue(agencyDepartmentFieldName, department);
-    setIsLoading(true);
-    agenciesRetriever(department)
-      .then((retrievedAgencies) => {
-        setAgencies(sortByPropertyCaseInsensitive("name")(retrievedAgencies));
-        if (
-          defaultAgencyId &&
-          isDefaultAgencyOnAgenciesAndEnabled(
-            disabled,
-            defaultAgencyId,
-            retrievedAgencies,
-          )
-        )
-          setValue(agencyIdFieldName, defaultAgencyId);
-        else setValue(agencyIdFieldName, "");
-        setLoadingError(false);
-      })
-      .catch((e: any) => {
-        //eslint-disable-next-line no-console
-        console.log("AgencySelector", e);
-        setAgencies([]);
-        setLoadingError(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
+  const onAgencyDepartmentChange = useCallback(
+    (department: string) => {
+      setIsLoading(true);
+      agenciesRetrieverMemoized(department)
+        .then((retrievedAgencies) => {
+          setAgencies(sortByPropertyCaseInsensitive("name")(retrievedAgencies));
+          setLoadingError(false);
+        })
+        .catch((e: any) => {
+          //eslint-disable-next-line no-console
+          console.log("AgencySelector", e);
+          setAgencies([]);
+          setLoadingError(true);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    },
+    [agenciesRetrieverMemoized],
+  );
 
   const resetSelector = useCallback(() => {
     setValue(agencyDepartmentFieldName, "");
     setValue(agencyIdFieldName, "");
   }, [agencyDepartmentFieldName, agencyIdFieldName, setValue]);
+
+  useEffect(() => {
+    if (agencyDepartment) {
+      onAgencyDepartmentChange(agencyDepartment);
+    }
+  }, [agencyDepartment, onAgencyDepartmentChange]);
 
   useEffect(
     () => () => {
@@ -168,8 +176,11 @@ export const AgencySelector = ({
         nativeSelectProps={{
           ...agencyDepartmentField,
           ...register(agencyDepartmentFieldName),
-          onChange: (event) =>
-            onAgencyDepartmentChange(event.currentTarget.value),
+          onChange: (event) => {
+            const department = event.currentTarget.value;
+            setValue(agencyIdFieldName, "");
+            setValue(agencyDepartmentFieldName, department);
+          },
         }}
       />
 
@@ -205,6 +216,7 @@ export const AgencySelector = ({
         nativeSelectProps={{
           ...agencyIdField,
           ...register(agencyIdFieldName),
+          value: agencyIdValue,
         }}
       />
       {showError && (
@@ -245,9 +257,3 @@ const agencyOptionsInSelectorFromAgencies = (
       label: name,
       value: id,
     }));
-
-const isDefaultAgencyOnAgenciesAndEnabled = (
-  disabled: boolean | undefined,
-  defaultAgencyId: string,
-  agencies: AgencyOption[],
-) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);

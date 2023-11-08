@@ -51,9 +51,10 @@ export const ConventionImmersionPage = ({
   const currentRoute = useRoute();
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
+  const { jwt, ...routeParamsWithoutJwt } = route.params;
   const isSharedConvention = useMemo(
-    () => keys(route.params).length > 0,
-    [route.params],
+    () => keys(routeParamsWithoutJwt).length > 0,
+    [routeParamsWithoutJwt],
   );
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
     useState(isSharedConvention);
@@ -142,10 +143,10 @@ export const ConventionImmersionPage = ({
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const { jwt, ...routeParamsWithoutJwt } = route.params;
   const isSharedConvention = useMemo(
-    // depends on initial (on page load) route params, shouldn't change on re-render
-    () => keys(route.params).length > 0,
-    [route.params],
+    () => keys(routeParamsWithoutJwt).length > 0,
+    [routeParamsWithoutJwt],
   );
   const [shouldShowForm, setShouldShowForm] = useState(
     isSharedConvention ||
