@@ -94,6 +94,7 @@ describe("Convention slice", () => {
           fetchError: null,
           feedback: { kind: "idle" },
           currentSignatoryRole: null,
+          similarConventionIds: [],
         },
       }));
       const convention = new ConventionDtoBuilder().build();
@@ -132,6 +133,34 @@ describe("Convention slice", () => {
         isLoading: false,
         feedback: { kind: "errored", errorMessage },
       });
+    });
+  });
+
+  describe("Get similar conventions", () => {
+    it("get no similar convention", () => {
+      const convention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .build();
+      store.dispatch(
+        conventionSlice.actions.getSimilarConventionsRequested({
+          siret: convention.dateStart,
+          beneficiaryBirthdate: "2023-10-01",
+          dateStart: convention.dateStart,
+          beneficiaryLastName: "Test",
+          codeAppellation: "111222",
+        }),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+      dependencies.conventionGateway.getSimilarConventionsResult$.next([]);
+      expectConventionState({
+        isLoading: false,
+      });
+      expectToEqual(
+        conventionSelectors.similarConventionIds(store.getState()),
+        [],
+      );
     });
   });
 
@@ -286,6 +315,7 @@ describe("Convention slice", () => {
           fetchError: null,
           jwt: null,
           currentSignatoryRole: null,
+          similarConventionIds: [],
         },
       }));
       store.dispatch(
@@ -636,6 +666,7 @@ describe("Convention slice", () => {
           convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: null,
+          similarConventionIds: [],
         },
       }));
       const signatoryData = conventionSelectors.signatoryData(store.getState());
@@ -681,6 +712,7 @@ describe("Convention slice", () => {
           convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: "beneficiary",
+          similarConventionIds: [],
         },
       }));
 
@@ -848,6 +880,7 @@ describe("Convention slice", () => {
         isLoading: false,
         fetchError: null,
         currentSignatoryRole: null,
+        similarConventionIds: [],
       },
     }));
     store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
@@ -873,6 +906,7 @@ describe("Convention slice", () => {
         isLoading: false,
         fetchError: null,
         currentSignatoryRole: null,
+        similarConventionIds: [],
       },
     }));
     expectConventionState({
@@ -903,6 +937,7 @@ describe("Convention slice", () => {
         isLoading: false,
         fetchError: null,
         currentSignatoryRole: null,
+        similarConventionIds: [],
       },
     }));
     expectConventionState({
@@ -937,6 +972,7 @@ describe("Convention slice", () => {
         isLoading: false,
         fetchError: null,
         currentSignatoryRole: null,
+        similarConventionIds: [],
       },
     }));
     expectConventionState({
@@ -1010,6 +1046,7 @@ describe("Convention slice", () => {
         isLoading: false,
         fetchError: null,
         currentSignatoryRole: null,
+        similarConventionIds: [],
       },
     }));
     expectConventionState({ convention });

@@ -7,6 +7,7 @@ import {
   ConventionId,
   ConventionReadDto,
   ConventionSupportedJwt,
+  FindSimilarConventionsParams,
   RenewConventionParams,
   ShareLinkByEmailDto,
   sleep,
@@ -39,6 +40,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public conventionSignedResult$ = new Subject<void>();
 
+  public getSimilarConventionsResult$ = new Subject<ConventionId[]>();
+
   public updateConventionCallCount = 0;
 
   public updateConventionResult$ = new Subject<void>();
@@ -59,6 +62,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public getConventionStatusDashboardUrl$(_jwt: string) {
     return this.conventionDashboardUrl$;
+  }
+
+  public getSimilarConventions$(
+    _findSimilarConventionsParams: FindSimilarConventionsParams,
+  ): Observable<ConventionId[]> {
+    return this.getSimilarConventionsResult$;
   }
 
   public renewConvention$(
