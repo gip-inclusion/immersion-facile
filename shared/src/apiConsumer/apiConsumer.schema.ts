@@ -3,7 +3,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { phoneSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
-import { dateIsoStringSchema } from "../schedule/Schedule.schema";
+import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { ApiConsumerJwt } from "../tokens/jwt.dto";
 import { dateRegExp } from "../utils/date";
 import { localization, zStringMinLength1 } from "../zodUtils";
@@ -38,7 +38,7 @@ export const webhookSubscriptionSchema: z.Schema<WebhookSubscription> =
   createWebhookSubscriptionSchema.and(
     z.object({
       id: z.string(),
-      createdAt: dateIsoStringSchema,
+      createdAt: dateTimeIsoStringSchema,
     }),
   );
 

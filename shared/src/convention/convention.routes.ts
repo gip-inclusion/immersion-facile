@@ -1,6 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAuthorizationHeaders } from "../headers";
+import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
@@ -73,7 +74,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     url: "/share-immersion-demand",
     method: "post",
     requestBodySchema: shareLinkByEmailSchema,
-    responses: { 200: expressEmptyResponseBody },
+    responses: { 200: expressEmptyResponseBody, 400: httpErrorSchema },
   }),
   renewMagicLink: defineRoute({
     url: "/renew-magic-link",
@@ -85,6 +86,8 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     url: "/find-similar-immersion",
     method: "get",
     queryParamsSchema: findSimilarConventionsParamsSchema,
-    responses: { 200: findSimilarConventionsResponseSchema },
+    responses: {
+      200: findSimilarConventionsResponseSchema,
+    },
   }),
 });

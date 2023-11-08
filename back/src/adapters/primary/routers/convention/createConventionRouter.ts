@@ -1,34 +1,34 @@
 import { Router } from "express";
 import { unauthenticatedConventionRoutes } from "shared";
+import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
 export const createConventionRouter = (deps: AppDependencies) => {
-  const conventionRouter = Router();
+  const expressRouter = Router();
 
-  conventionRouter
-    .route(unauthenticatedConventionRoutes.shareConvention.url)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.shareConventionByEmail.execute(req.body),
-      ),
-    );
+  const conventionSharedRouter = createExpressSharedRouter(
+    unauthenticatedConventionRoutes,
+    expressRouter,
+  );
 
-  conventionRouter
-    .route(unauthenticatedConventionRoutes.createConvention.url)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.addConvention.execute(req.body),
-      ),
-    );
+  conventionSharedRouter.shareConvention(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.shareConventionByEmail.execute(req.body),
+    ),
+  );
 
-  conventionRouter
-    .route(unauthenticatedConventionRoutes.findSimilarConventions.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.findSimilarConventions.execute(req.query as any),
-      ),
-    );
+  conventionSharedRouter.createConvention(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.addConvention.execute(req.body),
+    ),
+  );
 
-  return conventionRouter;
+  conventionSharedRouter.findSimilarConventions(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.findSimilarConventions.execute(req.query),
+    ),
+  );
+
+  return expressRouter;
 };

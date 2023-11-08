@@ -183,26 +183,23 @@ describe("convention e2e", () => {
     describe("400 - Invalid body", () => {
       it("should return error message when missing mandatory fields", async () => {
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
-
-        const response = await request
-          .post(unauthenticatedConventionRoutes.shareConvention.url)
-          .send({
+        const response = await unauthenticatedRequest.shareConvention({
+          body: {
             details: "any@email.fr",
             email: "any@email.fr",
             internshipKind: "immersion",
-          });
+            conventionLink: "",
+          },
+        });
 
-        expectToEqual(response.status, 400);
-        expectToEqual(response.body, {
-          errors: [
-            {
-              code: "invalid_type",
-              expected: "string",
-              received: "undefined",
-              path: ["conventionLink"],
-              message: "Obligatoire",
-            },
-          ],
+        expectHttpResponseToEqual(response, {
+          status: 400,
+          body: {
+            status: 400,
+            message:
+              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /share-immersion-demand",
+            issues: ["conventionLink : Obligatoire"],
+          },
         });
       });
     });

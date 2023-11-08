@@ -7,7 +7,7 @@ import {
   ScheduleDto,
   SelectedDaysOfTheWeekDto,
 } from "./Schedule.dto";
-import { dateIsoStringSchema, scheduleSchema } from "./Schedule.schema";
+import { dateTimeIsoStringSchema, scheduleSchema } from "./Schedule.schema";
 import { defaultInterval, ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
@@ -645,7 +645,7 @@ describe("ScheduleUtils", () => {
     it.each(["2022-07-05", "Not a date", "31-07-2022"])(
       "parse '%s' is not valid",
       (date) => {
-        expect(() => dateIsoStringSchema.parse(date)).toThrow(
+        expect(() => dateTimeIsoStringSchema.parse(date)).toThrow(
           new ZodError([
             {
               code: "invalid_string",
@@ -659,7 +659,7 @@ describe("ScheduleUtils", () => {
     );
 
     it.each(["2022-02-27T10:00:00.001Z"])("parse '%s' is valid", (date) => {
-      expect(dateIsoStringSchema.parse(date)).toBe(
+      expect(dateTimeIsoStringSchema.parse(date)).toBe(
         new Date(date).toISOString(),
       );
     });
