@@ -7,7 +7,7 @@ export const toAgencyPublicDisplayDto = (
   if (
     agency.refersToAgencyId &&
     referedAgency &&
-    agency.id !== referedAgency.id
+    agency.refersToAgencyId !== referedAgency.id
   )
     throw new Error(
       "Agency.refersToAgencyId and referedAgency.id are not identical.",

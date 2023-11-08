@@ -11,6 +11,7 @@ import {
   AgencyKind,
   CreateAgencyDto,
   createAgencySchema,
+  DepartmentCode,
   domElementIds,
   toDotNotation,
 } from "shared";
@@ -120,6 +121,15 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
       });
   };
 
+  const agenciesRetrieverMemoized = useMemo(
+    () => (departmentCode: DepartmentCode) =>
+      agencyGateway.getFilteredAgencies({
+        departmentCode,
+        kind: "withoutRefersToAgency",
+      }),
+    [],
+  );
+
   useEffect(() => {
     reset(formInitialValues);
   }, [reset, formInitialValues]);
@@ -155,12 +165,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
               shouldLockToPeAgencies={false}
               shouldShowAgencyKindField
               agencyDepartmentOptions={departmentOptions}
-              agenciesRetriever={(departmentCode) =>
-                agencyGateway.getFilteredAgencies({
-                  departmentCode,
-                  kind: "withoutRefersToAgency",
-                })
-              }
+              agenciesRetriever={agenciesRetrieverMemoized}
             />
           </>
         )}

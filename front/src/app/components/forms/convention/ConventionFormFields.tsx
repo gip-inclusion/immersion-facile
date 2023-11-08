@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { get, type SubmitHandler, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -9,8 +9,12 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
 import {
   addressDtoToString,
+  AgencyOption,
   ConventionReadDto,
+  DepartmentCode,
   domElementIds,
+  FederatedIdentity,
+  InternshipKind,
   isPeConnectIdentity,
   miniStageRestrictedDepartments,
   toDotNotation,
@@ -32,7 +36,7 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
-import { deviceRepository } from "src/config/dependencies";
+import { agencyGateway, deviceRepository } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
@@ -40,7 +44,6 @@ import {
   NumberOfSteps,
 } from "src/core-logic/domain/convention/convention.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { conventionAgenciesRetriever } from "src/core-logic/ports/AgencyGateway";
 import { AddressAutocomplete } from "../autocomplete/AddressAutocomplete";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
@@ -225,6 +228,16 @@ export const ConventionFormFields = ({
 
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
+  const agenciesRetrieverMemoized = useMemo(
+    () =>
+      conventionAgenciesRetriever({
+        internshipKind: conventionValues.internshipKind,
+        shouldListAll: shouldListAllAgencies,
+        federatedIdentity,
+      }),
+    [conventionValues.internshipKind, shouldListAllAgencies, federatedIdentity],
+  );
+
   return (
     <>
       <input
@@ -254,11 +267,7 @@ export const ConventionFormFields = ({
                       miniStageRestrictedDepartments.includes(department.value),
                     )
               }
-              agenciesRetriever={conventionAgenciesRetriever({
-                internshipKind: conventionValues.internshipKind,
-                shouldListAll: shouldListAllAgencies,
-                federatedIdentity,
-              })}
+              agenciesRetriever={agenciesRetrieverMemoized}
             />
           </Accordion>
         )}
@@ -338,19 +347,37 @@ export const ConventionFormFields = ({
           nativeButtonProps={{
             id: domElementIds.conventionImmersionRoute.submitFormButton,
           }}
-          onClick={handleSubmit(
-            (values) => onSubmit(values),
-            (errors) => {
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              validateSteps(false);
-              // eslint-disable-next-line no-console
-              console.error(getValues(), errors);
-            },
-          )}
+          onClick={handleSubmit(onSubmit, (errors) => {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            validateSteps(false);
+            // eslint-disable-next-line no-console
+            console.error(getValues(), errors);
+          })}
         >
           Vérifier la demande
         </Button>
       </div>
     </>
   );
+};
+
+const conventionAgenciesRetriever = ({
+  internshipKind,
+  shouldListAll,
+  federatedIdentity,
+}: {
+  internshipKind: InternshipKind;
+  shouldListAll: boolean;
+  federatedIdentity: FederatedIdentity | null;
+}): ((departmentCode: DepartmentCode) => Promise<AgencyOption[]>) => {
+  if (internshipKind === "mini-stage-cci")
+    return (departmentCode) =>
+      agencyGateway.listMiniStageAgencies(departmentCode);
+  if (shouldListAll)
+    return (departmentCode) =>
+      agencyGateway.listImmersionAgencies(departmentCode);
+  return federatedIdentity && isPeConnectIdentity(federatedIdentity)
+    ? (departmentCode) =>
+        agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
+    : (departmentCode) => agencyGateway.listImmersionAgencies(departmentCode);
 };
