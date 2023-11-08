@@ -63,10 +63,6 @@ export const AgencySelector = ({
     () => agencyDepartmentField.name as keyof SupportedFormsDto,
     [agencyDepartmentField.name],
   );
-  const agenciesRetrieverMemoized = useCallback(
-    (departmentCode: DepartmentCode) => agenciesRetriever(departmentCode),
-    [agenciesRetriever],
-  );
 
   const agencyDepartment = useWatch({
     name: agencyDepartmentFieldName,
@@ -128,7 +124,7 @@ export const AgencySelector = ({
   const onAgencyDepartmentChange = useCallback(
     (department: string) => {
       setIsLoading(true);
-      agenciesRetrieverMemoized(department)
+      agenciesRetriever(department)
         .then((retrievedAgencies) => {
           setAgencies(sortByPropertyCaseInsensitive("name")(retrievedAgencies));
           setLoadingError(false);
@@ -143,7 +139,7 @@ export const AgencySelector = ({
           setIsLoading(false);
         });
     },
-    [agenciesRetrieverMemoized],
+    [agenciesRetriever],
   );
 
   const resetSelector = useCallback(() => {
