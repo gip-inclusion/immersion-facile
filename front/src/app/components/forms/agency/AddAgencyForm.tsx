@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -121,8 +121,8 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
       });
   };
 
-  const agenciesRetrieverMemoized = useMemo(
-    () => (departmentCode: DepartmentCode) =>
+  const agenciesRetrieverMemoized = useCallback(
+    (departmentCode: DepartmentCode) =>
       agencyGateway.getFilteredAgencies({
         departmentCode,
         kind: "withoutRefersToAgency",
