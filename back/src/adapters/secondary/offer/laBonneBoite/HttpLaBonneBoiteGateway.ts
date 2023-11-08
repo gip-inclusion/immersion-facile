@@ -6,6 +6,7 @@ import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
 } from "../../../../domain/offer/ports/LaBonneBoiteGateway";
+import { createLogger } from "../../../../utils/logger";
 import { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
 import {
   LaBonneBoiteApiResultProps,
@@ -17,6 +18,7 @@ const MAX_DISTANCE_IN_KM = 100;
 
 const lbbMaxQueryPerSeconds = 1;
 
+const logger = createLogger(__filename);
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   #limiter = new Bottleneck({
     reservoir: lbbMaxQueryPerSeconds,
@@ -36,37 +38,49 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lon,
     rome,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
-    const { body } = await this.#limiter.schedule(async () => {
-      const accessToken = await this.poleEmploiGateway.getAccessToken(
-        `application_${this.poleEmploiClientId} api_labonneboitev1`,
-      );
-
-      return this.httpClient.getCompany({
-        headers: {
-          authorization: createAuthorization(accessToken.access_token),
-        },
-        queryParams: {
-          distance: MAX_DISTANCE_IN_KM,
-          longitude: lon,
-          latitude: lat,
-          page: 1,
-          page_size: MAX_PAGE_SIZE,
-          rome_codes: rome,
-          sort: "distance",
-        },
+    logger.warn({ distanceKm, lat, lon, rome }, "searchCompanies");
+    return this.#limiter
+      .schedule(async () =>
+        this.poleEmploiGateway
+          .getAccessToken(
+            `application_${this.poleEmploiClientId} api_labonneboitev1`,
+          )
+          .then((accessToken) =>
+            this.httpClient.getCompany({
+              headers: {
+                authorization: createAuthorization(accessToken.access_token),
+              },
+              queryParams: {
+                distance: MAX_DISTANCE_IN_KM,
+                longitude: lon,
+                latitude: lat,
+                page: 1,
+                page_size: MAX_PAGE_SIZE,
+                rome_codes: rome,
+                sort: "distance",
+              },
+            }),
+          ),
+      )
+      .then(({ body }) =>
+        body.companies
+          .map(
+            (props: LaBonneBoiteApiResultProps) =>
+              new LaBonneBoiteCompanyDto(props),
+          )
+          .filter(
+            (result) =>
+              result.props.distance <= distanceKm && result.isCompanyRelevant(),
+          )
+          .map((result) => result.toSearchResult()),
+      )
+      .catch((error) => {
+        logger.warn(
+          { error, distanceKm, lat, lon, rome },
+          "searchCompanies_error",
+        );
+        throw error;
       });
-    });
-
-    return body.companies
-      .map(
-        (props: LaBonneBoiteApiResultProps) =>
-          new LaBonneBoiteCompanyDto(props),
-      )
-      .filter(
-        (result) =>
-          result.props.distance <= distanceKm && result.isCompanyRelevant(),
-      )
-      .map((result) => result.toSearchResult());
   }
 }
 
