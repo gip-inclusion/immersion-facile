@@ -456,10 +456,14 @@ describe("Pg implementation of ConventionQueries", () => {
     const matchingBeneficiaryLastname = "Dupont";
     const matchingDateStart = new Date("2021-01-09").toISOString();
     const someMatchingStatus = "DRAFT";
-    const conventionMatchingId: ConventionId =
-      "11111111-1111-4111-1111-111111111111";
+    const conventionMatchingIdA: ConventionId =
+      "aaaa1111-1111-4111-1111-11111111aaaa";
+    const conventionMatchingIdB: ConventionId =
+      "bbbb1111-1111-4111-1111-11111111bbbb";
 
     beforeEach(async () => {
+      await client.query("DELETE FROM agencies");
+      await client.query("DELETE FROM conventions");
       const agency = AgencyDtoBuilder.create().build();
       const conventionBuilderInitialMatching = new ConventionDtoBuilder()
         .withAgencyId(agency.id)
@@ -476,8 +480,13 @@ describe("Pg implementation of ConventionQueries", () => {
         .withDateEnd(new Date("2021-01-25").toISOString())
         .withStatus(someMatchingStatus);
 
-      const conventionMatching = conventionBuilderInitialMatching
-        .withId(conventionMatchingId)
+      const conventionMatchingA = conventionBuilderInitialMatching
+        .withId(conventionMatchingIdA)
+        .build();
+
+      const conventionMatchingB = conventionBuilderInitialMatching
+        .withId(conventionMatchingIdB)
+        .withDateStart(new Date("2021-01-10").toISOString())
         .build();
 
       const conventionWithWrongSiret = conventionBuilderInitialMatching
@@ -542,7 +551,8 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionRepository.save(conventionDeprecated),
         conventionRepository.save(conventionRejected),
         conventionRepository.save(conventionCancelled),
-        conventionRepository.save(conventionMatching),
+        conventionRepository.save(conventionMatchingA),
+        conventionRepository.save(conventionMatchingB),
       ]);
     });
 
@@ -569,7 +579,10 @@ describe("Pg implementation of ConventionQueries", () => {
           codeAppellation: matchingAppellation,
         });
 
-      expectToEqual(similarConventionIdsFound, [conventionMatchingId]);
+      expectToEqual(similarConventionIdsFound, [
+        conventionMatchingIdB,
+        conventionMatchingIdA,
+      ]);
     });
   });
 
