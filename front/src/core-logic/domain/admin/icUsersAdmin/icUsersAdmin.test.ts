@@ -6,6 +6,7 @@ import {
   AuthenticatedUser,
   expectToEqual,
   IcUserRoleForAgencyParams,
+  RejectIcUserRoleForAgencyParams,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
@@ -230,17 +231,23 @@ describe("Agency registration for authenticated users", () => {
   });
 
   describe("Reject user registration for agency", () => {
-    it("rejects succesfully the user for agency", () => {
-      expectToEqual(
-        store.getState().admin.inclusionConnectedUsersAdmin,
-        icUsersAdminInitialState,
-      );
-      store.dispatch(
-        icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested({
-          agencyId: "rejected-user-for-this-agency",
-          justification: "osef",
-          userId: "user-to-reject-id",
+    it("rejects successfully the user for agency", () => {
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          inclusionConnectedUsersAdmin: {
+            ...icUsersAdminInitialState,
+            icUsersNeedingReview: testUserSet,
+          },
         }),
+      }));
+      const payload: RejectIcUserRoleForAgencyParams = {
+        agencyId: agency3.id,
+        justification: "osef",
+        userId: user2Id,
+      };
+
+      store.dispatch(
+        icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested(payload),
       );
 
       expectIsUpdatingUserAgencyToBe(true);

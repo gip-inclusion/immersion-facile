@@ -87,7 +87,11 @@ const rejectAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
           state$.value.admin.adminAuth.adminToken ?? "",
         )
         .pipe(
-          map(icUsersAdminSlice.actions.rejectAgencyWithRoleToUserSucceeded),
+          map(() =>
+            icUsersAdminSlice.actions.rejectAgencyWithRoleToUserSucceeded(
+              action.payload,
+            ),
+          ),
         ),
     ),
     catchEpicError((error) =>

@@ -1372,6 +1372,22 @@ export const emailTemplatesByName =
         subContent: defaultSignature("immersion"),
       }),
     },
+    IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
+      niceName:
+        "Notification de rejet de rattachement a une agence (Utilisateur IC)",
+      tags: ["rejet de rattachement a une agence"],
+      createEmailVariables: ({ agencyName, justification }) => ({
+        subject: `Immersion Facilitée - Refus de rattachement a une agence`,
+        greetings: "Bonjour,",
+        content: `<strong>Votre demande rattachement a une agence a été rejeté.</strong>
+
+        Votre demande de rattachement a l'agence: ${agencyName} a été rejetter pour les raisons suivante : ${justification}
+
+        Vous pouvez blablabla!!!!!
+      `,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     DEPRECATED_CONVENTION_NOTIFICATION: {
       niceName: "Notification de convention obsolète",
       tags: ["dépreciation demande d'immersion"],

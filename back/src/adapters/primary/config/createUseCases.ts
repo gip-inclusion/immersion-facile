@@ -42,6 +42,7 @@ import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/conve
 import { NotifyAllActorsThatConventionIsRejected } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsRejected";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
 import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightChanged";
+import { NotifyIcUserAgencyRightRejected } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightRejected";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewConventionNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewConventionNeedsReview";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
@@ -179,6 +180,10 @@ export const createUseCases = (
       rejectIcUserForAgency: new RejectIcUserForAgency(
         uowPerformer,
         createNewEvent,
+      ),
+      notifyIcUserAgencyRightRejected: new NotifyIcUserAgencyRightRejected(
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
       ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(

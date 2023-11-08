@@ -104,9 +104,19 @@ export const icUsersAdminSlice = createSlice({
       state.isUpdatingIcUserAgency = true;
     },
 
-    rejectAgencyWithRoleToUserSucceeded: (state) => {
+    rejectAgencyWithRoleToUserSucceeded: (
+      state,
+      action: PayloadAction<RejectIcUserRoleForAgencyParams>,
+    ) => {
+      const { userId, agencyId } = action.payload;
+
+      const { [agencyId]: agency, ...agenciesFiltered } =
+        state.icUsersNeedingReview[userId].agencyRights;
+
       state.isUpdatingIcUserAgency = false;
       state.feedback.kind = "agencyRejectToUserSuccess";
+
+      state.icUsersNeedingReview[userId].agencyRights = agenciesFiltered;
     },
 
     rejectAgencyWithRoleToUserFailed: (
