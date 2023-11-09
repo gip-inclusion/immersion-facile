@@ -1379,7 +1379,7 @@ export const emailTemplatesByName =
       createEmailVariables: ({ agencyName, justification }) => ({
         subject: `Immersion Facilitée - Refus de la demande d’accès au tableau de bord`,
         greetings: "Bonjour,",
-        content: `<strong>Votre demande demande d’accès au tableau de bord a été rejeté.</strong>
+        content: `<strong>Votre demande d’accès au tableau de bord a été rejetée.</strong>
 
         Votre demande d'accès au tableau de bord des conventions d'immersion de la structure: ${agencyName} a été refusée par l'administrateur d'Immersion Facilitée pour les raisons suivante : ${justification}. 
       `,
