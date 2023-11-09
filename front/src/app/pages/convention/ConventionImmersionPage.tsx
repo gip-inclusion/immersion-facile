@@ -6,6 +6,7 @@ import { keys } from "ramda";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
 import {
+  FeatureFlag,
   FederatedIdentityProvider,
   isPeConnectIdentity,
   loginPeConnect,
@@ -51,10 +52,13 @@ export const ConventionImmersionPage = ({
   const currentRoute = useRoute();
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const { jwt, ...routeParamsWithoutJwt } = route.params;
   const isSharedConvention = useMemo(
-    () => keys(routeParamsWithoutJwt).length > 0,
-    [routeParamsWithoutJwt],
+    () =>
+      keys(routeParamsWithoutJwt).length > 0 &&
+      (!federatedIdentity || !isPeConnectIdentity(federatedIdentity)),
+    [routeParamsWithoutJwt, federatedIdentity],
   );
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
     useState(isSharedConvention);
@@ -68,61 +72,10 @@ export const ConventionImmersionPage = ({
 
   return (
     <HeaderFooterLayout>
-      {displaySharedConventionMessage && (
-        <MainWrapper layout={"default"}>
-          <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
-            <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
-              <h1>
-                Quelqu'un a partagé une demande de convention d'immersion avec
-                vous
-              </h1>
-              <p>
-                Une entreprise ou un candidat a rempli ses informations dans le
-                formulaire de demande de convention. Vous n'avez plus qu'à
-                remplir vos informations et à valider le formulaire en quelques
-                clics.
-              </p>
-              <Button
-                onClick={() => setDisplaySharedConventionMessage(false)}
-                iconId="fr-icon-arrow-right-line"
-                iconPosition="right"
-              >
-                Continuer
-              </Button>
-              {enablePeConnectApi && (
-                <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
-                  <a
-                    href={`/api/${loginPeConnect}`}
-                    className={fr.cx(
-                      "fr-link",
-                      "fr-icon-arrow-right-line",
-                      "fr-link--icon-right",
-                    )}
-                  >
-                    Ou continuer avec mes identifiants Pôle emploi (candidats
-                    inscrits à Pôle emploi)
-                  </a>
-                </p>
-              )}
-            </div>
-            <div
-              className={fr.cx(
-                "fr-col-12",
-                "fr-col-md-4",
-                "fr-hidden",
-                "fr-unhidden-md",
-                "fr-mb-6w",
-              )}
-            >
-              <img src={illustrationShareConvention} alt="" />
-            </div>
-          </div>
-        </MainWrapper>
-      )}
-      {!displaySharedConventionMessage && (
-        <MainWrapper
-          layout={"default"}
-          pageHeader={
+      <MainWrapper
+        layout={"default"}
+        pageHeader={
+          !displaySharedConventionMessage && (
             <PageHeader
               title={
                 showSummary
@@ -131,11 +84,18 @@ export const ConventionImmersionPage = ({
               }
               theme="default"
             />
-          }
-        >
+          )
+        }
+      >
+        {displaySharedConventionMessage ? (
+          <SharedConventionMessage
+            enablePeConnectApi={enablePeConnectApi}
+            onClickContinue={() => setDisplaySharedConventionMessage(false)}
+          />
+        ) : (
           <PageContent route={route} />
-        </MainWrapper>
-      )}
+        )}
+      </MainWrapper>
     </HeaderFooterLayout>
   );
 };
@@ -164,12 +124,12 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     shouldShowForm,
   })
     .with({ isLoading: true }, () => <Loader />)
-    .with({ mode: "create", shouldShowForm: false }, () => (
+    .with({ shouldShowForm: false, mode: "create" }, () => (
       <InitiateConventionSection
         onNotPeConnectButtonClick={() => setShouldShowForm(true)}
       />
     ))
-    .with({ mode: "edit", shouldShowForm: false }, () => (
+    .with({ shouldShowForm: false, mode: "edit" }, () => (
       <ConventionForm internshipKind="immersion" mode={mode} />
     ))
     .with({ shouldShowForm: true }, () => (
@@ -206,3 +166,57 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
     }
   }, [fedId, fedIdProvider, email, firstName, lastName, dispatch]);
 };
+
+const SharedConventionMessage = ({
+  enablePeConnectApi,
+  onClickContinue,
+}: {
+  enablePeConnectApi: FeatureFlag;
+  onClickContinue: () => void;
+}) => (
+  <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
+    <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+      <h1>
+        Quelqu'un a partagé une demande de convention d'immersion avec vous
+      </h1>
+      <p>
+        Une entreprise ou un candidat a rempli ses informations dans le
+        formulaire de demande de convention. Vous n'avez plus qu'à remplir vos
+        informations et à valider le formulaire en quelques clics.
+      </p>
+      <Button
+        onClick={() => onClickContinue()}
+        iconId="fr-icon-arrow-right-line"
+        iconPosition="right"
+      >
+        Continuer
+      </Button>
+      {enablePeConnectApi && (
+        <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
+          <a
+            href={`/api/${loginPeConnect}`}
+            className={fr.cx(
+              "fr-link",
+              "fr-icon-arrow-right-line",
+              "fr-link--icon-right",
+            )}
+          >
+            Ou continuer avec mes identifiants Pôle emploi (candidats inscrits à
+            Pôle emploi)
+          </a>
+        </p>
+      )}
+    </div>
+    <div
+      className={fr.cx(
+        "fr-col-12",
+        "fr-col-md-4",
+        "fr-hidden",
+        "fr-unhidden-md",
+        "fr-mb-6w",
+      )}
+    >
+      <img src={illustrationShareConvention} alt="" />
+    </div>
+  </div>
+);
