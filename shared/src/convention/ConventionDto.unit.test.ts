@@ -566,6 +566,8 @@ describe("conventionDtoSchema", () => {
             role: "beneficiary",
             email: "jean@bono.com",
             levelOfEducation: "4ème",
+            schoolName: "lycée Jean Moulin",
+            schoolPostcode: "06500",
             phone: "0836656565",
             isRqth: false,
           })
@@ -632,6 +634,8 @@ describe("conventionDtoSchema", () => {
       phone: "0011223344",
       role: "beneficiary",
       isRqth: false,
+      schoolName: "École du quartier ouest",
+      schoolPostcode: "87000",
     };
     const beneficiary: Beneficiary<"immersion"> = {
       birthdate: new Date().toISOString(),
@@ -694,10 +698,16 @@ describe("conventionDtoSchema", () => {
             establishmentRepresentative,
           },
         };
+      const expectedErrorMessages = [
+        "Votre niveau d'étude est obligatoire.",
+        "Obligatoire",
+        "Obligatoire",
+      ];
+
       expectConventionInvalidWithIssueMessages(
         conventionInternshipKindSpecificSchema,
         badConventionInternshipKindSpecific,
-        ["Votre niveau d'étude est obligatoire."],
+        expectedErrorMessages,
       );
     });
   });
@@ -738,6 +748,8 @@ describe("conventionDtoSchema", () => {
         lastName: "sdfs",
         phone: "0011223344",
         role: "beneficiary",
+        schoolName: "École du quartier ouest",
+        schoolPostcode: "87000",
       };
 
       const convention = new ConventionDtoBuilder()

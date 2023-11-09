@@ -305,6 +305,16 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     id: beneficiarySectionIds.emergencyContactEmail,
     placeholder: "Ex : contact@urgence.com (optionnel)",
   },
+  "signatories.beneficiary.schoolName": {
+    label: "Nom de l'établissement scolaire du candidat",
+    id: beneficiarySectionIds.schoolName,
+    placeholder: "Ex : Lycée Jean Moulin",
+  },
+  "signatories.beneficiary.schoolPostcode": {
+    label: "Code postal de l'établissement scolaire du candidat",
+    id: beneficiarySectionIds.schoolPostcode,
+    placeholder: "Ex : 06530",
+  },
   "signatories.beneficiary.isRqth": {
     label:
       "Le candidat a une reconnaissance travailleur handicapé (RQTH) ou équivalent ",
