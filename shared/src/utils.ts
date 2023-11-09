@@ -1,6 +1,7 @@
 // TODO: find the standard for gouv.fr phone verification
 
 import { pipe, prop, sortBy, toLower, values } from "ramda";
+import { Flavor } from "./typeFlavors";
 
 export const phoneRegExp = /^\+?[0-9]+$/;
 export const stringOfNumbers = /^\+?[0-9]+$/;
@@ -111,11 +112,13 @@ type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
 
 export type DotNestedKeys<T> = (
   T extends object
-    ? {
-        [K in Exclude<keyof T, symbol>]: `${K}${DotPrefix<
-          DotNestedKeys<T[K]>
-        >}`;
-      }[Exclude<keyof T, symbol>]
+    ? T extends Flavor<string, unknown>
+      ? ""
+      : {
+          [K in Exclude<keyof T, symbol>]: `${K}${DotPrefix<
+            DotNestedKeys<T[K]>
+          >}`;
+        }[Exclude<keyof T, symbol>]
     : ""
 ) extends infer D
   ? Extract<D, string>
