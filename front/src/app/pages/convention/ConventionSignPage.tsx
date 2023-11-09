@@ -140,7 +140,11 @@ const ConventionSignPageContent = ({
               severity="success"
               {...t.conventionAlreadySigned}
               title="Convention signée"
-              description={`Votre convention (${conventionId}) a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée par ${convention?.agencyName}, vous la recevrez par email.`}
+              description={`Votre convention (${conventionId}) a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée par ${
+                convention?.agencyRefersTo
+                  ? convention?.agencyRefersTo.name
+                  : convention?.agencyName
+              }, vous la recevrez par email.`}
               className={fr.cx("fr-mb-5v")}
             />
             <ConventionSummary />
