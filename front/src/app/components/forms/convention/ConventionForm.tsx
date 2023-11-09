@@ -244,7 +244,7 @@ export const ConventionForm = ({
         formSuccessfullySubmitted,
         shouldRedirectToError: !!(route.params.jwt && fetchConventionError),
       })
-        .with({ reduxFormUiReady: false }, () => null)
+        .with({ reduxFormUiReady: false }, () => <Loader />)
         .with({ shouldRedirectToError: true }, () => (
           <>
             {route.params.jwt && fetchConventionError && (

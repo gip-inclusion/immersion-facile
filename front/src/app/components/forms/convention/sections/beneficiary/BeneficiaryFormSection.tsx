@@ -162,21 +162,49 @@ export const BeneficiaryFormSection = ({
         {...getFieldError("signatories.beneficiary.phone")}
       />
       {values.internshipKind === "mini-stage-cci" && (
-        <Select
-          label={formContents["signatories.beneficiary.levelOfEducation"].label}
-          hint={
-            formContents["signatories.beneficiary.levelOfEducation"].hintText
-          }
-          options={levelsOfEducationToSelectOption}
-          nativeSelectProps={{
-            ...formContents["signatories.beneficiary.levelOfEducation"],
-            ...register("signatories.beneficiary.levelOfEducation"),
-            value: isBeneficiaryStudent(values.signatories.beneficiary)
-              ? values.signatories.beneficiary.levelOfEducation
-              : "",
-          }}
-          {...getFieldError("signatories.beneficiary.levelOfEducation")}
-        />
+        <>
+          <Select
+            label={
+              formContents["signatories.beneficiary.levelOfEducation"].label
+            }
+            hint={
+              formContents["signatories.beneficiary.levelOfEducation"].hintText
+            }
+            options={levelsOfEducationToSelectOption}
+            nativeSelectProps={{
+              ...formContents["signatories.beneficiary.levelOfEducation"],
+              ...register("signatories.beneficiary.levelOfEducation"),
+              value: isBeneficiaryStudent(values.signatories.beneficiary)
+                ? values.signatories.beneficiary.levelOfEducation
+                : "",
+            }}
+            {...getFieldError("signatories.beneficiary.levelOfEducation")}
+          />
+
+          <Input
+            label={formContents["signatories.beneficiary.schoolName"].label}
+            hintText={
+              formContents["signatories.beneficiary.schoolName"].hintText
+            }
+            nativeInputProps={{
+              ...formContents["signatories.beneficiary.schoolName"],
+              ...register("signatories.beneficiary.schoolName"),
+            }}
+            {...getFieldError("signatories.beneficiary.schoolName")}
+          />
+
+          <Input
+            label={formContents["signatories.beneficiary.schoolPostcode"].label}
+            hintText={
+              formContents["signatories.beneficiary.schoolPostcode"].hintText
+            }
+            nativeInputProps={{
+              ...formContents["signatories.beneficiary.schoolPostcode"],
+              ...register("signatories.beneficiary.schoolPostcode"),
+            }}
+            {...getFieldError("signatories.beneficiary.schoolPostcode")}
+          />
+        </>
       )}
       <Input
         label={formContents["signatories.beneficiary.financiaryHelp"].label}

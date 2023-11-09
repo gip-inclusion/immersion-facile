@@ -175,6 +175,9 @@ export const domElementIds = {
       phone: "im-convention-form__signatories-beneficiary-phone",
       levelOfEducation:
         "im-convention-form__signatories-beneficiary-level-of-education",
+      schoolName: "im-convention-form__signatories-beneficiary-school-name",
+      schoolPostcode:
+        "im-convention-form__signatories-beneficiary-school-postcode",
       financiaryHelp:
         "im-convention-form__signatories-beneficiary-financiary-help",
       federatedIdentity:

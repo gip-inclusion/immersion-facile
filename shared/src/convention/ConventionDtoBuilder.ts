@@ -550,6 +550,8 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
             beneficiary: {
               ...beneficiary,
               levelOfEducation: "3ème",
+              schoolName: "École du quartier ouest",
+              schoolPostcode: "87000",
             },
           },
         });

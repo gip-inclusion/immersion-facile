@@ -1,3 +1,4 @@
+import { Postcode } from "../address/address.dto";
 import { AgencyId, AgencyKind } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
@@ -196,6 +197,8 @@ export type GenericSignatory<R extends Role> = GenericActor<R> & {
 
 type StudentProperties = {
   levelOfEducation: LevelOfEducation;
+  schoolName: string;
+  schoolPostcode: Postcode;
 };
 
 /* eslint-disable @typescript-eslint/ban-types */

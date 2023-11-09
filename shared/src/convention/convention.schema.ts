@@ -138,6 +138,8 @@ const studentBeneficiarySchema: z.Schema<Beneficiary<"mini-stage-cci">> =
         levelsOfEducation,
         "Votre niveau d'étude est obligatoire.",
       ),
+      schoolName: zStringMinLength1,
+      schoolPostcode: zStringMinLength1,
     }),
   );
 
