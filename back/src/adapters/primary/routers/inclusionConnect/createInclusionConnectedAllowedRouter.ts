@@ -24,7 +24,7 @@ export const createInclusionConnectedAllowedRouter = (
     inclusionConnectedMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () =>
-        deps.useCases.getUserAgencyDashboardUrl.execute(
+        deps.useCases.getInclusionConnectedUser.execute(
           undefined,
           req.payloads?.inclusion,
         ),
@@ -44,7 +44,7 @@ export const createInclusionConnectedAllowedRouter = (
 
   inclusionConnectedSharedRoutes.getInclusionConnectLogoutUrl((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.inclusionConnectLogout.execute(undefined),
+      deps.useCases.inclusionConnectLogout.execute(req.query),
     ),
   );
 

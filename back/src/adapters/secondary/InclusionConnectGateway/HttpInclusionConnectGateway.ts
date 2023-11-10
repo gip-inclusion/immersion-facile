@@ -1,7 +1,10 @@
 import { queryParamsAsString } from "shared";
 import { HttpClient } from "shared-routes";
 import { InclusionAccessTokenResponse } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
-import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
+import {
+  GetAccessTokenParams,
+  InclusionConnectGateway,
+} from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { createLogger } from "../../../utils/logger";
 import { InclusionConnectExternalRoutes } from "./inclusionConnectExternalRoutes";
@@ -14,9 +17,10 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
     private inclusionConnectConfig: InclusionConnectConfig,
   ) {}
 
-  public async getAccessToken(
-    code: string,
-  ): Promise<InclusionAccessTokenResponse> {
+  public async getAccessToken({
+    code,
+    redirectUri,
+  }: GetAccessTokenParams): Promise<InclusionAccessTokenResponse> {
     const response = await this.httpClient
       .inclusionConnectGetAccessToken({
         body: queryParamsAsString({
@@ -24,7 +28,7 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
           client_id: this.inclusionConnectConfig.clientId,
           client_secret: this.inclusionConnectConfig.clientSecret,
           grant_type: "authorization_code",
-          redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
+          redirect_uri: redirectUri,
         }),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",

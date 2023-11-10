@@ -1,8 +1,13 @@
-import { z } from "zod";
-import { AbsoluteUrl, queryParamsAsString } from "shared";
+import {
+  AbsoluteUrl,
+  queryParamsAsString,
+  StartInclusionConnectLoginQueryParams,
+  startInclusionConnectLoginQueryParamsSchema,
+} from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeInclusionConnectRedirectUri } from "../entities/inclusionConnectRedirectUrl";
 
 type InclusionConnectUrlParams = {
   response_type: "code";
@@ -23,10 +28,10 @@ export type InclusionConnectConfig = {
 };
 
 export class InitiateInclusionConnect extends TransactionalUseCase<
-  void,
+  StartInclusionConnectLoginQueryParams,
   AbsoluteUrl
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = startInclusionConnectLoginQueryParamsSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -36,7 +41,10 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  protected async _execute(_: void, uow: UnitOfWork): Promise<AbsoluteUrl> {
+  protected async _execute(
+    params: StartInclusionConnectLoginQueryParams,
+    uow: UnitOfWork,
+  ): Promise<AbsoluteUrl> {
     const nonce = this.uuidGenerator.new();
     const state = this.uuidGenerator.new();
 
@@ -66,7 +74,10 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
     }/${authorizeInPath}?${queryParamsAsString<InclusionConnectUrlParams>({
       client_id: this.inclusionConnectConfig.clientId,
       nonce,
-      redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
+      redirect_uri: makeInclusionConnectRedirectUri(
+        this.inclusionConnectConfig,
+        params,
+      ),
       response_type: "code",
       scope: this.inclusionConnectConfig.scope,
       state,

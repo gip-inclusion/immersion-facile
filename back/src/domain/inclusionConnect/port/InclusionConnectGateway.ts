@@ -1,5 +1,13 @@
+import { AbsoluteUrl } from "shared";
 import { InclusionAccessTokenResponse } from "./InclusionAccessTokenResponse";
 
+export type GetAccessTokenParams = {
+  code: string;
+  redirectUri: AbsoluteUrl;
+};
+
 export interface InclusionConnectGateway {
-  getAccessToken: (code: string) => Promise<InclusionAccessTokenResponse>;
+  getAccessToken: (
+    params: GetAccessTokenParams,
+  ) => Promise<InclusionAccessTokenResponse>;
 }

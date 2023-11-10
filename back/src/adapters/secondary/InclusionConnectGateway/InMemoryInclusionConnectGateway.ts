@@ -1,5 +1,8 @@
 import { InclusionAccessTokenResponse } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
-import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
+import {
+  GetAccessTokenParams,
+  InclusionConnectGateway,
+} from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 
 // this token is for test purpose :
 
@@ -30,7 +33,7 @@ export class InMemoryInclusionConnectGateway
   #accessTokenResponse: InclusionAccessTokenResponse | undefined = undefined;
 
   public async getAccessToken(
-    _code: string,
+    _params: GetAccessTokenParams,
   ): Promise<InclusionAccessTokenResponse> {
     if (this.#accessTokenResponse) return this.#accessTokenResponse;
     throw new Error("No access token provided (in memory)");

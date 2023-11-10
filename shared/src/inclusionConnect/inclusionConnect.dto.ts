@@ -4,17 +4,26 @@ import {
   AuthenticatedUser,
   InclusionConnectedUser,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
 import { ExcludeFromExisting } from "../utils";
 
-export type AuthenticateWithInclusionCodeConnectParams = {
+export type AuthenticateWithInclusionCodeConnectParams = WithSourcePage & {
   code: string;
   state: string;
 };
 
-export type AuthenticatedUserQueryParams = { token: string } & Pick<
-  AuthenticatedUser,
-  "email" | "firstName" | "lastName"
->;
+export type AllowedStartInclusionConnectLoginSourcesKind =
+  (typeof allowedStartInclusionConnectLoginPages)[number];
+
+export type WithSourcePage = {
+  page: AllowedStartInclusionConnectLoginSourcesKind;
+};
+
+export type StartInclusionConnectLoginQueryParams = WithSourcePage;
+
+export type AuthenticatedUserQueryParams = {
+  token: string;
+} & Pick<AuthenticatedUser, "email" | "firstName" | "lastName">;
 
 export const getUserRoleForAccessingConvention = (
   convention: ConventionReadDto,

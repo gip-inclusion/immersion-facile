@@ -1,5 +1,6 @@
 import {
   AbsoluteUrl,
+  allowedStartInclusionConnectLoginPages,
   AuthenticatedUser,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -25,6 +26,12 @@ import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
 const correctToken = "my-correct-token";
+const clientId = "my-client-id";
+const clientSecret = "my-client-secret";
+const scope = "openid profile email";
+
+const inclusionConnectBaseUri: AbsoluteUrl =
+  "http://fake-inclusion-connect-uri.com";
 
 describe("AuthenticateWithInclusionCode use case", () => {
   let uow: InMemoryUnitOfWork;
@@ -36,6 +43,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
     uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
+    const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
+    const immersionRedirectUri: AbsoluteUrl = `${immersionBaseUri}/my-redirection`;
     useCase = new AuthenticateWithInclusionCode(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
@@ -46,13 +55,23 @@ describe("AuthenticateWithInclusionCode use case", () => {
       uuidGenerator,
       () => correctToken,
       immersionBaseUrl,
+      {
+        immersionRedirectUri,
+        inclusionConnectBaseUri,
+        scope,
+        clientId,
+        clientSecret,
+      },
     );
   });
 
   it("rejects the connection if no state match the provided one in DB", async () => {
-    const params = { code: "my-inclusion-code", state: "my-state" };
     await expectPromiseToFailWithError(
-      useCase.execute(params),
+      useCase.execute({
+        code: "my-inclusion-code",
+        state: "my-state",
+        page: "agencyDashboard",
+      }),
       new ForbiddenError("No ongoing OAuth with provided state : my-state"),
     );
   });
@@ -72,9 +91,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
       access_token: accessToken,
     });
 
-    const params = { code: "my-inclusion-code", state: "my-state" };
     await expectPromiseToFailWithError(
-      useCase.execute(params),
+      useCase.execute({
+        code: "my-inclusion-code",
+        state: "my-state",
+        page: "agencyDashboard",
+      }),
       new ForbiddenError("Nonce mismatch"),
     );
   });
@@ -88,6 +110,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         await useCase.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
         });
 
         expect(uow.authenticatedUserRepository.users).toHaveLength(1);
@@ -106,6 +129,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         await useCase.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
         });
 
         expect(uow.ongoingOAuthRepository.ongoingOAuths).toHaveLength(1);
@@ -124,6 +148,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         await useCase.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
         });
 
         expect(uow.outboxRepository.events).toHaveLength(1);
@@ -147,6 +172,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         await useCase.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
         });
 
         expect(uow.authenticatedUserRepository.users).toHaveLength(1);
@@ -159,18 +185,23 @@ describe("AuthenticateWithInclusionCode use case", () => {
       });
     });
 
-    it("generates an app token and returns a redirection url which includes token and user data", async () => {
-      const { initialOngoingOAuth } = makeSuccessfulAuthenticationConditions();
+    it.each(allowedStartInclusionConnectLoginPages)(
+      "generates an app token and returns a redirection url which includes token and user data for %s",
+      async (page) => {
+        const { initialOngoingOAuth } =
+          makeSuccessfulAuthenticationConditions();
 
-      const redirectedUrl = await useCase.execute({
-        code: "my-inclusion-code",
-        state: initialOngoingOAuth.state,
-      });
+        const redirectedUrl = await useCase.execute({
+          code: "my-inclusion-code",
+          state: initialOngoingOAuth.state,
+          page,
+        });
 
-      expect(redirectedUrl).toBe(
-        `${immersionBaseUrl}/${frontRoutes.agencyDashboard}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com`,
-      );
-    });
+        expect(redirectedUrl).toBe(
+          `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com`,
+        );
+      },
+    );
   });
 
   const makeSuccessfulAuthenticationConditions = () => {

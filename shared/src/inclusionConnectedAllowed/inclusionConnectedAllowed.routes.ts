@@ -5,7 +5,10 @@ import { markPartnersErroredConventionAsHandledRequestSchema } from "../conventi
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import { inclusionConnectedUserSchema } from "./inclusionConnectedAllowed.schema";
+import {
+  getInclusionConnectLogoutUrlQueryParamsSchema,
+  inclusionConnectedUserSchema,
+} from "./inclusionConnectedAllowed.schema";
 
 export type InclusionConnectedAllowedRoutes =
   typeof inclusionConnectedAllowedRoutes;
@@ -44,6 +47,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
   getInclusionConnectLogoutUrl: defineRoute({
     method: "get",
     url: "/inclusion-connect-logout",
+    queryParamsSchema: getInclusionConnectLogoutUrlQueryParamsSchema,
     responses: {
       200: absoluteUrlSchema,
     },

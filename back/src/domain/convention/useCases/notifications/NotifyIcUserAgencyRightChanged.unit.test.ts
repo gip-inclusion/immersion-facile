@@ -90,7 +90,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       firstName: "jean",
       lastName: "babouche",
       id: "jbab-123",
-      dashboardUrl: "https://placeholder.com/",
+      agencyDashboardUrl: "https://placeholder.com/",
       agencyRights: [
         {
           role: "toReview",
@@ -125,7 +125,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       firstName: "jean",
       lastName: "babouche",
       id: "jbab-123",
-      dashboardUrl: "https://placeholder.com/",
+      agencyDashboardUrl: "https://placeholder.com/",
       agencyRights: [
         {
           role: "validator",

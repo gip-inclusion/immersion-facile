@@ -17,7 +17,9 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
+import { makeInclusionConnectRedirectUri } from "../entities/inclusionConnectRedirectUrl";
 import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
+import { InclusionConnectConfig } from "./InitiateInclusionConnect";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
 
@@ -37,6 +39,8 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   readonly #immersionFacileBaseUrl: AbsoluteUrl;
 
+  readonly #inclusionConnectConfig: InclusionConnectConfig;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
@@ -44,6 +48,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     uuidGenerator: UuidGenerator,
     generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
     immersionFacileBaseUrl: AbsoluteUrl,
+    inclusionConnectConfig: InclusionConnectConfig,
   ) {
     super(uowPerformer);
 
@@ -52,6 +57,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     this.#uuidGenerator = uuidGenerator;
     this.#generateAuthenticatedUserJwt = generateAuthenticatedUserJwt;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
+    this.#inclusionConnectConfig = inclusionConnectConfig;
   }
 
   protected async _execute(
@@ -69,26 +75,18 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
   }
 
-  #makeAuthenticatedUser(
-    userId: string,
-    jwtPayload: InclusionConnectIdTokenPayload,
-  ): AuthenticatedUser {
-    return {
-      id: userId,
-      firstName: jwtPayload.given_name,
-      lastName: jwtPayload.family_name,
-      email: jwtPayload.email,
-    };
-  }
-
   async #onOngoingOAuth(
     params: AuthenticateWithInclusionCodeConnectParams,
     uow: UnitOfWork,
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
-    const response = await this.#inclusionConnectGateway.getAccessToken(
-      params.code,
-    );
+    const response = await this.#inclusionConnectGateway.getAccessToken({
+      code: params.code,
+      redirectUri: makeInclusionConnectRedirectUri(
+        this.#inclusionConnectConfig,
+        { page: params.page },
+      ),
+    });
     const jwtPayload =
       decodeJwtWithoutSignatureCheck<InclusionConnectIdTokenPayload>(
         response.id_token,
@@ -139,12 +137,24 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
 
     return `${this.#immersionFacileBaseUrl}/${
-      frontRoutes.agencyDashboard
+      frontRoutes[params.page]
     }?${queryParamsAsString<AuthenticatedUserQueryParams>({
       token,
       firstName: newOrUpdatedAuthenticatedUser.firstName,
       lastName: newOrUpdatedAuthenticatedUser.lastName,
       email: newOrUpdatedAuthenticatedUser.email,
     })}`;
+  }
+
+  #makeAuthenticatedUser(
+    userId: string,
+    jwtPayload: InclusionConnectIdTokenPayload,
+  ): AuthenticatedUser {
+    return {
+      id: userId,
+      firstName: jwtPayload.given_name,
+      lastName: jwtPayload.family_name,
+      email: jwtPayload.email,
+    };
   }
 }
