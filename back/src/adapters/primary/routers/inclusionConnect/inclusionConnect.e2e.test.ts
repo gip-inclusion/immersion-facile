@@ -1,12 +1,15 @@
 import { SuperTest, Test } from "supertest";
 import {
   AbsoluteUrl,
+  allowedStartInclusionConnectLoginPages,
   decodeJwtWithoutSignatureCheck,
   displayRouteName,
   expectHttpResponseToEqual,
   frontRoutes,
   InclusionConnectImmersionRoutes,
   inclusionConnectImmersionRoutes,
+  queryParamsAsString,
+  WithSourcePage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -60,7 +63,13 @@ describe("inclusion connection flow", () => {
       const uuids = [nonce, state];
       uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
-      const response = await httpClient.startInclusionConnectLogin();
+      const queryParams: WithSourcePage = {
+        page: "establishmentDashboard",
+      };
+
+      const response = await httpClient.startInclusionConnectLogin({
+        queryParams,
+      });
 
       expectHttpResponseToEqual(response, {
         body: {},
@@ -70,7 +79,9 @@ describe("inclusion connection flow", () => {
             `${inclusionConnectBaseUri}/auth?${[
               `client_id=${clientId}`,
               `nonce=${nonce}`,
-              `redirect_uri=https://${domain}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
+              `redirect_uri=https://${domain}/api${
+                inclusionConnectImmersionRoutes.afterLoginRedirection.url
+              }?${queryParamsAsString(queryParams)}`,
               `response_type=${responseType}`,
               `scope=${scope}`,
               `state=${state}`,
@@ -80,38 +91,42 @@ describe("inclusion connection flow", () => {
       });
     });
 
-    it(`${displayRouteName(
-      inclusionConnectImmersionRoutes.afterLoginRedirection,
-    )} 302 redirect to agency dashboard with inclusion connect token`, async () => {
-      const authCode = "inclusion-auth-code";
-      const inclusionToken = "inclusion-token";
-      gateways.inclusionConnectGateway.setAccessTokenResponse({
-        ...defaultInclusionAccessTokenResponse,
-        access_token: inclusionToken,
-        id_token: jwtGeneratedTokenFromFakeInclusionPayload,
-      });
-      const response = await httpClient.afterLoginRedirection({
-        queryParams: {
-          code: authCode,
-          state,
-        },
-      });
+    it.each(allowedStartInclusionConnectLoginPages)(
+      `${displayRouteName(
+        inclusionConnectImmersionRoutes.afterLoginRedirection,
+      )} 302 redirect to %s with inclusion connect token`,
+      async (page) => {
+        const authCode = "inclusion-auth-code";
+        const inclusionToken = "inclusion-token";
+        gateways.inclusionConnectGateway.setAccessTokenResponse({
+          ...defaultInclusionAccessTokenResponse,
+          access_token: inclusionToken,
+          id_token: jwtGeneratedTokenFromFakeInclusionPayload,
+        });
+        const response = await httpClient.afterLoginRedirection({
+          queryParams: {
+            code: authCode,
+            state,
+            page,
+          },
+        });
 
-      expectHttpResponseToEqual(response, {
-        body: {},
-        status: 302,
-      });
+        expectHttpResponseToEqual(response, {
+          body: {},
+          status: 302,
+        });
 
-      if (response.status !== 302) throw new Error("Response must be 302");
-      const locationHeader = response.headers.location as string;
-      const locationPrefix = `https://${domain}/${frontRoutes.agencyDashboard}?token=`;
+        if (response.status !== 302) throw new Error("Response must be 302");
+        const locationHeader = response.headers.location as string;
+        const locationPrefix = `https://${domain}/${frontRoutes[page]}?token=`;
 
-      expect(locationHeader).toContain(locationPrefix);
-      expect(
-        typeof decodeJwtWithoutSignatureCheck<{ userId: string }>(
-          locationHeader.replace(locationPrefix, ""),
-        ).userId,
-      ).toBe("string");
-    });
+        expect(locationHeader).toContain(locationPrefix);
+        expect(
+          typeof decodeJwtWithoutSignatureCheck<{ userId: string }>(
+            locationHeader.replace(locationPrefix, ""),
+          ).userId,
+        ).toBe("string");
+      },
+    );
   });
 });

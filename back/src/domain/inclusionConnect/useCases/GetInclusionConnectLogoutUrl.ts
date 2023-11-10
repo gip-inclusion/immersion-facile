@@ -1,11 +1,19 @@
-import { z } from "zod";
-import { AbsoluteUrl, frontRoutes, queryParamsAsString } from "shared";
+import {
+  AbsoluteUrl,
+  frontRoutes,
+  GetInclusionConnectLogoutUrlQueryParams,
+  getInclusionConnectLogoutUrlQueryParamsSchema,
+  queryParamsAsString,
+} from "shared";
 import { InclusionConnectLogoutQueryParams } from "../../../adapters/secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
 import { UseCase } from "../../core/UseCase";
 import { InclusionConnectConfig } from "./InitiateInclusionConnect";
 
-export class GetInclusionConnectLogoutUrl extends UseCase<void, AbsoluteUrl> {
-  protected inputSchema = z.void();
+export class GetInclusionConnectLogoutUrl extends UseCase<
+  GetInclusionConnectLogoutUrlQueryParams,
+  AbsoluteUrl
+> {
+  protected inputSchema = getInclusionConnectLogoutUrlQueryParamsSchema;
 
   constructor(
     private immersionBaseUrl: AbsoluteUrl,
@@ -14,16 +22,20 @@ export class GetInclusionConnectLogoutUrl extends UseCase<void, AbsoluteUrl> {
     super();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  public async _execute(): Promise<AbsoluteUrl> {
-    const redirectUrl =
-      `${this.immersionBaseUrl}/${frontRoutes.agencyDashboard}` as AbsoluteUrl;
+  public async _execute(
+    params: GetInclusionConnectLogoutUrlQueryParams,
+  ): Promise<AbsoluteUrl> {
+    const redirectUrl: AbsoluteUrl = `${this.immersionBaseUrl}/${
+      frontRoutes[params.page]
+    }`;
 
     const queryParams = queryParamsAsString<InclusionConnectLogoutQueryParams>({
       client_id: this.inclusionConnectConfig.clientId,
       post_logout_redirect_uri: redirectUrl,
     });
 
-    return `${this.inclusionConnectConfig.inclusionConnectBaseUri}/logout/?${queryParams}`;
+    return Promise.resolve<AbsoluteUrl>(
+      `${this.inclusionConnectConfig.inclusionConnectBaseUri}/logout/?${queryParams}`,
+    );
   }
 }

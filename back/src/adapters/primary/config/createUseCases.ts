@@ -186,7 +186,7 @@ export const createUseCases = (
         saveNotificationAndRelatedEvent,
       ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
-      getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
+      getInclusionConnectedUser: new GetInclusionConnectedUser(
         uowPerformer,
         gateways.dashboardGateway,
         gateways.timeGateway,
@@ -203,6 +203,7 @@ export const createUseCases = (
         uuidGenerator,
         generateAuthenticatedUserToken,
         config.immersionFacileBaseUrl,
+        config.inclusionConnectConfig,
       ),
       inclusionConnectLogout: new GetInclusionConnectLogoutUrl(
         config.immersionFacileBaseUrl,

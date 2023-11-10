@@ -14,13 +14,13 @@ export const createInclusionConnectRouter = (deps: AppDependencies) => {
 
   inclusionConnectSharedRouter.startInclusionConnectLogin((req, res) =>
     sendRedirectResponse(req, res, () =>
-      deps.useCases.initiateInclusionConnect.execute(),
+      deps.useCases.initiateInclusionConnect.execute(req.query),
     ),
   );
 
   inclusionConnectSharedRouter.afterLoginRedirection(async (req, res) =>
     sendRedirectResponse(req, res, () =>
-      deps.useCases.authenticateWithInclusionCode.execute(req.query as any),
+      deps.useCases.authenticateWithInclusionCode.execute(req.query),
     ),
   );
 
