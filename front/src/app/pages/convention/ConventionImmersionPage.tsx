@@ -22,7 +22,7 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
 import illustrationShareConvention from "src/assets/img/share-convention.svg";
 import { deviceRepository } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -49,26 +49,32 @@ const storeConventionRouteParamsOnDevice = (
 export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => {
-  const currentRoute = useRoute();
+  const { jwt, ...routeParamsWithoutJwt } = route.params;
+
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const { jwt, ...routeParamsWithoutJwt } = route.params;
-  const isSharedConvention = useMemo(
-    () =>
-      keys(routeParamsWithoutJwt).length > 0 &&
-      (!federatedIdentity || !isPeConnectIdentity(federatedIdentity)),
-    [routeParamsWithoutJwt, federatedIdentity],
-  );
-  const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
-    useState(isSharedConvention);
+  const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const { enablePeConnectApi } = useFeatureFlags();
 
+  useFederatedIdentityFromUrl(route);
+
+  const isSharedConvention = useMemo(
+    () => keys(routeParamsWithoutJwt).length > 0 && !isPeConnected,
+    [routeParamsWithoutJwt, isPeConnected],
+  );
+
+  const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
+    useState(isSharedConvention);
+
   useEffect(() => {
-    if (enablePeConnectApi && currentRoute.name === "conventionImmersion") {
-      storeConventionRouteParamsOnDevice(currentRoute.params);
+    setDisplaySharedConventionMessage(isSharedConvention);
+  }, [isSharedConvention]);
+
+  useEffect(() => {
+    if (enablePeConnectApi && route.name === "conventionImmersion") {
+      storeConventionRouteParamsOnDevice(route.params);
     }
-  }, [currentRoute.name, currentRoute.params, enablePeConnectApi]);
+  }, [route.name, route.params, enablePeConnectApi]);
 
   return (
     <HeaderFooterLayout>
@@ -115,7 +121,6 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
         isPeConnectIdentity(federatedIdentity)),
   );
   const mode: ConventionFormMode = "jwt" in route.params ? "edit" : "create";
-  useFederatedIdentityFromUrl(route);
   useScrollToTop(shouldShowForm);
 
   return match({
