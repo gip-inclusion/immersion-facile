@@ -2,16 +2,19 @@ import {
   AgencyDtoBuilder,
   allAgencyRoles,
   AuthenticatedUser,
+  ConventionDtoBuilder,
   expectPromiseToFailWith,
   expectToEqual,
   InclusionConnectedUser,
   InclusionConnectJwtPayload,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../../../adapters/secondary/dashboardGateway/StubDashboardGateway";
-import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
@@ -32,11 +35,10 @@ const john: AuthenticatedUser = {
 describe("GetUserAgencyDashboardUrl", () => {
   let getInclusionConnectedUser: GetInclusionConnectedUser;
   let uowPerformer: InMemoryUowPerformer;
-  let inclusionConnectedUserRepository: InMemoryInclusionConnectedUserRepository;
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
+    uow = createInMemoryUow();
     uowPerformer = new InMemoryUowPerformer(uow);
     getInclusionConnectedUser = new GetInclusionConnectedUser(
       uowPerformer,
@@ -70,7 +72,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     "returns the dashboard url when role is '%s'",
     async (agencyUserRole) => {
       const agency = new AgencyDtoBuilder().build();
-      inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         { ...john, agencyRights: [{ agency, role: agencyUserRole }] },
       ]);
       const url = await getInclusionConnectedUser.execute(
@@ -81,7 +83,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       expectToEqual(url, {
         ...john,
         agencyRights: [{ agency, role: agencyUserRole }],
-        dashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
+        agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
       }); // coming from StubDashboardGateway
     },
   );
@@ -95,7 +97,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           { agency: new AgencyDtoBuilder().build(), role: agencyUserRole },
         ],
       };
-      inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         storedInclusionConnectedUser,
       ]);
       const inclusionConnectedUser = await getInclusionConnectedUser.execute(
@@ -117,7 +119,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     const agency3 = agencyBuilder.withId("3333").build();
     const agency4 = agencyBuilder.withId("4444").build();
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         ...john,
         agencyRights: [
@@ -142,7 +144,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         { agency: agency4, role: "agencyOwner" },
       ],
       // dashboardUrl is coming from StubDashboardGateway
-      dashboardUrl: `http://stubAgencyDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
+      agencyDashboardUrl: `http://stubAgencyDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
       erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
     });
   });
@@ -151,7 +153,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     const agencyBuilder = new AgencyDtoBuilder();
     const agency1 = agencyBuilder.withId("1111").withKind("cci").build();
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         ...john,
         agencyRights: [{ agency: agency1, role: "counsellor" }],
@@ -168,7 +170,48 @@ describe("GetUserAgencyDashboardUrl", () => {
       ...john,
       agencyRights: [{ agency: agency1, role: "counsellor" }],
       // dashboardUrl is coming from StubDashboardGateway
-      dashboardUrl: `http://stubAgencyDashboard/${agency1.id}`,
+      agencyDashboardUrl: `http://stubAgencyDashboard/${agency1.id}`,
+    });
+  });
+
+  describe("establishment representative dashboard", () => {
+    it("retrieve establishment dashboard when IC user is establishement rep in at least one convention", async () => {
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        {
+          ...john,
+          agencyRights: [],
+        },
+      ]);
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentRepresentativeEmail(john.email)
+        .build();
+      uow.conventionRepository.setConventions({ [convention.id]: convention });
+
+      const result = await getInclusionConnectedUser.execute(
+        undefined,
+        inclusionConnectJwtPayload,
+      );
+
+      expectToEqual(
+        result.establishmentRepresentativeDashboardUrl,
+        "http://stubEstablishmentRepresentativeConventionsDashboardUrl/john@mail.com/Wed Sep 01 2021 12:10:00 GMT+0200 (Central European Summer Time)",
+      );
+    });
+
+    it("do not retrieve establishment dashboard when IC user is not establishement rep in any conventions", async () => {
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        {
+          ...john,
+          agencyRights: [],
+        },
+      ]);
+
+      const result = await getInclusionConnectedUser.execute(
+        undefined,
+        inclusionConnectJwtPayload,
+      );
+
+      expectToEqual(result.establishmentRepresentativeDashboardUrl, undefined);
     });
   });
 });

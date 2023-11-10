@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { InclusionConnectedUser, InclusionConnectJwtPayload } from "shared";
+import {
+  InclusionConnectedUser,
+  InclusionConnectJwtPayload,
+  WithDashboardUrls,
+} from "shared";
 import {
   ForbiddenError,
   NotFoundError,
@@ -42,6 +46,16 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     if (!user)
       throw new NotFoundError(`No user found with provided ID : ${userId}`);
 
+    return {
+      ...user,
+      ...(await this.#withAgencyDashboard(user, uow)),
+    };
+  }
+
+  async #withAgencyDashboard(
+    user: InclusionConnectedUser,
+    uow: UnitOfWork,
+  ): Promise<WithDashboardUrls> {
     const agencyIdsWithEnoughPrivileges = user.agencyRights
       .filter(({ role }) => role !== "toReview")
       .map(({ agency }) => agency.id);
@@ -50,25 +64,40 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
       ({ agency }) => agency.kind === "pole-emploi",
     );
 
+    const hasConventionForEstablishmentRepresentative =
+      (
+        await uow.conventionRepository.getIdsByEstablishmentRepresentativeEmail(
+          user.email,
+        )
+      ).length > 0;
+
     return {
-      ...user,
-      ...(agencyIdsWithEnoughPrivileges.length < 1
-        ? {}
-        : {
-            dashboardUrl: await this.#dashboardGateway.getAgencyUserUrl(
+      ...(agencyIdsWithEnoughPrivileges.length > 0
+        ? {
+            agencyDashboardUrl: await this.#dashboardGateway.getAgencyUserUrl(
               agencyIdsWithEnoughPrivileges,
               this.#timeGateway.now(),
             ),
-            ...(hasAtLeastOnePeAgency
-              ? {
-                  erroredConventionsDashboardUrl:
-                    await this.#dashboardGateway.getErroredConventionsDashboardUrl(
-                      agencyIdsWithEnoughPrivileges,
-                      this.#timeGateway.now(),
-                    ),
-                }
-              : {}),
-          }),
+          }
+        : {}),
+      ...(agencyIdsWithEnoughPrivileges.length > 0 && hasAtLeastOnePeAgency
+        ? {
+            erroredConventionsDashboardUrl:
+              await this.#dashboardGateway.getErroredConventionsDashboardUrl(
+                agencyIdsWithEnoughPrivileges,
+                this.#timeGateway.now(),
+              ),
+          }
+        : {}),
+      ...(hasConventionForEstablishmentRepresentative
+        ? {
+            establishmentRepresentativeDashboardUrl:
+              await this.#dashboardGateway.getEstablishmentRepresentativeConventionsDashboardUrl(
+                user.email,
+                this.#timeGateway.now(),
+              ),
+          }
+        : {}),
     };
   }
 }
