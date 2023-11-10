@@ -67,14 +67,8 @@ export const ConventionImmersionPage = ({
     useState(isSharedConvention);
 
   useEffect(() => {
-    setDisplaySharedConventionMessage(isSharedConvention);
-  }, [isSharedConvention]);
-
-  useEffect(() => {
-    if (enablePeConnectApi && route.name === "conventionImmersion") {
-      storeConventionRouteParamsOnDevice(route.params);
-    }
-  }, [route.name, route.params, enablePeConnectApi]);
+    if (isPeConnected) setDisplaySharedConventionMessage(false);
+  }, [isPeConnected]);
 
   return (
     <HeaderFooterLayout>
@@ -95,6 +89,7 @@ export const ConventionImmersionPage = ({
       >
         {displaySharedConventionMessage ? (
           <SharedConventionMessage
+            route={route}
             enablePeConnectApi={enablePeConnectApi}
             onClickContinue={() => setDisplaySharedConventionMessage(false)}
           />
@@ -175,9 +170,11 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
 const SharedConventionMessage = ({
   enablePeConnectApi,
   onClickContinue,
+  route,
 }: {
   enablePeConnectApi: FeatureFlag;
   onClickContinue: () => void;
+  route: ConventionImmersionPageRoute;
 }) => (
   <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
     <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
@@ -200,6 +197,9 @@ const SharedConventionMessage = ({
         <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
           <a
             href={`/api/${loginPeConnect}`}
+            onClick={() => {
+              storeConventionRouteParamsOnDevice(route.params);
+            }}
             className={fr.cx(
               "fr-link",
               "fr-icon-arrow-right-line",

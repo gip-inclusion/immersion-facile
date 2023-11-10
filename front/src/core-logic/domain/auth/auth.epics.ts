@@ -40,6 +40,7 @@ const deleteFederatedIdentityFromDevice: AuthEpic = (
   action$.pipe(
     filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
     tap(() => deviceRepository.delete("federatedIdentityWithUser")),
+    tap(() => deviceRepository.delete("partialConventionInUrl")),
     map(() => authSlice.actions.federatedIdentityInDeviceDeletionSucceeded()),
   );
 
