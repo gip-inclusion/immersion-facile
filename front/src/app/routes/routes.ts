@@ -14,7 +14,9 @@ const createInclusionConnectedParams = <
 >(
   t: T,
 ) => t;
+
 const inclusionConnectedParams = createInclusionConnectedParams({
+  page: param.query.optional.string,
   token: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
@@ -74,6 +76,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   editFormEstablishment: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.editFormEstablishmentRoute}`,
+  ),
+  establishmentDashboard: defineRoute(
+    inclusionConnectedParams,
+    () => `/${frontRoutes.establishmentDashboard}`,
   ),
   errorRedirect: defineRoute(
     {

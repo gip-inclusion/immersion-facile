@@ -6,12 +6,14 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { all } from "ramda";
 import { match, P } from "ts-pattern";
+import { Route } from "type-route";
 import { AbsoluteUrl, AgencyRight } from "shared";
 import { Loader } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
+import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -19,7 +21,11 @@ import { partnersErroredConventionSelectors } from "src/core-logic/domain/partne
 import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
 import { MarkPartnersErroredConventionAsHandledFormSection } from "./MarkPartnersErroredConventionAsHandledFormSection";
 
-export const AgencyDashboardPage = () => {
+export const AgencyDashboardPage = ({
+  route,
+}: {
+  route: Route<typeof routes.agencyDashboard>;
+}) => {
   // the Layout (Header, Footer...) is given by InclusionConnectedPrivateRoute (higher order component)
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const feedback = useAppSelector(inclusionConnectedSelectors.feedback);
@@ -38,7 +44,7 @@ export const AgencyDashboardPage = () => {
   };
 
   const agencyDashboardTabs = (
-    dashboardUrl: AbsoluteUrl,
+    agencyDashboardUrl: AbsoluteUrl,
     conventionErrorUrl?: AbsoluteUrl,
   ): AgencyDashboardTab[] => [
     {
@@ -48,7 +54,10 @@ export const AgencyDashboardPage = () => {
           <ManageConventionFormSection
             routeNameToRedirectTo={"manageConventionInclusionConnected"}
           />
-          <MetabaseView title="Tableau de bord agence" url={dashboardUrl} />
+          <MetabaseView
+            title="Tableau de bord agence"
+            url={agencyDashboardUrl}
+          />
         </>
       ),
     },
@@ -110,7 +119,11 @@ export const AgencyDashboardPage = () => {
         <div className={fr.cx("fr-ml-auto", "fr-mt-1w")}>
           <Button
             onClick={() => {
-              dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
+              dispatch(
+                authSlice.actions.federatedIdentityDeletionTriggered(
+                  route.name,
+                ),
+              );
             }}
             type="button"
             priority="secondary"
@@ -146,9 +159,11 @@ export const AgencyDashboardPage = () => {
         .with(
           {
             currentUser: {
-              dashboardUrl: P.select(
-                "dashboardUrl",
-                P.when((dashboardUrl) => dashboardUrl !== undefined),
+              agencyDashboardUrl: P.select(
+                "agencyDashboardUrl",
+                P.when(
+                  (agencyDashboardUrl) => agencyDashboardUrl !== undefined,
+                ),
               ),
               erroredConventionsDashboardUrl: P.select(
                 "erroredConventionsDashboardUrl",
@@ -159,12 +174,12 @@ export const AgencyDashboardPage = () => {
               ),
             },
           },
-          ({ dashboardUrl, erroredConventionsDashboardUrl }) =>
-            dashboardUrl &&
+          ({ agencyDashboardUrl, erroredConventionsDashboardUrl }) =>
+            agencyDashboardUrl &&
             erroredConventionsDashboardUrl && (
               <Tabs
                 tabs={agencyDashboardTabs(
-                  dashboardUrl,
+                  agencyDashboardUrl,
                   erroredConventionsDashboardUrl,
                 )}
               />
@@ -173,8 +188,10 @@ export const AgencyDashboardPage = () => {
         .with(
           {
             currentUser: {
-              dashboardUrl: P.select(
-                P.when((dashboardUrl) => dashboardUrl !== undefined),
+              agencyDashboardUrl: P.select(
+                P.when(
+                  (agencyDashboardUrl) => agencyDashboardUrl !== undefined,
+                ),
               ),
             },
           },
