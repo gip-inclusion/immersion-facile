@@ -58,7 +58,7 @@ describe("Add Convention", () => {
     );
   });
 
-  it("saves valid applications in the repository", async () => {
+  it("saves valid conventions in the repository", async () => {
     const occurredAt = new Date("2021-10-15T15:00");
     const id = "eventId";
     timeGateway.setNextDate(occurredAt);
