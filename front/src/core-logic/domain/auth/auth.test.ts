@@ -3,6 +3,7 @@ import {
   FederatedIdentity,
   InclusionConnectedUser,
 } from "shared";
+import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
   authSlice,
@@ -49,7 +50,7 @@ describe("Auth slice", () => {
     expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
   });
 
-  it("deletes federatedIdentity stored in device and in store when asked for, and redirects to provider logout page", () => {
+  it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for, and redirects to provider logout page", () => {
     ({ store, dependencies } = createTestStore({
       auth: { federatedIdentityWithUser: inclusionConnectedFederatedIdentity },
     }));
@@ -57,12 +58,16 @@ describe("Auth slice", () => {
       "federatedIdentityWithUser",
       inclusionConnectedFederatedIdentity,
     );
+    dependencies.deviceRepository.set("partialConventionInUrl", {
+      firstName: "BOB",
+    });
     store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
     dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
       "http://yolo-logout.com",
     );
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
+    expectPartialConventionInUrlInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, [
       "http://yolo-logout.com",
     ]);
@@ -111,5 +116,13 @@ describe("Auth slice", () => {
     expect(
       dependencies.deviceRepository.get("federatedIdentityWithUser"),
     ).toEqual(federatedIdentity);
+  };
+
+  const expectPartialConventionInUrlInDevice = (
+    conventionParams: Partial<ConventionParamsInUrl> | undefined,
+  ) => {
+    expect(dependencies.deviceRepository.get("partialConventionInUrl")).toEqual(
+      conventionParams,
+    );
   };
 });
