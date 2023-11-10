@@ -4,6 +4,7 @@ import {
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionId,
+  Email,
   EstablishmentRepresentative,
   EstablishmentTutor,
   InternshipKind,
@@ -49,6 +50,23 @@ export class PgConventionRepository implements ConventionRepository {
     if (!readDto) return;
     const { agencyName, agencyDepartment, agencyKind, ...dto } = readDto;
     return dto;
+  }
+
+  public async getIdsByEstablishmentRepresentativeEmail(
+    email: Email,
+  ): Promise<ConventionId[]> {
+    const result = await executeKyselyRawSqlQuery<{ id: ConventionId }>(
+      this.transaction,
+      `
+     SELECT conventions.id
+     FROM conventions
+     LEFT JOIN actors on conventions.establishment_representative_id = actors.id
+     WHERE actors.email = $1
+      `,
+      [email],
+    );
+
+    return result.rows.map(({ id }) => id);
   }
 
   public async save(convention: ConventionDto): Promise<void> {
