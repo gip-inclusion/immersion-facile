@@ -3,6 +3,7 @@ import {
   AdminDashboardKind,
   AgencyId,
   ConventionId,
+  Email,
 } from "shared";
 
 export interface DashboardGateway {
@@ -16,4 +17,8 @@ export interface DashboardGateway {
     now: Date,
   ) => AbsoluteUrl;
   getConventionStatusUrl: (id: ConventionId, now: Date) => AbsoluteUrl;
+  getEstablishmentRepresentativeConventionsDashboardUrl(
+    establishmentRepresentativeEmail: Email,
+    now: Date,
+  ): AbsoluteUrl;
 }

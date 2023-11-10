@@ -3,6 +3,7 @@ import {
   AdminDashboardKind,
   AgencyId,
   ConventionId,
+  Email,
 } from "shared";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { createLogger } from "../../../utils/logger";
@@ -30,5 +31,15 @@ export class StubDashboardGateway implements DashboardGateway {
   public getErroredConventionsDashboardUrl(agencyIds: AgencyId[]): AbsoluteUrl {
     logger.warn("Dashboard gateway not implemented, getAgencyUrl method");
     return `http://stubErroredConventionDashboard/${agencyIds.join("_")}`;
+  }
+
+  public getEstablishmentRepresentativeConventionsDashboardUrl(
+    establishmentRepresentativeEmail: Email,
+    now: Date,
+  ): AbsoluteUrl {
+    logger.warn(
+      "Dashboard gateway not implemented, getEstablishmentRepresentativeConventionsDashboardUrl method",
+    );
+    return `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${establishmentRepresentativeEmail}/${now}`;
   }
 }

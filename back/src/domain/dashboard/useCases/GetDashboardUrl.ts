@@ -29,6 +29,11 @@ export class GetDashboardUrl extends UseCase<GetDashboardParams, AbsoluteUrl> {
         params.conventionId,
         this.#timeGateway.now(),
       );
+    if (params.name === "establishmentRepresentativeConventions")
+      return this.#dashboardGateway.getEstablishmentRepresentativeConventionsDashboardUrl(
+        params["email_repr%C3%A9sentant_de_l'entreprise"],
+        this.#timeGateway.now(),
+      );
     return this.#dashboardGateway.getDashboardUrl(
       params.name,
       this.#timeGateway.now(),
