@@ -747,6 +747,38 @@ describe("PgConventionRepository", () => {
     });
   });
 
+  describe("getIdsByEstablishmentRepresentativeEmail", () => {
+    it("Match convention with email", async () => {
+      const email = "mail@mail.com";
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentRepresentativeEmail(email)
+        .build();
+      await conventionRepository.save(convention);
+
+      const result =
+        await conventionRepository.getIdsByEstablishmentRepresentativeEmail(
+          email,
+        );
+
+      expectToEqual(result, [convention.id]);
+    });
+
+    it("Without convention with email", async () => {
+      const email = "mail@mail.com";
+      const conventionWithoutEmail = new ConventionDtoBuilder()
+        .withEstablishmentRepresentativeEmail("notEmail@emauil.ciom")
+        .build();
+      await conventionRepository.save(conventionWithoutEmail);
+
+      const result =
+        await conventionRepository.getIdsByEstablishmentRepresentativeEmail(
+          email,
+        );
+
+      expectToEqual(result, []);
+    });
+  });
+
   const tutorIdAndRepIdFromConventionId = (conventionId: ConventionId) =>
     client.query<{
       establishment_tutor_id: number;
