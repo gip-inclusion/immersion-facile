@@ -33,7 +33,9 @@ const buildSignatoriesObject = `JSON_BUILD_OBJECT(
         ) ELSE NULL END,
         'levelOfEducation', CASE WHEN  (b.extra_fields ->> 'levelOfEducation' IS NOT NULL) THEN b.extra_fields ->> 'levelOfEducation' ELSE NULL END,
         'financiaryHelp', CASE WHEN  (b.extra_fields ->> 'financiaryHelp' IS NOT NULL) THEN b.extra_fields ->> 'financiaryHelp' ELSE NULL END,
-        'birthdate', CASE WHEN  (b.extra_fields ->> 'birthdate' IS NOT NULL) THEN b.extra_fields ->> 'birthdate' ELSE '1970-01-01T12:00:00.000Z' END
+        'birthdate', CASE WHEN  (b.extra_fields ->> 'birthdate' IS NOT NULL) THEN b.extra_fields ->> 'birthdate' ELSE '1970-01-01T12:00:00.000Z' END,
+        'schoolName', CASE WHEN  (b.extra_fields ->> 'schoolName' IS NOT NULL) THEN b.extra_fields ->> 'schoolName' ELSE NULL END,
+        'schoolPostcode', CASE WHEN  (b.extra_fields ->> 'schoolPostcode' IS NOT NULL) THEN b.extra_fields ->> 'schoolPostcode' ELSE NULL END
       ),
       'beneficiaryCurrentEmployer' , CASE WHEN bce IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
         'role', 'beneficiary-current-employer',
