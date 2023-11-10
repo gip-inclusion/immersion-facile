@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Route } from "type-route";
-import { inclusionConnectImmersionRoutes } from "shared";
+import { inclusionConnectImmersionRoutes, queryParamsAsString } from "shared";
 import {
   InclusionConnectButton,
   LoginForm,
   MainWrapper,
-  PageHeader,
 } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -14,13 +13,21 @@ import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 
+type InclusionConnectPrivateRoute =
+  | Route<typeof routes.agencyDashboard>
+  | Route<typeof routes.establishmentDashboard>;
+
+type InclusionConnectedPrivateRouteProps = {
+  route: InclusionConnectPrivateRoute;
+  children: React.ReactElement;
+  inclusionConnectConnexionPageHeader: React.ReactElement;
+};
+
 export const InclusionConnectedPrivateRoute = ({
   route,
   children,
-}: {
-  route: Route<typeof routes.agencyDashboard>;
-  children: React.ReactElement;
-}) => {
+  inclusionConnectConnexionPageHeader,
+}: InclusionConnectedPrivateRouteProps) => {
   const dispatch = useDispatch();
   const isInclusionConnected = useAppSelector(
     authSelectors.isInclusionConnected,
@@ -38,22 +45,18 @@ export const InclusionConnectedPrivateRoute = ({
           firstName,
         }),
       );
-      routes.agencyDashboard().replace();
+      if (route.name === "agencyDashboard") routes.agencyDashboard().replace();
+      if (route.name === "establishmentDashboard")
+        routes.establishmentDashboard().replace();
     }
-  }, [route.params, dispatch]);
+  }, [route.params, route.name, dispatch]);
 
   if (!isInclusionConnected)
     return (
       <HeaderFooterLayout>
         <MainWrapper
           layout="boxed"
-          pageHeader={
-            <PageHeader
-              title="Retrouvez vos conventions en tant que prescripteur"
-              theme="agency"
-              centered
-            />
-          }
+          pageHeader={inclusionConnectConnexionPageHeader}
         >
           <LoginForm
             sections={[
@@ -63,10 +66,14 @@ export const InclusionConnectedPrivateRoute = ({
                   "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
                 authComponent: (
                   <InclusionConnectButton
-                    inclusionConnectEndpoint={
+                    inclusionConnectEndpoint={`${
                       inclusionConnectImmersionRoutes.startInclusionConnectLogin
                         .url
-                    }
+                    }?${queryParamsAsString(
+                      inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
+                        { page: route.name },
+                      ),
+                    )}`}
                   />
                 ),
               },

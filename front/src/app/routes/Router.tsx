@@ -1,5 +1,6 @@
 import React from "react";
 import { Route } from "type-route";
+import { PageHeader } from "react-design-system";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { AgencyDashboardPage } from "src/app/pages/agencyDashboard/AgencyDashboardPage";
@@ -11,6 +12,7 @@ import { ConventionStatusDashboardPage } from "src/app/pages/convention/Conventi
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
+import { EstablishmentDashboardPage } from "src/app/pages/establishmentDashboard/EstablishmentDashboardPage";
 import { OpenApiDocPage } from "src/app/pages/open-api-doc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
@@ -53,8 +55,17 @@ const getPageByRouteName: {
       <ErrorPage type="httpClientNotFoundError" />
     ),
   agencyDashboard: (route) => (
-    <InclusionConnectedPrivateRoute route={route}>
-      <AgencyDashboardPage />
+    <InclusionConnectedPrivateRoute
+      route={route}
+      inclusionConnectConnexionPageHeader={
+        <PageHeader
+          title="Retrouvez vos conventions en tant que prescripteur"
+          theme="agency"
+          centered
+        />
+      }
+    >
+      <AgencyDashboardPage route={route} />
     </InclusionConnectedPrivateRoute>
   ),
   conventionCustomAgency: () => <ConventionCustomAgencyPage />,
@@ -70,6 +81,20 @@ const getPageByRouteName: {
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
   editFormEstablishment: () => <EstablishmentEditionFormPage />,
+  establishmentDashboard: (route) => (
+    <InclusionConnectedPrivateRoute
+      route={route}
+      inclusionConnectConnexionPageHeader={
+        <PageHeader
+          title="Retrouvez vos conventions en tant qu'entreprise"
+          theme="establishment"
+          centered
+        />
+      }
+    >
+      <EstablishmentDashboardPage route={route} />
+    </InclusionConnectedPrivateRoute>
+  ),
   errorRedirect: (route) => <ErrorRedirectPage route={route} />,
   formEstablishment: () => <EstablishmentCreationFormPage />,
   formEstablishmentForExternals: (route) => (

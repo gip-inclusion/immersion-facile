@@ -70,7 +70,9 @@ export const LayoutHeader = () => {
       text: "Se déconnecter (PE Connect)",
       buttonProps: {
         onClick: () =>
-          dispatch(authSlice.actions.federatedIdentityDeletionTriggered()),
+          dispatch(
+            authSlice.actions.federatedIdentityDeletionTriggered("other"),
+          ),
       },
     });
   }
@@ -139,7 +141,6 @@ export const LayoutHeader = () => {
         {
           text: "Référencer mon entreprise",
           isActive: currentRoute.name === routes.formEstablishment().name,
-
           linkProps: {
             ...routes.formEstablishment().link,
             id: establishmentIds.addEstablishmentForm,
@@ -153,6 +154,15 @@ export const LayoutHeader = () => {
             id: establishmentIds.formConvention,
           },
         },
+        // {
+        //   text: "Piloter mon entreprise",
+        //   isActive: false,
+        //   linkProps: {
+        //     ...routes.establishmentDashboard().link,
+        //     "aria-disabled": true,
+        //     id: establishmentIds.establishmentDashboard,
+        //   },
+        // },
       ],
     },
     {

@@ -24,6 +24,7 @@ export const domElementIds = {
         home: buildHeaderNavLinkId("establishment-home"),
         addEstablishmentForm: buildHeaderNavLinkId("establishment-form"),
         formConvention: buildHeaderNavLinkId("establishment-form-convention"),
+        establishmentDashboard: buildHeaderNavLinkId("establishment-dashboard"),
       },
       agency: {
         home: buildHeaderNavLinkId("agency-home"),
@@ -363,4 +364,5 @@ export const domElementIds = {
   offer: {},
   offerExternal: {},
   manageEstablishmentAdmin: {},
+  establishmentDashboard: {},
 } satisfies DomElementIds;

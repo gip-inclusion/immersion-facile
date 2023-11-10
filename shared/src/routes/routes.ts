@@ -1,13 +1,19 @@
+export const allowedStartInclusionConnectLoginPages = [
+  "agencyDashboard",
+  "establishmentDashboard",
+] as const;
+
 export const frontRoutes = {
   addAgency: "ajouter-prescripteur",
   admin: "admin",
-  agencyDashboard: "agence-dashboard",
+  [allowedStartInclusionConnectLoginPages[0]]: "agence-dashboard",
   conventionImmersionRoute: "demande-immersion",
   conventionDocument: "convention-immersion",
   conventionMiniStageRoute: "demande-mini-stage",
   conventionStatusDashboard: "statut-convention",
   conventionToSign: "verifier-et-signer",
   editFormEstablishmentRoute: "edition-etablissement",
+  [allowedStartInclusionConnectLoginPages[1]]: "entreprise-dashboard",
   error: "error",
   establishment: "establishment",
   group: "groupe",
