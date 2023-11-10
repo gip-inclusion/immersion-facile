@@ -309,11 +309,13 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     label: "Nom de l'établissement scolaire du candidat",
     id: beneficiarySectionIds.schoolName,
     placeholder: "Ex : Lycée Jean Moulin",
+    required: true,
   },
   "signatories.beneficiary.schoolPostcode": {
     label: "Code postal de l'établissement scolaire du candidat",
     id: beneficiarySectionIds.schoolPostcode,
     placeholder: "Ex : 06530",
+    required: true,
   },
   "signatories.beneficiary.isRqth": {
     label:

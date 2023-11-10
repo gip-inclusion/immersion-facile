@@ -110,12 +110,20 @@ const beneficiarySummary = (convention: ConventionReadDto) => {
     formConventionFieldsLabels(convention.internshipKind),
   );
   const fields = getFormFields();
-  const levelOfEducationRowInArray: ConventionSummaryRow[] =
+  const studentRowsInArray: ConventionSummaryRow[] =
     convention.internshipKind === "mini-stage-cci"
       ? [
           [
             fields["signatories.beneficiary.levelOfEducation"].label,
             convention.signatories.beneficiary.levelOfEducation,
+          ],
+          [
+            fields["signatories.beneficiary.schoolName"].label,
+            convention.signatories.beneficiary.schoolName,
+          ],
+          [
+            fields["signatories.beneficiary.schoolPostcode"].label,
+            convention.signatories.beneficiary.schoolPostcode,
           ],
         ]
       : [];
@@ -133,7 +141,7 @@ const beneficiarySummary = (convention: ConventionReadDto) => {
       fields["signatories.beneficiary.birthdate"].label,
       convention.signatories.beneficiary.birthdate,
     ],
-    ...levelOfEducationRowInArray,
+    ...studentRowsInArray,
     [
       fields["signatories.beneficiary.financiaryHelp"].label,
       convention.signatories.beneficiary.financiaryHelp,

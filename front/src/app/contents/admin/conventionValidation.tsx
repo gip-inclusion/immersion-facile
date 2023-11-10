@@ -101,6 +101,11 @@ const beneficiaryFields: ColField[] = [
           <div className={fr.cx("fr-text--xs")}>
             Niveau d'études :{" "}
             {convention.signatories.beneficiary.levelOfEducation}
+            <br />
+            Établissement : {convention.signatories.beneficiary.schoolName}
+            <br />
+            Code postal de l'établissement :{" "}
+            {convention.signatories.beneficiary.schoolPostcode}
           </div>
         )}
       </span>
