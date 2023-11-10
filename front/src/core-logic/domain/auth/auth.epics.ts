@@ -1,5 +1,6 @@
 import { filter, map, tap } from "rxjs";
 import { switchMap } from "rxjs/operators";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -7,7 +8,7 @@ import {
 import { appIsReadyAction } from "../actions";
 import { authSlice } from "./auth.slice";
 
-type AuthAction = ActionOfSlice<typeof authSlice>;
+export type AuthAction = ActionOfSlice<typeof authSlice>;
 type AuthEpic = AppEpic<AuthAction>;
 
 const storeFederatedIdentityInDevice: AuthEpic = (
@@ -56,11 +57,18 @@ const logoutFromInclusionConnect: AuthEpic = (
         state$.value.auth.federatedIdentityWithUser?.provider ===
         "inclusionConnect",
     ),
-    switchMap(() => inclusionConnectedGateway.getLogoutUrl$()),
+    switchMap(({ payload }) => {
+      if (payload === "other")
+        throw new Error("WithSourcePage required in payload");
+      return inclusionConnectedGateway.getLogoutUrl$({ page: payload });
+    }),
     map((logoutUrl) => {
       navigationGateway.goToUrl(logoutUrl);
       return authSlice.actions.loggedOutSuccessfullyFromInclusionConnect();
     }),
+    catchEpicError((_error) =>
+      authSlice.actions.loggedOutFailedFromInclusionConnect(),
+    ),
   );
 
 const checkConnectedWithFederatedIdentity: AuthEpic = (

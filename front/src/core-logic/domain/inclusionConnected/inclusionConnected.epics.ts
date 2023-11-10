@@ -45,7 +45,7 @@ const getCurrentUserEpic: AppEpic<InclusionConnectedAction> = (
     map(inclusionConnectedSlice.actions.currentUserFetchSucceeded),
     catchEpicError((error) =>
       error?.message.includes("jwt expired")
-        ? authSlice.actions.federatedIdentityDeletionTriggered()
+        ? authSlice.actions.federatedIdentityDeletionTriggered("other")
         : inclusionConnectedSlice.actions.currentUserFetchFailed(
             error?.message,
           ),

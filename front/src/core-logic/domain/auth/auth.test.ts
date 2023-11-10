@@ -52,7 +52,9 @@ describe("Auth slice", () => {
 
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for, and redirects to provider logout page", () => {
     ({ store, dependencies } = createTestStore({
-      auth: { federatedIdentityWithUser: inclusionConnectedFederatedIdentity },
+      auth: {
+        federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+      },
     }));
     dependencies.deviceRepository.set(
       "federatedIdentityWithUser",
@@ -61,7 +63,9 @@ describe("Auth slice", () => {
     dependencies.deviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
-    store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
+    store.dispatch(
+      authSlice.actions.federatedIdentityDeletionTriggered("agencyDashboard"),
+    );
     dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
       "http://yolo-logout.com",
     );
@@ -71,6 +75,28 @@ describe("Auth slice", () => {
     expectToEqual(dependencies.navigationGateway.wentToUrls, [
       "http://yolo-logout.com",
     ]);
+  });
+
+  it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page", () => {
+    ({ store, dependencies } = createTestStore({
+      auth: {
+        federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+      },
+    }));
+    dependencies.deviceRepository.set(
+      "federatedIdentityWithUser",
+      inclusionConnectedFederatedIdentity,
+    );
+    dependencies.deviceRepository.set("partialConventionInUrl", {
+      firstName: "BOB",
+    });
+    store.dispatch(
+      authSlice.actions.federatedIdentityDeletionTriggered("other"),
+    );
+    expectFederatedIdentityToEqual(null);
+    expectFederatedIdentityInDevice(undefined);
+    expectPartialConventionInUrlInDevice(undefined);
+    expectToEqual(dependencies.navigationGateway.wentToUrls, []);
   });
 
   it("retrieves federatedIdentity if stored in device", () => {
