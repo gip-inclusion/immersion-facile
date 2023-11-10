@@ -27,7 +27,7 @@ describe("InclusionConnected", () => {
     firstName: "Fake",
     lastName: "User",
     id: "fake-user-id",
-    dashboardUrl: "https://placeholder.com/",
+    agencyDashboardUrl: "https://placeholder.com/",
     agencyRights: [
       {
         role: "agencyOwner",

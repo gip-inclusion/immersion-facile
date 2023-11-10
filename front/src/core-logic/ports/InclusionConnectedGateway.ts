@@ -5,6 +5,7 @@ import {
   ConventionSupportedJwt,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  WithSourcePage,
 } from "shared";
 
 export interface InclusionConnectedGateway {
@@ -17,5 +18,5 @@ export interface InclusionConnectedGateway {
     params: MarkPartnersErroredConventionAsHandledRequest,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
-  getLogoutUrl$(): Observable<AbsoluteUrl>;
+  getLogoutUrl$(params: WithSourcePage): Observable<AbsoluteUrl>;
 }

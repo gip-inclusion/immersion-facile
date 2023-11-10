@@ -1,5 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FederatedIdentity } from "shared";
+import {
+  AllowedStartInclusionConnectLoginSourcesKind,
+  FederatedIdentity,
+} from "shared";
 
 export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;
@@ -33,10 +36,18 @@ export const authSlice = createSlice({
       _action: PayloadAction<FederatedIdentityWithUser | null>,
     ) => state,
     federatedIdentityNotFoundInDevice: (state) => state,
-    federatedIdentityDeletionTriggered: (state) => state,
+    federatedIdentityDeletionTriggered: (
+      state: AuthState,
+      _action: PayloadAction<
+        AllowedStartInclusionConnectLoginSourcesKind | "other"
+      >,
+    ) => state,
     federatedIdentityInDeviceDeletionSucceeded: (state) => {
       state.federatedIdentityWithUser = null;
     },
     loggedOutSuccessfullyFromInclusionConnect: (state) => state,
+    loggedOutFailedFromInclusionConnect: (state) => {
+      state.federatedIdentityWithUser = null;
+    },
   },
 });
