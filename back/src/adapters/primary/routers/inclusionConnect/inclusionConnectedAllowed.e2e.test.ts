@@ -51,10 +51,21 @@ describe("InclusionConnectedAllowedRoutes", () => {
   describe("/inclusion-connected/user", () => {
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.getInclusionConnectedUser,
-    )} 200 with dashboard url on response body`, async () => {
+    )} 200 with agency dashboard url on response body`, async () => {
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentRepresentativeEmail(
+          inclusionConnectedUserWithRights.email,
+        )
+        .build();
+
+      inMemoryUow.conventionRepository.setConventions({
+        [convention.id]: convention,
+      });
+
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUserWithRights,
       ]);
+
       const token = generateInclusionConnectJwt({
         userId,
         version: currentJwtVersions.inclusion,
@@ -68,6 +79,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: {
           ...inclusionConnectedUserWithRights,
           agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
+          establishmentRepresentativeDashboardUrl: `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${inclusionConnectedUserWithRights.email}/Wed Sep 01 2021 12:10:00 GMT+0200 (Central European Summer Time)`,
         },
         status: 200,
       });

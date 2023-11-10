@@ -1,4 +1,5 @@
-import { ConventionDto, ConventionId } from "shared";
+import { values } from "ramda";
+import { ConventionDto, ConventionId, Email } from "shared";
 import { ConventionRepository } from "../../domain/convention/ports/ConventionRepository";
 import { createLogger } from "../../utils/logger";
 import { ConflictError } from "../primary/helpers/httpErrors";
@@ -19,6 +20,17 @@ export class InMemoryConventionRepository implements ConventionRepository {
   public async getById(id: ConventionId) {
     logger.info({ id }, "getById");
     return this._conventions[id];
+  }
+
+  public async getIdsByEstablishmentRepresentativeEmail(
+    email: Email,
+  ): Promise<ConventionId[]> {
+    return values(this._conventions)
+      .filter(
+        ({ signatories }) =>
+          signatories.establishmentRepresentative.email === email,
+      )
+      .map(({ id }) => id);
   }
 
   public async save(convention: ConventionDto): Promise<void> {
