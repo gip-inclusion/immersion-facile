@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DateIsoString, dateRegExp } from "../utils/date";
+import { dateRegExp, DateString, DateTimeIsoString } from "../utils/date";
 import { localization, zStringMinLength1, zTimeString } from "../zodUtils";
 import {
   DailyScheduleDto,
@@ -20,12 +20,14 @@ export const timePeriodSchema: z.Schema<TimePeriodDto> = z.object({
 export const timePeriodsSchema: z.Schema<TimePeriodsDto> =
   z.array(timePeriodSchema);
 
-export const dateTimeIsoStringSchema: z.Schema<DateIsoString> = z
+export const dateTimeIsoStringSchema: z.Schema<DateTimeIsoString> = z
   .string()
   .datetime();
 
-export const dateStringSchema: z.Schema<DateIsoString> =
-  zStringMinLength1.regex(dateRegExp, localization.invalidDate);
+export const dateStringSchema: z.Schema<DateString> = zStringMinLength1.regex(
+  dateRegExp,
+  localization.invalidDate,
+);
 
 export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
   date: dateTimeIsoStringSchema,
