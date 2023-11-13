@@ -1,7 +1,11 @@
 import { ColumnType, Generated } from "kysely";
+import { InternshipKind } from "kysely-codegen/dist/db";
 import { AbsoluteUrl } from "shared";
 
 export interface Database {
+  actors: Actors;
+  conventions: Conventions;
+  convention_external_ids: ConventionExternalIds;
   discussions: Discussions;
   exchanges: Exchanges;
   groups: Groups;
@@ -17,7 +21,7 @@ type JsonObject = {
 };
 
 type JsonPrimitive = boolean | null | number | string;
-export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 type Json = ColumnType<JsonValue, string, string>;
 type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
@@ -110,4 +114,60 @@ interface SavedErrors {
   params: Record<string, unknown> | null;
   occurred_at: Timestamp;
   handled_by_agency: Generated<boolean>;
+}
+
+// prettier-ignore
+type ConventionObjectiveType = "Confirmer un projet professionnel" | "Découvrir un métier ou un secteur d'activité" | "Initier une démarche de recrutement";
+
+// prettier-ignore
+type ConventionStatusType = "ACCEPTED_BY_COUNSELLOR" | "ACCEPTED_BY_VALIDATOR" | "CANCELLED" | "DEPRECATED" | "DRAFT" | "IN_REVIEW" | "PARTIALLY_SIGNED" | "READY_TO_SIGN" | "REJECTED";
+
+interface ConventionExternalIds {
+  convention_id: string | null;
+  external_id: Generated<number>;
+}
+
+interface Conventions {
+  id: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp>;
+  status: ConventionStatusType;
+  agency_id: string;
+  date_submission: Timestamp;
+  date_start: Timestamp;
+  date_end: Timestamp;
+  siret: string;
+  business_name: string;
+  schedule: Json;
+  individual_protection: boolean;
+  sanitary_prevention: boolean;
+  sanitary_prevention_description: string;
+  immersion_address: string;
+  immersion_objective: ConventionObjectiveType;
+  immersion_activities: string;
+  immersion_skills: string;
+  work_conditions: string | null;
+  immersion_appellation: number;
+  date_validation: Timestamp | null;
+  internship_kind: InternshipKind;
+  beneficiary_id: number;
+  establishment_tutor_id: number;
+  establishment_representative_id: number;
+  beneficiary_representative_id: number | null;
+  beneficiary_current_employer_id: number | null;
+  business_advantages: string | null;
+  status_justification: string | null;
+  validators: Json | null;
+  renewed_from: string | null;
+  renewed_justification: string | null;
+}
+
+interface Actors {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  signed_at: Timestamp | null;
+  extra_fields: Json | null;
+  id: Generated<number>;
 }
