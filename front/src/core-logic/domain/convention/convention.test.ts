@@ -143,7 +143,7 @@ describe("Convention slice", () => {
         .build();
       store.dispatch(
         conventionSlice.actions.getSimilarConventionsRequested({
-          siret: convention.dateStart,
+          siret: convention.siret,
           beneficiaryBirthdate: "2023-10-01",
           dateStart: convention.dateStart,
           beneficiaryLastName: "Test",
