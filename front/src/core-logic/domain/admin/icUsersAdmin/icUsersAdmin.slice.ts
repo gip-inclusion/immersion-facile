@@ -25,7 +25,7 @@ export type NormalizedIcUserById = Record<
 type IcUsersAdminFeedbackKind =
   | "usersToReviewFetchSuccess"
   | "agencyRegisterToUserSuccess"
-  | "agencyRejectToUserSuccess";
+  | "agencyRejectionForUserSuccess";
 
 export type IcUsersAdminFeedback = SubmitFeedBack<IcUsersAdminFeedbackKind>;
 
@@ -114,7 +114,7 @@ export const icUsersAdminSlice = createSlice({
         state.icUsersNeedingReview[userId].agencyRights;
 
       state.isUpdatingIcUserAgency = false;
-      state.feedback.kind = "agencyRejectToUserSuccess";
+      state.feedback.kind = "agencyRejectionForUserSuccess";
 
       state.icUsersNeedingReview[userId].agencyRights = agenciesFiltered;
     },

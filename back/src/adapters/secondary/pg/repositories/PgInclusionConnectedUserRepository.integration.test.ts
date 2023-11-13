@@ -142,6 +142,41 @@ describe("PgInclusionConnectedUserRepository", () => {
         );
         expectToEqual(savedIcUser, icUserToSave);
       });
+
+      it("Delete just one element in users__agencies table when two agency rights are provided", async () => {
+        await agencyRepository.insert(agency1);
+        await agencyRepository.insert(agency2);
+
+        await insertAuthenticatedUser(authenticatedUser1);
+
+        const icUserToSave: InclusionConnectedUser = {
+          ...authenticatedUser1,
+          agencyRights: [
+            { agency: agency1, role: "validator" },
+            { agency: agency2, role: "toReview" },
+          ],
+        };
+
+        await icUserRepository.update(icUserToSave);
+
+        const savedIcUser = await icUserRepository.getById(
+          authenticatedUser1.id,
+        );
+
+        expectToEqual(savedIcUser, icUserToSave);
+
+        const updatedIcUserToSave: InclusionConnectedUser = {
+          ...authenticatedUser1,
+          agencyRights: [{ agency: agency1, role: "validator" }],
+        };
+
+        await icUserRepository.update(updatedIcUserToSave);
+
+        const updatedSavedIcUser = await icUserRepository.getById(
+          authenticatedUser1.id,
+        );
+        expectToEqual(updatedSavedIcUser, updatedIcUserToSave);
+      });
     });
   });
 

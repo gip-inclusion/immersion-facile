@@ -40,6 +40,24 @@ describe("reject IcUser for agency", () => {
     );
   });
 
+  it("throws when no jwt token provided", async () => {
+    const agency1 = new AgencyDtoBuilder().withId("agency1").build();
+
+    const icUser: InclusionConnectedUser = {
+      ...user,
+      agencyRights: [{ agency: agency1, role: "toReview" }],
+    };
+
+    await expectPromiseToFailWith(
+      rejectIcUserForAgencyUsecase.execute({
+        userId: icUser.id,
+        agencyId: agency1.id,
+        justification: "osef",
+      }),
+      "No JWT token provided",
+    );
+  });
+
   it("Throw when no icUser were found", async () => {
     const agency1 = new AgencyDtoBuilder().withId("agency1").build();
 
@@ -81,24 +99,6 @@ describe("reject IcUser for agency", () => {
         { role: "backOffice" } as BackOfficeJwtPayload,
       ),
       `No agency found with id: ${agency1.id}`,
-    );
-  });
-
-  it("throws when no jwt token provided", async () => {
-    const agency1 = new AgencyDtoBuilder().withId("agency1").build();
-
-    const icUser: InclusionConnectedUser = {
-      ...user,
-      agencyRights: [{ agency: agency1, role: "toReview" }],
-    };
-
-    await expectPromiseToFailWith(
-      rejectIcUserForAgencyUsecase.execute({
-        userId: icUser.id,
-        agencyId: agency1.id,
-        justification: "osef",
-      }),
-      "No JWT token provided",
     );
   });
 
