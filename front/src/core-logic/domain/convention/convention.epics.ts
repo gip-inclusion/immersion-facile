@@ -31,6 +31,22 @@ const saveConventionEpic: ConventionEpic = (
     ),
   );
 
+const getSimilarConventionsEpic: ConventionEpic = (
+  action$,
+  _state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(conventionSlice.actions.getSimilarConventionsRequested.match),
+    switchMap(({ payload }) =>
+      conventionGateway.getSimilarConventions$(payload),
+    ),
+    map(conventionSlice.actions.getSimilarConventionsSucceeded),
+    catchEpicError((error: Error) =>
+      conventionSlice.actions.getSimilarConventionsFailed(error.message),
+    ),
+  );
+
 const getConventionEpic: ConventionEpic = (
   action$,
   _state$,
@@ -162,4 +178,5 @@ export const conventionEpics = [
   getConventionStatusDashboardUrl,
   getPreselectAgencyId,
   renewConventionEpic,
+  getSimilarConventionsEpic,
 ];

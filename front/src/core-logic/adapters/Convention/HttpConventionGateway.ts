@@ -3,9 +3,11 @@ import { fromPromise } from "rxjs/internal/observable/innerFrom";
 import {
   AbsoluteUrl,
   ConventionDto,
+  ConventionId,
   ConventionMagicLinkRoutes,
   ConventionReadDto,
   ConventionSupportedJwt,
+  FindSimilarConventionsParams,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
@@ -38,6 +40,17 @@ export class HttpConventionGateway implements ConventionGateway {
         })
         .then(({ body }) => body),
     );
+  }
+
+  public getSimilarConventions$(
+    findSimilarConventionsParams: FindSimilarConventionsParams,
+  ): Observable<ConventionId[]> {
+    const conventionIdsPromise = this.unauthenticatedHttpClient
+      .findSimilarConventions({
+        queryParams: findSimilarConventionsParams,
+      })
+      .then(({ body }) => body.similarConventionIds);
+    return from(conventionIdsPromise);
   }
 
   public renewConvention$(

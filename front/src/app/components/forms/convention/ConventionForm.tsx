@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { createPortal } from "react-dom";
+import {
+  FormProvider,
+  SubmitHandler,
+  useForm,
+  UseFormReturn,
+} from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import {
   Beneficiary,
+  ConventionId,
   ConventionJwtPayload,
   ConventionReadDto,
   conventionSchema,
@@ -54,10 +62,22 @@ import { useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import {
+  conventionSlice,
+  ConventionSubmitFeedback,
+} from "src/core-logic/domain/convention/convention.slice";
 import { ConventionSummary } from "./ConventionSummary";
 import { ShareConventionLink } from "./ShareConventionLink";
 import { useUpdateConventionValuesInUrl } from "./useUpdateConventionValuesInUrl";
+
+const {
+  Component: ConfirmDuplicateConventionModal,
+  open: openConfirmDuplicateConventionModal,
+  close: closeConfirmDuplicateConventionModal,
+} = createModal({
+  id: "confirm-duplicate-convention-modal",
+  isOpenedByDefault: false,
+});
 
 const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
   initialValues: ConventionPresentation,
@@ -128,9 +148,7 @@ export const ConventionForm = ({
 
   useExistingSiret(initialValues.siret);
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
-  const fetchedConvention: ConventionReadDto | null = useAppSelector(
-    conventionSelectors.convention,
-  );
+  const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const dispatch = useDispatch();
@@ -251,42 +269,12 @@ export const ConventionForm = ({
             formSuccessfullySubmitted: false,
           },
           () => (
-            <>
-              <section>
-                {isLoading && <Loader />}
-                <ConventionSummary />
-                <ConventionFeedbackNotification
-                  submitFeedback={submitFeedback}
-                  signatories={getValues("signatories")}
-                />
-                <ButtonsGroup
-                  inlineLayoutWhen="sm and up"
-                  alignment="center"
-                  buttons={[
-                    {
-                      children: "Modifier la convention",
-                      onClick: () => {
-                        dispatch(
-                          conventionSlice.actions.showSummaryChangeRequested({
-                            showSummary: false,
-                          }),
-                        );
-                      },
-                      priority: "secondary",
-                    },
-                    {
-                      children: "Envoyer la convention",
-                      onClick: methods.handleSubmit(onConfirmSubmit),
-                      nativeButtonProps: {
-                        id: domElementIds.conventionImmersionRoute
-                          .confirmSubmitFormButton,
-                        disabled: isLoading,
-                      },
-                    },
-                  ]}
-                />
-              </section>
-            </>
+            <ConventionSummarySection
+              methods={methods}
+              onConfirmSubmit={onConfirmSubmit}
+              isLoading={isLoading}
+              submitFeedback={submitFeedback}
+            />
           ),
         )
         .with(
@@ -372,3 +360,124 @@ const makeInitialBenefiaryForm = (
     }),
   };
 };
+
+const ConventionSummarySection = (props: {
+  isLoading: boolean;
+  submitFeedback: ConventionSubmitFeedback;
+  methods: UseFormReturn<ConventionReadDto>;
+  onConfirmSubmit: () => void;
+}) => {
+  const { getValues } = props.methods;
+  const dispatch = useDispatch();
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
+  const convention = useAppSelector(conventionSelectors.convention);
+  const similarConventionIds = useAppSelector(
+    conventionSelectors.similarConventionIds,
+  );
+
+  useEffect(() => {
+    if (!convention) return;
+    dispatch(
+      conventionSlice.actions.getSimilarConventionsRequested({
+        codeAppellation: convention.immersionAppellation.appellationCode,
+        siret: convention.siret,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        dateStart: convention.dateStart,
+        beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
+      }),
+    );
+  }, []);
+
+  return (
+    <section>
+      {props.isLoading && <Loader />}
+      <ConventionSummary />
+      <ConventionFeedbackNotification
+        submitFeedback={props.submitFeedback}
+        signatories={getValues("signatories")}
+      />
+      {similarConventionIds.length > 0 && (
+        <DuplicateConventionAlert similarConventionIds={similarConventionIds} />
+      )}
+      <ButtonsGroup
+        className={fr.cx("fr-mt-4w")}
+        inlineLayoutWhen="sm and up"
+        alignment="center"
+        buttons={[
+          {
+            children: "Modifier la convention",
+            onClick: () => {
+              dispatch(
+                conventionSlice.actions.showSummaryChangeRequested({
+                  showSummary: false,
+                }),
+              );
+            },
+            priority: "secondary",
+          },
+          {
+            children: "Envoyer la convention",
+            onClick: (event) =>
+              similarConventionIds.length > 0
+                ? openConfirmDuplicateConventionModal()
+                : props.methods.handleSubmit(props.onConfirmSubmit)(event),
+            nativeButtonProps: {
+              id: domElementIds.conventionImmersionRoute
+                .confirmSubmitFormButton,
+              disabled: isLoading,
+            },
+          },
+        ]}
+      />
+      {createPortal(
+        <ConfirmDuplicateConventionModal
+          title={"Confirmer la création de cette convention"}
+        >
+          <DuplicateConventionAlert
+            similarConventionIds={similarConventionIds}
+          />
+          <ButtonsGroup
+            className={fr.cx("fr-mt-4w")}
+            inlineLayoutWhen="sm and up"
+            alignment="center"
+            buttons={[
+              {
+                children: "Annuler",
+                onClick: closeConfirmDuplicateConventionModal,
+                priority: "secondary",
+              },
+              {
+                children: "Valider (au risque de créer un doublon)",
+                onClick: props.methods.handleSubmit(props.onConfirmSubmit),
+                nativeButtonProps: {
+                  disabled: isLoading,
+                },
+              },
+            ]}
+          />
+        </ConfirmDuplicateConventionModal>,
+        document.body,
+      )}
+    </section>
+  );
+};
+
+const DuplicateConventionAlert = (props: {
+  similarConventionIds: ConventionId[];
+}) => (
+  <Alert
+    severity={"warning"}
+    title={"Possible convention en doublon"}
+    description={
+      <div>
+        Des conventions ont été initiées avec des informations similaires. Voici
+        leurs identifiants :
+        <ul>
+          {props.similarConventionIds.map((id) => (
+            <li key={id}>{id}</li>
+          ))}
+        </ul>
+      </div>
+    }
+  />
+);

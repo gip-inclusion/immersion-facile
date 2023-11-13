@@ -13,10 +13,7 @@ import {
   appellationDtoSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { DailyScheduleDto } from "../schedule/Schedule.dto";
-import {
-  dateIsoStringSchema,
-  scheduleSchema,
-} from "../schedule/Schedule.schema";
+import { scheduleSchema } from "../schedule/Schedule.schema";
 import {
   calculateWeeklyHoursFromSchedule,
   isSundayInSchedule,
@@ -529,8 +526,14 @@ export const findSimilarConventionsParamsSchema: z.Schema<FindSimilarConventions
   z.object({
     siret: siretSchema,
     codeAppellation: appellationCodeSchema,
-    dateStart: dateIsoStringSchema,
-    beneficiaryBirthdate: dateIsoStringSchema,
+    dateStart: zStringMinLength1.regex(
+      dateRegExp,
+      localization.invalidDateStart,
+    ),
+    beneficiaryBirthdate: zStringMinLength1.regex(
+      dateRegExp,
+      localization.invalidDate,
+    ),
     beneficiaryLastName: zStringMinLength1,
   });
 
