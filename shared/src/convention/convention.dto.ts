@@ -15,6 +15,7 @@ import {
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
+import { DateIsoString } from "../utils/date";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
 
@@ -118,10 +119,10 @@ export type ConventionCommon = {
   status: ConventionStatus;
   statusJustification?: string;
   agencyId: AgencyId;
-  dateSubmission: string; // Date iso string
-  dateStart: string; // Date iso string
-  dateEnd: string; // Date iso string
-  dateValidation?: string; // Date iso string (undefined until the convention is validated)
+  dateSubmission: DateIsoString;
+  dateStart: DateIsoString;
+  dateEnd: DateIsoString;
+  dateValidation?: DateIsoString; // undefined until the convention is validated
   siret: SiretDto;
   businessName: string;
   schedule: ScheduleDto;
@@ -347,9 +348,9 @@ export type MarkPartnersErroredConventionAsHandledRequest = {
 export type FindSimilarConventionsParams = {
   siret: SiretDto;
   codeAppellation: AppellationCode;
-  dateStart: string; // Date iso string
-  beneficiaryBirthdate: string; // Date iso string
-  beneficiaryLastName: string;
+  dateStart: DateIsoString;
+  beneficiaryBirthdate: DateIsoString;
+  beneficiaryLastName: DateIsoString;
 };
 
 export type FindSimilarConventionsResponseDto = {

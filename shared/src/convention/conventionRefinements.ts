@@ -1,5 +1,6 @@
 import { differenceInYears } from "date-fns";
 import differenceInDays from "date-fns/differenceInDays";
+import { DateIsoString } from "../utils/date";
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
   ConventionDto,
@@ -11,14 +12,14 @@ import {
 } from "./convention.dto";
 
 type DatesInConvention = {
-  dateStart: string;
-  dateEnd: string;
-  dateSubmission: string;
+  dateStart: DateIsoString;
+  dateEnd: DateIsoString;
+  dateSubmission: DateIsoString;
 };
 
 type DatesAndInternshipKing = {
-  dateStart: string;
-  dateEnd: string;
+  dateStart: DateIsoString;
+  dateEnd: DateIsoString;
   internshipKind: InternshipKind;
 };
 
