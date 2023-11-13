@@ -150,3 +150,16 @@ export const createApiConsumerParamsFromApiConsumer = (
   contact: apiConsumer.contact,
   description: apiConsumer.description,
 });
+
+export const findSubscribedEventFromId = (
+  apiConsumer: ApiConsumer,
+  subscriptionId: ApiConsumerSubscriptionId,
+): SubscriptionEvent | undefined => {
+  for (const rightName of apiConsumerRightNames) {
+    const subscription = apiConsumer.rights[rightName].subscriptions.find(
+      (subscription) => subscription.id === subscriptionId,
+    );
+    if (subscription) return subscription.subscribedEvent;
+  }
+  return;
+};
