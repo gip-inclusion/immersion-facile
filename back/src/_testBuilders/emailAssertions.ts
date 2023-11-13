@@ -102,6 +102,7 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
         ? concatValidatorNames(convention.validators?.agencyValidator)
         : "",
       agencyAssessmentDocumentLink: agency.questionnaireUrl,
+      agencyValidatorEmail: agency.validatorEmails[0],
     },
   });
 
