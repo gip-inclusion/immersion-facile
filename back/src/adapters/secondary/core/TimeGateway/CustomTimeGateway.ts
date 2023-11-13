@@ -1,4 +1,4 @@
-import { DateIsoString } from "shared";
+import { DateString } from "shared";
 import { TimeGateway } from "../../../../domain/core/ports/TimeGateway";
 
 export class CustomTimeGateway implements TimeGateway {
@@ -26,7 +26,7 @@ export class CustomTimeGateway implements TimeGateway {
     this.#nextDates = dates;
   }
 
-  public setNextDateStr(dateStr: DateIsoString) {
+  public setNextDateStr(dateStr: DateString) {
     this.setNextDate(new Date(dateStr));
   }
 }

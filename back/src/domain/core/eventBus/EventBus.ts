@@ -1,4 +1,4 @@
-import { DateIsoString } from "shared";
+import { DateString } from "shared";
 import { TimeGateway } from "../ports/TimeGateway";
 import { UuidGenerator } from "../ports/UuidGenerator";
 import type {
@@ -35,7 +35,7 @@ type CreateEventDependencies = {
 export type CreateNewEvent = <T extends DomainTopic>(params: {
   topic: T;
   payload: NarrowEvent<T>["payload"];
-  occurredAt?: DateIsoString;
+  occurredAt?: DateString;
   wasQuarantined?: boolean;
   publications?: EventPublication[];
   status?: EventStatus;

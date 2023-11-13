@@ -3,7 +3,7 @@ import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
 import { Flavor } from "../typeFlavors";
 import { Either, ReplaceTypeAtKey } from "../utils";
-import { DateIsoString } from "../utils/date";
+import { DateString, DateTimeIsoString } from "../utils/date";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 
@@ -109,7 +109,7 @@ export type CreateWebhookSubscription = SubscriptionParams & {
 
 export type WebhookSubscription = CreateWebhookSubscription & {
   id: ApiConsumerSubscriptionId;
-  createdAt: DateIsoString;
+  createdAt: DateTimeIsoString;
 };
 
 export type ApiConsumer = ReplaceTypeAtKey<
@@ -117,8 +117,8 @@ export type ApiConsumer = ReplaceTypeAtKey<
   "rights",
   ApiConsumerRights
 > & {
-  createdAt: DateIsoString;
-  expirationDate: DateIsoString;
+  createdAt: DateString;
+  expirationDate: DateString;
 };
 
 export const createApiConsumerParamsFromApiConsumer = (

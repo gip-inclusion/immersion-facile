@@ -7,7 +7,7 @@ import {
   ApiConsumerRightName,
   ApiConsumerRights,
   apiConsumerSchema,
-  DateIsoString,
+  DateString,
   eventToRightName,
   WebhookSubscription,
 } from "shared";
@@ -205,8 +205,8 @@ type PgRawConsumerData = {
   consumer: string;
   description?: string;
   rights: ApiConsumerRights;
-  createdAt: DateIsoString;
-  expirationDate: DateIsoString;
+  createdAt: DateString;
+  expirationDate: DateString;
   contact: ApiConsumerContact;
   subscriptions: WebhookSubscription[];
 };

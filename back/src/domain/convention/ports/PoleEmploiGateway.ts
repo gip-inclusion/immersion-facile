@@ -1,4 +1,4 @@
-import { ConventionStatus, DateIsoString } from "shared";
+import { ConventionStatus, DateString } from "shared";
 
 // This is an interface contract with Pole Emploi (conventions broadcast).
 // ⚠️ Beware of NOT breaking contract ! ⚠️
@@ -40,10 +40,10 @@ export type PoleEmploiConvention = {
   telephone?: string;
   prenom: string;
   nom: string;
-  dateNaissance: DateIsoString;
-  dateDemande: DateIsoString;
-  dateDebut: DateIsoString;
-  dateFin: DateIsoString;
+  dateNaissance: DateString;
+  dateDemande: DateString;
+  dateDebut: DateString;
+  dateFin: DateString;
   dureeImmersion: number; // Ex : 20.75 (pour 20h45min)
   raisonSociale: string;
   siret: string;

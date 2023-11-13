@@ -11,7 +11,7 @@ import {
 } from "date-fns";
 import { clone, prop, uniq } from "ramda";
 import { arrayFromNumber } from "../utils";
-import { DateIsoString } from "../utils/date";
+import { DateString } from "../utils/date";
 import {
   DailyScheduleDto,
   DateIntervalDto,
@@ -26,7 +26,7 @@ import {
 
 export type DailyImmersionTimetableDto = {
   timePeriods: TimePeriodsDto | null;
-  date: DateIsoString;
+  date: DateString;
 };
 
 export type WeeklyImmersionTimetableDto = DailyImmersionTimetableDto[];

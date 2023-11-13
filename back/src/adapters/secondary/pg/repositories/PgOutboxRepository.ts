@@ -1,5 +1,5 @@
 import { differenceWith } from "ramda";
-import { DateIsoString, propEq, replaceArrayElement } from "shared";
+import { DateString, propEq, replaceArrayElement } from "shared";
 import type {
   DomainEvent,
   DomainTopic,
@@ -145,7 +145,7 @@ export const storedEventRowsToDomainEvent = (
         };
       }
 
-      const publishedAt: DateIsoString = row.published_at.toISOString();
+      const publishedAt: DateString = row.published_at.toISOString();
 
       const existingPublicationIndex = acc.publications.findIndex(
         propEq("publishedAt", publishedAt),

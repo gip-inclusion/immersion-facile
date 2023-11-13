@@ -1,5 +1,5 @@
 import { NotEmptyArray } from "../utils";
-import { DateIsoString } from "../utils/date";
+import { DateString, DateTimeIsoString } from "../utils/date";
 
 export type Weekday =
   | "lundi"
@@ -16,11 +16,11 @@ export type ScheduleDto = {
   isSimple: boolean;
   complexSchedule: DailyScheduleDto[];
 };
-export type TimePeriodDto = { start: DateIsoString; end: DateIsoString };
+export type TimePeriodDto = { start: DateString; end: DateString };
 export type TimePeriodsDto = TimePeriodDto[];
 
 export type DailyScheduleDto = {
-  date: DateIsoString;
+  date: DateTimeIsoString;
   timePeriods: TimePeriodsDto;
 };
 export type SelectedDaysOfTheWeekDto = WeekdayNumber[];

@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
-import { DateIsoString } from "shared";
+import { DateString } from "shared";
 import {
   EventBus,
   EventCallback,
@@ -83,7 +83,7 @@ export class InMemoryEventBus implements EventBus {
 
   async #publish(
     event: DomainEvent,
-    publishedAt: DateIsoString,
+    publishedAt: DateString,
   ): Promise<DomainEvent> {
     // the publication happens here, an event is expected in return,
     // with the publication added to the event
@@ -161,7 +161,7 @@ const isUndefined = (
 
 const publishEventWithNoCallbacks = (
   event: DomainEvent,
-  publishedAt: DateIsoString,
+  publishedAt: DateString,
 ): DomainEvent => {
   monitorAbsenceOfCallback(event);
 
