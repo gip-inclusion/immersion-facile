@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -108,11 +108,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const formContents = getFormFields();
   const getFieldError = makeFieldError(methods.formState);
 
+  const currentRoute = useRef(route);
+
   const debouncedFormValues = useDebounce(formValues);
 
-  const [isSearchable, setIsSearchable] = useState(
-    initialFormEstablishment.maxContactsPerWeek > noContactPerWeek,
-  );
+  const isSearchable = formValues.maxContactsPerWeek > noContactPerWeek;
 
   useInitialSiret(
     (isEstablishmentCreation || isEstablishmentAdmin) && route.params.siret
@@ -121,7 +121,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
 
   useEffect(() => {
-    match({ route, adminJwt })
+    match({ route: currentRoute.current, adminJwt })
       .with(
         {
           route: {
@@ -175,11 +175,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
-  }, []);
+  }, [adminJwt, dispatch, currentRoute]);
 
   useEffect(() => {
     reset(initialFormEstablishment);
-  }, [initialFormEstablishment]);
+  }, [initialFormEstablishment, reset]);
 
   useEffect(() => {
     if (isEstablishmentCreation) {
@@ -442,7 +442,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   nativeInputProps: {
                     checked: isSearchable,
                     onChange: (e) => {
-                      setIsSearchable(e.currentTarget.checked);
                       setValue(
                         "maxContactsPerWeek",
                         e.currentTarget.checked
@@ -455,21 +454,21 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               ]}
             />
           )}
-
-          {enableMaxContactPerWeek.isActive && isSearchable && (
-            <Input
-              label={formContents.maxContactsPerWeek.label}
-              nativeInputProps={{
-                ...formContents.maxContactsPerWeek,
-                ...register("maxContactsPerWeek", {
-                  valueAsNumber: true,
-                }),
-                type: "number",
-                min: 0,
-                pattern: "\\d*",
-              }}
-            />
-          )}
+          {enableMaxContactPerWeek.isActive &&
+            (isNaN(formValues.maxContactsPerWeek) || isSearchable) && (
+              <Input
+                label={formContents.maxContactsPerWeek.label}
+                nativeInputProps={{
+                  ...formContents.maxContactsPerWeek,
+                  ...register("maxContactsPerWeek", {
+                    valueAsNumber: true,
+                  }),
+                  type: "number",
+                  min: 0,
+                  pattern: "\\d*",
+                }}
+              />
+            )}
 
           {mode === "edit" && (
             <>
