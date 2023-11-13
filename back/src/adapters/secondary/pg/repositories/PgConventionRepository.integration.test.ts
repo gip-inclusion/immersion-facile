@@ -17,10 +17,7 @@ import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { ConflictError } from "../../../primary/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
-import {
-  beneficiaryCurrentEmployerIdColumnName,
-  PgConventionRepository,
-} from "./PgConventionRepository";
+import { PgConventionRepository } from "./PgConventionRepository";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
@@ -815,7 +812,7 @@ describe("PgConventionRepository", () => {
       `
       SELECT actors.*
       FROM actors 
-      LEFT JOIN conventions ON actors.id = conventions.${beneficiaryCurrentEmployerIdColumnName} 
+      LEFT JOIN conventions ON actors.id = conventions.beneficiary_current_employer_id 
       WHERE conventions.id = '${conventionId}'
       `,
     );

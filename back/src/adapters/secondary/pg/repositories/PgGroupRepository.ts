@@ -1,4 +1,3 @@
-import { Expression, RawBuilder, Simplify, sql } from "kysely";
 import {
   Group,
   GroupSlug,
@@ -8,7 +7,12 @@ import {
 } from "shared";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { GroupRepository } from "../../../../domain/offer/ports/GroupRepository";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import {
+  executeKyselyRawSqlQuery,
+  jsonBuildObject,
+  jsonStripNulls,
+  KyselyDb,
+} from "../kysely/kyselyUtils";
 
 const buildAppellationsArray = `JSON_AGG(
     JSON_BUILD_OBJECT(
@@ -179,31 +183,4 @@ export class PgGroupRepository implements GroupRepository {
       .where("group_slug", "=", groupSlug)
       .execute();
   }
-}
-
-// @TODO remove / move in utils when merged
-export function jsonBuildObject<O extends Record<string, Expression<unknown>>>(
-  obj: O,
-): RawBuilder<
-  Simplify<{
-    [K in keyof O]: O[K] extends Expression<infer V> ? V : never;
-  }>
-> {
-  return sql`json_build_object(${sql.join(
-    Object.keys(obj).flatMap((k) => [sql.lit(k), obj[k]]),
-  )})`;
-}
-
-type NullableToUndefined<A> = A extends null ? Exclude<A, null> | undefined : A;
-
-type StripNullRecursive<T> = {
-  [K in keyof T]: T[K] extends Record<any, unknown>
-    ? StripNullRecursive<T[K]>
-    : NullableToUndefined<T[K]>;
-};
-
-export function jsonStripNulls<T>(
-  obj: RawBuilder<T>,
-): RawBuilder<StripNullRecursive<T>> {
-  return sql`json_strip_nulls(${obj})`;
 }

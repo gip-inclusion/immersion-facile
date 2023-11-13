@@ -1,6 +1,5 @@
 import { ColumnType, Generated } from "kysely";
-import { InternshipKind } from "kysely-codegen/dist/db";
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, ConventionId } from "shared";
 
 export interface Database {
   actors: Actors;
@@ -29,6 +28,8 @@ type ImmersionObjectives =
   | "Confirmer un projet professionnel"
   | "Découvrir un métier ou un secteur d'activité"
   | "Initier une démarche de recrutement";
+
+type InternshipKind = "immersion" | "mini-stage-cci";
 
 interface Discussions {
   id: string;
@@ -128,7 +129,7 @@ interface ConventionExternalIds {
 }
 
 interface Conventions {
-  id: string;
+  id: ConventionId;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
   status: ConventionStatusType;
