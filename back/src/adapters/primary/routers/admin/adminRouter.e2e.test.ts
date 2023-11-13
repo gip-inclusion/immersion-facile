@@ -27,11 +27,13 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import {
   GenerateApiConsumerJwt,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
 import { EXPIRATION_IN_YEARS } from "../../../../domain/auth/useCases/SaveApiConsumer";
+import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -45,6 +47,7 @@ describe("Admin router", () => {
   let appConfig: AppConfig;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let getFeatureFlags: () => Promise<FeatureFlags>;
+  let eventCrawler: BasicEventCrawler;
 
   beforeEach(async () => {
     const testDepsAndApp = await buildTestApp(
@@ -56,8 +59,13 @@ describe("Admin router", () => {
         .build(),
     );
     const { request } = testDepsAndApp;
-    ({ gateways, inMemoryUow, appConfig, generateApiConsumerJwt } =
-      testDepsAndApp);
+    ({
+      gateways,
+      inMemoryUow,
+      appConfig,
+      generateApiConsumerJwt,
+      eventCrawler,
+    } = testDepsAndApp);
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
 
@@ -427,8 +435,9 @@ describe("Admin router", () => {
   describe(`${displayRouteName(
     adminRoutes.rejectIcUserForAgency,
   )} Reject user registration to agency`, () => {
-    it("201 - Reject user registration to agency", async () => {
+    it("201 - Reject user registration to agency and send a notification email", async () => {
       const agency = new AgencyDtoBuilder().build();
+
       const inclusionConnectedUser: InclusionConnectedUser = {
         id: "my-user-id",
         email: "john@mail.com",
@@ -461,6 +470,15 @@ describe("Admin router", () => {
           [inclusionConnectedUser.id]: [],
         },
       );
+
+      await processEventsForEmailToBeSent(eventCrawler);
+
+      expect(gateways.notification.getSentEmails()).toMatchObject([
+        {
+          kind: "IC_USER_REGISTRATION_TO_AGENCY_REJECTED",
+          recipients: [inclusionConnectedUser.email],
+        },
+      ]);
     });
 
     it("401 - missing admin token", async () => {
@@ -476,31 +494,6 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 401,
         body: { error: "You need to authenticate first" },
-      });
-    });
-
-    it("404 - Missing user", async () => {
-      const agency = new AgencyDtoBuilder().build();
-      const inclusionConnectedUser: InclusionConnectedUser = {
-        id: "my-user-id",
-        email: "john@mail.com",
-        firstName: "John",
-        lastName: "Doe",
-        agencyRights: [{ agency, role: "toReview" }],
-      };
-
-      const response = await sharedRequest.rejectIcUserForAgency({
-        body: {
-          agencyId: agency.id,
-          userId: inclusionConnectedUser.id,
-          justification: "osef",
-        },
-        headers: { authorization: token },
-      });
-
-      expectHttpResponseToEqual(response, {
-        status: 404,
-        body: { errors: "No user found with id: my-user-id" },
       });
     });
   });

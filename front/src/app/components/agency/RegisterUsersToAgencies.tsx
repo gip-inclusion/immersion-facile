@@ -8,7 +8,7 @@ import { AuthenticatedUserId } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { IcUserAgenciesToReview } from "./RejectIcUserRegistrationToAgencyForm";
+import { IcUserAgenciesToReview } from "./IcUserAgenciesToReview";
 
 export const RegisterUsersToAgencies = () => {
   const dispatch = useDispatch();
@@ -85,7 +85,8 @@ export const RegisterUsersToAgencies = () => {
             .with(
               {
                 feedback: P.when(
-                  (feedback) => feedback.kind === "agencyRejectToUserSuccess",
+                  (feedback) =>
+                    feedback.kind === "agencyRejectionForUserSuccess",
                 ),
               },
               () => (

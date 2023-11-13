@@ -255,7 +255,7 @@ describe("Agency registration for authenticated users", () => {
       dependencies.adminGateway.rejectUserToAgencyResponse$.next();
 
       expectIsUpdatingUserAgencyToBe(false);
-      expectFeedbackToEqual({ kind: "agencyRejectToUserSuccess" });
+      expectFeedbackToEqual({ kind: "agencyRejectionForUserSuccess" });
     });
 
     it("Fail to rejects the user for agency", () => {
