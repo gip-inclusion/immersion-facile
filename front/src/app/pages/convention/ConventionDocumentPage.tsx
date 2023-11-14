@@ -540,19 +540,26 @@ export const ConventionDocumentPage = ({
                 </li>
               )}
               {convention.agencyRefersTo && (
-                <li>
-                  ✔ L'agence prescriptrice{" "}
-                  {internshipKind === "immersion"
-                    ? "de l'immersion"
-                    : "du mini-stage"}
-                  , <strong>{convention.agencyRefersTo.name}</strong> (validée
-                  le{" "}
-                  {toDisplayedDate(
-                    new Date(throwOnMissingSignDate(convention.dateValidation)),
-                  )}
-                  ). La personne bénéficiaire est accompagnée par :{" "}
-                  <strong>{convention.agencyName}</strong>
-                </li>
+                <>
+                  <li>
+                    ✔ L'agence prescriptrice{" "}
+                    {internshipKind === "immersion"
+                      ? "de l'immersion"
+                      : "du mini-stage"}
+                    , <strong>{convention.agencyRefersTo.name}</strong> (validée
+                    le{" "}
+                    {toDisplayedDate(
+                      new Date(
+                        throwOnMissingSignDate(convention.dateValidation),
+                      ),
+                    )}
+                    ).
+                  </li>
+                  <li>
+                    La personne bénéficiaire est accompagnée par :{" "}
+                    <strong>{convention.agencyName}</strong>
+                  </li>
+                </>
               )}
             </ul>
           </div>
