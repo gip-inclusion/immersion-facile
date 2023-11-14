@@ -30,10 +30,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { tab: param.path.ofType(adminTabSerializer) },
     ({ tab }) => `/${frontRoutes.admin}/${tab}`,
   ),
-  agencyDashboard: defineRoute(
-    inclusionConnectedParams,
-    () => `/${frontRoutes.agencyDashboard}`,
-  ),
+  agencyDashboard: defineRoute(inclusionConnectedParams, () => [
+    `/${frontRoutes.agencyDashboard}`,
+    "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
+  ]),
   conventionCustomAgency: defineRoute(
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
     () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
