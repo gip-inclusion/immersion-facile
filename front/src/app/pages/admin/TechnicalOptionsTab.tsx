@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
@@ -15,6 +16,7 @@ import { match, P } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 import {
   ApiConsumer,
+  ApiConsumerJwt,
   FeatureFlagName,
   toDateString,
   toDisplayedDate,
@@ -31,6 +33,7 @@ import {
 import { commonContent } from "src/app/contents/commonContent";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
@@ -274,27 +277,10 @@ export const TechnicalOptionsTab = () => {
                   saveConsumerFeedbackKind: "createSuccess",
                 },
                 ({ lastCreatedToken }) => (
-                  <>
-                    <Alert
-                      severity="success"
-                      title="Consommateur Api ajouté !"
-                      className={"fr-mb-2w"}
-                    />
-                    <Input
-                      textArea
-                      label="Token généré"
-                      hintText="Ce token est à conserver précieusement, il ne sera plus affiché par la suite."
-                      nativeTextAreaProps={{
-                        readOnly: true,
-                        value: lastCreatedToken,
-                        rows: 5,
-                      }}
-                    />
-
-                    <Button type="button" onClick={onConfirmTokenModalClose}>
-                      J'ai bien copié le token, je peux fermer la fenêtre
-                    </Button>
-                  </>
+                  <ShowApiKeyToCopy
+                    lastCreatedToken={lastCreatedToken}
+                    onConfirmTokenModalClose={onConfirmTokenModalClose}
+                  />
                 ),
               )
               .with({ saveConsumerFeedbackKind: "updateSuccess" }, () => (
@@ -316,6 +302,56 @@ export const TechnicalOptionsTab = () => {
           document.body,
         )}
       </div>
+    </>
+  );
+};
+
+const ShowApiKeyToCopy = ({
+  lastCreatedToken,
+  onConfirmTokenModalClose,
+}: {
+  lastCreatedToken: ApiConsumerJwt;
+  onConfirmTokenModalClose: () => void;
+}) => {
+  const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
+    useCopyButton("Copier la clé API");
+
+  return (
+    <>
+      <Alert
+        severity="success"
+        title="Consommateur Api ajouté !"
+        className={"fr-mb-2w"}
+      />
+      <Input
+        textArea
+        label="Token généré"
+        hintText="Ce token est à conserver précieusement, il ne sera plus affiché par la suite."
+        nativeTextAreaProps={{
+          readOnly: true,
+          value: lastCreatedToken,
+          rows: 5,
+        }}
+      />
+
+      <ButtonsGroup
+        buttons={[
+          {
+            type: "button",
+            children: copyButtonLabel,
+            priority: "secondary",
+            disabled: copyButtonIsDisabled,
+            onClick: () => {
+              onCopyButtonClick(lastCreatedToken);
+            },
+          },
+          {
+            type: "button",
+            children: "J'ai bien copié le token, je peux fermer la fenêtre",
+            onClick: onConfirmTokenModalClose,
+          },
+        ]}
+      />
     </>
   );
 };
