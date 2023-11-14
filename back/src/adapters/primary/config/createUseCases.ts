@@ -18,6 +18,7 @@ import {
 } from "../../../domain/auth/jwt";
 import { SaveApiConsumer } from "../../../domain/auth/useCases/SaveApiConsumer";
 import { BroadcastToPartnersOnConventionUpdates } from "../../../domain/broadcast/useCases/BroadcastToPartnersOnConventionUpdates";
+import { DeleteSubscription } from "../../../domain/broadcast/useCases/DeleteSubscription";
 import { ListActiveSubscriptions } from "../../../domain/broadcast/useCases/ListActiveSubscriptions";
 import { SubscribeToWebhook } from "../../../domain/broadcast/useCases/SubscribeToWebhook";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
@@ -498,6 +499,7 @@ export const createUseCases = (
         uuidGenerator,
         gateways.timeGateway,
       ),
+      deleteSubscription: new DeleteSubscription(uowPerformer),
       shareConventionByEmail: new ShareConventionLinkByEmail(
         uowPerformer,
         saveNotificationAndRelatedEvent,

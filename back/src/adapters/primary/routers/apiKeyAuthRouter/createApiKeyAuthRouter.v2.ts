@@ -193,5 +193,16 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       }),
   );
 
+  webhooksV2Router.unsubscribeToWebhook(
+    deps.apiConsumerMiddleware,
+    (req, res) =>
+      sendHttpResponseForApiV2(req, res.status(204), async () => {
+        await deps.useCases.deleteSubscription.execute(
+          req.params.subscriptionId,
+          req.apiConsumer,
+        );
+      }),
+  );
+
   return v2ExpressRouter;
 };
