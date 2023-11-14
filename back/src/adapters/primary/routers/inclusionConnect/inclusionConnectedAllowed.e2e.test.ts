@@ -17,6 +17,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { GenerateInclusionConnectJwt } from "../../../../domain/auth/jwt";
 import { broadcastToPeServiceName } from "../../../../domain/core/ports/ErrorRepository";
+import { Gateways } from "../../config/createGateways";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("InclusionConnectedAllowedRoutes", () => {
@@ -37,10 +38,11 @@ describe("InclusionConnectedAllowedRoutes", () => {
   let httpClient: HttpClient<InclusionConnectedAllowedRoutes>;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
+  let gateways: Gateways;
 
   beforeEach(async () => {
     let request: SuperTest<Test>;
-    ({ request, generateInclusionConnectJwt, inMemoryUow } =
+    ({ request, generateInclusionConnectJwt, inMemoryUow, gateways } =
       await buildTestApp());
     httpClient = createSupertestSharedClient(
       inclusionConnectedAllowedRoutes,
@@ -79,7 +81,9 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: {
           ...inclusionConnectedUserWithRights,
           agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
-          establishmentRepresentativeDashboardUrl: `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${inclusionConnectedUserWithRights.email}/Wed Sep 01 2021 12:10:00 GMT+0200 (Central European Summer Time)`,
+          establishmentRepresentativeDashboardUrl: `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${
+            inclusionConnectedUserWithRights.email
+          }/${gateways.timeGateway.now()}`,
         },
         status: 200,
       });

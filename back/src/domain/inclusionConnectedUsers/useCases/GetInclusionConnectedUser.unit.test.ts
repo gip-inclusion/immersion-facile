@@ -36,14 +36,16 @@ describe("GetUserAgencyDashboardUrl", () => {
   let getInclusionConnectedUser: GetInclusionConnectedUser;
   let uowPerformer: InMemoryUowPerformer;
   let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     uowPerformer = new InMemoryUowPerformer(uow);
+    timeGateway = new CustomTimeGateway();
     getInclusionConnectedUser = new GetInclusionConnectedUser(
       uowPerformer,
       new StubDashboardGateway(),
-      new CustomTimeGateway(),
+      timeGateway,
     );
   });
 
@@ -194,7 +196,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
       expectToEqual(
         result.establishmentRepresentativeDashboardUrl,
-        "http://stubEstablishmentRepresentativeConventionsDashboardUrl/john@mail.com/Wed Sep 01 2021 12:10:00 GMT+0200 (Central European Summer Time)",
+        `http://stubEstablishmentRepresentativeConventionsDashboardUrl/john@mail.com/${timeGateway.now()}`,
       );
     });
 
