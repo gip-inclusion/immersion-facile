@@ -462,7 +462,6 @@ export const createOpenApiSpecV2 = (envType: string) =>
           },
         },
       },
-      // unsubscribeToWebhook: {} as any,
       subscribeToWebhook: {
         summary: "Souscription à un webhook",
         description:
@@ -501,6 +500,30 @@ export const createOpenApiSpecV2 = (envType: string) =>
             "401": { description: "Lorsque vous n'êtes pas authentifié" },
             "403": {
               description: "Lorsque vous n'avez pas suffisamment de droits",
+            },
+          },
+        },
+      },
+      unsubscribeToWebhook: {
+        summary: "Suppression d'une souscription de webhook",
+        description:
+          "Cette route permet de supprimer une souscription à un webhook.",
+        extraDocs: {
+          urlParams: {
+            subscriptionId: {
+              description: "Identifiant du webhook",
+            },
+          },
+          responses: {
+            "204": {
+              description: "Suppression du webhook réussie",
+            },
+            "401": { description: "Lorsque vous n'êtes pas authentifié" },
+            "403": {
+              description: "Lorsque vous n'avez pas suffisamment de droits",
+            },
+            "404": {
+              description: "La souscription demandée n'est pas trouvée",
             },
           },
         },

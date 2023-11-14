@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   createWebhookSubscriptionSchema,
+  emptyObjectSchema,
   expressEmptyResponseBody,
   httpErrorSchema,
   searchResultSchema,
@@ -115,15 +116,15 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
       403: httpErrorSchema,
     },
   }),
-  // unsubscribeToWebhook: defineRoute({
-  //   method: "delete",
-  //   url: "/v2/webhooks/:subscriptionId",
-  //   ...withAuthorizationHeaders,
-  //   responses: {
-  //     204: z.void(),
-  //     400: httpErrorSchema,
-  //     401: httpErrorSchema,
-  //     403: httpErrorSchema,
-  //   },
-  // }),
+  unsubscribeToWebhook: defineRoute({
+    method: "delete",
+    url: "/v2/webhooks/:subscriptionId",
+    ...withAuthorizationHeaders,
+    responses: {
+      204: emptyObjectSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
 });

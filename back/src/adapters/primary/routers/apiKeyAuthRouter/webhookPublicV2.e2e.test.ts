@@ -165,4 +165,128 @@ describe("Webhook routes", () => {
       });
     });
   });
+
+  describe(`${publicApiV2WebhooksRoutes.unsubscribeToWebhook.method.toUpperCase()} ${
+    publicApiV2WebhooksRoutes.subscribeToWebhook.url
+  }`, () => {
+    it("204 - delete the requested webhook subscription", async () => {
+      const subscription: WebhookSubscription = {
+        id: "subscription-id",
+        callbackHeaders: {
+          authorization: "my-cb-auth-header",
+        },
+        callbackUrl: "https://www.my-service.com/convention-updated",
+        subscribedEvent: "convention.updated",
+        createdAt: new Date("2022-01-01T12:00:00.000Z").toISOString(),
+      };
+      const apiConsumersWithSubscriptions: ApiConsumer = {
+        ...authorizedSubscriptionApiConsumer,
+        rights: {
+          convention: {
+            kinds: ["SUBSCRIPTION"],
+            scope: {
+              agencyKinds: [],
+            },
+            subscriptions: [subscription],
+          },
+          searchEstablishment: {
+            kinds: [],
+            scope: "no-scope",
+            subscriptions: [],
+          },
+        },
+      };
+      inMemoryUow.apiConsumerRepository.consumers = [
+        apiConsumersWithSubscriptions,
+      ];
+      const authToken = generateApiConsumerJwt({
+        id: authorizedSubscriptionApiConsumer.id,
+      });
+
+      const response = await sharedRequest.unsubscribeToWebhook({
+        headers: {
+          authorization: authToken,
+        },
+        urlParams: {
+          subscriptionId: subscription.id,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 204,
+        body: {},
+      });
+    });
+
+    it("401 - rejects when unauthorized", async () => {
+      const response = await sharedRequest.unsubscribeToWebhook({
+        headers: {
+          authorization: "incorrect-jwt",
+        },
+        urlParams: {
+          subscriptionId: "subscription-id",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: {
+          message: "incorrect Jwt",
+          status: 401,
+        },
+      });
+    });
+
+    it("403 - rejects when SUBSCRIPTION kind is not in the rights", async () => {
+      const subscription: WebhookSubscription = {
+        id: "subscription-id",
+        callbackHeaders: {
+          authorization: "my-cb-auth-header",
+        },
+        callbackUrl: "https://www.my-service.com/convention-updated",
+        subscribedEvent: "convention.updated",
+        createdAt: new Date("2022-01-01T12:00:00.000Z").toISOString(),
+      };
+      const unauthorizedApiConsumerWithSubscriptions: ApiConsumer = {
+        ...unauthorizedApiConsumer,
+        rights: {
+          convention: {
+            kinds: [],
+            scope: {
+              agencyKinds: [],
+            },
+            subscriptions: [subscription],
+          },
+          searchEstablishment: {
+            kinds: [],
+            scope: "no-scope",
+            subscriptions: [],
+          },
+        },
+      };
+      inMemoryUow.apiConsumerRepository.consumers = [
+        unauthorizedApiConsumerWithSubscriptions,
+      ];
+      const authToken = generateApiConsumerJwt({
+        id: unauthorizedApiConsumerWithSubscriptions.id,
+      });
+
+      const response = await sharedRequest.unsubscribeToWebhook({
+        headers: {
+          authorization: authToken,
+        },
+        urlParams: {
+          subscriptionId: subscription.id,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          message: `You do not have the "SUBSCRIPTION" kind associated to the "convention" right`,
+          status: 403,
+        },
+      });
+    });
+  });
 });
