@@ -93,7 +93,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
         ? {
             establishmentRepresentativeDashboardUrl:
               await this.#dashboardGateway.getEstablishmentRepresentativeConventionsDashboardUrl(
-                user.email,
+                user.id,
                 this.#timeGateway.now(),
               ),
           }

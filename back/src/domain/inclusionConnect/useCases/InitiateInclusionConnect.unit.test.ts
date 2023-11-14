@@ -3,7 +3,7 @@ import {
   allowedStartInclusionConnectLoginPages,
   expectToEqual,
   queryParamsAsString,
-  StartInclusionConnectLoginQueryParams,
+  WithSourcePage,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -41,7 +41,7 @@ describe("InitiateInclusionConnect usecase", () => {
 
       uuidGenerator.setNextUuids([nonce, state]);
 
-      const sourcePage: StartInclusionConnectLoginQueryParams = {
+      const sourcePage: WithSourcePage = {
         page,
       };
       const redirectUrl = await useCase.execute(sourcePage);
@@ -51,7 +51,7 @@ describe("InitiateInclusionConnect usecase", () => {
           `${inclusionConnectBaseUri}/auth?${[
             `client_id=${clientId}`,
             `nonce=${nonce}`,
-            `redirect_uri=${immersionRedirectUri}?${queryParamsAsString(
+            `redirect_uri=${immersionRedirectUri}?${queryParamsAsString<WithSourcePage>(
               sourcePage,
             )}`,
             `response_type=${responseType}`,

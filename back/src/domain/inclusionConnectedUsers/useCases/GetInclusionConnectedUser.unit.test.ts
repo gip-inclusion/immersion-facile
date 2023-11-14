@@ -196,7 +196,9 @@ describe("GetUserAgencyDashboardUrl", () => {
 
       expectToEqual(
         result.establishmentRepresentativeDashboardUrl,
-        `http://stubEstablishmentRepresentativeConventionsDashboardUrl/john@mail.com/${timeGateway.now()}`,
+        `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${
+          john.id
+        }/${timeGateway.now()}`,
       );
     });
 

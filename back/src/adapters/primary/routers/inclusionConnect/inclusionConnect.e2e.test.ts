@@ -81,7 +81,7 @@ describe("inclusion connection flow", () => {
               `nonce=${nonce}`,
               `redirect_uri=https://${domain}/api${
                 inclusionConnectImmersionRoutes.afterLoginRedirection.url
-              }?${queryParamsAsString(queryParams)}`,
+              }?${queryParamsAsString<WithSourcePage>(queryParams)}`,
               `response_type=${responseType}`,
               `scope=${scope}`,
               `state=${state}`,

@@ -1,14 +1,10 @@
-import {
-  AbsoluteUrl,
-  queryParamsAsString,
-  StartInclusionConnectLoginQueryParams,
-} from "shared";
+import { AbsoluteUrl, queryParamsAsString, WithSourcePage } from "shared";
 import { InclusionConnectConfig } from "../useCases/InitiateInclusionConnect";
 
 export const makeInclusionConnectRedirectUri = (
   config: InclusionConnectConfig,
-  params: StartInclusionConnectLoginQueryParams,
+  params: WithSourcePage,
 ): AbsoluteUrl =>
-  `${
-    config.immersionRedirectUri
-  }?${queryParamsAsString<StartInclusionConnectLoginQueryParams>(params)}`;
+  `${config.immersionRedirectUri}?${queryParamsAsString<WithSourcePage>(
+    params,
+  )}`;

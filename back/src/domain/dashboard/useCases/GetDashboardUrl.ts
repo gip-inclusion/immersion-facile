@@ -1,4 +1,5 @@
 import { AbsoluteUrl, GetDashboardParams, getDashboardParams } from "shared";
+import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";
@@ -30,9 +31,8 @@ export class GetDashboardUrl extends UseCase<GetDashboardParams, AbsoluteUrl> {
         this.#timeGateway.now(),
       );
     if (params.name === "establishmentRepresentativeConventions")
-      return this.#dashboardGateway.getEstablishmentRepresentativeConventionsDashboardUrl(
-        params["email_repr%C3%A9sentant_de_l'entreprise"],
-        this.#timeGateway.now(),
+      throw new ForbiddenError(
+        "establishmentRepresentativeConventions is not available for GetDashboardUrl",
       );
     return this.#dashboardGateway.getDashboardUrl(
       params.name,

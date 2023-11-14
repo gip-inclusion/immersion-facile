@@ -2,7 +2,7 @@ import { defineRoute, defineRoutes } from "shared-routes";
 import { emptyObjectSchema } from "../zodUtils";
 import {
   authenticateWithInclusionCodeSchema,
-  startInclusionConnectLoginQueryParamsSchema,
+  withSourcePageSchema,
 } from "./inclusionConnect.schema";
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
@@ -13,7 +13,7 @@ export const inclusionConnectImmersionRoutes = defineRoutes({
   startInclusionConnectLogin: defineRoute({
     method: "get",
     url: "/inclusion-connect-start-login",
-    queryParamsSchema: startInclusionConnectLoginQueryParamsSchema,
+    queryParamsSchema: withSourcePageSchema,
     responses: {
       302: emptyObjectSchema,
     },
