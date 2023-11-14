@@ -33,7 +33,7 @@ export const IcUserAgenciesToReview = ({
   selectedUserId,
 }: IcUserAgenciesToReviewProps) => {
   const dispatch = useDispatch();
-  const [clickedAgencyId, setClickedAgencyId] = useState<AgencyId>();
+  const [selectedAgency, setSelectedAgency] = useState<AgencyDto>();
 
   const registerIcUserToAgency = (agency: AgencyDto) => {
     dispatch(
@@ -104,7 +104,7 @@ export const IcUserAgenciesToReview = ({
                       type: "button",
                       priority: "secondary",
                       onClick: () => {
-                        setClickedAgencyId(agency.id);
+                        setSelectedAgency(agency);
                         openRejectIcUserRegistrationToAgencyModal();
                       },
                       children: "Refuser",
@@ -117,10 +117,10 @@ export const IcUserAgenciesToReview = ({
         </div>
       ))}
       {createPortal(
-        <RejectIcUserRegistrationToAgencyModal title="toto">
-          {clickedAgencyId ? (
+        <RejectIcUserRegistrationToAgencyModal title="Refuser le rattachement">
+          {selectedAgency ? (
             <RejectIcUserRegistrationToAgencyForm
-              agencyId={clickedAgencyId}
+              agency={{ id: selectedAgency.id, name: selectedAgency.name }}
               userId={selectedUserId}
             />
           ) : (
@@ -169,12 +169,15 @@ const {
 });
 
 type RejectIcUserRegistrationToAgencyFormProps = {
-  agencyId: AgencyId;
+  agency: {
+    id: AgencyId;
+    name: string;
+  };
   userId: AuthenticatedUserId;
 };
 
 const RejectIcUserRegistrationToAgencyForm = ({
-  agencyId,
+  agency,
   userId,
 }: RejectIcUserRegistrationToAgencyFormProps) => {
   const dispatch = useDispatch();
@@ -184,7 +187,7 @@ const RejectIcUserRegistrationToAgencyForm = ({
       resolver: zodResolver(rejectIcUserRoleForAgencyParamsSchema),
       mode: "onTouched",
       defaultValues: {
-        agencyId,
+        agencyId: agency.id,
         userId,
         justification: "",
       },
@@ -204,7 +207,7 @@ const RejectIcUserRegistrationToAgencyForm = ({
   return (
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <Input
-        label="justification"
+        label={`Motif de refus de rattachement à l'agence ${agency.name}`}
         nativeInputProps={register("justification")}
         {...getFieldError("justification")}
       />
@@ -213,14 +216,14 @@ const RejectIcUserRegistrationToAgencyForm = ({
         inlineLayoutWhen="always"
         buttons={[
           {
-            type: "submit",
-            children: "Refuser le rattachement",
-          },
-          {
             type: "button",
             priority: "secondary",
             onClick: closeRejectIcUserRegistrationToAgencyModal,
             children: "Annuler",
+          },
+          {
+            type: "submit",
+            children: "Refuser le rattachement",
           },
         ]}
       />
