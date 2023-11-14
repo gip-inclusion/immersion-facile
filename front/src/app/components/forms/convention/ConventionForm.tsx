@@ -467,11 +467,12 @@ const DuplicateConventionAlert = (props: {
 }) => (
   <Alert
     severity={"warning"}
-    title={"Possible convention en doublon"}
+    title={"Attention ! Possible convention en doublon."}
     description={
       <div>
-        Des conventions ont été initiées avec des informations similaires. Voici
-        leurs identifiants :
+        {props.similarConventionIds.length === 1
+          ? "Une convention a déjà été initiée avec des informations similaires. Voici son identifiant :"
+          : "Des conventions ont déjà été initiées avec des informations similaires. Voici leurs identifiants :"}
         <ul>
           {props.similarConventionIds.map((id) => (
             <li key={id}>{id}</li>
