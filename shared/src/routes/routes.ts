@@ -13,7 +13,7 @@ export const frontRoutes = {
   conventionStatusDashboard: "statut-convention",
   conventionToSign: "verifier-et-signer",
   editFormEstablishmentRoute: "edition-etablissement",
-  [allowedStartInclusionConnectLoginPages[1]]: "entreprise-dashboard",
+  [allowedStartInclusionConnectLoginPages[1]]: "pilotage-etablissement",
   error: "error",
   establishment: "establishment",
   group: "groupe",

@@ -2,13 +2,13 @@ import { z } from "zod";
 import {
   GetAdminDashboardParams,
   GetConventionMagicLinkDashboardParams,
-  simpleDashboardKinds,
+  simpleDashboardNames,
 } from "./dashboard.dto";
 
 export const getAdminDashboardParamsSchema: z.Schema<GetAdminDashboardParams> =
   z.union([
     z.object({
-      name: z.enum(simpleDashboardKinds),
+      name: z.enum(simpleDashboardNames),
     }),
     z.object({
       name: z.enum(["agency"]),

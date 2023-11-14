@@ -1,42 +1,37 @@
 import { AgencyId } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
-import { Email } from "../email/email.dto";
+import { AuthenticatedUserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 
 export type DashboardName =
-  | AdminDashboardKind
+  | AdminDashboardName
   | ConventionMagicLinkDashboardName
-  | EstablishmentDashboardKind;
+  | EstablishmentDashboardName;
 
-export type EstablishmentDashboardKind =
-  (typeof establishmentDashboardKinds)[number];
+export type EstablishmentDashboardName =
+  (typeof establishmentDashboardNames)[number];
 
-export const establishmentDashboardKinds = [
+export const establishmentDashboardNames = [
   "establishmentRepresentativeConventions",
 ] as const;
 
-export const simpleDashboardKinds = [
+export const simpleDashboardNames = [
   "conventions",
   "events",
   "establishments",
 ] as const;
 
-export const adminDashboardKinds = [
-  ...simpleDashboardKinds,
+export const adminDashboardNames = [
+  ...simpleDashboardNames,
   "agency",
   "erroredConventions",
 ] as const;
-export type AdminDashboardKind = (typeof adminDashboardKinds)[number];
+export type AdminDashboardName = (typeof adminDashboardNames)[number];
 
 export type ConventionMagicLinkDashboardName =
   (typeof conventionMagicLinkDashboardNames)[number];
 export const conventionMagicLinkDashboardNames = ["conventionStatus"] as const;
 
-type GenericGetDashboardParams<
-  N extends
-    | AdminDashboardKind
-    | ConventionMagicLinkDashboardName
-    | EstablishmentDashboardKind,
-> = {
+type GenericGetDashboardParams<N extends DashboardName> = {
   name: N;
 };
 
@@ -47,7 +42,7 @@ export type GetDashboardParams =
 
 export type GetEstablishmentDashboardParams =
   GenericGetDashboardParams<"establishmentRepresentativeConventions"> & {
-    "email_repr%C3%A9sentant_de_l'entreprise": Email;
+    ic_user_id: AuthenticatedUserId;
   };
 
 export type GetAdminDashboardParams =

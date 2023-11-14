@@ -19,8 +19,6 @@ export type WithSourcePage = {
   page: AllowedStartInclusionConnectLoginSourcesKind;
 };
 
-export type StartInclusionConnectLoginQueryParams = WithSourcePage;
-
 export type AuthenticatedUserQueryParams = {
   token: string;
 } & Pick<AuthenticatedUser, "email" | "firstName" | "lastName">;

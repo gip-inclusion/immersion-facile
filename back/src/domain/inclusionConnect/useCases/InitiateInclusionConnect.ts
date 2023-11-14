@@ -1,8 +1,8 @@
 import {
   AbsoluteUrl,
   queryParamsAsString,
-  StartInclusionConnectLoginQueryParams,
-  startInclusionConnectLoginQueryParamsSchema,
+  WithSourcePage,
+  withSourcePageSchema,
 } from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -28,10 +28,10 @@ export type InclusionConnectConfig = {
 };
 
 export class InitiateInclusionConnect extends TransactionalUseCase<
-  StartInclusionConnectLoginQueryParams,
+  WithSourcePage,
   AbsoluteUrl
 > {
-  protected inputSchema = startInclusionConnectLoginQueryParamsSchema;
+  protected inputSchema = withSourcePageSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -42,7 +42,7 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: StartInclusionConnectLoginQueryParams,
+    params: WithSourcePage,
     uow: UnitOfWork,
   ): Promise<AbsoluteUrl> {
     const nonce = this.uuidGenerator.new();

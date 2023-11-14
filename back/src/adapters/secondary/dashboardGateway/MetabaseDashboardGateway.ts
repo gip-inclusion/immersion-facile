@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import {
   AbsoluteUrl,
   AgencyId,
+  AuthenticatedUserId,
   ConventionId,
   DashboardName,
-  Email,
 } from "shared";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 
@@ -83,16 +83,14 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   }
 
   public getEstablishmentRepresentativeConventionsDashboardUrl(
-    establishmentRepresentativeEmail: Email,
+    authenticatedUserId: AuthenticatedUserId,
     now: Date,
   ): AbsoluteUrl {
     const dashboard = dashboardByName.establishmentRepresentativeConventions;
     const token = this.#createToken({
       dashboard,
       params: {
-        "email_repr%C3%A9sentant_de_l'entreprise": [
-          establishmentRepresentativeEmail,
-        ],
+        ic_user_id: [authenticatedUserId],
       },
       now,
     });

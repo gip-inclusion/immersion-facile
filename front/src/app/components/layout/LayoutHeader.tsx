@@ -154,15 +154,6 @@ export const LayoutHeader = () => {
             id: establishmentIds.formConvention,
           },
         },
-        // {
-        //   text: "Piloter mon entreprise",
-        //   isActive: false,
-        //   linkProps: {
-        //     ...routes.establishmentDashboard().link,
-        //     "aria-disabled": true,
-        //     id: establishmentIds.establishmentDashboard,
-        //   },
-        // },
       ],
     },
     {
@@ -228,6 +219,17 @@ export const LayoutHeader = () => {
             id: adminIds.emails,
           },
         },
+        //In the end - Should be placed at the establishment menu
+        {
+          text: "🛠 DEMO - Piloter mon entreprise 🛠",
+          isActive: false,
+          linkProps: {
+            ...routes.establishmentDashboard().link,
+            "aria-disabled": true,
+            id: establishmentIds.establishmentDashboard,
+          },
+        },
+        //-------------------------------------------------------
       ],
     });
   }
