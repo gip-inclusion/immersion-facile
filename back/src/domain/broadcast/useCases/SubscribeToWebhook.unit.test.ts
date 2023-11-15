@@ -57,7 +57,7 @@ describe("SubscribeToWebhook", () => {
     uow.apiConsumerRepository.consumers = [apiConsumer];
 
     const subscriptionParams: SubscriptionParams = {
-      callbackHeaders: { authorization: "lol" },
+      callbackHeaders: { authorization: "lol", operateur: "el-classico" },
       callbackUrl: "https://www.lol.com",
     };
 

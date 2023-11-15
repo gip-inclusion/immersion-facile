@@ -11,6 +11,8 @@ import {
   ApiConsumer,
   ApiConsumerContact,
   apiConsumerKinds,
+  authorizedCallbackHeaderKeys,
+  CallbackHeaders,
   CreateApiConsumerParams,
   CreateApiConsumerRights,
   CreateWebhookSubscription,
@@ -27,11 +29,16 @@ const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({
 
 export const apiConsumerJwtSchema: z.Schema<ApiConsumerJwt> = z.string();
 
+const callbackHeadersSchema: z.Schema<CallbackHeaders> = z.record(
+  z.enum(authorizedCallbackHeaderKeys),
+  zStringMinLength1,
+);
+
 export const createWebhookSubscriptionSchema: z.Schema<CreateWebhookSubscription> =
   z.object({
     subscribedEvent: z.enum(["convention.updated"]),
     callbackUrl: absoluteUrlSchema,
-    callbackHeaders: z.object({ authorization: z.string() }),
+    callbackHeaders: callbackHeadersSchema,
   });
 
 export const webhookSubscriptionSchema: z.Schema<WebhookSubscription> =
