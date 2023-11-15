@@ -84,9 +84,18 @@ export const isApiConsumerAllowed = ({
 }): boolean =>
   !!apiConsumer && apiConsumer.rights[rightName].kinds.includes(consumerKind);
 
-export type CallbackHeaders = {
-  authorization: string;
-};
+export const authorizedCallbackHeaderKeys = [
+  "authorization",
+  "X-Gravitee-Api-Key",
+  "operateur",
+] as const;
+
+type AuthorizedCallbackHeaderKey =
+  (typeof authorizedCallbackHeaderKeys)[number];
+
+export type CallbackHeaders = Partial<
+  Record<AuthorizedCallbackHeaderKey, string>
+>;
 
 export const eventToRightName = (
   event: SubscriptionEvent,

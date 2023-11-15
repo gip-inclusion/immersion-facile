@@ -119,7 +119,10 @@ describe("PgApiConsumerRepository", () => {
 
       const subscription: WebhookSubscription = {
         callbackUrl: "https://partner-callback-url",
-        callbackHeaders: { authorization: "my-cb-auth-header" },
+        callbackHeaders: {
+          authorization: "my-cb-auth-header",
+          "X-Gravitee-Api-Key": "gravitee",
+        },
         subscribedEvent: "convention.updated",
         createdAt: new Date().toISOString(),
         id: new UuidV4Generator().new(),
