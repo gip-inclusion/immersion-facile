@@ -1,7 +1,9 @@
 import { SuperTest, Test } from "supertest";
 import {
   ApiConsumer,
+  CallbackHeaders,
   expectHttpResponseToEqual,
+  expectToEqual,
   WebhookSubscription,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -65,6 +67,46 @@ describe("Webhook routes", () => {
         status: 201,
         body: "",
       });
+    });
+
+    it("201- saves a webhook with custom headers for authorized consumer", async () => {
+      inMemoryUow.apiConsumerRepository.consumers = [
+        authorizedSubscriptionApiConsumer,
+      ];
+      const authToken = generateApiConsumerJwt({
+        id: authorizedSubscriptionApiConsumer.id,
+      });
+      const callbackHeaders: CallbackHeaders = {
+        authorization: "Bearer some-string-provided-by-consumer",
+        customHeader1: "additional-data",
+        customHeader2: "additional-data-2",
+      };
+
+      const response = await sharedRequest.subscribeToWebhook({
+        headers: {
+          authorization: authToken,
+        },
+        body: {
+          callbackHeaders,
+          callbackUrl:
+            "https://some-url-provided-by-consumer.com/on-convention-updated",
+          subscribedEvent: "convention.updated",
+        },
+      });
+
+      const savedConsumer = await inMemoryUow.apiConsumerRepository.getById(
+        authorizedSubscriptionApiConsumer.id,
+      );
+      const savedCallbackHeaders =
+        savedConsumer?.rights.convention.subscriptions.find(
+          (subscription) =>
+            subscription.subscribedEvent === "convention.updated",
+        )?.callbackHeaders;
+      expectHttpResponseToEqual(response, {
+        status: 201,
+        body: "",
+      });
+      expectToEqual(savedCallbackHeaders, callbackHeaders);
     });
 
     // Wrong paths

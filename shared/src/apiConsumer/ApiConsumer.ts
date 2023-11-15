@@ -86,7 +86,7 @@ export const isApiConsumerAllowed = ({
 
 export type CallbackHeaders = {
   authorization: string;
-};
+} & Record<string, string>;
 
 export const eventToRightName = (
   event: SubscriptionEvent,

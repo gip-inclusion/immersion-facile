@@ -31,7 +31,9 @@ export const createWebhookSubscriptionSchema: z.Schema<CreateWebhookSubscription
   z.object({
     subscribedEvent: z.enum(["convention.updated"]),
     callbackUrl: absoluteUrlSchema,
-    callbackHeaders: z.object({ authorization: z.string() }),
+    callbackHeaders: z
+      .object({ authorization: z.string() })
+      .and(z.record(z.string(), z.string())),
   });
 
 export const webhookSubscriptionSchema: z.Schema<WebhookSubscription> =
