@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, castError } from "shared";
 import {
   ShortLinkId,
   ShortLinkQuery,
@@ -34,7 +34,10 @@ export class PgShortLinkQuery implements ShortLinkQuery {
         return result.url as AbsoluteUrl;
       })
       .catch((error) => {
-        logger.error({ error }, "PgShortLinkQueryGetByIdError");
+        logger.error(
+          { error: castError(error) },
+          "PgShortLinkQueryGetByIdError",
+        );
         throw error;
       });
   }

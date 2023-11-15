@@ -1,5 +1,5 @@
-import { AxiosInstance } from "axios";
-import { SubscriptionParams } from "shared";
+import axios, { AxiosInstance } from "axios";
+import { castError, SubscriptionParams } from "shared";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscribersGateway,
@@ -20,8 +20,8 @@ export class HttpSubscribersGateway implements SubscribersGateway {
     { payload, subscribedEvent }: ConventionUpdatedSubscriptionCallbackBody,
     { callbackUrl, callbackHeaders }: SubscriptionParams,
   ): Promise<void> {
-    try {
-      const response = await this.#axios.post(
+    return this.#axios
+      .post(
         callbackUrl,
         {
           payload,
@@ -30,22 +30,29 @@ export class HttpSubscribersGateway implements SubscribersGateway {
         {
           headers: callbackHeaders,
         },
-      );
-      logger.info({
-        title: "Partner subscription notified successfully",
-        callbackUrl,
-        status: response.status,
-      });
-    } catch (error: any) {
-      const errorContext = {
-        title: "Partner subscription errored",
-        callbackUrl,
-        status: error?.response?.status,
-        message: error?.response?.data ?? error.message,
-      };
+      )
+      .then((response) => {
+        logger.info({
+          title: "Partner subscription notified successfully",
+          callbackUrl,
+          status: response.status,
+        });
+      })
+      .catch((err) => {
+        const error = castError(err);
+        const errorContext = {
+          title: "Partner subscription errored",
+          callbackUrl,
+          status: axios.isAxiosError(error)
+            ? error.response?.status
+            : "not an axios error",
+          message: axios.isAxiosError(error)
+            ? (error.response?.data as unknown)
+            : error.message,
+        };
 
-      logger.error({ ...errorContext, error });
-      notifyObjectDiscord(errorContext);
-    }
+        logger.error({ ...errorContext, error });
+        notifyObjectDiscord(errorContext);
+      });
   }
 }

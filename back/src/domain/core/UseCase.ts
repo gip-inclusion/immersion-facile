@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   calculateDurationInSecondsFrom,
+  castError,
   ConventionJwtPayload,
   stringToMd5,
 } from "shared";
@@ -102,14 +103,14 @@ export abstract class TransactionalUseCase<
         ...(paramsHash ? { paramsHash } : {}),
       });
       return result;
-    } catch (error: any) {
+    } catch (error) {
       const durationInSeconds = calculateDurationInSecondsFrom(startDate);
       logger.error({
         useCaseName,
         status: "error",
         durationInSeconds,
         ...(paramsHash ? { paramsHash } : {}),
-        errorMessage: error?.message,
+        errorMessage: castError(error).message,
       });
       throw error;
     }

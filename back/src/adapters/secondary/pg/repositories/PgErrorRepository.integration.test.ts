@@ -82,18 +82,23 @@ describe("PgErrorRepository", () => {
         conventionId1,
       );
 
-      const response = await client.query(
-        "SELECT * FROM saved_errors ORDER BY id",
-      );
+      const response = await client.query<{
+        service_name: string;
+        message: string;
+        params: Record<string, unknown>;
+        occurred_at: Date;
+        handled_by_agency: boolean;
+      }>("SELECT * FROM saved_errors ORDER BY id");
+
       expectToEqual(
         response.rows.map(
           (row) =>
             ({
-              handledByAgency: row.handled_by_agency,
-              message: row.message,
-              occurredAt: row.occurred_at,
-              params: row.params,
               serviceName: row.service_name,
+              message: row.message,
+              params: row.params,
+              occurredAt: row.occurred_at,
+              handledByAgency: row.handled_by_agency,
             } satisfies SavedError),
         ),
         [

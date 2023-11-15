@@ -3,6 +3,7 @@ import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
   ApiConsumerName,
   backOfficeJwtPayloadSchema,
+  castError,
   ConventionJwtPayload,
   currentJwtVersions,
   ExtractFromExisting,
@@ -186,7 +187,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
         {
           error,
         },
-        `makeApiKeyAuthMiddlewareV1 : ${(error as any).message}`,
+        `makeApiKeyAuthMiddlewareV1 : ${castError(error).message}`,
       );
       incTotalCountForRequest({
         authorisationStatus: "incorrectJwt",
@@ -230,7 +231,7 @@ export const makeMagicLinkAuthMiddleware = (
           : { [payloadKey]: payload };
 
       next();
-    } catch (err: unknown) {
+    } catch (err) {
       const unsafePayload = jwt.decode(maybeJwt) as ConventionJwtPayload;
       if (err instanceof TokenExpiredError) {
         logger.warn(
@@ -245,8 +246,8 @@ export const makeMagicLinkAuthMiddleware = (
       try {
         verifyDeprecatedJwt(maybeJwt);
         return sendNeedsRenewedLinkError(res, err);
-      } catch (error: any) {
-        return sendAuthenticationError(res, error);
+      } catch (error) {
+        return sendAuthenticationError(res, castError(error));
       }
     }
   };
@@ -340,7 +341,7 @@ export const makeConsumerMiddleware = (
         {
           error,
         },
-        `makeApiKeyAuthMiddlewareV2 : ${(error as any).message}`,
+        `makeApiKeyAuthMiddlewareV2 : ${castError(error).message}`,
       );
       incTotalCountForRequest({
         authorisationStatus: "incorrectJwt",

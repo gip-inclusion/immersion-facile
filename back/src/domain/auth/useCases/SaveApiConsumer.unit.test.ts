@@ -190,7 +190,7 @@ describe("SaveApiConsumer", () => {
             authorizedUnJeuneUneSolutionApiConsumer,
           ),
           {
-            role: wrongRole as any,
+            role: wrongRole as BackOfficeJwtPayload["role"],
             sub: "123",
           },
         ),

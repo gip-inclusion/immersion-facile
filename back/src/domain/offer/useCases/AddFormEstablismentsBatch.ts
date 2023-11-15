@@ -1,4 +1,5 @@
 import {
+  castError,
   CommonJwtPayload,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -63,10 +64,10 @@ export class AddFormEstablishmentBatch extends UseCase<
           try {
             await this.addFormEstablishmentUseCase.execute(formEstablishment);
             report.numberOfSuccess += 1;
-          } catch (error: any) {
+          } catch (error) {
             report.failures.push({
               siret: formEstablishment.siret,
-              errorMessage: error?.message,
+              errorMessage: castError(error).message,
             });
           } finally {
             report.numberOfEstablishmentsProcessed += 1;

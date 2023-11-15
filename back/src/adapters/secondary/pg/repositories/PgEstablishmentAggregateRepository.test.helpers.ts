@@ -23,15 +23,17 @@ type PgImmersionOfferRow = {
 export const getAllImmersionOfferRows = async (
   client: PoolClient,
 ): Promise<PgImmersionOfferRow[]> =>
-  client.query("SELECT * FROM immersion_offers").then(({ rows }) =>
-    rows.map((row) => ({
-      rome_code: row.rome_code,
-      rome_nomenclature: row.rome_nomenclature,
-      appellation_code: row.appellation_code,
-      siret: row.siret,
-      score: row.score,
-    })),
-  );
+  client
+    .query<PgImmersionOfferRow>("SELECT * FROM immersion_offers")
+    .then(({ rows }) =>
+      rows.map((row) => ({
+        rome_code: row.rome_code,
+        rome_nomenclature: row.rome_nomenclature,
+        appellation_code: row.appellation_code,
+        siret: row.siret,
+        score: row.score,
+      })),
+    );
 
 export const insertImmersionOffer = async (
   client: PoolClient,

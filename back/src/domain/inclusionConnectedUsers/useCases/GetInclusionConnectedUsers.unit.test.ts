@@ -55,10 +55,15 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("throws Forbidden if token payload is not backoffice token", async () => {
+    const badBackOfficeJwtPayload = {
+      role: "validator",
+    } as unknown as BackOfficeJwtPayload;
+
     await expectPromiseToFailWith(
-      getInclusionConnectedUsers.execute({ agencyRole: "toReview" }, {
-        role: "validator",
-      } as any),
+      getInclusionConnectedUsers.execute(
+        { agencyRole: "toReview" },
+        badBackOfficeJwtPayload,
+      ),
       "This user is not a backOffice user, role was : 'validator'",
     );
   });

@@ -1,4 +1,11 @@
-import { AppellationAndRomeDto, AppellationCode, RomeDto } from "shared";
+import {
+  AppellationAndRomeDto,
+  AppellationCode,
+  castError,
+  RomeCode,
+  RomeDto,
+  RomeLabel,
+} from "shared";
 import { RomeRepository } from "../../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../../utils/logger";
 import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
@@ -39,7 +46,7 @@ export class PgRomeRepository implements RomeRepository {
   public async getAppellationAndRomeDtosFromAppellationCodes(
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
-    const { rows } = await executeKyselyRawSqlQuery(
+    const { rows } = await executeKyselyRawSqlQuery<AppelationRow>(
       this.transaction,
       `
         SELECT ogr_appellation, libelle_appellation_long, appellations.code_rome, libelle_rome
@@ -55,7 +62,7 @@ export class PgRomeRepository implements RomeRepository {
   public searchAppellation(query: string): Promise<AppellationAndRomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
 
-    return executeKyselyRawSqlQuery(
+    return executeKyselyRawSqlQuery<AppelationRow>(
       this.transaction,
       `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
         FROM public_appellations_data 
@@ -68,14 +75,20 @@ export class PgRomeRepository implements RomeRepository {
     )
       .then((res) => res.rows.map(convertRowToAppellationDto))
       .catch((error) => {
-        logger.error({ error, query }, "searchAppellation error");
+        logger.error(
+          { error: castError(error), query },
+          "searchAppellation error",
+        );
         return [];
       });
   }
 
   public searchRome(query: string): Promise<RomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
-    return executeKyselyRawSqlQuery(
+    return executeKyselyRawSqlQuery<{
+      code_rome: RomeCode;
+      libelle_rome: RomeLabel;
+    }>(
       this.transaction,
       `
         WITH matching_rome AS(
@@ -110,8 +123,17 @@ export class PgRomeRepository implements RomeRepository {
   }
 }
 
-const convertRowToAppellationDto = (row: any): AppellationAndRomeDto => ({
-  appellationCode: row.ogr_appellation?.toString(),
+type AppelationRow = {
+  ogr_appellation: number;
+  code_rome: RomeCode;
+  libelle_appellation_long: string;
+  libelle_rome: string;
+};
+
+const convertRowToAppellationDto = (
+  row: AppelationRow,
+): AppellationAndRomeDto => ({
+  appellationCode: row.ogr_appellation.toString(),
   romeCode: row.code_rome,
   appellationLabel: row.libelle_appellation_long,
   romeLabel: row.libelle_rome,

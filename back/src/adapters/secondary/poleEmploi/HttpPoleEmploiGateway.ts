@@ -2,7 +2,7 @@ import axios from "axios";
 import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
 import querystring from "querystring";
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, castError } from "shared";
 import { HttpClient } from "shared-routes";
 import {
   GetAccessTokenResponse,
@@ -119,7 +119,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         });
         return { status: response.status as 200 | 201 };
       })
-      .catch((error) => {
+      .catch((err) => {
+        const error = castError(err);
         if (!axios.isAxiosError(error) || !error.response) {
           logger.error({
             _title: "PeBroadcast",
@@ -133,12 +134,16 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           throw error;
         }
 
+        const message = !error.response.data?.message
+          ? "missing message"
+          : JSON.stringify(error.response.data?.message);
+
         if (error.response.status === 404) {
           logger.error({
             _title: "PeBroadcast",
             status: "notFoundOrMismatch",
             httpStatus: error.response.status,
-            message: error.response.data?.message,
+            message,
             peConvention: {
               peId: poleEmploiConvention.id,
               originalId: poleEmploiConvention.originalId,
@@ -146,7 +151,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           });
           return {
             status: 404,
-            message: error.response.data?.message,
+            message,
           };
         }
 
@@ -155,7 +160,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           status: "unknownAxiosError",
           httpStatus: error.response.status,
           message: error.message,
-          axiosBody: error.response.data,
+          axiosBody: error.response.data as unknown,
           peConvention: {
             peId: poleEmploiConvention.id,
             originalId: poleEmploiConvention.originalId,
@@ -166,7 +171,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         return {
           status: error.response.status,
-          message: error.response.data?.message,
+          message,
         };
       });
   }

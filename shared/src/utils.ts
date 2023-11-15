@@ -10,7 +10,7 @@ export type SleepFn = typeof sleep;
 
 // sleep function is use to simulate latency for demo and dev purpose
 export const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve: any) => {
+  new Promise((resolve: (args: void) => void) => {
     setTimeout(resolve, ms);
   });
 
@@ -182,3 +182,6 @@ export const isUrlValid = (url: string | undefined) => {
     return false;
   }
 };
+
+export const castError = (error: unknown): Error =>
+  error instanceof Error ? error : new Error(JSON.stringify(error));

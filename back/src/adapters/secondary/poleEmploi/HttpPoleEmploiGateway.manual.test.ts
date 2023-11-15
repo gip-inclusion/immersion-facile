@@ -133,7 +133,7 @@ describe("HttpPoleEmploiGateway", () => {
         ...fields,
       });
 
-      expect((response as any).message).toBe((expected as any).message);
+      expectToEqual(response, expected);
       expectToEqual(response.status, expected.status);
     },
   );

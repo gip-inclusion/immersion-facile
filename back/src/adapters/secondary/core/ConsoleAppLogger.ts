@@ -2,19 +2,19 @@
 import { AppLogger } from "../../../domain/core/ports/AppLogger";
 
 export class ConsoleAppLogger implements AppLogger {
-  public debug(...messages: any[]): void {
+  public debug(...messages: unknown[]): void {
     console.debug(...messages);
   }
 
-  public error(...messages: any[]): void {
+  public error(...messages: unknown[]): void {
     console.error(...messages);
   }
 
-  public info(...messages: any[]): void {
+  public info(...messages: unknown[]): void {
     console.log(...messages);
   }
 
-  public warn(...messages: any[]): void {
+  public warn(...messages: unknown[]): void {
     console.warn(...messages);
   }
 }

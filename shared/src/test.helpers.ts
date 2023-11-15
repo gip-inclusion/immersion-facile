@@ -78,7 +78,9 @@ export const expectToEqual = <T>(actual: T, expected: T) => {
   expect(actual).toEqual(expected);
 };
 
-export const expectHttpResponseToEqual = <R extends HttpResponse<any, unknown>>(
+export const expectHttpResponseToEqual = <
+  R extends HttpResponse<string | number | symbol, unknown>,
+>(
   { headers, ...rest }: R,
   expected: Omit<R, "headers"> & Partial<Pick<R, "headers">>,
 ) => {

@@ -70,7 +70,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     await uow.establishmentAggregateRepository
       .insertEstablishmentAggregates([establishmentAggregate])
-      .catch((err: any) => {
+      .catch((err) => {
         notifyAndThrowErrorDiscord(
           new Error(
             `Error when adding establishment aggregate with siret ${formEstablishment.siret} due to ${err}`,
