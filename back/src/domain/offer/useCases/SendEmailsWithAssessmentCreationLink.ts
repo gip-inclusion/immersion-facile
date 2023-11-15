@@ -1,6 +1,7 @@
 import { addDays } from "date-fns";
 import { z } from "zod";
 import {
+  castError,
   ConventionDto,
   ConventionId,
   frontRoutes,
@@ -18,7 +19,7 @@ import { NotificationGateway } from "../../generic/notifications/ports/Notificat
 const logger = createLogger(__filename);
 
 type SendEmailsWithAssessmentCreationLinkOutput = {
-  errors?: Record<ConventionId, any>;
+  errors?: Record<ConventionId, Error>;
   numberOfImmersionEndingTomorrow: number;
 };
 
@@ -69,14 +70,14 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     );
     if (conventions.length === 0) return { numberOfImmersionEndingTomorrow: 0 };
 
-    const errors: Record<ConventionId, any> = {};
+    const errors: Record<ConventionId, Error> = {};
     await Promise.all(
       conventions.map(async (convention) => {
         await this.#sendOneEmailWithImmersionAssessmentCreationLink(
           uow,
           convention,
-        ).catch((error: any) => {
-          errors[convention.id] = error;
+        ).catch((error) => {
+          errors[convention.id] = castError(error);
         });
       }),
     );

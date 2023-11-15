@@ -50,7 +50,7 @@ export const makeGenerateJwtES256 =
     privateKey: string,
     defaultExpiresInSeconds: number | undefined,
   ): GenerateJwtFn<K> =>
-  (payload: any, expiresInSeconds?: string | number) => {
+  (payload, expiresInSeconds?: string | number) => {
     const expire =
       !("exp" in payload) &&
       (expiresInSeconds !== undefined || defaultExpiresInSeconds)

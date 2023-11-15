@@ -6,10 +6,10 @@ export const mergeObjectsExceptFalsyValues = <T>(
 ): Partial<T> => {
   const allKeys = [
     ...new Set([...keys(priorityObj), ...keys(partialObj)]),
-  ] as (keyof T)[];
+  ] satisfies (keyof T)[];
 
-  return allKeys.reduce((acc, key) => {
-    const priorityValue: any | boolean = priorityObj[key];
+  return allKeys.reduce<Partial<T>>((acc, key) => {
+    const priorityValue = priorityObj[key];
     return {
       ...acc,
       [key]:
@@ -17,5 +17,5 @@ export const mergeObjectsExceptFalsyValues = <T>(
           ? priorityValue
           : partialObj[key],
     };
-  }, {} as T);
+  }, {});
 };

@@ -1,6 +1,7 @@
 import format from "pg-format";
 import { uniq } from "ramda";
 import {
+  castError,
   EmailNotification,
   exhaustiveCheck,
   Notification,
@@ -59,7 +60,7 @@ export class PgNotificationRepository implements NotificationRepository {
     emailKind,
     email,
   }: EmailNotificationFilters = {}): Promise<EmailNotification[]> {
-    const filterValues: any[] = [];
+    const filterValues: string[] = [];
     const filterConditions: string[] = [];
 
     if (since) {
@@ -104,7 +105,9 @@ export class PgNotificationRepository implements NotificationRepository {
   }
 
   public async getLastNotifications(): Promise<NotificationsByKind> {
-    const smsResponse = await executeKyselyRawSqlQuery(
+    const smsResponse = await executeKyselyRawSqlQuery<{
+      notif: SmsNotification;
+    }>(
       this.transaction,
       `
         SELECT ${buildSmsNotificationObject} as notif
@@ -198,7 +201,7 @@ export class PgNotificationRepository implements NotificationRepository {
         format(query, values),
       ).catch((error) => {
         logger.error(
-          { query, values, error },
+          { query, values, error: castError(error) },
           "PgNotificationRepository_insertEmailAttachments_QueryErrored",
         );
         throw error;
@@ -218,7 +221,7 @@ export class PgNotificationRepository implements NotificationRepository {
         format(query, values),
       ).catch((error) => {
         logger.error(
-          { query, values, error },
+          { query, values, error: castError(error) },
           `PgNotificationRepository_insertEmailRecipients_${recipientKind}_QueryErrored`,
         );
         throw error;
@@ -241,7 +244,7 @@ export class PgNotificationRepository implements NotificationRepository {
     await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
       (error) => {
         logger.error(
-          { query, values, error },
+          { query, values, error: castError(error) },
           "PgNotificationRepository_insertNotificationEmail_QueryErrored",
         );
         throw error;

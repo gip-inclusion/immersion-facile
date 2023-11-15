@@ -1,5 +1,5 @@
 import { differenceWith } from "ramda";
-import { DateString, propEq, replaceArrayElement } from "shared";
+import { castError, DateString, propEq, replaceArrayElement } from "shared";
 import type {
   DomainEvent,
   DomainTopic,
@@ -80,7 +80,7 @@ export class PgOutboxRepository implements OutboxRepository {
     await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
       (error) => {
         logger.error(
-          { query, values, error },
+          { query, values, error: castError(error) },
           "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
         );
         throw error;
@@ -94,7 +94,7 @@ export class PgOutboxRepository implements OutboxRepository {
     eventId: string,
     { publishedAt, failures }: EventPublication,
   ) {
-    const { rows } = await executeKyselyRawSqlQuery(
+    const { rows } = await executeKyselyRawSqlQuery<{ id: string }>(
       this.transaction,
       "INSERT INTO outbox_publications(event_id, published_at) VALUES($1, $2) RETURNING id",
       [eventId, publishedAt],

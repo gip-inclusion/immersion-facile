@@ -47,28 +47,42 @@ describe("PgSearchesMadeRepository", () => {
   const getSearchMadeById = async (
     id: string,
   ): Promise<SearchMadeEntity | undefined> => {
-    const res = await client.query("SELECT * FROM searches_made WHERE id=$1", [
-      id,
-    ]);
+    const searchMadeResult = (
+      await client.query<{
+        id: string;
+        distance: number;
+        lat: number;
+        lon: number;
+        sorted_by?: "distance";
+        voluntary_to_immersion?: boolean;
+        address?: string;
+        needstobesearched: boolean;
+        api_consumer_name?: string;
+        number_of_results?: number;
+      }>("SELECT * FROM searches_made WHERE id=$1", [id])
+    ).rows.at(0);
+
     const appellationCodes: AppellationCode[] = await client
       .query(
         "SELECT * FROM searches_made__appellation_code WHERE search_made_id=$1",
         [id],
       )
       .then(({ rows }) => rows.map(({ appellation_code }) => appellation_code));
-    if (res.rows.length === 0) return;
-    return {
-      id: res.rows[0].id,
-      distanceKm: res.rows[0].distance,
-      lat: res.rows[0].lat,
-      lon: res.rows[0].lon,
-      sortedBy: res.rows[0].sorted_by,
-      voluntaryToImmersion: res.rows[0].voluntary_to_immersion,
-      place: res.rows[0].address,
-      needsToBeSearched: res.rows[0].needstobesearched,
-      appellationCodes: optional(appellationCodes),
-      apiConsumerName: optional(res.rows[0].api_consumer_name),
-      numberOfResults: optional(res.rows[0].number_of_results),
-    };
+
+    return (
+      searchMadeResult && {
+        id: searchMadeResult.id,
+        distanceKm: searchMadeResult.distance,
+        lat: searchMadeResult.lat,
+        lon: searchMadeResult.lon,
+        sortedBy: searchMadeResult.sorted_by,
+        voluntaryToImmersion: searchMadeResult.voluntary_to_immersion,
+        place: searchMadeResult.address,
+        needsToBeSearched: searchMadeResult.needstobesearched,
+        appellationCodes: optional(appellationCodes),
+        apiConsumerName: optional(searchMadeResult.api_consumer_name),
+        numberOfResults: optional(searchMadeResult.number_of_results) ?? 0,
+      }
+    );
   };
 });

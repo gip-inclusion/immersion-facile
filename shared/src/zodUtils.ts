@@ -142,7 +142,7 @@ export const zEnumValidation = <T extends string>(
 
 export const zSchemaForType =
   <T>() =>
-  <S extends z.ZodType<T, any, any>>(arg: S) =>
+  <S extends z.ZodType<T, z.ZodTypeDef, T>>(arg: S) =>
     arg;
 
 export const zAnyObj = z.object({}).passthrough();

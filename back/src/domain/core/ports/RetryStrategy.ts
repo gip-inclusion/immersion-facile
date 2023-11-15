@@ -1,3 +1,5 @@
+import { castError } from "shared";
+
 export class RetryableError extends Error {
   constructor(public readonly initialError: Error) {
     super();
@@ -13,7 +15,8 @@ export const noRetries: RetryStrategy = {
   apply: (cb) => {
     try {
       return cb();
-    } catch (error: any) {
+    } catch (err) {
+      const error = castError(err);
       throw error instanceof RetryableError ? error.initialError : error;
     }
   },

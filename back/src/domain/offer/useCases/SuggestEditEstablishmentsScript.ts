@@ -1,6 +1,6 @@
 import { subMonths } from "date-fns";
 import { z } from "zod";
-import { SiretDto } from "shared";
+import { castError, SiretDto } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -13,7 +13,7 @@ const NB_MONTHS_BEFORE_SUGGEST = 6;
 
 type Report = {
   numberOfEstablishmentsToContact: number;
-  errors?: Record<SiretDto, any>;
+  errors?: Record<SiretDto, Error>;
 };
 
 export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
@@ -60,15 +60,13 @@ export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
       )}`,
     );
 
-    const errors: Record<SiretDto, any> = {};
+    const errors: Record<SiretDto, Error> = {};
 
     await Promise.all(
       siretsToContact.map(async (siret) => {
-        await this.#suggestEditEstablishment
-          .execute(siret)
-          .catch((error: any) => {
-            errors[siret] = error;
-          });
+        await this.#suggestEditEstablishment.execute(siret).catch((error) => {
+          errors[siret] = castError(error);
+        });
       }),
     );
 

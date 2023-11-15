@@ -99,7 +99,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
       // probably expired or an old version.
       payloadToExtract = verifyJwt(expiredJwt);
-    } catch (err: any) {
+    } catch (err) {
       // If this JWT is signed by us but expired, deal with it.
       if (err instanceof TokenExpiredError) {
         payloadToExtract = decode(expiredJwt) as ConventionJwtPayload;

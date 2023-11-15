@@ -1,4 +1,9 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
 import { Logger } from "pino";
 import { createLogger } from "./logger";
 
@@ -22,12 +27,18 @@ export const createAxiosInstance = (
 const QUOTA_EXEEDED_STATUSES = new Set([429, 503]);
 const TIMEOUT_CODES = new Set(["ETIMEDOUT", "ECONNABORTED"]);
 
-export const isRetryableError = (logger: Logger, error: any): boolean => {
-  if (QUOTA_EXEEDED_STATUSES.has(error.response?.status)) {
+export const isRetryableError = (
+  logger: Logger,
+  error: AxiosError,
+): boolean => {
+  if (
+    error.response?.status &&
+    QUOTA_EXEEDED_STATUSES.has(error.response?.status)
+  ) {
     logger.warn("Request quota exceeded: " + error);
     return true;
   }
-  if (TIMEOUT_CODES.has(error.code)) {
+  if (error.code && TIMEOUT_CODES.has(error.code)) {
     logger.warn("Request timed out: " + error);
     return true;
   }
@@ -35,7 +46,11 @@ export const isRetryableError = (logger: Logger, error: any): boolean => {
   return false;
 };
 
-export const logAxiosError = (logger: Logger, error: any, msg?: string) => {
+export const logAxiosError = (
+  logger: Logger,
+  error: AxiosError,
+  msg?: string,
+) => {
   const message = `${msg || "Axios error"}: ${error}`;
   if (error.response) {
     logger.error({ response: extractPartialResponse(error.response) }, message);
@@ -47,13 +62,13 @@ export const logAxiosError = (logger: Logger, error: any, msg?: string) => {
 const extractPartialRequest = (request: AxiosRequestConfig) => ({
   method: request.method,
   url: request.url,
-  params: request.params,
+  params: request.params as unknown,
   timeout: request.timeout,
 });
 
 const extractPartialResponse = (response: AxiosResponse) => ({
   status: response.status,
   statusText: response.statusText,
-  data: response.data,
+  data: response.data as unknown,
   request: extractPartialRequest(response.config ?? response.request),
 });

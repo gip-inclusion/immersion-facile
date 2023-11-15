@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, castError } from "shared";
 import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../../../domain/core/ports/ShortLinkRepository";
 import { createLogger } from "../../../../utils/logger";
@@ -45,7 +45,10 @@ export class PgShortLinkRepository
         );
       })
       .catch((error) => {
-        logger.error({ error }, "pgShortLinkRepositorySaveFailed");
+        logger.error(
+          { error: castError(error) },
+          "pgShortLinkRepositorySaveFailed",
+        );
         throw error;
       });
   }

@@ -67,7 +67,8 @@ describe("PgScriptsQueries", () => {
         topic: "FormEstablishmentEditLinkSent",
         payload: {
           siret: establishmentWithLinkSentEvent.establishment.siret,
-        } as any,
+          version: 1,
+        },
         occurredAt: addDays(before, 1).toISOString(),
         publications: [],
         status: "never-published",
