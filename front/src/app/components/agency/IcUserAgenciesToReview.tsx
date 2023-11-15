@@ -122,6 +122,7 @@ export const IcUserAgenciesToReview = ({
             <RejectIcUserRegistrationToAgencyForm
               agency={{ id: selectedAgency.id, name: selectedAgency.name }}
               userId={selectedUserId}
+              key={`${selectedAgency.id}-${selectedUserId}`}
             />
           ) : (
             "Pas d'agence sélectionnée"
@@ -181,7 +182,6 @@ const RejectIcUserRegistrationToAgencyForm = ({
   userId,
 }: RejectIcUserRegistrationToAgencyFormProps) => {
   const dispatch = useDispatch();
-
   const { register, handleSubmit, formState } =
     useForm<RejectIcUserRoleForAgencyParams>({
       resolver: zodResolver(rejectIcUserRoleForAgencyParamsSchema),

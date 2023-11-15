@@ -115,7 +115,6 @@ export const icUsersAdminSlice = createSlice({
 
       state.isUpdatingIcUserAgency = false;
       state.feedback.kind = "agencyRejectionForUserSuccess";
-
       state.icUsersNeedingReview[userId].agencyRights = agenciesFiltered;
     },
 
