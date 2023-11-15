@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -23,6 +23,7 @@ import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
+  initialState,
   SearchPageParams,
   SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
@@ -47,6 +48,7 @@ export const SearchPage = ({
   route: Route<typeof routes.search>;
 }) => {
   const { cx } = useStyles();
+  const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const searchUseCase = useSearchUseCase();
@@ -62,14 +64,12 @@ export const SearchPage = ({
   const availableForSearchRequest = (
     searchStatus: SearchStatus,
     { lat, lon }: GeoPositionDto,
-  ): boolean => {
-    const check =
-      searchStatus !== "initialFetch" &&
-      searchStatus !== "extraFetch" &&
-      lon !== 0 &&
-      lat !== 0;
-    return !!check;
-  };
+  ): boolean =>
+    searchStatus !== "initialFetch" &&
+    searchStatus !== "extraFetch" &&
+    lon !== 0 &&
+    lat !== 0;
+
   const filterFormValues = (values: SearchPageParams) =>
     keys(values).reduce(
       (acc, key) => ({
@@ -96,6 +96,14 @@ export const SearchPage = ({
     name: ["latitude", "longitude"],
   });
 
+  const availableForInitialSearchRequest = useMemo(
+    () =>
+      searchStatus === initialSearchSliceState.searchStatus &&
+      lat !== 0 &&
+      lon !== 0,
+    [searchStatus, initialSearchSliceState.searchStatus, lat, lon],
+  );
+
   const getSearchResultsSummary = (resultsNumber: number) => {
     const plural = resultsNumber > 1 ? "s" : "";
     return (
@@ -106,10 +114,10 @@ export const SearchPage = ({
   };
 
   useEffect(() => {
-    if (availableForSearchRequest(searchStatus, { lat, lon })) {
+    if (availableForInitialSearchRequest) {
       searchUseCase(filterFormValues(formValues));
     }
-  }, []);
+  }, [availableForInitialSearchRequest, formValues, searchUseCase]);
 
   return (
     <HeaderFooterLayout>
