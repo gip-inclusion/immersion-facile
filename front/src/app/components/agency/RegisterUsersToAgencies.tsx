@@ -71,7 +71,8 @@ export const RegisterUsersToAgencies = () => {
                 feedback: P.when(
                   (feedback) =>
                     feedback.kind === "agencyRegisterToUserSuccess" ||
-                    feedback.kind === "usersToReviewFetchSuccess",
+                    feedback.kind === "usersToReviewFetchSuccess" ||
+                    feedback.kind === "agencyRejectionForUserSuccess",
                 ),
                 selectedUserId: P.not(P.nullish),
               },
@@ -93,7 +94,7 @@ export const RegisterUsersToAgencies = () => {
                 <Alert
                   severity="success"
                   title="Beau travail !"
-                  description="Le rattachement de cet utilisateur a l'agence a bien été rejetté"
+                  description="Le rattachement de cet utilisateur à l'agence a bien été rejeté"
                 />
               ),
             )
