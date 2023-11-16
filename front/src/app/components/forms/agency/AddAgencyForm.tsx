@@ -163,6 +163,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
                 },
               }}
               shouldLockToPeAgencies={false}
+              shouldFilterDelegationPrescriptionAgencyKind={true}
               shouldShowAgencyKindField
               agencyDepartmentOptions={departmentOptions}
               agenciesRetriever={agenciesRetrieverMemoized}

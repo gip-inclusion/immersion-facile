@@ -4,6 +4,7 @@ import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys, uniqBy } from "ramda";
 import {
   AgencyId,
+  AgencyKind,
   AgencyOption,
   ConventionReadDto,
   CreateAgencyDto,
@@ -21,6 +22,7 @@ import { AgencyErrorText } from "../convention/sections/agency/AgencyErrorText";
 
 type AgencySelectorProps = {
   shouldLockToPeAgencies: boolean;
+  shouldFilterDelegationPrescriptionAgencyKind: boolean;
   shouldShowAgencyKindField: boolean;
   fields: {
     agencyDepartmentField: FormFieldAttributes;
@@ -39,6 +41,7 @@ type SupportedFormsDto = ConventionReadDto | CreateAgencyDto;
 
 export const AgencySelector = ({
   shouldLockToPeAgencies,
+  shouldFilterDelegationPrescriptionAgencyKind,
   shouldShowAgencyKindField,
   disabled,
   fields: { agencyDepartmentField, agencyKindField, agencyIdField },
@@ -96,17 +99,27 @@ export const AgencySelector = ({
   const userError = !!(touched && error);
   const showError: boolean = userError || loadingError;
 
+  const agencyKindFilter = (
+    kind: AgencyKind,
+  ): kind is AllowedAgencyKindToAdd => {
+    if (shouldLockToPeAgencies) return kind === "pole-emploi";
+    if (shouldFilterDelegationPrescriptionAgencyKind)
+      return (
+        kind !== "autre" &&
+        kind !== "cci" &&
+        kind !== "operateur-cep" &&
+        kind !== "immersion-facile"
+      );
+    return kind !== "immersion-facile";
+  };
+
   const agencyKindOptions: AgencyKindOptions = [
     ...((shouldLockToPeAgencies
       ? []
       : [{ label: "Toutes", value: "all" }]) satisfies AgencyKindOptions),
     ...uniqBy((agencyOption) => agencyOption.kind, agencies)
       .map((agencyOption) => agencyOption.kind)
-      .filter((kind): kind is AllowedAgencyKindToAdd =>
-        shouldLockToPeAgencies
-          ? kind === "pole-emploi"
-          : kind !== "immersion-facile",
-      )
+      .filter((kind): kind is AllowedAgencyKindToAdd => agencyKindFilter(kind))
       .map((agencyKind) => ({
         label: agencyKindToLabel[agencyKind],
         value: agencyKind,
