@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { Email } from "../email/email.dto";
@@ -70,6 +71,7 @@ export type WithAgencyId = {
 };
 
 export type AgencyKind = (typeof agencyKindList)[number];
+
 export const agencyKindList = [
   "pole-emploi",
   "mission-locale",
@@ -82,6 +84,26 @@ export const agencyKindList = [
   "immersion-facile",
   "operateur-cep",
 ] as const;
+
+export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
+
+export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
+  "mission-locale": "Mission Locale",
+  "pole-emploi": "Pôle Emploi",
+  "cap-emploi": "Cap Emploi",
+  "conseil-departemental": "Conseil Départemental",
+  "prepa-apprentissage": "Prépa Apprentissage",
+  cci: "Chambres de Commerce et d'Industrie",
+  "structure-IAE": "Structure IAE",
+  "operateur-cep": "Opérateur du CEP",
+  autre: "Autre",
+};
+
+export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel);
+
+export const fitForDelegationAgencyKind = allAgencyKindsAllowedToAdd.filter(
+  (kind) => kind !== "autre" && kind !== "cci" && kind !== "operateur-cep",
+);
 
 export type AgencyOption = {
   id: AgencyId;

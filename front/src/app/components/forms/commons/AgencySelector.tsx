@@ -5,24 +5,22 @@ import { keys, uniqBy } from "ramda";
 import {
   AgencyId,
   AgencyKind,
+  agencyKindToLabel,
   AgencyOption,
+  allAgencyKindsAllowedToAdd,
+  AllowedAgencyKindToAdd,
   ConventionReadDto,
   CreateAgencyDto,
   DepartmentCode,
   departmentNameToDepartmentCode,
+  fitForDelegationAgencyKind,
   sortByPropertyCaseInsensitive,
 } from "shared";
 import { Loader } from "react-design-system";
-import {
-  agencyKindToLabel,
-  AllowedAgencyKindToAdd,
-} from "src/app/components/forms/agency/agencyKindToLabel";
 import { FormFieldAttributes } from "src/app/contents/forms/types";
 import { AgencyErrorText } from "../convention/sections/agency/AgencyErrorText";
 
 type AgencySelectorProps = {
-  shouldLockToPeAgencies: boolean;
-  shouldFilterDelegationPrescriptionAgencyKind: boolean;
   shouldShowAgencyKindField: boolean;
   fields: {
     agencyDepartmentField: FormFieldAttributes;
@@ -34,10 +32,36 @@ type AgencySelectorProps = {
     departmentCode: DepartmentCode,
   ) => Promise<AgencyOption[]>;
   disabled?: boolean;
-};
+} & (
+  | {
+      shouldLockToPeAgencies: true;
+      shouldFilterDelegationPrescriptionAgencyKind: false;
+    }
+  | {
+      shouldLockToPeAgencies: false;
+      shouldFilterDelegationPrescriptionAgencyKind: boolean;
+    }
+);
+
 type AgencyKindForSelector = AllowedAgencyKindToAdd | "all";
 
 type SupportedFormsDto = ConventionReadDto | CreateAgencyDto;
+
+const getAgencyKindsInitialValue = (
+  agencyKindRestrictions: Pick<
+    AgencySelectorProps,
+    "shouldFilterDelegationPrescriptionAgencyKind" | "shouldLockToPeAgencies"
+  >,
+): AllowedAgencyKindToAdd[] => {
+  const {
+    shouldFilterDelegationPrescriptionAgencyKind,
+    shouldLockToPeAgencies,
+  } = agencyKindRestrictions;
+  if (shouldLockToPeAgencies) return ["pole-emploi"];
+  if (shouldFilterDelegationPrescriptionAgencyKind)
+    return fitForDelegationAgencyKind;
+  return allAgencyKindsAllowedToAdd;
+};
 
 export const AgencySelector = ({
   shouldLockToPeAgencies,
@@ -54,7 +78,13 @@ export const AgencySelector = ({
     formState: { errors, touchedFields },
     control,
   } = useFormContext<SupportedFormsDto>();
-  const [agencyKind, setAgencyKind] = useState<AgencyKindForSelector>("all");
+
+  const [agencyKinds, setAgencyKinds] = useState<AllowedAgencyKindToAdd[]>(
+    getAgencyKindsInitialValue({
+      shouldFilterDelegationPrescriptionAgencyKind,
+      shouldLockToPeAgencies,
+    }),
+  );
   const [agencies, setAgencies] = useState<AgencyOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -79,7 +109,7 @@ export const AgencySelector = ({
 
   const agencyOptionsInSelector = agencyOptionsInSelectorFromAgencies(
     agencies,
-    agencyKind,
+    agencyKinds,
   );
   const isAgencySelectionDisabled =
     disabled ||
@@ -103,23 +133,21 @@ export const AgencySelector = ({
     kind: AgencyKind,
   ): kind is AllowedAgencyKindToAdd => {
     if (shouldLockToPeAgencies) return kind === "pole-emploi";
-    if (shouldFilterDelegationPrescriptionAgencyKind)
-      return (
-        kind !== "autre" &&
-        kind !== "cci" &&
-        kind !== "operateur-cep" &&
-        kind !== "immersion-facile"
-      );
+    if (
+      kind !== "immersion-facile" &&
+      shouldFilterDelegationPrescriptionAgencyKind
+    )
+      return fitForDelegationAgencyKind.includes(kind);
     return kind !== "immersion-facile";
   };
 
   const agencyKindOptions: AgencyKindOptions = [
-    ...((shouldLockToPeAgencies
+    ...((shouldLockToPeAgencies || shouldFilterDelegationPrescriptionAgencyKind
       ? []
       : [{ label: "Toutes", value: "all" }]) satisfies AgencyKindOptions),
     ...uniqBy((agencyOption) => agencyOption.kind, agencies)
       .map((agencyOption) => agencyOption.kind)
-      .filter((kind): kind is AllowedAgencyKindToAdd => agencyKindFilter(kind))
+      .filter(agencyKindFilter)
       .map((agencyKind) => ({
         label: agencyKindToLabel[agencyKind],
         value: agencyKind,
@@ -129,10 +157,6 @@ export const AgencySelector = ({
     name: agencyIdFieldName,
     control,
   }) as AgencyId;
-
-  if (shouldLockToPeAgencies && agencyKind !== "pole-emploi") {
-    setAgencyKind("pole-emploi");
-  }
 
   const onAgencyDepartmentChange = useCallback(
     (department: string) => {
@@ -210,8 +234,12 @@ export const AgencySelector = ({
           disabled={agencyKindOptions.length === 0 || shouldLockToPeAgencies}
           nativeSelectProps={{
             ...agencyKindField,
-            value: agencyKind,
-            onChange: (event) => setAgencyKind(event.currentTarget.value),
+            value: agencyKinds[0],
+            onChange: (event) => {
+              if (event.currentTarget.value === "all")
+                return setAgencyKinds(allAgencyKindsAllowedToAdd);
+              return setAgencyKinds([event.currentTarget.value]);
+            },
           }}
         />
       )}
@@ -258,10 +286,12 @@ const getAgencyPlaceholder = (
 
 const agencyOptionsInSelectorFromAgencies = (
   agencies: AgencyOption[],
-  agencyKind: AgencyKindForSelector,
+  agencyKinds: AllowedAgencyKindToAdd[],
 ) =>
   agencies
-    .filter(({ kind }) => agencyKind === "all" || kind === agencyKind)
+    .filter(
+      ({ kind }) => kind !== "immersion-facile" && agencyKinds.includes(kind),
+    )
     .map(({ id, name }) => ({
       label: name,
       value: id,
