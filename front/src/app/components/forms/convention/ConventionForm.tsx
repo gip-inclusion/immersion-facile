@@ -15,6 +15,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
+import { Route } from "type-route";
 import {
   Beneficiary,
   ConventionId,
@@ -58,7 +59,7 @@ import {
   conventionInitialValuesFromUrl,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
-import { useRoute } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -374,6 +375,11 @@ const ConventionSummarySection = (props: {
   const similarConventionIds = useAppSelector(
     conventionSelectors.similarConventionIds,
   );
+  const route = useRoute() as Route<typeof routes.conventionImmersion>;
+
+  const isEditingConvention = !!route.params.jwt;
+  const shouldShowDuplicateWarning =
+    !isEditingConvention && similarConventionIds.length > 0;
 
   useEffect(() => {
     if (!convention) return;
@@ -396,7 +402,7 @@ const ConventionSummarySection = (props: {
         submitFeedback={props.submitFeedback}
         signatories={getValues("signatories")}
       />
-      {similarConventionIds.length > 0 && (
+      {shouldShowDuplicateWarning && (
         <DuplicateConventionAlert similarConventionIds={similarConventionIds} />
       )}
       <ButtonsGroup
@@ -418,7 +424,7 @@ const ConventionSummarySection = (props: {
           {
             children: "Envoyer la convention",
             onClick: (event) =>
-              similarConventionIds.length > 0
+              shouldShowDuplicateWarning
                 ? openConfirmDuplicateConventionModal()
                 : props.methods.handleSubmit(props.onConfirmSubmit)(event),
             nativeButtonProps: {
