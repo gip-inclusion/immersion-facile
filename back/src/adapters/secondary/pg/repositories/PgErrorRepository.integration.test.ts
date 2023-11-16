@@ -1,6 +1,8 @@
-import { Pool, PoolClient } from "pg";
+import { Kysely } from "kysely/dist/cjs/kysely";
+import { Pool } from "pg";
 import {
   ConventionId,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -11,6 +13,7 @@ import {
 } from "../../../../domain/core/ports/ErrorRepository";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { Database } from "../kysely/model/database";
 import { PgErrorRepository } from "./PgErrorRepository";
 
 const makeSavedError = (
@@ -27,31 +30,42 @@ const makeSavedError = (
 
 describe("PgErrorRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
   let pgErrorRepository: PgErrorRepository;
+  let kyselyDb: Kysely<Database>;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     pool = getTestPgPool();
-    client = await pool.connect();
   });
 
   beforeEach(async () => {
-    pgErrorRepository = new PgErrorRepository(makeKyselyDb(pool));
-    await client.query("DELETE FROM saved_errors");
+    kyselyDb = makeKyselyDb(pool);
+    pgErrorRepository = new PgErrorRepository(kyselyDb);
+    await kyselyDb.deleteFrom("saved_errors").execute();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   it("saves an error in the repository", async () => {
-    const savedError = makeSavedError("osef", "someId");
+    const conventionId = "someId";
+    const savedError = makeSavedError("osef", conventionId);
     await pgErrorRepository.save(savedError);
-    const response = await client.query("SELECT * FROM saved_errors");
-    expect(response.rows).toHaveLength(1);
-    expect(response.rows[0].service_name).toBe(savedError.serviceName);
-    expect(response.rows[0].params).toEqual(savedError.params);
+
+    const response = await kyselyDb
+      .selectFrom("saved_errors")
+      .selectAll()
+      .execute();
+
+    expectObjectInArrayToMatch(response, [
+      {
+        handled_by_agency: savedError.handledByAgency,
+        message: savedError.message,
+        occurred_at: savedError.occurredAt,
+        params: savedError.params,
+        service_name: savedError.serviceName,
+      },
+    ]);
   });
 
   describe("markPartnersErroredConventionAsHandled", () => {
@@ -82,23 +96,21 @@ describe("PgErrorRepository", () => {
         conventionId1,
       );
 
-      const response = await client.query<{
-        service_name: string;
-        message: string;
-        params: Record<string, unknown>;
-        occurred_at: Date;
-        handled_by_agency: boolean;
-      }>("SELECT * FROM saved_errors ORDER BY id");
+      const pgSavedErrors = await kyselyDb
+        .selectFrom("saved_errors")
+        .selectAll()
+        .orderBy("id")
+        .execute();
 
       expectToEqual(
-        response.rows.map(
-          (row) =>
+        pgSavedErrors.map(
+          (pgSavedError) =>
             ({
-              serviceName: row.service_name,
-              message: row.message,
-              params: row.params,
-              occurredAt: row.occurred_at,
-              handledByAgency: row.handled_by_agency,
+              serviceName: pgSavedError.service_name,
+              message: pgSavedError.message,
+              params: pgSavedError.params ?? undefined,
+              occurredAt: pgSavedError.occurred_at,
+              handledByAgency: pgSavedError.handled_by_agency,
             } satisfies SavedError),
         ),
         [

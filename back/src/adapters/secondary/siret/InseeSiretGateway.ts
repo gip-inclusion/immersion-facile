@@ -186,26 +186,19 @@ export class InseeSiretGateway implements SiretGateway {
     date?: string | undefined;
     q: string;
   } {
-    const siretQuery = `siret:${siret}`;
-
     // According to API SIRENE documentation :
     // etatAdministratifEtablissement :
     //   État de l'établissement pendant la période :
     //     A= établissement actif
     //     F= établissement fermé
-
-    return {
-      q: !includeClosedEstablishments
-        ? `${siretQuery} AND periode(etatAdministratifEtablissement:A)`
-        : siretQuery,
-      ...(!includeClosedEstablishments
-        ? {
-            date: formatISO(this.#timeGateway.now(), {
-              representation: "date",
-            }),
-          }
-        : {}),
-    };
+    return includeClosedEstablishments
+      ? { q: `siret:${siret}` }
+      : {
+          q: `siret:${siret} AND periode(etatAdministratifEtablissement:A)`,
+          date: formatISO(this.#timeGateway.now(), {
+            representation: "date",
+          }),
+        };
   }
 }
 

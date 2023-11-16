@@ -43,12 +43,15 @@ export class HttpSubscribersGateway implements SubscribersGateway {
         const errorContext = {
           title: "Partner subscription errored",
           callbackUrl,
-          status: axios.isAxiosError(error)
-            ? error.response?.status
-            : "not an axios error",
-          message: axios.isAxiosError(error)
-            ? (error.response?.data as unknown)
-            : error.message,
+          ...(axios.isAxiosError(error)
+            ? {
+                status: error.response?.status,
+                message: error.response?.data as unknown,
+              }
+            : {
+                status: "not an axios error",
+                message: error.message,
+              }),
         };
 
         logger.error({ ...errorContext, error });

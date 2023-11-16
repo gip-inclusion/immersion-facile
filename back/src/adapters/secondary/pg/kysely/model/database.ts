@@ -10,23 +10,23 @@ export interface Database {
   saved_errors: SavedErrors;
 }
 
-export type JsonArray = JsonValue[];
+type JsonArray = JsonValue[];
 
-export type JsonObject = {
+type JsonObject = {
   [K in string]?: JsonValue;
 };
 
-export type JsonPrimitive = boolean | null | number | string;
+type JsonPrimitive = boolean | null | number | string;
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
-export type Json = ColumnType<JsonValue, string, string>;
-export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+type Json = ColumnType<JsonValue, string, string>;
+type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-export type ImmersionObjectives =
+type ImmersionObjectives =
   | "Confirmer un projet professionnel"
   | "Découvrir un métier ou un secteur d'activité"
   | "Initier une démarche de recrutement";
 
-export interface Discussions {
+interface Discussions {
   id: string;
   siret: string;
   contact_method: string;
@@ -62,7 +62,7 @@ interface Exchanges {
   id: Generated<number>;
 }
 
-export interface Groups {
+interface Groups {
   slug: string;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
@@ -74,12 +74,12 @@ export interface Groups {
   tint_color: string | null;
 }
 
-export interface GroupsSirets {
+interface GroupsSirets {
   group_slug: string;
   siret: string;
 }
 
-export interface Agencies {
+interface Agencies {
   id: string;
   name: string;
   counsellor_emails: Json;
@@ -103,11 +103,11 @@ export interface Agencies {
   refers_to_agency_id: string | null;
 }
 
-export interface SavedErrors {
+interface SavedErrors {
   id: Generated<number>;
   service_name: string;
   message: string;
-  params: Json | null;
+  params: Record<string, unknown> | null;
   occurred_at: Timestamp;
   handled_by_agency: Generated<boolean>;
 }
