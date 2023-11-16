@@ -44,6 +44,7 @@ const isUnhandledSavedErrorForConvention = (
   savedError: SavedError,
   conventionId: ConventionId,
 ) =>
+  savedError.params &&
   "conventionId" in savedError.params &&
   savedError.params.conventionId === conventionId &&
   savedError.serviceName === broadcastToPeServiceName &&

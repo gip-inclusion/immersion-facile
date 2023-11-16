@@ -20,7 +20,7 @@ describe("BrevoNotificationGateway manual", () => {
   it("should send email correctly", async () => {
     await notificationGateway.sendEmail({
       kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-      recipients: ["recette@immersion-facile.beta.gouv.fr"],
+      recipients: ["bbohec.pro@gmail.com"],
       params: {
         conventionId: "CONVENTION_ID",
         internshipKind: "immersion",

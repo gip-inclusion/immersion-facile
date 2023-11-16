@@ -3,7 +3,7 @@ import { ConventionId } from "shared";
 export type SavedError = {
   serviceName: string;
   message: string;
-  params: Record<string, unknown>;
+  params?: Record<string, unknown>;
   occurredAt: Date;
   handledByAgency: boolean;
 };

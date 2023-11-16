@@ -37,7 +37,7 @@ export class PgErrorRepository implements ErrorRepository {
       .values({
         service_name: serviceName,
         message,
-        params: JSON.stringify(params),
+        params: params ?? null,
         occurred_at: occurredAt,
         handled_by_agency: handledByAgency,
       })
