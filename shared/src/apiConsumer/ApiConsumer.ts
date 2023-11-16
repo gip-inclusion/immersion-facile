@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
@@ -151,15 +152,12 @@ export const createApiConsumerParamsFromApiConsumer = (
   description: apiConsumer.description,
 });
 
-export const findSubscribedEventFromId = (
+export const findRightNameFromSubscriptionId = (
   apiConsumer: ApiConsumer,
   subscriptionId: ApiConsumerSubscriptionId,
-): SubscriptionEvent | undefined => {
-  for (const rightName of apiConsumerRightNames) {
-    const subscription = apiConsumer.rights[rightName].subscriptions.find(
-      (subscription) => subscription.id === subscriptionId,
-    );
-    if (subscription) return subscription.subscribedEvent;
-  }
-  return;
-};
+): ApiConsumerRightName | undefined =>
+  keys(apiConsumer.rights).find((rightName) =>
+    apiConsumer.rights[rightName].subscriptions.find(
+      (sub) => sub.id === subscriptionId,
+    ),
+  );
