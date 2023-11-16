@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -93,6 +93,25 @@ export const BeneficiaryFormSection = ({
     (level: string) => ({ label: level, value: level }),
   );
 
+  const onBirthdateChange = useCallback(
+    (value: string) => {
+      const age = differenceInYears(
+        new Date(values.dateStart),
+        new Date(value),
+      );
+      const newIsMinor = age < 18;
+      setIsMinorAccordingToAge(newIsMinor);
+      dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
+    },
+    [dispatch, values.dateStart],
+  );
+
+  useEffect(() => {
+    if (values.signatories.beneficiary.birthdate) {
+      onBirthdateChange(values.signatories.beneficiary.birthdate);
+    }
+  }, [onBirthdateChange, values.signatories.beneficiary.birthdate]);
+
   return (
     <>
       <Input
@@ -125,13 +144,7 @@ export const BeneficiaryFormSection = ({
           ...formContents["signatories.beneficiary.birthdate"],
           ...register("signatories.beneficiary.birthdate"),
           onBlur: (event) => {
-            const age = differenceInYears(
-              new Date(values.dateStart),
-              new Date(event.target.value),
-            );
-            const newIsMinor = age < 18;
-            setIsMinorAccordingToAge(newIsMinor);
-            dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
+            onBirthdateChange(event.currentTarget.value);
           },
           type: "date",
           max: "9999-12-31",
