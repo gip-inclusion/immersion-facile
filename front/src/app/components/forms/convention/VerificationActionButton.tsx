@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, Fragment, SetStateAction } from "react";
 import { createPortal } from "react-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
@@ -6,6 +6,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -45,82 +46,93 @@ export type VerificationActions = Exclude<
   "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW"
 >;
 
+const createRejectModalParams = {
+  id: domElementIds.manageConvention.rejectedModal,
+  isOpenedByDefault: false,
+};
 const {
   Component: RejectModal,
   open: openRejectModal,
   close: closeRejectModal,
-} = createModal({
-  id: domElementIds.manageConvention.rejectedModal,
-  isOpenedByDefault: false,
-});
+} = createModal(createRejectModalParams);
 
+const createDraftModalParams = {
+  id: domElementIds.manageConvention.draftModal,
+  isOpenedByDefault: false,
+};
 const {
   Component: DraftModal,
   open: openDraftModal,
   close: closeDraftModal,
-} = createModal({
-  id: domElementIds.manageConvention.draftModal,
-  isOpenedByDefault: false,
-});
+} = createModal(createDraftModalParams);
 
+const createCancelModalParams = {
+  id: domElementIds.manageConvention.cancelModal,
+  isOpenedByDefault: false,
+};
 const {
   Component: CancelModal,
   open: openCancelModal,
   close: closeCancelModal,
-} = createModal({
-  id: domElementIds.manageConvention.cancelModal,
-  isOpenedByDefault: false,
-});
+} = createModal(createCancelModalParams);
 
+const createDeprecatedModalParams = {
+  id: domElementIds.manageConvention.deprecatedModal,
+  isOpenedByDefault: false,
+};
 const {
   Component: DeprecateModal,
   open: openDeprecateModal,
   close: closeDeprecateModal,
-} = createModal({
-  id: domElementIds.manageConvention.deprecatedModal,
-  isOpenedByDefault: false,
-});
+} = createModal(createDeprecatedModalParams);
 
+const createValidatorModalParams = {
+  id: domElementIds.manageConvention.validatorModal,
+  isOpenedByDefault: false,
+};
 const {
   Component: ValidatorModal,
   open: openValidatorModal,
   close: closeValidatorModal,
-} = createModal({
-  id: domElementIds.manageConvention.validatorModal,
-  isOpenedByDefault: false,
-});
+} = createModal(createValidatorModalParams);
 
-const ModalByStatus = (status: VerificationActions) => {
+const modalByStatus = (status: VerificationActions) => {
   const modals = {
     DRAFT: {
       modal: DraftModal,
       openModal: openDraftModal,
       closeModal: closeDraftModal,
+      createModalParams: createDraftModalParams,
     },
     REJECTED: {
       modal: RejectModal,
       openModal: openRejectModal,
       closeModal: closeRejectModal,
+      createModalParams: createRejectModalParams,
     },
     CANCELLED: {
       modal: CancelModal,
       openModal: openCancelModal,
       closeModal: closeCancelModal,
+      createModalParams: createCancelModalParams,
     },
     DEPRECATED: {
       modal: DeprecateModal,
       openModal: openDeprecateModal,
       closeModal: closeDeprecateModal,
+      createModalParams: createDeprecatedModalParams,
     },
     ACCEPTED_BY_COUNSELLOR: {
       modal: ValidatorModal,
       openModal: openValidatorModal,
       closeModal: closeValidatorModal,
+      createModalParams: createValidatorModalParams,
     },
     ACCEPTED_BY_VALIDATOR: {
       modal: ValidatorModal,
       openModal: openValidatorModal,
       closeModal: closeValidatorModal,
+      createModalParams: createValidatorModalParams,
     },
   };
   return modals[status];
@@ -158,7 +170,7 @@ export const VerificationActionButton = ({
   const onActionButtonClick = () =>
     doesStatusNeedsJustification(newStatus) ||
     doesStatusNeedsValidators(initialStatus, newStatus)
-      ? ModalByStatus(newStatus).openModal()
+      ? modalByStatus(newStatus).openModal()
       : onSubmit({ status: newStatus, conventionId });
 
   return (
@@ -216,18 +228,23 @@ const ModalWrapper = ({
     SetStateAction<string | null>
   >;
 }) => {
+  const modalObject = modalByStatus(newStatus);
+  const isModalOpen = useIsModalOpen(modalObject.createModalParams);
+
   if (
     !doesStatusNeedsJustification(newStatus) &&
     !doesStatusNeedsValidators(initialStatus, newStatus)
   )
     return null;
 
-  const Modal = ModalByStatus(newStatus).modal;
-  const closeModal = ModalByStatus(newStatus).closeModal;
+  const Modal = modalObject.modal;
+  const closeModal = modalObject.closeModal;
 
   return createPortal(
     <Modal title={title}>
-      <>
+      <Fragment
+        key={`${modalObject.createModalParams.id}-${isModalOpen.toString()}`}
+      >
         {doesStatusNeedsJustification(newStatus) && (
           <JustificationModalContent
             onSubmit={onSubmit}
@@ -248,7 +265,7 @@ const ModalWrapper = ({
             }
           />
         )}
-      </>
+      </Fragment>
     </Modal>,
     document.body,
   );

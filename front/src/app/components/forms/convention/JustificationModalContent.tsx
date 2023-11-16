@@ -1,19 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { keys } from "ramda";
 import {
   ConventionDto,
   ConventionStatusWithJustification,
   doesStatusNeedsJustification,
   domElementIds,
   Role,
-  Signatories,
+  Signatory,
   signatoryTitleByRole,
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
@@ -32,6 +32,10 @@ export const JustificationModalContent = ({
   convention: ConventionDto;
   currentSignatoryRole: Role;
 }) => {
+  const [areSignaturesMissing, setAreSignaturesMissing] = useState<
+    boolean | null
+  >(null);
+
   const { register, handleSubmit } = useForm<
     Partial<UpdateConventionStatusRequestDto>
   >({
@@ -50,12 +54,11 @@ export const JustificationModalContent = ({
     closeModal();
   };
 
-  const getSignatoriesOption = (signatories: Signatories) => {
-    const conventionSignatories = keys(signatories).map(
-      (signatory) => signatories[signatory],
-    );
-
-    const signatoriesOptions = conventionSignatories.map((signatory) =>
+  const conventionSignatories: Signatory[] = Object.values(
+    convention.signatories,
+  );
+  const getSignatoryOptions = () => {
+    const signatoryOptions = conventionSignatories.map((signatory) =>
       signatory && signatory.role !== currentSignatoryRole
         ? {
             label: `${signatory.firstName} ${signatory.lastName} - ${
@@ -70,7 +73,7 @@ export const JustificationModalContent = ({
     );
 
     return [
-      ...signatoriesOptions,
+      ...signatoryOptions,
       ...(currentSignatoryRole === "validator" ||
       currentSignatoryRole === "counsellor"
         ? [
@@ -82,6 +85,84 @@ export const JustificationModalContent = ({
         : []),
     ];
   };
+
+  if (areSignaturesMissing === null) {
+    return (
+      <div>
+        <ButtonsGroup
+          buttons={[
+            {
+              type: "button",
+              priority: "secondary",
+              onClick: () => setAreSignaturesMissing(true),
+              children: "Je veux relancer des signataires manquants",
+            },
+            {
+              type: "button",
+              priority: "secondary",
+              onClick: () => setAreSignaturesMissing(false),
+              children: "Il y a un problème sur le contenu de la convention",
+            },
+          ]}
+        />
+      </div>
+    );
+  }
+
+  if (areSignaturesMissing === true) {
+    const signatoriesWithMissingSignature = conventionSignatories.filter(
+      ({ signedAt }) => signedAt === undefined,
+    );
+
+    const signatoryEmailsWithMissingSignature =
+      signatoriesWithMissingSignature.map(({ email }) => email);
+
+    const emailTitle =
+      "Signature%20manquante%20pour%20la%20convention%20d%27immersion";
+    const emailBody =
+      "Bonjour,%0D%0A%0D%0AVous%20avez%20initi%C3%A9%20une%20convention%20d%27immersion%20professionnelle%20via%20le%20site%20d%27immersion%20facilit%C3%A9.%20Mais%20vous%20n%27avez%20pas%20encore%20sign%C3%A9%20cette%20convention.%0D%0A%0D%0APouvez-vous%20effectuer%20cette%20signature%20via%20le%20mail%20re%C3%A7u%20d%27immersion%20facilit%C3%A9e%20?%0D%0A%0D%0AJe%20vous%20remercie%20d%27avance,%0D%0A%0D%0ACordialement,";
+
+    return (
+      <div>
+        <p>
+          Dans ce cas, il ne faut pas réclamer de modification, car cela
+          entraine la perte de toute les signatures déjà enregistrées.
+        </p>
+
+        {signatoryEmailsWithMissingSignature.length === 0 ? (
+          <p>
+            <strong>
+              Tous les signataires ont bien signé, pas la peine de les relancer.
+            </strong>
+          </p>
+        ) : (
+          <>
+            <div>
+              Les signataires suivants n'ont pas encore signé :
+              <ul>
+                {signatoriesWithMissingSignature.map((signatory) => (
+                  <li key={signatory.email}>
+                    <strong>{signatoryTitleByRole[signatory.role]} :</strong>{" "}
+                    {signatory.firstName} {signatory.lastName} -{" "}
+                    {signatory.email} - {signatory.phone}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Button
+              linkProps={{
+                href: `mailto:${signatoryEmailsWithMissingSignature.join(
+                  ",",
+                )}?subject=${emailTitle}&body=${emailBody}`,
+              }}
+            >
+              Relancer les signataires qui n'ont pas signé
+            </Button>
+          </>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -121,7 +202,7 @@ export const JustificationModalContent = ({
             <Select
               label="À qui souhaitez-vous envoyer la demande de modification ?"
               placeholder="Sélectionnez un signataire"
-              options={getSignatoriesOption(convention.signatories)}
+              options={getSignatoryOptions()}
               nativeSelectProps={{
                 ...register("modifierRole"),
                 id: domElementIds.manageConvention.modifierRoleSelect,
