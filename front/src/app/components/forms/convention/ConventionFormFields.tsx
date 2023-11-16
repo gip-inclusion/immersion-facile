@@ -257,6 +257,7 @@ export const ConventionFormFields = ({
                 agencyKindField,
               }}
               shouldLockToPeAgencies={shouldLockToPeAgencies}
+              shouldFilterDelegationPrescriptionAgencyKind={false}
               shouldShowAgencyKindField={
                 conventionValues?.internshipKind === "immersion"
               }
