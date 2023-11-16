@@ -1,8 +1,7 @@
 import { z } from "zod";
 import {
   ApiConsumer,
-  eventToRightName,
-  findSubscribedEventFromId,
+  findRightNameFromSubscriptionId,
   isApiConsumerAllowed,
   SubscriptionEvent,
 } from "shared";
@@ -32,38 +31,38 @@ export class DeleteSubscription extends TransactionalUseCase<
   ): Promise<void> {
     if (!apiConsumer) throw new UnauthorizedError();
 
-    const eventToDelete = findSubscribedEventFromId(
+    const subscribedRightName = findRightNameFromSubscriptionId(
       apiConsumer,
       subscriptionId,
     );
 
-    if (!eventToDelete)
+    if (!subscribedRightName)
       throw new NotFoundError(`subscription ${subscriptionId} not found`);
-    const rightName = eventToRightName(eventToDelete);
+
     if (
       !isApiConsumerAllowed({
         apiConsumer,
-        rightName,
+        rightName: subscribedRightName,
         consumerKind: "SUBSCRIPTION",
       })
     ) {
       throw new ForbiddenError(
-        `You do not have the "SUBSCRIPTION" kind associated to the "${rightName}" right`,
+        `You do not have the "SUBSCRIPTION" kind associated to the "${subscribedRightName}" right`,
       );
     }
 
     const updatedSubscriptions = apiConsumer.rights[
-      rightName
+      subscribedRightName
     ].subscriptions.filter(
-      (subscription) => subscription.subscribedEvent !== eventToDelete,
+      (subscription) => subscription.id !== subscriptionId,
     );
 
     await uow.apiConsumerRepository.save({
       ...apiConsumer,
       rights: {
         ...apiConsumer.rights,
-        [rightName]: {
-          ...apiConsumer.rights[rightName],
+        [subscribedRightName]: {
+          ...apiConsumer.rights[subscribedRightName],
           subscriptions: updatedSubscriptions,
         },
       },
