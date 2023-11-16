@@ -1381,7 +1381,7 @@ export const emailTemplatesByName =
         greetings: "Bonjour,",
         content: `<strong>Votre demande d’accès au tableau de bord a été rejetée.</strong>
 
-        Votre demande d'accès au tableau de bord des conventions d'immersion de la structure: ${agencyName} a été refusée par l'administrateur d'Immersion Facilitée pour les raisons suivante : ${justification}. 
+        Votre demande d'accès au tableau de bord des conventions d'immersion de la structure : ${agencyName} a été refusée par l'administrateur d'Immersion Facilitée pour les raisons suivantes : ${justification}. 
       `,
         subContent: defaultSignature("immersion"),
       }),
