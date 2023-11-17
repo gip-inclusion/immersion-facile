@@ -117,16 +117,23 @@ export const JustificationModalContent = ({
     const signatoryEmailsWithMissingSignature =
       signatoriesWithMissingSignature.map(({ email }) => email);
 
-    const emailTitle =
-      "Signature%20manquante%20pour%20la%20convention%20d%27immersion";
-    const emailBody =
-      "Bonjour,%0D%0A%0D%0AVous%20avez%20initi%C3%A9%20une%20convention%20d%27immersion%20professionnelle%20via%20le%20site%20d%27immersion%20facilit%C3%A9.%20Mais%20vous%20n%27avez%20pas%20encore%20sign%C3%A9%20cette%20convention.%0D%0A%0D%0APouvez-vous%20effectuer%20cette%20signature%20via%20le%20mail%20re%C3%A7u%20d%27immersion%20facilit%C3%A9e%20?%0D%0A%0D%0AJe%20vous%20remercie%20d%27avance,%0D%0A%0D%0ACordialement,";
+    const emailTitle = "Signature manquante pour la convention d'immersion";
+    const emailBody = `Bonjour,
+
+    Vous avez initié une convention d'immersion professionnelle via le site d'immersion facilité (${convention.id}). Mais vous n'avez pas encore signé cette convention.
+    
+    Pouvez-vous effectuer cette signature via le mail reçu d'immersion facilitée ?
+    
+    Je vous remercie d'avance,
+    
+    Cordialement,
+    `;
 
     return (
       <div>
         <p>
-          Dans ce cas, il ne faut pas réclamer de modification, car cela
-          entraine la perte de toute les signatures déjà enregistrées.
+          Dans ce cas, il ne faut pas réclamer de modification car cela entraîne
+          la perte de toutes les signatures déjà enregistrées.
         </p>
 
         {signatoryEmailsWithMissingSignature.length === 0 ? (
@@ -153,7 +160,9 @@ export const JustificationModalContent = ({
               linkProps={{
                 href: `mailto:${signatoryEmailsWithMissingSignature.join(
                   ",",
-                )}?subject=${emailTitle}&body=${emailBody}`,
+                )}?subject=${encodeURI(emailTitle)}&body=${encodeURI(
+                  emailBody,
+                )}`,
               }}
             >
               Relancer les signataires qui n'ont pas signé
