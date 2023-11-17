@@ -1,34 +1,26 @@
 import { addDays, subDays } from "date-fns";
-import format from "pg-format";
+import { sql } from "kysely";
+import { andThen } from "ramda";
 import {
   ConventionId,
   ConventionReadDto,
   conventionReadSchema,
   ConventionScope,
   ConventionStatus,
-  filterNotFalsy,
   FindSimilarConventionsParams,
-  Flavor,
   ListConventionsRequestDto,
+  pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
 import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
 } from "../../../../domain/convention/ports/ConventionQueries";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb } from "../kysely/kyselyUtils";
 import {
   createConventionReadQueryBuilder,
   getReadConventionById,
 } from "./pgConventionSql";
-
-type WhereClause = Flavor<string, "WhereClause">;
-
-type GetConventionsRequestProperties = {
-  whereClauses?: WhereClause[];
-  orderByClause: string;
-  limit?: number;
-};
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
@@ -44,46 +36,42 @@ export class PgConventionQueries implements ConventionQueries {
       "CANCELLED",
     ];
 
-    const conventions = await this.#getConventionsWhere({
-      whereClauses: [
-        format("conventions.siret = %1$L", params.siret),
-        format(
-          "conventions.immersion_appellation = %1$L",
-          params.codeAppellation,
-        ),
-        format(
-          "(b.extra_fields ->> 'birthdate') = %1$L",
-          params.beneficiaryBirthdate,
-        ),
-        format("b.last_name = %1$L", params.beneficiaryLastName),
-        format(
-          "conventions.date_start::date <= %1$L",
-          addDays(dateStartToMatch, numberOfDaysTolerance),
-        ),
-        format(
-          "conventions.date_start::date >= %1$L",
-          subDays(dateStartToMatch, numberOfDaysTolerance),
-        ),
-        format("conventions.status not in (%L)", statusesToIgnore),
-      ],
-      orderByClause: "ORDER BY conventions.date_start DESC",
-      limit: 20,
-    });
+    //prettier-ignore
+    const pgResults = await createConventionReadQueryBuilder(this.transaction)
+      .where("conventions.siret", "=", params.siret)
+      .where("conventions.immersion_appellation", "=", +params.codeAppellation)
+      .where(sql`b.extra_fields ->> 'birthdate'`, "=", params.beneficiaryBirthdate)
+      .where("b.last_name", "=", params.beneficiaryLastName)      
+      .where("conventions.date_start","<=", addDays(dateStartToMatch, numberOfDaysTolerance))
+      .where("conventions.date_start",">=", subDays(dateStartToMatch, numberOfDaysTolerance))
+      .where("conventions.status", "not in", statusesToIgnore)
+      .orderBy("conventions.date_start", "desc")
+      .limit(20)
+      .execute();
 
-    return conventions.map((c) => c.id);
+    return pgResults.map(
+      (pgResult) => conventionReadSchema.parse(pgResult.dto).id,
+    );
   }
 
   public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,
   ): Promise<ConventionReadDto[]> {
-    return this.#getConventionsWhere({
-      orderByClause: "ORDER BY conventions.date_start DESC",
-      whereClauses: [
-        this.#whereConventionsDateEndMatch(dateEnd),
-        this.#whereConventionsAreValidated(),
-        this.#whereConventionsAssessmentEmailHasNotBeenAlreadySent(),
-      ],
-    });
+    // prettier-ignore
+    const pgResults = await createConventionReadQueryBuilder(this.transaction)
+      .where("conventions.date_end", "=", dateEnd)
+      .where("conventions.status", "in", validatedConventionStatuses)
+      .where("conventions.id", "not in", sql`(
+          SELECT (payload ->> 'id')::uuid
+          FROM outbox
+          WHERE topic = 'EmailWithLinkToCreateAssessmentSent'
+        )`)
+      .orderBy("conventions.date_start", "desc")
+      .execute();
+
+    return pgResults.map((pgResult) =>
+      conventionReadSchema.parse(pgResult.dto),
+    );
   }
 
   public async getConventionById(
@@ -92,14 +80,15 @@ export class PgConventionQueries implements ConventionQueries {
     return getReadConventionById(this.transaction, id);
   }
 
-  public getConventionsByFilters(
+  public async getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
   ): Promise<ConventionReadDto[]> {
-    return this.#getConventionsWhere({
-      orderByClause: "ORDER BY conventions.date_start DESC",
-      whereClauses:
-        makeQueryWhereClauseFromFilters(filters).filter(filterNotFalsy),
-    });
+    return pipeWithValue(
+      createConventionReadQueryBuilder(this.transaction),
+      addFiltersToBuilder(filters),
+      (builder) => builder.orderBy("conventions.date_start", "desc").execute(),
+      andThen(validateConventionReadResults),
+    );
   }
 
   public async getConventionsByScope(params: {
@@ -113,86 +102,75 @@ export class PgConventionQueries implements ConventionQueries {
     )
       return [];
 
-    return this.#getConventionsWhere({
-      limit: params.limit,
-      whereClauses: [
-        ...makeQueryWhereClauseFromFilters(params.filters),
+    return pipeWithValue(
+      createConventionReadQueryBuilder(this.transaction),
+      addFiltersToBuilder(params.filters),
+      (builder) =>
         params.scope.agencyKinds
-          ? format("agencies.kind IN (%1$L)", params.scope.agencyKinds)
-          : format("agencies.id IN (%1$L)", params.scope.agencyIds),
-      ].filter(filterNotFalsy),
-      orderByClause: "ORDER BY conventions.date_start DESC",
-    });
+          ? builder.where("agencies.kind", "in", params.scope.agencyKinds)
+          : builder.where("agencies.id", "in", params.scope.agencyIds),
+      (builder) =>
+        builder
+          .orderBy("conventions.date_start", "desc")
+          .limit(params.limit)
+          .execute(),
+      andThen(validateConventionReadResults),
+    );
   }
 
   public async getLatestConventions({
     status,
     agencyId,
   }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
-    return this.#getConventionsWhere({
-      whereClauses: [
-        status && format("conventions.status = %1$L", status),
-        agencyId && format("conventions.agency_id::text = %1$L", agencyId),
-      ].filter(filterNotFalsy),
-      orderByClause: "ORDER BY date_validation DESC",
-      limit: 10,
-    });
-  }
-
-  async #getConventionsWhere({
-    whereClauses,
-    orderByClause,
-    limit,
-  }: GetConventionsRequestProperties): Promise<ConventionReadDto[]> {
-    const conventionReadQueryBuilder = createConventionReadQueryBuilder(
-      this.transaction,
+    return pipeWithValue(
+      createConventionReadQueryBuilder(this.transaction),
+      (b) => (status ? b.where("conventions.status", "=", status) : b),
+      (b) => (agencyId ? b.where("conventions.agency_id", "=", agencyId) : b),
+      (b) => b.orderBy("date_validation", "desc").limit(10).execute(),
+      andThen(validateConventionReadResults),
     );
-
-    const query = [
-      conventionReadQueryBuilder.compile().sql,
-      whereClauses &&
-        whereClauses.length > 0 &&
-        `WHERE ${whereClauses.join(" AND ")}`,
-      orderByClause,
-      limit && `LIMIT ${limit}`,
-    ]
-      .filter(filterNotFalsy)
-      .join("\n");
-
-    const pgResult = await executeKyselyRawSqlQuery<{ dto: unknown }>(
-      this.transaction,
-      query,
-    );
-    return pgResult.rows.map((row) => conventionReadSchema.parse(row.dto));
-  }
-
-  #whereConventionsAreValidated(): WhereClause {
-    return format("conventions.status IN (%1$L)", validatedConventionStatuses);
-  }
-
-  #whereConventionsAssessmentEmailHasNotBeenAlreadySent(): WhereClause {
-    return format(
-      "conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )",
-    );
-  }
-
-  #whereConventionsDateEndMatch(dateEnd: Date): WhereClause {
-    return format("conventions.date_end::date = %1$L", dateEnd);
   }
 }
 
-const makeQueryWhereClauseFromFilters = ({
-  startDateGreater,
-  startDateLessOrEqual,
-  withStatuses,
-}: GetConventionsByFiltersQueries) => [
-  withStatuses && withStatuses.length > 0
-    ? format("conventions.status IN (%1$L)", withStatuses)
-    : undefined,
-  startDateLessOrEqual
-    ? format("conventions.date_start::date <= %1$L", startDateLessOrEqual)
-    : undefined,
-  startDateGreater
-    ? format("conventions.date_start::date > %1$L", startDateGreater)
-    : undefined,
-];
+type ConventionReadQueryBuilder = ReturnType<
+  typeof createConventionReadQueryBuilder
+>;
+
+const addFiltersToBuilder =
+  ({
+    startDateGreater,
+    startDateLessOrEqual,
+    withStatuses,
+  }: GetConventionsByFiltersQueries) =>
+  (builder: ConventionReadQueryBuilder) => {
+    const addWithStatusFilterIfNeeded: AddToBuilder = (b) =>
+      withStatuses && withStatuses.length > 0
+        ? b.where("conventions.status", "in", withStatuses)
+        : b;
+
+    const addStartDateLessOrEqualFilterIfNeeded: AddToBuilder = (b) =>
+      startDateLessOrEqual
+        ? b.where("conventions.date_start", "<=", startDateLessOrEqual)
+        : b;
+
+    const addStartDateGreaterFilterIfNeeded: AddToBuilder = (b) =>
+      startDateGreater
+        ? b.where("conventions.date_start", ">", startDateGreater)
+        : b;
+
+    return pipeWithValue(
+      builder,
+      addWithStatusFilterIfNeeded,
+      addStartDateLessOrEqualFilterIfNeeded,
+      addStartDateGreaterFilterIfNeeded,
+    );
+  };
+
+const validateConventionReadResults = (
+  pgResults: { dto: unknown }[],
+): ConventionReadDto[] =>
+  pgResults.map((pgResult) => conventionReadSchema.parse(pgResult.dto));
+
+type AddToBuilder = (
+  b: ConventionReadQueryBuilder,
+) => ConventionReadQueryBuilder;

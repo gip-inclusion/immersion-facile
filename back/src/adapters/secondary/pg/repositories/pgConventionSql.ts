@@ -1,12 +1,20 @@
 import { sql } from "kysely";
 import {
+  AppellationCode,
+  AppellationLabel,
   ConventionId,
   ConventionReadDto,
   conventionReadSchema,
+  DateString,
+  Email,
   parseZodSchemaAndLogErrorOnParsingFailure,
+  RomeCode,
+  RomeLabel,
+  ScheduleDto,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import {
+  cast,
   jsonBuildObject,
   jsonStripNulls,
   KyselyDb,
@@ -31,10 +39,10 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
       jsonBuildObject({
         id: ref("conventions.id"),
         status: ref("conventions.status"),
-        dateValidation: sql`date_to_iso(conventions.date_validation)`,
-        dateSubmission: sql`date_to_iso(conventions.date_submission)`,
-        dateStart: sql`date_to_iso(conventions.date_start)`,
-        dateEnd: sql`date_to_iso(conventions.date_end)`,
+        dateValidation: sql<DateString>`date_to_iso(conventions.date_validation)`,
+        dateSubmission: sql<DateString>`date_to_iso(conventions.date_submission)`,
+        dateStart: sql<DateString>`date_to_iso(conventions.date_start)`,
+        dateEnd: sql<DateString>`date_to_iso(conventions.date_end)`,
         signatories: jsonBuildObject({
           beneficiary: jsonBuildObject({
             role: sql`'beneficiary'`,
@@ -153,7 +161,7 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
             .end(),
         }),
         siret: ref("conventions.siret"),
-        schedule: ref("conventions.schedule"),
+        schedule: cast<ScheduleDto>(ref("conventions.schedule")),
         businessName: ref("conventions.business_name"),
         workConditions: ref("conventions.work_conditions"),
         agencyId: ref("conventions.agency_id"),
@@ -180,10 +188,12 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
         immersionAddress: ref("conventions.immersion_address"),
         immersionObjective: ref("conventions.immersion_objective"),
         immersionAppellation: jsonBuildObject({
-          appellationCode: sql`vad.appellation_code::text`,
-          appellationLabel: ref("vad.appellation_label"),
-          romeCode: ref("vad.rome_code"),
-          romeLabel: ref("vad.rome_label"),
+          appellationCode: sql<AppellationCode>`vad.appellation_code::text`,
+          appellationLabel: cast<AppellationLabel>(
+            ref("vad.appellation_label"),
+          ),
+          romeCode: cast<RomeCode>(ref("vad.rome_code")),
+          romeLabel: cast<RomeLabel>(ref("vad.rome_label")),
         }),
         immersionActivities: ref("conventions.immersion_activities"),
         immersionSkills: ref("conventions.immersion_skills"),
@@ -191,11 +201,11 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
         businessAdvantages: ref("conventions.business_advantages"),
         statusJustification: ref("conventions.status_justification"),
         establishmentTutor: jsonBuildObject({
-          role: sql`'establishment-tutor'`,
+          role: sql<"establishment-tutor">`'establishment-tutor'`,
           firstName: ref("et.first_name"),
           lastName: ref("et.last_name"),
-          email: ref("et.email"),
-          phone: ref("et.phone"),
+          email: cast<Email>(ref("et.email")),
+          phone: cast<string>(ref("et.phone")),
           job: sql`et.extra_fields ->> 'job'`,
         }),
         validators: ref("conventions.validators"),
