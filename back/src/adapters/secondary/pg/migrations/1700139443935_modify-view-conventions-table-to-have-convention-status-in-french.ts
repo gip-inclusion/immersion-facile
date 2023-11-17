@@ -91,20 +91,20 @@ ass.establishment_feedback AS "Commentaire du bilan",
 a.id AS "StructureId",
 c.created_at AS "Date de création",
 c.updated_at AS "Date de mise à jour"
-FROM ${mode === "up" ? `(` : ``}(((((((((((conventions c
- LEFT JOIN view_agencies a ON ((a.id = c.agency_id)))
- LEFT JOIN partners_pe_connect p ON ((p.convention_id = c.id)))
- LEFT JOIN public_appellations_data pad ON ((pad.ogr_appellation = c.immersion_appellation)))
- LEFT JOIN public_romes_data prd ON (((pad.code_rome)::bpchar = prd.code_rome)))
- LEFT JOIN form_establishments fe ON ((fe.siret = c.siret)))
- LEFT JOIN immersion_assessments ass ON ((ass.convention_id = c.id)))
- LEFT JOIN actors b ON ((c.beneficiary_id = b.id)))
- LEFT JOIN actors et ON ((c.establishment_tutor_id = et.id)))
- LEFT JOIN actors er ON ((c.establishment_representative_id = er.id)))
- LEFT JOIN actors br ON ((c.beneficiary_representative_id = br.id)))
+FROM conventions c
+ LEFT JOIN view_agencies a ON ((a.id = c.agency_id))
+ LEFT JOIN partners_pe_connect p ON ((p.convention_id = c.id))
+ LEFT JOIN public_appellations_data pad ON ((pad.ogr_appellation = c.immersion_appellation))
+ LEFT JOIN public_romes_data prd ON (((pad.code_rome)::bpchar = prd.code_rome))
+ LEFT JOIN form_establishments fe ON ((fe.siret = c.siret))
+ LEFT JOIN immersion_assessments ass ON ((ass.convention_id = c.id))
+ LEFT JOIN actors b ON ((c.beneficiary_id = b.id))
+ LEFT JOIN actors et ON ((c.establishment_tutor_id = et.id))
+ LEFT JOIN actors er ON ((c.establishment_representative_id = er.id))
+ LEFT JOIN actors br ON ((c.beneficiary_representative_id = br.id))
  ${
    mode === "up"
-     ? `LEFT JOIN convention_status_translations cst ON ((c.status = cst.status)))`
+     ? `LEFT JOIN convention_status_translations cst ON ((c.status = cst.status))`
      : ``
  }
- LEFT JOIN actors bce ON ((c.beneficiary_current_employer_id = bce.id)));`;
+ LEFT JOIN actors bce ON ((c.beneficiary_current_employer_id = bce.id));`;
