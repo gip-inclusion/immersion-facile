@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import {
   ConventionId,
   ConventionReadDto,
@@ -5,150 +6,222 @@ import {
   parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import {
+  jsonBuildObject,
+  jsonStripNulls,
+  KyselyDb,
+} from "../kysely/kyselyUtils";
 
-const buildSignatoriesObject = `JSON_BUILD_OBJECT(
-      'beneficiary' , JSON_BUILD_OBJECT(
-        'role', 'beneficiary',
-        'firstName', b.first_name,
-        'lastName', b.last_name,
-        'email', b.email,
-        'phone', b.phone,
-        'signedAt', date_to_iso(b.signed_at),
-        'isRqth', CASE WHEN (b.extra_fields ->> 'isRqth' IS NOT NULL) THEN (b.extra_fields ->> 'isRqth')::boolean ELSE NULL END,
-        'emergencyContact', b.extra_fields ->> 'emergencyContact',
-        'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
-        'emergencyContactEmail', b.extra_fields ->> 'emergencyContactEmail',
-        'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN JSON_BUILD_OBJECT(
-          'provider','peConnect',
-          'token', p.user_pe_external_id,
-          'payload', CASE WHEN (p.email IS NOT NULL) THEN JSON_BUILD_OBJECT(
-            'advisor', JSON_BUILD_OBJECT(
-              'email',p.email,
-              'firstName', p.firstname,
-              'lastName',p.lastname,
-              'type', p.type
+export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
+  // prettier-ignore
+  const builder = transaction
+    .selectFrom("conventions")
+    .leftJoin("actors as b", "b.id", "conventions.beneficiary_id")
+    .leftJoin("actors as br", "br.id", "conventions.beneficiary_representative_id")
+    .leftJoin("actors as bce", "bce.id", "conventions.beneficiary_current_employer_id")
+    .leftJoin("actors as er", "er.id", "conventions.establishment_representative_id")
+    .leftJoin("actors as et", "et.id", "conventions.establishment_tutor_id")
+    .leftJoin("partners_pe_connect as p", "p.convention_id", "conventions.id")
+    .leftJoin("view_appellations_dto as vad", "vad.appellation_code", "conventions.immersion_appellation")
+    .leftJoin("agencies", "agencies.id", "conventions.agency_id")
+    .leftJoin("agencies as referring_agencies", "agencies.refers_to_agency_id", "referring_agencies.id")
+
+  return builder.select(({ ref, ...eb }) =>
+    jsonStripNulls(
+      jsonBuildObject({
+        id: ref("conventions.id"),
+        status: ref("conventions.status"),
+        dateValidation: sql`date_to_iso(conventions.date_validation)`,
+        dateSubmission: sql`date_to_iso(conventions.date_submission)`,
+        dateStart: sql`date_to_iso(conventions.date_start)`,
+        dateEnd: sql`date_to_iso(conventions.date_end)`,
+        signatories: jsonBuildObject({
+          beneficiary: jsonBuildObject({
+            role: sql`'beneficiary'`,
+            firstName: ref("b.first_name"),
+            lastName: ref("b.last_name"),
+            email: ref("b.email"),
+            phone: ref("b.phone"),
+            signedAt: sql`date_to_iso(b.signed_at)`,
+            isRqth: eb
+              .case()
+              .when(sql`b.extra_fields ->> 'isRqth'`, "is not", null)
+              .then(sql`(b.extra_fields ->> 'isRqth')::boolean`)
+              .else(null)
+              .end(),
+            emergencyContact: sql`b.extra_fields ->> 'emergencyContact'`,
+            emergencyContactPhone: sql`b.extra_fields ->> 'emergencyContactPhone'`,
+            emergencyContactEmail: sql`b.extra_fields ->> 'emergencyContactEmail'`,
+            federatedIdentity: eb
+              .case()
+              .when("p.user_pe_external_id", "is not", null)
+              .then(
+                jsonBuildObject({
+                  provider: sql`'peConnect'`,
+                  token: ref("p.user_pe_external_id"),
+                  payload: eb
+                    .case()
+                    .when("p.email", "is not", null)
+                    .then(
+                      jsonBuildObject({
+                        advisor: jsonBuildObject({
+                          email: ref("p.email"),
+                          firstName: ref("p.firstname"),
+                          lastName: ref("p.lastname"),
+                          type: ref("p.type"),
+                        }),
+                      }),
+                    )
+                    .else(null)
+                    .end(),
+                }),
+              )
+              .else(null)
+              .end(),
+            levelOfEducation: eb
+              .case()
+              .when(sql`b.extra_fields ->> 'levelOfEducation'`, "is not", null)
+              .then(sql`b.extra_fields ->> 'levelOfEducation'`)
+              .else(null)
+              .end(),
+            financiaryHelp: eb
+              .case()
+              .when(sql`b.extra_fields ->> 'financiaryHelp'`, "is not", null)
+              .then(sql`b.extra_fields ->> 'financiaryHelp'`)
+              .else(null)
+              .end(),
+            birthdate: eb
+              .case()
+              .when(sql`b.extra_fields ->> 'birthdate'`, "is not", null)
+              .then(sql`b.extra_fields ->> 'birthdate'`)
+              .else(sql`'1970-01-01T12:00:00.000Z'`)
+              .end(),
+            schoolName: eb
+              .case()
+              .when(sql`b.extra_fields ->> 'schoolName'`, "is not", null)
+              .then(sql`b.extra_fields ->> 'schoolName'`)
+              .else(null)
+              .end(),
+            schoolPostcode: eb
+              .case()
+              .when(sql`b.extra_fields ->> 'schoolPostcode'`, "is not", null)
+              .then(sql`b.extra_fields ->> 'schoolPostcode'`)
+              .else(null)
+              .end(),
+          }),
+          beneficiaryCurrentEmployer: eb
+            .case()
+            .when("bce.id", "is", null)
+            .then(null)
+            .else(
+              jsonBuildObject({
+                role: sql`'beneficiary-current-employer'`,
+                firstName: ref("bce.first_name"),
+                lastName: ref("bce.last_name"),
+                email: ref("bce.email"),
+                phone: ref("bce.phone"),
+                job: sql`bce.extra_fields ->> 'job'`,
+                businessSiret: sql`bce.extra_fields ->> 'businessSiret'`,
+                businessName: sql`bce.extra_fields ->> 'businessName'`,
+                signedAt: sql`date_to_iso(bce.signed_at)`,
+                businessAddress: sql`bce.extra_fields ->> 'businessAddress'`,
+              }),
             )
-          ) ELSE NULL END 
-        ) ELSE NULL END,
-        'levelOfEducation', CASE WHEN  (b.extra_fields ->> 'levelOfEducation' IS NOT NULL) THEN b.extra_fields ->> 'levelOfEducation' ELSE NULL END,
-        'financiaryHelp', CASE WHEN  (b.extra_fields ->> 'financiaryHelp' IS NOT NULL) THEN b.extra_fields ->> 'financiaryHelp' ELSE NULL END,
-        'birthdate', CASE WHEN  (b.extra_fields ->> 'birthdate' IS NOT NULL) THEN b.extra_fields ->> 'birthdate' ELSE '1970-01-01T12:00:00.000Z' END,
-        'schoolName', CASE WHEN  (b.extra_fields ->> 'schoolName' IS NOT NULL) THEN b.extra_fields ->> 'schoolName' ELSE NULL END,
-        'schoolPostcode', CASE WHEN  (b.extra_fields ->> 'schoolPostcode' IS NOT NULL) THEN b.extra_fields ->> 'schoolPostcode' ELSE NULL END
-      ),
-      'beneficiaryCurrentEmployer' , CASE WHEN bce IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
-        'role', 'beneficiary-current-employer',
-        'firstName', bce.first_name,
-        'lastName', bce.last_name,
-        'email', bce.email,
-        'phone', bce.phone,
-        'job', bce.extra_fields ->> 'job',
-        'businessSiret', bce.extra_fields ->> 'businessSiret',
-        'businessName', bce.extra_fields ->> 'businessName',
-        'signedAt', date_to_iso(bce.signed_at),
-        'businessAddress', bce.extra_fields ->> 'businessAddress'
-      ) END,
-      'establishmentRepresentative' , JSON_BUILD_OBJECT(
-        'role', 'establishment-representative',
-        'firstName', er.first_name,
-        'lastName', er.last_name,
-        'email', er.email,
-        'phone', er.phone,
-        'signedAt', date_to_iso(er.signed_at)
-      ),
-      'beneficiaryRepresentative' , CASE WHEN br IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
-        'role', 'beneficiary-representative',
-        'firstName', br.first_name,
-        'lastName', br.last_name,
-        'email', br.email,
-        'phone', br.phone,
-        'signedAt', date_to_iso(br.signed_at)
-      ) END
-    )`;
-
-const buildDto = `JSON_STRIP_NULLS(
-  JSON_BUILD_OBJECT(
-    'id', conventions.id,
-    'status', conventions.status,
-    'dateValidation', date_to_iso(date_validation),
-    'dateSubmission', date_to_iso(date_submission),
-    'dateStart',  date_to_iso(date_start),
-    'dateEnd', date_to_iso(date_end),
-    'signatories', ${buildSignatoriesObject},
-    'siret', siret,
-    'schedule', schedule,
-    'businessName', business_name,
-    'workConditions', work_conditions,
-    'agencyId', agency_id,
-    'agencyName', agencies.name,
-    'agencyKind', agencies.kind,
-    'agencyDepartment', agencies.department_code,
-    'agencySiret', agencies.agency_siret,
-    'agencyRefersTo', CASE WHEN agencies.refers_to_agency_id IS NOT NULL 
-      THEN JSON_BUILD_OBJECT(
-        'id', agencies.refers_to_agency_id,
-        'name', referring_agencies.name
-        ) 
-      ELSE NULL 
-      END,
-    'individualProtection', individual_protection,
-    'sanitaryPrevention', sanitary_prevention,
-    'sanitaryPreventionDescription', sanitary_prevention_description,
-    'immersionAddress', immersion_address,
-    'immersionObjective', immersion_objective,
-    'immersionAppellation', JSON_BUILD_OBJECT(
-      'appellationCode', vad.appellation_code::text,
-      'appellationLabel', vad.appellation_label,
-      'romeCode', vad.rome_code,
-      'romeLabel', vad.rome_label
-    ),
-    'immersionActivities', immersion_activities,
-    'immersionSkills', immersion_skills,
-    'internshipKind', internship_kind,
-    'businessAdvantages', business_advantages,
-    'statusJustification', status_justification,
-    'establishmentTutor' , JSON_BUILD_OBJECT(
-      'role', 'establishment-tutor',
-      'firstName', et.first_name,
-      'lastName', et.last_name,
-      'email', et.email,
-      'phone', et.phone,
-      'job', et.extra_fields ->> 'job'
-    ),
-    'validators', validators,
-    'renewed', CASE WHEN renewed_from IS NOT NULL THEN JSON_BUILD_OBJECT(
-      'from', renewed_from,
-      'justification', renewed_justification
-    ) ELSE NULL END
-))`;
-
-export const selectAllConventionDtosById = `SELECT conventions.id, ${buildDto} as dto 
-  FROM conventions
-  LEFT JOIN actors AS b ON b.id = conventions.beneficiary_id
-  LEFT JOIN actors AS br ON br.id = conventions.beneficiary_representative_id
-  LEFT JOIN actors AS bce ON bce.id = conventions.beneficiary_current_employer_id
-  LEFT JOIN actors AS er ON er.id = conventions.establishment_representative_id
-  LEFT JOIN partners_pe_connect AS p ON p.convention_id = conventions.id
-  LEFT JOIN actors as et ON et.id = conventions.establishment_tutor_id
-  LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = conventions.immersion_appellation
-  LEFT JOIN agencies ON agencies.id = conventions.agency_id
-  LEFT JOIN agencies as referring_agencies ON agencies.refers_to_agency_id = referring_agencies.id
-`;
-
-const getReadConventionByIdQuery = `
-  ${selectAllConventionDtosById} WHERE conventions.id = $1`;
+            .end(),
+          establishmentRepresentative: jsonBuildObject({
+            role: sql`'establishment-representative'`,
+            firstName: ref("er.first_name"),
+            lastName: ref("er.last_name"),
+            email: ref("er.email"),
+            phone: ref("er.phone"),
+            signedAt: sql`date_to_iso(er.signed_at)`,
+          }),
+          beneficiaryRepresentative: eb
+            .case()
+            .when("br.id", "is", null)
+            .then(null)
+            .else(
+              jsonBuildObject({
+                role: sql`'beneficiary-representative'`,
+                firstName: ref("br.first_name"),
+                lastName: ref("br.last_name"),
+                email: ref("br.email"),
+                phone: ref("br.phone"),
+                signedAt: sql`date_to_iso(br.signed_at)`,
+              }),
+            )
+            .end(),
+        }),
+        siret: ref("conventions.siret"),
+        schedule: ref("conventions.schedule"),
+        businessName: ref("conventions.business_name"),
+        workConditions: ref("conventions.work_conditions"),
+        agencyId: ref("conventions.agency_id"),
+        agencyName: ref("agencies.name"),
+        agencyKind: ref("agencies.kind"),
+        agencyDepartment: ref("agencies.department_code"),
+        agencySiret: ref("agencies.agency_siret"),
+        agencyRefersTo: eb
+          .case()
+          .when("agencies.refers_to_agency_id", "is not", null)
+          .then(
+            jsonBuildObject({
+              id: ref("agencies.refers_to_agency_id"),
+              name: ref("referring_agencies.name"),
+            }),
+          )
+          .else(null)
+          .end(),
+        individualProtection: ref("conventions.individual_protection"),
+        sanitaryPrevention: ref("conventions.sanitary_prevention"),
+        sanitaryPreventionDescription: ref(
+          "conventions.sanitary_prevention_description",
+        ),
+        immersionAddress: ref("conventions.immersion_address"),
+        immersionObjective: ref("conventions.immersion_objective"),
+        immersionAppellation: jsonBuildObject({
+          appellationCode: sql`vad.appellation_code::text`,
+          appellationLabel: ref("vad.appellation_label"),
+          romeCode: ref("vad.rome_code"),
+          romeLabel: ref("vad.rome_label"),
+        }),
+        immersionActivities: ref("conventions.immersion_activities"),
+        immersionSkills: ref("conventions.immersion_skills"),
+        internshipKind: ref("conventions.internship_kind"),
+        businessAdvantages: ref("conventions.business_advantages"),
+        statusJustification: ref("conventions.status_justification"),
+        establishmentTutor: jsonBuildObject({
+          role: sql`'establishment-tutor'`,
+          firstName: ref("et.first_name"),
+          lastName: ref("et.last_name"),
+          email: ref("et.email"),
+          phone: ref("et.phone"),
+          job: sql`et.extra_fields ->> 'job'`,
+        }),
+        validators: ref("conventions.validators"),
+        renewed: eb
+          .case()
+          .when("renewed_from", "is not", null)
+          .then(
+            jsonBuildObject({
+              from: ref("renewed_from"),
+              justification: ref("renewed_justification"),
+            }),
+          )
+          .else(null)
+          .end(),
+      }),
+    ).as("dto"),
+  );
+};
 
 export const getReadConventionById = async (
   transaction: KyselyDb,
   conventionId: ConventionId,
 ): Promise<ConventionReadDto | undefined> => {
-  const pgResult = await executeKyselyRawSqlQuery<{ dto: unknown }>(
-    transaction,
-    getReadConventionByIdQuery,
-    [conventionId],
-  );
-  const pgConvention = pgResult.rows.at(0);
+  const pgConvention = await createConventionReadQueryBuilder(transaction)
+    .where("conventions.id", "=", conventionId)
+    .executeTakeFirst();
 
   return (
     pgConvention &&

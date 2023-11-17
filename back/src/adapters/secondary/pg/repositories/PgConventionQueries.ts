@@ -18,8 +18,8 @@ import {
 } from "../../../../domain/convention/ports/ConventionQueries";
 import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 import {
+  createConventionReadQueryBuilder,
   getReadConventionById,
-  selectAllConventionDtosById,
 } from "./pgConventionSql";
 
 type WhereClause = Flavor<string, "WhereClause">;
@@ -144,8 +144,12 @@ export class PgConventionQueries implements ConventionQueries {
     orderByClause,
     limit,
   }: GetConventionsRequestProperties): Promise<ConventionReadDto[]> {
+    const conventionReadQueryBuilder = createConventionReadQueryBuilder(
+      this.transaction,
+    );
+
     const query = [
-      selectAllConventionDtosById,
+      conventionReadQueryBuilder.compile().sql,
       whereClauses &&
         whereClauses.length > 0 &&
         `WHERE ${whereClauses.join(" AND ")}`,

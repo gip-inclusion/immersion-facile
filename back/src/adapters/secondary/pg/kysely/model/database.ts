@@ -11,6 +11,8 @@ export interface Database {
   groups__sirets: GroupsSirets;
   agencies: Agencies;
   saved_errors: SavedErrors;
+  partners_pe_connect: PartnersPeConnect;
+  view_appellations_dto: ViewAppellationsDto;
 }
 
 type JsonArray = JsonValue[];
@@ -171,4 +173,20 @@ interface Actors {
   signed_at: Timestamp | null;
   extra_fields: Json | null;
   id: Generated<number>;
+}
+
+interface PartnersPeConnect {
+  user_pe_external_id: string;
+  convention_id: Generated<string>;
+  firstname: string | null;
+  lastname: string | null;
+  email: string | null;
+  type: string | null;
+}
+
+interface ViewAppellationsDto {
+  appellation_code: number | null;
+  appellation_label: string | null;
+  rome_code: string | null;
+  rome_label: string | null;
 }
