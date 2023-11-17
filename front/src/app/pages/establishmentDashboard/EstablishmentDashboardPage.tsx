@@ -45,7 +45,7 @@ export const EstablishmentDashboardPage = ({
             <p>
               {" "}
               Vous n'avez pas de convention où vous être signataire en tant que
-              réprésentant de l'entreprise.
+              représentant de l'entreprise.
             </p>
           )}
         </>
