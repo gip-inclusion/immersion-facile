@@ -780,3 +780,63 @@ describe("Pg implementation of ConventionQueries", () => {
     } satisfies ConventionReadDto;
   };
 });
+
+// const buildSignatoriesObject = `JSON_BUILD_OBJECT(
+//   'beneficiary' , JSON_BUILD_OBJECT(
+//     'role', 'beneficiary',
+//     'firstName', b.first_name,
+//     'lastName', b.last_name,
+//     'email', b.email,
+//     'phone', b.phone,
+//     'signedAt', date_to_iso(b.signed_at),
+//     'isRqth', CASE WHEN (b.extra_fields ->> 'isRqth' IS NOT NULL) THEN (b.extra_fields ->> 'isRqth')::boolean ELSE NULL END,
+//     'emergencyContact', b.extra_fields ->> 'emergencyContact',
+//     'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
+//     'emergencyContactEmail', b.extra_fields ->> 'emergencyContactEmail',
+//     'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN JSON_BUILD_OBJECT(
+//       'provider','peConnect',
+//       'token', p.user_pe_external_id,
+//       'payload', CASE WHEN (p.email IS NOT NULL) THEN JSON_BUILD_OBJECT(
+//         'advisor', JSON_BUILD_OBJECT(
+//           'email',p.email,
+//           'firstName', p.firstname,
+//           'lastName',p.lastname,
+//           'type', p.type
+//         )
+//       ) ELSE NULL END
+//     ) ELSE NULL END,
+//     'levelOfEducation', CASE WHEN  (b.extra_fields ->> 'levelOfEducation' IS NOT NULL) THEN b.extra_fields ->> 'levelOfEducation' ELSE NULL END,
+//     'financiaryHelp', CASE WHEN  (b.extra_fields ->> 'financiaryHelp' IS NOT NULL) THEN b.extra_fields ->> 'financiaryHelp' ELSE NULL END,
+//     'birthdate', CASE WHEN  (b.extra_fields ->> 'birthdate' IS NOT NULL) THEN b.extra_fields ->> 'birthdate' ELSE '1970-01-01T12:00:00.000Z' END,
+//     'schoolName', CASE WHEN  (b.extra_fields ->> 'schoolName' IS NOT NULL) THEN b.extra_fields ->> 'schoolName' ELSE NULL END,
+//     'schoolPostcode', CASE WHEN  (b.extra_fields ->> 'schoolPostcode' IS NOT NULL) THEN b.extra_fields ->> 'schoolPostcode' ELSE NULL END
+//   ),
+//   'beneficiaryCurrentEmployer' , CASE WHEN bce IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
+//     'role', 'beneficiary-current-employer',
+//     'firstName', bce.first_name,
+//     'lastName', bce.last_name,
+//     'email', bce.email,
+//     'phone', bce.phone,
+//     'job', bce.extra_fields ->> 'job',
+//     'businessSiret', bce.extra_fields ->> 'businessSiret',
+//     'businessName', bce.extra_fields ->> 'businessName',
+//     'signedAt', date_to_iso(bce.signed_at),
+//     'businessAddress', bce.extra_fields ->> 'businessAddress'
+//   ) END,
+//   'establishmentRepresentative' , JSON_BUILD_OBJECT(
+//     'role', 'establishment-representative',
+//     'firstName', er.first_name,
+//     'lastName', er.last_name,
+//     'email', er.email,
+//     'phone', er.phone,
+//     'signedAt', date_to_iso(er.signed_at)
+//   ),
+//   'beneficiaryRepresentative' , CASE WHEN br IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
+//     'role', 'beneficiary-representative',
+//     'firstName', br.first_name,
+//     'lastName', br.last_name,
+//     'email', br.email,
+//     'phone', br.phone,
+//     'signedAt', date_to_iso(br.signed_at)
+//   ) END
+// )`;
