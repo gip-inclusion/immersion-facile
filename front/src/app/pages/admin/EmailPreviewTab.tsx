@@ -261,21 +261,6 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     conventionId: "CONVENTION_ID",
   },
-  NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
-    internshipKind: "immersion",
-    conventionId: "CONVENTION_ID",
-    firstName: "FIRST_NAME",
-    lastName: "LAST_NAME",
-    agencyLogoUrl: defaultEmailPreviewUrl,
-  },
-  NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
-    internshipKind: "immersion",
-    conventionId: "CONVENTION_ID",
-    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
-    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
-    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
-    agencyLogoUrl: defaultEmailPreviewUrl,
-  },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     internshipKind: "immersion",
     conventionId: "CONVENTION_ID",
