@@ -124,6 +124,6 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       throw new NotFoundError(
         `Convention with id ${conventionToSyncId} missing in conventionRepository.`,
       );
-    return this.#broadcastToPeUsecase.execute(convention);
+    return this.#broadcastToPeUsecase.execute({ convention });
   }
 }

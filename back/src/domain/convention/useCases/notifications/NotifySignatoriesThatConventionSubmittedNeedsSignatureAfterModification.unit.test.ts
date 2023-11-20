@@ -70,7 +70,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
         ["shortLink1", "shortLink2"],
       );
 
-      await useCase.execute(convention);
+      await useCase.execute({ convention });
 
       await expectSavedNotificationsAndEvents({
         emails: [
@@ -124,7 +124,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
         ["shortLink1", "shortLink2"],
       );
 
-      await useCase.execute(convention);
+      await useCase.execute({ convention });
 
       await expectSavedNotificationsAndEvents({
         emails: [
@@ -200,7 +200,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
         ["shortLink1", "shortLink2", "shortLink3", "shortLink4"],
       );
 
-      await useCase.execute(convention);
+      await useCase.execute({ convention });
 
       await expectSavedNotificationsAndEvents({
         emails: [
@@ -295,7 +295,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
       uow.agencyRepository.setAgencies([new AgencyDtoBuilder().build()]);
 
       await expectPromiseToFailWithError(
-        useCase.execute(convention),
+        useCase.execute({ convention }),
         new Error(conventionMissingMessage(convention.id)),
       );
 
@@ -312,7 +312,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
       });
 
       await expectPromiseToFailWithError(
-        useCase.execute(convention),
+        useCase.execute({ convention }),
         new Error(agencyMissingMessage(convention.agencyId)),
       );
 

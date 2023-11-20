@@ -76,6 +76,7 @@ import {
   UpdateConventionStatusWithJustificationWithoutModierRole,
   UpdateConventionStatusWithoutJustification,
   UpdateConventionStatusWithValidator,
+  WithConventionDto,
   WithConventionId,
   WithConventionIdLegacy,
 } from "./convention.dto";
@@ -352,6 +353,10 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
         .optional(),
     }),
   );
+
+export const withConventionSchema: z.Schema<WithConventionDto> = z.object({
+  convention: conventionSchema,
+});
 
 export const withConventionIdLegacySchema: z.Schema<WithConventionIdLegacy> =
   z.object({

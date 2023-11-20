@@ -2,12 +2,13 @@ import { values } from "ramda";
 import {
   AgencyDto,
   ConventionDto,
-  conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
   filterNotFalsy,
   frontRoutes,
   Signatory,
   TemplatedEmail,
+  WithConventionDto,
+  withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -24,8 +25,8 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 
 const logger = createLogger(__filename);
 
-export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #timeGateway: TimeGateway;
 
@@ -55,7 +56,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
   }
 
   public async _execute(
-    convention: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     if (convention.status === "PARTIALLY_SIGNED") {

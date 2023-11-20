@@ -67,7 +67,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .build();
 
-    await broadcastToPe.execute(convention);
+    await broadcastToPe.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
@@ -95,7 +95,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withoutFederatedIdentity()
       .build();
 
-    await broadcastToPe.execute(convention);
+    await broadcastToPe.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -125,7 +125,7 @@ describe("Broadcasts events to pole-emploi", () => {
     const now = new Date();
     timeGateway.setNextDate(now);
 
-    await broadcastToPe.execute(convention);
+    await broadcastToPe.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -165,7 +165,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withImmersionObjective("Confirmer un projet professionnel")
       .build();
 
-    await broadcastToPe.execute(convention);
+    await broadcastToPe.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
@@ -204,7 +204,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
 
-    await broadcastToPe.execute(convention);
+    await broadcastToPe.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);

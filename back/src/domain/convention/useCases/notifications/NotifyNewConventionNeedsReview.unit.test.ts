@@ -87,7 +87,9 @@ describe("NotifyConventionNeedsReview", () => {
 
       uow.agencyRepository.setAgencies([agency]);
 
-      await notifyNewConventionNeedsReview.execute(conventionInReview);
+      await notifyNewConventionNeedsReview.execute({
+        convention: conventionInReview,
+      });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
         [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -179,7 +181,9 @@ describe("NotifyConventionNeedsReview", () => {
       ];
       shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
-      await notifyNewConventionNeedsReview.execute(conventionInReview);
+      await notifyNewConventionNeedsReview.execute({
+        convention: conventionInReview,
+      });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
         [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -255,7 +259,9 @@ describe("NotifyConventionNeedsReview", () => {
     });
 
     it("No counsellors available, neither validators => ensure no mail is sent", async () => {
-      await notifyNewConventionNeedsReview.execute(conventionInReview);
+      await notifyNewConventionNeedsReview.execute({
+        convention: conventionInReview,
+      });
       expectSavedNotificationsAndEvents({ emails: [] });
     });
 
@@ -282,9 +288,9 @@ describe("NotifyConventionNeedsReview", () => {
 
         uow.agencyRepository.setAgencies([agency]);
 
-        await notifyNewConventionNeedsReview.execute(
-          acceptedByCounsellorConvention,
-        );
+        await notifyNewConventionNeedsReview.execute({
+          convention: acceptedByCounsellorConvention,
+        });
 
         expectToEqual(uow.shortLinkQuery.getShortLinks(), {
           [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -365,9 +371,9 @@ describe("NotifyConventionNeedsReview", () => {
       });
 
       it("No validators available => ensure no mail is sent", async () => {
-        await notifyNewConventionNeedsReview.execute(
-          acceptedByCounsellorConvention,
-        );
+        await notifyNewConventionNeedsReview.execute({
+          convention: acceptedByCounsellorConvention,
+        });
         expectSavedNotificationsAndEvents({ emails: [] });
       });
     });
@@ -390,9 +396,9 @@ describe("NotifyConventionNeedsReview", () => {
 
         uow.agencyRepository.setAgencies([agency]);
 
-        await notifyNewConventionNeedsReview.execute(
-          acceptedByValidatorConvention,
-        );
+        await notifyNewConventionNeedsReview.execute({
+          convention: acceptedByValidatorConvention,
+        });
 
         expectToEqual(uow.shortLinkQuery.getShortLinks(), {
           [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -438,9 +444,9 @@ describe("NotifyConventionNeedsReview", () => {
       });
 
       it("No admin available => ensure no mail is sent", async () => {
-        await notifyNewConventionNeedsReview.execute(
-          acceptedByValidatorConvention,
-        );
+        await notifyNewConventionNeedsReview.execute({
+          convention: acceptedByValidatorConvention,
+        });
 
         expectSavedNotificationsAndEvents({ emails: [] });
       });
@@ -473,7 +479,9 @@ describe("NotifyConventionNeedsReview", () => {
 
       uow.agencyRepository.setAgencies([agency]);
 
-      await notifyNewConventionNeedsReview.execute(conventionInReview);
+      await notifyNewConventionNeedsReview.execute({
+        convention: conventionInReview,
+      });
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
         [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({

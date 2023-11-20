@@ -1,11 +1,11 @@
 import { filter } from "ramda";
 import {
   ApiConsumer,
-  ConventionDto,
   ConventionReadDto,
-  conventionSchema,
   isApiConsumerAllowed,
   pipeWithValue,
+  WithConventionDto,
+  withConventionSchema,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { isConventionInScope } from "../../convention/entities/Convention";
@@ -22,8 +22,8 @@ const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {
   return !!conventionUpdatedCallbackParams;
 };
 
-export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #subscribersGateway: SubscribersGateway;
 
@@ -35,7 +35,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     this.#subscribersGateway = subscribersGateway;
   }
 
-  protected async _execute(convention: ConventionDto, uow: UnitOfWork) {
+  protected async _execute({ convention }: WithConventionDto, uow: UnitOfWork) {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
       throw new NotFoundError(

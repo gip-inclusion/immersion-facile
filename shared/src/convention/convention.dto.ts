@@ -270,6 +270,9 @@ export type WithConventionIdLegacy = {
 export type WithConventionId = {
   conventionId: ConventionId;
 };
+export type WithConventionDto = {
+  convention: ConventionDto;
+};
 
 export type UpdateConventionRequestDto = {
   convention: ConventionDto;

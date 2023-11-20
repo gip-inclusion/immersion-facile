@@ -86,7 +86,7 @@ export class SignConvention extends TransactionalUseCase<
     if (domainTopic) {
       const event = this.#createNewEvent({
         topic: domainTopic,
-        payload: signedConvention,
+        payload: { convention: signedConvention },
       });
       await uow.outboxRepository.save(event);
     }

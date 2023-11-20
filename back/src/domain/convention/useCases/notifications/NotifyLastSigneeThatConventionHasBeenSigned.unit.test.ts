@@ -73,7 +73,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       [signedConvention.id]: signedConvention,
     };
 
-    await notifyLastSignee.execute(signedConvention);
+    await notifyLastSignee.execute({ convention: signedConvention });
     const conventionStatusLink = fakeGenerateMagicLinkUrlFn({
       targetRoute: frontRoutes.conventionStatusDashboard,
       id: signedConvention.id,
@@ -111,7 +111,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       [signedConvention.id]: signedConvention,
     };
 
-    await notifyLastSignee.execute(signedConvention);
+    await notifyLastSignee.execute({ convention: signedConvention });
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -148,7 +148,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     };
 
     await expectPromiseToFailWithError(
-      notifyLastSignee.execute(conventionSignedByNoOne),
+      notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
       new Error(noSignatoryMessage(conventionSignedByNoOne)),
     );
 
@@ -159,7 +159,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     uow.conventionRepository._conventions = {};
 
     await expectPromiseToFailWithError(
-      notifyLastSignee.execute(conventionSignedByNoOne),
+      notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
       new Error(missingConventionMessage(conventionSignedByNoOne.id)),
     );
 

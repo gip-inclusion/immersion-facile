@@ -2,11 +2,12 @@ import {
   AgencyDto,
   ConventionDto,
   ConventionId,
-  conventionSchema,
   frontRoutes,
   Signatory,
   SignatoryRole,
   TemplatedEmail,
+  WithConventionDto,
+  withConventionSchema,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
@@ -26,8 +27,8 @@ export const missingAgencyMessage = (convention: ConventionDto) =>
 export const noSignatoryMessage = (convention: ConventionDto): string =>
   `No signatories has signed the convention id ${convention.id}.`;
 
-export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -48,7 +49,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   }
 
   protected async _execute(
-    convention: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const savedConvention = await uow.conventionRepository.getById(

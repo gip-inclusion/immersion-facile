@@ -1,4 +1,4 @@
-import { ConventionDto, conventionSchema } from "shared";
+import { WithConventionDto, withConventionSchema } from "shared";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -7,8 +7,8 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { getAllConventionRecipientsEmail } from "../../entities/Convention";
 
-export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -21,7 +21,7 @@ export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCa
   }
 
   protected async _execute(
-    convention: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);

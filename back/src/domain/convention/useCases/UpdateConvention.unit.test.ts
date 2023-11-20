@@ -254,7 +254,7 @@ describe("Update Convention", () => {
         outboxRepo.events[0],
         createNewEvent({
           topic: "ConventionSubmittedAfterModification",
-          payload: inReviewConvention,
+          payload: { convention: inReviewConvention },
         }),
       );
 

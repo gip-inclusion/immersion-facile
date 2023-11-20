@@ -186,7 +186,7 @@ describe("Sign convention", () => {
     expectEventsInOutbox([
       {
         topic: "ConventionPartiallySigned",
-        payload: expectedConvention,
+        payload: { convention: expectedConvention },
       },
     ]);
   });
@@ -232,7 +232,7 @@ describe("Sign convention", () => {
     expectEventsInOutbox([
       {
         topic: "ConventionPartiallySigned",
-        payload: expectedConvention,
+        payload: { convention: expectedConvention },
       },
     ]);
   });
@@ -272,7 +272,7 @@ describe("Sign convention", () => {
     expectEventsInOutbox([
       {
         topic: "ConventionFullySigned",
-        payload: expectedConvention,
+        payload: { convention: expectedConvention },
       },
     ]);
   });

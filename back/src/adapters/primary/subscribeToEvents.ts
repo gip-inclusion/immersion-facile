@@ -69,16 +69,8 @@ const getUseCasesByTopics = (
   // Edge cases for immersion application.
   ConventionRequiresModification: [
     useCases.notifyActorThatConventionNeedsModifications,
-    {
-      useCaseName: "BroadcastToPartners",
-      execute: ({ convention }) =>
-        useCases.broadcastToPartnersOnConventionUpdates.execute(convention),
-    },
-    {
-      useCaseName: "BroadcastToPoleEmploi",
-      execute: ({ convention }) =>
-        useCases.broadcastToPoleEmploiOnConventionUpdates.execute(convention),
-    },
+    useCases.broadcastToPartnersOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ConventionRejected: [
     useCases.notifyAllActorsThatConventionIsRejected,

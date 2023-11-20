@@ -199,10 +199,10 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     return user.email;
   }
 
-  #createEvent(updatedDto: ConventionDto, domainTopic: DomainTopic) {
+  #createEvent(updatedConventionDto: ConventionDto, domainTopic: DomainTopic) {
     return this.createNewEvent({
       topic: domainTopic,
-      payload: updatedDto,
+      payload: { convention: updatedConventionDto },
     });
   }
 

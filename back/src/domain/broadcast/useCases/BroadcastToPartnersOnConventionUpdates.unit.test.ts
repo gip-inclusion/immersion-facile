@@ -115,7 +115,7 @@ describe("Broadcast to partners on updated convention", () => {
         subscribersGateway,
       );
 
-    await broadcastUpdatedConvention.execute(convention1);
+    await broadcastUpdatedConvention.execute({ convention: convention1 });
 
     const expectedCallsAfterFirstExecute: CallbackParams[] = [
       {
@@ -137,7 +137,7 @@ describe("Broadcast to partners on updated convention", () => {
 
     expectToEqual(subscribersGateway.calls, expectedCallsAfterFirstExecute);
 
-    await broadcastUpdatedConvention.execute(convention2);
+    await broadcastUpdatedConvention.execute({ convention: convention2 });
 
     const expectedCallsAfterSecondExecute: CallbackParams[] = [
       ...expectedCallsAfterFirstExecute,

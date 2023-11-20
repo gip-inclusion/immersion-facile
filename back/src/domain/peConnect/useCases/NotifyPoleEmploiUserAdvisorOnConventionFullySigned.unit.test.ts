@@ -56,7 +56,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .withFederatedIdentity({ provider: "peConnect", token: "blop" })
       .build();
 
-    expect(await usecase.execute(conventionDtoFromEvent)).toBeUndefined();
+    expect(
+      await usecase.execute({ convention: conventionDtoFromEvent }),
+    ).toBeUndefined();
   });
 
   it("should send email with the correct params", async () => {
@@ -90,7 +92,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       ],
     );
 
-    await usecase.execute(conventionDtoFromEvent);
+    await usecase.execute({ convention: conventionDtoFromEvent });
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -156,7 +158,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       ],
     );
 
-    await usecase.execute(conventionDtoFromEvent);
+    await usecase.execute({ convention: conventionDtoFromEvent });
 
     expectSavedNotificationsAndEvents({
       emails: [],

@@ -57,7 +57,7 @@ export class AddConvention extends TransactionalUseCase<
 
     const event = this.#createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: convention,
+      payload: { convention },
     });
 
     await uow.outboxRepository.save(event);
