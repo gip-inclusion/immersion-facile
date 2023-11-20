@@ -1396,13 +1396,17 @@ export const emailTemplatesByName =
       createEmailVariables: ({ agencyName }) => ({
         subject: `Immersion Facilitée - Activation de l’accès au back office de votre structure`,
         greetings: "Bonjour,",
-        content: `<strong>Vous pouvez désormais accéder au back office de votre structure.</strong>
+        content: `<strong>Vous pouvez désormais accéder au tableau de bord de votre structure: ${agencyName}.</strong>
 
-        Nous avons bien activé votre accès au back office de votre structure : ${agencyName}.
+        Vous avez ainsi la possibilité de:
+         <ul>
+            <li>consulter l’ensemble des conventions d’immersion établies et à traiter,</li>
+            <li>les exporter sous format excel ou csv,</li>
+            <li>les modifier, valider, rendre obsolètes,</li>
+            <li>faire une demande de renouvellement.</li>
+         </ul>
 
-        Vous avez ainsi la possibilité de consulter l’ensemble des conventions d’immersion établies et à traiter et de les exporter sous format excel ou csv.
-
-        Nous allons progressivement enrichir ce back office et vous proposer de nouvelles fonctionnalités.
+        Nous allons progressivement enrichir ce tableau de bord et vous proposer de nouvelles fonctionnalités.
       `,
         subContent: defaultSignature("immersion"),
       }),
