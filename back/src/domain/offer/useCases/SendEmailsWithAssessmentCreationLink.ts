@@ -14,7 +14,7 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 const logger = createLogger(__filename);
 
@@ -29,7 +29,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
 > {
   protected inputSchema = z.void();
 
-  readonly #notificationGateway: NotificationGateway;
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   readonly #timeGateway: TimeGateway;
 
@@ -39,7 +39,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    notificationGateway: NotificationGateway,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     timeGateway: TimeGateway,
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     createNewEvent: CreateNewEvent,
@@ -47,7 +47,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     super(uowPerformer);
 
     this.#createNewEvent = createNewEvent;
-    this.#notificationGateway = notificationGateway;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
     this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
   }
@@ -96,28 +96,36 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     if (!agency)
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
-    await this.#notificationGateway.sendEmail({
-      kind: "CREATE_ASSESSMENT",
-      recipients: [convention.establishmentTutor.email],
-      sender: immersionFacileNoReplyEmailSender,
-      params: {
-        agencyLogoUrl: agency.logoUrl,
-        agencyValidatorEmail: agency.validatorEmails[0],
-        agencyAssessmentDocumentLink: isUrlValid(agency.questionnaireUrl)
-          ? agency.questionnaireUrl
-          : undefined,
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+    await this.#saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "CREATE_ASSESSMENT",
+        recipients: [convention.establishmentTutor.email],
+        sender: immersionFacileNoReplyEmailSender,
+        params: {
+          agencyLogoUrl: agency.logoUrl,
+          agencyValidatorEmail: agency.validatorEmails[0],
+          agencyAssessmentDocumentLink: isUrlValid(agency.questionnaireUrl)
+            ? agency.questionnaireUrl
+            : undefined,
+          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          conventionId: convention.id,
+          establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+          assessmentCreationLink: this.#generateConventionMagicLinkUrl({
+            id: convention.id,
+            email: convention.establishmentTutor.email,
+            role: "establishment-tutor",
+            targetRoute: frontRoutes.assessment,
+            now: this.#timeGateway.now(),
+          }),
+          internshipKind: convention.internshipKind,
+        },
+      },
+      followedIds: {
         conventionId: convention.id,
-        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        assessmentCreationLink: this.#generateConventionMagicLinkUrl({
-          id: convention.id,
-          email: convention.establishmentTutor.email,
-          role: "establishment-tutor",
-          targetRoute: frontRoutes.assessment,
-          now: this.#timeGateway.now(),
-        }),
-        internshipKind: convention.internshipKind,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
       },
     });
 

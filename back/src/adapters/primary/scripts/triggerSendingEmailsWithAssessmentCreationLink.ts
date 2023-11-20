@@ -1,18 +1,13 @@
-import axios from "axios";
 import { Pool } from "pg";
 import { keys } from "ramda";
-import { immersionFacileContactEmail } from "shared";
-import { createAxiosSharedClient } from "shared-routes/axios";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/offer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
-import { brevoNotificationGatewayRoutes } from "../../secondary/notificationGateway/BrevoNotificationGateway.routes";
-import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
-import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
+import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -29,33 +24,23 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   });
   const timeGateway = new RealTimeGateway();
 
-  const notificationGateway =
-    config.notificationGateway === "BREVO"
-      ? new BrevoNotificationGateway(
-          createAxiosSharedClient(brevoNotificationGatewayRoutes, axios),
-          makeEmailAllowListPredicate({
-            skipEmailAllowList: config.skipEmailAllowlist,
-            emailAllowList: config.emailAllowList,
-          }),
-          config.apiKeyBrevo,
-          {
-            name: "Immersion Facilitée",
-            email: immersionFacileContactEmail,
-          },
-        )
-      : new InMemoryNotificationGateway(timeGateway);
-
   const { uowPerformer } = createUowPerformer(config, () => pool);
 
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,
     3600 * 24 * 30,
   );
+  const uuidGenerator = new UuidV4Generator();
+
+  const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+    uuidGenerator,
+    timeGateway,
+  );
 
   const sendEmailsWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
       uowPerformer,
-      notificationGateway,
+      saveNotificationAndRelatedEvent,
       timeGateway,
       makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
       makeCreateNewEvent({
