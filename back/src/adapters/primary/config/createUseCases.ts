@@ -37,6 +37,7 @@ import { GetConventionForApiConsumer } from "../../../domain/convention/useCases
 import { GetConventionsForApiConsumer } from "../../../domain/convention/useCases/GetConventionsForApiConsumer";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../../domain/convention/useCases/notifications/NotifyActorThatConventionNeedsModifications";
+import { NotifyAgencyThatAssessmentIsCreated } from "../../../domain/convention/useCases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled as NotifyAllActorsThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
@@ -477,6 +478,11 @@ export const createUseCases = (
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
+        ),
+      notifyAgencyThatAssessmentIsCreated:
+        new NotifyAgencyThatAssessmentIsCreated(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
         ),
       broadcastToPoleEmploiOnConventionUpdates:
         new BroadcastToPoleEmploiOnConventionUpdates(

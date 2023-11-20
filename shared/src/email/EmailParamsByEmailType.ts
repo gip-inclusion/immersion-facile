@@ -5,6 +5,7 @@ import {
   InternshipKind,
   Renewed,
 } from "../convention/convention.dto";
+import { AssessmentStatus } from "../immersionAssessment/ImmersionAssessmentDto";
 import { SiretDto } from "../siret/siret";
 import { Email } from "./email.dto";
 
@@ -109,6 +110,18 @@ export type EmailParamsByEmailType = {
     establishmentTutorName: string;
     assessmentCreationLink: string;
     internshipKind: InternshipKind;
+  };
+  NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
+    immersionObjective: ImmersionObjective | null;
+    conventionId: ConventionId;
+    dateEnd: string;
+    dateStart: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    establishmentFeedback: string;
+    agencyValidatorEmail: Email;
+    assessmentStatus: AssessmentStatus;
   };
   DEPRECATED_CONVENTION_NOTIFICATION: {
     beneficiaryFirstName: string;

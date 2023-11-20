@@ -1,18 +1,25 @@
 import {
+  AgencyDtoBuilder,
   AssessmentDto,
   assessmentRoute,
   ConventionDtoBuilder,
   createConventionMagicLinkPayload,
 } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 
 const conventionId = "my-Convention-id";
 
 describe("Immersion assessment routes", () => {
-  describe(`POST /auth/${assessmentRoute}/:jwt`, () => {
+  describe(`POST /auth/${assessmentRoute}`, () => {
     it("returns 200 if the jwt is valid", async () => {
-      const { request, generateConventionJwt, inMemoryUow } =
-        await buildTestApp();
+      const {
+        request,
+        generateConventionJwt,
+        inMemoryUow,
+        eventCrawler,
+        gateways,
+      } = await buildTestApp();
 
       const jwt = generateConventionJwt(
         createConventionMagicLinkPayload({
@@ -23,8 +30,11 @@ describe("Immersion assessment routes", () => {
         }),
       );
 
+      const agency = new AgencyDtoBuilder().build();
+
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)
+        .withAgencyId(agency.id)
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
 
@@ -44,7 +54,14 @@ describe("Immersion assessment routes", () => {
         .send(assessment);
 
       expect(response.status).toBe(200);
-      expect(response.body).toBe("");
+      await processEventsForEmailToBeSent(eventCrawler);
+
+      expect(gateways.notification.getSentEmails()).toMatchObject([
+        {
+          kind: "NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION",
+          recipients: [agency.validatorEmails[0]],
+        },
+      ]);
     });
 
     it("fails with 401 if jwt is not valid", async () => {

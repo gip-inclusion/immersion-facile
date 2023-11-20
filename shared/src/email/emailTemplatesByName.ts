@@ -1272,6 +1272,41 @@ export const emailTemplatesByName =
         agencyLogoUrl,
       }),
     },
+    NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
+      niceName: "Notification de creation du bilan",
+      tags: ["notification agence bilan de l’immersion"],
+      createEmailVariables: ({
+        agencyValidatorEmail,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        dateEnd,
+        dateStart,
+        establishmentFeedback,
+        immersionObjective,
+        assessmentStatus,
+      }) => ({
+        subject: `Pour information : évaluation de l'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son immersion au sein de l'entreprise ${businessName}.
+        <ul>
+          <li>Objectif de l'immersion : ${immersionObjective}</li>
+          <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${
+            isStringDate(dateStart)
+              ? toDisplayedDate(new Date(dateStart), true)
+              : "DATE INVALIDE"
+          } au ${
+          isStringDate(dateEnd)
+            ? toDisplayedDate(new Date(dateEnd), true)
+            : "DATE INVALIDE"
+        } : ${assessmentStatus === "FINISHED" ? "oui" : "non"}</li>
+          <li>Retour de l'entreprise : ${establishmentFeedback}</li>
+        </ul>
+        La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email à l'adresse : ${agencyValidatorEmail}.`,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     FULL_PREVIEW_EMAIL: {
       niceName: "Preview email complet (tous les blocs)",
       tags: ["aperçu pour tests"],
