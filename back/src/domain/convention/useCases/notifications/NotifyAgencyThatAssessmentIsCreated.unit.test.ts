@@ -1,8 +1,8 @@
 import {
   AgencyDtoBuilder,
+  AssessmentDto,
   ConventionDtoBuilder,
   expectPromiseToFailWith,
-  ImmersionAssessmentDto,
 } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -16,7 +16,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import { createImmersionAssessmentEntity } from "../../entities/ImmersionAssessmentEntity";
+import { createAssessmentEntity } from "../../entities/AssessmentEntity";
 import { NotifyAgencyThatAssessmentIsCreated } from "./NotifyAgencyThatAssessmentIsCreated";
 
 const agency = new AgencyDtoBuilder().build();
@@ -25,7 +25,7 @@ const convention = new ConventionDtoBuilder()
   .withStatus("ACCEPTED_BY_VALIDATOR")
   .build();
 
-const immersionAssessment: ImmersionAssessmentDto = {
+const assessment: AssessmentDto = {
   conventionId: convention.id,
   status: "FINISHED",
   establishmentFeedback: "osef",
@@ -58,8 +58,8 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
   it("Throw when no convention were found", async () => {
     await expectPromiseToFailWith(
-      usecase.execute(immersionAssessment),
-      `Unable to send mail. No convention were found with id : ${immersionAssessment.conventionId}`,
+      usecase.execute(assessment),
+      `Unable to send mail. No convention were found with id : ${assessment.conventionId}`,
     );
 
     expectSavedNotificationsAndEvents({
@@ -71,7 +71,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     await uow.conventionRepository.save(convention);
 
     await expectPromiseToFailWith(
-      usecase.execute(immersionAssessment),
+      usecase.execute(assessment),
       `Unable to send mail. No agency were found with id : ${convention.agencyId}`,
     );
 
@@ -83,11 +83,11 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   it("Send an email to first validator", async () => {
     await uow.agencyRepository.insert(agency);
     await uow.conventionRepository.save(convention);
-    await uow.immersionAssessmentRepository.save(
-      createImmersionAssessmentEntity(immersionAssessment, convention),
+    await uow.assessmentRepository.save(
+      createAssessmentEntity(assessment, convention),
     );
 
-    await usecase.execute(immersionAssessment);
+    await usecase.execute(assessment);
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -101,9 +101,9 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,
-            establishmentFeedback: immersionAssessment.establishmentFeedback,
+            establishmentFeedback: assessment.establishmentFeedback,
             agencyValidatorEmail: agency.validatorEmails[0],
-            assessmentStatus: immersionAssessment.status,
+            assessmentStatus: assessment.status,
           },
           recipients: [agency.validatorEmails[0]],
         },
