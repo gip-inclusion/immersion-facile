@@ -1,4 +1,4 @@
-import { ImmersionAssessmentDto, immersionAssessmentSchema } from "shared";
+import { AssessmentDto, assessmentSchema } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
   UnitOfWork,
@@ -8,10 +8,10 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<
-  ImmersionAssessmentDto,
+  AssessmentDto,
   void
 > {
-  protected inputSchema = immersionAssessmentSchema;
+  protected inputSchema = assessmentSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -24,7 +24,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<
   }
 
   public async _execute(
-    payload: ImmersionAssessmentDto,
+    payload: AssessmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const convention = await uow.conventionRepository.getById(

@@ -1,11 +1,11 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
+import { AssessmentStatus } from "../assessment/AssessmentDto";
 import {
   ConventionId,
   ImmersionObjective,
   InternshipKind,
   Renewed,
 } from "../convention/convention.dto";
-import { AssessmentStatus } from "../immersionAssessment/ImmersionAssessmentDto";
 import { SiretDto } from "../siret/siret";
 import { Email } from "./email.dto";
 
