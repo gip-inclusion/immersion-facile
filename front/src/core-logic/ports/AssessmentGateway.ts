@@ -1,11 +1,11 @@
 import { Observable } from "rxjs";
-import { ImmersionAssessmentDto } from "shared";
+import { AssessmentDto } from "shared";
 
 export type AssessmentAndJwt = {
-  assessment: ImmersionAssessmentDto;
+  assessment: AssessmentDto;
   jwt: string;
 };
 
-export interface ImmersionAssessmentGateway {
+export interface AssessmentGateway {
   createAssessment(params: AssessmentAndJwt): Observable<void>;
 }

@@ -5,10 +5,10 @@ import { ENV } from "src/config/environmentVariables";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
+import { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
@@ -19,7 +19,7 @@ import { createStore } from "src/core-logic/storeConfig/store";
 
 export type Dependencies = {
   adminGateway: AdminGateway;
-  immersionAssessmentGateway: ImmersionAssessmentGateway;
+  assessmentGateway: AssessmentGateway;
   siretGatewayThroughBack: SiretGatewayThroughBack;
   agencyGateway: AgencyGateway;
   addressGateway: AddressGateway;

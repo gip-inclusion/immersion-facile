@@ -30,7 +30,7 @@ import { UpdateAgency } from "../../../domain/convention/useCases/agencies/Updat
 import { UpdateAgencyReferingToUpdatedAgency } from "../../../domain/convention/useCases/agencies/UpdateAgencyReferingToUpdatedAgency";
 import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
-import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
+import { CreateAssessment } from "../../../domain/convention/useCases/CreateAssessment";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { GetConventionForApiConsumer } from "../../../domain/convention/useCases/GetConventionForApiConsumer";
@@ -239,10 +239,7 @@ export const createUseCases = (
       ),
 
       // Conventions
-      createImmersionAssessment: new CreateImmersionAssessment(
-        uowPerformer,
-        createNewEvent,
-      ),
+      createAssessment: new CreateAssessment(uowPerformer, createNewEvent),
       addConvention,
       getConvention: new GetConvention(uowPerformer),
       getConventionForApiConsumer: new GetConventionForApiConsumer(

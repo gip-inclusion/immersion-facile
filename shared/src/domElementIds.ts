@@ -284,7 +284,7 @@ export const domElementIds = {
     manageButton: "im-form-manage-establishment__manage-button",
   },
 
-  immersionAssessment: {
+  assessment: {
     assessmentFormSubmitButton: "im-assessment-form__submit-button",
     assessmentFormDownloadButton: "im-assessment-form__download-button",
   },

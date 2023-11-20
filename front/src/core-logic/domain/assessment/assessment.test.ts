@@ -5,13 +5,10 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
-  immersionAssessmentErrorSelector,
-  immersionAssessmentStatusSelector,
-} from "./immersionAssessment.selectors";
-import {
-  immersionAssessmentSlice,
-  ImmersionAssessmentUIStatus,
-} from "./immersionAssessment.slice";
+  assessmentErrorSelector,
+  assessmentStatusSelector,
+} from "./assessment.selectors";
+import { assessmentSlice, AssessmentUIStatus } from "./assessment.slice";
 
 describe("Immersion Assessment slice", () => {
   let store: ReduxStore;
@@ -24,7 +21,7 @@ describe("Immersion Assessment slice", () => {
   it("immersion assessment creation requested - success", () => {
     expectStatusToBe("Idle");
     store.dispatch(
-      immersionAssessmentSlice.actions.creationRequested({
+      assessmentSlice.actions.creationRequested({
         assessment: {
           conventionId: "23465",
           status: "ABANDONED",
@@ -43,7 +40,7 @@ describe("Immersion Assessment slice", () => {
     const backendError: Error = new Error("Backend Error");
     expectStatusToBe("Idle");
     store.dispatch(
-      immersionAssessmentSlice.actions.creationRequested({
+      assessmentSlice.actions.creationRequested({
         assessment: {
           conventionId: "23465",
           status: "ABANDONED",
@@ -58,27 +55,22 @@ describe("Immersion Assessment slice", () => {
     expectErrorToBe(backendError.message);
   });
 
-  const expectStatusToBe = (
-    immersionAssessmentStatus: ImmersionAssessmentUIStatus,
-  ) => {
-    expectToEqual(
-      immersionAssessmentStatusSelector(store.getState()),
-      immersionAssessmentStatus,
-    );
+  const expectStatusToBe = (assessmentStatus: AssessmentUIStatus) => {
+    expectToEqual(assessmentStatusSelector(store.getState()), assessmentStatus);
   };
 
   const expectErrorToBe = (expectedErrorMessage: string | null) => {
     expectToEqual(
-      immersionAssessmentErrorSelector(store.getState()),
+      assessmentErrorSelector(store.getState()),
       expectedErrorMessage,
     );
   };
 
   const feedGatewayWithCreationError = (error: Error) => {
-    dependencies.immersionAssessmentGateway.creationResponse$.error(error);
+    dependencies.assessmentGateway.creationResponse$.error(error);
   };
 
   const feedGatewayWithCreationSuccess = () => {
-    dependencies.immersionAssessmentGateway.creationResponse$.next(undefined);
+    dependencies.assessmentGateway.creationResponse$.next(undefined);
   };
 });

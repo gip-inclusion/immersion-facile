@@ -1199,7 +1199,7 @@ export const emailTemplatesByName =
         ],
       }),
     },
-    CREATE_IMMERSION_ASSESSMENT: {
+    CREATE_ASSESSMENT: {
       niceName: "Lien de creation du bilan",
       tags: ["notification entreprise fin de l’immersion"],
       createEmailVariables: ({
@@ -1209,7 +1209,7 @@ export const emailTemplatesByName =
         beneficiaryLastName,
         conventionId,
         establishmentTutorName,
-        immersionAssessmentCreationLink,
+        assessmentCreationLink,
         internshipKind,
         agencyAssessmentDocumentLink,
       }) => ({
@@ -1240,7 +1240,7 @@ export const emailTemplatesByName =
                 ? "cette immersion"
                 : "ce mini stage"
             }`,
-            url: immersionAssessmentCreationLink,
+            url: assessmentCreationLink,
           },
           {
             label: "Télécharger la fiche bilan",

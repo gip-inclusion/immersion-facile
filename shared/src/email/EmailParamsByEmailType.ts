@@ -99,7 +99,7 @@ export type EmailParamsByEmailType = {
     signature: string;
     requesterName: string;
   };
-  CREATE_IMMERSION_ASSESSMENT: {
+  CREATE_ASSESSMENT: {
     agencyAssessmentDocumentLink: string | undefined;
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyValidatorEmail: string;
@@ -107,7 +107,7 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     conventionId: ConventionId;
     establishmentTutorName: string;
-    immersionAssessmentCreationLink: string;
+    assessmentCreationLink: string;
     internshipKind: InternshipKind;
   };
   DEPRECATED_CONVENTION_NOTIFICATION: {

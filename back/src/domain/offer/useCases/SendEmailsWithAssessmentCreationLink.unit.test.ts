@@ -17,7 +17,7 @@ import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { SendEmailsWithAssessmentCreationLink } from "./SendEmailsWithAssessmentCreationLink";
 
-describe("SendEmailWithImmersionAssessmentCreationLink", () => {
+describe("SendEmailWithAssessmentCreationLink", () => {
   const id: ConventionId = "immersion-ending-tomorrow-id";
 
   let uow: InMemoryUnitOfWork;
@@ -71,7 +71,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     // Assert
     expectToEqual(notificationGateway.getSentEmails(), [
       {
-        kind: "CREATE_IMMERSION_ASSESSMENT",
+        kind: "CREATE_ASSESSMENT",
         recipients: [
           immersionApplicationEndingTomorrow.establishmentTutor.email,
         ],
@@ -88,7 +88,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
           conventionId: immersionApplicationEndingTomorrow.id,
           establishmentTutorName: "Tom Cruise",
           internshipKind: immersionApplicationEndingTomorrow.internshipKind,
-          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/${id}/establishment-tutor/${now.toISOString()}/establishment@example.com`,
+          assessmentCreationLink: `http://fake-magic-link/bilan-immersion/${id}/establishment-tutor/${now.toISOString()}/establishment@example.com`,
         },
       },
     ]);

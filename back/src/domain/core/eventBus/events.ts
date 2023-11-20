@@ -1,6 +1,7 @@
 import {
   AgencyDto,
   AgencyId,
+  AssessmentDto,
   AuthenticatedUserId,
   ContactEstablishmentEventPayload,
   ConventionDto,
@@ -10,7 +11,6 @@ import {
   Flavor,
   FormEstablishmentDto,
   IcUserRoleForAgencyParams,
-  ImmersionAssessmentDto,
   RejectIcUserRoleForAgencyParams,
   WithAgencyDto,
   WithConventionIdLegacy,
@@ -91,7 +91,7 @@ export type DomainEvent =
   | GenericEvent<"AgencyUpdated", WithAgencyDto>
 
   // IMMERSION ASSESSMENT related
-  | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>
+  | GenericEvent<"AssessmentCreated", AssessmentDto>
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
 
   // PECONNECT related

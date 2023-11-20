@@ -1,15 +1,15 @@
 import {
+  AssessmentDto,
+  assessmentRoute,
   ConventionDtoBuilder,
   createConventionMagicLinkPayload,
-  ImmersionAssessmentDto,
-  immersionAssessmentRoute,
 } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 const conventionId = "my-Convention-id";
 
 describe("Immersion assessment routes", () => {
-  describe(`POST /auth/${immersionAssessmentRoute}/:jwt`, () => {
+  describe(`POST /auth/${assessmentRoute}/:jwt`, () => {
     it("returns 200 if the jwt is valid", async () => {
       const { request, generateConventionJwt, inMemoryUow } =
         await buildTestApp();
@@ -32,14 +32,14 @@ describe("Immersion assessment routes", () => {
         [convention.id]: convention,
       });
 
-      const assessment: ImmersionAssessmentDto = {
+      const assessment: AssessmentDto = {
         conventionId,
         status: "ABANDONED",
         establishmentFeedback: "The guy left after one day",
       };
 
       const response = await request
-        .post(`/auth/${immersionAssessmentRoute}`)
+        .post(`/auth/${assessmentRoute}`)
         .set("Authorization", jwt)
         .send(assessment);
 
@@ -49,14 +49,14 @@ describe("Immersion assessment routes", () => {
 
     it("fails with 401 if jwt is not valid", async () => {
       const { request } = await buildTestApp();
-      const assessment: ImmersionAssessmentDto = {
+      const assessment: AssessmentDto = {
         conventionId,
         status: "ABANDONED",
         establishmentFeedback: "The guy left after one day",
       };
 
       const response = await request
-        .post(`/auth/${immersionAssessmentRoute}`)
+        .post(`/auth/${assessmentRoute}`)
         .set("Authorization", "invalid-jwt")
         .send(assessment);
 

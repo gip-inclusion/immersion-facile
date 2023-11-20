@@ -8,40 +8,40 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { identity } from "ramda";
 import {
+  AssessmentDto,
+  assessmentSchema,
   AssessmentStatus,
   assessmentStatuses,
   ConventionReadDto,
   domElementIds,
-  ImmersionAssessmentDto,
-  immersionAssessmentSchema,
   InternshipKind,
 } from "shared";
+import { useAssessment } from "src/app/hooks/assessment.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { useImmersionAssessment } from "src/app/hooks/immersionAssessment";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
-  immersionAssessmentErrorSelector,
-  immersionAssessmentStatusSelector,
-} from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
+  assessmentErrorSelector,
+  assessmentStatusSelector,
+} from "src/core-logic/domain/assessment/assessment.selectors";
 
-type ImmersionAssessmentFormProperties = {
+type AssessmentFormProperties = {
   convention: ConventionReadDto;
   jwt: string;
 };
 
-export const ImmersionAssessmentForm = ({
+export const AssessmentForm = ({
   convention,
   jwt,
-}: ImmersionAssessmentFormProperties): JSX.Element => {
-  const { createAssessment } = useImmersionAssessment(jwt);
-  const assessmentError = useAppSelector(immersionAssessmentErrorSelector);
-  const assessmentStatus = useAppSelector(immersionAssessmentStatusSelector);
+}: AssessmentFormProperties): JSX.Element => {
+  const { createAssessment } = useAssessment(jwt);
+  const assessmentError = useAppSelector(assessmentErrorSelector);
+  const assessmentStatus = useAppSelector(assessmentStatusSelector);
   const isDisabled = assessmentStatus !== "Idle" || assessmentError !== null;
 
-  const methods = useForm<ImmersionAssessmentDto>({
-    resolver: zodResolver(immersionAssessmentSchema),
+  const methods = useForm<AssessmentDto>({
+    resolver: zodResolver(assessmentSchema),
     mode: "onTouched",
-    defaultValues: identity<ImmersionAssessmentDto>({
+    defaultValues: identity<AssessmentDto>({
       conventionId: convention.id,
       status: null as unknown as AssessmentStatus,
       establishmentFeedback: "",
@@ -82,7 +82,7 @@ export const ImmersionAssessmentForm = ({
             type="submit"
             disabled={isDisabled}
             nativeButtonProps={{
-              id: domElementIds.immersionAssessment.assessmentFormSubmitButton,
+              id: domElementIds.assessment.assessmentFormSubmitButton,
             }}
           >
             Envoyer
@@ -109,10 +109,9 @@ export const ImmersionAssessmentForm = ({
             <Button
               priority="secondary"
               type="button"
-              onClick={downloadFullImmersionAssessmentPdf}
+              onClick={downloadFullAssessmentPdf}
               nativeButtonProps={{
-                id: domElementIds.immersionAssessment
-                  .assessmentFormDownloadButton,
+                id: domElementIds.assessment.assessmentFormDownloadButton,
               }}
             >
               Télécharger le bilan détaillé en PDF
@@ -137,7 +136,7 @@ const getLabels = (
       : "Le bénéficiaire a abandonné le mini-stage",
 });
 
-const downloadFullImmersionAssessmentPdf = () => {
+const downloadFullAssessmentPdf = () => {
   window.open(
     "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf",
     "_blank",

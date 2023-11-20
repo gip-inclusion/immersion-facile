@@ -1,31 +1,24 @@
-import {
-  ConventionDto,
-  ConventionStatus,
-  ImmersionAssessmentDto,
-} from "shared";
+import { AssessmentDto, ConventionDto, ConventionStatus } from "shared";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { EntityFromDto } from "../../core/EntityFromDto";
 
-export type ImmersionAssessmentEntity = EntityFromDto<
-  ImmersionAssessmentDto,
-  "ImmersionAssessment"
->;
+export type AssessmentEntity = EntityFromDto<AssessmentDto, "Assessment">;
 
 const acceptedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",
 ];
 
-export const createImmersionAssessmentEntity = (
-  dto: ImmersionAssessmentDto,
+export const createAssessmentEntity = (
+  dto: AssessmentDto,
   convention: ConventionDto,
-): ImmersionAssessmentEntity => {
+): AssessmentEntity => {
   if (!acceptedConventionStatuses.includes(convention.status))
     throw new BadRequestError(
       `Cannot create an assessment for which the convention has not been validated, status was ${convention.status}`,
     );
 
   return {
-    _entityName: "ImmersionAssessment",
+    _entityName: "Assessment",
     ...dto,
   };
 };

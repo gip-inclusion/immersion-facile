@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { match, P } from "ts-pattern";
-import { conventionMagicLinkRoutes, immersionAssessmentRoute } from "shared";
+import { assessmentRoute, conventionMagicLinkRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { UnauthorizedError } from "../../helpers/httpErrors";
@@ -10,10 +10,10 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   const expressRouter = Router({ mergeParams: true });
 
   expressRouter
-    .route(`/auth/${immersionAssessmentRoute}`)
+    .route(`/auth/${assessmentRoute}`)
     .post(deps.conventionMagicLinkAuthMiddleware, async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.createImmersionAssessment.execute(
+        deps.useCases.createAssessment.execute(
           req.body,
           req.payloads?.convention,
         ),

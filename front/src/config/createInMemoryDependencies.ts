@@ -4,7 +4,7 @@ import type { Dependencies } from "src/config/dependencies";
 import { InMemoryAddressGateway } from "src/core-logic/adapters/AddressGateway/InMemoryAddressGateway";
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
-import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
+import { SimulatedAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedAssessmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
 import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
@@ -30,7 +30,7 @@ export const createInMemoryDependencies = (): Dependencies => ({
       .withFitForDisabledWorkers(false)
       .build(),
   ]),
-  immersionAssessmentGateway: new SimulatedImmersionAssessmentGateway(),
+  assessmentGateway: new SimulatedAssessmentGateway(),
 
   searchGateway: new SimulatedSearchGateway(
     seedSearchResults,

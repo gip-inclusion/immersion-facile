@@ -96,7 +96,7 @@ export const metaContents: Partial<
     title: "Statut convention",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
-  immersionAssessment: {
+  assessment: {
     title: "Bilan d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },

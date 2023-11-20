@@ -1,10 +1,10 @@
 import { ApiConsumerRepository } from "../../auth/ports/ApiConsumerRepository";
 import { AgencyRepository } from "../../convention/ports/AgencyRepository";
+import { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import { ConventionExternalIdRepository } from "../../convention/ports/ConventionExternalIdRepository";
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { ConventionsToSyncRepository } from "../../convention/ports/ConventionsToSyncRepository";
-import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
@@ -40,7 +40,7 @@ export type UnitOfWork = {
   groupRepository: GroupRepository;
   featureFlagRepository: FeatureFlagRepository;
   formEstablishmentRepository: FormEstablishmentRepository;
-  immersionAssessmentRepository: ImmersionAssessmentRepository;
+  assessmentRepository: AssessmentRepository;
   inclusionConnectedUserRepository: InclusionConnectedUserRepository;
   notificationRepository: NotificationRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;

@@ -1,7 +1,7 @@
 import {
+  AssessmentDto,
+  assessmentSchema,
   ConventionJwtPayload,
-  ImmersionAssessmentDto,
-  immersionAssessmentSchema,
   Role,
 } from "shared";
 import {
@@ -13,12 +13,12 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import {
-  createImmersionAssessmentEntity,
-  ImmersionAssessmentEntity,
-} from "../entities/ImmersionAssessmentEntity";
+  AssessmentEntity,
+  createAssessmentEntity,
+} from "../entities/AssessmentEntity";
 
-export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAssessmentDto> {
-  protected inputSchema = immersionAssessmentSchema;
+export class CreateAssessment extends TransactionalUseCase<AssessmentDto> {
+  protected inputSchema = assessmentSchema;
 
   #createNewEvent: CreateNewEvent;
 
@@ -31,31 +31,33 @@ export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAss
   }
 
   public async _execute(
-    dto: ImmersionAssessmentDto,
+    dto: AssessmentDto,
     uow: UnitOfWork,
     conventionJwtPayload?: ConventionJwtPayload,
   ): Promise<void> {
     throwForbiddenIfNotAllow(dto, conventionJwtPayload);
 
-    const immersionAssessmentEntity =
-      await validateConventionAndCreateImmersionAssessmentEntity(uow, dto);
+    const assessmentEntity = await validateConventionAndCreateAssessmentEntity(
+      uow,
+      dto,
+    );
 
     const event = this.#createNewEvent({
-      topic: "ImmersionAssessmentCreated",
+      topic: "AssessmentCreated",
       payload: dto,
     });
 
     await Promise.all([
-      uow.immersionAssessmentRepository.save(immersionAssessmentEntity),
+      uow.assessmentRepository.save(assessmentEntity),
       uow.outboxRepository.save(event),
     ]);
   }
 }
 
-const validateConventionAndCreateImmersionAssessmentEntity = async (
+const validateConventionAndCreateAssessmentEntity = async (
   uow: UnitOfWork,
-  dto: ImmersionAssessmentDto,
-): Promise<ImmersionAssessmentEntity> => {
+  dto: AssessmentDto,
+): Promise<AssessmentEntity> => {
   const conventionId = dto.conventionId;
   const convention = await uow.conventionRepository.getById(conventionId);
 
@@ -64,7 +66,7 @@ const validateConventionAndCreateImmersionAssessmentEntity = async (
       `Did not found convention with id: ${conventionId}`,
     );
 
-  const assessment = await uow.immersionAssessmentRepository.getByConventionId(
+  const assessment = await uow.assessmentRepository.getByConventionId(
     conventionId,
   );
 
@@ -73,11 +75,11 @@ const validateConventionAndCreateImmersionAssessmentEntity = async (
       `Cannot create an assessment as one already exists for convention with id : ${conventionId}`,
     );
 
-  return createImmersionAssessmentEntity(dto, convention);
+  return createAssessmentEntity(dto, convention);
 };
 
 const throwForbiddenIfNotAllow = (
-  dto: ImmersionAssessmentDto,
+  dto: AssessmentDto,
   conventionJwtPayload?: ConventionJwtPayload,
 ) => {
   if (!conventionJwtPayload) throw new ForbiddenError("No magic link provided");

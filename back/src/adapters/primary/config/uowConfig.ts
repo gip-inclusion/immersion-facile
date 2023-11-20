@@ -7,6 +7,7 @@ import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQuerie
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
+import { InMemoryAssessmentRepository } from "../../secondary/InMemoryAssessmentRepository";
 import { InMemoryAuthenticatedUserRepository } from "../../secondary/InMemoryAuthenticatedUserRepository";
 import { InMemoryConventionExternalIdRepository } from "../../secondary/InMemoryConventionExternalIdRepository";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
@@ -16,7 +17,6 @@ import { InMemoryConventionsToSyncRepository } from "../../secondary/InMemoryCon
 import { InMemoryDeletedEstablishmentRepository } from "../../secondary/InMemoryDeletedEstablishmentRepository";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
-import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryNotificationRepository } from "../../secondary/InMemoryNotificationRepository";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
@@ -31,6 +31,7 @@ import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { PgAgencyRepository } from "../../secondary/pg/repositories/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/repositories/PgApiConsumerRepository";
+import { PgAssessmentRepository } from "../../secondary/pg/repositories/PgAssessmentRepository";
 import { PgAuthenticatedUserRepository } from "../../secondary/pg/repositories/PgAuthenticatedUserRepository";
 import { PgConventionExternalIdRepository } from "../../secondary/pg/repositories/PgConventionExternalIdRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/repositories/PgConventionPoleEmploiAdvisorRepository";
@@ -44,7 +45,6 @@ import { PgEstablishmentAggregateRepository } from "../../secondary/pg/repositor
 import { PgFeatureFlagRepository } from "../../secondary/pg/repositories/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/repositories/PgFormEstablishmentRepository";
 import { PgGroupRepository } from "../../secondary/pg/repositories/PgGroupRepository";
-import { PgImmersionAssessmentRepository } from "../../secondary/pg/repositories/PgImmersionAssessmentRepository";
 import { PgInclusionConnectedUserRepository } from "../../secondary/pg/repositories/PgInclusionConnectedUserRepository";
 import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNotificationRepository";
 import { PgOngoingOAuthRepository } from "../../secondary/pg/repositories/PgOngoingOAuthRepository";
@@ -86,7 +86,7 @@ export const createInMemoryUow = () => {
     errorRepository: new InMemoryErrorRepository(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
-    immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
+    assessmentRepository: new InMemoryAssessmentRepository(),
     inclusionConnectedUserRepository:
       new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
     notificationRepository: new InMemoryNotificationRepository(),
@@ -131,9 +131,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     groupRepository: new PgGroupRepository(transaction),
     featureFlagRepository: new PgFeatureFlagRepository(transaction),
     formEstablishmentRepository: new PgFormEstablishmentRepository(transaction),
-    immersionAssessmentRepository: new PgImmersionAssessmentRepository(
-      transaction,
-    ),
+    assessmentRepository: new PgAssessmentRepository(transaction),
     inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
       transaction,
     ),

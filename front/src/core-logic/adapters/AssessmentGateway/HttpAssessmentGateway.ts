@@ -1,14 +1,12 @@
 import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
-import { immersionAssessmentRoute } from "shared";
+import { assessmentRoute } from "shared";
 import {
   AssessmentAndJwt,
-  ImmersionAssessmentGateway,
-} from "src/core-logic/ports/ImmersionAssessmentGateway";
+  AssessmentGateway,
+} from "src/core-logic/ports/AssessmentGateway";
 
-export class HttpImmersionAssessmentGateway
-  implements ImmersionAssessmentGateway
-{
+export class HttpAssessmentGateway implements AssessmentGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
   public createAssessment({
@@ -17,7 +15,7 @@ export class HttpImmersionAssessmentGateway
   }: AssessmentAndJwt): Observable<void> {
     return from(
       this.httpClient
-        .post<void>(`/auth/${immersionAssessmentRoute}`, assessment, {
+        .post<void>(`/auth/${assessmentRoute}`, assessment, {
           headers: { Authorization: jwt },
         })
         .then(({ data }) => data),

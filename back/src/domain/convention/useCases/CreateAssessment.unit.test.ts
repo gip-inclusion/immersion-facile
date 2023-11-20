@@ -1,4 +1,5 @@
 import {
+  AssessmentDto,
   ConventionDtoBuilder,
   ConventionJwtPayload,
   conventionStatuses,
@@ -6,7 +7,6 @@ import {
   expectArraysToEqual,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
-  ImmersionAssessmentDto,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -19,16 +19,16 @@ import {
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryAssessmentRepository } from "../../../adapters/secondary/InMemoryAssessmentRepository";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryImmersionAssessmentRepository } from "../../../adapters/secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { ImmersionAssessmentEntity } from "../entities/ImmersionAssessmentEntity";
-import { CreateImmersionAssessment } from "./CreateImmersionAssessment";
+import { AssessmentEntity } from "../entities/AssessmentEntity";
+import { CreateAssessment } from "./CreateAssessment";
 
 const conventionId = "conventionId";
 
-const immersionAssessment: ImmersionAssessmentDto = {
+const assessment: AssessmentDto = {
   conventionId,
   status: "FINISHED",
   establishmentFeedback: "Ca c'est bien passé",
@@ -45,16 +45,16 @@ const validPayload: ConventionJwtPayload = {
   version: currentJwtVersions.convention,
 };
 
-describe("CreateImmersionAssessment", () => {
+describe("CreateAssessment", () => {
   let outboxRepository: InMemoryOutboxRepository;
   let conventionRepository: InMemoryConventionRepository;
-  let createImmersionAssessment: CreateImmersionAssessment;
+  let createAssessment: CreateAssessment;
   let uowPerformer: InMemoryUowPerformer;
-  let immersionAssessmentRepository: InMemoryImmersionAssessmentRepository;
+  let assessmentRepository: InMemoryAssessmentRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    immersionAssessmentRepository = uow.immersionAssessmentRepository;
+    assessmentRepository = uow.assessmentRepository;
     conventionRepository = uow.conventionRepository;
     outboxRepository = uow.outboxRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
@@ -66,7 +66,7 @@ describe("CreateImmersionAssessment", () => {
     conventionRepository.setConventions({
       [convention.id]: convention,
     });
-    createImmersionAssessment = new CreateImmersionAssessment(
+    createAssessment = new CreateAssessment(
       uowPerformer,
       makeCreateNewEvent({
         timeGateway: new CustomTimeGateway(),
@@ -77,14 +77,14 @@ describe("CreateImmersionAssessment", () => {
 
   it("throws forbidden if no magicLink payload is provided", async () => {
     await expectPromiseToFailWithError(
-      createImmersionAssessment.execute(immersionAssessment),
+      createAssessment.execute(assessment),
       new ForbiddenError("No magic link provided"),
     );
   });
 
   it("throws forbidden if magicLink payload has a different applicationId linked", async () => {
     await expectPromiseToFailWithError(
-      createImmersionAssessment.execute(immersionAssessment, {
+      createAssessment.execute(assessment, {
         applicationId: "otherId",
         role: "establishment-tutor",
       } as ConventionJwtPayload),
@@ -96,7 +96,7 @@ describe("CreateImmersionAssessment", () => {
 
   it("throws forbidden if magicLink role is not establishment", async () => {
     await expectPromiseToFailWithError(
-      createImmersionAssessment.execute(immersionAssessment, {
+      createAssessment.execute(assessment, {
         applicationId: conventionId,
         role: "beneficiary",
       } as ConventionJwtPayload),
@@ -107,8 +107,8 @@ describe("CreateImmersionAssessment", () => {
   it("throws not found if provided conventionId does not match any in DB", async () => {
     const notFoundId = "not-found-id";
     await expectPromiseToFailWithError(
-      createImmersionAssessment.execute(
-        { ...immersionAssessment, conventionId: notFoundId },
+      createAssessment.execute(
+        { ...assessment, conventionId: notFoundId },
         { ...validPayload, applicationId: notFoundId },
       ),
       new NotFoundError(`Did not found convention with id: ${notFoundId}`),
@@ -116,11 +116,11 @@ describe("CreateImmersionAssessment", () => {
   });
 
   it("throws ConflictError if the assessment already exists for the Convention", async () => {
-    immersionAssessmentRepository.setAssessments([
-      { ...immersionAssessment, _entityName: "ImmersionAssessment" },
+    assessmentRepository.setAssessments([
+      { ...assessment, _entityName: "Assessment" },
     ]);
     await expectPromiseToFailWithError(
-      createImmersionAssessment.execute(immersionAssessment, validPayload),
+      createAssessment.execute(assessment, validPayload),
       new ConflictError(
         `Cannot create an assessment as one already exists for convention with id : ${conventionId}`,
       ),
@@ -141,7 +141,7 @@ describe("CreateImmersionAssessment", () => {
       });
 
       await expectPromiseToFailWithError(
-        createImmersionAssessment.execute(immersionAssessment, validPayload),
+        createAssessment.execute(assessment, validPayload),
         new BadRequestError(
           `Cannot create an assessment for which the convention has not been validated, status was ${status}`,
         ),
@@ -150,34 +150,31 @@ describe("CreateImmersionAssessment", () => {
   );
 
   it.each(passingStatuses.map((status) => ({ status })))(
-    "should save the ImmersionAssessment if Convention has status $status",
+    "should save the Assessment if Convention has status $status",
     async ({ status }) => {
       const convention = ConventionDtoBuilderWithId.withStatus(status).build();
       conventionRepository.setConventions({
         [convention.id]: convention,
       });
 
-      await createImmersionAssessment.execute(
-        immersionAssessment,
-        validPayload,
-      );
+      await createAssessment.execute(assessment, validPayload);
 
-      const expectedImmersionEntity: ImmersionAssessmentEntity = {
-        ...immersionAssessment,
-        _entityName: "ImmersionAssessment",
+      const expectedImmersionEntity: AssessmentEntity = {
+        ...assessment,
+        _entityName: "Assessment",
       };
-      expectArraysToEqual(immersionAssessmentRepository.assessments, [
+      expectArraysToEqual(assessmentRepository.assessments, [
         expectedImmersionEntity,
       ]);
     },
   );
 
-  it("should dispatch an ImmersionAssessmentCreated event", async () => {
-    await createImmersionAssessment.execute(immersionAssessment, validPayload);
+  it("should dispatch an AssessmentCreated event", async () => {
+    await createAssessment.execute(assessment, validPayload);
     expect(outboxRepository.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepository.events[0], {
-      topic: "ImmersionAssessmentCreated",
-      payload: immersionAssessment,
+      topic: "AssessmentCreated",
+      payload: assessment,
     });
   });
 });
