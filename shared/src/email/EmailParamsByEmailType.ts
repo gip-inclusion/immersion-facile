@@ -182,13 +182,6 @@ export type EmailParamsByEmailType = {
     magicLink: AbsoluteUrl;
     warning?: string;
   };
-  NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
-    agencyLogoUrl: AbsoluteUrl | undefined;
-    conventionId: ConventionId;
-    internshipKind: InternshipKind;
-    firstName: string;
-    lastName: string;
-  };
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryName: string;
@@ -215,14 +208,6 @@ export type EmailParamsByEmailType = {
     justification: string;
     signatoryFirstName: string;
     signatoryLastName: string;
-  };
-  NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
-    agencyLogoUrl: AbsoluteUrl | undefined;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    conventionId: ConventionId;
-    establishmentTutorName: string;
-    internshipKind: InternshipKind;
   };
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
