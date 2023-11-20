@@ -1,12 +1,10 @@
 import { Observable, Subject } from "rxjs";
 import {
   AssessmentAndJwt,
-  ImmersionAssessmentGateway,
-} from "src/core-logic/ports/ImmersionAssessmentGateway";
+  AssessmentGateway,
+} from "src/core-logic/ports/AssessmentGateway";
 
-export class TestImmersionAssessmentGateway
-  implements ImmersionAssessmentGateway
-{
+export class TestAssessmentGateway implements AssessmentGateway {
   // test purpose
   public creationResponse$ = new Subject<void>();
 

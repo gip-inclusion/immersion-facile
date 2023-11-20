@@ -18,7 +18,7 @@ import type { Dependencies } from "src/config/dependencies";
 import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
-import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
+import { HttpAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
@@ -60,9 +60,7 @@ export const createHttpDependencies = (): Dependencies => {
         axiosOnSlashApiLegacy,
       ),
     ),
-    immersionAssessmentGateway: new HttpImmersionAssessmentGateway(
-      axiosOnSlashApiLegacy,
-    ),
+    assessmentGateway: new HttpAssessmentGateway(axiosOnSlashApiLegacy),
     searchGateway: new HttpSearchGateway(
       createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApiLegacy),
     ),

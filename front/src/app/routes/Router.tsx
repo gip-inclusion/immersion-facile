@@ -30,7 +30,7 @@ import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentCreationFormPage } from "../pages/establishment/EstablishmentCreationFormPage";
 import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
-import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
+import { AssessmentPage } from "../pages/immersion-assessment/AssessmentPage";
 import { SearchResultPage } from "../pages/search/SearchResultPage";
 import { AdminTab, adminTabs } from "./routeParams/adminTabs";
 import {
@@ -105,7 +105,7 @@ const getPageByRouteName: {
   homeAgencies: () => <HomePage type="agency" />,
   homeCandidates: () => <HomePage type="candidate" />,
   homeEstablishments: () => <HomePage type="establishment" />,
-  immersionAssessment: (route) => <ImmersionAssessmentPage route={route} />,
+  assessment: (route) => <AssessmentPage route={route} />,
   searchResult: () => <SearchResultPage />,
   searchResultExternal: () => <SearchResultPage />,
   manageConvention: (route) => <ConventionManagePage route={route} />,

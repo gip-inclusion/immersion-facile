@@ -10,7 +10,7 @@ import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/T
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
-import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
+import { TestAssessmentGateway } from "../adapters/AssessmentGateway/TestAssessmentGateway";
 import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
 import { TestSearchGateway } from "../adapters/SearchGateway/TestSearchGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
@@ -20,7 +20,7 @@ export type TestDependencies = ReturnType<typeof createTestDependencies>;
 const createTestDependencies = () =>
   ({
     adminGateway: new TestAdminGateway(),
-    immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
+    assessmentGateway: new TestAssessmentGateway(),
     siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
     searchGateway: new TestSearchGateway(),
     establishmentGateway: new TestEstablishmentGateway(),

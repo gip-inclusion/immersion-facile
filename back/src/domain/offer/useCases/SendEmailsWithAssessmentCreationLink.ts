@@ -73,7 +73,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     const errors: Record<ConventionId, Error> = {};
     await Promise.all(
       conventions.map(async (convention) => {
-        await this.#sendOneEmailWithImmersionAssessmentCreationLink(
+        await this.#sendOneEmailWithAssessmentCreationLink(
           uow,
           convention,
         ).catch((error) => {
@@ -88,7 +88,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     };
   }
 
-  async #sendOneEmailWithImmersionAssessmentCreationLink(
+  async #sendOneEmailWithAssessmentCreationLink(
     uow: UnitOfWork,
     convention: ConventionDto,
   ) {
@@ -97,7 +97,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
     await this.#notificationGateway.sendEmail({
-      kind: "CREATE_IMMERSION_ASSESSMENT",
+      kind: "CREATE_ASSESSMENT",
       recipients: [convention.establishmentTutor.email],
       sender: immersionFacileNoReplyEmailSender,
       params: {
@@ -110,11 +110,11 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         conventionId: convention.id,
         establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        immersionAssessmentCreationLink: this.#generateConventionMagicLinkUrl({
+        assessmentCreationLink: this.#generateConventionMagicLinkUrl({
           id: convention.id,
           email: convention.establishmentTutor.email,
           role: "establishment-tutor",
-          targetRoute: frontRoutes.immersionAssessment,
+          targetRoute: frontRoutes.assessment,
           now: this.#timeGateway.now(),
         }),
         internshipKind: convention.internshipKind,

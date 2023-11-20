@@ -490,7 +490,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     businessAddress: "BUSINESS_ADDRESS",
   },
-  CREATE_IMMERSION_ASSESSMENT: {
+  CREATE_ASSESSMENT: {
     agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
     agencyValidatorEmail: "VALIDATOR_EMAIL",
@@ -498,7 +498,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     conventionId: "CONVENTION_ID",
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
-    immersionAssessmentCreationLink: "IMMERSION_ASSESSMENT_CREATION_LINK",
+    assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
     internshipKind: "immersion",
   },
   FULL_PREVIEW_EMAIL: {

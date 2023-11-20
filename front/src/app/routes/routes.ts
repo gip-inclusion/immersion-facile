@@ -111,9 +111,9 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     `/${frontRoutes.homeEstablishments}`,
     `/${frontRoutes.landingEstablishment}`,
   ]),
-  immersionAssessment: defineRoute(
+  assessment: defineRoute(
     { jwt: param.query.string },
-    () => `/${frontRoutes.immersionAssessment}`,
+    () => `/${frontRoutes.assessment}`,
   ),
   searchResult: defineRoute(
     {

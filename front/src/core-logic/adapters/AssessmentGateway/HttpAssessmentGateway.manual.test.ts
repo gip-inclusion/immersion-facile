@@ -1,12 +1,12 @@
 import { firstValueFrom } from "rxjs";
-import { createManagedAxiosInstance, ImmersionAssessmentDto } from "shared";
-import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
-import { HttpImmersionAssessmentGateway } from "./HttpImmersionAssessmentGateway";
+import { AssessmentDto, createManagedAxiosInstance } from "shared";
+import { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
+import { HttpAssessmentGateway } from "./HttpAssessmentGateway";
 import {
   failedId,
   failedIdError,
-  SimulatedImmersionAssessmentGateway,
-} from "./SimulatedImmersionAssessmentGateway";
+  SimulatedAssessmentGateway,
+} from "./SimulatedAssessmentGateway";
 
 const expectPromiseToFailWithError = async (
   promise: Promise<unknown>,
@@ -15,34 +15,31 @@ const expectPromiseToFailWithError = async (
   await expect(promise).rejects.toThrow(expectedError);
 };
 
-const simulated = new SimulatedImmersionAssessmentGateway();
-const http = new HttpImmersionAssessmentGateway(
+const simulated = new SimulatedAssessmentGateway();
+const http = new HttpAssessmentGateway(
   createManagedAxiosInstance({ baseURL: "http://localhost:1234" }),
 );
 
-const immersionAssessmentGateways: ImmersionAssessmentGateway[] = [
-  simulated,
-  http,
-];
+const assessmentGateways: AssessmentGateway[] = [simulated, http];
 
-const failedImmersionAssessment: ImmersionAssessmentDto = {
+const failedAssessment: AssessmentDto = {
   conventionId: failedId,
   status: "ABANDONED",
   establishmentFeedback: "",
 };
 const jwt = "UNKNOWN";
 
-immersionAssessmentGateways.forEach((assessmentGateway) => {
+assessmentGateways.forEach((assessmentGateway) => {
   describe(`${assessmentGateway.constructor.name} - manual`, () => {
     it("createAssessment - Failure", async () => {
       await expectPromiseToFailWithError(
         firstValueFrom(
           assessmentGateway.createAssessment({
-            assessment: failedImmersionAssessment,
+            assessment: failedAssessment,
             jwt,
           }),
         ),
-        assessmentGateway.constructor.name === "HttpImmersionAssessmentGateway"
+        assessmentGateway.constructor.name === "HttpAssessmentGateway"
           ? new Error("Request failed with status code 401")
           : failedIdError,
       );

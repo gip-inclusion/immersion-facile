@@ -1,27 +1,21 @@
-import {
-  AssessmentStatus,
-  ConventionId,
-  immersionAssessmentSchema,
-} from "shared";
-import { ImmersionAssessmentEntity } from "../../../../domain/convention/entities/ImmersionAssessmentEntity";
-import { ImmersionAssessmentRepository } from "../../../../domain/convention/ports/ImmersionAssessmentRepository";
+import { assessmentSchema, AssessmentStatus, ConventionId } from "shared";
+import { AssessmentEntity } from "../../../../domain/convention/entities/AssessmentEntity";
+import { AssessmentRepository } from "../../../../domain/convention/ports/AssessmentRepository";
 import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
 
-interface PgImmersionAssessment {
+interface PgAssessment {
   convention_id: string;
   status: AssessmentStatus;
   establishment_feedback: string;
 }
 
-export class PgImmersionAssessmentRepository
-  implements ImmersionAssessmentRepository
-{
+export class PgAssessmentRepository implements AssessmentRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async getByConventionId(
     conventionId: ConventionId,
-  ): Promise<ImmersionAssessmentEntity | undefined> {
-    const result = await executeKyselyRawSqlQuery<PgImmersionAssessment>(
+  ): Promise<AssessmentEntity | undefined> {
+    const result = await executeKyselyRawSqlQuery<PgAssessment>(
       this.transaction,
       "SELECT * FROM immersion_assessments WHERE convention_id = $1",
       [conventionId],
@@ -29,19 +23,19 @@ export class PgImmersionAssessmentRepository
     const pgAssessment = result.rows[0];
     if (!pgAssessment) return;
 
-    const dto = immersionAssessmentSchema.parse({
+    const dto = assessmentSchema.parse({
       conventionId: pgAssessment.convention_id,
       establishmentFeedback: pgAssessment.establishment_feedback,
       status: pgAssessment.status,
     });
 
     return {
-      _entityName: "ImmersionAssessment",
+      _entityName: "Assessment",
       ...dto,
     };
   }
 
-  public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
+  public async save(assessment: AssessmentEntity): Promise<void> {
     const { status, conventionId, establishmentFeedback } = assessment;
 
     await executeKyselyRawSqlQuery(

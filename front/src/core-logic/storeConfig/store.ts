@@ -15,6 +15,8 @@ import { notificationsEpics } from "src/core-logic/domain/admin/notifications/no
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import { apiConsumerEpics } from "src/core-logic/domain/apiConsumer/apiConsumer.epics";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
+import { assessmentEpics } from "src/core-logic/domain/assessment/assessment.epics";
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
@@ -39,8 +41,6 @@ import { establishmentBatchSlice } from "../domain/establishmentBatch/establishm
 import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
 import { geosearchEpics } from "../domain/geosearch/geosearch.epics";
 import { geosearchSlice } from "../domain/geosearch/geosearch.slice";
-import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
-import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
 import { partnersErroredConventionEpics } from "../domain/partnersErroredConvention/partnersErroredConvention.epics";
 import { partnersErroredConventionSlice } from "../domain/partnersErroredConvention/partnersErroredConvention.slice";
 
@@ -59,7 +59,7 @@ const allEpics: any[] = [
   ...agenciesAdminEpics,
   romeAutocompleteEpic,
   ...conventionEpics,
-  ...immersionAssessmentEpics,
+  ...assessmentEpics,
   ...inclusionConnectedEpics,
   ...agencyInfoEpics,
   ...icUsersAdminEpics,
@@ -77,7 +77,7 @@ const rootReducer = combineReducers({
   [establishmentSlice.name]: establishmentSlice.reducer,
   [geosearchSlice.name]: geosearchSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
-  [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
+  [assessmentSlice.name]: assessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,
   [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,

@@ -1,15 +1,13 @@
 import { delay, Observable, of, throwError } from "rxjs";
 import {
   AssessmentAndJwt,
-  ImmersionAssessmentGateway,
-} from "src/core-logic/ports/ImmersionAssessmentGateway";
+  AssessmentGateway,
+} from "src/core-logic/ports/AssessmentGateway";
 
 export const failedId = "failed-id";
 export const failedIdError = new Error("Failed Id");
 
-export class SimulatedImmersionAssessmentGateway
-  implements ImmersionAssessmentGateway
-{
+export class SimulatedAssessmentGateway implements AssessmentGateway {
   constructor(private latency: number = 0) {}
 
   public createAssessment({ assessment }: AssessmentAndJwt): Observable<void> {

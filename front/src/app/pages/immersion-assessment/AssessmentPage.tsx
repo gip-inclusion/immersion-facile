@@ -7,22 +7,20 @@ import {
   Role,
 } from "shared";
 import { Loader, MainWrapper } from "react-design-system";
-import { ImmersionAssessmentForm } from "src/app/components/forms/immersion-assessment/ImmersionAssessmentForm";
+import { AssessmentForm } from "src/app/components/forms/immersion-assessment/AssessmentForm";
 import { ImmersionDescription } from "src/app/components/forms/immersion-assessment/ImmersionDescription";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
 
-type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
+type AssessmentRoute = Route<typeof routes.assessment>;
 
-interface ImmersionAssessmentPageProps {
-  route: ImmersionAssessmentRoute;
+interface AssessmentPageProps {
+  route: AssessmentRoute;
 }
 
-export const ImmersionAssessmentPage = ({
-  route,
-}: ImmersionAssessmentPageProps) => {
+export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   const { role, applicationId: conventionId } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
       route.params.jwt,
@@ -76,7 +74,7 @@ export const ImmersionAssessmentPage = ({
             {canCreateAssessment && (
               <>
                 <ImmersionDescription convention={convention} />
-                <ImmersionAssessmentForm
+                <AssessmentForm
                   convention={convention}
                   jwt={route.params.jwt}
                 />

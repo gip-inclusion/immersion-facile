@@ -7,27 +7,27 @@ import {
   expectToEqual,
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
-import { ImmersionAssessmentEntity } from "../../../../domain/convention/entities/ImmersionAssessmentEntity";
+import { AssessmentEntity } from "../../../../domain/convention/entities/AssessmentEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
+import { PgAssessmentRepository } from "./PgAssessmentRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
-import { PgImmersionAssessmentRepository } from "./PgImmersionAssessmentRepository";
 
 const conventionId = "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa";
 
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
-const assessment: ImmersionAssessmentEntity = {
-  _entityName: "ImmersionAssessment",
+const assessment: AssessmentEntity = {
+  _entityName: "Assessment",
   conventionId,
   status: "FINISHED",
   establishmentFeedback: "Ca s'est bien passé",
 };
 
-describe("PgImmersionAssessmentRepository", () => {
+describe("PgAssessmentRepository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let immersionAssessmentRepository: PgImmersionAssessmentRepository;
+  let assessmentRepository: PgAssessmentRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -48,15 +48,13 @@ describe("PgImmersionAssessmentRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_assessments");
-    immersionAssessmentRepository = new PgImmersionAssessmentRepository(
-      makeKyselyDb(pool),
-    );
+    assessmentRepository = new PgAssessmentRepository(makeKyselyDb(pool));
   });
 
   describe("save", () => {
     it("fails to save when it does not match an existing Convention", async () => {
       await expectPromiseToFailWithError(
-        immersionAssessmentRepository.save({
+        assessmentRepository.save({
           ...assessment,
           conventionId: "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
         }),
@@ -67,7 +65,7 @@ describe("PgImmersionAssessmentRepository", () => {
     });
 
     it("when all is good", async () => {
-      await immersionAssessmentRepository.save(assessment);
+      await assessmentRepository.save(assessment);
       const inDb = await client.query("SELECT * FROM immersion_assessments");
       expect(inDb.rows).toHaveLength(1);
       expectObjectsToMatch(inDb.rows[0], {
@@ -80,20 +78,18 @@ describe("PgImmersionAssessmentRepository", () => {
 
   describe("getByConventionId", () => {
     it("returns undefined if no Convention where found", async () => {
-      const notFoundImmersion =
-        await immersionAssessmentRepository.getByConventionId(
-          "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
-        );
+      const notFoundImmersion = await assessmentRepository.getByConventionId(
+        "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
+      );
 
       expect(notFoundImmersion).toBeUndefined();
     });
 
     it("returns assessment found", async () => {
-      await immersionAssessmentRepository.save(assessment);
-      const assessmentInDb =
-        await immersionAssessmentRepository.getByConventionId(
-          assessment.conventionId,
-        );
+      await assessmentRepository.save(assessment);
+      const assessmentInDb = await assessmentRepository.getByConventionId(
+        assessment.conventionId,
+      );
 
       expectToEqual(assessmentInDb, assessment);
     });

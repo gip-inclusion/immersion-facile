@@ -20,7 +20,7 @@ export const frontRoutes = {
   homeAgencies: "accueil-prescripteurs",
   homeCandidates: "accueil-beneficiaires",
   homeEstablishments: "accueil-entreprises",
-  immersionAssessment: "bilan-immersion",
+  assessment: "bilan-immersion",
   offer: "offre",
   offerExternal: "tentez-votre-chance",
   landingEstablishment: "accueil-etablissement",
@@ -37,7 +37,7 @@ export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const getImmersionOfferByIdRoute__v0 = "get-immersion-by-id"; // Will be removed.
-export const immersionAssessmentRoute = "immersion-assessment";
+export const assessmentRoute = "assessment";
 export const immersionOffersApiAuthRoute__v0 = "immersion-offers";
 export const immersionOffersRoute = "immersion-offers";
 export const loginPeConnect = "login-pe-connect";
