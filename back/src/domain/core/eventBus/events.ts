@@ -9,12 +9,12 @@ import {
   EstablishmentJwtPayload,
   ExtractFromExisting,
   Flavor,
-  FormEstablishmentDto,
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
   WithAgencyDto,
   WithConventionDto,
   WithConventionIdLegacy,
+  WithFormEstablishmentDto,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
@@ -80,8 +80,8 @@ export type DomainEvent =
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
 
   // FORM ESTABLISHMENT RELATED
-  | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>
-  | GenericEvent<"FormEstablishmentEdited", FormEstablishmentDto>
+  | GenericEvent<"FormEstablishmentAdded", WithFormEstablishmentDto>
+  | GenericEvent<"FormEstablishmentEdited", WithFormEstablishmentDto>
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload>
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>

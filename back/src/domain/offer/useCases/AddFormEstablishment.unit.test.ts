@@ -78,7 +78,7 @@ describe("Add FormEstablishment", () => {
     expect(outboxRepo.events).toHaveLength(1);
     expect(outboxRepo.events[0]).toMatchObject({
       topic: "FormEstablishmentAdded",
-      payload: formEstablishment,
+      payload: { formEstablishment },
     });
   });
 
@@ -121,7 +121,9 @@ describe("Add FormEstablishment", () => {
     expect(outboxRepo.events).toHaveLength(1);
     expect(outboxRepo.events[0]).toMatchObject({
       topic: "FormEstablishmentAdded",
-      payload: formEstablishmentWithCorrectAppellationDto,
+      payload: {
+        formEstablishment: formEstablishmentWithCorrectAppellationDto,
+      },
     });
   });
 

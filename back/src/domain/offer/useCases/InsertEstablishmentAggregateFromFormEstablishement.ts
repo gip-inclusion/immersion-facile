@@ -1,4 +1,4 @@
-import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
+import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
@@ -17,10 +17,10 @@ const makeLog = (siret: string) => (message: string) =>
   logger.info(`${new Date().toISOString()} - InsertEstablishmentAggregateFromForm - ${siret} - ${message}`);
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
-  FormEstablishmentDto,
+  WithFormEstablishmentDto,
   void
 > {
-  protected inputSchema = formEstablishmentSchema;
+  protected inputSchema = withFormEstablishmentSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -34,7 +34,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   }
 
   protected async _execute(
-    formEstablishment: FormEstablishmentDto,
+    { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const log = makeLog(formEstablishment.siret);

@@ -101,7 +101,9 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       maxContactsPerWeek: row.max_contacts_per_week,
     };
     try {
-      await upsertAggregateFromForm.execute(formEstablishmentDto);
+      await upsertAggregateFromForm.execute({
+        formEstablishment: formEstablishmentDto,
+      });
       logger.info(
         `Successfully added form with siret ${row.siret} to aggregate tables.`,
       );
