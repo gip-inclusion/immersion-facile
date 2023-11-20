@@ -501,6 +501,18 @@ export const defaultEmailValueByEmailKind: {
     assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
     internshipKind: "immersion",
   },
+  NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
+    agencyValidatorEmail: "VALIDATOR_EMAIL",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    conventionId: "CONVENTION_ID",
+    dateStart: "DATE_START",
+    dateEnd: "DATE_END",
+    establishmentFeedback: "ESTABLISHMENT_FEEDBACK",
+    assessmentStatus: "FINISHED",
+    immersionObjective: "Confirmer un projet professionnel",
+  },
   FULL_PREVIEW_EMAIL: {
     internshipKind: "immersion",
     beneficiaryName: "BENEFICIARY_NAME",
