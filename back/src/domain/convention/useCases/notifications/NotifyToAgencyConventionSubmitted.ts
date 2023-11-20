@@ -1,9 +1,10 @@
 import {
   AgencyDto,
   ConventionDto,
-  conventionSchema,
   frontRoutes,
   Role,
+  WithConventionDto,
+  withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -19,10 +20,10 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
-  ConventionDto,
+  WithConventionDto,
   void
 > {
-  protected inputSchema = conventionSchema;
+  protected inputSchema = withConventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -52,7 +53,7 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
   }
 
   protected async _execute(
-    convention: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);

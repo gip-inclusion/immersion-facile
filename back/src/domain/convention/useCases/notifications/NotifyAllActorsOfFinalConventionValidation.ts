@@ -4,7 +4,6 @@ import {
   AgencyDto,
   concatValidatorNames,
   ConventionDto,
-  conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   Email,
@@ -12,6 +11,8 @@ import {
   isUrlValid,
   Role,
   TemplatedEmail,
+  WithConventionDto,
+  withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -27,8 +28,8 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 
-export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -58,7 +59,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
   }
 
   public async _execute(
-    convention: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);

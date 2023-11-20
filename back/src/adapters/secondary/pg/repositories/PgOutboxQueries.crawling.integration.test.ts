@@ -51,21 +51,21 @@ describe("PgOutboxQueries for crawling purposes", () => {
     const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: convention,
+      payload: { convention },
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const event2 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: convention,
+      payload: { convention },
     });
 
     timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const alreadyProcessedEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: convention,
+      payload: { convention },
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
       status: "published",
     });
@@ -74,7 +74,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     const quarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
-      payload: convention,
+      payload: { convention },
     });
 
     await storeInOutbox([
@@ -98,14 +98,14 @@ describe("PgOutboxQueries for crawling purposes", () => {
     const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: convention,
+      payload: { convention },
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const eventFailedToRerun = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: convention,
+      payload: { convention },
       publications: [
         {
           publishedAt: "2021-11-15T08:00:00.000Z",
@@ -127,7 +127,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const withFailureButEventuallySuccessfulEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: convention,
+      payload: { convention },
       status: "published",
       publications: [
         {
@@ -144,7 +144,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     const failedButQuarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
-      payload: convention,
+      payload: { convention },
       status: "failed-but-will-retry",
       publications: [
         {

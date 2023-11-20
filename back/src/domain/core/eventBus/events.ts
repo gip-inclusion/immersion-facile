@@ -4,7 +4,6 @@ import {
   AssessmentDto,
   AuthenticatedUserId,
   ContactEstablishmentEventPayload,
-  ConventionDto,
   ConventionId,
   DateString,
   EstablishmentJwtPayload,
@@ -14,6 +13,7 @@ import {
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
   WithAgencyDto,
+  WithConventionDto,
   WithConventionIdLegacy,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -62,19 +62,19 @@ export type DomainEvent =
   | NotificationAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
-  | GenericEvent<"ConventionSubmittedByBeneficiary", ConventionDto>
-  | GenericEvent<"ConventionSubmittedAfterModification", ConventionDto>
-  | GenericEvent<"ConventionPartiallySigned", ConventionDto>
-  | GenericEvent<"ConventionFullySigned", ConventionDto>
-  | GenericEvent<"ConventionAcceptedByCounsellor", ConventionDto>
-  | GenericEvent<"ConventionAcceptedByValidator", ConventionDto>
+  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto>
+  | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto>
+  | GenericEvent<"ConventionPartiallySigned", WithConventionDto>
+  | GenericEvent<"ConventionFullySigned", WithConventionDto>
+  | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionDto>
+  | GenericEvent<"ConventionAcceptedByValidator", WithConventionDto>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
 
   // UNHAPPY PATHS
-  | GenericEvent<"ConventionRejected", ConventionDto>
-  | GenericEvent<"ConventionCancelled", ConventionDto>
+  | GenericEvent<"ConventionRejected", WithConventionDto>
+  | GenericEvent<"ConventionCancelled", WithConventionDto>
   | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload>
-  | GenericEvent<"ConventionDeprecated", ConventionDto>
+  | GenericEvent<"ConventionDeprecated", WithConventionDto>
 
   // MAGIC LINK RENEWAL
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
@@ -97,8 +97,8 @@ export type DomainEvent =
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
   // PECONNECT related
-  | GenericEvent<"FederatedIdentityBoundToConvention", ConventionDto>
-  | GenericEvent<"FederatedIdentityNotBoundToConvention", ConventionDto>
+  | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionDto>
+  | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>

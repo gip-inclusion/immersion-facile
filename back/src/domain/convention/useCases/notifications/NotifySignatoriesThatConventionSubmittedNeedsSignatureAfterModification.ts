@@ -3,11 +3,12 @@ import {
   AgencyDto,
   ConventionDto,
   ConventionJwtPayload,
-  conventionSchema,
   filterNotFalsy,
   frontRoutes,
   Signatory,
   TemplatedEmail,
+  WithConventionDto,
+  withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -24,8 +25,8 @@ import { retrieveConventionWithAgency } from "../../entities/Convention";
 
 export const NO_JUSTIFICATION = "Aucune justification trouvée.";
 
-export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #timeGateway: TimeGateway;
 
@@ -55,30 +56,28 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
   }
 
   protected async _execute(
-    conventionPayload: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
     _jwtPayload?: ConventionJwtPayload | undefined,
   ): Promise<void> {
-    const { agency, convention } = await retrieveConventionWithAgency(
-      uow,
-      conventionPayload,
-    );
+    const { agency, convention: conventionReadDto } =
+      await retrieveConventionWithAgency(uow, convention);
     await Promise.all(
-      values(convention.signatories)
+      values(conventionReadDto.signatories)
         .filter(filterNotFalsy)
         .map(async (signatory) =>
           this.#saveNotificationAndRelatedEvent(uow, {
             kind: "email",
             templatedContent: await this.#makeEmail(
               signatory,
-              convention,
+              conventionReadDto,
               agency,
               uow,
             ),
             followedIds: {
-              conventionId: convention.id,
-              agencyId: convention.agencyId,
-              establishmentSiret: convention.siret,
+              conventionId: conventionReadDto.id,
+              agencyId: conventionReadDto.agencyId,
+              establishmentSiret: conventionReadDto.siret,
             },
           }),
         ),

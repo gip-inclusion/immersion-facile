@@ -98,7 +98,7 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
   });
 
   it("Sends a conevention deprecated notification to all actors", async () => {
-    await useCase.execute(deprecatedConvention);
+    await useCase.execute({ convention: deprecatedConvention });
     const {
       beneficiaryCurrentEmployer,
       beneficiary,
@@ -131,7 +131,9 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
       agencyWithSameEmailAdressForCounsellorAndValidator,
     ]);
 
-    await useCase.execute(deprecatedConventionWithDuplicatedEmails);
+    await useCase.execute({
+      convention: deprecatedConventionWithDuplicatedEmails,
+    });
 
     const {
       beneficiaryCurrentEmployer,

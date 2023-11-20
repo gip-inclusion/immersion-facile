@@ -1,12 +1,12 @@
-import { ConventionDto, conventionSchema, frontRoutes } from "shared";
+import { frontRoutes, WithConventionDto, withConventionSchema } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
-export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -28,7 +28,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
   }
 
   public async _execute(
-    conventionFromEvent: ConventionDto,
+    { convention: conventionFromEvent }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const [conventionPeAdvisor, convention] = await Promise.all([

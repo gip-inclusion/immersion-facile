@@ -81,7 +81,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
     ];
     shortLinkGenerator.addMoreShortLinkIds(deterministicShortLinks);
 
-    await useCase.execute(validConvention);
+    await useCase.execute({ convention: validConvention });
 
     expectToEqual(shortLinkQuery.getShortLinks(), {
       [deterministicShortLinks[0]]: fakeGenerateMagicLinkUrlFn({

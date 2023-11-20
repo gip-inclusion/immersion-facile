@@ -132,7 +132,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
-      await notifyAllActorsOfFinalConventionValidation.execute(validConvention);
+      await notifyAllActorsOfFinalConventionValidation.execute({
+        convention: validConvention,
+      });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
@@ -219,9 +221,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
-      await notifyAllActorsOfFinalConventionValidation.execute(
-        conventionWithBeneficiaryCurrentEmployer,
-      );
+      await notifyAllActorsOfFinalConventionValidation.execute({
+        convention: conventionWithBeneficiaryCurrentEmployer,
+      });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
@@ -309,9 +311,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
-      await notifyAllActorsOfFinalConventionValidation.execute(
-        conventionWithBeneficiaryCurrentEmployer,
-      );
+      await notifyAllActorsOfFinalConventionValidation.execute({
+        convention: conventionWithBeneficiaryCurrentEmployer,
+      });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
@@ -398,9 +400,10 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           .withEstablishmentTutorEmail(establishmentTutorEmail)
           .build();
 
-      await notifyAllActorsOfFinalConventionValidation.execute(
-        conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative,
-      );
+      await notifyAllActorsOfFinalConventionValidation.execute({
+        convention:
+          conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative,
+      });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
@@ -498,7 +501,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
-      await notifyAllActorsOfFinalConventionValidation.execute(validConvention);
+      await notifyAllActorsOfFinalConventionValidation.execute({
+        convention: validConvention,
+      });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
@@ -586,7 +591,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
-      await notifyAllActorsOfFinalConventionValidation.execute(validConvention);
+      await notifyAllActorsOfFinalConventionValidation.execute({
+        convention: validConvention,
+      });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({

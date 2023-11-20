@@ -1,4 +1,8 @@
-import { ConventionDto, conventionSchema, ImmersionObjective } from "shared";
+import {
+  ImmersionObjective,
+  WithConventionDto,
+  withConventionSchema,
+} from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
@@ -24,10 +28,10 @@ const conventionObjectiveToObjectifDeImmersion: Record<
 };
 
 export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<
-  ConventionDto,
+  WithConventionDto,
   void
 > {
-  protected inputSchema = conventionSchema;
+  protected inputSchema = withConventionSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -39,7 +43,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   }
 
   protected async _execute(
-    convention: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const { enablePeConventionBroadcast } =

@@ -60,16 +60,16 @@ export const throwIfTransitionNotAllowed = ({
 
 export async function retrieveConventionWithAgency(
   uow: UnitOfWork,
-  conventionEvent: ConventionDto,
+  conventionInPayload: ConventionDto,
 ): Promise<{
   agency: AgencyDto;
   convention: ConventionReadDto;
 }> {
   const convention = await uow.conventionQueries.getConventionById(
-    conventionEvent.id,
+    conventionInPayload.id,
   );
   if (!convention)
-    throw new NotFoundError(conventionMissingMessage(conventionEvent.id));
+    throw new NotFoundError(conventionMissingMessage(conventionInPayload.id));
   const agency = await uow.agencyRepository.getById(convention.agencyId);
   if (!agency)
     throw new NotFoundError(agencyMissingMessage(convention.agencyId));

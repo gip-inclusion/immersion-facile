@@ -96,7 +96,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
   });
 
   it("Sends cancelation email to beneficiary, establishment tutor, and counsellors, validor, beneficiary Representativ and beneficiary current employer", async () => {
-    await useCase.execute(cancelledConvention);
+    await useCase.execute({ convention: cancelledConvention });
     const {
       beneficiaryCurrentEmployer,
       beneficiary,
@@ -130,7 +130,9 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
       agencyWithSameEmailAdressForCounsellorAndValidator,
     ]);
 
-    await useCase.execute(cancelledConventionWithDuplicatedEmails);
+    await useCase.execute({
+      convention: cancelledConventionWithDuplicatedEmails,
+    });
 
     const {
       beneficiaryCurrentEmployer,

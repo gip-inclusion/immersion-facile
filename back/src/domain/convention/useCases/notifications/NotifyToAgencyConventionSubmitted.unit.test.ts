@@ -124,7 +124,9 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withAgencyId(agencyWithCounsellors.id)
       .build();
 
-    await notifyToAgencyConventionSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute({
+      convention: validConvention,
+    });
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -195,7 +197,9 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withAgencyId(agencyWithOnlyValidator.id)
       .build();
 
-    await notifyToAgencyConventionSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute({
+      convention: validConvention,
+    });
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -244,7 +248,9 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withAgencyId(agencyWithConsellorsAndValidator.id)
       .build();
 
-    await notifyToAgencyConventionSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute({
+      convention: validConvention,
+    });
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
@@ -339,7 +345,9 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       ],
     );
 
-    await notifyToAgencyConventionSubmitted.execute(validConvention);
+    await notifyToAgencyConventionSubmitted.execute({
+      convention: validConvention,
+    });
 
     expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({

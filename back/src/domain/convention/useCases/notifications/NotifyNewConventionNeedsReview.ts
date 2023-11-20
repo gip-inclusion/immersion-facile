@@ -1,12 +1,12 @@
 import {
   AgencyDto,
   concatValidatorNames,
-  ConventionDto,
-  conventionSchema,
   ConventionStatus,
   frontRoutes,
   Role,
   TemplatedEmail,
+  WithConventionDto,
+  withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -23,8 +23,8 @@ import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/
 
 const logger = createLogger(__filename);
 
-export class NotifyNewConventionNeedsReview extends TransactionalUseCase<ConventionDto> {
-  protected inputSchema = conventionSchema;
+export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithConventionDto> {
+  protected inputSchema = withConventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -54,7 +54,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<Convent
   }
 
   protected async _execute(
-    convention: ConventionDto,
+    { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(convention.agencyId);

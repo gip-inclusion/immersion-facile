@@ -98,7 +98,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
   });
 
   it("Sends rejection email to  beneficiary, establishment tutor, and counsellors, validor, beneficiary Representativ and beneficiary current employer", async () => {
-    await useCase.execute(rejectedConvention);
+    await useCase.execute({ convention: rejectedConvention });
 
     const templatedEmailsSent = uow.notificationRepository.notifications
       .filter((notif): notif is EmailNotification => notif.kind === "email")
@@ -131,7 +131,9 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       agencyWithSameEmailAdressForCounsellorAndValidator,
     ]);
 
-    await useCase.execute(rejectedConventionWithDuplicatedEmails);
+    await useCase.execute({
+      convention: rejectedConventionWithDuplicatedEmails,
+    });
 
     const {
       beneficiaryCurrentEmployer,

@@ -350,7 +350,7 @@ const makeTestAcceptsStatusUpdate =
         expectedDomainTopic,
         {
           topic: expectedDomainTopic,
-          payload: expectedConvention,
+          payload: { convention: expectedConvention },
         },
         outboxRepository,
       );

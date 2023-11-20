@@ -17,7 +17,7 @@ import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 const domainEvt: DomainEvent = {
   id: "anId",
   topic: "ConventionSubmittedByBeneficiary",
-  payload: new ConventionDtoBuilder().build(),
+  payload: { convention: new ConventionDtoBuilder().build() },
   occurredAt: "a date",
   wasQuarantined: false,
   status: "never-published",
