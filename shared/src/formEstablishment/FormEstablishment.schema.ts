@@ -23,6 +23,7 @@ import {
   FormEstablishmentSource,
   ImmersionContactInEstablishmentId,
   SiretAdditionFailure,
+  WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
 
 // prettier-ignore
@@ -84,6 +85,11 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       }),
   },
 );
+
+export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
+  z.object({
+    formEstablishment: formEstablishmentSchema,
+  });
 
 export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
   z.object({

@@ -152,12 +152,16 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     expectObjectsToMatch(outboxRepo.events[0], {
       id: "event1-id",
       topic: "FormEstablishmentAdded",
-      payload: formEstablishmentBatch.formEstablishments[0],
+      payload: {
+        formEstablishment: formEstablishmentBatch.formEstablishments[0],
+      },
     });
     expectObjectsToMatch(outboxRepo.events[1], {
       id: "event2-id",
       topic: "FormEstablishmentAdded",
-      payload: formEstablishmentBatch.formEstablishments[1],
+      payload: {
+        formEstablishment: formEstablishmentBatch.formEstablishments[1],
+      },
     });
   });
 

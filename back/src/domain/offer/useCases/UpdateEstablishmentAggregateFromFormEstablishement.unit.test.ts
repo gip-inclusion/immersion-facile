@@ -64,9 +64,9 @@ describe("Update Establishment aggregate from form data", () => {
 
   it("Fails if establishment does not exists amongst establishments from form", async () => {
     await expectPromiseToFailWith(
-      updateEstablishmentAggregateFromFormUseCase.execute(
-        FormEstablishmentDtoBuilder.valid().build(),
-      ),
+      updateEstablishmentAggregateFromFormUseCase.execute({
+        formEstablishment: FormEstablishmentDtoBuilder.valid().build(),
+      }),
       "Cannot update establishment that does not exist.",
     );
   });
@@ -122,9 +122,9 @@ describe("Update Establishment aggregate from form data", () => {
       .build();
 
     // Act : execute use-case with same siret
-    await updateEstablishmentAggregateFromFormUseCase.execute(
+    await updateEstablishmentAggregateFromFormUseCase.execute({
       formEstablishment,
-    );
+    });
 
     // Assert
     // One aggregate only

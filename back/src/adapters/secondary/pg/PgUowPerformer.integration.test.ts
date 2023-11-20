@@ -68,7 +68,7 @@ describe("PgUowPerformer", () => {
 
     const event = createNewEvent({
       topic: "FormEstablishmentAdded",
-      payload: formEstablishment,
+      payload: { formEstablishment },
     });
     await uow.outboxRepository.save(event);
   };

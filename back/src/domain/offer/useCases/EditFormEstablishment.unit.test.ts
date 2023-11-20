@@ -17,11 +17,11 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { formEstablishementUpdateFailedErrorMessage } from "../ports/FormEstablishmentRepository";
-import { EditFormEstablishment } from "../useCases/EditFormEstablishment";
+import { EditFormEstablishment } from "./EditFormEstablishment";
 
 describe("Edit Form Establishment", () => {
   let uow: InMemoryUnitOfWork;
@@ -99,7 +99,7 @@ describe("Edit Form Establishment", () => {
         {
           id: uuidGenerator.new(),
           occurredAt: timeGateway.now().toISOString(),
-          payload: updatedFormEstablishment,
+          payload: { formEstablishment: updatedFormEstablishment },
           status: "never-published",
           publications: [],
           topic: "FormEstablishmentEdited",
@@ -126,7 +126,7 @@ describe("Edit Form Establishment", () => {
         {
           id: uuidGenerator.new(),
           occurredAt: timeGateway.now().toISOString(),
-          payload: updatedFormEstablishment,
+          payload: { formEstablishment: updatedFormEstablishment },
           status: "never-published",
           publications: [],
           topic: "FormEstablishmentEdited",

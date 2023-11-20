@@ -51,6 +51,10 @@ export type FormEstablishmentDto = {
   maxContactsPerWeek: number;
 };
 
+export type WithFormEstablishmentDto = {
+  formEstablishment: FormEstablishmentDto;
+};
+
 export type CSVBoolean = "1" | "0" | "";
 export type CSVOptionalString = string | "";
 

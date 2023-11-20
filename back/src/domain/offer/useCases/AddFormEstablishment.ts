@@ -58,7 +58,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
 
     const event = this.#createNewEvent({
       topic: "FormEstablishmentAdded",
-      payload: correctFormEstablishement,
+      payload: { formEstablishment: correctFormEstablishement },
       ...(isApiInseeEnabled ? {} : { wasQuarantined: true }),
     });
 

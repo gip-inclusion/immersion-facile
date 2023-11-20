@@ -40,7 +40,7 @@ export class EditFormEstablishment extends TransactionalUseCase<
       uow.outboxRepository.save(
         this.#createNewEvent({
           topic: "FormEstablishmentEdited",
-          payload: dto,
+          payload: { formEstablishment: dto },
         }),
       ),
     ]);

@@ -1,4 +1,4 @@
-import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
+import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
 import { makeUpdateEstablishmentAggregateFromFormEstablishment } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -7,10 +7,10 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../ports/AddressGateway";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
-  FormEstablishmentDto,
+  WithFormEstablishmentDto,
   void
 > {
-  protected inputSchema = formEstablishmentSchema;
+  protected inputSchema = withFormEstablishmentSchema;
 
   readonly #addressAPI: AddressGateway;
 
@@ -32,7 +32,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   }
 
   public async _execute(
-    formEstablishment: FormEstablishmentDto,
+    { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const initialEstablishmentAggregate =

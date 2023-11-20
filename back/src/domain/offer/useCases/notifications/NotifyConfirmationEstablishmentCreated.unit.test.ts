@@ -10,7 +10,7 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyConfirmationEstablishmentCreated } from "./NotifyConfirmationEstablishmentCreated";
 
-describe("NotifyConfirmationEstablismentCreated", () => {
+describe("NotifyConfirmationEstablishmentCreated", () => {
   const validEstablishment = FormEstablishmentDtoBuilder.valid().build();
   let notifyConfirmationEstablishmentCreated: NotifyConfirmationEstablishmentCreated;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
@@ -37,7 +37,9 @@ describe("NotifyConfirmationEstablismentCreated", () => {
 
   describe("When establishment is valid", () => {
     it("Nominal case: Sends notification email to Establisment contact", async () => {
-      await notifyConfirmationEstablishmentCreated.execute(validEstablishment);
+      await notifyConfirmationEstablishmentCreated.execute({
+        formEstablishment: validEstablishment,
+      });
 
       expectSavedNotificationsAndEvents({
         emails: [

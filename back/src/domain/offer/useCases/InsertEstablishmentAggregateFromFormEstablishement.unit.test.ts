@@ -119,7 +119,7 @@ describe("Insert Establishment aggregate from form data", () => {
     prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
 
     // Act
-    await useCase.execute(formEstablishment);
+    await useCase.execute({ formEstablishment });
 
     // Assert
     expectEstablishmentAggregateInRepo({
@@ -180,7 +180,7 @@ describe("Insert Establishment aggregate from form data", () => {
 
     prepareSirenGateway(siretGateway, fakeSiret, "0");
 
-    await useCase.execute(formEstablishment);
+    await useCase.execute({ formEstablishment });
 
     const establishmentAggregate =
       establishmentAggregateRepo.establishmentAggregates[0];
@@ -240,7 +240,7 @@ describe("Insert Establishment aggregate from form data", () => {
     ]);
 
     // Act : execute use-case with same siret
-    await useCase.execute(formEstablishment);
+    await useCase.execute({ formEstablishment });
 
     // Assert
     // One aggregate only
@@ -278,7 +278,7 @@ describe("Insert Establishment aggregate from form data", () => {
 
     prepareSirenGateway(siretGateway, fakeSiret, "0");
 
-    await useCase.execute(formEstablishment);
+    await useCase.execute({ formEstablishment });
 
     const establishmentAggregate =
       establishmentAggregateRepo.establishmentAggregates[0];

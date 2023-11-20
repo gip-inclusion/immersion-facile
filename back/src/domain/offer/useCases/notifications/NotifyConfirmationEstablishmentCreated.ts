@@ -1,4 +1,4 @@
-import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
+import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -6,8 +6,8 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
-export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase<FormEstablishmentDto> {
-  protected inputSchema = formEstablishmentSchema;
+export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase<WithFormEstablishmentDto> {
+  protected inputSchema = withFormEstablishmentSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -20,7 +20,7 @@ export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase
   }
 
   public async _execute(
-    formEstablishment: FormEstablishmentDto,
+    { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
     await this.#saveNotificationAndRelatedEvent(uow, {
