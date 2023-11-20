@@ -27,7 +27,7 @@ const testAgencies: AgencyDto[] = [
     status: "active",
     kind: "immersion-facile",
     counsellorEmails: ["notificationsconventions@immersion-facile.fr"],
-    validatorEmails: [],
+    validatorEmails: ["validator123@mail.com"],
     adminEmails: ["contact@immersion-facile.fr"],
     questionnaireUrl: "",
     signature: "Signature of Immersion Facile",
