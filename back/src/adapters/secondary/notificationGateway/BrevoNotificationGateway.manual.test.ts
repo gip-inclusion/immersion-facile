@@ -14,6 +14,7 @@ describe("BrevoNotificationGateway manual", () => {
       (_) => true,
       config.apiKeyBrevo,
       { email: "bob@fake.mail", name: "Bob" },
+      [],
     );
   });
 

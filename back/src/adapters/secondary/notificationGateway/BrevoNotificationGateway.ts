@@ -63,6 +63,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
     private emailAllowListPredicate: (recipient: string) => boolean,
     apiKey: ApiKey,
     private defaultSender: RecipientOrSender,
+    private blackListedEmailDomains: string[],
     private generateHtmlOptions: GenerateHtmlOptions = {},
   ) {
     this.#brevoHeaders = {
@@ -211,6 +212,12 @@ export class BrevoNotificationGateway implements NotificationGateway {
   ): RecipientOrSender[] {
     return emails
       .filter(this.emailAllowListPredicate)
+      .filter(
+        (email: string) =>
+          !this.blackListedEmailDomains.some((domain) =>
+            email.toLowerCase().endsWith(domain.toLowerCase()),
+          ),
+      )
       .map((email) => ({ email }));
   }
 }

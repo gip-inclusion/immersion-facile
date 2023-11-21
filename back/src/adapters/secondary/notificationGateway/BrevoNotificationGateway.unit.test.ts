@@ -17,125 +17,127 @@ import {
 const sender = { name: "bob", email: "Machin@mail.com" };
 
 describe("SendingBlueHtmlNotificationGateway unit", () => {
-  let fakeHttpClient: HttpClient<BrevoNotificationGatewayRoutes>;
-  let allowListPredicate;
-  let notificationGateway: BrevoNotificationGateway;
-  let sentEmails: {
-    headers: BrevoHeaders;
-    body: SendTransactEmailRequestBody;
-  }[];
+  describe("sendEmail with skipEmailAllowList false", () => {
+    let fakeHttpClient: HttpClient<BrevoNotificationGatewayRoutes>;
+    let allowListPredicate;
+    let notificationGateway: BrevoNotificationGateway;
+    let sentEmails: {
+      headers: BrevoHeaders;
+      body: SendTransactEmailRequestBody;
+    }[];
 
-  beforeEach(() => {
-    sentEmails = [];
+    beforeEach(() => {
+      sentEmails = [];
 
-    fakeHttpClient = {
-      sendTransactEmail(email: any) {
-        sentEmails.push(email);
-      },
-    } as unknown as HttpClient<BrevoNotificationGatewayRoutes>;
+      fakeHttpClient = {
+        sendTransactEmail(email: any) {
+          sentEmails.push(email);
+        },
+      } as unknown as HttpClient<BrevoNotificationGatewayRoutes>;
 
-    allowListPredicate = makeEmailAllowListPredicate({
-      emailAllowList: [
-        "beneficiary@gmail.com",
-        "advisor@gmail.com",
-        "establishment-ceo@gmail.com",
-        "establishment-cto@gmail.com",
-      ],
-      skipEmailAllowList: false,
+      allowListPredicate = makeEmailAllowListPredicate({
+        emailAllowList: [
+          "beneficiary@gmail.com",
+          "advisor@gmail.com",
+          "establishment-ceo@gmail.com",
+          "establishment-cto@gmail.com",
+        ],
+        skipEmailAllowList: false,
+      });
+
+      notificationGateway = new BrevoNotificationGateway(
+        fakeHttpClient,
+        allowListPredicate,
+        "fake-api-key",
+        sender,
+        { skipHead: true },
+        [],
+      );
     });
 
-    notificationGateway = new BrevoNotificationGateway(
-      fakeHttpClient,
-      allowListPredicate,
-      "fake-api-key",
-      sender,
-      { skipHead: true },
-    );
-  });
+    it("should throw if no recipient is provided", async () => {
+      const triggerSendEmail = () =>
+        notificationGateway.sendEmail({
+          kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+          recipients: [],
+          params: {
+            scheduleText: "",
+          } as any,
+        });
 
-  it("should throw if no recipient is provided", async () => {
-    const triggerSendEmail = () =>
-      notificationGateway.sendEmail({
+      await expectPromiseToFailWithError(
+        triggerSendEmail(),
+        new BadRequestError("No recipient for provided email"),
+      );
+    });
+
+    it("should not send email if recipient are not in white list", async () => {
+      await notificationGateway.sendEmail({
         kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-        recipients: [],
+        recipients: ["i-am-not-allowed@mail.net"],
         params: {
           scheduleText: "",
         } as any,
       });
 
-    await expectPromiseToFailWithError(
-      triggerSendEmail(),
-      new BadRequestError("No recipient for provided email"),
-    );
-  });
-
-  it("should not send email if recipient are not in white list", async () => {
-    await notificationGateway.sendEmail({
-      kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      recipients: ["i-am-not-allowed@mail.net"],
-      params: {
-        scheduleText: "",
-      } as any,
+      expect(sentEmails).toHaveLength(0);
     });
 
-    expect(sentEmails).toHaveLength(0);
-  });
-
-  it("should filter emails according to predicate", async () => {
-    await notificationGateway.sendEmail({
-      kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      recipients: [
-        "beneficiary@gmail.com",
-        "advisor@gmail.com",
-        "i-am-not-allowed@mail.net",
-      ],
-      params: {
-        scheduleText: "",
-      } as any,
-    });
-
-    expect(sentEmails[0].body.to).toEqual([
-      { email: "beneficiary@gmail.com" },
-      { email: "advisor@gmail.com" },
-    ]);
-  });
-
-  it("should filter email and carbon copy according to predicate", async () => {
-    const carbonCopy = [
-      "establishment-cto@gmail.com",
-      "establishment-comptable-not-allowed@gmail.com",
-    ];
-
-    await notificationGateway.sendEmail({
-      kind: "AGENCY_WAS_ACTIVATED",
-      recipients: ["establishment-ceo@gmail.com"],
-      cc: carbonCopy,
-      params: {
-        agencyName: "AGENCY_NAME",
-        agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
-      },
-    });
-
-    expectToEqual(sentEmails[0], {
-      headers: {
-        "api-key": "fake-api-key",
-        "content-type": "application/json",
-        accept: "application/json",
-      },
-      body: {
-        cc: [
-          {
-            email: "establishment-cto@gmail.com",
-          },
+    it("should filter emails according to predicate", async () => {
+      await notificationGateway.sendEmail({
+        kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+        recipients: [
+          "beneficiary@gmail.com",
+          "advisor@gmail.com",
+          "i-am-not-allowed@mail.net",
         ],
-        to: [
-          {
-            email: "establishment-ceo@gmail.com",
-          },
-        ],
-        tags: ["activation prescripteur"],
-        subject: "Immersion Facilitée - Votre structure a été activée",
-        htmlContent: ignoreTabs(`
+        params: {
+          scheduleText: "",
+        } as any,
+      });
+
+      expect(sentEmails[0].body.to).toEqual([
+        { email: "beneficiary@gmail.com" },
+        { email: "advisor@gmail.com" },
+      ]);
+    });
+
+    it("should filter email and carbon copy according to predicate", async () => {
+      const carbonCopy = [
+        "establishment-cto@gmail.com",
+        "establishment-comptable-not-allowed@gmail.com",
+      ];
+
+      await notificationGateway.sendEmail({
+        kind: "AGENCY_WAS_ACTIVATED",
+        recipients: ["establishment-ceo@gmail.com"],
+        cc: carbonCopy,
+        params: {
+          agencyName: "AGENCY_NAME",
+          agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
+        },
+      });
+
+      expectToEqual(sentEmails[0], {
+        headers: {
+          "api-key": "fake-api-key",
+          "content-type": "application/json",
+          accept: "application/json",
+        },
+        body: {
+          cc: [
+            {
+              email: "establishment-cto@gmail.com",
+            },
+          ],
+          to: [
+            {
+              email: "establishment-ceo@gmail.com",
+            },
+          ],
+          tags: ["activation prescripteur"],
+          subject: "Immersion Facilitée - Votre structure a été activée",
+          htmlContent: ignoreTabs(`
       <html lang="fr">
       <body>
       <table 
@@ -239,8 +241,71 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       </body>
       </html>
       `),
+          sender,
+        },
+      });
+    });
+  });
+
+  describe("sendEmail with skipEmailAllowList true", () => {
+    let fakeHttpClient: HttpClient<BrevoNotificationGatewayRoutes>;
+    let allowListPredicate;
+    let notificationGateway: BrevoNotificationGateway;
+    let sentEmails: {
+      headers: BrevoHeaders;
+      body: SendTransactEmailRequestBody;
+    }[];
+
+    beforeEach(() => {
+      sentEmails = [];
+
+      fakeHttpClient = {
+        sendTransactEmail(email: any) {
+          sentEmails.push(email);
+        },
+      } as unknown as HttpClient<BrevoNotificationGatewayRoutes>;
+
+      allowListPredicate = makeEmailAllowListPredicate({
+        emailAllowList: [],
+        skipEmailAllowList: true,
+      });
+
+      notificationGateway = new BrevoNotificationGateway(
+        fakeHttpClient,
+        allowListPredicate,
+        "fake-api-key",
         sender,
-      },
+        { skipHead: true },
+        ["outlook.fr", "hotmail.fr", "live.fr"],
+      );
+    });
+
+    it("shouldn't send emails to email containing blacklisted domain", async () => {
+      await notificationGateway.sendEmail({
+        kind: "AGENCY_WAS_ACTIVATED",
+        recipients: ["recipient-test@outlook.fr"],
+        params: {
+          agencyName: "AGENCY_NAME",
+          agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
+        },
+      });
+      expectToEqual(sentEmails, []);
+    });
+
+    it("should send emails to email containing blacklisted domain", async () => {
+      await notificationGateway.sendEmail({
+        kind: "AGENCY_WAS_ACTIVATED",
+        recipients: ["toto-test@mail.fr", "jean-louis@hotmail.fr"],
+        cc: ["cc@live.fr"],
+        params: {
+          agencyName: "AGENCY_NAME",
+          agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
+        },
+      });
+
+      expect(sentEmails[0]?.body.to[0].email).toBe("toto-test@mail.fr");
+      expect(sentEmails[0]?.body.to[1]).toBeUndefined();
+      expect(sentEmails[0]?.body.cc).toBeUndefined();
     });
   });
 });

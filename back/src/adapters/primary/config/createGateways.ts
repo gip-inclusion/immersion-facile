@@ -202,6 +202,7 @@ export const createGateways = async (
         name: "Immersion Facilitée",
         email: immersionFacileContactEmail,
       },
+      config.emailDomainBlackList,
     );
 
     if (config.notificationGateway === "BREVO") {
