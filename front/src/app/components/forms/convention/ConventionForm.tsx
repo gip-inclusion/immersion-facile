@@ -80,7 +80,7 @@ const {
   isOpenedByDefault: false,
 });
 
-const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
+const useWaitForReduxFormUiReadyBeforeInitialisation = (
   initialValues: ConventionPresentation,
 ) => {
   const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);
@@ -230,7 +230,7 @@ export const ConventionForm = ({
     );
   };
   const reduxFormUiReady =
-    useWaitForReduxFormUiReadyBeforeFormikInitialisation(initialValues);
+    useWaitForReduxFormUiReadyBeforeInitialisation(initialValues);
 
   const t = useConventionTexts(initialValues.internshipKind);
 
