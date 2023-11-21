@@ -22,7 +22,7 @@ type ManageConventionFormSectionProps = {
 export const ManageConventionFormSection = ({
   routeNameToRedirectTo,
 }: ManageConventionFormSectionProps): JSX.Element => {
-  const { register, handleSubmit, formState } =
+  const { register, handleSubmit, formState, setValue } =
     useForm<ManageConventionAdminForm>({
       resolver: zodResolver(manageConventionAdminFormSchema),
       mode: "onTouched",
@@ -44,6 +44,9 @@ export const ManageConventionFormSection = ({
                 ...register("conventionId"),
                 id: "manageConventionAdminForm-conventionId",
                 placeholder: "Id de la convention",
+                onChange: (event) => {
+                  setValue("conventionId", event.currentTarget.value.trim());
+                },
               }}
               className={fr.cx("fr-col-12", "fr-col-lg-6")}
               {...makeFieldError(formState)("conventionId")}
