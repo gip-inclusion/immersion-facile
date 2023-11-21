@@ -13,7 +13,7 @@ import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
 
 export const ManageEstablishment = (): JSX.Element => {
-  const { register, handleSubmit, formState } =
+  const { register, handleSubmit, formState, setValue } =
     useForm<ManageEstablishmentAdminForm>({
       resolver: zodResolver(manageEstablishmentAdminFormSchema),
       mode: "onTouched",
@@ -32,8 +32,11 @@ export const ManageEstablishment = (): JSX.Element => {
               label="Siret de l'entreprise"
               nativeInputProps={{
                 ...register("siret"),
+                onChange: (event) => {
+                  setValue("siret", event.currentTarget.value.trim());
+                },
                 id: domElementIds.admin.manageEstablishment.siretInput,
-                placeholder: "ex: 1234567891234 ",
+                placeholder: "ex: 1234567891234",
               }}
               className={fr.cx("fr-col-12", "fr-col-lg-6")}
               {...makeFieldError(formState)("siret")}
