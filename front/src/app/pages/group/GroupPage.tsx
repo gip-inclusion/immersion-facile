@@ -37,6 +37,7 @@ export const GroupPage = ({ route }: GroupPageProps) => {
   }, [groupSlug]);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getInitialGroupData().finally(() => {
       setLoading(false);
     });
