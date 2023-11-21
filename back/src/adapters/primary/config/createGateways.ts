@@ -192,17 +192,21 @@ export const createGateways = async (
       return new InMemoryNotificationGateway(timeGateway);
 
     const brevoNotificationGateway = new BrevoNotificationGateway(
-      createAxiosHttpClientForExternalAPIs(brevoNotificationGatewayRoutes),
-      makeEmailAllowListPredicate({
-        skipEmailAllowList: config.skipEmailAllowlist,
-        emailAllowList: config.emailAllowList,
-      }),
-      config.apiKeyBrevo,
       {
-        name: "Immersion Facilitée",
-        email: immersionFacileContactEmail,
+        httpClient: createAxiosHttpClientForExternalAPIs(
+          brevoNotificationGatewayRoutes,
+        ),
+        blackListedEmailDomains: config.emailDomainBlackList,
+        defaultSender: {
+          name: "Immersion Facilitée",
+          email: immersionFacileContactEmail,
+        },
+        emailAllowListPredicate: makeEmailAllowListPredicate({
+          skipEmailAllowList: config.skipEmailAllowlist,
+          emailAllowList: config.emailAllowList,
+        }),
       },
-      config.emailDomainBlackList,
+      config.apiKeyBrevo,
     );
 
     if (config.notificationGateway === "BREVO") {

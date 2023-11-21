@@ -46,12 +46,14 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       });
 
       notificationGateway = new BrevoNotificationGateway(
-        fakeHttpClient,
-        allowListPredicate,
+        {
+          httpClient: fakeHttpClient,
+          defaultSender: sender,
+          blackListedEmailDomains: [],
+          emailAllowListPredicate: allowListPredicate,
+          generateHtmlOptions: { skipHead: true },
+        },
         "fake-api-key",
-        sender,
-        { skipHead: true },
-        [],
       );
     });
 
@@ -271,12 +273,14 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       });
 
       notificationGateway = new BrevoNotificationGateway(
-        fakeHttpClient,
-        allowListPredicate,
+        {
+          httpClient: fakeHttpClient,
+          defaultSender: sender,
+          blackListedEmailDomains: ["outlook.fr", "hotmail.fr", "live.fr"],
+          emailAllowListPredicate: allowListPredicate,
+          generateHtmlOptions: { skipHead: true },
+        },
         "fake-api-key",
-        sender,
-        { skipHead: true },
-        ["outlook.fr", "hotmail.fr", "live.fr"],
       );
     });
 

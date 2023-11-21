@@ -59,12 +59,14 @@ export class BrevoNotificationGateway implements NotificationGateway {
   });
 
   constructor(
-    private readonly httpClient: HttpClient<BrevoNotificationGatewayRoutes>,
-    private emailAllowListPredicate: (recipient: string) => boolean,
+    private readonly params: {
+      httpClient: HttpClient<BrevoNotificationGatewayRoutes>;
+      emailAllowListPredicate: (recipient: string) => boolean;
+      defaultSender: RecipientOrSender;
+      blackListedEmailDomains: string[];
+      generateHtmlOptions?: GenerateHtmlOptions;
+    },
     apiKey: ApiKey,
-    private defaultSender: RecipientOrSender,
-    private blackListedEmailDomains: string[],
-    private generateHtmlOptions: GenerateHtmlOptions = {},
   ) {
     this.#brevoHeaders = {
       accept: "application/json",
@@ -74,7 +76,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   }
 
   public async getAttachmentContent(downloadToken: string): Promise<Buffer> {
-    const response = await this.httpClient.getAttachmentContent({
+    const response = await this.params.httpClient.getAttachmentContent({
       urlParams: { downloadToken },
       headers: {
         accept: "application/octet-stream",
@@ -111,8 +113,8 @@ export class BrevoNotificationGateway implements NotificationGateway {
               footer: cciCustomHtmlFooter,
             }
           : { footer: undefined, header: undefined },
-      )(email.kind, email.params, this.generateHtmlOptions),
-      sender: email.sender ?? this.defaultSender,
+      )(email.kind, email.params, this.params.generateHtmlOptions),
+      sender: email.sender ?? this.params.defaultSender,
     };
 
     if (emailData.to.length === 0) return;
@@ -191,7 +193,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
   async #sendTransacEmail(body: SendTransactEmailRequestBody) {
     return this.#emailLimiter.schedule(() =>
-      this.httpClient.sendTransactEmail({
+      this.params.httpClient.sendTransactEmail({
         headers: this.#brevoHeaders,
         body,
       }),
@@ -200,7 +202,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
   #sendTransacSms(body: SendTransactSmsRequestBody) {
     return this.#smslimiter.schedule(() =>
-      this.httpClient.sendTransactSms({
+      this.params.httpClient.sendTransactSms({
         headers: this.#brevoHeaders,
         body,
       }),
@@ -211,13 +213,16 @@ export class BrevoNotificationGateway implements NotificationGateway {
     emails: string[] = [],
   ): RecipientOrSender[] {
     return emails
-      .filter(this.emailAllowListPredicate)
+      .filter(this.params.emailAllowListPredicate)
       .filter(
-        (email: string) =>
-          !this.blackListedEmailDomains.some((domain) =>
-            email.toLowerCase().endsWith(domain.toLowerCase()),
-          ),
+        filterBlackListedEmailDomains(this.params.blackListedEmailDomains),
       )
       .map((email) => ({ email }));
   }
 }
+
+const filterBlackListedEmailDomains =
+  (blackListedEmailDomains: string[]) => (email: string) =>
+    !blackListedEmailDomains.some((domain) =>
+      email.toLowerCase().endsWith(domain.toLowerCase()),
+    );
