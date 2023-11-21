@@ -141,8 +141,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       shared-routes:
-        specifier: ^0.8.16
-        version: 0.8.16(openapi-types@12.1.3)(zod@3.22.3)
+        specifier: ^0.8.17
+        version: 0.8.17(openapi-types@12.1.3)(zod@3.22.3)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.13.0)(typescript@5.3.2)
@@ -434,8 +434,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       shared-routes:
-        specifier: ^0.8.16
-        version: 0.8.16(openapi-types@12.1.3)(zod@3.22.3)
+        specifier: ^0.8.17
+        version: 0.8.17(openapi-types@12.1.3)(zod@3.22.3)
       swagger-ui-react:
         specifier: ^5.1.0
         version: 5.1.0(@types/react-dom@18.0.10)(@types/react@18.0.28)(react-dom@18.2.0)(react@18.2.0)
@@ -676,8 +676,8 @@ importers:
         specifier: ^0.28.0
         version: 0.28.0
       shared-routes:
-        specifier: ^0.8.16
-        version: 0.8.16(openapi-types@12.1.3)(zod@3.22.3)
+        specifier: ^0.8.17
+        version: 0.8.17(openapi-types@12.1.3)(zod@3.22.3)
       typescript:
         specifier: ^5.3.2
         version: 5.3.2
@@ -3475,7 +3475,7 @@ packages:
       babel-plugin-polyfill-corejs3: 0.6.0(@babel/core@7.21.4)
       babel-plugin-polyfill-regenerator: 0.4.1(@babel/core@7.21.4)
       core-js-compat: 3.31.0
-      semver: 6.3.1
+      semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -15280,11 +15280,6 @@ packages:
     hasBin: true
     dev: true
 
-  /semver@6.3.1:
-    resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-    dev: true
-
   /semver@7.0.0:
     resolution: {integrity: sha512-+GB6zVA9LWh6zovYQLALHwv5rb2PHGlJi3lfiqIHxR0uuwCgefcOJc59v9fv1w8GbStwxuuqqAjI9NMAOOgq1A==}
     hasBin: true
@@ -15395,8 +15390,8 @@ packages:
     resolution: {integrity: sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==}
     dev: true
 
-  /shared-routes@0.8.16(openapi-types@12.1.3)(zod@3.22.3):
-    resolution: {integrity: sha512-n6BYg3vhUUbALPhSJBOUKCySZgha/U9Nxb1wnlx1sX8o1pAncT2hXRMkKgnxRh4xqKgMIVWdEBHcno/f6RwZlQ==}
+  /shared-routes@0.8.17(openapi-types@12.1.3)(zod@3.22.3):
+    resolution: {integrity: sha512-c66riRgm6VWBPrLFi6pkEE0TQ7yy1Y60kRiNe+StOZVgtnmFXxEKMNQ5C+dnJwbQ4XDdxAS7V1eF2dahHXdspA==}
     peerDependencies:
       openapi-types: ^12.0.0
       zod: ^3.0.0
