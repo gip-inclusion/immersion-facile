@@ -155,6 +155,13 @@ export class AppConfig {
     return parseStringList(this.env.EMAIL_ALLOW_LIST);
   }
 
+  public get emailDomainBlackList() {
+    return this.#throwIfNotDefinedOrDefault(
+      "EMAIL_DOMAIN_BLACK_LIST",
+      "",
+    ).split(",");
+  }
+
   // == Email validation gateway ==
   public get emailValidationGateway() {
     return this.#throwIfNotInArray({
