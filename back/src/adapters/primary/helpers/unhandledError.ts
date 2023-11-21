@@ -23,12 +23,13 @@ export class UnhandledError extends Error {
 export const unhandledError = (error: any, req: Request, res: Response) => {
   if (axios.isAxiosError(error)) {
     const errorResponse = error.response;
+
     logErrorAndNotifyDiscord("Axios", req, {
       message: error.message,
-      method: error.config.method,
-      url: error.config.url,
+      method: error.config?.method,
+      url: error.config?.url,
       path: errorResponse?.request?.path,
-      ...(error.config.data ? { requestBody: error.config.data } : {}),
+      ...(error.config?.data ? { requestBody: error.config.data } : {}),
       ...(errorResponse
         ? {
             httpStatus: errorResponse.status,
