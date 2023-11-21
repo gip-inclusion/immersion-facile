@@ -10,11 +10,16 @@ describe("BrevoNotificationGateway manual", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     notificationGateway = new BrevoNotificationGateway(
-      createAxiosSharedClient(brevoNotificationGatewayRoutes, axios),
-      (_) => true,
+      {
+        httpClient: createAxiosSharedClient(
+          brevoNotificationGatewayRoutes,
+          axios,
+        ),
+        emailAllowListPredicate: () => true,
+        defaultSender: { email: "bob@fake.mail", name: "Bob" },
+        blackListedEmailDomains: [],
+      },
       config.apiKeyBrevo,
-      { email: "bob@fake.mail", name: "Bob" },
-      [],
     );
   });
 
