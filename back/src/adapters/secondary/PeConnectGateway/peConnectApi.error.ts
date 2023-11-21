@@ -107,7 +107,7 @@ const isInvalidGrantError = (
 ) =>
   context === "exchangeCodeForAccessToken" &&
   error.response?.status === HTTP_STATUS.BAD_REQUEST &&
-  error.response?.data.error === "invalid_grant";
+  (error.response?.data as { error?: string }).error === "invalid_grant";
 
 const hasNoErrorIdentifier = (error: AxiosError) =>
   !error.response?.status && !error.code;

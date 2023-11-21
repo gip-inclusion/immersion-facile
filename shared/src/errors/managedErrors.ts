@@ -22,7 +22,10 @@ export abstract class RedirectError extends Error {
 
 export class ManagedRedirectError extends RedirectError {
   constructor(public readonly kind: ManagedErrorKind, cause?: Error) {
-    super(`A managed redirect error of type ${kind} has been thrown`, cause);
+    super(
+      `A managed redirect error of type ${kind} has been thrown`,
+      cause && new Error(cause?.message),
+    );
   }
 }
 
