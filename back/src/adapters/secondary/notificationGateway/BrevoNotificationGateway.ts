@@ -59,7 +59,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   });
 
   constructor(
-    private readonly params: {
+    private readonly config: {
       httpClient: HttpClient<BrevoNotificationGatewayRoutes>;
       emailAllowListPredicate: (recipient: string) => boolean;
       defaultSender: RecipientOrSender;
@@ -76,7 +76,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   }
 
   public async getAttachmentContent(downloadToken: string): Promise<Buffer> {
-    const response = await this.params.httpClient.getAttachmentContent({
+    const response = await this.config.httpClient.getAttachmentContent({
       urlParams: { downloadToken },
       headers: {
         accept: "application/octet-stream",
@@ -113,8 +113,8 @@ export class BrevoNotificationGateway implements NotificationGateway {
               footer: cciCustomHtmlFooter,
             }
           : { footer: undefined, header: undefined },
-      )(email.kind, email.params, this.params.generateHtmlOptions),
-      sender: email.sender ?? this.params.defaultSender,
+      )(email.kind, email.params, this.config.generateHtmlOptions),
+      sender: email.sender ?? this.config.defaultSender,
     };
 
     if (emailData.to.length === 0) return;
@@ -193,7 +193,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
   async #sendTransacEmail(body: SendTransactEmailRequestBody) {
     return this.#emailLimiter.schedule(() =>
-      this.params.httpClient.sendTransactEmail({
+      this.config.httpClient.sendTransactEmail({
         headers: this.#brevoHeaders,
         body,
       }),
@@ -202,7 +202,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
   #sendTransacSms(body: SendTransactSmsRequestBody) {
     return this.#smslimiter.schedule(() =>
-      this.params.httpClient.sendTransactSms({
+      this.config.httpClient.sendTransactSms({
         headers: this.#brevoHeaders,
         body,
       }),
@@ -213,9 +213,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
     emails: string[] = [],
   ): RecipientOrSender[] {
     return emails
-      .filter(this.params.emailAllowListPredicate)
+      .filter(this.config.emailAllowListPredicate)
       .filter(
-        filterBlackListedEmailDomains(this.params.blackListedEmailDomains),
+        filterBlackListedEmailDomains(this.config.blackListedEmailDomains),
       )
       .map((email) => ({ email }));
   }
