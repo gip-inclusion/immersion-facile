@@ -1085,12 +1085,19 @@ export const emailTemplatesByName =
         establishmentFeedback,
         immersionObjective,
         assessmentStatus,
+        internshipKind,
       }) => ({
-        subject: `Pour information : évaluation de l'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+        subject: `Pour information : évaluation ${
+          internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+        } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
         greetings: greetingsWithConventionId(conventionId),
-        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son immersion au sein de l'entreprise ${businessName}.
+        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${
+          internshipKind === "immersion" ? "immersion" : "mini-stage"
+        } au sein de l'entreprise ${businessName}.
         <ul>
-          <li>Objectif de l'immersion : ${immersionObjective}</li>
+          <li>Objectif ${
+            internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+          } : ${immersionObjective}</li>
           <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${
             isStringDate(dateStart)
               ? toDisplayedDate(new Date(dateStart), true)

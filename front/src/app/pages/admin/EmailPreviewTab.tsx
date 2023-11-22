@@ -506,6 +506,7 @@ export const defaultEmailValueByEmailKind: {
     establishmentFeedback: "ESTABLISHMENT_FEEDBACK",
     assessmentStatus: "FINISHED",
     immersionObjective: "Confirmer un projet professionnel",
+    internshipKind: "immersion",
   },
   FULL_PREVIEW_EMAIL: {
     internshipKind: "immersion",

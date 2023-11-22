@@ -57,6 +57,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<
           establishmentFeedback: payload.establishmentFeedback,
           assessmentStatus: payload.status,
           immersionObjective: convention.immersionObjective,
+          internshipKind: convention.internshipKind,
         },
       },
       followedIds: {

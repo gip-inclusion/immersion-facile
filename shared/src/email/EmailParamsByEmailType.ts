@@ -131,6 +131,7 @@ export type EmailParamsByEmailType = {
     establishmentFeedback: string;
     agencyValidatorEmail: Email;
     assessmentStatus: AssessmentStatus;
+    internshipKind: InternshipKind;
   };
   DEPRECATED_CONVENTION_NOTIFICATION: {
     beneficiaryFirstName: string;
