@@ -82,9 +82,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
         {
           kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
           params: {
-            agencyAssessmentDocumentLink: undefined,
             agencyLogoUrl: "http://LOGO AGENCY IF URL",
-            agencyValidatorEmail: "validator123@mail.com",
             beneficiaryFirstName: "Esteban",
             beneficiaryLastName: "Ocon",
             conventionId: "immersion-ending-yesterday-id",
