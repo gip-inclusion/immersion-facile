@@ -1,6 +1,7 @@
 import { values } from "ramda";
 import {
   AgencyDtoBuilder,
+  AgencyRole,
   allRoles,
   ConventionDto,
   ConventionDtoBuilder,
@@ -9,6 +10,7 @@ import {
   ConventionStatus,
   conventionStatuses,
   createConventionMagicLinkPayload,
+  Email,
   expectPromiseToFailWithError,
   expectToEqual,
   InclusionConnectedUser,
@@ -41,12 +43,15 @@ export const allInclusionConnectedTestUsers = [
   "icUserWithRoleCounsellor",
   "icUserWithRoleValidator",
   "icUserWithRoleAgencyOwner",
+  "icUserWithRoleEstablishmentRepresentative",
 ] as const;
 
 type InclusionConnectedTestUser =
   (typeof allInclusionConnectedTestUsers)[number];
 
 const fakeAgency = new AgencyDtoBuilder().build();
+
+const establishmentRepEmail: Email = "establishmentrep@email.com";
 
 const makeUserIdMapInclusionConnectedUser: Record<
   InclusionConnectedTestUser,
@@ -101,6 +106,13 @@ const makeUserIdMapInclusionConnectedUser: Record<
     id: "icUserWithRoleAgencyOwner",
     lastName: "Owner",
   },
+  icUserWithRoleEstablishmentRepresentative: {
+    agencyRights: [],
+    email: establishmentRepEmail,
+    firstName: "icUserWithRoleEstablishmentRepresentativeFirstName",
+    id: "icUserWithRoleEstablishmentRepresentative",
+    lastName: "Owner",
+  },
 };
 
 type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
@@ -133,7 +145,7 @@ export const setupInitialState = ({
   const conventionBuilder = new ConventionDtoBuilder()
     .withId(originalConventionId)
     .withStatus(initialStatus)
-    .withoutDateValidation();
+    .withEstablishmentRepresentativeEmail(establishmentRepEmail);
   const originalConvention = alreadySigned
     ? conventionBuilder.build()
     : conventionBuilder.notSigned().build();
@@ -303,15 +315,10 @@ const makeTestAcceptsStatusUpdate =
         throw new Error(
           `Expected domain topic ${expectedDomainTopic} not supported with convention status ${updateStatusParams.status}`,
         );
-      const role =
-        "role" in testAcceptNewStatusParams
-          ? testAcceptNewStatusParams.role
-          : makeUserIdMapInclusionConnectedUser[
-              testAcceptNewStatusParams.userId
-            ].agencyRights.find(
-              (agencyRight) =>
-                agencyRight.agency.id === expectedConvention.agencyId,
-            )?.role;
+      const role = defineRoleForTest(
+        testAcceptNewStatusParams,
+        expectedConvention,
+      );
 
       if (!role || role === "agencyOwner" || role === "toReview")
         throw new Error(
@@ -411,14 +418,14 @@ type TestAllCaseProps = {
   updateStatusParams: UpdateConventionStatusRequestDto;
   expectedDomainTopic: ConventionDomainTopic;
   updatedFields?: UpdatedFields;
-  allowedRoles: Role[];
+  allowedMagicLinkRoles: Role[];
   allowedInclusionConnectedUsers: InclusionConnectedTestUser[];
   allowedInitialStatuses: ConventionStatus[];
   nextDate?: Date;
 };
 
 export const testForAllRolesAndInitialStatusCases = ({
-  allowedRoles,
+  allowedMagicLinkRoles,
   expectedDomainTopic,
   updatedFields = {},
   allowedInitialStatuses,
@@ -427,7 +434,7 @@ export const testForAllRolesAndInitialStatusCases = ({
   updateStatusParams,
 }: TestAllCaseProps) => {
   const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
-    splitCasesBetweenPassingAndFailing(allRoles, allowedRoles);
+    splitCasesBetweenPassingAndFailing(allRoles, allowedMagicLinkRoles);
 
   const [
     allowedInclusionConnectedUsersToUpdate,
@@ -454,7 +461,7 @@ export const testForAllRolesAndInitialStatusCases = ({
       nextDate,
     });
 
-    it.each(allowedRoles.map((role) => ({ role })))(
+    it.each(allowedMagicLinkRoles.map((role) => ({ role })))(
       "Accepted from role '$role'",
       ({ role }) =>
         testAcceptsStatusUpdate({
@@ -491,14 +498,17 @@ export const testForAllRolesAndInitialStatusCases = ({
     if (notAllowedRolesToUpdate.length) {
       it.each(notAllowedRolesToUpdate.map((role) => ({ role })))(
         "Rejected from role '$role'",
-        ({ role }) =>
-          testRejectsStatusUpdate({
+        ({ role }) => {
+          const userId = "icUserWithRoleEstablishmentRepresentative";
+          return testRejectsStatusUpdate({
+            userId,
             role,
             initialStatus: someValidInitialStatus,
             expectedError: new ForbiddenError(
-              `${role} is not allowed to go to status ${updateStatusParams.status}`,
+              `Role '${role}' is not allowed to go to status '${updateStatusParams.status}' for convention '${updateStatusParams.conventionId}'.`,
             ),
-          }),
+          });
+        },
       );
     }
 
@@ -510,11 +520,16 @@ export const testForAllRolesAndInitialStatusCases = ({
           userId,
           initialStatus: someValidInitialStatus,
           expectedError: new ForbiddenError(
-            `${
-              makeUserIdMapInclusionConnectedUser[userId].agencyRights.find(
-                (agencyRight) => agencyRight.agency.id === fakeAgency.id,
-              )?.role
-            } is not allowed to go to status ${updateStatusParams.status}`,
+            `Role '${
+              makeUserIdMapInclusionConnectedUser[userId].email ===
+              establishmentRepEmail
+                ? "establishment-representative"
+                : makeUserIdMapInclusionConnectedUser[userId].agencyRights.find(
+                    (agencyRight) => agencyRight.agency.id === fakeAgency.id,
+                  )?.role
+            }' is not allowed to go to status '${
+              updateStatusParams.status
+            }' for convention '${updateStatusParams.conventionId}'.`,
           ),
         }),
       );
@@ -532,4 +547,24 @@ export const testForAllRolesAndInitialStatusCases = ({
         }),
     );
   });
+};
+
+const defineRoleForTest = (
+  testAcceptNewStatusParams: TestAcceptNewStatusParams,
+  expectedConvention: ConventionDto,
+): Role | AgencyRole | undefined => {
+  if ("role" in testAcceptNewStatusParams)
+    return testAcceptNewStatusParams.role;
+
+  if (
+    testAcceptNewStatusParams.userId ===
+    "icUserWithRoleEstablishmentRepresentative"
+  )
+    return "establishment-representative";
+
+  return makeUserIdMapInclusionConnectedUser[
+    testAcceptNewStatusParams.userId
+  ].agencyRights.find(
+    (agencyRight) => agencyRight.agency.id === expectedConvention.agencyId,
+  )?.role;
 };

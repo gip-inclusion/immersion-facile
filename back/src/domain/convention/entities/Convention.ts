@@ -34,14 +34,16 @@ const throwIfStatusTransitionNotPossible = ({
 const throwIfRoleNotAllowedToChangeStatus = ({
   role,
   targetStatus,
+  conventionId,
 }: {
   role: Role;
   targetStatus: ConventionStatus;
+  conventionId: ConventionId;
 }) => {
   const config = statusTransitionConfigs[targetStatus];
   if (!config.validRoles.includes(role))
     throw new ForbiddenError(
-      `${role} is not allowed to go to status ${targetStatus}`,
+      `Role '${role}' is not allowed to go to status '${targetStatus}' for convention '${conventionId}'.`,
     );
 };
 
@@ -49,12 +51,14 @@ export const throwIfTransitionNotAllowed = ({
   targetStatus,
   initialStatus,
   role,
+  conventionId,
 }: {
   targetStatus: ConventionStatus;
   initialStatus: ConventionStatus;
   role: Role;
+  conventionId: ConventionId;
 }) => {
-  throwIfRoleNotAllowedToChangeStatus({ role, targetStatus });
+  throwIfRoleNotAllowedToChangeStatus({ role, targetStatus, conventionId });
   throwIfStatusTransitionNotPossible({ initialStatus, targetStatus });
 };
 
