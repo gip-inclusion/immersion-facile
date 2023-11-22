@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { subDays } from "date-fns";
 import { z } from "zod";
 import {
   castError,
@@ -57,10 +57,10 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<SendEmailsWithAssessmentCreationLinkOutput> {
     const now = this.#timeGateway.now();
-    const tomorrow = addDays(now, 1);
+    const yesterday = subDays(now, 1);
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
-        tomorrow,
+        yesterday,
         "EmailWithLinkToCreateAssessmentSent",
       );
 
