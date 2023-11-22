@@ -313,9 +313,9 @@ There is currently only one way to quarantine events:
 
 Quarantining could be used in other scenarios in the future, e.g. individual events could be quarantined after 3 unsuccessful processing attempts.
 
-# Data Processing Pipelines
+# Cron jobs
 
-This section describes how to work with our pipelines, both locally and remotely. We will use the _start-update-establishments-from-sirene_ pipeline (currently our only pipeline) as an example throughout this section:
+This section describes how to work with our cron jobs, both locally and remotely. We will use the _trigger-update-establishments-from-sirene_ job as an example throughout this section:
 
 ## Code structure
 
@@ -323,45 +323,23 @@ The source code is located in `back/src` so that it can take advantage of the ad
 
 ## Production setup
 
-We use a docker container that is running [cron](https://en.wikipedia.org/wiki/Cron) to schedule the execution of the pipelines. The main configuration files are
+We use the [Scalingo Scheduler](https://doc.scalingo.com/platform/app/task-scheduling/scalingo-scheduler) to schedule the execution of the cron jobs. The configuration is defined in [back/scalingo/cron.json](./scalingo/cron.json).
 
-- [docker-compose.yml](../docker-compose.yml)
-  - defines the `pipelines` docker container
-- [back/Dockerfile.pipelines](../Dockerfile.pipelines)
-  - creates the docker image
-- [back/bin/start_pipelines_cron.sh](./bin/start_pipelines_cron.sh):
-  - initializes the docker container
-  - defines the execution schedule (crontab)
-  - runs cron
+Logs for scheduled tasks are included in the application logs.
 
-Each pipeline has its own log file, to which log output will be appended by every new run (e.g. `docker-data/pipelines/logs/start-update-establishments-from-sirene.log`). The log directory is mapped to a filesystem volume in order to persist across restarts of the docker container.
+## Running a cron job locally
 
-## Running a pipeline locally
-
-Each pipeline has its own `pnpm start` script with which it can be started:
+Each cron job has its own `pnpm start` script with which it can be started:
 
 ```
-back$ pnpm run start-update-establishments-from-sirene
+back$ pnpm run trigger-update-establishments-from-sirene
 ```
 
 As with the back-end, we use environment variables for parametrization.
 
-## Running the pipelines docker container
-
-Alternatively, you can execute it inside a local docker container:
+## Running a cron job remotely
 
 ```
-immersion-facile$ docker-compose up --build pipelines
-```
-
-If you're using PG repositories and you're running with docker, you need to set DATABASE_URL host to `postgres` (see commented lines in .env.sample file)
-
-Doing this will start `cron`, which will execute all registered pipelines according to their default schedules (e.g. _establishmentBackfill_ is run every day at midnight).
-
-You can **override the default schedule** by explicitly setting the `$ESTABLISHMENT_UPDATE_FROM_SIRENE` environment variable (see [Specifying environment variables](#Specifying-environment-variables)).
-
-Example: To start a container that schedules a run of _update-establishments-from-sirene_ every 10 minutes:
-
-```
-immersion-facile$ $ESTABLISHMENT_UPDATE_FROM_SIRENE="*/10 * * * *" docker-compose up --build pipelines
+scalingo --region {region-name} --app {app-name} run bash
+pnpm back trigger-update-establishments-from-sirene
 ```
