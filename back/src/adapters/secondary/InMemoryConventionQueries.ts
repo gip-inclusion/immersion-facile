@@ -15,6 +15,7 @@ import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
 } from "../../domain/convention/ports/ConventionQueries";
+import { AssessmentEmailDomainTopic } from "../../domain/core/eventBus/events";
 import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
@@ -55,12 +56,13 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .map((convention) => convention.id);
   }
 
-  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
+  public async getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
     dateEnd: Date,
+    sendingTopic: AssessmentEmailDomainTopic,
   ): Promise<ConventionReadDto[]> {
     const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
       ? this.outboxRepository.events
-          .filter(propEq("topic", "EmailWithLinkToCreateAssessmentSent"))
+          .filter(propEq("topic", sendingTopic))
           .map((event) => (event.payload as WithConventionIdLegacy).id)
       : [];
     return Object.values(this.conventionRepository._conventions)

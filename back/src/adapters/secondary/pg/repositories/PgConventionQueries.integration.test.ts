@@ -657,8 +657,9 @@ describe("Pg implementation of ConventionQueries", () => {
 
       // Act
       const queryResults =
-        await conventionQueries.getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
+        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
           new Date("2022-05-15"),
+          "EmailWithLinkToCreateAssessmentSent",
         );
 
       // Assert

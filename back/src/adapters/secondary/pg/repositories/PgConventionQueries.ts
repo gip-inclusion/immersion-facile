@@ -16,6 +16,7 @@ import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
 } from "../../../../domain/convention/ports/ConventionQueries";
+import { AssessmentEmailDomainTopic } from "../../../../domain/core/eventBus/events";
 import { KyselyDb } from "../kysely/kyselyUtils";
 import {
   createConventionReadQueryBuilder,
@@ -54,8 +55,9 @@ export class PgConventionQueries implements ConventionQueries {
     );
   }
 
-  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
+  public async getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
     dateEnd: Date,
+    sendingTopic: AssessmentEmailDomainTopic,
   ): Promise<ConventionReadDto[]> {
     // prettier-ignore
     const pgResults = await createConventionReadQueryBuilder(this.transaction)
@@ -64,7 +66,7 @@ export class PgConventionQueries implements ConventionQueries {
       .where("conventions.id", "not in", sql`(
           SELECT (payload ->> 'id')::uuid
           FROM outbox
-          WHERE topic = 'EmailWithLinkToCreateAssessmentSent'
+          WHERE topic = ${sendingTopic}
         )`)
       .orderBy("conventions.date_start", "desc")
       .execute();

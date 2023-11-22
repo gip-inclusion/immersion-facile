@@ -31,6 +31,15 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
   };
+  BENEFICIARY_ASSESSMENT_NOTIFICATION: {
+    conventionId: ConventionId;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    agencyValidatorEmail: string;
+    internshipKind: InternshipKind;
+    agencyAssessmentDocumentLink: string | undefined;
+  };
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryFirstName: string;
