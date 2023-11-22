@@ -185,4 +185,78 @@ describe("PgDiscussionAggregateRepository", () => {
       );
     expect(numberOfDiscussions).toBe(2);
   });
+
+  it("Delete messages from old discussions", async () => {
+    const siret = "12212222333344";
+    const since = new Date("2023-03-05");
+
+    await establishmentAggregateRepo.insertEstablishmentAggregates([
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(siret)
+        .withContactId("12345678-1111-2222-3333-444444444455")
+        .withOffers([offer])
+        .build(),
+    ]);
+
+    const discussionAggregate1 = new DiscussionAggregateBuilder()
+      .withSiret(siret)
+      .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120104")
+      .withCreatedAt(new Date("2023-11-11"))
+      .withExchanges([
+        {
+          subject: "mon nouveau sujet",
+          message: "mon nouveau message",
+          recipient: "potentialBeneficiary",
+          sentAt: new Date("2023-11-11"),
+          sender: "establishment",
+        },
+      ])
+      .build();
+    const discussionAggregateOld = new DiscussionAggregateBuilder()
+      .withSiret(siret)
+      .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120103")
+      .withCreatedAt(new Date("2022-11-11"))
+      .withExchanges([
+        {
+          subject: "mon nouveau sujet",
+          message: "mon nouveau message",
+          recipient: "potentialBeneficiary",
+          sentAt: new Date("2022-11-11"),
+          sender: "establishment",
+        },
+      ])
+      .build();
+
+    await Promise.all([
+      pgDiscussionAggregateRepository.insert(discussionAggregate1),
+      pgDiscussionAggregateRepository.insert(discussionAggregateOld),
+    ]);
+
+    const numberOfUpdatedMessages =
+      await pgDiscussionAggregateRepository.deleteOldMessages(since);
+
+    expectToEqual(numberOfUpdatedMessages, 1);
+    await expectMessageToBeDeleted(discussionAggregate1, "mon nouveau message");
+    await expectMessageToBeDeleted(discussionAggregateOld, "Expired");
+  });
+
+  const expectMessageToBeDeleted = async (
+    discussion: DiscussionAggregate,
+    expectedMessage: string,
+  ) => {
+    expectToEqual(
+      await pgDiscussionAggregateRepository.getById(discussion.id),
+      new DiscussionAggregateBuilder(discussion)
+        .withExchanges([
+          {
+            subject: "mon nouveau sujet",
+            message: expectedMessage,
+            recipient: "potentialBeneficiary",
+            sentAt: new Date(discussion.exchanges[0].sentAt),
+            sender: "establishment",
+          },
+        ])
+        .build(),
+    );
+  };
 });

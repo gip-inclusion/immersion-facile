@@ -36,6 +36,18 @@ export class PgDiscussionAggregateRepository
     return parseInt(result!.count);
   }
 
+  public async deleteOldMessages(endedSince: Date) {
+    const result = await this.transaction
+      .updateTable("exchanges")
+      .set({
+        message: "Expired",
+      })
+      .where("sent_at", "<=", endedSince)
+      .executeTakeFirst();
+
+    return Number(result.numUpdatedRows);
+  }
+
   public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionAggregate | undefined> {
