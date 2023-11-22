@@ -8,6 +8,7 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
+  SignatoryRole,
   stringToMd5,
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
@@ -78,17 +79,19 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         : await this.#agencyRoleFromUserIdAndAgencyId(
             uow,
             payload.userId,
-            originalConvention.agencyId,
+            originalConvention,
           );
+
     if (role === "toReview" || role === "agencyOwner")
       throw new ForbiddenError(
-        `${role} is not allowed to go to status ${params.status}`,
+        `Role '${role}' is not allowed to go to status '${params.status}' for convention '${originalConvention.id}'.`,
       );
 
     throwIfTransitionNotAllowed({
       initialStatus: originalConvention.status,
       role,
       targetStatus: params.status,
+      conventionId: originalConvention.id,
     });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();
@@ -162,19 +165,25 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   async #agencyRoleFromUserIdAndAgencyId(
     uow: UnitOfWork,
     userId: AuthenticatedUserId,
-    agencyId: AgencyId,
-  ): Promise<AgencyRole> {
+    convention: ConventionDto,
+  ): Promise<
+    AgencyRole | Extract<SignatoryRole, "establishment-representative">
+  > {
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(
         `User '${userId}' not found on inclusion connected user repository.`,
       );
+
+    if (user.email === convention.signatories.establishmentRepresentative.email)
+      return "establishment-representative";
+
     const userAgencyRights = user.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === agencyId,
+      (agencyRight) => agencyRight.agency.id === convention.agencyId,
     );
     if (!userAgencyRights)
       throw new ForbiddenError(
-        `User '${userId}' has no rôle on agency '${agencyId}'.`,
+        `User '${userId}' has no role on agency '${convention.agencyId}'.`,
       );
     return userAgencyRights.role;
   }
