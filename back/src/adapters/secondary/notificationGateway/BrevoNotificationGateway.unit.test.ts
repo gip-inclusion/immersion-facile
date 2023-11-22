@@ -296,7 +296,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       expectToEqual(sentEmails, []);
     });
 
-    it("should send emails to email containing blacklisted domain", async () => {
+    it("should send emails but not to emails containing blacklisted domain", async () => {
       await notificationGateway.sendEmail({
         kind: "AGENCY_WAS_ACTIVATED",
         recipients: ["toto-test@mail.fr", "jean-louis@hotmail.fr"],
