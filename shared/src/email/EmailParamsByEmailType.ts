@@ -110,9 +110,7 @@ export type EmailParamsByEmailType = {
     requesterName: string;
   };
   ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
-    agencyAssessmentDocumentLink: string | undefined;
     agencyLogoUrl: AbsoluteUrl | undefined;
-    agencyValidatorEmail: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     conventionId: ConventionId;

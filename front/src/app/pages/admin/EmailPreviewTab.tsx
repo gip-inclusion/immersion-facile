@@ -476,9 +476,7 @@ export const defaultEmailValueByEmailKind: {
     businessAddress: "BUSINESS_ADDRESS",
   },
   ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
-    agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
-    agencyValidatorEmail: "VALIDATOR_EMAIL",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     conventionId: "CONVENTION_ID",

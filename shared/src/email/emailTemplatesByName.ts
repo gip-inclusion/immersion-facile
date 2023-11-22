@@ -960,14 +960,12 @@ export const emailTemplatesByName =
       tags: ["notification entreprise fin de l’immersion"],
       createEmailVariables: ({
         agencyLogoUrl,
-        agencyValidatorEmail,
         beneficiaryFirstName,
         beneficiaryLastName,
         conventionId,
         establishmentTutorName,
         assessmentCreationLink,
         internshipKind,
-        agencyAssessmentDocumentLink,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -998,25 +996,7 @@ export const emailTemplatesByName =
             }`,
             url: assessmentCreationLink,
           },
-          {
-            label: "Télécharger la fiche bilan",
-            url:
-              agencyAssessmentDocumentLink ||
-              `${
-                internshipKind === "immersion"
-                  ? "https://immersion.cellar-c2.services.clever-cloud.com/PMSMP_Bilan.pdf"
-                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
-              }`,
-          },
         ],
-        highlight: {
-          kind: "info",
-          content: `${
-            internshipKind === "immersion"
-              ? `À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée avec ${beneficiaryFirstName} ${beneficiaryLastName}, `
-              : `À la fin du mini stage, nous vous remercions de compléter la fiche bilan du mini stage, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée avec ${beneficiaryFirstName} ${beneficiaryLastName}, `
-          } puis envoyée à <a href= "mailto:${agencyValidatorEmail}" target="_blank">${agencyValidatorEmail}</a>.`,
-        },
         subContent: `
       Ces informations sont importantes pour la suite de son parcours professionnel. 
 
