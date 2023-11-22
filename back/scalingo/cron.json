@@ -17,6 +17,10 @@
       "size": "M"
     },
     {
+      "command": "55 23 * * * pnpm back run trigger-sending-beneficiary-assessment-emails",
+      "size": "M"
+    },
+    {
       "command": "10 0 * * * pnpm back run trigger-suggest-edit-form-establishment-every-6-months",
       "size": "M"
     },
