@@ -100,7 +100,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        kind: "CREATE_ASSESSMENT",
+        kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
         recipients: [convention.establishmentTutor.email],
         sender: immersionFacileNoReplyEmailSender,
         params: {

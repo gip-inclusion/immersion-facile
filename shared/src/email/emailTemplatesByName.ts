@@ -955,7 +955,7 @@ export const emailTemplatesByName =
       }),
     },
 
-    CREATE_ASSESSMENT: {
+    ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
       niceName: "Convention - Lien de creation du bilan",
       tags: ["notification entreprise fin de l’immersion"],
       createEmailVariables: ({
