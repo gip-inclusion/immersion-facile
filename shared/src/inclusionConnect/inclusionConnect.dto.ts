@@ -1,9 +1,10 @@
-import { ConventionReadDto } from "../convention/convention.dto";
+import { ConventionDto } from "../convention/convention.dto";
 import {
   AgencyRole,
   AuthenticatedUser,
   InclusionConnectedUser,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import { SignatoryRole } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
 import { ExcludeFromExisting } from "../utils";
 
@@ -23,10 +24,16 @@ export type AuthenticatedUserQueryParams = {
   token: string;
 } & Pick<AuthenticatedUser, "email" | "firstName" | "lastName">;
 
-export const getUserRoleForAccessingConvention = (
-  convention: ConventionReadDto,
+export type InclusionConnectConventionManageAllowedRoles =
+  | ExcludeFromExisting<AgencyRole, "toReview">
+  | Extract<SignatoryRole, "establishment-representative">;
+
+export const getIcUserRoleForAccessingConvention = (
+  convention: ConventionDto,
   user: InclusionConnectedUser,
-): ExcludeFromExisting<AgencyRole, "toReview"> | null => {
+): InclusionConnectConventionManageAllowedRoles | null => {
+  if (convention.signatories.establishmentRepresentative.email === user.email)
+    return "establishment-representative";
   const agencyRight = user.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === convention.agencyId,
   );
