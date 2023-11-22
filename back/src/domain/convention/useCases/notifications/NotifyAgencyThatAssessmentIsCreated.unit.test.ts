@@ -104,6 +104,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             establishmentFeedback: assessment.establishmentFeedback,
             agencyValidatorEmail: agency.validatorEmails[0],
             assessmentStatus: assessment.status,
+            internshipKind: convention.internshipKind,
           },
           recipients: [agency.validatorEmails[0]],
         },
