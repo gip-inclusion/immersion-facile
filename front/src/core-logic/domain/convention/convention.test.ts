@@ -738,9 +738,8 @@ describe("Convention slice", () => {
       }));
       store.dispatch(
         conventionSlice.actions.signConventionRequested({
+          conventionId: convention.id,
           jwt,
-          role: "beneficiary",
-          signedAt: new Date().toISOString(),
         }),
       );
       expectConventionState({
@@ -758,9 +757,8 @@ describe("Convention slice", () => {
       const jwt = "some-correct-jwt";
       store.dispatch(
         conventionSlice.actions.signConventionRequested({
+          conventionId: "id",
           jwt,
-          role: "beneficiary",
-          signedAt: new Date().toISOString(),
         }),
       );
       expectConventionState({

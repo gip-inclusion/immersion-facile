@@ -11,13 +11,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
 import { v4 as uuidV4 } from "uuid";
 import {
+  BackOfficeJwt,
   ConventionDto,
+  ConventionJwt,
   ConventionReadDto,
   ConventionStatus,
   ConventionSupportedJwt,
   DateIntervalDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  InclusionConnectJwt,
   isConventionRenewed,
   reasonableSchedule,
   RenewConventionParams,
@@ -38,10 +41,25 @@ import {
   conventionSlice,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { ScheduleSection } from "../../forms/convention/sections/schedule/ScheduleSection";
 
+export type JwtKindProps =
+  | {
+      jwt: BackOfficeJwt;
+      kind: "backoffice";
+    }
+  | {
+      jwt: ConventionJwt;
+      kind: "convention";
+    }
+  | {
+      jwt: InclusionConnectJwt;
+      kind: "inclusionConnect";
+    };
+
 type ConventionManageActionsProps = {
-  jwt: ConventionSupportedJwt;
+  jwtParams: JwtKindProps;
   convention: ConventionReadDto;
   role: Role;
   submitFeedback: ConventionSubmitFeedback;
@@ -56,9 +74,12 @@ export const ConventionManageActions = ({
   convention,
   role,
   submitFeedback,
-  jwt,
+  jwtParams,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
+  const icUserRole = useAppSelector(
+    inclusionConnectedSelectors.userRoleForFetchedConvention,
+  );
   const feedback = useAppSelector(conventionSelectors.feedback);
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
@@ -68,7 +89,7 @@ export const ConventionManageActions = ({
     (updateStatusParams: UpdateConventionStatusRequestDto) =>
       dispatch(
         conventionSlice.actions.statusChangeRequested({
-          jwt,
+          jwt: jwtParams.jwt,
           feedbackKind,
           updateStatusParams,
         }),
@@ -76,6 +97,12 @@ export const ConventionManageActions = ({
 
   const disabled = submitFeedback.kind !== "idle";
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
+  const shouldShowSignatureAction =
+    icUserRole === "establishment-representative" &&
+    !convention.signatories.establishmentRepresentative.signedAt &&
+    jwtParams.kind !== "backoffice" &&
+    ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status);
+
   return (
     <div
       style={{
@@ -215,17 +242,20 @@ export const ConventionManageActions = ({
                 Renouveler la convention
               </Button>
             )}
+
             <Button
               iconId="fr-icon-file-pdf-line"
               className={fr.cx("fr-m-1w")}
               priority="secondary"
               onClick={() => {
-                const payload = decodeMagicLinkJwtWithoutSignatureCheck(jwt);
+                const payload = decodeMagicLinkJwtWithoutSignatureCheck(
+                  jwtParams.jwt,
+                );
                 const isConventionMagicLinkJwt =
                   "role" in payload && payload.role !== "backOffice";
                 return routes
                   .conventionDocument({
-                    jwt: isConventionMagicLinkJwt ? jwt : undefined,
+                    jwt: isConventionMagicLinkJwt ? jwtParams.jwt : undefined,
                     conventionId: convention.id,
                   })
                   .push();
@@ -235,10 +265,30 @@ export const ConventionManageActions = ({
             </Button>
           </>
         )}
+        {shouldShowSignatureAction && (
+          <Button
+            iconId="fr-icon-check-line"
+            className={fr.cx("fr-m-1w")}
+            onClick={() => {
+              dispatch(
+                conventionSlice.actions.signConventionRequested({
+                  conventionId: convention.id,
+                  jwt: jwtParams.jwt,
+                }),
+              );
+            }}
+            disabled={submitFeedback.kind === "signedSuccessfully"}
+          >
+            Signer la convention
+          </Button>
+        )}
         {feedback.kind !== "renewed" &&
           createPortal(
             <renewModal.Component title="Renouvellement de convention">
-              <RenewConventionForm convention={convention} jwt={jwt} />
+              <RenewConventionForm
+                convention={convention}
+                jwt={jwtParams.jwt}
+              />
             </renewModal.Component>,
             document.body,
           )}

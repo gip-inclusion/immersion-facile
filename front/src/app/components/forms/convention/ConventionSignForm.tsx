@@ -77,9 +77,8 @@ export const ConventionSignForm = ({
 
     dispatch(
       conventionSlice.actions.signConventionRequested({
+        conventionId: convention.id,
         jwt,
-        role: signatory.role,
-        signedAt: new Date().toISOString(),
       }),
     );
   };

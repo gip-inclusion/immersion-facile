@@ -6,6 +6,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
 import { MainWrapper } from "react-design-system";
+import { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { routes } from "src/app/routes/routes";
@@ -19,30 +20,39 @@ type ConventionManagePageProps = {
 
 export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
   const adminToken = useAdminToken();
-  const jwt = match(route)
+  const jwtParams: JwtKindProps | undefined = match(route)
     .with(
       {
         name: "manageConventionAdmin",
       },
-      () => adminToken,
+      () =>
+        (adminToken
+          ? { jwt: adminToken, kind: "backoffice" }
+          : undefined) satisfies JwtKindProps | undefined,
     )
     .with(
       {
         name: "manageConvention",
       },
-      (route) => route.params.jwt,
+      (route) =>
+        ({ jwt: route.params.jwt, kind: "convention" } satisfies JwtKindProps),
     )
     .exhaustive();
 
-  if (!jwt) return null;
+  if (!jwtParams) return null;
 
   const { applicationId: conventionId } =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+      jwtParams.jwt,
+    );
 
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
-        <ConventionManageContent jwt={jwt} conventionId={conventionId} />
+        <ConventionManageContent
+          jwtParams={jwtParams}
+          conventionId={conventionId}
+        />
       </MainWrapper>
     </HeaderFooterLayout>
   );

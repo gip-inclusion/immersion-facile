@@ -5,24 +5,25 @@ import {
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   Role,
+  WithConventionId,
 } from "shared";
 import { Loader } from "react-design-system";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
-import {
-  conventionSlice,
-  FetchConventionRequestedPayload,
-} from "src/core-logic/domain/convention/convention.slice";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { NpsSection } from "../../nps/NpsSection";
-import { ConventionManageActions } from "./ConventionManageActions";
+import {
+  ConventionManageActions,
+  JwtKindProps,
+} from "./ConventionManageActions";
 import { ConventionValidation } from "./ConventionValidation";
 
 export const ConventionManageContent = ({
   conventionId,
-  jwt,
-}: FetchConventionRequestedPayload): JSX.Element => {
+  jwtParams,
+}: WithConventionId & { jwtParams: JwtKindProps }): JSX.Element => {
   const route = useRoute();
   const inclusionConnectedRole = useAppSelector(
     inclusionConnectedSelectors.userRoleForFetchedConvention,
@@ -35,7 +36,9 @@ export const ConventionManageContent = ({
     .with(
       { name: "manageConvention" },
       () =>
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt).role,
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+          jwtParams.jwt,
+        ).role,
     )
     .with({ name: "manageConventionAdmin" }, (): Role => "backOffice")
     .with(
@@ -51,7 +54,7 @@ export const ConventionManageContent = ({
     .otherwise(() => undefined);
 
   const { convention, fetchConventionError, submitFeedback, isLoading } =
-    useConvention({ jwt, conventionId });
+    useConvention({ jwt: jwtParams.jwt, conventionId });
 
   const dispatch = useDispatch();
 
@@ -66,7 +69,7 @@ export const ConventionManageContent = ({
     fetchConventionError.includes("Le lien magique est périmé")
       ? routes
           .renewConventionMagicLink({
-            expiredJwt: jwt,
+            expiredJwt: jwtParams.jwt,
             originalURL: window.location.href,
           })
           .replace()
@@ -86,7 +89,7 @@ export const ConventionManageContent = ({
     <>
       <ConventionValidation convention={convention} />
       <ConventionManageActions
-        jwt={jwt}
+        jwtParams={jwtParams}
         convention={convention}
         role={role}
         submitFeedback={submitFeedback}

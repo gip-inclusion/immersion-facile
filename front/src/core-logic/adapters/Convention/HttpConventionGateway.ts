@@ -4,10 +4,12 @@ import {
   AbsoluteUrl,
   ConventionDto,
   ConventionId,
+  ConventionJwt,
   ConventionMagicLinkRoutes,
   ConventionReadDto,
   ConventionSupportedJwt,
   FindSimilarConventionsParams,
+  InclusionConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
@@ -88,8 +90,13 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ status }) => status === 200);
   }
 
-  public signConvention$(jwt: string): Observable<void> {
-    return fromPromise(this.#signConvention(jwt).then(() => undefined));
+  public signConvention$(
+    conventionId: ConventionId,
+    jwt: ConventionJwt | InclusionConnectJwt,
+  ): Observable<void> {
+    return fromPromise(
+      this.#signConvention(conventionId, jwt).then(() => undefined),
+    );
   }
 
   public updateConvention$(
@@ -139,11 +146,14 @@ export class HttpConventionGateway implements ConventionGateway {
       .then(({ body }) => body);
   }
 
-  #signConvention(jwt: string): Promise<WithConventionIdLegacy> {
+  #signConvention(
+    conventionId: ConventionId,
+    jwt: ConventionJwt | InclusionConnectJwt,
+  ): Promise<WithConventionIdLegacy> {
     return this.magicLinkHttpClient
       .signConvention({
         headers: { authorization: jwt },
-        urlParams: { conventionId: jwt }, // todo change this to conventionId,
+        urlParams: { conventionId },
       })
       .then(({ body }) => body);
   }

@@ -90,14 +90,10 @@ const signConventionEpic: ConventionEpic = (
 ) =>
   action$.pipe(
     filter(conventionSlice.actions.signConventionRequested.match),
-    switchMap(({ payload: { jwt, role, signedAt } }) =>
+    switchMap(({ payload: { jwt, conventionId } }) =>
       conventionGateway
-        .signConvention$(jwt)
-        .pipe(
-          map(() =>
-            conventionSlice.actions.signConventionSucceeded({ role, signedAt }),
-          ),
-        ),
+        .signConvention$(conventionId, jwt)
+        .pipe(map(() => conventionSlice.actions.signConventionSucceeded())),
     ),
     catchEpicError((error: Error) =>
       conventionSlice.actions.signConventionFailed(error.message),
