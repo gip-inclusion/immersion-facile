@@ -1,12 +1,15 @@
-import { z } from "zod";
 import {
   allSignatoryRoles,
-  ConventionJwtPayload,
+  ConventionDomainPayload,
+  ConventionDto,
   ConventionStatus,
+  InclusionConnectDomainJwtPayload,
   Role,
   SignatoryRole,
   signConventionDtoWithRole,
+  WithConventionId,
   WithConventionIdLegacy,
+  withConventionIdSchema,
 } from "shared";
 import {
   ForbiddenError,
@@ -33,10 +36,11 @@ const isAllowedToSign = (role: Role): role is SignatoryRole =>
   allSignatoryRoles.includes(role as SignatoryRole);
 
 export class SignConvention extends TransactionalUseCase<
-  void,
-  WithConventionIdLegacy
+  WithConventionId,
+  WithConventionIdLegacy,
+  ConventionDomainPayload | InclusionConnectDomainJwtPayload
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = withConventionIdSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -53,21 +57,24 @@ export class SignConvention extends TransactionalUseCase<
   }
 
   public async _execute(
-    _: void,
+    { conventionId }: WithConventionId,
     uow: UnitOfWork,
-    { applicationId, role }: ConventionJwtPayload,
+    params: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    logger.debug({ conventionId: applicationId, role });
+    const initialConvention = await uow.conventionRepository.getById(
+      conventionId,
+    );
+    if (!initialConvention) throw new NotFoundError(conventionId);
 
-    if (!isAllowedToSign(role))
+    const role = await this.#getRole(params, uow, initialConvention);
+
+    logger.debug({ conventionId, role });
+
+    if (!role || !isAllowedToSign(role))
       throw new ForbiddenError(
         "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
       );
 
-    const initialConvention = await uow.conventionRepository.getById(
-      applicationId,
-    );
-    if (!initialConvention) throw new NotFoundError(applicationId);
     const signedConvention = signConventionDtoWithRole(
       initialConvention,
       role,
@@ -77,6 +84,7 @@ export class SignConvention extends TransactionalUseCase<
       role,
       targetStatus: signedConvention.status,
       initialStatus: initialConvention.status,
+      conventionId: initialConvention.id,
     });
 
     const signedId = await uow.conventionRepository.update(signedConvention);
@@ -92,5 +100,20 @@ export class SignConvention extends TransactionalUseCase<
     }
 
     return { id: signedId };
+  }
+
+  async #getRole(
+    params: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+    uow: UnitOfWork,
+    initialConvention: ConventionDto,
+  ): Promise<Role | undefined> {
+    if ("role" in params) return params.role;
+    const icUser = await uow.inclusionConnectedUserRepository.getById(
+      params.userId,
+    );
+    return icUser?.email ===
+      initialConvention.signatories.establishmentRepresentative.email
+      ? initialConvention.signatories.establishmentRepresentative.role
+      : undefined;
   }
 }

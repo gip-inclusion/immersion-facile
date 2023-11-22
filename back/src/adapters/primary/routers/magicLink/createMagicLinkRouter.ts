@@ -74,7 +74,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () => {
         if (!req?.payloads?.convention) throw new UnauthorizedError();
         return deps.useCases.signConvention.execute(
-          undefined,
+          req.params,
           req.payloads.convention,
         );
       }),

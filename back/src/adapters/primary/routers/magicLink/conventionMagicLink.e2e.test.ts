@@ -408,4 +408,78 @@ describe("Magic link router", () => {
       expectToEqual(response.status, 403);
     });
   });
+
+  describe("POST /auth/sign-application/:conventionId", () => {
+    it("200 - can sign with inclusion connected user (same email as establishement representative in convention)", async () => {
+      const convention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .notSigned()
+        .build();
+      const icUser: InclusionConnectedUser = {
+        agencyRights: [],
+        email: convention.signatories.establishmentRepresentative.email,
+        firstName: "",
+        lastName: "",
+        id: "1",
+      };
+
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        icUser,
+      ]);
+      inMemoryUow.conventionRepository.setConventions({
+        [convention.id]: convention,
+      });
+
+      const response = await request
+        .post(`/auth/sign-application/${convention.id}`)
+        .send()
+        .set({
+          authorization: generateInclusionConnectJwt({
+            userId: icUser.id,
+            version: 1,
+          }),
+        });
+      expectToEqual(response.status, 200);
+      expectToEqual(response.body, {
+        id: "a99eaca1-ee70-4c90-b3f4-668d492f7392",
+      });
+    });
+
+    it("403 - cannot sign with inclusion connected user (icUser email != convention establishment representative email)", async () => {
+      const convention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .notSigned()
+        .build();
+      const icUser: InclusionConnectedUser = {
+        agencyRights: [],
+        email: "email@mail.com",
+        firstName: "",
+        lastName: "",
+        id: "1",
+      };
+
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        icUser,
+      ]);
+      inMemoryUow.conventionRepository.setConventions({
+        [convention.id]: convention,
+      });
+
+      const response = await request
+        .post(`/auth/sign-application/${convention.id}`)
+        .send()
+        .set({
+          authorization: generateInclusionConnectJwt({
+            userId: icUser.id,
+            version: 1,
+          }),
+        });
+
+      expectToEqual(response.status, 403);
+      expectToEqual(response.body, {
+        errors:
+          "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
+      });
+    });
+  });
 });
