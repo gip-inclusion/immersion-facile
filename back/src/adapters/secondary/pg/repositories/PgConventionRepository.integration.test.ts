@@ -378,6 +378,21 @@ describe("PgConventionRepository", () => {
       updatedConvention.signatories.establishmentRepresentative,
     );
     await expectTutorAndRepToHaveSameId(updatedConvention.id);
+
+    const toDraftConvention: ConventionDto = new ConventionDtoBuilder(
+      convention,
+    )
+      .withEstablishmentRepresentative(establishmentRepresentative)
+      .build();
+
+    await conventionRepository.update(toDraftConvention);
+    const toDraftConventionStored = await conventionRepository.getById(
+      toDraftConvention.id,
+    );
+    expectToEqual(
+      toDraftConventionStored!.signatories.establishmentRepresentative,
+      toDraftConvention.signatories.establishmentRepresentative,
+    );
   });
 
   it("Update convention with different tutor and establishment rep", async () => {

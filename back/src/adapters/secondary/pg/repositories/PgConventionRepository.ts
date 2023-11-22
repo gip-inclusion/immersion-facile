@@ -14,7 +14,7 @@ import {
 } from "shared";
 import { ConventionRepository } from "../../../../domain/convention/ports/ConventionRepository";
 import { ConflictError } from "../../../primary/helpers/httpErrors";
-import { KyselyDb } from "../kysely/kyselyUtils";
+import { falsyToNull, KyselyDb } from "../kysely/kyselyUtils";
 import { getReadConventionById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
@@ -263,7 +263,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: beneficiary.lastName,
         email: beneficiary.email,
         phone: beneficiary.phone,
-        signed_at: beneficiary.signedAt,
+        signed_at: falsyToNull(beneficiary.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'birthdate', ${beneficiary.birthdate}::text,
           'emergencyContact', ${beneficiary.emergencyContact}::text,
@@ -293,7 +293,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: beneficiaryCurrentEmployer.lastName,
         email: beneficiaryCurrentEmployer.email,
         phone: beneficiaryCurrentEmployer.phone,
-        signed_at: beneficiaryCurrentEmployer.signedAt,
+        signed_at: falsyToNull(beneficiaryCurrentEmployer.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'businessName', ${beneficiaryCurrentEmployer.businessName}::text,
           'businessSiret', ${beneficiaryCurrentEmployer.businessSiret}::text,
@@ -318,7 +318,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: actor.lastName,
         email: actor.email,
         phone: actor.phone,
-        signed_at: actor.signedAt,
+        signed_at: falsyToNull(actor.signedAt),
       })
       .returning("id")
       .executeTakeFirst();
@@ -393,7 +393,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: beneficiary.lastName,
         email: beneficiary.email,
         phone: beneficiary.phone,
-        signed_at: beneficiary.signedAt,
+        signed_at: falsyToNull(beneficiary.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'emergencyContact', ${beneficiary.emergencyContact}::text,
           'emergencyContactPhone',  ${beneficiary.emergencyContactPhone}::text,
@@ -423,7 +423,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: beneficiaryCurrentEmployer.lastName,
         email: beneficiaryCurrentEmployer.email,
         phone: beneficiaryCurrentEmployer.phone,
-        signed_at: beneficiaryCurrentEmployer.signedAt,
+        signed_at: falsyToNull(beneficiaryCurrentEmployer.signedAt),
         extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
         'businessName', ${beneficiaryCurrentEmployer.businessName}::text,
         'businessSiret', ${beneficiaryCurrentEmployer.businessSiret}::text,
@@ -454,7 +454,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: beneficiaryRepresentative.lastName,
         email: beneficiaryRepresentative.email,
         phone: beneficiaryRepresentative.phone,
-        signed_at: beneficiaryRepresentative.signedAt,
+        signed_at: falsyToNull(beneficiaryRepresentative.signedAt),
       })
       .from("conventions")
       .where("conventions.id", "=", id)
@@ -527,7 +527,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: establishmentRepresentative.lastName,
         email: establishmentRepresentative.email,
         phone: establishmentRepresentative.phone,
-        signed_at: establishmentRepresentative.signedAt,
+        signed_at: falsyToNull(establishmentRepresentative.signedAt),
       })
       .from("conventions")
       .where("conventions.id", "=", conventionId)
@@ -553,7 +553,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: establishmentTutor.lastName,
         email: establishmentTutor.email,
         phone: establishmentTutor.phone,
-        signed_at: signedAt,
+        signed_at: falsyToNull(signedAt),
       })
       .from("conventions")
       .where("conventions.id", "=", conventionId)

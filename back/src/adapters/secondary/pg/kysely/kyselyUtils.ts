@@ -9,6 +9,7 @@ import {
   sql,
 } from "kysely";
 import { Pool, QueryResultRow } from "pg";
+import { Falsy } from "ramda";
 import { Database } from "./model/database";
 
 export const jsonBuildObject = <O extends Record<string, Expression<unknown>>>(
@@ -48,3 +49,6 @@ export const cast = <Cast>(query: ExpressionWrapper<any, any, any>) =>
   sql<Cast>`${query}`;
 
 export type KyselyDb = Kysely<Database>;
+
+export const falsyToNull = <T>(value: T | Falsy): T | null =>
+  value ? value : null;
