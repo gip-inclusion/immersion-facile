@@ -80,7 +80,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          kind: "CREATE_ASSESSMENT",
+          kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
           params: {
             agencyAssessmentDocumentLink: undefined,
             agencyLogoUrl: "http://LOGO AGENCY IF URL",

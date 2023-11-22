@@ -109,7 +109,7 @@ export type EmailParamsByEmailType = {
     signature: string;
     requesterName: string;
   };
-  CREATE_ASSESSMENT: {
+  ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
     agencyAssessmentDocumentLink: string | undefined;
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyValidatorEmail: string;

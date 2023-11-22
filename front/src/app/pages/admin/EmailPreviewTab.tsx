@@ -475,7 +475,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     businessAddress: "BUSINESS_ADDRESS",
   },
-  CREATE_ASSESSMENT: {
+  ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
     agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
     agencyValidatorEmail: "VALIDATOR_EMAIL",
