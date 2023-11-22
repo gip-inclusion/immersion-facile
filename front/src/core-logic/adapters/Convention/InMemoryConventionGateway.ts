@@ -5,9 +5,11 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
+  ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
   FindSimilarConventionsParams,
+  InclusionConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
   sleep,
@@ -106,7 +108,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return true;
   }
 
-  public signConvention$(_jwt: string): Observable<void> {
+  public signConvention$(
+    _conventionId: ConventionId,
+    _jwt: ConventionJwt | InclusionConnectJwt,
+  ): Observable<void> {
     return this.conventionSignedResult$;
   }
 

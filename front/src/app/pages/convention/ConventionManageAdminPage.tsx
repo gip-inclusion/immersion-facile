@@ -24,7 +24,7 @@ export const ConventionManageAdminPage = ({
       <MainWrapper layout="default" vSpacing={8}>
         {backOfficeJwt ? (
           <ConventionManageContent
-            jwt={backOfficeJwt}
+            jwtParams={{ jwt: backOfficeJwt, kind: "backoffice" }}
             conventionId={conventionId}
           />
         ) : (

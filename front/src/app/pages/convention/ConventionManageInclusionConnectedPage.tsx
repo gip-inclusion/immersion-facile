@@ -25,7 +25,7 @@ export const ConventionManageInclusionConnectedPage = ({
       <MainWrapper layout="default" vSpacing={8}>
         {inclusionConnectedJwt ? (
           <ConventionManageContent
-            jwt={inclusionConnectedJwt}
+            jwtParams={{ jwt: inclusionConnectedJwt, kind: "inclusionConnect" }}
             conventionId={conventionId}
           />
         ) : (

@@ -88,24 +88,29 @@ export const JustificationModalContent = ({
 
   if (areSignaturesMissing === null) {
     return (
-      <div>
+      <>
+        <p>
+          Vous avez constaté un problème dans les informations renseignées sur
+          la convention ?
+        </p>
         <ButtonsGroup
           buttons={[
             {
               type: "button",
               priority: "secondary",
-              onClick: () => setAreSignaturesMissing(true),
-              children: "Je veux relancer des signataires manquants",
+              onClick: () => setAreSignaturesMissing(false),
+              children:
+                "Oui, il y a bien un problème sur le contenu de la convention",
             },
             {
               type: "button",
               priority: "secondary",
-              onClick: () => setAreSignaturesMissing(false),
-              children: "Il y a un problème sur le contenu de la convention",
+              onClick: () => setAreSignaturesMissing(true),
+              children: "Non, je veux juste relancer des signataires manquants",
             },
           ]}
         />
-      </div>
+      </>
     );
   }
 

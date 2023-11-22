@@ -7,6 +7,7 @@ import {
   ConventionReadDto,
   ConventionSupportedJwt,
   FindSimilarConventionsParams,
+  InclusionConnectJwt,
   RenewConventionParams,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
@@ -91,8 +92,6 @@ type StatusChangePayload = {
   updateStatusParams: UpdateConventionStatusRequestDto;
 };
 
-type DateIsoStr = string;
-
 const setFeedbackAsErrored = (
   state: ConventionState,
   action: PayloadAction<string>,
@@ -161,17 +160,13 @@ export const conventionSlice = createSlice({
     signConventionRequested: (
       state,
       _action: PayloadAction<{
-        jwt: ConventionJwt;
-        role: SignatoryRole;
-        signedAt: DateIsoStr;
+        conventionId: ConventionId;
+        jwt: ConventionJwt | InclusionConnectJwt;
       }>,
     ) => {
       state.isLoading = true;
     },
-    signConventionSucceeded: (
-      state,
-      _action: PayloadAction<{ role: SignatoryRole; signedAt: DateIsoStr }>,
-    ) => {
+    signConventionSucceeded: (state) => {
       state.isLoading = false;
       state.feedback = { kind: "signedSuccessfully" };
     },
