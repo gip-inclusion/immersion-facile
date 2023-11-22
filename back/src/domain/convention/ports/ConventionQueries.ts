@@ -6,6 +6,7 @@ import {
   FindSimilarConventionsParams,
   ListConventionsRequestDto,
 } from "shared";
+import { AssessmentEmailDomainTopic } from "../../core/eventBus/events";
 
 export type GetConventionsByFiltersQueries = {
   startDateGreater?: Date;
@@ -20,8 +21,9 @@ export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
-  getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink: (
+  getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic: (
     dateEnd: Date,
+    sendingTopic: AssessmentEmailDomainTopic,
   ) => Promise<ConventionReadDto[]>;
 
   getConventionsByFilters(

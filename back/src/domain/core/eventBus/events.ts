@@ -8,6 +8,7 @@ import {
   ConventionId,
   DateString,
   EstablishmentJwtPayload,
+  ExtractFromExisting,
   Flavor,
   FormEstablishmentDto,
   IcUserRoleForAgencyParams,
@@ -93,6 +94,7 @@ export type DomainEvent =
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", AssessmentDto>
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
+  | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
   // PECONNECT related
   | GenericEvent<"FederatedIdentityBoundToConvention", ConventionDto>
@@ -109,6 +111,11 @@ export type DomainEvent =
   | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId, userId: AuthenticatedUserId }>;
 
 export type DomainTopic = DomainEvent["topic"];
+
+export type AssessmentEmailDomainTopic = ExtractFromExisting<
+  DomainTopic,
+  "EmailWithLinkToCreateAssessmentSent" | "BeneficiaryAssessmentEmailSent"
+>;
 
 const eventToDebugInfo = (event: DomainEvent) => {
   const publishCount = event.publications.length;

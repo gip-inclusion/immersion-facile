@@ -486,6 +486,15 @@ export const defaultEmailValueByEmailKind: {
     assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
     internshipKind: "immersion",
   },
+  BENEFICIARY_ASSESSMENT_NOTIFICATION: {
+    conventionId: "CONVENTION_ID",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    agencyValidatorEmail: "VALIDATOR_EMAIL",
+    internshipKind: "immersion",
+    agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
+  },
   NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
     agencyValidatorEmail: "VALIDATOR_EMAIL",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
