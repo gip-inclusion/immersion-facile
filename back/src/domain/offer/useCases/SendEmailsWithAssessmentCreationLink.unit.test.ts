@@ -17,7 +17,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications
 import { SendEmailsWithAssessmentCreationLink } from "./SendEmailsWithAssessmentCreationLink";
 
 describe("SendEmailWithAssessmentCreationLink", () => {
-  const id: ConventionId = "immersion-ending-tomorrow-id";
+  const id: ConventionId = "immersion-ending-yesterday-id";
 
   let uow: InMemoryUnitOfWork;
   let sendEmailWithAssessmentCreationLink: SendEmailsWithAssessmentCreationLink;
@@ -50,21 +50,21 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       );
   });
 
-  it("Sends an email to immersions ending tomorrow", async () => {
+  it("Sends an email to immersions that end yesterday", async () => {
     // Arrange
     const expectedAgency = uow.agencyRepository.agencies[0];
-    const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
+    const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
       .withAgencyId(expectedAgency.id)
       .withDateStart("2021-05-13T10:00:00.000Z")
-      .withDateEnd("2021-05-16T10:00:00.000Z")
+      .withDateEnd("2021-05-14T10:00:00.000Z")
       .withId(id)
       .withEstablishmentTutorFirstName("Tom")
       .withEstablishmentTutorLastName("Cruise")
       .validated()
       .build();
-    const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
+    const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
       .withAgencyId(expectedAgency.id)
-      .withDateEnd("2021-05-14T10:00:00.000Z")
+      .withDateEnd("2021-05-16T10:00:00.000Z")
       .validated()
       .build();
 
@@ -87,10 +87,10 @@ describe("SendEmailWithAssessmentCreationLink", () => {
             agencyValidatorEmail: "validator123@mail.com",
             beneficiaryFirstName: "Esteban",
             beneficiaryLastName: "Ocon",
-            conventionId: "immersion-ending-tomorrow-id",
+            conventionId: "immersion-ending-yesterday-id",
             establishmentTutorName: "Tom Cruise",
             assessmentCreationLink:
-              "http://fake-magic-link/bilan-immersion/immersion-ending-tomorrow-id/establishment-tutor/2021-05-15T08:00:00.000Z/establishment@example.com",
+              "http://fake-magic-link/bilan-immersion/immersion-ending-yesterday-id/establishment-tutor/2021-05-15T08:00:00.000Z/establishment@example.com",
             internshipKind: "immersion",
           },
           recipients: ["establishment@example.com"],
@@ -115,15 +115,15 @@ describe("SendEmailWithAssessmentCreationLink", () => {
 
   it("Does not send an email to immersions having already received one", async () => {
     // Arrange
-    const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
-      .withDateEnd("2021-05-16T10:00:00.000Z")
+    const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
+      .withDateEnd("2021-05-14T10:00:00.000Z")
       .validated()
       .withId(id)
       .build();
-    await uow.conventionRepository.save(immersionApplicationEndingTomorrow);
+    await uow.conventionRepository.save(immersionApplicationEndingYesterday);
     await uow.outboxRepository.save({
       topic: "EmailWithLinkToCreateAssessmentSent",
-      payload: { id: immersionApplicationEndingTomorrow.id },
+      payload: { id: immersionApplicationEndingYesterday.id },
     } as DomainEvent);
 
     timeGateway.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
