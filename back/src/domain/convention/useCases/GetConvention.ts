@@ -2,7 +2,7 @@ import {
   ConventionId,
   ConventionReadDto,
   ConventionRelatedJwtPayload,
-  getUserRoleForAccessingConvention,
+  getIcUserRoleForAccessingConvention,
   InclusionConnectJwtPayload,
   WithConventionId,
   withConventionIdSchema,
@@ -50,7 +50,7 @@ export class GetConvention extends TransactionalUseCase<
           `No user found with id '${authPayload.userId}'`,
         );
 
-      const role = getUserRoleForAccessingConvention(convention, user);
+      const role = getIcUserRoleForAccessingConvention(convention, user);
 
       if (!role)
         throw new ForbiddenError(

@@ -117,30 +117,60 @@ describe("Get Convention", () => {
       uow.conventionRepository.setConventions({ [convention.id]: convention });
     });
 
-    it("Inclusion connected user", async () => {
-      const user: InclusionConnectedUser = {
-        id: "my-user-id",
-        email: "my-user@email.com",
-        firstName: "John",
-        lastName: "Doe",
-        agencyRights: [{ role: "validator", agency }],
-      };
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
-      const jwtPayload: InclusionConnectDomainJwtPayload = {
-        userId: "my-user-id",
-      };
+    describe("Inclusion connected user", () => {
+      it("that have agency rights", async () => {
+        const user: InclusionConnectedUser = {
+          id: "my-user-id",
+          email: "my-user@email.com",
+          firstName: "John",
+          lastName: "Doe",
+          agencyRights: [{ role: "validator", agency }],
+        };
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+        const jwtPayload: InclusionConnectDomainJwtPayload = {
+          userId: "my-user-id",
+        };
 
-      const fetchedConvention = await getConvention.execute(
-        { conventionId: convention.id },
-        jwtPayload,
-      );
+        const fetchedConvention = await getConvention.execute(
+          { conventionId: convention.id },
+          jwtPayload,
+        );
 
-      expectToEqual(fetchedConvention, {
-        ...convention,
-        agencyName: agency.name,
-        agencyDepartment: agency.address.departmentCode,
-        agencyKind: agency.kind,
-        agencySiret: agency.agencySiret,
+        expectToEqual(fetchedConvention, {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+        });
+      });
+
+      it("that establishment rep is also the inclusion connected user", async () => {
+        const user: InclusionConnectedUser = {
+          id: "my-user-id",
+          email: convention.signatories.establishmentRepresentative.email,
+          firstName: "John",
+          lastName: "Doe",
+          agencyRights: [],
+        };
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+
+        const jwtPayload: InclusionConnectDomainJwtPayload = {
+          userId: user.id,
+        };
+
+        const fetchedConvention = await getConvention.execute(
+          { conventionId: convention.id },
+          jwtPayload,
+        );
+
+        expectToEqual(fetchedConvention, {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+        });
       });
     });
 

@@ -10,9 +10,15 @@ import { InclusionConnectedUser } from "shared";
 import { Loader } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+
+type EstablishmentDashboardTab = {
+  label: string;
+  content: JSX.Element;
+};
 
 export const EstablishmentDashboardPage = ({
   route,
@@ -23,11 +29,6 @@ export const EstablishmentDashboardPage = ({
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
   const dispatch = useDispatch();
 
-  type EstablishmentDashboardTab = {
-    label: string;
-    content: JSX.Element;
-  };
-
   const establishmentDashboardTabs = (
     currentUser: InclusionConnectedUser,
   ): EstablishmentDashboardTab[] => [
@@ -35,6 +36,9 @@ export const EstablishmentDashboardPage = ({
       label: "Conventions en cours",
       content: (
         <>
+          <ManageConventionFormSection
+            routeNameToRedirectTo={"manageConventionInclusionConnected"}
+          />
           {currentUser.establishmentRepresentativeDashboardUrl ? (
             <MetabaseView
               title={`Tableau des conventions en cours

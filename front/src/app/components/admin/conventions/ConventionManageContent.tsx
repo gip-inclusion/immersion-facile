@@ -25,7 +25,7 @@ export const ConventionManageContent = ({
 }: FetchConventionRequestedPayload): JSX.Element => {
   const route = useRoute();
   const inclusionConnectedRole = useAppSelector(
-    inclusionConnectedSelectors.agencyRoleForFetchedConvention,
+    inclusionConnectedSelectors.userRoleForFetchedConvention,
   );
 
   const role: Role | undefined = match({
