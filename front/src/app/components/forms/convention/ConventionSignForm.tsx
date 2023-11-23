@@ -43,7 +43,7 @@ export const ConventionSignForm = ({
   );
   const alreadySigned = !!currentSignatory?.signedAt;
 
-  const [isModalClosedWithoutSignature, SetIsModalClosedWithoutSignature] =
+  const [isModalClosedWithoutSignature, setIsModalClosedWithoutSignature] =
     useState<boolean>(false);
 
   const methods = useForm<ConventionReadDto>({
@@ -147,7 +147,7 @@ export const ConventionSignForm = ({
               "modificationsAskedFromSignatory",
             )}
             currentSignatoryRole={currentSignatory.role}
-            onCloseSignModalWithoutSignature={SetIsModalClosedWithoutSignature}
+            onCloseSignModalWithoutSignature={setIsModalClosedWithoutSignature}
           />
         )}
       </form>

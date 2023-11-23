@@ -7,6 +7,7 @@ import {
   ConventionStatus,
   ConventionValidatorInputName,
   Signatories,
+  Signatory,
 } from "./convention.dto";
 
 export const concatValidatorNames = (
@@ -90,8 +91,7 @@ export const isSignatory = (role: Role): role is SignatoryRole =>
 
 export type ConventionField = DotNestedKeys<ConventionDto>;
 
-export const getConventionFieldName = (name: DotNestedKeys<ConventionDto>) =>
-  name;
+export const getConventionFieldName = (name: ConventionField) => name;
 
 type SignatoryField = ExtractFromExisting<keyof ConventionDto, "signatories">;
 
@@ -149,3 +149,45 @@ export const isConventionRenewed = (
   const renewedKey: keyof ConventionDto = "renewed";
   return renewedKey in convention;
 };
+
+const processedDataBySignatoryRole: Record<
+  SignatoryRole,
+  {
+    fieldName: ConventionField;
+    signatoryFunction: string;
+  }
+> = {
+  beneficiary: {
+    fieldName: getConventionFieldName("signatories.beneficiary.signedAt"),
+    signatoryFunction: "bénéficiaire",
+  },
+  "beneficiary-current-employer": {
+    fieldName: getConventionFieldName(
+      "signatories.beneficiaryCurrentEmployer.signedAt",
+    ),
+    signatoryFunction: "employeur actuel du bénéficiaire",
+  },
+  "establishment-representative": {
+    fieldName: getConventionFieldName(
+      "signatories.establishmentRepresentative.signedAt",
+    ),
+    signatoryFunction: "représentant de la structure d'accueil",
+  },
+  "beneficiary-representative": {
+    fieldName: getConventionFieldName(
+      "signatories.beneficiaryRepresentative.signedAt",
+    ),
+    signatoryFunction: "représentant légal du bénéficiaire",
+  },
+};
+
+export const getSignatoryProcessedData = (
+  signatory: Signatory,
+): {
+  fieldName: ConventionField;
+  signatoryFullName: string;
+  signatoryFunction: string;
+} => ({
+  ...processedDataBySignatoryRole[signatory.role],
+  signatoryFullName: `${signatory.firstName} ${signatory.lastName}`,
+});
