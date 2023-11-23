@@ -1,5 +1,6 @@
 import {
   AppellationAndRomeDto,
+  expectToEqual,
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
   NafDto,
@@ -284,6 +285,6 @@ describe("Insert Establishment aggregate from form data", () => {
       establishmentAggregateRepo.establishmentAggregates[0];
     expect(establishmentAggregate).toBeDefined();
     expect(outboxRepo.events).toHaveLength(1);
-    expect(outboxRepo.events[0].payload).toEqual(establishmentAggregate);
+    expectToEqual(outboxRepo.events[0].payload, { establishmentAggregate });
   });
 });

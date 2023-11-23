@@ -39,3 +39,7 @@ export type EstablishmentAggregate = {
   offers: OfferEntity[];
   contact?: ContactEntity;
 };
+
+export type WithEstablishmentAggregate = {
+  establishmentAggregate: EstablishmentAggregate;
+};

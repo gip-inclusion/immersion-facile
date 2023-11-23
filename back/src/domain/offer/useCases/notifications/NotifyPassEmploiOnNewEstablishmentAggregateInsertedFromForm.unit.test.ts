@@ -44,7 +44,7 @@ describe("Notify pass-emploi", () => {
       ])
       .build();
 
-    await useCase.execute(newAggregate);
+    await useCase.execute({ establishmentAggregate: newAggregate });
 
     // Assert
     const expectedNotifications: PassEmploiNotificationParams[] = [

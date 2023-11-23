@@ -1,24 +1,25 @@
 import { z } from "zod";
 import { UseCase } from "../../../core/UseCase";
-import { EstablishmentAggregate } from "../../entities/EstablishmentEntity";
+import { WithEstablishmentAggregate } from "../../entities/EstablishmentEntity";
 import {
   PassEmploiGateway,
   PassEmploiNotificationParams,
 } from "../../ports/PassEmploiGateway";
 
-export class NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm extends UseCase<
-  EstablishmentAggregate,
-  void
-> {
-  protected inputSchema = z.any(); // No need of a validation schema here since this use-case is only called from the our domain
+// No need of a validation schema here since this use-case is only called from the our domain
+const establishmentAggregateSchema: z.Schema<WithEstablishmentAggregate> =
+  z.any();
+
+export class NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm extends UseCase<WithEstablishmentAggregate> {
+  protected inputSchema = establishmentAggregateSchema;
 
   constructor(private passEmploiGateway: PassEmploiGateway) {
     super();
   }
 
-  public async _execute(
-    establishmentAggregate: EstablishmentAggregate,
-  ): Promise<void> {
+  public async _execute({
+    establishmentAggregate,
+  }: WithEstablishmentAggregate): Promise<void> {
     const notificationParams: PassEmploiNotificationParams = {
       immersions: establishmentAggregate.offers.map(({ romeCode }) => ({
         rome: romeCode,
