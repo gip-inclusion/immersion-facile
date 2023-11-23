@@ -1,7 +1,6 @@
 import Bottleneck from "bottleneck";
 import {
   emailTemplatesByName,
-  immersionFacileContactEmail,
   smsTemplatesByName,
   type TemplatedEmail,
   type TemplatedSms,
@@ -103,9 +102,6 @@ export class BrevoNotificationGateway implements NotificationGateway {
       ...(email.attachments ? { attachment: email.attachments } : {}),
       ...configureGenerateHtmlFromTemplate(
         emailTemplatesByName,
-        {
-          contactEmail: immersionFacileContactEmail,
-        },
         "internshipKind" in email.params &&
           email.params.internshipKind === "mini-stage-cci"
           ? {

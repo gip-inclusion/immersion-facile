@@ -29,10 +29,9 @@ const renderHTMLRow = (html: string | undefined) =>
 export const configureGenerateHtmlFromTemplate =
   <TemplateByName extends Record<string, HtmlTemplateEmailData<any>>>(
     templateByName: TemplateByName,
-    config: { contactEmail: string },
     customParts: {
       header: ((agencyLogoUrl?: string) => string) | undefined;
-      footer: ((contactEmail: string) => string) | undefined;
+      footer: (() => string) | undefined;
     },
   ) =>
   <N extends keyof TemplateByName>(
@@ -88,7 +87,7 @@ export const configureGenerateHtmlFromTemplate =
                 renderHighlight(highlight),
                 renderContent(subContent),
                 renderLegals(legals),
-                renderFooter(config.contactEmail, customParts.footer),
+                renderFooter(customParts.footer),
               ]
                 .map(renderHTMLRow)
                 .join("")}       
