@@ -17,7 +17,7 @@ type SendBeneficiaryAssessmentEmailsOutput = {
   numberOfImmersionEndingTomorrow: number;
 };
 
-export class SendBeneficiariesAssessmentsEmails extends TransactionalUseCase<
+export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
   void,
   SendBeneficiaryAssessmentEmailsOutput
 > {

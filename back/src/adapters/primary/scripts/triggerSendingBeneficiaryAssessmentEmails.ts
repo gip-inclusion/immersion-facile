@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import { keys } from "ramda";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
-import { SendBeneficiariesAssessmentsEmails } from "../../../domain/offer/useCases/SendBeneficiariesAssesmentsEmails";
+import { SendBeneficiariesPdfAssessmentsEmails } from "../../../domain/offer/useCases/SendBeneficiariesPdfAssessmentsEmails";
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
@@ -32,7 +32,7 @@ const sendBeneficiaryAssessmentEmailsScript = async () => {
   );
 
   const sendBeneficiariesAssesmentsEmails =
-    new SendBeneficiariesAssessmentsEmails(
+    new SendBeneficiariesPdfAssessmentsEmails(
       uowPerformer,
       saveNotificationAndRelatedEvent,
       timeGateway,

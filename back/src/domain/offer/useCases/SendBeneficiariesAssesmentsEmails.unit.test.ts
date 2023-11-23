@@ -13,13 +13,13 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
-import { SendBeneficiariesAssessmentsEmails } from "./SendBeneficiariesAssesmentsEmails";
+import { SendBeneficiariesPdfAssessmentsEmails } from "./SendBeneficiariesPdfAssessmentsEmails";
 
-describe("SendBeneficiariesAssessmentsEmails", () => {
+describe("SendBeneficiariesPdfAssessmentsEmails", () => {
   const id: ConventionId = "immersion-ending-tomorrow-id";
 
   let uow: InMemoryUnitOfWork;
-  let sendBeneficiaryAssesmentEmail: SendBeneficiariesAssessmentsEmails;
+  let sendBeneficiaryAssesmentEmail: SendBeneficiariesPdfAssessmentsEmails;
   let timeGateway: CustomTimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
@@ -36,7 +36,7 @@ describe("SendBeneficiariesAssessmentsEmails", () => {
       timeGateway,
     );
 
-    sendBeneficiaryAssesmentEmail = new SendBeneficiariesAssessmentsEmails(
+    sendBeneficiaryAssesmentEmail = new SendBeneficiariesPdfAssessmentsEmails(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
       timeGateway,
