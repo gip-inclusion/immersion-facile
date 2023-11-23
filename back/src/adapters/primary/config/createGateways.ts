@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
-import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
+import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
@@ -197,10 +197,7 @@ export const createGateways = async (
           brevoNotificationGatewayRoutes,
         ),
         blackListedEmailDomains: config.emailDomainBlackList,
-        defaultSender: {
-          name: "Immersion Facilitée",
-          email: immersionFacileContactEmail,
-        },
+        defaultSender: immersionFacileNoReplyEmailSender,
         emailAllowListPredicate: makeEmailAllowListPredicate({
           skipEmailAllowList: config.skipEmailAllowlist,
           emailAllowList: config.emailAllowList,
