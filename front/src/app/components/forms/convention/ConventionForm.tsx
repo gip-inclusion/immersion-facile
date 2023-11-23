@@ -292,7 +292,13 @@ export const ConventionForm = ({
                     <Alert
                       severity="info"
                       small
-                      description={t.intro.conventionWelcomeNotification}
+                      description={
+                        route.params.jwt
+                          ? t.intro.conventionModificationNotification(
+                              fetchedConvention?.statusJustification,
+                            )
+                          : t.intro.conventionCreationNotification
+                      }
                     />
 
                     <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>

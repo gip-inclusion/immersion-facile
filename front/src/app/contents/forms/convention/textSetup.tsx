@@ -47,7 +47,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
           </p>
         </>
       ),
-    conventionWelcomeNotification:
+    conventionCreationNotification:
       internshipKind === "immersion" ? (
         <>
           <p>
@@ -115,7 +115,22 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
           </p>
         </>
       ),
+    conventionModificationNotification: (
+      statusJustification: string | undefined,
+    ) => (
+      <>
+        <p>
+          Une demande de modification sur la convention vous a été demandée pour
+          la raison suivante :
+        </p>
+        <p>
+          <strong>"{statusJustification}"</strong>
+        </p>
+        <p>Modifiez le formulaire et validez-le.</p>
+      </>
+    ),
   },
+
   agencySection: {
     title:
       internshipKind === "immersion"
