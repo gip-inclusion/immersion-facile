@@ -1,4 +1,4 @@
-import { AssessmentDto, assessmentSchema } from "shared";
+import { WithAssessmentDto, withAssessmentSchema } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
   UnitOfWork,
@@ -7,11 +7,8 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
-export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<
-  AssessmentDto,
-  void
-> {
-  protected inputSchema = assessmentSchema;
+export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<WithAssessmentDto> {
+  protected inputSchema = withAssessmentSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -24,15 +21,15 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<
   }
 
   public async _execute(
-    payload: AssessmentDto,
+    { assessment }: WithAssessmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const convention = await uow.conventionRepository.getById(
-      payload.conventionId,
+      assessment.conventionId,
     );
     if (!convention)
       throw new NotFoundError(
-        `Unable to send mail. No convention were found with id : ${payload.conventionId}`,
+        `Unable to send mail. No convention were found with id : ${assessment.conventionId}`,
       );
 
     const agency = await uow.agencyRepository.getById(convention.agencyId);
@@ -54,8 +51,8 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<
           conventionId: convention.id,
           dateEnd: convention.dateEnd,
           dateStart: convention.dateStart,
-          establishmentFeedback: payload.establishmentFeedback,
-          assessmentStatus: payload.status,
+          establishmentFeedback: assessment.establishmentFeedback,
+          assessmentStatus: assessment.status,
           immersionObjective: convention.immersionObjective,
           internshipKind: convention.internshipKind,
         },

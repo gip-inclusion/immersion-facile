@@ -58,7 +58,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
   it("Throw when no convention were found", async () => {
     await expectPromiseToFailWith(
-      usecase.execute(assessment),
+      usecase.execute({ assessment }),
       `Unable to send mail. No convention were found with id : ${assessment.conventionId}`,
     );
 
@@ -71,7 +71,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     await uow.conventionRepository.save(convention);
 
     await expectPromiseToFailWith(
-      usecase.execute(assessment),
+      usecase.execute({ assessment }),
       `Unable to send mail. No agency were found with id : ${convention.agencyId}`,
     );
 
@@ -87,7 +87,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       createAssessmentEntity(assessment, convention),
     );
 
-    await usecase.execute(assessment);
+    await usecase.execute({ assessment });
 
     expectSavedNotificationsAndEvents({
       emails: [

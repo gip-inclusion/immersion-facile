@@ -8,3 +8,7 @@ export interface AssessmentDto {
   status: AssessmentStatus;
   establishmentFeedback: string;
 }
+
+export type WithAssessmentDto = {
+  assessment: AssessmentDto;
+};
