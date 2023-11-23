@@ -55,7 +55,7 @@ export class PgConventionQueries implements ConventionQueries {
     );
   }
 
-  public async getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
+  public async getAllConventionsForThoseEndingThatDidntGoThrough(
     dateEnd: Date,
     sendingTopic: AssessmentEmailDomainTopic,
   ): Promise<ConventionReadDto[]> {
