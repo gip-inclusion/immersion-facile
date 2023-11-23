@@ -40,7 +40,7 @@ export class PgDiscussionAggregateRepository
     const result = await this.transaction
       .updateTable("exchanges")
       .set({
-        message: "Expired",
+        message: "Supprimé car trop ancien",
       })
       .where("sent_at", "<=", endedSince)
       .executeTakeFirst();
