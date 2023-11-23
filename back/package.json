@@ -36,7 +36,7 @@
     "trigger-refresh-materialized-views": "ts-node src/adapters/primary/scripts/triggerRefreshMaterializedViews.ts",
     "trigger-resync-old-conventions-to-pe": "ts-node src/adapters/primary/scripts/triggerResyncOldConventionsToPe.ts",
     "trigger-sending-emails-with-assessment-creation-link": "ts-node src/adapters/primary/scripts/triggerSendingEmailsWithAssessmentCreationLink.ts",
-    "trigger-sending-beneficiary-assessment-emails": "ts-node src/adapters/primary/scripts/triggerSendingBeneficiaryAssessmentEmails.ts",
+    "trigger-sending-beneficiary-assessment-emails": "ts-node src/adapters/primary/scripts/triggerSendingBeneficiaryPdfAssessmentEmails.ts",
     "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/adapters/primary/scripts/triggerSuggestEditFormEstablishmentEvery6Months.ts",
     "trigger-update-establishments-from-sirene": "ts-node src/adapters/primary/scripts/triggerUpdateEstablishmentsFromSireneApiScript.ts",
     "typecheck": "tsc --noEmit",
