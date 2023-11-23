@@ -8,7 +8,6 @@ import {
   domElementIds,
   type EmailTemplatesByName,
   emailTemplatesByName,
-  immersionFacileContactEmail,
   internshipKinds,
 } from "shared";
 import { ImmersionTextField } from "react-design-system";
@@ -36,7 +35,6 @@ export const EmailPreviewTab = () => {
 
   const fakeContent = configureGenerateHtmlFromTemplate(
     emailTemplatesByName,
-    { contactEmail: immersionFacileContactEmail },
     "internshipKind" in emailVariables &&
       emailVariables.internshipKind === "mini-stage-cci"
       ? {
