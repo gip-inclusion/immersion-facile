@@ -237,7 +237,10 @@ describe("PgDiscussionAggregateRepository", () => {
 
     expectToEqual(numberOfUpdatedMessages, 1);
     await expectMessageToBeDeleted(discussionAggregate1, "mon nouveau message");
-    await expectMessageToBeDeleted(discussionAggregateOld, "Expired");
+    await expectMessageToBeDeleted(
+      discussionAggregateOld,
+      "Supprimé car trop ancien",
+    );
   });
 
   const expectMessageToBeDeleted = async (
