@@ -82,7 +82,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     const event = this.createNewEvent({
       topic: "NewEstablishmentAggregateInsertedFromForm",
-      payload: establishmentAggregate,
+      payload: { establishmentAggregate },
     });
     log("About to save event " + event.id);
     await uow.outboxRepository.save(event);

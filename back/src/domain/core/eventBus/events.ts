@@ -19,7 +19,7 @@ import {
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
-import { EstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
+import { WithEstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
 import { ConventionRequiresModificationPayload } from "./eventPayload.dto";
 
@@ -84,7 +84,7 @@ export type DomainEvent =
   | GenericEvent<"FormEstablishmentEdited", WithFormEstablishmentDto>
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload>
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
-  | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>
+  | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate>
 
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", AgencyDto>
