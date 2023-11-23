@@ -13,7 +13,7 @@ import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
-const sendBeneficiaryAssessmentEmailsScript = async () => {
+const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
   logger.info("Starting to send Beneficiary assessment Emails ");
 
   const dbUrl = config.pgImmersionDbUrl;
@@ -31,7 +31,7 @@ const sendBeneficiaryAssessmentEmailsScript = async () => {
     timeGateway,
   );
 
-  const sendBeneficiariesAssesmentsEmails =
+  const sendBeneficiariesPdfAssesmentsEmails =
     new SendBeneficiariesPdfAssessmentsEmails(
       uowPerformer,
       saveNotificationAndRelatedEvent,
@@ -42,14 +42,14 @@ const sendBeneficiaryAssessmentEmailsScript = async () => {
       }),
     );
 
-  return sendBeneficiariesAssesmentsEmails.execute();
+  return sendBeneficiariesPdfAssesmentsEmails.execute();
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
-  "sendBeneficiaryAssessmentEmailsScript",
+  "sendBeneficiaryPdfAssessmentEmailsScript",
   config,
-  sendBeneficiaryAssessmentEmailsScript,
+  sendBeneficiaryPdfAssessmentEmailsScript,
   ({ numberOfImmersionEndingTomorrow, errors = {} }) => {
     const failures = keys(errors);
     const numberOfFailures = failures.length;
