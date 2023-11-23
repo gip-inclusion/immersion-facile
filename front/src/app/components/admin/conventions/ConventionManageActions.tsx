@@ -30,6 +30,7 @@ import {
   UpdateConventionStatusRequestDto,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -266,21 +267,24 @@ export const ConventionManageActions = ({
           </>
         )}
         {shouldShowSignatureAction && (
-          <Button
-            iconId="fr-icon-check-line"
+          <SignButton
+            disabled={disabled}
             className={fr.cx("fr-m-1w")}
-            onClick={() => {
+            onConfirmClick={() => {
               dispatch(
                 conventionSlice.actions.signConventionRequested({
-                  conventionId: convention.id,
                   jwt: jwtParams.jwt,
+                  conventionId: convention.id,
                 }),
               );
             }}
-            disabled={submitFeedback.kind === "signedSuccessfully"}
-          >
-            Signer la convention
-          </Button>
+            signatory={convention.signatories.establishmentRepresentative}
+            internshipKind={convention.internshipKind}
+            id={domElementIds.manageConvention.openSignModalButton}
+            submitButtonId={
+              domElementIds.manageConvention.submitSignModalButton
+            }
+          />
         )}
         {feedback.kind !== "renewed" &&
           createPortal(

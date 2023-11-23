@@ -253,6 +253,8 @@ export const domElementIds = {
     validatorModal: "im-validator-modal",
     cancelModal: "im-cancel-modal",
     renewModal: "im-renew-modal",
+    openSignModalButton: "im-convention-validation__open-sign-modal-button",
+    submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
   },
 
   establishment: {
