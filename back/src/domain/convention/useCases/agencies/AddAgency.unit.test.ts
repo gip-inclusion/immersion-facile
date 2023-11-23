@@ -95,10 +95,13 @@ describe("AddAgency use case", () => {
         createNewEvent({
           topic: "NewAgencyAdded",
           payload: {
-            ...createParisMissionLocaleParams,
-            questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl!,
-            adminEmails: [],
-            status: "needsReview",
+            agency: {
+              ...createParisMissionLocaleParams,
+              questionnaireUrl:
+                createParisMissionLocaleParams.questionnaireUrl!,
+              adminEmails: [],
+              status: "needsReview",
+            },
           },
         }),
       ]);

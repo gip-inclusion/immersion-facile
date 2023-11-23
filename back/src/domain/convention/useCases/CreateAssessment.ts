@@ -44,7 +44,7 @@ export class CreateAssessment extends TransactionalUseCase<AssessmentDto> {
 
     const event = this.#createNewEvent({
       topic: "AssessmentCreated",
-      payload: dto,
+      payload: { assessment: dto },
     });
 
     await Promise.all([

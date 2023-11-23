@@ -1,7 +1,5 @@
 import {
-  AgencyDto,
   AgencyId,
-  AssessmentDto,
   AuthenticatedUserId,
   ContactEstablishmentEventPayload,
   ConventionId,
@@ -12,6 +10,7 @@ import {
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
   WithAgencyDto,
+  WithAssessmentDto,
   WithConventionDto,
   WithConventionIdLegacy,
   WithFormEstablishmentDto,
@@ -87,12 +86,12 @@ export type DomainEvent =
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate>
 
   // AGENCY RELATED
-  | GenericEvent<"NewAgencyAdded", AgencyDto>
+  | GenericEvent<"NewAgencyAdded", WithAgencyDto>
   | GenericEvent<"AgencyActivated", WithAgencyDto>
   | GenericEvent<"AgencyUpdated", WithAgencyDto>
 
   // IMMERSION ASSESSMENT related
-  | GenericEvent<"AssessmentCreated", AssessmentDto>
+  | GenericEvent<"AssessmentCreated", WithAssessmentDto>
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
