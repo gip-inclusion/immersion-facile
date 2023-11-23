@@ -955,6 +955,49 @@ export const emailTemplatesByName =
       }),
     },
 
+    BENEFICIARY_ASSESSMENT_NOTIFICATION: {
+      niceName: "Convention - Notification de bilan au bénéficiaire",
+      tags: ["notification bénéficiaire bilan de l’immersion/mini-stage"],
+      createEmailVariables: ({
+        conventionId,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        agencyValidatorEmail,
+        internshipKind,
+        agencyAssessmentDocumentLink,
+      }) => ({
+        subject: `Remplissez le bilan de fin ${
+          internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
+        } avec votre tuteur`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${beneficiaryFirstName} ${beneficiaryLastName}`,
+        ),
+        content: `
+        Votre ${
+          internshipKind === "immersion"
+            ? "immersion professionnelle"
+            : "mini-stage"
+        } au sein de l'entreprise ${businessName} est bientôt finie.
+        
+        Prenez quelques instants pour remplir le bilan avec votre tuteur. Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier. Renvoyez-le ensuite à votre conseiller par email à l'adresse ${agencyValidatorEmail}.
+        `,
+        buttons: [
+          {
+            label: "Télécharger la fiche bilan",
+            url:
+              agencyAssessmentDocumentLink ||
+              `${
+                internshipKind === "immersion"
+                  ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
+                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
+              }`,
+          },
+        ],
+        subContent: defaultSignature(internshipKind),
+      }),
+    },
     ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
       niceName: "Convention - Lien de creation du bilan",
       tags: ["notification entreprise fin de l’immersion"],
@@ -1006,49 +1049,6 @@ export const emailTemplatesByName =
       ${defaultSignature(internshipKind)}
       `,
         agencyLogoUrl,
-      }),
-    },
-    BENEFICIARY_ASSESSMENT_NOTIFICATION: {
-      niceName: "Convention - Notification de bilan au bénéficiaire",
-      tags: ["notification bénéficiaire bilan de l’immersion/mini-stage"],
-      createEmailVariables: ({
-        conventionId,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        agencyValidatorEmail,
-        internshipKind,
-        agencyAssessmentDocumentLink,
-      }) => ({
-        subject: `Remplissez le bilan de fin ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
-        } avec votre tuteur`,
-        greetings: greetingsWithConventionId(
-          conventionId,
-          `${beneficiaryFirstName} ${beneficiaryLastName}`,
-        ),
-        content: `
-        Votre ${
-          internshipKind === "immersion"
-            ? "immersion professionnelle"
-            : "mini-stage"
-        } au sein de l'entreprise ${businessName} est bientôt finie.
-        
-        Prenez quelques instants pour remplir le bilan avec votre tuteur. Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier. Renvoyez-le ensuite à votre conseiller par email à l'adresse ${agencyValidatorEmail}.
-        `,
-        buttons: [
-          {
-            label: "Télécharger la fiche bilan",
-            url:
-              agencyAssessmentDocumentLink ||
-              `${
-                internshipKind === "immersion"
-                  ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
-                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
-              }`,
-          },
-        ],
-        subContent: defaultSignature(internshipKind),
       }),
     },
     NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
