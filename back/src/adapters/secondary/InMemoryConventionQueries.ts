@@ -56,7 +56,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .map((convention) => convention.id);
   }
 
-  public async getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
+  public async getAllConventionsForThoseEndingThatDidntGoThrough(
     dateEnd: Date,
     sendingTopic: AssessmentEmailDomainTopic,
   ): Promise<ConventionReadDto[]> {

@@ -58,7 +58,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     const now = this.#timeGateway.now();
     const yesterday = subDays(now, 1);
     const conventions =
-      await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
+      await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
         yesterday,
         "EmailWithLinkToCreateAssessmentSent",
       );

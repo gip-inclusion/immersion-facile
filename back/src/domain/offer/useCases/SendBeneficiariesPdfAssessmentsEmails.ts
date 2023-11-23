@@ -49,7 +49,7 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
     const now = this.#timeGateway.now();
     const tomorrow = addDays(now, 1);
     const conventions =
-      await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic(
+      await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
         tomorrow,
         "BeneficiaryAssessmentEmailSent",
       );

@@ -21,7 +21,7 @@ export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
-  getAllConventionsForThoseEndingThatDidntGoThroughSendingTopic: (
+  getAllConventionsForThoseEndingThatDidntGoThrough: (
     dateEnd: Date,
     sendingTopic: AssessmentEmailDomainTopic,
   ) => Promise<ConventionReadDto[]>;
