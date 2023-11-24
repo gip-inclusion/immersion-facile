@@ -6,7 +6,7 @@ import {
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { SignatoryRole } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
-import { ExcludeFromExisting } from "../utils";
+import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
 export type AuthenticateWithInclusionCodeConnectParams = WithSourcePage & {
   code: string;
@@ -26,7 +26,7 @@ export type AuthenticatedUserQueryParams = {
 
 export type InclusionConnectConventionManageAllowedRoles =
   | ExcludeFromExisting<AgencyRole, "toReview">
-  | Extract<SignatoryRole, "establishment-representative">;
+  | ExtractFromExisting<SignatoryRole, "establishment-representative">;
 
 export const getIcUserRoleForAccessingConvention = (
   convention: ConventionDto,

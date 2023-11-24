@@ -59,14 +59,14 @@ export class SignConvention extends TransactionalUseCase<
   public async _execute(
     { conventionId }: WithConventionId,
     uow: UnitOfWork,
-    params: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+    jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
     const initialConvention = await uow.conventionRepository.getById(
       conventionId,
     );
     if (!initialConvention) throw new NotFoundError(conventionId);
 
-    const role = await this.#getRole(params, uow, initialConvention);
+    const role = await this.#getRole(jwtPayload, uow, initialConvention);
 
     logger.debug({ conventionId, role });
 
@@ -103,13 +103,13 @@ export class SignConvention extends TransactionalUseCase<
   }
 
   async #getRole(
-    params: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+    jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
     uow: UnitOfWork,
     initialConvention: ConventionDto,
   ): Promise<Role | undefined> {
-    if ("role" in params) return params.role;
+    if ("role" in jwtPayload) return jwtPayload.role;
     const icUser = await uow.inclusionConnectedUserRepository.getById(
-      params.userId,
+      jwtPayload.userId,
     );
     return icUser?.email ===
       initialConvention.signatories.establishmentRepresentative.email
