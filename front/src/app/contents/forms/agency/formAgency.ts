@@ -19,7 +19,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.id,
   },
   name: {
-    label: "Nom de l'organisme",
+    label: "Nom de la structure",
     placeholder: "Agence de Boulogne-Billancourt",
     required: true,
     id: domElementIds.addAgency.nameInput,
@@ -48,11 +48,11 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.addressInput.streetNumberAndAddress,
   },
   position: {
-    label: "Coordonnées géographiques de l'organisme",
+    label: "Coordonnées géographiques de la structure",
     id: domElementIds.addAgency.positionInput,
   },
   logoUrl: {
-    label: "Téléverser le logo de votre organisme",
+    label: "Téléverser le logo de votre structure",
     id: domElementIds.addAgency.logoUrlInput,
     hintText: "Cela permet de personnaliser les mails automatisés.",
   },
