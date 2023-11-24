@@ -98,11 +98,15 @@ export const ConventionManageActions = ({
 
   const disabled = submitFeedback.kind !== "idle";
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
+  const allowedToSignStatuses: ConventionStatus[] = [
+    "READY_TO_SIGN",
+    "PARTIALLY_SIGNED",
+  ];
   const shouldShowSignatureAction =
     icUserRole === "establishment-representative" &&
     !convention.signatories.establishmentRepresentative.signedAt &&
     jwtParams.kind !== "backoffice" &&
-    ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status);
+    allowedToSignStatuses.includes(convention.status);
 
   return (
     <div
