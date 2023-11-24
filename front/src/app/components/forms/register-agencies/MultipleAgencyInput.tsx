@@ -49,7 +49,7 @@ export const MultipleAgencyInput = ({
           >
             <div className={fr.cx("fr-col", "fr-mt-2w")}>
               <AgencyAutocomplete
-                label="Commencez à taper le nom de votre organisme"
+                label="Commencez à taper le nom de votre structure"
                 placeholder="Ex: Agence de Berry"
                 seletedAgency={currentAgencies[index]}
                 onAgencySelected={(selectedAgency) => {

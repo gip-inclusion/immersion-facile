@@ -33,7 +33,7 @@ export const RegisterAgenciesForm = () => {
     <>
       <p>
         C'est votre première connexion sur Immersion Facilitée avec votre compte
-        Inclusion Connect, choisissez l'organisme auquel nous devons vous
+        Inclusion Connect, choisissez la structure à laquelle nous devons vous
         associer.
       </p>
       <form
@@ -65,7 +65,7 @@ export const RegisterAgenciesForm = () => {
           visible={keys(formState.errors).length > 0}
         />
         <div className={fr.cx("fr-mt-2w")}>
-          <Button>Demander à être relié à ces organismes</Button>
+          <Button>Demander à être relié à ces structures</Button>
         </div>
       </form>
     </>

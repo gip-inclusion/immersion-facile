@@ -146,7 +146,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
               Qui est le prescripteur référent de votre structure
               d'accompagnement ?
             </h2>
-            <p>Il sera le validateur finale des conventions</p>
+            <p>Il sera le validateur final des conventions</p>
             <AgencySelector
               fields={{
                 agencyDepartmentField: {
@@ -159,7 +159,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
                 agencyIdField: refersToAgencyIdField,
                 agencyKindField: {
                   name: "refersToAgencyKind",
-                  label: "Type d'organisme",
+                  label: "Type de structure",
                   required: true,
                   id: "refersToAgencyKind",
                 },
