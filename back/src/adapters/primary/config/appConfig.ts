@@ -155,11 +155,14 @@ export class AppConfig {
     return parseStringList(this.env.EMAIL_ALLOW_LIST);
   }
 
-  public get emailDomainBlackList() {
-    return this.#throwIfNotDefinedOrDefault(
+  public get emailDomainBlackList(): string[] {
+    const emailDomainBlackListRaw = this.#throwIfNotDefinedOrDefault(
       "EMAIL_DOMAIN_BLACK_LIST",
       "",
-    ).split(",");
+    );
+
+    if (!emailDomainBlackListRaw) return [];
+    return emailDomainBlackListRaw.split(",");
   }
 
   // == Email validation gateway ==
