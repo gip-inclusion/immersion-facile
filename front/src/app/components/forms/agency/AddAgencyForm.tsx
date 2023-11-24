@@ -64,7 +64,7 @@ export const AddAgencyForm = () => {
   return (
     <>
       <RadioButtons
-        legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
+        legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
         options={refersToOtherAgencyOptions}
       />
       {match(refersToOtherAgency)
@@ -143,8 +143,10 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
         {refersToOtherAgency && (
           <>
             <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-              Prescripteur lié (signataire des conventions)
+              Qui est le prescripteur référent de votre structure
+              d'accompagnement ?
             </h2>
+            <p>Il sera le validateur finale des conventions</p>
             <AgencySelector
               fields={{
                 agencyDepartmentField: {
@@ -171,7 +173,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
           </>
         )}
         <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-          Structure d'accompagnement
+          {refersToOtherAgency ? "Structure d'accompagnement" : "Prescripteur"}
         </h2>
         <AgencyFormCommonFields refersToOtherAgency={refersToOtherAgency} />
         <AgencyLogoUpload />
