@@ -79,12 +79,13 @@ export const AgencySelector = ({
     control,
   } = useFormContext<SupportedFormsDto>();
 
-  const [agencyKinds, setAgencyKinds] = useState<AllowedAgencyKindToAdd[]>(
-    getAgencyKindsInitialValue({
-      shouldFilterDelegationPrescriptionAgencyKind,
-      shouldLockToPeAgencies,
-    }),
-  );
+  const initialAgencyKinds = getAgencyKindsInitialValue({
+    shouldFilterDelegationPrescriptionAgencyKind,
+    shouldLockToPeAgencies,
+  });
+  const [agencyKinds, setAgencyKinds] =
+    useState<AllowedAgencyKindToAdd[]>(initialAgencyKinds);
+
   const [agencies, setAgencies] = useState<AgencyOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -234,7 +235,10 @@ export const AgencySelector = ({
           disabled={agencyKindOptions.length === 0 || shouldLockToPeAgencies}
           nativeSelectProps={{
             ...agencyKindField,
-            value: agencyKinds[0],
+            value:
+              agencyKinds.length === initialAgencyKinds.length
+                ? "all"
+                : agencyKinds[0],
             onChange: (event) => {
               if (event.currentTarget.value === "all")
                 return setAgencyKinds(allAgencyKindsAllowedToAdd);
