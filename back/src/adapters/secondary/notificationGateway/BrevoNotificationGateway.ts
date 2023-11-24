@@ -208,17 +208,19 @@ export class BrevoNotificationGateway implements NotificationGateway {
   #filterAllowListAndConvertToRecipients(
     emails: string[] = [],
   ): RecipientOrSender[] {
-    return emails
-      .filter(this.config.emailAllowListPredicate)
-      .filter(
-        filterBlackListedEmailDomains(this.config.blackListedEmailDomains),
-      )
-      .map((email) => ({ email }));
+    return (
+      emails
+        .filter(this.config.emailAllowListPredicate)
+        // .filter(
+        //   filterBlackListedEmailDomains(this.config.blackListedEmailDomains),
+        // )
+        .map((email) => ({ email }))
+    );
   }
 }
 
-const filterBlackListedEmailDomains =
-  (blackListedEmailDomains: string[]) => (email: string) =>
-    !blackListedEmailDomains.some((domain) =>
-      email.toLowerCase().endsWith(domain.toLowerCase()),
-    );
+// const filterBlackListedEmailDomains =
+//   (blackListedEmailDomains: string[]) => (email: string) =>
+//     !blackListedEmailDomains.some((domain) =>
+//       email.toLowerCase().endsWith(domain.toLowerCase()),
+//     );
