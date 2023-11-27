@@ -1,0 +1,26 @@
+.im-footer {
+  &__content {
+    flex: 1 1 33%;
+    margin-left: 3%;
+  }
+  &__partner-link {
+    margin: 0 0.5rem;
+    max-width: 160px;
+    max-height: 90px;
+    height: auto;
+  }
+  &__partners-main {
+    flex-direction: column;
+  }
+  &__brand-text {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    max-width: 20rem;
+  }
+  &__partners-sub {
+    & > ul {
+      align-items: center;
+    }
+  }
+}

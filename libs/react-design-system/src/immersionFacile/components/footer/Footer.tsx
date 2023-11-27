@@ -1,7 +1,8 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-import "./Footer.css";
+import plateformeInclusionLogoUrl from "./assets/img/logo-plateforme-inclusion.svg";
+import Styles from "./Footer.styles";
 
 export type NavLink = {
   onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
@@ -18,7 +19,6 @@ export type FooterProps = {
   links?: NavLink[];
   bottomLinks?: NavLink[];
   topFooter: React.ReactNode;
-  ministereLogo: React.ReactNode;
   partnersLogos?: React.ReactNode;
 };
 
@@ -52,17 +52,14 @@ export const Footer = ({
   links,
   topFooter,
   bottomLinks,
-  ministereLogo,
   partnersLogos,
 }: FooterProps) => {
   const { cx } = useStyles();
   return (
-    <footer className={cx(fr.cx("fr-footer"), "im-footer")} id="main-footer">
+    <footer className={cx(fr.cx("fr-footer"), Styles.root)} id="main-footer">
       {topFooter}
       <div className={fr.cx("fr-container")}>
-        <div
-          className={cx(fr.cx("fr-footer__content-list"), "im-footer__content")}
-        >
+        <div className={cx(fr.cx("fr-footer__content-list"), Styles.content)}>
           {links && links.length > 0 && (
             <ul className={fr.cx("fr-footer__content")}>
               {links.map((link, index) => (
@@ -72,9 +69,49 @@ export const Footer = ({
             </ul>
           )}
         </div>
-        <div className={fr.cx("fr-footer__body", "fr-footer__bottom")}>
-          <div className={fr.cx("fr-footer__content")}>{ministereLogo}</div>
-          <div className={fr.cx("fr-footer__content")}>{partnersLogos}</div>
+        <div className={fr.cx("fr-footer__partners")}>
+          <div className={fr.cx("fr-footer__partners-logos")}>
+            <div
+              className={cx(
+                fr.cx("fr-footer__partners-main"),
+                Styles.partnersMain,
+              )}
+            >
+              <span>Ce service fait partie de la </span>
+              <div className={fr.cx("fr-footer__brand")}>
+                <img
+                  src={plateformeInclusionLogoUrl}
+                  alt="Plateforme de l'Inclusion"
+                  className={fr.cx("fr-footer__logo")}
+                  style={{ height: "5.625rem" }}
+                />
+                <p
+                  className={cx(fr.cx("fr-ml-2w", "fr-mb-0"), Styles.brandText)}
+                >
+                  Découvrez les outils qui portent l'inclusion au cœur de leur
+                  service. À chaque service, son objectif.
+                  <a
+                    className={fr.cx(
+                      "fr-footer__content-link",
+                      "fr-icon-external-link-line",
+                      "fr-link--icon-right",
+                    )}
+                    href={""}
+                  >
+                    Découvrez nos services
+                  </a>
+                </p>
+              </div>
+            </div>
+            <div
+              className={cx(
+                fr.cx("fr-footer__partners-sub"),
+                Styles.partnersSub,
+              )}
+            >
+              {partnersLogos}
+            </div>
+          </div>
         </div>
         <div className={fr.cx("fr-footer__bottom")}>
           {bottomLinks && bottomLinks.length > 0 && (
