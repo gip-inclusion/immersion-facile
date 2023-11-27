@@ -1,4 +1,5 @@
-import { from, map, Observable } from "rxjs";
+import { from, Observable } from "rxjs";
+import { match, P } from "ts-pattern";
 import {
   AbsoluteUrl,
   AdminRoutes,
@@ -16,6 +17,10 @@ import {
   UserAndPassword,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import {
+  logBodyAndThrow,
+  otherwiseThrow,
+} from "src/core-logic/adapters/otherwiseThrow";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {
@@ -24,11 +29,13 @@ export class HttpAdminGateway implements AdminGateway {
     token: BackOfficeJwt,
   ): Observable<void> =>
     from(
-      this.httpClient.updateFeatureFlags({
-        body: params,
-        headers: { authorization: token },
-      }),
-    ).pipe(map(() => undefined));
+      this.httpClient
+        .updateFeatureFlags({
+          body: params,
+          headers: { authorization: token },
+        })
+        .then(() => undefined),
+    );
 
   constructor(private readonly httpClient: HttpClient<AdminRoutes>) {}
 
@@ -56,10 +63,12 @@ export class HttpAdminGateway implements AdminGateway {
         .getAllApiConsumers({
           headers: { authorization: adminToken },
         })
-        .then((response) => {
-          if (response.status === 200) return response.body;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -145,10 +154,12 @@ export class HttpAdminGateway implements AdminGateway {
           body: createApiConsumerParamsFromApiConsumer(apiConsumer),
           headers: { authorization: adminToken },
         })
-        .then((response) => {
-          if (response.status === 200) return response.body || undefined;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body || undefined)
+            .with({ status: P.union(401) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -162,10 +173,12 @@ export class HttpAdminGateway implements AdminGateway {
           body: params,
           headers: { authorization: token },
         })
-        .then((response) => {
-          if (response.status === 201) return;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, () => undefined)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 }

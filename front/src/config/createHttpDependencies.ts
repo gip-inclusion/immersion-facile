@@ -39,7 +39,7 @@ export const createHttpDependencies = (): Dependencies => {
       createAxiosSharedClient(addressRoutes, axiosOnSlashApi),
     ),
     adminGateway: new HttpAdminGateway(
-      createAxiosSharedClient(adminRoutes, axiosOnSlashApiLegacy),
+      createAxiosSharedClient(adminRoutes, axiosOnSlashApi),
     ),
     agencyGateway: new HttpAgencyGateway(
       createAxiosSharedClient(agencyRoutes, axiosOnSlashApiLegacy),
