@@ -45,10 +45,7 @@ export const createHttpDependencies = (): Dependencies => {
       createAxiosSharedClient(agencyRoutes, axiosOnSlashApi),
     ),
     inclusionConnectedGateway: new HttpInclusionConnectedGateway(
-      createAxiosSharedClient(
-        inclusionConnectedAllowedRoutes,
-        axiosOnSlashApiLegacy,
-      ),
+      createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
     ),
     establishmentGateway: new HttpEstablishmentGateway(
       createAxiosSharedClient(establishmentRoutes, axiosOnSlashApi),

@@ -1,4 +1,5 @@
-import { from, map, Observable } from "rxjs";
+import { from, Observable } from "rxjs";
+import { match } from "ts-pattern";
 import {
   AbsoluteUrl,
   AgencyId,
@@ -8,6 +9,10 @@ import {
   WithSourcePage,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import {
+  logBodyAndThrow,
+  otherwiseThrow,
+} from "src/core-logic/adapters/otherwiseThrow";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 export class HttpInclusionConnectedGateway
@@ -18,11 +23,13 @@ export class HttpInclusionConnectedGateway
   ) {}
 
   public getCurrentUser$(token: string): Observable<InclusionConnectedUser> {
-    return from(this.#getCurrentUser(token)).pipe(
-      map(({ body, status }) => {
-        if (status === 200) return body;
-        throw new Error(JSON.stringify(body));
-      }),
+    return from(
+      this.#getCurrentUser(token).then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 400 }, logBodyAndThrow)
+          .otherwise(otherwiseThrow),
+      ),
     );
   }
 
@@ -73,14 +80,17 @@ export class HttpInclusionConnectedGateway
         body: params,
         headers: { authorization: jwt },
       })
-      .then(() => undefined)
-      .catch((error) => {
-        if (error?.httpStatusCode === 404)
-          throw new Error(
-            "L'erreur sur la convention que vous cherchez à traiter n'existe pas, peut-être est-elle déjà marquée comme traitée. Rechargez la page pour mettre à jour le tableau.",
-          );
-        throw error;
-      });
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, () => undefined)
+          .with({ status: 404 }, () => {
+            throw new Error(
+              "L'erreur sur la convention que vous cherchez à traiter n'existe pas, peut-être est-elle déjà marquée comme traitée. Rechargez la page pour mettre à jour le tableau.",
+            );
+          })
+          .with({ status: 400 }, logBodyAndThrow)
+          .otherwise(otherwiseThrow),
+      );
   }
 
   #registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {
