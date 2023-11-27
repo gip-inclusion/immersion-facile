@@ -37,7 +37,11 @@ export class HttpAgencyGateway implements AgencyGateway {
           urlParams: { agencyId },
           headers: { authorization: adminToken },
         })
-        .then(({ body }) => body),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -46,7 +50,11 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Promise<AgencyPublicDisplayDto> {
     return this.httpClient
       .getAgencyPublicInfoById({ queryParams: withAgencyId })
-      .then(({ body }) => body);
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .otherwise(otherwiseThrow),
+      );
   }
 
   public getAgencyPublicInfoById$(
@@ -60,12 +68,20 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Promise<AgencyOption[]> {
     return this.httpClient
       .getFilteredAgencies({ queryParams: request })
-      .then(({ body }) => body);
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .otherwise(otherwiseThrow),
+      );
   }
 
   public getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
     return from(
-      this.httpClient.getImmersionFacileAgencyId().then(({ body }) => body),
+      this.httpClient.getImmersionFacileAgencyId().then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .otherwise(otherwiseThrow),
+      ),
     );
   }
 

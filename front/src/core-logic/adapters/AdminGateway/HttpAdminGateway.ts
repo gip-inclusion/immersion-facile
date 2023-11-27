@@ -34,7 +34,12 @@ export class HttpAdminGateway implements AdminGateway {
           body: params,
           headers: { authorization: token },
         })
-        .then(() => undefined),
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, () => undefined)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
 
   constructor(private readonly httpClient: HttpClient<AdminRoutes>) {}
@@ -51,7 +56,11 @@ export class HttpAdminGateway implements AdminGateway {
           },
           body: establishmentBatch,
         })
-        .then(({ body }) => body),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -87,10 +96,12 @@ export class HttpAdminGateway implements AdminGateway {
             authorization: token,
           },
         })
-        .then((response) => {
-          if (response.status === 200) return response.body;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: P.union(400, 401) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -103,10 +114,12 @@ export class HttpAdminGateway implements AdminGateway {
           queryParams: { agencyRole: "toReview" },
           headers: { authorization: token },
         })
-        .then((response) => {
-          if (response.status === 200) return response.body;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -114,16 +127,22 @@ export class HttpAdminGateway implements AdminGateway {
     return from(
       this.httpClient
         .getLastNotifications({ headers: { authorization: token } })
-        .then(({ body }) => body),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
   public login$(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
     return from(
-      this.httpClient.login({ body: userAndPassword }).then((response) => {
-        if (response.status === 200) return response.body;
-        throw new Error(JSON.stringify(response.body));
-      }),
+      this.httpClient.login({ body: userAndPassword }).then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 403 }, logBodyAndThrow)
+          .otherwise(otherwiseThrow),
+      ),
     );
   }
 
@@ -137,10 +156,12 @@ export class HttpAdminGateway implements AdminGateway {
           body: params,
           headers: { authorization: token },
         })
-        .then((response) => {
-          if (response.status === 201) return;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, () => undefined)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
