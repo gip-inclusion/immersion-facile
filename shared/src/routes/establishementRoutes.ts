@@ -4,7 +4,7 @@ import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
-  legacyBadRequestErrorSchema,
+  legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
 import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
@@ -31,7 +31,7 @@ export const establishmentRoutes = defineRoutes({
       400: httpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
       403: renewMagicLinkResponseSchema,
-      409: legacyBadRequestErrorSchema,
+      409: legacyHttpErrorSchema,
     },
   }),
   getFormEstablishment: defineRoute({
@@ -40,7 +40,7 @@ export const establishmentRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: formEstablishmentSchema,
-      400: legacyBadRequestErrorSchema,
+      400: legacyHttpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
     },
   }),
@@ -49,7 +49,7 @@ export const establishmentRoutes = defineRoutes({
     url: "/request-email-to-update-form/:siret",
     responses: {
       201: expressEmptyResponseBody,
-      400: legacyBadRequestErrorSchema,
+      400: legacyHttpErrorSchema,
     },
   }),
   deleteEstablishment: defineRoute({
@@ -60,7 +60,7 @@ export const establishmentRoutes = defineRoutes({
       204: emptyObjectSchema,
       400: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
-      404: legacyBadRequestErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
 });

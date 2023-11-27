@@ -1,7 +1,10 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAuthorizationHeaders } from "../headers";
-import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import {
+  httpErrorSchema,
+  legacyHttpErrorSchema,
+} from "../httpClient/errors/httpErrors.schema";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
@@ -22,7 +25,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/demandes-immersion/:conventionId",
     method: "get",
     ...withAuthorizationHeaders,
-    responses: { 200: conventionReadSchema },
+    responses: { 200: conventionReadSchema, 404: legacyHttpErrorSchema },
   }),
   getConventionStatusDashboard: defineRoute({
     url: "/auth/status-convention",
