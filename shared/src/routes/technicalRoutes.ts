@@ -9,7 +9,7 @@ import { featureFlagsSchema } from "../featureFlags";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
-  legacyBadRequestErrorSchema,
+  legacyHttpErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
 import {
@@ -45,7 +45,7 @@ export const technicalRoutes = defineRoutes({
     url: `/to/:shortLinkId`,
     responses: {
       302: emptyObjectSchema,
-      404: legacyBadRequestErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
   featureFlags: defineRoute({

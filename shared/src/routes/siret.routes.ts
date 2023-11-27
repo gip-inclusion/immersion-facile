@@ -1,5 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { legacyBadRequestErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import { legacyHttpErrorSchema } from "../httpClient/errors/httpErrors.schema";
 import {
   getSiretInfoSchema,
   isSiretExistResponseSchema,
@@ -17,11 +17,11 @@ export const siretRoutes = defineRoutes({
     url: `/siret/:siret`,
     responses: {
       200: getSiretInfoSchema,
-      400: legacyBadRequestErrorSchema,
-      404: legacyBadRequestErrorSchema,
-      409: legacyBadRequestErrorSchema,
-      429: legacyBadRequestErrorSchema,
-      503: legacyBadRequestErrorSchema,
+      400: legacyHttpErrorSchema,
+      404: legacyHttpErrorSchema,
+      409: legacyHttpErrorSchema,
+      429: legacyHttpErrorSchema,
+      503: legacyHttpErrorSchema,
     },
   }),
   getSiretInfoIfNotAlreadySaved: defineRoute({
@@ -29,11 +29,11 @@ export const siretRoutes = defineRoutes({
     url: `/siret-if-not-saved/:siret`,
     responses: {
       200: getSiretInfoSchema,
-      400: legacyBadRequestErrorSchema,
-      404: legacyBadRequestErrorSchema,
-      409: legacyBadRequestErrorSchema,
-      429: legacyBadRequestErrorSchema,
-      503: legacyBadRequestErrorSchema,
+      400: legacyHttpErrorSchema,
+      404: legacyHttpErrorSchema,
+      409: legacyHttpErrorSchema,
+      429: legacyHttpErrorSchema,
+      503: legacyHttpErrorSchema,
     },
   }),
 });

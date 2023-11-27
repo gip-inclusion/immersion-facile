@@ -14,7 +14,7 @@ import {
 } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
-  legacyBadRequestErrorSchema,
+  legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
@@ -36,7 +36,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: userAndPasswordSchema,
     responses: {
       200: backOfficeJwtSchema,
-      403: legacyBadRequestErrorSchema,
+      403: legacyHttpErrorSchema,
     },
   }),
   getDashboardUrl: defineRoute({
@@ -46,7 +46,7 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: absoluteUrlSchema,
-      400: legacyBadRequestErrorSchema,
+      400: legacyHttpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
     },
   }),
@@ -65,7 +65,7 @@ export const adminRoutes = defineRoutes({
     responses: {
       201: expressEmptyResponseBody,
       401: legacyUnauthenticatedErrorSchema,
-      404: legacyBadRequestErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
   rejectIcUserForAgency: defineRoute({
@@ -76,7 +76,7 @@ export const adminRoutes = defineRoutes({
     responses: {
       201: expressEmptyResponseBody,
       401: legacyUnauthenticatedErrorSchema,
-      404: legacyBadRequestErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
   getInclusionConnectedUsers: defineRoute({
