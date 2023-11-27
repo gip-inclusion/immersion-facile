@@ -41,30 +41,46 @@ const PlateformeSoloLogo = () => {
     },
   }))();
   return (
-    <div className={fr.cx("fr-enlarge-link")}>
-      <p>Ce service fait partie de la</p>
-      <div className={fr.cx("fr-footer__content")}>
+    <div>
+      <p>
+        <strong> Ce service fait partie de la </strong>
+      </p>
+      <div className={fr.cx("fr-footer__brand")}>
         <img
           src={plateformeLogo}
           alt="Plateforme de l'Inclusion"
           className={cx(
-            fr.cx("fr-footer__partners-link"),
-            "im-footer__partner-link",
+            fr.cx("fr-footer__logo"),
+            "im-footer__logo",
             classes.partnerLogo,
           )}
+          style={{ height: "5.625rem" }}
         />
-        <p>
-          Découvrez les outils qui portent l'inclusion au coeur de leur service.
-          A chaque service, son objectif.
-        </p>
+        <div>
+          <p>
+            Découvrez les outils qui portent l'inclusion au cœur de leur
+            service. À chaque service, son objectif.
+            <a
+              className={fr.cx(
+                "fr-footer__content-link",
+                "fr-icon-external-link-line",
+                "fr-link--icon-right",
+              )}
+              style={{ justifyContent: "start" }}
+              href={""}
+            >
+              Découvrez nos services
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
 export const MinistereLogo = () => (
-  <div className={fr.cx("fr-footer__brand")}>
-    <p className={fr.cx("fr-logo")}>
+  <div className={fr.cx("fr-footer__logo")}>
+    <p className={fr.cx("fr-logo")} style={{ fontSize: "1rem" }}>
       Ministère
       <br />
       du travail,
@@ -85,28 +101,34 @@ const PartnersLogos = () => {
     },
   }))();
   return (
-    <>
-      <MinistereLogo />
-      <img
-        src={poleEmploiLogo}
-        alt="Pole Emploi"
-        style={{ margin: "0 1.5rem" }}
-        className={cx(
-          fr.cx("fr-footer__partners-link"),
-          "im-footer__partner-link",
-          classes.partnerLogo,
-        )}
-      />
-      <img
-        src={lesEntrepriseSengagent}
-        alt="Les entreprises s'engagent"
-        className={cx(
-          fr.cx("fr-footer__partners-link"),
-          "im-footer__partner-link",
-          classes.partnerLogo,
-        )}
-      />
-    </>
+    <ul>
+      <li>
+        <MinistereLogo />
+      </li>
+      <li>
+        <img
+          src={poleEmploiLogo}
+          alt="Pole Emploi"
+          style={{ margin: "0 1.5rem" }}
+          className={cx(
+            fr.cx("fr-footer__logo"),
+            "im-footer__logo",
+            classes.partnerLogo,
+          )}
+        />
+      </li>
+      <li>
+        <img
+          src={lesEntrepriseSengagent}
+          alt="Les entreprises s'engagent"
+          className={cx(
+            fr.cx("fr-footer__logo"),
+            "im-footer__logo",
+            classes.partnerLogo,
+          )}
+        />
+      </li>
+    </ul>
   );
 };
 
