@@ -1,4 +1,5 @@
 import { from, Observable } from "rxjs";
+import { match } from "ts-pattern";
 import {
   ActiveOrRejectedStatus,
   AgencyDto,
@@ -13,6 +14,10 @@ import {
   WithAgencyId,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import {
+  logBodyAndThrow,
+  otherwiseThrow,
+} from "src/core-logic/adapters/otherwiseThrow";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class HttpAgencyGateway implements AgencyGateway {
@@ -81,10 +86,12 @@ export class HttpAgencyGateway implements AgencyGateway {
           queryParams: { status: "needsReview" },
           headers: { authorization: adminToken },
         })
-        .then((response) => {
-          if (response.status === 200) return response.body;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -139,10 +146,12 @@ export class HttpAgencyGateway implements AgencyGateway {
           headers: { authorization: adminToken },
           urlParams: { agencyId: agencyDto.id },
         })
-        .then((response) => {
-          if (response.status === 200) return;
-          throw new Error(JSON.stringify(response.body));
-        }),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
