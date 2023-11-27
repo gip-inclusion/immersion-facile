@@ -24,12 +24,16 @@ export class HttpInclusionConnectedGateway
 
   public getCurrentUser$(token: string): Observable<InclusionConnectedUser> {
     return from(
-      this.#getCurrentUser(token).then((response) =>
-        match(response)
-          .with({ status: 200 }, ({ body }) => body)
-          .with({ status: 400 }, logBodyAndThrow)
-          .otherwise(otherwiseThrow),
-      ),
+      this.httpClient
+        .getInclusionConnectedUser({
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -37,7 +41,11 @@ export class HttpInclusionConnectedGateway
     return from(
       this.httpClient
         .getInclusionConnectLogoutUrl({ queryParams: params })
-        .then((response) => response.body),
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -57,18 +65,18 @@ export class HttpInclusionConnectedGateway
     token: string,
   ): Observable<void> {
     return from(
-      this.#registerAgenciesToCurrentUser(agencyIds, token).then(
-        (responseBody) => {
-          responseBody;
-        },
-      ),
+      this.httpClient
+        .registerAgenciesToUser({
+          headers: { authorization: token },
+          body: agencyIds,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
-  }
-
-  #getCurrentUser(token: string) {
-    return this.httpClient.getInclusionConnectedUser({
-      headers: { authorization: token },
-    });
   }
 
   #markPartnersErroredConventionAsHandled(
@@ -91,12 +99,5 @@ export class HttpInclusionConnectedGateway
           .with({ status: 400 }, logBodyAndThrow)
           .otherwise(otherwiseThrow),
       );
-  }
-
-  #registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {
-    return this.httpClient.registerAgenciesToUser({
-      headers: { authorization: token },
-      body: agencyIds,
-    });
   }
 }
