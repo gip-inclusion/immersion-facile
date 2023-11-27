@@ -21,8 +21,49 @@ const {
   overFooterCols: overFooterColsIds,
 } = domElementIds.footer;
 
+const TopFooter = () => {
+  const { cx } = useStyles();
+  return (
+    <div className={fr.cx("fr-footer__top")}>
+      <div className={fr.cx("fr-container")}>
+        <p>test</p>
+      </div>
+    </div>
+  );
+};
+
+const PlateformeSoloLogo = () => {
+  const { cx } = useStyles();
+  const darkModeState = useIsDark();
+  const { classes } = makeStyles({ name: LayoutFooter.displayName })(() => ({
+    partnerLogo: {
+      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
+    },
+  }))();
+  return (
+    <div className={fr.cx("fr-enlarge-link")}>
+      <p>Ce service fait partie de la</p>
+      <div className={fr.cx("fr-footer__content")}>
+        <img
+          src={plateformeLogo}
+          alt="Plateforme de l'Inclusion"
+          className={cx(
+            fr.cx("fr-footer__partners-link"),
+            "im-footer__partner-link",
+            classes.partnerLogo,
+          )}
+        />
+        <p>
+          Découvrez les outils qui portent l'inclusion au coeur de leur service.
+          A chaque service, son objectif.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 export const MinistereLogo = () => (
-  <div className={fr.cx("fr-footer__brand", "fr-enlarge-link")}>
+  <div className={fr.cx("fr-footer__brand")}>
     <p className={fr.cx("fr-logo")}>
       Ministère
       <br />
@@ -45,6 +86,7 @@ const PartnersLogos = () => {
   }))();
   return (
     <>
+      <MinistereLogo />
       <img
         src={poleEmploiLogo}
         alt="Pole Emploi"
@@ -58,15 +100,6 @@ const PartnersLogos = () => {
       <img
         src={lesEntrepriseSengagent}
         alt="Les entreprises s'engagent"
-        className={cx(
-          fr.cx("fr-footer__partners-link"),
-          "im-footer__partner-link",
-          classes.partnerLogo,
-        )}
-      />
-      <img
-        src={plateformeLogo}
-        alt="Plateforme de l'Inclusion"
         className={cx(
           fr.cx("fr-footer__partners-link"),
           "im-footer__partner-link",
@@ -120,7 +153,7 @@ const links: NavLink[] = [
     target: "_blank",
   },
   {
-    label: "service-public.fr",
+    label: "service-public",
     href: "https://www.service-public.fr/",
     id: linksIds.civilService,
     target: "_blank",
@@ -186,8 +219,9 @@ export const LayoutFooter = () => (
   <>
     <OverFooter cols={overFooterCols} />
     <Footer
+      topFooter={<TopFooter />}
       links={links}
-      ministereLogo={<MinistereLogo />}
+      ministereLogo={<PlateformeSoloLogo />}
       partnersLogos={<PartnersLogos />}
       bottomLinks={bottomsLinks}
     />

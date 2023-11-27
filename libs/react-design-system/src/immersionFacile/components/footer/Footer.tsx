@@ -17,6 +17,7 @@ export type NavLink = {
 export type FooterProps = {
   links?: NavLink[];
   bottomLinks?: NavLink[];
+  topFooter: React.ReactNode;
   ministereLogo: React.ReactNode;
   partnersLogos?: React.ReactNode;
 };
@@ -49,6 +50,7 @@ const BottomLink = ({ link }: { link: NavLink }) => (
 
 export const Footer = ({
   links,
+  topFooter,
   bottomLinks,
   ministereLogo,
   partnersLogos,
@@ -56,25 +58,24 @@ export const Footer = ({
   const { cx } = useStyles();
   return (
     <footer className={cx(fr.cx("fr-footer"), "im-footer")} id="main-footer">
+      {topFooter}
       <div className={fr.cx("fr-container")}>
-        <div className={fr.cx("fr-footer__body")}>
-          {ministereLogo}
-          {partnersLogos}
-
-          <div
-            className={cx(fr.cx("fr-footer__content"), "im-footer__content")}
-          >
-            {links && links.length > 0 && (
-              <ul className={fr.cx("fr-footer__content-list")}>
-                {links.map((link, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <TopLink key={index} link={link} />
-                ))}
-              </ul>
-            )}
-          </div>
+        <div
+          className={cx(fr.cx("fr-footer__content-list"), "im-footer__content")}
+        >
+          {links && links.length > 0 && (
+            <ul className={fr.cx("fr-footer__content")}>
+              {links.map((link, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <TopLink key={index} link={link} />
+              ))}
+            </ul>
+          )}
         </div>
-
+        <div className={fr.cx("fr-footer__body", "fr-footer__bottom")}>
+          <div className={fr.cx("fr-footer__content")}>{ministereLogo}</div>
+          <div className={fr.cx("fr-footer__content")}>{partnersLogos}</div>
+        </div>
         <div className={fr.cx("fr-footer__bottom")}>
           {bottomLinks && bottomLinks.length > 0 && (
             <ul className={fr.cx("fr-footer__bottom-list")}>
