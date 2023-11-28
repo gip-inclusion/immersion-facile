@@ -76,7 +76,10 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       .min(1, localization.atLeastOneJob),
     businessContact: businessContactSchema,
     maxContactsPerWeek: z
-      .number()
+      .number({
+        invalid_type_error:
+          "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
+      })
       .nonnegative({
         message: "La valeur renseignée ne peut pas être négative",
       })
