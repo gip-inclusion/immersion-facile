@@ -12,7 +12,6 @@ import {
 import { routes } from "src/app/routes/routes";
 
 import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
-import plateformeLogo from "/assets/img/plateforme-inclusion-logo.svg";
 import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
 
 const {
@@ -21,57 +20,33 @@ const {
   overFooterCols: overFooterColsIds,
 } = domElementIds.footer;
 
-const TopFooter = () => {
+const TopFooter = ({ links }: { links: NavLink[] }) => {
   const { cx } = useStyles();
   return (
     <div className={fr.cx("fr-footer__top")}>
       <div className={fr.cx("fr-container")}>
-        <p>test</p>
-      </div>
-    </div>
-  );
-};
-
-const PlateformeSoloLogo = () => {
-  const { cx } = useStyles();
-  const darkModeState = useIsDark();
-  const { classes } = makeStyles({ name: LayoutFooter.displayName })(() => ({
-    partnerLogo: {
-      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
-    },
-  }))();
-  return (
-    <div>
-      <p>
-        <strong> Ce service fait partie de la </strong>
-      </p>
-      <div className={fr.cx("fr-footer__brand")}>
-        <img
-          src={plateformeLogo}
-          alt="Plateforme de l'Inclusion"
-          className={cx(
-            fr.cx("fr-footer__logo"),
-            "im-footer__logo",
-            classes.partnerLogo,
-          )}
-          style={{ height: "5.625rem" }}
-        />
-        <div>
-          <p>
-            Découvrez les outils qui portent l'inclusion au cœur de leur
-            service. À chaque service, son objectif.
-            <a
-              className={fr.cx(
-                "fr-footer__content-link",
-                "fr-icon-external-link-line",
-                "fr-link--icon-right",
-              )}
-              style={{ justifyContent: "start" }}
-              href={""}
+        <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+          {links.map((link) => (
+            <div
+              className={fr.cx("fr-col-12", "fr-col-sm-3", "fr-col-md-2")}
+              key={link.id}
             >
-              Découvrez nos services
-            </a>
-          </p>
+              <a className="fr-footer__top_cat" href="#">
+                {link.label}
+              </a>
+              {link.children && link.children.length > 0 && (
+                <ul className={fr.cx("fr-footer__top-list")}>
+                  {link.children.map((children) => (
+                    <li key={children.id}>
+                      <a className="fr-footer__top-link" href="#">
+                        {children.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -237,13 +212,75 @@ const bottomsLinks: NavLink[] = [
   },
 ];
 
+const topNavlinks: NavLink[] = [
+  {
+    label: "test1",
+    href: "https://www.gouvernement.fr/",
+    id: linksIds.gouv,
+    target: "_blank",
+    children: [
+      {
+        label: "sublink",
+        href: "https://www.gouvernement.fr/",
+        id: linksIds.gouv,
+        target: "_blank",
+      },
+      {
+        label: "sublink",
+        href: "https://www.gouvernement.fr/",
+        id: linksIds.gouv,
+        target: "_blank",
+      },
+    ],
+  },
+  {
+    label: "test2",
+    href: "https://www.service-public.fr/",
+    id: linksIds.civilService,
+    target: "_blank",
+    children: [
+      {
+        label: "sublink",
+        href: "https://www.gouvernement.fr/",
+        id: linksIds.gouv,
+        target: "_blank",
+      },
+    ],
+  },
+  {
+    label: "test3",
+    href: "https://inclusion-experimentation.beta.gouv.fr/",
+    id: linksIds.inclusion,
+    target: "_blank",
+    children: [
+      {
+        label: "sublink",
+        href: "https://www.gouvernement.fr/",
+        id: linksIds.gouv,
+        target: "_blank",
+      },
+      {
+        label: "sublink",
+        href: "https://www.gouvernement.fr/",
+        id: linksIds.gouv,
+        target: "_blank",
+      },
+      {
+        label: "sublink",
+        href: "https://www.gouvernement.fr/",
+        id: linksIds.gouv,
+        target: "_blank",
+      },
+    ],
+  },
+];
+
 export const LayoutFooter = () => (
   <>
     <OverFooter cols={overFooterCols} />
     <Footer
-      topFooter={<TopFooter />}
+      topFooter={<TopFooter links={topNavlinks} />}
       links={links}
-      ministereLogo={<PlateformeSoloLogo />}
       partnersLogos={<PartnersLogos />}
       bottomLinks={bottomsLinks}
     />
