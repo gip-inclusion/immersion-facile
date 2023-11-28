@@ -14,7 +14,6 @@ import { Route } from "type-route";
 import {
   AppellationAndRomeDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  // defaultMaxContactsPerWeek,
   domElementIds,
   emptyAppellationAndRome,
   EstablishmentJwtPayload,
@@ -116,7 +115,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   const debouncedFormValues = useDebounce(formValues);
 
-  const isSearchable = formValues.maxContactsPerWeek > noContactPerWeek;
+  const isSearchable =
+    isNaN(formValues.maxContactsPerWeek) ||
+    formValues.maxContactsPerWeek > noContactPerWeek;
 
   useInitialSiret(
     (isEstablishmentCreation || isEstablishmentAdmin) && route.params.siret
@@ -450,9 +451,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 {
                   label: "Oui",
                   nativeInputProps: {
-                    checked:
-                      isNaN(formValues.maxContactsPerWeek) ||
-                      formValues.maxContactsPerWeek > 0,
+                    checked: isSearchable,
                     onChange: (e) => {
                       e.currentTarget.checked
                         ? resetField("maxContactsPerWeek", {
@@ -474,14 +473,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   valueAsNumber: true,
                 }),
                 type: "number",
-                min: mode === "create" ? 1 : 0,
+                min:
+                  mode === "create" || (mode === "edit" && isSearchable)
+                    ? 1
+                    : 0,
                 pattern: "\\d*",
               }}
-              disabled={
-                mode === "edit" &&
-                !isNaN(formValues.maxContactsPerWeek) &&
-                !isSearchable
-              }
+              disabled={mode === "edit" && !isSearchable}
               {...getFieldError("maxContactsPerWeek")}
             />
           )}
