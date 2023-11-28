@@ -130,8 +130,8 @@ export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
     title: "Politique de confidentialité",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
-  "declaration-accessibilite": {
-    title: "Déclaration d'accessibilité",
+  accessibilite: {
+    title: "Accessibilité",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   "plan-du-site": {

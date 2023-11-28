@@ -135,7 +135,7 @@ const links: NavLink[] = [
 const bottomsLinks: NavLink[] = [
   {
     label: "Accessibilité : partiellement conforme",
-    ...routes.standard({ pagePath: "declaration-accessibilite" }).link,
+    ...routes.standard({ pagePath: "accessibilite" }).link,
     id: bottomsLinksIds.accessibility,
   },
   {
