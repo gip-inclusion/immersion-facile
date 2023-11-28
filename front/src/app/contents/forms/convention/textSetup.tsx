@@ -11,6 +11,10 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Remplir la demande de convention"
         : "S’informer sur les métiers, découvrir l’entreprise",
+    conventionEditTitle:
+      internshipKind === "immersion"
+        ? "Modifier la demande de convention"
+        : "S’informer sur les métiers, découvrir l’entreprise",
     conventionSummaryTitle:
       internshipKind === "immersion"
         ? "Vérifier la demande de convention"

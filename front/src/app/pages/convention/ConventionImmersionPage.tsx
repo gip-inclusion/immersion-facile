@@ -66,6 +66,16 @@ export const ConventionImmersionPage = ({
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
     useState(isSharedConvention);
 
+  const getPageHeaderTitle = (
+    jwt: string | undefined,
+    showSummary: boolean,
+  ) => {
+    const createOrEditTitle = jwt
+      ? t.intro.conventionEditTitle
+      : t.intro.conventionTitle;
+    return showSummary ? t.intro.conventionSummaryTitle : createOrEditTitle;
+  };
+
   useEffect(() => {
     if (isPeConnected) setDisplaySharedConventionMessage(false);
   }, [isPeConnected]);
@@ -77,11 +87,7 @@ export const ConventionImmersionPage = ({
         pageHeader={
           !displaySharedConventionMessage && (
             <PageHeader
-              title={
-                showSummary
-                  ? t.intro.conventionSummaryTitle
-                  : t.intro.conventionTitle
-              }
+              title={getPageHeaderTitle(jwt, showSummary)}
               theme="default"
             />
           )
