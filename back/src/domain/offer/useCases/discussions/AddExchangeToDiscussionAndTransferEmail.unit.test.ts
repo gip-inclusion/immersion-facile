@@ -181,6 +181,133 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         ],
       });
     });
+
+    it("saves the new exchange in the discussion and sends the email, with a default subject if not provided", async () => {
+      const discussionId1 = "my-discussion-id-1";
+      const discussionId2 = "my-discussion-id-2";
+      const responseSubject = "";
+      const brevoResponse = createBrevoResponse(
+        [
+          `${discussionId1}_b@${replyDomain}`,
+          `${discussionId2}_e@${replyDomain}`,
+        ],
+        responseSubject,
+      );
+      const bufferRawContent = Buffer.from("my-attachment-content");
+      notificationGateway.attachment = bufferRawContent;
+
+      const discussion1 = new DiscussionAggregateBuilder()
+        .withId(discussionId1)
+        .withExchanges([
+          {
+            subject: "Ma discussion 1",
+            message: "Hello",
+            sender: "potentialBeneficiary",
+            sentAt: new Date(),
+            recipient: "establishment",
+          },
+        ])
+        .build();
+
+      const discussion2 = new DiscussionAggregateBuilder()
+        .withId(discussionId2)
+        .withExchanges([
+          {
+            subject: "",
+            message: "Hello",
+            sender: "potentialBeneficiary",
+            sentAt: new Date(),
+            recipient: "establishment",
+          },
+        ])
+        .build();
+
+      discussionAggregateRepository.discussionAggregates = [
+        discussion1,
+        discussion2,
+      ];
+      await addExchangeToDiscussionAndTransferEmail.execute(brevoResponse);
+      const discussionsInRepository =
+        discussionAggregateRepository.discussionAggregates;
+
+      expect(discussionsInRepository).toHaveLength(2);
+
+      expectToEqual(discussionAggregateRepository.discussionAggregates, [
+        {
+          ...discussion1,
+          exchanges: [
+            ...discussion1.exchanges,
+            {
+              message: brevoResponse.items[0].RawHtmlBody,
+              sender: "establishment",
+              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              recipient: "potentialBeneficiary",
+              subject: "Sans objet",
+            },
+          ],
+        },
+        {
+          ...discussion2,
+          exchanges: [
+            ...discussion2.exchanges,
+            {
+              message: brevoResponse.items[1].RawHtmlBody,
+              sender: "potentialBeneficiary",
+              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              recipient: "establishment",
+              subject: "Sans objet",
+            },
+          ],
+        },
+      ]);
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "DISCUSSION_EXCHANGE",
+            params: {
+              htmlContent:
+                brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---",
+              subject: "Sans objet",
+            },
+            recipients: [discussion1.potentialBeneficiary.email],
+            replyTo: {
+              email: `${discussionId1}_e@reply.my-domain.com`,
+              name: `${discussion1.establishmentContact.firstName} ${discussion1.establishmentContact.lastName} - ${discussion1.businessName}`,
+            },
+            sender: immersionFacileNoReplyEmailSender,
+            cc: [],
+            attachments: [
+              {
+                name: "IMG_20230617_151239.jpg",
+                content: bufferRawContent.toString("base64"),
+              },
+            ],
+          },
+          {
+            kind: "DISCUSSION_EXCHANGE",
+            params: {
+              htmlContent:
+                brevoResponse.items[1].RawHtmlBody ?? "--- pas de message ---",
+              subject: "Sans objet",
+            },
+            recipients: [discussion2.establishmentContact.email],
+            replyTo: {
+              email: `${discussionId2}_b@reply.my-domain.com`,
+              name: `${discussion2.potentialBeneficiary.firstName} ${discussion2.potentialBeneficiary.lastName}`,
+            },
+            sender: immersionFacileNoReplyEmailSender,
+            cc: discussion2.establishmentContact.copyEmails,
+            attachments: [
+              {
+                name: "IMG_20230617_151239.jpg",
+                content: bufferRawContent.toString("base64"),
+              },
+            ],
+          },
+        ],
+      });
+    });
   });
 
   describe("wrong paths", () => {
@@ -219,7 +346,10 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
   });
 });
 
-const createBrevoResponse = (toAddresses: string[]): BrevoInboundBody => ({
+const createBrevoResponse = (
+  toAddresses: string[],
+  subject?: string,
+): BrevoInboundBody => ({
   items: toAddresses.map((address) => ({
     Uuid: ["8d79f2b1-20ae-4939-8d0b-d2517331a9e5"],
     MessageId:
@@ -248,7 +378,7 @@ const createBrevoResponse = (toAddresses: string[]): BrevoInboundBody => ({
     ],
     ReplyTo: null,
     SentAtDate: "Wed, 28 Jun 2023 10:06:52 +0200",
-    Subject: "Fwd: Hey !",
+    Subject: subject ?? "Fwd: Hey !",
     Attachments: [
       {
         Name: "IMG_20230617_151239.jpg",

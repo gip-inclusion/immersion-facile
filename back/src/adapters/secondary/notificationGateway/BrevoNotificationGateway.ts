@@ -1,6 +1,7 @@
 import Bottleneck from "bottleneck";
 import {
   emailTemplatesByName,
+  NotificationId,
   smsTemplatesByName,
   type TemplatedEmail,
   type TemplatedSms,
@@ -85,7 +86,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
     return response.body;
   }
 
-  public async sendEmail(email: TemplatedEmail) {
+  public async sendEmail(
+    email: TemplatedEmail,
+    notificationId?: NotificationId,
+  ) {
     if (email.recipients.length === 0) {
       logger.error(
         { emailType: email.kind, emailParams: email.params },
@@ -143,6 +147,8 @@ export class BrevoNotificationGateway implements NotificationGateway {
             to: emailData.to,
             type: email.kind,
             errorMessage: error?.response?.data ?? error?.message,
+            notificationId,
+            notificationKind: "email",
           },
           "sendTransactEmailError",
         );
@@ -150,11 +156,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
       });
   }
 
-  public sendSms({
-    kind,
-    params,
-    recipientPhone,
-  }: TemplatedSms): Promise<void> {
+  public sendSms(
+    { kind, params, recipientPhone }: TemplatedSms,
+    notificationId?: NotificationId,
+  ): Promise<void> {
     logger.info(
       {
         phone: recipientPhone,
@@ -179,6 +184,8 @@ export class BrevoNotificationGateway implements NotificationGateway {
         logger.error(
           {
             phone: recipientPhone,
+            notificationId,
+            notificationKind: "sms",
             error,
           },
           "sendTransactSmsError",

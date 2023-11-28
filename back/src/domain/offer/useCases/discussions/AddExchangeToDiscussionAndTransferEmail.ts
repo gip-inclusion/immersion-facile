@@ -25,6 +25,8 @@ import {
   ExchangeEntity,
 } from "../../entities/DiscussionAggregate";
 
+const defaultSubject = "Sans objet";
+
 export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundBody> {
   protected inputSchema = brevoInboundBodySchema;
 
@@ -96,7 +98,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
         : "establishment";
 
     const exchange: ExchangeEntity = {
-      subject: item.Subject,
+      subject: item.Subject || defaultSubject,
       message: processEmailMessage(item),
       sentAt: new Date(item.SentAtDate),
       recipient: recipientKind,

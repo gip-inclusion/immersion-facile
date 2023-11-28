@@ -47,9 +47,13 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
       case "email":
         return this.notificationGateway.sendEmail(
           notification.templatedContent,
+          notification.id,
         );
       case "sms":
-        return this.notificationGateway.sendSms(notification.templatedContent);
+        return this.notificationGateway.sendSms(
+          notification.templatedContent,
+          notification.id,
+        );
       default:
         return exhaustiveCheck(notification, {
           variableName: "notification",
