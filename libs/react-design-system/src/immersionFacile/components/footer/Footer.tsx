@@ -59,15 +59,23 @@ export const Footer = ({
     <footer className={cx(fr.cx("fr-footer"), Styles.root)} id="main-footer">
       {topFooter}
       <div className={fr.cx("fr-container")}>
-        <div className={cx(fr.cx("fr-footer__content-list"), Styles.content)}>
-          {links && links.length > 0 && (
-            <ul className={fr.cx("fr-footer__content")}>
-              {links.map((link, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <TopLink key={index} link={link} />
-              ))}
-            </ul>
-          )}
+        <div className={fr.cx("fr-footer__content")}>
+          <div
+            className={cx(
+              fr.cx("fr-footer__content"),
+              Styles.content,
+              Styles.contentEnd,
+            )}
+          >
+            {links && links.length > 0 && (
+              <ul className={fr.cx("fr-footer__content-list")}>
+                {links.map((link, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <TopLink key={index} link={link} />
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
         <div className={fr.cx("fr-footer__partners")}>
           <div className={fr.cx("fr-footer__partners-logos")}>
