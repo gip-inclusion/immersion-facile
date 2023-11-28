@@ -14,7 +14,7 @@ import { Route } from "type-route";
 import {
   AppellationAndRomeDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  defaultMaxContactsPerWeek,
+  // defaultMaxContactsPerWeek,
   domElementIds,
   emptyAppellationAndRome,
   EstablishmentJwtPayload,
@@ -90,7 +90,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
 
   const methods = useForm<FormEstablishmentDto>({
-    defaultValues: initialFormEstablishment,
+    defaultValues: {
+      ...initialFormEstablishment,
+      maxContactsPerWeek: undefined,
+    },
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
@@ -102,6 +105,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     getValues,
     formState: { errors, submitCount, isSubmitting, touchedFields },
     reset,
+    resetField,
   } = methods;
 
   const formValues = getValues();
@@ -178,8 +182,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   }, [adminJwt, dispatch, currentRoute]);
 
   useEffect(() => {
-    reset(initialFormEstablishment);
-  }, [initialFormEstablishment, reset]);
+    reset({
+      ...initialFormEstablishment,
+      maxContactsPerWeek:
+        mode === "create"
+          ? undefined
+          : initialFormEstablishment.maxContactsPerWeek,
+    });
+  }, [initialFormEstablishment, reset, mode]);
 
   useEffect(() => {
     if (isEstablishmentCreation) {
@@ -440,35 +450,41 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 {
                   label: "Oui",
                   nativeInputProps: {
-                    checked: isSearchable,
+                    checked:
+                      isNaN(formValues.maxContactsPerWeek) ||
+                      formValues.maxContactsPerWeek > 0,
                     onChange: (e) => {
-                      setValue(
-                        "maxContactsPerWeek",
-                        e.currentTarget.checked
-                          ? defaultMaxContactsPerWeek
-                          : noContactPerWeek,
-                      );
+                      e.currentTarget.checked
+                        ? resetField("maxContactsPerWeek", {
+                            defaultValue: "",
+                          })
+                        : setValue("maxContactsPerWeek", noContactPerWeek);
                     },
                   },
                 },
               ]}
             />
           )}
-          {enableMaxContactPerWeek.isActive &&
-            (isNaN(formValues.maxContactsPerWeek) || isSearchable) && (
-              <Input
-                label={formContents.maxContactsPerWeek.label}
-                nativeInputProps={{
-                  ...formContents.maxContactsPerWeek,
-                  ...register("maxContactsPerWeek", {
-                    valueAsNumber: true,
-                  }),
-                  type: "number",
-                  min: 0,
-                  pattern: "\\d*",
-                }}
-              />
-            )}
+          {enableMaxContactPerWeek.isActive && (
+            <Input
+              label={formContents.maxContactsPerWeek.label}
+              nativeInputProps={{
+                ...formContents.maxContactsPerWeek,
+                ...register("maxContactsPerWeek", {
+                  valueAsNumber: true,
+                }),
+                type: "number",
+                min: mode === "create" ? 1 : 0,
+                pattern: "\\d*",
+              }}
+              disabled={
+                mode === "edit" &&
+                !isNaN(formValues.maxContactsPerWeek) &&
+                !isSearchable
+              }
+              {...getFieldError("maxContactsPerWeek")}
+            />
+          )}
 
           {mode === "edit" && (
             <>
