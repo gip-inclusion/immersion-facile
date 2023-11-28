@@ -46,9 +46,9 @@ const siteMapLinks: RegisteredLinkProps[] = [
     ...routes.addAgency().link,
   },
   {
-    title: "Déclaration d'accessibilité",
+    title: "Accessibilité",
     id: siteMapIds.accessibility,
-    ...routes.standard({ pagePath: "declaration-accessibilite" }).link,
+    ...routes.standard({ pagePath: "accessibilite" }).link,
   },
   {
     title: "Mentions légales",

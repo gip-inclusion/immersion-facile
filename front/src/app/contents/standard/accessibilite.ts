@@ -1,10 +1,14 @@
 import { immersionFacileContactEmail } from "shared";
 
 export default {
-  title: "Déclaration d'accessibilité",
+  title: "Accessibilité",
   content: `
 
-  GIP Plateforme de l'Inclusion s’engage à rendre ses sites internet, intranet, extranet et ses progiciels accessibles (et ses applications mobiles et mobilier urbain numérique) conformément à l’article 47 de la loi n°2005-102 du 11 février 2005.
+  <strong>Déclaration d’accessibilité</strong>
+
+  Le GIP Plateforme de l’inclusion s’engage à rendre ses sites internet et applications accessibles conformément à l’article 47 de la loi n°2005-102 du 11 février 2005.
+
+  Son schéma pluriannuel décrit les points importants sur lesquels le GIP de la plateforme de l’inclusion s’appuiera pour améliorer l’accessibilité numérique de l’ensemble de ses sites internet et applications. Ce schéma s’accompagne du plans d’action annuels (<a target="_blank" href="https://inclusion.beta.gouv.fr/documents/86/GIP_plateforme_de_linclusion_-_Plan_annuel_daccessibilite_2023.pdf">2023</a>) qui détaillent les opérations programmées et mises en œuvre pour l'année courante, ainsi que l’état de suivis de ces actions, détaillé dans le <a target="_blank" href="https://inclusion.beta.gouv.fr/documents/87/GIP_plateforme_de_linclusion_-_Schema_pluriannuel_daccessibilite_2023-2026.pdf">schéma pluriannuel d’accessibilité 2023-2026</a>.
   
   Cette déclaration d’accessibilité s’applique à https://immersion-facile.beta.gouv.fr.
 

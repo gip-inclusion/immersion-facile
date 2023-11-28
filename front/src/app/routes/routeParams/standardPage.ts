@@ -6,7 +6,7 @@ export const standardPageSlugs = [
   "mentions-legales",
   "cgu",
   "politique-de-confidentialite",
-  "declaration-accessibilite",
+  "accessibilite",
   "plan-du-site",
   "obligations-des-parties",
   "budget",
