@@ -1,7 +1,13 @@
-import { TemplatedEmail, TemplatedSms } from "shared";
+import { NotificationId, TemplatedEmail, TemplatedSms } from "shared";
 
 export interface NotificationGateway {
-  sendEmail(templatedEmail: TemplatedEmail): Promise<void>;
-  sendSms(sendSmsParams: TemplatedSms): Promise<void>;
+  sendEmail(
+    templatedEmail: TemplatedEmail,
+    notificationId?: NotificationId,
+  ): Promise<void>;
+  sendSms(
+    sendSmsParams: TemplatedSms,
+    notificationId?: NotificationId,
+  ): Promise<void>;
   getAttachmentContent(downloadToken: string): Promise<Buffer>;
 }
