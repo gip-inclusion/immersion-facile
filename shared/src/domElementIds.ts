@@ -45,6 +45,20 @@ export const domElementIds = {
       linkedin: buildFooterNavLinkId("over-linkedin"),
       contact: buildFooterNavLinkId("over-contact"),
     },
+    navTopGroupLinks: {
+      search: buildFooterNavLinkId("footer-nav-top-candidate-search"),
+      formConvention: buildFooterNavLinkId("footer-nav-top-form-convention"),
+      addEstablishmentForm: buildFooterNavLinkId(
+        "footer-nav-top-establishement-form-convention",
+      ),
+      establishementformConvention: buildFooterNavLinkId(
+        "footer-nav-top-establishement-form-convention",
+      ),
+      addAgencyForm: buildFooterNavLinkId("footer-nav-top-agency-form"),
+      agencyformConvention: buildFooterNavLinkId(
+        "footer-nav-top-agency-form-convention",
+      ),
+    },
     links: {
       gouv: buildFooterNavLinkId("gouv"),
       civilService: buildFooterNavLinkId("service-public"),
