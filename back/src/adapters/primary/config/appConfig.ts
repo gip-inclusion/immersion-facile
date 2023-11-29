@@ -274,6 +274,10 @@ export class AppConfig {
     });
   }
 
+  public get maxApiConsumerCallsPerSecond() {
+    return parseInteger(this.env.MAX_API_CONSUMER_CALLS_PER_SECOND, 5);
+  }
+
   public get maxConventionsToSyncWithPe() {
     return parseInt(
       this.#throwIfNotDefinedOrDefault("MAX_CONVENTIONS_TO_SYNC_WITH_PE", "50"),

@@ -27,6 +27,7 @@ export const publicApiV2SearchEstablishmentRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
   searchImmersion: defineRoute({
@@ -39,6 +40,7 @@ export const publicApiV2SearchEstablishmentRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
   contactEstablishment: defineRoute({
@@ -52,6 +54,7 @@ export const publicApiV2SearchEstablishmentRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
 });
@@ -68,6 +71,7 @@ export const publicApiV2ConventionRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
   getConventions: defineRoute({
@@ -80,6 +84,7 @@ export const publicApiV2ConventionRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
 });
@@ -96,6 +101,7 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
   listActiveSubscriptions: defineRoute({
@@ -114,6 +120,7 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
   unsubscribeToWebhook: defineRoute({
@@ -125,6 +132,7 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
 });

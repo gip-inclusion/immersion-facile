@@ -153,6 +153,10 @@ const error404Example = {
   status: 404,
   message: "No establishment found with siret 12345678912345",
 };
+const error429Example = {
+  status: 429,
+  message: "Too many requests, please try again later.",
+};
 
 const conventionExample: ConventionReadDto = {
   ...new ConventionDtoBuilder().build(),
@@ -265,6 +269,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
                 "Accès non autorisé (veuillez vérifier que vous avez les droits)",
               example: error403Example,
             },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
+            },
           },
         },
       },
@@ -312,6 +321,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
             "404": {
               description: "Résultat non trouvé",
               example: error404Example,
+            },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
             },
           },
         },
@@ -377,6 +391,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
               description: "Établissement/Contact non trouvé",
               example: error404Example,
             },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
+            },
           },
         },
       },
@@ -407,6 +426,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
               description: "Convention non trouvé",
               example: error404Example,
             },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
+            },
           },
         },
       },
@@ -433,6 +457,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
                 "Accès non autorisé (veuillez vérifier que vous avez les droits)",
               example: error403Example,
             },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
+            },
           },
         },
       },
@@ -458,6 +487,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
               description:
                 "Accès non autorisé (veuillez vérifier que vous avez les droits)",
               example: error403Example,
+            },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
             },
           },
         },
@@ -501,6 +535,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
             "403": {
               description: "Lorsque vous n'avez pas suffisamment de droits",
             },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
+            },
           },
         },
       },
@@ -524,6 +563,11 @@ export const createOpenApiSpecV2 = (envType: string) =>
             },
             "404": {
               description: "La souscription demandée n'est pas trouvée",
+            },
+            "429": {
+              description:
+                "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+              example: error429Example,
             },
           },
         },
