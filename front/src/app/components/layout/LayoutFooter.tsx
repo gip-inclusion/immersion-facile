@@ -1,5 +1,6 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { makeStyles, useStyles } from "tss-react/dsfr";
 import { domElementIds } from "shared";
@@ -13,45 +14,42 @@ import { routes } from "src/app/routes/routes";
 
 import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
 import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
-
 const {
   bottomLinks: bottomsLinksIds,
   links: linksIds,
   overFooterCols: overFooterColsIds,
 } = domElementIds.footer;
 
-const TopFooter = ({ links }: { links: NavLink[] }) => {
-  const { cx } = useStyles();
-  return (
-    <div className={fr.cx("fr-footer__top")}>
-      <div className={fr.cx("fr-container")}>
-        <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-          {links.map((link) => (
-            <div
-              className={fr.cx("fr-col-12", "fr-col-sm-3", "fr-col-md-2")}
-              key={link.id}
-            >
-              <a className="fr-footer__top_cat" href="#">
-                {link.label}
-              </a>
-              {link.children && link.children.length > 0 && (
-                <ul className={fr.cx("fr-footer__top-list")}>
-                  {link.children.map((children) => (
-                    <li key={children.id}>
-                      <a className="fr-footer__top-link" href="#">
-                        {children.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
+const TopFooter = ({ links }: { links: MainNavigationProps.Item[] }) => (
+  <div className={fr.cx("fr-footer__top")}>
+    <div className={fr.cx("fr-container")}>
+      <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+        {links.map((link) => (
+          <div
+            className={fr.cx("fr-col-12", "fr-col-sm-3", "fr-col-md-2")}
+            key={link.linkProps?.id}
+          >
+            <h3 className={fr.cx("fr-footer__top-cat")}>{link.text}</h3>
+            {link.menuLinks && link.menuLinks.length > 0 && (
+              <ul className={fr.cx("fr-footer__top-list")}>
+                {link.menuLinks.map((children) => (
+                  <li key={children.linkProps.id}>
+                    <a
+                      className={fr.cx("fr-footer__top-link")}
+                      href={children.linkProps.href}
+                    >
+                      {children.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 export const MinistereLogo = () => (
   <div className={fr.cx("fr-footer__logo")}>
@@ -123,7 +121,7 @@ const overFooterCols: OverFooterCols = [
     title: "Rejoignez la communauté",
     subtitle:
       "Rejoignez la communauté d'Immersion Facilitée et suivez nos actualités.",
-    iconTitle: "fr-icon-links-fill",
+    iconTitle: "fr-icon-linkedin-box-fill",
     link: {
       label: "Rejoignez-nous sur Linkedin",
       url: "https://www.linkedin.com/company/l-immersion-facilitee/",
@@ -211,65 +209,79 @@ const bottomsLinks: NavLink[] = [
     id: bottomsLinksIds.apiDocumentation,
   },
 ];
+const {
+  candidate: candidateIds,
+  establishment: establishmentIds,
+  agency: agencyIds,
+} = domElementIds.header.navLinks;
 
-const topNavlinks: NavLink[] = [
+const topNavlinks: MainNavigationProps.Item[] = [
   {
-    label: "test1",
-    href: "https://www.gouvernement.fr/",
-    id: linksIds.gouv,
-    target: "_blank",
-    children: [
+    text: "Candidats",
+    menuLinks: [
       {
-        label: "sublink",
-        href: "https://www.gouvernement.fr/",
-        id: linksIds.gouv,
-        target: "_blank",
+        text: "Trouver une entreprise accueillante",
+        linkProps: {
+          ...routes.search().link,
+          id: candidateIds.search,
+        },
       },
       {
-        label: "sublink",
-        href: "https://www.gouvernement.fr/",
-        id: linksIds.gouv,
-        target: "_blank",
+        text: "Remplir la demande de convention",
+        linkProps: {
+          ...routes.conventionImmersion().link,
+          id: candidateIds.formConvention,
+        },
       },
     ],
   },
   {
-    label: "test2",
-    href: "https://www.service-public.fr/",
-    id: linksIds.civilService,
-    target: "_blank",
-    children: [
+    text: "Entreprises",
+    menuLinks: [
       {
-        label: "sublink",
-        href: "https://www.gouvernement.fr/",
-        id: linksIds.gouv,
-        target: "_blank",
+        text: "Référencer mon entreprise",
+        linkProps: {
+          ...routes.formEstablishment().link,
+          id: establishmentIds.addEstablishmentForm,
+        },
+      },
+      {
+        text: "Remplir la demande de convention",
+        linkProps: {
+          ...routes.conventionImmersion().link,
+          id: establishmentIds.formConvention,
+        },
       },
     ],
   },
   {
-    label: "test3",
-    href: "https://inclusion-experimentation.beta.gouv.fr/",
-    id: linksIds.inclusion,
-    target: "_blank",
-    children: [
+    text: "Prescripteurs",
+    menuLinks: [
       {
-        label: "sublink",
-        href: "https://www.gouvernement.fr/",
-        id: linksIds.gouv,
-        target: "_blank",
+        text: "Référencer mon organisme",
+        linkProps: {
+          ...routes.addAgency().link,
+          id: agencyIds.addAgencyForm,
+        },
       },
       {
-        label: "sublink",
-        href: "https://www.gouvernement.fr/",
-        id: linksIds.gouv,
-        target: "_blank",
+        text: "Remplir la demande de convention",
+        linkProps: {
+          ...routes.conventionImmersion().link,
+          id: agencyIds.formConvention,
+        },
       },
+    ],
+  },
+  {
+    text: "Réseaux sociaux",
+    menuLinks: [
       {
-        label: "sublink",
-        href: "https://www.gouvernement.fr/",
-        id: linksIds.gouv,
-        target: "_blank",
+        text: "Rejoignez nous sur Linkedin",
+        linkProps: {
+          href: "https://www.linkedin.com/company/l-immersion-facilitee/",
+          id: agencyIds.addAgencyForm,
+        },
       },
     ],
   },
