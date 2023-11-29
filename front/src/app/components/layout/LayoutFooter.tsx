@@ -1,12 +1,12 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { makeStyles, useStyles } from "tss-react/dsfr";
 import { domElementIds } from "shared";
 import {
   Footer,
   NavLink,
+  NavTopGroupLinks,
   OverFooter,
   OverFooterCols,
 } from "react-design-system";
@@ -17,39 +17,9 @@ import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
 const {
   bottomLinks: bottomsLinksIds,
   links: linksIds,
+  navTopGroupLinks: navTopGroupLinksIds,
   overFooterCols: overFooterColsIds,
 } = domElementIds.footer;
-
-const TopFooter = ({ links }: { links: MainNavigationProps.Item[] }) => (
-  <div className={fr.cx("fr-footer__top")}>
-    <div className={fr.cx("fr-container")}>
-      <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-        {links.map((link) => (
-          <div
-            className={fr.cx("fr-col-12", "fr-col-sm-3", "fr-col-md-2")}
-            key={link.linkProps?.id}
-          >
-            <h3 className={fr.cx("fr-footer__top-cat")}>{link.text}</h3>
-            {link.menuLinks && link.menuLinks.length > 0 && (
-              <ul className={fr.cx("fr-footer__top-list")}>
-                {link.menuLinks.map((children) => (
-                  <li key={children.linkProps.id}>
-                    <a
-                      className={fr.cx("fr-footer__top-link")}
-                      href={children.linkProps.href}
-                    >
-                      {children.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-);
 
 export const MinistereLogo = () => (
   <div className={fr.cx("fr-footer__logo")}>
@@ -142,20 +112,20 @@ const overFooterCols: OverFooterCols = [
 ];
 const links: NavLink[] = [
   {
-    label: "gouvernement.fr",
-    href: "https://www.gouvernement.fr/",
+    label: "beta.gouv.fr",
+    href: "https://beta.gouv.fr/",
     id: linksIds.gouv,
     target: "_blank",
   },
   {
-    label: "service-public",
-    href: "https://www.service-public.fr/",
+    label: "data.gouv.fr",
+    href: "https://www.data.gouv.fr/",
     id: linksIds.civilService,
     target: "_blank",
   },
   {
-    label: "La plateforme de l'inclusion",
-    href: "https://inclusion-experimentation.beta.gouv.fr/",
+    label: "api.gouv.fr",
+    href: "https://api.gouv.fr/",
     id: linksIds.inclusion,
     target: "_blank",
   },
@@ -209,79 +179,67 @@ const bottomsLinks: NavLink[] = [
     id: bottomsLinksIds.apiDocumentation,
   },
 ];
-const {
-  candidate: candidateIds,
-  establishment: establishmentIds,
-  agency: agencyIds,
-} = domElementIds.header.navLinks;
 
-const topNavlinks: MainNavigationProps.Item[] = [
+const navTopGroupLinks: NavTopGroupLinks[] = [
   {
-    text: "Candidats",
-    menuLinks: [
+    title: "Candidats",
+    links: [
       {
-        text: "Trouver une entreprise accueillante",
-        linkProps: {
-          ...routes.search().link,
-          id: candidateIds.search,
-        },
+        label: "Trouver une entreprise accueillante",
+        ...routes.search().link,
+        id: navTopGroupLinksIds.search,
       },
       {
-        text: "Remplir la demande de convention",
-        linkProps: {
-          ...routes.conventionImmersion().link,
-          id: candidateIds.formConvention,
-        },
+        label: "Remplir la demande de convention",
+        ...routes.conventionImmersion().link,
+        id: navTopGroupLinksIds.formConvention,
       },
     ],
   },
   {
-    text: "Entreprises",
-    menuLinks: [
+    title: "Entreprises",
+    links: [
       {
-        text: "Référencer mon entreprise",
-        linkProps: {
-          ...routes.formEstablishment().link,
-          id: establishmentIds.addEstablishmentForm,
-        },
+        label: "Référencer mon entreprise",
+        ...routes.formEstablishment().link,
+        id: navTopGroupLinksIds.addEstablishmentForm,
       },
       {
-        text: "Remplir la demande de convention",
-        linkProps: {
-          ...routes.conventionImmersion().link,
-          id: establishmentIds.formConvention,
-        },
+        label: "Remplir la demande de convention",
+        ...routes.conventionImmersion().link,
+        id: navTopGroupLinksIds.addEstablishmentForm,
       },
     ],
   },
   {
-    text: "Prescripteurs",
-    menuLinks: [
+    title: "Prescripteurs",
+    links: [
       {
-        text: "Référencer mon organisme",
-        linkProps: {
-          ...routes.addAgency().link,
-          id: agencyIds.addAgencyForm,
-        },
+        label: "Référencer mon organisme",
+        ...routes.addAgency().link,
+        id: navTopGroupLinksIds.addAgencyForm,
       },
       {
-        text: "Remplir la demande de convention",
-        linkProps: {
-          ...routes.conventionImmersion().link,
-          id: agencyIds.formConvention,
-        },
+        label: "Remplir la demande de convention",
+        ...routes.conventionImmersion().link,
+        id: navTopGroupLinksIds.agencyformConvention,
       },
     ],
   },
   {
-    text: "Réseaux sociaux",
-    menuLinks: [
+    title: "Réseaux sociaux",
+    links: [
       {
-        text: "Rejoignez nous sur Linkedin",
-        linkProps: {
-          href: "https://www.linkedin.com/company/l-immersion-facilitee/",
-          id: agencyIds.addAgencyForm,
-        },
+        label: (
+          <>
+            <i
+              className={fr.cx("fr-icon-linkedin-box-fill", "fr-icon--sm")}
+            ></i>
+            Rejoignez-nous sur Linkedin
+          </>
+        ),
+        href: "https://www.linkedin.com/company/l-immersion-facilitee/",
+        id: navTopGroupLinksIds.addAgencyForm,
       },
     ],
   },
@@ -291,7 +249,7 @@ export const LayoutFooter = () => (
   <>
     <OverFooter cols={overFooterCols} />
     <Footer
-      topFooter={<TopFooter links={topNavlinks} />}
+      navTopGroupLinks={navTopGroupLinks}
       links={links}
       partnersLogos={<PartnersLogos />}
       bottomLinks={bottomsLinks}

@@ -6,7 +6,7 @@ import Styles from "./Footer.styles";
 
 export type NavLink = {
   onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
-  label: string;
+  label: React.ReactNode;
   href?: string;
   active?: boolean;
   target?: string;
@@ -15,10 +15,15 @@ export type NavLink = {
   id: string;
 };
 
+export type NavTopGroupLinks = {
+  title: string;
+  links: NavLink[];
+};
+
 export type FooterProps = {
   links?: NavLink[];
+  navTopGroupLinks?: NavTopGroupLinks[];
   bottomLinks?: NavLink[];
-  topFooter: React.ReactNode;
   partnersLogos?: React.ReactNode;
 };
 
@@ -50,14 +55,43 @@ const BottomLink = ({ link }: { link: NavLink }) => (
 
 export const Footer = ({
   links,
-  topFooter,
+  navTopGroupLinks,
   bottomLinks,
   partnersLogos,
 }: FooterProps) => {
   const { cx } = useStyles();
   return (
     <footer className={cx(fr.cx("fr-footer"), Styles.root)} id="main-footer">
-      {topFooter}
+      <div className={fr.cx("fr-footer__top")}>
+        <div className={fr.cx("fr-container")}>
+          <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+            {navTopGroupLinks?.map((groupOfLink) => (
+              <div
+                className={fr.cx("fr-col-12", "fr-col-sm-3", "fr-col-md-2")}
+                key="navTopGroupLinks"
+              >
+                <h3 className={fr.cx("fr-footer__top-cat")}>
+                  {groupOfLink.title}
+                </h3>
+                {groupOfLink.links && groupOfLink.links.length > 0 && (
+                  <ul className={fr.cx("fr-footer__top-list")}>
+                    {groupOfLink.links.map((link) => (
+                      <li key={link.id}>
+                        <a
+                          className={fr.cx("fr-footer__top-link")}
+                          href={link.href}
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className={fr.cx("fr-container")}>
         <div className={fr.cx("fr-footer__content")}>
           <div
@@ -69,9 +103,8 @@ export const Footer = ({
           >
             {links && links.length > 0 && (
               <ul className={fr.cx("fr-footer__content-list")}>
-                {links.map((link, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <TopLink key={index} link={link} />
+                {links.map((link) => (
+                  <TopLink key={link.id} link={link} />
                 ))}
               </ul>
             )}
@@ -104,7 +137,7 @@ export const Footer = ({
                       "fr-icon-external-link-line",
                       "fr-link--icon-right",
                     )}
-                    href={""}
+                    href={"https://inclusion.beta.gouv.fr/"}
                   >
                     Découvrez nos services
                   </a>
