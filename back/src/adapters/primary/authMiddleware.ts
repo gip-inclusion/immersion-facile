@@ -1,3 +1,4 @@
+import Bottleneck from "bottleneck";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
@@ -30,6 +31,7 @@ type TotalCountProps = {
     | "incorrectJwt"
     | "expiredToken"
     | "consumerNotFound"
+    | "tooManyRequests"
     | "unauthenticated";
 };
 
@@ -296,6 +298,13 @@ export const makeConsumerMiddleware = (
   config: AppConfig,
 ) => {
   const verifyJwt = makeVerifyJwtES256<"apiConsumer">(config.apiJwtPublicKey);
+  const consumerMiddlewareLimiter = new Bottleneck.Group({
+    highWater: 0,
+    strategy: Bottleneck.strategy.BLOCK,
+    reservoir: config.maxApiConsumerCallsPerSecond,
+    reservoirRefreshInterval: 1000,
+    reservoirRefreshAmount: config.maxApiConsumerCallsPerSecond,
+  });
 
   return async (
     req: Request<any, any, any, any>,
@@ -334,8 +343,26 @@ export const makeConsumerMiddleware = (
         authorisationStatus: "authorised",
       });
 
+      const userLimiter = consumerMiddlewareLimiter.key(apiConsumer.id);
+
       req.apiConsumer = apiConsumer;
-      return next();
+
+      return await userLimiter
+        // eslint-disable-next-line @typescript-eslint/require-await
+        .schedule(async () => next())
+        .catch((error) => {
+          logger.error({
+            error,
+          });
+          incTotalCountForRequest({
+            authorisationStatus: "tooManyRequests",
+          });
+          return responseErrorForV2(
+            res,
+            "Too many requests, please try again later.",
+            429,
+          );
+        });
     } catch (error) {
       logger.error(
         {

@@ -97,6 +97,7 @@ export const buildTestApp = async (
     EMAIL_VALIDATION_GATEWAY: "IN_MEMORY",
     SHORT_LINK_ID_GENERATOR_GATEWAY: "DETERMINIST",
     INBOUND_EMAIL_ALLOWED_IPS: "::ffff:127.0.0.1",
+    MAX_API_CONSUMER_CALLS_PER_SECOND: "2",
     ...appConfigOverrides?.configParams,
   }).build();
 
