@@ -65,7 +65,7 @@ export const configureGenerateHtmlFromTemplate =
       "color: #b5b5b5; font-size: 12px; margin-bottom: 12px;";
     const replyHeader = `
         <p style="${replyHeaderStyle}">##- Veuillez répondre au-dessus de cette ligne -##</p>
-        <p style="${replyHeaderStyle}">Cet email vous a été envoyé via le service Immersion Facilitée, vous pouvez répondre à directement à cet email, il sera transmis à votre interlocuteur.</p>
+        <p style="${replyHeaderStyle}">Cet email vous a été envoyé via le service Immersion Facilitée, vous pouvez répondre directement à cet email, il sera transmis à votre interlocuteur.</p>
         <p style="${replyHeaderStyle}">-----------------------------</p>`;
 
     const htmlContent = bypassLayout
