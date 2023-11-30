@@ -8,3 +8,4 @@ cypress
 front/src/assets/
 public/assets/
 public/dsfr/
+back/transpile-back-and-prepare-for-prod.js

@@ -1,10 +1,6 @@
 name: "Fullcheck of the project + integration tests"
 
 on:
-  push:
-    branches-ignore:
-      - main
-
   workflow_call:
 
 jobs:

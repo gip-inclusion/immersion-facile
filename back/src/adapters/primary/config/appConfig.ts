@@ -365,7 +365,10 @@ export class AppConfig {
   }
 
   public get pgImmersionDbUrl() {
-    return this.#throwIfNotDefinedOrDefault("DATABASE_URL");
+    return this.#throwIfNotDefinedOrDefault("DATABASE_URL").replace(
+      "?sslmode=prefer",
+      "",
+    );
   }
 
   public get poleEmploiAccessTokenConfig(): AccessTokenConfig {

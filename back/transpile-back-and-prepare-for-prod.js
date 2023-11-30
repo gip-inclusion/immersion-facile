@@ -26,7 +26,7 @@ console.log("Copying package.json of back for prod");
 fs.copyFileSync("./package.json", "build/back/package.json");
 
 execSync(
-  "cp -v -R ./src/adapters/secondary/pg/staticData build/back/src/adapters/secondary/pg/staticData"
+  "cp -v -R ./src/adapters/secondary/pg/staticData build/back/src/adapters/secondary/pg"
 );
 
 // Copy dependencies package.json files to build directory
