@@ -1,0 +1,23 @@
+name: "Destroy review-app"
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  delete-app:
+    environment: review-app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install scalingo CLI
+        run: |
+          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
+      - name: Login to scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
+      - name: Destroy review app
+        run: |
+          scalingo --app if-dev-back-pr${{ github.event.number }} integration-link-delete
+          scalingo --app if-dev-front-pr${{ github.event.number }} integration-link-delete
+          scalingo --app if-dev-back-pr${{ github.event.number }} destroy --force
+          scalingo --app if-dev-front-pr${{ github.event.number }} destroy --force

@@ -1,0 +1,43 @@
+name: "Review app"
+
+on:
+  pull_request:
+
+jobs:
+  validation:
+    uses: ./.github/workflows/fullcheck.yml
+
+  deploy-review-app:
+    if: ${{ github.event.pull_request.draft == false }}
+    uses: ./.github/workflows/review-app-deploy.yml
+    needs: validation
+    with:
+      pull_request_id: ${{ github.event.number }}
+      run_number: ${{ github.run_number }}
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  run-seeds:
+    needs: deploy-review-app
+    runs-on: ubuntu-latest
+    environment: review-app
+    steps:
+      - name: Install scalingo CLI
+        run: |
+          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
+      - name: Login to scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
+      - name: Run DB seed
+        run: scalingo --app if-dev-back-pr${{ github.event.number }} run pnpm db:seed
+
+  notify-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify PR about the webapp url
+        if: ${{ github.run_number == '1'  }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Review app:
+            https://if-dev-front-pr${{ github.event.number }}.osc-fr1.scalingo.io
