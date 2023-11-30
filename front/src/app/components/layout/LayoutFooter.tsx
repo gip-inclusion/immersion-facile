@@ -5,6 +5,7 @@ import { makeStyles, useStyles } from "tss-react/dsfr";
 import { domElementIds } from "shared";
 import {
   Footer,
+  MinistereEmploiLogo,
   NavLink,
   NavTopGroupLinks,
   OverFooter,
@@ -13,6 +14,7 @@ import {
 import { routes } from "src/app/routes/routes";
 
 import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
+import plateformeInclusionLogoUrl from "/assets/img/plateforme-inclusion-logo.svg";
 import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
 const {
   bottomLinks: bottomsLinksIds,
@@ -20,20 +22,6 @@ const {
   navTopGroupLinks: navTopGroupLinksIds,
   overFooterCols: overFooterColsIds,
 } = domElementIds.footer;
-
-export const MinistereLogo = () => (
-  <div className={fr.cx("fr-footer__logo")}>
-    <p className={fr.cx("fr-logo")} style={{ fontSize: "1rem" }}>
-      Ministère
-      <br />
-      du travail,
-      <br />
-      du plein emploi
-      <br />
-      et de l'insertion
-    </p>
-  </div>
-);
 
 const PartnersLogos = () => {
   const { cx } = useStyles();
@@ -46,15 +34,14 @@ const PartnersLogos = () => {
   return (
     <ul>
       <li>
-        <MinistereLogo />
+        <MinistereEmploiLogo />
       </li>
       <li>
         <img
           src={poleEmploiLogo}
           alt="Pole Emploi"
-          style={{ margin: "0 1.5rem" }}
           className={cx(
-            fr.cx("fr-footer__logo"),
+            fr.cx("fr-footer__logo", "fr-mx-1w"),
             "im-footer__logo",
             classes.partnerLogo,
           )}
@@ -72,6 +59,24 @@ const PartnersLogos = () => {
         />
       </li>
     </ul>
+  );
+};
+
+export const PlateformeInclusionLogo = () => {
+  const { cx } = useStyles();
+  const darkModeState = useIsDark();
+  const { classes } = makeStyles()(() => ({
+    partnerLogo: {
+      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
+    },
+  }))();
+  return (
+    <img
+      src={plateformeInclusionLogoUrl}
+      alt="Plateforme de l'Inclusion"
+      className={cx(fr.cx("fr-footer__logo"), classes.partnerLogo)}
+      style={{ height: "5.625rem" }}
+    />
   );
 };
 
@@ -253,6 +258,7 @@ export const LayoutFooter = () => (
       links={links}
       partnersLogos={<PartnersLogos />}
       bottomLinks={bottomsLinks}
+      plateformeInclusionLogo={<PlateformeInclusionLogo />}
     />
   </>
 );

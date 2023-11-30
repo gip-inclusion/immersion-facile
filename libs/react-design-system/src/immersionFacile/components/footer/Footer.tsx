@@ -1,7 +1,6 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-import plateformeInclusionLogoUrl from "./assets/img/logo-plateforme-inclusion.svg";
 import Styles from "./Footer.styles";
 
 export type NavLink = {
@@ -25,6 +24,7 @@ export type FooterProps = {
   navTopGroupLinks?: NavTopGroupLinks[];
   bottomLinks?: NavLink[];
   partnersLogos?: React.ReactNode;
+  plateformeInclusionLogo?: React.ReactNode;
 };
 
 const TopLink = ({ link }: { link: NavLink }) => {
@@ -58,6 +58,7 @@ export const Footer = ({
   navTopGroupLinks,
   bottomLinks,
   partnersLogos,
+  plateformeInclusionLogo,
 }: FooterProps) => {
   const { cx } = useStyles();
   return (
@@ -120,12 +121,7 @@ export const Footer = ({
             >
               <span>Ce service fait partie de la </span>
               <div className={fr.cx("fr-footer__brand")}>
-                <img
-                  src={plateformeInclusionLogoUrl}
-                  alt="Plateforme de l'Inclusion"
-                  className={fr.cx("fr-footer__logo")}
-                  style={{ height: "5.625rem" }}
-                />
+                {plateformeInclusionLogo}
                 <p
                   className={cx(fr.cx("fr-ml-2w", "fr-mb-0"), Styles.brandText)}
                 >

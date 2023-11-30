@@ -25,6 +25,7 @@
   &__partners-sub {
     & > ul {
       align-items: center;
+      flex-direction: row;
     }
   }
   &__top-link {
