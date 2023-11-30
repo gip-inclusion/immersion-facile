@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/fullcheck.yml
 
   deploy-review-app:
-    if: ${{ github.event.pull_request.draft == false }}
+    if: github.event.pull_request.draft == false && github.event.pull_request.state == 'open'
     uses: ./.github/workflows/review-app-deploy.yml
     needs: validation
     with:
@@ -32,10 +32,17 @@ jobs:
         run: scalingo --app if-dev-back-pr${{ github.event.number }} run pnpm db:seed
 
   notify-pr:
+    if: github.event.pull_request.draft == false && github.event.pull_request.state == 'open'
     runs-on: ubuntu-latest
     steps:
+      - name: Find existing notification
+        uses: peter-evans/find-comment@v2
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.number }}
+          body-regex: Review app:\nhttps:\/\/if-dev-front-pr
       - name: Notify PR about the webapp url
-        if: ${{ github.run_number == '1'  }}
+        if: steps.find-comment.outputs.comment-id == ''
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
