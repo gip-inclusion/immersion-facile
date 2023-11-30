@@ -94,22 +94,14 @@ export const Footer = ({
         </div>
       </div>
       <div className={fr.cx("fr-container")}>
-        <div className={fr.cx("fr-footer__content")}>
-          <div
-            className={cx(
-              fr.cx("fr-footer__content"),
-              Styles.content,
-              Styles.contentEnd,
-            )}
-          >
-            {links && links.length > 0 && (
-              <ul className={fr.cx("fr-footer__content-list")}>
-                {links.map((link) => (
-                  <TopLink key={link.id} link={link} />
-                ))}
-              </ul>
-            )}
-          </div>
+        <div className={fr.cx("fr-footer__content", "fr-m-2w", "fr-m-md-1v")}>
+          {links && links.length > 0 && (
+            <ul className={fr.cx("fr-footer__content-list")}>
+              {links.map((link) => (
+                <TopLink key={link.id} link={link} />
+              ))}
+            </ul>
+          )}
         </div>
         <div className={fr.cx("fr-footer__partners")}>
           <div className={fr.cx("fr-footer__partners-logos")}>
@@ -120,7 +112,7 @@ export const Footer = ({
               )}
             >
               <span>Ce service fait partie de la </span>
-              <div className={fr.cx("fr-footer__brand")}>
+              <div className={cx(fr.cx("fr-footer__brand"), Styles.brand)}>
                 {plateformeInclusionLogo}
                 <p
                   className={cx(fr.cx("fr-ml-2w", "fr-mb-0"), Styles.brandText)}
