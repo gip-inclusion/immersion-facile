@@ -1,9 +1,11 @@
+@import "../../../config/responsive";
+
 .im-footer {
   &__content {
     flex: 1 1 33%;
     margin-left: 3%;
   }
-  &__contentEnd {
+  &__content-end {
     display: flex;
     justify-content: flex-end;
   }
@@ -16,6 +18,12 @@
   &__partners-main {
     flex-direction: column;
   }
+  &__brand {
+    flex-direction: column;
+    @include for-screen-min($bp-sm) {
+      flex-direction: row;
+    }
+  }
   &__brand-text {
     display: flex;
     flex-direction: column;
@@ -26,11 +34,10 @@
     & > ul {
       align-items: center;
       flex-direction: row;
+      flex-wrap: nowrap;
     }
   }
-  &__top-link {
-    display: flex;
-    flex-direction: column;
-    align-items: end;
+  &__logo {
+    max-height: 5.75rem;
   }
 }

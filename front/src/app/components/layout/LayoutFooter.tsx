@@ -11,6 +11,7 @@ import {
   OverFooter,
   OverFooterCols,
 } from "react-design-system";
+import FooterStyles from "src/../../libs/react-design-system/src/immersionFacile/components/footer/Footer.styles";
 import { routes } from "src/app/routes/routes";
 
 import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
@@ -42,7 +43,7 @@ const PartnersLogos = () => {
           alt="Pole Emploi"
           className={cx(
             fr.cx("fr-footer__logo", "fr-mx-1w"),
-            "im-footer__logo",
+            FooterStyles.logo,
             classes.partnerLogo,
           )}
         />
@@ -53,7 +54,7 @@ const PartnersLogos = () => {
           alt="Les entreprises s'engagent"
           className={cx(
             fr.cx("fr-footer__logo"),
-            "im-footer__logo",
+            FooterStyles.logo,
             classes.partnerLogo,
           )}
         />
@@ -74,8 +75,11 @@ export const PlateformeInclusionLogo = () => {
     <img
       src={plateformeInclusionLogoUrl}
       alt="Plateforme de l'Inclusion"
-      className={cx(fr.cx("fr-footer__logo"), classes.partnerLogo)}
-      style={{ height: "5.625rem" }}
+      className={cx(
+        fr.cx("fr-footer__logo"),
+        classes.partnerLogo,
+        FooterStyles.logo,
+      )}
     />
   );
 };
