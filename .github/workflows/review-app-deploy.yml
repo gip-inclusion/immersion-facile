@@ -61,9 +61,9 @@ jobs:
           fi
       - name: Remove sslmode from $SCALINGO_POSTGRESQL_URL
         run: |
-          current_db_url=$(scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env | grep SCALINGO_POSTGRESQL_URL= | cut -d '=' -f2-)
+          current_db_url=$(scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env | grep 'SCALINGO_POSTGRESQL_URL=' | cut -d '=' -f2-)
           new_db_url=$(echo $current_db_url | sed "s/?sslmode=prefer//")
-          scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env-set SCALINGO_POSTGRESQL_URL="$new_db_url"
+          scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env-set "SCALINGO_POSTGRESQL_URL=$new_db_url"
       - name: Deploy back
         run: scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} deploy back/back-build.tar.gz ${{ inputs.pull_request_id }}-${{ inputs.run_number }}
       - name: Deploy front
