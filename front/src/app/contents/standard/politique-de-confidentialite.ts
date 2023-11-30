@@ -14,6 +14,7 @@ Elle peut traiter des données à caractère personnel pour les finalités suiva
 • Améliorer et faciliter le parcours d’accès à l’immersion professionnelle ;
 • Construire et développer une base entreprises immersions contenant les entreprises volontaires pour accueillir les personnes ;
 • Aider et faciliter la tâche des prescripteurs dans la décision et le suivi des personnes.
+• Réaliser une analyse statistique des mises en relation
 
 <strong>Quelles sont les données que nous traitons ?</strong>
 
