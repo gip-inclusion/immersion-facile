@@ -69,9 +69,9 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     const now = new Date();
     timeGateway.setNextDate(now);
 
-    uow.conventionRepository._conventions = {
+    uow.conventionRepository.setConventions({
       [signedConvention.id]: signedConvention,
-    };
+    });
 
     await notifyLastSignee.execute({ convention: signedConvention });
     const conventionStatusLink = fakeGenerateMagicLinkUrlFn({
@@ -107,9 +107,9 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .build();
     const now = new Date();
     timeGateway.setNextDate(now);
-    uow.conventionRepository._conventions = {
+    uow.conventionRepository.setConventions({
       [signedConvention.id]: signedConvention,
-    };
+    });
 
     await notifyLastSignee.execute({ convention: signedConvention });
 
@@ -143,9 +143,9 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   });
 
   it("No one has signed the convention.", async () => {
-    uow.conventionRepository._conventions = {
+    uow.conventionRepository.setConventions({
       [conventionSignedByNoOne.id]: conventionSignedByNoOne,
-    };
+    });
 
     await expectPromiseToFailWithError(
       notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
@@ -156,7 +156,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   });
 
   it("No convention on repository.", async () => {
-    uow.conventionRepository._conventions = {};
+    uow.conventionRepository.setConventions({});
 
     await expectPromiseToFailWithError(
       notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
