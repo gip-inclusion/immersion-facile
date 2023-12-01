@@ -6,6 +6,7 @@ import {
 } from "shared";
 
 export interface AgencyRepository {
+  getBySafir(safirCode: string): Promise<AgencyDto | undefined>;
   insert: (agency: AgencyDto) => Promise<AgencyId | undefined>;
   update: (partialAgency: PartialAgencyDto) => Promise<void>;
   getByIds: (ids: AgencyId[]) => Promise<AgencyDto[]>;

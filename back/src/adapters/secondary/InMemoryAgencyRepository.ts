@@ -245,6 +245,12 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return result.agencies;
   }
 
+  public async getBySafir(safirCode: string): Promise<AgencyDto | undefined> {
+    return values(this.#agencies)
+      .filter(isTruthy)
+      .find((agency) => agency.codeSafir === safirCode);
+  }
+
   public async getImmersionFacileAgencyId(): Promise<AgencyId> {
     return "immersion-facile-agency";
   }

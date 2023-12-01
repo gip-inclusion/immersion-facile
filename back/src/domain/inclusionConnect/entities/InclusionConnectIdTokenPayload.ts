@@ -4,4 +4,5 @@ export type InclusionConnectIdTokenPayload = {
   given_name: string;
   family_name: string;
   email: string;
+  structure_pe?: string;
 };
