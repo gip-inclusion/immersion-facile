@@ -1,7 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-import Styles from "./Footer.styles";
+import FooterStyles from "./Footer.styles";
 
 export type NavLink = {
   onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
@@ -62,7 +62,7 @@ export const Footer = ({
 }: FooterProps) => {
   const { cx } = useStyles();
   return (
-    <footer className={cx(fr.cx("fr-footer"), Styles.root)} id="main-footer">
+    <footer className={cx(fr.cx("fr-footer"))} id="main-footer">
       <div className={fr.cx("fr-footer__top")}>
         <div className={fr.cx("fr-container")}>
           <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -94,29 +94,35 @@ export const Footer = ({
         </div>
       </div>
       <div className={fr.cx("fr-container")}>
-        <div className={fr.cx("fr-footer__content", "fr-m-2w", "fr-m-md-1v")}>
-          {links && links.length > 0 && (
-            <ul className={fr.cx("fr-footer__content-list")}>
-              {links.map((link) => (
-                <TopLink key={link.id} link={link} />
-              ))}
-            </ul>
-          )}
+        <div className={cx(fr.cx("fr-footer__body"), FooterStyles.body)}>
+          <div
+            className={cx(fr.cx("fr-footer__content"), FooterStyles.content)}
+          >
+            {links && links.length > 0 && (
+              <ul className={fr.cx("fr-footer__content-list")}>
+                {links.map((link) => (
+                  <TopLink key={link.id} link={link} />
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-        <div className={fr.cx("fr-footer__partners")}>
+        <div className={fr.cx("fr-footer__partners", "fr-pt-4w", "fr-pb-2w")}>
           <div className={fr.cx("fr-footer__partners-logos")}>
             <div
               className={cx(
                 fr.cx("fr-footer__partners-main"),
-                Styles.partnersMain,
+                FooterStyles.partnersMain,
               )}
             >
-              <span>Ce service fait partie de la </span>
-              <div className={cx(fr.cx("fr-footer__brand"), Styles.brand)}>
+              <span className={cx(FooterStyles.brandText)}>
+                Ce service fait partie de la{" "}
+              </span>
+              <div
+                className={cx(fr.cx("fr-footer__brand"), FooterStyles.brand)}
+              >
                 {plateformeInclusionLogo}
-                <p
-                  className={cx(fr.cx("fr-ml-2w", "fr-mb-0"), Styles.brandText)}
-                >
+                <p className={cx(fr.cx("fr-mb-0"), FooterStyles.brandText)}>
                   Découvrez les outils qui portent l'inclusion au cœur de leur
                   service. À chaque service, son objectif.
                   <a
@@ -135,7 +141,7 @@ export const Footer = ({
             <div
               className={cx(
                 fr.cx("fr-footer__partners-sub"),
-                Styles.partnersSub,
+                FooterStyles.partnersSub,
               )}
             >
               {partnersLogos}
