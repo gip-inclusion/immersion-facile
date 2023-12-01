@@ -23,6 +23,7 @@ import {
 } from "../../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../../utils/logger";
 import {
+  ConflictError,
   NotFoundError,
   validateAndParseZodSchema,
 } from "../../../primary/helpers/httpErrors";
@@ -200,6 +201,22 @@ export class PgAgencyRepository implements AgencyRepository {
     return agencies;
   }
 
+  public async getBySafir(safirCode: string): Promise<AgencyDto | undefined> {
+    return this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("a.code_safir", "=", safirCode)
+      .execute()
+      .then((rows) => {
+        if (rows.length > 1)
+          throw new ConflictError(
+            safirConflictErrorMessage(
+              safirCode,
+              rows.map(({ agency }) => agency),
+            ),
+          );
+        return rows.at(0)?.agency;
+      });
+  }
+
   public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
     return this.transaction
       .selectFrom("agencies")
@@ -352,3 +369,10 @@ const parseGeoJson = (raw: string): GeoPositionDto => {
     lon: json.coordinates[0],
   };
 };
+export const safirConflictErrorMessage = (
+  safirCode: string,
+  agencies: AgencyDto[],
+): any =>
+  `Multiple agencies were found with safir code "${safirCode}": ${agencies
+    .map(({ id }) => id)
+    .join(",")}`;
