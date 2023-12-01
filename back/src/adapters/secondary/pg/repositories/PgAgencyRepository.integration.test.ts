@@ -9,9 +9,15 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { someAgenciesMissingMessage } from "../../../../domain/convention/ports/AgencyRepository";
-import { NotFoundError } from "../../../primary/helpers/httpErrors";
+import {
+  ConflictError,
+  NotFoundError,
+} from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { PgAgencyRepository } from "./PgAgencyRepository";
+import {
+  PgAgencyRepository,
+  safirConflictErrorMessage,
+} from "./PgAgencyRepository";
 
 const agency1builder = AgencyDtoBuilder.create(
   "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
@@ -55,11 +61,14 @@ const inactiveAgency = AgencyDtoBuilder.create(
   .withPosition(48.7, 6.2)
   .build();
 
+const safirCode = "AAAAAA";
 const agency1 = agency1builder
   .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
   .withAgencySiret("01234567890123")
-  .withCodeSafir("AAAAAA")
+  .withCodeSafir(safirCode)
   .build();
+
+const agency2 = agency2builder.withCodeSafir(safirCode).build();
 
 const agencyWithRefersTo = agency2builder
   .withRefersToAgencyId(agency1.id)
@@ -147,6 +156,32 @@ describe("PgAgencyRepository", () => {
       await expectPromiseToFailWithError(
         agencyRepository.getByIds([agency1.id]),
         new NotFoundError(someAgenciesMissingMessage([agency1.id])),
+      );
+    });
+  });
+
+  describe("getBySafir", () => {
+    it("returns undefined when no agency found", async () => {
+      const retrievedAgency = await agencyRepository.getBySafir(agency1.id);
+      expect(retrievedAgency).toBeUndefined();
+    });
+
+    it("returns existing agency", async () => {
+      await agencyRepository.insert(agency1);
+
+      const retrievedAgency = await agencyRepository.getBySafir(safirCode);
+      expectToEqual(retrievedAgency, agency1);
+    });
+
+    it("throw conflict error on multiple agencies with same safir code", async () => {
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+
+      await expectPromiseToFailWithError(
+        agencyRepository.getBySafir(safirCode),
+        new ConflictError(
+          safirConflictErrorMessage(safirCode, [agency1, agency2]),
+        ),
       );
     });
   });
