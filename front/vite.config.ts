@@ -10,6 +10,7 @@ const manifest: Partial<ManifestOptions> = {
   short_name: "IF",
   description: "Faciliter la réalisation des immersions professionnelles",
   theme_color: "#0091FF",
+  lang: "fr",
   icons: [
     {
       src: "/dsfr/favicon/android-chrome-192x192.png",
