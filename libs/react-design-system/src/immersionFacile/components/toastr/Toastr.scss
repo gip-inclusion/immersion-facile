@@ -1,0 +1,8 @@
+.im-toastr {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  background: var(--grey-1000-100);
+}
