@@ -1,8 +1,9 @@
 import {
   AbsoluteUrl,
+  AgencyDtoBuilder,
   allowedStartInclusionConnectLoginPages,
   AuthenticatedUser,
-  expectObjectsToMatch,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -14,14 +15,11 @@ import {
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import {
-  defaultInclusionAccessTokenResponse,
-  fakeInclusionPayload,
-  InMemoryInclusionConnectGateway,
-} from "../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { InMemoryInclusionConnectGateway } from "../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
+import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
@@ -34,6 +32,14 @@ const inclusionConnectBaseUri: AbsoluteUrl =
   "http://fake-inclusion-connect-uri.com";
 
 describe("AuthenticateWithInclusionCode use case", () => {
+  const defaultExpectedIcIdTokenPayload: InclusionConnectIdTokenPayload = {
+    nonce: "nounce",
+    sub: "my-user-id",
+    given_name: "John",
+    family_name: "Doe",
+    email: "john.doe@inclusion.com",
+  };
+
   let uow: InMemoryUnitOfWork;
   let inclusionConnectGateway: InMemoryInclusionConnectGateway;
   let uuidGenerator: TestUuidGenerator;
@@ -65,43 +71,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     );
   });
 
-  it("rejects the connection if no state match the provided one in DB", async () => {
-    await expectPromiseToFailWithError(
-      useCase.execute({
-        code: "my-inclusion-code",
-        state: "my-state",
-        page: "agencyDashboard",
-      }),
-      new ForbiddenError("No ongoing OAuth with provided state : my-state"),
-    );
-  });
-
-  it("should raise a Forbidden error if the nonce does not match", async () => {
-    const existingNonce = "existing-nonce";
-    const initialOngoingOAuth: OngoingOAuth = {
-      provider: "inclusionConnect",
-      state: "my-state",
-      nonce: existingNonce,
-    };
-    uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
-
-    const accessToken = "inclusion-access-token";
-    inclusionConnectGateway.setAccessTokenResponse({
-      ...defaultInclusionAccessTokenResponse,
-      access_token: accessToken,
-    });
-
-    await expectPromiseToFailWithError(
-      useCase.execute({
-        code: "my-inclusion-code",
-        state: "my-state",
-        page: "agencyDashboard",
-      }),
-      new ForbiddenError("Nonce mismatch"),
-    );
-  });
-
-  describe("when auth process goes successfully", () => {
+  describe("right paths", () => {
     describe("when user had never connected before", () => {
       it("saves the user as Authenticated user", async () => {
         const { initialOngoingOAuth, userId } =
@@ -113,13 +83,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
           page: "agencyDashboard",
         });
 
-        expect(uow.authenticatedUserRepository.users).toHaveLength(1);
-        expectToEqual(uow.authenticatedUserRepository.users[0], {
-          id: userId,
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@inclusion.com",
-        });
+        expectToEqual(uow.authenticatedUserRepository.users, [
+          {
+            id: userId,
+            firstName: defaultExpectedIcIdTokenPayload.given_name,
+            lastName: defaultExpectedIcIdTokenPayload.family_name,
+            email: defaultExpectedIcIdTokenPayload.email,
+          },
+        ]);
       });
 
       it("updates ongoingOAuth with userId, accessToken and externalId", async () => {
@@ -132,13 +103,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
           page: "agencyDashboard",
         });
 
-        expect(uow.ongoingOAuthRepository.ongoingOAuths).toHaveLength(1);
-        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths[0], {
-          ...initialOngoingOAuth,
-          accessToken,
-          userId,
-          externalId: fakeInclusionPayload.sub,
-        });
+        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+          {
+            ...initialOngoingOAuth,
+            accessToken,
+            userId,
+            externalId: defaultExpectedIcIdTokenPayload.sub,
+          },
+        ]);
       });
 
       it("saves UserConnectedSuccessfully event with relevant data", async () => {
@@ -151,14 +123,15 @@ describe("AuthenticateWithInclusionCode use case", () => {
           page: "agencyDashboard",
         });
 
-        expect(uow.outboxRepository.events).toHaveLength(1);
-        expectObjectsToMatch(uow.outboxRepository.events[0], {
-          topic: "UserAuthenticatedSuccessfully",
-          payload: {
-            provider: "inclusionConnect",
-            userId,
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserAuthenticatedSuccessfully",
+            payload: {
+              provider: "inclusionConnect",
+              userId,
+            },
           },
-        });
+        ]);
       });
     });
 
@@ -169,42 +142,237 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const { alreadyExistingUser } =
           addAlreadyExistingAuthenticatedUserInRepo();
 
+        expectToEqual(uow.authenticatedUserRepository.users, [
+          {
+            id: alreadyExistingUser.id,
+            email: alreadyExistingUser.email,
+            firstName: alreadyExistingUser.firstName,
+            lastName: alreadyExistingUser.lastName,
+          },
+        ]);
+
         await useCase.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
           page: "agencyDashboard",
         });
 
-        expect(uow.authenticatedUserRepository.users).toHaveLength(1);
-        expectToEqual(uow.authenticatedUserRepository.users[0], {
-          id: alreadyExistingUser.id,
-          email: alreadyExistingUser.email,
-          firstName: "John",
-          lastName: "Doe",
-        });
+        expectToEqual(uow.authenticatedUserRepository.users, [
+          {
+            id: alreadyExistingUser.id,
+            email: alreadyExistingUser.email,
+            firstName: defaultExpectedIcIdTokenPayload.given_name,
+            lastName: defaultExpectedIcIdTokenPayload.family_name,
+          },
+        ]);
       });
     });
 
-    it.each(allowedStartInclusionConnectLoginPages)(
-      "generates an app token and returns a redirection url which includes token and user data for %s",
-      async (page) => {
-        const { initialOngoingOAuth } =
-          makeSuccessfulAuthenticationConditions();
+    describe("handle dynamic login pages", () => {
+      it.each(allowedStartInclusionConnectLoginPages)(
+        "generates an app token and returns a redirection url which includes token and user data for %s",
+        async (page) => {
+          const { initialOngoingOAuth } =
+            makeSuccessfulAuthenticationConditions();
 
-        const redirectedUrl = await useCase.execute({
+          const redirectedUrl = await useCase.execute({
+            code: "my-inclusion-code",
+            state: initialOngoingOAuth.state,
+            page,
+          });
+
+          expect(redirectedUrl).toBe(
+            `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com`,
+          );
+        },
+      );
+    });
+
+    describe("handle PE structure", () => {
+      const agency = new AgencyDtoBuilder().withCodeSafir("546546645").build();
+
+      const peSpecificIcIdTokenPayload: InclusionConnectIdTokenPayload = {
+        ...defaultExpectedIcIdTokenPayload,
+        structure_pe: agency.codeSafir,
+      };
+
+      it("add agency right to IC user when Pe structure code is provided by IC and user has no rights on agency", async () => {
+        const { initialOngoingOAuth, userId } =
+          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
+
+        uow.agencyRepository.setAgencies([agency]);
+
+        await useCase.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
-          page,
+          page: "agencyDashboard",
         });
 
-        expect(redirectedUrl).toBe(
-          `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com`,
+        expectToEqual(uow.authenticatedUserRepository.users, [
+          {
+            email: peSpecificIcIdTokenPayload.email,
+            firstName: peSpecificIcIdTokenPayload.given_name,
+            lastName: peSpecificIcIdTokenPayload.family_name,
+            id: userId,
+          },
+        ]);
+
+        expectToEqual(
+          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
+          {
+            [userId]: [{ agency, role: "validator" }],
+          },
         );
-      },
-    );
+      });
+
+      it("don't add agency right to IC user when Pe structure code is provided by IC and user already has rights on agency", async () => {
+        const { initialOngoingOAuth, userId } =
+          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
+
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            email: peSpecificIcIdTokenPayload.email,
+            firstName: peSpecificIcIdTokenPayload.given_name,
+            lastName: peSpecificIcIdTokenPayload.family_name,
+            id: userId,
+            agencyRights: [{ agency, role: "agencyOwner" }],
+          },
+        ]);
+
+        uow.agencyRepository.setAgencies([agency]);
+
+        await useCase.execute({
+          code: "my-inclusion-code",
+          state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
+        });
+
+        expectToEqual(uow.authenticatedUserRepository.users, [
+          {
+            email: peSpecificIcIdTokenPayload.email,
+            firstName: peSpecificIcIdTokenPayload.given_name,
+            lastName: peSpecificIcIdTokenPayload.family_name,
+            id: userId,
+          },
+        ]);
+
+        expectToEqual(
+          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
+          {
+            [userId]: [{ agency, role: "agencyOwner" }],
+          },
+        );
+      });
+
+      it("replace agency right to IC user when Pe structure code is provided by IC and user already has rights on agency and current right is toReview", async () => {
+        const { initialOngoingOAuth, userId } =
+          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
+
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            email: peSpecificIcIdTokenPayload.email,
+            firstName: peSpecificIcIdTokenPayload.given_name,
+            lastName: peSpecificIcIdTokenPayload.family_name,
+            id: userId,
+            agencyRights: [{ agency, role: "toReview" }],
+          },
+        ]);
+
+        uow.agencyRepository.setAgencies([agency]);
+
+        await useCase.execute({
+          code: "my-inclusion-code",
+          state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
+        });
+
+        expectToEqual(uow.authenticatedUserRepository.users, [
+          {
+            email: peSpecificIcIdTokenPayload.email,
+            firstName: peSpecificIcIdTokenPayload.given_name,
+            lastName: peSpecificIcIdTokenPayload.family_name,
+            id: userId,
+          },
+        ]);
+
+        expectToEqual(
+          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
+          {
+            [userId]: [{ agency, role: "validator" }],
+          },
+        );
+      });
+
+      it("don't add agency right to IC user when Pe structure code is provided by IC and there is not agency with same Pe structure code", async () => {
+        const { initialOngoingOAuth, userId } =
+          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
+
+        await useCase.execute({
+          code: "my-inclusion-code",
+          state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
+        });
+
+        expectToEqual(uow.authenticatedUserRepository.users, [
+          {
+            email: peSpecificIcIdTokenPayload.email,
+            firstName: peSpecificIcIdTokenPayload.given_name,
+            lastName: peSpecificIcIdTokenPayload.family_name,
+            id: userId,
+          },
+        ]);
+
+        expectToEqual(
+          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
+          {},
+        );
+      });
+    });
   });
 
-  const makeSuccessfulAuthenticationConditions = () => {
+  describe("wrong paths", () => {
+    it("rejects the connection if no state match the provided one in DB", async () => {
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          code: "my-inclusion-code",
+          state: "my-state",
+          page: "agencyDashboard",
+        }),
+        new ForbiddenError("No ongoing OAuth with provided state : my-state"),
+      );
+    });
+
+    it("should raise a Forbidden error if the nonce does not match", async () => {
+      const existingNonce = "existing-nonce";
+      const initialOngoingOAuth: OngoingOAuth = {
+        provider: "inclusionConnect",
+        state: "my-state",
+        nonce: existingNonce,
+      };
+      uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
+
+      const accessToken = "inclusion-access-token";
+
+      inclusionConnectGateway.setAccessTokenResponse({
+        expire: 60,
+        icIdTokenPayload: defaultExpectedIcIdTokenPayload,
+        accessToken,
+      });
+
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          code: "my-inclusion-code",
+          state: "my-state",
+          page: "agencyDashboard",
+        }),
+        new ForbiddenError("Nonce mismatch"),
+      );
+    });
+  });
+
+  const makeSuccessfulAuthenticationConditions = (
+    expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
+  ) => {
     const initialOngoingOAuth: OngoingOAuth = {
       provider: "inclusionConnect",
       state: "my-state",
@@ -217,8 +385,9 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
     const accessToken = "inclusion-access-token";
     inclusionConnectGateway.setAccessTokenResponse({
-      ...defaultInclusionAccessTokenResponse,
-      access_token: accessToken,
+      icIdTokenPayload: expectedIcIdTokenPayload,
+      accessToken,
+      expire: 60,
     });
 
     return {
@@ -231,7 +400,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   const addAlreadyExistingAuthenticatedUserInRepo = () => {
     const alreadyExistingUser: AuthenticatedUser = {
       id: "already-existing-id",
-      email: "john.doe@inclusion.com",
+      email: defaultExpectedIcIdTokenPayload.email,
       firstName: "Johnny",
       lastName: "Doe Existing",
     };

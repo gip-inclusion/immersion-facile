@@ -6,5 +6,5 @@ export type OngoingOAuth = {
   provider: IdentityProvider;
   state: string;
   nonce: string;
-  accessToken?: string;
+  accessToken?: string; //TODO Pourquoi on le stocke en DB (on ne fait que le save)
 };

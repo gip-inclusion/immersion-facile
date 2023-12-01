@@ -19,10 +19,6 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { UuidGenerator } from "../../../../domain/core/ports/UuidGenerator";
-import {
-  defaultInclusionAccessTokenResponse,
-  jwtGeneratedTokenFromFakeInclusionPayload,
-} from "../../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 
 describe("inclusion connection flow", () => {
   const clientId = "my-client-id";
@@ -99,9 +95,15 @@ describe("inclusion connection flow", () => {
         const authCode = "inclusion-auth-code";
         const inclusionToken = "inclusion-token";
         gateways.inclusionConnectGateway.setAccessTokenResponse({
-          ...defaultInclusionAccessTokenResponse,
-          access_token: inclusionToken,
-          id_token: jwtGeneratedTokenFromFakeInclusionPayload,
+          accessToken: inclusionToken,
+          expire: 1,
+          icIdTokenPayload: {
+            email: "osef@gmail",
+            family_name: "osef",
+            given_name: "jean",
+            nonce,
+            sub: "osef",
+          },
         });
         const response = await httpClient.afterLoginRedirection({
           queryParams: {

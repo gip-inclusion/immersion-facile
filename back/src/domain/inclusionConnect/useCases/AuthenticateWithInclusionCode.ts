@@ -1,15 +1,20 @@
 import {
   AbsoluteUrl,
+  AgencyDto,
   AuthenticatedUser,
+  AuthenticatedUserId,
   AuthenticatedUserQueryParams,
   AuthenticateWithInclusionCodeConnectParams,
   authenticateWithInclusionCodeSchema,
   currentJwtVersions,
-  decodeJwtWithoutSignatureCheck,
   frontRoutes,
+  InclusionConnectedUser,
   queryParamsAsString,
 } from "shared";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateInclusionConnectJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -75,32 +80,59 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
   }
 
+  async #onStructurePe(
+    userId: AuthenticatedUserId,
+    safirCode: string,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const icUser = await uow.inclusionConnectedUserRepository.getById(userId);
+    if (!icUser)
+      throw new NotFoundError(`Inclusion Connect user '${userId}' not found.`);
+
+    if (isIcUserAlreadyHasValidRight(icUser, safirCode)) return;
+
+    const agency: AgencyDto | undefined = await uow.agencyRepository.getBySafir(
+      safirCode,
+    );
+    if (!agency) return;
+
+    await uow.inclusionConnectedUserRepository.update({
+      ...icUser,
+      agencyRights: [
+        ...icUser.agencyRights.filter(
+          (agencyRight) => agencyRight.agency.codeSafir !== safirCode,
+        ),
+        { agency, role: "validator" },
+      ],
+    });
+  }
+
   async #onOngoingOAuth(
     params: AuthenticateWithInclusionCodeConnectParams,
     uow: UnitOfWork,
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
-    const response = await this.#inclusionConnectGateway.getAccessToken({
-      code: params.code,
-      redirectUri: makeInclusionConnectRedirectUri(
-        this.#inclusionConnectConfig,
-        { page: params.page },
-      ),
-    });
-    const jwtPayload =
-      decodeJwtWithoutSignatureCheck<InclusionConnectIdTokenPayload>(
-        response.id_token,
-      );
+    const { accessToken, expire, icIdTokenPayload } =
+      await this.#inclusionConnectGateway.getAccessToken({
+        code: params.code,
+        redirectUri: makeInclusionConnectRedirectUri(
+          this.#inclusionConnectConfig,
+          { page: params.page },
+        ),
+      });
 
-    if (jwtPayload.nonce !== existingOngoingOAuth.nonce)
+    if (icIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
       throw new ForbiddenError("Nonce mismatch");
 
     const existingAuthenticatedUser =
-      await uow.authenticatedUserRepository.findByEmail(jwtPayload.email);
+      await uow.authenticatedUserRepository.findByEmail(icIdTokenPayload.email);
 
     const newOrUpdatedAuthenticatedUser: AuthenticatedUser = {
       ...existingAuthenticatedUser,
-      ...this.#makeAuthenticatedUser(this.#uuidGenerator.new(), jwtPayload),
+      ...this.#makeAuthenticatedUser(
+        this.#uuidGenerator.new(),
+        icIdTokenPayload,
+      ),
       ...(existingAuthenticatedUser && {
         email: existingAuthenticatedUser.email,
         id: existingAuthenticatedUser.id,
@@ -110,30 +142,38 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     const ongoingOAuth: OngoingOAuth = {
       ...existingOngoingOAuth,
       userId: newOrUpdatedAuthenticatedUser.id,
-      externalId: jwtPayload.sub,
-      accessToken: response.access_token,
+      externalId: icIdTokenPayload.sub,
+      accessToken,
     };
 
     await Promise.all([
       uow.ongoingOAuthRepository.save(ongoingOAuth),
       uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser),
-      uow.outboxRepository.save(
-        this.#createNewEvent({
-          topic: "UserAuthenticatedSuccessfully",
-          payload: {
-            userId: newOrUpdatedAuthenticatedUser.id,
-            provider: ongoingOAuth.provider,
-          },
-        }),
-      ),
     ]);
+
+    if (icIdTokenPayload.structure_pe)
+      await this.#onStructurePe(
+        newOrUpdatedAuthenticatedUser.id,
+        icIdTokenPayload.structure_pe,
+        uow,
+      );
+
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "UserAuthenticatedSuccessfully",
+        payload: {
+          userId: newOrUpdatedAuthenticatedUser.id,
+          provider: ongoingOAuth.provider,
+        },
+      }),
+    );
 
     const token = this.#generateAuthenticatedUserJwt(
       {
         userId: newOrUpdatedAuthenticatedUser.id,
         version: currentJwtVersions.inclusion,
       },
-      response.expires_in * 60,
+      expire * 60,
     );
 
     return `${this.#immersionFacileBaseUrl}/${
@@ -158,3 +198,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     };
   }
 }
+const isIcUserAlreadyHasValidRight = (
+  icUser: InclusionConnectedUser,
+  codeSafir: string,
+) =>
+  icUser.agencyRights.some(
+    ({ agency, role }) => agency.codeSafir === codeSafir && role !== "toReview",
+  );

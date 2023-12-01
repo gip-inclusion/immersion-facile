@@ -1,8 +1,9 @@
-import { queryParamsAsString } from "shared";
+import { decodeJwtWithoutSignatureCheck, queryParamsAsString } from "shared";
 import { HttpClient } from "shared-routes";
-import { InclusionAccessTokenResponse } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
+import { InclusionConnectIdTokenPayload } from "../../../domain/inclusionConnect/entities/InclusionConnectIdTokenPayload";
 import {
   GetAccessTokenParams,
+  GetAccessTokenResult,
   InclusionConnectGateway,
 } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
@@ -20,8 +21,8 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   public async getAccessToken({
     code,
     redirectUri,
-  }: GetAccessTokenParams): Promise<InclusionAccessTokenResponse> {
-    const response = await this.httpClient
+  }: GetAccessTokenParams): Promise<GetAccessTokenResult> {
+    return this.httpClient
       .inclusionConnectGetAccessToken({
         body: queryParamsAsString({
           code,
@@ -34,6 +35,14 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       })
+      .then(({ body }) => ({
+        accessToken: body.access_token,
+        expire: body.expires_in,
+        icIdTokenPayload:
+          decodeJwtWithoutSignatureCheck<InclusionConnectIdTokenPayload>(
+            body.id_token,
+          ),
+      }))
       .catch((error) => {
         logger.error(
           { body: error?.response?.data },
@@ -41,8 +50,6 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
         );
         throw error;
       });
-
-    return response.body;
   }
 }
 
@@ -62,3 +69,25 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
 //     given_name : le prénom de l'utilisateur.
 //     family_name : son nom de famille.
 //     email : so
+// // this token is for test purpose :
+
+// export const jwtGeneratedTokenFromFakeInclusionPayload =
+//   "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6Im5vdW5jZSIsInN1YiI6Im15LXVzZXItaWQiLCJnaXZlbl9uYW1lIjoiSm9obiIsImZhbWlseV9uYW1lIjoiRG9lIiwiZW1haWwiOiJqb2huLmRvZUBpbmNsdXNpb24uY29tIn0.kHy9LewhgXGVPy9rwcRea6LufhvgBb4zpcXa_H0-fEHIQk6ZhMATHL3LR1bgYqAo4IBU-cg1HYEbiOYMVPd4kg";
+
+// // JWT contains the following payload :
+
+// export const fakeInclusionPayload = {
+//   nonce: "nounce",
+//   sub: "my-user-id",
+//   given_name: "John",
+//   family_name: "Doe",
+//   email: "john.doe@inclusion.com",
+// };
+
+// export const defaultInclusionAccessTokenResponse: InclusionAccessTokenResponse =
+//   {
+//     token_type: "Bearer",
+//     expires_in: 60,
+//     access_token: "initial-access-token",
+//     id_token: jwtGeneratedTokenFromFakeInclusionPayload,
+//   };
