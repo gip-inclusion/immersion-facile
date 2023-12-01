@@ -74,7 +74,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
-    uow.conventionRepository.setConventions({ [convention.id]: convention });
+    uow.conventionRepository.setConventions([convention]);
     uow.agencyRepository.setAgencies([agency]);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,

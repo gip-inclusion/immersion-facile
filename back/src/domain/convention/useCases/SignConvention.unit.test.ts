@@ -98,9 +98,7 @@ describe("Sign convention", () => {
         "$role is not allowed to sign",
         async ({ role }) => {
           const convention = prepareConventionWithStatus("READY_TO_SIGN");
-          uow.conventionRepository.setConventions({
-            [convention.id]: convention,
-          });
+          uow.conventionRepository.setConventions([convention]);
           await expectPromiseToFailWithError(
             signConvention.execute(
               { conventionId },
@@ -121,9 +119,7 @@ describe("Sign convention", () => {
     describe("with convention inclusion connect jwt", () => {
       it("wh IC user is not establishment rep", async () => {
         const conventionInDb = prepareConventionWithStatus("READY_TO_SIGN");
-        uow.conventionRepository.setConventions({
-          [conventionInDb.id]: conventionInDb,
-        });
+        uow.conventionRepository.setConventions([conventionInDb]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
           email: "other@mail.com",
@@ -158,9 +154,7 @@ describe("Sign convention", () => {
         "$initialStatus initial status is not allowed",
         async ({ initialStatus }) => {
           const conventionInDb = prepareConventionWithStatus(initialStatus);
-          uow.conventionRepository.setConventions({
-            [conventionInDb.id]: conventionInDb,
-          });
+          uow.conventionRepository.setConventions([conventionInDb]);
 
           await expectPromiseToFailWithError(
             signConvention.execute(
@@ -186,9 +180,7 @@ describe("Sign convention", () => {
         "updates the convention with new signature for $role",
         async ({ role }) => {
           const conventionInDb = prepareConventionWithStatus("READY_TO_SIGN");
-          uow.conventionRepository.setConventions({
-            [conventionInDb.id]: conventionInDb,
-          });
+          uow.conventionRepository.setConventions([conventionInDb]);
           const signedAt = new Date("2022-01-01");
           timeGateway.setNextDate(signedAt);
 
@@ -230,9 +222,7 @@ describe("Sign convention", () => {
     describe("with inclusion connect jwt", () => {
       it("updates the convention with new signature for IC user when user is establisment representative", async () => {
         const conventionInDb = prepareConventionWithStatus("READY_TO_SIGN");
-        uow.conventionRepository.setConventions({
-          [conventionInDb.id]: conventionInDb,
-        });
+        uow.conventionRepository.setConventions([conventionInDb]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
           email: conventionInDb.signatories.establishmentRepresentative.email,
@@ -269,9 +259,7 @@ describe("Sign convention", () => {
       it("goes from status READY_TO_SIGN to PARTIALLY_SIGNED, and saves corresponding event", async () => {
         expectAllowedInitialStatus("READY_TO_SIGN");
         const initialConvention = prepareConventionWithStatus("READY_TO_SIGN");
-        uow.conventionRepository.setConventions({
-          [initialConvention.id]: initialConvention,
-        });
+        uow.conventionRepository.setConventions([initialConvention]);
         const signedAt = new Date("2022-01-01");
         timeGateway.setNextDate(signedAt);
 
@@ -313,9 +301,7 @@ describe("Sign convention", () => {
           .signedByBeneficiary(beneficiarySignedAt.toISOString())
           .build();
 
-        uow.conventionRepository.setConventions({
-          [initialConvention.id]: initialConvention,
-        });
+        uow.conventionRepository.setConventions([initialConvention]);
 
         const establishmentRepresentativeSignedAt = new Date("2022-01-01");
         timeGateway.setNextDate(establishmentRepresentativeSignedAt);
@@ -364,9 +350,7 @@ describe("Sign convention", () => {
           .signedByBeneficiary(beneficiarySignedAt.toISOString())
           .build();
 
-        uow.conventionRepository.setConventions({
-          [initialConvention.id]: initialConvention,
-        });
+        uow.conventionRepository.setConventions([initialConvention]);
 
         const establishmentRepresentativeSignedAt = new Date("2022-01-01");
         timeGateway.setNextDate(establishmentRepresentativeSignedAt);

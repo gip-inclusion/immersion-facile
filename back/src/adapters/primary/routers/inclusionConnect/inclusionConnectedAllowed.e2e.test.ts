@@ -60,9 +60,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         )
         .build();
 
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUserWithRights,
@@ -251,9 +249,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         user,
       ]);
       inMemoryUow.agencyRepository.setAgencies([agency]);
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.errorRepository.save({
         serviceName: broadcastToPeServiceName,
         message: "Some message",

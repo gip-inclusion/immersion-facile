@@ -43,9 +43,7 @@ describe("Magic link router", () => {
       inMemoryUow,
     } = await buildTestApp());
     const initialConvention = conventionBuilder.build();
-    inMemoryUow.conventionRepository.setConventions({
-      [initialConvention.id]: initialConvention,
-    });
+    inMemoryUow.conventionRepository.setConventions([initialConvention]);
   });
 
   describe("POST /auth/demande-immersion/:conventionId", () => {
@@ -164,9 +162,7 @@ describe("Magic link router", () => {
       const existingConvention = new ConventionDtoBuilder()
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
-      inMemoryUow.conventionRepository.setConventions({
-        [existingConvention.id]: existingConvention,
-      });
+      inMemoryUow.conventionRepository.setConventions([existingConvention]);
       const renewedConventionStartDate = addDays(
         new Date(existingConvention.dateEnd),
         1,
@@ -227,9 +223,7 @@ describe("Magic link router", () => {
       const existingConvention = new ConventionDtoBuilder()
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
-      inMemoryUow.conventionRepository.setConventions({
-        [existingConvention.id]: existingConvention,
-      });
+      inMemoryUow.conventionRepository.setConventions([existingConvention]);
       const renewedConventionStartDate = addDays(
         new Date(existingConvention.dateEnd),
         1,
@@ -291,9 +285,7 @@ describe("Magic link router", () => {
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .withAgencyId(agency.id)
         .build();
-      inMemoryUow.conventionRepository.setConventions({
-        [existingConvention.id]: existingConvention,
-      });
+      inMemoryUow.conventionRepository.setConventions([existingConvention]);
 
       const inclusionConnectedUser: InclusionConnectedUser = {
         id: "my-user-id",
@@ -426,9 +418,7 @@ describe("Magic link router", () => {
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         icUser,
       ]);
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request
         .post(`/auth/sign-application/${convention.id}`)
@@ -461,9 +451,7 @@ describe("Magic link router", () => {
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         icUser,
       ]);
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request
         .post(`/auth/sign-application/${convention.id}`)

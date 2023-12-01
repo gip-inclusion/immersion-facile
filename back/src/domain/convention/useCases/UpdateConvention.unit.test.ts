@@ -1,5 +1,4 @@
 import {
-  ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   conventionStatuses,
@@ -53,10 +52,8 @@ describe("Update Convention", () => {
 
   describe("When the Convention is valid", () => {
     it("updates the Convention in the repository", async () => {
-      const conventionsInRepo: Record<string, ConventionDto> = {};
       const conventionInRepo = new ConventionDtoBuilder().build();
-      conventionsInRepo[conventionInRepo.id] = conventionInRepo;
-      conventionRepository.setConventions(conventionsInRepo);
+      conventionRepository.setConventions([conventionInRepo]);
 
       const updatedConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
@@ -96,9 +93,7 @@ describe("Update Convention", () => {
         .withStatus("PARTIALLY_SIGNED")
         .build();
 
-      conventionRepository.setConventions({
-        [storedConvention.id]: storedConvention,
-      });
+      conventionRepository.setConventions([storedConvention]);
 
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder()
@@ -137,9 +132,7 @@ describe("Update Convention", () => {
         })
         .build();
 
-      conventionRepository.setConventions({
-        [storedConvention.id]: storedConvention,
-      });
+      conventionRepository.setConventions([storedConvention]);
 
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder(storedConvention)
@@ -164,9 +157,7 @@ describe("Update Convention", () => {
         .withStatus("DRAFT")
         .build();
 
-      conventionRepository.setConventions({
-        [storedConvention.id]: storedConvention,
-      });
+      conventionRepository.setConventions([storedConvention]);
 
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder(storedConvention)
@@ -194,10 +185,8 @@ describe("Update Convention", () => {
   describe("Status validation", () => {
     let id: ConventionId;
     beforeEach(() => {
-      const conventions: Record<string, ConventionDto> = {};
       const convention = new ConventionDtoBuilder().build();
-      conventions[convention.id] = convention;
-      conventionRepository.setConventions(conventions);
+      conventionRepository.setConventions([convention]);
       id = convention.id;
     });
 

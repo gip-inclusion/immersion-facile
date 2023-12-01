@@ -114,9 +114,7 @@ describe("convention e2e", () => {
     });
 
     it("409 - Conflict", async () => {
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request
         .post(unauthenticatedConventionRoutes.createConvention.url)
@@ -229,9 +227,7 @@ describe("convention e2e", () => {
     conventionMagicLinkRoutes.getConvention,
   )} gets a convention from a magic link`, () => {
     beforeEach(() => {
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.agencyRepository.setAgencies([peAgency]);
     });
 
@@ -352,9 +348,7 @@ describe("convention e2e", () => {
     conventionMagicLinkRoutes.updateConvention,
   )} updates a draft convention`, () => {
     beforeEach(() => {
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
     });
 
     it(`200 - Success with JWT ConventionJwt`, async () => {
@@ -433,9 +427,7 @@ describe("convention e2e", () => {
       const inReviewConvention = new ConventionDtoBuilder(convention)
         .withStatus("IN_REVIEW")
         .build();
-      inMemoryUow.conventionRepository.setConventions({
-        [inReviewConvention.id]: inReviewConvention,
-      });
+      inMemoryUow.conventionRepository.setConventions([inReviewConvention]);
       inMemoryUow.conventionExternalIdRepository.externalIdsByConventionId = {
         [inReviewConvention.id]: externalId,
       };

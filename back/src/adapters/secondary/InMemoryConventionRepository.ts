@@ -44,8 +44,11 @@ export class InMemoryConventionRepository implements ConventionRepository {
   }
 
   // for test purpose
-  public setConventions(conventions: Record<string, ConventionDto>) {
-    this.#conventions = conventions;
+  public setConventions(conventions: ConventionDto[]) {
+    this.#conventions = conventions.reduce<Record<ConventionId, ConventionDto>>(
+      (acc, convention) => ({ ...acc, [convention.id]: convention }),
+      {},
+    );
   }
 
   public async update(convention: ConventionDto) {

@@ -305,11 +305,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
     it("Agency missing", async () => {
       const convention = new ConventionDtoBuilder().build();
       const agency = new AgencyDtoBuilder().build();
-      uow.conventionRepository.setConventions({
-        [convention.id]: new ConventionDtoBuilder(convention)
-          .withAgencyId(agency.id)
-          .build(),
-      });
+      uow.conventionRepository.setConventions([
+        new ConventionDtoBuilder(convention).withAgencyId(agency.id).build(),
+      ]);
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),
@@ -330,11 +328,9 @@ const prepareScenario = (
   const agency = new AgencyDtoBuilder().build();
 
   uow.agencyRepository.setAgencies([agency]);
-  uow.conventionRepository.setConventions({
-    [convention.id]: new ConventionDtoBuilder(convention)
-      .withAgencyId(agency.id)
-      .build(),
-  });
+  uow.conventionRepository.setConventions([
+    new ConventionDtoBuilder(convention).withAgencyId(agency.id).build(),
+  ]);
   shortLinkGenerator.addMoreShortLinkIds(shortLinks);
   return { convention, agency, shortLinks };
 };

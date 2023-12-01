@@ -93,7 +93,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     it("Missing convention", async () => {
       //Arrange
       const convention = new ConventionDtoBuilder().build();
-      uow.conventionRepository.setConventions({});
+      uow.conventionRepository.setConventions([]);
 
       //Act
       await expectPromiseToFailWithError(
@@ -113,9 +113,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     it("Missing agency", async () => {
       //Arrange
       const convention = new ConventionDtoBuilder().build();
-      uow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      uow.conventionRepository.setConventions([convention]);
 
       //Act
       await expectPromiseToFailWithError(
@@ -155,9 +153,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withAgencyId(agency.id)
           .withStatus(status)
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
         const shortLinkIds = ["link1", "link2", "link3", "link4"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -240,9 +236,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withAgencyId(agency.id)
           .withStatus(status)
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         const type: ReminderKind = "FirstReminderForAgency";
@@ -283,9 +277,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withAgencyId(agency.id)
           .withStatus(status)
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
         const shortLinkIds = ["link1", "link2", "link3", "link4"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -363,9 +355,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withAgencyId(agency.id)
           .withStatus(status)
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         const type: ReminderKind = "FirstReminderForAgency";
@@ -418,9 +408,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             role: "establishment-tutor",
           })
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         const shortLinkIds = ["link1", "link2"];
@@ -494,9 +482,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             role: "establishment-tutor",
           })
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         const shortLinkIds = ["link1", "link2"];
@@ -570,9 +556,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withBeneficiaryPhone("0111223344")
           .withEstablishmentRepresentativePhone("0211223344")
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         const shortLinkIds = ["link1", "link2"];
@@ -636,9 +620,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withAgencyId(agency.id)
           .withStatus(status)
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         //Act & Assert
@@ -681,9 +663,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             role: "establishment-tutor",
           })
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -751,9 +731,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             role: "establishment-tutor",
           })
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
         const shortLinkIds = ["link1", "link2"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -820,9 +798,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withAgencyId(agency.id)
           .withStatus(status)
           .build();
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         //Act & Assert
@@ -946,9 +922,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .withEstablishmentRepresentativePhone("0211223344")
           .build();
 
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
         const shortLinkIds = ["link1", "link2"];

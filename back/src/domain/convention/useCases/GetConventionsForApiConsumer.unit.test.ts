@@ -41,10 +41,10 @@ describe("Get Conventions for ApiConsumer", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([agencyPoleEmploi, agencyMissionLocale]);
-    uow.conventionRepository.setConventions({
-      [conventionPoleEmploi.id]: conventionPoleEmploi,
-      [conventionMissionLocale.id]: conventionMissionLocale,
-    });
+    uow.conventionRepository.setConventions([
+      conventionPoleEmploi,
+      conventionMissionLocale,
+    ]);
     getConventionsForApiConsumer = new GetConventionsForApiConsumer(
       new InMemoryUowPerformer(uow),
     );

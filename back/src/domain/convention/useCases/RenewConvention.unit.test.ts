@@ -130,9 +130,7 @@ describe("RenewConvention", () => {
     ] satisfies { payloadKind: string; payload: ConventionRelatedJwtPayload }[])(
       "renews the convention with $payloadKind jwt payload",
       async ({ payload }) => {
-        uow.conventionRepository.setConventions({
-          [existingValidatedConvention.id]: existingValidatedConvention,
-        });
+        uow.conventionRepository.setConventions([existingValidatedConvention]);
 
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           inclusionConnectedUser,
@@ -177,9 +175,7 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when convention id in params does not match to convention id in JWT payload", async () => {
-      uow.conventionRepository.setConventions({
-        [existingDraftConvention.id]: existingDraftConvention,
-      });
+      uow.conventionRepository.setConventions([existingDraftConvention]);
 
       await expectPromiseToFailWithError(
         renewConvention.execute(
@@ -212,9 +208,7 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when convention is not ACCEPTED_BY_VALIDATOR", async () => {
-      uow.conventionRepository.setConventions({
-        [existingDraftConvention.id]: existingDraftConvention,
-      });
+      uow.conventionRepository.setConventions([existingDraftConvention]);
       await expectPromiseToFailWithError(
         renewConvention.execute(
           renewConventionParams,
@@ -230,9 +224,7 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when jwt role has not enough privileges", async () => {
-      uow.conventionRepository.setConventions({
-        [existingDraftConvention.id]: existingDraftConvention,
-      });
+      uow.conventionRepository.setConventions([existingDraftConvention]);
       await expectPromiseToFailWithError(
         renewConvention.execute(
           renewConventionParams,
@@ -248,9 +240,7 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when missing inclusion connect user", async () => {
-      uow.conventionRepository.setConventions({
-        [existingValidatedConvention.id]: existingValidatedConvention,
-      });
+      uow.conventionRepository.setConventions([existingValidatedConvention]);
       await expectPromiseToFailWithError(
         renewConvention.execute(renewConventionParams, inclusionConnectPayload),
         new NotFoundError(
@@ -260,9 +250,7 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when inclusion connect user has no rights on agency", async () => {
-      uow.conventionRepository.setConventions({
-        [existingValidatedConvention.id]: existingValidatedConvention,
-      });
+      uow.conventionRepository.setConventions([existingValidatedConvention]);
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         { ...inclusionConnectedUser, agencyRights: [] },
       ]);
@@ -275,9 +263,7 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when inclusion connect user has bad rights on agency", async () => {
-      uow.conventionRepository.setConventions({
-        [existingValidatedConvention.id]: existingValidatedConvention,
-      });
+      uow.conventionRepository.setConventions([existingValidatedConvention]);
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
           ...inclusionConnectedUser,
