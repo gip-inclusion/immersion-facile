@@ -32,10 +32,7 @@ describe("Broadcast to partners on updated convention", () => {
       .build();
 
     uow.agencyRepository.setAgencies([agency1, agency2]);
-    uow.conventionRepository.setConventions({
-      [convention1.id]: convention1,
-      [convention2.id]: convention2,
-    });
+    uow.conventionRepository.setConventions([convention1, convention2]);
 
     const subscriptionParams: SubscriptionParams = {
       callbackHeaders: { authorization: "my-cb-auth-header" },

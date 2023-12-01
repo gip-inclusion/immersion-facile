@@ -59,10 +59,10 @@ describe("ResyncOldConventionsToPe use case", () => {
   describe("Right paths", () => {
     it("broadcast two conventions to pe", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
-      uow.conventionRepository.setConventions({
-        [conventionToSync1.id]: conventionToSync1,
-        [conventionToSync2.id]: conventionToSync2,
-      });
+      uow.conventionRepository.setConventions([
+        conventionToSync1,
+        conventionToSync2,
+      ]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
@@ -106,9 +106,7 @@ describe("ResyncOldConventionsToPe use case", () => {
 
     it("broadcast one convention to pe", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
-      uow.conventionRepository.setConventions({
-        [conventionToSync1.id]: conventionToSync1,
-      });
+      uow.conventionRepository.setConventions([conventionToSync1]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
@@ -159,9 +157,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         .withAgencyId(agencyCCI.id)
         .build();
       uow.agencyRepository.setAgencies([agencyCCI]);
-      uow.conventionRepository.setConventions({
-        [conventionToSync.id]: conventionToSync,
-      });
+      uow.conventionRepository.setConventions([conventionToSync]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync.id,
@@ -199,9 +195,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         },
       });
       uow.agencyRepository.setAgencies([agencyPE]);
-      uow.conventionRepository.setConventions({
-        [conventionToSync1.id]: conventionToSync1,
-      });
+      uow.conventionRepository.setConventions([conventionToSync1]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
@@ -234,12 +228,12 @@ describe("ResyncOldConventionsToPe use case", () => {
 
     it("only process convention with status TO_PROCESS and ERROR", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
-      uow.conventionRepository.setConventions({
-        [conventionToSync1.id]: conventionToSync1,
-        [conventionToSync2.id]: conventionToSync2,
-        [conventionToSync3.id]: conventionToSync3,
-        [conventionToSync4.id]: conventionToSync4,
-      });
+      uow.conventionRepository.setConventions([
+        conventionToSync1,
+        conventionToSync2,
+        conventionToSync3,
+        conventionToSync4,
+      ]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
@@ -309,10 +303,10 @@ describe("ResyncOldConventionsToPe use case", () => {
 
     it("should consider limit", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
-      uow.conventionRepository.setConventions({
-        [conventionToSync1.id]: conventionToSync1,
-        [conventionToSync2.id]: conventionToSync2,
-      });
+      uow.conventionRepository.setConventions([
+        conventionToSync1,
+        conventionToSync2,
+      ]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,
@@ -393,9 +387,7 @@ describe("ResyncOldConventionsToPe use case", () => {
     });
 
     it("when no agency", async () => {
-      uow.conventionRepository.setConventions({
-        [conventionToSync1.id]: conventionToSync1,
-      });
+      uow.conventionRepository.setConventions([conventionToSync1]);
       uow.conventionsToSyncRepository.setForTesting([
         {
           id: conventionToSync1.id,

@@ -187,7 +187,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       const convention = new ConventionDtoBuilder()
         .withEstablishmentRepresentativeEmail(john.email)
         .build();
-      uow.conventionRepository.setConventions({ [convention.id]: convention });
+      uow.conventionRepository.setConventions([convention]);
 
       const result = await getInclusionConnectedUser.execute(
         undefined,

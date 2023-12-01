@@ -185,9 +185,7 @@ describe("technical router", () => {
         .build();
 
       const convention = new ConventionDtoBuilder().build();
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.agencyRepository.setAgencies([agency]);
 
       gateways.timeGateway.setNextDate(new Date());

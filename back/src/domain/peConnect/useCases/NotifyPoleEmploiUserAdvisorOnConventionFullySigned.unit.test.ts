@@ -78,9 +78,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .withBusinessName("Boulangerie Les Echarts")
       .build();
 
-    uow.conventionRepository.setConventions({
-      [conventionDtoFromEvent.id]: conventionDtoFromEvent,
-    });
+    uow.conventionRepository.setConventions([conventionDtoFromEvent]);
     uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
       [
         {
@@ -144,9 +142,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .withBusinessName("Boulangerie Les Echarts")
       .build();
 
-    uow.conventionRepository.setConventions({
-      [conventionDtoFromEvent.id]: conventionDtoFromEvent,
-    });
+    uow.conventionRepository.setConventions([conventionDtoFromEvent]);
     uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
       [
         {

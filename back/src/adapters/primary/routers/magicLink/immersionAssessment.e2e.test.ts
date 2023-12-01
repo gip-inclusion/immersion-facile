@@ -38,9 +38,7 @@ describe("Immersion assessment routes", () => {
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
 
-      inMemoryUow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      inMemoryUow.conventionRepository.setConventions([convention]);
 
       const assessment: AssessmentDto = {
         conventionId,

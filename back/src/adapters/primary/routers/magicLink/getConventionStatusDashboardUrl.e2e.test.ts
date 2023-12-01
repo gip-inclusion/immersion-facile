@@ -41,9 +41,7 @@ describe("getConventionStatusDashboardUrl", () => {
       .withBeneficiaryEmail(beneficiaryEmail)
       .build();
 
-    inMemoryUow.conventionRepository.setConventions({
-      [convention.id]: convention,
-    });
+    inMemoryUow.conventionRepository.setConventions([convention]);
 
     const response = await request
       .get(conventionMagicLinkRoutes.getConventionStatusDashboard.url)

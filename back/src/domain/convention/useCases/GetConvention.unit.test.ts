@@ -65,9 +65,7 @@ describe("Get Convention", () => {
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
         uow.agencyRepository.setAgencies([agency]);
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
 
         await expectPromiseToFailWithError(
           getConvention.execute(
@@ -98,9 +96,7 @@ describe("Get Convention", () => {
 
       it("When if user is not on inclusion connected users", async () => {
         uow.agencyRepository.setAgencies([agency]);
-        uow.conventionRepository.setConventions({
-          [convention.id]: convention,
-        });
+        uow.conventionRepository.setConventions([convention]);
         const userId = "my-user-id";
 
         await expectPromiseToFailWithError(
@@ -114,7 +110,7 @@ describe("Get Convention", () => {
   describe("Right paths", () => {
     beforeEach(() => {
       uow.agencyRepository.setAgencies([agency]);
-      uow.conventionRepository.setConventions({ [convention.id]: convention });
+      uow.conventionRepository.setConventions([convention]);
     });
 
     describe("Inclusion connected user", () => {

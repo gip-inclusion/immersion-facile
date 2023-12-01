@@ -75,9 +75,7 @@ describe("RenewConventionMagicLink use case", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([defaultAgency]);
-    uow.conventionRepository.setConventions({
-      [validConvention.id]: validConvention,
-    });
+    uow.conventionRepository.setConventions([validConvention]);
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     useCase = new RenewConventionMagicLink(
       new InMemoryUowPerformer(uow),
@@ -208,10 +206,10 @@ describe("RenewConventionMagicLink use case", () => {
 
     it("requires a known agency id", async () => {
       const storedUnknownId = "some unknown agency id";
-      const entity = new ConventionDtoBuilder()
+      const convention = new ConventionDtoBuilder()
         .withAgencyId(storedUnknownId)
         .build();
-      uow.conventionRepository.setConventions({ [entity.id]: entity });
+      uow.conventionRepository.setConventions([convention]);
 
       const payload = createConventionMagicLinkPayload({
         id: validConvention.id,

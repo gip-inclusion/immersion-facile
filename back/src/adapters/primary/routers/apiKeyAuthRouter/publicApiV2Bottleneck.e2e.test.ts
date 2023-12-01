@@ -80,9 +80,7 @@ describe("bottleneck", () => {
 
   it("fails when too many request for a same bottleneck group", async () => {
     inMemoryUow.agencyRepository.setAgencies([agency]);
-    inMemoryUow.conventionRepository.setConventions({
-      [convention.id]: convention,
-    });
+    inMemoryUow.conventionRepository.setConventions([convention]);
 
     const response = await Promise.all([
       createApiCall(sharedRequest, authorizationToken1, convention.id),
@@ -105,9 +103,7 @@ describe("bottleneck", () => {
 
   it("success when two different bottleneck groups", async () => {
     inMemoryUow.agencyRepository.setAgencies([agency]);
-    inMemoryUow.conventionRepository.setConventions({
-      [convention.id]: convention,
-    });
+    inMemoryUow.conventionRepository.setConventions([convention]);
 
     const response = await Promise.all([
       createApiCall(sharedRequest, authorizationToken1, convention.id),

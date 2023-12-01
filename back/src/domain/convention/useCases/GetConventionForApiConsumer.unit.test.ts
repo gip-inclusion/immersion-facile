@@ -59,9 +59,7 @@ describe("Get Convention for ApiConsumer", () => {
       new InMemoryUowPerformer(uow),
     );
     uow.agencyRepository.setAgencies([agency]);
-    uow.conventionRepository.setConventions({
-      [convention.id]: convention,
-    });
+    uow.conventionRepository.setConventions([convention]);
   });
 
   describe("Wrong paths", () => {

@@ -2,7 +2,6 @@ import { addBusinessDays, differenceInBusinessDays } from "date-fns";
 import {
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
   ConventionStatus,
   conventionStatuses,
   expectObjectInArrayToMatch,
@@ -68,9 +67,7 @@ describe("ConventionReminder use case", () => {
             ),
         );
 
-      conventionRepository.setConventions(
-        toConventionRepoRecord(conventionsWithUnsupportedStatuses),
-      );
+      conventionRepository.setConventions(conventionsWithUnsupportedStatuses);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -96,7 +93,7 @@ describe("ConventionReminder use case", () => {
         withDateStart,
       });
 
-      conventionRepository.setConventions(toConventionRepoRecord(conventions));
+      conventionRepository.setConventions(conventions);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -121,7 +118,7 @@ describe("ConventionReminder use case", () => {
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart,
       });
-      conventionRepository.setConventions(toConventionRepoRecord(conventions));
+      conventionRepository.setConventions(conventions);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -181,7 +178,7 @@ describe("ConventionReminder use case", () => {
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart,
       });
-      conventionRepository.setConventions(toConventionRepoRecord(conventions));
+      conventionRepository.setConventions(conventions);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -220,7 +217,7 @@ describe("ConventionReminder use case", () => {
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart,
       });
-      conventionRepository.setConventions(toConventionRepoRecord(conventions));
+      conventionRepository.setConventions(conventions);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -286,10 +283,4 @@ const makeOneConventionOfEachStatuses = ({
       .withStatus(conventionStatus)
       .withDateStart(withDateStart.toISOString())
       .build(),
-  );
-
-const toConventionRepoRecord = (conventions: ConventionDto[]) =>
-  conventions.reduce<Record<ConventionId, ConventionDto>>(
-    (acc, item) => ({ ...acc, [item["id"]]: item }),
-    {},
   );

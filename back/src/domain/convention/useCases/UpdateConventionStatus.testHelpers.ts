@@ -165,9 +165,7 @@ export const setupInitialState = ({
     timeGateway,
   );
 
-  conventionRepository.setConventions({
-    [originalConvention.id]: originalConvention,
-  });
+  conventionRepository.setConventions([originalConvention]);
   withIcUser &&
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
       values(makeUserIdMapInclusionConnectedUser),

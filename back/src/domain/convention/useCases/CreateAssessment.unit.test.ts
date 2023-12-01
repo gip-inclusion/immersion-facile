@@ -63,9 +63,7 @@ describe("CreateAssessment", () => {
     )
       .withId(conventionId)
       .build();
-    conventionRepository.setConventions({
-      [convention.id]: convention,
-    });
+    conventionRepository.setConventions([convention]);
     createAssessment = new CreateAssessment(
       uowPerformer,
       makeCreateNewEvent({
@@ -136,9 +134,7 @@ describe("CreateAssessment", () => {
     "throws bad request if the Convention status is $status",
     async ({ status }) => {
       const convention = ConventionDtoBuilderWithId.withStatus(status).build();
-      conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
+      conventionRepository.setConventions([convention]);
 
       await expectPromiseToFailWithError(
         createAssessment.execute(assessment, validPayload),
@@ -153,10 +149,7 @@ describe("CreateAssessment", () => {
     "should save the Assessment if Convention has status $status",
     async ({ status }) => {
       const convention = ConventionDtoBuilderWithId.withStatus(status).build();
-      conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
-
+      conventionRepository.setConventions([convention]);
       await createAssessment.execute(assessment, validPayload);
 
       const expectedImmersionEntity: AssessmentEntity = {
