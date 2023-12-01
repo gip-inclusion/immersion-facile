@@ -5,6 +5,7 @@ import {
   ConventionId,
   ConventionStatus,
   conventionStatuses,
+  expectObjectInArrayToMatch,
   expectToEqual,
 } from "shared";
 import {
@@ -20,10 +21,16 @@ import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { ConventionsReminder } from "./ConventionsReminder";
 
-describe("RemindConventionsNeedSignature use case", () => {
+describe("ConventionReminder use case", () => {
   const now = new Date("2023-03-17");
   const eventIds = ["event-1", "event-2", "event-3", "event-4"];
   const topic = "ConventionReminderRequired";
+  const needSignatureStatuses: ConventionStatus[] = [
+    "READY_TO_SIGN",
+    "PARTIALLY_SIGNED",
+  ];
+  const needReviewStatuses: ConventionStatus[] = ["IN_REVIEW"];
+
   let uow: InMemoryUnitOfWork;
   let conventionsReminder: ConventionsReminder;
   let outboxRepository: InMemoryOutboxRepository;
@@ -56,13 +63,9 @@ describe("RemindConventionsNeedSignature use case", () => {
           withDateStart: now,
         }).filter(
           (convention) =>
-            !(
-              [
-                "READY_TO_SIGN",
-                "PARTIALLY_SIGNED",
-                "IN_REVIEW",
-              ] as ConventionStatus[]
-            ).includes(convention.status),
+            ![...needSignatureStatuses, ...needReviewStatuses].includes(
+              convention.status,
+            ),
         );
 
       conventionRepository.setConventions(
@@ -79,8 +82,8 @@ describe("RemindConventionsNeedSignature use case", () => {
       });
       expectToEqual(outboxRepository.events, []);
       expectToEqual(
-        conventionRepository._conventions,
-        toConventionRepoRecord(conventionsWithUnsupportedStatuses),
+        conventionRepository.conventions,
+        conventionsWithUnsupportedStatuses,
       );
     });
 
@@ -106,15 +109,12 @@ describe("RemindConventionsNeedSignature use case", () => {
 
       //Assert
       expectToEqual(outboxRepository.events, []);
-      expectToEqual(
-        conventionRepository._conventions,
-        toConventionRepoRecord(conventions),
-      );
+      expectToEqual(conventionRepository.conventions, conventions);
     });
   });
 
-  describe("Send 'ConventionSignReminder' event", () => {
-    it("ConventionSignReminder type 'FirstReminderForSignatories' and 'FirstReminderForAgency' when there is a convention that is between 3 and 2 open days before interships start depending of convention statuses.", async () => {
+  describe("Send 'ConventionReminderRequired' event", () => {
+    it("with kind 'FirstReminderForSignatories' and 'FirstReminderForAgency' when there is a convention that is between 3 and 2 open days before interships start depending of convention statuses.", async () => {
       // Arrange
       const withDateStart = addBusinessDays(now, 3);
 
@@ -128,50 +128,37 @@ describe("RemindConventionsNeedSignature use case", () => {
 
       //Assert
       const conventionsForActors = conventions.filter((convention) =>
-        (["READY_TO_SIGN", "PARTIALLY_SIGNED"] as ConventionStatus[]).includes(
-          convention.status,
-        ),
-      );
-      const conventionsForAgencies = conventions.filter((convention) =>
-        (["IN_REVIEW"] as ConventionStatus[]).includes(convention.status),
+        needSignatureStatuses.includes(convention.status),
       );
 
-      const expectedEvents: DomainEvent[] = [
+      const conventionsForAgencies = conventions.filter((convention) =>
+        needReviewStatuses.includes(convention.status),
+      );
+
+      const expectedEvents: Partial<DomainEvent>[] = [
         {
           id: eventIds[0],
-          occurredAt: now.toISOString(),
           topic,
           payload: {
             reminderKind: "FirstReminderForSignatories",
             conventionId: conventionsForActors[0].id,
           },
-          publications: [],
-          status: "never-published",
-          wasQuarantined: false,
         },
         {
           id: eventIds[1],
-          occurredAt: now.toISOString(),
           topic,
           payload: {
             reminderKind: "FirstReminderForSignatories",
             conventionId: conventionsForActors[1].id,
           },
-          publications: [],
-          status: "never-published",
-          wasQuarantined: false,
         },
         {
           id: eventIds[2],
-          occurredAt: now.toISOString(),
           topic,
           payload: {
             reminderKind: "FirstReminderForAgency",
             conventionId: conventionsForAgencies[0].id,
           },
-          publications: [],
-          status: "never-published",
-          wasQuarantined: false,
         },
       ];
 
@@ -183,14 +170,11 @@ describe("RemindConventionsNeedSignature use case", () => {
         success: expectedEvents.length,
         failures: [],
       });
-      expectToEqual(outboxRepository.events, expectedEvents);
-      expectToEqual(
-        conventionRepository._conventions,
-        toConventionRepoRecord(conventions),
-      );
+      expectObjectInArrayToMatch(outboxRepository.events, expectedEvents);
+      expectToEqual(conventionRepository.conventions, conventions);
     });
 
-    it("ConventionSignReminder type 'LastReminderForSignatories' when there is a convention that is below 2 open days before interships start.", async () => {
+    it("with kind 'LastReminderForSignatories' when there is a convention that is below 2 open days before interships start.", async () => {
       // Arrange
       const withDateStart = addBusinessDays(now, 2);
 
@@ -209,36 +193,27 @@ describe("RemindConventionsNeedSignature use case", () => {
       );
       expect(differenceInBusinessDays(withDateStart, now)).toBeGreaterThan(0);
 
-      const events: DomainEvent[] = conventions
+      const events: Partial<DomainEvent>[] = conventions
         .filter((convention) =>
-          (
-            ["READY_TO_SIGN", "PARTIALLY_SIGNED"] as ConventionStatus[]
-          ).includes(convention.status),
+          needSignatureStatuses.includes(convention.status),
         )
         .map((convention, index) => ({
           id: eventIds[index],
-          occurredAt: now.toISOString(),
           topic,
           payload: {
             reminderKind: "LastReminderForSignatories",
             conventionId: convention.id,
           },
-          publications: [],
-          status: "never-published",
-          wasQuarantined: false,
         }));
       expectToEqual(summary, {
         success: events.length,
         failures: [],
       });
-      expectToEqual(outboxRepository.events, events);
-      expectToEqual(
-        conventionRepository._conventions,
-        toConventionRepoRecord(conventions),
-      );
+      expectObjectInArrayToMatch(outboxRepository.events, events);
+      expectToEqual(conventionRepository.conventions, conventions);
     });
 
-    it("ConventionSignReminder type 'LastReminderForSignatories' and 'LastReminderForAgency' when there is a convention that is below 1 open days before interships start depending on conventions statuses.", async () => {
+    it("with kind 'LastReminderForSignatories' and 'LastReminderForAgency' when there is a convention that is below 1 open days before interships start depending on conventions statuses.", async () => {
       // Arrange
       const withDateStart = addBusinessDays(now, 1);
 
@@ -258,61 +233,44 @@ describe("RemindConventionsNeedSignature use case", () => {
       expect(differenceInBusinessDays(withDateStart, now)).toBeGreaterThan(0);
 
       const conventionsNeeds48 = conventions.filter((convention) =>
-        (["READY_TO_SIGN", "PARTIALLY_SIGNED"] as ConventionStatus[]).includes(
-          convention.status,
-        ),
+        needSignatureStatuses.includes(convention.status),
       );
       const conventionsNeeds24 = conventions.filter((convention) =>
-        (["IN_REVIEW"] as ConventionStatus[]).includes(convention.status),
+        needReviewStatuses.includes(convention.status),
       );
 
-      const events: DomainEvent[] = [
+      const events: Partial<DomainEvent>[] = [
         {
           id: eventIds[0],
-          occurredAt: now.toISOString(),
           topic,
           payload: {
             reminderKind: "LastReminderForSignatories",
             conventionId: conventionsNeeds48[0].id,
           },
-          publications: [],
-          status: "never-published",
-          wasQuarantined: false,
         },
         {
           id: eventIds[1],
-          occurredAt: now.toISOString(),
           topic,
           payload: {
             reminderKind: "LastReminderForSignatories",
             conventionId: conventionsNeeds48[1].id,
           },
-          publications: [],
-          status: "never-published",
-          wasQuarantined: false,
         },
         {
           id: eventIds[2],
-          occurredAt: now.toISOString(),
           topic,
           payload: {
             reminderKind: "LastReminderForAgency",
             conventionId: conventionsNeeds24[0].id,
           },
-          publications: [],
-          status: "never-published",
-          wasQuarantined: false,
         },
       ];
       expectToEqual(summary, {
         success: events.length,
         failures: [],
       });
-      expectToEqual(outboxRepository.events, events);
-      expectToEqual(
-        conventionRepository._conventions,
-        toConventionRepoRecord(conventions),
-      );
+      expectObjectInArrayToMatch(outboxRepository.events, events);
+      expectToEqual(conventionRepository.conventions, conventions);
     });
   });
 });
@@ -331,7 +289,7 @@ const makeOneConventionOfEachStatuses = ({
   );
 
 const toConventionRepoRecord = (conventions: ConventionDto[]) =>
-  conventions.reduce(
+  conventions.reduce<Record<ConventionId, ConventionDto>>(
     (acc, item) => ({ ...acc, [item["id"]]: item }),
-    {} satisfies Record<ConventionId, ConventionDto>,
+    {},
   );

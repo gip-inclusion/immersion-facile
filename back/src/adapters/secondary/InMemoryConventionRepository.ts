@@ -7,10 +7,10 @@ import { ConflictError } from "../primary/helpers/httpErrors";
 const logger = createLogger(__filename);
 
 export class InMemoryConventionRepository implements ConventionRepository {
-  public _conventions: Record<string, ConventionDto> = {};
+  #conventions: Record<string, ConventionDto> = {};
 
   public get conventions() {
-    return Object.values(this._conventions);
+    return Object.values(this.#conventions);
   }
 
   public async deprecateConventionsWithoutDefinitiveStatusEndedSince(): Promise<number> {
@@ -19,13 +19,13 @@ export class InMemoryConventionRepository implements ConventionRepository {
 
   public async getById(id: ConventionId) {
     logger.info({ id }, "getById");
-    return this._conventions[id];
+    return this.#conventions[id];
   }
 
   public async getIdsByEstablishmentRepresentativeEmail(
     email: Email,
   ): Promise<ConventionId[]> {
-    return values(this._conventions)
+    return values(this.#conventions)
       .filter(
         ({ signatories }) =>
           signatories.establishmentRepresentative.email === email,
@@ -35,25 +35,25 @@ export class InMemoryConventionRepository implements ConventionRepository {
 
   public async save(convention: ConventionDto): Promise<void> {
     logger.info({ conventionWithoutExternalId: convention }, "save");
-    if (this._conventions[convention.id]) {
+    if (this.#conventions[convention.id]) {
       throw new ConflictError(
         `Convention with id ${convention.id} already exists`,
       );
     }
-    this._conventions[convention.id] = convention;
+    this.#conventions[convention.id] = convention;
   }
 
   // for test purpose
   public setConventions(conventions: Record<string, ConventionDto>) {
-    this._conventions = conventions;
+    this.#conventions = conventions;
   }
 
   public async update(convention: ConventionDto) {
     logger.info({ convention }, "updateConvention");
     const id = convention.id;
-    if (!this._conventions[id]) return;
+    if (!this.#conventions[id]) return;
 
-    this._conventions[id] = convention;
+    this.#conventions[id] = convention;
     return id;
   }
 }

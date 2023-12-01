@@ -65,7 +65,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           .filter(propEq("topic", sendingTopic))
           .map((event) => (event.payload as WithConventionIdLegacy).id)
       : [];
-    return Object.values(this.conventionRepository._conventions)
+    return this.conventionRepository.conventions
       .filter(
         (convention) =>
           new Date(convention.dateEnd).getDate() === dateEnd.getDate() &&
@@ -90,7 +90,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
   public async getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
   ): Promise<ConventionReadDto[]> {
-    return Object.values(this.conventionRepository._conventions)
+    return this.conventionRepository.conventions
       .filter(makeApplyFiltersToConventions(filters))
       .map((convention) => this.#addAgencyDataToConvention(convention));
   }
@@ -100,7 +100,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     limit: number;
     filters: GetConventionsByFiltersQueries;
   }): Promise<ConventionReadDto[]> {
-    return Object.values(this.conventionRepository._conventions)
+    return this.conventionRepository.conventions
       .filter((convention) => {
         const agency = this.agencyRepository.agencies.find(
           (agency) => agency.id === convention.agencyId,
@@ -122,7 +122,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     agencyId,
   }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
     logger.info("getAll");
-    return Object.values(this.conventionRepository._conventions)
+    return this.conventionRepository.conventions
       .filter((dto) => !status || dto.status === status)
       .filter((dto) => !agencyId || dto.agencyId === agencyId)
       .map((dto) => this.#addAgencyDataToConvention(dto));
