@@ -8,10 +8,10 @@ import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-const supportedStatuses: ConventionStatus[] = [
-  "READY_TO_SIGN",
+const agencyStatuses: ConventionStatus[] = ["IN_REVIEW"];
+const signatoryStatuses: ConventionStatus[] = [
   "PARTIALLY_SIGNED",
-  "IN_REVIEW",
+  "READY_TO_SIGN",
 ];
 
 const ZERO_DAYS = 0;
@@ -26,6 +26,11 @@ type ConventionsReminderSummary = {
     error: Error;
   }[];
 };
+type EventWithConventionId = {
+  id: ConventionId;
+  event: DomainEvent;
+};
+
 export class ConventionsReminder extends TransactionalUseCase<
   void,
   ConventionsReminderSummary
@@ -50,7 +55,12 @@ export class ConventionsReminder extends TransactionalUseCase<
     _: void,
     uow: UnitOfWork,
   ): Promise<ConventionsReminderSummary> {
-    const supportedConventions = await this.#getSupportedConventions(uow);
+    const supportedConventions =
+      await uow.conventionQueries.getConventionsByFilters({
+        startDateGreater: this.#timeGateway.now(),
+        startDateLessOrEqual: addBusinessDays(this.#timeGateway.now(), 3),
+        withStatuses: [...agencyStatuses, ...signatoryStatuses],
+      });
 
     const results: { id: ConventionId; error?: Error }[] = await Promise.all(
       supportedConventions
@@ -84,98 +94,72 @@ export class ConventionsReminder extends TransactionalUseCase<
     };
   }
 
-  #addReminderTypeForConventionOnMatchCase(
-    reminderType: ReminderKind,
-    conventionId: ConventionId,
-    supportedCondition: boolean,
-  ): { id: ConventionId; event: DomainEvent }[] {
-    return supportedCondition
-      ? [
-          {
-            id: conventionId,
-            event: this.#createNewEvent({
-              topic: "ConventionReminderRequired",
-              payload: {
-                conventionId,
-                reminderKind: reminderType,
-              },
-            }),
-          },
-        ]
-      : [];
+  #makeConventionReminderRequiredEvent(
+    id: ConventionId,
+    reminderKind: ReminderKind,
+  ): EventWithConventionId {
+    return {
+      id,
+      event: this.#createNewEvent({
+        topic: "ConventionReminderRequired",
+        payload: {
+          conventionId: id,
+          reminderKind,
+        },
+      }),
+    };
   }
 
-  #getSupportedConventions(uow: UnitOfWork): Promise<ConventionDto[]> {
-    return uow.conventionQueries.getConventionsByFilters({
-      startDateGreater: this.#timeGateway.now(),
-      startDateLessOrEqual: addBusinessDays(this.#timeGateway.now(), 3),
-      withStatuses: supportedStatuses,
-    });
-  }
-
-  #prepareReminderEventsByConvention(
-    convention: ConventionDto,
-  ): { id: ConventionId; event: DomainEvent }[] {
-    const differenceInDays: number = differenceInBusinessDays(
-      new Date(convention.dateStart),
+  #prepareReminderEventsByConvention({
+    id,
+    status,
+    dateStart,
+  }: ConventionDto): EventWithConventionId[] {
+    const dateStartDiff = differenceInBusinessDays(
+      new Date(dateStart),
       this.#timeGateway.now(),
     );
-
     return [
-      // ...this.#addReminderTypeForConventionOnMatchCase(
-      //   "FirstReminderForSignatories",
-      //   convention.id,
-      //   IsFirstReminderForSignatories(differenceInDays, convention),
-      // ),
-      ...this.#addReminderTypeForConventionOnMatchCase(
-        "LastReminderForSignatories",
-        convention.id,
-        isLastReminderForSignatories(differenceInDays, convention),
-      ),
-      ...this.#addReminderTypeForConventionOnMatchCase(
-        "FirstReminderForAgency",
-        convention.id,
-        isFirstReminderForAgency(differenceInDays, convention),
-      ),
-      ...this.#addReminderTypeForConventionOnMatchCase(
-        "LastReminderForAgency",
-        convention.id,
-        isLastReminderForAgency(differenceInDays, convention),
-      ),
+      // ...(dateStartDiff > TWO_DAYS &&
+      //   dateStartDiff <= THREE_DAYS &&
+      //   signatoryStatuses.includes(status)
+      //     ? [
+      //         this.#makeConventionReminderRequiredEvent(
+      //           id,
+      //           "FirstReminderForSignatories",
+      //         ),
+      //       ]
+      //     : []),
+      ...(dateStartDiff > ZERO_DAYS &&
+      dateStartDiff <= TWO_DAYS &&
+      signatoryStatuses.includes(status)
+        ? [
+            this.#makeConventionReminderRequiredEvent(
+              id,
+              "LastReminderForSignatories",
+            ),
+          ]
+        : []),
+      ...(dateStartDiff > TWO_DAYS &&
+      dateStartDiff <= THREE_DAYS &&
+      agencyStatuses.includes(status)
+        ? [
+            this.#makeConventionReminderRequiredEvent(
+              id,
+              "FirstReminderForAgency",
+            ),
+          ]
+        : []),
+      ...(dateStartDiff > ZERO_DAYS &&
+      dateStartDiff <= ONE_DAY &&
+      agencyStatuses.includes(status)
+        ? [
+            this.#makeConventionReminderRequiredEvent(
+              id,
+              "LastReminderForAgency",
+            ),
+          ]
+        : []),
     ];
   }
 }
-
-const isLastReminderForAgency = (
-  differenceInDays: number,
-  convention: ConventionDto,
-): boolean =>
-  ZERO_DAYS < differenceInDays &&
-  differenceInDays <= ONE_DAY &&
-  convention.status === "IN_REVIEW";
-
-const isFirstReminderForAgency = (
-  differenceInDays: number,
-  convention: ConventionDto,
-): boolean =>
-  TWO_DAYS < differenceInDays &&
-  differenceInDays <= THREE_DAYS &&
-  convention.status === "IN_REVIEW";
-
-const isLastReminderForSignatories = (
-  differenceInDays: number,
-  convention: ConventionDto,
-): boolean =>
-  ZERO_DAYS < differenceInDays &&
-  differenceInDays <= TWO_DAYS &&
-  (convention.status === "PARTIALLY_SIGNED" ||
-    convention.status === "READY_TO_SIGN");
-
-// const IsFirstReminderForSignatories = (
-//   differenceInDays: number,
-//   convention: ConventionDto,
-// ): boolean =>
-//   TWO_DAYS < differenceInDays &&
-//   differenceInDays <= THREE_DAYS &&
-//   (convention.status === "PARTIALLY_SIGNED" ||
-//     convention.status === "READY_TO_SIGN");
