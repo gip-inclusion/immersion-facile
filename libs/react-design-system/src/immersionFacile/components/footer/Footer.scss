@@ -1,19 +1,14 @@
 @import "../../../config/responsive";
 
 .im-footer {
+  &__body {
+    justify-content: center;
+    @include for-screen-min($bp-sm) {
+      justify-content: end;
+    }
+  }
   &__content {
-    flex: 1 1 33%;
-    margin-left: 3%;
-  }
-  &__content-end {
-    display: flex;
-    justify-content: flex-end;
-  }
-  &__partner-link {
-    margin: 0 0.5rem;
-    max-width: 160px;
-    max-height: 90px;
-    height: auto;
+    flex-basis: auto;
   }
   &__partners-main {
     flex-direction: column;
@@ -27,8 +22,13 @@
   &__brand-text {
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: center;
+    text-align: center;
     max-width: 20rem;
+    @include for-screen-min($bp-sm) {
+      align-items: start;
+      text-align: start;
+    }
   }
   &__partners-sub {
     & > ul {
