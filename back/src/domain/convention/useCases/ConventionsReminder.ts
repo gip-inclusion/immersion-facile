@@ -122,11 +122,11 @@ export class ConventionsReminder extends TransactionalUseCase<
     );
 
     return [
-      ...this.#addReminderTypeForConventionOnMatchCase(
-        "FirstReminderForSignatories",
-        convention.id,
-        IsFirstReminderForSignatories(differenceInDays, convention),
-      ),
+      // ...this.#addReminderTypeForConventionOnMatchCase(
+      //   "FirstReminderForSignatories",
+      //   convention.id,
+      //   IsFirstReminderForSignatories(differenceInDays, convention),
+      // ),
       ...this.#addReminderTypeForConventionOnMatchCase(
         "LastReminderForSignatories",
         convention.id,
@@ -171,11 +171,11 @@ const isLastReminderForSignatories = (
   (convention.status === "PARTIALLY_SIGNED" ||
     convention.status === "READY_TO_SIGN");
 
-const IsFirstReminderForSignatories = (
-  differenceInDays: number,
-  convention: ConventionDto,
-): boolean =>
-  TWO_DAYS < differenceInDays &&
-  differenceInDays <= THREE_DAYS &&
-  (convention.status === "PARTIALLY_SIGNED" ||
-    convention.status === "READY_TO_SIGN");
+// const IsFirstReminderForSignatories = (
+//   differenceInDays: number,
+//   convention: ConventionDto,
+// ): boolean =>
+//   TWO_DAYS < differenceInDays &&
+//   differenceInDays <= THREE_DAYS &&
+//   (convention.status === "PARTIALLY_SIGNED" ||
+//     convention.status === "READY_TO_SIGN");
