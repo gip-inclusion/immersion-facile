@@ -28,4 +28,5 @@ export * from "./section-stats";
 export * from "./section-text-embed";
 export * from "./skip-links";
 export * from "./submit-confirmation-section";
+export * from "./toastr";
 export * from "./tooltip";

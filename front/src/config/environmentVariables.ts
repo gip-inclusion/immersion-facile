@@ -20,6 +20,10 @@ export const ENV = {
   }),
   prefilledForms: getBoolean("VITE_PREFILLED_FORMS"),
   crispWebSiteId: windowEnv.VITE_CRISP_WEBSITE_ID,
+  updateServiceWorkerIntervalInSeconds: parseInt(
+    windowEnv.VITE_UPDATE_SERVICE_WORKER_INTERVAL_IN_SECONDS || "60",
+    10,
+  ),
 };
 
 Object.entries(ENV).forEach(([key, value]) =>
