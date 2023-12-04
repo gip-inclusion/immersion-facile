@@ -33,6 +33,14 @@ export class InMemoryConventionRepository implements ConventionRepository {
       .map(({ id }) => id);
   }
 
+  public async getIdsByEstablishmentTutorEmail(
+    email: Email,
+  ): Promise<ConventionId[]> {
+    return values(this.#conventions)
+      .filter(({ establishmentTutor }) => establishmentTutor.email === email)
+      .map(({ id }) => id);
+  }
+
   public async save(convention: ConventionDto): Promise<void> {
     logger.info({ conventionWithoutExternalId: convention }, "save");
     if (this.#conventions[convention.id]) {
