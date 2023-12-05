@@ -17,7 +17,7 @@ export interface DashboardGateway {
     now: Date,
   ) => AbsoluteUrl;
   getConventionStatusUrl: (id: ConventionId, now: Date) => AbsoluteUrl;
-  getEstablishmentRepresentativeConventionsDashboardUrl(
+  getEstablishmentConventionsDashboardUrl(
     authenticatedUserId: AuthenticatedUserId,
     now: Date,
   ): AbsoluteUrl;

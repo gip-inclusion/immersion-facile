@@ -82,7 +82,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     return this.#makeUrl(token, dashboard);
   }
 
-  public getEstablishmentRepresentativeConventionsDashboardUrl(
+  public getEstablishmentConventionsDashboardUrl(
     authenticatedUserId: AuthenticatedUserId,
     now: Date,
   ): AbsoluteUrl {

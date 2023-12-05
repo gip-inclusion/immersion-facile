@@ -80,7 +80,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           ...inclusionConnectedUserWithRights,
           agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
           establishmentDashboard: {
-            url: `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${
+            url: `http://stubEstablishmentConventionsDashboardUrl/${
               inclusionConnectedUserWithRights.id
             }/${gateways.timeGateway.now()}`,
             role: "establishment-representative",
