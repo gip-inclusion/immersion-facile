@@ -4,6 +4,7 @@ export type Role = (typeof allRoles)[number];
 export type SignatoryRole = (typeof allSignatoryRoles)[number];
 export type AgencyModifierRole = (typeof agencyModifierRoles)[number];
 export type ModifierRole = (typeof allModifierRoles)[number];
+export type EstablishmentRole = (typeof establishmentsRoles)[number];
 export const allRoles = [
   "beneficiary",
   "beneficiary-representative",
@@ -23,6 +24,11 @@ export const allSignatoryRoles = [
 ] as const satisfies ReadonlyArray<
   Required<Signatories>[keyof Required<Signatories>]["role"]
 >;
+
+export const establishmentsRoles = [
+  "establishment-representative",
+  "establishment-tutor",
+] as const;
 
 export const agencyModifierRoles = ["counsellor", "validator"] as const;
 
