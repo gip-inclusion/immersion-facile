@@ -1,6 +1,11 @@
 import { addBusinessDays, differenceInBusinessDays } from "date-fns";
 import { z } from "zod";
-import { ConventionDto, ConventionId, ConventionStatus } from "shared";
+import {
+  castError,
+  ConventionDto,
+  ConventionId,
+  ConventionStatus,
+} from "shared";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { ReminderKind } from "../../core/eventsPayloads/ConventionReminderPayload";
@@ -55,24 +60,58 @@ export class ConventionsReminder extends TransactionalUseCase<
     _: void,
     uow: UnitOfWork,
   ): Promise<ConventionsReminderSummary> {
-    const supportedConventions =
-      await uow.conventionQueries.getConventionsByFilters({
+    const [
+      conventionsForLastSignatoryReminder,
+      conventionsForAgencyReminders,
+      conventionsForFirstSignatoryReminder,
+    ] = await Promise.all([
+      uow.conventionQueries.getConventionsByFilters({
         startDateGreater: this.#timeGateway.now(),
-        startDateLessOrEqual: addBusinessDays(this.#timeGateway.now(), 3),
-        withStatuses: [...agencyStatuses, ...signatoryStatuses],
-      });
+        startDateLessOrEqual: addBusinessDays(
+          this.#timeGateway.now(),
+          TWO_DAYS,
+        ),
+        withStatuses: signatoryStatuses,
+      }),
+      uow.conventionQueries.getConventionsByFilters({
+        startDateGreater: this.#timeGateway.now(),
+        startDateLessOrEqual: addBusinessDays(
+          this.#timeGateway.now(),
+          THREE_DAYS,
+        ),
+        withStatuses: agencyStatuses,
+      }),
+      uow.conventionQueries.getConventionsByFilters({
+        startDateGreater: addBusinessDays(this.#timeGateway.now(), TWO_DAYS),
+        withStatuses: [...signatoryStatuses],
+      }),
+    ]);
+
+    const events = [
+      ...conventionsForLastSignatoryReminder.map(({ id }) =>
+        this.#makeConventionReminderRequiredEvent(
+          id,
+          "LastReminderForSignatories",
+        ),
+      ),
+      ...conventionsForAgencyReminders.flatMap((c) =>
+        this.#makeAgencyReminders(c),
+      ),
+      ...conventionsForFirstSignatoryReminder.map(({ id }) =>
+        this.#makeConventionReminderRequiredEvent(
+          id,
+          "FirstReminderForSignatories",
+        ),
+      ),
+    ];
 
     const results: { id: ConventionId; error?: Error }[] = await Promise.all(
-      supportedConventions
-        .flatMap((convention) =>
-          this.#prepareReminderEventsByConvention(convention),
-        )
-        .map((eventWithConvention) =>
-          uow.outboxRepository
-            .save(eventWithConvention.event)
-            .then(() => ({ id: eventWithConvention.id }))
-            .catch((error: Error) => ({ id: eventWithConvention.id, error })),
-        ),
+      events.map(({ event, id }) =>
+        uow.outboxRepository
+          .save(event)
+          .then(() => ({ id }))
+          .catch((error) => ({ id, error: castError(error) })),
+      ),
     );
 
     return {
@@ -110,7 +149,7 @@ export class ConventionsReminder extends TransactionalUseCase<
     };
   }
 
-  #prepareReminderEventsByConvention({
+  #makeAgencyReminders({
     id,
     status,
     dateStart,
@@ -119,30 +158,9 @@ export class ConventionsReminder extends TransactionalUseCase<
       new Date(dateStart),
       this.#timeGateway.now(),
     );
+    if (!agencyStatuses.includes(status)) return [];
     return [
-      // ...(dateStartDiff > TWO_DAYS &&
-      //   dateStartDiff <= THREE_DAYS &&
-      //   signatoryStatuses.includes(status)
-      //     ? [
-      //         this.#makeConventionReminderRequiredEvent(
-      //           id,
-      //           "FirstReminderForSignatories",
-      //         ),
-      //       ]
-      //     : []),
-      ...(dateStartDiff > ZERO_DAYS &&
-      dateStartDiff <= TWO_DAYS &&
-      signatoryStatuses.includes(status)
-        ? [
-            this.#makeConventionReminderRequiredEvent(
-              id,
-              "LastReminderForSignatories",
-            ),
-          ]
-        : []),
-      ...(dateStartDiff > TWO_DAYS &&
-      dateStartDiff <= THREE_DAYS &&
-      agencyStatuses.includes(status)
+      ...(TWO_DAYS < dateStartDiff && dateStartDiff <= THREE_DAYS
         ? [
             this.#makeConventionReminderRequiredEvent(
               id,
@@ -150,9 +168,7 @@ export class ConventionsReminder extends TransactionalUseCase<
             ),
           ]
         : []),
-      ...(dateStartDiff > ZERO_DAYS &&
-      dateStartDiff <= ONE_DAY &&
-      agencyStatuses.includes(status)
+      ...(ZERO_DAYS < dateStartDiff && dateStartDiff <= ONE_DAY
         ? [
             this.#makeConventionReminderRequiredEvent(
               id,
