@@ -1,5 +1,5 @@
 import { from, Observable } from "rxjs";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import {
   AbsoluteUrl,
   ConventionDto,
@@ -16,7 +16,10 @@ import {
   UpdateConventionStatusRequestDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
+import {
+  logBodyAndThrow,
+  otherwiseThrow,
+} from "src/core-logic/adapters/otherwiseThrow";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
@@ -35,6 +38,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
+            .with({ status: P.union(400, 409) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -115,6 +119,10 @@ export class HttpConventionGateway implements ConventionGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 404 }, () => undefined)
+            .with({ status: 403 }, (response) => {
+              throw new Error(response.body.message);
+            })
+
             .otherwise(otherwiseThrow),
         ),
     );
@@ -167,6 +175,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -185,6 +194,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
+            .with({ status: P.union(400, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

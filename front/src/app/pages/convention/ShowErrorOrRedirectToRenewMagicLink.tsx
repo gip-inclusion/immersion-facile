@@ -1,3 +1,4 @@
+import { expiredMagicLinkErrorMessage } from "shared";
 import { routes } from "src/app/routes/routes";
 
 export const ShowErrorOrRedirectToRenewMagicLink = ({
@@ -8,7 +9,7 @@ export const ShowErrorOrRedirectToRenewMagicLink = ({
   jwt: string;
 }) => {
   // un peu fragile, mais j'attends qu'on remette au carré les erreurs front/back. Ca fait un fix rapide (8/12/2022)
-  if (errorMessage.includes("Le lien magique est périmé")) {
+  if (errorMessage.includes(expiredMagicLinkErrorMessage)) {
     routes
       .renewConventionMagicLink({
         expiredJwt: jwt,

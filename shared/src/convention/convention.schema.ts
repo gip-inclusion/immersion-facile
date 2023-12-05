@@ -20,6 +20,7 @@ import {
   validateSchedule,
 } from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret.schema";
+import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
 import { phoneRegExp } from "../utils";
 import { dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
@@ -433,7 +434,7 @@ export const renewMagicLinkRequestSchema: z.Schema<RenewMagicLinkRequestDto> =
 
 export const renewMagicLinkResponseSchema: z.Schema<RenewMagicLinkResponse> =
   z.object({
-    message: z.literal("Le lien magique est périmé"),
+    message: z.literal(expiredMagicLinkErrorMessage),
     needsNewMagicLink: z.boolean(),
   });
 export const markPartnersErroredConventionAsHandledRequestSchema: z.Schema<MarkPartnersErroredConventionAsHandledRequest> =

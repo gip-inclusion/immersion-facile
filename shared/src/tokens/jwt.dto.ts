@@ -29,3 +29,5 @@ export const currentJwtVersions: Record<PayloadKey, number> = {
 export type JwtDto = {
   jwt: AppSupportedJwt;
 };
+
+export const expiredMagicLinkErrorMessage = "Le lien magique est périmé";
