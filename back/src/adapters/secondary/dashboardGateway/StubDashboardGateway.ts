@@ -24,10 +24,10 @@ export class StubDashboardGateway implements DashboardGateway {
     return `http://stubErroredConventionDashboard/${agencyIds.join("_")}`;
   }
 
-  public getEstablishmentRepresentativeConventionsDashboardUrl(
+  public getEstablishmentConventionsDashboardUrl(
     authenticatedUserId: AuthenticatedUserId,
     now: Date,
   ): AbsoluteUrl {
-    return `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${authenticatedUserId}/${now}`;
+    return `http://stubEstablishmentConventionsDashboardUrl/${authenticatedUserId}/${now}`;
   }
 }
