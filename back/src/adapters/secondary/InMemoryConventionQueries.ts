@@ -102,6 +102,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
   }): Promise<ConventionReadDto[]> {
     return this.conventionRepository.conventions
       .filter((convention) => {
+        //TODO : dépendance agency repo dans convention repo à gérer plutot dans le usecase pour garder le repo convention indépendant
         const agency = this.agencyRepository.agencies.find(
           (agency) => agency.id === convention.agencyId,
         );
@@ -164,18 +165,16 @@ const makeApplyFiltersToConventions =
     withStatuses,
   }: GetConventionsByFiltersQueries) =>
   (convention: ConventionDto) => {
-    if (
-      startDateLessOrEqual &&
-      new Date(convention.dateStart) > startDateLessOrEqual
-    )
-      return false;
-    if (startDateGreater && new Date(convention.dateStart) <= startDateGreater)
-      return false;
-    if (
+    const dateStart = new Date(convention.dateStart);
+    const conditionsToExcludeConvention = [
+      startDateLessOrEqual && dateStart > startDateLessOrEqual,
+      startDateGreater && startDateGreater >= dateStart,
       withStatuses &&
-      withStatuses.length > 0 &&
-      !withStatuses.includes(convention.status)
-    )
-      return false;
-    return true;
+        withStatuses.length > 0 &&
+        !withStatuses.includes(convention.status),
+    ];
+
+    return !conditionsToExcludeConvention.some(
+      (condition) => condition === true,
+    );
   };

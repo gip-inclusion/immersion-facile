@@ -78,13 +78,13 @@ describe("ConventionReminder use case", () => {
       );
     });
 
-    it("When there is no convention that is below 3 open days before intership starts.", async () => {
+    it("When there is conventions that is above 1 open day after internship starts", async () => {
       // Arrange
-      const { differenceWithNow, date } = prepareDate(now, 4);
-      expect(differenceWithNow > 3).toBeTruthy();
+      const { startDate, startDateDifference } = prepareDates(now, -1);
+      expect(startDateDifference < 0).toBeTruthy();
 
       const conventions = makeOneConventionOfEachStatuses({
-        withDateStart: date,
+        withDateStart: startDate,
       });
       uow.conventionRepository.setConventions(conventions);
 
@@ -102,13 +102,14 @@ describe("ConventionReminder use case", () => {
   });
 
   describe("Send 'ConventionReminderRequired' event", () => {
-    it("with kind 'FirstReminderForAgency' when there is a convention that is between 3 and 2 open days before interships start depending of convention statuses.", async () => {
+    it(`with kind 'FirstReminderForSignatories'
+        when there is a convention that is above 4 open days before interships start depending of convention statuses.`, async () => {
       // Arrange
-      const { differenceWithNow, date } = prepareDate(now, 3);
-      expect(differenceWithNow <= 3 && differenceWithNow > 2).toBeTruthy();
+      const { startDateDifference, startDate } = prepareDates(now, 4);
+      expect(startDateDifference > 3).toBeTruthy();
 
       const conventions = makeOneConventionOfEachStatuses({
-        withDateStart: date,
+        withDateStart: startDate,
       });
       uow.conventionRepository.setConventions(conventions);
 
@@ -116,20 +117,18 @@ describe("ConventionReminder use case", () => {
       const summary = await conventionsReminder.execute();
 
       //Assert
-      const conventionsForAgencies = conventions.filter((convention) =>
-        needReviewStatuses.includes(convention.status),
+      const conventionsForSignatories = conventions.filter((convention) =>
+        needSignatureStatuses.includes(convention.status),
       );
-      const expectedEvents: Partial<DomainEvent>[] = [
-        {
-          id: eventIds[0],
+      const expectedEvents: Partial<DomainEvent>[] =
+        conventionsForSignatories.map(({ id }, index) => ({
+          id: eventIds[index],
           topic,
           payload: {
-            reminderKind: "FirstReminderForAgency",
-            conventionId: conventionsForAgencies[0].id,
+            reminderKind: "FirstReminderForSignatories",
+            conventionId: id,
           },
-        },
-      ];
-
+        }));
       expectToEqual(summary, {
         success: expectedEvents.length,
         failures: [],
@@ -138,13 +137,14 @@ describe("ConventionReminder use case", () => {
       expectToEqual(uow.conventionRepository.conventions, conventions);
     });
 
-    it("with kind 'LastReminderForSignatories' when there is a convention that is below 2 open days before interships start.", async () => {
+    it(`with kind 'LastReminderForSignatories'
+        when there is a convention that is below 2 open days before interships start depending of convention statuses.`, async () => {
       // Arrange
-      const { differenceWithNow, date } = prepareDate(now, 2);
-      expect(differenceWithNow <= 2 && differenceWithNow > 0).toBeTruthy();
+      const { startDate, startDateDifference } = prepareDates(now, 2);
+      expect(0 < startDateDifference && startDateDifference <= 2).toBeTruthy();
 
       const conventions = makeOneConventionOfEachStatuses({
-        withDateStart: date,
+        withDateStart: startDate,
       });
       uow.conventionRepository.setConventions(conventions);
 
@@ -172,13 +172,69 @@ describe("ConventionReminder use case", () => {
       expectToEqual(uow.conventionRepository.conventions, conventions);
     });
 
-    it("with kind 'LastReminderForSignatories' and 'LastReminderForAgency' when there is a convention that is below 1 open days before interships start depending on conventions statuses.", async () => {
+    it(`with kind 'FirstReminderForAgency' and 'FirstReminderForSignatories'
+        when there is a convention that is between 3 and 2 open days before interships start depending of convention statuses.`, async () => {
       // Arrange
-      const { differenceWithNow, date } = prepareDate(now, 1);
-      expect(differenceWithNow <= 1 && differenceWithNow > 0).toBeTruthy();
+      const { startDate, startDateDifference } = prepareDates(now, 3);
+      expect(2 < startDateDifference && startDateDifference <= 3).toBeTruthy();
 
       const conventions = makeOneConventionOfEachStatuses({
-        withDateStart: date,
+        withDateStart: startDate,
+      });
+      uow.conventionRepository.setConventions(conventions);
+
+      // Act
+      const summary = await conventionsReminder.execute();
+
+      //Assert
+      const supportedConventions = conventions.filter((convention) =>
+        [...needReviewStatuses, ...needSignatureStatuses].includes(
+          convention.status,
+        ),
+      );
+      const expectedEvents: Partial<DomainEvent>[] = [
+        {
+          id: eventIds[0],
+          topic,
+          payload: {
+            reminderKind: "FirstReminderForAgency",
+            conventionId: supportedConventions[2].id,
+          },
+        },
+        {
+          id: eventIds[1],
+          topic,
+          payload: {
+            reminderKind: "FirstReminderForSignatories",
+            conventionId: supportedConventions[0].id,
+          },
+        },
+        {
+          id: eventIds[2],
+          topic,
+          payload: {
+            reminderKind: "FirstReminderForSignatories",
+            conventionId: supportedConventions[1].id,
+          },
+        },
+      ];
+
+      expectToEqual(summary, {
+        success: expectedEvents.length,
+        failures: [],
+      });
+      expectObjectInArrayToMatch(uow.outboxRepository.events, expectedEvents);
+      expectToEqual(uow.conventionRepository.conventions, conventions);
+    });
+
+    it(`with kind 'LastReminderForSignatories' and 'LastReminderForAgency'
+        when there is a convention that is below 1 open days before interships start depending on conventions statuses.`, async () => {
+      // Arrange
+      const { startDate, startDateDifference } = prepareDates(now, 1);
+      expect(0 < startDateDifference && startDateDifference <= 1).toBeTruthy();
+
+      const conventions = makeOneConventionOfEachStatuses({
+        withDateStart: startDate,
       });
       uow.conventionRepository.setConventions(conventions);
 
@@ -243,10 +299,10 @@ const makeOneConventionOfEachStatuses = ({
       .build(),
   );
 
-const prepareDate = (now: Date, addBusinessDay: number) => {
-  const date = addBusinessDays(now, addBusinessDay);
+const prepareDates = (now: Date, businessDaysToAdd: number) => {
+  const startDate = addBusinessDays(now, businessDaysToAdd);
   return {
-    differenceWithNow: differenceInBusinessDays(date, now),
-    date,
+    startDate,
+    startDateDifference: differenceInBusinessDays(startDate, now),
   };
 };
