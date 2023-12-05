@@ -1,13 +1,14 @@
 import { z } from "zod";
 import { zSchemaForType } from "./zodUtils";
 
-export type Headers = { authorization: string };
+export type WithAuthorizationHeader = { authorization: string };
 
-export const withAuthorizationSchema = zSchemaForType<Headers>()(
-  z.object({
-    authorization: z.string(),
-  }),
-);
+export const withAuthorizationSchema =
+  zSchemaForType<WithAuthorizationHeader>()(
+    z.object({
+      authorization: z.string(),
+    }),
+  );
 
 export const withValidateHeadersAuthorization = {
   validateHeaders: (headers: unknown) =>

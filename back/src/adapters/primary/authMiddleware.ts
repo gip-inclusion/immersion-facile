@@ -7,6 +7,7 @@ import {
   castError,
   ConventionJwtPayload,
   currentJwtVersions,
+  expiredMagicLinkErrorMessage,
   ExtractFromExisting,
   isApiConsumerAllowed,
   PayloadKey,
@@ -270,7 +271,7 @@ const sendNeedsRenewedLinkError = (res: Response, err: unknown) => {
     ? res.json({
         message:
           err.message === "jwt expired"
-            ? "Le lien magique est périmé"
+            ? expiredMagicLinkErrorMessage
             : err.message,
         needsNewMagicLink: true,
       })

@@ -1,4 +1,3 @@
-import { SuperTest, Test } from "supertest";
 import { match } from "ts-pattern";
 import {
   AgencyDtoBuilder,
@@ -13,11 +12,14 @@ import {
   expectEmailOfType,
   expectHttpResponseToEqual,
   expectToEqual,
+  expiredMagicLinkErrorMessage,
   InclusionConnectedUser,
   stringToMd5,
+  TechnicalRoutes,
   technicalRoutes,
   UnauthenticatedConventionRoutes,
   unauthenticatedConventionRoutes,
+  WithAuthorizationHeader,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -54,9 +56,9 @@ const convention = new ConventionDtoBuilder()
 const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
 describe("convention e2e", () => {
-  let request: SuperTest<Test>;
   let unauthenticatedRequest: HttpClient<UnauthenticatedConventionRoutes>;
   let magicLinkRequest: HttpClient<ConventionMagicLinkRoutes>;
+  let technicalRoutesClient: HttpClient<TechnicalRoutes>;
   let generateConventionJwt: GenerateConventionJwt;
   let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
@@ -65,15 +67,18 @@ describe("convention e2e", () => {
   let gateways: InMemoryGateways;
 
   beforeEach(async () => {
+    const testApp = await buildTestApp(new AppConfigBuilder().build());
+    const request = testApp.request;
+
     ({
       eventCrawler,
       gateways,
-      request,
+
       generateConventionJwt,
       generateBackOfficeJwt,
       generateInclusionConnectJwt,
       inMemoryUow,
-    } = await buildTestApp(new AppConfigBuilder().build()));
+    } = testApp);
 
     unauthenticatedRequest = createSupertestSharedClient(
       unauthenticatedConventionRoutes,
@@ -82,6 +87,11 @@ describe("convention e2e", () => {
 
     magicLinkRequest = createSupertestSharedClient(
       conventionMagicLinkRoutes,
+      request,
+    );
+
+    technicalRoutesClient = createSupertestSharedClient(
+      technicalRoutes,
       request,
     );
 
@@ -107,25 +117,55 @@ describe("convention e2e", () => {
     });
 
     it("400 - Invalid body", async () => {
-      const response = await request
-        .post(unauthenticatedConventionRoutes.createConvention.url)
-        .send({ invalid_params: true });
-      expectToEqual(response.status, 400);
+      const response = await unauthenticatedRequest.createConvention({
+        body: {
+          invalid_params: true,
+        } as unknown as ConventionDto,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          message:
+            "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /demandes-immersion",
+          status: 400,
+          issues: [
+            "id : Required",
+            "status : Required",
+            "agencyId : Obligatoire",
+            "dateSubmission : Obligatoire",
+            "dateStart : Obligatoire",
+            "dateEnd : Obligatoire",
+            "siret : Obligatoire",
+            "businessName : Obligatoire",
+            "schedule : Required",
+            "individualProtection : Obligatoire",
+            "sanitaryPrevention : Obligatoire",
+            "immersionAddress : Obligatoire",
+            "immersionObjective : Vous devez choisir un objectif d'immersion",
+            "immersionAppellation : Required",
+            "immersionActivities : Obligatoire",
+            "establishmentTutor : Required",
+            "internshipKind : Invalid discriminator value. Expected 'immersion' | 'mini-stage-cci'",
+          ],
+        },
+        status: 400,
+      });
     });
 
     it("409 - Conflict", async () => {
       inMemoryUow.conventionRepository.setConventions([convention]);
 
-      const response = await request
-        .post(unauthenticatedConventionRoutes.createConvention.url)
-        .send({
+      const response = await unauthenticatedRequest.createConvention({
+        body: {
           ...convention,
-          email: "another@email.fr",
-        });
+        },
+      });
 
-      expectToEqual(response.statusCode, 409);
-      expectToEqual(response.body, {
-        errors: `Convention with id ${convention.id} already exists`,
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors: `Convention with id ${convention.id} already exists`,
+        },
+        status: 409,
       });
     });
   });
@@ -164,10 +204,6 @@ describe("convention e2e", () => {
           "SHARE_DRAFT_CONVENTION_BY_LINK",
         );
 
-        const technicalRoutesClient = createSupertestSharedClient(
-          technicalRoutes,
-          request,
-        );
         const sharedConventionLink =
           await shortLinkRedirectToLinkWithValidation(
             conventionShortLinkEmail.params.conventionFormUrl,
@@ -287,16 +323,12 @@ describe("convention e2e", () => {
     );
 
     it("403 - JWT Expired", async () => {
-      const response = await request
-        .get(
-          conventionMagicLinkRoutes.getConvention.url.replace(
-            ":conventionId",
-            convention.id,
-          ),
-        )
-        .set(
-          "Authorization",
-          generateConventionJwt(
+      const response = await magicLinkRequest.getConvention({
+        urlParams: {
+          conventionId: convention.id,
+        },
+        headers: {
+          authorization: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: convention.id,
               role: "beneficiary",
@@ -308,13 +340,16 @@ describe("convention e2e", () => {
                 2 * 24 * 3600,
             }),
           ),
-        );
+        },
+      });
 
       // GETting the created convention 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
-      expectToEqual(response.statusCode, 403);
-      expectToEqual(response.body, {
-        message: "Le lien magique est périmé",
-        needsNewMagicLink: true,
+      expectHttpResponseToEqual(response, {
+        body: {
+          message: expiredMagicLinkErrorMessage,
+          needsNewMagicLink: true,
+        },
+        status: 403,
       });
     });
 
@@ -327,20 +362,20 @@ describe("convention e2e", () => {
           now: gateways.timeGateway.now(),
         }),
       );
-      const response = await request
-        .get(
-          conventionMagicLinkRoutes.getConvention.url.replace(
-            ":conventionId",
-            unknownId,
-          ),
-        )
-        .set("Authorization", jwt);
-
-      expect(response.body).toEqual({
-        errors:
-          "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+      const response = await magicLinkRequest.getConvention({
+        headers: { authorization: jwt },
+        urlParams: {
+          conventionId: unknownId,
+        },
       });
-      expect(response.status).toBe(404);
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors:
+            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+        },
+        status: 404,
+      });
     });
   });
 
@@ -389,16 +424,13 @@ describe("convention e2e", () => {
         .withStatus("READY_TO_SIGN")
         .build();
 
-      const response = await request
-        .post(
-          conventionMagicLinkRoutes.updateConvention.url.replace(
-            ":conventionId",
-            unknownId,
-          ),
-        )
-        .set(
-          "Authorization",
-          generateConventionJwt(
+      const response = await magicLinkRequest.updateConvention({
+        body: {
+          convention: conventionWithUnknownId,
+        },
+        urlParams: { conventionId: unknownId },
+        headers: {
+          authorization: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: unknownId,
               role: "beneficiary",
@@ -406,15 +438,15 @@ describe("convention e2e", () => {
               now: gateways.timeGateway.now(),
             }),
           ),
-        )
-        .send({
-          convention: conventionWithUnknownId,
-        });
-
-      expectToEqual(response.body, {
-        errors: `Convention with id ${unknownId} was not found`,
+        },
       });
-      expect(response.status).toBe(404);
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors: `Convention with id ${unknownId} was not found`,
+        },
+        status: 404,
+      });
     });
   });
 
@@ -521,25 +553,27 @@ describe("convention e2e", () => {
     );
 
     it("400 - no JWT", async () => {
-      const response = await request
-        .post(conventionMagicLinkRoutes.updateConventionStatus.url)
-        .send({ status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id });
+      const response = await magicLinkRequest.updateConventionStatus({
+        body: { status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id },
+        headers: undefined as unknown as WithAuthorizationHeader,
+      });
 
-      expectToEqual(response.statusCode, 400);
-      expectToEqual(response.body, {
-        issues: ["authorization : Required"],
-        message:
-          "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /auth/update-application-status",
+      expectHttpResponseToEqual(response, {
+        body: {
+          issues: ["authorization : Required"],
+          message:
+            "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /auth/update-application-status",
+          status: 400,
+        },
         status: 400,
       });
     });
 
     it("403 - unauthorized role for expected status update", async () => {
-      const response = await request
-        .post(conventionMagicLinkRoutes.updateConventionStatus.url)
-        .set(
-          "Authorization",
-          generateConventionJwt(
+      const response = await magicLinkRequest.updateConventionStatus({
+        body: { status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id },
+        headers: {
+          authorization: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: convention.id,
               role: "establishment-representative",
@@ -547,22 +581,26 @@ describe("convention e2e", () => {
               now: gateways.timeGateway.now(),
             }),
           ),
-        )
-        .send({ status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id });
-
-      expectToEqual(response.body, {
-        errors:
-          "Role 'establishment-representative' is not allowed to go to status 'ACCEPTED_BY_VALIDATOR' for convention 'a99eaca1-ee70-4c90-b3f4-668d492f7392'.",
+        },
       });
-      expectToEqual(response.statusCode, 403);
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors:
+            "Role 'establishment-representative' is not allowed to go to status 'ACCEPTED_BY_VALIDATOR' for convention 'a99eaca1-ee70-4c90-b3f4-668d492f7392'.",
+        },
+        status: 403,
+      });
     });
 
     it("404 - unknown convention id", async () => {
-      const response = await request
-        .post(conventionMagicLinkRoutes.updateConventionStatus.url)
-        .set(
-          "Authorization",
-          generateConventionJwt(
+      const response = await magicLinkRequest.updateConventionStatus({
+        body: {
+          status: "ACCEPTED_BY_COUNSELLOR",
+          conventionId: unknownId,
+        },
+        headers: {
+          authorization: generateConventionJwt(
             createConventionMagicLinkPayload({
               id: unknownId,
               role: "counsellor",
@@ -570,16 +608,15 @@ describe("convention e2e", () => {
               now: gateways.timeGateway.now(),
             }),
           ),
-        )
-        .send({
-          status: "ACCEPTED_BY_COUNSELLOR",
-          conventionId: unknownId,
-        });
-
-      expectToEqual(response.body, {
-        errors: conventionMissingMessage(unknownId),
+        },
       });
-      expectToEqual(response.statusCode, 404);
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors: conventionMissingMessage(unknownId),
+        },
+        status: 404,
+      });
     });
   });
 });

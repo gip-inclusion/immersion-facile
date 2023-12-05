@@ -4,6 +4,7 @@ import { match, P } from "ts-pattern";
 import {
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  expiredMagicLinkErrorMessage,
   Role,
   WithConventionId,
 } from "shared";
@@ -66,7 +67,7 @@ export const ConventionManageContent = ({
   );
 
   if (fetchConventionError) {
-    fetchConventionError.includes("Le lien magique est périmé")
+    fetchConventionError.includes(expiredMagicLinkErrorMessage)
       ? routes
           .renewConventionMagicLink({
             expiredJwt: jwtParams.jwt,

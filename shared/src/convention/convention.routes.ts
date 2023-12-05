@@ -14,6 +14,7 @@ import {
   findSimilarConventionsResponseSchema,
   renewConventionParamsSchema,
   renewMagicLinkRequestSchema,
+  renewMagicLinkResponseSchema,
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
   withConventionIdLegacySchema,
@@ -25,7 +26,11 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/demandes-immersion/:conventionId",
     method: "get",
     ...withAuthorizationHeaders,
-    responses: { 200: conventionReadSchema, 404: legacyHttpErrorSchema },
+    responses: {
+      200: conventionReadSchema,
+      403: renewMagicLinkResponseSchema,
+      404: legacyHttpErrorSchema,
+    },
   }),
   getConventionStatusDashboard: defineRoute({
     url: "/auth/status-convention",
@@ -44,14 +49,22 @@ export const conventionMagicLinkRoutes = defineRoutes({
     method: "post",
     requestBodySchema: updateConventionRequestSchema,
     ...withAuthorizationHeaders,
-    responses: { 200: withConventionIdLegacySchema },
+    responses: {
+      200: withConventionIdLegacySchema,
+      404: legacyHttpErrorSchema,
+    },
   }),
   updateConventionStatus: defineRoute({
     url: "/auth/update-application-status",
     method: "post",
     requestBodySchema: updateConventionStatusRequestSchema,
     ...withAuthorizationHeaders,
-    responses: { 200: withConventionIdLegacySchema },
+    responses: {
+      200: withConventionIdLegacySchema,
+      400: httpErrorSchema,
+      403: legacyHttpErrorSchema,
+      404: legacyHttpErrorSchema,
+    },
   }),
   renewConvention: defineRoute({
     url: "/auth/renew-convention",
@@ -71,6 +84,8 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     requestBodySchema: conventionSchema,
     responses: {
       200: withConventionIdLegacySchema,
+      400: httpErrorSchema,
+      409: legacyHttpErrorSchema,
     },
   }),
   shareConvention: defineRoute({

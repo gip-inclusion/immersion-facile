@@ -14,6 +14,7 @@ import {
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
+import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
 import { Flavor } from "../typeFlavors";
 import { DateString } from "../utils/date";
 
@@ -335,7 +336,7 @@ export type RenewMagicLinkRequestDto = {
 };
 
 export type RenewMagicLinkResponse = {
-  message: "Le lien magique est périmé";
+  message: typeof expiredMagicLinkErrorMessage;
   needsNewMagicLink: boolean;
 };
 

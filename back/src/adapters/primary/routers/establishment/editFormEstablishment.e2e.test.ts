@@ -7,6 +7,7 @@ import {
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
+  expiredMagicLinkErrorMessage,
   FormEstablishmentDtoBuilder,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -178,7 +179,7 @@ describe(`Edit form establishments`, () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: "Le lien magique est périmé",
+        message: expiredMagicLinkErrorMessage,
         needsNewMagicLink: true,
       },
       status: 403,
