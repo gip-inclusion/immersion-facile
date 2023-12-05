@@ -102,11 +102,7 @@ export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
 export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel);
 
 export const fitForDelegationAgencyKind = allAgencyKindsAllowedToAdd.filter(
-  (kind) =>
-    kind !== "autre" &&
-    kind !== "cci" &&
-    kind !== "operateur-cep" &&
-    kind !== "prepa-apprentissage",
+  (kind) => !["autre", "cci", "operateur-cep"].includes(kind),
 );
 
 export type AgencyOption = {
