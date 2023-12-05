@@ -2,6 +2,7 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyDto, AgencyId } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
+import { EstablishmentRole } from "../role/role.dto";
 import { Flavor } from "../typeFlavors";
 
 export type AgencyRole = (typeof allAgencyRoles)[number];
@@ -33,7 +34,10 @@ type WithAgencyRights = {
 export type WithDashboardUrls = {
   agencyDashboardUrl?: AbsoluteUrl;
   erroredConventionsDashboardUrl?: AbsoluteUrl;
-  establishmentRepresentativeDashboardUrl?: AbsoluteUrl;
+  establishmentDashboard?: {
+    url: AbsoluteUrl;
+    role: EstablishmentRole;
+  };
 };
 
 export type InclusionConnectedUser = AuthenticatedUser &

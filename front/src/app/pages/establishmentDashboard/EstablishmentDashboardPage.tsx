@@ -39,11 +39,11 @@ export const EstablishmentDashboardPage = ({
           <ManageConventionFormSection
             routeNameToRedirectTo={"manageConventionInclusionConnected"}
           />
-          {currentUser.establishmentRepresentativeDashboardUrl ? (
+          {currentUser.establishmentDashboard ? (
             <MetabaseView
               title={`Tableau des conventions en cours
             pour le responsable d'entreprise ${currentUser.firstName} ${currentUser.lastName}`}
-              url={currentUser.establishmentRepresentativeDashboardUrl}
+              url={currentUser.establishmentDashboard.url}
             />
           ) : (
             <p>
