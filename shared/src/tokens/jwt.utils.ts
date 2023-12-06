@@ -58,24 +58,28 @@ export const createConventionMagicLinkPayload = ({
   ...(sub ? { sub } : {}),
 });
 
+type CreateEstablishmentJwtPayloadProperties = {
+  siret: SiretDto;
+  durationDays: number;
+  now: Date;
+  iat?: number;
+  exp?: number;
+  version?: number;
+};
+
 export const createEstablishmentJwtPayload = ({
   siret,
   durationDays,
   now,
-}: {
-  siret: SiretDto;
-  durationDays: number;
-  now: Date;
-}): EstablishmentJwtPayload => {
-  const iat = Math.round(now.getTime() / 1000);
-  const exp = iat + durationDays * 24 * 3600;
-  return {
-    siret,
-    iat,
-    exp,
-    version: currentJwtVersions.establishment,
-  };
-};
+  iat = Math.round(now.getTime() / 1000),
+  exp = iat + durationDays * 24 * 3600,
+  version = currentJwtVersions.establishment,
+}: CreateEstablishmentJwtPayloadProperties): EstablishmentJwtPayload => ({
+  siret,
+  iat,
+  exp,
+  version,
+});
 
 export const createBackOfficeJwtPayload = ({
   durationDays,

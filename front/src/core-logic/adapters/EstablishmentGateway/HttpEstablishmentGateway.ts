@@ -79,6 +79,9 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             .with({ status: P.union(400, 401) }, ({ body }) => {
               throw new Error(JSON.stringify(body));
             })
+            .with({ status: 403 }, (response) => {
+              throw new Error(response.body.message);
+            })
             .otherwise(otherwiseThrow),
         ),
     );
