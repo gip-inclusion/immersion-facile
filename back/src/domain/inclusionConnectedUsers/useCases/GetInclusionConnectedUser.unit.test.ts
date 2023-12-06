@@ -176,7 +176,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     });
   });
 
-  describe("establishment representative dashboard", () => {
+  describe("establishment dashboard", () => {
     it("retrieve establishment dashboard when IC user is establishement rep in at least one convention", async () => {
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
@@ -202,24 +202,6 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
     });
 
-    it("do not retrieve establishment dashboard when IC user is not establishement rep in any conventions", async () => {
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          ...john,
-          agencyRights: [],
-        },
-      ]);
-
-      const result = await getInclusionConnectedUser.execute(
-        undefined,
-        inclusionConnectJwtPayload,
-      );
-
-      expectToEqual(result.establishmentDashboard, undefined);
-    });
-  });
-
-  describe("establishment tutor dashboard", () => {
     it("retrieve establishment tutor dashboard when IC user is establishement tutor in at least one convention", async () => {
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
@@ -245,7 +227,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
     });
 
-    it("should retrieve establishment representativ dashboard when ic user is establishment representativ and tutor for at least one convention", async () => {
+    it("should retrieve establishment representative dashboard when ic user is establishment representative and tutor for at least one convention", async () => {
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
           ...john,
@@ -271,7 +253,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
     });
 
-    it("do not retrieve establishment tutor dashboard when IC user is not establishement tutor in any conventions", async () => {
+    it("do not retrieve establishment tutor or representative dashboard when IC user is not establishement tutor or respresentative in any conventions", async () => {
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
           ...john,
