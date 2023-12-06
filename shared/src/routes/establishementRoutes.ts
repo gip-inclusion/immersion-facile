@@ -42,6 +42,7 @@ export const establishmentRoutes = defineRoutes({
       200: formEstablishmentSchema,
       400: legacyHttpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
+      403: renewMagicLinkResponseSchema,
     },
   }),
   requestEmailToUpdateFormRoute: defineRoute({

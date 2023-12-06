@@ -73,7 +73,6 @@ describe("convention e2e", () => {
     ({
       eventCrawler,
       gateways,
-
       generateConventionJwt,
       generateBackOfficeJwt,
       generateInclusionConnectJwt,

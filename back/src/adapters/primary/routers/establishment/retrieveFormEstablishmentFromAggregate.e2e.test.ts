@@ -7,11 +7,15 @@ import {
   EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
+  expiredMagicLinkErrorMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import {
+  buildTestApp,
+  InMemoryGateways,
+} from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import {
@@ -35,12 +39,14 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let inMemoryUow: InMemoryUnitOfWork;
+  let gateways: InMemoryGateways;
 
   beforeEach(async () => {
     let request: supertest.SuperTest<supertest.Test>;
     ({
       request,
       inMemoryUow,
+      gateways,
       generateBackOfficeJwt,
       generateEditEstablishmentJwt,
     } = await buildTestApp());
@@ -190,6 +196,37 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         error: "Provided token is invalid",
       },
       status: 401,
+    });
+  });
+
+  it(`${displayRouteName(
+    establishmentRoutes.getFormEstablishment,
+  )} 403 if token expired`, async () => {
+    const response = await httpClient.getFormEstablishment({
+      body: {},
+      headers: {
+        authorization: generateEditEstablishmentJwt(
+          createEstablishmentJwtPayload({
+            siret: establishmentAggregate.establishment.siret,
+            now: gateways.timeGateway.now(),
+            durationDays: 1,
+            exp:
+              Math.round(gateways.timeGateway.now().getTime() / 1000) -
+              2 * 24 * 3600,
+          }),
+        ),
+      },
+      urlParams: {
+        siret: establishmentAggregate.establishment.siret,
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        message: expiredMagicLinkErrorMessage,
+        needsNewMagicLink: true,
+      },
+      status: 403,
     });
   });
 });
