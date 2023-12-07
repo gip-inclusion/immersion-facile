@@ -266,11 +266,13 @@ describe("UpdateConventionStatus", () => {
   });
 
   describe("* -> ACCEPTED_BY_COUNSELLOR transition", () => {
+    const reviewDate = new Date("2021-09-01T10:10:00.000Z");
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "ACCEPTED_BY_COUNSELLOR",
         conventionId: originalConventionId,
       },
+      updatedFields: { reviewDate: reviewDate.toISOString() },
       expectedDomainTopic: "ConventionAcceptedByCounsellor",
       allowedMagicLinkRoles: ["counsellor"],
       allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],

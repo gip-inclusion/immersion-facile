@@ -8,6 +8,7 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
+  reviewedConventionStatuses,
   SignatoryRole,
   stringToMd5,
   UpdateConventionStatusRequestDto,
@@ -108,6 +109,11 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       .withStatus(params.status)
       .withDateValidation(
         validatedConventionStatuses.includes(params.status)
+          ? conventionUpdatedAt
+          : undefined,
+      )
+      .withReviewDate(
+        reviewedConventionStatuses.includes(params.status)
           ? conventionUpdatedAt
           : undefined,
       )
