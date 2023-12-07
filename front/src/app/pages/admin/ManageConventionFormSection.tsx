@@ -27,7 +27,7 @@ export const ManageConventionFormSection = ({
       resolver: zodResolver(manageConventionAdminFormSchema),
       mode: "onTouched",
     });
-
+  const { isValid } = formState;
   return (
     <>
       <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>Piloter une convention</h5>
@@ -45,7 +45,9 @@ export const ManageConventionFormSection = ({
                 id: "manageConventionAdminForm-conventionId",
                 placeholder: "Id de la convention",
                 onChange: (event) => {
-                  setValue("conventionId", event.currentTarget.value.trim());
+                  setValue("conventionId", event.currentTarget.value.trim(), {
+                    shouldValidate: true,
+                  });
                 },
               }}
               className={fr.cx("fr-col-12", "fr-col-lg-6")}
@@ -54,7 +56,7 @@ export const ManageConventionFormSection = ({
           </div>
           <Button
             title="Piloter la convention"
-            disabled={!formState.isValid}
+            disabled={!isValid}
             className={fr.cx("fr-mt-2w")}
           >
             Piloter la convention
