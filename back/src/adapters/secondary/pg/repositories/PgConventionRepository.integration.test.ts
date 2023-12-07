@@ -537,7 +537,7 @@ describe("PgConventionRepository", () => {
     );
   });
 
-  it("update convention with reviewDate", async () => {
+  it("update convention with dateApproval", async () => {
     const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder()
       .withId(conventionId)
@@ -548,7 +548,7 @@ describe("PgConventionRepository", () => {
     const updatedConvention = new ConventionDtoBuilder()
       .withId(conventionId)
       .withStatus("ACCEPTED_BY_COUNSELLOR")
-      .withReviewDate(new Date("2021-01-05").toISOString())
+      .withDateApproval(new Date("2021-01-05").toISOString())
       .withDateEnd(new Date("2021-01-20").toISOString())
       .build();
 

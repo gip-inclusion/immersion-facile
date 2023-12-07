@@ -5,7 +5,7 @@ const conventionTable = "conventions";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumn(conventionTable, {
-    review_date: {
+    date_approval: {
       type: "timestamptz",
       notNull: false,
     },
@@ -20,12 +20,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   WHERE outbox.topic = 'ConventionAcceptedByCounsellor'
    )
     UPDATE conventions AS c
-    SET review_date = filtered_outbox.review_occured_at
+    SET date_approval = filtered_outbox.review_occured_at
     FROM filtered_outbox
     WHERE filtered_outbox.convention_id = c.id::text
    `);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumn(conventionTable, "review_date");
+  pgm.dropColumn(conventionTable, "date_approval");
 }

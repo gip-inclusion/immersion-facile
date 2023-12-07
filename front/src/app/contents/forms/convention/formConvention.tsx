@@ -610,7 +610,7 @@ const fieldsToExclude = {
     required: undefined,
     autoComplete: undefined,
   },
-  reviewDate: {
+  dateApproval: {
     label: "",
     hintText: undefined,
     placeholder: undefined,

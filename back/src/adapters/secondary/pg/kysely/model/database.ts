@@ -163,7 +163,7 @@ interface Conventions {
   validators: Json | null;
   renewed_from: string | null;
   renewed_justification: string | null;
-  review_date: Timestamp | null;
+  date_approval: Timestamp | null;
 }
 
 interface Actors {

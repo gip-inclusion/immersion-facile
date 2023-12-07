@@ -40,7 +40,7 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
         id: ref("conventions.id"),
         status: ref("conventions.status"),
         dateValidation: sql<DateString>`date_to_iso(conventions.date_validation)`,
-        reviewDate: sql<DateString>`date_to_iso(conventions.review_date)`,
+        dateApproval: sql<DateString>`date_to_iso(conventions.date_approval)`,
         dateSubmission: sql<DateString>`date_to_iso(conventions.date_submission)`,
         dateStart: sql<DateString>`date_to_iso(conventions.date_start)`,
         dateEnd: sql<DateString>`date_to_iso(conventions.date_end)`,
