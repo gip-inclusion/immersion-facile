@@ -101,6 +101,10 @@ export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",
 ];
 
+export const reviewedConventionStatuses: ConventionStatus[] = [
+  "ACCEPTED_BY_COUNSELLOR",
+];
+
 export type ConventionId = Flavor<string, "ConventionId">;
 export type ConventionExternalId = Flavor<string, "ConventionExternalId">;
 
@@ -124,6 +128,7 @@ export type ConventionCommon = {
   dateStart: DateString;
   dateEnd: DateString;
   dateValidation?: DateString; // undefined until the convention is validated
+  reviewDate?: DateString; // undefined until the convention is accepted by counsellor
   siret: SiretDto;
   businessName: string;
   schedule: ScheduleDto;
@@ -254,7 +259,10 @@ export type EstablishmentTutor = GenericActor<"establishment-tutor"> & {
   job: string;
 };
 
-export type AgencyRefersToInConvention = { id: AgencyId; name: string };
+export type AgencyRefersToInConvention = {
+  id: AgencyId;
+  name: string;
+};
 
 export type ConventionReadDto = ConventionDto & {
   agencyName: string;

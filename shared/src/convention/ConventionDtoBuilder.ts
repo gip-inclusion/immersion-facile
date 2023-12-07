@@ -582,6 +582,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
+  public withReviewDate(reviewDate: string | undefined): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, reviewDate });
+  }
+
   public withSanitaryPrevention(
     sanitaryPrevention: boolean,
   ): ConventionDtoBuilder {

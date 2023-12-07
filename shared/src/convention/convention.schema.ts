@@ -213,6 +213,9 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   dateValidation: zStringMinLength1
     .regex(dateRegExp, localization.invalidValidationFormatDate)
     .optional(),
+  reviewDate: zStringMinLength1
+    .regex(dateRegExp, localization.invalidReviewFormatDate)
+    .optional(),
   siret: siretSchema,
   businessName: zTrimmedString,
   schedule: scheduleSchema,
