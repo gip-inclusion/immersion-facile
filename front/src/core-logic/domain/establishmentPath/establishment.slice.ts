@@ -9,7 +9,7 @@ import {
 import { emptyAppellationAndRome } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback"; // type EstablishmentUiStatus =
 
-type EstablishmentFeedback = SubmitFeedBack<
+export type EstablishmentFeedback = SubmitFeedBack<
   | "success"
   | "readyForLinkRequestOrRedirection"
   | "submitSuccess"

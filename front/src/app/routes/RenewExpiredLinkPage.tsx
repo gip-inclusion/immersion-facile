@@ -5,7 +5,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Route } from "type-route";
 import { ConventionJwtPayload, domElementIds } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
-import { LinkHome, MainWrapper } from "react-design-system";
+import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { conventionGateway } from "src/config/dependencies";
@@ -60,11 +60,23 @@ export const RenewExpiredLinkContent = ({
   if (!jwtPayload.applicationId)
     return (
       <>
-        <div>
-          Votre lien est périmé, veuillez renouveler votre demande si vous
-          souhaitez éditer votre établissement.
-        </div>
-        <LinkHome {...routes.home().link}>Page d'accueil</LinkHome>
+        <p>
+          Votre lien est périmé. Pour le renouveler et éditer votre entreprise :
+        </p>
+        <ol>
+          <li>Retournez sur l'accueil entreprises</li>
+          <li>Cliquez sur "Modifier mon entreprise" et entrez votre SIRET</li>
+          <li>
+            Un nouveau lien vous sera envoyé par mail pour modifier votre
+            entreprise
+          </li>
+        </ol>
+        <Button
+          {...routes.homeEstablishments().link}
+          className={fr.cx("fr-mt-2w")}
+        >
+          Retourner sur l'accueil entreprises
+        </Button>
       </>
     );
 

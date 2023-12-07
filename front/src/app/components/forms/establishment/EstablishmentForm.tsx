@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -17,6 +17,7 @@ import {
   domElementIds,
   emptyAppellationAndRome,
   EstablishmentJwtPayload,
+  expiredMagicLinkErrorMessage,
   FormEstablishmentDto,
   formEstablishmentSchema,
   immersionFacileContactEmail,
@@ -48,7 +49,10 @@ import {
 } from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import {
+  EstablishmentFeedback,
+  establishmentSlice,
+} from "src/core-logic/domain/establishmentPath/establishment.slice";
 import { BusinessContact } from "./BusinessContact";
 import { MultipleAppellationInput } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
@@ -123,6 +127,29 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     (isEstablishmentCreation || isEstablishmentAdmin) && route.params.siret
       ? route.params.siret
       : "",
+  );
+
+  const redirectToErrorOnFeedback = useCallback(
+    (feedback: EstablishmentFeedback, jwt: string) => {
+      if (feedback.kind === "errored") {
+        if (feedback.errorMessage.includes(expiredMagicLinkErrorMessage)) {
+          routes
+            .renewConventionMagicLink({
+              expiredJwt: jwt,
+              originalURL: window.location.href,
+            })
+            .replace();
+          return;
+        }
+        routes
+          .errorRedirect({
+            message: feedback.errorMessage,
+            title: "Erreur",
+          })
+          .push();
+      }
+    },
+    [],
   );
 
   useEffect(() => {
@@ -205,15 +232,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   }, [debouncedFormValues, isEstablishmentCreation]);
 
   useEffect(() => {
-    if (feedback.kind === "errored") {
-      routes
-        .errorRedirect({
-          message: feedback.errorMessage,
-          title: "Erreur",
-        })
-        .push();
+    if (route.name === "editFormEstablishment") {
+      redirectToErrorOnFeedback(feedback, route.params.jwt);
     }
-  }, [feedback.kind]);
+  }, [feedback, redirectToErrorOnFeedback, route]);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
     match({ route, adminJwt })
