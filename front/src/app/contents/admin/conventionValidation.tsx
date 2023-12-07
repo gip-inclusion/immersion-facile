@@ -279,8 +279,16 @@ const agencyFields: ColField[] = [
       match({
         agencyRefersTo: convention.agencyRefersTo,
         dateValidation: convention.dateValidation,
+        reviewDate: convention.reviewDate,
       })
-        .with({ agencyRefersTo: P.not(P.nullish) }, () => " N/A ")
+        .with(
+          { agencyRefersTo: P.not(P.nullish), reviewDate: P.not(P.nullish) },
+          ({ reviewDate }) => toDisplayedDate(new Date(reviewDate)),
+        )
+        .with(
+          { agencyRefersTo: P.not(P.nullish), reviewDate: undefined },
+          () => "",
+        )
         .with({ dateValidation: undefined }, () => "")
         .with({ dateValidation: P.string }, ({ dateValidation }) =>
           toDisplayedDate(new Date(dateValidation)),
