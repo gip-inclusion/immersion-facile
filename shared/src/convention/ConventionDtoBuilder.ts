@@ -382,10 +382,6 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({ ...this.dto, dateValidation });
   }
 
-  public withEstablishementTutorPhone(phone: string): ConventionDtoBuilder {
-    return this.withEstablishmentTutor({ ...this.#establishmentTutor, phone });
-  }
-
   public withEstablishmentRepresentative(
     establishmentRepresentative: EstablishmentRepresentative,
   ) {
@@ -481,6 +477,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.#establishmentTutor,
       lastName,
     });
+  }
+
+  public withEstablishmentTutorPhone(phone: string): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({ ...this.#establishmentTutor, phone });
   }
 
   public withFederatedIdentity(

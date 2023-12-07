@@ -295,11 +295,28 @@ describe("conventionDtoSchema", () => {
 
   it("rejects when establishmentTutorPhone is not a valid number", () => {
     const convention = new ConventionDtoBuilder()
-      .withEstablishementTutorPhone("wrong")
+      .withEstablishmentTutorPhone("wrong")
       .build();
 
     expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
       "Numéro de téléphone incorrect",
+    ]);
+  });
+
+  it("rejects when establishmentTutorJob is an empty string", () => {
+    const convention = new ConventionDtoBuilder()
+      .withEstablishmentTutor({
+        email: "tuteur@entreprise.com",
+        firstName: "Jean",
+        lastName: "Tuteur",
+        phone: "0102030405",
+        job: "",
+        role: "establishment-tutor",
+      })
+      .build();
+
+    expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+      "Obligatoire",
     ]);
   });
 

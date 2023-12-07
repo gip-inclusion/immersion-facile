@@ -149,7 +149,7 @@ const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
   actorSchema.merge(
     z.object({
       role: z.literal("establishment-tutor"),
-      job: zStringPossiblyEmpty,
+      job: zStringMinLength1,
     }),
   );
 
