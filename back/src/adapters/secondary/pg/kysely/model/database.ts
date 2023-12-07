@@ -3,15 +3,16 @@ import { AbsoluteUrl, ConventionId } from "shared";
 
 export interface Database {
   actors: Actors;
-  conventions: Conventions;
+  agencies: Agencies;
   convention_external_ids: ConventionExternalIds;
+  conventions: Conventions;
   discussions: Discussions;
   exchanges: Exchanges;
-  groups: Groups;
+  form_establishments: PgFormEstablishments;
   groups__sirets: GroupsSirets;
-  agencies: Agencies;
-  saved_errors: SavedErrors;
+  groups: Groups;
   partners_pe_connect: PartnersPeConnect;
+  saved_errors: SavedErrors;
   view_appellations_dto: ViewAppellationsDto;
 }
 
@@ -190,4 +191,22 @@ interface ViewAppellationsDto {
   appellation_label: string | null;
   rome_code: string | null;
   rome_label: string | null;
+}
+
+export interface PgFormEstablishments {
+  additional_information: Generated<string | null>;
+  business_address: string;
+  business_contact: Generated<Json>;
+  business_name_customized: string | null;
+  business_name: string;
+  created_at: Generated<Timestamp | null>;
+  fit_for_disabled_workers: Generated<boolean | null>;
+  is_engaged_enterprise: boolean | null;
+  max_contacts_per_week: number;
+  naf: Json | null;
+  professions: Json;
+  siret: string;
+  source: Generated<string>;
+  updated_at: Generated<Timestamp | null>;
+  website: Generated<string | null>;
 }

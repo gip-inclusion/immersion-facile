@@ -36,19 +36,19 @@ export type FormEstablishmentSource =
   | ApiConsumerName;
 
 export type FormEstablishmentDto = {
-  source: FormEstablishmentSource;
-  siret: SiretDto; // 14 characters string
+  additionalInformation?: string;
+  appellations: AppellationAndRomeDto[]; // at least one
+  businessAddress: string;
+  businessContact: BusinessContactDto;
   businessName: string;
   businessNameCustomized?: string;
-  businessAddress: string;
-  isEngagedEnterprise?: boolean;
   fitForDisabledWorkers?: boolean;
-  naf?: NafDto; // { code: string, nomenclature: string }
-  appellations: AppellationAndRomeDto[]; // at least one
-  businessContact: BusinessContactDto;
-  website?: string;
-  additionalInformation?: string;
+  isEngagedEnterprise?: boolean;
   maxContactsPerWeek: number;
+  naf?: NafDto; // { code: string, nomenclature: string }
+  siret: SiretDto; // 14 characters string
+  source: FormEstablishmentSource;
+  website?: string;
 };
 
 export type WithFormEstablishmentDto = {

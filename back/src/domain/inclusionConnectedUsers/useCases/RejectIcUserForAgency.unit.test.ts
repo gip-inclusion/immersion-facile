@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   AuthenticatedUser,
+  BackOfficeDomainPayload,
   BackOfficeJwtPayload,
   expectPromiseToFailWith,
   expectToEqual,
@@ -119,7 +120,7 @@ describe("reject IcUser for agency", () => {
         },
         {
           role: "validator",
-        } as any,
+        } as unknown as BackOfficeDomainPayload,
       ),
       "This user is not a backOffice user, role was : 'validator'",
     );
