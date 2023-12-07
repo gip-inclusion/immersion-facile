@@ -537,6 +537,28 @@ describe("PgConventionRepository", () => {
     );
   });
 
+  it("update convention with reviewDate", async () => {
+    const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+    const convention = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withStatus("IN_REVIEW")
+      .build();
+    await conventionRepository.save(convention);
+
+    const updatedConvention = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withStatus("ACCEPTED_BY_COUNSELLOR")
+      .withReviewDate(new Date("2021-01-05").toISOString())
+      .withDateEnd(new Date("2021-01-20").toISOString())
+      .build();
+
+    await conventionRepository.update(updatedConvention);
+
+    expect(await conventionRepository.getById(conventionId)).toEqual(
+      updatedConvention,
+    );
+  });
+
   it("Retrieves federated identity if exists", async () => {
     const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = new ConventionDtoBuilder()

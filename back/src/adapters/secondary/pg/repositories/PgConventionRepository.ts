@@ -503,6 +503,7 @@ export class PgConventionRepository implements ConventionRepository {
         date_start: convention.dateStart,
         date_end: convention.dateEnd,
         date_validation: convention.dateValidation,
+        review_date: convention.reviewDate,
         siret: convention.siret,
         business_name: convention.businessName,
         schedule: sql`${JSON.stringify(convention.schedule)}`,
