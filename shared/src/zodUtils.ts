@@ -39,6 +39,7 @@ export const localization = {
   invalidUuid: "Le format de l'identifiant est invalide",
   invalidValidationFormatDate:
     "Le format de la date de validation est invalide.",
+  invalidReviewFormatDate: "Le format de la date de revue est invalide",
   maxCharacters: (max: number) => `Le maximum est de ${max} caractères`,
   mustBeSignedByEveryone: "La confirmation de votre accord est obligatoire.",
   required: "Obligatoire",
