@@ -3,6 +3,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencySchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
 import { withSourcePageSchema } from "../inclusionConnect/inclusionConnect.schema";
+import { establishmentsRoles } from "../role/role.dto";
 import { zStringMinLength1, zTrimmedString } from "../zodUtils";
 import {
   AgencyRight,
@@ -31,7 +32,12 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     agencyRights: z.array(agencyRightSchema),
     agencyDashboardUrl: absoluteUrlSchema.optional(),
     erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
-    establishmentRepresentativeDashboardUrl: absoluteUrlSchema.optional(),
+    establishmentDashboard: z
+      .object({
+        url: absoluteUrlSchema,
+        role: z.enum(establishmentsRoles),
+      })
+      .optional(),
   });
 
 export const getInclusionConnectLogoutUrlQueryParamsSchema: z.Schema<GetInclusionConnectLogoutUrlQueryParams> =

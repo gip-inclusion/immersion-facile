@@ -6,7 +6,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { match, P } from "ts-pattern";
 import { Route } from "type-route";
-import { InclusionConnectedUser } from "shared";
+import { EstablishmentRole, InclusionConnectedUser } from "shared";
 import { Loader } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -19,6 +19,11 @@ type EstablishmentDashboardTab = {
   label: string;
   content: JSX.Element;
 };
+
+const currentUserRoleToDisplay = (role: EstablishmentRole) =>
+  role === "establishment-representative"
+    ? "responsable d'entreprise"
+    : "tuteur de l'entreprise";
 
 export const EstablishmentDashboardPage = ({
   route,
@@ -36,20 +41,25 @@ export const EstablishmentDashboardPage = ({
       label: "Conventions en cours",
       content: (
         <>
-          <ManageConventionFormSection
-            routeNameToRedirectTo={"manageConventionInclusionConnected"}
-          />
-          {currentUser.establishmentRepresentativeDashboardUrl ? (
+          {currentUser.establishmentDashboard?.role ===
+            "establishment-representative" && (
+            <ManageConventionFormSection
+              routeNameToRedirectTo={"manageConventionInclusionConnected"}
+            />
+          )}
+          {currentUser.establishmentDashboard ? (
             <MetabaseView
               title={`Tableau des conventions en cours
-            pour le responsable d'entreprise ${currentUser.firstName} ${currentUser.lastName}`}
-              url={currentUser.establishmentRepresentativeDashboardUrl}
+            pour le ${currentUserRoleToDisplay(
+              currentUser.establishmentDashboard.role,
+            )} ${currentUser.firstName} ${currentUser.lastName}`}
+              url={currentUser.establishmentDashboard.url}
             />
           ) : (
             <p>
               {" "}
               Nous n'avons pas trouvé de convention où vous êtes référencé en
-              tant que responsable d'entreprise.
+              tant que responsable ou tuteur d'entreprise.
             </p>
           )}
         </>

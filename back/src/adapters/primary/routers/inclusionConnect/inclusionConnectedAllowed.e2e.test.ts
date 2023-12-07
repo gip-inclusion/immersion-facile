@@ -79,9 +79,12 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: {
           ...inclusionConnectedUserWithRights,
           agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
-          establishmentRepresentativeDashboardUrl: `http://stubEstablishmentRepresentativeConventionsDashboardUrl/${
-            inclusionConnectedUserWithRights.id
-          }/${gateways.timeGateway.now()}`,
+          establishmentDashboard: {
+            url: `http://stubEstablishmentConventionsDashboardUrl/${
+              inclusionConnectedUserWithRights.id
+            }/${gateways.timeGateway.now()}`,
+            role: "establishment-representative",
+          },
         },
         status: 200,
       });

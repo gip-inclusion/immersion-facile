@@ -45,7 +45,6 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(`No user found with provided ID : ${userId}`);
-
     return {
       ...user,
       ...(await this.#withAgencyDashboard(user, uow)),
@@ -71,6 +70,13 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
         )
       ).length > 0;
 
+    const hasConventionForEstablishmentTutor =
+      (
+        await uow.conventionRepository.getIdsByEstablishmentTutorEmail(
+          user.email,
+        )
+      ).length > 0;
+
     return {
       ...(agencyIdsWithEnoughPrivileges.length > 0
         ? {
@@ -89,13 +95,18 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
               ),
           }
         : {}),
-      ...(hasConventionForEstablishmentRepresentative
+      ...(hasConventionForEstablishmentRepresentative ||
+      hasConventionForEstablishmentTutor
         ? {
-            establishmentRepresentativeDashboardUrl:
-              await this.#dashboardGateway.getEstablishmentRepresentativeConventionsDashboardUrl(
+            establishmentDashboard: {
+              url: await this.#dashboardGateway.getEstablishmentConventionsDashboardUrl(
                 user.id,
                 this.#timeGateway.now(),
               ),
+              role: hasConventionForEstablishmentRepresentative
+                ? "establishment-representative"
+                : "establishment-tutor",
+            },
           }
         : {}),
     };

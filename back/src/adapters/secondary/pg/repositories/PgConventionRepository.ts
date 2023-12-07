@@ -67,6 +67,19 @@ export class PgConventionRepository implements ConventionRepository {
     return result.map(({ id }) => id);
   }
 
+  public async getIdsByEstablishmentTutorEmail(
+    email: Email,
+  ): Promise<ConventionId[]> {
+    const result = await this.transaction
+      .selectFrom("conventions")
+      .select("conventions.id")
+      .leftJoin("actors", "conventions.establishment_tutor_id", "actors.id")
+      .where("actors.email", "=", email)
+      .execute();
+
+    return result.map(({ id }) => id);
+  }
+
   public async save(convention: ConventionDto): Promise<void> {
     const alreadyExistingConvention = await this.getById(convention.id);
     if (alreadyExistingConvention)
