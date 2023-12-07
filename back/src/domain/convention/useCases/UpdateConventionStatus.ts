@@ -112,7 +112,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
           ? conventionUpdatedAt
           : undefined,
       )
-      .withReviewDate(
+      .withDateApproval(
         reviewedConventionStatuses.includes(params.status)
           ? conventionUpdatedAt
           : undefined,

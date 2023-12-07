@@ -364,6 +364,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({ ...this.dto, businessName });
   }
 
+  public withDateApproval(
+    dateApproval: string | undefined,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateApproval });
+  }
+
   public withDateEnd(dateEnd: string): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, dateEnd });
   }
@@ -580,10 +586,6 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       renewed,
     });
-  }
-
-  public withReviewDate(reviewDate: string | undefined): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, reviewDate });
   }
 
   public withSanitaryPrevention(
