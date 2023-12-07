@@ -97,9 +97,22 @@ describe("PgFormEstablishmentRepository", () => {
         fitForDisabledWorkers: true,
       };
       await formEstablishmentRepository.update(updatedFormEstablishment);
-
       expectToEqual(await formEstablishmentRepository.getAll(), [
         updatedFormEstablishment,
+      ]);
+
+      const minimalFormEstablishment: FormEstablishmentDto = {
+        siret: formEstablishment.siret,
+        appellations: formEstablishment.appellations,
+        businessAddress: formEstablishment.businessAddress,
+        businessContact: formEstablishment.businessContact,
+        businessName: formEstablishment.businessName,
+        maxContactsPerWeek: formEstablishment.maxContactsPerWeek,
+        source: formEstablishment.source,
+      };
+      await formEstablishmentRepository.update(minimalFormEstablishment);
+      expectToEqual(await formEstablishmentRepository.getAll(), [
+        minimalFormEstablishment,
       ]);
     });
 

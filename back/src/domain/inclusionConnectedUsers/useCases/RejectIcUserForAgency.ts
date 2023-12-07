@@ -1,5 +1,5 @@
 import {
-  BackOfficeJwtPayload,
+  BackOfficeDomainPayload,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
@@ -16,7 +16,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 export class RejectIcUserForAgency extends TransactionalUseCase<
   RejectIcUserRoleForAgencyParams,
   void,
-  BackOfficeJwtPayload
+  BackOfficeDomainPayload
 > {
   protected inputSchema = rejectIcUserRoleForAgencyParamsSchema;
 
@@ -34,7 +34,7 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
   protected async _execute(
     params: RejectIcUserRoleForAgencyParams,
     uow: UnitOfWork,
-    jwtPayload: BackOfficeJwtPayload,
+    jwtPayload: BackOfficeDomainPayload,
   ): Promise<void> {
     if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
     if (jwtPayload.role !== "backOffice")
