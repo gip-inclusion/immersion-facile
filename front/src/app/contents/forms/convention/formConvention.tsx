@@ -610,6 +610,14 @@ const fieldsToExclude = {
     required: undefined,
     autoComplete: undefined,
   },
+  reviewDate: {
+    label: "",
+    hintText: undefined,
+    placeholder: undefined,
+    id: "",
+    required: undefined,
+    autoComplete: undefined,
+  },
 
   validators: {
     label: "",
