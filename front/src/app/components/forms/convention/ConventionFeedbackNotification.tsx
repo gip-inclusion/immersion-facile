@@ -2,13 +2,7 @@ import React, { ReactNode } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { values } from "ramda";
 import { useStyles } from "tss-react/dsfr";
-import {
-  filterNotFalsy,
-  immersionFacileContactEmail,
-  Signatories,
-  Signatory,
-  SignatoryRole,
-} from "shared";
+import { filterNotFalsy, Signatories, Signatory, SignatoryRole } from "shared";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import {
   ConventionFeedbackKind,
@@ -126,10 +120,12 @@ const InitialSubmitSuccessMessageBase = ({
         Pensez à vérifier votre boîte mail et vos spams.
       </p>
       <p className={cx(fr.cx("fr-my-2w"), "fr-text")}>
-        Si vous ne recevez rien, alertez-nous&nbsp;:&nbsp;
-        <a href={`mailto:${immersionFacileContactEmail}`}>
-          {immersionFacileContactEmail}
+        Si vous ne recevez rien, vous pouvez récupérer votre lien de signature
+        en cliquant sur&nbsp;:&nbsp;
+        <a href={`https://tally.so/r/nWE4oN`}>
+          Récuperer mon lien de signature
         </a>
+        .
       </p>
     </div>
   );
