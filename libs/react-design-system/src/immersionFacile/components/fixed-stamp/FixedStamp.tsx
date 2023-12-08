@@ -2,14 +2,14 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { Link } from "type-route";
-import "./FixedStamp.scss";
+import FixedStampStyles from "./FixedStamp.styles";
 
 export type FixedStampProps = {
   image: JSX.Element;
   overtitle?: JSX.Element | string;
   title?: JSX.Element | string;
   subtitle?: JSX.Element | string;
-  link?: Link;
+  link?: Link | { href: string };
 };
 
 export const FixedStamp = ({
@@ -22,27 +22,29 @@ export const FixedStamp = ({
   const { cx } = useStyles();
   return (
     <aside
-      className={cx("fixed-stamp")}
+      className={cx(FixedStampStyles.root)}
       role="complementary"
       aria-label="Mise en avant temporaire"
     >
-      {image && <div className={cx("fixed-stamp__image-wrapper")}>{image}</div>}
-      <div className={cx("fixed-stamp__content")}>
+      {image && (
+        <div className={cx(FixedStampStyles.imageWrapper)}>{image}</div>
+      )}
+      <div className={cx(FixedStampStyles.content)}>
         {overtitle && (
-          <span className={cx("fixed-stamp__overtitle")}>{overtitle}</span>
+          <span className={cx(FixedStampStyles.overtitle)}>{overtitle}</span>
         )}
         {title && (
-          <span className={cx(fr.cx("fr-text--bold"), "fixed-stamp__title")}>
+          <span className={cx(fr.cx("fr-text--bold"), FixedStampStyles.title)}>
             {title}
           </span>
         )}
         {subtitle && (
-          <span className={cx("fixed-stamp__subtitle")}>{subtitle}</span>
+          <span className={cx(FixedStampStyles.subtitle)}>{subtitle}</span>
         )}
       </div>
       {link && (
         <a
-          className={cx("fixed-stamp__overlay-link")}
+          className={cx(FixedStampStyles.overlayLink)}
           {...link}
           aria-label="Lien associé à la mise en avant temporaire"
         />
