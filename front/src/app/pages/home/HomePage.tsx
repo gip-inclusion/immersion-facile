@@ -19,8 +19,6 @@ import {
   sectionStatsData,
 } from "src/app/contents/home/content";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { routes } from "src/app/routes/routes";
-
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 
 type HomePageProps = {
@@ -77,17 +75,20 @@ export const HomePage = ({ type }: HomePageProps) => {
           image={
             <img
               src={
-                "https://immersion.cellar-c2.services.clever-cloud.com/logo-decathlon.svg"
+                "https://immersion.cellar-c2.services.clever-cloud.com/logo_semaine_du_numerique.svg"
               }
-              alt="Inclusiv'Day - Décathlon"
+              alt="Illustration d'une développeuse informatique"
             />
           }
-          subtitle="ouvre ses portes aux nouveaux talents, pourquoi pas vous ?"
-          link={
-            routes.group({
-              groupSlug: "decathlon",
-            }).link
+          subtitle={
+            <>
+              Découvrez <strong>les métiers du numérique</strong> en faisant une
+              immersion en entreprise !
+            </>
           }
+          link={{
+            href: "https://inclusion.beta.gouv.fr/nos-services/immersion-facilitee/22-26-janvier-2024-semaine-des-metiers-du-numerique/",
+          }}
         />
       )}
     </HeaderFooterLayout>
