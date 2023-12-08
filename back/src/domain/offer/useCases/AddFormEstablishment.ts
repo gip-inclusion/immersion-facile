@@ -54,6 +54,10 @@ export class AddFormEstablishment extends TransactionalUseCase<
     const correctFormEstablishement: FormEstablishmentDto = {
       ...dto,
       appellations,
+      businessNameCustomized:
+        dto.businessNameCustomized?.trim().length === 0
+          ? undefined
+          : dto.businessNameCustomized,
     };
 
     const event = this.#createNewEvent({

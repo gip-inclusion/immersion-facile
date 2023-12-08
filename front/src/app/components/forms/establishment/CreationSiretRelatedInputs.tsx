@@ -12,7 +12,10 @@ import {
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
-import { getFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  getFormContents,
+  makeFieldError,
+} from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -37,6 +40,9 @@ export const CreationSiretRelatedInputs = () => {
   } = useFormContext<FormEstablishmentDto>();
   const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
+  const getFieldError = makeFieldError(
+    useFormContext<FormEstablishmentDto>().formState,
+  );
 
   useEffect(() => {
     if (isFetchingSiret) return;
@@ -136,6 +142,7 @@ export const CreationSiretRelatedInputs = () => {
           ...register("businessNameCustomized"),
           readOnly: isFetchingSiret,
         }}
+        {...getFieldError("businessNameCustomized")}
       />
       <AddressAutocomplete
         initialSearchTerm={establishmentInfos?.businessAddress}

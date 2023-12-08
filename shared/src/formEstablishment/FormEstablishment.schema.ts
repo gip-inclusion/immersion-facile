@@ -4,6 +4,7 @@ import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { NotEmptyArray, phoneRegExp } from "../utils";
+import { frenchEstablishmentKinds } from "../utils/establishment";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
@@ -64,7 +65,14 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
     source: formEstablishmentSourceSchema,
     siret: siretSchema,
     businessName: zTrimmedString,
-    businessNameCustomized: zStringPossiblyEmpty,
+    businessNameCustomized: z
+      .string()
+      .transform((s) => s.trim())
+      .refine(
+        (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
+        "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
+      )
+      .optional(),
     website: zStringPossiblyEmpty,
     additionalInformation: zStringPossiblyEmpty,
     businessAddress: addressWithPostalCodeSchema,
