@@ -145,10 +145,15 @@ describe("Admin router", () => {
                         {
                           received: "unknown-dashboard",
                           code: "invalid_enum_value",
-                          options: ["conventions", "events", "establishments"],
+                          options: [
+                            "conventions",
+                            "events",
+                            "establishments",
+                            "agencies",
+                          ],
                           path: ["name"],
                           message:
-                            "Invalid enum value. Expected 'conventions' | 'events' | 'establishments', received 'unknown-dashboard'",
+                            "Invalid enum value. Expected 'conventions' | 'events' | 'establishments' | 'agencies', received 'unknown-dashboard'",
                         },
                       ]),
                       new ZodError([
