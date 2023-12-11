@@ -14,6 +14,7 @@ import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/
 export const AgencyTab = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
+  const { url, error } = useAdminDashboard({ name: "agencies" });
   return (
     <>
       <SubmitFeedbackNotification
@@ -26,6 +27,12 @@ export const AgencyTab = () => {
       {agency && <AgencyDashboard agency={agency} />}
 
       <RegisterUsersToAgencies />
+
+      {error ? (
+        <Alert severity="error" title="Erreur" description={error} />
+      ) : (
+        <MetabaseView title="Consulter les agences" url={url} />
+      )}
     </>
   );
 };

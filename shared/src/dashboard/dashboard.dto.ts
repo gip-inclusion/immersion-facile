@@ -18,6 +18,7 @@ export const simpleDashboardNames = [
   "conventions",
   "events",
   "establishments",
+  "agencies",
 ] as const;
 
 export const adminDashboardNames = [
@@ -46,7 +47,9 @@ export type GetEstablishmentDashboardParams =
   };
 
 export type GetAdminDashboardParams =
-  | GenericGetDashboardParams<"events" | "conventions" | "establishments">
+  | GenericGetDashboardParams<
+      "events" | "conventions" | "establishments" | "agencies"
+    >
   | (GenericGetDashboardParams<"agency" | "erroredConventions"> & {
       agencyId: AgencyId;
     });

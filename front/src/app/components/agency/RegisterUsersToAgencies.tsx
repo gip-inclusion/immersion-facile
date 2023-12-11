@@ -38,7 +38,7 @@ export const RegisterUsersToAgencies = () => {
       <h5 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
         Rapprocher un utilisateur d'une agence
       </h5>
-      <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
+      <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card", "fr-mb-4w")}>
         <>
           <Select
             label={`Sélectionner un utilisateur (${icUsersNeedingReview.length} en attente de validation)`}
