@@ -21,7 +21,6 @@ export const AgencyTab = () => {
         submitFeedback={feedback}
         messageByKind={agencySubmitMessageByKind}
       />
-      <ActivateAgency />
       <EditAgency />
 
       {agency && <AgencyDashboard agency={agency} />}
@@ -33,6 +32,7 @@ export const AgencyTab = () => {
       ) : (
         <MetabaseView title="Consulter les agences" url={url} />
       )}
+      <ActivateAgency />
     </>
   );
 };

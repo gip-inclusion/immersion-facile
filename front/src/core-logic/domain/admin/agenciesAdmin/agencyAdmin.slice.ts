@@ -79,6 +79,12 @@ export const agencyAdminSlice = createSlice({
       state.feedback = { kind: "idle" };
       state.agency = null;
     },
+    setSelectedAgencyNeedingReviewIdFailed: (
+      state,
+      action: PayloadAction<string>,
+    ) => {
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
     setAgency: (state, action: PayloadAction<AgencyDto | null>) => {
       state.agency = action.payload ?? null;
     },
