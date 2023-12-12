@@ -62,6 +62,11 @@ const agencyAdminGetDetailsForStatusEpic: AgencyEpic = (
     map((agency) =>
       agencyAdminSlice.actions.setAgencyNeedingReview(agency ?? null),
     ),
+    catchEpicError((error: Error) =>
+      agencyAdminSlice.actions.setSelectedAgencyNeedingReviewIdFailed(
+        error.message,
+      ),
+    ),
   );
 
 const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (

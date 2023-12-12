@@ -36,3 +36,7 @@ export type ManageConventionAdminForm = {
 export type ManageEstablishmentAdminForm = {
   siret: SiretDto;
 };
+
+export type ManageAgencyToReviewAdminForm = {
+  agencyId: AgencyId;
+};
