@@ -50,6 +50,7 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
+        navigateFallbackDenylist: [/^\/api/],
       },
       includeAssets: [
         "/dsfr/favicon/favicon.ico",
