@@ -32,17 +32,16 @@ export class PgFormEstablishmentRepository
     return this.transaction
       .insertInto("form_establishments")
       .values({
-        additional_information: formEstablishment.additionalInformation ?? null,
+        additional_information: formEstablishment.additionalInformation,
         business_address: formEstablishment.businessAddress,
         business_contact: sql`CAST(${JSON.stringify(
           formEstablishment.businessContact,
         )} AS JSONB)`,
-        business_name_customized:
-          formEstablishment.businessNameCustomized ?? null,
+        business_name_customized: formEstablishment.businessNameCustomized,
         business_name: formEstablishment.businessName,
         fit_for_disabled_workers:
           formEstablishment.fitForDisabledWorkers ?? null,
-        is_engaged_enterprise: formEstablishment.isEngagedEnterprise ?? null,
+        is_engaged_enterprise: formEstablishment.isEngagedEnterprise,
         max_contacts_per_week: formEstablishment.maxContactsPerWeek,
         naf: formEstablishment.naf
           ? JSON.stringify(formEstablishment.naf)
@@ -50,7 +49,7 @@ export class PgFormEstablishmentRepository
         professions: JSON.stringify(formEstablishment.appellations),
         siret: formEstablishment.siret,
         source: formEstablishment.source,
-        website: formEstablishment.website ?? null,
+        website: formEstablishment.website,
       })
       .execute()
       .then((_) => Promise.resolve())
