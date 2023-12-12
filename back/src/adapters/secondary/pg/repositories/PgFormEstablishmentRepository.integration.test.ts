@@ -95,6 +95,14 @@ describe("PgFormEstablishmentRepository", () => {
         ...formEstablishment,
         businessName: "newName",
         fitForDisabledWorkers: true,
+        additionalInformation: "toto",
+        naf: {
+          code: "32132",
+          nomenclature: "yolo",
+        },
+        businessNameCustomized: "billy",
+        isEngagedEnterprise: true,
+        website: "http://web.site",
       };
       await formEstablishmentRepository.update(updatedFormEstablishment);
       expectToEqual(await formEstablishmentRepository.getAll(), [
