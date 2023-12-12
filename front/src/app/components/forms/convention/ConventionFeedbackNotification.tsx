@@ -123,7 +123,7 @@ const InitialSubmitSuccessMessageBase = ({
         Si vous ne recevez rien, vous pouvez récupérer votre lien de signature
         en cliquant sur&nbsp;:&nbsp;
         <a href={`https://tally.so/r/nWE4oN`}>
-          Récuperer mon lien de signature
+          Récupérer mon lien de signature
         </a>
         .
       </p>
