@@ -1,6 +1,7 @@
 import {
   AppellationAndRomeDto,
   AppellationCode,
+  DateTimeIsoString,
   SearchResultDto,
   SiretDto,
 } from "shared";
@@ -14,6 +15,7 @@ import { SearchMade } from "../entities/SearchMadeEntity";
 export type OfferWithSiret = OfferEntity & { siret: SiretDto };
 export type SearchImmersionResult = SearchResultDto & {
   isSearchable: boolean;
+  nextAvailabilityDate?: DateTimeIsoString;
 };
 
 export type SearchImmersionParams = {
@@ -30,13 +32,6 @@ export interface EstablishmentAggregateRepository {
   updateEstablishmentAggregate(
     establishmentAggregate: EstablishmentAggregate,
     updatedAt: Date,
-  ): Promise<void>;
-
-  updateEstablishment(
-    propertiesToUpdate: Partial<EstablishmentEntity> & {
-      updatedAt: Date;
-      siret: SiretDto;
-    },
   ): Promise<void>;
 
   markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(

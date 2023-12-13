@@ -302,6 +302,8 @@ export const domElementIds = {
       "im-form-add-establishment__edit-establishment-button",
     submitButton: "im-form-add-establishment__submit-button",
     manageButton: "im-form-manage-establishment__manage-button",
+    nextAvailabilityDateInput:
+      "im-form-add-establishment__next-availability-date",
   },
 
   assessment: {

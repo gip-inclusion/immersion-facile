@@ -188,14 +188,12 @@ export const AgencyDashboardPage = ({
         .with(
           {
             currentUser: {
-              agencyDashboardUrl: P.select(
-                P.when(
-                  (agencyDashboardUrl) => agencyDashboardUrl !== undefined,
-                ),
-              ),
+              agencyDashboardUrl: P.not(undefined),
             },
           },
-          (dashboardUrl) => <Tabs tabs={agencyDashboardTabs(dashboardUrl)} />,
+          ({ currentUser: { agencyDashboardUrl } }) => (
+            <Tabs tabs={agencyDashboardTabs(agencyDashboardUrl)} />
+          ),
         )
         .with(
           {

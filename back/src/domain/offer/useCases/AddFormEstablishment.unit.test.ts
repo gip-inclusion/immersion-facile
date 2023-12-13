@@ -68,6 +68,7 @@ describe("Add FormEstablishment", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withFitForDisabledWorkers(true)
       .withMaxContactsPerWeek(9)
+      .withNextAvailabilityDate(new Date())
       .build();
 
     await addFormEstablishment.execute(formEstablishment);

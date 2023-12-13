@@ -2,6 +2,7 @@ import { z } from "zod";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { NotEmptyArray, phoneRegExp } from "../utils";
 import { frenchEstablishmentKinds } from "../utils/establishment";
@@ -9,6 +10,7 @@ import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
   zBoolean,
+  zEnumValidation,
   zStringMinLength1,
   zStringPossiblyEmpty,
   zTrimmedString,
@@ -39,7 +41,10 @@ const validContactMethods: NotEmptyArray<ContactMethod> = [
   "PHONE",
   "IN_PERSON",
 ];
-const preferredContactMethodSchema = z.enum(validContactMethods);
+const preferredContactMethodSchema = zEnumValidation(
+  validContactMethods,
+  "Choisissez parmis les options proposées",
+);
 
 export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   lastName: zTrimmedString,
@@ -94,6 +99,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       .int({
         message: "La valeur renseignée ne peut pas contenir de décimale",
       }),
+    nextAvailabilityDate: dateTimeIsoStringSchema.optional(),
   },
 );
 

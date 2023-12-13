@@ -112,7 +112,7 @@ type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
 
 export type DotNestedKeys<T> = (
   T extends object
-    ? T extends Flavor<string, unknown>
+    ? T extends Flavor<string, unknown> | Array<unknown>
       ? ""
       : {
           [K in Exclude<keyof T, symbol>]: `${K}${DotPrefix<

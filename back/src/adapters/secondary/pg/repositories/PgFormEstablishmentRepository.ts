@@ -1,6 +1,7 @@
 import { sql } from "kysely";
 import {
   castError,
+  DateString,
   FormEstablishmentDto,
   formEstablishmentSchema,
   SiretDto,
@@ -50,6 +51,7 @@ export class PgFormEstablishmentRepository
         siret: formEstablishment.siret,
         source: formEstablishment.source,
         website: formEstablishment.website,
+        next_availability_date: formEstablishment.nextAvailabilityDate,
       })
       .execute()
       .then((_) => Promise.resolve())
@@ -80,8 +82,8 @@ export class PgFormEstablishmentRepository
   public async getAll(): Promise<FormEstablishmentDto[]> {
     const pgResults =
       await this.#selectEstablishmentJsonBuildQueryBuilder().execute();
-    return pgResults.map((pgResult) =>
-      formEstablishmentSchema.parse(pgResult.formEstablishment),
+    return pgResults.map(({ formEstablishment }) =>
+      formEstablishmentSchema.parse(formEstablishment),
     );
   }
 
@@ -116,6 +118,7 @@ export class PgFormEstablishmentRepository
         naf: formEstablishment.naf
           ? JSON.stringify(formEstablishment.naf)
           : null,
+        next_availability_date: formEstablishment.nextAvailabilityDate ?? null,
         professions: JSON.stringify(formEstablishment.appellations),
         source: formEstablishment.source,
         website: formEstablishment.website ?? null, // TO DISCUSS : was missing on not kysely legacy update query
@@ -147,6 +150,7 @@ export class PgFormEstablishmentRepository
           siret: db.ref("siret"),
           source: db.ref("source"),
           website: db.ref("website"),
+          nextAvailabilityDate: sql<DateString>`date_to_iso(next_availability_date)`,
         }),
       ).as("formEstablishment"),
     ]);

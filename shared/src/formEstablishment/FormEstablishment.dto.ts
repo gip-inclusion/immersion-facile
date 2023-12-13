@@ -6,6 +6,7 @@ import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellat
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
+import { DateTimeIsoString } from "../utils/date";
 
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
@@ -46,6 +47,7 @@ export type FormEstablishmentDto = {
   isEngagedEnterprise?: boolean;
   maxContactsPerWeek: number;
   naf?: NafDto; // { code: string, nomenclature: string }
+  nextAvailabilityDate?: DateTimeIsoString;
   siret: SiretDto; // 14 characters string
   source: FormEstablishmentSource;
   website?: string;

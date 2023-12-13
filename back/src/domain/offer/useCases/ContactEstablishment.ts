@@ -6,6 +6,7 @@ import {
 import {
   BadRequestError,
   ConflictError,
+  ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
@@ -71,6 +72,15 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     if (contactMode !== establishmentContact.contactMethod)
       throw new BadRequestError(
         `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentContact.contactMethod}`,
+      );
+
+    if (
+      establishmentAggregate.establishment.nextAvailabilityDate &&
+      new Date(establishmentAggregate.establishment.nextAvailabilityDate) >
+        this.#timeGateway.now()
+    )
+      throw new ForbiddenError(
+        `The establishment ${establishmentAggregate.establishment.siret} is not available.`,
       );
 
     const similarDiscussionAlreadyExits =

@@ -6,7 +6,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 export const EstablishmentCreationFormPage = () => (
   <HeaderFooterLayout>
     <MainWrapper
-      layout="boxed"
+      layout="default"
       pageHeader={
         <PageHeader
           title="Référencer mon entreprise"

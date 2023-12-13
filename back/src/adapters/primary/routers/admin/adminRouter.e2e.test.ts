@@ -153,7 +153,7 @@ describe("Admin router", () => {
                           ],
                           path: ["name"],
                           message:
-                            "Invalid enum value. Expected 'conventions' | 'events' | 'establishments' | 'agencies', received 'unknown-dashboard'",
+                            "Vous devez sélectionner une option parmi celles proposées",
                         },
                       ]),
                       new ZodError([
@@ -163,7 +163,7 @@ describe("Admin router", () => {
                           options: ["agency"],
                           path: ["name"],
                           message:
-                            "Invalid enum value. Expected 'agency', received 'unknown-dashboard'",
+                            "Vous devez sélectionner une option parmi celles proposées",
                         },
                         {
                           code: "invalid_type",
@@ -185,7 +185,7 @@ describe("Admin router", () => {
                     options: ["conventionStatus"],
                     path: ["name"],
                     message:
-                      "Invalid enum value. Expected 'conventionStatus', received 'unknown-dashboard'",
+                      "Vous devez sélectionner une option parmi celles proposées",
                   },
                   {
                     code: "invalid_type",
