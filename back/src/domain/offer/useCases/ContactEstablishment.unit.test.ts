@@ -1,3 +1,4 @@
+import { addHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   AppellationAndRomeDto,
@@ -18,6 +19,7 @@ import {
 import {
   BadRequestError,
   ConflictError,
+  ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -506,6 +508,27 @@ describe("ContactEstablishment", () => {
         }),
         new BadRequestError(
           `Establishment with siret '${validRequest.siret}' doesn't have an immersion offer with appellation code '${validRequest.appellationCode}'.`,
+        ),
+      );
+    });
+
+    it("throws ForbidenError when establishment is not currently available", async () => {
+      const establishmentAggregate = establishmentAggregateWithEmailContact
+        .withIsSearchable(true)
+        .withMaxContactsPerWeek(2)
+        .withEstablishmentNextAvailabilityDate(addHours(timeGateway.now(), 1))
+        .withOffers([immersionOffer])
+        .build();
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+        establishmentAggregate,
+      ]);
+
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validEmailRequest,
+        }),
+        new ForbiddenError(
+          `The establishment ${establishmentAggregate.establishment.siret} is not available.`,
         ),
       );
     });

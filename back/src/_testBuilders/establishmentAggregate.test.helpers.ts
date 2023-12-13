@@ -62,6 +62,17 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  public withEstablishmentNextAvailabilityDate(date: Date) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withNextAvailabilityDate(date)
+        .build(),
+    });
+  }
+
   public withEstablishmentSiret(siret: string) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,

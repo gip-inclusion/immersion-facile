@@ -1,5 +1,6 @@
 import {
   AppellationAndRomeDto,
+  DateTimeIsoString,
   expectToEqual,
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
@@ -114,6 +115,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withSiret(fakeSiret)
       .withAppellations(professions)
       .withBusinessContact(fakeBusinessContact)
+      .withNextAvailabilityDate(new Date())
       .build();
 
     const numberEmployeesRanges: NumberEmployeesRange = "6-9";
@@ -144,6 +146,7 @@ describe("Insert Establishment aggregate from form data", () => {
       appellationCode?: string;
     }[];
     fitForDisabledWorkers?: boolean;
+    nextAvailabilityDate?: DateTimeIsoString;
   }) => {
     const repoEstablishmentAggregate =
       establishmentAggregateRepo.establishmentAggregates[0];
@@ -157,6 +160,9 @@ describe("Insert Establishment aggregate from form data", () => {
     );
     expect(repoEstablishmentAggregate.establishment.fitForDisabledWorkers).toBe(
       expected.fitForDisabledWorkers,
+    );
+    expect(repoEstablishmentAggregate.establishment.nextAvailabilityDate).toBe(
+      expected.nextAvailabilityDate,
     );
 
     // Contact

@@ -294,6 +294,7 @@ export const createUseCases = (
         uowPerformer,
         gateways.laBonneBoiteGateway,
         uuidGenerator,
+        gateways.timeGateway,
       ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getSearchResultBySiretAndAppellationCode:

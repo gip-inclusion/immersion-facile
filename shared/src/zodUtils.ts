@@ -5,9 +5,16 @@ import { timeHHmmRegExp } from "./utils/date";
 // Change default error map behavior to provide context
 // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
 z.setErrorMap((issue, ctx) => {
+  if (issue.code === "invalid_enum_value")
+    return {
+      message: `Vous devez sélectionner une option parmi celles proposées`,
+    };
+
   if (issue.code === "invalid_string" && issue.validation === "email")
     return {
-      message: `${localization.invalidEmailFormat} - email fourni : ${ctx.data}`,
+      message: `${localization.invalidEmailFormat} - email fourni : ${
+        ctx.data ?? "vide"
+      }`,
     };
 
   // Temporary regex instead of email - waiting for zod release

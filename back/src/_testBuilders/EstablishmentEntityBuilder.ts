@@ -110,6 +110,15 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, name });
   }
 
+  public withNextAvailabilityDate(nextAvailabilityDate: Date | undefined) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      nextAvailabilityDate: nextAvailabilityDate
+        ? nextAvailabilityDate.toISOString()
+        : undefined,
+    });
+  }
+
   public withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
     return new EstablishmentEntityBuilder({
       ...this.entity,

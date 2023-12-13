@@ -10,10 +10,7 @@ import {
   SearchResultDto,
   SiretDto,
 } from "shared";
-import {
-  EstablishmentAggregate,
-  EstablishmentEntity,
-} from "../../../domain/offer/entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../../../domain/offer/entities/EstablishmentEntity";
 import {
   EstablishmentAggregateRepository,
   establishmentNotFoundErrorMessage,
@@ -180,27 +177,6 @@ export class InMemoryEstablishmentAggregateRepository
       .slice(0, maxResults);
   }
 
-  public async updateEstablishment(
-    propertiesToUpdate: Partial<EstablishmentEntity> & {
-      updatedAt: Date;
-      siret: SiretDto;
-    },
-  ): Promise<void> {
-    this.#establishmentAggregates = this.#establishmentAggregates.map(
-      (aggregate) =>
-        aggregate.establishment.siret === propertiesToUpdate.siret
-          ? {
-              ...aggregate,
-              establishment: {
-                ...aggregate.establishment,
-                ...JSON.parse(JSON.stringify(propertiesToUpdate)), // parse and stringify to drop undefined values from propertiesToUpdate (Does not work with clone() from ramda)
-                updatedAt: propertiesToUpdate.updatedAt,
-              },
-            }
-          : aggregate,
-    );
-  }
-
   public async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
     const aggregateIndex = this.#establishmentAggregates.findIndex(
       pathEq("establishment.siret", aggregate.establishment.siret),
@@ -283,5 +259,6 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = ({
       : undefined,
     position: establishmentAgg.establishment.position,
     isSearchable: establishmentAgg.establishment.isSearchable,
+    nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
   };
 };

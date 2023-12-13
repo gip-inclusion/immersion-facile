@@ -210,4 +210,5 @@ interface PgFormEstablishments {
   source: Generated<string>;
   updated_at: Generated<Timestamp | null>;
   website: Generated<string | null>;
+  next_availability_date: Timestamp | null;
 }

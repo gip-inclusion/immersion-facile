@@ -61,6 +61,7 @@ describe("PgFormEstablishmentRepository", () => {
       const formEstablishmentA = FormEstablishmentDtoBuilder.valid()
         .withSource("lesentreprises-sengagent")
         .withSiret(siretA)
+        .withNextAvailabilityDate(new Date())
         .build();
 
       const siretB = "22222222222222";
@@ -103,6 +104,7 @@ describe("PgFormEstablishmentRepository", () => {
         businessNameCustomized: "billy",
         isEngagedEnterprise: true,
         website: "http://web.site",
+        nextAvailabilityDate: new Date().toISOString(),
       };
       await formEstablishmentRepository.update(updatedFormEstablishment);
       expectToEqual(await formEstablishmentRepository.getAll(), [

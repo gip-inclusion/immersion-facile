@@ -140,6 +140,15 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
+  public withNextAvailabilityDate(nextAvailabilityDate: Date | undefined) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      nextAvailabilityDate: nextAvailabilityDate
+        ? nextAvailabilityDate.toISOString()
+        : undefined,
+    });
+  }
+
   public withSiret(siret: SiretDto) {
     return new FormEstablishmentDtoBuilder({ ...this.#dto, siret });
   }

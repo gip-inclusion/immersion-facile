@@ -9,6 +9,7 @@ import {
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -29,6 +30,7 @@ export class SearchImmersion extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly laBonneBoiteAPI: LaBonneBoiteGateway,
     private readonly uuidGenerator: UuidGenerator,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -89,14 +91,23 @@ export class SearchImmersion extends TransactionalUseCase<
         lbbSearchResults.map((result) => result.siret),
       );
 
-    return [
-      ...(voluntaryToImmersion !== false
+    const searchResultsInRepo =
+      voluntaryToImmersion !== false
         ? this.#prepareVoluntaryToImmersionResults(repositorySearchResults)
-        : []),
-      ...lbbSearchResults
-        .filter(isSiretAlreadyInStoredResults(repositorySearchResults))
-        .filter(isEstablishmentNotDeleted(isDeletedBySiret)),
-    ].filter(isSiretIsNotInNotSeachableResults(repositorySearchResults));
+        : [];
+
+    const lbbAllowedResults = lbbSearchResults
+      .filter(isSiretAlreadyInStoredResults(searchResultsInRepo))
+      .filter(isEstablishmentNotDeleted(isDeletedBySiret));
+
+    return [...searchResultsInRepo, ...lbbAllowedResults]
+      .filter(isSiretIsNotInNotSeachableResults(repositorySearchResults))
+      .filter(
+        isSearchResultAvailable(
+          repositorySearchResults,
+          this.timeGateway.now(),
+        ),
+      );
   }
 
   #prepareVoluntaryToImmersionResults(
@@ -154,7 +165,7 @@ const shouldFetchLBB = (
   voluntaryToImmersion !== true;
 
 const isSiretAlreadyInStoredResults =
-  (searchImmersionQueryResults: SearchImmersionResult[]) =>
+  (searchImmersionQueryResults: SearchResultDto[]) =>
   <T extends { siret: SiretDto }>({ siret }: T) =>
     !searchImmersionQueryResults.map(prop("siret")).includes(siret);
 
@@ -163,6 +174,18 @@ const isSiretIsNotInNotSeachableResults =
   <T extends { siret: SiretDto }>({ siret }: T) =>
     !searchImmersionQueryResults
       .filter(propEq("isSearchable", false))
+      .map(prop("siret"))
+      .includes(siret);
+
+const isSearchResultAvailable =
+  (searchImmersionQueryResults: SearchImmersionResult[], now: Date) =>
+  <T extends { siret: SiretDto }>({ siret }: T) =>
+    !searchImmersionQueryResults
+      .filter((searchResult) =>
+        searchResult.nextAvailabilityDate
+          ? new Date(searchResult.nextAvailabilityDate) > now
+          : false,
+      )
       .map(prop("siret"))
       .includes(siret);
 

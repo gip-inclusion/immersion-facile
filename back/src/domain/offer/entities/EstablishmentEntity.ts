@@ -1,5 +1,6 @@
 import {
   AddressDto,
+  DateTimeIsoString,
   FormEstablishmentSource,
   GeoPositionDto,
   NafDto,
@@ -13,6 +14,7 @@ type ApiSource = "api_labonneboite";
 type SourceProvider = FormEstablishmentSource | ApiSource;
 
 export type EstablishmentEntity = {
+  nextAvailabilityDate?: DateTimeIsoString;
   siret: SiretDto;
   name: string;
   customizedName?: string;

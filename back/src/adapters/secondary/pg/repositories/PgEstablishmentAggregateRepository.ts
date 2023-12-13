@@ -163,7 +163,8 @@ export class PgEstablishmentAggregateRepository
                 'isSearchable', e.is_searchable, 
                 'isCommited', e.is_commited,
                 'fitForDisabledWorkers', e.fit_for_disabled_workers,
-                'maxContactsPerWeek', e.max_contacts_per_week
+                'maxContactsPerWeek', e.max_contacts_per_week,
+                'nextAvailabilityDate', date_to_iso(e.next_availability_date)
               ), 
               'immersionOffers', io.immersionOffers, 
               'contact', JSON_BUILD_OBJECT(
@@ -423,99 +424,6 @@ export class PgEstablishmentAggregateRepository
     }));
   }
 
-  public async updateEstablishment(
-    propertiesToUpdate: Partial<EstablishmentEntity> & {
-      updatedAt: Date;
-      siret: SiretDto;
-    },
-  ): Promise<void> {
-    const updateQuery = `
-          UPDATE establishments
-                   SET update_date = %1$L
-                   ${
-                     propertiesToUpdate.isOpen !== undefined
-                       ? ", is_open=%2$L"
-                       : ""
-                   }
-                   ${propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
-                   ${propertiesToUpdate.nafDto ? ", naf_nomenclature=%4$L" : ""}
-                   ${
-                     propertiesToUpdate.numberEmployeesRange
-                       ? ", number_employees=%5$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
-                       ? ", street_number_and_address=%6$L, post_code=%7$L, city=%8$L, department_code=%9$L, gps=ST_GeographyFromText(%10$L), lon=%11$L, lat=%12$L"
-                       : ""
-                   }
-                   ${propertiesToUpdate.name ? ", name=%13$L" : ""}
-                   ${
-                     propertiesToUpdate.customizedName
-                       ? ", customized_name=%14$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.isSearchable !== undefined
-                       ? ", is_searchable=%15$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.isCommited !== undefined
-                       ? ", is_commited=%16$L"
-                       : ""
-                   }
-                   ${
-                     propertiesToUpdate.website !== undefined
-                       ? ", website=%17$L"
-                       : ""
-                   }
-                  ${
-                    propertiesToUpdate.additionalInformation !== undefined
-                      ? ", additional_information=%18$L"
-                      : ""
-                  }
-                  ${
-                    propertiesToUpdate.fitForDisabledWorkers !== undefined
-                      ? ", fit_for_disabled_workers=%19$L"
-                      : ""
-                  }
-                  ${
-                    propertiesToUpdate.maxContactsPerWeek !== undefined
-                      ? ", max_contacts_per_week=%20$L"
-                      : ""
-                  }
-                   WHERE siret=%21$L;`;
-    const queryArgs = [
-      propertiesToUpdate.updatedAt.toISOString(),
-      propertiesToUpdate.isOpen,
-      propertiesToUpdate.nafDto?.code,
-      propertiesToUpdate.nafDto?.nomenclature,
-      propertiesToUpdate.numberEmployeesRange,
-      propertiesToUpdate.address?.streetNumberAndAddress,
-      propertiesToUpdate.address?.postcode,
-      propertiesToUpdate.address?.city,
-      propertiesToUpdate.address?.departmentCode,
-      propertiesToUpdate.position
-        ? `POINT(${propertiesToUpdate.position.lon} ${propertiesToUpdate.position.lat})`
-        : undefined,
-      propertiesToUpdate.position?.lon,
-      propertiesToUpdate.position?.lat,
-
-      propertiesToUpdate.name,
-      propertiesToUpdate.customizedName,
-      propertiesToUpdate.isSearchable,
-      propertiesToUpdate.isCommited,
-      propertiesToUpdate.website,
-      propertiesToUpdate.additionalInformation,
-      propertiesToUpdate.fitForDisabledWorkers,
-      propertiesToUpdate.maxContactsPerWeek,
-      propertiesToUpdate.siret,
-    ];
-    const formatedQuery = format(updateQuery, ...queryArgs);
-    await executeKyselyRawSqlQuery(this.transaction, formatedQuery);
-  }
-
   public async updateEstablishmentAggregate(
     updatedAggregate: EstablishmentAggregate,
     updatedAt: Date,
@@ -539,10 +447,10 @@ export class PgEstablishmentAggregateRepository
         updatedAggregate.establishment,
       )
     ) {
-      await this.updateEstablishment({
-        ...updatedAggregate.establishment,
+      await this.#updateEstablishmentEntity(
+        updatedAggregate.establishment,
         updatedAt,
-      });
+      );
     }
 
     // Create contact if it does'not exist
@@ -586,6 +494,65 @@ export class PgEstablishmentAggregateRepository
     });
 
     await executeKyselyRawSqlQuery(this.transaction, queries.join("\n"));
+  }
+
+  async #updateEstablishmentEntity(
+    establishment: EstablishmentEntity,
+    updatedAt: Date,
+  ): Promise<void> {
+    const updateQuery = `
+      UPDATE establishments
+        SET 
+          update_date = %1$L,
+          is_open = %2$L,
+          naf_code = %3$L,
+          naf_nomenclature=%4$L,
+          number_employees=%5$L,
+          street_number_and_address=%6$L,
+          post_code=%7$L,
+          city=%8$L,
+          department_code=%9$L,
+          gps=ST_GeographyFromText(%10$L),
+          lon=%11$L,
+          lat=%12$L,
+          name=%13$L,
+          customized_name=%14$L,
+          is_searchable=%15$L,
+          is_commited=%16$L,
+          website=%17$L,
+          additional_information=%18$L,
+          fit_for_disabled_workers=%19$L,
+          max_contacts_per_week=%20$L,
+          next_availability_date=%21$L
+        WHERE siret=%22$L;`;
+    const queryArgs = [
+      updatedAt.toISOString(),
+      establishment.isOpen,
+      establishment.nafDto?.code,
+      establishment.nafDto?.nomenclature,
+      establishment.numberEmployeesRange,
+      establishment.address?.streetNumberAndAddress,
+      establishment.address?.postcode,
+      establishment.address?.city,
+      establishment.address?.departmentCode,
+      establishment.position
+        ? `POINT(${establishment.position.lon} ${establishment.position.lat})`
+        : undefined,
+      establishment.position?.lon,
+      establishment.position?.lat,
+      establishment.name,
+      establishment.customizedName,
+      establishment.isSearchable,
+      establishment.isCommited,
+      establishment.website,
+      establishment.additionalInformation,
+      establishment.fitForDisabledWorkers,
+      establishment.maxContactsPerWeek,
+      establishment.nextAvailabilityDate,
+      establishment.siret,
+    ];
+    const formatedQuery = format(updateQuery, ...queryArgs);
+    await executeKyselyRawSqlQuery(this.transaction, formatedQuery);
   }
 
   async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
@@ -633,6 +600,7 @@ export class PgEstablishmentAggregateRepository
         ),
         voluntaryToImmersion: true,
         isSearchable: row.search_immersion_result.isSearchable,
+        nextAvailabilityDate: row.search_immersion_result.nextAvailabilityDate,
       }),
     );
   }
@@ -646,7 +614,7 @@ export class PgEstablishmentAggregateRepository
       establishment.address.streetNumberAndAddress, establishment.address.postcode, establishment.address.city, establishment.address.departmentCode, establishment.numberEmployeesRange,
       establishment.nafDto.code, establishment.nafDto.nomenclature, establishment.sourceProvider, convertPositionToStGeography(establishment.position), establishment.position.lon,
       establishment.position.lat, establishment.updatedAt ? establishment.updatedAt.toISOString() : null, establishment.isOpen, establishment.isSearchable, establishment.isCommited,
-      establishment.fitForDisabledWorkers, establishment.maxContactsPerWeek, establishment.lastInseeCheckDate ? establishment.lastInseeCheckDate.toISOString() : null, establishment.createdAt,
+      establishment.fitForDisabledWorkers, establishment.maxContactsPerWeek, establishment.lastInseeCheckDate ? establishment.lastInseeCheckDate.toISOString() : null, establishment.createdAt, establishment.nextAvailabilityDate ?? null
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -660,7 +628,7 @@ export class PgEstablishmentAggregateRepository
           street_number_and_address, post_code, city, department_code, number_employees, 
           naf_code, naf_nomenclature, source_provider, gps, lon, 
           lat, update_date, is_open, is_searchable, is_commited, 
-          fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at 
+          fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at , next_availability_date
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -900,27 +868,30 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
            match_immersion_offer AS (${selectedOffersSubQuery})
       SELECT 
       row_number,
-      JSONB_BUILD_OBJECT(
-        'rome', io.rome_code, 
-        'siret', io.siret, 
-        'distance_m', io.distance_m, 
-        'isSearchable',e.is_searchable,
-        'name', e.name, 
-        'website', e.website, 
-        'additionalInformation', e.additional_information, 
-        'customizedName', e.customized_name, 
-        'fitForDisabledWorkers', e.fit_for_disabled_workers,
-        'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-        'romeLabel', io.rome_label,
-        'appellations',  io.appellations,
-        'naf', e.naf_code,
-        'nafLabel', public_naf_classes_2008.class_label,
-        'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
-                                      'postcode', e.post_code,
-                                      'city', e.city,
-                                      'departmentCode', e.department_code),
-        'contactMode', ic.contact_mode,
-        'numberOfEmployeeRange', e.number_employees 
+      JSON_STRIP_NULLS(
+        JSON_BUILD_OBJECT(
+          'rome', io.rome_code, 
+          'siret', io.siret, 
+          'distance_m', io.distance_m, 
+          'isSearchable',e.is_searchable,
+          'nextAvailabilityDate', date_to_iso(e.next_availability_date),
+          'name', e.name, 
+          'website', e.website, 
+          'additionalInformation', e.additional_information, 
+          'customizedName', e.customized_name, 
+          'fitForDisabledWorkers', e.fit_for_disabled_workers,
+          'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+          'romeLabel', io.rome_label,
+          'appellations',  io.appellations,
+          'naf', e.naf_code,
+          'nafLabel', public_naf_classes_2008.class_label,
+          'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
+                                        'postcode', e.post_code,
+                                        'city', e.city,
+                                        'departmentCode', e.department_code),
+          'contactMode', ic.contact_mode,
+          'numberOfEmployeeRange', e.number_employees 
+        ) 
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 
       LEFT JOIN establishments AS e ON e.siret = io.siret  

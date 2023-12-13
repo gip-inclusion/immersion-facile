@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import {
   addressStringToDto,
   ApiConsumer,
@@ -21,6 +22,7 @@ import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { TEST_POSITION } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
@@ -64,16 +66,19 @@ describe("SearchImmersionUseCase", () => {
   let uuidGenerator: TestUuidGenerator;
   let searchImmersionUseCase: SearchImmersion;
   let laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     laBonneBoiteGateway = new InMemoryLaBonneBoiteGateway();
     uuidGenerator = new TestUuidGenerator();
     uow.romeRepository.appellations = [secretariatAppellationAndRome];
+    timeGateway = new CustomTimeGateway();
     searchImmersionUseCase = new SearchImmersion(
       new InMemoryUowPerformer(uow),
       laBonneBoiteGateway,
       uuidGenerator,
+      timeGateway,
     );
     uuidGenerator.setNextUuid("searchMadeUuid");
   });
@@ -542,6 +547,63 @@ describe("SearchImmersionUseCase", () => {
         new LaBonneBoiteCompanyDtoBuilder()
           .withSiret(notSearchableEstablishment.establishment.siret)
           .withRome(secretariatOffer.romeCode)
+          .build(),
+      ]);
+    });
+
+    it("Without voluntary to immersion", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        appellationCodes: [secretariatOffer.appellationCode],
+        sortedBy: "distance",
+      });
+      expectToEqual(response, []);
+    });
+
+    it("With voluntary to immersion false", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        appellationCodes: [secretariatOffer.appellationCode],
+        sortedBy: "distance",
+        voluntaryToImmersion: false,
+      });
+      expectToEqual(response, []);
+    });
+
+    it("With voluntary to immersion true", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchInMetzParams,
+        appellationCodes: [secretariatOffer.appellationCode],
+        sortedBy: "distance",
+        voluntaryToImmersion: true,
+      });
+      expectToEqual(response, []);
+    });
+  });
+
+  describe("No result when establishment aggregate next availability is after now", () => {
+    const now = new Date();
+
+    const establishmentWithNextAvailabilityDate =
+      new EstablishmentAggregateBuilder(establishment)
+        .withEstablishmentNextAvailabilityDate(addDays(now, 1))
+        .withMaxContactsPerWeek(10)
+        .withIsSearchable(true)
+        .build();
+
+    beforeEach(() => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentWithNextAvailabilityDate,
+      ];
+      uow.deletedEstablishmentRepository.deletedEstablishments = [];
+
+      timeGateway.setNextDate(now);
+
+      laBonneBoiteGateway.setNextResults([
+        new LaBonneBoiteCompanyDtoBuilder()
+          .withSiret(establishmentWithNextAvailabilityDate.establishment.siret)
+          .withRome(secretariatOffer.romeCode)
+          .withDistanceKm(1)
           .build(),
       ]);
     });

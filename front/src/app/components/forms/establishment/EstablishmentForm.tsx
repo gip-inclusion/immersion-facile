@@ -1,48 +1,32 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Button } from "@codegouvfr/react-dsfr/Button";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { Input } from "@codegouvfr/react-dsfr/Input";
-import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import { match, P } from "ts-pattern";
 import { Route } from "type-route";
 import {
-  AppellationAndRomeDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  domElementIds,
-  emptyAppellationAndRome,
+  DotNestedKeys,
   EstablishmentJwtPayload,
   expiredMagicLinkErrorMessage,
   FormEstablishmentDto,
   formEstablishmentSchema,
-  immersionFacileContactEmail,
   noContactPerWeek,
-  removeAtIndex,
-  toDotNotation,
 } from "shared";
-import { ErrorNotifications, Loader } from "react-design-system";
-import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
-import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
-import { booleanSelectOptions } from "src/app/contents/forms/common/values";
-import {
-  formEstablishmentFieldsLabels,
-  mailtoHref,
-} from "src/app/contents/forms/establishment/formEstablishment";
-import {
-  formErrorsToFlatErrors,
-  getFormContents,
-  makeFieldError,
-} from "src/app/hooks/formContents.hooks";
+import { Loader } from "react-design-system";
+import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";
+import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
+import { DetailsSection } from "src/app/components/forms/establishment/sections/DetailsSection";
+import { IntroSection } from "src/app/components/forms/establishment/sections/IntroSection";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { useDebounce } from "src/app/hooks/useDebounce";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import {
   formEstablishmentDtoToFormEstablishmentQueryParams,
   formEstablishmentQueryParamsToFormEstablishmentDto,
@@ -53,9 +37,6 @@ import {
   EstablishmentFeedback,
   establishmentSlice,
 } from "src/core-logic/domain/establishmentPath/establishment.slice";
-import { BusinessContact } from "./BusinessContact";
-import { MultipleAppellationInput } from "./MultipleAppellationInput";
-import { SearchResultPreview } from "./SearchResultPreview";
 
 type RouteByMode = {
   create:
@@ -65,17 +46,39 @@ type RouteByMode = {
   admin: Route<typeof routes.manageEstablishmentAdmin>;
 };
 
-type Mode = keyof RouteByMode;
+export type Mode = keyof RouteByMode;
 
 type EstablishmentFormProps = {
   mode: Mode;
 };
 
+const steps: Record<1 | 2 | 3, Pick<StepperProps, "title" | "nextTitle">> = {
+  1: {
+    title: "Êtes-vous disponible pour recevoir des personnes en immersion ?",
+    nextTitle: "Qui répondra aux demandes des candidats ?",
+  },
+  2: {
+    title: "Qui répondra aux demandes des candidats ?",
+    nextTitle: "Comment souhaitez-vous apparaître dans notre annuaire ?",
+  },
+  3: {
+    title: "Comment souhaitez-vous apparaître dans notre annuaire ?",
+  },
+};
+
+export type Step = 0 | keyof typeof steps | null;
+export type OnStepChange = (
+  step: Step,
+  fieldsToValidate: (
+    | keyof FormEstablishmentDto
+    | DotNestedKeys<FormEstablishmentDto>
+  )[],
+) => void;
+
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
   const adminJwt = useAdminToken();
   const route = useRoute() as RouteByMode[Mode];
-  const { enableMaxContactPerWeek } = useFeatureFlags();
 
   const isEstablishmentCreation =
     route.name === "formEstablishment" ||
@@ -88,8 +91,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     establishmentSelectors.formEstablishment,
   );
 
-  const { getFormErrors, getFormFields } = getFormContents(
-    formEstablishmentFieldsLabels,
+  const [availableForImmersion, setAvailableForImmersion] = useState<
+    boolean | undefined
+  >(undefined);
+
+  const [currentStep, setCurrentStep] = useState<Step>(
+    isEstablishmentAdmin ? null : 0,
   );
 
   const methods = useForm<FormEstablishmentDto>({
@@ -100,20 +107,15 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
-
   const {
     handleSubmit,
-    register,
-    setValue,
     getValues,
-    formState: { errors, submitCount, isSubmitting, touchedFields },
     reset,
-    resetField,
+    trigger,
+    // formState: { errors },
   } = methods;
 
   const formValues = getValues();
-  const formContents = getFormFields();
-  const getFieldError = makeFieldError(methods.formState);
 
   const currentRoute = useRef(route);
 
@@ -151,6 +153,8 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     },
     [],
   );
+
+  useScrollToTop(currentStep);
 
   useEffect(() => {
     match({ route: currentRoute.current, adminJwt })
@@ -237,6 +241,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [feedback, redirectToErrorOnFeedback, route]);
 
+  // const values = getValues();
+
+  // useEffect(() => {
+  //   console.log({ values, errors });
+  // }, [values, errors]);
+
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
     match({ route, adminJwt })
       .with(
@@ -289,21 +299,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .exhaustive();
 
-  const onClickEstablishmentDeleteButton = () => {
-    const confirmed = confirm(
-      `⚠️ Etes-vous sûr de vouloir supprimer cet établissement ? ⚠️
-                (cette opération est irréversible 💀)`,
-    );
-    if (confirmed && adminJwt)
-      dispatch(
-        establishmentSlice.actions.establishmentDeletionRequested({
-          siret: formValues.siret,
-          jwt: adminJwt,
-        }),
-      );
-    if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
-  };
-
   if (isLoading) {
     return <Loader />;
   }
@@ -328,269 +323,89 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     );
   }
 
+  const onStepChange: OnStepChange = async (step, fieldsToValidate) => {
+    if (step && currentStep && step < currentStep) {
+      setCurrentStep(step);
+      return;
+    }
+    const validatedFields = await Promise.all(
+      fieldsToValidate.map((key) => trigger(key)),
+    );
+    if (validatedFields.every((validatedField) => validatedField)) {
+      setCurrentStep(step);
+    }
+  };
+
   return (
-    <>
-      {!isEstablishmentAdmin && (
-        <>
-          <p>
-            Bienvenue sur l'espace de référencement des entreprises volontaires
-            pour l'accueil des immersions professionnelles.
-          </p>
-          <p>
-            En référençant votre entreprise, vous rejoignez la communauté{" "}
-            <a
-              href={"https://lesentreprises-sengagent.gouv.fr/"}
-              target={"_blank"}
-              rel="noreferrer"
-            >
-              « Les entreprises s'engagent »
-            </a>
-            .
-          </p>
-          <p>
-            Ce formulaire vous permet d'indiquer les métiers de votre
-            établissement ouverts aux immersions. Si votre entreprise comprend
-            plusieurs établissements, il convient de renseigner un formulaire
-            pour chaque établissement (Siret différent).
-          </p>
-          <p className={fr.cx("fr-text--xs")}>
-            Tous les champs marqués d'une astérisque (*) sont obligatoires.
-          </p>
-        </>
-      )}
-
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-            {!isEstablishmentAdmin
-              ? "Votre établissement"
-              : `Pilotage établissement ${formValues.siret}`}
-          </h2>
-          {match(mode)
-            .with("create", () => <CreationSiretRelatedInputs />)
-            .with("edit", () => (
-              <EditionSiretRelatedInputs
-                businessAddress={formValues.businessAddress}
-              />
-            ))
-            .with("admin", () => (
-              <EditionSiretRelatedInputs
-                businessAddress={formValues.businessAddress}
-              />
-            ))
-            .exhaustive()}
-
-          <RadioButtons
-            {...formContents["isEngagedEnterprise"]}
-            legend={formContents["isEngagedEnterprise"].label}
-            options={booleanSelectOptions.map((option) => ({
-              ...option,
-              nativeInputProps: {
-                ...option.nativeInputProps,
-                checked:
-                  Boolean(option.nativeInputProps.value) ===
-                  formValues["isEngagedEnterprise"],
-                onChange: () => {
-                  setValue(
-                    "isEngagedEnterprise",
-                    option.nativeInputProps.value === 1,
-                  );
-                },
-              },
-            }))}
-          />
-          <RadioButtons
-            {...formContents["fitForDisabledWorkers"]}
-            legend={formContents["fitForDisabledWorkers"].label}
-            options={booleanSelectOptions.map((option) => ({
-              ...option,
-              nativeInputProps: {
-                ...option.nativeInputProps,
-                checked:
-                  Boolean(option.nativeInputProps.value) ===
-                  formValues["fitForDisabledWorkers"],
-                onChange: () => {
-                  setValue(
-                    "fitForDisabledWorkers",
-                    option.nativeInputProps.value === 1,
-                  );
-                },
-              },
-            }))}
-          />
-          <Input
-            label={formContents.website.label}
-            hintText={formContents.website.hintText}
-            nativeInputProps={{
-              ...formContents.website,
-              ...register("website"),
-            }}
-            {...getFieldError("website")}
-          />
-          <Input
-            label={formContents.additionalInformation.label}
-            hintText={formContents.additionalInformation.hintText}
-            textArea
-            nativeTextAreaProps={{
-              ...formContents.additionalInformation,
-              ...register("additionalInformation"),
-            }}
-            {...getFieldError("additionalInformation")}
-          />
-
-          <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-            Les métiers que vous proposez à l'immersion :
-          </h2>
-          <MultipleAppellationInput
-            {...formContents.appellations}
-            onAppellationAdd={(appellation, index) => {
-              const appellationsToUpdate = formValues.appellations;
-              appellationsToUpdate[index] = appellation;
-              setValue("appellations", appellationsToUpdate);
-            }}
-            onAppellationDelete={(appellationIndex) => {
-              const appellationsToUpdate = formValues.appellations;
-              const newAppellations: AppellationAndRomeDto[] =
-                appellationIndex === 0 && appellationsToUpdate.length === 1
-                  ? [emptyAppellationAndRome]
-                  : removeAtIndex(formValues.appellations, appellationIndex);
-              setValue("appellations", newAppellations);
-            }}
-            currentAppellations={formValues.appellations}
-            error={errors?.appellations?.message}
-          />
-          <BusinessContact />
-
-          {mode === "edit" && (
-            <Checkbox
-              hintText={`${
-                isSearchable
-                  ? "(décochez la case si vous ne voulez pas être visible sur la recherche)."
-                  : "(cochez la case si vous voulez être visible sur la recherche)."
-              } Vous pourrez réactiver la visibilité à tout moment`}
-              legend="L'entreprise est-elle recherchable par les utilisateurs ?"
-              options={[
-                {
-                  label: "Oui",
-                  nativeInputProps: {
-                    checked: isSearchable,
-                    onChange: (e) => {
-                      e.currentTarget.checked
-                        ? resetField("maxContactsPerWeek", {
-                            defaultValue: "",
-                          })
-                        : setValue("maxContactsPerWeek", noContactPerWeek);
-                    },
-                  },
-                },
-              ]}
-            />
-          )}
-          {enableMaxContactPerWeek.isActive && (
-            <Input
-              label={formContents.maxContactsPerWeek.label}
-              nativeInputProps={{
-                ...formContents.maxContactsPerWeek,
-                ...register("maxContactsPerWeek", {
-                  valueAsNumber: true,
-                }),
-                type: "number",
-                min:
-                  mode === "create" || (mode === "edit" && isSearchable)
-                    ? 1
-                    : 0,
-                pattern: "\\d*",
-              }}
-              disabled={mode === "edit" && !isSearchable}
-              {...getFieldError("maxContactsPerWeek")}
-            />
-          )}
-
-          {mode === "edit" && (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {match(currentStep)
+          .with(null, () => (
             <>
-              <p>
-                Vous pouvez demander la suppression définitive de votre
-                entreprise{" "}
-                <a href={mailtoHref(formValues.siret)}>en cliquant ici</a>
-              </p>
-              <p>
-                Si vous avez besoin d'aide, envoyez-nous un email: <br />
-                {immersionFacileContactEmail}
-              </p>
+              <h1>Pilotage de l'entreprise {formValues.siret}</h1>
+              <h2>{steps[1].title}</h2>
+              <AvailabilitySection
+                mode={mode}
+                isSearchable={isSearchable}
+                onStepChange={onStepChange}
+                currentStep={currentStep}
+                setAvailableForImmersion={setAvailableForImmersion}
+                availableForImmersion={availableForImmersion}
+              />
+              <h2>{steps[2].title}</h2>
+              <BusinessContactSection
+                onStepChange={onStepChange}
+                currentStep={currentStep}
+              />
+              <h2>{steps[3].title}</h2>
+              <DetailsSection
+                mode={mode}
+                isEstablishmentAdmin={isEstablishmentAdmin}
+                currentStep={currentStep}
+                onStepChange={onStepChange}
+              />
             </>
-          )}
-          {!isEstablishmentAdmin &&
-            keys(errors).length === 0 &&
-            keys(touchedFields).length > 0 && (
-              <SearchResultPreview establishment={formValues} />
-            )}
-          <ErrorNotifications
-            labels={getFormErrors()}
-            errors={toDotNotation(formErrorsToFlatErrors(errors))}
-            visible={submitCount !== 0 && Object.values(errors).length > 0}
-          />
-          {feedback.kind === "submitErrored" && (
-            <Alert
-              severity="error"
-              title="Erreur lors de l'envoi du formulaire de référencement d'entreprise"
-              description={
-                "Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations."
-              }
-            />
-          )}
-          {feedback.kind === "deleteErrored" && (
-            <Alert
-              severity="error"
-              title="Erreur lors de la suppression"
-              description="Veuillez nous excuser. Un problème est survenu lors de la suppression de l'entreprise."
-            />
-          )}
-          <ul
-            className={fr.cx(
-              "fr-mt-4w",
-              "fr-btns-group",
-              "fr-btns-group--inline-md",
-              "fr-btns-group--icon-left",
-            )}
-          >
-            <li>
-              <Button
-                iconId="fr-icon-checkbox-circle-line"
-                iconPosition="left"
-                type="submit"
-                disabled={isSubmitting}
-                nativeButtonProps={{
-                  id: isEstablishmentAdmin
-                    ? domElementIds.admin.manageEstablishment.submitEditButton
-                    : domElementIds.establishment.submitButton,
-                }}
-              >
-                {isEstablishmentAdmin
-                  ? "Enregistrer les modifications"
-                  : "Enregistrer mes informations"}
-              </Button>
-            </li>
-            {isEstablishmentAdmin && (
-              <li>
-                <Button
-                  iconId="fr-icon-delete-bin-line"
-                  priority="secondary"
-                  iconPosition="left"
-                  type="button"
-                  disabled={isSubmitting}
-                  nativeButtonProps={{
-                    id: domElementIds.admin.manageEstablishment
-                      .submitDeleteButton,
-                  }}
-                  onClick={onClickEstablishmentDeleteButton}
-                >
-                  Supprimer l'entreprise
-                </Button>
-              </li>
-            )}
-          </ul>
-        </form>
-      </FormProvider>
-    </>
+          ))
+          .with(0, () => (
+            <IntroSection onStepChange={onStepChange} mode={mode} />
+          ))
+          .otherwise((currentStep) => (
+            <div className={fr.cx("fr-col-8")}>
+              <Stepper
+                currentStep={currentStep}
+                stepCount={keys(steps).length}
+                title={steps[currentStep].title}
+                nextTitle={steps[currentStep].nextTitle}
+              />
+              {match(currentStep)
+                .with(1, () => (
+                  <AvailabilitySection
+                    mode={mode}
+                    isSearchable={isSearchable}
+                    onStepChange={onStepChange}
+                    currentStep={currentStep}
+                    availableForImmersion={availableForImmersion}
+                    setAvailableForImmersion={setAvailableForImmersion}
+                  />
+                ))
+                .with(2, () => (
+                  <BusinessContactSection
+                    onStepChange={onStepChange}
+                    currentStep={currentStep}
+                  />
+                ))
+                .with(3, () => (
+                  <DetailsSection
+                    isEstablishmentAdmin={isEstablishmentAdmin}
+                    mode={mode}
+                    currentStep={currentStep}
+                    onStepChange={onStepChange}
+                  />
+                ))
+                .exhaustive()}
+            </div>
+          ))}
+      </form>
+    </FormProvider>
   );
 };

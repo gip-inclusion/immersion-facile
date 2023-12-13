@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 
-export const useScrollToTop = (valueToWatch: boolean) => {
+export const useScrollToTop = (valueToWatch: boolean | number | null) => {
   useEffect(() => {
     if (!valueToWatch) return;
-    window.scrollTo(0, 0);
+    document.body.scrollIntoView({
+      behavior: "smooth",
+    });
   }, [valueToWatch]);
 };

@@ -3,7 +3,7 @@ import { prop, sortBy } from "ramda";
 import {
   AppellationAndRomeDto,
   expectArraysToEqualIgnoringOrder,
-  expectObjectsToMatch,
+  expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   SearchResultDto,
@@ -18,7 +18,6 @@ import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establi
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
-import { EstablishmentEntity } from "../../../../domain/offer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
@@ -34,8 +33,6 @@ import {
   insertEstablishment,
   insertImmersionOffer,
   PgEstablishmentRow,
-  PgEstablishmentRowWithGeo,
-  retrieveEstablishmentWithSiret,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
 const cartographeImmersionOffer = new OfferEntityBuilder()
@@ -531,96 +528,32 @@ describe("PgEstablishmentAggregateRepository", () => {
       expect(searchResult[0].siret).toEqual(establishmentSiret1);
       expect(searchResult[1].siret).toEqual(establishmentSiret2);
     });
-  });
 
-  describe("updateEstablishment", () => {
-    const position = { lon: 2, lat: 3 };
+    it("provide next availability date on result if establishment entity have it", async () => {
+      const aggregate = new EstablishmentAggregateBuilder()
+        .withEstablishmentNextAvailabilityDate(new Date())
+        .build();
 
-    it("Updates the parameter `updatedAt`, `fitForDisabledWorkers` and `isActive if given", async () => {
-      // Prepare
-      const siretOfEstablishmentToUpdate = "78000403200021";
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        aggregate,
+      ]);
 
-      await insertEstablishment(client, {
-        siret: siretOfEstablishmentToUpdate,
-        updatedAt: new Date("2020-04-14T12:00:00.000"),
-        isOpen: true,
-        fitForDisabledWorkers: false,
-        position,
-        createdAt: new Date(),
-      });
+      const searchResults =
+        await pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            ...aggregate.establishment.position,
+            appellationCodes: [aggregate.offers[0].appellationCode],
+            distanceKm: 0,
+            sortedBy: "date",
+          },
+          maxResults: 2,
+        });
 
-      // Act
-      const updatedAt = new Date("2020-05-15T12:00:00.000");
-      await pgEstablishmentAggregateRepository.updateEstablishment({
-        siret: siretOfEstablishmentToUpdate,
-        isOpen: false,
-        fitForDisabledWorkers: true,
-        updatedAt,
-      });
-
-      // Assert
-      const establishmentRowInDB = await retrieveEstablishmentWithSiret(
-        client,
-        siretOfEstablishmentToUpdate,
-      );
-
-      expectObjectsToMatch(establishmentRowInDB, {
-        is_open: false,
-        update_date: updatedAt,
-        fit_for_disabled_workers: true,
-      });
-    });
-
-    it("updates parameters `nafDto`, `nb of employe`, `address` and `position` if given and `updatedAt`", async () => {
-      // Prepare
-      const siretOfEstablishmentToUpdate = "78000403200021";
-
-      const updateProps: Pick<
-        EstablishmentEntity,
-        "address" | "nafDto" | "numberEmployeesRange" | "position"
-      > = {
-        nafDto: { code: "8722B", nomenclature: "nomenc" },
-        numberEmployeesRange: "1-2",
-        position: { lon: 21, lat: 23 },
-        address: rueBitcheDto,
-      };
-      await insertEstablishment(client, {
-        siret: siretOfEstablishmentToUpdate,
-        updatedAt: new Date("2020-04-14T12:00:00.000"),
-        isOpen: true,
-        position,
-        createdAt: new Date(),
-      });
-
-      // Act
-      const updatedAt = new Date("2020-05-15T12:00:00.000");
-      await pgEstablishmentAggregateRepository.updateEstablishment({
-        ...updateProps,
-        siret: siretOfEstablishmentToUpdate,
-        updatedAt,
-      });
-
-      // Assert
-      const actualEstablishmentRowInDB = await retrieveEstablishmentWithSiret(
-        client,
-        siretOfEstablishmentToUpdate,
-      );
-      const partialExpectedEstablishmentRowInDB: Partial<PgEstablishmentRowWithGeo> =
+      expectArraysToMatch(searchResults, [
         {
-          update_date: updatedAt,
-          naf_code: updateProps.nafDto.code,
-          naf_nomenclature: updateProps.nafDto.nomenclature,
-          number_employees: updateProps.numberEmployeesRange,
-          street_number_and_address: updateProps.address.streetNumberAndAddress,
-          city: updateProps.address.city,
-          post_code: updateProps.address.postcode,
-          department_code: updateProps.address.departmentCode,
-          longitude: updateProps.position.lon,
-          latitude: updateProps.position.lat,
-        };
-      expect(actualEstablishmentRowInDB).toMatchObject(
-        partialExpectedEstablishmentRowInDB,
-      );
+          nextAvailabilityDate: aggregate.establishment.nextAvailabilityDate,
+        },
+      ]);
     });
   });
 

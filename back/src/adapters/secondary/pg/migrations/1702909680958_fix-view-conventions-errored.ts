@@ -23,17 +23,17 @@ const makeQuery = (mode: "up" | "down") => `WITH ranked_errors AS (
      row_number() OVER (PARTITION BY (se.params ->> 'conventionId'::text) ORDER BY se.occurred_at DESC) AS rn
     FROM saved_errors se
    WHERE (
-      se.message = 'Identifiant National DE trouvé mais écart sur la date de naissance'::text
-    OR 
+         se.message = 'Identifiant National DE trouvé mais écart sur la date de naissance'::text
+      OR
       se.message = 'Identifiant National DE non trouvé'::text
     ${
       mode === "up"
         ? `OR
-      se.message = '"Identifiant National DE trouvé mais écart sur la date de naissance"'::text
-    OR 
-      se.message = '"Identifiant National DE non trouvé"'::text)`
+        se.message = '"Identifiant National DE trouvé mais écart sur la date de naissance"'::text
+           OR
+           se.message = '"Identifiant National DE non trouvé"'::text`
         : ""
-    }   
+    })
     AND (
         (se.params ->> 'httpStatus'::text)::bigint = 404
       AND 

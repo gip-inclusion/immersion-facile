@@ -1,4 +1,4 @@
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 import { conventionSchema } from "../convention/convention.schema";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { expectToEqual } from "../test.helpers";
@@ -658,11 +658,14 @@ describe("ScheduleUtils", () => {
       },
     );
 
-    it.each(["2022-02-27T10:00:00.001Z"])("parse '%s' is valid", (date) => {
-      expect(dateTimeIsoStringSchema.parse(date)).toBe(
-        new Date(date).toISOString(),
-      );
-    });
+    it.each(["2022-02-27T10:00:00.001Z", new Date().toISOString()])(
+      "parse '%s' is valid",
+      (date) => {
+        expect(dateTimeIsoStringSchema.parse(date)).toBe(
+          new Date(date).toISOString(),
+        );
+      },
+    );
   });
 
   describe("french hour changes (changement d'heure)", () => {
@@ -1148,3 +1151,24 @@ const summerDateChangeInterval: DateIntervalDto = {
   start: new Date("2023-03-20"),
   end: new Date("2023-03-31"),
 };
+
+describe("datetime schema validation", () => {
+  it("should parse a valid datetime", () => {
+    expect(() =>
+      dateTimeIsoStringSchema.parse(new Date().toISOString()),
+    ).not.toThrow();
+  });
+
+  it("should not parse an invalid datetime", () => {
+    expect(() => dateTimeIsoStringSchema.parse("not a date")).toThrow();
+  });
+
+  it("should handle optional", () => {
+    const dateTimeIsoStringSchemaOptionalInObject = z.object({
+      date: dateTimeIsoStringSchema.optional(),
+    });
+    expect(() =>
+      dateTimeIsoStringSchemaOptionalInObject.parse({}),
+    ).not.toThrow();
+  });
+});
