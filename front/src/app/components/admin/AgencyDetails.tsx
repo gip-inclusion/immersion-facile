@@ -45,6 +45,14 @@ export const AgencyDetails = () => {
   const buildContent = (field: AgencyField): ReactNode => {
     const value = agency[field];
     if (field === "status") return formatAgencyStatus(agency.status);
+    if (field === "agencySiret" && typeof value === "string") {
+      const url = `https://lemarche.inclusion.beta.gouv.fr/prestataires/?q=${value}`;
+      return (
+        <a href={url} target="_blank" rel="noreferrer">
+          {value}
+        </a>
+      );
+    }
     if (typeof value === "string") return value;
     return JSON.stringify(value);
   };
