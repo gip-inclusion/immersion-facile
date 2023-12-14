@@ -1109,6 +1109,18 @@ export const emailTemplatesByName =
         subContent: defaultSignature("immersion"),
       }),
     },
+    AGENCY_WAS_REJECTED: {
+      niceName: "Agence - Refusée",
+      tags: ["rejet prescripteur"],
+      createEmailVariables: ({ agencyName, rejectionJustification }) => ({
+        subject: `Rejet de ${agencyName} comme structure prescriptrice`,
+        greetings: "Bonjour,",
+        content: `La demande d'activation de : ${agencyName} sur Immersion Facilitée comme prescripteur a été refusée pour les raisons suivantes : ${rejectionJustification}.
+
+Pour toute question concernant ce rejet, il est possible de nous contacter : contact@immersion-facile.beta.gouv.fr`,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     IC_USER_RIGHTS_HAS_CHANGED: {
       niceName: "Inclusion Connect - Changement de droit sur agence",
       tags: ["activation BO prescripteur"],

@@ -31,6 +31,10 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
   };
+  AGENCY_WAS_REJECTED: {
+    agencyName: string;
+    rejectionJustification: string;
+  };
   BENEFICIARY_ASSESSMENT_NOTIFICATION: {
     conventionId: ConventionId;
     beneficiaryFirstName: string;
