@@ -27,6 +27,8 @@ const formatAgencyStatus = (status: AgencyStatus) => {
   switch (status) {
     case "closed":
       return "❌ FERMÉE";
+    case "rejected":
+      return "🚫 REJETÉE";
     case "needsReview":
       return "📙 À VALIDER";
     case "active":
