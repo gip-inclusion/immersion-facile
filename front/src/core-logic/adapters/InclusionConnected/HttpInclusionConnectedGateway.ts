@@ -32,6 +32,7 @@ export class HttpInclusionConnectedGateway
           match(response)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 403 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -91,12 +92,13 @@ export class HttpInclusionConnectedGateway
       .then((response) =>
         match(response)
           .with({ status: 200 }, () => undefined)
+          .with({ status: 400 }, logBodyAndThrow)
+          .with({ status: 403 }, logBodyAndThrow)
           .with({ status: 404 }, () => {
             throw new Error(
               "L'erreur sur la convention que vous cherchez à traiter n'existe pas, peut-être est-elle déjà marquée comme traitée. Rechargez la page pour mettre à jour le tableau.",
             );
           })
-          .with({ status: 400 }, logBodyAndThrow)
           .otherwise(otherwiseThrow),
       );
   }
