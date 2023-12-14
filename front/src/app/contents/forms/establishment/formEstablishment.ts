@@ -116,7 +116,6 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
     hintText:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    //required: true,
     id: domElementIds.establishment.maxContactsPerWeek,
   },
   maxContactPerWeekWhenAvailable: {
@@ -124,7 +123,6 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Quand vous serez à nouveau disponible, combien de mises en relation par semaine souhaiteriez-vous recevoir ?",
     hintText:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    //required: true,
     id: domElementIds.establishment.maxContactsPerWeek,
   },
   nextAvailabilityDate: {

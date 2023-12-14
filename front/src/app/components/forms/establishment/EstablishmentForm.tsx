@@ -107,13 +107,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
-  const {
-    handleSubmit,
-    getValues,
-    reset,
-    trigger,
-    // formState: { errors },
-  } = methods;
+  const { handleSubmit, getValues, reset, trigger } = methods;
 
   const formValues = getValues();
 
@@ -240,12 +234,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       redirectToErrorOnFeedback(feedback, route.params.jwt);
     }
   }, [feedback, redirectToErrorOnFeedback, route]);
-
-  // const values = getValues();
-
-  // useEffect(() => {
-  //   console.log({ values, errors });
-  // }, [values, errors]);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
     match({ route, adminJwt })
