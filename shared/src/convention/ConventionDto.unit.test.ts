@@ -567,7 +567,7 @@ describe("conventionDtoSchema", () => {
       );
     });
 
-    describe("CCI specific, minor under 16yo", () => {
+    describe("CCI specific, minor under 15yo", () => {
       it("max week hours depends on beneficiary age", () => {
         const dateStart = new Date("2021-01-04").toISOString();
         const dateEnd = addDays(new Date(DATE_START), 3).toISOString();
@@ -590,7 +590,7 @@ describe("conventionDtoSchema", () => {
           })
           .build();
         expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-          "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 16 ans est de 30h",
+          "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 15 ans est de 35h",
         ]);
       });
     });
