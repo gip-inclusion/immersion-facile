@@ -625,6 +625,7 @@ describe("PgAgencyRepository", () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(1);
 
       const updatedAgency1 = agency1builder
+        .withStatus("rejected")
         .withName("Updated agency")
         .withPosition(41, 3)
         .withValidatorEmails(["updated@mail.com"])
@@ -636,6 +637,7 @@ describe("PgAgencyRepository", () => {
           departmentCode: "64",
           city: "Bayonne",
         })
+        .withRejectionJustification("justification du rejet")
         .build();
 
       await agencyRepository.update(updatedAgency1);
@@ -652,11 +654,16 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.update({
         id: agency1.id,
-        status: "active",
+        status: "rejected",
+        rejectionJustification: "justification du rejet",
       });
       const inDb = await agencyRepository.getAgencies({});
       expect(inDb).toHaveLength(1);
-      expectToEqual(inDb[0], { ...agency1, status: "active" });
+      expectToEqual(inDb[0], {
+        ...agency1,
+        status: "rejected",
+        rejectionJustification: "justification du rejet",
+      });
     });
   });
 

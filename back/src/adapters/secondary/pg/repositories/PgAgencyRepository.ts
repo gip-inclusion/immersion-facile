@@ -60,7 +60,8 @@ type AgencyColumns =
   | "questionnaire_url"
   | "status"
   | "street_number_and_address"
-  | "validator_emails";
+  | "validator_emails"
+  | "rejection_justification";
 
 type PersistenceAgency = Record<AgencyColumns, any>;
 
@@ -314,6 +315,7 @@ export class PgAgencyRepository implements AgencyRepository {
         department_code: agency.address?.departmentCode,
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
+        rejection_justification: agency.rejectionJustification,
       })
       .where("id", "=", agency.id)
       .execute();
@@ -381,6 +383,7 @@ const persistenceAgencyToAgencyDto = (params: PersistenceAgency): AgencyDto =>
       signature: params.email_signature,
       status: params.status,
       validatorEmails: params.validator_emails,
+      rejectionJustification: optional(params.rejection_justification),
     },
     logger,
   );

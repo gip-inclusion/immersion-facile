@@ -227,7 +227,7 @@ describe(`Agency routes`, () => {
 
         const response = await sharedRequest.updateAgencyStatus({
           headers: { authorization: adminToken },
-          body: { status: "active" },
+          body: { id: agency4NeedsReview.id, status: "active" },
           urlParams: { agencyId: agency4NeedsReview.id },
         });
 

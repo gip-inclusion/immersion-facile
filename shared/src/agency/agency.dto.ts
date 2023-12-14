@@ -54,6 +54,7 @@ export type AgencyDtoSensitiveFields = {
   adminEmails: Email[];
   status: AgencyStatus;
   codeSafir?: string;
+  rejectionJustification?: string;
 };
 
 export type WithAgencyDto = {
@@ -154,4 +155,3 @@ export type ActiveOrRejectedStatus = ExtractFromExisting<
   AgencyStatus,
   "active" | "rejected"
 >;
-export type WithActiveOrRejectedStatus = { status: ActiveOrRejectedStatus };
