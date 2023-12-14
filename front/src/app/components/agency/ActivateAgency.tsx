@@ -1,16 +1,20 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
-  ActiveOrRejectedStatus,
   AgencyId,
-  ManageAgencyToReviewAdminForm,
+  AgencyToReview,
+  domElementIds,
   withAgencyIdSchema,
+  zTrimmedString,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -19,36 +23,97 @@ import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
 import "src/assets/admin.css";
 
+type RejectionJustificationForm = { rejectionJustification: string };
+type ManageAgencyToReviewAdminForm = {
+  agencyId: AgencyId;
+};
+
+const rejectAgencyModal = createModal({
+  id: domElementIds.admin.agencyTab.rejectAgencyModal,
+  isOpenedByDefault: false,
+});
+
+const RejectAgencyModalContent = ({
+  onReject,
+}: {
+  onReject: (rejectionJustification: RejectionJustificationForm) => void;
+}) => {
+  const methods = useForm<RejectionJustificationForm>({
+    mode: "onTouched",
+    defaultValues: {
+      rejectionJustification: undefined,
+    },
+    resolver: zodResolver(z.object({ rejectionJustification: zTrimmedString })),
+  });
+  const { register, handleSubmit, formState, getValues } = methods;
+
+  const onSubmit = () => {
+    onReject(getValues());
+    rejectAgencyModal.close();
+  };
+
+  return (
+    <rejectAgencyModal.Component title="Rejeter cette agence">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Input
+          textArea
+          label="Justification"
+          nativeTextAreaProps={{
+            ...register("rejectionJustification"),
+          }}
+        />
+        <ButtonsGroup
+          className={fr.cx("fr-mt-4w")}
+          buttonsEquisized
+          alignment="center"
+          inlineLayoutWhen="always"
+          buttons={[
+            {
+              iconId: "fr-icon-alert-fill",
+              children: "Annuler",
+              priority: "secondary",
+              onClick: () => rejectAgencyModal.close(),
+            },
+            {
+              iconId: "fr-icon-checkbox-fill",
+              children: "Rejeter cette agence",
+              priority: "primary",
+              type: "submit",
+              disabled: !formState.isValid,
+            },
+          ]}
+        />
+      </form>
+    </rejectAgencyModal.Component>
+  );
+};
+
 const useFetchAgenciesNeedingReview = () => {
-  const { agencyNeedingReviewOptions, agencyNeedingReview } = useAppSelector(
+  const { agencyNeedingReview } = useAppSelector(
     agencyAdminSelectors.agencyState,
   );
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested());
-  }, [dispatch]);
 
   return {
-    agencyNeedingReviewOptions,
     agencyNeedingReview,
   };
 };
 
 export const ActivateAgency = () => {
-  const { agencyNeedingReviewOptions, agencyNeedingReview } =
-    useFetchAgenciesNeedingReview();
+  const { agencyNeedingReview } = useFetchAgenciesNeedingReview();
 
   const dispatch = useDispatch();
 
-  const updateAgencyStatus = (status: ActiveOrRejectedStatus) => {
+  const updateAgencyStatus = (agencyToReview: AgencyToReview) => {
     if (!agencyNeedingReview) return;
     dispatch(
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
-        id: agencyNeedingReview.id,
-        status,
-      }),
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested(
+        agencyToReview,
+      ),
     );
+    dispatch(agencyAdminSlice.actions.setAgencyNeedingReview(null));
+    reset({
+      agencyId: undefined,
+    });
   };
 
   const setSelectedAgencyNeedingReviewId = (values: {
@@ -69,7 +134,7 @@ export const ActivateAgency = () => {
     },
     resolver: zodResolver(withAgencyIdSchema),
   });
-  const { register, handleSubmit, formState } = methods;
+  const { register, handleSubmit, formState, reset } = methods;
 
   const getFieldError = makeFieldError(formState);
 
@@ -81,7 +146,7 @@ export const ActivateAgency = () => {
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <form onSubmit={handleSubmit(setSelectedAgencyNeedingReviewId)}>
           <Input
-            label={`${agencyNeedingReviewOptions.length} agence(s) en attente de revue`}
+            label="Id de l'agence *"
             nativeInputProps={{
               ...register("agencyId"),
             }}
@@ -97,29 +162,47 @@ export const ActivateAgency = () => {
         </form>
 
         <AgencyDetails />
-        {agencyNeedingReview?.id && (
-          <ButtonsGroup
-            className={fr.cx("fr-mt-4w")}
-            buttonsEquisized
-            alignment="center"
-            inlineLayoutWhen="always"
-            buttons={[
-              {
-                iconId: "fr-icon-checkbox-fill",
-                children: "Activer cette agence",
-                priority: "primary",
-                onClick: () => updateAgencyStatus("active"),
-              },
-              {
-                iconId: "fr-icon-alert-fill",
-                children: "Rejeter cette agence",
-                priority: "secondary",
-                onClick: () => updateAgencyStatus("rejected"),
-              },
-            ]}
-          />
-        )}
+        {agencyNeedingReview?.id &&
+          agencyNeedingReview.status === "needsReview" && (
+            <ButtonsGroup
+              className={fr.cx("fr-mt-4w")}
+              buttonsEquisized
+              alignment="center"
+              inlineLayoutWhen="always"
+              buttons={[
+                {
+                  iconId: "fr-icon-checkbox-fill",
+                  children: "Activer cette agence",
+                  priority: "primary",
+                  onClick: () =>
+                    updateAgencyStatus({
+                      id: agencyNeedingReview.id,
+                      status: "active",
+                    }),
+                },
+                {
+                  iconId: "fr-icon-alert-fill",
+                  children: "Rejeter cette agence",
+                  priority: "secondary",
+                  onClick: () => rejectAgencyModal.open(),
+                },
+              ]}
+            />
+          )}
       </div>
+      {agencyNeedingReview?.id &&
+        createPortal(
+          <RejectAgencyModalContent
+            onReject={({ rejectionJustification }) =>
+              updateAgencyStatus({
+                id: agencyNeedingReview.id,
+                status: "rejected",
+                rejectionJustification,
+              })
+            }
+          />,
+          document.body,
+        )}
     </>
   );
 };

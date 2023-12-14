@@ -6,6 +6,7 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
@@ -112,9 +113,9 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public validateOrRejectAgency$(
     _: BackOfficeJwt,
-    agencyId: AgencyId,
+    agencyToReview: AgencyToReview,
   ): Observable<void> {
-    return from(this.#validateOrRejectAgency(_, agencyId));
+    return from(this.#validateOrRejectAgency(_, agencyToReview.id));
   }
 
   async #validateOrRejectAgency(

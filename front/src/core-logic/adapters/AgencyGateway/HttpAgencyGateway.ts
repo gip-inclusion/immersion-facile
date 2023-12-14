@@ -1,12 +1,12 @@
 import { from, Observable } from "rxjs";
 import { match } from "ts-pattern";
 import {
-  ActiveOrRejectedStatus,
   AgencyDto,
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
   AgencyRoutes,
+  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
@@ -181,21 +181,19 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public async validateOrRejectAgency(
     adminToken: BackOfficeJwt,
-    agencyId: AgencyId,
-    status: ActiveOrRejectedStatus,
+    agencyToReview: AgencyToReview,
   ): Promise<void> {
     await this.httpClient.updateAgencyStatus({
-      body: { status },
+      body: agencyToReview,
       headers: { authorization: adminToken },
-      urlParams: { agencyId },
+      urlParams: { agencyId: agencyToReview.id },
     });
   }
 
   public validateOrRejectAgency$(
     adminToken: BackOfficeJwt,
-    agencyId: AgencyId,
-    status: ActiveOrRejectedStatus,
+    agencyToReview: AgencyToReview,
   ): Observable<void> {
-    return from(this.validateOrRejectAgency(adminToken, agencyId, status));
+    return from(this.validateOrRejectAgency(adminToken, agencyToReview));
   }
 }

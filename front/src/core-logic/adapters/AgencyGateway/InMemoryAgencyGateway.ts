@@ -7,6 +7,7 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
@@ -187,9 +188,9 @@ export class InMemoryAgencyGateway implements AgencyGateway {
 
   public validateOrRejectAgency$(
     adminToken: BackOfficeJwt,
-    agencyId: AgencyId,
+    agencyToReview: AgencyToReview,
   ): Observable<void> {
-    return from(this.#validateOrRejectAgency(adminToken, agencyId));
+    return from(this.#validateOrRejectAgency(adminToken, agencyToReview.id));
   }
 
   async #validateOrRejectAgency(
