@@ -80,7 +80,6 @@ export const AvailabilitySection = ({
       />
 
       {availableForImmersion === false && (
-        // Comportement pas bon lors du précédent >> la date ne s'affiche pas mais OK dans form
         <Input
           {...formContents["nextAvailabilityDate"]}
           nativeInputProps={{
