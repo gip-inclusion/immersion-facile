@@ -109,6 +109,7 @@ interface Agencies {
   city: string;
   department_code: string;
   refers_to_agency_id: string | null;
+  rejection_justification: string | null;
 }
 
 interface SavedErrors {
