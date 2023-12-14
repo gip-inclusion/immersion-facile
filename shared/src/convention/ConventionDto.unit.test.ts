@@ -590,7 +590,33 @@ describe("conventionDtoSchema", () => {
           })
           .build();
         expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-          "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 15 ans est de 35h",
+          "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 15 ans est de 30h",
+        ]);
+      });
+
+      it("Add issue when week hours is greater than cci max hours", () => {
+        const dateStart = new Date("2023-12-18").toISOString();
+        const dateEnd = new Date("2023-12-23").toISOString();
+        const convention = new ConventionDtoBuilder()
+          .withInternshipKind("mini-stage-cci")
+          .withDateStart(dateStart)
+          .withDateEnd(dateEnd)
+          .withSchedule(reasonableSchedule)
+          .withBeneficiary({
+            birthdate: new Date("2008-12-12").toISOString(),
+            firstName: "Jean",
+            lastName: "Bono",
+            role: "beneficiary",
+            email: "jean@bono.com",
+            levelOfEducation: "4ème",
+            schoolName: "lycée Jean Moulin",
+            schoolPostcode: "06500",
+            phone: "0836656565",
+            isRqth: false,
+          })
+          .build();
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+          "La durée maximale hebdomadaire pour un mini-stage est de 35h",
         ]);
       });
     });

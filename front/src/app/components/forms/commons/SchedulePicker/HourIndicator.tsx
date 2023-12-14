@@ -1,10 +1,10 @@
 import React from "react";
-import { differenceInCalendarYears } from "date-fns";
+import { addYears } from "date-fns";
 import {
   CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
+  CCI_WEEKLY_MAX_PERMITTED_HOURS,
   InternshipKind,
-  maxPermittedHoursPerWeek,
 } from "shared";
 import { formatHoursString } from "./TotalWeeklylHoursIndicator";
 
@@ -21,10 +21,9 @@ export const HourIndicator = ({
 }: HourIndicatorProperties) => {
   const maxAllowedHours =
     internshipKind === "mini-stage-cci" &&
-    differenceInCalendarYears(new Date(), new Date(birthdate)) <
-      CCI_WEEKLY_LIMITED_SCHEDULE_AGE
+    addYears(new Date(birthdate), CCI_WEEKLY_LIMITED_SCHEDULE_AGE) > new Date()
       ? CCI_WEEKLY_LIMITED_SCHEDULE_HOURS
-      : maxPermittedHoursPerWeek;
+      : CCI_WEEKLY_MAX_PERMITTED_HOURS;
   return (
     <span
       className={`${
