@@ -1,10 +1,10 @@
 import { Observable } from "rxjs";
 import {
-  ActiveOrRejectedStatus,
   AgencyDto,
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
@@ -34,8 +34,7 @@ export interface AgencyGateway {
 
   validateOrRejectAgency$(
     adminToken: BackOfficeJwt,
-    agencyId: AgencyId,
-    status: ActiveOrRejectedStatus,
+    agencyToReview: AgencyToReview,
   ): Observable<void>;
 
   getAgencyAdminById$(

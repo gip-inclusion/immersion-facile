@@ -1,4 +1,4 @@
-import { AgencyId } from "../agency/agency.dto";
+import { ActiveOrRejectedStatus, AgencyId } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
 import {
   AgencyRole,
@@ -37,6 +37,13 @@ export type ManageEstablishmentAdminForm = {
   siret: SiretDto;
 };
 
-export type ManageAgencyToReviewAdminForm = {
-  agencyId: AgencyId;
-};
+export type AgencyToReview =
+  | {
+      id: AgencyId;
+      status: Extract<ActiveOrRejectedStatus, "active">;
+    }
+  | {
+      id: AgencyId;
+      status: Extract<ActiveOrRejectedStatus, "rejected">;
+      rejectionJustification: string;
+    };

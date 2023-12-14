@@ -333,6 +333,7 @@ export const domElementIds = {
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
       editAgencyFormSafirCodeInput: "im-form-edit-agency__safir-code-input",
       editAgencyFormEditSubmitButton: "im-form-edit-agency__submit-button",
+      rejectAgencyModal: "im-reject-agency-modal",
     },
     emailPreviewTab: {
       emailTemplateNameSelect: "selectTemplateName",

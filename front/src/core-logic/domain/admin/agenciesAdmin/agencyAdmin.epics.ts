@@ -113,8 +113,7 @@ const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
       agencyGateway
         .validateOrRejectAgency$(
           state$.value.admin.adminAuth.adminToken || "",
-          payload.id,
-          payload.status,
+          payload,
         )
         .pipe(
           map(() =>
