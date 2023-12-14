@@ -3,7 +3,10 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyIdsSchema } from "../agency/agency.schema";
 import { markPartnersErroredConventionAsHandledRequestSchema } from "../convention/convention.schema";
 import { withAuthorizationHeaders } from "../headers";
-import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import {
+  httpErrorSchema,
+  legacyUnauthenticatedErrorSchema,
+} from "../httpClient/errors/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
   getInclusionConnectLogoutUrlQueryParamsSchema,
@@ -21,6 +24,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     responses: {
       200: inclusionConnectedUserSchema,
       400: httpErrorSchema,
+      403: legacyUnauthenticatedErrorSchema,
     },
   }),
   registerAgenciesToUser: defineRoute({
@@ -42,6 +46,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       200: expressEmptyResponseBody,
       404: httpErrorSchema,
       400: httpErrorSchema,
+      403: legacyUnauthenticatedErrorSchema,
     },
   }),
   getInclusionConnectLogoutUrl: defineRoute({

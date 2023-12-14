@@ -114,8 +114,10 @@ describe("InclusionConnectedAllowedRoutes", () => {
         headers: { authorization: "wrong-token" },
       });
 
-      expect(response.body).toEqual({ error: "jwt malformed" });
-      expect(response.status).toBe(403);
+      expectHttpResponseToEqual(response, {
+        body: { error: "jwt malformed" },
+        status: 403,
+      });
     });
 
     it(`${displayRouteName(
@@ -131,8 +133,10 @@ describe("InclusionConnectedAllowedRoutes", () => {
         headers: { authorization: token },
       });
 
-      expect(response.body).toEqual({ error: "jwt expired" });
-      expect(response.status).toBe(403);
+      expectHttpResponseToEqual(response, {
+        body: { error: "jwt expired" },
+        status: 403,
+      });
     });
   });
 
@@ -213,8 +217,10 @@ describe("InclusionConnectedAllowedRoutes", () => {
         headers: { authorization: "wrong-token" },
         body: { conventionId: "11111111-1111-4111-1111-111111111111" },
       });
-      expect(response.body).toEqual({ error: "jwt malformed" });
-      expect(response.status).toBe(403);
+      expectHttpResponseToEqual(response, {
+        body: { error: "jwt malformed" },
+        status: 403,
+      });
     });
 
     it(`${displayRouteName(
@@ -229,8 +235,10 @@ describe("InclusionConnectedAllowedRoutes", () => {
         headers: { authorization: token },
         body: { conventionId: "11111111-1111-4111-1111-111111111111" },
       });
-      expect(response.body).toEqual({ error: "jwt expired" });
-      expect(response.status).toBe(403);
+      expectHttpResponseToEqual(response, {
+        body: { error: "jwt expired" },
+        status: 403,
+      });
     });
 
     it("mark partners errored convention as handled", async () => {
@@ -269,8 +277,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         headers: { authorization: token },
         body: { conventionId: convention.id },
       });
-      expect(response.body).toBe("");
-      expect(response.status).toBe(200);
+      expectHttpResponseToEqual(response, { body: "", status: 200 });
       expectToEqual(inMemoryUow.errorRepository.savedErrors, [
         {
           serviceName: broadcastToPeServiceName,
