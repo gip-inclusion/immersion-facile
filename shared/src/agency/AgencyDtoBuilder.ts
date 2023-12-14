@@ -139,6 +139,13 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
+  public withRejectionJustification(rejectionJustification: string) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      rejectionJustification,
+    });
+  }
+
   public withSignature(signature: string) {
     return new AgencyDtoBuilder({
       ...this.#agency,

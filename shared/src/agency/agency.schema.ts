@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
+import { AgencyToReview } from "../admin/admin.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -26,8 +27,6 @@ import {
   CreateAgencyDto,
   ListAgenciesRequestDto,
   PrivateListAgenciesRequestDto,
-  UpdateAgencyRequestDto,
-  WithActiveOrRejectedStatus,
   WithAgencyDto,
   WithAgencyId,
   WithAgencyStatus,
@@ -145,6 +144,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       codeSafir: zStringPossiblyEmpty,
       refersToAgency:
         agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
+      rejectionJustification: z.string().optional(),
     }),
   );
 
@@ -154,12 +154,6 @@ export const withAgencySchema: z.ZodSchema<WithAgencyDto> = z.object({
 
 export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
   z.object({
-    status: agencyStatusSchema.optional(),
-  });
-
-export const updateAgencyRequestSchema: z.ZodSchema<UpdateAgencyRequestDto> =
-  z.object({
-    id: agencyIdSchema,
     status: agencyStatusSchema.optional(),
   });
 
@@ -177,10 +171,19 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
       agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
   });
 
-export const withActiveOrRejectedAgencyStatusSchema: z.Schema<WithActiveOrRejectedStatus> =
-  z.object({
-    status: z.enum(["active", "rejected"]),
-  });
+export const withActiveOrRejectedAgencyStatusSchema: z.Schema<AgencyToReview> =
+  z
+    .object({
+      id: agencyIdSchema,
+      status: z.literal("active"),
+    })
+    .or(
+      z.object({
+        id: agencyIdSchema,
+        status: z.literal("rejected"),
+        rejectionJustification: zTrimmedString,
+      }),
+    );
 
 export const withAgencyStatusSchema: z.Schema<WithAgencyStatus> = z.object({
   status: agencyStatusSchema,
