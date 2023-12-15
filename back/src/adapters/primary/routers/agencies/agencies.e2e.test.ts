@@ -16,7 +16,6 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
-import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const defaultAddress: AddressDto = {
@@ -32,18 +31,17 @@ describe(`Agency routes`, () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let adminToken: BackOfficeJwt;
-  let appConfig: AppConfig;
 
   beforeEach(async () => {
     const deps = await buildTestApp();
-    ({ gateways, eventCrawler, appConfig, inMemoryUow } = deps);
+    ({ gateways, eventCrawler, inMemoryUow } = deps);
 
     sharedRequest = createSupertestSharedClient(agencyRoutes, deps.request);
 
     gateways.timeGateway.defaultDate = new Date();
     const response = await deps.request.post("/admin/login").send({
-      user: appConfig.backofficeUsername,
-      password: appConfig.backofficePassword,
+      user: deps.appConfig.backofficeUsername,
+      password: deps.appConfig.backofficePassword,
     });
     adminToken = response.body;
   });
