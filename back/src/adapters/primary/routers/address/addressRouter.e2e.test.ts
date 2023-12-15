@@ -36,8 +36,10 @@ describe("address router", () => {
           lookup: query8bdduportLookup,
         },
       });
-      expect(response.body).toEqual(expected8bdduportAddressAndPositions);
-      expect(response.status).toBe(200);
+      expectHttpResponseToEqual(response, {
+        body: expected8bdduportAddressAndPositions,
+        status: 200,
+      });
     });
 
     it(`${displayRouteName(
@@ -125,8 +127,10 @@ describe("address router", () => {
           query: exampleQuery,
         },
       });
-      expect(response.body).toEqual(expectedLookupSearchResults);
-      expect(response.status).toBe(200);
+      expectHttpResponseToEqual(response, {
+        body: expectedLookupSearchResults,
+        status: 200,
+      });
     });
   });
 });
