@@ -1,20 +1,20 @@
-import { SuperTest, Test } from "supertest";
 import {
+  AdminRoutes,
   adminRoutes,
   BackOfficeJwt,
-  expectToEqual,
+  expectHttpResponseToEqual,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
-
-const addFormEstablishmentBatchUrl = adminRoutes.addFormEstablishmentBatch.url;
 
 describe("POST /add-form-establishment-batch", () => {
   const formEstablishment1: FormEstablishmentDto =
@@ -25,50 +25,63 @@ describe("POST /add-form-establishment-batch", () => {
     description: "My description",
     formEstablishments: [formEstablishment1],
   };
-  let request: SuperTest<Test>;
+  let httpClient: HttpClient<AdminRoutes>;
   let token: BackOfficeJwt;
   let gateways: InMemoryGateways;
 
   beforeEach(async () => {
-    const appConfig = new AppConfigBuilder()
-      .withConfigParams({
-        BACKOFFICE_USERNAME: "user",
-        BACKOFFICE_PASSWORD: "pwd",
-      })
-      .build();
+    const testApp = await buildTestApp(
+      new AppConfigBuilder()
+        .withConfigParams({
+          BACKOFFICE_USERNAME: "user",
+          BACKOFFICE_PASSWORD: "pwd",
+        })
+        .build(),
+    );
 
-    ({ request, gateways } = await buildTestApp(appConfig));
+    ({ gateways } = testApp);
+    httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
 
     gateways.timeGateway.defaultDate = new Date();
 
-    const response = await request
-      .post("/admin/login")
-      .send({ user: "user", password: "pwd" });
-
+    const response = await httpClient.login({
+      body: {
+        user: "user",
+        password: "pwd",
+      },
+    });
+    if (response.status !== 200) throw new Error("Login failed");
     token = response.body;
   });
 
   it("throws 401 if invalid token", async () => {
     const badBackOfficeJwt: BackOfficeJwt = "Invalid";
-    const response = await request
-      .post(addFormEstablishmentBatchUrl)
-      .set("authorization", badBackOfficeJwt)
-      .send(payload);
-    expectToEqual(response.body, { error: "Provided token is invalid" });
-    expect(response.status).toBe(401);
+    const response = await httpClient.addFormEstablishmentBatch({
+      body: payload,
+      headers: { authorization: badBackOfficeJwt },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: { error: "Provided token is invalid" },
+      status: 401,
+    });
   });
 
   it("throws 400 if missing token", async () => {
-    const response = await request
-      .post(addFormEstablishmentBatchUrl)
-      .send(payload);
-    expectToEqual(response.body, {
-      issues: ["authorization : Required"],
-      message:
-        "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /admin/add-form-establishment-batch",
+    const response = await httpClient.addFormEstablishmentBatch({
+      body: payload,
+      headers: {} as { authorization: string },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        issues: ["authorization : Required"],
+        message:
+          "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /admin/add-form-establishment-batch",
+        status: 400,
+      },
       status: 400,
     });
-    expect(response.status).toBe(400);
   });
 
   it("returns 200 if everything work", async () => {
@@ -77,16 +90,18 @@ describe("POST /add-form-establishment-batch", () => {
       siret: formEstablishment1.siret,
     });
 
-    const response = await request
-      .post(addFormEstablishmentBatchUrl)
-      .set("authorization", token)
-      .send(payload);
-
-    expect(response.body).toEqual({
-      failures: [],
-      numberOfEstablishmentsProcessed: 1,
-      numberOfSuccess: 1,
+    const response = await httpClient.addFormEstablishmentBatch({
+      body: payload,
+      headers: { authorization: token },
     });
-    expect(response.status).toBe(200);
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        failures: [],
+        numberOfEstablishmentsProcessed: 1,
+        numberOfSuccess: 1,
+      },
+      status: 200,
+    });
   });
 });

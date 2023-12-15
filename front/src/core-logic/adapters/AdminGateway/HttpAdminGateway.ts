@@ -59,6 +59,8 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -130,6 +132,7 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

@@ -1,45 +1,50 @@
-import { SuperTest, Test } from "supertest";
 import {
+  AdminRoutes,
   adminRoutes,
   BackOfficeJwt,
   EmailNotification,
-  expectToEqual,
+  expectHttpResponseToEqual,
   SmsNotification,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`${adminRoutes.getLastNotifications.url} route`, () => {
-  let request: SuperTest<Test>;
   let adminToken: BackOfficeJwt;
   let inMemoryUow: InMemoryUnitOfWork;
+  let httpClient: HttpClient<AdminRoutes>;
 
   beforeEach(async () => {
-    const testDeps = await buildTestApp();
-    ({ request, inMemoryUow } = testDeps);
-    const { generateBackOfficeJwt } = testDeps;
-
+    const testApp = await buildTestApp();
+    ({ inMemoryUow } = testApp);
     const iat = new Date().getTime() / 1000;
-    adminToken = generateBackOfficeJwt({
+    adminToken = testApp.generateBackOfficeJwt({
       role: "backOffice",
       sub: "admin",
       iat,
       exp: iat + 1000,
       version: 1,
     });
+    httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
   });
 
   describe("private route to get last email sent", () => {
     it("throws 400 if missing token", async () => {
-      const response = await request.get(adminRoutes.getLastNotifications.url);
+      const response = await httpClient.getLastNotifications({
+        headers: {} as { authorization: string },
+      });
 
-      expectToEqual(response.body, {
-        issues: ["authorization : Required"],
-        message:
-          "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /admin/notifications",
+      expectHttpResponseToEqual(response, {
+        body: {
+          issues: ["authorization : Required"],
+          message:
+            "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /admin/notifications",
+          status: 400,
+        },
         status: 400,
       });
-      expect(response.status).toBe(400);
     });
 
     it("Returns last notifications", async () => {
@@ -80,15 +85,17 @@ describe(`${adminRoutes.getLastNotifications.url} route`, () => {
       ];
 
       // Getting the application succeeds and shows that it's validated.
-      const response = await request
-        .get(adminRoutes.getLastNotifications.url)
-        .set("Authorization", adminToken);
-
-      expect(response.body).toEqual({
-        emails: [emailNotification],
-        sms: [smsNotification],
+      const response = await httpClient.getLastNotifications({
+        headers: { authorization: adminToken },
       });
-      expect(response.status).toBe(200);
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          emails: [emailNotification],
+          sms: [smsNotification],
+        },
+        status: 200,
+      });
     });
   });
 });
