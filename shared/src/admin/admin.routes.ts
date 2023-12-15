@@ -14,6 +14,7 @@ import {
 } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
+  httpErrorSchema,
   legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
@@ -55,7 +56,11 @@ export const adminRoutes = defineRoutes({
     url: "/admin/add-form-establishment-batch",
     requestBodySchema: formEstablishmentBatchSchema,
     ...withAuthorizationHeaders,
-    responses: { 200: establishmentBatchReportSchema },
+    responses: {
+      200: establishmentBatchReportSchema,
+      400: httpErrorSchema,
+      401: legacyUnauthenticatedErrorSchema,
+    },
   }),
   updateUserRoleForAgency: defineRoute({
     method: "patch",
@@ -93,7 +98,7 @@ export const adminRoutes = defineRoutes({
     method: "get",
     url: "/admin/notifications",
     ...withAuthorizationHeaders,
-    responses: { 200: notificationsByKindSchema },
+    responses: { 200: notificationsByKindSchema, 400: httpErrorSchema },
   }),
   updateFeatureFlags: defineRoute({
     method: "post",
