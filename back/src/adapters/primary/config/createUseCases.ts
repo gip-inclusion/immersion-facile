@@ -54,6 +54,7 @@ import { MarkPartnersErroredConventionAsHandled } from "../../../domain/conventi
 import { RenewConvention } from "../../../domain/convention/useCases/RenewConvention";
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
+import { SendEmailWhenAgencyIsRejected } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsRejected";
 import { ShareConventionLinkByEmail } from "../../../domain/convention/useCases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
 import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
@@ -375,6 +376,10 @@ export const createUseCases = (
       privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
+      ),
+      sendEmailWhenAgencyIsRejected: new SendEmailWhenAgencyIsRejected(
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),

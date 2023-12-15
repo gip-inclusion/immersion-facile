@@ -352,6 +352,7 @@ export class PgAgencyRepository implements AgencyRepository {
           adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
           signature: ref("a.email_signature"),
           refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
+          rejectionJustification: ref("a.rejection_justification"),
         }),
       ).as("agency"),
     ]);

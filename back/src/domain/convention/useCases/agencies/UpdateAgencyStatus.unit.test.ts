@@ -1,4 +1,4 @@
-import { AgencyDtoBuilder, expectPromiseToFailWithError } from "shared";
+import {AgencyDtoBuilder, AgencyToReview, expectPromiseToFailWithError} from "shared";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -43,24 +43,30 @@ describe("Update agency status", () => {
       .withStatus("needsReview")
       .build();
 
-    it("Updates an agency status in repository and publishes an event to notify if status becomes active", async () => {
+    it.each([{ status: "active" as const }, { status: "rejected" as const }])(
+    "Updates an agency status in repository and publishes an event to notify if status becomes $status",
+    async ({ status }) => {
       // Prepare
-      uow.agencyRepository.setAgencies([existingAgency]);
+      uow.
+      agencyRepository.setAgencies([existingAgency]);
 
       // Act
       await updateAgencyStatus.execute({
         id: existingAgency.id,
         status: "active",
-      });
+        rejectionJustification:
+          status === "rejected" ? "justification" : undefined,
+      } as AgencyToReview);
 
       // Assert
-      expect(uow.agencyRepository.agencies[0].status).toBe("active");
+      expect(uow.agencyRepository.agencies[0].status).toBe(status);
       expect(uow.outboxRepository.events[0]).toMatchObject({
         id: nextUuid,
-        topic: "AgencyActivated",
-        payload: { agency: { ...existingAgency, status: "active" } },
+        topic: status === "active" ? "AgencyActivated" : "AgencyRejected",
+        payload: { agency: { ...existingAgency, status } },
       });
-    });
+      },
+    );
   });
 
   describe("wrong paths", () => {
@@ -71,7 +77,7 @@ describe("Update agency status", () => {
     it("returns 404 if agency not found", async () => {
       const agencyId = "not-found-id";
       await expectPromiseToFailWithError(
-        updateAgencyStatus.execute({ id: agencyId }),
+        updateAgencyStatus.execute({ id: agencyId, status: "active" }),
         new NotFoundError(`No agency found with id ${agencyId}`),
       );
     });

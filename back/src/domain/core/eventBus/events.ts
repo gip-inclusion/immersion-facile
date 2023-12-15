@@ -89,6 +89,7 @@ export type DomainEvent =
   | GenericEvent<"NewAgencyAdded", WithAgencyDto>
   | GenericEvent<"AgencyActivated", WithAgencyDto>
   | GenericEvent<"AgencyUpdated", WithAgencyDto>
+  | GenericEvent<"AgencyRejected", WithAgencyDto>
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", WithAssessmentDto>
