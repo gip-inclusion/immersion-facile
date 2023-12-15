@@ -1,4 +1,4 @@
-import { AgencyToReview, withActiveOrRejectedAgencyStatusSchema } from "shared";
+import {AgencyDto, AgencyToReview, PartialAgencyDto, withActiveOrRejectedAgencyStatusSchema} from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
@@ -37,18 +37,21 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
       agency: existingAgency,
     });
 
-    if (agencyToReview.status) await uow.agencyRepository.update({ id: agencyToReview.id,
+    const updatedAgencyParams: PartialAgencyDto = { id: agencyToReview.id,
       status: agencyToReview.status,
       rejectionJustification:
         agencyToReview.status === "rejected"
           ? agencyToReview.rejectionJustification
-          : undefined, });
+          : undefined, }
+    if (agencyToReview.status) await uow.agencyRepository.update(updatedAgencyParams);
 
-    if (agencyToReview.status === "active") {
+    if (agencyToReview.status === "active" || agencyToReview.status === "rejected") {
       await uow.outboxRepository.save(
         this.#createNewEvent({
-          topic: "AgencyActivated",
-          payload: { agency: { ...existingAgency, status: agencyToReview.status } },
+          topic: agencyToReview.status === "active"
+            ? "AgencyActivated"
+            : "AgencyRejected",
+          payload: { agency: { ...existingAgency, ...updatedAgencyParams } },
         }),
       );
     }
