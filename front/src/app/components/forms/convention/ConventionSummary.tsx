@@ -55,6 +55,14 @@ const signatoriesSummary = (convention: ConventionReadDto) => {
       convention.signatories.beneficiaryRepresentative?.email,
     ],
     [
+      fields["signatories.establishmentRepresentative.firstName"].label,
+      convention.signatories.establishmentRepresentative.firstName,
+    ],
+    [
+      fields["signatories.establishmentRepresentative.lastName"].label,
+      convention.signatories.establishmentRepresentative.lastName,
+    ],
+    [
       fields["signatories.beneficiaryRepresentative.phone"].label,
       convention.signatories.beneficiaryRepresentative?.phone,
     ],
@@ -69,6 +77,14 @@ const signatoriesSummary = (convention: ConventionReadDto) => {
     [
       fields["establishmentTutor.email"].label,
       convention.establishmentTutor?.email,
+    ],
+    [
+      fields["establishmentTutor.firstName"].label,
+      convention.establishmentTutor?.firstName,
+    ],
+    [
+      fields["establishmentTutor.lastName"].label,
+      convention.establishmentTutor?.lastName,
     ],
     [
       fields["establishmentTutor.phone"].label,
