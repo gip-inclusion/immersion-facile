@@ -317,6 +317,7 @@ describe("conventionDtoSchema", () => {
 
     expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
       "Obligatoire",
+      "Obligatoire",
     ]);
   });
 
@@ -939,9 +940,13 @@ const expectConventionInvalidWithIssueMessages = <T>(
     schema.parse(convention);
   } catch (error) {
     if (error instanceof ZodError) {
-      error.issues.forEach((issue, index) => {
-        expect(issue.message).toEqual(issueMessages[index]);
-      });
+      expectToEqual(
+        error.issues.map((i) => i.message),
+        issueMessages,
+      );
+      // error.issues.forEach((issue, index) => {
+      //   expect(issue.message).toEqual(issueMessages[index]);
+      // });
       return;
     }
     throw new Error("Zod error expected when parsing convention");
