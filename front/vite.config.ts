@@ -45,12 +45,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      devOptions: {
-        enabled: true,
-      },
       workbox: {
         cleanupOutdatedCaches: true,
         navigateFallbackDenylist: [/^\/api/],
+        skipWaiting: true,
       },
       includeAssets: [
         "/dsfr/favicon/favicon.ico",
