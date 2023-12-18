@@ -113,9 +113,7 @@ export class EstablishmentEntityBuilder
   public withNextAvailabilityDate(nextAvailabilityDate: Date | undefined) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      nextAvailabilityDate: nextAvailabilityDate
-        ? nextAvailabilityDate.toISOString()
-        : undefined,
+      nextAvailabilityDate: nextAvailabilityDate?.toISOString(),
     });
   }
 

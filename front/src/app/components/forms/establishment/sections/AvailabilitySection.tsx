@@ -137,6 +137,7 @@ export const AvailabilitySection = ({
             },
             {
               children: "Étape suivante",
+              disabled: availableForImmersion === undefined,
               onClick: () =>
                 onStepChange(2, ["maxContactsPerWeek", "nextAvailabilityDate"]),
               type: "button",
