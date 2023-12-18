@@ -103,6 +103,17 @@ export const ActivateAgency = () => {
 
   const dispatch = useDispatch();
 
+  const methods = useForm<ManageAgencyToReviewAdminForm>({
+    mode: "onTouched",
+    defaultValues: {
+      agencyId: undefined,
+    },
+    resolver: zodResolver(withAgencyIdSchema),
+  });
+  const { register, handleSubmit, formState, reset } = methods;
+
+  const getFieldError = makeFieldError(formState);
+
   const updateAgencyStatus = (agencyToReview: AgencyToReview) => {
     if (!agencyNeedingReview) return;
     dispatch(
@@ -111,9 +122,7 @@ export const ActivateAgency = () => {
       ),
     );
     dispatch(agencyAdminSlice.actions.setAgencyNeedingReview(null));
-    reset({
-      agencyId: undefined,
-    });
+    reset();
   };
 
   const setSelectedAgencyNeedingReviewId = (values: {
@@ -126,17 +135,6 @@ export const ActivateAgency = () => {
       ),
     );
   };
-
-  const methods = useForm<ManageAgencyToReviewAdminForm>({
-    mode: "onTouched",
-    defaultValues: {
-      agencyId: undefined,
-    },
-    resolver: zodResolver(withAgencyIdSchema),
-  });
-  const { register, handleSubmit, formState, reset } = methods;
-
-  const getFieldError = makeFieldError(formState);
 
   return (
     <>
