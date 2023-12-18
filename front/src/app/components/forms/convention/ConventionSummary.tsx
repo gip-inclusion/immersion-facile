@@ -17,7 +17,7 @@ import { formConventionFieldsLabels } from "src/app/contents/forms/convention/fo
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { agencyGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 type ConventionSummaryRow = [
@@ -282,7 +282,7 @@ export const ConventionSummary = () => {
   const { cx } = useStyles();
   useEffect(() => {
     if (convention) {
-      agencyGateway
+      outOfReduxDependencies.agencyGateway
         .getAgencyPublicInfoById({
           agencyId: convention.agencyId,
         })

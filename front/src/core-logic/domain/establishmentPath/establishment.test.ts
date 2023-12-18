@@ -71,7 +71,7 @@ describe("Establishment", () => {
       },
     }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
-    dependencies.siretGatewayThroughBack.siretInfo$.next(
+    dependencies.formCompletionGateway.siretInfo$.next(
       establishmentFromSiretFetched,
     );
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
@@ -98,7 +98,7 @@ describe("Establishment", () => {
       },
     }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
-    dependencies.siretGatewayThroughBack.isSiretInDb$.next(false);
+    dependencies.formCompletionGateway.isSiretInDb$.next(false);
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
       siret: "10002000300040",
     });

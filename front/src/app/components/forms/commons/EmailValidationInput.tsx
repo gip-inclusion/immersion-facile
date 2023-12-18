@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
 import { Email, ValidateEmailReason, ValidateEmailStatus } from "shared";
-import { technicalGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {
   onEmailValidationFeedback?: (status: ValidateEmailStatus) => void;
@@ -73,7 +73,8 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
     }
   };
   const sendEmailValidationRequest = async (email: Email) => {
-    const emailValidationStatus = await technicalGateway.getEmailStatus(email);
+    const emailValidationStatus =
+      await outOfReduxDependencies.technicalGateway.getEmailStatus(email);
     props.onEmailValidationFeedback?.(emailValidationStatus);
     setStateRelated(
       getStateRelatedFromStatus(emailValidationStatus, {

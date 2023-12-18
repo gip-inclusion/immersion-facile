@@ -7,14 +7,11 @@ import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InM
 import { SimulatedAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedAssessmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
+import { SimulatedFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/SimulatedFormCompletionGateway";
+import { seedRomeDtos } from "src/core-logic/adapters/FormCompletionGateway/TestFormCompletionGateway";
 import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
-import {
-  InMemoryRomeAutocompleteGateway,
-  seedRomeDtos,
-} from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { seedSearchResults } from "src/core-logic/adapters/SearchGateway/simulatedSearchData";
 import { SimulatedSearchGateway } from "src/core-logic/adapters/SearchGateway/SimulatedSearchGateway";
-import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 
 const SIMULATED_LATENCY_MS = 400;
@@ -31,40 +28,36 @@ export const createInMemoryDependencies = (): Dependencies => ({
       .build(),
   ]),
   assessmentGateway: new SimulatedAssessmentGateway(),
-
   searchGateway: new SimulatedSearchGateway(
     seedSearchResults,
     SIMULATED_LATENCY_MS,
   ),
-  romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(
-    seedRomeDtos,
+  formCompletionGateway: new SimulatedFormCompletionGateway(
     SIMULATED_LATENCY_MS,
+    {
+      12345678901238: {
+        siret: "12345678901238",
+        businessName: "Entreprise 38",
+        businessAddress: "",
+        isOpen: true,
+      },
+      12345678901239: {
+        siret: "12345678901239",
+        businessName: "Entreprise 39",
+        businessAddress: "",
+        isOpen: false,
+      },
+      12345678901236: {
+        siret: "12345678901236",
+        businessName:
+          "Open Business on SIRENE but not registered on Immersion Facile",
+        businessAddress: "5 Rue du Chevalier de Saint-George, 75008 Paris",
+        isOpen: true,
+      },
+    },
+    seedRomeDtos,
   ),
-  siretGatewayThroughBack: getSimulatedSiretGatewayThroughBack(),
   technicalGateway: new SimulatedTechnicalGateway(),
   inclusionConnectedGateway: new SimulatedInclusionConnectedGateway(),
   ...createCommonDependencies(),
 });
-
-const getSimulatedSiretGatewayThroughBack = () =>
-  new SimulatedSiretGatewayThroughBack(SIMULATED_LATENCY_MS, {
-    12345678901238: {
-      siret: "12345678901238",
-      businessName: "Entreprise 38",
-      businessAddress: "",
-      isOpen: true,
-    },
-    12345678901239: {
-      siret: "12345678901239",
-      businessName: "Entreprise 39",
-      businessAddress: "",
-      isOpen: false,
-    },
-    12345678901236: {
-      siret: "12345678901236",
-      businessName:
-        "Open Business on SIRENE but not registered on Immersion Facile",
-      businessAddress: "5 Rue du Chevalier de Saint-George, 75008 Paris",
-      isOpen: true,
-    },
-  });

@@ -18,7 +18,7 @@ type RomeAutocompleteAction = ActionOfSlice<typeof romeAutocompleteSlice>;
 export const romeAutocompleteEpic: AppEpic<RomeAutocompleteAction> = (
   action$,
   _state$,
-  { romeAutocompleteGateway, scheduler },
+  { formCompletionGateway, scheduler },
 ) =>
   action$.pipe(
     filter(romeAutocompleteSlice.actions.setRomeSearchText.match),
@@ -29,7 +29,7 @@ export const romeAutocompleteEpic: AppEpic<RomeAutocompleteAction> = (
     switchMap((action) =>
       of(romeAutocompleteSlice.actions.searchStarted()).pipe(
         concatWith(
-          romeAutocompleteGateway
+          formCompletionGateway
             .getRomeDtoMatching(action.payload)
             .pipe(map(romeAutocompleteSlice.actions.setRomeOptions)),
         ),

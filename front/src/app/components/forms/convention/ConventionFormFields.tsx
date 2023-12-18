@@ -36,7 +36,7 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
-import { agencyGateway, deviceRepository } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
@@ -98,7 +98,7 @@ export const ConventionFormFields = ({
   } = getFormFields();
 
   useEffect(() => {
-    deviceRepository.delete("partialConventionInUrl");
+    outOfReduxDependencies.deviceRepository.delete("partialConventionInUrl");
     dispatch(conventionSlice.actions.setCurrentStep(1));
   }, []);
 
@@ -373,12 +373,21 @@ const conventionAgenciesRetriever = ({
 }): ((departmentCode: DepartmentCode) => Promise<AgencyOption[]>) => {
   if (internshipKind === "mini-stage-cci")
     return (departmentCode) =>
-      agencyGateway.listMiniStageAgencies(departmentCode);
+      outOfReduxDependencies.agencyGateway.listMiniStageAgencies(
+        departmentCode,
+      );
   if (shouldListAll)
     return (departmentCode) =>
-      agencyGateway.listImmersionAgencies(departmentCode);
+      outOfReduxDependencies.agencyGateway.listImmersionAgencies(
+        departmentCode,
+      );
   return federatedIdentity && isPeConnectIdentity(federatedIdentity)
     ? (departmentCode) =>
-        agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
-    : (departmentCode) => agencyGateway.listImmersionAgencies(departmentCode);
+        outOfReduxDependencies.agencyGateway.listImmersionOnlyPeAgencies(
+          departmentCode,
+        )
+    : (departmentCode) =>
+        outOfReduxDependencies.agencyGateway.listImmersionAgencies(
+          departmentCode,
+        );
 };

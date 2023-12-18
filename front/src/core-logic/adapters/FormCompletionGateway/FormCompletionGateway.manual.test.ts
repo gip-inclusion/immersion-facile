@@ -4,16 +4,16 @@ import {
   conflictErrorSiret,
   createManagedAxiosInstance,
   expectToEqual,
+  formCompletionRoutes,
   GetSiretInfoError,
-  siretRoutes,
   tooManySirenRequestsSiret,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
-import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
-import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
+import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
+import { HttpFormCompletionGateway } from "./HttpFormCompletionGateway";
+import { SimulatedFormCompletionGateway } from "./SimulatedFormCompletionGateway";
 
-const simulated = new SimulatedSiretGatewayThroughBack(0, {
+const simulated = new SimulatedFormCompletionGateway(0, {
   "12345678901234": {
     businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
     businessName: "MA P'TITE BOITE",
@@ -45,14 +45,11 @@ const axiosInstance = createManagedAxiosInstance({
   baseURL: "http://localhost:1234",
 });
 
-const siretGateway = new HttpSiretGatewayThroughBack(
-  createAxiosSharedClient(siretRoutes, axiosInstance),
+const http = new HttpFormCompletionGateway(
+  createAxiosSharedClient(formCompletionRoutes, axiosInstance),
 );
 
-const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [
-  simulated,
-  siretGateway,
-];
+const siretGatewaysThroughBack: FormCompletionGateway[] = [simulated, http];
 
 siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
   describe(`${siretGatewayThroughBack.constructor.name} - manual`, () => {

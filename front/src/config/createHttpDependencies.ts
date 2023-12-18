@@ -6,9 +6,9 @@ import {
   conventionMagicLinkRoutes,
   createManagedAxiosInstance,
   establishmentRoutes,
+  formCompletionRoutes,
   inclusionConnectedAllowedRoutes,
   searchImmersionRoutes,
-  siretRoutes,
   technicalRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
@@ -21,20 +21,21 @@ import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAge
 import { HttpAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
+import { HttpFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/HttpFormCompletionGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
-import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
 import { HttpSearchGateway } from "src/core-logic/adapters/SearchGateway/HttpSearchGateway";
-import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
 
 export const createHttpDependencies = (): Dependencies => {
+  const withBaseUrlConfig = { baseURL: "/api" };
   const axiosOnSlashApi = axios.create({
-    baseURL: "/api",
+    ...withBaseUrlConfig,
     validateStatus: () => true,
   });
-  const axiosOnSlashApiLegacy = createManagedAxiosInstance({ baseURL: "/api" });
+  const axiosOnSlashApiLegacy = createManagedAxiosInstance(withBaseUrlConfig);
 
   return {
+    ...createCommonDependencies(),
     addressGateway: new HttpAddressGateway(
       createAxiosSharedClient(addressRoutes, axiosOnSlashApi),
     ),
@@ -44,30 +45,26 @@ export const createHttpDependencies = (): Dependencies => {
     agencyGateway: new HttpAgencyGateway(
       createAxiosSharedClient(agencyRoutes, axiosOnSlashApi),
     ),
-    inclusionConnectedGateway: new HttpInclusionConnectedGateway(
-      createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
-    ),
-    establishmentGateway: new HttpEstablishmentGateway(
-      createAxiosSharedClient(establishmentRoutes, axiosOnSlashApi),
-    ),
+    assessmentGateway: new HttpAssessmentGateway(axiosOnSlashApiLegacy),
     conventionGateway: new HttpConventionGateway(
       createAxiosSharedClient(conventionMagicLinkRoutes, axiosOnSlashApi),
       createAxiosSharedClient(unauthenticatedConventionRoutes, axiosOnSlashApi),
     ),
-    assessmentGateway: new HttpAssessmentGateway(axiosOnSlashApiLegacy),
+    establishmentGateway: new HttpEstablishmentGateway(
+      createAxiosSharedClient(establishmentRoutes, axiosOnSlashApi),
+    ),
+    formCompletionGateway: new HttpFormCompletionGateway(
+      createAxiosSharedClient(formCompletionRoutes, axiosOnSlashApi),
+    ),
+    inclusionConnectedGateway: new HttpInclusionConnectedGateway(
+      createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
+    ),
     searchGateway: new HttpSearchGateway(
       createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApiLegacy),
-    ),
-    romeAutocompleteGateway: new HttpRomeAutocompleteGateway(
-      axiosOnSlashApiLegacy,
-    ),
-    siretGatewayThroughBack: new HttpSiretGatewayThroughBack(
-      createAxiosSharedClient(siretRoutes, axiosOnSlashApi),
     ),
     technicalGateway: new HttpTechnicalGateway(
       createAxiosSharedClient(technicalRoutes, axiosOnSlashApiLegacy),
       axiosOnSlashApiLegacy,
     ),
-    ...createCommonDependencies(),
   };
 };

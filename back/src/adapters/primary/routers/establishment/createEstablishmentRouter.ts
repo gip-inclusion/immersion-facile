@@ -3,7 +3,7 @@ import {
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   establishmentRoutes,
-  siretRoutes,
+  formCompletionRoutes,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -12,8 +12,9 @@ import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 export const createEstablishmentRouter = (deps: AppDependencies) => {
   const establishmentRouter = Router({ mergeParams: true });
 
+  //TODO: Move this route to createFormCompletionRouter OR move isSiretAlreadySaved route on EstablishmentRoutes
   const sharedSiretRouter = createExpressSharedRouter(
-    siretRoutes,
+    formCompletionRoutes,
     establishmentRouter,
   );
 

@@ -1,5 +1,9 @@
 import { SuperTest, Test } from "supertest";
-import { expectHttpResponseToEqual, SiretRoutes, siretRoutes } from "shared";
+import {
+  expectHttpResponseToEqual,
+  FormCompletionRoutes,
+  formCompletionRoutes,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -8,14 +12,14 @@ import { EstablishmentEntityBuilder } from "../../../../_testBuilders/Establishm
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("route to check if a form's siret already exists", () => {
-  let httpClient: HttpClient<SiretRoutes>;
+  let httpClient: HttpClient<FormCompletionRoutes>;
   let inMemoryUow: InMemoryUnitOfWork;
   const siret = "11111111111111";
 
   beforeEach(async () => {
     let request: SuperTest<Test>;
     ({ request, inMemoryUow } = await buildTestApp());
-    httpClient = createSupertestSharedClient(siretRoutes, request);
+    httpClient = createSupertestSharedClient(formCompletionRoutes, request);
   });
 
   it("Returns false if the siret does not exist", async () => {

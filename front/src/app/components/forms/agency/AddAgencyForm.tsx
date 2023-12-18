@@ -32,7 +32,7 @@ import {
   formErrorsToFlatErrors,
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
-import { agencyGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
@@ -106,7 +106,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
 
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");
-    return agencyGateway
+    return outOfReduxDependencies.agencyGateway
       .addAgency({
         ...values,
         kind: values.kind,
@@ -123,7 +123,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
 
   const agenciesRetrieverMemoized = useCallback(
     (departmentCode: DepartmentCode) =>
-      agencyGateway.getFilteredAgencies({
+      outOfReduxDependencies.agencyGateway.getFilteredAgencies({
         departmentCode,
         kind: "withoutRefersToAgency",
       }),

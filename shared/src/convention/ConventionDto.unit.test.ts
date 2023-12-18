@@ -944,9 +944,6 @@ const expectConventionInvalidWithIssueMessages = <T>(
         error.issues.map((i) => i.message),
         issueMessages,
       );
-      // error.issues.forEach((issue, index) => {
-      //   expect(issue.message).toEqual(issueMessages[index]);
-      // });
       return;
     }
     throw new Error("Zod error expected when parsing convention");

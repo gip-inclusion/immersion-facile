@@ -2,7 +2,7 @@ import * as React from "react";
 import { AbsoluteUrl } from "shared";
 import { domElementIds } from "shared";
 import { File } from "react-design-system";
-import { technicalGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 interface UploadLogoProps {
   label: string;
@@ -33,7 +33,8 @@ export const UploadLogo = ({
         }
         if (!file) return;
 
-        const fileUrl = await technicalGateway.uploadLogo(file);
+        const fileUrl =
+          await outOfReduxDependencies.technicalGateway.uploadLogo(file);
         setFileUrl(fileUrl);
       }}
       label={label}

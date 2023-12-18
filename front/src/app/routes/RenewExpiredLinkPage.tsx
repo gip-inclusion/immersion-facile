@@ -8,7 +8,7 @@ import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
-import { conventionGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewConventionMagicLink>;
@@ -45,7 +45,7 @@ export const RenewExpiredLinkContent = ({
     }
 
     setRequested(true);
-    conventionGateway
+    outOfReduxDependencies.conventionGateway
       .renewMagicLink(expiredJwt, originalURL)
       .then(() => {
         setRequestSuccessful(true);

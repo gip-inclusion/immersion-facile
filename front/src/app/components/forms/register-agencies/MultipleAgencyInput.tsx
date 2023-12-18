@@ -5,7 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Autocomplete } from "@mui/material";
 import { useStyles } from "tss-react/dsfr";
 import { AgencyOption } from "shared";
-import { agencyGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 type MultipleAgencyInputProps = {
   name?: string;
@@ -126,7 +126,7 @@ const AgencyAutocomplete = ({
     if (inputQuery === "") return;
     if (inputQuery.length < 3) return;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    agencyGateway
+    outOfReduxDependencies.agencyGateway
       .getFilteredAgencies({
         nameIncludes: inputQuery,
         status: ["active", "from-api-PE"],

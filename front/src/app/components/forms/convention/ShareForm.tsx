@@ -8,7 +8,7 @@ import {
   ShareLinkByEmailDto,
   shareLinkByEmailSchema,
 } from "shared";
-import { conventionGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 type ShareFormProps = {
   onSuccess: () => void;
@@ -52,10 +52,13 @@ export const ShareForm = ({
     details: string;
     internshipKind: InternshipKind;
   }) => {
-    const result = await conventionGateway.shareConventionLinkByEmail({
-      ...values,
-      conventionLink: window.location.href,
-    });
+    const result =
+      await outOfReduxDependencies.conventionGateway.shareConventionLinkByEmail(
+        {
+          ...values,
+          conventionLink: window.location.href,
+        },
+      );
     result ? onSuccess() : onError();
   };
   const methods = useForm<ShareLinkByEmailDto>({

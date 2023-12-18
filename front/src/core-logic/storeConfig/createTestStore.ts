@@ -5,35 +5,33 @@ import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/In
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
-import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestAssessmentGateway } from "../adapters/AssessmentGateway/TestAssessmentGateway";
 import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
+import { TestFormCompletionGateway } from "../adapters/FormCompletionGateway/TestFormCompletionGateway";
 import { TestSearchGateway } from "../adapters/SearchGateway/TestSearchGateway";
-import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
 export type TestDependencies = ReturnType<typeof createTestDependencies>;
 
 const createTestDependencies = () =>
   ({
-    adminGateway: new TestAdminGateway(),
-    assessmentGateway: new TestAssessmentGateway(),
-    siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
-    searchGateway: new TestSearchGateway(),
-    establishmentGateway: new TestEstablishmentGateway(),
-    conventionGateway: new InMemoryConventionGateway(),
     addressGateway: new TestAddressGateway(),
-    technicalGateway: new TestTechnicalGateway(),
+    adminGateway: new TestAdminGateway(),
     agencyGateway: new TestAgencyGateway(),
-    romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
-    inclusionConnectedGateway: new TestInclusionConnectedGateway(),
+    assessmentGateway: new TestAssessmentGateway(),
+    conventionGateway: new InMemoryConventionGateway(),
     deviceRepository: createTestDeviceRepository(),
+    establishmentGateway: new TestEstablishmentGateway(),
+    formCompletionGateway: new TestFormCompletionGateway(),
+    inclusionConnectedGateway: new TestInclusionConnectedGateway(),
+    minSearchResultsToPreventRefetch: 2,
     navigationGateway: new InMemoryNavigationGateway(),
     scheduler: new VirtualTimeScheduler(),
-    minSearchResultsToPreventRefetch: 2,
+    searchGateway: new TestSearchGateway(),
+    technicalGateway: new TestTechnicalGateway(),
   } satisfies Dependencies);
 
 export const createTestStore = (preloadedState?: Partial<RootState>) => {
