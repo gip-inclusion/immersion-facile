@@ -15,7 +15,7 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
-import { searchGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 type ContactByPhoneProps = {
   appellations: AppellationDto[];
@@ -59,7 +59,8 @@ export const ContactByPhone = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByPhoneDto) => {
-    const errorKind = await searchGateway.contactEstablishment(values);
+    const errorKind =
+      await outOfReduxDependencies.searchGateway.contactEstablishment(values);
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };

@@ -192,30 +192,28 @@ describe("Siret validation and fetching", () => {
   };
 
   const feedSirenGatewayThroughBackWith = (response: GetSiretInfo) => {
-    dependencies.siretGatewayThroughBack.siretInfo$.next(response);
+    dependencies.formCompletionGateway.siretInfo$.next(response);
   };
 
   const feedSirenGatewayThroughBackWithError = (error: Error) => {
-    dependencies.siretGatewayThroughBack.siretInfo$.error(error);
+    dependencies.formCompletionGateway.siretInfo$.error(error);
   };
 
   const feedSiretInDbWith = (isInDb: boolean) => {
-    dependencies.siretGatewayThroughBack.isSiretInDb$.next(isInDb);
+    dependencies.formCompletionGateway.isSiretInDb$.next(isInDb);
   };
 
   const expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled = () => {
     expect(
-      dependencies.siretGatewayThroughBack
-        .getSiretInfoIfNotAlreadySavedCallCount,
+      dependencies.formCompletionGateway.getSiretInfoIfNotAlreadySavedCallCount,
     ).toBe(1);
-    expect(dependencies.siretGatewayThroughBack.getSiretInfoCallCount).toBe(0);
+    expect(dependencies.formCompletionGateway.getSiretInfoCallCount).toBe(0);
   };
 
   const expectOnly_getSirenInfoObservable_toHaveBeenCalled = () => {
-    expect(dependencies.siretGatewayThroughBack.getSiretInfoCallCount).toBe(1);
+    expect(dependencies.formCompletionGateway.getSiretInfoCallCount).toBe(1);
     expect(
-      dependencies.siretGatewayThroughBack
-        .getSiretInfoIfNotAlreadySavedCallCount,
+      dependencies.formCompletionGateway.getSiretInfoIfNotAlreadySavedCallCount,
     ).toBe(0);
   };
 

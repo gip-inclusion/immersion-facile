@@ -4,9 +4,10 @@ import {
   getSiretInfoSchema,
   isSiretExistResponseSchema,
 } from "../siret/siret.schema";
+import { appellationSearchResponseSchema, romeListSchema } from "..";
 
-export type SiretRoutes = typeof siretRoutes;
-export const siretRoutes = defineRoutes({
+export type FormCompletionRoutes = typeof formCompletionRoutes;
+export const formCompletionRoutes = defineRoutes({
   isSiretAlreadySaved: defineRoute({
     method: "get",
     url: "/form-already-exists/:siret",
@@ -34,6 +35,20 @@ export const siretRoutes = defineRoutes({
       409: legacyHttpErrorSchema,
       429: legacyHttpErrorSchema,
       503: legacyHttpErrorSchema,
+    },
+  }),
+  appellation: defineRoute({
+    method: "get",
+    url: "/appellation/:searchText",
+    responses: {
+      200: appellationSearchResponseSchema,
+    },
+  }),
+  rome: defineRoute({
+    method: "get",
+    url: `/rome/:searchText`,
+    responses: {
+      200: romeListSchema,
     },
   }),
 });

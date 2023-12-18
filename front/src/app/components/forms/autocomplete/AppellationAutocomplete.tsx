@@ -10,7 +10,7 @@ import {
 import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
 import { useDebounce } from "src/app/hooks/useDebounce";
-import { romeAutocompleteGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 const romeSearchMatchToProposal = ({
   matchRanges,
@@ -90,7 +90,7 @@ export const AppellationAutocomplete = ({
       try {
         setIsSearching(true);
         const romeOptions =
-          await romeAutocompleteGateway.getAppellationDtoMatching(
+          await outOfReduxDependencies.formCompletionGateway.getAppellationDtoMatching(
             sanitizedTerm,
           );
         setOptions(

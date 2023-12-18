@@ -1,6 +1,6 @@
 import React from "react";
 import { AddressAndPosition } from "shared";
-import { apiAddressGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 
 export const getAddressesFromApi = async (
   term: string,
@@ -9,7 +9,8 @@ export const getAddressesFromApi = async (
 ): Promise<AddressAndPosition[]> => {
   try {
     setIsSearching(true);
-    const addresses = await apiAddressGateway.lookupStreetAddress(term);
+    const addresses =
+      await outOfReduxDependencies.addressGateway.lookupStreetAddress(term);
     setOptions(addresses);
     return addresses;
   } catch (_e: any) {

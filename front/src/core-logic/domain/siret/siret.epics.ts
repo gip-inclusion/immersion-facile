@@ -4,7 +4,7 @@ import {
   SiretAction,
   siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
-import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
+import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import { AppEpic } from "src/core-logic/storeConfig/redux.helpers";
 
@@ -42,9 +42,9 @@ const triggerSiretFetchEpic: SiretEpic = (action$) =>
 const getSiretEpic: SiretEpic = (
   action$,
   state$,
-  { siretGatewayThroughBack },
+  { formCompletionGateway },
 ) => {
-  const getSiret = makeGetSiret(siretGatewayThroughBack);
+  const getSiret = makeGetSiret(formCompletionGateway);
 
   return action$.pipe(
     filter(siretSlice.actions.siretInfoRequested.match),
@@ -74,7 +74,7 @@ const getSiretEpic: SiretEpic = (
 };
 
 const makeGetSiret =
-  (siretGatewayThroughBack: SiretGatewayThroughBack) =>
+  (siretGatewayThroughBack: FormCompletionGateway) =>
   ({
     enableInseeApi,
     shouldFetchEvenIfAlreadySaved,

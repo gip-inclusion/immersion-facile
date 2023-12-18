@@ -26,7 +26,7 @@ import { useJwt } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
-import { technicalGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
 import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
 
@@ -151,10 +151,11 @@ export const ConventionDocumentPage = ({
   const onDownloadPdfClick = async () => {
     try {
       setIsPdfLoading(true);
-      const pdfContent = await technicalGateway.htmlToPdf(
-        replaceContentsUrlWithAbsoluteUrl(document.documentElement.outerHTML),
-        jwt,
-      );
+      const pdfContent =
+        await outOfReduxDependencies.technicalGateway.htmlToPdf(
+          replaceContentsUrlWithAbsoluteUrl(document.documentElement.outerHTML),
+          jwt,
+        );
       const downloadLink = document.createElement("a");
       downloadLink.href = "data:application/pdf;base64," + pdfContent;
       downloadLink.download = `convention-immersion-${convention.id}.pdf`;

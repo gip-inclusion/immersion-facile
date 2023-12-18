@@ -1,21 +1,51 @@
 import { from, Observable } from "rxjs";
 import { match, P } from "ts-pattern";
 import {
+  AppellationMatchDto,
+  FormCompletionRoutes,
   GetSiretInfo,
   GetSiretInfoError,
+  RomeDto,
   siretApiMissingEstablishmentMessage,
   siretApiUnavailableSiretErrorMessage,
   SiretDto,
-  SiretRoutes,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
 import { HttpClient, HttpResponse } from "shared-routes";
 import type { ResponsesToHttpResponse } from "shared-routes/defineRoutes";
 import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
-import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
+import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 
-export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
-  constructor(private readonly httpClient: HttpClient<SiretRoutes>) {}
+export class HttpFormCompletionGateway implements FormCompletionGateway {
+  constructor(private readonly httpClient: HttpClient<FormCompletionRoutes>) {}
+
+  public getAppellationDtoMatching(
+    searchText: string,
+  ): Promise<AppellationMatchDto[]> {
+    return this.httpClient
+      .appellation({
+        urlParams: { searchText },
+      })
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .otherwise(otherwiseThrow),
+      );
+  }
+
+  public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
+    return from(
+      this.httpClient
+        .rome({
+          urlParams: { searchText },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
 
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
     return from(
@@ -46,8 +76,8 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
 
 const handleSiretResponses = (
   response: ResponsesToHttpResponse<
-    | SiretRoutes["getSiretInfo"]["responses"]
-    | SiretRoutes["getSiretInfoIfNotAlreadySaved"]["responses"]
+    | FormCompletionRoutes["getSiretInfo"]["responses"]
+    | FormCompletionRoutes["getSiretInfoIfNotAlreadySaved"]["responses"]
   >,
 ) =>
   match(response)

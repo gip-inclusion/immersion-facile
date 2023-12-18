@@ -19,7 +19,7 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
-import { searchGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
@@ -95,10 +95,11 @@ export const ContactByEmail = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
-    const errorKind = await searchGateway.contactEstablishment({
-      ...values,
-      message: removeMotivationPlaceholder(values.message),
-    });
+    const errorKind =
+      await outOfReduxDependencies.searchGateway.contactEstablishment({
+        ...values,
+        message: removeMotivationPlaceholder(values.message),
+      });
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };

@@ -24,7 +24,7 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import illustrationShareConvention from "src/assets/img/share-convention.svg";
-import { deviceRepository } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -42,7 +42,10 @@ const storeConventionRouteParamsOnDevice = (
 ) => {
   const { fedId, fedIdProvider, jwt, ...partialConvention } = routeParams;
   if (keys(partialConvention).length) {
-    deviceRepository.set("partialConventionInUrl", partialConvention);
+    outOfReduxDependencies.deviceRepository.set(
+      "partialConventionInUrl",
+      partialConvention,
+    );
   }
 };
 

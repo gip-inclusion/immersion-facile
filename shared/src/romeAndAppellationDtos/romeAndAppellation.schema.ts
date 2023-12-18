@@ -8,7 +8,6 @@ import type {
   MatchRangeDto,
   RomeCode,
   RomeDto,
-  RomeSearchInput,
 } from "./romeAndAppellation.dto";
 
 const codeRomeRegex = /^[A-N]\d{4}$/;
@@ -41,10 +40,6 @@ export const romeDtoSchema: z.Schema<RomeDto> = z.object({
   romeLabel: zTrimmedString,
 });
 export const romeListSchema: z.Schema<RomeDto[]> = z.array(romeDtoSchema);
-
-export const romeAutocompleteInputSchema: z.Schema<RomeSearchInput> = z.object({
-  searchText: zTrimmedString,
-});
 
 const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({
   startIndexInclusive: z

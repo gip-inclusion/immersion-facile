@@ -1,15 +1,32 @@
 import { BehaviorSubject, delay, Observable, of, Subject } from "rxjs";
-import { AppellationMatchDto, RomeDto, sleep } from "shared";
-import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
+import {
+  apiSirenNotAvailableSiret,
+  apiSirenUnexpectedError,
+  AppellationMatchDto,
+  conflictErrorSiret,
+  GetSiretInfo,
+  RomeDto,
+  siretApiMissingEstablishmentMessage,
+  siretApiUnavailableSiretErrorMessage,
+  siretApiUnexpectedErrorErrorMessage,
+  SiretDto,
+  SiretEstablishmentDto,
+  siretSchema,
+  sleep,
+  tooManiSirenRequestsSiretErrorMessage,
+  tooManySirenRequestsSiret,
+} from "shared";
+import { FormCompletionGateway } from "../../ports/FormCompletionGateway";
 
-export class InMemoryRomeAutocompleteGateway
-  implements RomeAutocompleteGateway
-{
+export class SimulatedFormCompletionGateway implements FormCompletionGateway {
   readonly #romeDtos$: Subject<RomeDto[]>;
 
   constructor(
-    private readonly seedRomeDtos?: RomeDto[],
     private readonly simulatedLatency = 0,
+    public sireneEstablishments: {
+      [siret: SiretDto]: SiretEstablishmentDto;
+    } = {},
+    seedRomeDtos?: RomeDto[],
   ) {
     this.#romeDtos$ = seedRomeDtos
       ? new BehaviorSubject(seedRomeDtos)
@@ -86,27 +103,46 @@ export class InMemoryRomeAutocompleteGateway
       : this.#romeDtos$;
   }
 
+  public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
+    const response$ = of(this.#simulatedResponse(siret));
+    return this.simulatedLatency
+      ? response$.pipe(delay(this.simulatedLatency))
+      : response$;
+  }
+
+  public getSiretInfoIfNotAlreadySaved(
+    siret: SiretDto,
+  ): Observable<GetSiretInfo> {
+    return this.getSiretInfo(siret);
+  }
+
+  public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
+    const response = this.#simulatedResponse(siret);
+    const response$ = of(
+      response === "Establishment with this siret is already in our DB",
+    );
+    return this.simulatedLatency
+      ? response$.pipe(delay(this.simulatedLatency))
+      : response$;
+  }
+
   // for test purpose
   public get romeDtos$() {
     return this.#romeDtos$;
   }
-}
 
-export const seedRomeDtos: RomeDto[] = [
-  {
-    romeCode: "C1504",
-    romeLabel: "Transaction immobilière",
-  },
-  {
-    romeCode: "D1102",
-    romeLabel: "Boulangerie - viennoiserie",
-  },
-  {
-    romeCode: "D1101",
-    romeLabel: "Boucherie",
-  },
-  {
-    romeCode: "D1105",
-    romeLabel: "Poissonneriee",
-  },
-];
+  #simulatedResponse(rawSiret: SiretDto): GetSiretInfo {
+    const siret = siretSchema.parse(rawSiret);
+
+    if (siret === tooManySirenRequestsSiret)
+      return tooManiSirenRequestsSiretErrorMessage;
+    if (siret === apiSirenNotAvailableSiret)
+      return siretApiUnavailableSiretErrorMessage;
+    if (siret === conflictErrorSiret)
+      return "Establishment with this siret is already in our DB";
+    if (siret === apiSirenUnexpectedError)
+      throw new Error(siretApiUnexpectedErrorErrorMessage);
+    const establishment = this.sireneEstablishments[siret];
+    return establishment || siretApiMissingEstablishmentMessage;
+  }
+}

@@ -10,7 +10,7 @@ import {
 
 const makeFeedRomeAutocompleteGatewayWithRomeDtos =
   (dependencies: TestDependencies) => (romeDtos: RomeDto[]) => {
-    dependencies.romeAutocompleteGateway.romeDtos$.next(romeDtos);
+    dependencies.formCompletionGateway.romeDtos$.next(romeDtos);
   };
 
 const makeExpectSelectedRomeToEqual =

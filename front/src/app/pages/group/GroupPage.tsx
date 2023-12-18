@@ -13,7 +13,7 @@ import {
 } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
-import { searchGateway } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { GroupListResults } from "./GroupListResults";
 
 type GroupPageProps = {
@@ -30,7 +30,9 @@ export const GroupPage = ({ route }: GroupPageProps) => {
 
   const getInitialGroupData = useCallback(async () => {
     setLoading(true);
-    const response = await searchGateway.getGroupBySlug(groupSlug);
+    const response = await outOfReduxDependencies.searchGateway.getGroupBySlug(
+      groupSlug,
+    );
     const { group, results } = response;
     setGroup(group);
     setInitialResults(results);

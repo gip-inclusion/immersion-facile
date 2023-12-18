@@ -24,7 +24,7 @@ import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/Conven
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import { deviceRepository } from "src/config/dependencies";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 
 type ConventionRoutes =
@@ -41,7 +41,7 @@ export const conventionInitialValuesFromUrl = ({
   internshipKind: InternshipKind;
 }): ConventionPresentation => {
   const params = mergeObjectsExceptFalsyValues(
-    deviceRepository.get("partialConventionInUrl") ?? {},
+    outOfReduxDependencies.deviceRepository.get("partialConventionInUrl") ?? {},
     route.params satisfies ConventionParamsInUrl,
   );
 
