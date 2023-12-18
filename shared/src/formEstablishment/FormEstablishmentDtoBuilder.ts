@@ -143,9 +143,7 @@ export class FormEstablishmentDtoBuilder
   public withNextAvailabilityDate(nextAvailabilityDate: Date | undefined) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
-      nextAvailabilityDate: nextAvailabilityDate
-        ? nextAvailabilityDate.toISOString()
-        : undefined,
+      nextAvailabilityDate: nextAvailabilityDate?.toISOString(),
     });
   }
 
