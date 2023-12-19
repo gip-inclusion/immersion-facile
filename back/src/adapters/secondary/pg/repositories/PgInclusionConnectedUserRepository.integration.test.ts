@@ -36,6 +36,7 @@ const agency1 = new AgencyDtoBuilder()
 const agency2 = new AgencyDtoBuilder()
   .withId("22222222-2222-4bbb-2222-222222222222")
   .withName("Agence 2")
+  .withKind("cci")
   .build();
 
 describe("PgInclusionConnectedUserRepository", () => {

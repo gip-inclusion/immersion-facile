@@ -259,7 +259,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyId: conventionIdB,
           agencyName: "agency B",
           agencyDepartment: "76",
-          agencyKind: "autre",
+          agencyKind: "cci",
           agencySiret: "11112222000088",
         }),
       ]);
