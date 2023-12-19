@@ -62,7 +62,7 @@ export type WithAgencyDto = {
 export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> &
   AgencyDtoSensitiveFields;
 
-export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
+export type wPartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
 
 export type AgencyId = Flavor<string, "AgencyId">;
 export type AgencyIdResponse = AgencyId | undefined;

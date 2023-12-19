@@ -608,12 +608,25 @@ describe("PgAgencyRepository", () => {
       await agencyRepository.insert(agency2);
       expect(await agencyRepository.getAgencies({})).toHaveLength(2);
     });
+
+    it("throws error when agency already exists", async () => {
+      agency2.name = agency1.name;
+      agency2.address = {
+        ...agency1.address,
+      };
+      await agencyRepository.insert(agency1);
+
+      await expectPromiseToFailWithError(
+        agencyRepository.insert(agency2),
+        new ConflictError("Similar agency already exists"),
+      );
+    });
   });
 
   describe("update", () => {
     const agency1 = agency1builder
       .withPosition(40, 2)
-      .withStatus("needsReview")
+      .withStatus("active")
       .build();
 
     it("updates the entire entity", async () => {
@@ -655,6 +668,20 @@ describe("PgAgencyRepository", () => {
       const inDb = await agencyRepository.getAgencies({});
       expect(inDb).toHaveLength(1);
       expectToEqual(inDb[0], { ...agency1, status: "active" });
+    });
+
+    it("throws an error if agency already exists with same information", async () => {
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+      agency2.name = agency1.name;
+      agency2.address = {
+        ...agency1.address,
+      };
+
+      await expectPromiseToFailWithError(
+        agencyRepository.update(agency2),
+        new ConflictError("Similar agency already exists"),
+      );
     });
   });
 

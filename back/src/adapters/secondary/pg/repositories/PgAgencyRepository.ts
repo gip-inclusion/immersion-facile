@@ -3,6 +3,7 @@ import format from "pg-format";
 import { map } from "ramda";
 import {
   AbsoluteUrl,
+  AddressDto,
   AgencyDto,
   AgencyId,
   AgencyKind,
@@ -227,6 +228,7 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
+    await this.#throwConflictErrorOnAlreadyExistingAgency(agency);
     const pgAgency: InsertPgAgency = {
       id: agency.id,
       name: agency.name,
@@ -266,6 +268,10 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async update(agency: PartialAgencyDto): Promise<void> {
+    await this.#throwConflictErrorOnAlreadyExistingAgency({
+      name: agency.name,
+      address: agency.address,
+    });
     await this.transaction
       .updateTable("agencies")
       .set({
@@ -330,6 +336,31 @@ export class PgAgencyRepository implements AgencyRepository {
         }),
       ).as("agency"),
     ]);
+
+  #throwConflictErrorOnAlreadyExistingAgency = async ({
+    name,
+    address,
+  }: {
+    name: string;
+    address: AddressDto;
+  }) => {
+    const alreadyExistingAgencies =
+      await this.#getAgencyWithJsonBuiltQueryBuilder()
+        .where("a.name", "=", name)
+        .where("a.status", "in", ["active", "from-api-PE"])
+        .where(
+          "a.street_number_and_address",
+          "=",
+          address.streetNumberAndAddress,
+        )
+        .where("a.city", "=", address.city)
+        .execute()
+        .then(map((row) => row.agency));
+    console.log(alreadyExistingAgencies.length);
+    console.log(alreadyExistingAgencies);
+    if (alreadyExistingAgencies.length > 0)
+      throw new ConflictError("Similar agency already exists");
+  };
 }
 
 const STPointStringFromPosition = (position: GeoPositionDto) =>
