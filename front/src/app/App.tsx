@@ -1,7 +1,6 @@
 import React, { useLayoutEffect } from "react";
 import { useDispatch } from "react-redux";
 import { CrispChat } from "react-design-system";
-import { ReloadPrompt } from "src/app/components/ReloadPrompt";
 import { useFetchFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { MatomoTagManager } from "src/app/MatomoTagManager";
 import { ENV } from "src/config/environmentVariables";
@@ -19,7 +18,6 @@ export const App = () => {
   useAppIsReady();
   return (
     <>
-      <ReloadPrompt />
       <Router />
       {ENV.crispWebSiteId && <CrispChat crispWebsiteId={ENV.crispWebSiteId} />}
 
