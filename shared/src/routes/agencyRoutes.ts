@@ -11,7 +11,10 @@ import {
   withAgencyStatusSchema,
 } from "../agency/agency.schema";
 import { withAuthorizationHeaders } from "../headers";
-import { legacyUnauthenticatedErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import {
+  legacyHttpErrorSchema,
+  legacyUnauthenticatedErrorSchema,
+} from "../httpClient/errors/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 
 const agencyWithIdForAdminUrl = `/admin/agencies/:agencyId` as const;
@@ -39,6 +42,7 @@ export const agencyRoutes = defineRoutes({
     responses: {
       200: expressEmptyResponseBody,
       401: legacyUnauthenticatedErrorSchema,
+      409: legacyHttpErrorSchema,
     },
   }),
   listAgenciesWithStatus: defineRoute({
@@ -63,6 +67,7 @@ export const agencyRoutes = defineRoutes({
     requestBodySchema: createAgencySchema,
     responses: {
       200: expressEmptyResponseBody,
+      409: legacyHttpErrorSchema,
     },
   }),
   getImmersionFacileAgencyId: defineRoute({

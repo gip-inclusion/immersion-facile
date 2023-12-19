@@ -113,11 +113,13 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
         questionnaireUrl:
           values.kind === "pole-emploi" ? "" : values.questionnaireUrl,
       })
-      .then(() => setSubmitFeedback({ kind: "agencyAdded" }))
+      .then(() => {
+        setSubmitFeedback({ kind: "agencyAdded" });
+      })
       .catch((e) => {
         //eslint-disable-next-line  no-console
         console.log("AddAgencyPage", e);
-        setSubmitFeedback(e);
+        setSubmitFeedback({ kind: "errored", errorMessage: e.message });
       });
   };
 

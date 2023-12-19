@@ -24,7 +24,14 @@ export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}
 
   public async addAgency(createAgencyParams: CreateAgencyDto): Promise<void> {
-    await this.httpClient.addAgency({ body: createAgencyParams });
+    await this.httpClient
+      .addAgency({ body: createAgencyParams })
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 409 }, logBodyAndThrow)
+          .otherwise(otherwiseThrow),
+      );
   }
 
   public getAgencyAdminById$(
@@ -166,6 +173,7 @@ export class HttpAgencyGateway implements AgencyGateway {
           match(response)
             .with({ status: 200 }, () => undefined)
             .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 409 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
