@@ -28,6 +28,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: conventionReadSchema,
+      400: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
       404: legacyHttpErrorSchema,
     },

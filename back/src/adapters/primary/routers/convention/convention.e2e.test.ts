@@ -321,6 +321,25 @@ describe("convention e2e", () => {
       },
     );
 
+    it("400 - no JWT", async () => {
+      const response = await magicLinkRequest.getConvention({
+        urlParams: {
+          conventionId: convention.id,
+        },
+        headers: undefined as unknown as WithAuthorizationHeader,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          issues: ["authorization : Required"],
+          message:
+            "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /auth/demandes-immersion/:conventionId",
+          status: 400,
+        },
+        status: 400,
+      });
+    });
+
     it("403 - JWT Expired", async () => {
       const response = await magicLinkRequest.getConvention({
         urlParams: {
