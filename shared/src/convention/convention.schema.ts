@@ -42,6 +42,7 @@ import {
   CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   CCI_WEEKLY_MAX_PERMITTED_HOURS,
+  CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
   ConventionCommon,
   ConventionDto,
   ConventionExternalId,
@@ -510,7 +511,9 @@ const addIssueIfLimitedScheduleHoursExceeded = (
     beneficiaryAgeAtConventionStart >= CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
     weeklyHours.some(
       (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_MAX_PERMITTED_HOURS,
-    )
+    ) &&
+    new Date(convention.dateSubmission).getTime() >=
+      CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE.getTime()
   ) {
     addIssue(
       `La durée maximale hebdomadaire pour un mini-stage est de ${CCI_WEEKLY_MAX_PERMITTED_HOURS}h`,
