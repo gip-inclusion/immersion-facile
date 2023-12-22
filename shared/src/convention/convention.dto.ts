@@ -97,6 +97,9 @@ export const MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT = 10;
 export const CCI_WEEKLY_LIMITED_SCHEDULE_HOURS = 30;
 export const CCI_WEEKLY_LIMITED_SCHEDULE_AGE = 15;
 export const CCI_WEEKLY_MAX_PERMITTED_HOURS = 35;
+export const CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE = new Date(
+  "2023-12-22",
+);
 
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",

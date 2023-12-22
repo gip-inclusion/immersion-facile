@@ -1,4 +1,4 @@
-import { addDays, subYears } from "date-fns";
+import { addDays, subDays, subYears } from "date-fns";
 import { keys } from "ramda";
 import { z, ZodError } from "zod";
 import {
@@ -10,7 +10,13 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "../test.helpers";
-import { DailyScheduleDto, DateIntervalDto, Weekday } from "..";
+import {
+  CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
+  DailyScheduleDto,
+  DateIntervalDto,
+  toDateString,
+  Weekday,
+} from "..";
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
@@ -595,16 +601,17 @@ describe("conventionDtoSchema", () => {
         ]);
       });
 
-      it("Add issue when week hours is greater than cci max hours", () => {
-        const dateStart = new Date("2023-12-18").toISOString();
-        const dateEnd = new Date("2023-12-23").toISOString();
-        const convention = new ConventionDtoBuilder()
+      describe("Add issue when week hours is greater than cci max hours", () => {
+        const convention42h = new ConventionDtoBuilder()
           .withInternshipKind("mini-stage-cci")
-          .withDateStart(dateStart)
-          .withDateEnd(dateEnd)
+          .withDateStart(new Date("2023-12-25").toISOString())
+          .withDateEnd(new Date("2023-12-30").toISOString())
           .withSchedule(reasonableSchedule)
           .withBeneficiary({
-            birthdate: new Date("2008-12-12").toISOString(),
+            birthdate: subYears(
+              CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
+              18,
+            ).toISOString(),
             firstName: "Jean",
             lastName: "Bono",
             role: "beneficiary",
@@ -616,9 +623,30 @@ describe("conventionDtoSchema", () => {
             isRqth: false,
           })
           .build();
-        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-          "La durée maximale hebdomadaire pour un mini-stage est de 35h",
-        ]);
+
+        it("valid when convention created before release date", () => {
+          expectConventionDtoToBeValid(
+            new ConventionDtoBuilder(convention42h)
+              .withDateSubmission(
+                toDateString(
+                  subDays(CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE, 1),
+                ),
+              )
+              .build(),
+          );
+        });
+
+        it("issue after release date", () => {
+          expectConventionInvalidWithIssueMessages(
+            conventionSchema,
+            new ConventionDtoBuilder(convention42h)
+              .withDateSubmission(
+                toDateString(CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE),
+              )
+              .build(),
+            ["La durée maximale hebdomadaire pour un mini-stage est de 35h"],
+          );
+        });
       });
     });
 
