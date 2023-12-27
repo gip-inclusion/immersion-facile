@@ -471,7 +471,7 @@ export const emailTemplatesByName =
         signatoriesSummary,
       }) => ({
         subject:
-          "RAPPEL - La convention démarrant d'ici 3 jours n'est pas complètement signée",
+          "RAPPEL - La demande de convention d'immersion faite il y a deux jours n'est pas complètement signée",
         greetings: greetingsWithConventionId(
           conventionId,
           `${actorFirstName} ${actorLastName}`,
