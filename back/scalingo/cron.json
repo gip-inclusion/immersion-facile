@@ -41,7 +41,7 @@
       "size": "M"
     },
     {
-      "command": "15 05 * * * pnpm back run trigger-convention-reminder",
+      "command": "15 07 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     }
   ]
