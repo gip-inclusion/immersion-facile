@@ -1,5 +1,6 @@
 import {
   AgencyDto,
+  AgencyDtoBuilder,
   CreateAgencyDto,
   expectPromiseToFail,
   expectPromiseToFailWithError,
@@ -9,7 +10,10 @@ import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import {
+  ConflictError,
+  NotFoundError,
+} from "../../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
@@ -189,6 +193,26 @@ describe("AddAgency use case", () => {
 
       expectToEqual(uow.agencyRepository.agencies, []);
       expectToEqual(uow.outboxRepository.events, []);
+    });
+
+    it("fails to create if the has the same address and kind than an existing one", async () => {
+      const existingAgency = new AgencyDtoBuilder().build();
+      const newAgency = new AgencyDtoBuilder()
+        .withId("agency-to-create-id")
+        .withStatus("needsReview")
+        .withAddress(existingAgency.address)
+        .withKind(existingAgency.kind)
+        .withAgencySiret("11110000111100")
+        .build();
+
+      uow.agencyRepository.setAgencies([existingAgency]);
+
+      await expectPromiseToFailWithError(
+        addAgency.execute(newAgency),
+        new ConflictError(
+          "An other agency exists with the same address and kind",
+        ),
+      );
     });
   });
 });

@@ -12,6 +12,7 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 import { referedAgencyMissingMessage } from "../../ports/AgencyRepository";
 
 export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
@@ -43,6 +44,8 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
       status: "needsReview",
       questionnaireUrl: params.questionnaireUrl || "",
     };
+
+    await throwConflictErrorOnSimilarAgencyFound({ uow, agency });
 
     await Promise.all([
       uow.agencyRepository.insert(agency),
