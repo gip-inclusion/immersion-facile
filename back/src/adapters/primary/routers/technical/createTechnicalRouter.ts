@@ -66,12 +66,6 @@ export const createTechnicalRouter = (
     sendHttpResponse(req, res, deps.useCases.getFeatureFlags.execute),
   );
 
-  technicalSharedRouter.renewMagicLink(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.renewConventionMagicLink.execute(req.query),
-    ),
-  );
-
   technicalSharedRouter.htmlToPdf(
     deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>

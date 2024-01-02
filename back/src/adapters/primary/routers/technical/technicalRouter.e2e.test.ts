@@ -1,16 +1,11 @@
 import { SuperTest, Test } from "supertest";
 import {
   AbsoluteUrl,
-  AgencyDtoBuilder,
   BrevoInboundBody,
-  ConventionDtoBuilder,
-  createConventionMagicLinkPayload,
   displayRouteName,
-  expectEmailOfType,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
-  frontRoutes,
   TechnicalRoutes,
   technicalRoutes,
   ValidateEmailStatus,
@@ -23,17 +18,12 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
-import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
-  makeGenerateJwtES256,
-  makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
 import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { shortLinkNotFoundMessage } from "../../../../domain/core/ShortLink";
-import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
-import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
@@ -47,7 +37,6 @@ describe("technical router", () => {
   let appConfig: AppConfig;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: InMemoryGateways;
-  let eventCrawler: BasicEventCrawler;
 
   beforeEach(async () => {
     let request: SuperTest<Test>;
@@ -58,7 +47,6 @@ describe("technical router", () => {
       appConfig,
       inMemoryUow,
       gateways,
-      eventCrawler,
     } = await buildTestApp(
       new AppConfigBuilder({
         INBOUND_EMAIL_ALLOWED_IPS: "130.10.10.10,::ffff:127.0.0.1",
@@ -168,79 +156,6 @@ describe("technical router", () => {
         body: {},
         status: 403,
       });
-    });
-  });
-
-  describe("/renewMagicLink", () => {
-    it(`${displayRouteName(
-      technicalRoutes.renewMagicLink,
-    )} 200 - sends the updated magic link`, async () => {
-      const validConvention = new ConventionDtoBuilder().build();
-
-      const agency = AgencyDtoBuilder.create(validConvention.agencyId)
-        .withName("TEST-name")
-        .withAdminEmails(["admin@email.fr"])
-        .withQuestionnaireUrl("TEST-questionnaireUrl")
-        .withSignature("TEST-signature")
-        .build();
-
-      const convention = new ConventionDtoBuilder().build();
-      inMemoryUow.conventionRepository.setConventions([convention]);
-      inMemoryUow.agencyRepository.setAgencies([agency]);
-
-      gateways.timeGateway.setNextDate(new Date());
-
-      generateConventionJwt = makeGenerateJwtES256<"convention">(
-        appConfig.jwtPrivateKey,
-        3600 * 24, // one day
-      );
-      const shortLinkIds = ["shortLink1", "shortLinkg2"];
-      gateways.shortLinkGenerator.addMoreShortLinkIds(shortLinkIds);
-
-      const originalUrl = `${appConfig.immersionFacileBaseUrl}/${frontRoutes.conventionToSign}`;
-
-      const expiredJwt = generateConventionJwt(
-        createConventionMagicLinkPayload({
-          id: validConvention.id,
-          role: "beneficiary",
-          email: validConvention.signatories.beneficiary.email,
-          now: new Date(),
-        }),
-      );
-
-      const response = await httpClient.renewMagicLink({
-        queryParams: {
-          expiredJwt,
-          originalUrl: encodeURIComponent(originalUrl),
-        },
-      });
-
-      expect(response.status).toBe(200);
-
-      await processEventsForEmailToBeSent(eventCrawler);
-
-      const sentEmails = gateways.notification.getSentEmails();
-
-      expect(sentEmails).toHaveLength(1);
-
-      const email = expectEmailOfType(sentEmails[0], "MAGIC_LINK_RENEWAL");
-      expect(email.recipients).toEqual([
-        validConvention.signatories.beneficiary.email,
-      ]);
-
-      const magicLink = await shortLinkRedirectToLinkWithValidation(
-        email.params.magicLink,
-        httpClient,
-      );
-
-      const newUrlStart = `${originalUrl}?jwt=`;
-
-      expect(magicLink.startsWith(newUrlStart)).toBeTruthy();
-      const renewedJwt = magicLink.replace(newUrlStart, "");
-      expect(renewedJwt !== expiredJwt).toBeTruthy();
-      expect(
-        makeVerifyJwtES256(appConfig.jwtPublicKey)(renewedJwt),
-      ).toBeDefined();
     });
   });
 

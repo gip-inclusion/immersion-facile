@@ -30,5 +30,11 @@ export const createConventionRouter = (deps: AppDependencies) => {
     ),
   );
 
+  conventionSharedRouter.renewMagicLink(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.renewConventionMagicLink.execute(req.query),
+    ),
+  );
+
   return expressRouter;
 };
