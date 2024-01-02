@@ -610,21 +610,6 @@ describe("PgAgencyRepository", () => {
       await agencyRepository.insert(agency2);
       expect(await agencyRepository.getAgencies({})).toHaveLength(2);
     });
-
-    it("throws error when agency already exists", async () => {
-      agency2.kind = agency1.kind;
-      agency2.address = {
-        ...agency1.address,
-      };
-      await agencyRepository.insert(agency1);
-
-      await expectPromiseToFailWithError(
-        agencyRepository.insert(agency2),
-        new ConflictError(
-          "Une agence de type pole-emploi existe déjà à cette adresse. Il s'agit de l'agence agency1.",
-        ),
-      );
-    });
   });
 
   describe("update", () => {
@@ -673,31 +658,38 @@ describe("PgAgencyRepository", () => {
       expect(inDb).toHaveLength(1);
       expectToEqual(inDb[0], { ...agency1, status: "active" });
     });
+  });
 
-    it("throws an error if agency already exists with same information", async () => {
-      await agencyRepository.insert(agency1);
-      await agencyRepository.insert(agency2);
-      agency2.kind = agency1.kind;
-      agency2.address = {
-        ...agency1.address,
-      };
+  describe("alreadyHasActiveAgencyWithSameAddressAndKind", () => {
+    it("return false if no agency exists with given address and kind", async () => {
+      const hasAlreadySimilarAgency =
+        await agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
+          address: agency1.address,
+          kind: agency1.kind,
+          idToIgnore: agency1.id,
+        });
 
-      await expectPromiseToFailWithError(
-        agencyRepository.update(agency2),
-        new ConflictError(
-          "Une agence de type pole-emploi existe déjà à cette adresse. Il s'agit de l'agence agency1.",
-        ),
-      );
+      expect(hasAlreadySimilarAgency).toBe(false);
     });
 
-    it("Update agency if name and address didn't change", async () => {
+    it("return true if there is an agency with given address and kind", async () => {
+      const newAgency = new AgencyDtoBuilder()
+        .withAddress(agency1.address)
+        .withKind(agency1.kind)
+        .withStatus("needsReview")
+        .build();
+
       await agencyRepository.insert(agency1);
-      const updatedAgency1 = {
-        ...agency1,
-        counsellorEmails: ["blabla@gmail.com"],
-      };
-      await agencyRepository.update(updatedAgency1);
-      expectToEqual(await agencyRepository.getAgencies({}), [updatedAgency1]);
+      await agencyRepository.insert(newAgency);
+
+      const hasAlreadySimilarAgency =
+        await agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
+          address: newAgency.address,
+          kind: newAgency.kind,
+          idToIgnore: newAgency.id,
+        });
+
+      expect(hasAlreadySimilarAgency).toBe(true);
     });
   });
 
