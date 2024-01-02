@@ -164,8 +164,8 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
       }) => {
         shortLinkIdGateway.addMoreShortLinkIds(
           expectedRecipients.flatMap((expectedRecipient) => [
-            `shortLinkId_${expectedRecipient}_1`,
-            `shortLinkId_${expectedRecipient}_2`,
+            `shortLinkId_${expectedRecipient}_1_${modifierRole}`,
+            `shortLinkId_${expectedRecipient}_2_${modifierRole}`,
           ]),
         );
         const justification = "Change required.";
@@ -185,20 +185,22 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
           const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
             {
               id: convention.id,
-              role: requesterRole,
+              role: modifierRole,
               email: expectedRecipient,
               now: timeGateway.now(),
             };
           return {
             ...prev,
-            [`shortLinkId_${expectedRecipient}_1`]: fakeGenerateMagicLinkUrlFn({
-              ...magicLinkCommonFields,
-              targetRoute: frontRoutes.conventionImmersionRoute,
-            }),
-            [`shortLinkId_${expectedRecipient}_2`]: fakeGenerateMagicLinkUrlFn({
-              ...magicLinkCommonFields,
-              targetRoute: frontRoutes.conventionStatusDashboard,
-            }),
+            [`shortLinkId_${expectedRecipient}_1_${modifierRole}`]:
+              fakeGenerateMagicLinkUrlFn({
+                ...magicLinkCommonFields,
+                targetRoute: frontRoutes.conventionImmersionRoute,
+              }),
+            [`shortLinkId_${expectedRecipient}_2_${modifierRole}`]:
+              fakeGenerateMagicLinkUrlFn({
+                ...magicLinkCommonFields,
+                targetRoute: frontRoutes.conventionStatusDashboard,
+              }),
           };
         }, {});
 
@@ -218,11 +220,11 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
               justification,
               magicLink: makeShortLinkUrl(
                 config,
-                `shortLinkId_${expectedRecipient}_1`,
+                `shortLinkId_${expectedRecipient}_1_${modifierRole}`,
               ),
               conventionStatusLink: makeShortLinkUrl(
                 config,
-                `shortLinkId_${expectedRecipient}_2`,
+                `shortLinkId_${expectedRecipient}_2_${modifierRole}`,
               ),
               signature: agency.signature,
               agencyLogoUrl: agency.logoUrl,

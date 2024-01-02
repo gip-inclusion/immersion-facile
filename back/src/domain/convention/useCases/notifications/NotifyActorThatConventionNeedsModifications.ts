@@ -62,7 +62,7 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
       kind: "email",
       templatedContent: await this.#prepareEmail(
         payload.convention,
-        payload.requesterRole,
+        payload.modifierRole,
         recipientOrError,
         uow,
         payload.justification,
@@ -79,7 +79,7 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
 
   async #prepareEmail(
     convention: ConventionDto,
-    role: Role,
+    recipientRole: Role,
     recipient: string,
     uow: UnitOfWork,
     justification: string,
@@ -89,11 +89,11 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
     const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
       {
         id: convention.id,
-        role,
+        role: recipientRole,
         email: recipient,
         now: this.timeGateway.now(),
         // UGLY : need to rework, handling of JWT payloads
-        ...(role === "backOffice"
+        ...(recipientRole === "backOffice"
           ? { sub: this.config.backofficeUsername }
           : {}),
       };
