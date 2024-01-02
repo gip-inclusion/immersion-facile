@@ -109,6 +109,28 @@ const makeStatusFilterSQL = (
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
 
+  public async alreadyHasActiveAgencyWithSameAddressAndKind({
+    idToIgnore,
+    kind,
+    address,
+  }: {
+    idToIgnore: AgencyId;
+    kind: AgencyKind;
+    address: AddressDto;
+  }) {
+    const alreadyExistingAgencies = await this.transaction
+      .selectFrom("agencies")
+      .selectAll()
+      .where("kind", "=", kind)
+      .where("status", "in", ["active", "from-api-PE"])
+      .where("street_number_and_address", "=", address.streetNumberAndAddress)
+      .where("city", "=", address.city)
+      .where("id", "!=", idToIgnore)
+      .execute();
+
+    return alreadyExistingAgencies.length !== 0;
+  }
+
   public async getAgencies({
     filters = {},
     limit,
@@ -228,7 +250,6 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
-    await this.#throwConflictErrorOnAlreadyExistingAgency(agency);
     const pgAgency: InsertPgAgency = {
       id: agency.id,
       name: agency.name,
@@ -268,15 +289,6 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async update(agency: PartialAgencyDto): Promise<void> {
-    const agencyToUpdate = await this.getById(agency.id);
-    if (!agencyToUpdate) {
-      throw new NotFoundError(`Agency ${agency.id} to update is not found`);
-    }
-    await this.#throwConflictErrorOnAlreadyExistingAgency({
-      id: agency.id,
-      kind: agency.kind || agencyToUpdate.kind,
-      address: agency.address || agencyToUpdate.address,
-    });
     await this.transaction
       .updateTable("agencies")
       .set({
@@ -341,34 +353,6 @@ export class PgAgencyRepository implements AgencyRepository {
         }),
       ).as("agency"),
     ]);
-
-  #throwConflictErrorOnAlreadyExistingAgency = async ({
-    id,
-    kind,
-    address,
-  }: {
-    id: AgencyId;
-    kind: AgencyKind;
-    address: AddressDto;
-  }) => {
-    const alreadyExistingAgencies =
-      await this.#getAgencyWithJsonBuiltQueryBuilder()
-        .where("a.kind", "=", kind)
-        .where("a.status", "in", ["active", "from-api-PE"])
-        .where(
-          "a.street_number_and_address",
-          "=",
-          address.streetNumberAndAddress,
-        )
-        .where("a.city", "=", address.city)
-        .where("a.id", "!=", id)
-        .execute()
-        .then(map((row) => row.agency));
-    if (alreadyExistingAgencies.length > 0)
-      throw new ConflictError(
-        `Une agence de type ${kind} existe déjà à cette adresse. Il s'agit de l'agence ${alreadyExistingAgencies[0].name}.`,
-      );
-  };
 }
 
 const STPointStringFromPosition = (position: GeoPositionDto) =>
