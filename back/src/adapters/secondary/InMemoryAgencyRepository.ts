@@ -1,7 +1,9 @@
 import { values } from "ramda";
 import {
+  AddressDto,
   AgencyDto,
   AgencyId,
+  AgencyKind,
   AgencyKindFilter,
   AgencyOption,
   AgencyPositionFilter,
@@ -173,6 +175,26 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   // test purpose only
   public get agencies(): AgencyDto[] {
     return values(this.#agencies).filter(isTruthy);
+  }
+
+  public async alreadyHasActiveAgencyWithSameAddressAndKind({
+    address,
+    kind,
+    idToIgnore,
+  }: {
+    address: AddressDto;
+    kind: AgencyKind;
+    idToIgnore: AgencyId;
+  }): Promise<boolean> {
+    return this.agencies.some(
+      (agency) =>
+        agency.kind === kind &&
+        agency.address.streetNumberAndAddress ===
+          address.streetNumberAndAddress &&
+        agency.address.city === address.city &&
+        (agency.status === "active" || agency.status === "from-api-PE") &&
+        agency.id !== idToIgnore,
+    );
   }
 
   public async getAgencies({
