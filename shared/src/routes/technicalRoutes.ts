@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { renewMagicLinkRequestSchema } from "../convention/convention.schema";
 import {
   validateEmailInputSchema,
   validateEmailResponseSchema,
@@ -52,11 +51,6 @@ export const technicalRoutes = defineRoutes({
     method: "get",
     url: `/feature-flags`,
     responses: { 200: featureFlagsSchema },
-  }),
-  renewMagicLink: defineRoute({
-    method: "get",
-    url: `/renew-magic-link`,
-    queryParamsSchema: renewMagicLinkRequestSchema,
   }),
   inboundEmailParsing: defineRoute({
     method: "post",
