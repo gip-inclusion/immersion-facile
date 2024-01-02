@@ -32,7 +32,10 @@ export const agencyRoutes = defineRoutes({
     url: agencyWithIdForAdminUrl,
     requestBodySchema: withActiveOrRejectedAgencyStatusSchema,
     ...withAuthorizationHeaders,
-    responses: { 200: expressEmptyResponseBody },
+    responses: {
+      200: expressEmptyResponseBody,
+      409: legacyHttpErrorSchema,
+    },
   }),
   updateAgency: defineRoute({
     method: "put",
