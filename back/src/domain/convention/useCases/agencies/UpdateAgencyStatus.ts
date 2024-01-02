@@ -1,14 +1,12 @@
 import { UpdateAgencyRequestDto, updateAgencyRequestSchema } from "shared";
-import {
-  ConflictError,
-  NotFoundError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyRequestDto,
@@ -34,17 +32,10 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
     if (!existingAgency)
       throw new NotFoundError(`No agency found with id ${id}`);
 
-    const hasSimilarAgency =
-      await uow.agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
-        address: existingAgency.address,
-        kind: existingAgency.kind,
-        idToIgnore: existingAgency.id,
-      });
-
-    if (hasSimilarAgency)
-      throw new ConflictError(
-        "An other agency exists with the same address and kind",
-      );
+    await throwConflictErrorOnSimilarAgencyFound({
+      uow,
+      agency: existingAgency,
+    });
 
     if (status) await uow.agencyRepository.update({ id, status });
 

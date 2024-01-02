@@ -271,7 +271,7 @@ describe(`Agency routes`, () => {
 
       it("Updates the agency and returns code 200", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
+        await inMemoryUow.agencyRepository.setAgencies([agency4NeedsReview]);
 
         const updatedAgency = new AgencyDtoBuilder()
           .withId(agency4NeedsReview.id)

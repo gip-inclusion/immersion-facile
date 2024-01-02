@@ -3,9 +3,11 @@ import {
   expectObjectsToMatch,
   expectPromiseToFail,
   expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { ConflictError } from "../../../../adapters/primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -38,7 +40,7 @@ describe("Update agency", () => {
     );
   });
 
-  it("Fails trying to edit if no matching agency was found", async () => {
+  it("Fails trying to update if no matching agency was found", async () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWith(
       updateAgency.execute(agency),
@@ -46,7 +48,7 @@ describe("Update agency", () => {
     );
   });
 
-  it("Fails to add agency if address components are empty", async () => {
+  it("Fails to update agency if address components are empty", async () => {
     agencyRepository.setAgencies([initialAgencyInRepo]);
     const updatedAgency = new AgencyDtoBuilder()
       .withId(initialAgencyInRepo.id)
@@ -62,7 +64,7 @@ describe("Update agency", () => {
     await expectPromiseToFail(updateAgency.execute(updatedAgency));
   });
 
-  it("Fails to add agency if geo components are 0,0", async () => {
+  it("Fails to update agency if geo components are 0,0", async () => {
     const initialAgencyInRepo = new AgencyDtoBuilder().build();
     agencyRepository.setAgencies([initialAgencyInRepo]);
     const updatedAgency = new AgencyDtoBuilder()
@@ -73,6 +75,25 @@ describe("Update agency", () => {
       .build();
 
     await expectPromiseToFail(updateAgency.execute(updatedAgency));
+  });
+
+  it("fails to update if attempt to update to another existing agency (with same address and kind, and a status 'active' or 'from-api-PE'", async () => {
+    const existingAgency = new AgencyDtoBuilder().build();
+    const updatedAgency = new AgencyDtoBuilder()
+      .withId("agency-to-update-id")
+      .withStatus("needsReview")
+      .withAddress(existingAgency.address)
+      .withKind(existingAgency.kind)
+      .build();
+
+    agencyRepository.setAgencies([updatedAgency, existingAgency]);
+
+    await expectPromiseToFailWithError(
+      updateAgency.execute(updatedAgency),
+      new ConflictError(
+        "An other agency exists with the same address and kind",
+      ),
+    );
   });
 
   it("Updates agency and create corresponding event", async () => {
