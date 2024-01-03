@@ -1,4 +1,9 @@
-import { addBusinessDays, differenceInBusinessDays } from "date-fns";
+import {
+  addBusinessDays,
+  addDays,
+  differenceInBusinessDays,
+  subDays,
+} from "date-fns";
 import {
   ConventionDto,
   ConventionDtoBuilder,
@@ -102,14 +107,62 @@ describe("ConventionReminder use case", () => {
   });
 
   describe("Send 'ConventionReminderRequired' event", () => {
+    it("When conventions exists, not fully signed which where submitted exactly 2 days before", async () => {
+      const dateStart = addDays(now, 10).toISOString();
+
+      const convention1 = new ConventionDtoBuilder()
+        .withId("1")
+        .withStatus("PARTIALLY_SIGNED")
+        .withDateSubmission(subDays(now, 1).toISOString())
+        .withDateStart(dateStart)
+        .build();
+
+      const convention2 = new ConventionDtoBuilder()
+        .withId("2")
+        .withStatus("READY_TO_SIGN")
+        .withDateSubmission(subDays(now, 3).toISOString())
+        .withDateStart(dateStart)
+        .build();
+
+      const conventionNeedsReminder = new ConventionDtoBuilder()
+        .withId("3")
+        .withStatus("READY_TO_SIGN")
+        .withDateSubmission(subDays(now, 2).toISOString())
+        .withDateStart(dateStart)
+        .build();
+
+      uow.conventionRepository.setConventions([
+        convention1,
+        convention2,
+        conventionNeedsReminder,
+      ]);
+
+      const summary = await conventionsReminder.execute();
+      expectToEqual(summary, {
+        success: 1,
+        failures: [],
+      });
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic,
+          payload: {
+            reminderKind: "FirstReminderForSignatories",
+            conventionId: conventionNeedsReminder.id,
+          },
+        },
+      ]);
+    });
+
     it(`with kind 'FirstReminderForSignatories'
-        when there is a convention that is above 4 open days before interships start depending of convention statuses.`, async () => {
+        when there is a convention that is not fully signed and was published exactly 2 days before`, async () => {
       // Arrange
       const { startDateDifference, startDate } = prepareDates(now, 4);
       expect(startDateDifference > 3).toBeTruthy();
+      const dateSubmission = subDays(now, 2);
 
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart: startDate,
+        withDateSubmission: dateSubmission,
       });
       uow.conventionRepository.setConventions(conventions);
 
@@ -180,6 +233,7 @@ describe("ConventionReminder use case", () => {
 
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart: startDate,
+        withDateSubmission: subDays(now, 2),
       });
       uow.conventionRepository.setConventions(conventions);
 
@@ -288,14 +342,17 @@ describe("ConventionReminder use case", () => {
 
 const makeOneConventionOfEachStatuses = ({
   withDateStart,
+  withDateSubmission = subDays(withDateStart, 10),
 }: {
   withDateStart: Date;
+  withDateSubmission?: Date;
 }): ConventionDto[] =>
   conventionStatuses.map((conventionStatus, index) =>
     new ConventionDtoBuilder()
       .withId(index.toString())
       .withStatus(conventionStatus)
       .withDateStart(withDateStart.toISOString())
+      .withDateSubmission(withDateSubmission.toISOString())
       .build(),
   );
 
