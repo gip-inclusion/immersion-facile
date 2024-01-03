@@ -144,6 +144,7 @@ const addFiltersToBuilder =
     startDateGreater,
     startDateLessOrEqual,
     withStatuses,
+    dateSubmissionEqual,
   }: GetConventionsByFiltersQueries) =>
   (builder: ConventionReadQueryBuilder) => {
     const addWithStatusFilterIfNeeded: AddToBuilder = (b) =>
@@ -161,11 +162,17 @@ const addFiltersToBuilder =
         ? b.where("conventions.date_start", ">", startDateGreater)
         : b;
 
+    const addDateSubmissionEqualIfNeeded: AddToBuilder = (b) =>
+      dateSubmissionEqual
+        ? b.where("conventions.date_submission", "=", dateSubmissionEqual)
+        : b;
+
     return pipeWithValue(
       builder,
       addWithStatusFilterIfNeeded,
       addStartDateLessOrEqualFilterIfNeeded,
       addStartDateGreaterFilterIfNeeded,
+      addDateSubmissionEqualIfNeeded,
     );
   };
 

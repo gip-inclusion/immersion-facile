@@ -11,6 +11,7 @@ import { AssessmentEmailDomainTopic } from "../../core/eventBus/events";
 export type GetConventionsByFiltersQueries = {
   startDateGreater?: Date;
   startDateLessOrEqual?: Date;
+  dateSubmissionEqual?: Date;
   withStatuses?: ConventionStatus[];
 };
 

@@ -315,6 +315,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     const conventionDraftAndDateStart20230330 = new ConventionDtoBuilder()
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
+      .withDateSubmission(new Date("2023-03-05").toISOString())
       .withDateStart(new Date("2023-03-30").toISOString())
       .withDateEnd(new Date("2023-03-31").toISOString())
       .withSchedule(reasonableSchedule)
@@ -331,6 +332,28 @@ describe("Pg implementation of ConventionQueries", () => {
           conventionDraftAndDateStart20230330,
         ].map((params) => conventionRepository.save(params)),
       );
+    });
+
+    it(`getConventionsByFilters with filters :
+          - dateSubmissionEqual
+        > expect 1 convention retrieved`, async () => {
+      // Act
+      const resultAll = await conventionQueries.getConventionsByFilters({
+        dateSubmissionEqual: new Date(
+          conventionCancelledAndDateStart20230327.dateSubmission,
+        ),
+      });
+
+      // Assert
+      expectToEqual(resultAll, [
+        {
+          ...conventionCancelledAndDateStart20230327,
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+        },
+      ]);
     });
 
     it(`getConventionsByFilters with filters :

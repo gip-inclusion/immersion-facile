@@ -163,18 +163,31 @@ const makeApplyFiltersToConventions =
     startDateLessOrEqual,
     startDateGreater,
     withStatuses,
+    dateSubmissionEqual,
   }: GetConventionsByFiltersQueries) =>
   (convention: ConventionDto) => {
-    const dateStart = new Date(convention.dateStart);
-    const conditionsToExcludeConvention = [
-      startDateLessOrEqual && dateStart > startDateLessOrEqual,
-      startDateGreater && startDateGreater >= dateStart,
-      withStatuses &&
-        withStatuses.length > 0 &&
-        !withStatuses.includes(convention.status),
-    ];
+    if (
+      dateSubmissionEqual &&
+      new Date(convention.dateSubmission).getTime() !==
+        dateSubmissionEqual.getTime()
+    )
+      return false;
 
-    return !conditionsToExcludeConvention.some(
-      (condition) => condition === true,
-    );
+    if (
+      startDateLessOrEqual &&
+      new Date(convention.dateStart) > startDateLessOrEqual
+    )
+      return false;
+
+    if (startDateGreater && new Date(convention.dateStart) <= startDateGreater)
+      return false;
+
+    if (
+      withStatuses &&
+      withStatuses.length > 0 &&
+      !withStatuses.includes(convention.status)
+    )
+      return false;
+
+    return true;
   };

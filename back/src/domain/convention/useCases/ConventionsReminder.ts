@@ -1,4 +1,4 @@
-import { addBusinessDays, differenceInBusinessDays } from "date-fns";
+import { addBusinessDays, differenceInBusinessDays, subDays } from "date-fns";
 import { z } from "zod";
 import {
   castError,
@@ -60,29 +60,24 @@ export class ConventionsReminder extends TransactionalUseCase<
     _: void,
     uow: UnitOfWork,
   ): Promise<ConventionsReminderSummary> {
+    const now = this.#timeGateway.now();
     const [
       conventionsForLastSignatoryReminder,
       conventionsForAgencyReminders,
       conventionsForFirstSignatoryReminder,
     ] = await Promise.all([
       uow.conventionQueries.getConventionsByFilters({
-        startDateGreater: this.#timeGateway.now(),
-        startDateLessOrEqual: addBusinessDays(
-          this.#timeGateway.now(),
-          TWO_DAYS,
-        ),
+        startDateGreater: now,
+        startDateLessOrEqual: addBusinessDays(now, TWO_DAYS),
         withStatuses: signatoryStatuses,
       }),
       uow.conventionQueries.getConventionsByFilters({
-        startDateGreater: this.#timeGateway.now(),
-        startDateLessOrEqual: addBusinessDays(
-          this.#timeGateway.now(),
-          THREE_DAYS,
-        ),
+        startDateGreater: now,
+        startDateLessOrEqual: addBusinessDays(now, THREE_DAYS),
         withStatuses: agencyStatuses,
       }),
       uow.conventionQueries.getConventionsByFilters({
-        startDateGreater: addBusinessDays(this.#timeGateway.now(), TWO_DAYS),
+        dateSubmissionEqual: subDays(now, TWO_DAYS),
         withStatuses: [...signatoryStatuses],
       }),
     ]);
