@@ -1,4 +1,8 @@
-import {AgencyDto, AgencyToReview, PartialAgencyDto, withActiveOrRejectedAgencyStatusSchema} from "shared";
+import {
+  PartialAgencyDto,
+  UpdateAgencyStatusParams,
+  updateAgencyStatusParamsSchema,
+} from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
@@ -9,10 +13,10 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<
-  AgencyToReview,
+  UpdateAgencyStatusParams,
   void
 > {
-  protected inputSchema = withActiveOrRejectedAgencyStatusSchema;
+  protected inputSchema = updateAgencyStatusParamsSchema;
 
   #createNewEvent: CreateNewEvent;
 
@@ -25,32 +29,42 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
   }
 
   public async _execute(
-    agencyToReview: AgencyToReview,
+    updateAgencyStatusParams: UpdateAgencyStatusParams,
     uow: UnitOfWork,
   ): Promise<void> {
-    const existingAgency = await uow.agencyRepository.getById(agencyToReview.id);
+    const existingAgency = await uow.agencyRepository.getById(
+      updateAgencyStatusParams.id,
+    );
     if (!existingAgency)
-      throw new NotFoundError(`No agency found with id ${agencyToReview.id}`);
+      throw new NotFoundError(
+        `No agency found with id ${updateAgencyStatusParams.id}`,
+      );
 
     await throwConflictErrorOnSimilarAgencyFound({
       uow,
       agency: existingAgency,
     });
 
-    const updatedAgencyParams: PartialAgencyDto = { id: agencyToReview.id,
-      status: agencyToReview.status,
+    const updatedAgencyParams: PartialAgencyDto = {
+      id: updateAgencyStatusParams.id,
+      status: updateAgencyStatusParams.status,
       rejectionJustification:
-        agencyToReview.status === "rejected"
-          ? agencyToReview.rejectionJustification
-          : undefined, }
-    if (agencyToReview.status) await uow.agencyRepository.update(updatedAgencyParams);
+        updateAgencyStatusParams.status === "rejected"
+          ? updateAgencyStatusParams.rejectionJustification
+          : undefined,
+    };
+    await uow.agencyRepository.update(updatedAgencyParams);
 
-    if (agencyToReview.status === "active" || agencyToReview.status === "rejected") {
+    if (
+      updateAgencyStatusParams.status === "active" ||
+      updateAgencyStatusParams.status === "rejected"
+    ) {
       await uow.outboxRepository.save(
         this.#createNewEvent({
-          topic: agencyToReview.status === "active"
-            ? "AgencyActivated"
-            : "AgencyRejected",
+          topic:
+            updateAgencyStatusParams.status === "active"
+              ? "AgencyActivated"
+              : "AgencyRejected",
           payload: { agency: { ...existingAgency, ...updatedAgencyParams } },
         }),
       );

@@ -6,11 +6,11 @@ import {
   AgencyOption,
   AgencyPublicDisplayDto,
   AgencyRoutes,
-  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
+  UpdateAgencyStatusParams,
   WithAgencyId,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -181,19 +181,21 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public async validateOrRejectAgency(
     adminToken: BackOfficeJwt,
-    agencyToReview: AgencyToReview,
+    { id, ...rest }: UpdateAgencyStatusParams,
   ): Promise<void> {
     await this.httpClient.updateAgencyStatus({
-      body: agencyToReview,
+      body: rest,
       headers: { authorization: adminToken },
-      urlParams: { agencyId: agencyToReview.id },
+      urlParams: { agencyId: id },
     });
   }
 
   public validateOrRejectAgency$(
     adminToken: BackOfficeJwt,
-    agencyToReview: AgencyToReview,
+    updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
-    return from(this.validateOrRejectAgency(adminToken, agencyToReview));
+    return from(
+      this.validateOrRejectAgency(adminToken, updateAgencyStatusParams),
+    );
   }
 }

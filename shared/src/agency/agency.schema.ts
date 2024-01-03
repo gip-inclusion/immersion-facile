@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
-import { AgencyToReview } from "../admin/admin.dto";
+import {
+  UpdateAgencyStatusParams,
+  UpdateAgencyStatusParamsWithoutId,
+} from "../admin/admin.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -171,19 +174,20 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
       agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
   });
 
-export const withActiveOrRejectedAgencyStatusSchema: z.Schema<AgencyToReview> =
+export const updateAgencyStatusParamsWithoutIdSchema: z.Schema<UpdateAgencyStatusParamsWithoutId> =
   z
     .object({
-      id: agencyIdSchema,
       status: z.literal("active"),
     })
     .or(
       z.object({
-        id: agencyIdSchema,
         status: z.literal("rejected"),
         rejectionJustification: zTrimmedString,
       }),
     );
+
+export const updateAgencyStatusParamsSchema: z.Schema<UpdateAgencyStatusParams> =
+  updateAgencyStatusParamsWithoutIdSchema.and(z.object({ id: agencyIdSchema }));
 
 export const withAgencyStatusSchema: z.Schema<WithAgencyStatus> = z.object({
   status: agencyStatusSchema,

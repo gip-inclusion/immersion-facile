@@ -7,7 +7,6 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
-  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
@@ -15,6 +14,7 @@ import {
   propEq,
   propNotEq,
   toAgencyPublicDisplayDto,
+  UpdateAgencyStatusParams,
   WithAgencyId,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
@@ -188,9 +188,11 @@ export class InMemoryAgencyGateway implements AgencyGateway {
 
   public validateOrRejectAgency$(
     adminToken: BackOfficeJwt,
-    agencyToReview: AgencyToReview,
+    updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
-    return from(this.#validateOrRejectAgency(adminToken, agencyToReview.id));
+    return from(
+      this.#validateOrRejectAgency(adminToken, updateAgencyStatusParams.id),
+    );
   }
 
   async #validateOrRejectAgency(

@@ -37,13 +37,15 @@ export type ManageEstablishmentAdminForm = {
   siret: SiretDto;
 };
 
-export type AgencyToReview =
+export type UpdateAgencyStatusParams = {
+  id: AgencyId;
+} & UpdateAgencyStatusParamsWithoutId;
+
+export type UpdateAgencyStatusParamsWithoutId =
   | {
-      id: AgencyId;
       status: Extract<ActiveOrRejectedStatus, "active">;
     }
   | {
-      id: AgencyId;
       status: Extract<ActiveOrRejectedStatus, "rejected">;
       rejectionJustification: string;
     };

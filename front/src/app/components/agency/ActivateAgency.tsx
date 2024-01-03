@@ -11,8 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
   AgencyId,
-  AgencyToReview,
   domElementIds,
+  UpdateAgencyStatusParams,
   withAgencyIdSchema,
   zTrimmedString,
 } from "shared";
@@ -114,11 +114,13 @@ export const ActivateAgency = () => {
 
   const getFieldError = makeFieldError(formState);
 
-  const updateAgencyStatus = (agencyToReview: AgencyToReview) => {
+  const updateAgencyStatus = (
+    updateAgencyStatusParams: UpdateAgencyStatusParams,
+  ) => {
     if (!agencyNeedingReview) return;
     dispatch(
       agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested(
-        agencyToReview,
+        updateAgencyStatusParams,
       ),
     );
     dispatch(agencyAdminSlice.actions.setAgencyNeedingReview(null));

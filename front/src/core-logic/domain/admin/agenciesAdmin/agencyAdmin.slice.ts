@@ -1,6 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { AgencyDto, AgencyId, AgencyOption } from "shared";
-import { AgencyToReview } from "shared";
+import type {
+  AgencyDto,
+  AgencyId,
+  AgencyOption,
+  UpdateAgencyStatusParams,
+} from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 export type AgencySuccessFeedbackKind = "agencyAdded" | "agencyUpdated";
@@ -107,7 +111,7 @@ export const agencyAdminSlice = createSlice({
     },
     updateAgencyNeedingReviewStatusRequested: (
       state,
-      _action: PayloadAction<AgencyToReview>,
+      _action: PayloadAction<UpdateAgencyStatusParams>,
     ) => {
       state.isUpdating = true;
       state.feedback = { kind: "idle" };

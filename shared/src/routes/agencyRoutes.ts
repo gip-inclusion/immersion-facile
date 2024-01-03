@@ -6,7 +6,7 @@ import {
   agencySchema,
   createAgencySchema,
   listAgenciesRequestSchema,
-  withActiveOrRejectedAgencyStatusSchema,
+  updateAgencyStatusParamsWithoutIdSchema,
   withAgencyIdSchema,
   withAgencyStatusSchema,
 } from "../agency/agency.schema";
@@ -30,7 +30,7 @@ export const agencyRoutes = defineRoutes({
   updateAgencyStatus: defineRoute({
     method: "patch",
     url: agencyWithIdForAdminUrl,
-    requestBodySchema: withActiveOrRejectedAgencyStatusSchema,
+    requestBodySchema: updateAgencyStatusParamsWithoutIdSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

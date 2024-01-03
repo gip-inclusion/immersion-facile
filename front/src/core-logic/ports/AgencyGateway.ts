@@ -4,11 +4,11 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
-  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
+  UpdateAgencyStatusParams,
   WithAgencyId,
 } from "shared";
 
@@ -34,7 +34,7 @@ export interface AgencyGateway {
 
   validateOrRejectAgency$(
     adminToken: BackOfficeJwt,
-    agencyToReview: AgencyToReview,
+    updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void>;
 
   getAgencyAdminById$(
