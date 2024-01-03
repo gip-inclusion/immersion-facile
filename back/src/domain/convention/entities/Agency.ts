@@ -18,6 +18,6 @@ export const throwConflictErrorOnSimilarAgencyFound = async ({
 
   if (hasSimilarAgency)
     throw new ConflictError(
-      "An other agency exists with the same address and kind",
+      "Une autre agence du même type existe avec la même adresse",
     );
 };

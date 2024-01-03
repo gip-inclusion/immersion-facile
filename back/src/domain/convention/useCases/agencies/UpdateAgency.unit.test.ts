@@ -91,7 +91,7 @@ describe("Update agency", () => {
     await expectPromiseToFailWithError(
       updateAgency.execute(updatedAgency),
       new ConflictError(
-        "An other agency exists with the same address and kind",
+        "Une autre agence du même type existe avec la même adresse",
       ),
     );
   });
