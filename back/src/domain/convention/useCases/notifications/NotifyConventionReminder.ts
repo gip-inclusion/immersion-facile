@@ -211,7 +211,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     );
 
     const emailActors = [
-      ...signatories.filter((signatory) => !smsSignatories.includes(signatory)),
+      ...signatories,
       ...(isEstablishmentTutorIsEstablishmentRepresentative(conventionRead)
         ? []
         : [conventionRead.establishmentTutor]),
