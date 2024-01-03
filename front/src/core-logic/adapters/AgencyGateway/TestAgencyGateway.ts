@@ -6,13 +6,13 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
-  AgencyToReview,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
   propEq,
   propNotEq,
+  UpdateAgencyStatusParams,
   WithAgencyId,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
@@ -113,9 +113,9 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public validateOrRejectAgency$(
     _: BackOfficeJwt,
-    agencyToReview: AgencyToReview,
+    updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
-    return from(this.#validateOrRejectAgency(_, agencyToReview.id));
+    return from(this.#validateOrRejectAgency(_, updateAgencyStatusParams.id));
   }
 
   async #validateOrRejectAgency(

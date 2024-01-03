@@ -107,7 +107,10 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
 
   sharedAgencyRouter.updateAgencyStatus(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.updateAgencyStatus.execute(req.body),
+      deps.useCases.updateAgencyStatus.execute({
+        ...req.body,
+        id: req.params.agencyId,
+      }),
     ),
   );
 

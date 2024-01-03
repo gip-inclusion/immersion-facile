@@ -1,4 +1,8 @@
-import {AgencyDtoBuilder, AgencyToReview, expectPromiseToFailWithError} from "shared";
+import {
+  AgencyDtoBuilder,
+  expectPromiseToFailWithError,
+  UpdateAgencyStatusParamsWithoutId,
+} from "shared";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -43,28 +47,33 @@ describe("Update agency status", () => {
       .withStatus("needsReview")
       .build();
 
-    it.each([{ status: "active" as const }, { status: "rejected" as const }])(
-    "Updates an agency status in repository and publishes an event to notify if status becomes $status",
-    async ({ status }) => {
-      // Prepare
-      uow.
-      agencyRepository.setAgencies([existingAgency]);
+    it.each([
+      { status: "active" },
+      { status: "rejected", rejectionJustification: "justification" },
+    ] satisfies UpdateAgencyStatusParamsWithoutId[])(
+      "Updates an agency status in repository and publishes an event to notify if status becomes $status",
+      async (testParams) => {
+        // Prepare
+        uow.agencyRepository.setAgencies([existingAgency]);
 
-      // Act
-      await updateAgencyStatus.execute({
-        id: existingAgency.id,
-        status: "active",
-        rejectionJustification:
-          status === "rejected" ? "justification" : undefined,
-      } as AgencyToReview);
+        // Act
+        await updateAgencyStatus.execute({
+          id: existingAgency.id,
+          ...testParams,
+        });
 
-      // Assert
-      expect(uow.agencyRepository.agencies[0].status).toBe(status);
-      expect(uow.outboxRepository.events[0]).toMatchObject({
-        id: nextUuid,
-        topic: status === "active" ? "AgencyActivated" : "AgencyRejected",
-        payload: { agency: { ...existingAgency, status } },
-      });
+        // Assert
+        expect(uow.agencyRepository.agencies[0].status).toBe(
+          testParams?.status,
+        );
+        expect(uow.outboxRepository.events[0]).toMatchObject({
+          id: nextUuid,
+          topic:
+            testParams.status === "active"
+              ? "AgencyActivated"
+              : "AgencyRejected",
+          payload: { agency: { ...existingAgency, ...testParams } },
+        });
       },
     );
   });
