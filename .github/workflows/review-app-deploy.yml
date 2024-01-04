@@ -65,7 +65,7 @@ jobs:
       - name: Deactivate front review app autodeploy
         run: |
           scalingo --app if-dev-front-pr${{ inputs.pull_request_id }} integration-link-update --no-auto-deploy
-      - name: Remove sslmode from $SCALINGO_POSTGRESQL_URL
+      - name: Remove sslmode option from $SCALINGO_POSTGRESQL_URL
         run: |
           current_db_url=$(scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env | grep 'SCALINGO_POSTGRESQL_URL=' | cut -d '=' -f2-)
           new_db_url=$(echo $current_db_url | sed "s/?sslmode=prefer//")
