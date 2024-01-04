@@ -4,7 +4,6 @@ import {
   adminRoutes,
   agencyRoutes,
   conventionMagicLinkRoutes,
-  createManagedAxiosInstance,
   establishmentRoutes,
   formCompletionRoutes,
   inclusionConnectedAllowedRoutes,
@@ -32,7 +31,6 @@ export const createHttpDependencies = (): Dependencies => {
     ...withBaseUrlConfig,
     validateStatus: () => true,
   });
-  const axiosOnSlashApiLegacy = createManagedAxiosInstance(withBaseUrlConfig);
 
   return {
     ...createCommonDependencies(),
@@ -65,8 +63,8 @@ export const createHttpDependencies = (): Dependencies => {
       createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApi),
     ),
     technicalGateway: new HttpTechnicalGateway(
-      createAxiosSharedClient(technicalRoutes, axiosOnSlashApiLegacy),
-      axiosOnSlashApiLegacy,
+      createAxiosSharedClient(technicalRoutes, axiosOnSlashApi),
+      axiosOnSlashApi,
     ),
   };
 };

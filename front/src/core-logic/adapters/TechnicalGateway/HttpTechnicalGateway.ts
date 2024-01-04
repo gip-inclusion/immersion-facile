@@ -1,5 +1,6 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
+import { match } from "ts-pattern";
 import {
   AbsoluteUrl,
   ConventionSupportedJwt,
@@ -10,6 +11,10 @@ import {
   ValidateEmailStatus,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import {
+  logBodyAndThrow,
+  otherwiseThrow,
+} from "src/core-logic/adapters/otherwiseThrow";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class HttpTechnicalGateway implements TechnicalGateway {
@@ -18,34 +23,44 @@ export class HttpTechnicalGateway implements TechnicalGateway {
 
   constructor(
     private readonly httpClient: HttpClient<TechnicalRoutes>,
-    private readonly axiosClient: AxiosInstance,
+    private readonly axiosInstance: AxiosInstance,
   ) {}
 
   public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
-    const response = await this.httpClient.validateEmail({
-      queryParams: {
-        email,
-      },
-    });
-    if (response.status === 200) return response.body;
-    throw new Error(JSON.stringify(response.body));
+    return this.httpClient
+      .validateEmail({
+        queryParams: {
+          email,
+        },
+      })
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 400 }, logBodyAndThrow)
+          .otherwise(otherwiseThrow),
+      );
   }
 
   public async htmlToPdf(
     htmlContent: string,
     jwt: ConventionSupportedJwt,
   ): Promise<string> {
-    const { body } = await this.httpClient.htmlToPdf({
-      body: { htmlContent },
-      headers: { authorization: jwt },
-    });
-    return body;
+    return this.httpClient
+      .htmlToPdf({
+        body: { htmlContent },
+        headers: { authorization: jwt },
+      })
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .otherwise(otherwiseThrow),
+      );
   }
 
   public async uploadLogo(file: File): Promise<AbsoluteUrl> {
     const formData = new FormData();
     formData.append(uploadFileRoute, file);
-    const { data } = await this.axiosClient.post(
+    const { data } = await this.axiosInstance.post(
       `/${uploadFileRoute}`,
       formData,
     );
