@@ -17,7 +17,6 @@ const defaultFlags: FeatureFlags = {
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "Maintenance message",
   }),
-  enableApiV0: makeBooleanFeatureFlag(false),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {

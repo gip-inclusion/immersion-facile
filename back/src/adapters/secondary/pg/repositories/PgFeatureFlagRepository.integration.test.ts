@@ -38,7 +38,6 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
-      enableApiV0: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insert(expectedFeatureFlags);
@@ -55,7 +54,6 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
-      enableApiV0: makeBooleanFeatureFlag(false),
     });
   });
 
@@ -70,7 +68,6 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
-      enableApiV0: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insert(initialFeatureFlags);
@@ -96,7 +93,6 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
-      enableApiV0: makeBooleanFeatureFlag(false),
     });
   });
 });

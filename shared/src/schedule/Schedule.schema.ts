@@ -34,9 +34,6 @@ export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
   timePeriods: timePeriodsSchema,
 });
 
-// Each element represents one weekday, starting with Monday.
-//export const complexScheduleSchema_V0 = z.array(z.array(timePeriodSchema));
-
 export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> =
   z.array(dailyScheduleSchema);
 

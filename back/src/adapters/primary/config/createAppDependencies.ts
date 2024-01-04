@@ -11,7 +11,6 @@ import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
-  createApiKeyAuthMiddlewareV0,
   makeConsumerMiddleware,
   makeMagicLinkAuthMiddleware,
 } from "../authMiddleware";
@@ -102,11 +101,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     establishmentMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(
       config,
       "establishment",
-    ),
-    apiKeyAuthMiddlewareV0: createApiKeyAuthMiddlewareV0(
-      useCases.getApiConsumerById.execute,
-      gateways.timeGateway,
-      config,
     ),
     apiConsumerMiddleware: makeConsumerMiddleware(
       useCases.getApiConsumerById.execute,

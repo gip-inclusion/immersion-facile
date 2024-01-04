@@ -49,7 +49,6 @@ const labelsByFeatureFlag: Record<FeatureFlagName, string> = {
   enableMaxContactPerWeek:
     "Activer le nombre de mise en contact maximum par semaine sur le formulaire entreprise",
   enableMaintenance: "Activer le mode maintenance",
-  enableApiV0: "Activer l'API V0",
 };
 
 const apiConsumerModal = createModal({

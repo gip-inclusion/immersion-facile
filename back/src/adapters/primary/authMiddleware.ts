@@ -9,7 +9,6 @@ import {
   currentJwtVersions,
   expiredMagicLinkErrorMessage,
   ExtractFromExisting,
-  isApiConsumerAllowed,
   PayloadKey,
 } from "shared";
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
@@ -56,71 +55,6 @@ const createIncTotalCountForRequest =
       "apiKeyAuthMiddlewareRequestsTotal",
     );
   };
-
-// should be deleted when all consumer migrate to v1
-export const createApiKeyAuthMiddlewareV0 = (
-  getApiConsumerById: GetApiConsumerById,
-  timeGateway: TimeGateway,
-  config: AppConfig,
-) => {
-  const verifyJwt = makeVerifyJwtES256<"apiConsumer">(config.apiJwtPublicKey);
-
-  return async (req: Request, _res: Response, next: NextFunction) => {
-    const incTotalCountForRequest = createIncTotalCountForRequest(req);
-    if (!req.headers.authorization) {
-      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
-      return next();
-    }
-
-    try {
-      const { id } = verifyJwt(req.headers.authorization);
-      const apiConsumer = await getApiConsumerById(id);
-      if (!apiConsumer) {
-        incTotalCountForRequest({
-          authorisationStatus: "consumerNotFound",
-        });
-        return next();
-      }
-
-      // todo: consider notifying the caller that he cannot access privileged fields (due to possible compromised key)
-      if (
-        !isApiConsumerAllowed({
-          apiConsumer,
-          rightName: "searchEstablishment",
-          consumerKind: "READ",
-        })
-      ) {
-        incTotalCountForRequest({
-          authorisationStatus: "unauthorisedId",
-          consumerName: apiConsumer.consumer,
-        });
-        return next();
-      }
-
-      if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
-        incTotalCountForRequest({
-          authorisationStatus: "expiredToken",
-          consumerName: apiConsumer.consumer,
-        });
-        return next();
-      }
-
-      // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
-      incTotalCountForRequest({
-        consumerName: apiConsumer.consumer,
-        authorisationStatus: "authorised",
-      });
-
-      req.apiConsumer = apiConsumer;
-      return next();
-    } catch (_) {
-      incTotalCountForRequest({
-        authorisationStatus: "incorrectJwt",
-      });
-      return next();
-    }
-  };
-};
 
 const responseError = (
   res: Response,
