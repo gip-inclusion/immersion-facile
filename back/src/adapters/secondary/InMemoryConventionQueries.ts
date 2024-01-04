@@ -22,8 +22,8 @@ import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
-export const TEST_AGENCY_NAME = "TEST_AGENCY_NAME";
-export const TEST_AGENCY_DEPARTMENT = "75-test";
+const TEST_AGENCY_NAME = "TEST_AGENCY_NAME";
+const TEST_AGENCY_DEPARTMENT = "75-test";
 const logger = createLogger(__filename);
 
 export class InMemoryConventionQueries implements ConventionQueries {
