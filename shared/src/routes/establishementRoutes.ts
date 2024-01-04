@@ -6,7 +6,7 @@ import {
   httpErrorSchema,
   legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
-} from "../httpClient/errors/httpErrors.schema";
+} from "../httpClient/httpErrors.schema";
 import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
 const formEstablishmentsUrl = "/form-establishments";

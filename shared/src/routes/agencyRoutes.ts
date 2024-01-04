@@ -14,7 +14,7 @@ import { withAuthorizationHeaders } from "../headers";
 import {
   legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
-} from "../httpClient/errors/httpErrors.schema";
+} from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 
 const agencyWithIdForAdminUrl = `/admin/agencies/:agencyId` as const;

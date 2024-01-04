@@ -1,5 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { legacyHttpErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import { legacyHttpErrorSchema } from "../httpClient/httpErrors.schema";
 import {
   getSiretInfoSchema,
   isSiretExistResponseSchema,

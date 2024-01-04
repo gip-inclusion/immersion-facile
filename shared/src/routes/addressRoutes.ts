@@ -5,7 +5,7 @@ import {
   withLookupLocationInputQueryParamsSchema,
   withLookupStreetAddressQueryParamsSchema,
 } from "../address/address.schema";
-import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 
 export type AddressRoutes = typeof addressRoutes;
 export const addressRoutes = defineRoutes({
