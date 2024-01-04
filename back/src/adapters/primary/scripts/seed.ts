@@ -51,7 +51,6 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
     enablePeConnectApi: makeBooleanFeatureFlag(true),
     enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
     enableTemporaryOperation: makeBooleanFeatureFlag(false),
-    enableApiV0: makeBooleanFeatureFlag(false),
   };
 
   await uow.featureFlagRepository.insert(featureFlags);

@@ -19,7 +19,6 @@ const initialState: FeatureFlagsState = {
   enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
   enableMaintenance: makeTextFeatureFlag(false, { message: "" }),
   isLoading: true,
-  enableApiV0: makeBooleanFeatureFlag(false),
 };
 
 export const featureFlagsSlice = createSlice({

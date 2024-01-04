@@ -72,11 +72,6 @@ export interface EstablishmentAggregateRepository {
     maxResults: number,
   ): Promise<SiretDto[]>;
 
-  getSearchImmersionResultDtoBySiretAndRome(
-    siret: SiretDto,
-    rome: string,
-  ): Promise<SearchResultDto | undefined>;
-
   searchImmersionResults(
     searchImmersionParams: SearchImmersionParams,
   ): Promise<SearchImmersionResult[]>;

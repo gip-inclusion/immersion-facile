@@ -97,30 +97,6 @@ export class InMemoryEstablishmentAggregateRepository
     return rest;
   }
 
-  // to delete when api v0 and v1 are removed
-  public async getSearchImmersionResultDtoBySiretAndRome(
-    siret: SiretDto,
-    rome: string,
-  ): Promise<SearchResultDto | undefined> {
-    const aggregate = this.establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret === siret,
-    );
-    if (!aggregate) return undefined;
-
-    const searchedAppellationCode =
-      aggregate.offers.find(({ romeCode }) => romeCode === rome)
-        ?.appellationCode ?? "no-appellation-code-matched";
-
-    const {
-      isSearchable,
-      ...buildSearchImmersionResultWithoutContactDetailsAndIsSearchable
-    } = buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
-      establishmentAgg: aggregate,
-      searchedAppellationCode,
-    });
-    return buildSearchImmersionResultWithoutContactDetailsAndIsSearchable;
-  }
-
   public getSiretOfEstablishmentsToSuggestUpdate(): Promise<SiretDto[]> {
     throw new Error(
       "Method not implemented : getSiretOfEstablishmentsToSuggestUpdate, you can use PG implementation instead",

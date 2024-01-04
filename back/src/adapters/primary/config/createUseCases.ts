@@ -88,7 +88,6 @@ import { DeleteEstablishment } from "../../../domain/offer/useCases/DeleteEstabl
 import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/offer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/offer/useCases/EditFormEstablishment";
 import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupBySlug";
-import { GetSearchResultBySiretAndRome } from "../../../domain/offer/useCases/GetSearchResultById";
 import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
@@ -299,9 +298,6 @@ export const createUseCases = (
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getSearchResultBySiretAndAppellationCode:
         new GetSearchResultBySiretAndAppellationCode(uowPerformer),
-      getSearchImmersionResultBySiretAndRome: new GetSearchResultBySiretAndRome(
-        uowPerformer,
-      ),
 
       addFormEstablishment,
 
