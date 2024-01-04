@@ -72,9 +72,14 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
     kind: z.enum(agencyKindFilters).optional(),
   });
 
+const stringWithMaxLength255 = zStringMinLength1.max(
+  255,
+  "Ne doit pas dépasser 255 caractères",
+);
+
 const commonAgencyShape = {
   id: agencyIdSchema,
-  name: zStringMinLength1,
+  name: stringWithMaxLength255,
   kind: agencyKindSchema,
   address: addressSchema,
   position: geoPositionSchema,
@@ -82,8 +87,11 @@ const commonAgencyShape = {
   validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
-  questionnaireUrl: z.string().optional(),
-  signature: zStringMinLength1,
+  questionnaireUrl: z
+    .string()
+    .max(600, "Ne doit pas dépasser 600 caractères")
+    .optional(),
+  signature: stringWithMaxLength255,
   logoUrl: absoluteUrlSchema.optional(),
   agencySiret: siretSchema,
 };
@@ -91,11 +99,11 @@ const commonAgencyShape = {
 const agencyPublicDisplayDtoWithoutRefersToAgencySchema: z.Schema<AgencyPublicDisplayDtoWithoutRefersToAgency> =
   z.object({
     id: agencyIdSchema,
-    name: zStringMinLength1,
+    name: stringWithMaxLength255,
     kind: agencyKindSchema,
     address: addressSchema,
     position: geoPositionSchema,
-    signature: zStringMinLength1,
+    signature: stringWithMaxLength255,
   });
 
 export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
