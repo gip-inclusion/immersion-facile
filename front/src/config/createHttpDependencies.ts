@@ -62,7 +62,7 @@ export const createHttpDependencies = (): Dependencies => {
       createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
     ),
     searchGateway: new HttpSearchGateway(
-      createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApiLegacy),
+      createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApi),
     ),
     technicalGateway: new HttpTechnicalGateway(
       createAxiosSharedClient(technicalRoutes, axiosOnSlashApiLegacy),

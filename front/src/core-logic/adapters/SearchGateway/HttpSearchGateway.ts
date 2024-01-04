@@ -1,4 +1,5 @@
 import { from, Observable } from "rxjs";
+import { match, P } from "ts-pattern";
 import {
   ContactEstablishmentRequestDto,
   GroupSlug,
@@ -8,8 +9,12 @@ import {
   SearchRoutes,
   SiretAndAppellationDto,
 } from "shared";
-import { HttpClient, HttpResponse } from "shared-routes";
+import { HttpClient } from "shared-routes";
 import { routes } from "src/app/routes/routes";
+import {
+  logBodyAndThrow,
+  otherwiseThrow,
+} from "src/core-logic/adapters/otherwiseThrow";
 import {
   ContactErrorKind,
   SearchGateway,
@@ -21,47 +26,42 @@ export class HttpSearchGateway implements SearchGateway {
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
   ): Promise<void | ContactErrorKind> {
-    const response = await this.httpClient
+    return this.httpClient
       .contactEstablishment({
         body: params,
       })
-      .catch((error): HttpResponse<number, string> | never => {
-        if (error.httpStatusCode) {
-          return {
-            body: error.message,
-            status: error.httpStatusCode,
-            headers: error.headers,
-          };
-        }
-        throw error;
-      });
-
-    if (response.status === 409) return "alreadyContactedRecently";
+      .then((response) =>
+        match(response)
+          .with({ status: 201 }, () => undefined)
+          .with(
+            { status: 409 },
+            (): ContactErrorKind => "alreadyContactedRecently",
+          )
+          .with({ status: P.union(400, 404) }, logBodyAndThrow)
+          .otherwise(otherwiseThrow),
+      );
   }
 
   public async getGroupBySlug(groupSlug: GroupSlug): Promise<GroupWithResults> {
-    const response = await this.httpClient
+    return this.httpClient
       .getGroupBySlug({
         urlParams: { groupSlug },
       })
-      .catch((error) => {
-        if (error.httpStatusCode === 404) {
-          routes
-            .errorRedirect({
-              title: "Groupe introuvable",
-              message: `Nous n'avons pas trouvé le groupe: '${groupSlug}'`,
-            })
-            .push();
-        }
-        return {
-          body: error.response?.message ?? error.message,
-          status: error?.response?.status,
-        };
-      });
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: P.union(404) }, () => {
+            routes
+              .errorRedirect({
+                title: "Groupe introuvable",
+                message: `Nous n'avons pas trouvé le groupe: '${groupSlug}'`,
+              })
+              .push();
 
-    if (response.status !== 200) throw new Error(response.body);
-
-    return response.body;
+            return undefined as unknown as GroupWithResults;
+          })
+          .otherwise(otherwiseThrow),
+      );
   }
 
   public getSearchResult$(
@@ -72,10 +72,12 @@ export class HttpSearchGateway implements SearchGateway {
         .getSearchResult({
           queryParams: params,
         })
-        .then((result) => {
-          if (result.status === 200) return result.body;
-          throw new Error(result.body.message);
-        }),
+        .then((result) =>
+          match(result)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: P.union(400, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -87,10 +89,12 @@ export class HttpSearchGateway implements SearchGateway {
         .search({
           queryParams: searchParams,
         })
-        .then((result) => {
-          if (result.status === 200) return result.body;
-          throw new Error(result.body.message);
-        }),
+        .then((result) =>
+          match(result)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: P.union(400) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 }
