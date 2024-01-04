@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { match, P } from "ts-pattern";
-import { assessmentRoute, conventionMagicLinkRoutes } from "shared";
+import { conventionMagicLinkRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { UnauthorizedError } from "../../helpers/httpErrors";
@@ -9,20 +9,20 @@ import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 export const createMagicLinkRouter = (deps: AppDependencies) => {
   const expressRouter = Router({ mergeParams: true });
 
-  expressRouter
-    .route(`/auth/${assessmentRoute}`)
-    .post(deps.conventionMagicLinkAuthMiddleware, async (req, res) =>
-      sendHttpResponse(req, res, () =>
+  const sharedRouter = createExpressSharedRouter(
+    conventionMagicLinkRoutes,
+    expressRouter,
+  );
+
+  sharedRouter.createAssessment(
+    deps.conventionMagicLinkAuthMiddleware,
+    async (req, res) =>
+      sendHttpResponse(req, res.status(201), () =>
         deps.useCases.createAssessment.execute(
           req.body,
           req.payloads?.convention,
         ),
       ),
-    );
-
-  const sharedRouter = createExpressSharedRouter(
-    conventionMagicLinkRoutes,
-    expressRouter,
   );
 
   sharedRouter.getConvention(

@@ -1,9 +1,4 @@
-import {
-  AssessmentDto,
-  assessmentSchema,
-  ConventionJwtPayload,
-  Role,
-} from "shared";
+import { AssessmentDto, assessmentSchema, ConventionJwtPayload } from "shared";
 import {
   ConflictError,
   ForbiddenError,
@@ -83,13 +78,10 @@ const throwForbiddenIfNotAllow = (
   conventionJwtPayload?: ConventionJwtPayload,
 ) => {
   if (!conventionJwtPayload) throw new ForbiddenError("No magic link provided");
-  if (
-    conventionJwtPayload.role !== "establishment-tutor" &&
-    // TODO : keep this temporary for old JWT support until 2023/10
-    conventionJwtPayload.role !== ("establishment" as Role)
-    // -----------------
-  )
-    throw new ForbiddenError("Only an establishment can create an assessment");
+  if (conventionJwtPayload.role !== "establishment-tutor")
+    throw new ForbiddenError(
+      "Only an establishment tutor can create an assessment",
+    );
   if (dto.conventionId !== conventionJwtPayload.applicationId)
     throw new ForbiddenError(
       "Convention provided in DTO is not the same as application linked to it",

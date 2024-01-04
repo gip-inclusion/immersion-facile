@@ -15,7 +15,7 @@ const createAssessmentEpic: AppEpic<AssessmentAction> = (
 ) =>
   action$.pipe(
     filter(assessmentSlice.actions.creationRequested.match),
-    switchMap((action) => assessmentGateway.createAssessment(action.payload)),
+    switchMap((action) => assessmentGateway.createAssessment$(action.payload)),
     map((_result) => assessmentSlice.actions.creationSucceeded()),
     catchEpicError((error) =>
       assessmentSlice.actions.creationFailed(error.message),

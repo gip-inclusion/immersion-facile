@@ -7,5 +7,5 @@ export type AssessmentAndJwt = {
 };
 
 export interface AssessmentGateway {
-  createAssessment(params: AssessmentAndJwt): Observable<void>;
+  createAssessment$(params: AssessmentAndJwt): Observable<void>;
 }

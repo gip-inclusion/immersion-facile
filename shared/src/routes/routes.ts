@@ -35,15 +35,9 @@ export const frontRoutes = {
 
 export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";
-export const generateMagicLinkRoute = "generate-magic-link";
-
-export const assessmentRoute = "assessment";
 
 export const immersionOffersRoute = "immersion-offers";
 export const loginPeConnect = "login-pe-connect";
 export const peConnect = "pe-connect";
-
-export const requestEmailToUpdateFormRoute = "request-email-to-update-form";
-export const romeRoute = "rome";
 
 export const uploadFileRoute = "upload-file";

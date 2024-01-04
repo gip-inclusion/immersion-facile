@@ -8,7 +8,7 @@ export class TestAssessmentGateway implements AssessmentGateway {
   // test purpose
   public creationResponse$ = new Subject<void>();
 
-  public createAssessment(_params: AssessmentAndJwt): Observable<void> {
+  public createAssessment$(_params: AssessmentAndJwt): Observable<void> {
     return this.creationResponse$;
   }
 }
