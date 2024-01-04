@@ -38,7 +38,6 @@ const defaultFlagsInFront: FeatureFlags = {
     message: "My maintenance message",
   }),
   enableApiV0: makeBooleanFeatureFlag(false),
-  enableApiV1: makeBooleanFeatureFlag(false),
 };
 
 export const makeStubFeatureFlags = (

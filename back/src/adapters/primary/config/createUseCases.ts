@@ -101,7 +101,6 @@ import { UpdateEstablishmentAggregateFromForm } from "../../../domain/offer/useC
 import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/useCases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
-import { ConvertContactEstablishmentPublicV1ToDomain } from "../../../domain/publicApi/useCases/ConvertContactEstablishmentPublicV1ToDomain";
 import { ConvertRomeToAppellationForEstablishment } from "../../../domain/publicApi/useCases/ConvertRomeToAppellationForEstablishment";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
@@ -162,8 +161,6 @@ export const createUseCases = (
           config.immersionFacileDomain,
           gateways.notification,
         ),
-      convertContactEstablishmentPublicV1ToDomain:
-        new ConvertContactEstablishmentPublicV1ToDomain(uowPerformer),
       sendNotification: new SendNotification(
         uowPerformer,
         gateways.notification,

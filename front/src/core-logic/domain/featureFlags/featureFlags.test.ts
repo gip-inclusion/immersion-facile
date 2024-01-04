@@ -26,7 +26,6 @@ const defaultFeatureFlags: FeatureFlags = {
     message: "",
   }),
   enableApiV0: makeBooleanFeatureFlag(false),
-  enableApiV1: makeBooleanFeatureFlag(false),
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -40,7 +39,6 @@ const flagsFromApi: FeatureFlags = {
     message: "My maintenance message",
   }),
   enableApiV0: makeBooleanFeatureFlag(false),
-  enableApiV1: makeBooleanFeatureFlag(false),
 };
 
 describe("feature flag slice", () => {
