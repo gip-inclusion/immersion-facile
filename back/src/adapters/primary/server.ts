@@ -20,7 +20,6 @@ import { createAddressRouter } from "./routers/address/createAddressRouter";
 import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter";
-import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
 import { createApiKeyAuthRouterV2 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/establishment/createEstablishmentRouter";
@@ -78,7 +77,6 @@ export const createApp = async (
   app.use(createRootApiRouter());
   app.use(createMagicLinkRouter(deps));
   app.use(createAdminRouter(deps));
-  app.use(createApiKeyAuthRouterV1(deps));
   app.use(createApiKeyAuthRouterV2(deps));
   app.use(createInclusionConnectedAllowedRouter(deps));
   // ----

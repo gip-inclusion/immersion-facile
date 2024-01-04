@@ -10,7 +10,6 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { avenueChampsElysees } from "../../../../_testBuilders/addressDtos";
 import {
   buildTestApp,
   InMemoryGateways,
@@ -26,7 +25,6 @@ import {
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { FormEstablishmentDtoPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
-import { FormEstablishmentDtoPublicV1 } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 
 describe("Add form establishment", () => {
   let request: SuperTest<Test>;
@@ -42,10 +40,6 @@ describe("Add form establishment", () => {
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
     await inMemoryUow.featureFlagRepository.update({
       flagName: "enableApiV0",
-      flagContent: { isActive: true },
-    });
-    await inMemoryUow.featureFlagRepository.update({
-      flagName: "enableApiV1",
       flagContent: { isActive: true },
     });
     inMemoryUow.apiConsumerRepository.consumers = [
@@ -185,98 +179,6 @@ describe("Add form establishment", () => {
             }),
           )
           .send(formEstablishment);
-
-        expectToEqual(body, "");
-        expectToEqual(status, 200);
-      });
-    });
-
-    describe("v1", () => {
-      const consumerv1FormEstablishmentsRoute = `/v1/form-establishments`;
-
-      it("forbids access to route if no api consumer", async () => {
-        const { body, status } = await request
-          .post(consumerv1FormEstablishmentsRoute)
-          .send({});
-
-        expectToEqual(body, {
-          error: "forbidden: unauthenticated",
-        });
-        expectToEqual(status, 401);
-      });
-
-      it("forbids access to route if invalid jwt", async () => {
-        const { body, status } = await request
-          .post(consumerv1FormEstablishmentsRoute)
-          .set("Authorization", "jwt-invalid")
-          .send({});
-
-        expectToEqual(body, {
-          error: "forbidden: incorrect Jwt",
-        });
-        expectToEqual(status, 401);
-      });
-
-      it("forbids adding establishment from unauthorized api consumer", async () => {
-        const { body, status } = await request
-          .post(consumerv1FormEstablishmentsRoute)
-          .set("Authorization", generateApiConsumerJwt({ id: "my-unknown-id" }))
-          .send({});
-
-        expectToEqual(body, {
-          error: "forbidden: consumer not found",
-        });
-        expectToEqual(status, 403);
-      });
-
-      it("forbids access to route if id is unauthorized", async () => {
-        const { body, status } = await request
-          .post(consumerv1FormEstablishmentsRoute)
-          .set(
-            "Authorization",
-            generateApiConsumerJwt({ id: unauthorizedApiConsumer.id }),
-          )
-          .send({});
-
-        expectToEqual(body, {
-          error: "forbidden: consumer has not enough privileges",
-        });
-        expectToEqual(status, 403);
-      });
-
-      it("forbids access to route if token has expired", async () => {
-        gateways.timeGateway.setNextDate(new Date());
-
-        const { body, status } = await request
-          .post(consumerv1FormEstablishmentsRoute)
-          .set(
-            "Authorization",
-            generateApiConsumerJwt({ id: outdatedApiConsumer.id }),
-          )
-          .send({});
-
-        expectToEqual(body, {
-          error: "forbidden: expired token",
-        });
-        expectToEqual(status, 403);
-      });
-
-      it("support adding establishment from known api consumer (for exemple Un Jeune Une Solution)", async () => {
-        const { status, body } = await request
-          .post(consumerv1FormEstablishmentsRoute)
-          .set(
-            "Authorization",
-            generateApiConsumerJwt({
-              id: authorizedUnJeuneUneSolutionApiConsumer.id,
-            }),
-          )
-          .send({
-            ...FormEstablishmentDtoBuilder.valid()
-              .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-              .build(),
-            isSearchable: true,
-            businessAddress: avenueChampsElysees,
-          } satisfies FormEstablishmentDtoPublicV1);
 
         expectToEqual(body, "");
         expectToEqual(status, 200);

@@ -10,7 +10,6 @@ const featureFlagNames = [
   "enableMaxContactPerWeek",
   "enableMaintenance",
   "enableApiV0",
-  "enableApiV1",
 ] as const;
 
 type FeatureFlagKind = (typeof featureFlagKinds)[number];

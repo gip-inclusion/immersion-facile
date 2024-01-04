@@ -12,7 +12,6 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
   createApiKeyAuthMiddlewareV0,
-  makeApiKeyAuthMiddlewareV1,
   makeConsumerMiddleware,
   makeMagicLinkAuthMiddleware,
 } from "../authMiddleware";
@@ -105,11 +104,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       "establishment",
     ),
     apiKeyAuthMiddlewareV0: createApiKeyAuthMiddlewareV0(
-      useCases.getApiConsumerById.execute,
-      gateways.timeGateway,
-      config,
-    ),
-    apiKeyAuthMiddlewareV1: makeApiKeyAuthMiddlewareV1(
       useCases.getApiConsumerById.execute,
       gateways.timeGateway,
       config,
