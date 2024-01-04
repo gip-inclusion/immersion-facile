@@ -6,7 +6,7 @@ import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
   legacyUnauthenticatedErrorSchema,
-} from "../httpClient/errors/httpErrors.schema";
+} from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
   getInclusionConnectLogoutUrlQueryParamsSchema,

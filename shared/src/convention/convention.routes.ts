@@ -6,7 +6,7 @@ import {
   httpErrorSchema,
   legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
-} from "../httpClient/errors/httpErrors.schema";
+} from "../httpClient/httpErrors.schema";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {

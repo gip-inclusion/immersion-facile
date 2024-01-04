@@ -1,8 +1,8 @@
+import axios from "axios";
 import { firstValueFrom } from "rxjs";
 import {
   apiSirenNotAvailableSiret,
   conflictErrorSiret,
-  createManagedAxiosInstance,
   expectToEqual,
   formCompletionRoutes,
   GetSiretInfoError,
@@ -41,9 +41,7 @@ const simulated = new SimulatedFormCompletionGateway(0, {
   },
 });
 
-const axiosInstance = createManagedAxiosInstance({
-  baseURL: "http://localhost:1234",
-});
+const axiosInstance = axios.create({ baseURL: "http://localhost:1234" });
 
 const http = new HttpFormCompletionGateway(
   createAxiosSharedClient(formCompletionRoutes, axiosInstance),

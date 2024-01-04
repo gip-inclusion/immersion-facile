@@ -9,7 +9,7 @@ import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
   legacyHttpErrorSchema,
-} from "../httpClient/errors/httpErrors.schema";
+} from "../httpClient/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
 import {
   emptyObjectSchema,

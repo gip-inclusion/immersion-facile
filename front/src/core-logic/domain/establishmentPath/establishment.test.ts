@@ -4,7 +4,6 @@ import {
   expectToEqual,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  LegacyHttpClientError,
   makeBooleanFeatureFlag,
   SiretEstablishmentDto,
 } from "shared";
@@ -126,7 +125,6 @@ describe("Establishment", () => {
   });
 
   it("handle send modification link error", () => {
-    const errorMessage = "Error sending modification link";
     expectEstablishmentStateToMatch({
       isLoading: false,
       feedback: { kind: "idle" },
@@ -136,9 +134,7 @@ describe("Establishment", () => {
     );
     expect(establishmentSelectors.isLoading(store.getState())).toBe(true);
     dependencies.establishmentGateway.establishmentModificationResponse$.error(
-      new LegacyHttpClientError(errorMessage, new Error(), 400, {
-        errors: errorMessage,
-      }),
+      new Error("whatever message"),
     );
     expect(establishmentSelectors.isLoading(store.getState())).toBe(false);
     expect(establishmentSelectors.feedback(store.getState())).toEqual({

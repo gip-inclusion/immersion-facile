@@ -17,7 +17,7 @@ import {
   httpErrorSchema,
   legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
-} from "../httpClient/errors/httpErrors.schema";
+} from "../httpClient/httpErrors.schema";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";

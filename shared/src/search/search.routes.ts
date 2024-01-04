@@ -1,7 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
 import { groupWithResultsSchema } from "../group/group.schema";
-import { httpErrorSchema } from "../httpClient/errors/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import {
   contactEstablishmentRoute,
   immersionOffersRoute,
