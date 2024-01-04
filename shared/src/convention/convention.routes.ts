@@ -1,9 +1,11 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { assessmentSchema } from "../assessment/assessment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
   legacyHttpErrorSchema,
+  legacyUnauthenticatedErrorSchema,
 } from "../httpClient/errors/httpErrors.schema";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { expressEmptyResponseBody } from "../zodUtils";
@@ -22,6 +24,18 @@ import {
 
 export type ConventionMagicLinkRoutes = typeof conventionMagicLinkRoutes;
 export const conventionMagicLinkRoutes = defineRoutes({
+  createAssessment: defineRoute({
+    url: "/auth/assessment",
+    method: "post",
+    ...withAuthorizationHeaders,
+    requestBodySchema: assessmentSchema,
+    responses: {
+      201: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: legacyUnauthenticatedErrorSchema,
+      403: legacyHttpErrorSchema,
+    },
+  }),
   getConvention: defineRoute({
     url: "/auth/demandes-immersion/:conventionId",
     method: "get",

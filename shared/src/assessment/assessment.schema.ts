@@ -4,7 +4,7 @@ import {
   AssessmentDto,
   assessmentStatuses,
   WithAssessmentDto,
-} from "./AssessmentDto";
+} from "./assessment.dto";
 
 export const assessmentSchema: z.Schema<AssessmentDto> = z.object({
   conventionId: z.string(),

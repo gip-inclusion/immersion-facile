@@ -1,5 +1,5 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
-import { AssessmentStatus } from "../assessment/AssessmentDto";
+import { AssessmentStatus } from "../assessment/assessment.dto";
 import {
   ConventionId,
   ImmersionObjective,
