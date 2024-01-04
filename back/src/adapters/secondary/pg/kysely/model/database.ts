@@ -194,7 +194,7 @@ interface ViewAppellationsDto {
   rome_label: string | null;
 }
 
-export interface PgFormEstablishments {
+interface PgFormEstablishments {
   additional_information: Generated<string | null>;
   business_address: string;
   business_contact: Generated<Json>;

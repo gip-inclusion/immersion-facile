@@ -24,7 +24,6 @@ import {
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
 
-export const TEST_NAF_LABEL = "test_naf_label";
 export const TEST_ROME_LABEL = "test_rome_label";
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
 export const TEST_APPELLATION_CODE = "12345";

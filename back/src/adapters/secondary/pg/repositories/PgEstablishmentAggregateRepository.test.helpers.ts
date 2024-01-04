@@ -60,7 +60,7 @@ export const insertImmersionOffer = async (
   ]);
 };
 
-export const insertImmersionContact = async (
+const insertImmersionContact = async (
   client: PoolClient,
   props: {
     uuid: string;
@@ -171,7 +171,7 @@ export const getEstablishmentsRowsBySiret = async (
     .query("SELECT * FROM establishments WHERE siret=$1", [siret])
     .then((res) => res.rows[0]);
 
-export type PgImmersionContact = {
+type PgImmersionContact = {
   uuid: string;
   lastname: string;
   firstname: string;
@@ -182,7 +182,7 @@ export type PgImmersionContact = {
   copy_emails: string[];
 };
 
-export type PgEstablishmentImmersionContact = {
+type PgEstablishmentImmersionContact = {
   contact_uuid: string;
   establishment_siret: string;
 };

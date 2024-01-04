@@ -25,7 +25,7 @@ export type BrevoHeaders = {
   "api-key": ApiKey;
 };
 
-export type BrevoBinaryContentHeaders = {
+type BrevoBinaryContentHeaders = {
   accept: ApplicationOctetStreamType;
   "api-key": ApiKey;
 };

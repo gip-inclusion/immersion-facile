@@ -30,15 +30,12 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
-import {
-  makeCreateNewEvent,
-  NarrowEvent,
-} from "../../../domain/core/eventBus/EventBus";
-import { DomainTopic } from "../../../domain/core/eventBus/events";
+import { makeCreateNewEvent, NarrowEvent } from "../../core/eventBus/EventBus";
 import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
+import { DomainTopic } from "../../core/eventBus/events";
+import { UpdateConventionStatus } from "./UpdateConventionStatus";
 
-export const allInclusionConnectedTestUsers = [
+const allInclusionConnectedTestUsers = [
   "icUserWithRoleToReview",
   "icUserWithRoleCounsellor",
   "icUserWithRoleValidator",
