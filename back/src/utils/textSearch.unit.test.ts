@@ -90,4 +90,27 @@ describe("findMatchRanges", () => {
       },
     ]);
   });
+
+  it("order results by startIndexInclusive", () => {
+    expect(
+      findMatchRanges("aide bou", "Aide-boulanger / Aide-boulangère"),
+    ).toEqual([
+      {
+        startIndexInclusive: 0,
+        endIndexExclusive: 4,
+      },
+      {
+        startIndexInclusive: 5,
+        endIndexExclusive: 8,
+      },
+      {
+        startIndexInclusive: 17,
+        endIndexExclusive: 21,
+      },
+      {
+        startIndexInclusive: 22,
+        endIndexExclusive: 25,
+      },
+    ]);
+  });
 });
