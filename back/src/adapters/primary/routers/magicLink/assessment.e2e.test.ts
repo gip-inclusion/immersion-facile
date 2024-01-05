@@ -49,7 +49,7 @@ describe("Assessment routes", () => {
   describe(`${displayRouteName(
     conventionMagicLinkRoutes.createAssessment,
   )} to add assessment`, () => {
-    it("returns 200 if the jwt is valid", async () => {
+    it("returns 201 if the jwt is valid", async () => {
       const agency = new AgencyDtoBuilder().build();
 
       const convention = new ConventionDtoBuilder()
