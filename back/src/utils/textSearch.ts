@@ -39,5 +39,6 @@ export const findMatchRanges = (
     .split(/\s+/)
     .filter(filterNotFalsy)
     .map((searchTerm) => findMatchRangesInternal(searchTerm, strNorm))
-    .reduce((acc, lst) => [...acc, ...lst], []);
+    .reduce((acc, lst) => [...acc, ...lst], [])
+    .sort((a, b) => a.startIndexInclusive - b.startIndexInclusive);
 };
