@@ -5,7 +5,6 @@ import {
   FormCompletionRoutes,
   GetSiretInfo,
   GetSiretInfoError,
-  RomeDto,
   siretApiMissingEstablishmentMessage,
   siretApiUnavailableSiretErrorMessage,
   SiretDto,
@@ -24,27 +23,13 @@ export class HttpFormCompletionGateway implements FormCompletionGateway {
   ): Promise<AppellationMatchDto[]> {
     return this.httpClient
       .appellation({
-        urlParams: { searchText: encodeURIComponent(searchText) },
+        queryParams: { searchText },
       })
       .then((response) =>
         match(response)
           .with({ status: 200 }, ({ body }) => body)
           .otherwise(otherwiseThrow),
       );
-  }
-
-  public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
-    return from(
-      this.httpClient
-        .rome({
-          urlParams: { searchText },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, ({ body }) => body)
-            .otherwise(otherwiseThrow),
-        ),
-    );
   }
 
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {

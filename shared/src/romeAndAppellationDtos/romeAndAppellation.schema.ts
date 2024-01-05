@@ -7,7 +7,6 @@ import type {
   AppellationMatchDto,
   MatchRangeDto,
   RomeCode,
-  RomeDto,
 } from "./romeAndAppellation.dto";
 
 const codeRomeRegex = /^[A-N]\d{4}$/;
@@ -34,12 +33,6 @@ export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
   appellationCode: appellationCodeSchema,
   appellationLabel: zTrimmedString,
 });
-
-export const romeDtoSchema: z.Schema<RomeDto> = z.object({
-  romeCode: codeRomeSchema,
-  romeLabel: zTrimmedString,
-});
-export const romeListSchema: z.Schema<RomeDto[]> = z.array(romeDtoSchema);
 
 const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({
   startIndexInclusive: z
