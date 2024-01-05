@@ -89,17 +89,17 @@ export const AppellationAutocomplete = ({
       }
       try {
         setIsSearching(true);
-        const romeOptions =
+        const appellationOptions =
           await outOfReduxDependencies.formCompletionGateway.getAppellationDtoMatching(
             sanitizedTerm,
           );
         setOptions(
-          romeOptions
+          appellationOptions
             .filter(
-              (romeOption) =>
+              (appellationOption) =>
                 !selectedAppellations
                   .map((selected) => selected.appellationCode)
-                  .includes(romeOption.appellation.appellationCode),
+                  .includes(appellationOption.appellation.appellationCode),
             )
             .map(romeSearchMatchToProposal),
         );
