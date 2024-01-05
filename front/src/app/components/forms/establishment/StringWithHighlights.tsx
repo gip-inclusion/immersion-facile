@@ -1,9 +1,9 @@
 import React, { Fragment } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import {
-  hightlightStringsFromMatches,
+  highlightStringsFromMatches,
   SliceOfString,
-} from "src/app/components/forms/establishment/hightlightStringsFromMatches";
+} from "src/app/components/forms/establishment/highlightStringsFromMatches";
 import { Proposal } from "./Proposal";
 
 export const StringWithHighlights = ({
@@ -13,7 +13,7 @@ export const StringWithHighlights = ({
   const slices: SliceOfString[] =
     matchRanges.length === 0
       ? onNoMatchRanges(description)
-      : hightlightStringsFromMatches(matchRanges, description);
+      : highlightStringsFromMatches(matchRanges, description);
 
   return (
     <span>
