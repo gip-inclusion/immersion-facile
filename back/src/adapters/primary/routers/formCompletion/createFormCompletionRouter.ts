@@ -14,12 +14,7 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
 
   formCompletionRouter.appellation((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.appellationSearch.execute(req.params.searchText),
-    ),
-  );
-  formCompletionRouter.rome(async (req, res) =>
-    sendHttpResponse(req, res, async () =>
-      deps.useCases.romeSearch.execute(req.params.searchText),
+      deps.useCases.appellationSearch.execute(req.query.searchText),
     ),
   );
 

@@ -27,7 +27,7 @@ describe("formCompletion Routes", () => {
   describe(`${displayRouteName(formCompletionRoutes.appellation)}`, () => {
     it("200 - forwards valid requests", async () => {
       const response = await httpClient.appellation({
-        urlParams: { searchText: "trail" },
+        queryParams: { searchText: "trail" },
       });
       expectHttpResponseToEqual(response, {
         body: [
@@ -44,23 +44,6 @@ describe("formCompletion Routes", () => {
                 endIndexExclusive: 7,
               },
             ],
-          },
-        ],
-        status: 200,
-      });
-    });
-  });
-
-  describe(`${displayRouteName(formCompletionRoutes.rome)}`, () => {
-    it("200 - forwards valid requests", async () => {
-      const response = await httpClient.rome({
-        urlParams: { searchText: "rails" },
-      });
-      expectHttpResponseToEqual(response, {
-        body: [
-          {
-            romeCode: "N4301",
-            romeLabel: "Conduite sur rails",
           },
         ],
         status: 200,

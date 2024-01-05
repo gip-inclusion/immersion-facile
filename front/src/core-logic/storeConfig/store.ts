@@ -23,8 +23,6 @@ import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlag
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { inclusionConnectedEpics } from "src/core-logic/domain/inclusionConnected/inclusionConnected.epics";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
-import { romeAutocompleteEpic } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.epics";
-import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
@@ -57,7 +55,6 @@ const allEpics: any[] = [
   ...siretEpics,
   ...featureFlagEpics,
   ...agenciesAdminEpics,
-  romeAutocompleteEpic,
   ...conventionEpics,
   ...assessmentEpics,
   ...inclusionConnectedEpics,
@@ -72,7 +69,6 @@ const rootReducer = combineReducers({
   [agenciesSlice.name]: agenciesSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
-  [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
   [establishmentSlice.name]: establishmentSlice.reducer,
   [geosearchSlice.name]: geosearchSlice.reducer,
