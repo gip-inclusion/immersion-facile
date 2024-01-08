@@ -1,5 +1,5 @@
 import { expectToEqual } from "shared";
-import { highlightStringsFromMatches } from "src/app/components/forms/establishment/highlightStringsFromMatches";
+import { highlightStringsFromMatches } from "src/app/utils/highlightStringsFromMatches";
 
 describe("hightlightStringsFromMatches", () => {
   it("match suggestions '' of 'Boulanger'", () => {

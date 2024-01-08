@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import {
   highlightStringsFromMatches,
   SliceOfString,
-} from "src/app/components/forms/establishment/highlightStringsFromMatches";
+} from "src/app/utils/highlightStringsFromMatches";
 import { Proposal } from "./Proposal";
 
 export const StringWithHighlights = ({
