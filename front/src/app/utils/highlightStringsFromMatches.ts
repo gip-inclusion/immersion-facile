@@ -10,40 +10,52 @@ export const highlightStringsFromMatches = (
   matchRanges: MatchRangeDto[],
   description: string,
 ): SliceOfString[] => {
-  const result: SliceOfString[] = [];
   const matchRangesWithoutOverlaps = mergeOverlappingMatchRanges(
     matchRanges,
     description.length,
   );
-  let prevEndIndex = 0;
 
-  for (let i = 0; i < matchRangesWithoutOverlaps.length; i++) {
-    const matchRange = matchRangesWithoutOverlaps[i];
-
-    if (matchRange.startIndexInclusive !== prevEndIndex) {
-      result.push({
-        bolded: false,
-        startIndexInclusive: prevEndIndex,
-        endIndexExclusive: matchRange.startIndexInclusive,
-      });
-    }
-    result.push({
-      bolded: true,
-      ...matchRange,
-    });
-    prevEndIndex = matchRange.endIndexExclusive;
-  }
+  const result = matchRangesWithoutOverlaps.reduce(
+    (acc, matchRange, currentIndex) => {
+      const prevEndIndex =
+        currentIndex === 0
+          ? 0
+          : matchRangesWithoutOverlaps[currentIndex - 1].endIndexExclusive;
+      const sliceOfStrings: SliceOfString[] = [
+        ...acc,
+        ...(matchRange.startIndexInclusive !== prevEndIndex
+          ? [
+              {
+                bolded: false,
+                startIndexInclusive: prevEndIndex,
+                endIndexExclusive: matchRange.startIndexInclusive,
+              },
+            ]
+          : []),
+        {
+          bolded: true,
+          ...matchRange,
+        },
+      ];
+      return sliceOfStrings;
+    },
+    [] as SliceOfString[],
+  );
 
   const lastResult = result[result.length - 1] ?? [];
-  if (lastResult && lastResult.endIndexExclusive !== description.length) {
-    result.push({
-      bolded: false,
-      startIndexInclusive: prevEndIndex,
-      endIndexExclusive: description.length,
-    });
-  }
 
-  return result;
+  return [
+    ...result,
+    ...(lastResult && lastResult.endIndexExclusive !== description.length
+      ? [
+          {
+            bolded: false,
+            startIndexInclusive: lastResult.endIndexExclusive ?? 0,
+            endIndexExclusive: description.length,
+          },
+        ]
+      : []),
+  ];
 };
 
 const mergeOverlappingMatchRanges = (
