@@ -8,12 +8,15 @@ import {
   SiretDto,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
+import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SearchMade } from "../entities/SearchMadeEntity";
 import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
 import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
+
+const logger = createLogger(__filename);
 
 export class SearchImmersion extends TransactionalUseCase<
   SearchQueryParamsDto,
@@ -128,12 +131,17 @@ export class SearchImmersion extends TransactionalUseCase<
         `No Rome code matching appellation codes ${appellationCodes}`,
       );
 
-    return this.laBonneBoiteAPI.searchCompanies({
-      rome: romeCode,
-      lat,
-      lon,
-      distanceKm,
-    });
+    try {
+      return await this.laBonneBoiteAPI.searchCompanies({
+        rome: romeCode,
+        lat,
+        lon,
+        distanceKm,
+      });
+    } catch (e) {
+      logger.error(e, "Error while searching on LBB");
+      return [];
+    }
   }
 }
 

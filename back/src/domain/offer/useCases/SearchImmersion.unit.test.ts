@@ -246,6 +246,24 @@ describe("SearchImmersionUseCase", () => {
     ]);
   });
 
+  it("does not crash when LBB returns an error, and provides only search results", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+    ];
+    laBonneBoiteGateway.setError(new Error("This is an LBB error"));
+    const range = 10;
+
+    const response = await searchImmersionUseCase.execute({
+      ...searchInMetzParams,
+      appellationCodes: [secretariatOffer.appellationCode],
+      sortedBy: "distance",
+      voluntaryToImmersion: false,
+      distanceKm: range,
+    });
+
+    expectToEqual(response, []);
+  });
+
   it("gets only the closest LBB results if voluntaryToImmersion is false, and do not query results from DB", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
