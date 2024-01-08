@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -14,6 +15,7 @@ import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilde
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
+import { SavedError } from "../../../domain/core/ports/ErrorRepository";
 import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
 import { AppConfig } from "../config/appConfig";
 import { createAppDependencies } from "../config/createAppDependencies";
@@ -196,6 +198,15 @@ const conventionSeed = async (uow: UnitOfWork) => {
     uow.conventionRepository.save(peConvention),
     uow.conventionRepository.save(cciConvention),
   ]);
+
+  const savedError: SavedError = {
+    handledByAgency: false,
+    message: "message de la seed",
+    occurredAt: addDays(new Date(peConvention.dateSubmission), 2),
+    serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
+    params: { httpStatus: 404, conventionId: peConvention.id },
+  };
+  await uow.errorRepository.save(savedError);
 
   console.log("done");
 };
