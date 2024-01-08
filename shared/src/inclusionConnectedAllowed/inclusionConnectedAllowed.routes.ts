@@ -5,6 +5,7 @@ import { markPartnersErroredConventionAsHandledRequestSchema } from "../conventi
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
+  legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
@@ -44,7 +45,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     requestBodySchema: markPartnersErroredConventionAsHandledRequestSchema,
     responses: {
       200: expressEmptyResponseBody,
-      404: httpErrorSchema,
+      404: legacyHttpErrorSchema,
       400: httpErrorSchema,
       403: legacyUnauthenticatedErrorSchema,
     },
