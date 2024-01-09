@@ -116,20 +116,10 @@ export const heroHeaderNavCards: (
     ],
     establishment: [
       {
-        title: "Référencer mon entreprise",
+        title: "Référencer ou modifier mon entreprise",
         icon: "fr-icon-hotel-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.addEstablishmentForm,
-        link: {
-          href: "",
-          onClick: onSiretModalOpenClick,
-        },
-      },
-      {
-        title: "Modifier mes informations",
-        icon: "fr-icon-edit-line",
-        type: "establishment",
-        id: domElementIds.homeEstablishments.heroHeader.editEstablishmentForm,
         link: {
           href: "",
           onClick: onSiretModalOpenClick,
@@ -148,6 +138,13 @@ export const heroHeaderNavCards: (
             routes.conventionImmersion().push();
           },
         },
+      },
+      {
+        title: "Piloter mon entreprise",
+        icon: "fr-icon-line-chart-line",
+        type: "establishment",
+        id: domElementIds.homeEstablishments.heroHeader.establishmentDashboard,
+        link: routes.establishmentDashboard().link,
       },
     ],
     agency: [
@@ -176,7 +173,7 @@ export const heroHeaderNavCards: (
         title: "Piloter mon organisme",
         icon: "fr-icon-line-chart-line",
         type: "agency",
-        id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
+        id: domElementIds.homeAgencies.heroHeader.agencyDashboard,
         link: routes.agencyDashboard().link,
       },
     ],
