@@ -92,14 +92,15 @@ export const domElementIds = {
     },
     heroHeader: {
       addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
-      editEstablishmentForm: buildHeroHeaderId("establishment-form-edit"),
       formConvention: buildHeroHeaderId("establishment-form-convention"),
+      establishmentDashboard: buildHeroHeaderId("establishment-dashboard"),
     },
   },
   homeAgencies: {
     heroHeader: {
       addAgencyForm: buildHeroHeaderId("agency-form-register"),
       formConvention: buildHeroHeaderId("agency-form-convention"),
+      agencyDashboard: buildHeroHeaderId("agency-dashboard"),
     },
   },
   homeCandidates: {
