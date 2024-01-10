@@ -18,6 +18,7 @@ import {
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
 } from "shared";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 export const JustificationModalContent = ({
   onSubmit,
@@ -36,7 +37,7 @@ export const JustificationModalContent = ({
     boolean | null
   >(null);
 
-  const { register, handleSubmit } = useForm<
+  const { register, handleSubmit, formState } = useForm<
     Partial<UpdateConventionStatusRequestDto>
   >({
     resolver: zodResolver(updateConventionStatusRequestSchema),
@@ -46,6 +47,8 @@ export const JustificationModalContent = ({
       conventionId: convention.id,
     },
   });
+
+  const getFieldError = makeFieldError(formState);
 
   const onFormSubmit: SubmitHandler<
     Partial<UpdateConventionStatusRequestDto>
@@ -221,6 +224,7 @@ export const JustificationModalContent = ({
                 ...register("modifierRole"),
                 id: domElementIds.manageConvention.modifierRoleSelect,
               }}
+              {...getFieldError("modifierRole")}
             />
           )}
           <Input
@@ -229,6 +233,7 @@ export const JustificationModalContent = ({
             nativeTextAreaProps={{
               ...register("statusJustification"),
             }}
+            {...getFieldError("statusJustification")}
           />
           <ButtonsGroup
             alignment="center"

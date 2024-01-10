@@ -76,7 +76,7 @@ import {
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
   UpdateConventionStatusWithJustificationWithModifierRole,
-  UpdateConventionStatusWithJustificationWithoutModierRole,
+  UpdateConventionStatusWithJustificationWithoutModifierRole,
   UpdateConventionStatusWithoutJustification,
   UpdateConventionStatusWithValidator,
   WithConventionDto,
@@ -106,7 +106,7 @@ export const phoneSchema = zStringMinLength1.regex(
   localization.invalidPhone,
 );
 
-const modifierRolesSchema = z.enum(allModifierRoles);
+const modifierRoleSchema = z.enum(allModifierRoles);
 
 const actorSchema = z.object({
   role: roleSchema,
@@ -386,18 +386,18 @@ export const updateConventionStatusWithoutJustificationSchema: z.Schema<UpdateCo
     conventionId: conventionIdSchema,
   });
 
-export const updateConventionStatusWithJustificationWhithoutModierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithoutModierRole> =
+export const updateConventionStatusWithJustificationWithoutModifierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithoutModifierRole> =
   z.object({
     status: z.enum(conventionStatusesWithJustificationWithoutModifierRole),
     statusJustification: justificationSchema,
     conventionId: conventionIdSchema,
   });
-export const updateConventionStatusWithJustificationWhithModierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithModifierRole> =
+export const updateConventionStatusWithJustificationWithModifierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithModifierRole> =
   z.object({
     status: z.enum(conventionStatusesWithJustificationWithModifierRole),
     statusJustification: justificationSchema,
     conventionId: conventionIdSchema,
-    modifierRole: modifierRolesSchema,
+    modifierRole: modifierRoleSchema,
   });
 const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatusWithValidator> =
   z.object({
@@ -409,10 +409,10 @@ const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatus
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z.union([
-    updateConventionStatusWithJustificationWhithoutModierRoleSchema,
+    updateConventionStatusWithJustificationWithoutModifierRoleSchema,
     updateConventionStatusWithValidatorSchema,
     updateConventionStatusWithoutJustificationSchema,
-    updateConventionStatusWithJustificationWhithModierRoleSchema,
+    updateConventionStatusWithJustificationWithModifierRoleSchema,
   ]);
 
 export const renewConventionParamsSchema: z.Schema<RenewConventionParams> =
