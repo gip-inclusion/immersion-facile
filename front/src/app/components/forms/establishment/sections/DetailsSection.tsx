@@ -14,7 +14,6 @@ import {
   domElementIds,
   emptyAppellationAndRome,
   FormEstablishmentDto,
-  immersionFacileContactEmail,
   removeAtIndex,
   toDotNotation,
 } from "shared";
@@ -22,10 +21,7 @@ import { ErrorNotifications } from "react-design-system";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
-import {
-  formEstablishmentFieldsLabels,
-  mailtoHref,
-} from "src/app/contents/forms/establishment/formEstablishment";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   formErrorsToFlatErrors,
   getFormContents,
@@ -84,6 +80,8 @@ export const DetailsSection = ({
     if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
   };
 
+  const isStepMode = currentStep !== null;
+
   const buttons: [ButtonProps, ...ButtonProps[]] = [
     {
       children: isEstablishmentAdmin
@@ -93,17 +91,19 @@ export const DetailsSection = ({
       iconPosition: "right",
       type: "submit",
       disabled: isSubmitting,
-      id: isEstablishmentAdmin
-        ? domElementIds.admin.manageEstablishment.submitEditButton
-        : domElementIds.establishment.submitButton,
+      id: getSubmitButtonId(isEstablishmentAdmin, mode),
     },
   ];
-  if (currentStep !== null) {
+  if (isStepMode) {
     buttons.unshift({
       children: "Étape précédente",
       iconId: "fr-icon-arrow-left-line",
       priority: "secondary",
       type: "button",
+      id: domElementIds.establishment.previousButtonFromStepAndMode({
+        currentStep,
+        mode,
+      }),
       onClick: () => onStepChange(2, []),
     });
   }
@@ -122,6 +122,9 @@ export const DetailsSection = ({
 
   return (
     <section className={fr.cx("fr-mb-4w")}>
+      <h2 className={fr.cx("fr-text--lead")}>
+        Comment souhaitez-vous apparaître dans notre annuaire ?
+      </h2>
       {match(mode)
         .with("create", () => <CreationSiretRelatedInputs />)
         .with("edit", () => (
@@ -215,18 +218,6 @@ export const DetailsSection = ({
         currentAppellations={formValues.appellations}
         error={errors?.appellations?.message}
       />
-      {mode === "edit" && (
-        <>
-          <p>
-            Vous pouvez demander la suppression définitive de votre entreprise{" "}
-            <a href={mailtoHref(formValues.siret)}>en cliquant ici</a>
-          </p>
-          <p>
-            Si vous avez besoin d'aide, envoyez-nous un email: <br />
-            {immersionFacileContactEmail}
-          </p>
-        </>
-      )}
       {keys(errors).length === 0 && keys(touchedFields).length > 0 && (
         <SearchResultPreview establishment={formValues} />
       )}
@@ -261,3 +252,13 @@ export const DetailsSection = ({
     </section>
   );
 };
+function getSubmitButtonId(
+  isEstablishmentAdmin: boolean,
+  mode: Mode,
+): string | undefined {
+  if (isEstablishmentAdmin)
+    return domElementIds.admin.manageEstablishment.submitEditButton;
+  if (mode === "edit")
+    return domElementIds.establishment.submitEditEstablishmentButton;
+  return domElementIds.establishment.submitCreateEstablishmentButton;
+}

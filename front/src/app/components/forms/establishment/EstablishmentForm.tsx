@@ -54,15 +54,15 @@ type EstablishmentFormProps = {
 
 const steps: Record<1 | 2 | 3, Pick<StepperProps, "title" | "nextTitle">> = {
   1: {
-    title: "Êtes-vous disponible pour recevoir des personnes en immersion ?",
-    nextTitle: "Qui répondra aux demandes des candidats ?",
+    title: "Planning",
+    nextTitle: "Référent immersion",
   },
   2: {
-    title: "Qui répondra aux demandes des candidats ?",
-    nextTitle: "Comment souhaitez-vous apparaître dans notre annuaire ?",
+    title: "Référent immersion",
+    nextTitle: "Votre fiche dans l’annuaire Immersion Facilitée",
   },
   3: {
-    title: "Comment souhaitez-vous apparaître dans notre annuaire ?",
+    title: "Votre fiche dans l’annuaire Immersion Facilitée",
   },
 };
 
@@ -343,6 +343,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               />
               <h2>{steps[2].title}</h2>
               <BusinessContactSection
+                mode={mode}
                 onStepChange={onStepChange}
                 currentStep={currentStep}
               />
@@ -379,6 +380,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 ))
                 .with(2, () => (
                   <BusinessContactSection
+                    mode={mode}
                     onStepChange={onStepChange}
                     currentStep={currentStep}
                   />

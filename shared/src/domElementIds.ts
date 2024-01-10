@@ -1,7 +1,10 @@
 import { frontRoutes } from "./routes/routes";
 
 type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
-type FrontRouteValue = string | Record<string, string | Record<string, string>>;
+type FrontRouteValue =
+  | string
+  | Record<string, string | Record<string, string>>
+  | ((params: Record<string, string | number>) => string);
 type FrontRoutesValues = Record<string, FrontRouteValue>;
 
 type DomElementIds = Record<FrontRoutesKeys, FrontRoutesValues>;
@@ -297,13 +300,22 @@ export const domElementIds = {
     website: "establishment-website",
     additionalInformation: "establishment-additionalInformation",
     maxContactsPerWeek: "establishment-maxContactPerWeek",
-    addAppellationButton: "im-form-add-establishment__add-appellation-button",
+    addAppellationButton:
+      "im-form-create-establishment__add-appellation-button",
     errorSiretAlreadyExistButton:
-      "im-form-add-establishment__edit-establishment-button",
-    submitButton: "im-form-add-establishment__submit-button",
+      "im-form-create-establishment__edit-establishment-button",
+    startAddEstablishmentButton: "im-form-create-establishment__start-button",
+    startEditEstablishmentButton: "im-form-edit-establishment__start-button",
+    submitCreateEstablishmentButton:
+      "im-form-create-establishment__submit-button",
+    submitEditEstablishmentButton: "im-form-edit-establishment__submit-button",
     manageButton: "im-form-manage-establishment__manage-button",
     nextAvailabilityDateInput:
-      "im-form-add-establishment__next-availability-date",
+      "im-form-create-establishment__next-availability-date",
+    previousButtonFromStepAndMode: ({ currentStep, mode }) =>
+      `im-form-${mode}-establishment__previous-button--step-${currentStep}`,
+    nextButtonFromStepAndMode: ({ currentStep, mode }) =>
+      `im-form-${mode}-establishment__next-button--step-${currentStep}`,
   },
 
   assessment: {

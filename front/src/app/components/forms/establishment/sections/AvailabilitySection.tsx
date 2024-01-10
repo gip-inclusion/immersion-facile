@@ -4,9 +4,17 @@ import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { FormEstablishmentDto, toDateString } from "shared";
-import { booleanSelectOptions } from "src/app/contents/forms/common/values";
-import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import {
+  domElementIds,
+  FormEstablishmentDto,
+  immersionFacileContactEmail,
+  toDateString,
+} from "shared";
+import { richBooleanSelectOptions } from "src/app/contents/forms/common/values";
+import {
+  formEstablishmentFieldsLabels,
+  mailtoHref,
+} from "src/app/contents/forms/establishment/formEstablishment";
 import {
   getFormContents,
   makeFieldError,
@@ -48,11 +56,13 @@ export const AvailabilitySection = ({
     currentNextAvailabilityDate &&
     toDateString(new Date(currentNextAvailabilityDate));
 
+  const isStepMode = currentStep !== null;
   return (
     <section className={fr.cx("fr-mb-4w")}>
       <RadioButtons
+        legend="Êtes-vous disponible actuellement pour recevoir des personnes en immersion ?"
         name="availableForImmersion"
-        options={booleanSelectOptions.map((option) => ({
+        options={richBooleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
@@ -62,7 +72,6 @@ export const AvailabilitySection = ({
               const isAvailable = option.nativeInputProps.value === 1;
               clearErrors("nextAvailabilityDate");
               clearErrors("maxContactsPerWeek");
-
               setAvailableForImmersion(isAvailable);
               if (isAvailable) {
                 setValue("nextAvailabilityDate", undefined);
@@ -123,7 +132,20 @@ export const AvailabilitySection = ({
             {...getFieldError("maxContactsPerWeek")}
           />
         )}
-      {currentStep !== null && (
+      {availableForImmersion === false && mode === "edit" && (
+        <div className={fr.cx("fr-highlight", "fr-ml-0")}>
+          <p>
+            Vous pouvez demander la suppression définitive de votre entreprise{" "}
+            <a href={mailtoHref(getValues().siret)}>en cliquant ici</a>. <br />
+            Si vous avez besoin d'aide, envoyez un email à{" "}
+            <a href={mailtoHref(immersionFacileContactEmail)}>
+              {immersionFacileContactEmail}
+            </a>
+            .
+          </p>
+        </div>
+      )}
+      {isStepMode && (
         <ButtonsGroup
           inlineLayoutWhen="always"
           alignment="left"
@@ -134,6 +156,10 @@ export const AvailabilitySection = ({
               iconId: "fr-icon-arrow-left-line",
               priority: "secondary",
               disabled: true,
+              id: domElementIds.establishment.previousButtonFromStepAndMode({
+                currentStep,
+                mode,
+              }),
             },
             {
               children: "Étape suivante",
@@ -143,6 +169,10 @@ export const AvailabilitySection = ({
               type: "button",
               iconId: "fr-icon-arrow-right-line",
               iconPosition: "right",
+              id: domElementIds.establishment.nextButtonFromStepAndMode({
+                currentStep,
+                mode,
+              }),
             },
           ]}
         />

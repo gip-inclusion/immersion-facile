@@ -5,6 +5,11 @@ import { timeHHmmRegExp } from "./utils/date";
 // Change default error map behavior to provide context
 // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
 z.setErrorMap((issue, ctx) => {
+  if (issue.code === "invalid_string" && issue.validation === "datetime")
+    return {
+      message: localization.invalidDate,
+    };
+
   if (issue.code === "invalid_enum_value")
     return {
       message: `Vous devez sélectionner une option parmi celles proposées`,
