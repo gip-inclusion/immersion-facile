@@ -33,7 +33,9 @@ export const ManageEstablishment = (): JSX.Element => {
               nativeInputProps={{
                 ...register("siret"),
                 onChange: (event) => {
-                  setValue("siret", event.currentTarget.value.trim());
+                  setValue("siret", event.currentTarget.value.trim(), {
+                    shouldValidate: true,
+                  });
                 },
                 id: domElementIds.admin.manageEstablishment.siretInput,
                 placeholder: "ex: 1234567891234",

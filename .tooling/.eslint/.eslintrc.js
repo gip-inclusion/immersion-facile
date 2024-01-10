@@ -5,7 +5,7 @@ const projects = [
   "./../../libs/react-design-system/tsconfig.json",
   "./../../libs/html-templates/tsconfig.json",
   "./../../libs/scss-mapper/tsconfig.json",
-  "./../../cypress/tsconfig.json",
+  "./../../playwright/tsconfig.json",
 ];
 
 module.exports = {
