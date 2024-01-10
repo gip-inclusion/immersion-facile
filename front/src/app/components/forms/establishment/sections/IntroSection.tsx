@@ -1,6 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 import formIntroIllustration from "src/assets/img/form-establishment-intro.webp";
 import { Mode, OnStepChange } from "../EstablishmentForm";
@@ -38,6 +39,11 @@ export const IntroSection = ({
         iconId="fr-icon-arrow-right-line"
         iconPosition="right"
         onClick={() => onStepChange(1, [])}
+        id={
+          mode === "create"
+            ? domElementIds.establishment.startAddEstablishmentButton
+            : domElementIds.establishment.startEditEstablishmentButton
+        }
       >
         {mode === "create"
           ? "Commencer le référencement"

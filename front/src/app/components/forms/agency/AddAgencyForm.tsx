@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
+import RadioButtons, {
+  RadioButtonsProps,
+} from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { match, P } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
@@ -27,7 +29,6 @@ import {
 } from "src/app/components/forms/commons/AgencySelector";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
-import { RadioButtonOption } from "src/app/contents/forms/common/values";
 import {
   formErrorsToFlatErrors,
   getFormContents,
@@ -44,7 +45,7 @@ export const AddAgencyForm = () => {
     boolean | undefined
   >(undefined);
 
-  const refersToOtherAgencyOptions: RadioButtonOption[] = [
+  const refersToOtherAgencyOptions: RadioButtonsProps["options"] = [
     {
       label: "Prescripteur",
       nativeInputProps: {

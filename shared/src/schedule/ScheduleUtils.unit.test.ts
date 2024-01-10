@@ -2,6 +2,7 @@ import { z, ZodError } from "zod";
 import { conventionSchema } from "../convention/convention.schema";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { expectToEqual } from "../test.helpers";
+import { localization } from "../zodUtils";
 import {
   DateIntervalDto,
   ScheduleDto,
@@ -650,7 +651,7 @@ describe("ScheduleUtils", () => {
             {
               code: "invalid_string",
               validation: "datetime",
-              message: "Invalid datetime",
+              message: localization.invalidDate,
               path: [],
             },
           ]),
