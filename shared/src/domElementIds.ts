@@ -259,6 +259,9 @@ export const domElementIds = {
       "im-convention-validation__deprecate-button",
     justificationModalCancelButton: "im-justification-modal__cancel-button",
     justificationModalSubmitButton: "im-justification-modal__submit-button",
+    justificationModalResendButton: "im-justification-modal__resend-button",
+    justificationModalRequestEditButton:
+      "im-justification-modal__request-edit-button",
     validatorModalCancelButton: "im-validator-modal__cancel-button",
     validatorModalSubmitButton: "im-validator-modal__submit-button",
     modifierRoleSelect: "im-validator-modal__modifier-role-select",

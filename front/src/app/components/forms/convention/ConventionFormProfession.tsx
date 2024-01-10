@@ -85,6 +85,7 @@ export const ConventionFormProfession = ({
             setValue("immersionAppellation.appellationCode", "");
             setValue("immersionAppellation.appellationLabel", "");
           }}
+          placeholder="Ex : agent d'entretien"
         />
         {error && <TextInputError errorMessage={error} />}
       </div>

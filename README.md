@@ -92,9 +92,9 @@ Pour le frontend se référer ensuite ici:
 
 ### Outillage
 
-#### Cypress
+#### Playwright
 
-Voir [Documentation frontend - Cypress](./front/README.md#e2e-tests-with-cypress)
+Voir [Documentation frontend - Playwright](./front/README.md#e2e-tests-with-playwright)
 
 #### CLI
 

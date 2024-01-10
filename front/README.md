@@ -59,27 +59,18 @@ Pour les éléments et modifiers, nous utiliserons la syntaxe :
 - on utilise toujours les classes du DSFR et les classes custom enrobés via les utilitaires de `react-dsfr` et `tss-react` `fr.cx()` et (éventuellement) `cx()`. Ex: `cx(fr.cx("fr-mt-4w"), Styles.imageWrapper)`
 - si une règle CSS ne trouve pas d'équivalent dans le DSFR, on peut se permettre de la déclarer en CSS ou Sass custom.
 
-### E2E Tests with Cypress
+### E2E Tests with Playwright
 
 #### Run locally
 
 - à la racine du projet
-- `pnpm cypress install` pour installer le binaire de l'app de votre OS
-- `pnpm front dev-http` & `pnpm back dev` : Cypress va écouter les requêtes XHR et a donc besoin du serveur back qui tourne et du front en mode HTTP
-- `pnpm cypress open` pour lancer l'app et démarrer les tests manuellement (End-to-end testing)
+- `pnpm run dev` : pour lancer le projet
+- `pnpm playwright test` pour lancer les tests
 
 ##### Linux prerequisites
 
 ```shell
 sudo apt-get update && sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-```
-
-### Open the app
-
-At the root of the project run :
-
-```shell
-pnpm cypress
 ```
 
 ### Sass to TS

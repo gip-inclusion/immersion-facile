@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
-import { useStyles } from "tss-react/dsfr";
 import {
   AppellationAndRomeDto,
   AppellationMatchDto,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
 } from "shared";
+import { AutocompleteInput } from "react-design-system";
 import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
 import { useDebounce } from "src/app/hooks/useDebounce";
@@ -43,7 +42,6 @@ export const AppellationAutocomplete = ({
   label,
   className,
   selectedAppellations = [],
-  description,
   placeholder,
   id = "im-appellation-autocomplete",
   disabled = false,
@@ -66,7 +64,6 @@ export const AppellationAutocomplete = ({
   const [searchTerm, setSearchTerm] = useState<string>(
     initialValue?.appellationLabel ?? "",
   );
-  const { cx } = useStyles();
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [inputHasChanged, setInputHasChanged] = useState(false);
@@ -159,20 +156,15 @@ export const AppellationAutocomplete = ({
           const { id } = params;
 
           return (
-            <div ref={params.InputProps.ref}>
-              <label className={cx(fr.cx("fr-label"), className)} htmlFor={id}>
-                {label}
-              </label>
-              {description && (
-                <span className={fr.cx("fr-hint-text")}>{description}</span>
-              )}
-              <input
-                {...params.inputProps}
-                id={id}
-                className={fr.cx("fr-input")}
-                placeholder={placeholder ?? "Ex: boulanger, styliste, etc."}
-              />
-            </div>
+            <AutocompleteInput
+              headerClassName={className}
+              label={label}
+              inputStyle={{}}
+              disabled={disabled}
+              placeholder={placeholder}
+              id={id}
+              params={params}
+            />
           );
         }}
       />

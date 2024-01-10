@@ -1,0 +1,24 @@
+name: Run Playwright on dev
+on:
+  workflow_call:
+jobs:
+  playwright-run:
+    name: Playwright run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Playwright install browser
+        run: pnpm playwright install
+      - name: Playwright run
+        run: pnpm playwright tests-ci

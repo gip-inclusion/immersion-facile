@@ -1,3 +1,3 @@
 export const testConfig = {
-  timeForEventCrawler: 6000,
+  timeForEventCrawler: 7000,
 };

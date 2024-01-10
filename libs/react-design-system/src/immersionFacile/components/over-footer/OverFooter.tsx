@@ -14,6 +14,8 @@ export const OverFooter = ({ cols = [] }: OverFooterProps) => {
     <aside
       id="over-footer"
       className={cx(fr.cx("fr-pt-8w", "fr-pb-4w"), "over-footer")}
+      role="complementary"
+      aria-label="Aide et informations complémentaires"
     >
       <div className={fr.cx("fr-container")}>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>

@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ADMIN_USER=admin ADMIN_PASSWORD=admin playwright test",
-    "show-report": "playwright show-report"
+    "tests": "ADMIN_USER=admin ADMIN_PASSWORD=admin playwright test",
+    "tests-ci": "BASE_URL=https://dev.immersion-facile.beta.gouv.fr ADMIN_USER=admin ADMIN_PASSWORD=admin playwright test",
+    "show-report": "playwright show-report",
+    "install": "playwright install"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +18,8 @@
     "@playwright/test": "^1.40.1",
     "@types/node": "^18.19.3",
     "shared": "workspace:*"
+  },
+  "dependencies": {
+    "date-fns": "2.28.0"
   }
 }

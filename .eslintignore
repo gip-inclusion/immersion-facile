@@ -4,7 +4,6 @@ node_modules/
 .idea/
 .git/
 vite.config.ts
-cypress
 front/src/assets/
 public/assets/
 public/dsfr/

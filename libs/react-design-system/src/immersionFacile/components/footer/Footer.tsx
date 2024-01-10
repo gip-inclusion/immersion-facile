@@ -71,9 +71,9 @@ export const Footer = ({
                 className={fr.cx("fr-col-12", "fr-col-sm-3", "fr-col-md-2")}
                 key="navTopGroupLinks"
               >
-                <h3 className={fr.cx("fr-footer__top-cat")}>
+                <span className={fr.cx("fr-footer__top-cat")}>
                   {groupOfLink.title}
-                </h3>
+                </span>
                 {groupOfLink.links && groupOfLink.links.length > 0 && (
                   <ul className={fr.cx("fr-footer__top-list")}>
                     {groupOfLink.links.map((link) => (

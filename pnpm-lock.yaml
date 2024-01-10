@@ -591,6 +591,28 @@ importers:
         specifier: ^5.3.2
         version: 5.3.2
 
+  playwright:
+    dependencies:
+      date-fns:
+        specifier: 2.28.0
+        version: 2.28.0
+    devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.8.2
+        version: 4.8.2(playwright-core@1.40.1)
+      '@faker-js/faker':
+        specifier: ^8.3.1
+        version: 8.3.1
+      '@playwright/test':
+        specifier: ^1.40.1
+        version: 1.40.1
+      '@types/node':
+        specifier: ^18.19.3
+        version: 18.19.3
+      shared:
+        specifier: workspace:*
+        version: link:../shared
+
   shared:
     dependencies:
       openapi-types:
@@ -679,6 +701,15 @@ packages:
     hasBin: true
     dependencies:
       default-browser-id: 3.0.0
+    dev: true
+
+  /@axe-core/playwright@4.8.2(playwright-core@1.40.1):
+    resolution: {integrity: sha512-9KOhX2tNuvqn9DzpBNyqoqNKRZBrexeSiN9irQ0sEdq8zH13JnatepCJxobuXn4UopNy6iIpP4342beMiH+MSQ==}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
+    dependencies:
+      axe-core: 4.8.3
+      playwright-core: 1.40.1
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -4563,6 +4594,11 @@ packages:
       - supports-color
     dev: true
 
+  /@faker-js/faker@8.3.1:
+    resolution: {integrity: sha512-FdgpFxY6V6rLZE9mmIBb9hM0xpfvQOSNOLnzolzKwsE1DH+gC7lEKV1p1IbR0lAYyvYd5a4u3qWJzowUkw1bIw==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
+    dev: true
+
   /@fal-works/esbuild-plugin-global-externals@2.1.2:
     resolution: {integrity: sha512-cEee/Z+I12mZcFJshKcCqC8tuX5hG3s+d+9nZ3LabqKF1vKdF41B92pJVCBggjAGORAeOzyyDDKrZwIkLffeOQ==}
     dev: true
@@ -5152,6 +5188,14 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
+    dev: true
+
+  /@playwright/test@1.40.1:
+    resolution: {integrity: sha512-EaaawMTOeEItCRvfmkI9v6rBkF1svM8wjl/YPRrg2N2Wmp+4qJYkWtJsbew1szfKKDm6fPLy4YAanBhIlf9dWw==}
+    engines: {node: '>=16'}
+    hasBin: true
+    dependencies:
+      playwright: 1.40.1
     dev: true
 
   /@popperjs/core@2.11.6:
@@ -6533,7 +6577,7 @@ packages:
       '@storybook/types': 7.0.0
       '@types/escodegen': 0.0.6
       '@types/estree': 0.0.51
-      '@types/node': 16.18.12
+      '@types/node': 16.18.46
       acorn: 7.4.1
       acorn-jsx: 5.3.2(acorn@7.4.1)
       acorn-walk: 7.2.0
@@ -7041,7 +7085,7 @@ packages:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 18.13.0
+      '@types/node': 18.19.3
     dev: true
 
   /@types/caseless@0.12.2:
@@ -7197,7 +7241,7 @@ packages:
   /@types/jsonwebtoken@9.0.2:
     resolution: {integrity: sha512-drE6uz7QBKq1fYqqoFKTDRdFCPHd5TCub75BM+D+cMx7NU9hUz7SESLfC2fSCXVFMO5Yj8sOWHuGqPgjc+fz0Q==}
     dependencies:
-      '@types/node': 18.13.0
+      '@types/node': 18.19.3
     dev: true
 
   /@types/lodash@4.14.191:
@@ -7247,10 +7291,6 @@ packages:
       form-data: 3.0.1
     dev: true
 
-  /@types/node@16.18.12:
-    resolution: {integrity: sha512-vzLe5NaNMjIE3mcddFVGlAXN1LEWueUsMsOJWaT6wWMJGyljHAWHznqfnKUQWGzu7TLPrGvWdNAsvQYW+C0xtw==}
-    dev: true
-
   /@types/node@16.18.46:
     resolution: {integrity: sha512-Mnq3O9Xz52exs3mlxMcQuA7/9VFe/dXcrgAyfjLkABIqxXKOgBRjyazTxUbjsxDa4BP7hhPliyjVTP9RDP14xg==}
     dev: true
@@ -7288,7 +7328,7 @@ packages:
   /@types/pg@8.10.2:
     resolution: {integrity: sha512-MKFs9P6nJ+LAeHLU3V0cODEOgyThJ3OAnmOlsZsxux6sfQs3HRXR5bBn7xG5DjckEFhTAxsXi7k7cd0pCMxpJw==}
     dependencies:
-      '@types/node': 18.13.0
+      '@types/node': 18.19.3
       pg-protocol: 1.6.0
       pg-types: 4.0.1
 
@@ -7412,7 +7452,7 @@ packages:
     resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==}
     dependencies:
       '@types/caseless': 0.12.2
-      '@types/node': 18.13.0
+      '@types/node': 18.19.3
       '@types/tough-cookie': 4.0.2
       form-data: 2.5.1
     dev: true
@@ -8253,6 +8293,11 @@ packages:
       uuid: 8.0.0
       xml2js: 0.4.19
     dev: false
+
+  /axe-core@4.8.3:
+    resolution: {integrity: sha512-d5ZQHPSPkF9Tw+yfyDcRoUOc4g/8UloJJe5J8m4L5+c7AtDdjDLRxew/knnI4CxvtdxEUVgWz4x3OIQUIFiMfw==}
+    engines: {node: '>=4'}
+    dev: true
 
   /axios-mock-adapter@1.21.2(axios@1.6.0):
     resolution: {integrity: sha512-jzyNxU3JzB2XVhplZboUcF0YDs7xuExzoRSHXPHr+UQajaGmcTqvkkUADgkVI2WkGlpZ1zZlMVdcTMU0ejV8zQ==}
@@ -10550,6 +10595,14 @@ packages:
   /fs@0.0.1-security:
     resolution: {integrity: sha512-3XY9e1pP0CVEUCdj5BmfIZxRBTSDycnbqhIOGec9QYtmVH2fbLpj86CFWkrNOkt/Fvty4KZG5lTglL9j/gJ87w==}
     dev: false
+
+  /fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
 
   /fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -13737,6 +13790,22 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       find-up: 5.0.0
+    dev: true
+
+  /playwright-core@1.40.1:
+    resolution: {integrity: sha512-+hkOycxPiV534c4HhpfX6yrlawqVUzITRKwHAmYfmsVreltEl6fAZJ3DPfLMOODw0H3s1Itd6MDCWmP1fl/QvQ==}
+    engines: {node: '>=16'}
+    hasBin: true
+    dev: true
+
+  /playwright@1.40.1:
+    resolution: {integrity: sha512-2eHI7IioIpQ0bS1Ovg/HszsN/XKNwEG1kbzSDDmADpclKc7CyqkHw7Mg2JCz/bbCxg25QUPcjksoMW7JcIFQmw==}
+    engines: {node: '>=16'}
+    hasBin: true
+    dependencies:
+      playwright-core: 1.40.1
+    optionalDependencies:
+      fsevents: 2.3.2
     dev: true
 
   /polished@4.2.2:
