@@ -1,0 +1,35 @@
+name: "Destroy review app"
+
+on:
+  pull_request:
+    types: [closed]
+  push:
+    branches:
+      - main
+
+jobs:
+  destroy-review-app:
+    name: "Destroy review app pr${{ github.event.number }}"
+    runs-on: ubuntu-latest
+    environment: review-app
+    concurrency:
+      group: deploy-to-scalingo-pr${{ github.event.number }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "pnpm"
+      - name: Install scalingo CLI
+        run: |
+          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
+      - name: Login to scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
+      - name: Destroy review app
+        run: scalingo --app if-dev-front-pr${{ secrets.SCALINGO_API_TOKEN }}
