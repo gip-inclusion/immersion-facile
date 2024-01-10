@@ -4,9 +4,11 @@ import {
   AgencyRoutes,
   agencyRoutes,
   BackOfficeJwt,
+  CreateAgencyDto,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
+  invalidAgencySiretMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -16,6 +18,7 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
+import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const defaultAddress: AddressDto = {
@@ -26,7 +29,7 @@ const defaultAddress: AddressDto = {
 };
 
 describe(`Agency routes`, () => {
-  let sharedRequest: HttpClient<AgencyRoutes>;
+  let httpClient: HttpClient<AgencyRoutes>;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
@@ -36,14 +39,17 @@ describe(`Agency routes`, () => {
     const deps = await buildTestApp();
     ({ gateways, eventCrawler, inMemoryUow } = deps);
 
-    sharedRequest = createSupertestSharedClient(agencyRoutes, deps.request);
+    httpClient = createSupertestSharedClient(agencyRoutes, deps.request);
 
+    inMemoryUow.agencyRepository.setAgencies([]);
     gateways.timeGateway.defaultDate = new Date();
-    const response = await deps.request.post("/admin/login").send({
-      user: deps.appConfig.backofficeUsername,
-      password: deps.appConfig.backofficePassword,
-    });
-    adminToken = response.body;
+
+    adminToken = (
+      await deps.request.post("/admin/login").send({
+        user: deps.appConfig.backofficeUsername,
+        password: deps.appConfig.backofficePassword,
+      })
+    ).body;
   });
 
   const agency1ActiveNearBy = AgencyDtoBuilder.create("test-agency-1")
@@ -87,7 +93,7 @@ describe(`Agency routes`, () => {
           agency4NeedsReview,
         ]);
 
-        const response = await sharedRequest.getFilteredAgencies({
+        const response = await httpClient.getFilteredAgencies({
           queryParams: { departmentCode: "20" },
         });
 
@@ -117,7 +123,7 @@ describe(`Agency routes`, () => {
         await inMemoryUow.agencyRepository.insert(agency1ActiveNearBy);
 
         // Act and assert
-        const response = await sharedRequest.getAgencyPublicInfoById({
+        const response = await httpClient.getAgencyPublicInfoById({
           queryParams: { agencyId: agency1ActiveNearBy.id },
         });
         expectHttpResponseToEqual(response, {
@@ -149,7 +155,7 @@ describe(`Agency routes`, () => {
         await inMemoryUow.agencyRepository.insert(agencyWithoutRefersTo);
 
         // Act and assert
-        const response = await sharedRequest.getAgencyPublicInfoById({
+        const response = await httpClient.getAgencyPublicInfoById({
           queryParams: { agencyId: agencyWithoutRefersTo.id },
         });
         expectHttpResponseToEqual(response, {
@@ -173,6 +179,74 @@ describe(`Agency routes`, () => {
         });
       });
     });
+
+    describe(`${displayRouteName(
+      agencyRoutes.addAgency,
+    )} to add Agency`, () => {
+      const parisMissionLocaleParams: CreateAgencyDto = {
+        id: "some-id",
+        address: {
+          streetNumberAndAddress: "Agency 1 address",
+          city: "Paris",
+          postcode: "75001",
+          departmentCode: "75",
+        },
+        counsellorEmails: ["counsellor@mail.com"],
+        validatorEmails: ["validator@mail.com"],
+        kind: "mission-locale",
+        name: "Mission locale de Paris",
+        position: { lat: 10, lon: 20 },
+        questionnaireUrl: "www.myUrl.com",
+        signature: "Super signature of the agency",
+        agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
+        refersToAgencyId: undefined,
+      };
+
+      it("200 - support posting valid agency", async () => {
+        const response = await httpClient.addAgency({
+          body: parisMissionLocaleParams,
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: "",
+        });
+
+        const {
+          refersToAgencyId,
+          ...parisMissionLocaleParamsWithoutRefersToAgencyId
+        } = parisMissionLocaleParams;
+
+        expectToEqual(inMemoryUow.agencyRepository.agencies, [
+          {
+            ...parisMissionLocaleParamsWithoutRefersToAgencyId,
+            questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
+            adminEmails: [],
+            status: "needsReview",
+          },
+        ]);
+      });
+
+      it("404 - siret not valid", async () => {
+        const missionLocaleWithBadSiret: CreateAgencyDto = {
+          ...parisMissionLocaleParams,
+          agencySiret: "12345678909999",
+        };
+
+        const response = await httpClient.addAgency({
+          body: missionLocaleWithBadSiret,
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 404,
+          body: {
+            errors: invalidAgencySiretMessage,
+          },
+        });
+
+        expectToEqual(inMemoryUow.agencyRepository.agencies, []);
+      });
+    });
   });
 
   describe("Private routes (for backoffice admin)", () => {
@@ -180,7 +254,7 @@ describe(`Agency routes`, () => {
       agencyRoutes.listAgenciesWithStatus,
     )} to get agencies full dto given filters`, () => {
       it("Returns Forbidden if no token provided", async () => {
-        const response = await sharedRequest.listAgenciesWithStatus({
+        const response = await httpClient.listAgenciesWithStatus({
           queryParams: { status: "needsReview" },
           headers: { authorization: "" },
         });
@@ -200,7 +274,7 @@ describe(`Agency routes`, () => {
           ),
         );
 
-        const response = await sharedRequest.listAgenciesWithStatus({
+        const response = await httpClient.listAgenciesWithStatus({
           queryParams: { status: "needsReview" },
           headers: { authorization: adminToken },
         });
@@ -225,7 +299,7 @@ describe(`Agency routes`, () => {
         // Prepare
         await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
 
-        const response = await sharedRequest.updateAgencyStatus({
+        const response = await httpClient.updateAgencyStatus({
           headers: { authorization: adminToken },
           body: { status: "active" },
           urlParams: { agencyId: agency4NeedsReview.id },
@@ -257,7 +331,7 @@ describe(`Agency routes`, () => {
           .withCodeSafir("1234")
           .build();
 
-        const response = await sharedRequest.updateAgency({
+        const response = await httpClient.updateAgency({
           headers: { authorization: "wrong-token" },
           urlParams: { agencyId: "test-agency-4" },
           body: updatedAgency,
@@ -279,7 +353,7 @@ describe(`Agency routes`, () => {
           .withCodeSafir("1234")
           .build();
 
-        const response = await sharedRequest.updateAgency({
+        const response = await httpClient.updateAgency({
           headers: { authorization: adminToken },
           urlParams: { agencyId: agency4NeedsReview.id },
           body: updatedAgency,
