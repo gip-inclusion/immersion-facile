@@ -5,6 +5,7 @@ import {
   expectPromiseToFail,
   expectPromiseToFailWithError,
   expectToEqual,
+  invalidAgencySiretMessage,
 } from "shared";
 import {
   createInMemoryUow,
@@ -17,6 +18,10 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  InMemorySiretGateway,
+  TEST_OPEN_ESTABLISHMENT_1,
+} from "../../../../adapters/secondary/siret/InMemorySiretGateway";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -41,7 +46,7 @@ describe("AddAgency use case", () => {
     questionnaireUrl: "www.myUrl.com",
     signature: "Super signature of the agency",
     logoUrl: "https://www.myUrl.com",
-    agencySiret: "01234567891234",
+    agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: undefined,
   };
 
@@ -59,13 +64,14 @@ describe("AddAgency use case", () => {
     name: "Mission locale de Paris Bis",
     position: { lat: 10, lon: 20 },
     signature: "Super signature of the agency bis",
-    agencySiret: "01234567890000",
+    agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: createParisMissionLocaleParams.id,
   };
 
   let uow: InMemoryUnitOfWork;
   let addAgency: AddAgency;
   let createNewEvent: CreateNewEvent;
+  let siretGateway: InMemorySiretGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -73,7 +79,12 @@ describe("AddAgency use case", () => {
       timeGateway: new CustomTimeGateway(),
       uuidGenerator: new TestUuidGenerator(),
     });
-    addAgency = new AddAgency(new InMemoryUowPerformer(uow), createNewEvent);
+    siretGateway = new InMemorySiretGateway();
+    addAgency = new AddAgency(
+      new InMemoryUowPerformer(uow),
+      createNewEvent,
+      siretGateway,
+    );
   });
 
   describe("right paths", () => {
@@ -212,6 +223,19 @@ describe("AddAgency use case", () => {
         new ConflictError(
           "Une autre agence du même type existe avec la même adresse",
         ),
+      );
+    });
+
+    it("fails to create if agency siret is not valid", async () => {
+      const newAgency = new AgencyDtoBuilder()
+        .withId("agency-to-create-id")
+        .withStatus("needsReview")
+        .withAgencySiret("11110000111100")
+        .build();
+
+      await expectPromiseToFailWithError(
+        addAgency.execute(newAgency),
+        new NotFoundError(invalidAgencySiretMessage),
       );
     });
   });

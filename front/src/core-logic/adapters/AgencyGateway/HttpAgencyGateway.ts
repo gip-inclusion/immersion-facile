@@ -29,6 +29,7 @@ export class HttpAgencyGateway implements AgencyGateway {
       .then((response) =>
         match(response)
           .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 404 }, logBodyAndThrow)
           .with({ status: 409 }, logBodyAndThrow)
           .otherwise(otherwiseThrow),
       );

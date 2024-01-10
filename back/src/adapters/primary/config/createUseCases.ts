@@ -507,7 +507,7 @@ export const createUseCases = (
         gateways.shortLinkGenerator,
         config,
       ),
-      addAgency: new AddAgency(uowPerformer, createNewEvent),
+      addAgency: new AddAgency(uowPerformer, createNewEvent, gateways.siret),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
       updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
