@@ -27,10 +27,10 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion" ? (
         <>
           <p className="fr-text">
-            <strong>
+            <h2 className={fr.cx("fr-text--md")}>
               Bravo, la mise en relation entre candidat et entreprise s’est bien
               passée !
-            </strong>
+            </h2>
           </p>
           <p className="fr-text">
             Complétez ce formulaire pour réaliser votre immersion

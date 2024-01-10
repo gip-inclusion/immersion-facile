@@ -156,6 +156,7 @@ export const SearchPage = ({
                   setValue("appellations", undefined);
                 }}
                 id={domElementIds.search.appellationAutocomplete}
+                placeholder="Ex: boulanger, styliste, etc"
               />
             </div>
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>

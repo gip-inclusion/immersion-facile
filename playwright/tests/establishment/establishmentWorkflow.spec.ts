@@ -6,6 +6,8 @@ import { connectToAdmin, goToTab } from "../../utils/admin";
 
 const providedSiret = "41433740200039";
 
+test.describe.configure({ mode: "serial" });
+
 test.describe("Establishment creation and modification workflow", () => {
   test("creates a new establishment", async ({ page }) => {
     await page.goto("/");

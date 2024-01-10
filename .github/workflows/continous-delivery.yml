@@ -38,10 +38,10 @@ jobs:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-  run-cypress-on-dev:
-    name: Run Cypress on dev
+  run-playwright-on-dev:
+    name: Run Playwright on dev
     needs: deploy-dev
-    uses: ./.github/workflows/cypress-run.yml
+    uses: ./.github/workflows/playwright-run.yml
     with:
       environment: dev
       tag: "v${{ github.run_number }}"
