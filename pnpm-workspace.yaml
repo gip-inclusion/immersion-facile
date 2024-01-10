@@ -3,4 +3,4 @@ packages:
   - "back"
   - "shared"
   - "libs/*"
-  - "cypress"
+  - "playwright"

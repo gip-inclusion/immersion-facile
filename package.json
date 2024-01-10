@@ -1,12 +1,6 @@
 {
   "name": "root",
   "version": "1.0.0",
-  "workspaces": [
-    "front",
-    "back",
-    "shared",
-    "libs/*"
-  ],
   "scripts": {
     "db:migrate": "pnpm back db:migrate",
     "db:create": "pnpm back db:create",
@@ -22,7 +16,7 @@
     "back": "pnpm --dir back",
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",
-    "cypress": "pnpm --dir cypress",
+    "playwright": "pnpm --dir playwright",
     "react-design-system": "pnpm --dir libs/react-design-system",
     "html-templates": "pnpm --dir libs/html-templates",
     "lintconfig:glob": "eslint --config=.eslintrc.js",

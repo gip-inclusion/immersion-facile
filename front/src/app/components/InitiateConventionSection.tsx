@@ -1,7 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Card from "@codegouvfr/react-dsfr/Card";
-import { loginPeConnect } from "shared";
+import { domElementIds, loginPeConnect } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import illustrationForm from "src/assets/img/fill-convention-form.svg";
 import illustrationHelp from "src/assets/img/fill-convention-help.svg";
@@ -38,6 +38,7 @@ export const InitiateConventionSection = ({
             imageUrl={illustrationForm}
             linkProps={{
               href: "#",
+              id: domElementIds.conventionImmersionRoute.showFormButton,
             }}
             size="medium"
             title="Je remplis une convention sans identifiants Pôle emploi"
