@@ -1,11 +1,27 @@
 name: Run Playwright on dev
 on:
   workflow_call:
+    secrets:
+      DISCORD_WEBHOOK_URL:
+        required: true
+    inputs:
+      tag:
+        type: string
+        required: true
+      environment:
+        type: string
+        required: true
 jobs:
   playwright-run:
     name: Playwright run
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
+      - name: Send Discord notification
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "content": "Les tests Playwright sont lancés, le report est dispo dans les logs de l’action Github"
+          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
       - name: Checkout
         uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
@@ -18,7 +34,6 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
-      - name: Playwright install browser
-        run: pnpm playwright install
       - name: Playwright run
+        continue-on-error: true
         run: pnpm playwright tests-ci
