@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  BackOfficeJwtPayload,
   expectObjectsToMatch,
   expectPromiseToFail,
   expectPromiseToFailWith,
@@ -7,7 +8,11 @@ import {
   expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { ConflictError } from "../../../../adapters/primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+} from "../../../../adapters/primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -15,6 +20,14 @@ import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemor
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { UpdateAgency } from "./UpdateAgency";
+
+const backofficeJwtPayload: BackOfficeJwtPayload = {
+  role: "backOffice",
+  iat: 0,
+  exp: 0,
+  sub: "backoffice-id",
+  version: 1,
+};
 
 describe("Update agency", () => {
   const initialAgencyInRepo = new AgencyDtoBuilder().build();
@@ -40,10 +53,18 @@ describe("Update agency", () => {
     );
   });
 
+  it("throws Unauthorized if no jwtPayload provided", async () => {
+    const agency = new AgencyDtoBuilder().build();
+    await expectPromiseToFailWithError(
+      updateAgency.execute(agency),
+      new UnauthorizedError(),
+    );
+  });
+
   it("Fails trying to update if no matching agency was found", async () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWith(
-      updateAgency.execute(agency),
+      updateAgency.execute(agency, backofficeJwtPayload),
       `No agency found with id : ${agency.id}`,
     );
   });
@@ -61,7 +82,9 @@ describe("Update agency", () => {
         departmentCode: "",
       })
       .build();
-    await expectPromiseToFail(updateAgency.execute(updatedAgency));
+    await expectPromiseToFail(
+      updateAgency.execute(updatedAgency, backofficeJwtPayload),
+    );
   });
 
   it("Fails to update agency if geo components are 0,0", async () => {
@@ -74,7 +97,27 @@ describe("Update agency", () => {
       .withPosition(0, 0)
       .build();
 
-    await expectPromiseToFail(updateAgency.execute(updatedAgency));
+    const expectedErrorMessage = JSON.stringify(
+      [
+        {
+          code: "custom",
+          message: "0 est une latitude par défaut qui ne semble pas correcte",
+          path: ["position", "lat"],
+        },
+        {
+          code: "custom",
+          message: "0 est une longitude par défaut qui ne semble pas correcte",
+          path: ["position", "lon"],
+        },
+      ],
+      null,
+      2,
+    );
+
+    await expectPromiseToFailWithError(
+      updateAgency.execute(updatedAgency, backofficeJwtPayload),
+      new BadRequestError(expectedErrorMessage),
+    );
   });
 
   it("fails to update if attempt to update to another existing agency (with same address and kind, and a status 'active' or 'from-api-PE'", async () => {
@@ -88,12 +131,20 @@ describe("Update agency", () => {
 
     agencyRepository.setAgencies([updatedAgency, existingAgency]);
 
+    // conflict error when user is not admin
     await expectPromiseToFailWithError(
-      updateAgency.execute(updatedAgency),
+      updateAgency.execute(updatedAgency, { role: "another-role" } as any),
       new ConflictError(
         "Une autre agence du même type existe avec la même adresse",
       ),
     );
+
+    // no conflict error if user is admin
+    const result = await updateAgency.execute(
+      updatedAgency,
+      backofficeJwtPayload,
+    );
+    expect(result).toBeUndefined();
   });
 
   it("Updates agency and create corresponding event", async () => {
@@ -106,7 +157,10 @@ describe("Update agency", () => {
       .withValidatorEmails(["new-validator@mail.com"])
       .build();
 
-    const response = await updateAgency.execute(updatedAgency);
+    const response = await updateAgency.execute(
+      updatedAgency,
+      backofficeJwtPayload,
+    );
     expect(response).toBeUndefined();
     expectToEqual(agencyRepository.agencies, [updatedAgency]);
 

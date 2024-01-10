@@ -1,5 +1,8 @@
-import { AgencyDto, agencySchema } from "shared";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { AgencyDto, agencySchema, BackOfficeJwtPayload } from "shared";
+import {
+  NotFoundError,
+  UnauthorizedError,
+} from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
@@ -8,7 +11,11 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 
-export class UpdateAgency extends TransactionalUseCase<AgencyDto> {
+export class UpdateAgency extends TransactionalUseCase<
+  AgencyDto,
+  void,
+  BackOfficeJwtPayload
+> {
   protected inputSchema = agencySchema;
 
   #createNewEvent: CreateNewEvent;
@@ -21,8 +28,15 @@ export class UpdateAgency extends TransactionalUseCase<AgencyDto> {
     this.#createNewEvent = createNewEvent;
   }
 
-  public async _execute(agency: AgencyDto, uow: UnitOfWork): Promise<void> {
-    await throwConflictErrorOnSimilarAgencyFound({ uow, agency });
+  public async _execute(
+    agency: AgencyDto,
+    uow: UnitOfWork,
+    jwtPayload: BackOfficeJwtPayload,
+  ): Promise<void> {
+    if (!jwtPayload) throw new UnauthorizedError();
+    if (jwtPayload.role !== "backOffice") {
+      await throwConflictErrorOnSimilarAgencyFound({ uow, agency });
+    }
 
     await uow.agencyRepository.update(agency).catch((error) => {
       if (error.message === `Agency ${agency.id} does not exist`) {

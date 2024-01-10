@@ -1,9 +1,13 @@
 import {
+  BackOfficeJwtPayload,
   PartialAgencyDto,
   UpdateAgencyStatusParams,
   updateAgencyStatusParamsSchema,
 } from "shared";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import {
+  NotFoundError,
+  UnauthorizedError,
+} from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
@@ -14,7 +18,8 @@ import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyStatusParams,
-  void
+  void,
+  BackOfficeJwtPayload
 > {
   protected inputSchema = updateAgencyStatusParamsSchema;
 
@@ -31,7 +36,9 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
   public async _execute(
     updateAgencyStatusParams: UpdateAgencyStatusParams,
     uow: UnitOfWork,
+    jwtPayload?: BackOfficeJwtPayload,
   ): Promise<void> {
+    if (!jwtPayload) throw new UnauthorizedError();
     const existingAgency = await uow.agencyRepository.getById(
       updateAgencyStatusParams.id,
     );
@@ -40,10 +47,12 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
         `No agency found with id ${updateAgencyStatusParams.id}`,
       );
 
-    await throwConflictErrorOnSimilarAgencyFound({
-      uow,
-      agency: existingAgency,
-    });
+    if (jwtPayload.role !== "backOffice") {
+      await throwConflictErrorOnSimilarAgencyFound({
+        uow,
+        agency: existingAgency,
+      });
+    }
 
     const updatedAgencyParams: PartialAgencyDto = {
       id: updateAgencyStatusParams.id,
