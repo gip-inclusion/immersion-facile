@@ -70,6 +70,7 @@ export const agencyRoutes = defineRoutes({
     requestBodySchema: createAgencySchema,
     responses: {
       200: expressEmptyResponseBody,
+      404: legacyHttpErrorSchema,
       409: legacyHttpErrorSchema,
     },
   }),
@@ -85,3 +86,6 @@ export const agencyRoutes = defineRoutes({
     responses: { 200: agencyPublicDisplaySchema },
   }),
 });
+
+export const invalidAgencySiretMessage =
+  "Le SIRET que vous avez saisi n'est pas valide et votre organisme n'a pas été enregistré. Merci de corriger le SIRET et de soumettre à nouveau le formulaire.";

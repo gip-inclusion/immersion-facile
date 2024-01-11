@@ -4,6 +4,7 @@ import {
   CreateAgencyDto,
   createAgencySchema,
   Email,
+  invalidAgencySiretMessage,
 } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
@@ -12,6 +13,7 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { SiretGateway } from "../../../sirene/ports/SirenGateway";
 import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 import { referedAgencyMissingMessage } from "../../ports/AgencyRepository";
 
@@ -23,6 +25,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
+    private siretGateway: SiretGateway,
   ) {
     super(uowPerformer);
     this.#createNewEvent = createNewEvent;
@@ -46,6 +49,13 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
     };
 
     await throwConflictErrorOnSimilarAgencyFound({ uow, agency });
+
+    const siretEstablishmentDto =
+      agency.agencySiret &&
+      (await this.siretGateway.getEstablishmentBySiret(agency.agencySiret));
+
+    if (!siretEstablishmentDto)
+      throw new NotFoundError(invalidAgencySiretMessage);
 
     await Promise.all([
       uow.agencyRepository.insert(agency),
