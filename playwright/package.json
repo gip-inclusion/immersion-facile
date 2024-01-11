@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tests": "ADMIN_USER=admin ADMIN_PASSWORD=admin playwright test",
-    "tests-ci": "BASE_URL=https://dev.immersion-facile.beta.gouv.fr ADMIN_USER=admin ADMIN_PASSWORD=admin playwright test",
+    "tests-ci": "CI=true BASE_URL=https://dev.immersion-facile.beta.gouv.fr ADMIN_USER=admin ADMIN_PASSWORD=admin playwright test",
     "show-report": "playwright show-report",
     "install": "playwright install"
   },
