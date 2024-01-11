@@ -35,5 +35,4 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Playwright run
-        continue-on-error: true
         run: pnpm playwright tests-ci
