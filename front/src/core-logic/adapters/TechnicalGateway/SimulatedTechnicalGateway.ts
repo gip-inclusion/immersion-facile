@@ -20,9 +20,16 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
   ): Promise<string> => Promise.resolve(`YWJjZA==`);
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public uploadLogo = async (file: File): Promise<AbsoluteUrl> => {
+  public uploadAnyFile = async (file: File): Promise<AbsoluteUrl> => {
     // eslint-disable-next-line no-console
     console.log("file uploaded : ", file);
+    return `http://${file.name}-url`;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public uploadLogo = async (file: File): Promise<AbsoluteUrl> => {
+    // eslint-disable-next-line no-console
+    console.log("logo uploaded : ", file);
     return `http://${file.name}-url`;
   };
 

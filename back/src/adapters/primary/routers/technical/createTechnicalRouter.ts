@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
-import { technicalRoutes, uploadFileRoute } from "shared";
+import { technicalRoutes, uploadAnyFileRoute, uploadLogoRoute } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
@@ -18,8 +18,17 @@ export const createTechnicalRouter = (
   const upload = multer({ storage: multer.memoryStorage() });
 
   technicalRouter
-    .route(`/${uploadFileRoute}`)
-    .post(upload.single(uploadFileRoute), (req, res) =>
+    .route(`/${uploadLogoRoute}`)
+    .post(upload.single(uploadLogoRoute), (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        if (!req.file) throw new BadRequestError("No file provided");
+        return deps.useCases.uploadLogo.execute(req.file);
+      }),
+    );
+
+  technicalRouter
+    .route(`/${uploadAnyFileRoute}`)
+    .post(upload.single(uploadAnyFileRoute), (req, res) =>
       sendHttpResponse(req, res, async () => {
         if (!req.file) throw new BadRequestError("No file provided");
         return deps.useCases.uploadLogo.execute(req.file);

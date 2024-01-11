@@ -21,14 +21,6 @@ export const expectPromiseToFailWithError = async <T extends Error>(
   await expect(promise).rejects.toBeInstanceOf(expectedError.constructor);
 };
 
-export const expectPromiseToFailWithErrorMatching = async (
-  promise: Promise<unknown>,
-  expectedErrorMatch: Record<string, unknown>,
-) => {
-  await expect(promise).rejects.toThrow();
-  await promise.catch((e) => expect(e).toMatchObject(expectedErrorMatch));
-};
-
 export const expectArraysToMatch = <T>(actual: T[], expected: Partial<T>[]) => {
   expect(actual).toMatchObject(expected);
 };

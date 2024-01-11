@@ -40,4 +40,5 @@ export const immersionOffersRoute = "immersion-offers";
 export const loginPeConnect = "login-pe-connect";
 export const peConnect = "pe-connect";
 
-export const uploadFileRoute = "upload-file";
+export const uploadLogoRoute = "upload-logo";
+export const uploadAnyFileRoute = "upload-any-file";

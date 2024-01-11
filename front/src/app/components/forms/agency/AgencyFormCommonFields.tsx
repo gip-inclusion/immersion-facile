@@ -22,7 +22,6 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes } from "src/app/routes/routes";
 
 type AgencyFormCommonFieldsProps = {
@@ -183,12 +182,10 @@ export const AgencyFormCommonFields = ({
 
 export const AgencyLogoUpload = () => {
   const { getValues, setValue } = useFormContext<CreateAgencyDto>();
-  const { enableLogoUpload } = useFeatureFlags();
   const { getFormFields } = getFormContents(formAgencyFieldsLabels);
   const fieldsContent: FormAgencyFieldsLabels = getFormFields();
   const formValues = getValues();
 
-  if (!enableLogoUpload.isActive) return null;
   return (
     <>
       <UploadLogo

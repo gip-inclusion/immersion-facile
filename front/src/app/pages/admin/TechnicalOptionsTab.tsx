@@ -42,7 +42,6 @@ import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFla
 
 const labelsByFeatureFlag: Record<FeatureFlagName, string> = {
   enableInseeApi: "API insee (siret)",
-  enableLogoUpload: "Upload de logos (pour agences)",
   enablePeConnectApi: "PE Connect",
   enablePeConventionBroadcast: "Diffusion des Conventions à Pole Emploi",
   enableTemporaryOperation: "Activer l'offre temporaire",

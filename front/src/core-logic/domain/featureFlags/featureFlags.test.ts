@@ -18,7 +18,6 @@ import { ReduxStore } from "src/core-logic/storeConfig/store";
 const defaultFeatureFlags: FeatureFlags = {
   enableInseeApi: makeBooleanFeatureFlag(true),
   enablePeConnectApi: makeBooleanFeatureFlag(false),
-  enableLogoUpload: makeBooleanFeatureFlag(false),
   enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
   enableTemporaryOperation: makeBooleanFeatureFlag(false),
   enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
@@ -30,7 +29,6 @@ const defaultFeatureFlags: FeatureFlags = {
 const flagsFromApi: FeatureFlags = {
   enableInseeApi: makeBooleanFeatureFlag(true),
   enablePeConnectApi: makeBooleanFeatureFlag(true),
-  enableLogoUpload: makeBooleanFeatureFlag(false),
   enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
   enableTemporaryOperation: makeBooleanFeatureFlag(false),
   enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
@@ -68,13 +66,13 @@ describe("feature flag slice", () => {
     ({ store, dependencies } = createTestStore({
       featureFlags: {
         ...defaultFeatureFlags,
-        enableLogoUpload: makeBooleanFeatureFlag(false),
+        enableInseeApi: makeBooleanFeatureFlag(false),
         isLoading: false,
       },
     }));
     store.dispatch(
       featureFlagsSlice.actions.setFeatureFlagRequested({
-        flagName: "enableLogoUpload",
+        flagName: "enableInseeApi",
         flagContent: {
           isActive: true,
         },
@@ -82,19 +80,19 @@ describe("feature flag slice", () => {
     );
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableLogoUpload: makeBooleanFeatureFlag(true),
+      enableInseeApi: makeBooleanFeatureFlag(true),
       isLoading: true,
     });
     dependencies.adminGateway.setFeatureFlagResponse$.next(undefined);
     expectToEqual(dependencies.adminGateway.setFeatureFlagLastCalledWith, {
-      flagName: "enableLogoUpload",
+      flagName: "enableInseeApi",
       flagContent: {
         isActive: true,
       },
     });
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableLogoUpload: makeBooleanFeatureFlag(true),
+      enableInseeApi: makeBooleanFeatureFlag(true),
       isLoading: false,
     });
   });

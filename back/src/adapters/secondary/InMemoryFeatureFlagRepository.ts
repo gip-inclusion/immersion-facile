@@ -10,7 +10,6 @@ import { FeatureFlagRepository } from "../../domain/core/ports/FeatureFlagReposi
 const defaultFlags: FeatureFlags = {
   enableInseeApi: makeBooleanFeatureFlag(true),
   enablePeConnectApi: makeBooleanFeatureFlag(true),
-  enableLogoUpload: makeBooleanFeatureFlag(true),
   enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
   enableTemporaryOperation: makeBooleanFeatureFlag(false),
   enableMaxContactPerWeek: makeBooleanFeatureFlag(false),

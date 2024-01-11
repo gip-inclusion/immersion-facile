@@ -45,7 +45,6 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
 
   const featureFlags: FeatureFlags = {
     enableInseeApi: makeBooleanFeatureFlag(true),
-    enableLogoUpload: makeBooleanFeatureFlag(true),
     enableMaintenance: makeTextFeatureFlag(false, {
       message: "Mon message de maintenance",
     }),
