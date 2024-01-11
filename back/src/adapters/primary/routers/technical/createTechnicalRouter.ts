@@ -28,10 +28,10 @@ export const createTechnicalRouter = (
 
   technicalRouter
     .route(`/${uploadAnyFileRoute}`)
-    .post(upload.single(uploadAnyFileRoute), (req, res) =>
+    .post(upload.single(uploadLogoRoute), (req, res) =>
       sendHttpResponse(req, res, async () => {
         if (!req.file) throw new BadRequestError("No file provided");
-        return deps.useCases.uploadLogo.execute(req.file);
+        return deps.useCases.uploadFile.execute(req.file);
       }),
     );
 

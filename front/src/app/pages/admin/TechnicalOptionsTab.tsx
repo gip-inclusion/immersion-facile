@@ -23,6 +23,7 @@ import {
 } from "shared";
 import { Loader } from "react-design-system";
 import { ApiConsumerForm } from "src/app/components/admin/technical-options/ApiConsumerForm";
+import { UploadFile } from "src/app/components/UploadFile";
 import {
   formatApiConsumerContact,
   formatApiConsumerDescription,
@@ -241,6 +242,9 @@ export const TechnicalOptionsTab = () => {
           </div>
         </div>
       </div>
+      <div className={fr.cx("fr-container")}>
+        <UploadFileSection />
+      </div>
       <div className={fr.cx("fr-container", "fr-mt-6w")}>
         <h4>Consommateurs API</h4>
         <Button type="button" onClick={onApiConsumerAddClick}>
@@ -299,6 +303,25 @@ export const TechnicalOptionsTab = () => {
           document.body,
         )}
       </div>
+    </>
+  );
+};
+
+const UploadFileSection = () => {
+  const [uploadedFileUrl, setUploadedFileUrl] = useState("");
+
+  return (
+    <>
+      <h4>Upload de fichier</h4>
+      <UploadFile setFileUrl={setUploadedFileUrl} />
+      {uploadedFileUrl && (
+        <Alert
+          severity="success"
+          title="Fichier uploadé !"
+          description={`URL du fichier : ${uploadedFileUrl}`}
+          className={"fr-mb-2w"}
+        />
+      )}
     </>
   );
 };

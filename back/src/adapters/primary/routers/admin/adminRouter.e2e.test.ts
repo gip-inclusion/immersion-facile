@@ -252,13 +252,13 @@ describe("Admin router", () => {
       const initialFeatureFlags = await getFeatureFlags();
       expectToEqual(
         initialFeatureFlags.enableMaxContactPerWeek,
-        makeBooleanFeatureFlag(true),
+        makeBooleanFeatureFlag(false),
       );
 
       const response = await sharedRequest.updateFeatureFlags({
         body: {
           flagName: "enableMaxContactPerWeek",
-          flagContent: { isActive: false },
+          flagContent: { isActive: true },
         },
         headers: { authorization: token },
       });
@@ -271,7 +271,7 @@ describe("Admin router", () => {
       const updatedFeatureFlags = await getFeatureFlags();
       expectToEqual(
         updatedFeatureFlags.enableMaxContactPerWeek,
-        makeBooleanFeatureFlag(false),
+        makeBooleanFeatureFlag(true),
       );
     });
 
