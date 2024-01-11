@@ -26,12 +26,10 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     welcome:
       internshipKind === "immersion" ? (
         <>
-          <p className="fr-text">
-            <h2 className={fr.cx("fr-text--md")}>
-              Bravo, la mise en relation entre candidat et entreprise s’est bien
-              passée !
-            </h2>
-          </p>
+          <h2 className={fr.cx("fr-text--md")}>
+            Bravo, la mise en relation entre candidat et entreprise s’est bien
+            passée !
+          </h2>
           <p className="fr-text">
             Complétez ce formulaire pour réaliser votre immersion
             professionnelle. <br /> Il vaut équivalence du CERFA 13912 * 04.
