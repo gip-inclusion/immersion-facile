@@ -9,6 +9,7 @@ import {
 
 export interface TechnicalGateway {
   getAllFeatureFlags$: () => Observable<FeatureFlags>;
+  uploadAnyFile: (file: File) => Promise<AbsoluteUrl>;
   uploadLogo: (file: File) => Promise<AbsoluteUrl>;
   htmlToPdf: (
     htmlContent: string,

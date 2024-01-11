@@ -13,7 +13,6 @@ export type FeatureFlagsState = FeatureFlags & {
 const initialState: FeatureFlagsState = {
   enableInseeApi: makeBooleanFeatureFlag(true),
   enablePeConnectApi: makeBooleanFeatureFlag(false),
-  enableLogoUpload: makeBooleanFeatureFlag(false),
   enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
   enableTemporaryOperation: makeBooleanFeatureFlag(false),
   enableMaxContactPerWeek: makeBooleanFeatureFlag(false),

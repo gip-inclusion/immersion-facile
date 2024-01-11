@@ -4,7 +4,6 @@ export type FeatureFlagName = (typeof featureFlagNames)[number];
 const featureFlagNames = [
   "enableInseeApi",
   "enablePeConnectApi",
-  "enableLogoUpload",
   "enablePeConventionBroadcast",
   "enableTemporaryOperation",
   "enableMaxContactPerWeek",

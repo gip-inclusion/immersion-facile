@@ -7,7 +7,7 @@ import {
   Email,
   FeatureFlags,
   TechnicalRoutes,
-  uploadFileRoute,
+  uploadLogoRoute,
   ValidateEmailStatus,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -57,11 +57,21 @@ export class HttpTechnicalGateway implements TechnicalGateway {
       );
   }
 
+  public async uploadAnyFile(file: File): Promise<AbsoluteUrl> {
+    const formData = new FormData();
+    formData.append(uploadLogoRoute, file);
+    const { data } = await this.axiosInstance.post(
+      `/${uploadLogoRoute}`,
+      formData,
+    );
+    return data;
+  }
+
   public async uploadLogo(file: File): Promise<AbsoluteUrl> {
     const formData = new FormData();
-    formData.append(uploadFileRoute, file);
+    formData.append(uploadLogoRoute, file);
     const { data } = await this.axiosInstance.post(
-      `/${uploadFileRoute}`,
+      `/${uploadLogoRoute}`,
       formData,
     );
     return data;
