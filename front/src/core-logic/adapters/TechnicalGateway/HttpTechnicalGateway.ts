@@ -7,6 +7,7 @@ import {
   Email,
   FeatureFlags,
   TechnicalRoutes,
+  uploadAnyFileRoute,
   uploadLogoRoute,
   ValidateEmailStatus,
 } from "shared";
@@ -61,7 +62,7 @@ export class HttpTechnicalGateway implements TechnicalGateway {
     const formData = new FormData();
     formData.append(uploadLogoRoute, file);
     const { data } = await this.axiosInstance.post(
-      `/${uploadLogoRoute}`,
+      `/${uploadAnyFileRoute}`,
       formData,
     );
     return data;
