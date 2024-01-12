@@ -86,7 +86,10 @@ export const conventionMagicLinkRoutes = defineRoutes({
     method: "post",
     requestBodySchema: renewConventionParamsSchema,
     ...withAuthorizationHeaders,
-    responses: { 200: expressEmptyResponseBody },
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+    },
   }),
 });
 

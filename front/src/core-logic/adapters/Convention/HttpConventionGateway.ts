@@ -89,6 +89,9 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, (response) => {
+              throw new Error(response.body.message);
+            })
             .otherwise(otherwiseThrow),
         ),
     );
