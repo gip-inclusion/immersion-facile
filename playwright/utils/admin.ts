@@ -1,22 +1,40 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
+
+const adminUser = process.env.ADMIN_USER ?? "admin";
+const adminPassword = process.env.ADMIN_PASSWORD ?? "admin";
 
 export const connectToAdmin = async (page: Page) => {
   await page.goto(frontRoutes.admin);
   await page.fill(
     `#${domElementIds.admin.adminPrivateRoute.formLoginUserInput}`,
-    process.env.ADMIN_USER ?? "admin",
+    adminUser,
   );
   await page.fill(
     `#${domElementIds.admin.adminPrivateRoute.formLoginPasswordInput}`,
-    process.env.ADMIN_PASSWORD ?? "admin",
+    adminPassword,
   );
+  await expect(
+    page.locator(
+      `#${domElementIds.admin.adminPrivateRoute.formLoginUserInput}`,
+    ),
+  ).toHaveValue(adminUser);
+  await expect(
+    page.locator(
+      `#${domElementIds.admin.adminPrivateRoute.formLoginPasswordInput}`,
+    ),
+  ).toHaveValue(adminPassword);
+
   await page.click(
     `#${domElementIds.admin.adminPrivateRoute.formLoginSubmitButton}`,
   );
+  await expect(page.locator(".fr-alert--error")).not.toBeVisible();
 };
 
 export const goToTab = async (page: Page, tabName: string) => {
+  await expect(
+    page.locator(`.fr-tabs__tab:has-text("${tabName}")`),
+  ).toBeVisible();
   await page.click(`.fr-tabs__tab:has-text("${tabName}")`);
 };
 

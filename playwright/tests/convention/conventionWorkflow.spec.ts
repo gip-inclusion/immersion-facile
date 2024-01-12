@@ -105,24 +105,36 @@ test.describe("Convention creation and modification workflow", () => {
 
   test("signs convention for signatories", async ({ page }) => {
     await connectToAdmin(page);
-    const signatories = 2;
-    for (let index = 0; index < signatories; index++) {
-      await page.goto(frontRoutes.admin);
-      const emailWrapper = await openEmailInAdmin(
-        page,
-        "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-        index,
-      );
-      const href = await getMagicLinkInEmailWrapper(
-        emailWrapper,
-        "conventionSignShortlink",
-      );
-      expect(href).not.toBe(null);
+    const emailWrapper1 = await openEmailInAdmin(
+      page,
+      "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      0,
+    );
+    const href1 = await getMagicLinkInEmailWrapper(
+      emailWrapper1,
+      "conventionSignShortlink",
+    );
+    expect(href1).not.toBe(null);
 
-      if (!href) return;
+    if (!href1) return;
 
-      await signConvention(page, href);
-    }
+    await signConvention(page, href1);
+
+    await page.goto(frontRoutes.admin);
+    const emailWrapper2 = await openEmailInAdmin(
+      page,
+      "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      1,
+    );
+    const href2 = await getMagicLinkInEmailWrapper(
+      emailWrapper2,
+      "conventionSignShortlink",
+    );
+    expect(href2).not.toBe(null);
+
+    if (!href2) return;
+
+    await signConvention(page, href2);
     await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 
