@@ -65,7 +65,7 @@ Pour les éléments et modifiers, nous utiliserons la syntaxe :
 
 - à la racine du projet
 - `pnpm run dev` : pour lancer le projet
-- `pnpm playwright test` pour lancer les tests
+- `pnpm playwright test:local` pour lancer les tests
 
 ##### Linux prerequisites
 

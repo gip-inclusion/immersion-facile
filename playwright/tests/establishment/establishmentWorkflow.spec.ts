@@ -72,7 +72,7 @@ test.describe("Establishment creation and modification workflow", () => {
     await page.goto("/");
     await page.click(`#${domElementIds.home.heroHeader.establishment}`);
     await page.click(
-      `#${domElementIds.homeEstablishments.heroHeader.editEstablishmentForm}`,
+      `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
     );
     await page.fill(
       `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,

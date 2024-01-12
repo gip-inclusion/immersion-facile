@@ -84,6 +84,7 @@ test.describe("Convention creation and modification workflow", () => {
       )
       .click();
     await expect(page.locator(".fr-alert--success")).toBeVisible();
+    await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 
   test("signatory edit the convention and re-submit it", async ({ page }) => {
