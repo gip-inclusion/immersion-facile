@@ -1,353 +1,16 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { useStyles } from "tss-react/dsfr";
-import {
-  AddressDto,
-  AgencyPublicDisplayDto,
-  ConventionReadDto,
-  DateIntervalDto,
-  DotNestedKeys,
-  prettyPrintSchedule,
-  ScheduleDto,
-  toDateString,
-} from "shared";
+import { AgencyPublicDisplayDto } from "shared";
 import { Loader } from "react-design-system";
+import { makeSummarySections } from "src/app/components/forms/convention/ConventionSummarySection";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-
-type ConventionSummaryRow = [
-  keyof ConventionReadDto | DotNestedKeys<ConventionReadDto> | string,
-  ReactNode | undefined,
-];
-
-const filterEmptyRows = (row: ConventionSummaryRow) =>
-  row[1] !== undefined && row[1] !== "";
-
-const signatoriesBeneficiaryCurrentEmployer = (
-  convention: ConventionReadDto,
-) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const rows: ConventionSummaryRow[] = [
-    [
-      fields["signatories.beneficiaryCurrentEmployer.email"].label,
-      convention.signatories.beneficiaryCurrentEmployer?.email,
-    ],
-    [
-      fields["signatories.beneficiaryCurrentEmployer.phone"].label,
-      convention.signatories.beneficiaryCurrentEmployer?.phone,
-    ],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-
-const signatoriesEstablishementRepresentative = (
-  convention: ConventionReadDto,
-) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const rows: ConventionSummaryRow[] = [
-    [
-      fields["signatories.establishmentRepresentative.firstName"].label,
-      convention.signatories.establishmentRepresentative?.firstName,
-    ],
-    [
-      fields["signatories.establishmentRepresentative.lastName"].label,
-      convention.signatories.establishmentRepresentative?.lastName,
-    ],
-    [
-      fields["signatories.establishmentRepresentative.email"].label,
-      convention.signatories.establishmentRepresentative.email,
-    ],
-    [
-      fields["signatories.establishmentRepresentative.phone"].label,
-      convention.signatories.establishmentRepresentative.phone,
-    ],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-
-const signatoriesEstablishmentTutor = (convention: ConventionReadDto) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const rows: ConventionSummaryRow[] = [
-    [
-      fields["establishmentTutor.firstName"].label,
-      convention.establishmentTutor?.firstName,
-    ],
-    [
-      fields["establishmentTutor.lastName"].label,
-      convention.establishmentTutor?.lastName,
-    ],
-    [
-      fields["establishmentTutor.email"].label,
-      convention.establishmentTutor?.email,
-    ],
-    [
-      fields["establishmentTutor.phone"].label,
-      convention.establishmentTutor?.phone,
-    ],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-
-const signatoriesBeneficiary = (convention: ConventionReadDto) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const rows: ConventionSummaryRow[] = [
-    [
-      fields["signatories.beneficiary.email"].label,
-      convention.signatories.beneficiary.email,
-    ],
-    [
-      fields["signatories.beneficiary.phone"].label,
-      convention.signatories.beneficiary.phone,
-    ],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-const signatoriesSummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const rows: ConventionSummaryRow[] = [
-    [
-      fields["signatories.beneficiary.email"].label,
-      convention.signatories.beneficiary.email,
-    ],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-
-const agencySummary = (
-  convention: ConventionReadDto,
-  agency: AgencyPublicDisplayDto,
-) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const displayAddress = (address: AddressDto) =>
-    `${address.streetNumberAndAddress} ${address.postcode} ${address.city}`;
-
-  const rows: ConventionSummaryRow[] = [
-    [
-      fields["agencyId"].label,
-      `${agency.name} (${displayAddress(agency.address)})`,
-    ],
-    [
-      fields["agencyRefersTo"].label,
-      agency.refersToAgency &&
-        `${agency.refersToAgency.name} (${displayAddress(
-          agency.refersToAgency.address,
-        )})`,
-    ],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-
-const beneficiarySummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const studentRowsInArray: ConventionSummaryRow[] =
-    convention.internshipKind === "mini-stage-cci"
-      ? [
-          [
-            fields["signatories.beneficiary.levelOfEducation"].label,
-            convention.signatories.beneficiary.levelOfEducation,
-          ],
-          [
-            fields["signatories.beneficiary.schoolName"].label,
-            convention.signatories.beneficiary.schoolName,
-          ],
-          [
-            fields["signatories.beneficiary.schoolPostcode"].label,
-            convention.signatories.beneficiary.schoolPostcode,
-          ],
-        ]
-      : [];
-
-  const rows: ConventionSummaryRow[] = [
-    [
-      fields["signatories.beneficiary.firstName"].label,
-      convention.signatories.beneficiary.firstName,
-    ],
-    [
-      fields["signatories.beneficiary.lastName"].label,
-      convention.signatories.beneficiary.lastName,
-    ],
-    [
-      fields["signatories.beneficiary.birthdate"].label,
-      convention.signatories.beneficiary.birthdate,
-    ],
-    ...studentRowsInArray,
-    [
-      fields["signatories.beneficiary.financiaryHelp"].label,
-      convention.signatories.beneficiary.financiaryHelp,
-    ],
-    [
-      fields["signatories.beneficiary.emergencyContact"].label,
-      convention.signatories.beneficiary?.emergencyContact,
-    ],
-    [
-      fields["signatories.beneficiary.emergencyContactPhone"].label,
-      convention.signatories.beneficiary?.emergencyContactPhone,
-    ],
-    [
-      fields["signatories.beneficiary.emergencyContactEmail"].label,
-      convention.signatories.beneficiary?.emergencyContactEmail,
-    ],
-    [
-      fields["signatories.beneficiaryCurrentEmployer.firstName"].label,
-      convention.signatories.beneficiaryCurrentEmployer?.firstName,
-    ],
-    [
-      fields["signatories.beneficiaryCurrentEmployer.lastName"].label,
-      convention.signatories.beneficiaryCurrentEmployer?.lastName,
-    ],
-    [
-      fields["signatories.beneficiaryCurrentEmployer.businessName"].label,
-      convention.signatories.beneficiaryCurrentEmployer?.businessName,
-    ],
-    [
-      fields["signatories.beneficiaryCurrentEmployer.businessSiret"].label,
-      convention.signatories.beneficiaryCurrentEmployer?.businessSiret,
-    ],
-    [
-      fields["signatories.beneficiary.isRqth"].label,
-      convention.signatories.beneficiary.isRqth ? "✅" : undefined,
-    ],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-
-const establishmentSummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const rows: ConventionSummaryRow[] = [
-    [fields["businessName"].label, convention.businessName],
-    [fields["siret"].label, convention.siret],
-    [fields["immersionAddress"].label, convention.immersionAddress],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-const prettyPrintScheduleAsJSX = (
-  schedule: ScheduleDto,
-  interval: DateIntervalDto,
-): JSX.Element => (
-  <ul>
-    {prettyPrintSchedule(schedule, interval)
-      .split("\n")
-      .map((line, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <li key={index}>{line}</li>
-      ))}
-  </ul>
-);
-const immersionConditionsSummary = (convention: ConventionReadDto) => {
-  const { getFormFields } = getFormContents(
-    formConventionFieldsLabels(convention.internshipKind),
-  );
-  const fields = getFormFields();
-  const rows: ConventionSummaryRow[] = [
-    [fields["dateStart"].label, toDateString(new Date(convention.dateStart))],
-    [fields["dateEnd"].label, toDateString(new Date(convention.dateEnd))],
-    [
-      "Emploi du temps",
-      prettyPrintScheduleAsJSX(convention.schedule, {
-        start: new Date(convention.dateStart),
-        end: new Date(convention.dateEnd),
-      }),
-    ],
-    [
-      fields["individualProtection"].label,
-      convention.individualProtection ? "✅" : "❌",
-    ],
-    [
-      fields["sanitaryPrevention"].label,
-      convention.sanitaryPrevention ? "✅" : "❌",
-    ],
-    [
-      fields["sanitaryPreventionDescription"].label,
-      convention.sanitaryPreventionDescription,
-    ],
-    [fields["immersionObjective"].label, convention.immersionObjective],
-    [
-      fields["immersionAppellation"].label,
-      convention.immersionAppellation.appellationLabel,
-    ],
-    [fields["workConditions"].label, convention.workConditions],
-    [fields["immersionActivities"].label, convention.immersionActivities],
-    [fields["businessAdvantages"].label, convention.businessAdvantages],
-    [fields["immersionSkills"].label, convention.immersionSkills],
-  ];
-  return rows.filter(filterEmptyRows);
-};
-
-const summarySections = (
-  convention: ConventionReadDto,
-  agency: AgencyPublicDisplayDto,
-) => [
-  {
-    title: "Signataires de la convention",
-    fields: signatoriesSummary(convention),
-    subfield: [
-      {
-        subtitle: "Beneficiaire",
-        fields: signatoriesBeneficiary(convention),
-      },
-      {
-        subtitle: "Représentant",
-        fields: signatoriesEstablishementRepresentative(convention),
-      },
-      {
-        subtitle: "Current employer",
-        fields: signatoriesBeneficiaryCurrentEmployer(convention),
-      },
-      {
-        subtitle: "Tutor",
-        fields: signatoriesEstablishmentTutor(convention),
-      },
-    ],
-  },
-  {
-    title: "Structure d'accompagnement du candidat",
-    fields: agencySummary(convention, agency),
-  },
-  {
-    title: "Informations du candidat",
-    fields: beneficiarySummary(convention),
-  },
-  {
-    title: "Informations de l'entreprise d'accueil",
-    fields: establishmentSummary(convention),
-  },
-  {
-    title:
-      convention.internshipKind === "immersion"
-        ? "Conditions d'immersion"
-        : "Conditions de stage",
-    fields: immersionConditionsSummary(convention),
-  },
-];
 
 export const ConventionSummary = () => {
   const convention = useAppSelector(conventionSelectors.convention);
@@ -371,22 +34,32 @@ export const ConventionSummary = () => {
   if (!convention) return null;
   if (!agency) return <Loader />;
 
+  const fields = getFormContents(
+    formConventionFieldsLabels(convention.internshipKind),
+  ).getFormFields();
+
   return (
     <div className={cx(fr.cx("fr-col"), "im-convention-summary")}>
-      {summarySections(convention, agency).map(
-        ({ title, subfield, fields }) => (
-          <section key={title} className={cx("im-convention-summary__section")}>
-            <h2 className={fr.cx("fr-h4")}>{title}</h2>
-            {subfield?.map(({ fields, subtitle }) => (
-              <div key={subtitle}>
-                <p>{subtitle} </p>
-                <Table data={fields} noCaption fixed />
-              </div>
-            ))}
-            <Table data={fields} noCaption fixed />
-          </section>
-        ),
-      )}
+      {makeSummarySections(convention, agency, fields).map((section) => (
+        <section
+          key={section.title}
+          className={cx("im-convention-summary__section")}
+        >
+          <h2 className={fr.cx("fr-h4")}>{section.title}</h2>
+          {"fields" in section ? (
+            <Table data={section.fields} noCaption fixed />
+          ) : (
+            section.subfields
+              .filter((sub) => sub.fields.length > 0)
+              .map(({ fields, subtitle }) => (
+                <div key={subtitle}>
+                  <p>{subtitle} </p>
+                  <Table data={fields} noCaption fixed />
+                </div>
+              ))
+          )}
+        </section>
+      ))}
     </div>
   );
 };
