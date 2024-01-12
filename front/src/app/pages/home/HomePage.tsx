@@ -82,8 +82,8 @@ export const HomePage = ({ type }: HomePageProps) => {
           }
           subtitle={
             <>
-              Découvrez <strong>les métiers du numérique</strong> en faisant une
-              immersion en entreprise !
+              Découvrez <strong>les métiers du numérique</strong> en réalisant
+              une immersion en entreprise&nbsp;!
             </>
           }
           link={{

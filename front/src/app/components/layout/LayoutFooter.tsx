@@ -13,10 +13,9 @@ import {
   OverFooterCols,
 } from "react-design-system";
 import { routes } from "src/app/routes/routes";
-
-import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
-import plateformeInclusionLogoUrl from "/assets/img/plateforme-inclusion-logo.svg";
-import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
+import lesEntrepriseSengagent from "../../../assets/img/les-entreprises-s-engagent.svg";
+import franceTravailLogo from "../../../assets/img/logo-france-travail.svg";
+import plateformeInclusionLogoUrl from "../../../assets/img/plateforme-inclusion-logo.svg";
 const {
   bottomLinks: bottomsLinksIds,
   links: linksIds,
@@ -39,8 +38,8 @@ const PartnersLogos = () => {
       </li>
       <li>
         <img
-          src={poleEmploiLogo}
-          alt="Pole Emploi"
+          src={franceTravailLogo}
+          alt="France Travail"
           className={cx(
             fr.cx("fr-footer__logo", "fr-mx-1w"),
             FooterStyles.default.logo,
