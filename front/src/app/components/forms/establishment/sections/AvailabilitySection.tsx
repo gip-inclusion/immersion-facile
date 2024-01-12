@@ -52,7 +52,7 @@ export const AvailabilitySection = ({
 
   const currentNextAvailabilityDate = getValues("nextAvailabilityDate");
 
-  const currentValueFormated =
+  const currentValueFormatted =
     currentNextAvailabilityDate &&
     toDateString(new Date(currentNextAvailabilityDate));
 
@@ -92,9 +92,8 @@ export const AvailabilitySection = ({
         <Input
           {...formContents["nextAvailabilityDate"]}
           nativeInputProps={{
-            ...register("nextAvailabilityDate"),
-            value: currentValueFormated,
-            onChange: (event) => {
+            defaultValue: currentValueFormatted,
+            onBlur: (event) => {
               setValue(
                 "nextAvailabilityDate",
                 new Date(event.currentTarget.value).toISOString(),
@@ -103,7 +102,7 @@ export const AvailabilitySection = ({
                 },
               );
             },
-            onBlur: () => {},
+            onChange: () => {},
             type: "date",
             min: toDateString(new Date()),
           }}
