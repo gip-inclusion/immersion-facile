@@ -35,7 +35,7 @@ export const DayCircle = ({
     );
 
   return (
-    <div>
+    <div className={cx("schedule-picker__day-circle")}>
       <button
         type="button"
         className={cx(

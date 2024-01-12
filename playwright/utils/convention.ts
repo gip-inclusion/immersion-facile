@@ -167,8 +167,17 @@ const fillAutocomplete = async (page: Page, locator: string, value: string) => {
 };
 
 export const signConvention = async (page: Page, magicLink: string) => {
+  // eslint-disable-next-line no-console
+  console.info("Signing convention with magic link ==>", magicLink);
+
   await page.goto(magicLink);
   await expect(page.locator(".fr-alert--success")).toBeHidden();
+  await expect(
+    page.locator(`#${domElementIds.conventionToSign.openSignModalButton}`),
+  ).toBeVisible();
+  await expect(
+    page.locator(`#${domElementIds.conventionToSign.openSignModalButton}`),
+  ).toBeEnabled();
   await page.click(`#${domElementIds.conventionToSign.openSignModalButton}`);
   await expect(
     page.locator(`#${domElementIds.conventionToSign.submitButton}`),
@@ -204,24 +213,13 @@ export const editConventionForm = async (page: Page, magicLink: string) => {
       `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
     )
     .fill(format(addBusinessDays(new Date(), 5), "yyyy-MM-dd"));
-  await expect(
-    page
-      .locator(".schedule-picker")
-      .getByRole("button", { name: "J", exact: true }),
-  ).toBeEnabled();
-  await expect(
-    page
-      .locator(".schedule-picker")
-      .getByRole("button", { name: "V", exact: true }),
-  ).toBeEnabled();
+
   await page
-    .locator(".schedule-picker")
-    .getByRole("button", { name: "J", exact: true })
-    .click();
-  await page
-    .locator(".schedule-picker")
-    .getByRole("button", { name: "V", exact: true })
-    .click();
+    .locator(".schedule-picker__day-circle")
+    .getByRole("button", { disabled: false })
+    .all()
+    .then((buttons) => buttons[0].click());
+
   await page
     .locator(
       `#${domElementIds.conventionImmersionRoute.conventionSection.addHoursButton}`,
@@ -230,6 +228,7 @@ export const editConventionForm = async (page: Page, magicLink: string) => {
   await page
     .locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
     .click();
+  await expect(page.locator(".fr-alert--error")).not.toBeVisible();
   await expectElementToBeVisible(page, ".im-convention-summary");
   await page.click(
     `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
