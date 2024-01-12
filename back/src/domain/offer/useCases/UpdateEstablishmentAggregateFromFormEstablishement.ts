@@ -1,10 +1,11 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
-import { makeUpdateEstablishmentAggregateFromFormEstablishment } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
+import { getAddressAndPosition } from "../../../utils/address";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../ports/AddressGateway";
+import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   WithFormEstablishmentDto,
@@ -12,7 +13,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 > {
   protected inputSchema = withFormEstablishmentSchema;
 
-  readonly #addressAPI: AddressGateway;
+  readonly #addressGateway: AddressGateway;
 
   readonly #uuidGenerator: UuidGenerator;
 
@@ -26,7 +27,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   ) {
     super(uowPerformer);
 
-    this.#addressAPI = addressAPI;
+    this.#addressGateway = addressAPI;
     this.#timeGateway = timeGateway;
     this.#uuidGenerator = uuidGenerator;
   }
@@ -43,14 +44,20 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     if (!initialEstablishmentAggregate)
       throw new Error("Cannot update establishment that does not exist.");
 
-    const establishmentAggregate =
-      await makeUpdateEstablishmentAggregateFromFormEstablishment({
-        addressGateway: this.#addressAPI,
-        uuidGenerator: this.#uuidGenerator,
-        timeGateway: this.#timeGateway,
-      })(initialEstablishmentAggregate, formEstablishment);
-
-    if (!establishmentAggregate) return;
+    const establishmentAggregate = makeEstablishmentAggregate({
+      uuidGenerator: this.#uuidGenerator,
+      timeGateway: this.#timeGateway,
+      nafAndNumberOfEmployee: {
+        nafDto: initialEstablishmentAggregate.establishment.nafDto,
+        numberEmployeesRange:
+          initialEstablishmentAggregate.establishment.numberEmployeesRange,
+      },
+      addressAndPosition: await getAddressAndPosition(
+        this.#addressGateway,
+        formEstablishment,
+      ),
+      formEstablishment,
+    });
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
       establishmentAggregate,

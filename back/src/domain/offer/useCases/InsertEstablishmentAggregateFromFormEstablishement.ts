@@ -1,7 +1,8 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
+import { getAddressAndPosition } from "../../../utils/address";
 import { createLogger } from "../../../utils/logger";
-import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
+import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -9,6 +10,7 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { AddressGateway } from "../ports/AddressGateway";
+import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 
 const logger = createLogger(__filename);
 
@@ -52,20 +54,21 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       log("Cleared existing Aggregate");
     }
 
-    const establishmentAggregate =
-      await makeFormEstablishmentToEstablishmentAggregate({
-        siretGateway: this.siretGateway,
-        addressGateway: this.addressAPI,
-        uuidGenerator: this.uuidGenerator,
-        timeGateway: this.timeGateway,
-      })(formEstablishment);
+    const establishmentAggregate = await makeEstablishmentAggregate({
+      uuidGenerator: this.uuidGenerator,
+      timeGateway: this.timeGateway,
+      nafAndNumberOfEmployee: await getNafAndNumberOfEmployee(
+        this.siretGateway,
+        formEstablishment.siret,
+      ),
+      addressAndPosition: await getAddressAndPosition(
+        this.addressAPI,
+        formEstablishment,
+      ),
+      formEstablishment,
+    });
 
-    log(
-      establishmentAggregate ? "Aggregate Ready" : "Could not create aggregate",
-    );
-
-    if (!establishmentAggregate) return;
-
+    log("Aggregate Ready");
     log("About to save : " + JSON.stringify(establishmentAggregate, null, 2));
 
     await uow.establishmentAggregateRepository

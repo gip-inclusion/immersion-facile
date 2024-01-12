@@ -1,64 +1,47 @@
 import {
   addressDtoToString,
+  AppellationAndRomeDto,
   expectPromiseToFailWith,
+  expectToEqual,
   FormEstablishmentDtoBuilder,
-  SiretEstablishmentDto,
+  SiretDto,
 } from "shared";
 import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
-
-const prepareSirenGateway = (
-  siretGateway: InMemorySiretGateway,
-  siret: string,
-) => {
-  const siretEstablishmentFromAPI: SiretEstablishmentDto = {
-    siret,
-    businessAddress: "1 rue Guillaume Tell, 75017 Paris",
-    businessName: "My establishment",
-    nafDto: { code: "1234Z", nomenclature: "Ref2" },
-    isOpen: true,
-    numberEmployeesRange: "10-19",
-  };
-
-  siretGateway.setSirenEstablishment(siretEstablishmentFromAPI);
-};
 
 describe("Update Establishment aggregate from form data", () => {
   let siretGateway: InMemorySiretGateway;
-  let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
-  let addressAPI: InMemoryAddressGateway;
-  let updateEstablishmentAggregateFromFormUseCase: UpdateEstablishmentAggregateFromForm;
+  let addressGateway: InMemoryAddressGateway;
   let uuidGenerator: TestUuidGenerator;
+  let timeGateway: CustomTimeGateway;
+  let uow: InMemoryUnitOfWork;
+  let updateEstablishmentAggregateFromFormUseCase: UpdateEstablishmentAggregateFromForm;
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
-    establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
-    addressAPI = new InMemoryAddressGateway();
+    addressGateway = new InMemoryAddressGateway();
+    uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
-
-    const uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      establishmentAggregateRepository: establishmentAggregateRepo,
-    });
-
+    timeGateway = new CustomTimeGateway();
     updateEstablishmentAggregateFromFormUseCase =
       new UpdateEstablishmentAggregateFromForm(
-        uowPerformer,
-        addressAPI,
+        new InMemoryUowPerformer(uow),
+        addressGateway,
         uuidGenerator,
-        new CustomTimeGateway(),
+        timeGateway,
       );
   });
 
@@ -72,87 +55,107 @@ describe("Update Establishment aggregate from form data", () => {
   });
 
   it("Replaces establishment and offers with same siret", async () => {
-    const siret = "12345678911234";
-    const newPosition = { lon: 1, lat: 2 };
-    const newAddress = rueGuillaumeTellDto;
-    prepareSirenGateway(siretGateway, siret);
+    // Prepare : insert an establishment aggregate from LBB with siret
 
-    addressAPI.setAddressAndPosition([
+    const siret: SiretDto = "12345678911234";
+
+    siretGateway.setSirenEstablishment({
+      siret,
+      businessAddress: "1 rue Guillaume Tell, 75017 Paris",
+      businessName: "My establishment",
+      nafDto: { code: "1234Z", nomenclature: "Ref2" },
+      isOpen: true,
+      numberEmployeesRange: "10-19",
+    });
+
+    addressGateway.setAddressAndPosition([
       {
-        address: newAddress,
-        position: newPosition,
+        address: rueGuillaumeTellDto,
+        position: { lon: 1, lat: 2 },
       },
     ]);
 
-    // Prepare : insert an establishment aggregate from LBB with siret
-    const previousContact = new ContactEntityBuilder()
+    const contact = new ContactEntityBuilder()
       .withEmail("previous.contact@gmail.com")
       .build();
-
-    const previousEstablishment = new EstablishmentEntityBuilder()
-      .withSiret(siret)
-      .build();
-
     const previousAggregate = new EstablishmentAggregateBuilder()
-      .withEstablishment(previousEstablishment)
+      .withEstablishment(
+        new EstablishmentEntityBuilder().withSiret(siret).build(),
+      )
       .withOffers([
         new OfferEntityBuilder().build(),
         new OfferEntityBuilder().build(),
       ])
-      .withContact(previousContact)
+      .withContact(contact)
       .build();
 
-    establishmentAggregateRepo.establishmentAggregates = [previousAggregate];
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      previousAggregate,
+    ];
+    uuidGenerator.setNextUuid(contact.id);
 
     const newRomeCode = "A1101";
-    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+    const updatedContact = new ContactEntityBuilder()
+      .withEmail("new.contact@gmail.com")
+      .build();
+    const updatedAppelation: AppellationAndRomeDto = {
+      romeLabel: "Boulangerie",
+      appellationLabel: "Boulanger",
+      romeCode: newRomeCode,
+      appellationCode: "22222",
+    };
+    const nextAvailabilityDate = new Date();
+    const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
-      .withAppellations([
-        {
-          romeLabel: "Boulangerie",
-          appellationLabel: "Boulanger",
-          romeCode: newRomeCode,
-          appellationCode: "22222",
-        },
-      ])
+      .withAppellations([updatedAppelation])
       .withBusinessAddress(addressDtoToString(rueGuillaumeTellDto))
-      .withBusinessContact(
-        new ContactEntityBuilder().withEmail("new.contact@gmail.com").build(),
-      )
+      .withBusinessContact(updatedContact)
+      .withNextAvailabilityDate(nextAvailabilityDate)
       .build();
 
     // Act : execute use-case with same siret
     await updateEstablishmentAggregateFromFormUseCase.execute({
-      formEstablishment,
+      formEstablishment: updatedFormEstablishment,
     });
 
     // Assert
     // One aggregate only
-    expect(establishmentAggregateRepo.establishmentAggregates).toHaveLength(1);
-
-    // Establishment matches update from form
-    const partialExpectedEstablishment: Partial<EstablishmentEntity> = {
-      siret,
-      address: newAddress,
-      position: newPosition,
-      isOpen: true,
-      name: formEstablishment.businessName,
-    };
-    expect(
-      establishmentAggregateRepo.establishmentAggregates[0].establishment,
-    ).toMatchObject(partialExpectedEstablishment);
-
-    // Offers match update from form
-    expect(
-      establishmentAggregateRepo.establishmentAggregates[0].offers,
-    ).toHaveLength(1);
-    expect(
-      establishmentAggregateRepo.establishmentAggregates[0].offers[0].romeCode,
-    ).toEqual(newRomeCode);
-
-    // Contact match update from form
-    expect(
-      establishmentAggregateRepo.establishmentAggregates[0].contact?.email,
-    ).toBe("new.contact@gmail.com");
+    expectToEqual(
+      uow.establishmentAggregateRepository.establishmentAggregates,
+      [
+        new EstablishmentAggregateBuilder(previousAggregate)
+          .withEstablishment(
+            new EstablishmentEntityBuilder(previousAggregate.establishment)
+              .withAddress(rueGuillaumeTellDto)
+              .withCreatedAt(timeGateway.now())
+              .withCustomizedName(
+                updatedFormEstablishment.businessNameCustomized,
+              )
+              .withFitForDisabledWorkers(
+                updatedFormEstablishment.fitForDisabledWorkers,
+              )
+              .withIsCommited(updatedFormEstablishment.isEngagedEnterprise)
+              .withIsOpen(true)
+              .withName(updatedFormEstablishment.businessName)
+              .withPosition({ lon: 1, lat: 2 })
+              .withUpdatedAt(timeGateway.now())
+              .withWebsite(updatedFormEstablishment.website)
+              .withNextAvailabilityDate(nextAvailabilityDate)
+              .build(),
+          )
+          .withOffers([
+            new OfferEntityBuilder()
+              .withRomeLabel(updatedAppelation.romeLabel)
+              .withRomeCode(updatedAppelation.romeCode)
+              .withAppellationCode(updatedAppelation.appellationCode)
+              .withAppellationLabel(updatedAppelation.appellationLabel)
+              .withCreatedAt(timeGateway.now())
+              .withScore(10)
+              .build(),
+          ])
+          .withContact(updatedContact)
+          .build(),
+      ],
+    );
   });
 });

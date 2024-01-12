@@ -1,6 +1,5 @@
 import {
   AppellationAndRomeDto,
-  DateTimeIsoString,
   expectToEqual,
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
@@ -16,13 +15,14 @@ import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilde
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import {
   InMemorySiretGateway,
   TEST_OPEN_ESTABLISHMENT_1,
@@ -35,8 +35,8 @@ const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
 const fakeAddress = avenueChampsElyseesDto;
 const fakeBusinessContact = new ContactEntityBuilder().build();
-
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
+const numberEmployeesRanges: NumberEmployeesRange = "6-9";
 
 const prepareSirenGateway = (
   siretGateway: InMemorySiretGateway,
@@ -58,40 +58,35 @@ const prepareSirenGateway = (
 
 describe("Insert Establishment aggregate from form data", () => {
   let siretGateway: InMemorySiretGateway;
-  let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
-  let outboxRepo: InMemoryOutboxRepository;
   let addressAPI: InMemoryAddressGateway;
-  let useCase: InsertEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
+  let timeGateway: CustomTimeGateway;
+  let uow: InMemoryUnitOfWork;
+  let useCase: InsertEstablishmentAggregateFromForm;
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
-    establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
-    outboxRepo = new InMemoryOutboxRepository();
     addressAPI = new InMemoryAddressGateway();
-    addressAPI.setAddressAndPosition([
-      {
-        address: fakeAddress,
-        position: fakePosition,
-      },
-    ]);
     uuidGenerator = new TestUuidGenerator();
-
-    const uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      establishmentAggregateRepository: establishmentAggregateRepo,
-      outboxRepository: outboxRepo,
-    });
-    const timeGateway = new CustomTimeGateway();
+    timeGateway = new CustomTimeGateway();
+    uow = createInMemoryUow();
 
     useCase = new InsertEstablishmentAggregateFromForm(
-      uowPerformer,
+      new InMemoryUowPerformer(uow),
       siretGateway,
       addressAPI,
       uuidGenerator,
       timeGateway,
       makeCreateNewEvent({ timeGateway, uuidGenerator }),
     );
+
+    uuidGenerator.setNextUuid(fakeBusinessContact.id);
+    addressAPI.setAddressAndPosition([
+      {
+        address: fakeAddress,
+        position: fakePosition,
+      },
+    ]);
   });
 
   it("Converts Form Establishment in search format", async () => {
@@ -110,75 +105,55 @@ describe("Insert Establishment aggregate from form data", () => {
         appellationLabel: "métier B.1",
       },
     ];
+    const nextAvailabilityDate = new Date();
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withFitForDisabledWorkers(true)
       .withSiret(fakeSiret)
       .withAppellations(professions)
       .withBusinessContact(fakeBusinessContact)
-      .withNextAvailabilityDate(new Date())
+      .withNextAvailabilityDate(nextAvailabilityDate)
       .build();
 
-    const numberEmployeesRanges: NumberEmployeesRange = "6-9";
     prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
 
     // Act
     await useCase.execute({ formEstablishment });
 
     // Assert
-    expectEstablishmentAggregateInRepo({
-      siret: fakeSiret,
-      nafDto: expectedNafDto,
-      offerRomeCodesAndAppellations: [
-        { romeCode: "A1101", appellationCode: "11717" },
-        { romeCode: "A1102", appellationCode: "11717" },
+    expectToEqual(
+      uow.establishmentAggregateRepository.establishmentAggregates,
+      [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(formEstablishment.siret)
+              .withCustomizedName(formEstablishment.businessNameCustomized)
+              .withNafDto(expectedNafDto)
+              .withCreatedAt(timeGateway.now())
+              .withUpdatedAt(timeGateway.now())
+              .withIsCommited(false)
+              .withName(formEstablishment.businessName)
+              .withNumberOfEmployeeRange(numberEmployeesRanges)
+              .withPosition(fakePosition)
+              .withWebsite(formEstablishment.website)
+              .withNextAvailabilityDate(nextAvailabilityDate)
+              .build(),
+          )
+          .withFitForDisabledWorkers(true)
+          .withOffers(
+            professions.map((prof) =>
+              new OfferEntityBuilder({
+                ...prof,
+                createdAt: timeGateway.now(),
+                score: 10,
+              }).build(),
+            ),
+          )
+          .withContact(fakeBusinessContact)
+          .build(),
       ],
-      contactEmail: fakeBusinessContact.email,
-      fitForDisabledWorkers: true,
-    });
+    );
   });
-
-  const expectEstablishmentAggregateInRepo = (expected: {
-    siret: string;
-    nafDto: NafDto;
-    contactEmail: string;
-    offerRomeCodesAndAppellations: {
-      romeCode: string;
-      appellationCode?: string;
-    }[];
-    fitForDisabledWorkers?: boolean;
-    nextAvailabilityDate?: DateTimeIsoString;
-  }) => {
-    const repoEstablishmentAggregate =
-      establishmentAggregateRepo.establishmentAggregates[0];
-
-    expect(repoEstablishmentAggregate).toBeDefined();
-    expect(repoEstablishmentAggregate.establishment.siret).toEqual(
-      expected.siret,
-    );
-    expect(repoEstablishmentAggregate.establishment.nafDto).toEqual(
-      expected.nafDto,
-    );
-    expect(repoEstablishmentAggregate.establishment.fitForDisabledWorkers).toBe(
-      expected.fitForDisabledWorkers,
-    );
-    expect(repoEstablishmentAggregate.establishment.nextAvailabilityDate).toBe(
-      expected.nextAvailabilityDate,
-    );
-
-    // Contact
-    expect(repoEstablishmentAggregate.contact).toBeDefined();
-    expect(repoEstablishmentAggregate.contact?.email).toEqual(
-      expected.contactEmail,
-    );
-
-    // Offer
-    expect(repoEstablishmentAggregate.offers).toHaveLength(
-      expected.offerRomeCodesAndAppellations.length,
-    );
-    expect(repoEstablishmentAggregate.offers).toMatchObject(
-      expected.offerRomeCodesAndAppellations,
-    );
-  };
 
   it("Correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
@@ -190,7 +165,7 @@ describe("Insert Establishment aggregate from form data", () => {
     await useCase.execute({ formEstablishment });
 
     const establishmentAggregate =
-      establishmentAggregateRepo.establishmentAggregates[0];
+      uow.establishmentAggregateRepository.establishmentAggregates[0];
     expect(establishmentAggregate).toBeDefined();
     expect(establishmentAggregate.establishment.siret).toEqual(
       formEstablishment.siret,
@@ -217,7 +192,10 @@ describe("Insert Establishment aggregate from form data", () => {
       ])
       .withContact(previousContact)
       .build();
-    establishmentAggregateRepo.establishmentAggregates = [previousAggregate];
+
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      previousAggregate,
+    ];
 
     const newRomeCode = "A1101";
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
@@ -251,7 +229,9 @@ describe("Insert Establishment aggregate from form data", () => {
 
     // Assert
     // One aggregate only
-    expect(establishmentAggregateRepo.establishmentAggregates).toHaveLength(1);
+    expect(
+      uow.establishmentAggregateRepository.establishmentAggregates,
+    ).toHaveLength(1);
 
     // Establishment matches update from form
     const partialExpectedEstablishment: Partial<EstablishmentEntity> = {
@@ -261,20 +241,23 @@ describe("Insert Establishment aggregate from form data", () => {
       name: formEstablishment.businessName,
     };
     expect(
-      establishmentAggregateRepo.establishmentAggregates[0].establishment,
+      uow.establishmentAggregateRepository.establishmentAggregates[0]
+        .establishment,
     ).toMatchObject(partialExpectedEstablishment);
 
     // Offers match update from form
     expect(
-      establishmentAggregateRepo.establishmentAggregates[0].offers,
+      uow.establishmentAggregateRepository.establishmentAggregates[0].offers,
     ).toHaveLength(1);
     expect(
-      establishmentAggregateRepo.establishmentAggregates[0].offers[0].romeCode,
+      uow.establishmentAggregateRepository.establishmentAggregates[0].offers[0]
+        .romeCode,
     ).toEqual(newRomeCode);
 
     // Contact match update from form
     expect(
-      establishmentAggregateRepo.establishmentAggregates[0].contact?.email,
+      uow.establishmentAggregateRepository.establishmentAggregates[0].contact
+        ?.email,
     ).toBe("new.contact@gmail.com");
   });
 
@@ -288,9 +271,11 @@ describe("Insert Establishment aggregate from form data", () => {
     await useCase.execute({ formEstablishment });
 
     const establishmentAggregate =
-      establishmentAggregateRepo.establishmentAggregates[0];
+      uow.establishmentAggregateRepository.establishmentAggregates[0];
     expect(establishmentAggregate).toBeDefined();
-    expect(outboxRepo.events).toHaveLength(1);
-    expectToEqual(outboxRepo.events[0].payload, { establishmentAggregate });
+    expect(uow.outboxRepository.events).toHaveLength(1);
+    expectToEqual(uow.outboxRepository.events[0].payload, {
+      establishmentAggregate,
+    });
   });
 });

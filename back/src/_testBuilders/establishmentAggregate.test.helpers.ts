@@ -1,4 +1,4 @@
-import { Builder, RomeCode, SearchResultDto } from "shared";
+import { Builder, NafDto, RomeCode, SearchResultDto } from "shared";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { TEST_ROME_LABEL } from "../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { ContactEntity } from "../domain/offer/entities/ContactEntity";
@@ -62,6 +62,17 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  public withEstablishmentNaf(naf: NafDto) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withNafDto(naf)
+        .build(),
+    });
+  }
+
   public withEstablishmentNextAvailabilityDate(date: Date) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
@@ -87,6 +98,17 @@ export class EstablishmentAggregateBuilder
         this.aggregate.establishment,
       )
         .withUpdatedAt(updatedAt)
+        .build(),
+    });
+  }
+
+  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withFitForDisabledWorkers(fitForDisabledWorkers)
         .build(),
     });
   }
