@@ -415,13 +415,30 @@ export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatu
     updateConventionStatusWithJustificationWithModifierRoleSchema,
   ]);
 
-export const renewConventionParamsSchema: z.Schema<RenewConventionParams> =
-  z.object({
+export const renewConventionParamsSchema: z.Schema<RenewConventionParams> = z
+  .object({
     id: conventionIdSchema,
     dateStart: zStringMinLength1.regex(dateRegExp),
     dateEnd: zStringMinLength1.regex(dateRegExp),
     schedule: scheduleSchema,
     renewed: renewedSchema,
+  })
+  .superRefine((renewConventionParams, issueMaker) => {
+    const addIssue = (message: string, path: string) => {
+      issueMaker.addIssue({
+        code: z.ZodIssueCode.custom,
+        message,
+        path: [path],
+      });
+    };
+
+    const message = validateSchedule(renewConventionParams.schedule, {
+      start: new Date(renewConventionParams.dateStart),
+      end: new Date(renewConventionParams.dateEnd),
+    });
+    if (message) {
+      addIssue(message, "schedule");
+    }
   });
 
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =

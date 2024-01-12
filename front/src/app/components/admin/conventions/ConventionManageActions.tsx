@@ -27,13 +27,20 @@ import {
   renewConventionParamsSchema,
   Role,
   statusTransitionConfigs,
+  toDotNotation,
   UpdateConventionStatusRequestDto,
 } from "shared";
+import { ErrorNotifications } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import {
+  formErrorsToFlatErrors,
+  getFormContents,
+  makeFieldError,
+} from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -341,7 +348,14 @@ export const RenewConventionForm = ({
     resolver: zodResolver(renewConventionParamsSchema),
     mode: "onTouched",
   });
-  const getFormErrors = makeFieldError(methods.formState);
+  const { errors, submitCount } = methods.formState;
+  const getFieldError = makeFieldError(methods.formState);
+
+  const conventionValues = methods.getValues();
+
+  const { getFormErrors } = getFormContents(
+    formConventionFieldsLabels(conventionValues.internshipKind),
+  );
   const onSubmit = (data: RenewConventionParams) => {
     dispatch(
       conventionSlice.actions.renewConventionRequested({
@@ -367,10 +381,15 @@ export const RenewConventionForm = ({
         />
         <ScheduleSection />
         <Input
-          label="Motif de renouvellement"
+          label="Motif de renouvellement *"
           textArea
           nativeTextAreaProps={methods.register("renewed.justification")}
-          {...getFormErrors("renewed.justification")}
+          {...getFieldError("renewed.justification")}
+        />
+        <ErrorNotifications
+          labels={getFormErrors()}
+          errors={toDotNotation(formErrorsToFlatErrors(errors))}
+          visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
         <Button>Renouveler la convention</Button>
       </form>

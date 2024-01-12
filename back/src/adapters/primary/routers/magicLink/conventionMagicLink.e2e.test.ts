@@ -135,6 +135,13 @@ describe("Magic link router", () => {
           start: renewedConventionStartDate,
           end: renewedConventionEndDate,
         })
+        .withRegularSchedule({
+          selectedDays: [0, 4],
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "17:00" },
+          ],
+        })
         .build(),
       renewed: {
         from: existingConvention.id,
