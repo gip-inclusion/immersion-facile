@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker/locale/fr";
-import { expect, test } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../../custom.config";
 import { connectToAdmin, goToTab } from "../../utils/admin";
@@ -19,6 +19,43 @@ test.describe("Establishment creation and modification workflow", () => {
       `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
       providedSiret,
     );
+    await page
+      .locator(`#${domElementIds.establishment.startAddEstablishmentButton}`)
+      .click();
+
+    await page.locator(".fr-radio-rich").getByText("Oui").click();
+    await page
+      .locator(`#${domElementIds.establishment.maxContactsPerWeek}`)
+      .fill("2");
+
+    await goToNextStep(page, 1, "create");
+
+    await page.fill(
+      `#${domElementIds.establishment.businessContact.firstName}`,
+      faker.person.firstName(),
+    );
+    await page.fill(
+      `#${domElementIds.establishment.businessContact.lastName}`,
+      faker.person.lastName(),
+    );
+    await page.fill(
+      `#${domElementIds.establishment.businessContact.job}`,
+      faker.person.jobType(),
+    );
+    await page.fill(
+      `#${domElementIds.establishment.businessContact.phone}`,
+      faker.string.numeric("06########"),
+    );
+    await page.fill(
+      `#${domElementIds.establishment.businessContact.email}`,
+      faker.internet.email(),
+    );
+    await page
+      .locator("[for='establishment-businessContact-contactMethod-0']")
+      .click();
+
+    await goToNextStep(page, 2, "create");
+
     await expect(
       page.locator(`#${domElementIds.establishment.siret}`),
     ).toHaveValue(providedSiret);
@@ -41,28 +78,10 @@ test.describe("Establishment creation and modification workflow", () => {
       )
       .first()
       .click();
-    await page.fill(
-      `#${domElementIds.establishment.businessContact.firstName}`,
-      faker.person.firstName(),
+
+    await page.click(
+      `#${domElementIds.establishment.submitCreateEstablishmentButton}`,
     );
-    await page.fill(
-      `#${domElementIds.establishment.businessContact.lastName}`,
-      faker.person.lastName(),
-    );
-    await page.fill(
-      `#${domElementIds.establishment.businessContact.job}`,
-      faker.person.jobType(),
-    );
-    await page.fill(
-      `#${domElementIds.establishment.businessContact.phone}`,
-      faker.string.numeric("06########"),
-    );
-    await page.fill(
-      `#${domElementIds.establishment.businessContact.email}`,
-      faker.internet.email(),
-    );
-    await page.fill(`#${domElementIds.establishment.maxContactsPerWeek}`, "1");
-    await page.click(`#${domElementIds.establishment.submitButton}`);
     await expect(page.url()).toContain(`siret=${providedSiret}`);
     await expect(page.locator(".fr-alert--success")).toBeVisible();
     await page.waitForTimeout(testConfig.timeForEventCrawler);
@@ -92,18 +111,23 @@ test.describe("Establishment creation and modification workflow", () => {
 
     // Go to admin page / go to notifications tab
     await connectToAdmin(page);
-    await page.getByRole("tab", { name: "Notifications" }).click();
+    await goToTab(page, "Notifications");
     const emailWrapper = page
       .locator(".fr-accordion:has-text('EDIT_FORM_ESTABLISHMENT_LINK')")
       .first();
     await emailWrapper.click();
     await emailWrapper.getByRole("link", { name: "Lien vers la page" }).click();
-    await expect(
-      page.locator(`#${domElementIds.establishment.siret} input`),
-    ).toBeDisabled();
-    await expect(
-      page.locator(`#${domElementIds.establishment.siret} input`),
-    ).toHaveValue(providedSiret);
+
+    await page
+      .locator(`#${domElementIds.establishment.startEditEstablishmentButton}`)
+      .click();
+    await page.locator(".fr-radio-rich").getByText("Oui").click();
+    await page
+      .locator(`#${domElementIds.establishment.maxContactsPerWeek}`)
+      .fill("5");
+
+    await goToNextStep(page, 1, "edit");
+
     await page.fill(
       `#${domElementIds.establishment.businessContact.job}`,
       faker.person.jobType(),
@@ -116,7 +140,18 @@ test.describe("Establishment creation and modification workflow", () => {
       `#${domElementIds.establishment.businessContact.email}`,
       faker.internet.email(),
     );
-    await page.click(`#${domElementIds.establishment.submitButton}`);
+
+    await goToNextStep(page, 2, "edit");
+
+    await expect(
+      page.locator(`#${domElementIds.establishment.siret} input`),
+    ).toBeDisabled();
+    await expect(
+      page.locator(`#${domElementIds.establishment.siret} input`),
+    ).toHaveValue(providedSiret);
+    await page.click(
+      `#${domElementIds.establishment.submitEditEstablishmentButton}`,
+    );
     await expect(page.locator(".fr-alert--success")).toBeVisible();
   });
 
@@ -158,3 +193,18 @@ test.describe("Establishment creation and modification workflow", () => {
     await expect(page.locator(".fr-alert--success")).toBeVisible();
   });
 });
+
+const goToNextStep = async (
+  page: Page,
+  currentStep: 1 | 2 | 3,
+  mode: "create" | "edit",
+) => {
+  await page
+    .locator(
+      `#${domElementIds.establishment.nextButtonFromStepAndMode({
+        currentStep,
+        mode,
+      })}`,
+    )
+    .click();
+};
