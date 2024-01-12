@@ -56,18 +56,22 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, address });
   }
 
-  public withCustomizedName(customizedName: string) {
+  public withCreatedAt(createdAt: Date) {
+    return new EstablishmentEntityBuilder({ ...this.entity, createdAt });
+  }
+
+  public withCustomizedName(customizedName?: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
   }
 
-  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+  public withFitForDisabledWorkers(fitForDisabledWorkers?: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       fitForDisabledWorkers,
     });
   }
 
-  public withIsCommited(isCommited: boolean) {
+  public withIsCommited(isCommited?: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       isCommited,
@@ -143,7 +147,7 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
   }
 
-  public withWebsite(website: string) {
+  public withWebsite(website?: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, website });
   }
 }

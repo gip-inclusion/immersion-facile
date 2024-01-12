@@ -1,0 +1,59 @@
+import {
+  AddressAndPosition,
+  FormEstablishmentDto,
+  noContactPerWeek,
+} from "shared";
+import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
+import { TimeGateway } from "../../core/ports/TimeGateway";
+import { UuidGenerator } from "../../core/ports/UuidGenerator";
+import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+
+const offerFromFormScore = 10;
+
+export const makeEstablishmentAggregate = ({
+  uuidGenerator,
+  timeGateway,
+  formEstablishment,
+  nafAndNumberOfEmployee,
+  addressAndPosition,
+}: {
+  uuidGenerator: UuidGenerator;
+  timeGateway: TimeGateway;
+  formEstablishment: FormEstablishmentDto;
+  addressAndPosition: AddressAndPosition;
+  nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
+}): EstablishmentAggregate => ({
+  establishment: {
+    ...addressAndPosition,
+    additionalInformation: formEstablishment.additionalInformation,
+    createdAt: timeGateway.now(),
+    customizedName: formEstablishment.businessNameCustomized,
+    fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
+    isCommited: formEstablishment.isEngagedEnterprise,
+    isOpen: true,
+    isSearchable: formEstablishment.maxContactsPerWeek > noContactPerWeek,
+    maxContactsPerWeek: formEstablishment.maxContactsPerWeek,
+    ...nafAndNumberOfEmployee,
+    name: formEstablishment.businessName,
+    siret: formEstablishment.siret,
+    sourceProvider: formEstablishment.source,
+    updatedAt: timeGateway.now(),
+    voluntaryToImmersion: true,
+    website: formEstablishment.website,
+    nextAvailabilityDate: formEstablishment.nextAvailabilityDate,
+  },
+  contact: {
+    id: uuidGenerator.new(),
+    ...formEstablishment.businessContact,
+  },
+  offers: formEstablishment.appellations.map(
+    ({ appellationCode, appellationLabel, romeCode, romeLabel }) => ({
+      romeCode,
+      appellationCode,
+      appellationLabel,
+      romeLabel,
+      score: offerFromFormScore,
+      createdAt: timeGateway.now(),
+    }),
+  ),
+});

@@ -55,6 +55,13 @@ export class OfferEntityBuilder implements Builder<OfferEntity> {
       romeLabel,
     });
   }
+
+  public withScore(score: number) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      score,
+    });
+  }
 }
 
 export const secretariatOffer = new OfferEntityBuilder()
