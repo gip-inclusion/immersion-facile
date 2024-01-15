@@ -2,25 +2,8 @@ import { faker } from "@faker-js/faker";
 import { expect, Page } from "@playwright/test";
 import { addBusinessDays, format } from "date-fns";
 import { domElementIds, frontRoutes, peParisAgencyId } from "shared";
-
-const possibleJobs = [
-  "Aide à domicile",
-  "Aide-soignant",
-  "Ambulancier",
-  "Boulanger",
-  "Boucher",
-  "Jongleur",
-  "Pompier",
-  "Pâtissier",
-  "Plombier",
-  "Serrurier",
-];
-const possibleAddressQueries = [
-  "1 rue de la paix",
-  "rue des mimosas",
-  "avenue des champs elysées",
-  "rue de la république",
-];
+import { possibleAddressQueries, possibleJobs } from "./data";
+import { expectElementToBeVisible, fillAutocomplete } from "./utils";
 
 let currentStep = 1;
 
@@ -127,43 +110,7 @@ export const submitBasicConventionForm = async (page: Page) => {
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
     faker.word.words(8),
   );
-  await page.click(
-    `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
-  );
-  await expectElementToBeVisible(page, ".im-convention-summary");
-  await expect(page.locator(".im-convention-summary")).toBeVisible();
-  await page.click(
-    `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
-  );
-  await expectElementToBeVisible(page, ".im-submit-confirmation-section");
-};
-
-const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
-const getTomorrowDate = () =>
-  format(addBusinessDays(new Date(), 1), "yyyy-MM-dd");
-
-const getRandomSiret = () =>
-  ["722 003 936 02320", "44229377500031", "130 005 481 00010"][
-    Math.floor(Math.random() * 3)
-  ];
-
-const openNextSection = async (page: Page) => {
-  await page
-    .locator(".fr-accordion")
-    .nth(currentStep)
-    .locator(".fr-accordion__btn")
-    .click();
-  currentStep++;
-};
-
-const fillAutocomplete = async (page: Page, locator: string, value: string) => {
-  await page.locator(locator).fill(value);
-  await page.waitForSelector(`${locator}[aria-controls]`);
-  const listboxId = await page.locator(locator).getAttribute("aria-controls");
-  await expect(
-    page.locator(`#${listboxId} .MuiAutocomplete-option`).nth(0),
-  ).toBeVisible();
-  await page.locator(`#${listboxId} .MuiAutocomplete-option`).nth(0).click();
+  await confirmCreateConventionFormSubmit(page);
 };
 
 export const signConvention = async (page: Page, magicLink: string) => {
@@ -186,33 +133,112 @@ export const signConvention = async (page: Page, magicLink: string) => {
   await expect(page.locator(".fr-alert--success")).toBeVisible();
 };
 
-export const editConventionForm = async (page: Page, magicLink: string) => {
+export const submitEditConventionForm = async (
+  page: Page,
+  magicLink: string,
+) => {
   await page.goto(magicLink);
   await expect(
     page.locator(
       `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
     ),
   ).toHaveValue(peParisAgencyId);
+  await openConventionAccordionSection(page, 1);
   await page
-    .locator(`.fr-accordion`)
-    .nth(2)
-    .locator(".fr-accordion__btn")
+    .locator(
+      `[for='${domElementIds.conventionImmersionRoute.conventionSection.isMinor}-0']`,
+    )
     .click();
+  await expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.firstName}`,
+    ),
+  ).toBeVisible();
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.firstName}`,
+    )
+    .fill(faker.person.firstName());
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.lastName}`,
+    )
+    .fill(faker.person.lastName());
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.email}`,
+    )
+    .fill(faker.internet.email());
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.phone}`,
+    )
+    .fill(faker.string.numeric("05########"));
+  await page
+    .locator(
+      `[for='${domElementIds.conventionImmersionRoute.conventionSection.isCurrentEmployer}-0']`,
+    )
+    .click();
+  await expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessSiret}`,
+    ),
+  ).toBeVisible();
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessSiret}`,
+    )
+    .fill(faker.string.numeric("XXXXXXXXXXXXXX"));
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessName}`,
+    )
+    .fill(faker.company.name());
+  await fillAutocomplete(
+    page,
+    `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessAddress}`,
+    possibleAddressQueries[
+      Math.floor(Math.random() * possibleAddressQueries.length)
+    ],
+  );
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.firstName}`,
+    )
+    .fill(faker.person.firstName());
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.lastName}`,
+    )
+    .fill(faker.person.lastName());
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.job}`,
+    )
+    .fill(faker.person.jobType());
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.phone}`,
+    )
+    .fill(faker.string.numeric("05########"));
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.email}`,
+    )
+    .fill(faker.internet.email());
+
+  await openConventionAccordionSection(page, 2);
   await page
     .locator(
       `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
     )
     .fill("Edited job");
-  await page
-    .locator(`.fr-accordion`)
-    .nth(3)
-    .locator(".fr-accordion__btn")
-    .click();
+  await openConventionAccordionSection(page, 3);
   await page
     .locator(
       `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
     )
-    .fill(format(addBusinessDays(new Date(), 5), "yyyy-MM-dd"));
+    .fill(format(addBusinessDays(new Date(), 3), "yyyy-MM-dd"));
 
   await page
     .locator(".schedule-picker__day-circle")
@@ -230,14 +256,66 @@ export const editConventionForm = async (page: Page, magicLink: string) => {
     .click();
   await expect(page.locator(".fr-alert--error")).not.toBeVisible();
   await expectElementToBeVisible(page, ".im-convention-summary");
+  await expect(
+    await page.locator(".im-convention-summary__signatory-section").all(),
+  ).toHaveLength(4);
+  await expect(
+    await page
+      .locator(".im-convention-summary__signatory-section")
+      .getByText("Représentant du bénéficiaire"),
+  ).toBeVisible();
+  await expect(
+    await page
+      .locator(".im-convention-summary__signatory-section")
+      .getByText("Employeur actuel"),
+  ).toBeVisible();
+
   await page.click(
     `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
   );
   await expectElementToBeVisible(page, ".im-submit-confirmation-section");
 };
 
-const expectElementToBeVisible = async (page: Page, selector: string) => {
-  const confirmation = await page.locator(selector);
-  await confirmation.waitFor();
-  await expect(confirmation).toBeVisible();
+export const openConventionAccordionSection = async (
+  page: Page,
+  sectionIndex: number,
+) => {
+  await page
+    .locator(".fr-accordion")
+    .nth(sectionIndex)
+    .locator(".fr-accordion__btn")
+    .click();
+};
+
+export const confirmCreateConventionFormSubmit = async (page: Page) => {
+  await page.click(
+    `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
+  );
+  await expectElementToBeVisible(page, ".im-convention-summary");
+  await expect(page.locator(".im-convention-summary")).toBeVisible();
+  await expect(
+    await page.locator(".im-convention-summary__signatory-section").all(),
+  ).toHaveLength(2);
+  await page.click(
+    `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
+  );
+  await expectElementToBeVisible(page, ".im-submit-confirmation-section");
+};
+
+const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
+const getTomorrowDate = () =>
+  format(addBusinessDays(new Date(), 1), "yyyy-MM-dd");
+
+const getRandomSiret = () =>
+  ["722 003 936 02320", "44229377500031", "130 005 481 00010"][
+    Math.floor(Math.random() * 3)
+  ];
+
+const openNextSection = async (page: Page) => {
+  await page
+    .locator(".fr-accordion")
+    .nth(currentStep)
+    .locator(".fr-accordion__btn")
+    .click();
+  currentStep++;
 };

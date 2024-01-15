@@ -52,8 +52,11 @@ export const ConventionSummary = () => {
             section.subfields
               .filter((sub) => sub.fields.length > 0)
               .map(({ fields, subtitle }) => (
-                <div key={subtitle}>
-                  <p>{subtitle} </p>
+                <div
+                  key={subtitle}
+                  className={cx("im-convention-summary__signatory-section")}
+                >
+                  <h3 className={fr.cx("fr-h6")}>{subtitle} </h3>
                   <Table data={fields} noCaption fixed />
                 </div>
               ))

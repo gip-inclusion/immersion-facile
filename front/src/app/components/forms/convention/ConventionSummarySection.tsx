@@ -60,8 +60,12 @@ export const makeSummarySections = (
     title: "Signataires de la convention",
     subfields: [
       {
-        subtitle: "Beneficiaire",
+        subtitle: "Bénéficiaire",
         fields: signatoriesBeneficiary(convention, fields),
+      },
+      {
+        subtitle: "Représentant du bénéficiaire",
+        fields: signatoriesBeneficiaryRepresentative(convention, fields),
       },
       {
         subtitle: "Représentant de l'entreprise",
@@ -70,10 +74,6 @@ export const makeSummarySections = (
       {
         subtitle: "Employeur actuel",
         fields: signatoriesBeneficiaryCurrentEmployer(convention, fields),
-      },
-      {
-        subtitle: "Tuteur",
-        fields: signatoriesEstablishmentTutor(convention, fields),
       },
     ],
   },
@@ -98,31 +98,6 @@ export const makeSummarySections = (
   },
 ];
 
-const signatoriesEstablishmentTutor = (
-  convention: ConventionReadDto,
-  fields: FormFieldsObject<FormConventionFieldsLabels>,
-): ConventionSummaryRow[] =>
-  (
-    [
-      [
-        fields["establishmentTutor.firstName"].label,
-        convention.establishmentTutor?.firstName,
-      ],
-      [
-        fields["establishmentTutor.lastName"].label,
-        convention.establishmentTutor?.lastName,
-      ],
-      [
-        fields["establishmentTutor.email"].label,
-        convention.establishmentTutor?.email,
-      ],
-      [
-        fields["establishmentTutor.phone"].label,
-        convention.establishmentTutor?.phone,
-      ],
-    ] satisfies ConventionSummaryRow[]
-  ).filter(filterEmptyRows);
-
 const signatoriesBeneficiaryCurrentEmployer = (
   convention: ConventionReadDto,
   fields: FormFieldsObject<FormConventionFieldsLabels>,
@@ -130,11 +105,44 @@ const signatoriesBeneficiaryCurrentEmployer = (
   (
     [
       [
+        fields["signatories.beneficiaryCurrentEmployer.firstName"].label,
+        convention.signatories.beneficiaryCurrentEmployer?.firstName,
+      ],
+      [
+        fields["signatories.beneficiaryCurrentEmployer.lastName"].label,
+        convention.signatories.beneficiaryCurrentEmployer?.lastName,
+      ],
+      [
         fields["signatories.beneficiaryCurrentEmployer.email"].label,
         convention.signatories.beneficiaryCurrentEmployer?.email,
       ],
       [
         fields["signatories.beneficiaryCurrentEmployer.phone"].label,
+        convention.signatories.beneficiaryCurrentEmployer?.phone,
+      ],
+    ] satisfies ConventionSummaryRow[]
+  ).filter(filterEmptyRows);
+
+const signatoriesBeneficiaryRepresentative = (
+  convention: ConventionReadDto,
+  fields: FormFieldsObject<FormConventionFieldsLabels>,
+): ConventionSummaryRow[] =>
+  (
+    [
+      [
+        fields["signatories.beneficiaryRepresentative.firstName"].label,
+        convention.signatories.beneficiaryRepresentative?.firstName,
+      ],
+      [
+        fields["signatories.beneficiaryRepresentative.lastName"].label,
+        convention.signatories.beneficiaryRepresentative?.lastName,
+      ],
+      [
+        fields["signatories.beneficiaryRepresentative.email"].label,
+        convention.signatories.beneficiaryCurrentEmployer?.email,
+      ],
+      [
+        fields["signatories.beneficiaryRepresentative.phone"].label,
         convention.signatories.beneficiaryCurrentEmployer?.phone,
       ],
     ] satisfies ConventionSummaryRow[]
@@ -171,6 +179,14 @@ const signatoriesBeneficiary = (
 ) =>
   (
     [
+      [
+        fields["signatories.beneficiary.firstName"].label,
+        convention.signatories.beneficiary.firstName,
+      ],
+      [
+        fields["signatories.beneficiary.lastName"].label,
+        convention.signatories.beneficiary.lastName,
+      ],
       [
         fields["signatories.beneficiary.email"].label,
         convention.signatories.beneficiary.email,
@@ -253,22 +269,6 @@ const beneficiarySummary = (
         convention.signatories.beneficiary?.emergencyContactEmail,
       ],
       [
-        fields["signatories.beneficiaryCurrentEmployer.firstName"].label,
-        convention.signatories.beneficiaryCurrentEmployer?.firstName,
-      ],
-      [
-        fields["signatories.beneficiaryCurrentEmployer.lastName"].label,
-        convention.signatories.beneficiaryCurrentEmployer?.lastName,
-      ],
-      [
-        fields["signatories.beneficiaryCurrentEmployer.businessName"].label,
-        convention.signatories.beneficiaryCurrentEmployer?.businessName,
-      ],
-      [
-        fields["signatories.beneficiaryCurrentEmployer.businessSiret"].label,
-        convention.signatories.beneficiaryCurrentEmployer?.businessSiret,
-      ],
-      [
         fields["signatories.beneficiary.isRqth"].label,
         convention.signatories.beneficiary.isRqth ? "✅" : undefined,
       ],
@@ -284,6 +284,22 @@ const establishmentSummary = (
       [fields["businessName"].label, convention.businessName],
       [fields["siret"].label, convention.siret],
       [fields["immersionAddress"].label, convention.immersionAddress],
+      [
+        fields["establishmentTutor.firstName"].label,
+        convention.establishmentTutor?.firstName,
+      ],
+      [
+        fields["establishmentTutor.lastName"].label,
+        convention.establishmentTutor?.lastName,
+      ],
+      [
+        fields["establishmentTutor.email"].label,
+        convention.establishmentTutor?.email,
+      ],
+      [
+        fields["establishmentTutor.phone"].label,
+        convention.establishmentTutor?.phone,
+      ],
     ] satisfies ConventionSummaryRow[]
   ).filter(filterEmptyRows);
 

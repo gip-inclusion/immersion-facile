@@ -147,7 +147,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     isMinorLabel:
       internshipKind === "immersion"
         ? "La personne qui va faire l'immersion est-elle mineure ?"
-        : "Etes vous mineur ou majeur protégé ?",
+        : "Êtes-vous mineur ou majeur protégé ?",
   },
   establishmentSection: {
     title: "3. Coordonnées de l'entreprise",

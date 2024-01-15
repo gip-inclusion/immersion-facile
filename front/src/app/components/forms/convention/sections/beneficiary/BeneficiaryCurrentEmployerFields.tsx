@@ -109,7 +109,6 @@ export const BeneficiaryCurrentEmployerFields = (): JSX.Element => {
         {...getFieldError("signatories.beneficiaryCurrentEmployer.firstName")}
       />
       <Input
-        {...formFields["signatories.beneficiaryCurrentEmployer.lastName"]}
         label={
           formFields["signatories.beneficiaryCurrentEmployer.lastName"].label
         }
