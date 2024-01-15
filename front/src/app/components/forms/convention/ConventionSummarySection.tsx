@@ -139,11 +139,11 @@ const signatoriesBeneficiaryRepresentative = (
       ],
       [
         fields["signatories.beneficiaryRepresentative.email"].label,
-        convention.signatories.beneficiaryCurrentEmployer?.email,
+        convention.signatories.beneficiaryRepresentative?.email,
       ],
       [
         fields["signatories.beneficiaryRepresentative.phone"].label,
-        convention.signatories.beneficiaryCurrentEmployer?.phone,
+        convention.signatories.beneficiaryRepresentative?.phone,
       ],
     ] satisfies ConventionSummaryRow[]
   ).filter(filterEmptyRows);
