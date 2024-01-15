@@ -25,7 +25,7 @@ export const createTechnicalRouter = (
         if (!req.file) throw new BadRequestError("No file provided");
         const params: UploadFileInput = {
           multerFile: req.file,
-          renameFileToId: true,
+          renameFileToId: req.body?.renameFileToId.toLowerCase() === "true",
         };
         return deps.useCases.uploadFile.execute(params);
       }),

@@ -313,7 +313,12 @@ const UploadFileSection = () => {
   return (
     <>
       <h4>Upload de fichier</h4>
-      <UploadFile setFileUrl={setUploadedFileUrl} />
+      <UploadFile
+        setFileUrl={setUploadedFileUrl}
+        renameFileToId={false}
+        label={"Télécharger un document sur clever"}
+        maxSize_Mo={10}
+      />
       {uploadedFileUrl && (
         <Alert
           severity="success"

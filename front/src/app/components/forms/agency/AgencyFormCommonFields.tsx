@@ -13,7 +13,7 @@ import { agencyListOfOptions } from "src/app/components/forms/agency/agencyKindT
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
-import { UploadLogo } from "src/app/components/UploadLogo";
+import { UploadFile } from "src/app/components/UploadFile";
 import {
   FormAgencyFieldsLabels,
   formAgencyFieldsLabels,
@@ -188,11 +188,12 @@ export const AgencyLogoUpload = () => {
 
   return (
     <>
-      <UploadLogo
+      <UploadFile
         setFileUrl={(value) => setValue("logoUrl", value)}
         maxSize_Mo={2}
         {...formAgencyFieldsLabels.logoUrl}
         hint={fieldsContent.logoUrl.hintText}
+        renameFileToId={true}
       />
       {formValues.logoUrl && (
         <img src={formValues.logoUrl} alt="uploaded-logo" width="100px" />
