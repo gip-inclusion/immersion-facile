@@ -70,7 +70,7 @@ import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboard
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { SetFeatureFlag } from "../../../domain/generic/featureFlag/SetFeatureFlag";
-import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
+import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
 import { HtmlToPdf } from "../../../domain/generic/htmlToPdf/HtmlToPdf";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
@@ -212,7 +212,7 @@ export const createUseCases = (
         uowPerformer,
         createNewEvent,
       ),
-      uploadLogo: new UploadLogo(gateways.documentGateway, uuidGenerator),
+      uploadFile: new UploadFile(gateways.documentGateway, uuidGenerator),
       htmlToPdf: new HtmlToPdf(gateways.pdfGeneratorGateway),
 
       // Address
