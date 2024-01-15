@@ -1,17 +1,25 @@
 import * as React from "react";
-import { AbsoluteUrl, domElementIds } from "shared";
+import { AbsoluteUrl } from "shared";
+import { domElementIds } from "shared";
 import { File } from "react-design-system";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
-interface UploadFileProps {
+interface UploadLogoProps {
+  label: string;
+  hint?: React.ReactNode;
+  maxSize_Mo: number;
   setFileUrl: (fileUrl: AbsoluteUrl) => void;
+  renameFileToId: boolean;
 }
 
-const maxSize_Mo = 10;
-
-export const UploadFile = ({ setFileUrl }: UploadFileProps) => {
+export const UploadFile = ({
+  maxSize_Mo,
+  setFileUrl,
+  label,
+  hint,
+  renameFileToId,
+}: UploadLogoProps) => {
   const [error, setError] = React.useState<string>();
-
   return (
     <File
       onChange={async (e) => {
@@ -28,10 +36,14 @@ export const UploadFile = ({ setFileUrl }: UploadFileProps) => {
         if (!file) return;
 
         const fileUrl =
-          await outOfReduxDependencies.technicalGateway.uploadAnyFile(file);
+          await outOfReduxDependencies.technicalGateway.uploadFile(
+            file,
+            renameFileToId,
+          );
         setFileUrl(fileUrl);
       }}
-      label={"Uploader un fichier"}
+      label={label}
+      hint={hint}
       errorMessage={error}
       id={domElementIds.addAgency.uploadLogoInput}
     />

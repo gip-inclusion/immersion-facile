@@ -20,20 +20,6 @@ export class TestTechnicalGateway implements TechnicalGateway {
   ): Promise<string> => Promise.resolve(`YWJjZA==`);
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public uploadAnyFile = async (file: File): Promise<AbsoluteUrl> => {
-    // eslint-disable-next-line no-console
-    console.log("file uploaded : ", file);
-    return `http://${file.name}-url`;
-  };
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  public uploadLogo = async (file: File): Promise<AbsoluteUrl> => {
-    // eslint-disable-next-line no-console
-    console.log("logo uploaded : ", file);
-    return `http://${file.name}-url`;
-  };
-
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
     const emailWithErrorStatus: ValidateEmailStatus = {
       isValid: false,
@@ -52,5 +38,15 @@ export class TestTechnicalGateway implements TechnicalGateway {
       reason: "accepted_email",
       proposal: null,
     };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async uploadFile(
+    file: File,
+    renameFileToId: boolean,
+  ): Promise<AbsoluteUrl> {
+    // eslint-disable-next-line no-console
+    console.log("logo uploaded : ", file);
+    return `http://${file.name}-${renameFileToId}-url`;
   }
 }
