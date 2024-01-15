@@ -3,7 +3,7 @@ import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import { technicalRoutes, uploadFileRoute } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import { UploadFileInput } from "../../../../domain/generic/fileManagement/useCases/UploadLogo";
+import { UploadFileInput } from "../../../../domain/generic/fileManagement/useCases/UploadFile";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
@@ -27,7 +27,7 @@ export const createTechnicalRouter = (
           multerFile: req.file,
           renameFileToId: true,
         };
-        return deps.useCases.uploadLogo.execute(params);
+        return deps.useCases.uploadFile.execute(params);
       }),
     );
 

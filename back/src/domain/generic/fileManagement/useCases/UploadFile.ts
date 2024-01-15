@@ -16,7 +16,7 @@ export type UploadFileInput = {
   renameFileToId?: boolean;
 };
 
-export class UploadLogo extends UseCase<UploadFileInput, string> {
+export class UploadFile extends UseCase<UploadFileInput, string> {
   protected inputSchema = z.any();
 
   readonly #documentGateway: DocumentGateway;
