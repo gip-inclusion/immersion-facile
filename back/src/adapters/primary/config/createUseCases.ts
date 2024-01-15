@@ -70,7 +70,6 @@ import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboard
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { SetFeatureFlag } from "../../../domain/generic/featureFlag/SetFeatureFlag";
-import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { HtmlToPdf } from "../../../domain/generic/htmlToPdf/HtmlToPdf";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
@@ -214,7 +213,6 @@ export const createUseCases = (
         createNewEvent,
       ),
       uploadLogo: new UploadLogo(gateways.documentGateway, uuidGenerator),
-      uploadFile: new UploadFile(gateways.documentGateway),
       htmlToPdf: new HtmlToPdf(gateways.pdfGeneratorGateway),
 
       // Address
@@ -629,7 +627,7 @@ const instantiatedUseCasesFromClasses = <
     ? InstantiatedUseCase<Input, Output, JwtPayload>
     : T[K] extends UseCase<infer Input2, infer Output2, infer JwtPayload2>
     ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
-    : never;
+    : void;
 } =>
   keys(useCases).reduce(
     (acc, useCaseKey) => ({
