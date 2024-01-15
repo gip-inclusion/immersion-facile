@@ -33,12 +33,10 @@ export const frontRoutes = {
   standard: "pages",
 };
 
-export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";
 
 export const immersionOffersRoute = "immersion-offers";
 export const loginPeConnect = "login-pe-connect";
 export const peConnect = "pe-connect";
 
-export const uploadLogoRoute = "upload-logo";
-export const uploadAnyFileRoute = "upload-any-file";
+export const uploadFileRoute = "upload-file";

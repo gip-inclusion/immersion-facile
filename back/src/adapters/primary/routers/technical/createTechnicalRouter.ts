@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
-import { technicalRoutes, uploadAnyFileRoute, uploadLogoRoute } from "shared";
+import { technicalRoutes, uploadFileRoute } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
+import { UploadFileInput } from "../../../../domain/generic/fileManagement/useCases/UploadLogo";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
@@ -18,20 +19,15 @@ export const createTechnicalRouter = (
   const upload = multer({ storage: multer.memoryStorage() });
 
   technicalRouter
-    .route(`/${uploadLogoRoute}`)
-    .post(upload.single(uploadLogoRoute), (req, res) =>
+    .route(`/${uploadFileRoute}`)
+    .post(upload.single(uploadFileRoute), (req, res) =>
       sendHttpResponse(req, res, async () => {
         if (!req.file) throw new BadRequestError("No file provided");
-        return deps.useCases.uploadLogo.execute(req.file);
-      }),
-    );
-
-  technicalRouter
-    .route(`/${uploadAnyFileRoute}`)
-    .post(upload.single(uploadLogoRoute), (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        if (!req.file) throw new BadRequestError("No file provided");
-        return deps.useCases.uploadFile.execute(req.file);
+        const params: UploadFileInput = {
+          multerFile: req.file,
+          renameFileToId: true,
+        };
+        return deps.useCases.uploadLogo.execute(params);
       }),
     );
 
