@@ -32,10 +32,9 @@ export const connectToAdmin = async (page: Page) => {
 };
 
 export const goToTab = async (page: Page, tabName: string) => {
-  await expect(
-    page.locator(`.fr-tabs__tab:has-text("${tabName}")`),
-  ).toBeVisible();
-  await page.click(`.fr-tabs__tab:has-text("${tabName}")`);
+  const locator = page.locator(`.fr-tabs__tab:has-text("${tabName}")`);
+  await expect(locator).toBeVisible();
+  await locator.click();
 };
 
 export const openEmailInAdmin = async (

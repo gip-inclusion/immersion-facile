@@ -236,6 +236,7 @@ export const BeneficiaryFormSection = ({
         <RadioButtons
           legend={formContents.isMinor.label}
           hintText={formContents.isMinor.hintText}
+          id={formContents.isMinor.id}
           options={booleanSelectOptions.map((option) => ({
             ...option,
             nativeInputProps: {
@@ -284,6 +285,7 @@ export const BeneficiaryFormSection = ({
           <RadioButtons
             legend={formContents.isCurrentEmployer.label}
             hintText={formContents.isCurrentEmployer.hintText}
+            id={formContents.isCurrentEmployer.id}
             options={booleanSelectOptions.map((option) => ({
               ...option,
               nativeInputProps: {
