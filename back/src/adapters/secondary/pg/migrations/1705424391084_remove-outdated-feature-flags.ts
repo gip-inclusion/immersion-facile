@@ -13,6 +13,7 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     INSERT INTO feature_flags (flag_name, is_active) VALUES ('enableMaxContactPerWeek', true);
     INSERT INTO feature_flags (flag_name, is_active) VALUES ('enablePeConnectApi', true);
     INSERT INTO feature_flags (flag_name, is_active) VALUES ('enablePeConventionBroadcast', true);
+    INSERT INTO feature_flags (flag_name, is_active) VALUES ('enableUploadLogo', true);
     `,
   );
 }
