@@ -44,13 +44,7 @@ export class AddConvention extends TransactionalUseCase<
       throw new ForbiddenError();
     }
 
-    const featureFlags = await uow.featureFlagRepository.getAll();
-    if (featureFlags.enableInseeApi.isActive) {
-      await rejectsSiretIfNotAnOpenCompany(
-        this.#siretGateway,
-        convention.siret,
-      );
-    }
+    await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, convention.siret);
 
     await uow.conventionRepository.save(convention);
     await uow.conventionExternalIdRepository.save(convention.id);

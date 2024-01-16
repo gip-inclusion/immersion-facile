@@ -5,7 +5,6 @@ import {
   EstablishmentTutor,
   expectPromiseToFailWithError,
   expectToEqual,
-  makeBooleanFeatureFlag,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -17,7 +16,6 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   CreateNewEvent,
@@ -36,9 +34,6 @@ describe("Update Convention", () => {
     const uow = createInMemoryUow();
     conventionRepository = uow.conventionRepository;
     outboxRepo = uow.outboxRepository;
-    uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: makeBooleanFeatureFlag(true),
-    });
 
     createNewEvent = makeCreateNewEvent({
       timeGateway: new CustomTimeGateway(),

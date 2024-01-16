@@ -34,7 +34,6 @@ import {
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -73,7 +72,6 @@ export const ConventionFormFields = ({
   } = useFormContext<ConventionReadDto>();
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionValues = getValues();
-  const { enablePeConnectApi } = useFeatureFlags();
   const { getFormFields, getFormErrors } = getFormContents(
     formConventionFieldsLabels(conventionValues.internshipKind),
   );
@@ -224,18 +222,16 @@ export const ConventionFormFields = ({
     )
   );
 
-  const shouldListAllAgencies = !enablePeConnectApi.isActive;
-
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   const agenciesRetrieverMemoized = useMemo(
     () =>
       conventionAgenciesRetriever({
         internshipKind: conventionValues.internshipKind,
-        shouldListAll: shouldListAllAgencies,
+        shouldListAll: false,
         federatedIdentity,
       }),
-    [conventionValues.internshipKind, shouldListAllAgencies, federatedIdentity],
+    [conventionValues.internshipKind, federatedIdentity],
   );
 
   return (

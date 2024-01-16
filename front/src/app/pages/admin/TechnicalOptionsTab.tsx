@@ -42,12 +42,7 @@ import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/feature
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 
 const labelsByFeatureFlag: Record<FeatureFlagName, string> = {
-  enableInseeApi: "API insee (siret)",
-  enablePeConnectApi: "PE Connect",
-  enablePeConventionBroadcast: "Diffusion des Conventions à Pole Emploi",
   enableTemporaryOperation: "Activer l'offre temporaire",
-  enableMaxContactPerWeek:
-    "Activer le nombre de mise en contact maximum par semaine sur le formulaire entreprise",
   enableMaintenance: "Activer le mode maintenance",
 };
 

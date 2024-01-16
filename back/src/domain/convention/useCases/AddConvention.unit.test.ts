@@ -2,7 +2,6 @@ import {
   ConventionDtoBuilder,
   conventionStatuses,
   expectPromiseToFailWithError,
-  makeBooleanFeatureFlag,
 } from "shared";
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -15,7 +14,6 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import {
@@ -40,9 +38,6 @@ describe("Add Convention", () => {
     const uow = createInMemoryUow();
     conventionRepository = uow.conventionRepository;
     outboxRepository = uow.outboxRepository;
-    uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: makeBooleanFeatureFlag(true),
-    });
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({
@@ -144,21 +139,6 @@ describe("Add Convention", () => {
       .withBusinessName("Active BUSINESS")
       .withIsActive(true)
       .build();
-
-    describe("if feature flag to do siret validation is OFF", () => {
-      it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
-        uowPerformer.setUow({
-          featureFlagRepository: new InMemoryFeatureFlagRepository({
-            enableInseeApi: makeBooleanFeatureFlag(false),
-          }),
-        });
-        siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
-
-        expect(await addConvention.execute(validConvention)).toEqual({
-          id: validConvention.id,
-        });
-      });
-    });
 
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
       siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);

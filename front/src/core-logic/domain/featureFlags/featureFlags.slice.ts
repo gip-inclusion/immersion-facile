@@ -11,11 +11,7 @@ export type FeatureFlagsState = FeatureFlags & {
 };
 
 const initialState: FeatureFlagsState = {
-  enableInseeApi: makeBooleanFeatureFlag(true),
-  enablePeConnectApi: makeBooleanFeatureFlag(false),
-  enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
   enableTemporaryOperation: makeBooleanFeatureFlag(false),
-  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
   enableMaintenance: makeTextFeatureFlag(false, { message: "" }),
   isLoading: true,
 };

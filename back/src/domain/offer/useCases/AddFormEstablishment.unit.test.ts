@@ -1,10 +1,8 @@
 import {
   AppellationAndRomeDto,
   defaultValidFormEstablishment,
-  expectObjectsToMatch,
   expectPromiseToFailWithError,
   FormEstablishmentDtoBuilder,
-  makeBooleanFeatureFlag,
 } from "shared";
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -15,7 +13,6 @@ import {
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -45,9 +42,6 @@ describe("Add FormEstablishment", () => {
       siret: defaultValidFormEstablishment.siret,
     });
     romeRepository.appellations = defaultValidFormEstablishment.appellations;
-    uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: makeBooleanFeatureFlag(true),
-    });
 
     uowPerformer = new InMemoryUowPerformer(uow);
 
@@ -176,32 +170,6 @@ describe("Add FormEstablishment", () => {
       .withBusinessAddress("20 AVENUE DE SEGUR 75007 PARIS 7")
       .withNafDto({ code: "78.3Z", nomenclature: "Ref2" })
       .build();
-
-    describe("when feature flag to do siret validation is OFF", () => {
-      it("accepts formEstablishment with SIRETs that don't correspond to active businesses and quarantines events", async () => {
-        const featureFlagRepository = new InMemoryFeatureFlagRepository({
-          enableInseeApi: makeBooleanFeatureFlag(false),
-        });
-        uowPerformer.setUow({
-          featureFlagRepository,
-        });
-        siretGateway.setSirenEstablishment({
-          ...TEST_OPEN_ESTABLISHMENT_1,
-          nafDto: { code: "78.3Z", nomenclature: "Ref2" },
-          businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-          isOpen: true,
-        });
-
-        await addFormEstablishment.execute(formEstablishment);
-
-        expect(outboxRepo.events).toHaveLength(1);
-        expectObjectsToMatch(outboxRepo.events[0], {
-          topic: "FormEstablishmentAdded",
-          publications: [],
-          wasQuarantined: true,
-        });
-      });
-    });
 
     it("rejects formEstablishment with SIRETs that don't correspond to active businesses", async () => {
       siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);

@@ -1,6 +1,5 @@
 import {
   GetSiretInfo,
-  makeBooleanFeatureFlag,
   SiretEstablishmentDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
@@ -9,7 +8,6 @@ import {
   siretSlice,
   SiretState,
 } from "src/core-logic/domain/siret/siret.slice";
-import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 import {
   createTestStore,
   TestDependencies,
@@ -134,36 +132,6 @@ describe("Siret validation and fetching", () => {
     });
   });
 
-  describe("When enableInseeApi feature flag is OFF", () => {
-    beforeEach(() => {
-      ({ store, dependencies } = createTestStore({
-        featureFlags: {
-          ...makeStubFeatureFlags({
-            enableInseeApi: {
-              ...makeBooleanFeatureFlag(false),
-            },
-          }),
-          isLoading: false,
-        },
-      }));
-    });
-
-    it("when it is already in db, displays accordingly", () => {
-      dispatchSiretModified("11110000111100");
-      expectIsSearchingToBe(true);
-      feedSiretInDbWith(true);
-      expectSiretErrorToBe("Cet établissement est déjà référencé");
-    });
-
-    it("when it is already NOT in db it should not fetch siret", () => {
-      dispatchSiretModified("11110000111100");
-      expectIsSearchingToBe(true);
-      feedSiretInDbWith(false);
-      expectSiretErrorToBe(null);
-      expectEstablishmentToEqual(null);
-    });
-  });
-
   const dispatchSiretModified = (siret: string) =>
     store.dispatch(siretSlice.actions.siretModified(siret));
 
@@ -197,10 +165,6 @@ describe("Siret validation and fetching", () => {
 
   const feedSirenGatewayThroughBackWithError = (error: Error) => {
     dependencies.formCompletionGateway.siretInfo$.error(error);
-  };
-
-  const feedSiretInDbWith = (isInDb: boolean) => {
-    dependencies.formCompletionGateway.isSiretInDb$.next(isInDb);
   };
 
   const expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled = () => {

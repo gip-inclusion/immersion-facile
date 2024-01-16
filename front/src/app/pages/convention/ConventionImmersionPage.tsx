@@ -6,7 +6,6 @@ import { keys } from "ramda";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
 import {
-  FeatureFlag,
   FederatedIdentityProvider,
   isPeConnectIdentity,
   loginPeConnect,
@@ -57,7 +56,6 @@ export const ConventionImmersionPage = ({
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
-  const { enablePeConnectApi } = useFeatureFlags();
 
   useFederatedIdentityFromUrl(route);
 
@@ -99,7 +97,6 @@ export const ConventionImmersionPage = ({
         {displaySharedConventionMessage ? (
           <SharedConventionMessage
             route={route}
-            enablePeConnectApi={enablePeConnectApi}
             onClickContinue={() => setDisplaySharedConventionMessage(false)}
           />
         ) : (
@@ -111,7 +108,7 @@ export const ConventionImmersionPage = ({
 };
 
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
-  const { enablePeConnectApi, isLoading } = useFeatureFlags();
+  const { isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const { jwt, ...routeParamsWithoutJwt } = route.params;
   const isSharedConvention = useMemo(
@@ -120,9 +117,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   );
   const [shouldShowForm, setShouldShowForm] = useState(
     isSharedConvention ||
-      (enablePeConnectApi.isActive &&
-        !!federatedIdentity &&
-        isPeConnectIdentity(federatedIdentity)),
+      (!!federatedIdentity && isPeConnectIdentity(federatedIdentity)),
   );
   const mode: ConventionFormMode = "jwt" in route.params ? "edit" : "create";
   useScrollToTop(shouldShowForm);
@@ -177,11 +172,9 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
 };
 
 const SharedConventionMessage = ({
-  enablePeConnectApi,
   onClickContinue,
   route,
 }: {
-  enablePeConnectApi: FeatureFlag;
   onClickContinue: () => void;
   route: ConventionImmersionPageRoute;
 }) => (
@@ -202,24 +195,23 @@ const SharedConventionMessage = ({
       >
         Continuer
       </Button>
-      {enablePeConnectApi && (
-        <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
-          <a
-            href={`/api/${loginPeConnect}`}
-            onClick={() => {
-              storeConventionRouteParamsOnDevice(route.params);
-            }}
-            className={fr.cx(
-              "fr-link",
-              "fr-icon-arrow-right-line",
-              "fr-link--icon-right",
-            )}
-          >
-            Ou continuer avec mes identifiants Pôle emploi (candidats inscrits à
-            Pôle emploi)
-          </a>
-        </p>
-      )}
+
+      <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
+        <a
+          href={`/api/${loginPeConnect}`}
+          onClick={() => {
+            storeConventionRouteParamsOnDevice(route.params);
+          }}
+          className={fr.cx(
+            "fr-link",
+            "fr-icon-arrow-right-line",
+            "fr-link--icon-right",
+          )}
+        >
+          Ou continuer avec mes identifiants Pôle emploi (candidats inscrits à
+          Pôle emploi)
+        </a>
+      </p>
     </div>
     <div
       className={fr.cx(

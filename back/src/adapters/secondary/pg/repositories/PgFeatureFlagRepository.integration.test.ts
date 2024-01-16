@@ -29,11 +29,7 @@ describe("PG getFeatureFlags", () => {
 
   it("gets all the Feature Flags of the app", async () => {
     const expectedFeatureFlags: FeatureFlags = {
-      enableInseeApi: makeBooleanFeatureFlag(true),
-      enablePeConnectApi: makeBooleanFeatureFlag(true),
-      enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
       enableTemporaryOperation: makeBooleanFeatureFlag(false),
-      enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
@@ -44,11 +40,7 @@ describe("PG getFeatureFlags", () => {
     const featureFlags = await featureFlagRepository.getAll();
 
     expectToEqual(featureFlags, {
-      enableInseeApi: makeBooleanFeatureFlag(true),
-      enablePeConnectApi: makeBooleanFeatureFlag(true),
-      enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
       enableTemporaryOperation: makeBooleanFeatureFlag(false),
-      enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
@@ -57,11 +49,7 @@ describe("PG getFeatureFlags", () => {
 
   it("inserts featureFlags than updates a Feature Flag to the given value", async () => {
     const initialFeatureFlags: FeatureFlags = {
-      enableInseeApi: makeBooleanFeatureFlag(true),
-      enablePeConnectApi: makeBooleanFeatureFlag(true),
-      enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
       enableTemporaryOperation: makeBooleanFeatureFlag(false),
-      enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
@@ -81,11 +69,7 @@ describe("PG getFeatureFlags", () => {
 
     const featureFlags = await featureFlagRepository.getAll();
     expectToEqual(featureFlags, {
-      enableInseeApi: makeBooleanFeatureFlag(true),
-      enablePeConnectApi: makeBooleanFeatureFlag(true),
-      enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
       enableTemporaryOperation: makeBooleanFeatureFlag(true),
-      enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),

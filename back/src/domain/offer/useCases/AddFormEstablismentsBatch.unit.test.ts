@@ -6,7 +6,6 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   GroupOptions,
-  makeBooleanFeatureFlag,
 } from "shared";
 import {
   createInMemoryUow,
@@ -15,7 +14,6 @@ import {
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryGroupRepository } from "../../../adapters/secondary/offer/InMemoryGroupRepository";
@@ -75,9 +73,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     outboxRepo = uow.outboxRepository;
     uow.romeRepository.appellations =
       defaultValidFormEstablishment.appellations;
-    uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableInseeApi: makeBooleanFeatureFlag(true),
-    });
 
     uowPerformer = new InMemoryUowPerformer(uow);
 

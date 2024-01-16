@@ -251,13 +251,13 @@ describe("Admin router", () => {
     it("201 - sets the feature flag to given value if token is valid", async () => {
       const initialFeatureFlags = await getFeatureFlags();
       expectToEqual(
-        initialFeatureFlags.enableMaxContactPerWeek,
+        initialFeatureFlags.enableTemporaryOperation,
         makeBooleanFeatureFlag(false),
       );
 
       const response = await sharedRequest.updateFeatureFlags({
         body: {
-          flagName: "enableMaxContactPerWeek",
+          flagName: "enableTemporaryOperation",
           flagContent: { isActive: true },
         },
         headers: { authorization: token },
@@ -270,7 +270,7 @@ describe("Admin router", () => {
 
       const updatedFeatureFlags = await getFeatureFlags();
       expectToEqual(
-        updatedFeatureFlags.enableMaxContactPerWeek,
+        updatedFeatureFlags.enableTemporaryOperation,
         makeBooleanFeatureFlag(true),
       );
     });
@@ -314,7 +314,7 @@ describe("Admin router", () => {
     it("401 - wrong admin token", async () => {
       const response = await sharedRequest.updateFeatureFlags({
         body: {
-          flagName: "enableMaxContactPerWeek",
+          flagName: "enableTemporaryOperation",
           flagContent: { isActive: false },
         },
         headers: { authorization: "wrong-token" },
