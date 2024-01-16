@@ -6,19 +6,23 @@ import {
   FormEstablishmentDtoBuilder,
   SiretDto,
 } from "shared";
-import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
-import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
-import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
+import {
+  InMemoryAddressGateway,
+  rueGuillaumeTellDto,
+} from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 

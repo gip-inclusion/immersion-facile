@@ -11,12 +11,14 @@ import {
   peParisAgencyId,
   reasonableSchedule,
 } from "shared";
-import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
 import { SavedError } from "../../../domain/core/ports/ErrorRepository";
 import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { AppConfig } from "../config/appConfig";
 import { createAppDependencies } from "../config/createAppDependencies";
 

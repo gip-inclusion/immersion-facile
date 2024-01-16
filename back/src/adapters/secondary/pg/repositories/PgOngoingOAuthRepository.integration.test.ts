@@ -1,8 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { OngoingOAuth } from "../../../../domain/generic/OAuth/entities/OngoingOAuth";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 
 describe("PgOngoingOAuthRepository", () => {

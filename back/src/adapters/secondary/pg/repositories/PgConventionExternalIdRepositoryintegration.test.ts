@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { ConventionDtoBuilder } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { executeKyselyRawSqlQuery, makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 

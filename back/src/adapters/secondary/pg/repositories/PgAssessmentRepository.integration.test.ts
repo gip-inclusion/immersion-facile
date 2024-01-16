@@ -6,9 +6,9 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { AssessmentEntity } from "../../../../domain/convention/entities/AssessmentEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgAssessmentRepository } from "./PgAssessmentRepository";
 import { PgConventionRepository } from "./PgConventionRepository";

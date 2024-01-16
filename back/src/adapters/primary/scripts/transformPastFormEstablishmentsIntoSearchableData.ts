@@ -2,7 +2,6 @@ import axios from "axios";
 import { Pool } from "pg";
 import { FormEstablishmentDto, random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
@@ -17,6 +16,7 @@ import {
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
+import { getTestPgPool } from "../../secondary/pg/pgUtils";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";

@@ -15,13 +15,10 @@ import {
   VALID_EMAILS,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import {
-  buildTestApp,
-  TestAppAndDeps,
-} from "../../../../_testBuilders/buildTestApp";
-import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
+import { buildTestApp, TestAppAndDeps } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryNotificationGateway } from "../../../secondary/notificationGateway/InMemoryNotificationGateway";
 

@@ -14,9 +14,9 @@ import {
 import { InclusionConnectedUser } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { GenerateInclusionConnectJwt } from "../../../../domain/auth/jwt";
 import { broadcastToPeServiceName } from "../../../../domain/core/ports/ErrorRepository";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { Gateways } from "../../config/createGateways";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

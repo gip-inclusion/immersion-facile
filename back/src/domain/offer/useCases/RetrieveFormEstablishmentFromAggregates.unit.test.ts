@@ -5,10 +5,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -18,6 +14,12 @@ import {
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { RetrieveFormEstablishmentFromAggregates } from "../useCases/RetrieveFormEstablishmentFromAggregates";
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {

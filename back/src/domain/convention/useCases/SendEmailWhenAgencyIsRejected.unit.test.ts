@@ -1,9 +1,9 @@
 import { AgencyDtoBuilder } from "shared";
-import { makeExpectSavedNotificationsAndEvents } from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { makeExpectSavedNotificationsAndEvents } from "../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { SendEmailWhenAgencyIsRejected } from "./SendEmailWhenAgencyIsRejected";
 

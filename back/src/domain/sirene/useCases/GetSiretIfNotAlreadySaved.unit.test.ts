@@ -1,11 +1,15 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
-import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import {
+  EstablishmentAggregateBuilder,
+  InMemoryEstablishmentAggregateRepository,
+} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import {
+  InMemorySiretGateway,
+  SiretEstablishmentDtoBuilder,
+} from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {
@@ -48,7 +52,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
   it("returns the establishment info if not already in DB", async () => {
     const siretAlreadyInDb = "11112222000033";
     establishmentAggregateRepo.establishmentAggregates = [];
-    const siretRawEstablishment = new SirenEstablishmentDtoBuilder()
+    const siretRawEstablishment = new SiretEstablishmentDtoBuilder()
       .withSiret(siretAlreadyInDb)
       .withBusinessAddress("20 AVENUE DE SEGUR 75007 PARIS 7")
       .withBusinessName("MA P'TITE BOITE 2")

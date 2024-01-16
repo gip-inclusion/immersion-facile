@@ -6,13 +6,13 @@ import {
   ConventionDtoBuilder,
 } from "shared";
 import { EmailNotification } from "shared";
-import { expectNotifyConventionCancelled } from "../../../../_testBuilders/emailAssertions";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { expectNotifyConventionCancelled } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyAllActorsThatConventionIsCancelled } from "./NotifyAllActorsThatConventionIsCancelled";

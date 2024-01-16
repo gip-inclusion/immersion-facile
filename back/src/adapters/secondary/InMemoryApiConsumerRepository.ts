@@ -1,6 +1,6 @@
-import { subYears } from "date-fns";
+import { addYears, subYears } from "date-fns";
 import { values } from "ramda";
-import { ApiConsumer, ApiConsumerId } from "shared";
+import { ApiConsumer, ApiConsumerId, ApiConsumerRights, Builder } from "shared";
 import { ApiConsumerRepository } from "../../domain/auth/ports/ApiConsumerRepository";
 import { UuidV4Generator } from "./core/UuidGeneratorImplementations";
 
@@ -136,5 +136,65 @@ export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
 
   public async save(apiConsumer: ApiConsumer): Promise<void> {
     this.#consumers[apiConsumer.id] = apiConsumer;
+  }
+}
+
+const defaultApiConsumer: ApiConsumer = {
+  id: "aaaaaaaa-4444-4444-4444-aaaaaaaaaaaa",
+  consumer: "unJeuneUneSolution",
+  contact: {
+    firstName: "john",
+    lastName: "doe",
+    emails: ["mail@mail.com"],
+    job: "tech",
+    phone: "0611223344",
+  },
+  createdAt: new Date().toISOString(),
+  expirationDate: addYears(new Date(), 1).toISOString(),
+  rights: {
+    searchEstablishment: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
+    convention: {
+      kinds: ["READ"],
+      scope: {
+        agencyIds: [],
+      },
+      subscriptions: [],
+    },
+  },
+  description: "a",
+};
+
+export class ApiConsumerBuilder implements Builder<ApiConsumer> {
+  #dto: ApiConsumer;
+
+  constructor(dto: ApiConsumer = defaultApiConsumer) {
+    this.#dto = dto;
+  }
+
+  public build(): ApiConsumer {
+    return this.#dto;
+  }
+
+  public withConventionRight(
+    conventionRight: ApiConsumerRights["convention"],
+  ): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({
+      ...this.#dto,
+      rights: {
+        ...this.#dto.rights,
+        convention: conventionRight,
+      },
+    });
+  }
+
+  public withId(id: ApiConsumer["id"]): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({
+      ...this.#dto,
+      id,
+    });
   }
 }

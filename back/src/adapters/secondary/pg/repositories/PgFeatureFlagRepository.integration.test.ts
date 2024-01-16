@@ -5,9 +5,9 @@ import {
   makeBooleanFeatureFlag,
   makeTextFeatureFlag,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { FeatureFlagRepository } from "../../../../domain/core/ports/FeatureFlagRepository";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
 describe("PG getFeatureFlags", () => {

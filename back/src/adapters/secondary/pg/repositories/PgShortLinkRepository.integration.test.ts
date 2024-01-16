@@ -1,8 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { AbsoluteUrl, expectPromiseToFailWithError } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import {
   deleteShortLinkByIdQuery,
   getShortLinkByIdQuery,

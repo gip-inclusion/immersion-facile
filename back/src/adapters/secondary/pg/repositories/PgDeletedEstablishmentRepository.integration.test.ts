@@ -1,9 +1,9 @@
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { DeletedEstablishementDto } from "../../../../domain/offer/ports/DeletedEstablishmentRepository";
+import { EstablishmentAggregateBuilder } from "../../offer/InMemoryEstablishmentAggregateRepository";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgDeletedEstablishmentRepository } from "./PgDeletedEstablishmentRepository";
 
 describe("PgDeletedEstablishmentRepository", () => {

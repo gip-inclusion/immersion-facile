@@ -8,12 +8,14 @@ import {
   GroupOptions,
   SearchResultDto,
 } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { EstablishmentEntity } from "../../../../domain/offer/entities/EstablishmentEntity";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
+import {
+  EstablishmentAggregateBuilder,
+  OfferEntityBuilder,
+} from "../../offer/InMemoryEstablishmentAggregateRepository";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgGroupRepository } from "./PgGroupRepository";
 

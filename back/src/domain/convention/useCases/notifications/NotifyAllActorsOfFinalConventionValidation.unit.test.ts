@@ -9,9 +9,6 @@ import {
   frontRoutes,
   Role,
 } from "shared";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../_testBuilders/emailAssertions";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
@@ -19,9 +16,12 @@ import {
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import {
   makeSaveNotificationAndRelatedEvent,

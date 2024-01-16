@@ -1,12 +1,14 @@
 import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
-import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { DiscussionAggregate } from "../../../../domain/offer/entities/DiscussionAggregate";
+import { DiscussionAggregateBuilder } from "../../offer/InMemoryDiscussionAggregateRepository";
+import {
+  EstablishmentAggregateBuilder,
+  OfferEntityBuilder,
+} from "../../offer/InMemoryEstablishmentAggregateRepository";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 

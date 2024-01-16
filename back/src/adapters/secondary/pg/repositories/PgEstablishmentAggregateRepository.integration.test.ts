@@ -8,19 +8,21 @@ import {
   expectToEqual,
   SearchResultDto,
 } from "shared";
+import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
+import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import {
   rueBitcheDto,
   rueGuillaumeTellDto,
   rueJacquardDto,
-} from "../../../../_testBuilders/addressDtos";
-import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
-import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
-import { NotFoundError } from "../../../primary/helpers/httpErrors";
+} from "../../addressGateway/InMemoryAddressGateway";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../offer/InMemoryEstablishmentAggregateRepository";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
   getAllEstablishmentImmersionContactsRows,

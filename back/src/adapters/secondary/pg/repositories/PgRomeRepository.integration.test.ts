@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgRomeRepository } from "./PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {

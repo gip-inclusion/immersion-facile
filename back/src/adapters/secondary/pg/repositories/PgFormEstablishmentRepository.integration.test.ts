@@ -6,7 +6,6 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import {
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,
@@ -16,6 +15,7 @@ import {
   NotFoundError,
 } from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgFormEstablishmentRepository } from "./PgFormEstablishmentRepository";
 
 describe("PgFormEstablishmentRepository", () => {

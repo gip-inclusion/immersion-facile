@@ -11,15 +11,15 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
+import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
+  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   establishmentAggregateToSearchResultByRome,
-} from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
-import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

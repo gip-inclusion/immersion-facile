@@ -2,19 +2,21 @@ import { SuperTest, Test } from "supertest";
 import { expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp } from "../../../../utils/buildTestApp";
+import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
-import { TEST_POSITION } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+  TEST_POSITION,
+} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {

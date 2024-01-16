@@ -1,9 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { AppellationCode } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { SearchMadeEntity } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { optional } from "../pgUtils";
+import { getTestPgPool, optional } from "../pgUtils";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 
 describe("PgSearchesMadeRepository", () => {

@@ -1,16 +1,29 @@
 import { uniqBy } from "ramda";
 import {
+  AddressDto,
   AppellationAndRomeDto,
   AppellationCode,
+  Builder,
   conflictErrorSiret,
+  ContactMethod,
+  defaultMaxContactsPerWeek,
+  FormEstablishmentSource,
   GeoPositionDto,
+  NafDto,
+  NumberEmployeesRange,
   path,
   pathEq,
   replaceArrayElement,
+  RomeCode,
   SearchResultDto,
   SiretDto,
 } from "shared";
-import { EstablishmentAggregate } from "../../../domain/offer/entities/EstablishmentEntity";
+import { ContactEntity } from "../../../domain/offer/entities/ContactEntity";
+import {
+  EstablishmentAggregate,
+  EstablishmentEntity,
+} from "../../../domain/offer/entities/EstablishmentEntity";
+import { OfferEntity } from "../../../domain/offer/entities/OfferEntity";
 import {
   EstablishmentAggregateRepository,
   establishmentNotFoundErrorMessage,
@@ -20,6 +33,8 @@ import {
 } from "../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
+import { avenueChampsElyseesDto } from "../addressGateway/InMemoryAddressGateway";
+import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 
 export const TEST_ROME_LABEL = "test_rome_label";
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
@@ -262,3 +277,439 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = ({
     nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
   };
 };
+
+const validContactEntityV2: ContactEntity = {
+  id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
+  lastName: "Prost",
+  firstName: "Alain",
+  email: "alain.prost@email.fr",
+  job: "le big boss",
+  phone: "0612345678",
+  contactMethod: "EMAIL",
+  copyEmails: [],
+};
+
+export class ContactEntityBuilder implements Builder<ContactEntity> {
+  constructor(private readonly entity: ContactEntity = validContactEntityV2) {}
+
+  public build() {
+    return this.entity;
+  }
+
+  public withContactMethod(contactMethod: ContactMethod) {
+    return new ContactEntityBuilder({ ...this.entity, contactMethod });
+  }
+
+  public withCopyEmails(copyEmails: string[]) {
+    return new ContactEntityBuilder({ ...this.entity, copyEmails });
+  }
+
+  public withEmail(email: string) {
+    return new ContactEntityBuilder({ ...this.entity, email });
+  }
+
+  public withGeneratedContactId() {
+    return this.withId(new UuidV4Generator().new());
+  }
+
+  public withId(id: string) {
+    return new ContactEntityBuilder({ ...this.entity, id });
+  }
+}
+
+export const defaultNafCode = "7820Z";
+const validEstablishmentEntityV2: EstablishmentEntity = {
+  siret: "78000403200019",
+  name: "Company inside repository",
+  address: avenueChampsElyseesDto,
+  website: "www.jobs.fr",
+  additionalInformation: "",
+  customizedName: undefined,
+  isCommited: undefined,
+  createdAt: new Date(),
+  sourceProvider: "immersion-facile",
+  voluntaryToImmersion: true,
+  position: {
+    lat: 48.866667, // Paris lat/lon
+    lon: 2.333333,
+  },
+  nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
+  numberEmployeesRange: "10-19",
+  updatedAt: new Date("2022-01-05T12:00:00.000"),
+  isOpen: true,
+  isSearchable: true,
+  maxContactsPerWeek: defaultMaxContactsPerWeek,
+};
+
+export class EstablishmentEntityBuilder
+  implements Builder<EstablishmentEntity>
+{
+  constructor(
+    private readonly entity: EstablishmentEntity = validEstablishmentEntityV2,
+  ) {}
+
+  public build() {
+    return this.entity;
+  }
+
+  public withAdditionalInformation(additionalInformation: string) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      additionalInformation,
+    });
+  }
+
+  public withAddress(address: AddressDto) {
+    return new EstablishmentEntityBuilder({ ...this.entity, address });
+  }
+
+  public withCreatedAt(createdAt: Date) {
+    return new EstablishmentEntityBuilder({ ...this.entity, createdAt });
+  }
+
+  public withCustomizedName(customizedName?: string) {
+    return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
+  }
+
+  public withFitForDisabledWorkers(fitForDisabledWorkers?: boolean) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      fitForDisabledWorkers,
+    });
+  }
+
+  public withIsCommited(isCommited?: boolean) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      isCommited,
+    });
+  }
+
+  public withIsOpen(isOpen: boolean) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      isOpen,
+    });
+  }
+
+  public withIsSearchable(isSearchable: boolean) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      isSearchable,
+    });
+  }
+
+  public withLastInseeCheck(lastInseeCheck: Date | undefined) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      lastInseeCheckDate: lastInseeCheck,
+    });
+  }
+
+  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      maxContactsPerWeek,
+    });
+  }
+
+  public withNafDto(nafDto: NafDto) {
+    return new EstablishmentEntityBuilder({ ...this.entity, nafDto });
+  }
+
+  public withName(name: string) {
+    return new EstablishmentEntityBuilder({ ...this.entity, name });
+  }
+
+  public withNextAvailabilityDate(nextAvailabilityDate: Date | undefined) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      nextAvailabilityDate: nextAvailabilityDate?.toISOString(),
+    });
+  }
+
+  public withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      numberEmployeesRange,
+    });
+  }
+
+  public withPosition(position: GeoPositionDto) {
+    return new EstablishmentEntityBuilder({ ...this.entity, position });
+  }
+
+  public withSiret(siret: string) {
+    return new EstablishmentEntityBuilder({ ...this.entity, siret });
+  }
+
+  public withSourceProvider(sourceProvider: FormEstablishmentSource) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      sourceProvider,
+    });
+  }
+
+  public withUpdatedAt(updatedAt: Date) {
+    return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
+  }
+
+  public withWebsite(website?: string) {
+    return new EstablishmentEntityBuilder({ ...this.entity, website });
+  }
+}
+
+export class EstablishmentAggregateBuilder
+  implements Builder<EstablishmentAggregate>
+{
+  constructor(
+    private readonly aggregate: EstablishmentAggregate = {
+      establishment: new EstablishmentEntityBuilder().build(),
+      offers: [new OfferEntityBuilder().build()],
+      contact: new ContactEntityBuilder().build(),
+    },
+  ) {}
+
+  public build() {
+    return this.aggregate;
+  }
+
+  public withContact(contact: ContactEntity | undefined) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      contact,
+    });
+  }
+
+  public withContactId(id: string) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      contact: new ContactEntityBuilder().withId(id).build(),
+    });
+  }
+
+  public withEstablishment(establishment: EstablishmentEntity) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment,
+    });
+  }
+
+  public withEstablishmentLastInseeCheckDate(
+    lastInseeCheckDate: Date | undefined,
+  ) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withLastInseeCheck(lastInseeCheckDate)
+        .build(),
+    });
+  }
+
+  public withEstablishmentNaf(naf: NafDto) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withNafDto(naf)
+        .build(),
+    });
+  }
+
+  public withEstablishmentNextAvailabilityDate(date: Date) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withNextAvailabilityDate(date)
+        .build(),
+    });
+  }
+
+  public withEstablishmentSiret(siret: string) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder().withSiret(siret).build(),
+    });
+  }
+
+  public withEstablishmentUpdatedAt(updatedAt: Date) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withUpdatedAt(updatedAt)
+        .build(),
+    });
+  }
+
+  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withFitForDisabledWorkers(fitForDisabledWorkers)
+        .build(),
+    });
+  }
+
+  public withGeneratedContactId() {
+    return this.withContactId(new UuidV4Generator().new());
+  }
+
+  public withIsSearchable(isSearchable: boolean) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withIsSearchable(isSearchable)
+        .build(),
+    });
+  }
+
+  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withMaxContactsPerWeek(maxContactsPerWeek)
+        .build(),
+    });
+  }
+
+  public withOffers(offers: OfferEntity[]) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      offers,
+    });
+  }
+
+  public withoutContact() {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      contact: undefined,
+    });
+  }
+}
+
+export const establishmentAggregateToSearchResultByRome = (
+  establishmentAggregate: EstablishmentAggregate,
+  romeCode: RomeCode,
+  distance_m?: number,
+): SearchResultDto => ({
+  rome: romeCode,
+  naf: establishmentAggregate.establishment.nafDto.code,
+  nafLabel: establishmentAggregate.establishment.nafDto.nomenclature,
+  siret: establishmentAggregate.establishment.siret,
+  name: establishmentAggregate.establishment.name,
+  numberOfEmployeeRange:
+    establishmentAggregate.establishment.numberEmployeesRange,
+  voluntaryToImmersion:
+    establishmentAggregate.establishment.voluntaryToImmersion,
+  additionalInformation:
+    establishmentAggregate.establishment.additionalInformation,
+  position: establishmentAggregate.establishment.position,
+  address: establishmentAggregate.establishment.address,
+  contactMode: establishmentAggregate.contact?.contactMethod,
+  distance_m,
+  romeLabel: TEST_ROME_LABEL,
+  website: establishmentAggregate.establishment.website,
+  appellations: establishmentAggregate.offers
+    .filter((offer) => offer.romeCode === romeCode)
+    .map((offer) => ({
+      appellationCode: offer.appellationCode,
+      appellationLabel: offer.appellationLabel,
+    })),
+});
+
+const defaultValidOfferEntity: OfferEntity = {
+  romeCode: "B1805",
+  appellationLabel: "Styliste",
+  appellationCode: "19540",
+  romeLabel: "Stylisme",
+  score: 4.5,
+  createdAt: new Date("2022-05-15T12:00:00.000"),
+};
+
+export class OfferEntityBuilder implements Builder<OfferEntity> {
+  constructor(
+    private readonly entity: OfferEntity = {
+      ...defaultValidOfferEntity,
+    },
+  ) {}
+
+  public build() {
+    return this.entity;
+  }
+
+  public withAppellationCode(appellationCode: string) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      appellationCode,
+    });
+  }
+
+  public withAppellationLabel(appellationLabel: string) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      appellationLabel,
+    });
+  }
+
+  public withCreatedAt(createdAt: Date) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      createdAt,
+    });
+  }
+
+  public withRomeCode(romeCode: RomeCode) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      romeCode,
+    });
+  }
+
+  public withRomeLabel(romeLabel: string) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      romeLabel,
+    });
+  }
+
+  public withScore(score: number) {
+    return new OfferEntityBuilder({
+      ...this.entity,
+      score,
+    });
+  }
+}
+
+export const secretariatOffer = new OfferEntityBuilder()
+  .withRomeCode("M1607")
+  .withAppellationLabel("Secrétaire")
+  .withAppellationCode("19364")
+  .withRomeLabel("Secrétariat")
+  .build();
+
+export const boulangerOffer = new OfferEntityBuilder()
+  .withRomeCode("D1102")
+  .withAppellationLabel("Boulanger / Boulangère")
+  .withAppellationCode("11573")
+  .withRomeLabel("Boulangerie - viennoiserie")
+  .build();
+
+export const boulangerAssistantOffer = new OfferEntityBuilder()
+  .withRomeCode("D1102")
+  .withAppellationLabel("Boulanger / Boulangère assistant de l'enfer!!!")
+  .withAppellationCode("00666")
+  .withRomeLabel("Boulangerie - viennoiserie")
+  .build();

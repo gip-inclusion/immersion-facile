@@ -1,8 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { ApiConsumer, expectToEqual, WebhookSubscription } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { UuidV4Generator } from "../../core/UuidGeneratorImplementations";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
 const apiConsumer: ApiConsumer = {

@@ -3,7 +3,6 @@ import {
   expectToEqual,
   SubscriptionParams,
 } from "shared";
-import { ApiConsumerBuilder } from "../../../_testBuilders/ApiConsumerBuilder";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -11,6 +10,7 @@ import {
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { ApiConsumerBuilder } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SubscribeToWebhook } from "./SubscribeToWebhook";
 

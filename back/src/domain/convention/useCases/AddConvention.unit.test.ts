@@ -3,7 +3,6 @@ import {
   conventionStatuses,
   expectPromiseToFailWithError,
 } from "shared";
-import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -15,7 +14,10 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import {
+  InMemorySiretGateway,
+  SiretEstablishmentDtoBuilder,
+} from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -126,7 +128,7 @@ describe("Add Convention", () => {
   });
 
   describe("SIRET validation", () => {
-    const siretRawEstablishmentBuilder = new SirenEstablishmentDtoBuilder()
+    const siretRawEstablishmentBuilder = new SiretEstablishmentDtoBuilder()
       .withSiret(validConvention.siret)
       .withNafDto({ code: "78.3Z", nomenclature: "Ref2" });
 

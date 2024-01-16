@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { AuthenticatedUser, expectToEqual } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 
 describe("PgAuthenticatedUserRepository", () => {

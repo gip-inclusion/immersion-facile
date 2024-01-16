@@ -9,11 +9,8 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 
 describe("POST /add-form-establishment-batch", () => {

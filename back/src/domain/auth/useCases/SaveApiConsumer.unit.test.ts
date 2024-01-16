@@ -8,7 +8,6 @@ import {
   expectToEqual,
   Role,
 } from "shared";
-import { generateApiConsumerJwtTestFn } from "../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -21,6 +20,7 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { generateApiConsumerJwtTestFn } from "../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { SaveApiConsumer } from "./SaveApiConsumer";
 

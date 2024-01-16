@@ -11,8 +11,6 @@ import {
   RenewMagicLinkRequestDto,
   Role,
 } from "shared";
-import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
-import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
@@ -26,6 +24,8 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { makeGenerateJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
