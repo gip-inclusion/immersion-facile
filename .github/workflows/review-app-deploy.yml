@@ -1,4 +1,4 @@
-name: "Generic workflow to deploy to scalingo, given arguments"
+name: "Deploy review app"
 
 on:
   workflow_call:
