@@ -11,9 +11,9 @@ export const MinistereEmploiLogo = () => {
       <br />
       du travail,
       <br />
-      du plein emploi
+      de la santé
       <br />
-      et de l'insertion
+      et des solidarités
     </p>
   );
 };
