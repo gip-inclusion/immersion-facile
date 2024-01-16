@@ -30,7 +30,8 @@ export const AddEstablishmentsByBatch = () => {
     register,
     handleSubmit,
     getValues,
-    formState: { errors },
+    reset,
+    formState: { errors, touchedFields },
   } = useForm<AddEstablishmentByBatchTabForm>();
   const feedback = useAppSelector(establishmentBatchSelectors.feedback);
   const isLoading = useAppSelector(establishmentBatchSelectors.isLoading);
@@ -46,6 +47,7 @@ export const AddEstablishmentsByBatch = () => {
   const numberOfInvalidCandidateEstablishments = useAppSelector(
     establishmentBatchSelectors.numberOfInvalidCandidateEstablishments,
   );
+  const shouldDisableSubmitButton = keys(touchedFields).length === 0;
   const onSubmit = (formData: AddEstablishmentByBatchTabForm) => {
     const reader = new FileReader();
     const files = formData.inputFile;
@@ -53,10 +55,12 @@ export const AddEstablishmentsByBatch = () => {
       const file = files[0];
       reader.addEventListener("load", () => {
         Papa.parse(reader.result as string, papaOptions);
-        setFormSubmitted(true);
       });
       reader.readAsDataURL(file);
     }
+    reset(getValues(), {
+      keepTouched: false,
+    });
   };
   const dispatch = useDispatch();
   const papaOptions: Papa.ParseRemoteConfig<EstablishmentCSVRow> = {
@@ -70,9 +74,9 @@ export const AddEstablishmentsByBatch = () => {
 
   const [csvRowsParsed, setCsvRowsParsed] = useState<unknown[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const tableElement = useRef<HTMLTableElement | null>(null);
+
   useEffect(() => {
     const onFullscreenChange = () =>
       setIsFullscreen(!!document.fullscreenElement);
@@ -163,7 +167,6 @@ export const AddEstablishmentsByBatch = () => {
             ) ?? [],
       }),
     );
-    setFormSubmitted(false);
   };
   return (
     <section className={fr.cx("fr-mt-4w")}>
@@ -178,7 +181,6 @@ export const AddEstablishmentsByBatch = () => {
             ...register("groupName", { required: true }),
             id: domElementIds.admin.manageEstablishment.groupNameInput,
             placeholder: "Le nom de votre groupement d'entreprise",
-            readOnly: formSubmitted,
           }}
           state={errors.groupName ? "error" : "default"}
           stateRelatedMessage={errors.groupName ? "Ce champ est requis" : ""}
@@ -189,7 +191,6 @@ export const AddEstablishmentsByBatch = () => {
             ...register("title", { required: true }),
             id: domElementIds.admin.manageEstablishment.titleInput,
             placeholder: "Ex: Semaine de l'agro-alimentaire 2023",
-            readOnly: formSubmitted,
           }}
           state={errors.title ? "error" : "default"}
           stateRelatedMessage={errors.title ? "Ce champ est requis" : ""}
@@ -202,7 +203,6 @@ export const AddEstablishmentsByBatch = () => {
             id: domElementIds.admin.manageEstablishment.descriptionInput,
             placeholder:
               "Ex: La super semaine de l'agro-alimentaire, du 12 au 16 novembre, etc... Rencontrez des entreprises sympas !",
-            readOnly: formSubmitted,
           }}
           state={errors.description ? "error" : "default"}
           stateRelatedMessage={errors.description ? "Ce champ est requis" : ""}
@@ -212,7 +212,6 @@ export const AddEstablishmentsByBatch = () => {
           nativeInputProps={{
             ...register("inputFile", { required: true }),
             id: domElementIds.admin.manageEstablishment.inputFileInput,
-            readOnly: formSubmitted,
             type: "file",
             accept: ".csv",
           }}
@@ -231,11 +230,10 @@ export const AddEstablishmentsByBatch = () => {
             </>
           }
         />
-
         <Button
           title="Vérifier les données à importer"
           className={fr.cx("fr-mt-2w")}
-          disabled={formSubmitted}
+          disabled={shouldDisableSubmitButton}
         >
           Vérifier les données à importer
         </Button>
