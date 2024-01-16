@@ -50,7 +50,6 @@ const getSiretEpic: SiretEpic = (
     filter(siretSlice.actions.siretInfoRequested.match),
     switchMap((action) =>
       getSiret({
-        enableInseeApi: state$.value.featureFlags.enableInseeApi.isActive,
         shouldFetchEvenIfAlreadySaved:
           state$.value.siret.shouldFetchEvenIfAlreadySaved,
         siret: action.payload,
@@ -76,30 +75,15 @@ const getSiretEpic: SiretEpic = (
 const makeGetSiret =
   (siretGatewayThroughBack: FormCompletionGateway) =>
   ({
-    enableInseeApi,
     shouldFetchEvenIfAlreadySaved,
     siret,
   }: {
-    enableInseeApi: boolean;
     shouldFetchEvenIfAlreadySaved: boolean;
     siret: SiretDto;
-  }): Observable<GetSiretInfo | null> => {
-    if (!enableInseeApi) {
-      return siretGatewayThroughBack
-        .isSiretAlreadySaved(siret)
-        .pipe(
-          map((isAlreadySaved) =>
-            isAlreadySaved
-              ? "Establishment with this siret is already in our DB"
-              : null,
-          ),
-        );
-    }
-
-    return shouldFetchEvenIfAlreadySaved
+  }): Observable<GetSiretInfo | null> =>
+    shouldFetchEvenIfAlreadySaved
       ? siretGatewayThroughBack.getSiretInfo(siret)
       : siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret);
-  };
 
 export const siretEpics = [
   triggerSiretFetchEpic,

@@ -5,7 +5,6 @@ import { addressDtoToString } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
 type EditionSiretRelatedInputsProps = {
   businessAddress: string;
@@ -14,7 +13,6 @@ type EditionSiretRelatedInputsProps = {
 export const EditionSiretRelatedInputs = ({
   businessAddress,
 }: EditionSiretRelatedInputsProps) => {
-  const featureFlags = useFeatureFlags();
   const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { register, setValue } = useFormContext();
@@ -31,7 +29,7 @@ export const EditionSiretRelatedInputs = ({
         {...formContents.businessName}
         nativeInputProps={{
           ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi.isActive,
+          readOnly: true,
         }}
       />
       <Input

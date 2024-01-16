@@ -2,11 +2,7 @@ import { z } from "zod";
 
 export type FeatureFlagName = (typeof featureFlagNames)[number];
 const featureFlagNames = [
-  "enableInseeApi",
-  "enablePeConnectApi",
-  "enablePeConventionBroadcast",
   "enableTemporaryOperation",
-  "enableMaxContactPerWeek",
   "enableMaintenance",
 ] as const;
 

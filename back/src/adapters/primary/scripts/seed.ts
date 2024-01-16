@@ -44,14 +44,10 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
   await client.query("DELETE FROM feature_flags");
 
   const featureFlags: FeatureFlags = {
-    enableInseeApi: makeBooleanFeatureFlag(true),
+    enableTemporaryOperation: makeBooleanFeatureFlag(false),
     enableMaintenance: makeTextFeatureFlag(false, {
       message: "Mon message de maintenance",
     }),
-    enableMaxContactPerWeek: makeBooleanFeatureFlag(true),
-    enablePeConnectApi: makeBooleanFeatureFlag(true),
-    enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
-    enableTemporaryOperation: makeBooleanFeatureFlag(false),
   };
 
   await uow.featureFlagRepository.insert(featureFlags);

@@ -6,10 +6,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 
-export class AddFormEstablishment extends TransactionalUseCase<
-  FormEstablishmentDto,
-  void
-> {
+export class AddFormEstablishment extends TransactionalUseCase<FormEstablishmentDto> {
   protected inputSchema = formEstablishmentSchema;
 
   readonly #createNewEvent: CreateNewEvent;
@@ -31,9 +28,6 @@ export class AddFormEstablishment extends TransactionalUseCase<
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const featureFlags = await uow.featureFlagRepository.getAll();
-    const isApiInseeEnabled = featureFlags.enableInseeApi.isActive;
-
     const existingFormEstablishment =
       await uow.formEstablishmentRepository.getBySiret(dto.siret);
 
@@ -42,16 +36,14 @@ export class AddFormEstablishment extends TransactionalUseCase<
         `Establishment with siret ${dto.siret} already exists`,
       );
     }
-    if (isApiInseeEnabled) {
-      await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, dto.siret);
-    }
+    await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, dto.siret);
 
     const appellations =
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
         dto.appellations.map(({ appellationCode }) => appellationCode),
       );
 
-    const correctFormEstablishement: FormEstablishmentDto = {
+    const correctFormEstablishment: FormEstablishmentDto = {
       ...dto,
       appellations,
       businessNameCustomized:
@@ -62,12 +54,11 @@ export class AddFormEstablishment extends TransactionalUseCase<
 
     const event = this.#createNewEvent({
       topic: "FormEstablishmentAdded",
-      payload: { formEstablishment: correctFormEstablishement },
-      ...(isApiInseeEnabled ? {} : { wasQuarantined: true }),
+      payload: { formEstablishment: correctFormEstablishment },
     });
 
     await Promise.all([
-      uow.formEstablishmentRepository.create(correctFormEstablishement),
+      uow.formEstablishmentRepository.create(correctFormEstablishment),
       uow.outboxRepository.save(event),
     ]);
   }

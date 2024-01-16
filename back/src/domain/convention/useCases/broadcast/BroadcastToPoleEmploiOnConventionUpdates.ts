@@ -27,10 +27,7 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Initier une démarche de recrutement": 3,
 };
 
-export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<
-  WithConventionDto,
-  void
-> {
+export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;
 
   constructor(
@@ -46,19 +43,6 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const { enablePeConventionBroadcast } =
-      await uow.featureFlagRepository.getAll();
-
-    if (!enablePeConventionBroadcast.isActive)
-      return this.options.resyncMode
-        ? uow.conventionsToSyncRepository.save({
-            id: convention.id,
-            status: "SKIP",
-            processDate: this.timeGateway.now(),
-            reason: "Feature flag enablePeConventionBroadcast not enabled",
-          })
-        : undefined;
-
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
       throw new NotFoundError(

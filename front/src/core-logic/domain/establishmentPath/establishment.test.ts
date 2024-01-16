@@ -4,13 +4,11 @@ import {
   expectToEqual,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  makeBooleanFeatureFlag,
   SiretEstablishmentDto,
 } from "shared";
 import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
-import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 import {
   createTestStore,
   TestDependencies,
@@ -77,29 +75,6 @@ describe("Establishment", () => {
       siret: establishmentFromSiretFetched.siret,
       bName: establishmentFromSiretFetched.businessName,
       bAddress: establishmentFromSiretFetched.businessAddress,
-    });
-  });
-
-  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION', even if insee feature flag is OFF", () => {
-    ({ store, dependencies } = createTestStore({
-      establishment: {
-        isLoading: false,
-        feedback: { kind: "readyForLinkRequestOrRedirection" },
-        formEstablishment: defaultFormEstablishmentValue(),
-      },
-      featureFlags: {
-        ...makeStubFeatureFlags({
-          enableInseeApi: {
-            ...makeBooleanFeatureFlag(false),
-          },
-        }),
-        isLoading: false,
-      },
-    }));
-    store.dispatch(siretSlice.actions.siretModified("10002000300040"));
-    dependencies.formCompletionGateway.isSiretInDb$.next(false);
-    expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
-      siret: "10002000300040",
     });
   });
 

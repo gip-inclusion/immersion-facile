@@ -18,7 +18,6 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 
@@ -57,7 +56,6 @@ export const CreationSiretRelatedInputs = () => {
     setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
   }, [establishmentInfos]);
 
-  const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
   return (
     <>
@@ -131,7 +129,7 @@ export const CreationSiretRelatedInputs = () => {
         nativeInputProps={{
           ...formContents.businessName,
           ...register("businessName"),
-          readOnly: featureFlags.enableInseeApi.isActive,
+          readOnly: true,
         }}
       />
       <Input

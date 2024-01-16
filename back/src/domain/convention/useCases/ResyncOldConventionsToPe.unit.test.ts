@@ -187,45 +187,6 @@ describe("ResyncOldConventionsToPe use case", () => {
       });
     });
 
-    it("when feature flag enablePeConventionBroadcast is disabled", async () => {
-      await uow.featureFlagRepository.update({
-        flagName: "enablePeConventionBroadcast",
-        flagContent: {
-          isActive: false,
-        },
-      });
-      uow.agencyRepository.setAgencies([agencyPE]);
-      uow.conventionRepository.setConventions([conventionToSync1]);
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync1.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(peGateway.notifications, []);
-
-      const report = await useCase.execute();
-
-      expectToEqual(uow.conventionRepository.conventions, [conventionToSync1]);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync1.id,
-          status: "SKIP",
-          processDate: timeGateway.now(),
-          reason: "Feature flag enablePeConventionBroadcast not enabled",
-        },
-      ]);
-      expectToEqual(peGateway.notifications, []);
-      expectToEqual(report, {
-        success: 0,
-        skips: {
-          [conventionToSync1.id]:
-            "Feature flag enablePeConventionBroadcast not enabled",
-        },
-        errors: {},
-      });
-    });
-
     it("only process convention with status TO_PROCESS and ERROR", async () => {
       uow.agencyRepository.setAgencies([agencyPE]);
       uow.conventionRepository.setConventions([

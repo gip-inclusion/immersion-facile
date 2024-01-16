@@ -16,22 +16,14 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const defaultFeatureFlags: FeatureFlags = {
-  enableInseeApi: makeBooleanFeatureFlag(true),
-  enablePeConnectApi: makeBooleanFeatureFlag(false),
-  enablePeConventionBroadcast: makeBooleanFeatureFlag(false),
   enableTemporaryOperation: makeBooleanFeatureFlag(false),
-  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "",
   }),
 };
 
 const flagsFromApi: FeatureFlags = {
-  enableInseeApi: makeBooleanFeatureFlag(true),
-  enablePeConnectApi: makeBooleanFeatureFlag(true),
-  enablePeConventionBroadcast: makeBooleanFeatureFlag(true),
   enableTemporaryOperation: makeBooleanFeatureFlag(false),
-  enableMaxContactPerWeek: makeBooleanFeatureFlag(false),
   enableMaintenance: makeTextFeatureFlag(true, {
     message: "My maintenance message",
   }),
@@ -66,13 +58,14 @@ describe("feature flag slice", () => {
     ({ store, dependencies } = createTestStore({
       featureFlags: {
         ...defaultFeatureFlags,
-        enableInseeApi: makeBooleanFeatureFlag(false),
+        enableTemporaryOperation: makeBooleanFeatureFlag(false),
         isLoading: false,
       },
     }));
+
     store.dispatch(
       featureFlagsSlice.actions.setFeatureFlagRequested({
-        flagName: "enableInseeApi",
+        flagName: "enableTemporaryOperation",
         flagContent: {
           isActive: true,
         },
@@ -80,19 +73,19 @@ describe("feature flag slice", () => {
     );
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableInseeApi: makeBooleanFeatureFlag(true),
+      enableTemporaryOperation: makeBooleanFeatureFlag(true),
       isLoading: true,
     });
     dependencies.adminGateway.setFeatureFlagResponse$.next(undefined);
     expectToEqual(dependencies.adminGateway.setFeatureFlagLastCalledWith, {
-      flagName: "enableInseeApi",
+      flagName: "enableTemporaryOperation",
       flagContent: {
         isActive: true,
       },
     });
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableInseeApi: makeBooleanFeatureFlag(true),
+      enableTemporaryOperation: makeBooleanFeatureFlag(true),
       isLoading: false,
     });
   });

@@ -19,7 +19,6 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { Mode, OnStepChange, Step } from "../EstablishmentForm";
 
 export const AvailabilitySection = ({
@@ -43,7 +42,6 @@ export const AvailabilitySection = ({
     formEstablishmentFieldsLabels,
   ).getFormFields();
   const getFieldError = makeFieldError(formState);
-  const { enableMaxContactPerWeek } = useFeatureFlags();
 
   const shouldShowErrorOnAvailableForImmersion =
     availableForImmersion === undefined &&
@@ -109,28 +107,26 @@ export const AvailabilitySection = ({
           {...getFieldError("nextAvailabilityDate")}
         />
       )}
-      {enableMaxContactPerWeek.isActive &&
-        availableForImmersion !== undefined && (
-          <Input
-            label={
-              availableForImmersion
-                ? formContents.maxContactsPerWeek.label
-                : formContents.maxContactPerWeekWhenAvailable.label
-            }
-            nativeInputProps={{
-              ...formContents.maxContactsPerWeek,
-              ...register("maxContactsPerWeek", {
-                valueAsNumber: true,
-              }),
-              type: "number",
-              min:
-                mode === "create" || (mode === "edit" && isSearchable) ? 1 : 0,
-              pattern: "\\d*",
-            }}
-            disabled={mode === "edit" && !isSearchable}
-            {...getFieldError("maxContactsPerWeek")}
-          />
-        )}
+      {availableForImmersion !== undefined && (
+        <Input
+          label={
+            availableForImmersion
+              ? formContents.maxContactsPerWeek.label
+              : formContents.maxContactPerWeekWhenAvailable.label
+          }
+          nativeInputProps={{
+            ...formContents.maxContactsPerWeek,
+            ...register("maxContactsPerWeek", {
+              valueAsNumber: true,
+            }),
+            type: "number",
+            min: mode === "create" || (mode === "edit" && isSearchable) ? 1 : 0,
+            pattern: "\\d*",
+          }}
+          disabled={mode === "edit" && !isSearchable}
+          {...getFieldError("maxContactsPerWeek")}
+        />
+      )}
       {availableForImmersion === false && mode === "edit" && (
         <div className={fr.cx("fr-highlight", "fr-ml-0")}>
           <p>

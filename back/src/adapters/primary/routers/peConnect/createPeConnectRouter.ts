@@ -2,7 +2,6 @@ import { Router } from "express";
 import { loginPeConnect, ManagedRedirectError, peConnect } from "shared";
 import { makePeConnectLoginPageUrl } from "../../../secondary/PeConnectGateway/peConnectApi.routes";
 import { AppDependencies } from "../../config/createAppDependencies";
-import { FeatureDisabledError } from "../../helpers/httpErrors";
 import { sendRedirectResponseWithManagedErrors } from "../../helpers/sendRedirectResponseWithManagedErrors";
 
 export const createPeConnectRouter = (deps: AppDependencies) => {
@@ -12,10 +11,8 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
     sendRedirectResponseWithManagedErrors(
       req,
       res,
-      async () => {
-        await throwIfPeConnectDisabled(deps);
-        return makePeConnectLoginPageUrl(deps.config);
-      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      async () => makePeConnectLoginPageUrl(deps.config),
       deps.errorHandlers.handleManagedRedirectResponseError,
       deps.errorHandlers.handleRawRedirectResponseError,
     ),
@@ -26,8 +23,6 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
       req,
       res,
       async () => {
-        await throwIfPeConnectDisabled(deps);
-
         if (!req?.query?.code)
           throw new ManagedRedirectError("peConnectNoAuthorisation");
 
@@ -41,11 +36,4 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
   );
 
   return peConnectRouter;
-};
-
-const throwIfPeConnectDisabled = async (deps: AppDependencies) => {
-  const features = await deps.useCases.getFeatureFlags.execute();
-  if (!features.enablePeConnectApi.isActive) {
-    throw new FeatureDisabledError("PeConnect");
-  }
 };

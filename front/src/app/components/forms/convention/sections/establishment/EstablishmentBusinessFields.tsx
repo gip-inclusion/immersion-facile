@@ -9,7 +9,6 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/hooks/siret.hooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 export const EstablishmentBusinessFields = ({
@@ -17,7 +16,6 @@ export const EstablishmentBusinessFields = ({
 }: {
   disabled: undefined | boolean;
 }): JSX.Element => {
-  const { enableInseeApi } = useFeatureFlags();
   const { currentSiret, updateSiret, siretErrorToDisplay, establishmentInfos } =
     useSiretFetcher({
       shouldFetchEvenIfAlreadySaved: true,
@@ -73,7 +71,7 @@ export const EstablishmentBusinessFields = ({
           value:
             establishmentInfos?.businessName || convention?.businessName || "",
         }}
-        disabled={enableInseeApi.isActive}
+        disabled={true}
       />
     </>
   );
