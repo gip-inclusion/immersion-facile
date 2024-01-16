@@ -627,7 +627,7 @@ const instantiatedUseCasesFromClasses = <
     ? InstantiatedUseCase<Input, Output, JwtPayload>
     : T[K] extends UseCase<infer Input2, infer Output2, infer JwtPayload2>
     ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
-    : void;
+    : never;
 } =>
   keys(useCases).reduce(
     (acc, useCaseKey) => ({
