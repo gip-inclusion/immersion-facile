@@ -40,12 +40,7 @@ const featureFlagSchema: z.Schema<FeatureFlag> = z
   );
 
 export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
-  enableInseeApi: featureFlagSchema,
-  enablePeConnectApi: featureFlagSchema,
-  enableLogoUpload: featureFlagSchema,
-  enablePeConventionBroadcast: featureFlagSchema,
   enableTemporaryOperation: featureFlagSchema,
-  enableMaxContactPerWeek: featureFlagSchema,
   enableMaintenance: featureFlagSchema,
 });
 
