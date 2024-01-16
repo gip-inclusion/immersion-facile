@@ -8,7 +8,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`${adminRoutes.getLastNotifications.url} route`, () => {

@@ -11,17 +11,16 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domain/auth/jwt";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
+import {
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

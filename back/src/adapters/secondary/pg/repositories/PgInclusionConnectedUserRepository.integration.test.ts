@@ -10,8 +10,8 @@ import {
   expectToEqual,
   InclusionConnectedUser,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 

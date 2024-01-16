@@ -7,8 +7,8 @@ import {
   GeoPositionDto,
   NumberEmployeesRange,
 } from "shared";
-import { rueGuillaumeTellDto } from "../../../../_testBuilders/addressDtos";
 import { EstablishmentAggregate } from "../../../../domain/offer/entities/EstablishmentEntity";
+import { rueGuillaumeTellDto } from "../../addressGateway/InMemoryAddressGateway";
 
 type PgImmersionOfferRow = {
   rome_code: string;

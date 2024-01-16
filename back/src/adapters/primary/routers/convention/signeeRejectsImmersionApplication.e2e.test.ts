@@ -12,12 +12,9 @@ import {
   UpdateConventionStatusRequestDto,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import {
-  buildTestApp,
-  TestAppAndDeps,
-} from "../../../../_testBuilders/buildTestApp";
-import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
+import { buildTestApp, TestAppAndDeps } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {

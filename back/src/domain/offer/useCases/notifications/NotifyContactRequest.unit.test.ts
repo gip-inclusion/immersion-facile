@@ -5,11 +5,6 @@ import {
   expectPromiseToFailWithError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
-import {
-  ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -19,11 +14,18 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryRomeRepository } from "../../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryDiscussionAggregateRepository } from "../../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
+import {
+  DiscussionAggregateBuilder,
+  InMemoryDiscussionAggregateRepository,
+} from "../../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import {
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
 } from "../../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 

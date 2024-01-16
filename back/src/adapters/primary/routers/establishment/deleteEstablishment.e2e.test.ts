@@ -11,14 +11,14 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domain/auth/jwt";
 import { establishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/FormEstablishmentRepository";
+import { buildTestApp } from "../../../../utils/buildTestApp";
+import { EstablishmentAggregateBuilder } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`Delete form establishment`, () => {

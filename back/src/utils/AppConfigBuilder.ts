@@ -27,7 +27,6 @@ const defaultConfigParams = {
   INCLUSION_CONNECT_CLIENT_SECRET: "inclusion-client-secret",
   INCLUSION_CONNECT_BASE_URI: "https://fake-inclusion.com",
 };
-
 // See "Working with AppConfig" in back/README.md for more details.
 export class AppConfigBuilder implements Builder<AppConfig> {
   readonly #configParams: ProcessEnv;

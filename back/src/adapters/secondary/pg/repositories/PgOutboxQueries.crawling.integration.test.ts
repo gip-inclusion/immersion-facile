@@ -1,6 +1,5 @@
 import { Pool, PoolClient } from "pg";
 import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
 import {
   DomainEvent,
@@ -9,6 +8,7 @@ import {
 import { CustomTimeGateway } from "../../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/UuidGeneratorImplementations";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgOutboxQueries } from "./PgOutboxQueries";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 

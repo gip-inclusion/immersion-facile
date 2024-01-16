@@ -6,11 +6,6 @@ import {
   FormEstablishmentDtoBuilder,
   GroupOptions,
 } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import {
-  ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -22,6 +17,11 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../utils/makeExpectSavedNotificationsAndEvents";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { ContactEntity } from "../entities/ContactEntity";

@@ -6,7 +6,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import {
   broadcastToPeServiceName,
   SavedError,
@@ -14,6 +13,7 @@ import {
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { Database } from "../kysely/model/database";
+import { getTestPgPool } from "../pgUtils";
 import { PgErrorRepository } from "./PgErrorRepository";
 
 const makeSavedError = (

@@ -9,9 +9,9 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { makeVerifyJwtES256 } from "../../../../domain/auth/jwt";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
 import { AppConfig } from "../../config/appConfig";
 

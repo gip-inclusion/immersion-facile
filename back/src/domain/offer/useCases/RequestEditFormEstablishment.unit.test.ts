@@ -4,13 +4,6 @@ import {
   expectPromiseToFailWithError,
   TemplatedEmail,
 } from "shared";
-import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import {
-  ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -19,6 +12,15 @@ import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "./RequestEditFormEstablishment";

@@ -7,13 +7,13 @@ import {
   expectToEqual,
   GeoPositionDto,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { someAgenciesMissingMessage } from "../../../../domain/convention/ports/AgencyRepository";
 import {
   ConflictError,
   NotFoundError,
 } from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import {
   PgAgencyRepository,
   safirConflictErrorMessage,

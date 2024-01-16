@@ -1,6 +1,6 @@
 import { SuperTest, Test } from "supertest";
 import { expectToEqual } from "shared";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("/", () => {
   let request: SuperTest<Test>;

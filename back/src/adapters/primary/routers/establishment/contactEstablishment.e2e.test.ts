@@ -8,16 +8,15 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
-import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const siret = "11112222333344";

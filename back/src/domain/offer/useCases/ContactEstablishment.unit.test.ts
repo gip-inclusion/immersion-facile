@@ -7,11 +7,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
-import { DiscussionAggregateBuilder } from "../../../_testBuilders/DiscussionAggregateBuilder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../_testBuilders/OfferEntityBuilder";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -25,6 +20,13 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { ContactEstablishment } from "./ContactEstablishment";

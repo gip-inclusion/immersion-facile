@@ -4,7 +4,6 @@ import {
   expectPromiseToFailWithError,
   FormEstablishmentDtoBuilder,
 } from "shared";
-import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -18,6 +17,7 @@ import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRome
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemorySiretGateway,
+  SiretEstablishmentDtoBuilder,
   TEST_OPEN_ESTABLISHMENT_1,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
@@ -163,7 +163,7 @@ describe("Add FormEstablishment", () => {
       .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
       .build();
 
-    const siretRawInactiveEstablishment = new SirenEstablishmentDtoBuilder()
+    const siretRawInactiveEstablishment = new SiretEstablishmentDtoBuilder()
       .withSiret(formEstablishment.siret)
       .withIsActive(false)
       .withBusinessName("INACTIVE BUSINESS")
@@ -183,7 +183,7 @@ describe("Add FormEstablishment", () => {
     });
 
     it("accepts formEstablishment with SIRETs that  correspond to active businesses", async () => {
-      const siretRawEstablishment = new SirenEstablishmentDtoBuilder().build();
+      const siretRawEstablishment = new SiretEstablishmentDtoBuilder().build();
       siretGateway.setSirenEstablishment(siretRawEstablishment);
       await addFormEstablishment.execute(formEstablishment);
       expect(outboxRepo.events).toHaveLength(1);

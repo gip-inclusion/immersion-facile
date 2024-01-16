@@ -12,18 +12,15 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
-import { DiscussionAggregateBuilder } from "../../../../_testBuilders/DiscussionAggregateBuilder";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
 } from "../../../../domain/auth/jwt";
 import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { shortLinkNotFoundMessage } from "../../../../domain/core/ShortLink";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { DiscussionAggregateBuilder } from "../../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

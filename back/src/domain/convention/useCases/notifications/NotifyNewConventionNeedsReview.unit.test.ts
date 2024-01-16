@@ -5,12 +5,6 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
-import {
-  ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
@@ -20,6 +14,12 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyNewConventionNeedsReview } from "./NotifyNewConventionNeedsReview";

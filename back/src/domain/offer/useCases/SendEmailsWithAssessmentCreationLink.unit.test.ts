@@ -1,9 +1,4 @@
 import { ConventionDtoBuilder, ConventionId, expectToEqual } from "shared";
-import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
-import {
-  ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -11,6 +6,11 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";

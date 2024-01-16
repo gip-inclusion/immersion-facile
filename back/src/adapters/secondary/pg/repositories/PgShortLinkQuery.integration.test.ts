@@ -4,9 +4,9 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import {
   deleteShortLinkByIdQuery,
   insertShortLinkQuery,

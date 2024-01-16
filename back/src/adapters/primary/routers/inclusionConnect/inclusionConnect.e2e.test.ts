@@ -13,12 +13,9 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
 import { UuidGenerator } from "../../../../domain/core/ports/UuidGenerator";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
 
 describe("inclusion connection flow", () => {
   const clientId = "my-client-id";

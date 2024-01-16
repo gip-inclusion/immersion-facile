@@ -11,12 +11,12 @@ import {
   Role,
   ScheduleDtoBuilder,
 } from "shared";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domain/auth/jwt";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const payloadMeta = {

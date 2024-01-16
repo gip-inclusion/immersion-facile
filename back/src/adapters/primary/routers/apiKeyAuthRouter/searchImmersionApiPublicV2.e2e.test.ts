@@ -2,19 +2,19 @@ import { SuperTest, Test } from "supertest";
 import { AppellationAndRomeDto, expectHttpResponseToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import {
-  defaultNafCode,
-  EstablishmentEntityBuilder,
-} from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { buildTestApp } from "../../../../utils/buildTestApp";
+import { avenueChampsElyseesDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
+import {
+  defaultNafCode,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {

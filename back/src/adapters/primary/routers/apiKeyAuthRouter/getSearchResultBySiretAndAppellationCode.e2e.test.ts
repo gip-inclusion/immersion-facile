@@ -6,22 +6,20 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import {
-  defaultNafCode,
-  EstablishmentEntityBuilder,
-} from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp } from "../../../../utils/buildTestApp";
+import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
 import {
+  ContactEntityBuilder,
+  defaultNafCode,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";

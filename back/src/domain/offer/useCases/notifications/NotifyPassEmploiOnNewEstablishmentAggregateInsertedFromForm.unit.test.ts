@@ -1,8 +1,10 @@
 import { expectArraysToEqual } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
-import { OfferEntityBuilder } from "../../../../_testBuilders/OfferEntityBuilder";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import {
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryPassEmploiGateway } from "../../../../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";

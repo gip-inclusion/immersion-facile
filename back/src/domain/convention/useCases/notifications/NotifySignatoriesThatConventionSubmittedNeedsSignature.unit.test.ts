@@ -6,18 +6,20 @@ import {
   frontRoutes,
 } from "shared";
 import { EmailNotification } from "shared";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryNotificationRepository } from "../../../../adapters/secondary/InMemoryNotificationRepository";
+import {
+  expectEmailSignatoryConfirmationSignatureRequestMatchingConvention,
+  InMemoryNotificationRepository,
+} from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import {
   makeSaveNotificationAndRelatedEvent,

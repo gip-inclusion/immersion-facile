@@ -8,8 +8,8 @@ import {
   TemplatedEmail,
   TemplatedSms,
 } from "shared";
-import { getTestPgPool } from "../../../../_testBuilders/getTestPgPool";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
+import { getTestPgPool } from "../pgUtils";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
 const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";

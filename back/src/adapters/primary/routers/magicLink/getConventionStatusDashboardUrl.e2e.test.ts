@@ -4,7 +4,7 @@ import {
   createConventionMagicLinkPayload,
   expectToEqual,
 } from "shared";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("getConventionStatusDashboardUrl", () => {
   it("fails if no token is provided", async () => {

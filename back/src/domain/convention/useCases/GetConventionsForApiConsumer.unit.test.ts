@@ -4,12 +4,12 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ApiConsumerBuilder } from "../../../_testBuilders/ApiConsumerBuilder";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { ApiConsumerBuilder } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { GetConventionsForApiConsumer } from "./GetConventionsForApiConsumer";
 

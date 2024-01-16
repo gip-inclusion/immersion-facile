@@ -24,12 +24,6 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
-import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
@@ -38,7 +32,10 @@ import {
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
 import { conventionMissingMessage } from "../../../../domain/convention/entities/Convention";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";

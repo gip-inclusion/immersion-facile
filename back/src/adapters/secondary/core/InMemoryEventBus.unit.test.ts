@@ -3,9 +3,10 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { spyOnTopic } from "../../../_testBuilders/spyOnTopic";
+import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import type {
   DomainEvent,
+  DomainTopic,
   EventFailure,
 } from "../../../domain/core/eventBus/events";
 import { createInMemoryUow } from "../../primary/config/uowConfig";
@@ -326,3 +327,16 @@ describe("InMemoryEventBus", () => {
     });
   });
 });
+
+const spyOnTopic = (
+  eventBus: EventBus,
+  topic: DomainTopic,
+  subscriptionId: string,
+): DomainEvent[] => {
+  const publishedEvents: DomainEvent[] = [];
+  //eslint-disable-next-line @typescript-eslint/require-await
+  eventBus.subscribe(topic, subscriptionId, async (event) => {
+    publishedEvents.push(event);
+  });
+  return publishedEvents;
+};

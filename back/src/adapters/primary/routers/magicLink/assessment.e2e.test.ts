@@ -11,11 +11,8 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
-import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

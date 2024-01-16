@@ -22,17 +22,14 @@ import {
 import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import {
-  buildTestApp,
-  InMemoryGateways,
-} from "../../../../_testBuilders/buildTestApp";
-import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import {
   GenerateApiConsumerJwt,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
 import { EXPIRATION_IN_YEARS } from "../../../../domain/auth/useCases/SaveApiConsumer";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import { AppConfig } from "../../config/appConfig";

@@ -1,13 +1,15 @@
 import subDays from "date-fns/subDays";
 import { expectToEqual, SiretEstablishmentDto } from "shared";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/establishmentAggregate.test.helpers";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
 

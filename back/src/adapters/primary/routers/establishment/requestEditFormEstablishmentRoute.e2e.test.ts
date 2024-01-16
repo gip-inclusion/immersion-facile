@@ -6,9 +6,11 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/establishmentAggregate.test.helpers";
+import { buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 
 describe("Route to generate an establishment edition link", () => {
   const siret = "11111111111111";

@@ -6,8 +6,8 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   authorizedSubscriptionApiConsumer,
   authorizedUnJeuneUneSolutionApiConsumer,
