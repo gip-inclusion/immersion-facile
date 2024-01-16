@@ -73,3 +73,68 @@ jobs:
           STORAGE_FULL_PATH=$(pwd)/back/storage
           mkdir -p $STORAGE_FULL_PATH/tmp/ 
           DATABASE_URL=$TEST_DATABASE_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
+
+  playwright-tests:
+    name: "Playwright tests"
+    runs-on: ubuntu-latest
+    env:
+      #      TEST_DATABASE_URL: postgresql://immersion:password@localhost:5432/immersion-db
+      NODE_ENV: test
+      DATABASE_URL: postgresql://immersion:password@localhost:5432/immersion-db
+      NOTIFICATION_GATEWAY: IN_MEMORY
+      ADDRESS_API_GATEWAY: IN_MEMORY
+      POLE_EMPLOI_GATEWAY: IN_MEMORY
+      LA_BONNE_BOITE_GATEWAY: IN_MEMORY
+      PASS_EMPLOI_GATEWAY: IN_MEMORY
+      PDF_GENERATOR_GATEWAY: IN_MEMORY
+      SHORT_LINK_ID_GENERATOR_GATEWAY: NANO_ID
+      # The following keys are for local use only, they are considered compromised and shall never be use on any of our environements
+      JWT_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgevZzL1gdAFr88hb2\nOF/2NxApJCzGCEDdfSp6VQO30hyhRANCAAQRWz+jn65BtOMvdyHKcvjBeBSDZH2r\n1RTwjmYSi9R/zpBnuQ4EiMnCqfMPWiZqB4QdbAd0E7oH50VpuZ1P087G\n-----END PRIVATE KEY-----"
+      JWT_PUBLIC_KEY: "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9\nq9UU8I5mEovUf86QZ7kOBIjJwqnzD1omageEHWwHdBO6B+dFabmdT9POxg==\n-----END PUBLIC KEY-----\n"
+      API_JWT_PRIVATE_KEY: "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIPnK7kOKC6VqJwmsXCcCgNfVEAMyt0IFm68g/dwg3/iVoAoGCCqGSM49\nAwEHoUQDQgAEXNo97BD4w2huuAYsmINnn/+TPolxYUexkcD49YyxsjJPA2d91B2r\nDzteUKnEsloNYDTeYW88oLPMdgmbzm+sQg==\n-----END EC PRIVATE KEY-----"
+      API_JWT_PUBLIC_KEY: "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXNo97BD4w2huuAYsmINnn/+TPolx\nYUexkcD49YyxsjJPA2d91B2rDzteUKnEsloNYDTeYW88oLPMdgmbzm+sQg==\n-----END PUBLIC KEY-----"
+      DOMAIN: localhost:3000
+      BACKOFFICE_USERNAME: admin
+      BACKOFFICE_PASSWORD: password
+      REPOSITORIES: PG
+    services:
+      postgres:
+        image: postgis/postgis:13-master
+        env:
+          POSTGRES_USER: immersion
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: immersion-db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run migrations
+        run: pnpm back db:up
+      - name: Run seed
+        run: pnpm back db:seed
+      - name: Start the backend
+        run: pnpm back dev &
+      - name: Start the frontend
+        run: pnpm front dev &
+      - name: Wait for the backend to be ready
+        run: sleep 30
+      - name: Run playwright tests
+        run: |
+          echo $DATABASE_URL 
+          pnpm playwright test:ci-v2
