@@ -695,7 +695,7 @@ describe("convention e2e", () => {
       const agency = AgencyDtoBuilder.create(validConvention.agencyId)
         .withName("TEST-name")
         .withAdminEmails(["admin@email.fr"])
-        .withQuestionnaireUrl("TEST-questionnaireUrl")
+        .withQuestionnaireUrl("https://TEST-questionnaireUrl")
         .withSignature("TEST-signature")
         .build();
 

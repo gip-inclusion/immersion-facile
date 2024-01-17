@@ -5,7 +5,7 @@ import { Email } from "../email/email.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
-import { ExtractFromExisting, RequireField } from "../utils";
+import { ExtractFromExisting } from "../utils";
 
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
 export const allAgencyStatuses = [
@@ -24,7 +24,7 @@ export type CreateAgencyDto = {
   position: GeoPositionDto;
   counsellorEmails: Email[];
   validatorEmails: Email[];
-  questionnaireUrl?: string;
+  questionnaireUrl?: AbsoluteUrl;
   agencySiret: SiretDto;
   logoUrl?: AbsoluteUrl;
   signature: string;
@@ -41,8 +41,7 @@ export type AgencyDtoSensitiveFields = {
 export type WithAgencyDto = {
   agency: AgencyDto;
 };
-export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> &
-  AgencyDtoSensitiveFields;
+export type AgencyDto = CreateAgencyDto & AgencyDtoSensitiveFields;
 
 export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
 

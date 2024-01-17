@@ -94,7 +94,7 @@ interface Agencies {
   counsellor_emails: Json;
   validator_emails: Json;
   admin_emails: Json;
-  questionnaire_url: string;
+  questionnaire_url: string | null;
   email_signature: string;
   legacy_address: string | null;
   position: Generated<string>;

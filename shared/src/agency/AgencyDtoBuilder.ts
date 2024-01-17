@@ -126,7 +126,7 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withQuestionnaireUrl(questionnaireUrl: string) {
+  public withQuestionnaireUrl(questionnaireUrl: AbsoluteUrl) {
     return new AgencyDtoBuilder({
       ...this.#agency,
       questionnaireUrl,

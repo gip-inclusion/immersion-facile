@@ -28,7 +28,7 @@ const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
     city: "Paris",
     departmentCode: "75",
   })
-  .withQuestionnaireUrl("www.questionnaireMissionLocale.com")
+  .withQuestionnaireUrl("https://www.questionnaireMissionLocale.com")
   .withKind("mission-locale")
   .withStatus("active")
   .build();
@@ -42,7 +42,7 @@ export const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
     city: "Paris",
     departmentCode: "75",
   })
-  .withQuestionnaireUrl("www.PE.com")
+  .withQuestionnaireUrl("https://www.PE.com")
   .withKind("pole-emploi")
   .withSignature("Mon agence PE")
   .withStatus("active")
@@ -90,7 +90,7 @@ export class InMemoryAgencyGateway implements AgencyGateway {
       ...createAgencyDto,
       status: "needsReview",
       adminEmails: [],
-      questionnaireUrl: createAgencyDto.questionnaireUrl ?? "",
+      questionnaireUrl: createAgencyDto.questionnaireUrl,
     };
   }
 

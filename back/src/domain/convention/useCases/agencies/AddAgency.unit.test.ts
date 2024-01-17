@@ -43,7 +43,7 @@ describe("AddAgency use case", () => {
     kind: "mission-locale",
     name: "Mission locale de Paris",
     position: { lat: 10, lon: 20 },
-    questionnaireUrl: "www.myUrl.com",
+    questionnaireUrl: "https://www.my-test-Url.com",
     signature: "Super signature of the agency",
     logoUrl: "https://www.myUrl.com",
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
@@ -125,7 +125,6 @@ describe("AddAgency use case", () => {
     it("uses default questionnaire url when none is provided", async () => {
       const poleEmploiParis: CreateAgencyDto = {
         ...createParisMissionLocaleParams,
-        questionnaireUrl: "",
       };
 
       uow.agencyRepository.setAgencies([]);
@@ -136,7 +135,6 @@ describe("AddAgency use case", () => {
           ...poleEmploiParis,
           adminEmails: [],
           status: "needsReview",
-          questionnaireUrl: "",
         },
       ]);
     });
@@ -159,7 +157,6 @@ describe("AddAgency use case", () => {
           validatorEmails: miloAgency.validatorEmails,
           adminEmails: [],
           status: "needsReview",
-          questionnaireUrl: "",
         },
       ]);
     });

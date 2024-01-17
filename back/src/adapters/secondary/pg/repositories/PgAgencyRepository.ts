@@ -331,7 +331,7 @@ export class PgAgencyRepository implements AgencyRepository {
           kind: cast<AgencyKind>(ref("a.kind")),
           counsellorEmails: sql<Email[]>`${ref("a.counsellor_emails")}`,
           validatorEmails: sql<Email[]>`${ref("a.validator_emails")}`,
-          questionnaireUrl: ref("a.questionnaire_url"),
+          questionnaireUrl: sql<AbsoluteUrl>`${ref("a.questionnaire_url")}`,
           logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
           position: jsonBuildObject({
             lat: sql<number>`(ST_AsGeoJSON(${ref(
