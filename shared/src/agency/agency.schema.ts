@@ -81,10 +81,7 @@ const commonAgencyShape = {
   validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
-  questionnaireUrl: z
-    .string()
-    .max(600, "Ne doit pas dépasser 600 caractères")
-    .optional(),
+  questionnaireUrl: absoluteUrlSchema.optional(),
   signature: stringWithMaxLength255,
   logoUrl: absoluteUrlSchema.optional(),
   agencySiret: siretSchema,
@@ -117,7 +114,7 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
   .object(commonAgencyShape)
   .and(
     z.object({
-      questionnaireUrl: z.string(),
+      questionnaireUrl: absoluteUrlSchema.optional(),
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringPossiblyEmpty,
@@ -133,7 +130,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
   )
   .and(
     z.object({
-      questionnaireUrl: z.string(),
+      questionnaireUrl: absoluteUrlSchema.optional(),
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringPossiblyEmpty,

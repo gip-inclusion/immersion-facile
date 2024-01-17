@@ -35,7 +35,7 @@ export class TestAgencyGateway implements AgencyGateway {
       ...createAgencyDto,
       status: "needsReview",
       adminEmails: [],
-      questionnaireUrl: createAgencyDto.questionnaireUrl ?? "",
+      questionnaireUrl: createAgencyDto.questionnaireUrl,
     };
   }
 

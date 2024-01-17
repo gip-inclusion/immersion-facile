@@ -165,7 +165,6 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       ...normalizePosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
       address: geocodedAddress,
-      questionnaireUrl: "",
       codeSafir: peReferentialAgency.codeSafir,
       agencySiret: peReferentialAgency.siret,
       kind: "pole-emploi",

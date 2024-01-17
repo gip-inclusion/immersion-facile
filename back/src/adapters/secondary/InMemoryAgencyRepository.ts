@@ -31,7 +31,6 @@ const testAgencies: AgencyDto[] = [
     counsellorEmails: ["notificationsconventions@immersion-facile.fr"],
     validatorEmails: ["validator123@mail.com"],
     adminEmails: ["contact@immersion-facile.fr"],
-    questionnaireUrl: "",
     signature: "Signature of Immersion Facile",
     agencySiret: "00000000000000",
     address: {

@@ -74,7 +74,7 @@ export const buildTestApp = async (
   const agency = AgencyDtoBuilder.create(validConvention.agencyId)
     .withName("TEST-name")
     .withAdminEmails([adminEmail])
-    .withQuestionnaireUrl("TEST-questionnaireUrl")
+    .withQuestionnaireUrl("https://TEST-questionnaireUrl")
     .withSignature("TEST-signature")
     .build();
 
