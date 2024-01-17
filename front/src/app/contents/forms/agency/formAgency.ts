@@ -89,6 +89,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   questionnaireUrl: {
     id: domElementIds.addAgency.questionnaireUrlInput,
     label: "Lien vers le document de support du bilan de fin d’immersion ",
+    hintText: "Format attendu : https://mon-document.com/bilan ",
     placeholder:
       "Ex : https://docs.google.com/document/d/mon-document-pour-bilan",
   },
