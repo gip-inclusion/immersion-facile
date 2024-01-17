@@ -91,6 +91,7 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
+        agencySiret: "12345678904444",
         refersToAgencyId: undefined,
       };
 
@@ -136,6 +137,7 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
+        agencySiret: "12345678904444",
         refersToAgencyId: undefined,
       };
 
@@ -176,6 +178,7 @@ describe("UpdateAllPeAgencies use case", () => {
         questionnaireUrl: "some-url",
         kind: "pole-emploi",
         status: "active",
+        agencySiret: "12345678904444",
         refersToAgencyId: undefined,
       };
 
@@ -219,6 +222,7 @@ describe("UpdateAllPeAgencies use case", () => {
       questionnaireUrl: "some-url",
       kind: "mission-locale",
       status: "active",
+      agencySiret: "12345678904444",
       refersToAgencyId: undefined,
     };
 

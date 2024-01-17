@@ -9,6 +9,8 @@ export * from "./agency/agency";
 export * from "./agency/agency.dto";
 export * from "./agency/agency.schema";
 export * from "./agency/AgencyDtoBuilder";
+export * from "./agency/publicAgency.dto";
+export * from "./agency/publicAgency.schema";
 export * from "./apiConsumer/ApiConsumer";
 export * from "./apiConsumer/apiConsumer.schema";
 export * from "./assessment/assessment.dto";

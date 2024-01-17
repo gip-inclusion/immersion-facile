@@ -2,7 +2,6 @@ import { defineRoute, defineRoutes } from "shared-routes";
 import {
   agenciesIdAndNameSchema,
   agencyIdResponseSchema,
-  agencyPublicDisplaySchema,
   agencySchema,
   createAgencySchema,
   listAgenciesRequestSchema,
@@ -10,6 +9,7 @@ import {
   withAgencyIdSchema,
   withAgencyStatusSchema,
 } from "../agency/agency.schema";
+import { agencyPublicDisplaySchema } from "../agency/publicAgency.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   legacyHttpErrorSchema,
