@@ -104,6 +104,7 @@ const establishmentAggregateSeed = async (
   console.log("seeding establishment aggregates...");
   await client.query("DELETE FROM discussions");
   await client.query("DELETE FROM immersion_contacts");
+  await client.query("DELETE FROM form_establishments");
   await client.query("DELETE FROM establishments CASCADE");
   await client.query("DELETE FROM groups CASCADE");
   const franceMerguez = new EstablishmentAggregateBuilder()
