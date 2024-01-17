@@ -84,6 +84,11 @@ export const zStringPossiblyEmptyWithMax = (max: number) =>
     .optional()
     .or(z.literal("")) as z.Schema<string>;
 
+export const stringWithMaxLength255 = zStringMinLength1.max(
+  255,
+  "Ne doit pas dépasser 255 caractères",
+);
+
 export const zTrimmedString = zStringMinLength1
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, localization.required);

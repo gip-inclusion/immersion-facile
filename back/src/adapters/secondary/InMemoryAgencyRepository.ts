@@ -33,6 +33,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["contact@immersion-facile.fr"],
     questionnaireUrl: "",
     signature: "Signature of Immersion Facile",
+    agencySiret: "00000000000000",
     address: {
       streetNumberAndAddress: "No address",
       departmentCode: "75",
@@ -56,6 +57,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["admin@agency1.fr"],
     questionnaireUrl: "http://questionnaire.agency1.fr",
     signature: "Signature of Test Agency 1",
+    agencySiret: "00000000000000",
     address: {
       streetNumberAndAddress: "Agency 1 address",
       departmentCode: "75",
@@ -74,6 +76,7 @@ const testAgencies: AgencyDto[] = [
     name: "Test Agency 2 (back)",
     status: "active",
     kind: "mission-locale",
+    agencySiret: "00000000000000",
     counsellorEmails: ["counsellor1@agency2.fr", "counsellor2@agency2.fr"],
     validatorEmails: ["validator1@agency2.fr", "validator2@agency2.fr"],
     adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
@@ -96,6 +99,7 @@ const testAgencies: AgencyDto[] = [
     id: "test-agency-3-back",
     name: "Test Agency 3 (back)",
     status: "active",
+    agencySiret: "00000000000000",
     kind: "pole-emploi",
     counsellorEmails: [], // no counsellors
     validatorEmails: ["validator@agency3.fr"],
@@ -119,6 +123,7 @@ const testAgencies: AgencyDto[] = [
     id: "test-agency-4-back-with-refers-to",
     name: "Test Agency 4 (back) - refers to Test Agency 3",
     status: "active",
+    agencySiret: "00000000000000",
     kind: "autre",
     counsellorEmails: ["counsellor@agency4.fr"], // no counsellors
     validatorEmails: ["validator@agency3.fr"],
@@ -142,6 +147,7 @@ const testAgencies: AgencyDto[] = [
     id: "test-agency-5-back-with-refers-to",
     name: "Test Agency 5 (back) - refers to Test Agency 1",
     status: "active",
+    agencySiret: "00000000000000",
     kind: "autre",
     counsellorEmails: ["counsellor@agency5.fr"], // no counsellors
     validatorEmails: ["validator@agency1.fr"],

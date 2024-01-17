@@ -10,6 +10,7 @@ import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
+  stringWithMaxLength255,
   zEnumValidation,
   zSchemaForType,
   zStringMinLength1,
@@ -24,8 +25,6 @@ import {
   agencyKindFilters,
   agencyKindList,
   AgencyOption,
-  AgencyPublicDisplayDto,
-  AgencyPublicDisplayDtoWithoutRefersToAgency,
   allAgencyStatuses,
   CreateAgencyDto,
   ListAgenciesRequestDto,
@@ -72,11 +71,6 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
     kind: z.enum(agencyKindFilters).optional(),
   });
 
-const stringWithMaxLength255 = zStringMinLength1.max(
-  255,
-  "Ne doit pas dépasser 255 caractères",
-);
-
 const commonAgencyShape = {
   id: agencyIdSchema,
   name: stringWithMaxLength255,
@@ -95,16 +89,6 @@ const commonAgencyShape = {
   logoUrl: absoluteUrlSchema.optional(),
   agencySiret: siretSchema,
 };
-
-const agencyPublicDisplayDtoWithoutRefersToAgencySchema: z.Schema<AgencyPublicDisplayDtoWithoutRefersToAgency> =
-  z.object({
-    id: agencyIdSchema,
-    name: stringWithMaxLength255,
-    kind: agencyKindSchema,
-    address: addressSchema,
-    position: geoPositionSchema,
-    signature: stringWithMaxLength255,
-  });
 
 export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
   .object(commonAgencyShape)
@@ -144,7 +128,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
   .object(commonAgencyShape)
   .merge(
     z.object({
-      agencySiret: siretSchema.optional().or(z.literal("")),
+      agencySiret: siretSchema,
     }),
   )
   .and(
@@ -153,8 +137,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringPossiblyEmpty,
-      refersToAgency:
-        agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
+
       rejectionJustification: z.string().optional(),
     }),
   );
@@ -166,20 +149,6 @@ export const withAgencySchema: z.ZodSchema<WithAgencyDto> = z.object({
 export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
   z.object({
     status: agencyStatusSchema.optional(),
-  });
-
-export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
-  z.object({
-    id: agencyIdSchema,
-    name: zStringMinLength1,
-    kind: agencyKindSchema,
-    address: addressSchema,
-    position: geoPositionSchema,
-    agencySiret: siretSchema.optional().or(z.literal("")),
-    logoUrl: absoluteUrlSchema.optional(),
-    signature: zStringMinLength1,
-    refersToAgency:
-      agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
   });
 
 export const updateAgencyStatusParamsWithoutIdSchema: z.Schema<UpdateAgencyStatusParamsWithoutId> =

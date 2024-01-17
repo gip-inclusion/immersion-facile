@@ -20,6 +20,7 @@ const emptyAgency: AgencyDto = {
   kind: "autre",
   counsellorEmails: [],
   validatorEmails: [defaultValidatorEmail],
+  agencySiret: "12345678904444",
   adminEmails: [],
   questionnaireUrl: "https://empty-questionnaire-url",
   signature: "empty-signature",

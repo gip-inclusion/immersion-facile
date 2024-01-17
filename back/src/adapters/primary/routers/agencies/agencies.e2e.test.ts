@@ -139,6 +139,7 @@ describe(`Agency routes`, () => {
               lat: 10.11,
               lon: 10.12,
             },
+            agencySiret: "12345678904444",
             signature: "empty-signature",
             refersToAgency: undefined,
           },
@@ -171,6 +172,7 @@ describe(`Agency routes`, () => {
               lat: 10.11,
               lon: 10.12,
             },
+            agencySiret: "12345678904444",
             signature: "empty-signature",
           },
         });

@@ -102,7 +102,7 @@ interface Agencies {
   updated_at: Generated<Timestamp>;
   status: Generated<string>;
   kind: string;
-  agency_siret: string | null;
+  agency_siret: string;
   code_safir: string | null;
   logo_url: string | null;
   street_number_and_address: string;

@@ -25,30 +25,11 @@ export type CreateAgencyDto = {
   counsellorEmails: Email[];
   validatorEmails: Email[];
   questionnaireUrl?: string;
-  agencySiret?: SiretDto;
+  agencySiret: SiretDto;
   logoUrl?: AbsoluteUrl;
   signature: string;
   refersToAgencyId?: AgencyId;
 };
-
-export type AgencyPublicDisplayDtoWithoutRefersToAgency = Pick<
-  CreateAgencyDto,
-  | "id"
-  | "name"
-  | "kind"
-  | "address"
-  | "position"
-  | "agencySiret"
-  | "logoUrl"
-  | "signature"
->;
-
-type WithOptionalRefersToAgency = {
-  refersToAgency?: AgencyPublicDisplayDtoWithoutRefersToAgency;
-};
-
-export type AgencyPublicDisplayDto =
-  AgencyPublicDisplayDtoWithoutRefersToAgency & WithOptionalRefersToAgency;
 
 export type AgencyDtoSensitiveFields = {
   adminEmails: Email[];
