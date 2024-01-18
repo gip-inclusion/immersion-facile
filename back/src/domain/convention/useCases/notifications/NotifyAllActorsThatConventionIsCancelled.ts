@@ -51,6 +51,7 @@ export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCa
           agencyLogoUrl: agency.logoUrl,
           dateEnd: convention.dateEnd,
           dateStart: convention.dateStart,
+          justification: convention.statusJustification || "non renseigné",
         },
       },
       followedIds: {

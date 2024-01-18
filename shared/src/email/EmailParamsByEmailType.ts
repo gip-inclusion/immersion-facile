@@ -69,6 +69,7 @@ export type EmailParamsByEmailType = {
     signature: string;
     dateEnd: string;
     dateStart: string;
+    justification: string;
   };
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: string;

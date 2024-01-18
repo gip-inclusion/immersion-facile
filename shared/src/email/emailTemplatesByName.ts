@@ -838,6 +838,7 @@ export const emailTemplatesByName =
         signature,
         dateEnd,
         dateStart,
+        justification,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -859,7 +860,9 @@ export const emailTemplatesByName =
             : "DATE INVALIDE"
         } a été annulée par ${agencyName}.
       
-      Cette demande de convention était devenue obsolète car une autre demande a déjà été traitée.
+      La demande a été annulée pour la raison suivante :
+      
+      ${justification}
       
       Vous pouvez vous rapprocher de votre conseiller${
         internshipKind === "immersion"
