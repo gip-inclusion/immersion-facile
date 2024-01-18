@@ -195,7 +195,7 @@ describe(`Agency routes`, () => {
         kind: "mission-locale",
         name: "Mission locale de Paris",
         position: { lat: 10, lon: 20 },
-        questionnaireUrl: "https://.myUrl.com",
+        questionnaireUrl: "https://www.myUrl.com",
         signature: "Super signature of the agency",
         agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
         refersToAgencyId: undefined,
