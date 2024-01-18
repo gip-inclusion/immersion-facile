@@ -12,6 +12,7 @@ import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRe
 import { DeletedEstablishmentRepository } from "../../offer/ports/DeletedEstablishmentRepository";
 import { DiscussionAggregateRepository } from "../../offer/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../offer/ports/EstablishmentAggregateRepository";
+import { EstablishmentLeadRepository } from "../../offer/ports/EstablishmentLeadRepository";
 import { FormEstablishmentRepository } from "../../offer/ports/FormEstablishmentRepository";
 import { GroupRepository } from "../../offer/ports/GroupRepository";
 import { SearchMadeRepository } from "../../offer/ports/SearchMadeRepository";
@@ -37,6 +38,7 @@ export type UnitOfWork = {
   discussionAggregateRepository: DiscussionAggregateRepository;
   errorRepository: ErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
+  establishmentLeadRepository: EstablishmentLeadRepository;
   groupRepository: GroupRepository;
   featureFlagRepository: FeatureFlagRepository;
   formEstablishmentRepository: FormEstablishmentRepository;

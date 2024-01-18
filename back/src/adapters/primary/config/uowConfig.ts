@@ -25,6 +25,7 @@ import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRe
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryEstablishmentLeadRepository } from "../../secondary/offer/InMemoryEstablishmentLeadRepository";
 import { InMemoryGroupRepository } from "../../secondary/offer/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/offer/InMemorySearchMadeRepository";
 import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
@@ -89,6 +90,7 @@ export const createInMemoryUow = () => {
     assessmentRepository: new InMemoryAssessmentRepository(),
     inclusionConnectedUserRepository:
       new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
+    establishmentLeadRepository: new InMemoryEstablishmentLeadRepository(),
     notificationRepository: new InMemoryNotificationRepository(),
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,
