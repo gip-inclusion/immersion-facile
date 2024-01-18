@@ -95,6 +95,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   agencySiret: {
     label: "SIRET de la structure",
     id: domElementIds.addAgency.agencySiretInput,
+    placeholder: "n° de siret",
     required: true,
   },
   refersToAgencyId: {

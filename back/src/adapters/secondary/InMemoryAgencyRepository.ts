@@ -192,7 +192,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
         agency.address.streetNumberAndAddress ===
           address.streetNumberAndAddress &&
         agency.address.city === address.city &&
-        (agency.status === "active" || agency.status === "from-api-PE") &&
+        agency.status !== "rejected" &&
         agency.id !== idToIgnore,
     );
   }

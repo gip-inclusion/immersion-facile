@@ -88,6 +88,7 @@ export const ApiConsumerForm = ({
         {...getFieldError("contact.phone")}
       />
       <MultipleEmailsInput
+        id="api-consumer-emails"
         label="Emails du contact"
         valuesInList={values.contact.emails}
         summaryHintText="Voici les emails qui seront ajoutés en contact pour ce consommateur API :"

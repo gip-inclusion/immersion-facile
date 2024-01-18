@@ -3,7 +3,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { z } from "zod";
 import {
-  cleanStringToHTMLAttribute,
   notEqual,
   OmitFromExistingKeys,
   validateMultipleEmailRegex,
@@ -83,6 +82,7 @@ export const MultipleEmailsInput = (
 type OnInputChange = (event: React.ChangeEvent<HTMLInputElement>) => void;
 
 type InputContainerProps = {
+  id: string;
   name: string;
   value: string;
   onInputChange: OnInputChange;
@@ -108,6 +108,7 @@ const createGetInputError =
   };
 
 const InputContainer = ({
+  id,
   name,
   value,
   label,
@@ -131,10 +132,7 @@ const InputContainer = ({
         error ? " fr-input-group--error" : ""
       } ${componentName}__add-to-list-wrapper fr-mb-2w`}
     >
-      <label
-        className={fr.cx("fr-label")}
-        htmlFor={cleanStringToHTMLAttribute(name)}
-      >
+      <label className={fr.cx("fr-label")} htmlFor={id}>
         {label}
       </label>
       {description && (
@@ -143,7 +141,7 @@ const InputContainer = ({
       <div className={fr.cx("fr-grid-row")}>
         <div className={fr.cx("fr-col")}>
           <input
-            id={cleanStringToHTMLAttribute(name)}
+            id={id}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();

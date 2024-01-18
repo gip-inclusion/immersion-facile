@@ -79,6 +79,7 @@ export const EditAgencyForm = ({
             refersToOtherAgency={refersToOtherAgency}
           />
           <MultipleEmailsInput
+            id={"agency-admin-emails"}
             name="agency-admin-emails"
             label="⚠️Emails administrateur de l'agence ⚠️"
             description="Ces emails auront le droit d'accéder aux tableaux de bord et d'éditer les informations et accès du personnel de l'agence"

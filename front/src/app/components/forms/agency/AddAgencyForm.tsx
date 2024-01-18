@@ -65,6 +65,7 @@ export const AddAgencyForm = () => {
   return (
     <>
       <RadioButtons
+        id={domElementIds.addAgency.agencyRefersToInput}
         legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
         options={refersToOtherAgencyOptions}
       />
@@ -188,6 +189,11 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
             formState.submitCount !== 0 &&
             Object.values(formState.errors).length > 0
           }
+        />
+        <input
+          id={domElementIds.addAgency.id}
+          {...methods.register("id")}
+          type="hidden"
         />
         <SubmitFeedbackNotification
           submitFeedback={submitFeedback}
