@@ -8,6 +8,10 @@ on:
 jobs:
   validation:
     uses: ./.github/workflows/fullcheck.yml
+    secrets:
+      API_KEY_OPEN_CAGE_DATA_GEOCODING: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOCODING }}
+      API_KEY_OPEN_CAGE_DATA_GEOSEARCH: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOSEARCH }}
+      SIRENE_BEARER_TOKEN: ${{ secrets.SIRENE_BEARER_TOKEN }}
 
   build-front-artefact:
     uses: ./.github/workflows/build-front-artefact.yml
