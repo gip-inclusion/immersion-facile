@@ -173,6 +173,7 @@ export const AgencyFormCommonFields = ({
         nativeInputProps={{
           ...register("agencySiret"),
           placeholder: "n° de siret",
+          ...fieldsContent.agencySiret,
         }}
         {...getFieldError("agencySiret")}
       />

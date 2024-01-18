@@ -123,13 +123,13 @@ export class PgAgencyRepository implements AgencyRepository {
       .selectFrom("agencies")
       .selectAll()
       .where("kind", "=", kind)
-      .where("status", "in", ["active", "from-api-PE"])
+      .where("status", "!=", "rejected")
       .where("street_number_and_address", "=", address.streetNumberAndAddress)
       .where("city", "=", address.city)
       .where("id", "!=", idToIgnore)
       .execute();
 
-    return alreadyExistingAgencies.length !== 0;
+    return alreadyExistingAgencies.length > 0;
   }
 
   public async getAgencies({
