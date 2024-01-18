@@ -14,7 +14,7 @@ Elle peut traiter des données à caractère personnel pour les finalités suiva
 • Améliorer et faciliter le parcours d’accès à l’immersion professionnelle ;
 • Construire et développer une base entreprises immersions contenant les entreprises volontaires pour accueillir les personnes ;
 • Aider et faciliter la tâche des prescripteurs dans la décision et le suivi des personnes.
-• Réaliser une analyse statistique des mises en relation
+• Suivre les statistiques des échanges lors des mises en relation.
 
 <strong>Quelles sont les données que nous traitons ?</strong>
 
@@ -26,7 +26,7 @@ La plateforme Immersion Facilitée peut traiter les données à caractère perso
 
 • Données d’identification Pôle Emploi (nom, date de naissance).
 
-<strong>Qu’est-ce qui nous autorise à manipuler ces données ?</strong>
+<strong>Qu’est-ce qui nous autorise à traiter ces données ?</strong>
 
 L’exécution d’une mission d’intérêt public ou relevant de l’exercice de l’autorité publique dont est investi le Responsable de traitement au sens de l’article 6-1 e) du RGPD. 
 
@@ -60,9 +60,10 @@ Pour les exercer, faites-nous parvenir une demande en précisant la date et l’
 
 Par voie postale :
 
-Groupement de l’inclusion 
-127 Rue de Grenelle
-75007 Paris
+GIP Plateforme de l’inclusion 
+6 boulevard Saint-Denis
+75010 Paris
+France
 
 Puisque ce sont des droits personnels, nous ne traiterons votre demande que si nous sommes en mesure de vous identifier. Dans le cas où nous ne parvenons pas à vous identifier, nous pouvons être amenés à vous demander une preuve de votre identité.
 
