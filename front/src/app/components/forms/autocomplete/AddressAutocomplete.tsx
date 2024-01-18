@@ -17,6 +17,7 @@ export type AddressAutocompleteProps = {
   placeholder?: string;
   notice?: string;
   id?: string;
+  useFirstAddressOnInitialSearchTerm?: boolean;
 };
 
 export const AddressAutocomplete = ({
@@ -29,6 +30,7 @@ export const AddressAutocomplete = ({
   placeholder = "Ex : Bordeaux 33000",
   notice,
   id = "im-address-autocomplete",
+  useFirstAddressOnInitialSearchTerm,
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =
     useState<AddressAndPosition | null>(null);
@@ -40,13 +42,15 @@ export const AddressAutocomplete = ({
 
   useEffect(
     () =>
-      effectInitialSearchTerm(
+      effectInitialSearchTerm({
         initialSearchTerm,
         selectedOption,
         setOptions,
         setIsSearching,
         setSelectedOption,
-      ),
+        setFormValue,
+        shouldSetFirstAddressInForm: useFirstAddressOnInitialSearchTerm,
+      }),
     [initialSearchTerm],
   );
 
@@ -151,22 +155,39 @@ const effectDebounceSearchTerm = (
   getAddressesFromApi(debounceSearchTerm, setOptions, setIsSearching);
 };
 
-const effectInitialSearchTerm = (
-  initialSearchTerm: string,
-  selectedOption: AddressAndPosition | null,
-  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>,
-  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
+type EffectInitialSearchTermProps = {
+  initialSearchTerm: string;
+  selectedOption: AddressAndPosition | null;
+  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>;
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedOption: React.Dispatch<
     React.SetStateAction<AddressAndPosition | null>
-  >,
-): void => {
+  >;
+  setFormValue: (p: AddressAndPosition) => void;
+  shouldSetFirstAddressInForm?: boolean;
+};
+
+const effectInitialSearchTerm = ({
+  initialSearchTerm,
+  selectedOption,
+  setOptions,
+  setIsSearching,
+  setSelectedOption,
+  setFormValue,
+  shouldSetFirstAddressInForm,
+}: EffectInitialSearchTermProps): void => {
   if (
     initialSearchTerm &&
     (!selectedOption ||
       initialSearchTerm !== addressDtoToString(selectedOption.address))
   )
     getAddressesFromApi(initialSearchTerm, setOptions, setIsSearching)
-      .then((addresses) => setSelectedOption(addresses?.[0] ?? null))
+      .then((addresses) => {
+        const firstAddress: AddressAndPosition | undefined = addresses?.[0];
+        setSelectedOption(firstAddress ?? null);
+        if (shouldSetFirstAddressInForm && firstAddress)
+          setFormValue(firstAddress);
+      })
       .catch((error: any) => {
         // eslint-disable-next-line no-console
         console.error("getAddressesFromApi", error);
