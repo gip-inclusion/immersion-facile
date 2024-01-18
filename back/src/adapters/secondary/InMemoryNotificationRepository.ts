@@ -216,6 +216,7 @@ export const expectNotifyConventionCancelled = (
       agencyLogoUrl: agency.logoUrl,
       dateStart: convention.dateStart,
       dateEnd: convention.dateEnd,
+      justification: convention.statusJustification || "non renseigné",
     },
   });
 };

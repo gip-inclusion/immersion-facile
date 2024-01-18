@@ -258,6 +258,7 @@ export const defaultEmailValueByEmailKind: {
     signature: "SIGNATURE",
     dateStart: "DATE_START",
     dateEnd: "DATE_END",
+    justification: "JUSTIFICATION",
   },
   CONTACT_BY_EMAIL_REQUEST: {
     replyToEmail: "REPLY_TO_EMAIL",
