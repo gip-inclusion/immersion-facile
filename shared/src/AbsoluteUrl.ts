@@ -8,7 +8,7 @@ export const absoluteUrlSchema: z.Schema<AbsoluteUrl> = z
   .string()
   .regex(
     /^https?:\/\/.+?$/,
-    "Le format de saisie est invalide. Exemple : https://docs.google.com/mon-url",
+    "Le format de saisie est invalide. Exemple : https://www.exemple.fr/chemin-du-lien",
   ) as z.Schema<AbsoluteUrl>;
 
 export const toAbsoluteUrl = (url: string): AbsoluteUrl =>
