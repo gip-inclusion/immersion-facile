@@ -90,6 +90,7 @@ import { EditFormEstablishment } from "../../../domain/offer/useCases/EditFormEs
 import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupBySlug";
 import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
+import { InsertEstablishmentLead } from "../../../domain/offer/useCases/InsertEstablishmentLead";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/offer/useCases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/offer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -320,6 +321,10 @@ export const createUseCases = (
           gateways.timeGateway,
           createNewEvent,
         ),
+      insertEstablishmentLead: new InsertEstablishmentLead(
+        uowPerformer,
+        gateways.timeGateway,
+      ),
       deleteEstablishment: new DeleteEstablishment(
         uowPerformer,
         gateways.timeGateway,
