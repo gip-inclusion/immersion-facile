@@ -4,6 +4,7 @@
     "dbaeumer.vscode-eslint",
     "ms-vsliveshare.vsliveshare",
     "esbenp.prettier-vscode",
-    "rvest.vs-code-prettier-eslint"
+    "rvest.vs-code-prettier-eslint",
+    "ms-playwright.playwright"
   ]
 }
