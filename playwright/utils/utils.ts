@@ -22,3 +22,26 @@ export const fillAutocomplete = async (
   ).toBeVisible();
   await page.locator(`#${listboxId} .MuiAutocomplete-option`).nth(0).click();
 };
+
+export const logHttpResponse = ({page, onlyErrors}: { page: Page, onlyErrors?: boolean }) => {
+  page.on("response", async (response) => {
+    if (onlyErrors && response.status() >= 400 && response.url().includes('/api/')) {
+      console.log(
+        "<<",
+        response.request().method(),
+        response.status(),
+        response.url(),
+        (await response.body()).toString(),
+      );
+    }
+    else if(response.url().includes('/api/')) {
+      console.log(
+        "<<",
+        response.request().method(),
+        response.status(),
+        response.url(),
+        await response.text(),
+      );
+    }
+  });
+};
