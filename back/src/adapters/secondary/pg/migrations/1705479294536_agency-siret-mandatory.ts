@@ -2,7 +2,7 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 const agencyTableName = "agencies";
 const siretColumnName = "agency_siret";
-const defaultSiret = "000000000000000";
+const defaultSiret = "00000000000000";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`

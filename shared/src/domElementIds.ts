@@ -154,6 +154,7 @@ export const domElementIds = {
     stepsForValidationInput: "steps-for-validation",
     submitButton: "im-form-add-agency__submit-button",
     refersToAgencyId: "im-form-add-agency__refers-to-agency-id",
+    addressAutocomplete: "im-form-add-agency__address-autocomplete-input",
   },
 
   conventionImmersionRoute: {
