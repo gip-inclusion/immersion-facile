@@ -19,9 +19,10 @@ test.describe("Establishment creation and modification workflow", () => {
       `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
       providedSiret,
     );
-    await page
-      .locator(`#${domElementIds.establishment.startAddEstablishmentButton}`)
-      .click();
+    const addEstablishmentButton = page.locator(
+      `#${domElementIds.establishment.startAddEstablishmentButton}`,
+    );
+    await addEstablishmentButton.click();
 
     await page.locator(".fr-radio-rich").getByText("Oui").click();
     await page

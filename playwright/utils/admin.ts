@@ -2,7 +2,7 @@ import { expect, Locator, Page } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 
 const adminUser = process.env.ADMIN_USER ?? "admin";
-const adminPassword = process.env.ADMIN_PASSWORD ?? "admin";
+const adminPassword = process.env.ADMIN_PASSWORD ?? "password";
 
 export const connectToAdmin = async (page: Page) => {
   await page.goto(frontRoutes.admin);

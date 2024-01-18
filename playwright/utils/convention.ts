@@ -1,7 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { expect, Page } from "@playwright/test";
 import { addBusinessDays, format } from "date-fns";
-import { domElementIds, frontRoutes, peParisAgencyId } from "shared";
+import {
+  domElementIds,
+  frontRoutes,
+  peParisAgencyId,
+  technicalRoutes,
+} from "shared";
 import { possibleAddressQueries, possibleJobs } from "./data";
 import { expectElementToBeVisible, fillAutocomplete } from "./utils";
 
@@ -9,7 +14,14 @@ let currentStep = 1;
 
 export const submitBasicConventionForm = async (page: Page) => {
   await page.goto(frontRoutes.conventionImmersionRoute);
-  await page.click(`#${domElementIds.conventionImmersionRoute.showFormButton}`);
+  await expect(
+    await page.request.get(technicalRoutes.featureFlags.url),
+  ).toBeOK();
+  const formButton = await page.locator(
+    `#${domElementIds.conventionImmersionRoute.showFormButton}`,
+  );
+  await formButton.waitFor();
+  await formButton.click();
   await page.selectOption(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
     "75",

@@ -25,9 +25,10 @@ test.describe("Home user flow", () => {
     await page.click(
       `#${domElementIds.homeCandidates.heroHeader.formConvention}`,
     );
-    await page.click(
+    const formButton = await page.locator(
       `#${domElementIds.conventionImmersionRoute.showFormButton}`,
     );
+    await formButton.click();
     await expect(page.url()).toContain(
       `/${frontRoutes.conventionImmersionRoute}`,
     );
