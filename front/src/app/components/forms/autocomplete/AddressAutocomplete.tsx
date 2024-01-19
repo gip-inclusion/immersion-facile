@@ -84,7 +84,14 @@ export const AddressAutocomplete = ({
           return addressDtoToString(option.address);
         }}
         onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
-        onInputChange={onAutocompleteInput(setSearchTerm)}
+        onInputChange={(_event, value) => {
+          if (value === "") {
+            setOptions([]);
+            setIsSearching(false);
+            return;
+          }
+          setSearchTerm(value);
+        }}
         filterOptions={(option) => option} // https://mui.com/material-ui/react-autocomplete/#search-as-you-type
         renderInput={(params) => (
           <AutocompleteInput
@@ -105,10 +112,10 @@ export const AddressAutocomplete = ({
   );
 };
 
-const onAutocompleteInput =
-  (setSearchTerm: React.Dispatch<React.SetStateAction<string>>) =>
-  (_: React.SyntheticEvent<Element, Event>, newSearchTerm: string) =>
-    setSearchTerm(newSearchTerm);
+// const onAutocompleteInput =
+//   (setSearchTerm: React.Dispatch<React.SetStateAction<string>>) =>
+//   (_: React.SyntheticEvent<Element, Event>, newSearchTerm: string) =>
+//     setSearchTerm(newSearchTerm);
 
 const onAutocompleteChange =
   (
@@ -149,8 +156,9 @@ const effectDebounceSearchTerm = (
     initialSearchTerm === debounceSearchTerm ||
     (selectedOption &&
       addressDtoToString(selectedOption.address) === debounceSearchTerm)
-  )
+  ) {
     return;
+  }
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   getAddressesFromApi(debounceSearchTerm, setOptions, setIsSearching);
 };

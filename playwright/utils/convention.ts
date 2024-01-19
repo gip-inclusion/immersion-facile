@@ -94,13 +94,14 @@ export const submitBasicConventionForm = async (page: Page) => {
   await page.click(
     `#${domElementIds.conventionImmersionRoute.conventionSection.addHoursButton}`,
   );
-  await fillAutocomplete(
+  await fillAutocomplete({
     page,
-    `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
-    possibleAddressQueries[
-      Math.floor(Math.random() * possibleAddressQueries.length)
-    ],
-  );
+    locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
+    value:
+      possibleAddressQueries[
+        Math.floor(Math.random() * possibleAddressQueries.length)
+      ],
+  });
 
   await openNextSection(page); // Open immersion details section
 
@@ -113,11 +114,11 @@ export const submitBasicConventionForm = async (page: Page) => {
   await page.click(
     `[for="${domElementIds.conventionImmersionRoute.conventionSection.immersionObjective}-1"]`,
   );
-  await fillAutocomplete(
+  await fillAutocomplete({
     page,
-    `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
-    possibleJobs[Math.floor(Math.random() * possibleJobs.length)],
-  );
+    locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
+    value: possibleJobs[Math.floor(Math.random() * possibleJobs.length)],
+  });
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
     faker.word.words(8),
@@ -150,6 +151,12 @@ export const submitEditConventionForm = async (
   magicLink: string,
 ) => {
   await page.goto(magicLink);
+  const agencyIdSelect = page.locator(
+    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
+  );
+  await agencyIdSelect.locator("option").locator("nth=1").waitFor({
+    state: "hidden",
+  });
   await expect(
     page.locator(
       `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
@@ -206,13 +213,14 @@ export const submitEditConventionForm = async (
       `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessName}`,
     )
     .fill(faker.company.name());
-  await fillAutocomplete(
+  await fillAutocomplete({
     page,
-    `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessAddress}`,
-    possibleAddressQueries[
-      Math.floor(Math.random() * possibleAddressQueries.length)
-    ],
-  );
+    locator: `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessAddress}`,
+    value:
+      possibleAddressQueries[
+        Math.floor(Math.random() * possibleAddressQueries.length)
+      ],
+  });
   await page
     .locator(
       `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.firstName}`,
