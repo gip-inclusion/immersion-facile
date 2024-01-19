@@ -112,11 +112,6 @@ export const AddressAutocomplete = ({
   );
 };
 
-// const onAutocompleteInput =
-//   (setSearchTerm: React.Dispatch<React.SetStateAction<string>>) =>
-//   (_: React.SyntheticEvent<Element, Event>, newSearchTerm: string) =>
-//     setSearchTerm(newSearchTerm);
-
 const onAutocompleteChange =
   (
     setSelectedOption: React.Dispatch<
