@@ -121,11 +121,12 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
         sender: immersionFacileNoReplyEmailSender,
         params: {
           subject: exchange.subject,
-          htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
-                  - Candidat : ${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}
-                  - Métier : ${appellation?.appellationLabel}
-                  - Entreprise : ${discussion.businessName} - ${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}
-
+          htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                  <br /><ul>
+                  <li>Candidat : ${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}</li>
+                  <li>Métier : ${appellation?.appellationLabel}</li>
+                  <li>Entreprise : ${discussion.businessName} - ${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}</li>
+                  </ul><br /></div>
             ${exchange.message}`,
         },
         recipients: [

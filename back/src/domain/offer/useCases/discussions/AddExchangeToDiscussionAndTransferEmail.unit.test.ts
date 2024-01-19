@@ -143,11 +143,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
-                  - Candidat : ali baba
-                  - Métier : Vendeur / Vendeuse en chocolaterie
-                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
-
+              htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                  <br /><ul>
+                  <li>Candidat : ali baba</li>
+                  <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
+                  <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
+                  </ul><br /></div>
             ${brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: brevoResponse.items[0].Subject,
             },
@@ -168,11 +169,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
-                  - Candidat : ali baba
-                  - Métier : Conducteur / Conductrice d'engins de traction sur rails
-                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
-
+              htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                  <br /><ul>
+                  <li>Candidat : ali baba</li>
+                  <li>Métier : Conducteur / Conductrice d'engins de traction sur rails</li>
+                  <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
+                  </ul><br /></div>
             ${brevoResponse.items[1].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: brevoResponse.items[1].Subject,
             },
@@ -280,11 +282,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
-                  - Candidat : ali baba
-                  - Métier : Vendeur / Vendeuse en chocolaterie
-                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
-
+              htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                  <br /><ul>
+                  <li>Candidat : ali baba</li>
+                  <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
+                  <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
+                  </ul><br /></div>
             ${brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: "Sans objet",
             },
@@ -305,11 +308,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
-                  - Candidat : ali baba
-                  - Métier : Conducteur / Conductrice d'engins de traction sur rails
-                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
-
+              htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                  <br /><ul>
+                  <li>Candidat : ali baba</li>
+                  <li>Métier : Conducteur / Conductrice d'engins de traction sur rails</li>
+                  <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
+                  </ul><br /></div>
             ${brevoResponse.items[1].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: "Sans objet",
             },
