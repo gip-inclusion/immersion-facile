@@ -57,17 +57,38 @@ const fillAndSubmitBasicAgencyForm = async (
   await page
     .locator(`#${domElementIds.addAgency.kindSelect}`)
     .selectOption("cap-emploi");
+
+  await page.locator(`#${domElementIds.addAgency.agencySiretInput}`).click();
+  await page
+    .locator(`#${domElementIds.addAgency.agencySiretInput}`)
+    .fill("751 984 972 00016");
+
+  await expect(
+    await page.locator(`#${domElementIds.addAgency.nameInput}`),
+  ).toHaveValue(
+    "CONFEDERATION NATIONALE HANDICAP & EMPLOI DES ORGANISMES DE PLACEMENT SPECIALISES",
+  );
+  await expect(
+    await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`),
+  ).toHaveValue("55 Rue Boissonade 75014 Paris");
+
   await page
     .locator(`#${domElementIds.addAgency.nameInput}`)
     .fill("Cap emploi de Bayonne");
-  await page
-    .locator(`#${domElementIds.addAgency.addressInput.address}`)
-    .click();
+  await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).click();
+  // await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).clear()
   await fillAutocomplete(
     page,
-    `#${domElementIds.addAgency.addressInput.address}`,
+    `#${domElementIds.addAgency.addressAutocomplete}`,
     "18 rue des tonneliers ",
   );
+  await expect(
+    await page.locator(`#${domElementIds.addAgency.nameInput}`),
+  ).toHaveValue("Cap emploi de Bayonne");
+  await expect(
+    await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`),
+  ).toHaveValue("18 Rue des Tonneliers 67065 Strasbourg");
+
   await page
     .locator(`#${domElementIds.addAgency.validatorEmailsInput}`)
     .click();
@@ -79,11 +100,6 @@ const fillAndSubmitBasicAgencyForm = async (
   await page
     .locator(`#${domElementIds.addAgency.signatureInput}`)
     .fill("Mon équipe de ouf !");
-
-  await page.locator(`#${domElementIds.addAgency.agencySiretInput}`).click();
-  await page
-    .locator(`#${domElementIds.addAgency.agencySiretInput}`)
-    .fill("751 984 972 00016");
 
   await page.locator(`#${domElementIds.addAgency.submitButton}`).click();
 
