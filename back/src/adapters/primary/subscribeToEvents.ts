@@ -64,6 +64,7 @@ const getUseCasesByTopics = (
     useCases.notifyAllActorsOfFinalConventionValidation,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
+    useCases.addEstablishmentLead,
   ],
 
   // Edge cases for immersion application.
