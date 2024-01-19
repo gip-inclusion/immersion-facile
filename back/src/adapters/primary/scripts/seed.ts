@@ -121,7 +121,11 @@ const establishmentAggregateSeed = async (
         .withRomeCode("D1101")
         .build(),
     ])
-    .withContact(new ContactEntityBuilder().build())
+    .withContact(
+      new ContactEntityBuilder()
+        .withEmail("recette+merguez@immersion-facile.beta.gouv.fr")
+        .build(),
+    )
     .build();
 
   const decathlon = new EstablishmentAggregateBuilder()

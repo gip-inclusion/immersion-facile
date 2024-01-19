@@ -158,7 +158,7 @@ export class PgDiscussionAggregateRepository
       ])
       .execute();
 
-    return result[0].exists as boolean;
+    return !!result.at(0)?.exists;
   }
 
   public async insert(discussion: DiscussionAggregate) {
