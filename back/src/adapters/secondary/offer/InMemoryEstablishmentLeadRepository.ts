@@ -5,16 +5,26 @@ import { EstablishmentLeadRepository } from "../../../domain/offer/ports/Establi
 export class InMemoryEstablishmentLeadRepository
   implements EstablishmentLeadRepository
 {
-  #establishmentLeads: EstablishmentLead[] = [];
+  #establishmentLeads: Record<SiretDto, EstablishmentLead> = {};
 
-  public getBySiret(siret: SiretDto): EstablishmentLead[] {
-    return this.#establishmentLeads.filter(
-      (establishmentLead) => establishmentLead.siret === siret,
+  public get establishmentLeads(): EstablishmentLead[] {
+    return Object.values(this.#establishmentLeads);
+  }
+
+  public set establishmentLeads(leads: EstablishmentLead[]) {
+    this.#establishmentLeads = leads.reduce(
+      (acc, lead) => ({ ...acc, [lead.siret]: lead }),
+      {} as Record<SiretDto, EstablishmentLead>,
     );
   }
 
-  public save(establishmentLead: EstablishmentLead): Promise<void> {
-    this.#establishmentLeads.push(establishmentLead);
-    return Promise.resolve();
+  public async getBySiret(
+    siret: SiretDto,
+  ): Promise<EstablishmentLead | undefined> {
+    return this.#establishmentLeads[siret];
+  }
+
+  public async save(establishmentLead: EstablishmentLead): Promise<void> {
+    this.#establishmentLeads[establishmentLead.siret] = establishmentLead;
   }
 }

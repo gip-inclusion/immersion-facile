@@ -14,6 +14,7 @@ export interface Database {
   partners_pe_connect: PartnersPeConnect;
   saved_errors: SavedErrors;
   view_appellations_dto: ViewAppellationsDto;
+  establishment_lead_events: EstablishmentLeadEvents;
 }
 
 type JsonArray = JsonValue[];
@@ -211,4 +212,21 @@ interface PgFormEstablishments {
   updated_at: Generated<Timestamp | null>;
   website: Generated<string | null>;
   next_availability_date: Timestamp | null;
+}
+
+type EstablishmentLeadEventsKind =
+  | "registration-accepted"
+  | "registration-refused"
+  | "reminder-sent"
+  | "to-be-reminded";
+
+type NotificationKind = "email" | "sms";
+
+interface EstablishmentLeadEvents {
+  siret: string;
+  kind: EstablishmentLeadEventsKind;
+  occurred_at: Timestamp;
+  convention_id: string;
+  notification_id: string | null;
+  notification_kind: NotificationKind | null;
 }

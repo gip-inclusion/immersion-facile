@@ -9,6 +9,7 @@ import {
   createConventionMagicLinkPayload,
   currentJwtVersions,
   displayRouteName,
+  expectArraysToEqual,
   expectEmailOfType,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -572,6 +573,50 @@ describe("convention e2e", () => {
         ]);
       },
     );
+
+    it("when a convention is ACCEPTED_BY_VALIDATOR, an Establishment Lead is created", async () => {
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: convention.id,
+          role: "validator",
+          email: "validator@pe.fr",
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      gateways.shortLinkGenerator.addMoreShortLinkIds([
+        "short-link-1",
+        "short-link-2",
+        "short-link-3",
+      ]);
+
+      await magicLinkRequest.updateConventionStatus({
+        headers: { authorization: jwt },
+        body: {
+          status: "ACCEPTED_BY_VALIDATOR",
+          conventionId: convention.id,
+        },
+      });
+
+      await eventCrawler.processNewEvents();
+
+      expectArraysToEqual(
+        inMemoryUow.establishmentLeadRepository.establishmentLeads,
+        [
+          {
+            siret: convention.siret,
+            lastEventKind: "to-be-reminded",
+            events: [
+              {
+                conventionId: convention.id,
+                kind: "to-be-reminded",
+                occuredAt: gateways.timeGateway.now(),
+              },
+            ],
+          },
+        ],
+      );
+    });
 
     it("400 - no JWT", async () => {
       const response = await magicLinkRequest.updateConventionStatus({

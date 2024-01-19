@@ -81,6 +81,7 @@ import { GetInclusionConnectedUser } from "../../../domain/inclusionConnectedUse
 import { GetInclusionConnectedUsers } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUsers";
 import { RejectIcUserForAgency } from "../../../domain/inclusionConnectedUsers/useCases/RejectIcUserForAgency";
 import { UpdateIcUserRoleForAgency } from "../../../domain/inclusionConnectedUsers/useCases/UpdateIcUserRoleForAgency";
+import { AddEstablishmentLead } from "../../../domain/offer/useCases/AddEstablishmentLead";
 import { AddFormEstablishment } from "../../../domain/offer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/offer/useCases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../../domain/offer/useCases/ContactEstablishment";
@@ -90,7 +91,6 @@ import { EditFormEstablishment } from "../../../domain/offer/useCases/EditFormEs
 import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupBySlug";
 import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
-import { InsertEstablishmentLead } from "../../../domain/offer/useCases/InsertEstablishmentLead";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/offer/useCases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/offer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -321,7 +321,7 @@ export const createUseCases = (
           gateways.timeGateway,
           createNewEvent,
         ),
-      insertEstablishmentLead: new InsertEstablishmentLead(
+      addEstablishmentLead: new AddEstablishmentLead(
         uowPerformer,
         gateways.timeGateway,
       ),
