@@ -113,6 +113,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
         params: {
           agencyName: "AGENCY_NAME",
           agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
+          refersToOtherAgency: false,
         },
       });
 
@@ -190,7 +191,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       <td>
       <p><strong>Votre structure prescriptrice d'immersion est activée !</strong> 
       <br/>
-      <br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: AGENCY_NAME. 
+      <br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: AGENCY_NAME.
       <br/>
       <br/>Merci à vous !</p>
       </td>
@@ -287,6 +288,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
         params: {
           agencyName: "AGENCY_NAME",
           agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
+          refersToOtherAgency: false,
         },
       });
       expectToEqual(sentEmails, []);
@@ -300,6 +302,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
         params: {
           agencyName: "AGENCY_NAME",
           agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
+          refersToOtherAgency: false,
         },
       });
 

@@ -30,7 +30,13 @@ export type EmailParamsByEmailType = {
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
-  };
+  } & (
+    | { refersToOtherAgency: false }
+    | {
+        refersToOtherAgency: true;
+        validatorEmails: string[];
+      }
+  );
   AGENCY_WAS_REJECTED: {
     agencyName: string;
     rejectionJustification: string;

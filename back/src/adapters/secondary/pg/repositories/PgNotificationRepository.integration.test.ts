@@ -27,6 +27,7 @@ const emailNotifications: EmailNotification[] = [
       params: {
         agencyName: "My agency",
         agencyLogoUrl: "http://logo.com",
+        refersToOtherAgency: false,
       },
       attachments: [
         {
@@ -356,7 +357,11 @@ const createTemplatedEmailAndNotification = ({
     recipients,
     sender,
     cc,
-    params: { agencyName: "My agency", agencyLogoUrl: "https://my-logo.com" },
+    params: {
+      agencyName: "My agency",
+      agencyLogoUrl: "https://my-logo.com",
+      refersToOtherAgency: false,
+    },
     attachments,
   };
 
