@@ -109,6 +109,11 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       addExchangeToDiscussion(discussion, exchange),
     );
 
+    const [appellation] =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
+        discussion.appellationCode,
+      ]);
+
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
@@ -116,7 +121,12 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
         sender: immersionFacileNoReplyEmailSender,
         params: {
           subject: exchange.subject,
-          htmlContent: exchange.message,
+          htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
+                  - Candidat : ${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}
+                  - Métier : ${appellation?.appellationLabel}
+                  - Entreprise : ${discussion.businessName} - ${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}
+
+            ${exchange.message}`,
         },
         recipients: [
           recipientKind === "establishment"

@@ -72,6 +72,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       notificationGateway.attachment = bufferRawContent;
 
       const discussion1 = new DiscussionAggregateBuilder()
+        .withAppellationCode("20567")
         .withId(discussionId1)
         .withExchanges([
           {
@@ -85,6 +86,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         .build();
 
       const discussion2 = new DiscussionAggregateBuilder()
+        .withAppellationCode("13252")
         .withId(discussionId2)
         .withExchanges([
           {
@@ -141,8 +143,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent:
-                brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---",
+              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
+                  - Candidat : ali baba
+                  - Métier : Vendeur / Vendeuse en chocolaterie
+                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
+
+            ${brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: brevoResponse.items[0].Subject,
             },
             recipients: [discussion1.potentialBeneficiary.email],
@@ -162,8 +168,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent:
-                brevoResponse.items[1].RawHtmlBody ?? "--- pas de message ---",
+              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
+                  - Candidat : ali baba
+                  - Métier : Conducteur / Conductrice d'engins de traction sur rails
+                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
+
+            ${brevoResponse.items[1].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: brevoResponse.items[1].Subject,
             },
             recipients: [discussion2.establishmentContact.email],
@@ -199,6 +209,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       notificationGateway.attachment = bufferRawContent;
 
       const discussion1 = new DiscussionAggregateBuilder()
+        .withAppellationCode("20567")
         .withId(discussionId1)
         .withExchanges([
           {
@@ -212,6 +223,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         .build();
 
       const discussion2 = new DiscussionAggregateBuilder()
+        .withAppellationCode("13252")
         .withId(discussionId2)
         .withExchanges([
           {
@@ -268,8 +280,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent:
-                brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---",
+              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
+                  - Candidat : ali baba
+                  - Métier : Vendeur / Vendeuse en chocolaterie
+                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
+
+            ${brevoResponse.items[0].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: "Sans objet",
             },
             recipients: [discussion1.potentialBeneficiary.email],
@@ -289,8 +305,12 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           {
             kind: "DISCUSSION_EXCHANGE",
             params: {
-              htmlContent:
-                brevoResponse.items[1].RawHtmlBody ?? "--- pas de message ---",
+              htmlContent: `Pour rappel, voici les informations liées à cette mise en relation :
+                  - Candidat : ali baba
+                  - Métier : Conducteur / Conductrice d'engins de traction sur rails
+                  - Entreprise : My default business name - 1 rue de la Paix 75001 Paris
+
+            ${brevoResponse.items[1].RawHtmlBody ?? "--- pas de message ---"}`,
               subject: "Sans objet",
             },
             recipients: [discussion2.establishmentContact.email],
