@@ -223,6 +223,8 @@ export const defaultEmailValueByEmailKind: {
   AGENCY_WAS_ACTIVATED: {
     agencyName: "AGENCY_NAME",
     agencyLogoUrl: defaultEmailPreviewUrl,
+    refersToOtherAgency: true,
+    validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
   },
   BENEFICIARY_ASSESSMENT_NOTIFICATION: {
     conventionId: "CONVENTION_ID",

@@ -45,6 +45,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
           params: {
             agencyName: "just-activated-agency",
             agencyLogoUrl: "https://logo.com",
+            refersToOtherAgency: false,
           },
         },
       ],

@@ -65,7 +65,11 @@ describe("SendNotification UseCase", () => {
   it("should send an email", async () => {
     const email: TemplatedEmail = {
       kind: "AGENCY_WAS_ACTIVATED",
-      params: { agencyName: "My agency", agencyLogoUrl: undefined },
+      params: {
+        agencyName: "My agency",
+        agencyLogoUrl: undefined,
+        refersToOtherAgency: false,
+      },
       recipients: ["bob@mail.com"],
       cc: [],
       replyTo: {

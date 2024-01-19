@@ -1100,13 +1100,19 @@ export const emailTemplatesByName =
     AGENCY_WAS_ACTIVATED: {
       niceName: "Agence - Activée",
       tags: ["activation prescripteur"],
-      createEmailVariables: ({ agencyLogoUrl, agencyName }) => ({
+      createEmailVariables: ({ agencyLogoUrl, agencyName, ...rest }) => ({
         subject: `Immersion Facilitée - Votre structure a été activée`,
         greetings: "Bonjour,",
         content: `<strong>Votre structure prescriptrice d'immersion est activée !</strong> 
 
-        Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: ${agencyName}. 
-        
+        Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: ${agencyName}.
+        ${
+          rest.refersToOtherAgency
+            ? `Les demandes de convention pour les personnes que vous accompagnées seront examinées en première étape par vous puis validées par ${rest.validatorEmails.join(
+                ", ",
+              )}.\n`
+            : ""
+        }  
         Merci à vous !`,
         agencyLogoUrl,
         subContent: defaultSignature("immersion"),

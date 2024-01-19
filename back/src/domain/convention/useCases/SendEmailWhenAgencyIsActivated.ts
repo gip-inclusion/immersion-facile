@@ -23,6 +23,13 @@ export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAge
     { agency }: WithAgency,
     uow: UnitOfWork,
   ): Promise<void> {
+    const refersToOtherAgencyParams = agency.refersToAgencyId
+      ? {
+          refersToOtherAgency: true as const,
+          validatorEmails: agency.validatorEmails,
+        }
+      : { refersToOtherAgency: false as const };
+
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
@@ -31,6 +38,7 @@ export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAge
         params: {
           agencyName: agency.name,
           agencyLogoUrl: agency.logoUrl,
+          ...refersToOtherAgencyParams,
         },
       },
       followedIds: {

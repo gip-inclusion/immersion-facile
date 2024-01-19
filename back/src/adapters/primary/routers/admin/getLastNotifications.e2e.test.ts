@@ -61,6 +61,7 @@ describe(`${adminRoutes.getLastNotifications.url} route`, () => {
           params: {
             agencyName: "Agence du Grand Est",
             agencyLogoUrl: "http://:)",
+            refersToOtherAgency: false,
           },
         },
       };
