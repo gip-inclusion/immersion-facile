@@ -41,7 +41,7 @@ export const goToAdminTab = async (page: Page, tabName: string) => {
   const adminMenuItemNavButton = adminMenuItemWrapper.locator(".fr-nav__btn");
   await expect(adminMenuItemNavButton).toBeVisible();
   await adminMenuItemNavButton.click();
-  await adminHomeSubMenuItem.click();
+  await adminHomeSubMenuItem.click({ force: true });
   const locator = page.locator(`.fr-tabs__tab:has-text("${tabName}")`);
   await locator.waitFor();
   await expect(locator).toBeVisible();
