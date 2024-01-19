@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { testConfig } from "../custom.config";
 
 export const expectElementToBeVisible = async (
   page: Page,
@@ -9,12 +10,22 @@ export const expectElementToBeVisible = async (
   await expect(confirmation).toBeVisible();
 };
 
-export const fillAutocomplete = async (
-  page: Page,
-  locator: string,
-  value: string,
-) => {
+export const fillAutocomplete = async ({
+  page,
+  locator,
+  value,
+  endpoint,
+}: {
+  page: Page;
+  locator: string;
+  value: string;
+  endpoint?: string;
+}) => {
   await page.locator(locator).fill(value);
+  await page.waitForTimeout(testConfig.timeForDebounce);
+  if (endpoint) {
+    await page.waitForResponse(`**${endpoint}**`);
+  }
   await page.waitForSelector(`${locator}[aria-controls]`);
   const listboxId = await page.locator(locator).getAttribute("aria-controls");
   await expect(
@@ -23,19 +34,30 @@ export const fillAutocomplete = async (
   await page.locator(`#${listboxId} .MuiAutocomplete-option`).nth(0).click();
 };
 
-export const logHttpResponse = ({page, onlyErrors}: { page: Page, onlyErrors?: boolean }) => {
+export const logHttpResponse = ({
+  page,
+  onlyErrors,
+}: {
+  page: Page;
+  onlyErrors?: boolean;
+}) => {
   page.on("response", async (response) => {
-    if (onlyErrors && response.status() >= 400 && response.url().includes('/api/')) {
-      console.log(
+    if (
+      onlyErrors &&
+      response.status() >= 400 &&
+      response.url().includes("/api/")
+    ) {
+      // eslint-disable-next-line no-console
+      console.info(
         "<<",
         response.request().method(),
         response.status(),
         response.url(),
         (await response.body()).toString(),
       );
-    }
-    else if(response.url().includes('/api/')) {
-      console.log(
+    } else if (response.url().includes("/api/")) {
+      // eslint-disable-next-line no-console
+      console.info(
         "<<",
         response.request().method(),
         response.status(),

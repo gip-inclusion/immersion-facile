@@ -1,6 +1,6 @@
 import { expect, Page, test } from "@playwright/test";
-import { AgencyId, domElementIds, frontRoutes } from "shared";
-import { connectToAdmin, goToTab } from "../../utils/admin";
+import { addressRoutes, AgencyId, domElementIds, frontRoutes } from "shared";
+import { connectToAdmin, goToAdminTab } from "../../utils/admin";
 import { fillAutocomplete } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
@@ -23,7 +23,7 @@ test.describe("Agency workflow", () => {
   test("Rejects an agency in backoffice", async ({ page }) => {
     if (!agencyAddedId) throw new Error("agencyAddedId is null");
     await connectToAdmin(page);
-    await goToTab(page, "Agences");
+    await goToAdminTab(page, "Agences");
     await page.locator(`#admin-agency-to-review-id`).click();
     await page.locator(`#admin-agency-to-review-id`).fill(agencyAddedId);
 
@@ -66,7 +66,7 @@ const fillAndSubmitBasicAgencyForm = async (
   await expect(
     await page.locator(`#${domElementIds.addAgency.nameInput}`),
   ).toHaveValue(
-    "CONFEDERATION NATIONALE HANDICAP & EMPLOI DES ORGANISMES DE PLACEMENT SPECIALISES",
+    "CONFEDERATION NATIONALE HANDICAP & EMPLOI DES ORGANISMES DE PLACEMENT SPECIALISES (CHEOPS)",
   );
   await expect(
     await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`),
@@ -76,12 +76,14 @@ const fillAndSubmitBasicAgencyForm = async (
     .locator(`#${domElementIds.addAgency.nameInput}`)
     .fill("Cap emploi de Bayonne");
   await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).click();
-  // await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).clear()
-  await fillAutocomplete(
+  await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).clear();
+  await fillAutocomplete({
     page,
-    `#${domElementIds.addAgency.addressAutocomplete}`,
-    "18 rue des tonneliers ",
-  );
+    locator: `#${domElementIds.addAgency.addressAutocomplete}`,
+    value: "18 rue des tonneliers",
+    endpoint: addressRoutes.lookupStreetAddress.url,
+  });
+
   await expect(
     await page.locator(`#${domElementIds.addAgency.nameInput}`),
   ).toHaveValue("Cap emploi de Bayonne");

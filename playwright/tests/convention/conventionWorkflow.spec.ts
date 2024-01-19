@@ -1,5 +1,5 @@
 import test, { expect } from "@playwright/test";
-import { domElementIds, frontRoutes } from "shared";
+import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
   connectToAdmin,
@@ -103,30 +103,30 @@ test.describe("Convention creation and modification workflow", () => {
     await submitEditConventionForm(page, href);
   });
 
-  test("signs convention for signatories", async ({ page }) => {
-    await connectToAdmin(page);
+  test.describe("signs convention for signatories", () => {
     const signatories = 4;
     for (let index = 0; index < signatories; index++) {
-      if (index > 0) {
-        await page.goto(frontRoutes.admin);
-      }
-      const emailWrapper = await openEmailInAdmin(
-        page,
-        "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-        index,
-      );
-      const href = await getMagicLinkInEmailWrapper(
-        emailWrapper,
-        "conventionSignShortlink",
-      );
-      expect(href).not.toBe(null);
+      test(`signs convention for signatory ${index}`, async ({ page }) => {
+        await connectToAdmin(page);
+        const emailWrapper = await openEmailInAdmin(
+          page,
+          "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          index,
+        );
+        const href = await getMagicLinkInEmailWrapper(
+          emailWrapper,
+          "conventionSignShortlink",
+        );
+        expect(href).not.toBe(null);
 
-      if (!href) return;
+        if (!href) return;
 
-      await signConvention(page, href);
+        await signConvention(page, href);
+        if (index === signatories - 1) {
+          await page.waitForTimeout(testConfig.timeForEventCrawler);
+        }
+      });
     }
-
-    await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 
   test("reviews and validate convention", async ({ page }) => {
