@@ -1,11 +1,11 @@
 import { Observable } from "rxjs";
 import {
-  AbsoluteUrl,
   ConventionDto,
   ConventionId,
   ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
+  DashboardUrlAndName,
   FindSimilarConventionsParams,
   InclusionConnectJwt,
   RenewConventionParams,
@@ -18,7 +18,9 @@ export interface ConventionGateway {
   retrieveFromToken$(
     payload: FetchConventionRequestedPayload,
   ): Observable<ConventionReadDto | undefined>;
-  getConventionStatusDashboardUrl$(jwt: string): Observable<AbsoluteUrl>;
+  getConventionStatusDashboardUrl$(
+    jwt: string,
+  ): Observable<DashboardUrlAndName>;
 
   createConvention$(conventionDto: ConventionDto): Observable<void>;
   getSimilarConventions$(

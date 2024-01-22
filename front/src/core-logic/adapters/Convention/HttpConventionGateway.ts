@@ -1,13 +1,13 @@
 import { from, Observable } from "rxjs";
 import { match, P } from "ts-pattern";
 import {
-  AbsoluteUrl,
   ConventionDto,
   ConventionId,
   ConventionJwt,
   ConventionMagicLinkRoutes,
   ConventionReadDto,
   ConventionSupportedJwt,
+  DashboardUrlAndName,
   FindSimilarConventionsParams,
   InclusionConnectJwt,
   RenewConventionParams,
@@ -46,7 +46,7 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public getConventionStatusDashboardUrl$(
     jwt: string,
-  ): Observable<AbsoluteUrl> {
+  ): Observable<DashboardUrlAndName> {
     return from(
       this.magicLinkHttpClient
         .getConventionStatusDashboard({
@@ -55,6 +55,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

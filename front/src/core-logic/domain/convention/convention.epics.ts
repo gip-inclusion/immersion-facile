@@ -130,7 +130,9 @@ const getConventionStatusDashboardUrl: ConventionEpic = (
     switchMap(({ payload }) =>
       conventionGateway.getConventionStatusDashboardUrl$(payload),
     ),
-    map(conventionSlice.actions.conventionStatusDashboardSucceeded),
+    map(({ url }) =>
+      conventionSlice.actions.conventionStatusDashboardSucceeded(url),
+    ),
     catchEpicError((error: Error) =>
       conventionSlice.actions.conventionStatusDashboardFailed(error.message),
     ),

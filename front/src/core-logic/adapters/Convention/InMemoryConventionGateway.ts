@@ -1,6 +1,5 @@
 import { from, Observable, Subject } from "rxjs";
 import {
-  AbsoluteUrl,
   AgencyOption,
   ConventionDto,
   ConventionDtoBuilder,
@@ -8,6 +7,7 @@ import {
   ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
+  DashboardUrlAndName,
   FindSimilarConventionsParams,
   InclusionConnectJwt,
   RenewConventionParams,
@@ -34,7 +34,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   // For testing purpose
   public convention$ = new Subject<ConventionReadDto | undefined>();
 
-  public conventionDashboardUrl$ = new Subject<AbsoluteUrl>();
+  public conventionDashboardUrl$ = new Subject<DashboardUrlAndName>();
 
   public conventionModificationResult$ = new Subject<void>();
 
