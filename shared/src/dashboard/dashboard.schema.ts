@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
+  allDashboardNames,
+  DashboardUrlAndName,
   GetAdminDashboardParams,
   GetConventionMagicLinkDashboardParams,
   simpleDashboardNames,
@@ -26,3 +29,9 @@ export const getDashboardParams = z.union([
   getAdminDashboardParamsSchema,
   getConventionMagicLinkDashboardParamsSchema,
 ]);
+
+export const dashboardUrlAndNameSchema: z.Schema<DashboardUrlAndName> =
+  z.object({
+    name: z.enum(allDashboardNames),
+    url: absoluteUrlSchema,
+  });

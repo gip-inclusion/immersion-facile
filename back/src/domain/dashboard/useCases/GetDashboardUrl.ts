@@ -1,10 +1,18 @@
-import { AbsoluteUrl, GetDashboardParams, getDashboardParams } from "shared";
+import {
+  AbsoluteUrl,
+  DashboardUrlAndName,
+  GetDashboardParams,
+  getDashboardParams,
+} from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";
 
-export class GetDashboardUrl extends UseCase<GetDashboardParams, AbsoluteUrl> {
+export class GetDashboardUrl extends UseCase<
+  GetDashboardParams,
+  DashboardUrlAndName
+> {
   protected inputSchema = getDashboardParams;
 
   readonly #dashboardGateway: DashboardGateway;
@@ -19,7 +27,16 @@ export class GetDashboardUrl extends UseCase<GetDashboardParams, AbsoluteUrl> {
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  protected async _execute(params: GetDashboardParams): Promise<AbsoluteUrl> {
+  protected async _execute(
+    params: GetDashboardParams,
+  ): Promise<DashboardUrlAndName> {
+    return {
+      url: this.#getDashboardAbsoluteUrl(params),
+      name: params.name,
+    };
+  }
+
+  #getDashboardAbsoluteUrl(params: GetDashboardParams): AbsoluteUrl {
     if (params.name === "agency")
       return this.#dashboardGateway.getAgencyUserUrl(
         [params.agencyId],
