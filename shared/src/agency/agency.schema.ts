@@ -137,7 +137,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringPossiblyEmpty,
-
+      refersToAgencyId: refersToAgencyIdSchema.optional(),
       rejectionJustification: z.string().optional(),
     }),
   );
