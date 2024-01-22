@@ -226,7 +226,7 @@ interface EstablishmentLeadEvents {
   siret: string;
   kind: EstablishmentLeadEventsKind;
   occurred_at: Timestamp;
-  convention_id: string;
+  convention_id: string | null;
   notification_id: string | null;
   notification_kind: NotificationKind | null;
 }

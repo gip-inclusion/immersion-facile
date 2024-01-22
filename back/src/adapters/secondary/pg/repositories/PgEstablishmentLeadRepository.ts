@@ -1,5 +1,9 @@
+import { match, P } from "ts-pattern";
 import { SiretDto } from "shared";
-import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
+import {
+  EstablishmentLead,
+  EstablishmentLeadEvent,
+} from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadRepository } from "../../../../domain/offer/ports/EstablishmentLeadRepository";
 import { KyselyDb } from "../kysely/kyselyUtils";
 
@@ -25,31 +29,42 @@ export class PgEstablishmentLeadRepository
     if (leadEvents.length === 0) return;
 
     return leadEvents.reduce((acc, event) => {
-      const {
-        siret,
-        convention_id,
-        kind,
-        notification_id,
-        notification_kind,
-        occurred_at,
-      } = event;
-      const withNotification =
-        notification_id && notification_kind
-          ? { notification: { id: notification_id, kind: notification_kind } }
-          : null;
-
-      const newLead: EstablishmentLead = {
-        siret,
-        lastEventKind: kind,
-        events: [
-          ...(acc?.events ?? []),
-          {
-            conventionId: convention_id,
+      const eventToAdd: EstablishmentLeadEvent = match(event)
+        .with(
+          { kind: "to-be-reminded", convention_id: P.not(P.nullish) },
+          ({ kind, convention_id, occurred_at }) => ({
             kind,
             occuredAt: occurred_at,
-            ...withNotification,
+            conventionId: convention_id,
+          }),
+        )
+        .with(
+          {
+            kind: "reminder-sent",
+            notification_id: P.not(P.nullish),
+            notification_kind: P.not(P.nullish),
           },
-        ],
+          ({ kind, notification_kind, notification_id, occurred_at }) => ({
+            kind,
+            occuredAt: occurred_at,
+            notification: { id: notification_id, kind: notification_kind },
+          }),
+        )
+        .with(
+          { kind: P.union("registration-accepted", "registration-refused") },
+          ({ kind, occurred_at }) => ({
+            kind,
+            occuredAt: occurred_at,
+          }),
+        )
+        .otherwise(() => {
+          throw new Error("should not happen");
+        });
+
+      const newLead: EstablishmentLead = {
+        siret: event.siret,
+        lastEventKind: event.kind,
+        events: [...(acc?.events ?? []), eventToAdd],
       };
       return newLead;
     }, {} as EstablishmentLead);
@@ -64,15 +79,34 @@ export class PgEstablishmentLeadRepository
     await this.#transaction
       .insertInto("establishment_lead_events")
       .values(
-        establishmentLead.events.map((event) => ({
-          convention_id: event.conventionId,
-          kind: event.kind,
-          siret: establishmentLead.siret,
-          occurred_at: event.occuredAt,
-          notification_id: event.notification?.id,
-          notification_kind: event.notification?.kind,
-        })),
+        establishmentLead.events.map((event) =>
+          mapEventToEstablishmentLead(establishmentLead.siret, event),
+        ),
       )
       .execute();
   }
 }
+
+const mapEventToEstablishmentLead = (
+  siret: SiretDto,
+  event: EstablishmentLeadEvent,
+) =>
+  match(event)
+    .with({ kind: "to-be-reminded" }, ({ kind, occuredAt, conventionId }) => ({
+      siret,
+      kind,
+      occurred_at: occuredAt,
+      convention_id: conventionId,
+    }))
+    .with({ kind: "reminder-sent" }, ({ kind, occuredAt, notification }) => ({
+      siret,
+      kind,
+      occurred_at: occuredAt,
+      notification_id: notification.id,
+      notification_kind: notification.kind,
+    }))
+    .otherwise(({ kind, occuredAt }) => ({
+      siret,
+      kind,
+      occurred_at: occuredAt,
+    }));
