@@ -10,6 +10,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
@@ -42,33 +43,7 @@ describe("Add form establishment", () => {
   describe(`${displayRouteName(
     establishmentRoutes.addFormEstablishment,
   )} Route to post form establishments from front (hence, without API key)`, () => {
-    // from front
-    it(`${displayRouteName(
-      establishmentRoutes.addFormEstablishment,
-    )} 200 support posting valid establishment from front`, async () => {
-      inMemoryUow.romeRepository.appellations =
-        defaultValidFormEstablishment.appellations;
-
-      const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-        .build();
-
-      const response = await httpClient.addFormEstablishment({
-        body: formEstablishment,
-      });
-
-      expectHttpResponseToEqual(response, {
-        body: "",
-        status: 200,
-      });
-      expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
-        formEstablishment,
-      ]);
-    });
-
-    it(`${displayRouteName(
-      establishmentRoutes.addFormEstablishment,
-    )} 200 Check if email notification has been sent and published after FormEstablishment added`, async () => {
+    beforeEach(() => {
       gateways.addressApi.setAddressAndPosition([
         {
           position: {
@@ -86,7 +61,11 @@ describe("Add form establishment", () => {
 
       inMemoryUow.romeRepository.appellations =
         defaultValidFormEstablishment.appellations;
+    });
 
+    it(`${displayRouteName(
+      establishmentRoutes.addFormEstablishment,
+    )} 200 Check if email notification has been sent and published after FormEstablishment added`, async () => {
       const email = "tiredofthismess@seriously.com";
 
       const response = await httpClient.addFormEstablishment({
@@ -101,11 +80,82 @@ describe("Add form establishment", () => {
         status: 200,
       });
 
+      expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
+        FormEstablishmentDtoBuilder.valid()
+          .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
+          .withBusinessContactEmail(email)
+          .build(),
+      ]);
+
       await processEventsForEmailToBeSent(eventCrawler);
 
       expectToEqual(
         gateways.notification.getSentEmails().map((e) => e.recipients),
         [[email]],
+      );
+    });
+
+    it(`${displayRouteName(
+      establishmentRoutes.addFormEstablishment,
+    )} 200 update EstablishmentLead kind`, async () => {
+      const email = "tiredofthismess@seriously.com";
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
+        .withBusinessContactEmail(email)
+        .build();
+      const establishmentLead: EstablishmentLead = {
+        lastEventKind: "to-be-reminded",
+        siret: formEstablishment.siret,
+        events: [
+          {
+            kind: "to-be-reminded",
+            occuredAt: gateways.timeGateway.now(),
+            conventionId: "11111111-1111-4111-1111-111111111111",
+          },
+        ],
+      };
+
+      inMemoryUow.establishmentLeadRepository.establishmentLeads = [
+        establishmentLead,
+      ];
+      expect(
+        (
+          await inMemoryUow.establishmentLeadRepository.getBySiret(
+            formEstablishment.siret,
+          )
+        )?.lastEventKind,
+      ).toBe("to-be-reminded");
+
+      const response = await httpClient.addFormEstablishment({
+        body: formEstablishment,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: "",
+        status: 200,
+      });
+
+      await processEventsForEmailToBeSent(eventCrawler);
+
+      expectToEqual(
+        await inMemoryUow.establishmentLeadRepository.getBySiret(
+          formEstablishment.siret,
+        ),
+        {
+          lastEventKind: "registration-accepted",
+          siret: formEstablishment.siret,
+          events: [
+            {
+              kind: "to-be-reminded",
+              occuredAt: gateways.timeGateway.now(),
+              conventionId: "11111111-1111-4111-1111-111111111111",
+            },
+            {
+              kind: "registration-accepted",
+              occuredAt: gateways.timeGateway.now(),
+            },
+          ],
+        },
       );
     });
   });
