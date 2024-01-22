@@ -291,26 +291,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return <Loader />;
   }
 
-  if (feedback.kind === "deleteSuccess") {
-    return (
-      <Alert
-        severity="success"
-        title="Succès de la suppression"
-        description="Succès. Nous avons bien supprimé les informations concernant l'entreprise."
-      />
-    );
-  }
-  if (feedback.kind === "submitSuccess") {
-    return (
-      <Alert
-        severity="success"
-        title="Succès de l'envoi"
-        description="Succès. Nous avons bien enregistré les informations concernant
-      votre entreprise."
-      />
-    );
-  }
-
   const onStepChange: OnStepChange = async (step, fieldsToValidate) => {
     if (step && currentStep && step < currentStep) {
       setCurrentStep(step);
@@ -324,79 +304,103 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       setCurrentStep(step);
     }
   };
-
-  return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {match(currentStep)
-          .with(null, () => (
-            <>
-              <h1>Pilotage de l'entreprise {formValues.siret}</h1>
-              <h2>{steps[1].title}</h2>
-              <AvailabilitySection
-                mode={mode}
-                isSearchable={isSearchable}
-                onStepChange={onStepChange}
-                currentStep={currentStep}
-                setAvailableForImmersion={setAvailableForImmersion}
-                availableForImmersion={availableForImmersion}
-              />
-              <h2>{steps[2].title}</h2>
-              <BusinessContactSection
-                mode={mode}
-                onStepChange={onStepChange}
-                currentStep={currentStep}
-              />
-              <h2>{steps[3].title}</h2>
-              <DetailsSection
-                mode={mode}
-                isEstablishmentAdmin={isEstablishmentAdmin}
-                currentStep={currentStep}
-                onStepChange={onStepChange}
-              />
-            </>
-          ))
-          .with(0, () => (
-            <IntroSection onStepChange={onStepChange} mode={mode} />
-          ))
-          .otherwise((currentStep) => (
-            <div className={fr.cx("fr-col-8")}>
-              <Stepper
-                currentStep={currentStep}
-                stepCount={keys(steps).length}
-                title={steps[currentStep].title}
-                nextTitle={steps[currentStep].nextTitle}
-              />
-              {match(currentStep)
-                .with(1, () => (
-                  <AvailabilitySection
-                    mode={mode}
-                    isSearchable={isSearchable}
-                    onStepChange={onStepChange}
-                    currentStep={currentStep}
-                    availableForImmersion={availableForImmersion}
-                    setAvailableForImmersion={setAvailableForImmersion}
-                  />
-                ))
-                .with(2, () => (
-                  <BusinessContactSection
-                    mode={mode}
-                    onStepChange={onStepChange}
-                    currentStep={currentStep}
-                  />
-                ))
-                .with(3, () => (
-                  <DetailsSection
-                    isEstablishmentAdmin={isEstablishmentAdmin}
-                    mode={mode}
-                    currentStep={currentStep}
-                    onStepChange={onStepChange}
-                  />
-                ))
-                .exhaustive()}
-            </div>
-          ))}
-      </form>
-    </FormProvider>
-  );
+  return match(feedback)
+    .with({ kind: "errored" }, (feedback) => {
+      routes
+        .errorRedirect({
+          message: JSON.parse(feedback.errorMessage).errors,
+          title: "Entreprise non trouvée",
+        })
+        .push();
+      return null;
+    })
+    .with({ kind: "deleteSuccess" }, () => (
+      <Alert
+        severity="success"
+        title="Succès de la suppression"
+        description="Succès. Nous avons bien supprimé les informations concernant l'entreprise."
+      />
+    ))
+    .with({ kind: "submitSuccess" }, () => (
+      <Alert
+        severity="success"
+        title="Succès de l'envoi"
+        description="Succès. Nous avons bien enregistré les informations concernant
+        votre entreprise."
+      />
+    ))
+    .otherwise(() => (
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {match(currentStep)
+            .with(null, () => (
+              <>
+                <h1>Pilotage de l'entreprise {formValues.siret}</h1>
+                <h2>{steps[1].title}</h2>
+                <AvailabilitySection
+                  mode={mode}
+                  isSearchable={isSearchable}
+                  onStepChange={onStepChange}
+                  currentStep={currentStep}
+                  setAvailableForImmersion={setAvailableForImmersion}
+                  availableForImmersion={availableForImmersion}
+                />
+                <h2>{steps[2].title}</h2>
+                <BusinessContactSection
+                  mode={mode}
+                  onStepChange={onStepChange}
+                  currentStep={currentStep}
+                />
+                <h2>{steps[3].title}</h2>
+                <DetailsSection
+                  mode={mode}
+                  isEstablishmentAdmin={isEstablishmentAdmin}
+                  currentStep={currentStep}
+                  onStepChange={onStepChange}
+                />
+              </>
+            ))
+            .with(0, () => (
+              <IntroSection onStepChange={onStepChange} mode={mode} />
+            ))
+            .otherwise((currentStep) => (
+              <div className={fr.cx("fr-col-8")}>
+                <Stepper
+                  currentStep={currentStep}
+                  stepCount={keys(steps).length}
+                  title={steps[currentStep].title}
+                  nextTitle={steps[currentStep].nextTitle}
+                />
+                {match(currentStep)
+                  .with(1, () => (
+                    <AvailabilitySection
+                      mode={mode}
+                      isSearchable={isSearchable}
+                      onStepChange={onStepChange}
+                      currentStep={currentStep}
+                      availableForImmersion={availableForImmersion}
+                      setAvailableForImmersion={setAvailableForImmersion}
+                    />
+                  ))
+                  .with(2, () => (
+                    <BusinessContactSection
+                      mode={mode}
+                      onStepChange={onStepChange}
+                      currentStep={currentStep}
+                    />
+                  ))
+                  .with(3, () => (
+                    <DetailsSection
+                      isEstablishmentAdmin={isEstablishmentAdmin}
+                      mode={mode}
+                      currentStep={currentStep}
+                      onStepChange={onStepChange}
+                    />
+                  ))
+                  .exhaustive()}
+              </div>
+            ))}
+        </form>
+      </FormProvider>
+    ));
 };
