@@ -272,7 +272,7 @@ export type ConventionReadDto = ConventionDto & {
   agencyName: string;
   agencyDepartment: string;
   agencyKind: AgencyKind;
-  agencySiret?: SiretDto;
+  agencySiret: SiretDto;
   agencyRefersTo?: AgencyRefersToInConvention;
 };
 

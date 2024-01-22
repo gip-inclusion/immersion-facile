@@ -5,6 +5,8 @@ import {
   subDays,
 } from "date-fns";
 import {
+  AgencyDtoBuilder,
+  AgencyId,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionStatus,
@@ -32,6 +34,7 @@ describe("ConventionReminder use case", () => {
     "PARTIALLY_SIGNED",
   ];
   const needReviewStatuses: ConventionStatus[] = ["IN_REVIEW"];
+  const agency = new AgencyDtoBuilder().build();
 
   let uow: InMemoryUnitOfWork;
   let conventionsReminder: ConventionsReminder;
@@ -59,6 +62,7 @@ describe("ConventionReminder use case", () => {
       const conventionsWithUnsupportedStatuses =
         makeOneConventionOfEachStatuses({
           withDateStart: now,
+          agencyId: agency.id,
         }).filter(
           ({ status }) =>
             ![...needSignatureStatuses, ...needReviewStatuses].includes(status),
@@ -90,6 +94,7 @@ describe("ConventionReminder use case", () => {
 
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart: startDate,
+        agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
 
@@ -136,6 +141,7 @@ describe("ConventionReminder use case", () => {
         convention2,
         conventionNeedsReminder,
       ]);
+      uow.agencyRepository.setAgencies([agency]);
 
       const summary = await conventionsReminder.execute();
       expectToEqual(summary, {
@@ -163,8 +169,10 @@ describe("ConventionReminder use case", () => {
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart: startDate,
         withDateSubmission: dateSubmission,
+        agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
+      uow.agencyRepository.setAgencies([agency]);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -198,8 +206,10 @@ describe("ConventionReminder use case", () => {
 
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart: startDate,
+        agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
+      uow.agencyRepository.setAgencies([agency]);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -234,8 +244,10 @@ describe("ConventionReminder use case", () => {
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart: startDate,
         withDateSubmission: subDays(now, 2),
+        agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
+      uow.agencyRepository.setAgencies([agency]);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -289,8 +301,10 @@ describe("ConventionReminder use case", () => {
 
       const conventions = makeOneConventionOfEachStatuses({
         withDateStart: startDate,
+        agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
+      uow.agencyRepository.setAgencies([agency]);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -343,13 +357,16 @@ describe("ConventionReminder use case", () => {
 const makeOneConventionOfEachStatuses = ({
   withDateStart,
   withDateSubmission = subDays(withDateStart, 10),
+  agencyId,
 }: {
   withDateStart: Date;
   withDateSubmission?: Date;
+  agencyId: AgencyId;
 }): ConventionDto[] =>
   conventionStatuses.map((conventionStatus, index) =>
     new ConventionDtoBuilder()
       .withId(index.toString())
+      .withAgencyId(agencyId)
       .withStatus(conventionStatus)
       .withDateStart(withDateStart.toISOString())
       .withDateSubmission(withDateSubmission.toISOString())
