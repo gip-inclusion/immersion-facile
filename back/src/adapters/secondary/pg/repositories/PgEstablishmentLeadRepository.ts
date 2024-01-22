@@ -22,6 +22,8 @@ export class PgEstablishmentLeadRepository
       .orderBy("occurred_at asc")
       .execute();
 
+    if (leadEvents.length === 0) return;
+
     return leadEvents.reduce((acc, event) => {
       const {
         siret,
