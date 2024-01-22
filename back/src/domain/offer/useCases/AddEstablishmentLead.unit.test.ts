@@ -62,9 +62,12 @@ describe("Add EstablishmentLead", () => {
           occuredAt: subDays(new Date(), 2),
         },
         {
-          conventionId: convention.id,
           kind: "reminder-sent",
           occuredAt: new Date(),
+          notification: {
+            id: "1234",
+            kind: "email",
+          },
         },
       ],
     };

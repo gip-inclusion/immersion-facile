@@ -46,7 +46,6 @@ describe("PgEstablishmentLeadRepository", () => {
             kind: "to-be-reminded",
           },
           {
-            conventionId: "45664444-1234-4000-4444-123456789012",
             occuredAt: now,
             kind: "registration-accepted",
           },

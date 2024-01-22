@@ -14,12 +14,24 @@ const establishmentLeadEventKind = [
 
 type EstablishmentLeadEventKind = (typeof establishmentLeadEventKind)[number];
 
-type EstablishmentLeadEvent = {
-  occuredAt: Date;
-  kind: EstablishmentLeadEventKind;
-  conventionId: ConventionId;
-  notification?: { id: NotificationId; kind: NotificationKind };
-};
+export type EstablishmentLeadEvent =
+  | {
+      kind: Extract<EstablishmentLeadEventKind, "to-be-reminded">;
+      occuredAt: Date;
+      conventionId: ConventionId;
+    }
+  | {
+      kind: Extract<EstablishmentLeadEventKind, "reminder-sent">;
+      occuredAt: Date;
+      notification: { id: NotificationId; kind: NotificationKind };
+    }
+  | {
+      kind: Exclude<
+        EstablishmentLeadEventKind,
+        "to-be-reminded" | "reminder-sent"
+      >;
+      occuredAt: Date;
+    };
 
 export type EstablishmentLead = {
   siret: SiretDto;
