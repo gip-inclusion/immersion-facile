@@ -236,7 +236,6 @@ export const ConventionForm = ({
 
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
     useCopyButton();
-
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
       {match({
@@ -244,8 +243,20 @@ export const ConventionForm = ({
         reduxFormUiReady,
         formSuccessfullySubmitted,
         shouldRedirectToError: !!(route.params.jwt && fetchConventionError),
+        conventionCantBeEdited:
+          mode === "edit" &&
+          route.params.jwt &&
+          fetchedConvention &&
+          fetchedConvention?.status !== "DRAFT",
       })
         .with({ reduxFormUiReady: false }, () => <Loader />)
+        .with({ conventionCantBeEdited: true }, () => (
+          <Alert
+            severity="error"
+            title="Cette convention ne peut plus être modifiée"
+            description="Cette convention ne peut plus être modifiée car elle a déjà été signée, validée ou refusée."
+          />
+        ))
         .with({ shouldRedirectToError: true }, () => (
           <>
             {route.params.jwt && fetchConventionError && (
