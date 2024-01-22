@@ -8,7 +8,7 @@ export const conventionReadPublicV2Schema: z.Schema<ConventionReadPublicV2Dto> =
       agencyName: z.string(),
       agencyDepartment: z.string(),
       agencyKind: agencyKindSchema,
-      agencySiret: siretSchema.optional(),
+      agencySiret: siretSchema,
       agencyRefersToOtherAgency: z
         .object({
           id: z.string(),

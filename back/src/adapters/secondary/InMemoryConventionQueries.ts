@@ -15,6 +15,7 @@ import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
 } from "../../domain/convention/ports/ConventionQueries";
+import { missingAgencyMessage } from "../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { AssessmentEmailDomainTopic } from "../../domain/core/eventBus/events";
 import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../primary/helpers/httpErrors";
@@ -22,8 +23,6 @@ import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
-const TEST_AGENCY_NAME = "TEST_AGENCY_NAME";
-const TEST_AGENCY_DEPARTMENT = "75-test";
 const logger = createLogger(__filename);
 
 export class InMemoryConventionQueries implements ConventionQueries {
@@ -136,6 +135,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
       (agency) => agency.id === convention.agencyId,
     );
 
+    if (!agency) throw new NotFoundError(missingAgencyMessage(convention));
+
     const referedAgency =
       agency &&
       agency.refersToAgencyId &&
@@ -145,11 +146,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
     return {
       ...convention,
-      agencyName: agency?.name ?? TEST_AGENCY_NAME,
-      agencyDepartment:
-        agency?.address.departmentCode ?? TEST_AGENCY_DEPARTMENT,
-      agencyKind: agency?.kind ?? "autre",
-      agencySiret: agency?.agencySiret,
+      agencyName: agency.name,
+      agencyDepartment: agency.address.departmentCode,
+      agencyKind: agency.kind,
+      agencySiret: agency.agencySiret,
       agencyRefersTo: referedAgency && {
         id: referedAgency.id,
         name: referedAgency.name,

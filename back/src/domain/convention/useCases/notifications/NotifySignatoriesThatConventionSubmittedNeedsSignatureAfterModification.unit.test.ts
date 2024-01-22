@@ -23,7 +23,7 @@ import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { conventionMissingMessage } from "../../entities/Convention";
-import { agencyMissingMessage } from "../../ports/AgencyRepository";
+import { missingAgencyMessage } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 import {
   NO_JUSTIFICATION,
   NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification,
@@ -311,7 +311,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),
-        new Error(agencyMissingMessage(convention.agencyId)),
+        new Error(missingAgencyMessage(convention)),
       );
 
       await expectSavedNotificationsAndEvents({});

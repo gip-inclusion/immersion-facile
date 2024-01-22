@@ -241,6 +241,7 @@ describe("conventionDtoSchema", () => {
       const validConventionRead: ConventionReadDto = {
         ...new ConventionDtoBuilder().build(),
         agencyName: "agence de test",
+        agencySiret: "00000000000000",
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
       };
@@ -254,6 +255,7 @@ describe("conventionDtoSchema", () => {
           .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .build(),
         agencyName: "agence de test",
+        agencySiret: "00000000000000",
         agencyDepartment: "90",
         agencyKind: "pole-emploi",
       };
