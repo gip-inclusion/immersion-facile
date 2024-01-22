@@ -92,7 +92,7 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 200,
-        body: "http://stubDashboard/events",
+        body: { name: "events", url: "http://stubDashboard/events" },
       });
     });
 
@@ -104,7 +104,10 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 200,
-        body: "http://stubDashboard/establishments",
+        body: {
+          name: "establishments",
+          url: "http://stubDashboard/establishments",
+        },
       });
     });
 
@@ -116,7 +119,10 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 200,
-        body: "http://stubAgencyDashboard/my-agency-id",
+        body: {
+          name: "agency",
+          url: "http://stubAgencyDashboard/my-agency-id",
+        },
       });
     });
 

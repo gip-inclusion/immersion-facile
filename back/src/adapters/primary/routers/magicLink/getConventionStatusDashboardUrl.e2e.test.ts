@@ -1,32 +1,31 @@
 import {
   ConventionDtoBuilder,
+  ConventionJwt,
+  ConventionMagicLinkRoutes,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
-  expectToEqual,
+  expectHttpResponseToEqual,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../utils/buildTestApp";
+import type { InMemoryUnitOfWork } from "../../config/uowConfig";
+
+const conventionId = "my-Convention-id";
+const beneficiaryEmail = "joe@lebenef.fr";
 
 describe("getConventionStatusDashboardUrl", () => {
-  it("fails if no token is provided", async () => {
-    const { request } = await buildTestApp();
-    const response = await request.get(
-      conventionMagicLinkRoutes.getConventionStatusDashboard.url,
-    );
-    expect(response.status).toBe(400);
-    expectToEqual(response.body, {
-      issues: ["authorization : Required"],
-      message:
-        "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: GET /auth/status-convention",
-      status: 400,
-    });
-  });
+  let httpClient: HttpClient<ConventionMagicLinkRoutes>;
+  let jwt: ConventionJwt;
+  let uow: InMemoryUnitOfWork;
 
-  it("gets the dashboard url if token is correct", async () => {
+  beforeEach(async () => {
     const { request, generateConventionJwt, inMemoryUow } =
       await buildTestApp();
-    const conventionId = "my-Convention-id";
-    const beneficiaryEmail = "joe@lebenef.fr";
-    const jwt = generateConventionJwt(
+
+    uow = inMemoryUow;
+
+    jwt = generateConventionJwt(
       createConventionMagicLinkPayload({
         id: conventionId,
         role: "beneficiary",
@@ -35,21 +34,44 @@ describe("getConventionStatusDashboardUrl", () => {
       }),
     );
 
+    httpClient = createSupertestSharedClient(
+      conventionMagicLinkRoutes,
+      request,
+    );
+  });
+
+  it("fails if no token is provided", async () => {
+    const response = await httpClient.getConventionStatusDashboard({
+      headers: { authorization: "" },
+    });
+
+    expectHttpResponseToEqual(response, {
+      status: 401,
+      body: {
+        error: "forbidden: unauthenticated",
+      },
+    });
+  });
+
+  it("gets the dashboard url if token is correct", async () => {
     const convention = new ConventionDtoBuilder()
       .withId(conventionId)
       .withStatus("READY_TO_SIGN")
       .withBeneficiaryEmail(beneficiaryEmail)
       .build();
 
-    inMemoryUow.conventionRepository.setConventions([convention]);
+    uow.conventionRepository.setConventions([convention]);
 
-    const response = await request
-      .get(conventionMagicLinkRoutes.getConventionStatusDashboard.url)
-      .set("Authorization", jwt);
+    const response = await httpClient.getConventionStatusDashboard({
+      headers: { authorization: jwt },
+    });
 
-    expect(response.status).toBe(200);
-    expect(response.body).toBe(
-      `http://stubConventionStatusDashboard/${convention.id}`,
-    );
+    expectHttpResponseToEqual(response, {
+      status: 200,
+      body: {
+        url: `http://stubConventionStatusDashboard/${convention.id}`,
+        name: "conventionStatus",
+      },
+    });
   });
 });

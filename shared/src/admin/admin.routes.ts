@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAgencyIdSchema } from "../agency/agency.schema";
 import {
   apiConsumerJwtSchema,
   apiConsumerSchema,
   createApiConsumerSchema,
 } from "../apiConsumer/apiConsumer.schema";
+import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { setFeatureFlagSchema } from "../featureFlags";
 import {
   establishmentBatchReportSchema,
@@ -46,7 +46,7 @@ export const adminRoutes = defineRoutes({
     queryParamsSchema: withAgencyIdSchema.partial(),
     ...withAuthorizationHeaders,
     responses: {
-      200: absoluteUrlSchema,
+      200: dashboardUrlAndNameSchema,
       400: legacyHttpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
     },

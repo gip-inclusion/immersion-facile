@@ -1,6 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { assessmentSchema } from "../assessment/assessment.schema";
+import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
@@ -51,7 +51,10 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/status-convention",
     method: "get",
     ...withAuthorizationHeaders,
-    responses: { 200: absoluteUrlSchema },
+    responses: {
+      200: dashboardUrlAndNameSchema,
+      401: legacyUnauthenticatedErrorSchema,
+    },
   }),
   signConvention: defineRoute({
     url: "/auth/sign-application/:conventionId",

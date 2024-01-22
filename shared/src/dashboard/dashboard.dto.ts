@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyId } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
 import { AuthenticatedUserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
@@ -32,6 +33,12 @@ export type ConventionMagicLinkDashboardName =
   (typeof conventionMagicLinkDashboardNames)[number];
 export const conventionMagicLinkDashboardNames = ["conventionStatus"] as const;
 
+export const allDashboardNames = [
+  ...adminDashboardNames,
+  ...establishmentDashboardNames,
+  ...conventionMagicLinkDashboardNames,
+] as const;
+
 type GenericGetDashboardParams<N extends DashboardName> = {
   name: N;
 };
@@ -40,6 +47,11 @@ export type GetDashboardParams =
   | GetAdminDashboardParams
   | GetConventionMagicLinkDashboardParams
   | GetEstablishmentDashboardParams;
+
+export type DashboardUrlAndName = {
+  name: DashboardName;
+  url: AbsoluteUrl;
+};
 
 export type GetEstablishmentDashboardParams =
   GenericGetDashboardParams<"establishmentRepresentativeConventions"> & {
