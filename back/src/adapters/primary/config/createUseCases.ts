@@ -98,6 +98,7 @@ import { RequestEditFormEstablishment } from "../../../domain/offer/useCases/Req
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/offer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/offer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { UpdateEstablishmentLeadOnEstablishmentRegistered } from "../../../domain/offer/useCases/UpdateEstablishmentLeadOnEstablishmentRegistered";
 import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/useCases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
@@ -325,6 +326,11 @@ export const createUseCases = (
         uowPerformer,
         gateways.timeGateway,
       ),
+      updateEstablishmentLeadOnEstablishmentRegistered:
+        new UpdateEstablishmentLeadOnEstablishmentRegistered(
+          uowPerformer,
+          gateways.timeGateway,
+        ),
       deleteEstablishment: new DeleteEstablishment(
         uowPerformer,
         gateways.timeGateway,

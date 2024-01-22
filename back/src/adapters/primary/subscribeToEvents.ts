@@ -90,6 +90,7 @@ const getUseCasesByTopics = (
   FormEstablishmentAdded: [
     useCases.insertEstablishmentAggregateFromForm,
     useCases.notifyConfirmationEstablishmentCreated,
+    useCases.updateEstablishmentLeadOnEstablishmentRegistered,
   ],
   FormEstablishmentEdited: [useCases.updateEstablishmentAggregateFromForm],
   FormEstablishmentEditLinkSent: [],
