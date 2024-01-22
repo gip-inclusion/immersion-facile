@@ -1,11 +1,11 @@
 import { addDays } from "date-fns";
 import {
-  AbsoluteUrl,
   AgencyDtoBuilder,
   AgencyId,
   Beneficiary,
   ConventionDtoBuilder,
   ConventionReadDto,
+  DashboardUrlAndName,
   EstablishmentRepresentative,
   EstablishmentTutor,
   expectObjectsToMatch,
@@ -830,9 +830,12 @@ describe("Convention slice", () => {
       conventionSlice.actions.conventionStatusDashboardRequested(jwt),
     );
     expectConventionState({ isLoading: true });
-    const dashboardUrl: AbsoluteUrl = "https://my-dashboard.com/123";
-    feedGatewayWithConventionStatusDashboardUrl(dashboardUrl);
-    expectConventionState({ conventionStatusDashboardUrl: dashboardUrl });
+    const urlAndName: DashboardUrlAndName = {
+      name: "conventionStatus",
+      url: "https://my-dashboard.com/123",
+    };
+    feedGatewayWithConventionStatusDashboardUrl(urlAndName);
+    expectConventionState({ conventionStatusDashboardUrl: urlAndName.url });
   });
 
   it("stores the error when something goes wrong when fetching the dashboard Url for convention status check", () => {
@@ -1129,17 +1132,15 @@ describe("Convention slice", () => {
     dependencies.conventionGateway.updateConventionResult$.next(undefined);
   };
 
-  const feedGatewayWithConventionStatusDashboardUrl = (url: AbsoluteUrl) => {
-    dependencies.conventionGateway.conventionDashboardUrl$.next(url);
+  const feedGatewayWithConventionStatusDashboardUrl = (
+    params: DashboardUrlAndName,
+  ) => {
+    dependencies.conventionGateway.conventionDashboardUrl$.next(params);
   };
 
   const feedGatewayWithConventionStatusDashboardUrlError = (error: Error) => {
     dependencies.conventionGateway.conventionDashboardUrl$.error(error);
   };
-
-  // const feedGatewayWithUpdateConventionError = (error: Error) => {
-  //   dependencies.conventionGateway.updateConventionResult$.error(error);
-  // };
 
   const expectAddConventionToHaveBeenCalled = (numberOfCalls: number) => {
     expect(dependencies.conventionGateway.addConventionCallCount).toBe(

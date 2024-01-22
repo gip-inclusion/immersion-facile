@@ -1,11 +1,11 @@
 import { Observable, of, throwError } from "rxjs";
 import {
-  AbsoluteUrl,
   AgencyDtoBuilder,
   AgencyRight,
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
+  DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
@@ -76,9 +76,8 @@ export class SimulatedAdminGateway implements AdminGateway {
   public getDashboardUrl$(
     { name }: GetDashboardParams,
     _token: BackOfficeJwt,
-  ): Observable<AbsoluteUrl> {
-    const url: AbsoluteUrl = `http://${name}.com`;
-    return of(url);
+  ): Observable<DashboardUrlAndName> {
+    return of({ name, url: `http://${name}.com` });
   }
 
   public getInclusionConnectedUsersToReview$(): Observable<

@@ -1,12 +1,12 @@
 import { from, Observable } from "rxjs";
 import { match, P } from "ts-pattern";
 import {
-  AbsoluteUrl,
   AdminRoutes,
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
   createApiConsumerParamsFromApiConsumer,
+  DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
@@ -86,7 +86,7 @@ export class HttpAdminGateway implements AdminGateway {
   public getDashboardUrl$(
     params: GetDashboardParams,
     token: BackOfficeJwt,
-  ): Observable<AbsoluteUrl> {
+  ): Observable<DashboardUrlAndName> {
     return from(
       this.httpClient
         .getDashboardUrl({

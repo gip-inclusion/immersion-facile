@@ -1,9 +1,9 @@
 import { Observable, Subject } from "rxjs";
 import {
-  AbsoluteUrl,
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
+  DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   IcUserRoleForAgencyParams,
@@ -17,7 +17,7 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 export class TestAdminGateway implements AdminGateway {
   public apiConsumers$ = new Subject<ApiConsumer[]>();
 
-  public dashboardUrl$ = new Subject<AbsoluteUrl>();
+  public dashboardUrl$ = new Subject<DashboardUrlAndName>();
 
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
 
@@ -58,7 +58,7 @@ export class TestAdminGateway implements AdminGateway {
     return this.establishmentBatchResponse$;
   }
 
-  public getDashboardUrl$(): Observable<AbsoluteUrl> {
+  public getDashboardUrl$(): Observable<DashboardUrlAndName> {
     return this.dashboardUrl$;
   }
 

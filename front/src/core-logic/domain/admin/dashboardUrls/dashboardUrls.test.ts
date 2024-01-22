@@ -1,4 +1,4 @@
-import { AbsoluteUrl, expectObjectsToMatch } from "shared";
+import { DashboardUrlAndName, expectObjectsToMatch } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import {
   DashboardUrls,
@@ -27,10 +27,13 @@ describe("dashboardUrls slice", () => {
           name: "conventions",
         }),
       );
-      const valueFromApi: AbsoluteUrl = "https://conventions.url";
+      const valueFromApi: DashboardUrlAndName = {
+        name: "conventions",
+        url: "https://conventions.url",
+      };
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
 
-      expectUrlsToMatch({ conventions: valueFromApi });
+      expectUrlsToMatch({ conventions: valueFromApi.url });
       expectDashboardError(null);
     });
 
@@ -42,10 +45,13 @@ describe("dashboardUrls slice", () => {
           name: "establishments",
         }),
       );
-      const valueFromApi: AbsoluteUrl = "https://establishments.url";
+      const valueFromApi: DashboardUrlAndName = {
+        name: "establishments",
+        url: "https://establishments.url",
+      };
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
 
-      expectUrlsToMatch({ establishments: valueFromApi });
+      expectUrlsToMatch({ establishments: valueFromApi.url });
       expectDashboardError(null);
     });
 
@@ -58,10 +64,13 @@ describe("dashboardUrls slice", () => {
           agencyId: "my-agency-id",
         }),
       );
-      const valueFromApi: AbsoluteUrl = "https://agency.url";
+      const valueFromApi: DashboardUrlAndName = {
+        name: "agency",
+        url: "https://agency.url",
+      };
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
 
-      expectUrlsToMatch({ agency: valueFromApi });
+      expectUrlsToMatch({ agency: valueFromApi.url });
       expectDashboardError(null);
     });
 
@@ -78,6 +87,40 @@ describe("dashboardUrls slice", () => {
 
       expectUrlsToMatch({ conventions: null });
       expectDashboardError(errorMessage);
+    });
+
+    it("should be able to load 2 different dashboards at the same time (agency and agencies for exemple)", () => {
+      expectUrlsToMatch({ agency: null, agencies: null });
+
+      store.dispatch(
+        dashboardUrlsSlice.actions.dashboardUrlRequested({
+          name: "agency",
+          agencyId: "my-agency-id",
+        }),
+      );
+
+      store.dispatch(
+        dashboardUrlsSlice.actions.dashboardUrlRequested({
+          name: "agencies",
+        }),
+      );
+
+      const agencyValueFromApi: DashboardUrlAndName = {
+        name: "agency",
+        url: "https://my-agency.url",
+      };
+      dependencies.adminGateway.dashboardUrl$.next(agencyValueFromApi);
+
+      const agenciesValueFromApi: DashboardUrlAndName = {
+        name: "agencies",
+        url: "https://agencies.url",
+      };
+      dependencies.adminGateway.dashboardUrl$.next(agenciesValueFromApi);
+
+      expectUrlsToMatch({
+        agency: agencyValueFromApi.url,
+        agencies: agenciesValueFromApi.url,
+      });
     });
   });
 

@@ -1,9 +1,9 @@
 import { Observable } from "rxjs";
 import {
-  AbsoluteUrl,
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
+  DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
@@ -24,7 +24,7 @@ export interface AdminGateway {
   getDashboardUrl$: (
     params: GetDashboardParams,
     token: BackOfficeJwt,
-  ) => Observable<AbsoluteUrl>;
+  ) => Observable<DashboardUrlAndName>;
   getInclusionConnectedUsersToReview$: (
     token: BackOfficeJwt,
   ) => Observable<InclusionConnectedUser[]>;
