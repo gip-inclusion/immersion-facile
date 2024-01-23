@@ -103,7 +103,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         recipients: [convention.establishmentTutor.email],
         sender: immersionFacileNoReplyEmailSender,
         params: {
-          agencyLogoUrl: agency.logoUrl,
+          agencyLogoUrl: agency.logoUrl ?? undefined,
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
           conventionId: convention.id,

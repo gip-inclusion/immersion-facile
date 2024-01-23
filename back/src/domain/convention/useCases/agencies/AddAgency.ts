@@ -46,6 +46,8 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
       adminEmails: [],
       status: "needsReview",
       questionnaireUrl: params.questionnaireUrl,
+      codeSafir: null,
+      rejectionJustification: null,
     };
 
     await throwConflictErrorOnSimilarAgencyFound({ uow, agency });

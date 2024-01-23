@@ -170,10 +170,12 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           beneficiaryRepresentative,
           beneficiary,
         }),
-        agencyLogoUrl: agency.logoUrl,
-        agencyAssessmentDocumentLink: isUrlValid(agency.questionnaireUrl)
-          ? agency.questionnaireUrl
-          : undefined,
+        agencyLogoUrl: agency.logoUrl ?? undefined,
+        agencyAssessmentDocumentLink:
+          agency.questionnaireUrl !== null &&
+          isUrlValid(agency.questionnaireUrl)
+            ? agency.questionnaireUrl
+            : undefined,
         agencyValidatorEmail: agency.validatorEmails[0],
         magicLink: await makeShortMagicLink(frontRoutes.conventionDocument),
         validatorName: convention.validators?.agencyValidator

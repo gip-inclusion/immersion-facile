@@ -151,7 +151,7 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
               conventionStatusLink: await makeMagicShortLink(
                 frontRoutes.conventionStatusDashboard,
               ),
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               warning,
             },
           },

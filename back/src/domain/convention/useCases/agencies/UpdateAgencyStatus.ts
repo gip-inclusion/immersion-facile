@@ -60,7 +60,7 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
       rejectionJustification:
         updateAgencyStatusParams.status === "rejected"
           ? updateAgencyStatusParams.rejectionJustification
-          : undefined,
+          : null,
     };
     await uow.agencyRepository.update(updatedAgencyParams);
 

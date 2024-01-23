@@ -78,7 +78,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [convention.signatories.beneficiary.email],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -97,7 +97,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.establishmentRepresentative.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -132,7 +132,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [convention.signatories.beneficiary.email],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -151,7 +151,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.establishmentRepresentative.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -208,7 +208,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [convention.signatories.beneficiary.email],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -227,7 +227,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.establishmentRepresentative.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -248,7 +248,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.beneficiaryRepresentative!.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -269,7 +269,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.beneficiaryCurrentEmployer!.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,

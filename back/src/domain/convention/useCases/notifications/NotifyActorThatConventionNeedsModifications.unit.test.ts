@@ -227,7 +227,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
                 `shortLinkId_${expectedRecipient}_2_${modifierRole}`,
               ),
               signature: agency.signature,
-              agencyLogoUrl: agency.logoUrl,
+              agencyLogoUrl: agency.logoUrl ?? undefined,
               requesterName,
             },
           })),

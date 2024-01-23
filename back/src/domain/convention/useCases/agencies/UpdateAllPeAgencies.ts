@@ -169,7 +169,10 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       agencySiret: peReferentialAgency.siret,
       kind: "pole-emploi",
       status: "from-api-PE",
-      refersToAgencyId: undefined,
+      refersToAgencyId: null,
+      questionnaireUrl: null,
+      logoUrl: null,
+      rejectionJustification: null,
     };
   }
 }

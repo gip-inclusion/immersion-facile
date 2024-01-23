@@ -91,6 +91,8 @@ export class InMemoryAgencyGateway implements AgencyGateway {
       status: "needsReview",
       adminEmails: [],
       questionnaireUrl: createAgencyDto.questionnaireUrl,
+      codeSafir: null,
+      rejectionJustification: null,
     };
   }
 

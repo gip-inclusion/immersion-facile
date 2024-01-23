@@ -29,6 +29,10 @@ const emptyAgency: AgencyDto = {
     lat: 48.866667, // Paris lat/lon
     lon: 2.333333,
   },
+  logoUrl: null,
+  refersToAgencyId: null,
+  codeSafir: null,
+  rejectionJustification: null,
 };
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {
@@ -74,7 +78,7 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withCodeSafir(code: string) {
+  public withCodeSafir(code: string | null) {
     return new AgencyDtoBuilder({
       ...this.#agency,
       codeSafir: code,
@@ -102,7 +106,7 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withLogoUrl(logoUrl?: AbsoluteUrl) {
+  public withLogoUrl(logoUrl: AbsoluteUrl | null) {
     return new AgencyDtoBuilder({
       ...this.#agency,
       logoUrl,
@@ -133,14 +137,14 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withRefersToAgencyId(refersToAgencyId: AgencyId | undefined) {
+  public withRefersToAgencyId(refersToAgencyId: AgencyId | null) {
     return new AgencyDtoBuilder({
       ...this.#agency,
       refersToAgencyId,
     });
   }
 
-  public withRejectionJustification(rejectionJustification: string) {
+  public withRejectionJustification(rejectionJustification: string | null) {
     return new AgencyDtoBuilder({
       ...this.#agency,
       rejectionJustification,

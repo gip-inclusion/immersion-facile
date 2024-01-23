@@ -170,7 +170,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ...expectedParams(agencyWithCounsellors, validConvention),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
-            agencyLogoUrl: agencyWithCounsellors.logoUrl,
+            agencyLogoUrl: agencyWithCounsellors.logoUrl ?? undefined,
             warning: undefined,
           },
         },
@@ -182,7 +182,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ...expectedParams(agencyWithCounsellors, validConvention),
             magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
-            agencyLogoUrl: agencyWithCounsellors.logoUrl,
+            agencyLogoUrl: agencyWithCounsellors.logoUrl ?? undefined,
             warning: undefined,
           },
         },
@@ -228,7 +228,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ...expectedParams(agencyWithCounsellors, validConvention),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
-            agencyLogoUrl: agencyWithCounsellors.logoUrl,
+            agencyLogoUrl: agencyWithCounsellors.logoUrl ?? undefined,
           },
         },
       ],
@@ -296,7 +296,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
-            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+            agencyLogoUrl:
+              agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
         },
         {
@@ -310,7 +311,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
-            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+            agencyLogoUrl:
+              agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
         },
       ],
@@ -394,7 +396,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
-            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+            agencyLogoUrl:
+              agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
         },
         {
@@ -408,7 +411,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
-            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+            agencyLogoUrl:
+              agencyWithConsellorsAndValidator.logoUrl ?? undefined,
             warning: `Merci de vérifier le conseiller référent associé à ce bénéficiaire.`,
           },
         },
