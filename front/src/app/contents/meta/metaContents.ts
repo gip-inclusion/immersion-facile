@@ -1,5 +1,4 @@
-import { GroupName } from "shared";
-import { AdminTab } from "src/app/routes/routeParams/adminTabs";
+import { AdminTab, GroupName } from "shared";
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { routes } from "src/app/routes/routes";
 

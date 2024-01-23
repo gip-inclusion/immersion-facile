@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { domElementIds, frontRoutes } from "shared";
+import { AdminTab, adminTabsList, domElementIds, frontRoutes } from "shared";
 
 const adminUser = process.env.ADMIN_USER ?? "admin";
 const adminPassword = process.env.ADMIN_PASSWORD ?? "password";
@@ -31,7 +31,7 @@ export const connectToAdmin = async (page: Page) => {
   await expect(page.locator(".fr-alert--error")).not.toBeVisible();
 };
 
-export const goToAdminTab = async (page: Page, tabName: string) => {
+export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   const adminHomeSubMenuItem = page.locator(
     `#${domElementIds.header.navLinks.admin.backOffice}`,
   );
@@ -42,10 +42,17 @@ export const goToAdminTab = async (page: Page, tabName: string) => {
   await expect(adminMenuItemNavButton).toBeVisible();
   await adminMenuItemNavButton.click();
   await adminHomeSubMenuItem.click({ force: true });
-  const locator = page.locator(`.fr-tabs__tab:has-text("${tabName}")`);
-  await locator.waitFor();
-  await expect(locator).toBeVisible();
-  await locator.click({ force: true });
+  const tabLocator = page
+    .locator(".fr-tabs")
+    .locator("li")
+    .nth(getTabIndexByTabName(tabName))
+    .locator(".fr-tabs__tab");
+  await tabLocator.waitFor();
+  const tabPanelId = await tabLocator.getAttribute("id");
+  await expect(tabLocator).toBeVisible();
+  await tabLocator.click({ force: true });
+  await page.locator(`[aria-labelledby="${tabPanelId}"]`).waitFor(); // can't select by ID because of the : in the ID, but we can select by aria-labelledby
+  expect(page.url()).toContain(`${frontRoutes.admin}/${tabName}`);
 };
 
 export const openEmailInAdmin = async (
@@ -53,7 +60,7 @@ export const openEmailInAdmin = async (
   emailType: string,
   elementIndex = 0,
 ) => {
-  await goToAdminTab(page, "Notifications");
+  await goToAdminTab(page, "notifications");
   const emailSection = page
     .locator(`.fr-accordion:has-text("${emailType}")`)
     .nth(elementIndex);
@@ -72,3 +79,11 @@ export const getMagicLinkInEmailWrapper = (
     })
     .getByRole("link")
     .getAttribute("href");
+
+const getTabIndexByTabName = (tabName: AdminTab) => {
+  const index = adminTabsList.findIndex((tab) => tab === tabName);
+  if (index === -1) {
+    throw new Error(`Tab ${tabName} not found in adminTabs`);
+  }
+  return index;
+};

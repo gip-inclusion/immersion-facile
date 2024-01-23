@@ -112,7 +112,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
     // Go to admin page / go to notifications tab
     await connectToAdmin(page);
-    await goToAdminTab(page, "Notifications");
+    await goToAdminTab(page, "notifications");
     const emailWrapper = page
       .locator(".fr-accordion:has-text('EDIT_FORM_ESTABLISHMENT_LINK')")
       .first();
@@ -176,8 +176,7 @@ test.describe("Establishment creation and modification workflow", () => {
   test("deletes an establishment", async ({ page }) => {
     page.on("dialog", (dialog) => dialog.accept());
     await connectToAdmin(page);
-    await goToAdminTab(page, "Établissements");
-    await expect(page.url()).toContain(`${frontRoutes.admin}/establishments`);
+    await goToAdminTab(page, "establishments");
     const siretInputLocator = page.locator(
       `#${domElementIds.admin.manageEstablishment.siretInput}`,
     );

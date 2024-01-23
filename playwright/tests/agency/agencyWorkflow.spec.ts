@@ -23,7 +23,7 @@ test.describe("Agency workflow", () => {
   test("Rejects an agency in backoffice", async ({ page }) => {
     if (!agencyAddedId) throw new Error("agencyAddedId is null");
     await connectToAdmin(page);
-    await goToAdminTab(page, "Agences");
+    await goToAdminTab(page, "agencies");
     await page.locator(`#admin-agency-to-review-id`).click();
     await page.locator(`#admin-agency-to-review-id`).fill(agencyAddedId);
 
