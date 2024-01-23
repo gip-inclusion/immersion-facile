@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
+      - name: Install scalingo CLI
+        run: |
+          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
       - name: Login to scalingo
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Run DB seed
