@@ -5,6 +5,7 @@ export * from "./address/address.schema";
 export * from "./admin/admin.dto";
 export * from "./admin/admin.routes";
 export * from "./admin/admin.schema";
+export * from "./admin/adminTabs";
 export * from "./agency/agency";
 export * from "./agency/agency.dto";
 export * from "./agency/agency.schema";

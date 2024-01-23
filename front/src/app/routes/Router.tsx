@@ -1,5 +1,6 @@
 import React from "react";
 import { Route } from "type-route";
+import { AdminTab, adminTabsList } from "shared";
 import { PageHeader } from "react-design-system";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
@@ -32,7 +33,6 @@ import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { AssessmentPage } from "../pages/immersion-assessment/AssessmentPage";
 import { SearchResultPage } from "../pages/search/SearchResultPage";
-import { AdminTab, adminTabs } from "./routeParams/adminTabs";
 import {
   StandardPageSlugs,
   standardPageSlugs,
@@ -47,7 +47,7 @@ const getPageByRouteName: {
   addAgency: () => <AddAgencyPage />,
   adminRoot: () => <LoginForm />,
   adminTab: (route) =>
-    adminTabs.includes(route.params.tab as AdminTab) ? (
+    adminTabsList.includes(route.params.tab as AdminTab) ? (
       <AdminPrivateRoute>
         <AdminPage route={route} />
       </AdminPrivateRoute>

@@ -2,6 +2,7 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { Route } from "type-route";
+import { AdminTab } from "shared";
 import { LayoutHeader } from "src/app/components/layout/LayoutHeader";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
@@ -10,7 +11,7 @@ import { EstablishmentsTab } from "src/app/pages/admin/EstablishmentsTab";
 import { EventsTab } from "src/app/pages/admin/EventsTabs";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
-import { AdminTab, isAdminTab } from "src/app/routes/routeParams/adminTabs";
+import { isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
 
 const rawAdminTabs: Array<
