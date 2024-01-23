@@ -13,7 +13,6 @@ import {
   AgencyId,
   AgencyRight,
   AgencyRole,
-  allAgencyRoles,
   AuthenticatedUserId,
   RejectIcUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
@@ -21,100 +20,139 @@ import {
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
-const defaultRoleOnAssociation: AgencyRole = "validator";
+type SelectableAgencyRole = (typeof selectableAgencyRoles)[number];
+const selectableAgencyRoles = [
+  "counsellor",
+  "validator",
+] satisfies AgencyRole[];
 
 type IcUserAgenciesToReviewProps = {
   agenciesNeedingReviewForUser: AgencyRight[];
   selectedUserId: AuthenticatedUserId;
 };
 
-export const IcUserAgenciesToReview = ({
-  agenciesNeedingReviewForUser,
+function AgencyReviewForm({
+  agency,
+  setSelectedAgency,
   selectedUserId,
-}: IcUserAgenciesToReviewProps) => {
+}: {
+  agency: AgencyDto;
+  selectedUserId: AuthenticatedUserId;
+  setSelectedAgency: (agency: AgencyDto) => void;
+}) {
   const dispatch = useDispatch();
-  const [selectedAgency, setSelectedAgency] = useState<AgencyDto>();
+  const agencyHasNoCounsellors = agency.counsellorEmails.length === 0;
+  const agencyRefersToOtherAgency = !!agency.refersToAgencyId;
+
+  const getDefaultRole = (): SelectableAgencyRole | undefined => {
+    if (agencyRefersToOtherAgency) return "counsellor";
+    if (agencyHasNoCounsellors) return "validator";
+    return undefined;
+  };
+
+  const [selectedRole, setSelectedRole] = useState<
+    SelectableAgencyRole | undefined
+  >(getDefaultRole());
 
   const registerIcUserToAgency = (agency: AgencyDto) => {
+    if (!selectedRole) throw new Error("please select a role");
+
     dispatch(
       icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
         agencyId: agency.id,
         userId: selectedUserId,
-        role: defaultRoleOnAssociation,
+        role: selectedRole,
       }),
     );
   };
 
   return (
-    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-      {agenciesNeedingReviewForUser.map(({ agency }) => (
-        <div key={agency.id} className={fr.cx("fr-col-4")}>
-          <div className={fr.cx("fr-card")}>
-            <div className={fr.cx("fr-card__body")}>
-              <div className={fr.cx("fr-card__content")}>
-                <h3 className={fr.cx("fr-card__title")}>{agency.name}</h3>
-                <p className={fr.cx("fr-card__desc")}>
-                  {agency.address.streetNumberAndAddress}{" "}
-                  {agency.address.postcode} {agency.address.city}
-                </p>
-                <p className={fr.cx("fr-card__desc")}>
-                  <DisplayEmailList
-                    emailKind={"conseillers"}
-                    emails={agency.counsellorEmails}
-                  />
-                  <DisplayEmailList
-                    emailKind={"validateurs"}
-                    emails={agency.validatorEmails}
-                  />
-                </p>
-                <div className={fr.cx("fr-card__desc")}>
-                  <Select
-                    label="Sélectionner un rôle"
-                    disabled={true}
-                    options={[
-                      {
-                        value: "",
-                        label: "Sélectionner un rôle",
-                        disabled: true,
-                      },
-                      ...allAgencyRoles.map((roleValue) => ({
-                        value: roleValue,
-                        label: labelByRole[roleValue],
-                      })),
-                    ]}
-                    nativeSelectProps={{
-                      value: defaultRoleOnAssociation, // change to role when feature ready
-                    }}
-                  />
-                </div>
-              </div>
-              <div className={fr.cx("fr-card__footer")}>
-                <ButtonsGroup
-                  alignment="center"
-                  inlineLayoutWhen="always"
-                  buttonsSize="small"
-                  buttons={[
-                    {
-                      type: "button",
-                      priority: "primary",
-                      onClick: () => registerIcUserToAgency(agency),
-                      children: "Valider",
-                    },
-                    {
-                      type: "button",
-                      priority: "secondary",
-                      onClick: () => {
-                        setSelectedAgency(agency);
-                        openRejectIcUserRegistrationToAgencyModal();
-                      },
-                      children: "Refuser",
-                    },
-                  ]}
-                />
-              </div>
+    <div className={fr.cx("fr-col-4")}>
+      <div className={fr.cx("fr-card")}>
+        <div className={fr.cx("fr-card__body")}>
+          <div className={fr.cx("fr-card__content")}>
+            <h3 className={fr.cx("fr-card__title")}>{agency.name}</h3>
+            <p className={fr.cx("fr-card__desc")}>
+              {agency.address.streetNumberAndAddress} {agency.address.postcode}{" "}
+              {agency.address.city}
+            </p>
+            <p className={fr.cx("fr-card__desc")}>
+              <DisplayEmailList
+                emailKind={"conseillers"}
+                emails={agency.counsellorEmails}
+              />
+              <DisplayEmailList
+                emailKind={"validateurs"}
+                emails={agency.validatorEmails}
+              />
+            </p>
+            <div className={fr.cx("fr-card__desc")}>
+              <Select
+                label="Sélectionner un rôle"
+                disabled={agencyHasNoCounsellors || agencyRefersToOtherAgency}
+                options={[
+                  ...selectableAgencyRoles.map((role) => ({
+                    value: role,
+                    label: labelByRole[role],
+                  })),
+                ]}
+                nativeSelectProps={{
+                  value: selectedRole,
+                  onChange: (event) => {
+                    setSelectedRole(
+                      event.currentTarget.value as SelectableAgencyRole,
+                    );
+                  },
+                }}
+              />
             </div>
           </div>
+          <div className={fr.cx("fr-card__footer")}>
+            <ButtonsGroup
+              alignment="center"
+              inlineLayoutWhen="always"
+              buttonsSize="small"
+              buttons={[
+                {
+                  type: "button",
+                  priority: "primary",
+                  onClick: () => registerIcUserToAgency(agency),
+                  children: "Valider",
+                  disabled: !selectedRole,
+                },
+                {
+                  type: "button",
+                  priority: "secondary",
+                  onClick: () => {
+                    setSelectedAgency(agency);
+                    openRejectIcUserRegistrationToAgencyModal();
+                  },
+                  children: "Refuser",
+                },
+              ]}
+            />
+          </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+export const IcUserAgenciesToReview = ({
+  agenciesNeedingReviewForUser,
+  selectedUserId,
+}: IcUserAgenciesToReviewProps) => {
+  const [selectedAgency, setSelectedAgency] = useState<AgencyDto>();
+
+  return (
+    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+      {agenciesNeedingReviewForUser.map(({ agency }) => (
+        <AgencyReviewForm
+          key={agency.id}
+          agency={agency}
+          setSelectedAgency={setSelectedAgency}
+          selectedUserId={selectedUserId}
+        />
       ))}
       {createPortal(
         <RejectIcUserRegistrationToAgencyModal title="Refuser le rattachement">
