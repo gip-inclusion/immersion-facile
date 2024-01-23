@@ -109,7 +109,7 @@ describe("Add form establishment", () => {
         events: [
           {
             kind: "to-be-reminded",
-            occuredAt: gateways.timeGateway.now(),
+            occurredAt: gateways.timeGateway.now(),
             conventionId: "11111111-1111-4111-1111-111111111111",
           },
         ],
@@ -147,12 +147,12 @@ describe("Add form establishment", () => {
           events: [
             {
               kind: "to-be-reminded",
-              occuredAt: gateways.timeGateway.now(),
+              occurredAt: gateways.timeGateway.now(),
               conventionId: "11111111-1111-4111-1111-111111111111",
             },
             {
               kind: "registration-accepted",
-              occuredAt: gateways.timeGateway.now(),
+              occurredAt: gateways.timeGateway.now(),
             },
           ],
         },

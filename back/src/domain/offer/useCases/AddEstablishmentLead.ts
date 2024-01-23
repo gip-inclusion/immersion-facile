@@ -36,7 +36,7 @@ export class AddEstablishmentLead extends TransactionalUseCase<WithConventionDto
       events: [
         {
           conventionId: convention.id,
-          occuredAt: this.#timeGateway.now(),
+          occurredAt: this.#timeGateway.now(),
           kind: "to-be-reminded",
         },
       ],

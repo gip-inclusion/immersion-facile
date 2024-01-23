@@ -13,23 +13,22 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryEstablishmentLeadRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentLeadRepository";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
-import { UpdateEstablishmentLeadOnEstablishmentRegistered } from "./UpdateEstablishmentLeadOnEstablishmentRegistered";
+import { MarkEstablishmentLeadAsRegistrationAccepted } from "./MarkEstablishmentLeadAsRegistrationAccepted";
 
 describe("UpdateEstablishmentLeadOnEstablishmentRegistered", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
-  let updateEstablishmentLead: UpdateEstablishmentLeadOnEstablishmentRegistered;
+  let updateEstablishmentLead: MarkEstablishmentLeadAsRegistrationAccepted;
   let establishmentLeadRepository: InMemoryEstablishmentLeadRepository;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
 
-    updateEstablishmentLead =
-      new UpdateEstablishmentLeadOnEstablishmentRegistered(
-        new InMemoryUowPerformer(uow),
-        timeGateway,
-      );
+    updateEstablishmentLead = new MarkEstablishmentLeadAsRegistrationAccepted(
+      new InMemoryUowPerformer(uow),
+      timeGateway,
+    );
     establishmentLeadRepository = uow.establishmentLeadRepository;
   });
 
@@ -55,11 +54,11 @@ describe("UpdateEstablishmentLeadOnEstablishmentRegistered", () => {
         {
           conventionId: convention.id,
           kind: "to-be-reminded",
-          occuredAt: subDays(timeGateway.now(), 2),
+          occurredAt: subDays(timeGateway.now(), 2),
         },
         {
           kind: "reminder-sent",
-          occuredAt: subDays(timeGateway.now(), 1),
+          occurredAt: subDays(timeGateway.now(), 1),
           notification: { id: "my-notification-id", kind: "email" },
         },
       ],
@@ -81,16 +80,16 @@ describe("UpdateEstablishmentLeadOnEstablishmentRegistered", () => {
           {
             conventionId: convention.id,
             kind: "to-be-reminded",
-            occuredAt: subDays(timeGateway.now(), 2),
+            occurredAt: subDays(timeGateway.now(), 2),
           },
           {
             kind: "reminder-sent",
-            occuredAt: subDays(timeGateway.now(), 1),
+            occurredAt: subDays(timeGateway.now(), 1),
             notification: { id: "my-notification-id", kind: "email" },
           },
           {
             kind: "registration-accepted",
-            occuredAt: timeGateway.now(),
+            occurredAt: timeGateway.now(),
           },
         ],
       },

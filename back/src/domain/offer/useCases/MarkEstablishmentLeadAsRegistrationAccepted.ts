@@ -4,7 +4,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 
-export class UpdateEstablishmentLeadOnEstablishmentRegistered extends TransactionalUseCase<WithFormEstablishmentDto> {
+export class MarkEstablishmentLeadAsRegistrationAccepted extends TransactionalUseCase<WithFormEstablishmentDto> {
   protected inputSchema = withFormEstablishmentSchema;
 
   #timeGateway: TimeGateway;
@@ -29,7 +29,7 @@ export class UpdateEstablishmentLeadOnEstablishmentRegistered extends Transactio
       events: [
         ...alreadyExistingLead.events,
         {
-          occuredAt: this.#timeGateway.now(),
+          occurredAt: this.#timeGateway.now(),
           kind: "registration-accepted",
         },
       ],

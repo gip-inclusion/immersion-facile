@@ -610,7 +610,7 @@ describe("convention e2e", () => {
               {
                 conventionId: convention.id,
                 kind: "to-be-reminded",
-                occuredAt: gateways.timeGateway.now(),
+                occurredAt: gateways.timeGateway.now(),
               },
             ],
           },

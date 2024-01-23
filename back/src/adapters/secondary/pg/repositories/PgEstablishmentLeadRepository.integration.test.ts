@@ -42,11 +42,11 @@ describe("PgEstablishmentLeadRepository", () => {
         events: [
           {
             conventionId: "45664444-1234-4000-4444-123456789012",
-            occuredAt: subDays(now, 2),
+            occurredAt: subDays(now, 2),
             kind: "to-be-reminded",
           },
           {
-            occuredAt: now,
+            occurredAt: now,
             kind: "registration-accepted",
           },
         ],

@@ -1,5 +1,7 @@
 import {
   ConventionId,
+  ExcludeFromExisting,
+  ExtractFromExisting,
   NotificationId,
   NotificationKind,
   SiretDto,
@@ -16,21 +18,21 @@ type EstablishmentLeadEventKind = (typeof establishmentLeadEventKind)[number];
 
 export type EstablishmentLeadEvent =
   | {
-      kind: Extract<EstablishmentLeadEventKind, "to-be-reminded">;
-      occuredAt: Date;
+      kind: ExtractFromExisting<EstablishmentLeadEventKind, "to-be-reminded">;
+      occurredAt: Date;
       conventionId: ConventionId;
     }
   | {
-      kind: Extract<EstablishmentLeadEventKind, "reminder-sent">;
-      occuredAt: Date;
+      kind: ExtractFromExisting<EstablishmentLeadEventKind, "reminder-sent">;
+      occurredAt: Date;
       notification: { id: NotificationId; kind: NotificationKind };
     }
   | {
-      kind: Exclude<
+      kind: ExcludeFromExisting<
         EstablishmentLeadEventKind,
         "to-be-reminded" | "reminder-sent"
       >;
-      occuredAt: Date;
+      occurredAt: Date;
     };
 
 export type EstablishmentLead = {

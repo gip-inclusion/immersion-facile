@@ -59,11 +59,11 @@ describe("Add EstablishmentLead", () => {
         {
           conventionId: convention.id,
           kind: "to-be-reminded",
-          occuredAt: subDays(new Date(), 2),
+          occurredAt: subDays(new Date(), 2),
         },
         {
           kind: "reminder-sent",
-          occuredAt: new Date(),
+          occurredAt: new Date(),
           notification: {
             id: "1234",
             kind: "email",
@@ -96,7 +96,7 @@ describe("Add EstablishmentLead", () => {
       events: [
         {
           conventionId: convention.id,
-          occuredAt: timeGateway.now(),
+          occurredAt: timeGateway.now(),
           kind: "to-be-reminded",
         },
       ],
