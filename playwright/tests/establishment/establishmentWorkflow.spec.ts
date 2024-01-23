@@ -177,10 +177,12 @@ test.describe("Establishment creation and modification workflow", () => {
     page.on("dialog", (dialog) => dialog.accept());
     await connectToAdmin(page);
     await goToAdminTab(page, "Établissements");
-    await page.fill(
+    await expect(page.url()).toContain(`${frontRoutes.admin}/establishments`);
+    const siretInputLocator = page.locator(
       `#${domElementIds.admin.manageEstablishment.siretInput}`,
-      providedSiret,
     );
+    await siretInputLocator.waitFor();
+    await siretInputLocator.fill(providedSiret);
     await page.focus(
       `#${domElementIds.admin.manageEstablishment.searchButton}`,
     );
