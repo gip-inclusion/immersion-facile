@@ -21,7 +21,8 @@ export const contentsMapper = (
 ): Record<ManagedErrorKind, HTTPFrontErrorContents> => ({
   peConnectConnectionAborted: {
     overtitle: peConnectErrorKind,
-    title: "La connexion à Pôle Emploi Connect a été interrompue.",
+    title:
+      "La connexion à France Travail (anciennement Pôle emploi) Connect a été interrompue.",
     subtitle: "Veuillez réessayer.",
     description: ``,
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
@@ -39,7 +40,7 @@ export const contentsMapper = (
     overtitle: peConnectErrorKind,
     title: "Impossible d'identifier votre conseiller référent",
     subtitle:
-      "Les données retournées par Pôle Emploi ne permettent pas d'identifier le conseiller référent qui vous est dédié.",
+      "Les données retournées par France Travail (anciennement Pôle emploi) ne permettent pas d'identifier le conseiller référent qui vous est dédié.",
     description: ``,
     buttons: [
       redirectToConventionWithoutIdentityProvider(
@@ -53,7 +54,7 @@ export const contentsMapper = (
     title:
       "Les données retournées par Pôle Emploi Connect ne permettent pas de vous identifier.",
     subtitle:
-      "Les données retournées par Pôle Emploi ne permettent pas de vous identifier.",
+      "Les données retournées par France Travail (anciennement Pôle emploi) ne permettent pas de vous identifier.",
     description: ``,
     buttons: [
       redirectToConventionWithoutIdentityProvider(
@@ -66,7 +67,7 @@ export const contentsMapper = (
     overtitle: peConnectErrorKind,
     title: "Pôle Emploi Connect - Identifiants invalides",
     subtitle:
-      "Le code d'autorisation retourné par Pôle Emploi ne permet pas d'avoir accès aux droits nécessaires pour lier votre compte.",
+      "Le code d'autorisation retourné par France Travail (anciennement Pôle emploi) ne permet pas d'avoir accès aux droits nécessaires pour lier votre compte.",
     description: ``,
     buttons: [
       redirectToConventionWithoutIdentityProvider(
@@ -159,7 +160,7 @@ const redirectToConventionWithoutIdentityProvider = (
 ): ErrorButton => ({
   kind: "primary",
   label:
-    "Vous pouvez quand même remplir votre demande de convention en indiquant l'agence Pole Emploi à laquelle vous êtes rattaché ici.",
+    "Vous pouvez quand même remplir votre demande de convention en indiquant l'agence France Travail à laquelle vous êtes rattaché ici.",
   onClick,
 });
 const contactUsButtonContent: ErrorButton = {
@@ -170,4 +171,4 @@ const contactUsButtonContent: ErrorButton = {
 };
 const httpClientErrorKind = "Erreur Http Client";
 const peConnectErrorKind = "Erreur Pôle Emploi Connect";
-const peTechnicalTeamForwardDescription = `Nous travaillons activement à la résolution de ce problème avec le service technique Pôle Emploi.`;
+const peTechnicalTeamForwardDescription = `Nous travaillons activement à la résolution de ce problème avec le service technique France Travail (anciennement Pôle emploi).`;

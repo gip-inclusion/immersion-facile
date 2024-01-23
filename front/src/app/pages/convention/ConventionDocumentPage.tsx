@@ -303,7 +303,8 @@ export const ConventionDocumentPage = ({
               "peConnect" &&
               convention.signatories.beneficiary.federatedIdentity?.payload && (
                 <li>
-                  conseiller Pôle emploi référent :{" "}
+                  conseiller France Travail (anciennement Pôle emploi) référent
+                  :{" "}
                   <strong>
                     {
                       convention.signatories.beneficiary.federatedIdentity

@@ -134,7 +134,7 @@ export const emailTemplatesByName =
     },
     POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
       niceName:
-        "Convention - Nouvelle convention à traiter par le conseiller PE lié",
+        "Convention - Nouvelle convention à traiter par le conseiller France Travail lié",
       tags: [],
       createEmailVariables: ({
         advisorFirstName,
@@ -309,7 +309,7 @@ export const emailTemplatesByName =
     },
     POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
       niceName:
-        "Convention - Entièrement signée à traiter par le conseiller PE lié",
+        "Convention - Entièrement signée à traiter par le conseiller France Travail lié",
       tags: ["immersion à étudier (mail conseiller)"],
       createEmailVariables: ({
         advisorFirstName,

@@ -223,7 +223,7 @@ export const AgencySelector = ({
           label={agencyKindField.label}
           hint={
             shouldLockToPeAgencies
-              ? "Cette convention a été initié par un utilisateur connecté via PE Connect, vous ne pouvez choisir qu'une agence de rattachement de type Pole emploi"
+              ? "Cette convention a été initié par un utilisateur connecté via PE Connect, vous ne pouvez choisir qu'une agence de rattachement de type France Travail (anciennement Pôle emploi)"
               : agencyKindField.hintText
           }
           options={agencyKindOptions}

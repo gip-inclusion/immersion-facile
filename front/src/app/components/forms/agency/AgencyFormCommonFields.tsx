@@ -192,8 +192,8 @@ export const AgencyFormCommonFields = ({
 
 const agencyErrorMessage = (
   <span>
-    Attention, toutes les agences Pôle emploi ont déjà été ajoutées par notre
-    équipe sur Immersion.{" "}
+    Attention, toutes les agences France Travail ont déjà été ajoutées par notre
+    équipe sur Immersion Facilitée.{" "}
     <LinkHome {...routes.agencyDashboard().link}>
       Accéder à votre espace prescripteur.
     </LinkHome>

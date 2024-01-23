@@ -25,7 +25,7 @@ export const InitiateConventionSection = ({
           desc={
             <>
               Je suis <strong>une entreprise</strong>,{" "}
-              <strong>un candidat</strong> sans identifiants Pôle emploi,{" "}
+              <strong>un candidat</strong> sans identifiants France Travail,{" "}
               <strong>un conseiller accompagnant un candidat</strong>.
             </>
           }
@@ -37,7 +37,7 @@ export const InitiateConventionSection = ({
             id: domElementIds.conventionImmersionRoute.showFormButton,
           }}
           size="medium"
-          title="Je remplis une convention sans identifiants Pôle emploi"
+          title="Je remplis une convention sans identifiants France Travail (anciennement Pôle emploi)"
           titleAs="h2"
         />
       </div>
@@ -48,8 +48,8 @@ export const InitiateConventionSection = ({
           border
           desc={
             <>
-              Je suis <strong>un candidat inscrit à Pôle emploi</strong>. Je me
-              connecte avec Pôle emploi pour accélérer les démarches.
+              Je suis <strong>un candidat inscrit à France Travail</strong>. Je
+              me connecte avec France Travail pour accélérer les démarches.
             </>
           }
           enlargeLink
@@ -59,7 +59,7 @@ export const InitiateConventionSection = ({
             href: `/api/${loginPeConnect}`,
           }}
           size="medium"
-          title="Je remplis une convention avec mes identifiants Pôle emploi"
+          title="Je remplis une convention avec mes identifiants France Travail (anciennement Pôle emploi)"
           titleAs="h2"
         />
       </div>
