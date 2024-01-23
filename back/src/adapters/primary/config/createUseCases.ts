@@ -91,6 +91,7 @@ import { EditFormEstablishment } from "../../../domain/offer/useCases/EditFormEs
 import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupBySlug";
 import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
+import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../../domain/offer/useCases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/offer/useCases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/offer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -98,7 +99,6 @@ import { RequestEditFormEstablishment } from "../../../domain/offer/useCases/Req
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/offer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/offer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
-import { UpdateEstablishmentLeadOnEstablishmentRegistered } from "../../../domain/offer/useCases/UpdateEstablishmentLeadOnEstablishmentRegistered";
 import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/useCases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
@@ -326,8 +326,8 @@ export const createUseCases = (
         uowPerformer,
         gateways.timeGateway,
       ),
-      updateEstablishmentLeadOnEstablishmentRegistered:
-        new UpdateEstablishmentLeadOnEstablishmentRegistered(
+      markEstablishmentLeadAsRegistrationAccepted:
+        new MarkEstablishmentLeadAsRegistrationAccepted(
           uowPerformer,
           gateways.timeGateway,
         ),
