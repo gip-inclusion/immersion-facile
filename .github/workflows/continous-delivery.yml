@@ -50,7 +50,7 @@ jobs:
       environment: dev
       tag: "v${{ github.run_number }}"
     secrets:
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
 
   deploy-staging:
     name: Deploy staging

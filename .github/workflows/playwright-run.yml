@@ -2,7 +2,7 @@ name: Run Playwright on dev
 on:
   workflow_call:
     secrets:
-      DISCORD_WEBHOOK_URL:
+      SCALINGO_API_TOKEN:
         required: true
     inputs:
       tag:
@@ -17,11 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: Send Discord notification
-        run: |
-          curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "Les tests Playwright sont lancés, le report est dispo dans les logs de l’action Github"
-          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: Login to scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
+      - name: Run DB seed
+        run: scalingo --app if-dev-back run pnpm db:seed
       - name: Checkout
         uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
