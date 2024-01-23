@@ -24,18 +24,18 @@ export type CreateAgencyDto = {
   position: GeoPositionDto;
   counsellorEmails: Email[];
   validatorEmails: Email[];
-  questionnaireUrl?: AbsoluteUrl;
+  questionnaireUrl: AbsoluteUrl | null;
   agencySiret: SiretDto;
-  logoUrl?: AbsoluteUrl;
+  logoUrl: AbsoluteUrl | null;
   signature: string;
-  refersToAgencyId?: AgencyId;
+  refersToAgencyId: AgencyId | null;
 };
 
 export type AgencyDtoSensitiveFields = {
   adminEmails: Email[];
   status: AgencyStatus;
-  codeSafir?: string;
-  rejectionJustification?: string;
+  codeSafir: string | null;
+  rejectionJustification: string | null;
 };
 
 export type WithAgencyDto = {
@@ -121,12 +121,6 @@ export type ListAgenciesRequestDto = Omit<GetAgenciesFilter, "position">;
 
 export type PrivateListAgenciesRequestDto = {
   status?: AgencyStatus;
-};
-
-// TODO Rename into UpdateAgencyRequestStatusDto ?
-export type UpdateAgencyRequestDto = Partial<Pick<AgencyDto, "status">> & {
-  // | "name" | "logoUrl" | "address" (coming soon.)
-  id: AgencyId;
 };
 
 export type WithAgencyStatus = { status: AgencyStatus };

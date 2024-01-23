@@ -113,7 +113,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
         ...values,
         kind: values.kind,
         questionnaireUrl:
-          values.kind === "pole-emploi" ? undefined : values.questionnaireUrl,
+          values.kind === "pole-emploi" ? null : values.questionnaireUrl,
       })
       .then(() => {
         setSubmitFeedback({ kind: "agencyAdded" });
@@ -233,8 +233,9 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   },
   counsellorEmails: [],
   validatorEmails: [],
-  questionnaireUrl: undefined,
-  logoUrl: undefined,
+  questionnaireUrl: null,
+  logoUrl: null,
   signature: "",
   agencySiret: "",
+  refersToAgencyId: null,
 });

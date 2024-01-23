@@ -32,11 +32,9 @@ import {
   cast,
   executeKyselyRawSqlQuery,
   jsonBuildObject,
-  jsonStripNulls,
   KyselyDb,
 } from "../kysely/kyselyUtils";
 import { Database } from "../kysely/model/database";
-import { optional } from "../pgUtils";
 
 const logger = createLogger(__filename);
 
@@ -61,6 +59,7 @@ type AgencyColumns =
   | "status"
   | "street_number_and_address"
   | "validator_emails"
+  | "refers_to_agency_id"
   | "rejection_justification";
 
 type PersistenceAgency = Record<AgencyColumns, any>;
@@ -191,7 +190,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
       this.transaction,
       `SELECT id, name, status, kind, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
-        street_number_and_address, post_code, city, department_code
+        street_number_and_address, post_code, city, department_code, refers_to_agency_id, rejection_justification
        FROM public.agencies
        WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
       [email],
@@ -323,38 +322,36 @@ export class PgAgencyRepository implements AgencyRepository {
 
   #getAgencyWithJsonBuiltQueryBuilder = () =>
     this.transaction.selectFrom("agencies as a").select(({ ref }) => [
-      jsonStripNulls(
-        jsonBuildObject({
-          id: cast<AgencyId>(ref("a.id")),
-          name: ref("a.name"),
-          status: cast<AgencyStatus>(ref("a.status")),
-          kind: cast<AgencyKind>(ref("a.kind")),
-          counsellorEmails: sql<Email[]>`${ref("a.counsellor_emails")}`,
-          validatorEmails: sql<Email[]>`${ref("a.validator_emails")}`,
-          questionnaireUrl: sql<AbsoluteUrl>`${ref("a.questionnaire_url")}`,
-          logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
-          position: jsonBuildObject({
-            lat: sql<number>`(ST_AsGeoJSON(${ref(
-              "a.position",
-            )})::json->'coordinates'->>1)::numeric`,
-            lon: sql<number>`(ST_AsGeoJSON(${ref(
-              "a.position",
-            )})::json->'coordinates'->>0)::numeric`,
-          }),
-          address: jsonBuildObject({
-            streetNumberAndAddress: ref("a.street_number_and_address"),
-            postcode: ref("a.post_code"),
-            city: ref("a.city"),
-            departmentCode: ref("a.department_code"),
-          }),
-          agencySiret: ref("a.agency_siret"),
-          codeSafir: ref("a.code_safir"),
-          adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
-          signature: ref("a.email_signature"),
-          refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
-          rejectionJustification: ref("a.rejection_justification"),
+      jsonBuildObject({
+        id: cast<AgencyId>(ref("a.id")),
+        name: ref("a.name"),
+        status: cast<AgencyStatus>(ref("a.status")),
+        kind: cast<AgencyKind>(ref("a.kind")),
+        counsellorEmails: sql<Email[]>`${ref("a.counsellor_emails")}`,
+        validatorEmails: sql<Email[]>`${ref("a.validator_emails")}`,
+        questionnaireUrl: sql<AbsoluteUrl>`${ref("a.questionnaire_url")}`,
+        logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
+        position: jsonBuildObject({
+          lat: sql<number>`(ST_AsGeoJSON(${ref(
+            "a.position",
+          )})::json->'coordinates'->>1)::numeric`,
+          lon: sql<number>`(ST_AsGeoJSON(${ref(
+            "a.position",
+          )})::json->'coordinates'->>0)::numeric`,
         }),
-      ).as("agency"),
+        address: jsonBuildObject({
+          streetNumberAndAddress: ref("a.street_number_and_address"),
+          postcode: ref("a.post_code"),
+          city: ref("a.city"),
+          departmentCode: ref("a.department_code"),
+        }),
+        agencySiret: ref("a.agency_siret"),
+        codeSafir: ref("a.code_safir"),
+        adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
+        signature: ref("a.email_signature"),
+        refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
+        rejectionJustification: ref("a.rejection_justification"),
+      }).as("agency"),
     ]);
 }
 
@@ -372,19 +369,20 @@ const persistenceAgencyToAgencyDto = (params: PersistenceAgency): AgencyDto =>
         city: params.city,
       },
       adminEmails: params.admin_emails,
-      agencySiret: optional(params.agency_siret),
-      codeSafir: optional(params.code_safir),
+      agencySiret: params.agency_siret,
+      codeSafir: params.code_safir,
       counsellorEmails: params.counsellor_emails,
       id: params.id,
       kind: params.kind,
-      logoUrl: optional(params.logo_url),
+      logoUrl: params.logo_url,
       name: params.name,
       position: parseGeoJson(params.position),
       questionnaireUrl: params.questionnaire_url,
       signature: params.email_signature,
       status: params.status,
       validatorEmails: params.validator_emails,
-      rejectionJustification: optional(params.rejection_justification),
+      rejectionJustification: params.rejection_justification,
+      refersToAgencyId: params.refers_to_agency_id,
     },
     logger,
   );

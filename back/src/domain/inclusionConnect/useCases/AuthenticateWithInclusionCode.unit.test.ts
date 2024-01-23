@@ -193,7 +193,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
       const peSpecificIcIdTokenPayload: InclusionConnectIdTokenPayload = {
         ...defaultExpectedIcIdTokenPayload,
-        structure_pe: agency.codeSafir,
+        structure_pe: agency.codeSafir ?? undefined,
       };
 
       it("add agency right to IC user when Pe structure code is provided by IC and user has no rights on agency", async () => {

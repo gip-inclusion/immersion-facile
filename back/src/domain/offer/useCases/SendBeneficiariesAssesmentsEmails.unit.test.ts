@@ -85,7 +85,8 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
             agencyValidatorEmail: expectedAgency.validatorEmails[0],
             businessName: conventionEndingTomorrow.businessName,
             internshipKind: conventionEndingTomorrow.internshipKind,
-            agencyAssessmentDocumentLink: expectedAgency.questionnaireUrl,
+            agencyAssessmentDocumentLink:
+              expectedAgency.questionnaireUrl ?? undefined,
           },
           recipients: [conventionEndingTomorrow.signatories.beneficiary.email],
           sender: {

@@ -141,20 +141,19 @@ describe(`Agency routes`, () => {
             },
             agencySiret: "12345678904444",
             signature: "empty-signature",
-            refersToAgency: undefined,
+            refersToAgency: null,
+            logoUrl: null,
           },
         });
       });
 
       it("Returns agency public info without refersToAgency", async () => {
-        const { refersToAgencyId, ...agencyWithoutRefersTo } =
-          agency1ActiveNearBy;
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agencyWithoutRefersTo);
+        await inMemoryUow.agencyRepository.insert(agency1ActiveNearBy);
 
         // Act and assert
         const response = await httpClient.getAgencyPublicInfoById({
-          queryParams: { agencyId: agencyWithoutRefersTo.id },
+          queryParams: { agencyId: agency1ActiveNearBy.id },
         });
         expectHttpResponseToEqual(response, {
           status: 200,
@@ -174,6 +173,8 @@ describe(`Agency routes`, () => {
             },
             agencySiret: "12345678904444",
             signature: "empty-signature",
+            logoUrl: null,
+            refersToAgency: null,
           },
         });
       });
@@ -198,7 +199,8 @@ describe(`Agency routes`, () => {
         questionnaireUrl: "https://www.myUrl.com",
         signature: "Super signature of the agency",
         agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
-        refersToAgencyId: undefined,
+        refersToAgencyId: null,
+        logoUrl: null,
       };
 
       it("200 - support posting valid agency", async () => {
@@ -222,6 +224,9 @@ describe(`Agency routes`, () => {
             questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
             adminEmails: [],
             status: "needsReview",
+            refersToAgencyId: null,
+            codeSafir: null,
+            rejectionJustification: null,
           },
         ]);
       });

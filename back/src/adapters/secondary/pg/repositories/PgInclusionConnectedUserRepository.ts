@@ -74,6 +74,8 @@ export class PgInclusionConnectedUserRepository
             'lon', ST_X(ST_AsText(agencies.position)::geometry)
           ),
           'questionnaireUrl', agencies.questionnaire_url,
+          'refersToAgencyId', agencies.refers_to_agency_id,
+          'rejectionJustification', agencies.rejection_justification,
           'signature', agencies.email_signature,
           'status', agencies.status,
           'validatorEmails', agencies.validator_emails
@@ -92,7 +94,7 @@ export class PgInclusionConnectedUserRepository
     const response = await executeKyselyRawSqlQuery(
       this.transaction,
       `
-      SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+      SELECT JSON_BUILD_OBJECT(
         'id', authenticated_users.id,
         'email', authenticated_users.email,
         'firstName', authenticated_users.first_name,
@@ -102,7 +104,7 @@ export class PgInclusionConnectedUserRepository
               WHEN ${agencyRightsJsonAgg} = '[null]' THEN '[]' 
               ELSE ${agencyRightsJsonAgg} 
             END 
-        )) as inclusion_user
+        ) as inclusion_user
       FROM authenticated_users
       LEFT JOIN users__agencies ON authenticated_users.id = users__agencies.user_id
       LEFT JOIN agencies ON users__agencies.agency_id = agencies.id

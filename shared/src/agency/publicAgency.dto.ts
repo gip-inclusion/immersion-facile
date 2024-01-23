@@ -13,7 +13,7 @@ export type AgencyPublicDisplayDtoWithoutRefersToAgency = Pick<
 >;
 
 export type WithOptionalRefersToAgency = {
-  refersToAgency?: AgencyPublicDisplayDtoWithoutRefersToAgency;
+  refersToAgency: AgencyPublicDisplayDtoWithoutRefersToAgency | null;
 };
 
 export type AgencyPublicDisplayDto =

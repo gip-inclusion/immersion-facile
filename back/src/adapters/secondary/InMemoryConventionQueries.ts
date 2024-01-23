@@ -150,10 +150,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
-      agencyRefersTo: referedAgency && {
-        id: referedAgency.id,
-        name: referedAgency.name,
-      },
+      agencyRefersTo: referedAgency
+        ? {
+            id: referedAgency.id,
+            name: referedAgency.name,
+          }
+        : undefined,
     };
   };
 }

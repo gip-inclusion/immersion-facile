@@ -81,9 +81,9 @@ const commonAgencyShape = {
   validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
-  questionnaireUrl: absoluteUrlSchema.optional(),
+  questionnaireUrl: absoluteUrlSchema.or(z.null()),
   signature: stringWithMaxLength255,
-  logoUrl: absoluteUrlSchema.optional(),
+  logoUrl: absoluteUrlSchema.or(z.null()),
   agencySiret: siretSchema,
 };
 
@@ -91,7 +91,7 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
   .object(commonAgencyShape)
   .and(
     z.object({
-      refersToAgencyId: refersToAgencyIdSchema.optional(),
+      refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
     }),
   )
   .superRefine((createAgency, context) => {
@@ -114,10 +114,12 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
   .object(commonAgencyShape)
   .and(
     z.object({
-      questionnaireUrl: absoluteUrlSchema.optional(),
+      questionnaireUrl: absoluteUrlSchema.or(z.null()),
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringPossiblyEmpty,
+      refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+      rejectionJustification: zStringMinLength1.or(z.null()),
     }),
   );
 
@@ -126,16 +128,12 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
   .merge(
     z.object({
       agencySiret: siretSchema,
-    }),
-  )
-  .and(
-    z.object({
-      questionnaireUrl: absoluteUrlSchema.optional(),
+      questionnaireUrl: absoluteUrlSchema.or(z.null()),
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
-      codeSafir: zStringPossiblyEmpty,
-      refersToAgencyId: refersToAgencyIdSchema.optional(),
-      rejectionJustification: z.string().optional(),
+      codeSafir: zStringMinLength1.or(z.null()),
+      refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+      rejectionJustification: z.string().or(z.null()),
     }),
   );
 

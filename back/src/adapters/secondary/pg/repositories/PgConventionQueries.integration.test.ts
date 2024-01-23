@@ -780,9 +780,7 @@ describe("Pg implementation of ConventionQueries", () => {
       })
       .withAgencySiret(agencySiret)
       .withKind(agencyKind)
-      .withRefersToAgencyId(
-        withRefersToAgency ? withRefersToAgency.id : undefined,
-      )
+      .withRefersToAgencyId(withRefersToAgency ? withRefersToAgency.id : null)
       .build();
 
     if (withRefersToAgency) await agencyRepo.insert(withRefersToAgency);

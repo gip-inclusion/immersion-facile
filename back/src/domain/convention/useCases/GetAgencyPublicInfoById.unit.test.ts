@@ -45,6 +45,7 @@ describe("GetAgencyPublicInfoById", () => {
           position: agency.position,
           address: agency.address,
           agencySiret: agency.agencySiret,
+          logoUrl: agency.logoUrl,
         },
         logoUrl: agency2.logoUrl,
       };
@@ -67,6 +68,7 @@ describe("GetAgencyPublicInfoById", () => {
         address: agency.address,
         agencySiret: agency.agencySiret,
         logoUrl: agency.logoUrl,
+        refersToAgency: null,
       };
 
       expectToEqual(

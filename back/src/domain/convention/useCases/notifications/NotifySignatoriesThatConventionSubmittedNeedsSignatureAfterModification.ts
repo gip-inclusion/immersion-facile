@@ -94,7 +94,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
       kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
       recipients: [signatory.email],
       params: {
-        agencyLogoUrl: agency.logoUrl,
+        agencyLogoUrl: agency.logoUrl ?? undefined,
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         businessName: convention.businessName,

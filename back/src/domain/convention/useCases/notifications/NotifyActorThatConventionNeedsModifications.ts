@@ -123,7 +123,7 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
         conventionStatusLink: await makeShortMagicLink(
           frontRoutes.conventionStatusDashboard,
         ),
-        agencyLogoUrl: agency.logoUrl,
+        agencyLogoUrl: agency.logoUrl ?? undefined,
         requesterName,
       },
     };

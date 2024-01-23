@@ -80,7 +80,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     return {
       kind: "SIGNEE_HAS_SIGNED_CONVENTION",
       params: {
-        agencyLogoUrl: agency.logoUrl,
+        agencyLogoUrl: agency.logoUrl ?? undefined,
         internshipKind: convention.internshipKind,
         conventionId: convention.id,
         signedAt: lastSignee.signedAt,

@@ -146,7 +146,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
           frontRoutes.conventionStatusDashboard,
         ),
         businessName,
-        agencyLogoUrl: agency.logoUrl,
+        agencyLogoUrl: agency.logoUrl ?? undefined,
       },
     };
   }

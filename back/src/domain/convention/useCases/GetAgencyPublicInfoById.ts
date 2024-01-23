@@ -27,6 +27,9 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
     const referedAgency =
       agencyDto.refersToAgencyId &&
       (await uow.agencyRepository.getById(agencyDto.refersToAgencyId));
-    return toAgencyPublicDisplayDto(agencyDto, referedAgency);
+    return toAgencyPublicDisplayDto(
+      agencyDto,
+      referedAgency ? referedAgency : null,
+    );
   }
 }

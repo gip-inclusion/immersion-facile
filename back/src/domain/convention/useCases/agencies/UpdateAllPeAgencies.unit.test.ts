@@ -61,7 +61,10 @@ describe("UpdateAllPeAgencies use case", () => {
         codeSafir: "63019",
         kind: "pole-emploi",
         status: "from-api-PE",
-        refersToAgencyId: undefined,
+        refersToAgencyId: null,
+        logoUrl: null,
+        questionnaireUrl: null,
+        rejectionJustification: null,
       },
     ]);
   });
@@ -91,7 +94,10 @@ describe("UpdateAllPeAgencies use case", () => {
         kind: "pole-emploi",
         status: "active",
         agencySiret: "12345678904444",
-        refersToAgencyId: undefined,
+        refersToAgencyId: null,
+        logoUrl: null,
+        rejectionJustification: null,
+        codeSafir: null,
       };
 
       agencyRepository.setAgencies([initialAgency]);
@@ -137,7 +143,10 @@ describe("UpdateAllPeAgencies use case", () => {
         kind: "pole-emploi",
         status: "active",
         agencySiret: "12345678904444",
-        refersToAgencyId: undefined,
+        refersToAgencyId: null,
+        logoUrl: null,
+        rejectionJustification: null,
+        codeSafir: null,
       };
 
       agencyRepository.setAgencies([initialAgency]);
@@ -178,7 +187,10 @@ describe("UpdateAllPeAgencies use case", () => {
         kind: "pole-emploi",
         status: "active",
         agencySiret: "12345678904444",
-        refersToAgencyId: undefined,
+        refersToAgencyId: null,
+        logoUrl: null,
+        rejectionJustification: null,
+        codeSafir: "",
       };
 
       agencyRepository.setAgencies([initialAgency]);
@@ -222,7 +234,10 @@ describe("UpdateAllPeAgencies use case", () => {
       kind: "mission-locale",
       status: "active",
       agencySiret: "12345678904444",
-      refersToAgencyId: undefined,
+      refersToAgencyId: null,
+      logoUrl: null,
+      rejectionJustification: null,
+      codeSafir: "",
     };
 
     agencyRepository.setAgencies([initialAgency]);
@@ -248,6 +263,10 @@ describe("UpdateAllPeAgencies use case", () => {
         codeSafir: "63019",
         kind: "pole-emploi",
         status: "from-api-PE",
+        logoUrl: null,
+        questionnaireUrl: null,
+        refersToAgencyId: null,
+        rejectionJustification: null,
       },
     ]);
   });

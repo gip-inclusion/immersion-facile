@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -20,12 +21,14 @@ export const agencyPublicDisplayDtoWithoutRefersToAgencySchema: z.Schema<AgencyP
     position: geoPositionSchema,
     signature: stringWithMaxLength255,
     agencySiret: siretSchema,
+    logoUrl: absoluteUrlSchema.or(z.null()),
   });
 
 export const withOptionalRefersToAgencySchema: z.Schema<WithOptionalRefersToAgency> =
   z.object({
-    refersToAgency:
-      agencyPublicDisplayDtoWithoutRefersToAgencySchema.optional(),
+    refersToAgency: agencyPublicDisplayDtoWithoutRefersToAgencySchema.or(
+      z.null(),
+    ),
   });
 
 export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =

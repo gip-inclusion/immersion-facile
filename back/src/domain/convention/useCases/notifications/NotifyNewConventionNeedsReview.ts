@@ -109,7 +109,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
           kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [recipientEmail],
           params: {
-            agencyLogoUrl: agency.logoUrl,
+            agencyLogoUrl: agency.logoUrl ?? undefined,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,

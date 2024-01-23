@@ -128,7 +128,7 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
         ),
         conventionStatusLink: makeShortLinkUrl(config, conventionStatusLinkId),
         businessName,
-        agencyLogoUrl: agency.logoUrl,
+        agencyLogoUrl: agency.logoUrl ?? undefined,
       },
     });
   };
@@ -161,12 +161,12 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
           convention.signatories.beneficiaryRepresentative,
         beneficiary: convention.signatories.beneficiary,
       }),
-      agencyLogoUrl: agency.logoUrl,
+      agencyLogoUrl: agency.logoUrl ?? undefined,
       magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
       validatorName: convention.validators?.agencyValidator
         ? concatValidatorNames(convention.validators?.agencyValidator)
         : "",
-      agencyAssessmentDocumentLink: agency.questionnaireUrl,
+      agencyAssessmentDocumentLink: agency.questionnaireUrl ?? undefined,
       agencyValidatorEmail: agency.validatorEmails[0],
     },
   });
@@ -190,7 +190,7 @@ export const expectNotifyConventionRejected = (
       rejectionReason: convention.statusJustification || "",
       signature: agency.signature,
       immersionProfession: convention.immersionAppellation.appellationLabel,
-      agencyLogoUrl: agency.logoUrl,
+      agencyLogoUrl: agency.logoUrl ?? undefined,
     },
   });
 };
@@ -213,7 +213,7 @@ export const expectNotifyConventionCancelled = (
       businessName: convention.businessName,
       signature: agency.signature,
       immersionProfession: convention.immersionAppellation.appellationLabel,
-      agencyLogoUrl: agency.logoUrl,
+      agencyLogoUrl: agency.logoUrl ?? undefined,
       dateStart: convention.dateStart,
       dateEnd: convention.dateEnd,
       justification: convention.statusJustification || "non renseigné",

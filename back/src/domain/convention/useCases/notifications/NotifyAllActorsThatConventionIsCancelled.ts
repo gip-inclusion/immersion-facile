@@ -48,7 +48,7 @@ export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCa
           businessName: convention.businessName,
           signature: agency.signature,
           immersionProfession: convention.immersionAppellation.appellationLabel,
-          agencyLogoUrl: agency.logoUrl,
+          agencyLogoUrl: agency.logoUrl ?? undefined,
           dateEnd: convention.dateEnd,
           dateStart: convention.dateStart,
           justification: convention.statusJustification || "non renseigné",

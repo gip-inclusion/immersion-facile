@@ -44,7 +44,10 @@ const testAgencies: AgencyDto[] = [
       lon: 114.189505,
     },
     logoUrl: "http://LOGO AGENCY IF URL",
-    refersToAgencyId: undefined,
+    refersToAgencyId: null,
+    questionnaireUrl: null,
+    codeSafir: null,
+    rejectionJustification: null,
   },
   {
     id: "test-agency-1-back",
@@ -68,7 +71,9 @@ const testAgencies: AgencyDto[] = [
       lon: 2,
     },
     logoUrl: "http://LOGO AGENCY 1 URL",
-    refersToAgencyId: undefined,
+    refersToAgencyId: null,
+    codeSafir: null,
+    rejectionJustification: null,
   },
   {
     id: "test-agency-2-back",
@@ -92,7 +97,9 @@ const testAgencies: AgencyDto[] = [
       lon: 50,
     },
     logoUrl: "http://LOGO AGENCY 2 URL",
-    refersToAgencyId: undefined,
+    refersToAgencyId: null,
+    rejectionJustification: null,
+    codeSafir: null,
   },
   {
     id: "test-agency-3-back",
@@ -116,7 +123,9 @@ const testAgencies: AgencyDto[] = [
       lon: 89.9999,
     },
     logoUrl: "http://LOGO AGENCY 3 URL",
-    refersToAgencyId: undefined,
+    refersToAgencyId: null,
+    codeSafir: null,
+    rejectionJustification: null,
   },
   {
     id: "test-agency-4-back-with-refers-to",
@@ -141,6 +150,8 @@ const testAgencies: AgencyDto[] = [
     },
     logoUrl: "http://LOGO AGENCY 4 URL",
     refersToAgencyId: "test-agency-3-back",
+    rejectionJustification: null,
+    codeSafir: null,
   },
   {
     id: "test-agency-5-back-with-refers-to",
@@ -165,6 +176,8 @@ const testAgencies: AgencyDto[] = [
     },
     logoUrl: "http://LOGO AGENCY 5 URL",
     refersToAgencyId: "test-agency-1-back",
+    rejectionJustification: null,
+    codeSafir: null,
   },
 ];
 

@@ -118,7 +118,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
               email: advisor.email,
               now: timeGateway.now(),
             }),
-            agencyLogoUrl: agency.logoUrl,
+            agencyLogoUrl: agency.logoUrl ?? undefined,
           },
         },
       ],

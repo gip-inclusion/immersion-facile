@@ -114,7 +114,7 @@ describe("Query: List agencies by filter", () => {
       expectToEqual(
         await useCase.execute({ kind: "withoutRefersToAgency" }, undefined),
         allAgencies
-          .filter((agency) => agency.refersToAgencyId === undefined)
+          .filter((agency) => agency.refersToAgencyId === null)
           .map(toAgencyOption),
       );
     });

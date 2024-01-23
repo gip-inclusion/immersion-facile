@@ -37,7 +37,7 @@ export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAge
         recipients: agency.validatorEmails,
         params: {
           agencyName: agency.name,
-          agencyLogoUrl: agency.logoUrl,
+          agencyLogoUrl: agency.logoUrl ?? undefined,
           ...refersToOtherAgencyParams,
         },
       },

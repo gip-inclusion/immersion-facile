@@ -3,7 +3,7 @@ import { AgencyPublicDisplayDto } from "./publicAgency.dto";
 
 export const toAgencyPublicDisplayDto = (
   agency: AgencyDto,
-  referedAgency: AgencyDto | undefined,
+  referedAgency: AgencyDto | null,
 ): AgencyPublicDisplayDto => {
   if (
     agency.refersToAgencyId &&
@@ -35,6 +35,6 @@ export const toAgencyPublicDisplayDto = (
             agencySiret: referedAgency.agencySiret,
             logoUrl: referedAgency.logoUrl,
           }
-        : undefined,
+        : null,
   };
 };

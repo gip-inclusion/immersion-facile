@@ -47,7 +47,7 @@ describe("AddAgency use case", () => {
     signature: "Super signature of the agency",
     logoUrl: "https://www.myUrl.com",
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
-    refersToAgencyId: undefined,
+    refersToAgencyId: null,
   };
 
   const createAgencyWithRefersToParams: CreateAgencyDto = {
@@ -66,6 +66,8 @@ describe("AddAgency use case", () => {
     signature: "Super signature of the agency bis",
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: createParisMissionLocaleParams.id,
+    questionnaireUrl: null,
+    logoUrl: null,
   };
 
   let uow: InMemoryUnitOfWork;
@@ -99,6 +101,8 @@ describe("AddAgency use case", () => {
           adminEmails: [],
           status: "needsReview",
           questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl!,
+          rejectionJustification: null,
+          codeSafir: null,
         },
       ]);
     });
@@ -116,6 +120,8 @@ describe("AddAgency use case", () => {
                 createParisMissionLocaleParams.questionnaireUrl!,
               adminEmails: [],
               status: "needsReview",
+              rejectionJustification: null,
+              codeSafir: null,
             },
           },
         }),
@@ -135,6 +141,8 @@ describe("AddAgency use case", () => {
           ...poleEmploiParis,
           adminEmails: [],
           status: "needsReview",
+          codeSafir: null,
+          rejectionJustification: null,
         },
       ]);
     });
@@ -145,6 +153,8 @@ describe("AddAgency use case", () => {
         adminEmails: [],
         status: "needsReview",
         questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl!,
+        codeSafir: null,
+        rejectionJustification: null,
       };
       uow.agencyRepository.setAgencies([miloAgency]);
 
@@ -157,6 +167,8 @@ describe("AddAgency use case", () => {
           validatorEmails: miloAgency.validatorEmails,
           adminEmails: [],
           status: "needsReview",
+          codeSafir: null,
+          rejectionJustification: null,
         },
       ]);
     });

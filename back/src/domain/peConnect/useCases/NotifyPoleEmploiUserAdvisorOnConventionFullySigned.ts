@@ -51,7 +51,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
           params: {
             advisorFirstName: conventionPeAdvisor.advisor.firstName,
             advisorLastName: conventionPeAdvisor.advisor.lastName,
-            agencyLogoUrl: agency.logoUrl,
+            agencyLogoUrl: agency.logoUrl ?? undefined,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             beneficiaryEmail: convention.signatories.beneficiary.email,

@@ -49,7 +49,7 @@ export class NotifyAllActorsThatConventionIsRejected extends TransactionalUseCas
           rejectionReason: convention.statusJustification || "",
           signature: agency.signature,
           immersionProfession: convention.immersionAppellation.appellationLabel,
-          agencyLogoUrl: agency.logoUrl,
+          agencyLogoUrl: agency.logoUrl ?? undefined,
         },
       },
       followedIds: {

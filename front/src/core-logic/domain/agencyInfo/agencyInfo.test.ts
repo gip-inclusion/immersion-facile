@@ -34,20 +34,14 @@ describe("Agency info in store", () => {
       position: agency.position,
       signature: agency.signature,
       agencySiret: agency.agencySiret,
+      refersToAgency: null,
+      logoUrl: agency.logoUrl,
     };
 
     store.dispatch(
       agencyInfoSlice.actions.fetchAgencyInfoRequested(expectedAgencyInfos.id),
     );
-    dependencies.agencyGateway.agencyInfo$.next({
-      id: expectedAgencyInfos.id,
-      name: expectedAgencyInfos.name,
-      kind: expectedAgencyInfos.kind,
-      address: expectedAgencyInfos.address,
-      position: expectedAgencyInfos.position,
-      signature: expectedAgencyInfos.signature,
-      agencySiret: expectedAgencyInfos.agencySiret,
-    });
+    dependencies.agencyGateway.agencyInfo$.next(expectedAgencyInfos);
 
     expectAgencyInfoToEqual(expectedAgencyInfos);
     expectIsLoadingToBe(false);
