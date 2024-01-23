@@ -250,13 +250,6 @@ export const ConventionForm = ({
           fetchedConvention?.status !== "DRAFT",
       })
         .with({ reduxFormUiReady: false }, () => <Loader />)
-        .with({ conventionCantBeEdited: true }, () => (
-          <Alert
-            severity="error"
-            title="Cette convention ne peut plus être modifiée"
-            description="Cette convention ne peut plus être modifiée car elle a déjà été signée, validée ou refusée."
-          />
-        ))
         .with({ shouldRedirectToError: true }, () => (
           <>
             {route.params.jwt && fetchConventionError && (
@@ -273,6 +266,13 @@ export const ConventionForm = ({
             copyButtonIsDisabled={copyButtonIsDisabled}
             copyButtonLabel={copyButtonLabel}
             onCopyButtonClick={onCopyButtonClick}
+          />
+        ))
+        .with({ conventionCantBeEdited: true }, () => (
+          <Alert
+            severity="error"
+            title="Cette convention ne peut plus être modifiée"
+            description="Cette convention ne peut plus être modifiée car elle a déjà été signée, validée ou refusée."
           />
         ))
         .with(
