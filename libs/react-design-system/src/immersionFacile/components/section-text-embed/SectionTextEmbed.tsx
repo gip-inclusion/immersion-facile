@@ -42,7 +42,7 @@ export const SectionTextEmbed = ({
         </li>
         <li className={`${componentName}__item`}>
           <strong>Vous conservez votre statut initial</strong> et restez couvert
-          par un prescripteur (Pôle emploi, Cap Emploi, Mission Locale, etc.)
+          par un prescripteur (France Travail, Cap Emploi, Mission Locale, etc.)
           grâce à la signature d’une convention.
         </li>
         <li className={`${componentName}__item`}>

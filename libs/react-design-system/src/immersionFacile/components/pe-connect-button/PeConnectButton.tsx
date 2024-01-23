@@ -19,9 +19,9 @@ export const PeConnectButton = ({
         onClick={onClick}
         href={`/api/${peConnectEndpoint}`}
         className={cx("pe-connect__button")}
-        title="Se connecter avec Pôle emploi"
+        title="Se connecter avec France Travail (anciennement Pôle emploi)"
       >
-        Se connecter avec Pôle emploi
+        Se connecter avec France Travail (anciennement Pôle emploi)
       </a>
     </div>
   );

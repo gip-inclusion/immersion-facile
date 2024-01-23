@@ -54,8 +54,9 @@ export const SectionAccordion = () => {
               <li>
                 C’est un stage d’observation, strictement encadré d’un point de
                 vue juridique. Vous conservez votre statut et êtes couvert par
-                votre Pôle emploi, votre Mission Locale ou le Conseil
-                départemental (en fonction de votre situation).
+                votre France Travail (anciennement Pôle emploi), votre Mission
+                Locale ou le Conseil départemental (en fonction de votre
+                situation).
               </li>
               <li>
                 Le rôle de celui qui vous accueillera est de vous présenter le

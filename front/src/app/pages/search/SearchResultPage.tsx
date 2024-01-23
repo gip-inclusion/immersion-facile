@@ -367,9 +367,9 @@ export const SearchResultPage = () => {
                         <p className={fr.cx("fr-mb-2w")}>
                           C’est un stage d’observation, strictement encadré d’un
                           point de vue juridique. Vous conservez votre statut et
-                          êtes couvert par votre Pôle emploi,votre Mission
-                          Locale ou le Conseil départemental (en fonction de
-                          votre situation).
+                          êtes couvert par votre France Travail (anciennement
+                          Pôle emploi), votre Mission Locale ou le Conseil
+                          départemental (en fonction de votre situation).
                         </p>
                         <p className={fr.cx("fr-mb-2w")}>
                           Le rôle de celui qui vous accueillera est de vous

@@ -24,7 +24,7 @@ La plateforme Immersion Facilitée peut traiter les données à caractère perso
 
 • Données relatives aux représentants des entreprises structures d’accueil de l’immersion, signataires de la convention y compris les tuteurs ou tutrices des structures d’accueil d’immersion (nom, prénom, fonctions, adresse e-mail, téléphone professionnel). Ces données sont susceptibles d'être partagées avec la « Mission interministérielle pour l’apprentissage » et le Groupement d’Intérêt Public « Les Entreprises s’engagent » à des fins de proposition de recueil d’offres de recrutement en alternance ou d’actions pour renforcer l’inclusion dans les entreprises ;
 
-• Données d’identification Pôle Emploi (nom, date de naissance).
+• Données d’identification France Travail, anciennement Pôle emploi (nom, date de naissance).
 
 <strong>Qu’est-ce qui nous autorise à traiter ces données ?</strong>
 
@@ -82,14 +82,14 @@ Le responsable de traitement s’engage à ce que les données à caractères pe
 Les organismes prescripteurs ont accès aux seules données de leurs dossiers lorsqu’ils utilisent « Immersion Facilitée ».
 
 Ces derniers sont :
-• Pôle emploi ;
+• France Travail (anciennement Pôle emploi) ;
 • Les missions locales ;
 • Les Cap Emploi ;
 • Les structures d’insertion par l’activité économique (SIAE), à l’exception des ETTI ;
 • Les Conseils départementaux ;
 • Les organismes de « Prépa Apprentissage » ;
 • Inclusion Connect ;
-• Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux PMSMP et liés soit à Pôle emploi, soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des PMSMP sur un périmètre donné ;
+• Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux PMSMP et liés soit à France Travail (anciennement Pôle emploi), soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des PMSMP sur un périmètre donné ;
 • La Mission interministérielle pour l’apprentissage ;
 • Le Groupement d’intérêt public « Les Entreprises s’engagent ».
 

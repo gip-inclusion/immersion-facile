@@ -70,7 +70,7 @@ export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
 
 export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "mission-locale": "Mission Locale",
-  "pole-emploi": "Pôle Emploi",
+  "pole-emploi": "France Travail (anciennement Pôle emploi)",
   "cap-emploi": "Cap Emploi",
   "conseil-departemental": "Conseil Départemental",
   "prepa-apprentissage": "Prépa Apprentissage",

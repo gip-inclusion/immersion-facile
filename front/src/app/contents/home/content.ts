@@ -198,7 +198,7 @@ export const sectionStatsData: Record<UserType, Stat[]> = {
       value: "7",
       subtitle: "demandeurs d’emploi sur 10",
       description:
-        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude Pôle emploi en 2021.",
+        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude France Travail (anciennement Pôle emploi) en 2021.",
     },
   ],
   candidate: [
@@ -219,7 +219,7 @@ export const sectionStatsData: Record<UserType, Stat[]> = {
       value: "7",
       subtitle: "demandeurs d’emploi sur 10",
       description:
-        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude Pôle emploi en 2021.",
+        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude France Travail (anciennement Pôle emploi) en 2021.",
     },
   ],
   establishment: [
@@ -240,7 +240,7 @@ export const sectionStatsData: Record<UserType, Stat[]> = {
       value: "95%",
       subtitle: "",
       description:
-        "des entreprises qui bénéficient du dispositif le recommandent, selon une étude publiée en mars 2021 par Pôle emploi",
+        "des entreprises qui bénéficient du dispositif le recommandent, selon une étude publiée en mars 2021 par France Travail (anciennement Pôle emploi).",
     },
   ],
   agency: [
@@ -261,7 +261,7 @@ export const sectionStatsData: Record<UserType, Stat[]> = {
       value: "7",
       subtitle: "demandeurs d’emploi sur 10",
       description:
-        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude Pôle emploi en 2021.",
+        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude France Travail (anciennement Pôle emploi) en 2021.",
     },
   ],
 };
@@ -287,7 +287,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
   candidate: [
     {
       title: "Qui peut bénéficier d'une Immersion Professionnelle (PMSMP) ?",
-      description: `S’inscrivant dans une démarche préventive (bénéficiaire salarié en recherche d’emploi ou de réorientation professionnelle) et proactive (bénéficiaire privé d’emploi, inscrit ou non auprès de Pôle emploi), les périodes...`,
+      description: `S’inscrivant dans une démarche préventive (bénéficiaire salarié en recherche d’emploi ou de réorientation professionnelle) et proactive (bénéficiaire privé d’emploi, inscrit ou non auprès de France Travail, anciennement Pôle emploi), les périodes...`,
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-beneficier-dune-immersion-professionnelle-pmsmp-jz1af4/",
     },
     {
