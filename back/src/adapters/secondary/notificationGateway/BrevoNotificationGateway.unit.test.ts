@@ -189,7 +189,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       width="600">
       <tr>
       <td>
-      <p><strong>Votre structure prescriptrice d'immersion est activée !</strong> 
+      <p><strong>Votre structure prescriptrice est activée sur Immersion facilitée !</strong> 
       <br/>
       <br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: AGENCY_NAME.
       <br/>
