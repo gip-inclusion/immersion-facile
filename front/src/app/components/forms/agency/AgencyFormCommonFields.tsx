@@ -170,8 +170,8 @@ export const AgencyFormCommonFields = ({
           nativeInputProps={{
             ...formContents.questionnaireUrl,
             ...register("questionnaireUrl", {
-              setValueAs: (value: string | undefined) =>
-                value && value !== "" ? value : undefined,
+              setValueAs: (value: string | null) =>
+                value === "" ? null : value,
             }),
           }}
           {...getFieldError("questionnaireUrl")}
