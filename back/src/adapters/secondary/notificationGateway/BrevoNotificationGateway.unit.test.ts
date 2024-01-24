@@ -228,9 +228,8 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       <tr>
       <td align="center" style="padding: 20px;">
       <img 
-      src="https://immersion.cellar-c2.services.clever-cloud.com/d0cfdb84-881a-40d5-b228-7e14c185fb68.png" 
-      alt="" 
-      width="290" />
+      src="https://immersion.cellar-c2.services.clever-cloud.com/email_footer.png" 
+      alt=""/>
       </td>
       </tr>
       </table>

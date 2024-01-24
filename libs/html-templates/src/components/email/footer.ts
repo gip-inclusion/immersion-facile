@@ -12,7 +12,7 @@ const defaultImmersionFooter = () => `<table>
   </tr>
   <tr>
     <td align="center" style="padding: 20px;">
-      <img src="https://immersion.cellar-c2.services.clever-cloud.com/d0cfdb84-881a-40d5-b228-7e14c185fb68.png" alt="" width="290" />
+      <img src="https://immersion.cellar-c2.services.clever-cloud.com/email_footer.png" alt=""/>
     </td>
   </tr>
 </table>`;
@@ -28,7 +28,7 @@ export const cciCustomHtmlFooter = () => `<table>
   </tr>
   <tr>
     <td align="center" style="padding: 20px;">
-      <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci-blanc.png" width="899" height="173" alt="Chambre de Commerce et d'Industrie" style="max-width: 350px; max-height: 120px; height: auto;"/>
+      <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci-blanc.png" alt="Chambre de Commerce et d'Industrie"/>
     </td>
   </tr>
 </table>`;
