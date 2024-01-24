@@ -6,8 +6,8 @@ import {
   ConventionDtoBuilder,
   conventionSchema,
   FeatureFlags,
-  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
   peParisAgencyId,
   reasonableSchedule,
 } from "shared";
@@ -46,13 +46,18 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
   await client.query("DELETE FROM feature_flags");
 
   const featureFlags: FeatureFlags = {
-    enableTemporaryOperation: makeBooleanFeatureFlag(false),
+    enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+      imageAlt: "",
+      imageUrl: "https://",
+      message: "",
+      redirectUrl: "https://",
+    }),
     enableMaintenance: makeTextFeatureFlag(false, {
       message: "Mon message de maintenance",
     }),
   };
 
-  await uow.featureFlagRepository.insert(featureFlags);
+  await uow.featureFlagRepository.insertAll(featureFlags);
   console.log("done");
 };
 

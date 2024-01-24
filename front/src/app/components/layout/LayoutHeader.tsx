@@ -19,7 +19,6 @@ import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
@@ -27,9 +26,7 @@ import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
 export const LayoutHeader = () => {
   const dispatch = useDispatch();
   const { enableMaintenance } = useFeatureFlags();
-  const maintenanceMessage = useAppSelector(
-    featureFlagSelectors.maintenanceMessage,
-  );
+
   const currentRoute = useRoute();
   const darkModeState = useIsDark();
   const { classes } = makeStyles({ name: LayoutHeader.displayName })(() => ({
@@ -236,8 +233,8 @@ export const LayoutHeader = () => {
       {enableMaintenance.isActive && (
         <MaintenanceCallout
           message={
-            maintenanceMessage || maintenanceMessage !== ""
-              ? maintenanceMessage
+            enableMaintenance.value.message !== ""
+              ? enableMaintenance.value.message
               : commonContent.maintenanceMessage
           }
         />

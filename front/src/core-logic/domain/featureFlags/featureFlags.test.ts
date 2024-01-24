@@ -1,8 +1,8 @@
 import {
   expectToEqual,
   FeatureFlags,
-  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
 } from "shared";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import {
@@ -16,14 +16,24 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const defaultFeatureFlags: FeatureFlags = {
-  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+    imageAlt: "",
+    imageUrl: "https://",
+    message: "",
+    redirectUrl: "https://",
+  }),
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "",
   }),
 };
 
 const flagsFromApi: FeatureFlags = {
-  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+    imageAlt: "",
+    imageUrl: "https://",
+    message: "",
+    redirectUrl: "https://",
+  }),
   enableMaintenance: makeTextFeatureFlag(true, {
     message: "My maintenance message",
   }),
@@ -58,7 +68,12 @@ describe("feature flag slice", () => {
     ({ store, dependencies } = createTestStore({
       featureFlags: {
         ...defaultFeatureFlags,
-        enableTemporaryOperation: makeBooleanFeatureFlag(false),
+        enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+          imageAlt: "",
+          imageUrl: "https://",
+          message: "",
+          redirectUrl: "https://",
+        }),
         isLoading: false,
       },
     }));
@@ -66,26 +81,42 @@ describe("feature flag slice", () => {
     store.dispatch(
       featureFlagsSlice.actions.setFeatureFlagRequested({
         flagName: "enableTemporaryOperation",
-        flagContent: {
-          isActive: true,
-        },
+        featureFlag: makeTextImageAndRedirectFeatureFlag(true, {
+          imageAlt: "",
+          imageUrl: "https://",
+          message: "",
+          redirectUrl: "https://",
+        }),
       }),
     );
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableTemporaryOperation: makeBooleanFeatureFlag(true),
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
+        imageAlt: "",
+        imageUrl: "https://",
+        message: "",
+        redirectUrl: "https://",
+      }),
       isLoading: true,
     });
     dependencies.adminGateway.setFeatureFlagResponse$.next(undefined);
     expectToEqual(dependencies.adminGateway.setFeatureFlagLastCalledWith, {
       flagName: "enableTemporaryOperation",
-      flagContent: {
-        isActive: true,
-      },
+      featureFlag: makeTextImageAndRedirectFeatureFlag(true, {
+        imageAlt: "",
+        imageUrl: "https://",
+        message: "",
+        redirectUrl: "https://",
+      }),
     });
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      enableTemporaryOperation: makeBooleanFeatureFlag(true),
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
+        imageAlt: "",
+        imageUrl: "https://",
+        message: "",
+        redirectUrl: "https://",
+      }),
       isLoading: false,
     });
   });

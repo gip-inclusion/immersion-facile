@@ -7,7 +7,7 @@ import {
   createApiConsumerSchema,
 } from "../apiConsumer/apiConsumer.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
-import { setFeatureFlagSchema } from "../featureFlags";
+import { setFeatureFlagSchema } from "../featureFlag/featureFlags.schema";
 import {
   establishmentBatchReportSchema,
   formEstablishmentBatchSchema,

@@ -10,7 +10,9 @@ const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
       [row.flag_name]: {
         isActive: row.is_active,
         kind: row.kind,
-        ...(row.kind === "text" && { value: row.value }),
+        ...((row.kind === "text" || row.kind === "textImageAndRedirect") && {
+          value: row.value,
+        }),
       },
     }),
     {} as FeatureFlags,
@@ -20,14 +22,15 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async getAll(): Promise<FeatureFlags> {
-    const result = await executeKyselyRawSqlQuery(
+    const { rows } = await executeKyselyRawSqlQuery(
       this.transaction,
       "SELECT * FROM feature_flags",
     );
-    return rawPgToFeatureFlags(result.rows);
+
+    return rawPgToFeatureFlags(rows);
   }
 
-  public async insert(featureFlags: FeatureFlags): Promise<void> {
+  public async insertAll(featureFlags: FeatureFlags): Promise<void> {
     await Promise.all(
       keys(featureFlags).map(async (flagName) => {
         const flag = featureFlags[flagName];
@@ -50,9 +53,9 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
       this.transaction,
       "UPDATE feature_flags SET is_active = $1, value = $2 WHERE flag_name = $3",
       [
-        params.flagContent.isActive,
-        hasFeatureFlagValue(params.flagContent)
-          ? JSON.stringify(params.flagContent.value)
+        params.featureFlag.isActive,
+        hasFeatureFlagValue(params.featureFlag)
+          ? JSON.stringify(params.featureFlag.value)
           : null,
         params.flagName,
       ],

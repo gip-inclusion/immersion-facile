@@ -4,7 +4,7 @@ import {
   validateEmailInputSchema,
   validateEmailResponseSchema,
 } from "../email/validateEmail.schema";
-import { featureFlagsSchema } from "../featureFlags";
+import { featureFlagsSchema } from "../featureFlag/featureFlags.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,

@@ -1,18 +1,7 @@
-import { createSelector } from "@reduxjs/toolkit";
-import { hasFeatureFlagValue } from "shared";
 import { RootState } from "src/core-logic/storeConfig/store";
 
-export const featureFlagState = (state: RootState) => state.featureFlags;
-
-export const maintenanceMessage = createSelector(
-  featureFlagState,
-  (featureFlags) =>
-    hasFeatureFlagValue(featureFlags.enableMaintenance)
-      ? featureFlags.enableMaintenance.value.message
-      : "",
-);
+const featureFlagState = (state: RootState) => state.featureFlags;
 
 export const featureFlagSelectors = {
-  maintenanceMessage,
   featureFlagState,
 };

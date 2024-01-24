@@ -95,3 +95,24 @@ describe("GetAgencyPublicInfoById", () => {
     });
   });
 });
+
+// Scenario
+// Gherkin
+
+// Given ETAT 1
+// And Situation 2
+// When Evenement A survient
+// Then ETAT 1 modifié
+// And Situation 2 non modifiée
+
+// Given ETAT 1
+// And Situation 2Bis
+// When Evenement A survient
+// Then ETAT 1 modifié
+// And Situation 2Bis modifiée
+
+// AAA
+
+// Arrange
+// Act
+// Assert

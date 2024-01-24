@@ -2,9 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
-  FixedStamp,
   HeroHeader,
-  HeroHeaderNavCard,
   MainWrapper,
   SectionFaq,
   SectionStats,
@@ -19,6 +17,7 @@ import {
   sectionStatsData,
 } from "src/app/contents/home/content";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { TemporaryOperation } from "./TemporaryOperation";
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 
 type HomePageProps = {
@@ -53,7 +52,7 @@ export const HomePage = ({ type }: HomePageProps) => {
           typeDisplayName={displayName}
           icon={icon}
           patterns
-          navCards={heroHeaderNavCardsWithDispatch[type] as HeroHeaderNavCard[]}
+          navCards={heroHeaderNavCardsWithDispatch[type]}
           parallax
           siretModal={
             <SiretModal title="Créer ou modifier votre établissement">
@@ -70,27 +69,15 @@ export const HomePage = ({ type }: HomePageProps) => {
         />
         <SectionFaq articles={sectionFaqDataForType} />
       </MainWrapper>
-      {featureFlags.enableTemporaryOperation.isActive && (
-        <FixedStamp
-          image={
-            <img
-              src={
-                "https://immersion.cellar-c2.services.clever-cloud.com/logo_semaine_du_numerique.svg"
-              }
-              alt="Illustration d'une développeuse informatique"
-            />
-          }
-          subtitle={
-            <>
-              Découvrez <strong>les métiers du numérique</strong> en réalisant
-              une immersion en entreprise&nbsp;!
-            </>
-          }
-          link={{
-            href: "https://inclusion.beta.gouv.fr/nos-services/immersion-facilitee/22-26-janvier-2024-semaine-des-metiers-du-numerique/",
-          }}
-        />
-      )}
+      {featureFlags.enableTemporaryOperation.isActive &&
+        featureFlags.enableTemporaryOperation.kind ===
+          "textImageAndRedirect" && (
+          <TemporaryOperation
+            temporaryOperationFeatureFlag={
+              featureFlags.enableTemporaryOperation
+            }
+          />
+        )}
     </HeaderFooterLayout>
   );
 };
