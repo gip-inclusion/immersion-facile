@@ -32,24 +32,18 @@ export const connectToAdmin = async (page: Page) => {
 };
 
 export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
-  const adminHomeSubMenuItem = page.locator(
-    `#${domElementIds.header.navLinks.admin.backOffice}`,
-  );
-  const adminMenuItemWrapper = page.locator(".fr-nav__item", {
-    has: adminHomeSubMenuItem,
-  });
-  const adminMenuItemNavButton = adminMenuItemWrapper.locator(".fr-nav__btn");
-  await expect(adminMenuItemNavButton).toBeVisible();
-  await adminMenuItemNavButton.click();
-  await adminHomeSubMenuItem.click({ force: true });
+  const adminButton = await page.locator("#fr-header-main-navigation-button-4");
+
+  if (!adminButton.isVisible()) {
+    await connectToAdmin(page);
+  }
+  await expect(adminButton.isVisible()).toBeTruthy();
   const tabLocator = page
-    .locator(".fr-tabs")
-    .locator("li")
+    .locator(".fr-tabs__list li")
     .nth(getTabIndexByTabName(tabName))
     .locator(".fr-tabs__tab");
-  await tabLocator.waitFor();
-  const tabPanelId = await tabLocator.getAttribute("id");
   await expect(tabLocator).toBeVisible();
+  const tabPanelId = await tabLocator.getAttribute("id");
   await tabLocator.click({ force: true });
   await page.locator(`[aria-labelledby="${tabPanelId}"]`).waitFor(); // can't select by ID because of the : in the ID, but we can select by aria-labelledby
   expect(page.url()).toContain(`${frontRoutes.admin}/${tabName}`);
