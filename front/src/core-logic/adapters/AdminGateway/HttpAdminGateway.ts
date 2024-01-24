@@ -24,24 +24,6 @@ import {
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {
-  public updateFeatureFlags$ = (
-    params: SetFeatureFlagParam,
-    token: BackOfficeJwt,
-  ): Observable<void> =>
-    from(
-      this.httpClient
-        .updateFeatureFlags({
-          body: params,
-          headers: { authorization: token },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 201 }, () => undefined)
-            .with({ status: 401 }, logBodyAndThrow)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-
   constructor(private readonly httpClient: HttpClient<AdminRoutes>) {}
 
   public addEstablishmentBatch$(
@@ -182,6 +164,25 @@ export class HttpAdminGateway implements AdminGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body || undefined)
             .with({ status: P.union(401) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public updateFeatureFlags$(
+    params: SetFeatureFlagParam,
+    token: BackOfficeJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .updateFeatureFlags({
+          body: params,
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, () => undefined)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

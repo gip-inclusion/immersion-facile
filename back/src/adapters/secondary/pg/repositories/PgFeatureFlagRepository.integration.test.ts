@@ -2,8 +2,8 @@ import { Pool, PoolClient } from "pg";
 import {
   expectToEqual,
   FeatureFlags,
-  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
 } from "shared";
 import { FeatureFlagRepository } from "../../../../domain/core/ports/FeatureFlagRepository";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
@@ -29,18 +29,28 @@ describe("PG getFeatureFlags", () => {
 
   it("gets all the Feature Flags of the app", async () => {
     const expectedFeatureFlags: FeatureFlags = {
-      enableTemporaryOperation: makeBooleanFeatureFlag(false),
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+        imageAlt: "Alt",
+        imageUrl: "http://image",
+        message: "message",
+        redirectUrl: "http://redirect",
+      }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
     };
 
-    await featureFlagRepository.insert(expectedFeatureFlags);
+    await featureFlagRepository.insertAll(expectedFeatureFlags);
 
     const featureFlags = await featureFlagRepository.getAll();
 
     expectToEqual(featureFlags, {
-      enableTemporaryOperation: makeBooleanFeatureFlag(false),
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+        imageAlt: "Alt",
+        imageUrl: "http://image",
+        message: "message",
+        redirectUrl: "http://redirect",
+      }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
@@ -49,27 +59,40 @@ describe("PG getFeatureFlags", () => {
 
   it("inserts featureFlags than updates a Feature Flag to the given value", async () => {
     const initialFeatureFlags: FeatureFlags = {
-      enableTemporaryOperation: makeBooleanFeatureFlag(false),
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+        imageAlt: "Alt",
+        imageUrl: "http://image",
+        message: "message",
+        redirectUrl: "http://redirect",
+      }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
     };
 
-    await featureFlagRepository.insert(initialFeatureFlags);
+    await featureFlagRepository.insertAll(initialFeatureFlags);
 
     const featureFlagsInitiallyInserted = await featureFlagRepository.getAll();
     expectToEqual(initialFeatureFlags, featureFlagsInitiallyInserted);
 
     await featureFlagRepository.update({
       flagName: "enableTemporaryOperation",
-      flagContent: {
-        isActive: true,
-      },
+      featureFlag: makeTextImageAndRedirectFeatureFlag(true, {
+        imageAlt: "updatedAlt",
+        imageUrl: "http://updatedImage",
+        message: "updatedMessage",
+        redirectUrl: "http://updatedRedirect",
+      }),
     });
 
     const featureFlags = await featureFlagRepository.getAll();
     expectToEqual(featureFlags, {
-      enableTemporaryOperation: makeBooleanFeatureFlag(true),
+      enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
+        imageAlt: "updatedAlt",
+        imageUrl: "http://updatedImage",
+        message: "updatedMessage",
+        redirectUrl: "http://updatedRedirect",
+      }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),

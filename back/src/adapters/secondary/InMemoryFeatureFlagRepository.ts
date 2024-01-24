@@ -1,21 +1,25 @@
-import { keys } from "ramda";
 import {
   FeatureFlags,
-  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
   SetFeatureFlagParam,
 } from "shared";
 import { FeatureFlagRepository } from "../../domain/core/ports/FeatureFlagRepository";
 
 const defaultFlags: FeatureFlags = {
-  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+    imageAlt: "altImage",
+    imageUrl: "https://imageUrl",
+    message: "message",
+    redirectUrl: "https://redirectUrl",
+  }),
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "Maintenance message",
   }),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
-  readonly #featureFlags: FeatureFlags;
+  #featureFlags: FeatureFlags;
 
   constructor(featureFlags: Partial<FeatureFlags> = {}) {
     this.#featureFlags = { ...defaultFlags, ...featureFlags };
@@ -25,16 +29,14 @@ export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
     return this.#featureFlags;
   }
 
-  public async insert(flags: FeatureFlags): Promise<void> {
-    keys(flags).forEach((flagName) => {
-      this.#featureFlags[flagName] = flags[flagName];
-    });
+  public async insertAll(flags: FeatureFlags): Promise<void> {
+    this.#featureFlags = flags;
   }
 
   public async update(params: SetFeatureFlagParam): Promise<void> {
     this.#featureFlags[params.flagName] = {
       ...this.#featureFlags[params.flagName],
-      ...(params.flagContent as any),
+      ...(params.featureFlag as any),
     };
   }
 }

@@ -14,8 +14,8 @@ import {
   expectToEqual,
   FeatureFlags,
   InclusionConnectedUser,
-  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
   SetFeatureFlagParam,
   technicalRoutes,
 } from "shared";
@@ -255,13 +255,23 @@ describe("Admin router", () => {
       const initialFeatureFlags = await getFeatureFlags();
       expectToEqual(
         initialFeatureFlags.enableTemporaryOperation,
-        makeBooleanFeatureFlag(false),
+        makeTextImageAndRedirectFeatureFlag(false, {
+          imageAlt: "altImage",
+          imageUrl: "https://imageUrl",
+          message: "message",
+          redirectUrl: "https://redirectUrl",
+        }),
       );
 
       const response = await sharedRequest.updateFeatureFlags({
         body: {
           flagName: "enableTemporaryOperation",
-          flagContent: { isActive: true },
+          featureFlag: makeTextImageAndRedirectFeatureFlag(true, {
+            imageAlt: "updatedAltImage",
+            imageUrl: "https://updatedImageUrl",
+            message: "message",
+            redirectUrl: "https://updatedRedirectUrl",
+          }),
         },
         headers: { authorization: token },
       });
@@ -274,7 +284,12 @@ describe("Admin router", () => {
       const updatedFeatureFlags = await getFeatureFlags();
       expectToEqual(
         updatedFeatureFlags.enableTemporaryOperation,
-        makeBooleanFeatureFlag(true),
+        makeTextImageAndRedirectFeatureFlag(true, {
+          imageAlt: "updatedAltImage",
+          imageUrl: "https://updatedImageUrl",
+          message: "message",
+          redirectUrl: "https://updatedRedirectUrl",
+        }),
       );
     });
 
@@ -287,12 +302,9 @@ describe("Admin router", () => {
 
       const params: SetFeatureFlagParam = {
         flagName: "enableMaintenance",
-        flagContent: {
-          isActive: true,
-          value: {
-            message: "Maintenance message",
-          },
-        },
+        featureFlag: makeTextFeatureFlag(true, {
+          message: "Updated Maintenance message",
+        }),
       };
 
       const response = await sharedRequest.updateFeatureFlags({
@@ -309,7 +321,7 @@ describe("Admin router", () => {
       expectToEqual(
         updatedFeatureFlags.enableMaintenance,
         makeTextFeatureFlag(true, {
-          message: "Maintenance message",
+          message: "Updated Maintenance message",
         }),
       );
     });
@@ -318,7 +330,12 @@ describe("Admin router", () => {
       const response = await sharedRequest.updateFeatureFlags({
         body: {
           flagName: "enableTemporaryOperation",
-          flagContent: { isActive: false },
+          featureFlag: makeTextImageAndRedirectFeatureFlag(true, {
+            imageAlt: "altImage",
+            imageUrl: "https://imageUrl",
+            message: "message",
+            redirectUrl: "https://redirectUrl",
+          }),
         },
         headers: { authorization: "wrong-token" },
       });

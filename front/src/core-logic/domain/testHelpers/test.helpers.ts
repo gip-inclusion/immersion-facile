@@ -1,11 +1,16 @@
 import {
   FeatureFlags,
-  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
 } from "shared";
 
 const defaultFlagsInFront: FeatureFlags = {
-  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+    imageAlt: "imageAlt",
+    imageUrl: "https://imageUrl",
+    message: "message",
+    redirectUrl: "https://redirectUrl",
+  }),
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "My maintenance message",
   }),

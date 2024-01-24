@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   FeatureFlags,
-  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
+  makeTextImageAndRedirectFeatureFlag,
   SetFeatureFlagParam,
 } from "shared";
 
@@ -11,7 +11,12 @@ export type FeatureFlagsState = FeatureFlags & {
 };
 
 const initialState: FeatureFlagsState = {
-  enableTemporaryOperation: makeBooleanFeatureFlag(false),
+  enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+    message: "",
+    imageAlt: "",
+    imageUrl: "https://",
+    redirectUrl: "https://",
+  }),
   enableMaintenance: makeTextFeatureFlag(false, { message: "" }),
   isLoading: true,
 };
@@ -36,7 +41,7 @@ export const featureFlagsSlice = createSlice({
       isLoading: true,
       [action.payload.flagName]: {
         ...state[action.payload.flagName],
-        ...action.payload.flagContent,
+        ...action.payload.featureFlag,
       },
     }),
     setFeatureFlagSucceeded: (state): FeatureFlagsState => ({

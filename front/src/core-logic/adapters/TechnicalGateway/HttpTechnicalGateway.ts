@@ -26,7 +26,7 @@ export class HttpTechnicalGateway implements TechnicalGateway {
     private readonly axiosInstance: AxiosInstance,
   ) {}
 
-  public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
+  public getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
     return this.httpClient
       .validateEmail({
         queryParams: {
@@ -41,7 +41,7 @@ export class HttpTechnicalGateway implements TechnicalGateway {
       );
   }
 
-  public async htmlToPdf(
+  public htmlToPdf(
     htmlContent: string,
     jwt: ConventionSupportedJwt,
   ): Promise<string> {
