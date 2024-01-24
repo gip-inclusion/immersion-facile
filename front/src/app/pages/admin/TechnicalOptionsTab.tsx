@@ -18,7 +18,7 @@ export const TechnicalOptionsTab = () => {
       <div className={fr.cx("fr-container")}>
         <FeatureFlagsSection />
       </div>
-      <div className={fr.cx("fr-container")}>
+      <div className={fr.cx("fr-container", "fr-mt-6w")}>
         <UploadFileSection />
       </div>
       <div className={fr.cx("fr-container", "fr-mt-6w")}>

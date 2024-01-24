@@ -6,9 +6,9 @@ import Styles from "./FixedStamp.styles";
 
 export type FixedStampProps = {
   image: JSX.Element;
-  overtitle?: JSX.Element | string;
-  title?: JSX.Element | string;
-  subtitle?: JSX.Element | string;
+  overtitle?: string;
+  title?: string;
+  subtitle?: string;
   link?: Link | { href: string };
 };
 
@@ -34,7 +34,12 @@ export const FixedStamp = ({
             {title}
           </span>
         )}
-        {subtitle && <span className={cx(Styles.subtitle)}>{subtitle}</span>}
+        {subtitle && (
+          <span
+            className={cx(Styles.subtitle)}
+            dangerouslySetInnerHTML={{ __html: subtitle }}
+          ></span>
+        )}
       </div>
       {link && (
         <a

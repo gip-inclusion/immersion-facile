@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
+  FixedStamp,
   HeroHeader,
   MainWrapper,
   SectionFaq,
@@ -17,7 +18,6 @@ import {
   sectionStatsData,
 } from "src/app/contents/home/content";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { TemporaryOperation } from "./TemporaryOperation";
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 
 type HomePageProps = {
@@ -30,7 +30,7 @@ const { Component: SiretModal, open: openSiretModal } = createModal({
 });
 
 export const HomePage = ({ type }: HomePageProps) => {
-  const featureFlags = useFeatureFlags();
+  const { enableTemporaryOperation } = useFeatureFlags();
   const storeDispatch = useDispatch();
 
   const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(
@@ -69,13 +69,19 @@ export const HomePage = ({ type }: HomePageProps) => {
         />
         <SectionFaq articles={sectionFaqDataForType} />
       </MainWrapper>
-      {featureFlags.enableTemporaryOperation.isActive &&
-        featureFlags.enableTemporaryOperation.kind ===
-          "textImageAndRedirect" && (
-          <TemporaryOperation
-            temporaryOperationFeatureFlag={
-              featureFlags.enableTemporaryOperation
+      {enableTemporaryOperation.isActive &&
+        enableTemporaryOperation.kind === "textImageAndRedirect" && (
+          <FixedStamp
+            image={
+              <img
+                src={enableTemporaryOperation.value.imageUrl}
+                alt={enableTemporaryOperation.value.imageAlt}
+              />
             }
+            subtitle={enableTemporaryOperation.value.message}
+            link={{
+              href: enableTemporaryOperation.value.redirectUrl,
+            }}
           />
         )}
     </HeaderFooterLayout>
