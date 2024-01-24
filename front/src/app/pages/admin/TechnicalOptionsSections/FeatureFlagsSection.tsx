@@ -29,10 +29,14 @@ export const FeatureFlagsSection = () => {
       <FeatureFlagListWrapper>
         <>
           {!isLoading &&
-            keys(labelsByFeatureFlag).map((featureFlagName) => (
-              <div key={featureFlagName}>
+            keys(labelsByFeatureFlag).map((featureFlagName, index) => (
+              <div
+                key={featureFlagName}
+                className={fr.cx(index > 0 && "fr-mt-4w")}
+              >
+                <h5>{labelsByFeatureFlag[featureFlagName].title}</h5>
                 <ToggleSwitch
-                  label={labelsByFeatureFlag[featureFlagName]}
+                  label={labelsByFeatureFlag[featureFlagName].enableLabel}
                   checked={featureFlags[featureFlagName].isActive}
                   showCheckedHint={false}
                   onChange={() => {
@@ -90,9 +94,21 @@ const FeatureFlagListWrapper = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
-const labelsByFeatureFlag: Record<FeatureFlagName, string> = {
-  enableTemporaryOperation: "Activer l'offre temporaire",
-  enableMaintenance: "Activer le mode maintenance",
+const labelsByFeatureFlag: Record<
+  FeatureFlagName,
+  {
+    title: string;
+    enableLabel: string;
+  }
+> = {
+  enableTemporaryOperation: {
+    title: "Offre temporaire",
+    enableLabel: "Activer l'offre temporaire",
+  },
+  enableMaintenance: {
+    title: "Maintenance",
+    enableLabel: "Activer le mode maintenance",
+  },
 };
 
 const FeatureFlagTextForm = ({
@@ -132,9 +148,7 @@ const FeatureFlagTextForm = ({
           placeholder: commonContent.maintenanceMessage,
         }}
       />
-      <Button type="button" size="small">
-        Mettre à jour cette option
-      </Button>
+      <Button size="small">Mettre à jour cette option</Button>
     </form>
   );
 };
@@ -179,7 +193,7 @@ const FeatureFlagTextImageAndRedirectForm = ({
       />
       <Input
         label="Addresse de l'image"
-        hintText="https://..."
+        hintText="https://www.mon-site.com/mon-image.jpg"
         nativeInputProps={{
           ...register("imageUrl"),
         }}
@@ -192,14 +206,12 @@ const FeatureFlagTextImageAndRedirectForm = ({
       />
       <Input
         label="URL du lien"
-        hintText="https://..."
+        hintText="https://www.mon-site.com/mon-lien"
         nativeInputProps={{
           ...register("redirectUrl"),
         }}
       />
-      <Button type="button" size="small">
-        Mettre à jour cette option
-      </Button>
+      <Button size="small">Mettre à jour cette option</Button>
     </form>
   );
 };
