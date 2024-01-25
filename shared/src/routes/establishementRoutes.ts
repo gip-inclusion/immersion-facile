@@ -9,13 +9,11 @@ import {
 } from "../httpClient/httpErrors.schema";
 import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
-const formEstablishmentsUrl = "/form-establishments";
-
 export type EstablishmentRoutes = typeof establishmentRoutes;
 export const establishmentRoutes = defineRoutes({
   addFormEstablishment: defineRoute({
     method: "post",
-    url: formEstablishmentsUrl,
+    url: "/form-establishments",
     requestBodySchema: formEstablishmentSchema,
     responses: {
       200: expressEmptyResponseBody,
@@ -23,7 +21,7 @@ export const establishmentRoutes = defineRoutes({
   }),
   updateFormEstablishment: defineRoute({
     method: "put",
-    url: formEstablishmentsUrl,
+    url: "/form-establishments",
     requestBodySchema: formEstablishmentSchema,
     ...withAuthorizationHeaders,
     responses: {
@@ -36,7 +34,7 @@ export const establishmentRoutes = defineRoutes({
   }),
   getFormEstablishment: defineRoute({
     method: "get",
-    url: `${formEstablishmentsUrl}/:siret`,
+    url: `/form-establishments/:siret`,
     ...withAuthorizationHeaders,
     responses: {
       200: formEstablishmentSchema,
@@ -55,13 +53,22 @@ export const establishmentRoutes = defineRoutes({
   }),
   deleteEstablishment: defineRoute({
     method: "delete",
-    url: `${formEstablishmentsUrl}/:siret`,
+    url: `/form-establishments/:siret`,
     ...withAuthorizationHeaders,
     responses: {
       204: emptyObjectSchema,
       400: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
       404: legacyHttpErrorSchema,
+    },
+  }),
+  unregisterEstablishmentLead: defineRoute({
+    method: "post",
+    url: `/establishment-lead/unregister`,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      404: httpErrorSchema,
     },
   }),
 });
