@@ -8,7 +8,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     SET
       kind = 'textImageAndRedirect',
       is_active = false,
-      value = '{"message": "message","imageUrl": "https://imageUrl", "redirectUrl":"https://redirectUrl","imageAlt":"imageAlt"}'
+      value = '{"message": "message","imageUrl": "https://imageUrl", "redirectUrl":"https://redirectUrl","imageAlt":"", "title": "", "overtitle": "" }'
     WHERE flag_name = '${flagName}'
   `);
 }

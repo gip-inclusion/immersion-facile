@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { zStringMinLength1 } from "../zodUtils";
 import {
   FeatureFlag,
   featureFlagNames,
@@ -30,17 +29,11 @@ export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
 > = z.object({
   message: z.string(),
   imageUrl: absoluteUrlSchema,
-  imageAlt: zStringMinLength1,
+  imageAlt: z.string(),
   redirectUrl: absoluteUrlSchema,
+  title: z.string(),
+  overtitle: z.string(),
 });
-
-// const setFeatureFlagValueSchema: z.Schema<SetFeatureFlagParam["flagContent"]> =
-//   z.object({
-//     isActive: z.boolean(),
-//     value: featureFlagTextValueSchema
-//       .or(featureFlagTextImageAndRedirectValueSchema)
-//       .optional(),
-//   });
 
 const featureFlagTextImageAndRedirectSchema: z.Schema<FeatureFlagTextImageAndRedirect> =
   z.object({

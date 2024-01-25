@@ -18,6 +18,8 @@ type WithFeatureFlagTextValue = { message: string };
 type WithImageUrl = { imageUrl: AbsoluteUrl };
 type WithImageAlt = { imageAlt: string };
 type WithRedirectUrl = { redirectUrl: AbsoluteUrl };
+type WithTitle = { title: string };
+type WithOvertitle = { overtitle: string };
 
 export type FeatureFlagText = GenericFeatureFlag<
   "text",
@@ -25,7 +27,12 @@ export type FeatureFlagText = GenericFeatureFlag<
 >;
 export type FeatureFlagTextImageAndRedirect = GenericFeatureFlag<
   "textImageAndRedirect",
-  WithFeatureFlagTextValue & WithImageUrl & WithRedirectUrl & WithImageAlt
+  WithFeatureFlagTextValue &
+    WithImageUrl &
+    WithRedirectUrl &
+    WithImageAlt &
+    WithTitle &
+    WithOvertitle
 >;
 export type FeatureFlagBoolean = GenericFeatureFlag<"boolean">;
 
