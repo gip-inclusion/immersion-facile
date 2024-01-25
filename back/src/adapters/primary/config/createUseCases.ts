@@ -92,6 +92,7 @@ import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupByS
 import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../../domain/offer/useCases/MarkEstablishmentLeadAsRegistrationAccepted";
+import { MarkEstablishmentLeadAsRegistrationRejected } from "../../../domain/offer/useCases/MarkEstablishmentLeadAsRegistrationRejected";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/offer/useCases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/offer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -328,6 +329,11 @@ export const createUseCases = (
       ),
       markEstablishmentLeadAsRegistrationAccepted:
         new MarkEstablishmentLeadAsRegistrationAccepted(
+          uowPerformer,
+          gateways.timeGateway,
+        ),
+      markEstablishmentLeadAsRegistrationRejected:
+        new MarkEstablishmentLeadAsRegistrationRejected(
           uowPerformer,
           gateways.timeGateway,
         ),
