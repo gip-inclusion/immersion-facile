@@ -785,8 +785,12 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
 
     it("Delete aggregate including establishment, immersion offers, immersion contacts", async () => {
-      const establishmentAggregate =
-        new EstablishmentAggregateBuilder().build();
+      const establishmentAggregate = new EstablishmentAggregateBuilder()
+        .withSearchableBy({
+          students: false,
+          jobSeekers: false,
+        })
+        .build();
 
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         establishmentAggregate,
@@ -886,6 +890,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withEstablishment(establishment)
         .withContact(contact)
         .withOffers(offers)
+        .withSearchableBy({
+          students: true,
+          jobSeekers: false,
+        })
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         aggregate,
@@ -945,6 +953,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withCustomizedName("La boulangerie de Lucie")
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
         .withAddress(rueJacquardDto)
+        .withSearchableBy({
+          students: false,
+          jobSeekers: false,
+        })
         .build();
       const boulangerOffer1 = new OfferEntityBuilder()
         .withRomeCode(boulangerRome)

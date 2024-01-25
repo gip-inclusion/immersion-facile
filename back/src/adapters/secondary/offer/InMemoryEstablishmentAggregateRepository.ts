@@ -7,6 +7,7 @@ import {
   conflictErrorSiret,
   ContactMethod,
   defaultMaxContactsPerWeek,
+  EstablishmentSearchableBy,
   FormEstablishmentSource,
   GeoPositionDto,
   NafDto,
@@ -443,6 +444,13 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, position });
   }
 
+  public withSearchableBy(searchableBy: EstablishmentSearchableBy) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      searchableBy,
+    });
+  }
+
   public withSiret(siret: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, siret });
   }
@@ -600,6 +608,17 @@ export class EstablishmentAggregateBuilder
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact: undefined,
+    });
+  }
+
+  public withSearchableBy(searchableBy: EstablishmentSearchableBy) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withSearchableBy(searchableBy)
+        .build(),
     });
   }
 }

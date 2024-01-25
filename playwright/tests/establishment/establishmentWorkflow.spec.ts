@@ -30,7 +30,11 @@ test.describe("Establishment creation and modification workflow", () => {
       .fill("2");
 
     await goToNextStep(page, 1, "create");
+    await page
+      .locator(`[for="${domElementIds.establishment.searchableBy}-1"]`)
+      .click();
 
+    await goToNextStep(page, 2, "create");
     await page.fill(
       `#${domElementIds.establishment.businessContact.firstName}`,
       faker.person.firstName(),
@@ -55,7 +59,7 @@ test.describe("Establishment creation and modification workflow", () => {
       .locator("[for='establishment-businessContact-contactMethod-0']")
       .click();
 
-    await goToNextStep(page, 2, "create");
+    await goToNextStep(page, 3, "create");
 
     await expect(
       page.locator(`#${domElementIds.establishment.siret}`),
@@ -128,7 +132,10 @@ test.describe("Establishment creation and modification workflow", () => {
       .fill("5");
 
     await goToNextStep(page, 1, "edit");
-
+    await page
+      .locator(`[for="${domElementIds.establishment.searchableBy}-2"]`)
+      .click();
+    await goToNextStep(page, 2, "edit");
     await page.fill(
       `#${domElementIds.establishment.businessContact.job}`,
       faker.person.jobType(),
@@ -142,7 +149,7 @@ test.describe("Establishment creation and modification workflow", () => {
       faker.internet.email(),
     );
 
-    await goToNextStep(page, 2, "edit");
+    await goToNextStep(page, 3, "edit");
 
     await expect(
       page.locator(`#${domElementIds.establishment.siret} input`),
@@ -198,7 +205,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
 const goToNextStep = async (
   page: Page,
-  currentStep: 1 | 2 | 3,
+  currentStep: 1 | 2 | 3 | 4,
   mode: "create" | "edit",
 ) => {
   await page

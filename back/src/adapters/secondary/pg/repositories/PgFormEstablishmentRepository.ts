@@ -52,6 +52,8 @@ export class PgFormEstablishmentRepository
         source: formEstablishment.source,
         website: formEstablishment.website,
         next_availability_date: formEstablishment.nextAvailabilityDate,
+        searchable_by_job_seekers: formEstablishment.searchableBy.jobSeekers,
+        searchable_by_students: formEstablishment.searchableBy.students,
       })
       .execute()
       .then((_) => Promise.resolve())
@@ -151,6 +153,10 @@ export class PgFormEstablishmentRepository
           source: db.ref("source"),
           website: db.ref("website"),
           nextAvailabilityDate: sql<DateString>`date_to_iso(next_availability_date)`,
+          searchableBy: jsonBuildObject({
+            jobSeekers: db.ref("searchable_by_job_seekers"),
+            students: db.ref("searchable_by_students"),
+          }),
         }),
       ).as("formEstablishment"),
     ]);
