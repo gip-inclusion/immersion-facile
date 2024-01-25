@@ -50,7 +50,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
     );
   });
 
-  it("should resolve to undefined if the convention pole emploi OAuth advisor is not found", async () => {
+  it("should resolve to undefined if the convention France Travail OAuth advisor is not found", async () => {
     const conventionDtoFromEvent: ConventionDto = new ConventionDtoBuilder()
       .withId("add5c20e-6dd2-45af-affe-927358005251")
       .withFederatedIdentity({ provider: "peConnect", token: "blop" })
