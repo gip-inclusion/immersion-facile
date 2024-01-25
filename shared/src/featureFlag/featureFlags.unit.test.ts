@@ -31,6 +31,8 @@ describe("feature flag utils tests", () => {
       imageUrl: "http://image.url",
       redirectUrl: "https://redirect.url",
       imageAlt: "YoloAlt",
+      overtitle: "overtitle",
+      title: "title",
     });
     expect(flag).toEqual({
       isActive: true,
@@ -40,6 +42,8 @@ describe("feature flag utils tests", () => {
         imageUrl: "http://image.url",
         redirectUrl: "https://redirect.url",
         imageAlt: "YoloAlt",
+        overtitle: "overtitle",
+        title: "title",
       },
     });
   });

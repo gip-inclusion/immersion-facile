@@ -8,4 +8,5 @@ export interface StoredFile {
   encoding: string;
   size: number;
   buffer: Buffer;
+  mimetype: string;
 }

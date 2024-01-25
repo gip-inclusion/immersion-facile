@@ -34,6 +34,8 @@ describe("PG getFeatureFlags", () => {
         imageUrl: "http://image",
         message: "message",
         redirectUrl: "http://redirect",
+        overtitle: "",
+        title: "",
       }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
@@ -50,6 +52,8 @@ describe("PG getFeatureFlags", () => {
         imageUrl: "http://image",
         message: "message",
         redirectUrl: "http://redirect",
+        overtitle: "",
+        title: "",
       }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
@@ -64,6 +68,8 @@ describe("PG getFeatureFlags", () => {
         imageUrl: "http://image",
         message: "message",
         redirectUrl: "http://redirect",
+        overtitle: "overtitle",
+        title: "title",
       }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
@@ -82,6 +88,8 @@ describe("PG getFeatureFlags", () => {
         imageUrl: "http://updatedImage",
         message: "updatedMessage",
         redirectUrl: "http://updatedRedirect",
+        overtitle: "updatedOvertitle",
+        title: "updatedTitle",
       }),
     });
 
@@ -92,6 +100,8 @@ describe("PG getFeatureFlags", () => {
         imageUrl: "http://updatedImage",
         message: "updatedMessage",
         redirectUrl: "http://updatedRedirect",
+        overtitle: "updatedOvertitle",
+        title: "updatedTitle",
       }),
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",

@@ -4,15 +4,8 @@ import { UseCase } from "../../../core/UseCase";
 import type { StoredFile } from "../entity/StoredFile";
 import { DocumentGateway } from "../port/DocumentGateway";
 
-type MulterFile = {
-  originalname: string;
-  encoding: string;
-  size: number;
-  buffer: Buffer;
-};
-
 export type UploadFileInput = {
-  multerFile: MulterFile;
+  multerFile: Express.Multer.File;
   renameFileToId?: boolean;
 };
 
@@ -43,13 +36,14 @@ export class UploadFile extends UseCase<UploadFileInput, string> {
       encoding: multerFile.encoding,
       size: multerFile.size,
       buffer: multerFile.buffer,
+      mimetype: multerFile.mimetype,
     };
 
     await this.#documentGateway.put(file);
     return this.#documentGateway.getFileUrl(file);
   }
 
-  #replaceNameWithUuid(multerFile: MulterFile) {
+  #replaceNameWithUuid(multerFile: Express.Multer.File) {
     const extension = multerFile.originalname.split(".").at(-1);
     return `${this.#uuidGenerator.new()}.${extension}`;
   }

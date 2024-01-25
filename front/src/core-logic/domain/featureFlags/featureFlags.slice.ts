@@ -16,6 +16,8 @@ const initialState: FeatureFlagsState = {
     imageAlt: "",
     imageUrl: "https://",
     redirectUrl: "https://",
+    overtitle: "",
+    title: "",
   }),
   enableMaintenance: makeTextFeatureFlag(false, { message: "" }),
   isLoading: true,

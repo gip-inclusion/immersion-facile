@@ -10,6 +10,8 @@ const defaultFlagsInFront: FeatureFlags = {
     imageUrl: "https://imageUrl",
     message: "message",
     redirectUrl: "https://redirectUrl",
+    overtitle: "overtitle",
+    title: "title",
   }),
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "My maintenance message",
