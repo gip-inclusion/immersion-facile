@@ -38,3 +38,13 @@ export const toAgencyPublicDisplayDto = (
         : null,
   };
 };
+
+export const getCounsellorsAndValidatorsEmailsDeduplicated = (
+  agency: AgencyDto,
+) => {
+  const allEmails = [...agency.validatorEmails, ...agency.counsellorEmails].map(
+    (email) => email.toLowerCase(),
+  );
+
+  return [...new Set(allEmails)];
+};
