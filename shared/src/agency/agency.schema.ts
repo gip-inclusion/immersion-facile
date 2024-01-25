@@ -14,7 +14,6 @@ import {
   zEnumValidation,
   zSchemaForType,
   zStringMinLength1,
-  zStringPossiblyEmpty,
   zTrimmedString,
 } from "../zodUtils";
 import {
@@ -117,7 +116,7 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
       questionnaireUrl: absoluteUrlSchema.or(z.null()),
       status: agencyStatusSchema,
       adminEmails: z.array(zStringMinLength1),
-      codeSafir: zStringPossiblyEmpty,
+      codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       rejectionJustification: zStringMinLength1.or(z.null()),
     }),
