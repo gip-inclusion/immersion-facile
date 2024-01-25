@@ -21,6 +21,8 @@ const defaultFeatureFlags: FeatureFlags = {
     imageUrl: "https://",
     message: "",
     redirectUrl: "https://",
+    overtitle: "",
+    title: "",
   }),
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "",
@@ -33,6 +35,8 @@ const flagsFromApi: FeatureFlags = {
     imageUrl: "https://",
     message: "",
     redirectUrl: "https://",
+    overtitle: "",
+    title: "",
   }),
   enableMaintenance: makeTextFeatureFlag(true, {
     message: "My maintenance message",
@@ -73,6 +77,8 @@ describe("feature flag slice", () => {
           imageUrl: "https://",
           message: "",
           redirectUrl: "https://",
+          overtitle: "",
+          title: "",
         }),
         isLoading: false,
       },
@@ -86,6 +92,8 @@ describe("feature flag slice", () => {
           imageUrl: "https://",
           message: "",
           redirectUrl: "https://",
+          overtitle: "",
+          title: "",
         }),
       }),
     );
@@ -96,6 +104,8 @@ describe("feature flag slice", () => {
         imageUrl: "https://",
         message: "",
         redirectUrl: "https://",
+        overtitle: "",
+        title: "",
       }),
       isLoading: true,
     });
@@ -107,6 +117,8 @@ describe("feature flag slice", () => {
         imageUrl: "https://",
         message: "",
         redirectUrl: "https://",
+        overtitle: "",
+        title: "",
       }),
     });
     expectFeatureFlagsStateToEqual({
@@ -116,6 +128,8 @@ describe("feature flag slice", () => {
         imageUrl: "https://",
         message: "",
         redirectUrl: "https://",
+        overtitle: "",
+        title: "",
       }),
       isLoading: false,
     });

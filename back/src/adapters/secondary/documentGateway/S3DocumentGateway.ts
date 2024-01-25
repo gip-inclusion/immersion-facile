@@ -41,6 +41,7 @@ export class S3DocumentGateway implements DocumentGateway {
           Bucket: this.#bucketName,
           Body: file.buffer,
           ACL: "public-read",
+          ContentType: file.mimetype,
         },
         (err) => {
           if (err) {

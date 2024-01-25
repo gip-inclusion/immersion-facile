@@ -260,6 +260,8 @@ describe("Admin router", () => {
           imageUrl: "https://imageUrl",
           message: "message",
           redirectUrl: "https://redirectUrl",
+          overtitle: "overtitle",
+          title: "title",
         }),
       );
 
@@ -271,6 +273,8 @@ describe("Admin router", () => {
             imageUrl: "https://updatedImageUrl",
             message: "message",
             redirectUrl: "https://updatedRedirectUrl",
+            overtitle: "overtitle",
+            title: "title",
           }),
         },
         headers: { authorization: token },
@@ -289,6 +293,8 @@ describe("Admin router", () => {
           imageUrl: "https://updatedImageUrl",
           message: "message",
           redirectUrl: "https://updatedRedirectUrl",
+          overtitle: "overtitle",
+          title: "title",
         }),
       );
     });
@@ -335,6 +341,8 @@ describe("Admin router", () => {
             imageUrl: "https://imageUrl",
             message: "message",
             redirectUrl: "https://redirectUrl",
+            overtitle: "overtitle",
+            title: "title",
           }),
         },
         headers: { authorization: "wrong-token" },
