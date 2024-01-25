@@ -317,6 +317,7 @@ export const domElementIds = {
       `im-form-${mode}-establishment__previous-button--step-${currentStep}`,
     nextButtonFromStepAndMode: ({ currentStep, mode }) =>
       `im-form-${mode}-establishment__next-button--step-${currentStep}`,
+    searchableBy: "im-form-create-establishment__searchable-by",
   },
 
   assessment: {

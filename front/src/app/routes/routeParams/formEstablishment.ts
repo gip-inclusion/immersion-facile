@@ -48,6 +48,8 @@ export const formEstablishmentParamsInUrl = {
   additionalInformation: param.query.optional.string,
   appellations: param.query.optional.ofType(appellationsDtoSerializer),
   bcCopyEmails: param.query.optional.ofType(copyEmailsSerializer),
+  sByJobSeekers: param.query.optional.boolean,
+  sByStudents: param.query.optional.boolean,
 };
 
 export type FormEstablishmentKeysInUrl =
@@ -80,6 +82,10 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
   website: params.website,
   additionalInformation: params.additionalInformation,
   appellations: params.appellations ?? [],
+  searchableBy: {
+    jobSeekers: params.sByJobSeekers ?? true,
+    students: params.sByStudents ?? true,
+  },
 });
 
 export const formEstablishmentDtoToFormEstablishmentQueryParams = (
@@ -145,6 +151,10 @@ export const createInitialFormValues = (
         email: "joe@mail.com",
         contactMethod: "EMAIL",
         copyEmails: ["recrutement@boucherie.net"],
+      },
+      searchableBy: {
+        jobSeekers: true,
+        students: true,
       },
     };
   }

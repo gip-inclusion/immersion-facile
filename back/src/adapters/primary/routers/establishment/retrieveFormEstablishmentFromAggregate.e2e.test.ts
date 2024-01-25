@@ -98,6 +98,10 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         maxContactsPerWeek:
           establishmentAggregate.establishment.maxContactsPerWeek,
         businessContact: establishmentAggregate.contact!,
+        searchableBy: {
+          jobSeekers: true,
+          students: true,
+        },
       },
       status: 200,
     });
@@ -146,6 +150,10 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         maxContactsPerWeek:
           establishmentAggregate.establishment.maxContactsPerWeek,
         businessContact: establishmentAggregate.contact!,
+        searchableBy: {
+          jobSeekers: true,
+          students: true,
+        },
       },
       status: 200,
     });

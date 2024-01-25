@@ -41,6 +41,10 @@ export const makeEstablishmentAggregate = ({
     voluntaryToImmersion: true,
     website: formEstablishment.website,
     nextAvailabilityDate: formEstablishment.nextAvailabilityDate,
+    searchableBy: {
+      jobSeekers: true,
+      students: true,
+    },
   },
   contact: {
     id: uuidGenerator.new(),

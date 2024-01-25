@@ -76,6 +76,10 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       businessContact: establishmentAggregate.contact,
       maxContactsPerWeek:
         establishmentAggregate.establishment.maxContactsPerWeek,
+      searchableBy: {
+        jobSeekers: true,
+        students: true,
+      },
     };
     return retrievedForm;
   }

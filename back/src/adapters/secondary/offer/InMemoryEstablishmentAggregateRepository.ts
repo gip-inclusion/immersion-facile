@@ -339,6 +339,10 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   isOpen: true,
   isSearchable: true,
   maxContactsPerWeek: defaultMaxContactsPerWeek,
+  searchableBy: {
+    jobSeekers: true,
+    students: true,
+  },
 };
 
 export class EstablishmentEntityBuilder

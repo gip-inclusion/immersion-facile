@@ -100,6 +100,10 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
         message: "La valeur renseignée ne peut pas contenir de décimale",
       }),
     nextAvailabilityDate: dateTimeIsoStringSchema.optional(),
+    searchableBy: z.object({
+      students: zBoolean,
+      jobSeekers: zBoolean,
+    }),
   },
 );
 
@@ -149,6 +153,8 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     website: zStringPossiblyEmpty,
     additionalInformation: zStringPossiblyEmpty,
     fitForDisabledWorkers: csvBooleanSchema,
+    searchableByJobSeekers: csvBooleanSchema,
+    searchableByStudents: csvBooleanSchema,
   });
 
 export const establishmentCSVRowsSchema: z.Schema<EstablishmentCSVRow[]> =
