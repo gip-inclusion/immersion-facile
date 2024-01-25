@@ -82,6 +82,8 @@ export const HomePage = ({ type }: HomePageProps) => {
             link={{
               href: enableTemporaryOperation.value.redirectUrl,
             }}
+            title={enableTemporaryOperation.value.title}
+            overtitle={enableTemporaryOperation.value.overtitle}
           />
         )}
     </HeaderFooterLayout>

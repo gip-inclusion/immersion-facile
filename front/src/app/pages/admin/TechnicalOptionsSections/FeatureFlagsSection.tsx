@@ -14,8 +14,17 @@ import {
   FeatureFlagTextImageAndRedirect,
   featureFlagTextImageAndRedirectValueSchema,
   featureFlagTextValueSchema,
+  toDotNotation,
 } from "shared";
-import { commonContent } from "src/app/contents/commonContent";
+import { ErrorNotifications } from "react-design-system";
+import {
+  formTextFieldsLabels,
+  formTextImageAndRedirectFieldsLabels,
+} from "src/app/contents/forms/admin/technicalOptions";
+import {
+  formErrorsToFlatErrors,
+  getFormContents,
+} from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 
@@ -120,11 +129,18 @@ const FeatureFlagTextForm = ({
 }) => {
   const dispatch = useDispatch();
 
-  const { handleSubmit, register } = useForm<FeatureFlagText["value"]>({
+  const { handleSubmit, register, formState } = useForm<
+    FeatureFlagText["value"]
+  >({
     defaultValues: featureFlag.value,
     mode: "onTouched",
     resolver: zodResolver(featureFlagTextValueSchema),
   });
+
+  const { getFormErrors, getFormFields } =
+    getFormContents(formTextFieldsLabels);
+
+  const formFields = getFormFields();
 
   const onFormSubmit = (value: FeatureFlagText["value"]) => {
     dispatch(
@@ -142,11 +158,19 @@ const FeatureFlagTextForm = ({
     <form className={fr.cx("fr-ml-9w")} onSubmit={handleSubmit(onFormSubmit)}>
       <Input
         textArea
-        label={"Message"}
+        {...formFields.message}
         nativeTextAreaProps={{
+          ...formFields.message,
           ...register("message"),
-          placeholder: commonContent.maintenanceMessage,
         }}
+      />
+      <ErrorNotifications
+        labels={getFormErrors()}
+        errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+        visible={
+          formState.submitCount !== 0 &&
+          Object.values(formState.errors).length > 0
+        }
       />
       <Button size="small">Mettre à jour cette option</Button>
     </form>
@@ -162,13 +186,18 @@ const FeatureFlagTextImageAndRedirectForm = ({
 }) => {
   const dispatch = useDispatch();
 
-  const { register, handleSubmit } = useForm<
+  const { register, handleSubmit, formState } = useForm<
     FeatureFlagTextImageAndRedirect["value"]
   >({
     defaultValues: featureFlag.value,
     mode: "onTouched",
     resolver: zodResolver(featureFlagTextImageAndRedirectValueSchema),
   });
+  const { getFormErrors, getFormFields } = getFormContents(
+    formTextImageAndRedirectFieldsLabels,
+  );
+
+  const formFields = getFormFields();
 
   const onFormSubmit = (value: FeatureFlagTextImageAndRedirect["value"]) => {
     dispatch(
@@ -185,31 +214,55 @@ const FeatureFlagTextImageAndRedirectForm = ({
   return (
     <form className={fr.cx("fr-ml-9w")} onSubmit={handleSubmit(onFormSubmit)}>
       <Input
-        label="Message"
+        {...formFields.overtitle}
         nativeInputProps={{
-          ...register("message"),
-          placeholder: commonContent.maintenanceMessage,
+          ...formFields.overtitle,
+          ...register("overtitle"),
         }}
       />
       <Input
-        label="Addresse de l'image"
-        hintText="https://www.mon-site.com/mon-image.jpg"
+        {...formFields.title}
         nativeInputProps={{
+          ...formFields.title,
+          ...register("title"),
+        }}
+      />
+      <Input
+        {...formFields.message}
+        label="Message (optionel)"
+        nativeInputProps={{
+          ...formFields.message,
+          ...register("message"),
+        }}
+      />
+      <Input
+        {...formFields.imageUrl}
+        nativeInputProps={{
+          ...formFields.imageUrl,
           ...register("imageUrl"),
         }}
       />
       <Input
-        label="Texte alternatif de l'image"
+        {...formFields.imageAlt}
         nativeInputProps={{
+          ...formFields.imageAlt,
           ...register("imageAlt"),
         }}
       />
       <Input
-        label="URL du lien"
-        hintText="https://www.mon-site.com/mon-lien"
+        {...formFields.redirectUrl}
         nativeInputProps={{
+          ...formFields.redirectUrl,
           ...register("redirectUrl"),
         }}
+      />
+      <ErrorNotifications
+        labels={getFormErrors()}
+        errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+        visible={
+          formState.submitCount !== 0 &&
+          Object.values(formState.errors).length > 0
+        }
       />
       <Button size="small">Mettre à jour cette option</Button>
     </form>

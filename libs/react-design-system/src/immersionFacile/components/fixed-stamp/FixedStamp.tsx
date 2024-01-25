@@ -28,20 +28,22 @@ export const FixedStamp = ({
     >
       {image && <div className={cx(Styles.imageWrapper)}>{image}</div>}
       <div className={cx(Styles.content)}>
-        {overtitle && <span className={cx(Styles.overtitle)}>{overtitle}</span>}
+        {overtitle && overtitle !== "" && (
+          <span className={cx(Styles.overtitle)}>{overtitle}</span>
+        )}
         {title && (
           <span className={cx(fr.cx("fr-text--bold"), Styles.title)}>
             {title}
           </span>
         )}
-        {subtitle && (
+        {subtitle && subtitle !== "" && (
           <span
             className={cx(Styles.subtitle)}
             dangerouslySetInnerHTML={{ __html: subtitle }}
           ></span>
         )}
       </div>
-      {link && (
+      {link && link.href !== "" && (
         <a
           className={cx(Styles.overlayLink)}
           {...link}
