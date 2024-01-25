@@ -103,6 +103,8 @@ export const insertEstablishment = async (
     position?: GeoPositionDto;
     fitForDisabledWorkers?: boolean;
     maxContactsPerWeek?: number;
+    searchableByStudents?: boolean;
+    searchableByJobSeekers?: boolean;
   },
 ) => {
   const defaultPosition = { lon: 12.2, lat: 2.1 };
@@ -112,11 +114,12 @@ export const insertEstablishment = async (
     siret, name, street_number_and_address, post_code, city,
     department_code, number_employees, naf_code, source_provider, update_date, 
     is_open, is_searchable, fit_for_disabled_workers, gps, lon, 
-    lat, max_contacts_per_week, created_at
+    lat, max_contacts_per_week, created_at,
+    searchable_by_students, searchable_by_job_seekers
   ) VALUES (
     $1, '', $2, $3, $4, $5,
     $6, $7, $8, $9, $10,
-    $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15, $16
+    $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15, $16, $17, $18
   )`;
   const addressDto = props.address ?? rueGuillaumeTellDto;
 
@@ -126,6 +129,7 @@ export const insertEstablishment = async (
     props.numberEmployeesRange ?? null, props.nafCode ?? "8622B", props.sourceProvider ?? "api_labonneboite", props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null, 
     props.isOpen ?? true, props.isSearchable ?? true, props.fitForDisabledWorkers, position.lon, position.lat,
     props.maxContactsPerWeek ?? defaultMaxContactsPerWeek, props.createdAt.toISOString(),
+    props.searchableByStudents ?? false, props.searchableByJobSeekers ?? false
   ]);
 };
 

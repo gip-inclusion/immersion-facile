@@ -212,6 +212,8 @@ interface PgFormEstablishments {
   updated_at: Generated<Timestamp | null>;
   website: Generated<string | null>;
   next_availability_date: Timestamp | null;
+  searchable_by_students: boolean;
+  searchable_by_job_seekers: boolean;
 }
 
 type EstablishmentLeadEventsKind =

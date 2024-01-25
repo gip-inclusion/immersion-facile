@@ -164,7 +164,11 @@ export class PgEstablishmentAggregateRepository
                 'isCommited', e.is_commited,
                 'fitForDisabledWorkers', e.fit_for_disabled_workers,
                 'maxContactsPerWeek', e.max_contacts_per_week,
-                'nextAvailabilityDate', date_to_iso(e.next_availability_date)
+                'nextAvailabilityDate', date_to_iso(e.next_availability_date),
+                'searchableBy', JSON_BUILD_OBJECT(
+                  'jobSeekers', e.searchable_by_job_seekers,
+                  'students', e.searchable_by_students
+                )
               ), 
               'immersionOffers', io.immersionOffers, 
               'contact', JSON_BUILD_OBJECT(
@@ -614,7 +618,8 @@ export class PgEstablishmentAggregateRepository
       establishment.address.streetNumberAndAddress, establishment.address.postcode, establishment.address.city, establishment.address.departmentCode, establishment.numberEmployeesRange,
       establishment.nafDto.code, establishment.nafDto.nomenclature, establishment.sourceProvider, convertPositionToStGeography(establishment.position), establishment.position.lon,
       establishment.position.lat, establishment.updatedAt ? establishment.updatedAt.toISOString() : null, establishment.isOpen, establishment.isSearchable, establishment.isCommited,
-      establishment.fitForDisabledWorkers, establishment.maxContactsPerWeek, establishment.lastInseeCheckDate ? establishment.lastInseeCheckDate.toISOString() : null, establishment.createdAt, establishment.nextAvailabilityDate ?? null
+      establishment.fitForDisabledWorkers, establishment.maxContactsPerWeek, establishment.lastInseeCheckDate ? establishment.lastInseeCheckDate.toISOString() : null, establishment.createdAt, establishment.nextAvailabilityDate ?? null,
+      establishment.searchableBy.students, establishment.searchableBy.jobSeekers
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -628,7 +633,8 @@ export class PgEstablishmentAggregateRepository
           street_number_and_address, post_code, city, department_code, number_employees, 
           naf_code, naf_nomenclature, source_provider, gps, lon, 
           lat, update_date, is_open, is_searchable, is_commited, 
-          fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at , next_availability_date
+          fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at , next_availability_date, 
+          searchable_by_students, searchable_by_job_seekers
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -642,7 +648,9 @@ export class PgEstablishmentAggregateRepository
                 number_employees=EXCLUDED.number_employees,
                 naf_code=EXCLUDED.naf_code,
                 fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
-                max_contacts_per_week=EXCLUDED.max_contacts_per_week
+                max_contacts_per_week=EXCLUDED.max_contacts_per_week,
+                searchable_by_students=EXCLUDED.searchable_by_students,
+                searchable_by_job_seekers=EXCLUDED.searchable_by_job_seekers
               `,
           establishmentFields,
         ),
