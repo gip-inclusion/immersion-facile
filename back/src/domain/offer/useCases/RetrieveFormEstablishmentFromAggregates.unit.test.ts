@@ -115,6 +115,10 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
       maxContactsPerWeek: establishment.maxContactsPerWeek,
+      searchableBy: {
+        jobSeekers: true,
+        students: true,
+      },
     });
   });
 
@@ -159,6 +163,10 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
       maxContactsPerWeek: establishment.maxContactsPerWeek,
+      searchableBy: {
+        jobSeekers: true,
+        students: true,
+      },
     });
   });
 });

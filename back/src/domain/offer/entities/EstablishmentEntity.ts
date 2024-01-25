@@ -1,6 +1,7 @@
 import {
   AddressDto,
   DateTimeIsoString,
+  EstablishmentSearchableBy,
   FormEstablishmentSource,
   GeoPositionDto,
   NafDto,
@@ -34,6 +35,7 @@ export type EstablishmentEntity = {
   website?: string;
   additionalInformation?: string;
   maxContactsPerWeek: number;
+  searchableBy: EstablishmentSearchableBy;
 };
 
 export type EstablishmentAggregate = {

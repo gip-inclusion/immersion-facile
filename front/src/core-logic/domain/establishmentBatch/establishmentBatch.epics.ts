@@ -109,6 +109,12 @@ export const candidateEstablishmentMapper = (
       maxContactsPerWeek: calculateMaxContactsPerWeek(
         establishmentRow.isSearchable,
       ),
+      searchableBy: {
+        jobSeekers: csvBooleanToBoolean(
+          establishmentRow.searchableByJobSeekers,
+        ),
+        students: csvBooleanToBoolean(establishmentRow.searchableByStudents),
+      },
     };
 
     formEstablishmentSchema.parse(mappedEstablishment);

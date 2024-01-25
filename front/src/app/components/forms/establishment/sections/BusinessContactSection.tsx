@@ -26,7 +26,7 @@ export const BusinessContactSection = ({
           buttons={[
             {
               children: "Étape précédente",
-              onClick: () => onStepChange(1, []),
+              onClick: () => onStepChange(2, []),
               iconId: "fr-icon-arrow-left-line",
               priority: "secondary",
               id: domElementIds.establishment.previousButtonFromStepAndMode({
@@ -37,7 +37,7 @@ export const BusinessContactSection = ({
             {
               children: "Étape suivante",
               onClick: () =>
-                onStepChange(3, [
+                onStepChange(4, [
                   "businessContact.firstName",
                   "businessContact.lastName",
                   "businessContact.job",

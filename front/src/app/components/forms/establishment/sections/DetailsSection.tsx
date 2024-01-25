@@ -104,7 +104,7 @@ export const DetailsSection = ({
         currentStep,
         mode,
       }),
-      onClick: () => onStepChange(2, []),
+      onClick: () => onStepChange(3, []),
     });
   }
 

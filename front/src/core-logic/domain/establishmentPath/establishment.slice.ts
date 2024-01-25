@@ -61,6 +61,10 @@ export const defaultFormEstablishmentValue = (
   isEngagedEnterprise: undefined,
   fitForDisabledWorkers: undefined,
   businessNameCustomized: undefined,
+  searchableBy: {
+    jobSeekers: true,
+    students: true,
+  },
 });
 
 export type EstablishmentState = {

@@ -22,6 +22,7 @@ import { AvailabilitySection } from "src/app/components/forms/establishment/sect
 import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
 import { DetailsSection } from "src/app/components/forms/establishment/sections/DetailsSection";
 import { IntroSection } from "src/app/components/forms/establishment/sections/IntroSection";
+import { SearchableBySection } from "src/app/components/forms/establishment/sections/SearchableBySection";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
@@ -52,21 +53,27 @@ type EstablishmentFormProps = {
   mode: Mode;
 };
 
-const steps: Record<1 | 2 | 3, Pick<StepperProps, "title" | "nextTitle">> = {
+type FormStep = 1 | 2 | 3 | 4;
+
+const steps: Record<FormStep, Pick<StepperProps, "title" | "nextTitle">> = {
   1: {
     title: "Planning",
     nextTitle: "Référent immersion",
   },
   2: {
+    title: "Type de candidats",
+    nextTitle: "Référent immersion",
+  },
+  3: {
     title: "Référent immersion",
     nextTitle: "Votre fiche dans l’annuaire Immersion Facilitée",
   },
-  3: {
+  4: {
     title: "Votre fiche dans l’annuaire Immersion Facilitée",
   },
 };
 
-export type Step = 0 | keyof typeof steps | null;
+export type Step = 0 | FormStep | null;
 export type OnStepChange = (
   step: Step,
   fieldsToValidate: (
@@ -352,6 +359,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   currentStep={currentStep}
                 />
                 <h2>{steps[3].title}</h2>
+                <BusinessContactSection
+                  mode={mode}
+                  onStepChange={onStepChange}
+                  currentStep={currentStep}
+                />
+                <h2>{steps[4].title}</h2>
                 <DetailsSection
                   mode={mode}
                   isEstablishmentAdmin={isEstablishmentAdmin}
@@ -383,13 +396,20 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                     />
                   ))
                   .with(2, () => (
-                    <BusinessContactSection
+                    <SearchableBySection
                       mode={mode}
                       onStepChange={onStepChange}
                       currentStep={currentStep}
                     />
                   ))
                   .with(3, () => (
+                    <BusinessContactSection
+                      mode={mode}
+                      onStepChange={onStepChange}
+                      currentStep={currentStep}
+                    />
+                  ))
+                  .with(4, () => (
                     <DetailsSection
                       isEstablishmentAdmin={isEstablishmentAdmin}
                       mode={mode}

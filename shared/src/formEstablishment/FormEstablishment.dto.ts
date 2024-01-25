@@ -36,6 +36,11 @@ export type FormEstablishmentSource =
   | FormEstablishmentSourceInUrl
   | ApiConsumerName;
 
+export type EstablishmentSearchableBy = {
+  students: boolean;
+  jobSeekers: boolean;
+};
+
 export type FormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
@@ -51,6 +56,7 @@ export type FormEstablishmentDto = {
   siret: SiretDto; // 14 characters string
   source: FormEstablishmentSource;
   website?: string;
+  searchableBy: EstablishmentSearchableBy;
 };
 
 export type WithFormEstablishmentDto = {
@@ -79,6 +85,8 @@ export type EstablishmentCSVRow = {
   website: CSVOptionalString;
   additionalInformation: CSVOptionalString;
   fitForDisabledWorkers?: CSVBoolean;
+  searchableByStudents: CSVBoolean;
+  searchableByJobSeekers: CSVBoolean;
 };
 
 export type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };

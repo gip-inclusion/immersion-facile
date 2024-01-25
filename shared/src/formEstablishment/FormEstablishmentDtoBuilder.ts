@@ -52,6 +52,10 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
     },
   ],
   maxContactsPerWeek: defaultMaxContactsPerWeek,
+  searchableBy: {
+    jobSeekers: true,
+    students: true,
+  },
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
@@ -73,6 +77,10 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   website: "",
   additionalInformation: "",
   maxContactsPerWeek: defaultMaxContactsPerWeek,
+  searchableBy: {
+    jobSeekers: true,
+    students: false,
+  },
 };
 
 export class FormEstablishmentDtoBuilder
@@ -180,4 +188,6 @@ const FormEstablishmentToEstablishmentCsvRow = (
   isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
   isSearchable: establishment.maxContactsPerWeek > noContactPerWeek ? "1" : "0",
   fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
+  searchableByStudents: establishment.searchableBy.students ? "1" : "0",
+  searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",
 });

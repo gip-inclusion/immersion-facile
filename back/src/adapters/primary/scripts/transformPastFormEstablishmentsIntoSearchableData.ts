@@ -99,6 +99,10 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       appellations: row.professions,
       businessContact: row.business_contact,
       maxContactsPerWeek: row.max_contacts_per_week,
+      searchableBy: {
+        jobSeekers: row.searchable_by_job_seekers,
+        students: row.searchable_by_students,
+      },
     };
     try {
       await upsertAggregateFromForm.execute({

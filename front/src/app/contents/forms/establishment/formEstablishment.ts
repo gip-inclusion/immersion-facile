@@ -129,6 +129,10 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     label: "Quand serez-vous à nouveau disponible ?",
     id: domElementIds.establishment.nextAvailabilityDateInput,
   },
+  searchableBy: {
+    label: "Qui souhaitez-vous accueillir en immersion ?",
+    id: domElementIds.establishment.searchableBy,
+  },
 };
 
 export const mailtoHref = (siret: SiretDto) => {
