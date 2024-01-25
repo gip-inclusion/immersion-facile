@@ -8,7 +8,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications
 import { SendEmailWhenAgencyIsActivated } from "./SendEmailWhenAgencyIsActivated";
 
 describe("SendEmailWhenAgencyIsActivated", () => {
-  it("Sends an email to validators with agency name", async () => {
+  it("Sends an email to counsellors and validators with agency name", async () => {
     // Prepare
     const uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
@@ -27,8 +27,14 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       uowPerformer,
       saveNotificationAndRelatedEvent,
     );
+
+    const emailPresentInBoth = "in-both@mail.com";
+    const counsellorEmails = ["councellor@email.com"];
+    const validatorEmails = ["toto-valide@email.com"];
+
     const updatedAgency = AgencyDtoBuilder.create()
-      .withValidatorEmails(["toto@email.com"])
+      .withCounsellorEmails([...counsellorEmails, emailPresentInBoth])
+      .withValidatorEmails([...validatorEmails, emailPresentInBoth])
       .withName("just-activated-agency")
       .withLogoUrl("https://logo.com")
       .build();
@@ -41,7 +47,11 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       emails: [
         {
           kind: "AGENCY_WAS_ACTIVATED",
-          recipients: ["toto@email.com"],
+          recipients: [
+            ...validatorEmails,
+            emailPresentInBoth,
+            ...counsellorEmails,
+          ],
           params: {
             agencyName: "just-activated-agency",
             agencyLogoUrl: "https://logo.com",

@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { AgencyDto, agencySchema } from "shared";
+import {
+  AgencyDto,
+  agencySchema,
+  getCounsellorsAndValidatorsEmailsDeduplicated,
+} from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
@@ -34,7 +38,7 @@ export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAge
       kind: "email",
       templatedContent: {
         kind: "AGENCY_WAS_ACTIVATED",
-        recipients: agency.validatorEmails,
+        recipients: getCounsellorsAndValidatorsEmailsDeduplicated(agency),
         params: {
           agencyName: agency.name,
           agencyLogoUrl: agency.logoUrl ?? undefined,
