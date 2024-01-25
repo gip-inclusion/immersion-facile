@@ -27,14 +27,14 @@ export const peConnectErrorStrategy = (
     [
       isHttpClientError4XX(error),
       makeRawRedirectError(
-        "Une erreur est survenue lors de la connexion aux service pole emploi",
+        "Une erreur est survenue lors de la connexion aux services France Travail",
         error,
       ),
     ],
     [
       isHttpServerError5XX(error),
       makeRawRedirectError(
-        "Une erreur est survenue lors de la connexion aux service pole emploi",
+        "Une erreur est survenue lors de la connexion aux services France Travail",
         error,
       ),
     ],
@@ -43,7 +43,7 @@ export const peConnectErrorStrategy = (
     [
       error instanceof ConnectionRefusedError,
       makeRawRedirectError(
-        "Le serveur distant pôle emploi refuse la connexion.",
+        "Le serveur distant de France Travail refuse la connexion.",
         error,
       ),
     ],

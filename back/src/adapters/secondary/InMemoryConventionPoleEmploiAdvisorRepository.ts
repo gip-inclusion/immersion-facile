@@ -73,7 +73,7 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
         .find(isOpenEntity);
     if (entity) return entity;
     throw new NotFoundError(
-      "There is no open pole emploi advisor entity linked to this OAuth peExternalId",
+      "There is no open France Travail advisor entity linked to this OAuth peExternalId",
     );
   }
 

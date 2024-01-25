@@ -17,7 +17,7 @@ export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
   z.object({
     email: z
       .string()
-      .email("L'addresse email pole emploi doit être remplie valide")
+      .email("L'addresse email France Travail doit être remplie valide")
       .optional(),
     family_name: zTrimmedString,
     gender: z.enum(["male", "female"]),
