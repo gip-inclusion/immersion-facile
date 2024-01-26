@@ -388,13 +388,19 @@ export class PgEstablishmentAggregateRepository
     const romeCodes =
       searchMade.romeCode ??
       (await this.#getRomeCodeFromAppellationCode(searchMade.appellationCodes));
-
+    const andSearchableByFilter = searchMade.establishmentSearchableBy
+      ? `AND (searchable_by_students IS ${
+          searchMade.establishmentSearchableBy === "students"
+        } OR searchable_by_job_seekers IS ${
+          searchMade.establishmentSearchableBy === "jobSeekers"
+        })`
+      : "";
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
         (SELECT siret, fit_for_disabled_workers, gps
          FROM establishments 
-         WHERE is_open 
+         WHERE is_open ${andSearchableByFilter}
          AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
         matching_offers AS (
           SELECT 
