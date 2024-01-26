@@ -104,10 +104,12 @@ test.describe("Convention creation and modification workflow", () => {
   });
 
   test.describe("signs convention for signatories", () => {
+    const signatoriesMagicLinks: string[] = [];
     const signatories = 4;
-    for (let index = 0; index < signatories; index++) {
-      test(`signs convention for signatory ${index}`, async ({ page }) => {
-        await connectToAdmin(page);
+
+    test("get signatories magicLink urls from email", async ({ page }) => {
+      await connectToAdmin(page);
+      for (let index = 0; index < signatories; index++) {
         const emailWrapper = await openEmailInAdmin(
           page,
           "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
@@ -117,37 +119,52 @@ test.describe("Convention creation and modification workflow", () => {
           emailWrapper,
           "conventionSignShortlink",
         );
-        expect(href).not.toBe(null);
-
-        if (!href) return;
-
-        await signConvention(page, href);
-        if (index === signatories - 1) {
-          await page.waitForTimeout(testConfig.timeForEventCrawler);
+        if (href) {
+          signatoriesMagicLinks.push(href);
         }
-      });
-    }
-  });
+      }
+      await expect(signatoriesMagicLinks.length).toBe(signatories);
+    });
 
-  test("reviews and validate convention", async ({ page }) => {
-    await connectToAdmin(page);
-    const emailWrapper = await openEmailInAdmin(
-      page,
-      "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-      0,
-    );
-    const href = await getMagicLinkInEmailWrapper(emailWrapper);
-    expect(href).not.toBe(null);
-    if (!href) return;
-    await page.goto(href);
-    await page
-      .locator(
-        `#${domElementIds.manageConvention.conventionValidationValidateButton}`,
-      )
-      .click();
-    await page
-      .locator(`#${domElementIds.manageConvention.validatorModalSubmitButton}`)
-      .click();
-    await expect(page.locator(".fr-alert--success")).toBeVisible();
+    test("signs convention for signatory 1", async ({ page }) => {
+      await signConvention(page, signatoriesMagicLinks[0]);
+    });
+
+    test("signs convention for signatory 2", async ({ page }) => {
+      await signConvention(page, signatoriesMagicLinks[1]);
+    });
+
+    test("signs convention for signatory 3", async ({ page }) => {
+      await signConvention(page, signatoriesMagicLinks[2]);
+    });
+
+    test(`signs convention for signatory 4`, async ({ page }) => {
+      await signConvention(page, signatoriesMagicLinks[3]);
+      await page.waitForTimeout(testConfig.timeForEventCrawler);
+    });
+
+    test("reviews and validate convention", async ({ page }) => {
+      await connectToAdmin(page);
+      const emailWrapper = await openEmailInAdmin(
+        page,
+        "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+        0,
+      );
+      const href = await getMagicLinkInEmailWrapper(emailWrapper);
+      expect(href).not.toBe(null);
+      if (!href) return;
+      await page.goto(href);
+      await page
+        .locator(
+          `#${domElementIds.manageConvention.conventionValidationValidateButton}`,
+        )
+        .click();
+      await page
+        .locator(
+          `#${domElementIds.manageConvention.validatorModalSubmitButton}`,
+        )
+        .click();
+      await expect(page.locator(".fr-alert--success")).toBeVisible();
+    });
   });
 });
