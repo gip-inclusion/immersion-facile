@@ -59,6 +59,54 @@ const establishment = new EstablishmentAggregateBuilder()
   .withOffers([secretariatOffer, boulangerOffer, boulangerAssistantOffer])
   .build();
 
+const establishmentAcceptingOnlyStudent = new EstablishmentAggregateBuilder()
+  .withEstablishment(
+    new EstablishmentEntityBuilder()
+      .withSiret("12345677123456")
+      .withPosition(TEST_POSITION)
+      .withAddress({
+        streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
+        postcode: "75001",
+        city: "Paris",
+        departmentCode: "75",
+      })
+      .withNafDto({
+        code: "naf code",
+        nomenclature: "naf nomenclature",
+      })
+      .withNumberOfEmployeeRange("20-49")
+      .withWebsite("www.website.com")
+      .withSearchableBy({ students: true, jobSeekers: false })
+      .build(),
+  )
+  .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
+  .withOffers([secretariatOffer, boulangerOffer])
+  .build();
+
+const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
+  .withEstablishment(
+    new EstablishmentEntityBuilder()
+      .withSiret("12345678901234")
+      .withPosition(TEST_POSITION)
+      .withAddress({
+        streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
+        postcode: "75001",
+        city: "Paris",
+        departmentCode: "75",
+      })
+      .withNafDto({
+        code: "naf code",
+        nomenclature: "naf nomenclature",
+      })
+      .withNumberOfEmployeeRange("20-49")
+      .withWebsite("www.website.com")
+      .withSearchableBy({ students: false, jobSeekers: true })
+      .build(),
+  )
+  .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
+  .withOffers([secretariatOffer, boulangerOffer])
+  .build();
+
 describe("SearchImmersionUseCase", () => {
   let uow: InMemoryUnitOfWork;
   let uuidGenerator: TestUuidGenerator;
@@ -450,6 +498,118 @@ describe("SearchImmersionUseCase", () => {
         needsToBeSearched: true,
         sortedBy: "distance",
         numberOfResults: 1,
+      },
+    ]);
+  });
+
+  it("return only the establishment that only accept student if estbablishmentSearchableBy params is define to student", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+      establishmentAcceptingOnlyStudent,
+      establishmentAcceptingOnlyJobSeeker,
+    ];
+    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+    const searchParams: SearchQueryParamsDto = {
+      ...searchInMetzParams,
+      establishmentSearchableBy: "students",
+    };
+
+    const response = await searchImmersionUseCase.execute(searchParams);
+
+    expectToEqual(response, [
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyStudent,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyStudent,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+    ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCodes: undefined,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 4,
+        establishmentSearchableBy: "students",
+      },
+    ]);
+  });
+
+  it("return all the establishments if estbablishmentSearchableBy params is not define", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+      establishmentAcceptingOnlyStudent,
+      establishmentAcceptingOnlyJobSeeker,
+    ];
+    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+    const searchParams: SearchQueryParamsDto = {
+      ...searchInMetzParams,
+    };
+
+    const response = await searchImmersionUseCase.execute(searchParams);
+
+    expectToEqual(response, [
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyStudent,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyStudent,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyJobSeeker,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyJobSeeker,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+    ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCodes: undefined,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 6,
       },
     ]);
   });

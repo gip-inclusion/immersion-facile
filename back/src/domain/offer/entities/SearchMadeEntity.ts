@@ -1,4 +1,9 @@
-import { ApiConsumerName, Flavor, SearchSortedBy } from "shared";
+import {
+  ApiConsumerName,
+  EstablishmentSearchableByValue,
+  Flavor,
+  SearchSortedBy,
+} from "shared";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
@@ -11,6 +16,7 @@ export type SearchMade = {
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
   place?: string;
+  establishmentSearchableBy?: EstablishmentSearchableByValue;
 };
 
 export type SearchMadeEntity = {
