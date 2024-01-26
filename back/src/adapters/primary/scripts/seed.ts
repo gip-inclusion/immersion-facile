@@ -47,12 +47,12 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
 
   const featureFlags: FeatureFlags = {
     enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
+      message: "message",
+      imageUrl: "https://imageUrl",
+      redirectUrl: "https://redirectUrl",
       imageAlt: "",
-      imageUrl: "https://",
-      message: "",
-      redirectUrl: "https://",
-      overtitle: "",
       title: "",
+      overtitle: "",
     }),
     enableMaintenance: makeTextFeatureFlag(false, {
       message: "Mon message de maintenance",
