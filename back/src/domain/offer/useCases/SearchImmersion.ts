@@ -45,6 +45,7 @@ export class SearchImmersion extends TransactionalUseCase<
       sortedBy,
       voluntaryToImmersion,
       rome,
+      establishmentSearchableBy,
     }: SearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
@@ -58,6 +59,7 @@ export class SearchImmersion extends TransactionalUseCase<
       place,
       appellationCodes,
       romeCode: rome,
+      establishmentSearchableBy,
     };
 
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([

@@ -15,6 +15,7 @@ export const searchQueryParamsSchema: z.Schema<SearchQueryParamsDto> = z.object(
     voluntaryToImmersion: z.undefined().or(zToBoolean.optional()),
     place: z.string().optional(),
     sortedBy: z.enum(["distance", "date"]).optional(),
+    establishmentSearchableBy: z.enum(["students", "jobSeekers"]).optional(),
   },
 );
 

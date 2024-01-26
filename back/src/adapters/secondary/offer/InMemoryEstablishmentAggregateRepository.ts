@@ -167,11 +167,16 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async searchImmersionResults({
-    searchMade: { lat, lon, appellationCodes },
+    searchMade: { lat, lon, appellationCodes, establishmentSearchableBy },
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this.#establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
+      .filter((aggregate) =>
+        establishmentSearchableBy
+          ? aggregate.establishment.searchableBy[establishmentSearchableBy]
+          : true,
+      )
       .flatMap((aggregate) =>
         uniqBy((offer) => offer.romeCode, aggregate.offers)
           .filter(

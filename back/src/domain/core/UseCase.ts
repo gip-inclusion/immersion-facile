@@ -77,7 +77,7 @@ export abstract class TransactionalUseCase<
     jwtPayload?: JWTPayload,
   ): Promise<Output>;
 
-  // this methode should not be overwritten, implement _execute instead
+  // this method should not be overwritten, implement _execute instead
   public async execute(
     params: Input,
     jwtPayload?: JWTPayload,

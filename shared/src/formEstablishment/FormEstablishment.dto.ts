@@ -41,6 +41,8 @@ export type EstablishmentSearchableBy = {
   jobSeekers: boolean;
 };
 
+export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
+
 export type FormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
