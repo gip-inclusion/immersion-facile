@@ -47,7 +47,7 @@ export const FixedStamp = ({
         <a
           className={cx(Styles.overlayLink)}
           {...link}
-          aria-label="Lien associé à la mise en avant temporaire"
+          aria-label={subtitle || "Lien associé à la mise en avant temporaire"}
         />
       )}
     </aside>
