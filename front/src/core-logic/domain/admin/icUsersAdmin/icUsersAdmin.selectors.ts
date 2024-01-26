@@ -36,7 +36,14 @@ const icUsersNeedingReview = createSelector(
       .filter((user) =>
         values(user.agencyRights).some((right) => right.role === "toReview"),
       )
-      .map(({ agencyRights, agencyDashboardUrl, ...user }) => user),
+      .map(
+        ({
+          agencyRights,
+          agencyDashboardUrl,
+          establishmentDashboards,
+          ...user
+        }) => user,
+      ),
 );
 
 export const icUsersAdminSelectors = {

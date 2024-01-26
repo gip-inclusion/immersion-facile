@@ -25,7 +25,11 @@ export class InMemoryInclusionConnectedUserRepository
       (user) => user.id === userId,
     );
     if (!user) return;
-    return { ...user, agencyRights: this.agencyRightsByUserId[userId] ?? [] };
+    return {
+      ...user,
+      agencyRights: this.agencyRightsByUserId[userId] ?? [],
+      establishmentDashboards: {},
+    };
   }
 
   public async getWithFilter({
@@ -40,6 +44,7 @@ export class InMemoryInclusionConnectedUserRepository
       .map((user) => ({
         ...user,
         agencyRights: this.agencyRightsByUserId[user.id],
+        establishmentDashboards: {},
       }));
   }
 

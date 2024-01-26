@@ -29,6 +29,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     firstName: "Joe",
     lastName: "Doe",
     agencyRights: [],
+    establishmentDashboards: {},
   };
   const inclusionConnectedUserWithRights: InclusionConnectedUser = {
     ...inclusionConnectedUserWithoutRights,
@@ -79,11 +80,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: {
           ...inclusionConnectedUserWithRights,
           agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
-          establishmentDashboard: {
-            url: `http://stubEstablishmentConventionsDashboardUrl/${
-              inclusionConnectedUserWithRights.id
-            }/${gateways.timeGateway.now()}`,
-            role: "establishment-representative",
+          establishmentDashboards: {
+            conventions: {
+              url: `http://stubEstablishmentConventionsDashboardUrl/${
+                inclusionConnectedUserWithRights.id
+              }/${gateways.timeGateway.now()}`,
+              role: "establishment-representative",
+            },
           },
         },
         status: 200,
@@ -251,6 +254,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         firstName: "Joe",
         lastName: "Doe",
         agencyRights: [{ agency, role: "validator" }],
+        establishmentDashboards: {},
       };
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)

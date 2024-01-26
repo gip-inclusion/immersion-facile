@@ -128,7 +128,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       await uow.authenticatedUserRepository.findByEmail(icIdTokenPayload.email);
 
     const newOrUpdatedAuthenticatedUser: AuthenticatedUser = {
-      ...existingAuthenticatedUser,
+      // ...existingAuthenticatedUser,
       ...this.#makeAuthenticatedUser(
         this.#uuidGenerator.new(),
         icIdTokenPayload,

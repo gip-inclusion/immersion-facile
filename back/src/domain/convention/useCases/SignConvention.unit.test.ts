@@ -122,6 +122,7 @@ describe("Sign convention", () => {
         uow.conventionRepository.setConventions([conventionInDb]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
+          establishmentDashboards: {},
           email: "other@mail.com",
           firstName: "Billy",
           lastName: "Idol",
@@ -225,6 +226,7 @@ describe("Sign convention", () => {
         uow.conventionRepository.setConventions([conventionInDb]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
+          establishmentDashboards: {},
           email: conventionInDb.signatories.establishmentRepresentative.email,
           firstName: "Billy",
           lastName: "Idol",

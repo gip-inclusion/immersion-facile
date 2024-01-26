@@ -114,6 +114,7 @@ describe("Auth slice", () => {
       firstName: inclusionConnectedFederatedIdentity.firstName,
       lastName: inclusionConnectedFederatedIdentity.lastName,
       agencyRights: [],
+      establishmentDashboards: {},
     };
     dependencies.inclusionConnectedGateway.currentUser$.next(icUser);
     expectToEqual(

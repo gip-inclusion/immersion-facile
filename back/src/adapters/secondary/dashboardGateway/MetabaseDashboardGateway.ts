@@ -27,6 +27,10 @@ const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
     kind: "dashboard",
     id: 128,
   },
+  establishmentRepresentativeDiscussions: {
+    kind: "dashboard",
+    id: 138,
+  },
 };
 
 type MetabasePayload = {
@@ -88,6 +92,21 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     now: Date,
   ): AbsoluteUrl {
     const dashboard = dashboardByName.establishmentRepresentativeConventions;
+    const token = this.#createToken({
+      dashboard,
+      params: {
+        ic_user_id: [authenticatedUserId],
+      },
+      now,
+    });
+    return this.#makeUrl(token, dashboard);
+  }
+
+  public getEstablishmentDiscussionsDashboardUrl(
+    authenticatedUserId: AuthenticatedUserId,
+    now: Date,
+  ): AbsoluteUrl {
+    const dashboard = dashboardByName.establishmentRepresentativeDiscussions;
     const token = this.#createToken({
       dashboard,
       params: {

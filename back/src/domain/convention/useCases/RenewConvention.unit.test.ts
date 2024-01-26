@@ -83,6 +83,7 @@ describe("RenewConvention", () => {
     firstName: "John",
     lastName: "Doe",
     agencyRights: [{ role: "validator", agency }],
+    establishmentDashboards: {},
   };
   const inclusionConnectPayload: InclusionConnectDomainJwtPayload = {
     userId: inclusionConnectedUser.id,

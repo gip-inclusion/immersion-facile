@@ -34,6 +34,7 @@ describe("InclusionConnected", () => {
         agency: new AgencyDtoBuilder().build(),
       },
     ],
+    establishmentDashboards: {},
   };
 
   const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {

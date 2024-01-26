@@ -13,6 +13,7 @@ const simulatedUserConnected: InclusionConnectedUser = {
   lastName: "User",
   id: "fake-user-id",
   agencyRights: [],
+  establishmentDashboards: {},
 };
 
 export const nonExisitingAgencyId: AgencyId = "not-found-agency-id";

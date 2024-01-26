@@ -49,6 +49,7 @@ const inclusionConnectedUser: InclusionConnectedUser = {
   firstName: "John",
   lastName: "Doe",
   agencyRights: [{ role: "validator", agency: peAgency }],
+  establishmentDashboards: {},
 };
 const convention = new ConventionDtoBuilder()
   .withAgencyId(peAgency.id)

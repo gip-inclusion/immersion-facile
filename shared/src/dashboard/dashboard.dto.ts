@@ -13,6 +13,7 @@ export type EstablishmentDashboardName =
 
 export const establishmentDashboardNames = [
   "establishmentRepresentativeConventions",
+  "establishmentRepresentativeDiscussions",
 ] as const;
 
 export const simpleDashboardNames = [

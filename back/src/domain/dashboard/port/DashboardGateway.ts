@@ -21,4 +21,8 @@ export interface DashboardGateway {
     authenticatedUserId: AuthenticatedUserId,
     now: Date,
   ): AbsoluteUrl;
+  getEstablishmentDiscussionsDashboardUrl(
+    authenticatedUserId: AuthenticatedUserId,
+    now: Date,
+  ): AbsoluteUrl;
 }
