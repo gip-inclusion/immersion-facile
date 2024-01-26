@@ -22,6 +22,7 @@ const johnWithAgenciesToReview: InclusionConnectedUser = {
     { agency: agency1, role: "toReview" },
     { agency: agency2, role: "validator" },
   ],
+  establishmentDashboards: {},
 };
 
 const paulWithAllAgenciesReviewed: InclusionConnectedUser = {
@@ -33,6 +34,7 @@ const paulWithAllAgenciesReviewed: InclusionConnectedUser = {
     { agency: agency1, role: "counsellor" },
     { agency: agency2, role: "validator" },
   ],
+  establishmentDashboards: {},
 };
 
 describe("GetInclusionConnectedUsers", () => {

@@ -90,6 +90,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         firstName: "Jean",
         lastName: "Bon",
         agencyRights: simulatedAgencyDtos,
+        establishmentDashboards: {},
       },
       {
         id: "fake-user-id-2",
@@ -97,6 +98,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         firstName: "Rémi",
         lastName: "Sanfamille",
         agencyRights: [],
+        establishmentDashboards: {},
       },
       {
         id: "user-in-error",
@@ -112,8 +114,9 @@ export class SimulatedAdminGateway implements AdminGateway {
               .build(),
           },
         ],
+        establishmentDashboards: {},
       },
-    ]);
+    ] satisfies InclusionConnectedUser[]);
   }
 
   public getLastNotifications$(

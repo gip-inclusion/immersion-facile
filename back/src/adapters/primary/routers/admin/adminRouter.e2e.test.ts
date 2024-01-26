@@ -391,6 +391,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
+        establishmentDashboards: {},
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -445,6 +446,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
+        establishmentDashboards: {},
       };
 
       const updatedRole: AgencyRole = "counsellor";
@@ -477,6 +479,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
+        establishmentDashboards: {},
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([

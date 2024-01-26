@@ -32,12 +32,16 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     agencyRights: z.array(agencyRightSchema),
     agencyDashboardUrl: absoluteUrlSchema.optional(),
     erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
-    establishmentDashboard: z
-      .object({
-        url: absoluteUrlSchema,
-        role: z.enum(establishmentsRoles),
-      })
-      .optional(),
+
+    establishmentDashboards: z.object({
+      conventions: z
+        .object({
+          url: absoluteUrlSchema,
+          role: z.enum(establishmentsRoles),
+        })
+        .optional(),
+      discussions: absoluteUrlSchema.optional(),
+    }),
   });
 
 export const getInclusionConnectLogoutUrlQueryParamsSchema: z.Schema<GetInclusionConnectLogoutUrlQueryParams> =

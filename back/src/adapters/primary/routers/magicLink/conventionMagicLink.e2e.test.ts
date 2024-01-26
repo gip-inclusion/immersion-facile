@@ -300,6 +300,7 @@ describe("Magic link router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ role: "validator", agency }],
+        establishmentDashboards: {},
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -416,6 +417,7 @@ describe("Magic link router", () => {
         .build();
       const icUser: InclusionConnectedUser = {
         agencyRights: [],
+        establishmentDashboards: {},
         email: convention.signatories.establishmentRepresentative.email,
         firstName: "",
         lastName: "",
@@ -449,6 +451,7 @@ describe("Magic link router", () => {
         .build();
       const icUser: InclusionConnectedUser = {
         agencyRights: [],
+        establishmentDashboards: {},
         email: "email@mail.com",
         firstName: "",
         lastName: "",

@@ -2,7 +2,6 @@ import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
   AgencyId,
-  AgencyRight,
   AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
@@ -74,6 +73,7 @@ describe("PgInclusionConnectedUserRepository", () => {
       expectToEqual(inclusionConnectedUser, {
         ...authenticatedUser1,
         agencyRights: [],
+        establishmentDashboards: {},
       });
     });
 
@@ -107,7 +107,8 @@ describe("PgInclusionConnectedUserRepository", () => {
         agencyRights: [
           { agency: agency1, role: "toReview" },
           { agency: agency2, role: "validator" },
-        ] satisfies AgencyRight[],
+        ],
+        establishmentDashboards: {},
       });
     });
 
@@ -118,6 +119,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         const icUserToSave: InclusionConnectedUser = {
           ...authenticatedUser1,
           agencyRights: [{ role: "counsellor", agency: agency1 }],
+          establishmentDashboards: {},
         };
 
         await icUserRepository.update(icUserToSave);
@@ -134,6 +136,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         const icUserToSave: InclusionConnectedUser = {
           ...authenticatedUser1,
           agencyRights: [],
+          establishmentDashboards: {},
         };
 
         await icUserRepository.update(icUserToSave);
@@ -156,6 +159,7 @@ describe("PgInclusionConnectedUserRepository", () => {
             { agency: agency1, role: "validator" },
             { agency: agency2, role: "toReview" },
           ],
+          establishmentDashboards: {},
         };
 
         await icUserRepository.update(icUserToSave);
@@ -169,6 +173,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         const updatedIcUserToSave: InclusionConnectedUser = {
           ...authenticatedUser1,
           agencyRights: [{ agency: agency1, role: "validator" }],
+          establishmentDashboards: {},
         };
 
         await icUserRepository.update(updatedIcUserToSave);
@@ -235,10 +240,12 @@ describe("PgInclusionConnectedUserRepository", () => {
             { agency: agency1, role: "toReview" },
             { agency: agency2, role: "validator" },
           ],
+          establishmentDashboards: {},
         },
         {
           ...authenticatedUser2,
           agencyRights: [{ agency: agency2, role: "toReview" }],
+          establishmentDashboards: {},
         },
       ]);
     });

@@ -97,6 +97,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
           agency,
         },
       ],
+      establishmentDashboards: {},
     };
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 
@@ -132,6 +133,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
           agency,
         },
       ],
+      establishmentDashboards: {},
     };
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 

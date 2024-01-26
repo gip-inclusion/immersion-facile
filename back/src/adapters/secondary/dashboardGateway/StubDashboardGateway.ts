@@ -30,4 +30,11 @@ export class StubDashboardGateway implements DashboardGateway {
   ): AbsoluteUrl {
     return `http://stubEstablishmentConventionsDashboardUrl/${authenticatedUserId}/${now}`;
   }
+
+  public getEstablishmentDiscussionsDashboardUrl(
+    authenticatedUserId: AuthenticatedUserId,
+    now: Date,
+  ): AbsoluteUrl {
+    return `http://stubEstablishmentDiscussionsDashboardUrl/${authenticatedUserId}/${now}`;
+  }
 }

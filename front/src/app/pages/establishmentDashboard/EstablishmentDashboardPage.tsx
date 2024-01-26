@@ -41,25 +41,44 @@ export const EstablishmentDashboardPage = ({
       label: "Conventions en cours",
       content: (
         <>
-          {currentUser.establishmentDashboard?.role ===
+          {currentUser.establishmentDashboards.conventions?.role ===
             "establishment-representative" && (
             <ManageConventionFormSection
               routeNameToRedirectTo={"manageConventionInclusionConnected"}
             />
           )}
-          {currentUser.establishmentDashboard ? (
+          {currentUser.establishmentDashboards.conventions ? (
             <MetabaseView
               title={`Tableau des conventions en cours
             pour le ${currentUserRoleToDisplay(
-              currentUser.establishmentDashboard.role,
+              currentUser.establishmentDashboards.conventions.role,
             )} ${currentUser.firstName} ${currentUser.lastName}`}
-              url={currentUser.establishmentDashboard.url}
+              url={currentUser.establishmentDashboards.conventions.url}
             />
           ) : (
             <p>
               {" "}
               Nous n'avons pas trouvé de convention où vous êtes référencé en
               tant que responsable ou tuteur d'entreprise.
+            </p>
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Mises en relation",
+      content: (
+        <>
+          {currentUser.establishmentDashboards.discussions ? (
+            <MetabaseView
+              title={`Suivi des mises en relations pour ${currentUser.firstName} ${currentUser.lastName}`}
+              url={currentUser.establishmentDashboards.discussions}
+            />
+          ) : (
+            <p>
+              {" "}
+              Nous n'avons pas trouvé de mises en relation où vous êtes
+              référencé en tant que contact d'entreprise.
             </p>
           )}
         </>

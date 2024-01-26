@@ -75,7 +75,11 @@ describe("GetUserAgencyDashboardUrl", () => {
     async (agencyUserRole) => {
       const agency = new AgencyDtoBuilder().build();
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        { ...john, agencyRights: [{ agency, role: agencyUserRole }] },
+        {
+          ...john,
+          agencyRights: [{ agency, role: agencyUserRole }],
+          establishmentDashboards: {},
+        },
       ]);
       const url = await getInclusionConnectedUser.execute(
         undefined,
@@ -86,6 +90,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         ...john,
         agencyRights: [{ agency, role: agencyUserRole }],
         agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
+        establishmentDashboards: {},
       }); // coming from StubDashboardGateway
     },
   );
@@ -98,6 +103,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         agencyRights: [
           { agency: new AgencyDtoBuilder().build(), role: agencyUserRole },
         ],
+        establishmentDashboards: {},
       };
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         storedInclusionConnectedUser,
@@ -130,6 +136,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           { agency: agency3, role: "toReview" },
           { agency: agency4, role: "agencyOwner" },
         ],
+        establishmentDashboards: {},
       },
     ]);
     const url = await getInclusionConnectedUser.execute(
@@ -145,6 +152,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         { agency: agency3, role: "toReview" },
         { agency: agency4, role: "agencyOwner" },
       ],
+      establishmentDashboards: {},
       // dashboardUrl is coming from StubDashboardGateway
       agencyDashboardUrl: `http://stubAgencyDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
       erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${agency1.id}_${agency2.id}_${agency4.id}`,
@@ -159,6 +167,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       {
         ...john,
         agencyRights: [{ agency: agency1, role: "counsellor" }],
+        establishmentDashboards: {},
       },
     ]);
     const url = await getInclusionConnectedUser.execute(
@@ -171,6 +180,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     expectToEqual(url, {
       ...john,
       agencyRights: [{ agency: agency1, role: "counsellor" }],
+      establishmentDashboards: {},
       // dashboardUrl is coming from StubDashboardGateway
       agencyDashboardUrl: `http://stubAgencyDashboard/${agency1.id}`,
     });
@@ -181,6 +191,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
           ...john,
+          establishmentDashboards: {},
           agencyRights: [],
         },
       ]);
@@ -194,11 +205,13 @@ describe("GetUserAgencyDashboardUrl", () => {
         inclusionConnectJwtPayload,
       );
 
-      expectToEqual(result.establishmentDashboard, {
-        url: `http://stubEstablishmentConventionsDashboardUrl/${
-          john.id
-        }/${timeGateway.now()}`,
-        role: "establishment-representative",
+      expectToEqual(result.establishmentDashboards, {
+        conventions: {
+          role: "establishment-representative",
+          url: `http://stubEstablishmentConventionsDashboardUrl/${
+            john.id
+          }/${timeGateway.now()}`,
+        },
       });
     });
 
@@ -207,6 +220,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         {
           ...john,
           agencyRights: [],
+          establishmentDashboards: {},
         },
       ]);
       const convention = new ConventionDtoBuilder()
@@ -219,11 +233,13 @@ describe("GetUserAgencyDashboardUrl", () => {
         inclusionConnectJwtPayload,
       );
 
-      expectToEqual(result.establishmentDashboard, {
-        url: `http://stubEstablishmentConventionsDashboardUrl/${
-          john.id
-        }/${timeGateway.now()}`,
-        role: "establishment-tutor",
+      expectToEqual(result.establishmentDashboards, {
+        conventions: {
+          role: "establishment-tutor",
+          url: `http://stubEstablishmentConventionsDashboardUrl/${
+            john.id
+          }/${timeGateway.now()}`,
+        },
       });
     });
 
@@ -232,6 +248,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         {
           ...john,
           agencyRights: [],
+          establishmentDashboards: {},
         },
       ]);
       const convention = new ConventionDtoBuilder()
@@ -245,11 +262,13 @@ describe("GetUserAgencyDashboardUrl", () => {
         inclusionConnectJwtPayload,
       );
 
-      expectToEqual(result.establishmentDashboard, {
-        url: `http://stubEstablishmentConventionsDashboardUrl/${
-          john.id
-        }/${timeGateway.now()}`,
-        role: "establishment-representative",
+      expectToEqual(result.establishmentDashboards, {
+        conventions: {
+          url: `http://stubEstablishmentConventionsDashboardUrl/${
+            john.id
+          }/${timeGateway.now()}`,
+          role: "establishment-representative",
+        },
       });
     });
 
@@ -258,6 +277,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         {
           ...john,
           agencyRights: [],
+          establishmentDashboards: {},
         },
       ]);
 
@@ -266,7 +286,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         inclusionConnectJwtPayload,
       );
 
-      expectToEqual(result.establishmentDashboard, undefined);
+      expectToEqual(result.establishmentDashboards, {});
     });
   });
 });

@@ -62,6 +62,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [{ role: "toReview", agency }],
+          establishmentDashboards: {},
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
         uow.agencyRepository.setAgencies([agency]);
@@ -121,6 +122,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [{ role: "validator", agency }],
+          establishmentDashboards: {},
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
         const jwtPayload: InclusionConnectDomainJwtPayload = {
@@ -148,6 +150,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [],
+          establishmentDashboards: {},
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
 

@@ -30,6 +30,7 @@ const user: AuthenticatedUser = {
 const icUser: InclusionConnectedUser = {
   ...user,
   agencyRights: [],
+  establishmentDashboards: {},
 };
 
 describe("Notify icUser agency right rejected", () => {

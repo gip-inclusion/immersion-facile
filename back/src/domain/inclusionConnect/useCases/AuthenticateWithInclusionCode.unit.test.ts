@@ -236,6 +236,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             lastName: peSpecificIcIdTokenPayload.family_name,
             id: userId,
             agencyRights: [{ agency, role: "agencyOwner" }],
+            establishmentDashboards: {},
           },
         ]);
 
@@ -275,6 +276,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             lastName: peSpecificIcIdTokenPayload.family_name,
             id: userId,
             agencyRights: [{ agency, role: "toReview" }],
+            establishmentDashboards: {},
           },
         ]);
 

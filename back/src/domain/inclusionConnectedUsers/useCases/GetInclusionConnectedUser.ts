@@ -3,6 +3,7 @@ import {
   InclusionConnectedUser,
   InclusionConnectJwtPayload,
   WithDashboardUrls,
+  WithEstablishmentDashboards,
 } from "shared";
 import {
   ForbiddenError,
@@ -77,6 +78,24 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
         )
       ).length > 0;
 
+    const establishmentDashboards: WithEstablishmentDashboards = {
+      establishmentDashboards: {
+        ...(hasConventionForEstablishmentRepresentative ||
+        hasConventionForEstablishmentTutor
+          ? {
+              conventions: {
+                url: this.#dashboardGateway.getEstablishmentConventionsDashboardUrl(
+                  user.id,
+                  this.#timeGateway.now(),
+                ),
+                role: hasConventionForEstablishmentRepresentative
+                  ? "establishment-representative"
+                  : "establishment-tutor",
+              },
+            }
+          : {}),
+      },
+    };
     return {
       ...(agencyIdsWithEnoughPrivileges.length > 0
         ? {
@@ -95,20 +114,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
               ),
           }
         : {}),
-      ...(hasConventionForEstablishmentRepresentative ||
-      hasConventionForEstablishmentTutor
-        ? {
-            establishmentDashboard: {
-              url: await this.#dashboardGateway.getEstablishmentConventionsDashboardUrl(
-                user.id,
-                this.#timeGateway.now(),
-              ),
-              role: hasConventionForEstablishmentRepresentative
-                ? "establishment-representative"
-                : "establishment-tutor",
-            },
-          }
-        : {}),
+      ...establishmentDashboards,
     };
   }
 }
