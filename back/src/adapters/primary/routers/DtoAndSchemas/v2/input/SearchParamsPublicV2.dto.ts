@@ -1,4 +1,8 @@
-import { AppellationCode, RomeCode } from "shared";
+import {
+  AppellationCode,
+  EstablishmentSearchableByValue,
+  RomeCode,
+} from "shared";
 
 type SearchSortedBy = "distance" | "date";
 
@@ -10,4 +14,5 @@ export type SearchParamsPublicV2 = {
   distanceKm: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
+  establishmentSearchableBy?: EstablishmentSearchableByValue;
 };
