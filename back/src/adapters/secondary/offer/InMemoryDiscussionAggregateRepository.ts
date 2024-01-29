@@ -4,7 +4,6 @@ import {
   AppellationCode,
   Builder,
   DiscussionId,
-  Email,
   ImmersionObjective,
   SiretDto,
 } from "shared";
@@ -14,7 +13,10 @@ import {
   DiscussionPotentialBeneficiary,
   ExchangeEntity,
 } from "../../../domain/offer/entities/DiscussionAggregate";
-import { DiscussionAggregateRepository } from "../../../domain/offer/ports/DiscussionAggregateRepository";
+import {
+  DiscussionAggregateRepository,
+  HasDiscussionMatchingParams,
+} from "../../../domain/offer/ports/DiscussionAggregateRepository";
 
 type DiscussionsById = Record<DiscussionId, DiscussionAggregate>;
 
@@ -39,18 +41,27 @@ export class InMemoryDiscussionAggregateRepository
     appellationCode,
     potentialBeneficiaryEmail,
     since,
-  }: {
-    potentialBeneficiaryEmail: Email;
-    appellationCode: AppellationCode;
-    siret: SiretDto;
-    since: Date;
-  }): Promise<boolean> {
-    return this.discussionAggregates.some(
-      (discussion) =>
-        discussion.siret === siret &&
-        discussion.appellationCode === appellationCode &&
-        discussion.potentialBeneficiary.email === potentialBeneficiaryEmail &&
-        discussion.createdAt >= since,
+    establishmentRepresentativeEmail,
+  }: Partial<HasDiscussionMatchingParams>): Promise<boolean> {
+    const filters = [
+      (discussion: DiscussionAggregate) =>
+        siret ? discussion.siret === siret : true,
+      (discussion: DiscussionAggregate) =>
+        appellationCode ? discussion.appellationCode === appellationCode : true,
+      (discussion: DiscussionAggregate) =>
+        potentialBeneficiaryEmail
+          ? discussion.potentialBeneficiary.email === potentialBeneficiaryEmail
+          : true,
+      (discussion: DiscussionAggregate) =>
+        since ? discussion.createdAt >= since : true,
+      (discussion: DiscussionAggregate) =>
+        establishmentRepresentativeEmail
+          ? discussion.establishmentContact.email ===
+            establishmentRepresentativeEmail
+          : true,
+    ];
+    return this.discussionAggregates.some((discussion) =>
+      filters.every((filter) => filter(discussion)),
     );
   }
 
