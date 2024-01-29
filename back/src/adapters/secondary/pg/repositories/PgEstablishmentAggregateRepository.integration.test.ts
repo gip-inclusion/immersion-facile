@@ -7,6 +7,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   SearchResultDto,
+  SiretDto,
 } from "shared";
 import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
@@ -209,51 +210,47 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
 
     describe("if 'establishmentSearchableBy' parameter is defined", () => {
-      it('return only establishment searchable by student if "establishmentSearchableBy" parameter is defined to students', async () => {
-        await Promise.all([
-          insertEstablishment(client, {
-            siret: "12345678901234",
-            position: searchedPosition,
-            // no need to provide searchableByStudents, searchableByJobSeekers, it should default to true
-            createdAt: new Date(),
-          }),
-          insertEstablishment(client, {
-            siret: "12345677654321",
-            position: searchedPosition,
-            searchableByStudents: true,
-            searchableByJobSeekers: false,
-            createdAt: new Date(),
-          }),
-          insertEstablishment(client, {
-            siret: "09876543211234",
-            position: searchedPosition,
-            searchableByStudents: false,
-            searchableByJobSeekers: true,
-            createdAt: new Date(),
-          }),
-        ]);
+      const siret1 = "12345678901234";
+      const siret2 = "12345677654321";
+      const siret3 = "09876543211234";
 
-        await Promise.all([
+      const sirets = [siret1, siret2, siret3];
+
+      beforeEach(async () => {
+        await insertEstablishment(client, {
+          siret: siret1,
+          position: searchedPosition,
+          // no need to provide searchableByStudents, searchableByJobSeekers, it should default to true
+          createdAt: new Date(),
+        });
+
+        await insertEstablishment(client, {
+          siret: siret2,
+          position: searchedPosition,
+          searchableByStudents: true,
+          searchableByJobSeekers: false,
+          createdAt: new Date(),
+        });
+
+        await insertEstablishment(client, {
+          siret: siret3,
+          position: searchedPosition,
+          searchableByStudents: false,
+          searchableByJobSeekers: true,
+          createdAt: new Date(),
+        });
+
+        sirets.forEach(async (siret) =>
           insertImmersionOffer(client, {
             romeCode: cartographeImmersionOffer.romeCode,
             appellationCode: cartographeSearchMade.appellationCodes![0],
-            siret: "12345678901234",
+            siret,
             offerCreatedAt: new Date("2022-05-05"),
           }),
-          insertImmersionOffer(client, {
-            romeCode: cartographeImmersionOffer.romeCode,
-            appellationCode: cartographeSearchMade.appellationCodes![0],
-            siret: "12345677654321",
-            offerCreatedAt: new Date("2022-05-02"),
-          }),
-          insertImmersionOffer(client, {
-            romeCode: cartographeImmersionOffer.romeCode,
-            appellationCode: cartographeSearchMade.appellationCodes![0],
-            siret: "09876543211234",
-            offerCreatedAt: new Date("2022-05-02"),
-          }),
-        ]);
+        );
+      });
 
+      it('return only establishment searchable by student if "establishmentSearchableBy" parameter is defined to students', async () => {
         const searchResultsOnlyForStudents =
           await pgEstablishmentAggregateRepository.searchImmersionResults({
             searchMade: {
@@ -262,193 +259,37 @@ describe("PgEstablishmentAggregateRepository", () => {
             },
           });
 
-        expectArraysToEqualIgnoringOrder(searchResultsOnlyForStudents, [
-          {
-            rome: "M1808",
-            siret: "12345677654321",
-            distance_m: 0,
-            isSearchable: true,
-            name: "",
-            website: "",
-            additionalInformation: "",
-            position: { lon: 6, lat: 49 },
-            romeLabel: "Information géographique",
-            appellations: [
-              { appellationCode: "11704", appellationLabel: "Cartographe" },
-            ],
-            naf: "8622B",
-            nafLabel: "Activité des médecins spécialistes",
-            address: {
-              streetNumberAndAddress: "7 rue guillaume tell",
-              postcode: "75017",
-              city: "Paris",
-              departmentCode: "75",
+        expectArraysToEqualIgnoringOrder(
+          searchResultsOnlyForStudents,
+          toSearchResults([siret2, siret1]),
+        );
+      });
+
+      it('return only establishment searchable by student if "establishmentSearchableBy" parameter is defined to jobSeekers', async () => {
+        const searchResultsOnlyForStudents =
+          await pgEstablishmentAggregateRepository.searchImmersionResults({
+            searchMade: {
+              ...cartographeSearchMade,
+              establishmentSearchableBy: "jobSeekers",
             },
-            voluntaryToImmersion: true,
-          },
-          {
-            rome: "M1808",
-            siret: "12345678901234",
-            distance_m: 0,
-            isSearchable: true,
-            name: "",
-            website: "",
-            additionalInformation: "",
-            position: { lon: 6, lat: 49 },
-            romeLabel: "Information géographique",
-            appellations: [
-              { appellationCode: "11704", appellationLabel: "Cartographe" },
-            ],
-            naf: "8622B",
-            nafLabel: "Activité des médecins spécialistes",
-            address: {
-              streetNumberAndAddress: "7 rue guillaume tell",
-              postcode: "75017",
-              city: "Paris",
-              departmentCode: "75",
-            },
-            voluntaryToImmersion: true,
-          },
-        ]);
+          });
+
+        expectArraysToEqualIgnoringOrder(
+          searchResultsOnlyForStudents,
+          toSearchResults([siret3, siret1]),
+        );
       });
 
       it('return all establishments if "establishmentSearchableBy" parameter is not defined', async () => {
-        await insertEstablishment(client, {
-          siret: "12345678901234",
-          position: searchedPosition,
-          // no need to provide searchableByStudents, searchableByJobSeekers, it should default to true
-          createdAt: new Date(),
-        });
-        await insertEstablishment(client, {
-          siret: "12345677654321",
-          position: searchedPosition,
-          searchableByStudents: true,
-          searchableByJobSeekers: false,
-          createdAt: new Date(),
-        });
-        await insertEstablishment(client, {
-          siret: "09876543211234",
-          position: searchedPosition,
-          searchableByStudents: false,
-          searchableByJobSeekers: true,
-          createdAt: new Date(),
-        });
-
-        await insertImmersionOffer(client, {
-          romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCodes![0],
-          siret: "12345678901234",
-          offerCreatedAt: new Date("2022-05-05"),
-        });
-
-        await insertImmersionOffer(client, {
-          romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCodes![0],
-          siret: "12345677654321",
-          offerCreatedAt: new Date("2022-05-02"),
-        });
-
-        await insertImmersionOffer(client, {
-          romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCodes![0],
-          siret: "09876543211234",
-          offerCreatedAt: new Date("2022-05-02"),
-        });
-
         const searchResultsOnlyForStudents =
           await pgEstablishmentAggregateRepository.searchImmersionResults({
             searchMade: cartographeSearchMade,
           });
 
-        expectArraysToEqualIgnoringOrder(searchResultsOnlyForStudents, [
-          {
-            rome: "M1808",
-            siret: "12345677654321",
-            distance_m: 0,
-            isSearchable: true,
-            name: "",
-            website: "",
-            additionalInformation: "",
-            position: {
-              lon: 6,
-              lat: 49,
-            },
-            romeLabel: "Information géographique",
-            appellations: [
-              {
-                appellationCode: "11704",
-                appellationLabel: "Cartographe",
-              },
-            ],
-            naf: "8622B",
-            nafLabel: "Activité des médecins spécialistes",
-            address: {
-              streetNumberAndAddress: "7 rue guillaume tell",
-              postcode: "75017",
-              city: "Paris",
-              departmentCode: "75",
-            },
-            voluntaryToImmersion: true,
-          },
-          {
-            rome: "M1808",
-            siret: "09876543211234",
-            distance_m: 0,
-            isSearchable: true,
-            name: "",
-            website: "",
-            additionalInformation: "",
-            position: {
-              lon: 6,
-              lat: 49,
-            },
-            romeLabel: "Information géographique",
-            appellations: [
-              {
-                appellationCode: "11704",
-                appellationLabel: "Cartographe",
-              },
-            ],
-            naf: "8622B",
-            nafLabel: "Activité des médecins spécialistes",
-            address: {
-              streetNumberAndAddress: "7 rue guillaume tell",
-              postcode: "75017",
-              city: "Paris",
-              departmentCode: "75",
-            },
-            voluntaryToImmersion: true,
-          },
-          {
-            rome: "M1808",
-            siret: "12345678901234",
-            distance_m: 0,
-            isSearchable: true,
-            name: "",
-            website: "",
-            additionalInformation: "",
-            position: {
-              lon: 6,
-              lat: 49,
-            },
-            romeLabel: "Information géographique",
-            appellations: [
-              {
-                appellationCode: "11704",
-                appellationLabel: "Cartographe",
-              },
-            ],
-            naf: "8622B",
-            nafLabel: "Activité des médecins spécialistes",
-            address: {
-              streetNumberAndAddress: "7 rue guillaume tell",
-              postcode: "75017",
-              city: "Paris",
-              departmentCode: "75",
-            },
-            voluntaryToImmersion: true,
-          },
-        ]);
+        expectArraysToEqualIgnoringOrder(
+          searchResultsOnlyForStudents,
+          toSearchResults([siret2, siret1, siret3]),
+        );
       });
     });
 
@@ -1257,3 +1098,28 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 });
+
+const toSearchResults = (sirets: SiretDto[]): SearchResultDto[] =>
+  sirets.map((siret) => ({
+    rome: "M1808",
+    siret,
+    distance_m: 0,
+    isSearchable: true,
+    name: "",
+    website: "",
+    additionalInformation: "",
+    position: { lon: 6, lat: 49 },
+    romeLabel: "Information géographique",
+    appellations: [
+      { appellationCode: "11704", appellationLabel: "Cartographe" },
+    ],
+    naf: "8622B",
+    nafLabel: "Activité des médecins spécialistes",
+    address: {
+      streetNumberAndAddress: "7 rue guillaume tell",
+      postcode: "75017",
+      city: "Paris",
+      departmentCode: "75",
+    },
+    voluntaryToImmersion: true,
+  }));

@@ -554,6 +554,58 @@ describe("SearchImmersionUseCase", () => {
     ]);
   });
 
+  it("return only the establishment that only accept student if estbablishmentSearchableBy params is define to jobSeekers", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishment,
+      establishmentAcceptingOnlyStudent,
+      establishmentAcceptingOnlyJobSeeker,
+    ];
+    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+    const searchParams: SearchQueryParamsDto = {
+      ...searchInMetzParams,
+      establishmentSearchableBy: "jobSeekers",
+    };
+
+    const response = await searchImmersionUseCase.execute(searchParams);
+
+    expectToEqual(response, [
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishment,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyJobSeeker,
+        secretariatOffer.romeCode,
+        606885,
+      ),
+      establishmentAggregateToSearchResultByRome(
+        establishmentAcceptingOnlyJobSeeker,
+        boulangerOffer.romeCode,
+        606885,
+      ),
+    ]);
+    expectToEqual(uow.searchMadeRepository.searchesMade, [
+      {
+        id: "searchMadeUuid",
+        appellationCodes: undefined,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
+        distanceKm: searchInMetzParams.distanceKm,
+        needsToBeSearched: true,
+        sortedBy: "distance",
+        numberOfResults: 4,
+        establishmentSearchableBy: "jobSeekers",
+      },
+    ]);
+  });
+
   it("return all the establishments if estbablishmentSearchableBy params is not define", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,

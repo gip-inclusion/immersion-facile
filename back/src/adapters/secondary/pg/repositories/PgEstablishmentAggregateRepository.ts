@@ -400,7 +400,8 @@ export class PgEstablishmentAggregateRepository
       `WITH active_establishments_within_area AS 
         (SELECT siret, fit_for_disabled_workers, gps
          FROM establishments 
-         WHERE is_open ${andSearchableByFilter}
+         WHERE is_open 
+         ${andSearchableByFilter}
          AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
         matching_offers AS (
           SELECT 

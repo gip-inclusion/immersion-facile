@@ -6,15 +6,19 @@ import {
   Group,
   immersionOffersRoute,
   searchImmersionRoutes,
+  SearchResultDto,
   SearchRoutes,
   SiretDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
+import { OfferEntity } from "../../../../domain/offer/entities/OfferEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
+import { avenueChampsElyseesDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   ContactEntityBuilder,
+  defaultNafCode,
   EstablishmentAggregateBuilder,
   establishmentAggregateToSearchResultByRome,
   EstablishmentEntityBuilder,
@@ -134,6 +138,161 @@ describe("search-immersion route", () => {
         expectHttpResponseToEqual(result, {
           status: 200,
           body: [],
+        });
+      });
+    });
+
+    describe("with filter establishmentSearchableBy", () => {
+      const siret1 = "12345678901234";
+      const siret2 = "11111111111111";
+      const siret3 = "12341234123455";
+
+      const toSearchImmersionResults = (
+        params: { siret: SiretDto; offer: OfferEntity }[],
+      ): SearchResultDto[] =>
+        params.map(({ siret, offer }) => ({
+          address: avenueChampsElyseesDto,
+          naf: defaultNafCode,
+          nafLabel: "NAFRev2",
+          name: "Company inside repository",
+          website: "www.jobs.fr",
+          additionalInformation: "",
+          rome: offer.romeCode,
+          romeLabel: "test_rome_label",
+          appellations: [
+            {
+              appellationLabel: offer.appellationLabel,
+              appellationCode: offer.appellationCode,
+            },
+          ],
+          siret,
+          voluntaryToImmersion: true,
+          contactMode: "EMAIL",
+          numberOfEmployeeRange: "10-19",
+          distance_m: 0,
+          position: { lat: 48.8531, lon: 2.34999 },
+        }));
+
+      const offer1 = new OfferEntityBuilder()
+        .withRomeCode("A1409")
+        .withAppellationCode("14704")
+        .build();
+
+      const offer2 = new OfferEntityBuilder()
+        .withRomeCode("A1203")
+        .withAppellationCode("16067")
+        .build();
+
+      beforeEach(async () => {
+        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+          [
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret(siret1)
+              .withOffers([offer1])
+              .withEstablishment(
+                new EstablishmentEntityBuilder()
+                  .withSiret(siret1)
+                  .withPosition({
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  })
+                  .withWebsite("www.jobs.fr")
+                  .build(),
+              )
+              .build(),
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret(siret2)
+              .withOffers([offer2])
+              .withEstablishment(
+                new EstablishmentEntityBuilder()
+                  .withSiret(siret2)
+                  .withPosition({
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  })
+                  .withWebsite("www.jobs.fr")
+                  .withSearchableBy({ students: true, jobSeekers: false })
+                  .build(),
+              )
+              .build(),
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret(siret3)
+              .withOffers([offer1])
+              .withEstablishment(
+                new EstablishmentEntityBuilder()
+                  .withSiret(siret3)
+                  .withPosition({
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  })
+                  .withWebsite("www.jobs.fr")
+                  .withSearchableBy({ students: false, jobSeekers: true })
+                  .build(),
+              )
+              .build(),
+          ],
+        );
+      });
+
+      it("with filter establishmentSearchableBy defined to students", async () => {
+        const result = await sharedRequest.search({
+          queryParams: {
+            appellationCodes: [offer1.appellationCode, offer2.appellationCode],
+            distanceKm: 30,
+            longitude: 2.34999,
+            latitude: 48.8531,
+            sortedBy: "distance",
+            establishmentSearchableBy: "students",
+          },
+        });
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: toSearchImmersionResults([
+            { siret: siret1, offer: offer1 },
+            { siret: siret2, offer: offer2 },
+          ]),
+        });
+      });
+
+      it("with filter establishmentSearchableBy defined to jobSeekers", async () => {
+        const result = await sharedRequest.search({
+          queryParams: {
+            appellationCodes: [offer1.appellationCode, offer2.appellationCode],
+            distanceKm: 30,
+            longitude: 2.34999,
+            latitude: 48.8531,
+            sortedBy: "distance",
+            establishmentSearchableBy: "jobSeekers",
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: toSearchImmersionResults([
+            { siret: siret1, offer: offer1 },
+            { siret: siret3, offer: offer1 },
+          ]),
+        });
+      });
+
+      it("with filter establishmentSearchableBy not defined", async () => {
+        const result = await sharedRequest.search({
+          queryParams: {
+            appellationCodes: [offer1.appellationCode, offer2.appellationCode],
+            distanceKm: 30,
+            longitude: 2.34999,
+            latitude: 48.8531,
+            sortedBy: "distance",
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 200,
+          body: toSearchImmersionResults([
+            { siret: siret1, offer: offer1 },
+            { siret: siret2, offer: offer2 },
+            { siret: siret3, offer: offer1 },
+          ]),
         });
       });
     });

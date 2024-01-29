@@ -1,5 +1,9 @@
 import { SuperTest, Test } from "supertest";
-import { AppellationAndRomeDto, expectHttpResponseToEqual } from "shared";
+import {
+  AppellationAndRomeDto,
+  expectHttpResponseToEqual,
+  SiretDto,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
@@ -232,7 +236,41 @@ describe("search route", () => {
           .expect(200, []);
       });
 
-      it("with filter establishmentSearchableBy", async () => {
+      describe("with filter establishmentSearchableBy", () => {
+        const siret1 = "12345678901234";
+        const siret2 = "11111111111111";
+        const siret3 = "12341234123455";
+
+        const toSearchImmersionResults = (
+          sirets: SiretDto[],
+        ): SearchImmersionResultPublicV2[] =>
+          sirets.map((siret) => ({
+            address: avenueChampsElyseesDto,
+            naf: defaultNafCode,
+            nafLabel: "NAFRev2",
+            name: "Company inside repository",
+            website: "www.jobs.fr",
+            additionalInformation: "",
+            rome: "M1808",
+            romeLabel: "test_rome_label",
+            appellations: [
+              {
+                appellationLabel: offer1.appellationLabel,
+                appellationCode: offer1.appellationCode,
+              },
+              {
+                appellationLabel: offer2.appellationLabel,
+                appellationCode: offer2.appellationCode,
+              },
+            ],
+            siret,
+            voluntaryToImmersion: true,
+            contactMode: "EMAIL",
+            numberOfEmployeeRange: "10-19",
+            distance_m: 0,
+            position: { lat: 48.8531, lon: 2.34999 },
+          }));
+
         const offer1 = new OfferEntityBuilder()
           .withRomeCode("M1808")
           .withAppellationCode("11704")
@@ -243,121 +281,98 @@ describe("search route", () => {
           .withAppellationCode("11705")
           .build();
 
-        // Prepare
-        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-          [
-            new EstablishmentAggregateBuilder()
-              .withEstablishmentSiret("12345678901234")
-              .withOffers([offer1, offer2])
-              .withEstablishment(
-                new EstablishmentEntityBuilder()
-                  .withSiret("12345678901234")
-                  .withPosition({
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  })
-                  .withWebsite("www.jobs.fr")
-                  .build(),
-              )
-              .build(),
-            new EstablishmentAggregateBuilder()
-              .withOffers([offer1, offer2])
-              .withEstablishment(
-                new EstablishmentEntityBuilder()
-                  .withSiret("11111111111111")
-                  .withPosition({
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  })
-                  .withWebsite("www.jobs.fr")
-                  .withSearchableBy({ students: true, jobSeekers: false })
-                  .build(),
-              )
-              .build(),
-            new EstablishmentAggregateBuilder()
-              .withEstablishmentSiret("12341234123455")
-              .withOffers([offer1, offer2])
-              .withEstablishment(
-                new EstablishmentEntityBuilder()
-                  .withSiret("12341234123455")
-                  .withPosition({
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  })
-                  .withWebsite("www.jobs.fr")
-                  .withSearchableBy({ students: false, jobSeekers: true })
-                  .build(),
-              )
-              .build(),
-          ],
-        );
-
-        const expectedResult: SearchImmersionResultPublicV2[] = [
-          {
-            address: avenueChampsElyseesDto,
-            naf: defaultNafCode,
-            nafLabel: "NAFRev2",
-            name: "Company inside repository",
-            website: "www.jobs.fr",
-            additionalInformation: "",
-            rome: "M1808",
-            romeLabel: "test_rome_label",
-            appellations: [
-              {
-                appellationLabel: offer1.appellationLabel,
-                appellationCode: offer1.appellationCode,
-              },
-              {
-                appellationLabel: offer2.appellationLabel,
-                appellationCode: offer2.appellationCode,
-              },
+        beforeEach(async () => {
+          await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+            [
+              new EstablishmentAggregateBuilder()
+                .withEstablishmentSiret(siret1)
+                .withOffers([offer1, offer2])
+                .withEstablishment(
+                  new EstablishmentEntityBuilder()
+                    .withSiret(siret1)
+                    .withPosition({
+                      lat: 48.8531,
+                      lon: 2.34999,
+                    })
+                    .withWebsite("www.jobs.fr")
+                    .build(),
+                )
+                .build(),
+              new EstablishmentAggregateBuilder()
+                .withEstablishmentSiret(siret2)
+                .withOffers([offer1, offer2])
+                .withEstablishment(
+                  new EstablishmentEntityBuilder()
+                    .withSiret(siret2)
+                    .withPosition({
+                      lat: 48.8531,
+                      lon: 2.34999,
+                    })
+                    .withWebsite("www.jobs.fr")
+                    .withSearchableBy({ students: true, jobSeekers: false })
+                    .build(),
+                )
+                .build(),
+              new EstablishmentAggregateBuilder()
+                .withEstablishmentSiret(siret3)
+                .withOffers([offer1, offer2])
+                .withEstablishment(
+                  new EstablishmentEntityBuilder()
+                    .withSiret(siret3)
+                    .withPosition({
+                      lat: 48.8531,
+                      lon: 2.34999,
+                    })
+                    .withWebsite("www.jobs.fr")
+                    .withSearchableBy({ students: false, jobSeekers: true })
+                    .build(),
+                )
+                .build(),
             ],
-            siret: "12345678901234",
-            voluntaryToImmersion: true,
-            contactMode: "EMAIL",
-            numberOfEmployeeRange: "10-19",
-            distance_m: 0,
-            position: { lat: 48.8531, lon: 2.34999 },
-          },
-          {
-            address: avenueChampsElyseesDto,
-            naf: defaultNafCode,
-            nafLabel: "NAFRev2",
-            name: "Company inside repository",
-            website: "www.jobs.fr",
-            additionalInformation: "",
-            rome: "M1808",
-            romeLabel: "test_rome_label",
-            appellations: [
-              {
-                appellationLabel: offer1.appellationLabel,
-                appellationCode: offer1.appellationCode,
-              },
-              {
-                appellationLabel: offer2.appellationLabel,
-                appellationCode: offer2.appellationCode,
-              },
-            ],
-            siret: "11111111111111",
-            voluntaryToImmersion: true,
-            contactMode: "EMAIL",
-            numberOfEmployeeRange: "10-19",
-            distance_m: 0,
-            position: { lat: 48.8531, lon: 2.34999 },
-          },
-        ];
+          );
+        });
 
-        await request
-          .get(
-            `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=students&sortedBy=distance`,
-          )
-          .set(
-            "Authorization",
-            generateApiConsumerJwt({
-              id: authorizedUnJeuneUneSolutionApiConsumer.id,
-            }),
-          )
-          .expect(200, expectedResult);
+        it("with filter establishmentSearchableBy defined to students", async () => {
+          await request
+            .get(
+              `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=students&sortedBy=distance`,
+            )
+            .set(
+              "Authorization",
+              generateApiConsumerJwt({
+                id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              }),
+            )
+            .expect(200, toSearchImmersionResults([siret1, siret2]));
+        });
+
+        it("with filter establishmentSearchableBy defined to jobSeekers", async () => {
+          await request
+            .get(
+              `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=jobSeekers&sortedBy=distance`,
+            )
+            .set(
+              "Authorization",
+              generateApiConsumerJwt({
+                id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              }),
+            )
+            .expect(200, toSearchImmersionResults([siret1, siret3]));
+        });
+
+        it("with filter establishmentSearchableBy not defined", async () => {
+          await request
+            .get(
+              `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
+            )
+            .set(
+              "Authorization",
+              generateApiConsumerJwt({
+                id: authorizedUnJeuneUneSolutionApiConsumer.id,
+              }),
+            )
+            .expect(200, toSearchImmersionResults([siret1, siret2, siret3]));
+        });
       });
     });
 
