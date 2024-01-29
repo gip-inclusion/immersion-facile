@@ -8,8 +8,8 @@ export const ImmersionDescription = ({
 }): JSX.Element => {
   const beneficiary = convention.signatories.beneficiary;
   const beneficiaryName = `${beneficiary.firstName} ${beneficiary.lastName}`;
-  const dateStart = toDisplayedDate(new Date(convention.dateStart));
-  const dateEnd = toDisplayedDate(new Date(convention.dateEnd));
+  const dateStart = toDisplayedDate({ date: new Date(convention.dateStart) });
+  const dateEnd = toDisplayedDate({ date: new Date(convention.dateEnd) });
   return (
     <p>
       {convention.internshipKind === "immersion"

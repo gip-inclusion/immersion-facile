@@ -211,7 +211,7 @@ export const ConventionDocumentPage = ({
               né(e) le{" "}
               <strong>
                 {isStringDate(beneficiary.birthdate)
-                  ? toDisplayedDate(new Date(beneficiary.birthdate))
+                  ? toDisplayedDate({ date: new Date(beneficiary.birthdate) })
                   : "Date invalide"}
               </strong>{" "}
               en qualité de <strong>bénéficiaire</strong> {""}
@@ -376,8 +376,9 @@ export const ConventionDocumentPage = ({
           </p>
           <p className={fr.cx("fr-text--bold")}>
             {internshipKind === "immersion" ? "L'immersion" : "Le mini-stage"}{" "}
-            se déroulera du {toDisplayedDate(new Date(convention.dateStart))} au{" "}
-            {toDisplayedDate(new Date(convention.dateEnd))}.
+            se déroulera du{" "}
+            {toDisplayedDate({ date: new Date(convention.dateStart) })} au{" "}
+            {toDisplayedDate({ date: new Date(convention.dateEnd) })}.
           </p>
           <div>
             Les horaires{" "}
@@ -470,9 +471,11 @@ export const ConventionDocumentPage = ({
                   {beneficiary.firstName} {beneficiary.lastName}
                 </strong>{" "}
                 (signé le{" "}
-                {toDisplayedDate(
-                  new Date(throwOnMissingSignDate(beneficiary.signedAt)),
-                )}
+                {toDisplayedDate({
+                  date: new Date(throwOnMissingSignDate(beneficiary.signedAt)),
+                  withHours: true,
+                  showGMT: true,
+                })}
                 )
               </li>
               {beneficiaryRepresentative && (
@@ -481,15 +484,17 @@ export const ConventionDocumentPage = ({
                   <strong>
                     {beneficiaryRepresentative.firstName}{" "}
                     {beneficiaryRepresentative.lastName}
-                  </strong>
+                  </strong>{" "}
                   (signé le{" "}
-                  {toDisplayedDate(
-                    new Date(
+                  {toDisplayedDate({
+                    date: new Date(
                       throwOnMissingSignDate(
                         beneficiaryRepresentative.signedAt,
                       ),
                     ),
-                  )}
+                    withHours: true,
+                    showGMT: true,
+                  })}
                   )
                 </li>
               )}
@@ -500,15 +505,17 @@ export const ConventionDocumentPage = ({
                   <strong>
                     {beneficiaryCurrentEmployer.firstName}{" "}
                     {beneficiaryCurrentEmployer.lastName}
-                  </strong>
+                  </strong>{" "}
                   (signé le{" "}
-                  {toDisplayedDate(
-                    new Date(
+                  {toDisplayedDate({
+                    date: new Date(
                       throwOnMissingSignDate(
                         beneficiaryCurrentEmployer.signedAt,
                       ),
                     ),
-                  )}
+                    withHours: true,
+                    showGMT: true,
+                  })}
                   )
                 </li>
               )}
@@ -519,13 +526,15 @@ export const ConventionDocumentPage = ({
                   {establishmentRepresentative.lastName}
                 </strong>{" "}
                 (signé le{" "}
-                {toDisplayedDate(
-                  new Date(
+                {toDisplayedDate({
+                  date: new Date(
                     throwOnMissingSignDate(
                       establishmentRepresentative.signedAt,
                     ),
                   ),
-                )}
+                  withHours: true,
+                  showGMT: true,
+                })}
                 )
               </li>
               {!convention.agencyRefersTo && (
@@ -535,9 +544,13 @@ export const ConventionDocumentPage = ({
                     ? "de l'immersion"
                     : "du mini-stage"}
                   , <strong>{convention.agencyName}</strong> (validée le{" "}
-                  {toDisplayedDate(
-                    new Date(throwOnMissingSignDate(convention.dateValidation)),
-                  )}
+                  {toDisplayedDate({
+                    date: new Date(
+                      throwOnMissingSignDate(convention.dateValidation),
+                    ),
+                    withHours: true,
+                    showGMT: true,
+                  })}
                   )
                 </li>
               )}
@@ -550,11 +563,13 @@ export const ConventionDocumentPage = ({
                       : "du mini-stage"}
                     , <strong>{convention.agencyRefersTo.name}</strong> (validée
                     le{" "}
-                    {toDisplayedDate(
-                      new Date(
+                    {toDisplayedDate({
+                      date: new Date(
                         throwOnMissingSignDate(convention.dateValidation),
                       ),
-                    )}
+                      withHours: true,
+                      showGMT: true,
+                    })}
                     ).
                   </li>
                   <li>
