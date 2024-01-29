@@ -1,6 +1,6 @@
 import type { InsertObject } from "kysely";
 import { sql } from "kysely";
-import { ContactMethod, DiscussionId, SiretDto } from "shared";
+import { ContactMethod, DiscussionId, pipeWithValue, SiretDto } from "shared";
 import {
   DiscussionAggregate,
   ExchangeEntity,
@@ -139,21 +139,39 @@ export class PgDiscussionAggregateRepository
     appellationCode,
     potentialBeneficiaryEmail,
     since,
-  }: HasDiscussionMatchingParams): Promise<boolean> {
+    establishmentRepresentativeEmail,
+  }: Partial<HasDiscussionMatchingParams>): Promise<boolean> {
     const result = await this.transaction
       .selectFrom("discussions")
-      .select(({ exists, selectFrom, lit }) => [
+      .select(({ exists, selectFrom, lit, fn }) => [
         exists(
-          selectFrom("discussions")
-            .select(lit(1).as("one"))
-            .where("siret", "=", siret)
-            .where("appellation_code", "=", +appellationCode)
-            .where(
-              "potential_beneficiary_email",
-              "=",
-              potentialBeneficiaryEmail,
-            )
-            .where("created_at", ">=", since),
+          pipeWithValue(
+            selectFrom("discussions").select(lit(1).as("one")),
+            (builder) => (siret ? builder.where("siret", "=", siret) : builder),
+            (builder) =>
+              appellationCode
+                ? builder.where("appellation_code", "=", +appellationCode)
+                : builder,
+
+            (builder) =>
+              since ? builder.where("created_at", ">=", since) : builder,
+            (builder) =>
+              potentialBeneficiaryEmail
+                ? builder.where(
+                    fn("lower", ["potential_beneficiary_email"]),
+                    "=",
+                    potentialBeneficiaryEmail.toLowerCase(),
+                  )
+                : builder,
+            (builder) =>
+              establishmentRepresentativeEmail
+                ? builder.where(
+                    fn("lower", ["establishment_contact_email"]),
+                    "=",
+                    establishmentRepresentativeEmail.toLowerCase(),
+                  )
+                : builder,
+          ),
         ).as("exists"),
       ])
       .execute();

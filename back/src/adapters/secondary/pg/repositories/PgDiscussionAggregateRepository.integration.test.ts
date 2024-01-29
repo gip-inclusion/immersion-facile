@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregate } from "../../../../domain/offer/entities/DiscussionAggregate";
+import { HasDiscussionMatchingParams } from "../../../../domain/offer/ports/DiscussionAggregateRepository";
 import { DiscussionAggregateBuilder } from "../../offer/InMemoryDiscussionAggregateRepository";
 import {
   EstablishmentAggregateBuilder,
@@ -60,25 +61,127 @@ describe("PgDiscussionAggregateRepository", () => {
 
   const discussionCreatedAt = new Date("2023-07-07");
 
+  const discussionWithExchanges = new DiscussionAggregateBuilder()
+    .withSiret(siret)
+    .withEstablishmentContact({
+      email: "TEST@email.com",
+    })
+    .withCreatedAt(discussionCreatedAt)
+    .build();
+  const discussionWithoutExchanges = new DiscussionAggregateBuilder()
+    .withSiret(siret)
+    .withExchanges([])
+    .withCreatedAt(discussionCreatedAt)
+    .build();
+
   it.each([
     {
-      discussionAggregate: new DiscussionAggregateBuilder()
-        .withSiret(siret)
-        .withCreatedAt(discussionCreatedAt)
-        .build(),
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        siret: discussionWithExchanges.siret,
+        appellationCode: discussionWithExchanges.appellationCode,
+        potentialBeneficiaryEmail:
+          discussionWithExchanges.potentialBeneficiary.email,
+        since: discussionCreatedAt,
+      },
+      expectedResult: true,
       testName: "discussion with exchange",
     },
     {
-      discussionAggregate: new DiscussionAggregateBuilder()
-        .withSiret(siret)
-        .withExchanges([])
-        .withCreatedAt(discussionCreatedAt)
-        .build(),
-      testName: "discussion without exchange",
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        siret: discussionWithExchanges.siret,
+        appellationCode: discussionWithExchanges.appellationCode,
+        potentialBeneficiaryEmail:
+          discussionWithExchanges.potentialBeneficiary.email,
+        since: addDays(discussionCreatedAt, 1),
+      },
+      expectedResult: false,
+      testName: "discussion with exchange with match since creation date +1",
     },
-  ])(
+    {
+      discussionAggregate: discussionWithoutExchanges,
+      testFilters: {
+        siret: discussionWithExchanges.siret,
+        appellationCode: discussionWithExchanges.appellationCode,
+        potentialBeneficiaryEmail:
+          discussionWithExchanges.potentialBeneficiary.email,
+        since: discussionCreatedAt,
+      },
+      expectedResult: true,
+      testName: "discussion without exchange initialy",
+    },
+    {
+      discussionAggregate: discussionWithoutExchanges,
+      testFilters: {
+        siret: discussionWithExchanges.siret,
+        appellationCode: discussionWithExchanges.appellationCode,
+        potentialBeneficiaryEmail:
+          discussionWithExchanges.potentialBeneficiary.email,
+        since: addDays(discussionCreatedAt, 1),
+      },
+      expectedResult: false,
+      testName:
+        "discussion without exchange initialy with match since creation date +1",
+    },
+    {
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        siret: discussionWithExchanges.siret,
+      },
+      expectedResult: true,
+      testName: "match with Siret",
+    },
+    {
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        siret: "00000000000000",
+      },
+      expectedResult: false,
+      testName: "don't match with Siret",
+    },
+    {
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        appellationCode: discussionWithExchanges.appellationCode,
+      },
+      expectedResult: true,
+      testName: "match with appellationCode",
+    },
+    {
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        potentialBeneficiaryEmail:
+          discussionWithExchanges.potentialBeneficiary.email,
+      },
+      expectedResult: true,
+      testName: "match with potentialBeneficiaryEmail",
+    },
+    {
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        since: discussionCreatedAt,
+      },
+      expectedResult: true,
+      testName: "match with since",
+    },
+    {
+      discussionAggregate: discussionWithExchanges,
+      testFilters: {
+        establishmentRepresentativeEmail:
+          discussionWithExchanges.establishmentContact.email.toUpperCase(),
+      },
+      expectedResult: true,
+      testName: "match with establishmentRepresentativeEmail",
+    },
+  ] satisfies {
+    discussionAggregate: DiscussionAggregate;
+    testFilters: Partial<HasDiscussionMatchingParams>;
+    expectedResult: boolean;
+    testName: string;
+  }[])(
     "Methode insert, update, getById and hasDiscussionMatching $testName",
-    async ({ discussionAggregate }) => {
+    async ({ discussionAggregate, testFilters, expectedResult }) => {
       expectToEqual(
         await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
         undefined,
@@ -123,24 +226,10 @@ describe("PgDiscussionAggregateRepository", () => {
       );
 
       expect(
-        await pgDiscussionAggregateRepository.hasDiscussionMatching({
-          siret: discussionAggregate.siret,
-          appellationCode: discussionAggregate.appellationCode,
-          potentialBeneficiaryEmail:
-            discussionAggregate.potentialBeneficiary.email,
-          since: discussionCreatedAt,
-        }),
-      ).toBe(true);
-
-      expect(
-        await pgDiscussionAggregateRepository.hasDiscussionMatching({
-          siret: discussionAggregate.siret,
-          appellationCode: discussionAggregate.appellationCode,
-          potentialBeneficiaryEmail:
-            discussionAggregate.potentialBeneficiary.email,
-          since: addDays(discussionCreatedAt, 1),
-        }),
-      ).toBe(false);
+        await pgDiscussionAggregateRepository.hasDiscussionMatching(
+          testFilters,
+        ),
+      ).toBe(expectedResult);
     },
   );
 
