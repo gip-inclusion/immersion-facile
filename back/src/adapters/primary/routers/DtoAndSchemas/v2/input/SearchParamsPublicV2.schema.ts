@@ -10,4 +10,5 @@ export const searchParamsPublicV2Schema: z.Schema<SearchParamsPublicV2> =
     distanceKm: zToNumber.positive("'distance_km' doit être > 0").max(100),
     voluntaryToImmersion: zToBoolean.optional(),
     sortedBy: z.enum(["distance", "date"]).optional(),
+    establishmentSearchableBy: z.enum(["students", "jobSeekers"]).optional(),
   });

@@ -231,6 +231,134 @@ describe("search route", () => {
           )
           .expect(200, []);
       });
+
+      it("with filter establishmentSearchableBy", async () => {
+        const offer1 = new OfferEntityBuilder()
+          .withRomeCode("M1808")
+          .withAppellationCode("11704")
+          .build();
+
+        const offer2 = new OfferEntityBuilder()
+          .withRomeCode("M1808")
+          .withAppellationCode("11705")
+          .build();
+
+        // Prepare
+        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+          [
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret("12345678901234")
+              .withOffers([offer1, offer2])
+              .withEstablishment(
+                new EstablishmentEntityBuilder()
+                  .withSiret("12345678901234")
+                  .withPosition({
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  })
+                  .withWebsite("www.jobs.fr")
+                  .build(),
+              )
+              .build(),
+            new EstablishmentAggregateBuilder()
+              .withOffers([offer1, offer2])
+              .withEstablishment(
+                new EstablishmentEntityBuilder()
+                  .withSiret("11111111111111")
+                  .withPosition({
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  })
+                  .withWebsite("www.jobs.fr")
+                  .withSearchableBy({ students: true, jobSeekers: false })
+                  .build(),
+              )
+              .build(),
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret("12341234123455")
+              .withOffers([offer1, offer2])
+              .withEstablishment(
+                new EstablishmentEntityBuilder()
+                  .withSiret("12341234123455")
+                  .withPosition({
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  })
+                  .withWebsite("www.jobs.fr")
+                  .withSearchableBy({ students: false, jobSeekers: true })
+                  .build(),
+              )
+              .build(),
+          ],
+        );
+
+        const expectedResult: SearchImmersionResultPublicV2[] = [
+          {
+            address: avenueChampsElyseesDto,
+            naf: defaultNafCode,
+            nafLabel: "NAFRev2",
+            name: "Company inside repository",
+            website: "www.jobs.fr",
+            additionalInformation: "",
+            rome: "M1808",
+            romeLabel: "test_rome_label",
+            appellations: [
+              {
+                appellationLabel: offer1.appellationLabel,
+                appellationCode: offer1.appellationCode,
+              },
+              {
+                appellationLabel: offer2.appellationLabel,
+                appellationCode: offer2.appellationCode,
+              },
+            ],
+            siret: "12345678901234",
+            voluntaryToImmersion: true,
+            contactMode: "EMAIL",
+            numberOfEmployeeRange: "10-19",
+            distance_m: 0,
+            position: { lat: 48.8531, lon: 2.34999 },
+          },
+          {
+            address: avenueChampsElyseesDto,
+            naf: defaultNafCode,
+            nafLabel: "NAFRev2",
+            name: "Company inside repository",
+            website: "www.jobs.fr",
+            additionalInformation: "",
+            rome: "M1808",
+            romeLabel: "test_rome_label",
+            appellations: [
+              {
+                appellationLabel: offer1.appellationLabel,
+                appellationCode: offer1.appellationCode,
+              },
+              {
+                appellationLabel: offer2.appellationLabel,
+                appellationCode: offer2.appellationCode,
+              },
+            ],
+            siret: "11111111111111",
+            voluntaryToImmersion: true,
+            contactMode: "EMAIL",
+            numberOfEmployeeRange: "10-19",
+            distance_m: 0,
+            position: { lat: 48.8531, lon: 2.34999 },
+          },
+        ];
+
+        await request
+          .get(
+            `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=students&sortedBy=distance`,
+          )
+          .set(
+            "Authorization",
+            generateApiConsumerJwt({
+              id: authorizedUnJeuneUneSolutionApiConsumer.id,
+            }),
+          )
+          .expect(200, expectedResult);
+      });
     });
 
     it("rejects invalid requests with error code 400", async () => {
