@@ -115,7 +115,10 @@ export class PgInclusionConnectedUserRepository
     );
 
     if (response.rows.length === 0) return [];
-    return response.rows.map((row) => row.inclusion_user);
+    return response.rows.map((row) => ({
+      ...row.inclusion_user,
+      establishmentDashboards: {},
+    }));
   }
 }
 

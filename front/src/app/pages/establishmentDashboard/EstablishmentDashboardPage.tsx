@@ -58,7 +58,7 @@ export const EstablishmentDashboardPage = ({
           ) : (
             <p>
               {" "}
-              Nous n'avons pas trouvé de convention où vous êtes référencé en
+              Nous n'avons pas trouvé de convention où vous êtes référencés en
               tant que responsable ou tuteur d'entreprise.
             </p>
           )}
@@ -78,7 +78,7 @@ export const EstablishmentDashboardPage = ({
             <p>
               {" "}
               Nous n'avons pas trouvé de mises en relation où vous êtes
-              référencé en tant que contact d'entreprise.
+              référencés en tant que contact d'entreprise.
             </p>
           )}
         </>
