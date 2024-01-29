@@ -11,7 +11,6 @@ import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsu
 export const TechnicalOptionsTab = () => {
   const { isLoading: isFeatureFlagsLoading } = useFeatureFlags();
   const isApiConsumersLoading = useAppSelector(apiConsumerSelectors.isLoading);
-
   return (
     <>
       {(isFeatureFlagsLoading || isApiConsumersLoading) && <Loader />}

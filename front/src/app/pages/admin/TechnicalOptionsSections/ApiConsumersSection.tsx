@@ -96,7 +96,10 @@ export const ApiConsumersSection = () => {
   const tableDataFromApiConsumers = sortedApiConsumers.map((apiConsumer) => [
     formatApiConsumerName(apiConsumer.id, apiConsumer.consumer),
     formatApiConsumerDescription(apiConsumer.description),
-    toDisplayedDate(new Date(apiConsumer.expirationDate), true),
+    toDisplayedDate({
+      date: new Date(apiConsumer.expirationDate),
+      withHours: true,
+    }),
     formatApiConsumerContact(apiConsumer.contact),
     formatApiConsumerRights(apiConsumer.rights),
     makeApiConsumerActionButtons(apiConsumer, onEditButtonClick),

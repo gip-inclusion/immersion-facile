@@ -11,7 +11,7 @@ import {
 import { ColField, FieldsAndTitle } from "./types";
 
 export const signToBooleanDisplay = (value: string | undefined) =>
-  value ? `✅ (${toDisplayedDate(new Date(value))})` : "❌";
+  value ? `✅ (${toDisplayedDate({ date: new Date(value) })})` : "❌";
 
 const booleanToCheck = (value: boolean) => (value ? "✅" : "❌");
 
@@ -77,9 +77,9 @@ const beneficiaryFields: ColField[] = [
       <span>
         <div className={fr.cx("fr-text--xs")}>
           Date de naissance :{" "}
-          {toDisplayedDate(
-            new Date(convention.signatories.beneficiary.birthdate),
-          )}
+          {toDisplayedDate({
+            date: new Date(convention.signatories.beneficiary.birthdate),
+          })}
         </div>
         <div className={fr.cx("fr-text--xs")}>
           Contact d'urgence :{" "}
@@ -283,7 +283,8 @@ const agencyFields: ColField[] = [
       })
         .with(
           { agencyRefersTo: P.not(P.nullish), dateApproval: P.not(P.nullish) },
-          ({ dateApproval }) => toDisplayedDate(new Date(dateApproval)),
+          ({ dateApproval }) =>
+            toDisplayedDate({ date: new Date(dateApproval) }),
         )
         .with(
           { agencyRefersTo: P.not(P.nullish), dateApproval: undefined },
@@ -291,7 +292,7 @@ const agencyFields: ColField[] = [
         )
         .with({ dateValidation: undefined }, () => "")
         .with({ dateValidation: P.string }, ({ dateValidation }) =>
-          toDisplayedDate(new Date(dateValidation)),
+          toDisplayedDate({ date: new Date(dateValidation) }),
         )
         .exhaustive(),
   },
@@ -307,7 +308,7 @@ const agencyRefersToFields: ColField[] = [
     colLabel: "Date de validation",
     getValue: (convention) =>
       convention.dateValidation && convention.agencyRefersTo?.id
-        ? toDisplayedDate(new Date(convention.dateValidation))
+        ? toDisplayedDate({ date: new Date(convention.dateValidation) })
         : "",
   },
 ];
@@ -317,17 +318,19 @@ const immersionPlaceDateFields: ColField[] = [
     key: "dateSubmission",
     colLabel: "Date de soumission",
     getValue: (convention) =>
-      toDisplayedDate(new Date(convention.dateSubmission)),
+      toDisplayedDate({ date: new Date(convention.dateSubmission) }),
   },
   {
     key: "dateStart",
     colLabel: "Début",
-    getValue: (convention) => toDisplayedDate(new Date(convention.dateStart)),
+    getValue: (convention) =>
+      toDisplayedDate({ date: new Date(convention.dateStart) }),
   },
   {
     key: "dateEnd",
     colLabel: "Fin",
-    getValue: (convention) => toDisplayedDate(new Date(convention.dateEnd)),
+    getValue: (convention) =>
+      toDisplayedDate({ date: new Date(convention.dateEnd) }),
   },
   {
     key: "immersionAddress",

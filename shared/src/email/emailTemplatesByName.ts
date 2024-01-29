@@ -288,7 +288,11 @@ export const emailTemplatesByName =
           : "la convention de mini stage "
       } le ${
           isStringDate(signedAt)
-            ? toDisplayedDate(new Date(signedAt), true)
+            ? toDisplayedDate({
+                date: new Date(signedAt),
+                withHours: true,
+                showGMT: true,
+              })
             : "DATE INVALIDE"
         }.
       `,
@@ -635,7 +639,7 @@ export const emailTemplatesByName =
 
       La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${
           isStringDate(beneficiaryBirthdate)
-            ? toDisplayedDate(new Date(beneficiaryBirthdate))
+            ? toDisplayedDate({ date: new Date(beneficiaryBirthdate) })
             : "Date invalide"
         }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée${
           validatorName ? ` par ${validatorName} ` : " "
@@ -852,11 +856,11 @@ export const emailTemplatesByName =
           : "de mini stage"
       } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${
           isStringDate(dateStart)
-            ? toDisplayedDate(new Date(dateStart), true)
+            ? toDisplayedDate({ date: new Date(dateStart), withHours: true })
             : "DATE INVALIDE"
         } au ${
           isStringDate(dateEnd)
-            ? toDisplayedDate(new Date(dateEnd), true)
+            ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
             : "DATE INVALIDE"
         } a été annulée par ${agencyName}.
       
@@ -906,11 +910,14 @@ export const emailTemplatesByName =
             : "un mini stage"
         } du ${
           isStringDate(dateStart)
-            ? toDisplayedDate(new Date(dateStart), true)
+            ? toDisplayedDate({
+                date: new Date(dateStart),
+                withHours: true,
+              })
             : "DATE INVALIDE"
         } au ${
           isStringDate(dateEnd)
-            ? toDisplayedDate(new Date(dateEnd), true)
+            ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
             : "DATE INVALIDE"
         } dans l'entreprise ${businessName} est supprimée.
       
@@ -1083,11 +1090,17 @@ export const emailTemplatesByName =
           } : ${immersionObjective}</li>
           <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${
             isStringDate(dateStart)
-              ? toDisplayedDate(new Date(dateStart), true)
+              ? toDisplayedDate({
+                  date: new Date(dateStart),
+                  withHours: true,
+                })
               : "DATE INVALIDE"
           } au ${
           isStringDate(dateEnd)
-            ? toDisplayedDate(new Date(dateEnd), true)
+            ? toDisplayedDate({
+                date: new Date(dateEnd),
+                withHours: true,
+              })
             : "DATE INVALIDE"
         } : ${assessmentStatus === "FINISHED" ? "oui" : "non"}</li>
           <li>Retour de l'entreprise : ${establishmentFeedback}</li>
