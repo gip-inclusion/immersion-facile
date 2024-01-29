@@ -5,6 +5,7 @@ export type HasDiscussionMatchingParams = {
   siret: SiretDto;
   appellationCode: AppellationCode;
   potentialBeneficiaryEmail: Email;
+  establishmentRepresentativeEmail: Email;
   since: Date;
 };
 
@@ -19,6 +20,6 @@ export interface DiscussionAggregateRepository {
     since: Date,
   ) => Promise<number>;
   hasDiscussionMatching: (
-    params: HasDiscussionMatchingParams,
+    params: Partial<HasDiscussionMatchingParams>,
   ) => Promise<boolean>;
 }

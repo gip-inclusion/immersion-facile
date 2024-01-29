@@ -31,14 +31,18 @@ type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };
 
+export type ConventionsEstablishmentDashboard = {
+  url: AbsoluteUrl;
+  role: EstablishmentRole;
+};
+
+export type EstablishmentDashboards = {
+  conventions?: ConventionsEstablishmentDashboard;
+  discussions?: AbsoluteUrl;
+};
+
 export type WithEstablishmentDashboards = {
-  establishmentDashboards: {
-    conventions?: {
-      url: AbsoluteUrl;
-      role: EstablishmentRole;
-    };
-    discussions?: AbsoluteUrl;
-  };
+  establishmentDashboards: EstablishmentDashboards;
 };
 
 export type WithDashboardUrls = {

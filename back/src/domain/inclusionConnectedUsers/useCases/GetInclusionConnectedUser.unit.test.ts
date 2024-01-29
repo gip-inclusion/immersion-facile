@@ -16,23 +16,24 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../../../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
-const userId = "123";
-const inclusionConnectJwtPayload: InclusionConnectJwtPayload = {
-  exp: 0,
-  iat: 0,
-  version: 1,
-  userId,
-};
-const john: AuthenticatedUser = {
-  id: userId,
-  email: "john@mail.com",
-  firstName: "John",
-  lastName: "Doe",
-};
-
 describe("GetUserAgencyDashboardUrl", () => {
+  const userId = "123";
+  const inclusionConnectJwtPayload: InclusionConnectJwtPayload = {
+    exp: 0,
+    iat: 0,
+    version: 1,
+    userId,
+  };
+  const john: AuthenticatedUser = {
+    id: userId,
+    email: "john@mail.com",
+    firstName: "John",
+    lastName: "Doe",
+  };
+
   let getInclusionConnectedUser: GetInclusionConnectedUser;
   let uowPerformer: InMemoryUowPerformer;
   let uow: InMemoryUnitOfWork;
@@ -186,107 +187,156 @@ describe("GetUserAgencyDashboardUrl", () => {
     });
   });
 
-  describe("establishment dashboard", () => {
-    it("retrieve establishment dashboard when IC user is establishement rep in at least one convention", async () => {
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          ...john,
-          establishmentDashboards: {},
-          agencyRights: [],
-        },
-      ]);
-      const convention = new ConventionDtoBuilder()
-        .withEstablishmentRepresentativeEmail(john.email)
-        .build();
-      uow.conventionRepository.setConventions([convention]);
+  describe("establishment dashboards", () => {
+    describe("convention", () => {
+      it("retrieve dashboard when IC user is establishement rep in at least one convention", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            establishmentDashboards: {},
+            agencyRights: [],
+          },
+        ]);
+        const convention = new ConventionDtoBuilder()
+          .withEstablishmentRepresentativeEmail(john.email)
+          .build();
+        uow.conventionRepository.setConventions([convention]);
 
-      const result = await getInclusionConnectedUser.execute(
-        undefined,
-        inclusionConnectJwtPayload,
-      );
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
 
-      expectToEqual(result.establishmentDashboards, {
-        conventions: {
-          role: "establishment-representative",
-          url: `http://stubEstablishmentConventionsDashboardUrl/${
-            john.id
-          }/${timeGateway.now()}`,
-        },
+        expectToEqual(result.establishmentDashboards, {
+          conventions: {
+            role: "establishment-representative",
+            url: `http://stubEstablishmentConventionsDashboardUrl/${
+              john.id
+            }/${timeGateway.now()}`,
+          },
+        });
+      });
+
+      it("retrieve dashboard when IC user is establishement tutor in at least one convention", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            agencyRights: [],
+            establishmentDashboards: {},
+          },
+        ]);
+        const convention = new ConventionDtoBuilder()
+          .withEstablishmentTutorEmail(john.email)
+          .build();
+        uow.conventionRepository.setConventions([convention]);
+
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
+
+        expectToEqual(result.establishmentDashboards, {
+          conventions: {
+            role: "establishment-tutor",
+            url: `http://stubEstablishmentConventionsDashboardUrl/${
+              john.id
+            }/${timeGateway.now()}`,
+          },
+        });
+      });
+
+      it("should retrieve dashboard when ic user is establishment representative and tutor for at least one convention", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            agencyRights: [],
+            establishmentDashboards: {},
+          },
+        ]);
+        const convention = new ConventionDtoBuilder()
+          .withEstablishmentTutorEmail(john.email)
+          .withEstablishmentRepresentativeEmail(john.email)
+          .build();
+        uow.conventionRepository.setConventions([convention]);
+
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
+
+        expectToEqual(result.establishmentDashboards, {
+          conventions: {
+            url: `http://stubEstablishmentConventionsDashboardUrl/${
+              john.id
+            }/${timeGateway.now()}`,
+            role: "establishment-representative",
+          },
+        });
+      });
+
+      it("do not retrieve dashboard when IC user is not establishement tutor or respresentative in any conventions", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            agencyRights: [],
+            establishmentDashboards: {},
+          },
+        ]);
+
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
+
+        expectToEqual(result.establishmentDashboards, {});
       });
     });
 
-    it("retrieve establishment tutor dashboard when IC user is establishement tutor in at least one convention", async () => {
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          ...john,
-          agencyRights: [],
-          establishmentDashboards: {},
-        },
-      ]);
-      const convention = new ConventionDtoBuilder()
-        .withEstablishmentTutorEmail(john.email)
-        .build();
-      uow.conventionRepository.setConventions([convention]);
+    describe("discussions", () => {
+      it("retrieve dashboard when IC user is establishment contact for at least one discussion", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            establishmentDashboards: {},
+            agencyRights: [],
+          },
+        ]);
+        uow.discussionAggregateRepository.discussionAggregates = [
+          new DiscussionAggregateBuilder()
+            .withEstablishmentContact({
+              email: john.email,
+            })
+            .build(),
+        ];
 
-      const result = await getInclusionConnectedUser.execute(
-        undefined,
-        inclusionConnectJwtPayload,
-      );
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
 
-      expectToEqual(result.establishmentDashboards, {
-        conventions: {
-          role: "establishment-tutor",
-          url: `http://stubEstablishmentConventionsDashboardUrl/${
+        expectToEqual(result.establishmentDashboards, {
+          discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
             john.id
           }/${timeGateway.now()}`,
-        },
+        });
       });
-    });
 
-    it("should retrieve establishment representative dashboard when ic user is establishment representative and tutor for at least one convention", async () => {
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          ...john,
-          agencyRights: [],
-          establishmentDashboards: {},
-        },
-      ]);
-      const convention = new ConventionDtoBuilder()
-        .withEstablishmentTutorEmail(john.email)
-        .withEstablishmentRepresentativeEmail(john.email)
-        .build();
-      uow.conventionRepository.setConventions([convention]);
+      it("do not retrieve dashboard when IC user is not establishment contact in any discussion", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            agencyRights: [],
+            establishmentDashboards: {},
+          },
+        ]);
 
-      const result = await getInclusionConnectedUser.execute(
-        undefined,
-        inclusionConnectJwtPayload,
-      );
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
 
-      expectToEqual(result.establishmentDashboards, {
-        conventions: {
-          url: `http://stubEstablishmentConventionsDashboardUrl/${
-            john.id
-          }/${timeGateway.now()}`,
-          role: "establishment-representative",
-        },
+        expectToEqual(result.establishmentDashboards, {});
       });
-    });
-
-    it("do not retrieve establishment tutor or representative dashboard when IC user is not establishement tutor or respresentative in any conventions", async () => {
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          ...john,
-          agencyRights: [],
-          establishmentDashboards: {},
-        },
-      ]);
-
-      const result = await getInclusionConnectedUser.execute(
-        undefined,
-        inclusionConnectJwtPayload,
-      );
-
-      expectToEqual(result.establishmentDashboards, {});
     });
   });
 });
