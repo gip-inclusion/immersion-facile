@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { callbackUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { phoneSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
@@ -37,7 +37,7 @@ const callbackHeadersSchema: z.Schema<CallbackHeaders> = z.record(
 export const createWebhookSubscriptionSchema: z.Schema<CreateWebhookSubscription> =
   z.object({
     subscribedEvent: z.enum(["convention.updated"]),
-    callbackUrl: absoluteUrlSchema,
+    callbackUrl: callbackUrlSchema,
     callbackHeaders: callbackHeadersSchema,
   });
 

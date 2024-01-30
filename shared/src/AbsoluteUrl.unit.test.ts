@@ -1,4 +1,4 @@
-import { toAbsoluteUrl } from "./AbsoluteUrl";
+import { callbackUrlSchema, toAbsoluteUrl } from "./AbsoluteUrl";
 
 describe("toAbsoluteUrl conversion", () => {
   const urlsToCheck = [
@@ -20,5 +20,19 @@ describe("toAbsoluteUrl conversion", () => {
 
   it.each(urlsToCheck)("url %s should equal to %s", (url, expectedUrl) => {
     expect(toAbsoluteUrl(url)).toBe(expectedUrl);
+  });
+});
+
+describe("callbackUrlSchema", () => {
+  it("should accept a valid url", () => {
+    expect(callbackUrlSchema.parse("https://www.example.com")).toBe(
+      "https://www.example.com",
+    );
+  });
+
+  it("should throw on local url", () => {
+    expect(() => callbackUrlSchema.parse("https://127.0.0.1")).toThrow();
+    expect(() => callbackUrlSchema.parse("https://localhost/path")).toThrow();
+    expect(() => callbackUrlSchema.parse("https://::1")).toThrow();
   });
 });
