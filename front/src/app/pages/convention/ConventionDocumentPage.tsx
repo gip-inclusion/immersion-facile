@@ -513,8 +513,6 @@ export const ConventionDocumentPage = ({
                         beneficiaryCurrentEmployer.signedAt,
                       ),
                     ),
-                    withHours: true,
-                    showGMT: true,
                   })}
                   )
                 </li>
@@ -532,8 +530,6 @@ export const ConventionDocumentPage = ({
                       establishmentRepresentative.signedAt,
                     ),
                   ),
-                  withHours: true,
-                  showGMT: true,
                 })}
                 )
               </li>
@@ -548,8 +544,6 @@ export const ConventionDocumentPage = ({
                     date: new Date(
                       throwOnMissingSignDate(convention.dateValidation),
                     ),
-                    withHours: true,
-                    showGMT: true,
                   })}
                   )
                 </li>
@@ -567,8 +561,6 @@ export const ConventionDocumentPage = ({
                       date: new Date(
                         throwOnMissingSignDate(convention.dateValidation),
                       ),
-                      withHours: true,
-                      showGMT: true,
                     })}
                     ).
                   </li>
