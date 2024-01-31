@@ -12,6 +12,8 @@ export type NavLink = {
   children?: NavLink[];
   index?: number;
   id: string;
+  "aria-controls"?: string;
+  "data-fr-js-modal-button"?: string;
 };
 
 export type NavTopGroupLinks = {

@@ -1,8 +1,11 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import Button from "@codegouvfr/react-dsfr/Button";
 import { useStyles } from "tss-react/dsfr";
 import { AbsoluteUrl } from "shared";
+import { useConsent } from "src/app/components/ConsentManager";
+import { statsPageUrl } from "src/app/pages/StatsPage";
 import { ENV } from "src/config/environmentVariables";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
@@ -24,13 +27,31 @@ export const MetabaseView = ({
   title: string;
 }) => {
   const { cx } = useStyles();
+  const consent = useConsent();
+  if (!consent.finalityConsent?.metabase)
+    return (
+      <>
+        <p>
+          Vous avez souhaité ne pas autoriser les cookies concernant cette
+          fonctionnalité.
+        </p>
+        <Button
+          type="button"
+          onClick={() => {
+            consent.assumeConsent("metabase");
+          }}
+        >
+          Autoriser les cookies d'affichage de données
+        </Button>
+      </>
+    );
   if (!url) return <p>Chargement du dashboard en cours...</p>;
   return (
     <div>
       <h5 className={cx(fr.cx("fr-h5", "fr-mb-2w"), "flex")}>
         {title} <TitleButton url={url} />
       </h5>
-      {ENV.envType === "production" ? (
+      {ENV.envType === "production" || url === statsPageUrl ? (
         <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
       ) : (
         <Alert

@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from "react";
+import { useConsent } from "src/app/components/ConsentManager";
 
 type MatomoTagManagerProps = {
   containerUrl: string;
@@ -16,15 +17,16 @@ export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
 
     document.getElementsByTagName("head")[0].appendChild(script);
   }, [containerUrl]);
+  const consent = useConsent();
 
   useEffect(() => {
-    if (containerUrl) {
+    if (containerUrl && consent.finalityConsent?.statistics) {
       if ("complete" === document.readyState) appendMatomoScript();
       else {
         window.addEventListener("load", appendMatomoScript, !1);
       }
     }
-  }, [containerUrl, appendMatomoScript]);
+  }, [containerUrl, appendMatomoScript, consent]);
 
   return null;
 };
