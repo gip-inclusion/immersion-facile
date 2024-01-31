@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
+import React from "react";
 import { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
 import { statsPageUrl } from "src/app/pages/StatsPage";
@@ -51,7 +52,13 @@ export const MetabaseView = ({
         {title} <TitleButton url={url} />
       </h5>
       {ENV.envType === "production" || url === statsPageUrl ? (
-        <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
+        <iframe
+          title="Tableau Metabase"
+          src={url}
+          frameBorder="0"
+          width="100%"
+          height="800"
+        />
       ) : (
         <Alert
           title="Non disponible hors production"
