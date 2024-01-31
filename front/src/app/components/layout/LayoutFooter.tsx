@@ -12,6 +12,7 @@ import {
   OverFooter,
   OverFooterCols,
 } from "react-design-system";
+import { getConsentModal } from "src/app/components/ConsentManager";
 import { routes } from "src/app/routes/routes";
 import lesEntrepriseSengagent from "../../../assets/img/les-entreprises-s-engagent.svg";
 import franceTravailLogo from "../../../assets/img/logo-france-travail.svg";
@@ -185,6 +186,20 @@ const bottomsLinks: NavLink[] = [
     label: "Documentation API",
     href: "/doc-api",
     id: bottomsLinksIds.apiDocumentation,
+  },
+  {
+    label: "Gestion des cookies",
+    id: "fr-consent-modal-control-button",
+    href: "#fr-consent-modal",
+    onClick: (event) => {
+      event.preventDefault();
+      const { modalElementDSFR, modalElement } = getConsentModal();
+      modalElementDSFR.disclose();
+      if (modalElement) {
+        modalElement.setAttribute("aria-hidden", "false");
+        modalElement.setAttribute("data-fr-opened", "true");
+      }
+    },
   },
 ];
 

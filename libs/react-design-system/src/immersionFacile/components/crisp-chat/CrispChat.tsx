@@ -2,12 +2,16 @@ import React, { useEffect, useRef } from "react";
 
 type CrispChatProperties = {
   crispWebsiteId: string;
+  userConsent: boolean;
 };
 
 // Inspired by https://github.com/MinooTavakoli/crisp-react
-export const CrispChat = ({ crispWebsiteId }: CrispChatProperties) => {
+export const CrispChat = ({
+  crispWebsiteId,
+  userConsent,
+}: CrispChatProperties) => {
   const ref = useRef<HTMLDivElement>(null);
-  const crispChat = () => {
+  const appendCrispChatScript = () => {
     (window as any).$crisp = [];
     (window as any).CRISP_WEBSITE_ID = crispWebsiteId;
     const d = document;
@@ -17,12 +21,12 @@ export const CrispChat = ({ crispWebsiteId }: CrispChatProperties) => {
     d.getElementsByTagName("head")[0].appendChild(s);
   };
   useEffect(() => {
-    if (crispWebsiteId) {
+    if (crispWebsiteId && userConsent) {
       const e = document;
       const a = window;
-      if ("complete" === e.readyState) crispChat();
+      if ("complete" === e.readyState) appendCrispChatScript();
       else {
-        a.addEventListener("load", crispChat, !1);
+        a.addEventListener("load", appendCrispChatScript);
       }
     }
   }, [crispWebsiteId]);
