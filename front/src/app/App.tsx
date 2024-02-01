@@ -1,13 +1,13 @@
 import React, { useLayoutEffect } from "react";
+import { CrispChat } from "react-design-system";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch } from "react-redux";
-import { CrispChat } from "react-design-system";
+import { MatomoTagManager } from "src/app/MatomoTagManager";
 import {
   ConsentBannerAndConsentManagement,
   useConsent,
 } from "src/app/components/ConsentManager";
 import { useFetchFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { MatomoTagManager } from "src/app/MatomoTagManager";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
 import { useRoute } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
