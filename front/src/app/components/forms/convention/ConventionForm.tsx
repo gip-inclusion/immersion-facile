@@ -166,7 +166,7 @@ export const ConventionForm = ({
   const { getValues, reset } = methods;
 
   const formSuccessfullySubmitted = submitFeedback.kind === "justSubmitted";
-
+  console.log("render with url params ===>", route.params.mtm_campaign);
   useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(getValues()));
   useMatomo(conventionProperties.internshipKind);
   useScrollToTop(formSuccessfullySubmitted);

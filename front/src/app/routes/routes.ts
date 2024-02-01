@@ -23,6 +23,11 @@ const inclusionConnectedParams = createInclusionConnectedParams({
   email: param.query.optional.string,
 });
 
+const matomoParams = {
+  mtm_campaign: param.query.optional.string,
+  mtm_kwd: param.query.optional.string,
+};
+
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
   adminRoot: defineRoute(`/${frontRoutes.admin}`),
@@ -46,7 +51,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.conventionDocument}`,
   ),
   conventionImmersion: defineRoute(
-    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
+    {
+      jwt: param.query.optional.string,
+      ...conventionValuesFromUrl,
+      ...matomoParams,
+    },
     () => `/${frontRoutes.conventionImmersionRoute}`,
   ),
   conventionImmersionForExternals: defineRoute(
@@ -164,6 +173,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ),
       sortedBy: param.query.optional.string,
       place: param.query.optional.string,
+      ...matomoParams,
     },
     () => `/${frontRoutes.search}`,
   ),
