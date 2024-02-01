@@ -10,12 +10,12 @@ import {
   FederatedIdentityWithUser,
 } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { appIsReadyAction } from "../actions";
 
 const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
   provider: "peConnect",
@@ -105,7 +105,7 @@ describe("Auth slice", () => {
       "federatedIdentityWithUser",
       inclusionConnectedFederatedIdentity,
     );
-    store.dispatch(appIsReadyAction());
+    store.dispatch(rootAppSlice.actions.appIsReady());
     expectFederatedIdentityToEqual(inclusionConnectedFederatedIdentity);
     expectFederatedIdentityInDevice(inclusionConnectedFederatedIdentity);
     const icUser: InclusionConnectedUser = {
@@ -126,7 +126,7 @@ describe("Auth slice", () => {
   it("shouldn't be logged in if no federatedIdentity stored in device", () => {
     expectFederatedIdentityToEqual(null);
     dependencies.deviceRepository.delete("federatedIdentityWithUser");
-    store.dispatch(appIsReadyAction());
+    store.dispatch(rootAppSlice.actions.appIsReady());
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
   });

@@ -200,7 +200,7 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
       {
         label: "Remplir la demande de convention",
         ...routes.conventionImmersion().link,
-        id: navTopGroupLinksIds.formConvention,
+        id: `${navTopGroupLinksIds.formConvention}-candidats`,
       },
     ],
   },
@@ -215,7 +215,7 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
       {
         label: "Remplir la demande de convention",
         ...routes.conventionImmersion().link,
-        id: navTopGroupLinksIds.addEstablishmentForm,
+        id: `${navTopGroupLinksIds.formConvention}-entreprises`,
       },
     ],
   },
@@ -247,7 +247,7 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
           </>
         ),
         href: "https://www.linkedin.com/company/l-immersion-facilitee/",
-        id: navTopGroupLinksIds.addAgencyForm,
+        id: navTopGroupLinksIds.linkedin,
       },
     ],
   },

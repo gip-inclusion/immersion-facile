@@ -23,6 +23,8 @@ import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlag
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { inclusionConnectedEpics } from "src/core-logic/domain/inclusionConnected/inclusionConnected.epics";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
+import { rootAppEpics } from "src/core-logic/domain/rootApp/rootApp.epics";
+import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
@@ -43,6 +45,7 @@ import { partnersErroredConventionEpics } from "../domain/partnersErroredConvent
 import { partnersErroredConventionSlice } from "../domain/partnersErroredConvention/partnersErroredConvention.slice";
 
 const allEpics: any[] = [
+  ...rootAppEpics,
   ...dashboardUrlsEpics,
   ...notificationsEpics,
   ...adminAuthEpics,
@@ -64,7 +67,7 @@ const allEpics: any[] = [
   ...partnersErroredConventionEpics,
 ];
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   [agencyInfoSlice.name]: agencyInfoSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
@@ -87,6 +90,14 @@ const rootReducer = combineReducers({
     [apiConsumerSlice.name]: apiConsumerSlice.reducer,
   }),
 });
+
+const rootReducer: typeof appReducer = (state, action) =>
+  appReducer(
+    action.type === rootAppSlice.actions.appResetRequested.type
+      ? undefined
+      : state,
+    action,
+  );
 
 const rootEpic: Epic = (action$, store$, dependencies) =>
   combineEpics(...allEpics)(action$, store$, dependencies).pipe(

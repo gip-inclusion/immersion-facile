@@ -69,7 +69,7 @@ export const Footer = ({
             {navTopGroupLinks?.map((groupOfLink) => (
               <div
                 className={fr.cx("fr-col-12", "fr-col-sm-3", "fr-col-md-2")}
-                key="navTopGroupLinks"
+                key={groupOfLink.title}
               >
                 <span className={fr.cx("fr-footer__top-cat")}>
                   {groupOfLink.title}

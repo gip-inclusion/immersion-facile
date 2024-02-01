@@ -10,7 +10,6 @@ import {
   SiretAndAppellationDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { routes } from "src/app/routes/routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
@@ -51,14 +50,9 @@ export class HttpSearchGateway implements SearchGateway {
         match(response)
           .with({ status: 200 }, ({ body }) => body)
           .with({ status: P.union(404) }, () => {
-            routes
-              .errorRedirect({
-                title: "Groupe introuvable",
-                message: `Nous n'avons pas trouvé le groupe: '${groupSlug}'`,
-              })
-              .push();
-
-            return undefined as unknown as GroupWithResults;
+            throw new Error(
+              `Nous n'avons pas trouvé le groupe: '${groupSlug}'`,
+            );
           })
           .otherwise(otherwiseThrow),
       );

@@ -1,11 +1,11 @@
 import { filter, map, switchMap, tap } from "rxjs";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { appIsReadyAction } from "../../actions";
 
 type AdminAuthAction = ActionOfSlice<typeof adminAuthSlice>;
 type AdminEpic = AppEpic<AdminAuthAction>;
@@ -29,7 +29,7 @@ const storeTokenInDevice: AdminEpic = (action$, _, { deviceRepository }) =>
 
 const checkIfAdminLoggedIn: AdminEpic = (action$, _, { deviceRepository }) =>
   action$.pipe(
-    filter(appIsReadyAction.match),
+    filter(rootAppSlice.actions.appIsReady.match),
     map(() => {
       const token = deviceRepository.get("adminToken");
       if (token) return adminAuthSlice.actions.tokenFoundInDevice(token);
