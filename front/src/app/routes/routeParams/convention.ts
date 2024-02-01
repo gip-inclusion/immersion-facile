@@ -33,15 +33,6 @@ type ConventionRoutes =
   | ConventionCustomAgencyPageRoute
   | ConventionImmersionForExternalsRoute;
 
-export type ConventionParamsInUrl = Partial<{
-  [K in keyof ConventionQueryParams]: ConventionQueryParams[K]["~internal"]["valueSerializer"] extends ValueSerializer<
-    infer T
-  >
-    ? T
-    : never;
-}> &
-  Record<string, unknown>;
-
 export const conventionInitialValuesFromUrl = ({
   route,
   internshipKind,
@@ -262,14 +253,9 @@ const conventionToConventionInUrl = (
 };
 
 export const makeValuesToWatchInUrl = (convention: ConventionPresentation) => {
-  const originalParamsInUrl = Object.fromEntries(
-    new URLSearchParams(window.location.search),
-  );
-  const paramKeys = Object.keys(originalParamsInUrl);
   const conventionInUrl = conventionToConventionInUrl(convention);
-  const keysToWatch: string[] = [
+  const keysToWatch: ConventionFormKeysInUrl[] = [
     ...conventionFormKeysInUrl,
-    ...paramKeys,
     "agencyDepartment",
   ];
   return keysToWatch.reduce(
@@ -367,6 +353,14 @@ export const conventionValuesFromUrl = {
     appellationAndRomeDtoSerializer,
   ),
 };
+
+export type ConventionParamsInUrl = Partial<{
+  [K in keyof ConventionQueryParams]: ConventionQueryParams[K]["~internal"]["valueSerializer"] extends ValueSerializer<
+    infer T
+  >
+    ? T
+    : never;
+}>;
 
 const beneficiaryRepresentativeFromParams = (
   params: ConventionParamsInUrl,

@@ -54,7 +54,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       jwt: param.query.optional.string,
       ...conventionValuesFromUrl,
-      ...matomoParams,
     },
     () => `/${frontRoutes.conventionImmersionRoute}`,
   ),
