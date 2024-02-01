@@ -135,21 +135,15 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const redirectToErrorOnFeedback = useCallback(
     (feedback: EstablishmentFeedback, jwt: string) => {
       if (feedback.kind === "errored") {
-        if (feedback.errorMessage.includes(expiredMagicLinkErrorMessage)) {
-          routes
-            .renewConventionMagicLink({
-              expiredJwt: jwt,
-              originalURL: window.location.href,
-            })
-            .replace();
-          return;
+        if (!feedback.errorMessage.includes(expiredMagicLinkErrorMessage)) {
+          throw new Error(feedback.errorMessage);
         }
         routes
-          .errorRedirect({
-            message: feedback.errorMessage,
-            title: "Erreur",
+          .renewConventionMagicLink({
+            expiredJwt: jwt,
+            originalURL: window.location.href,
           })
-          .push();
+          .replace();
       }
     },
     [],
@@ -186,12 +180,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
         () => {
-          routes
-            .errorRedirect({
-              message: "Accès interdit sans être connecté en admin.",
-              title: "Erreur",
-            })
-            .push();
+          throw new Error("Accès interdit sans être connecté en admin.");
         },
       )
       .with(
@@ -284,12 +273,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           adminJwt: P.nullish,
         },
         () => {
-          routes
-            .errorRedirect({
-              message: "Accès interdit sans être connecté en admin.",
-              title: "Erreur",
-            })
-            .push();
+          throw new Error("Accès interdit sans être connecté en admin.");
         },
       )
       .exhaustive();
@@ -313,13 +297,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   };
   return match(feedback)
     .with({ kind: "errored" }, (feedback) => {
-      routes
-        .errorRedirect({
-          message: JSON.parse(feedback.errorMessage).errors,
-          title: "Entreprise non trouvée",
-        })
-        .push();
-      return null;
+      throw new Error(
+        `Entreprise non trouvée : ${JSON.parse(feedback.errorMessage).errors}`,
+      );
     })
     .with({ kind: "deleteSuccess" }, () => (
       <Alert

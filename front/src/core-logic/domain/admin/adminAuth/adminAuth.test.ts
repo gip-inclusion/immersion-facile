@@ -5,12 +5,12 @@ import {
   AdminAuthState,
 } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
+import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { appIsReadyAction } from "../../actions";
 
 const userAndPassword = { user: "yo", password: "lala" };
 
@@ -57,14 +57,14 @@ describe("adminAuth slice", () => {
   describe("check if already logged in", () => {
     it("appears as logged in if a token is already in device", () => {
       dependencies.deviceRepository.set("adminToken", "already-there-token");
-      store.dispatch(appIsReadyAction());
+      store.dispatch(rootAppSlice.actions.appIsReady());
       expectIsAuthenticatedToBe(true);
       expectTokenToBe("already-there-token");
     });
 
     it("appears as NOT logged in if a NO token in device", () => {
       dependencies.deviceRepository.delete("adminToken");
-      store.dispatch(appIsReadyAction());
+      store.dispatch(rootAppSlice.actions.appIsReady());
       expectIsAuthenticatedToBe(false);
       expectTokenToBe(null);
     });

@@ -82,13 +82,12 @@
     "vite": "^4.5.2",
     "vite-plugin-pwa": "^0.17.2",
     "workbox-window": "^7.0.0",
-    "zod": "3.22.3"
+    "zod": "3.22.3",
+    "openapi-types": "^12.1.3",
+    "react-error-boundary": "^4.0.12"
   },
   "peerDependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1"
-  },
-  "dependencies": {
-    "openapi-types": "^12.1.3"
   }
 }

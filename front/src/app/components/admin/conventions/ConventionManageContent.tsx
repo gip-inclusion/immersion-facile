@@ -67,20 +67,15 @@ export const ConventionManageContent = ({
   );
 
   if (fetchConventionError) {
-    fetchConventionError.includes(expiredMagicLinkErrorMessage)
-      ? routes
-          .renewConventionMagicLink({
-            expiredJwt: jwtParams.jwt,
-            originalURL: window.location.href,
-          })
-          .replace()
-      : routes
-          .errorRedirect({
-            title: "Erreur lors de la récupération de la convention",
-            message: fetchConventionError,
-            kind: "",
-          })
-          .push();
+    if (!fetchConventionError.includes(expiredMagicLinkErrorMessage)) {
+      throw new Error(fetchConventionError);
+    }
+    routes
+      .renewConventionMagicLink({
+        expiredJwt: jwtParams.jwt,
+        originalURL: window.location.href,
+      })
+      .replace();
   }
   if (isLoading) return <Loader />;
   if (!role) return <p>Pas de rôle correspondant</p>;

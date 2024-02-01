@@ -1,11 +1,11 @@
 import { filter, map, tap } from "rxjs";
 import { switchMap } from "rxjs/operators";
+import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { appIsReadyAction } from "../actions";
 import { authSlice } from "./auth.slice";
 
 export type AuthAction = ActionOfSlice<typeof authSlice>;
@@ -77,7 +77,7 @@ const checkConnectedWithFederatedIdentity: AuthEpic = (
   { deviceRepository },
 ) =>
   action$.pipe(
-    filter(appIsReadyAction.match),
+    filter(rootAppSlice.actions.appIsReady.match),
     map(() => {
       const federatedIdentity = deviceRepository.get(
         "federatedIdentityWithUser",

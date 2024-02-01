@@ -61,6 +61,7 @@ export const domElementIds = {
       agencyformConvention: buildFooterNavLinkId(
         "footer-nav-top-agency-form-convention",
       ),
+      linkedin: buildFooterNavLinkId("footer-nav-top-linkedin"),
     },
     links: {
       gouv: buildFooterNavLinkId("gouv"),
