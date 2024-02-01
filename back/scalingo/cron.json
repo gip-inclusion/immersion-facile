@@ -1,30 +1,6 @@
 {
   "jobs": [
     {
-      "command": "0 21 * * * pnpm back run trigger-delete-email-attachements",
-      "size": "M"
-    },
-    {
-      "command": "0 22 * * * pnpm back run trigger-mark-old-convention-as-deprecated",
-      "size": "M"
-    },
-    {
-      "command": "3 22 * * * pnpm back run trigger-delete-old-discussion-messages",
-      "size": "M"
-    },
-    {
-      "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
-      "size": "M"
-    },
-    {
-      "command": "49 20 * * * pnpm back run trigger-sending-emails-with-assessment-creation-link",
-      "size": "M"
-    },
-    {
-      "command": "55 20 * * * pnpm back run trigger-sending-beneficiary-assessment-emails",
-      "size": "M"
-    },
-    {
       "command": "10 0 * * * pnpm back run trigger-suggest-edit-form-establishment-every-6-months",
       "size": "M"
     },
@@ -42,6 +18,30 @@
     },
     {
       "command": "15 07 * * * pnpm back run trigger-convention-reminder",
+      "size": "M"
+    },
+    {
+      "command": "49 20 * * * pnpm back run trigger-sending-emails-with-assessment-creation-link",
+      "size": "M"
+    },
+    {
+      "command": "55 20 * * * pnpm back run trigger-sending-beneficiary-assessment-emails",
+      "size": "M"
+    },
+    {
+      "command": "0 21 * * * pnpm back run trigger-delete-email-attachements",
+      "size": "M"
+    },
+    {
+      "command": "0 22 * * * pnpm back run trigger-mark-old-convention-as-deprecated",
+      "size": "M"
+    },
+    {
+      "command": "3 22 * * * pnpm back run trigger-delete-old-discussion-messages",
+      "size": "M"
+    },
+    {
+      "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
       "size": "M"
     }
   ]
