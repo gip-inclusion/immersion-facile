@@ -8,6 +8,7 @@ import {
   EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
+  expiredMagicLinkErrorMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -81,6 +82,65 @@ describe("Unregister establishment lead", () => {
       expectHttpResponseToEqual(response, {
         body: "",
         status: 200,
+      });
+    });
+
+    it(`${displayRouteName(
+      establishmentRoutes.unregisterEstablishmentLead,
+    )} 400 - Unauthenticated`, async () => {
+      const response = await httpClient.unregisterEstablishmentLead({
+        headers: {} as any,
+        body: {},
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          issues: ["authorization : Required"],
+          message:
+            "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /establishment-lead/unregister",
+          status: 400,
+        },
+        status: 400,
+      });
+    });
+
+    it("401 - Jwt is malformed", async () => {
+      const response = await httpClient.unregisterEstablishmentLead({
+        headers: {
+          authorization: "bad-jwt",
+        },
+        body: {},
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: { error: "Provided token is invalid" },
+        status: 401,
+      });
+    });
+
+    it(`${displayRouteName(
+      establishmentRoutes.unregisterEstablishmentLead,
+    )} 403 - Jwt expired`, async () => {
+      const response = await httpClient.unregisterEstablishmentLead({
+        headers: {
+          authorization: generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: convention.id,
+              role: "establishment-representative",
+              email: convention.signatories.establishmentRepresentative.email,
+              now: new Date(),
+              exp: Math.round((new Date().getTime() - 48 * 3600 * 1000) / 1000),
+            }),
+          ),
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          message: expiredMagicLinkErrorMessage,
+          needsNewMagicLink: true,
+        },
+        status: 403,
       });
     });
   });
