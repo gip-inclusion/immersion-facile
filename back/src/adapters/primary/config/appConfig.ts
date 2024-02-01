@@ -338,10 +338,17 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("PASS_EMPLOI_URL");
   }
 
+  public get pdfGenerator() {
+    return {
+      baseUrl: this.#throwIfNotAbsoluteUrl("PDF_GENERATOR_BASE_URL"),
+      apiKey: this.#throwIfNotDefinedOrDefault("PDF_GENERATOR_API_KEY"),
+    };
+  }
+
   public get pdfGeneratorGateway() {
     return this.#throwIfNotInArray({
       variableName: "PDF_GENERATOR_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "PUPPETEER"],
+      authorizedValues: ["IN_MEMORY", "PUPPETEER", "SCALINGO"],
     });
   }
 

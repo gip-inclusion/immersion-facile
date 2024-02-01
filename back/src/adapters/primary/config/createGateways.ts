@@ -9,6 +9,7 @@ import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
+import { PdfGeneratorGateway } from "../../../domain/generic/htmlToPdf/PdfGeneratorGateway";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
@@ -39,6 +40,10 @@ import { HttpPassEmploiGateway } from "../../secondary/offer/passEmploi/HttpPass
 import { InMemoryPassEmploiGateway } from "../../secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
 import { PuppeteerPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/PuppeteerPdfGeneratorGateway";
+import {
+  makeScalingoPdfGeneratorRoutes,
+  ScalingoPdfGeneratorGateway,
+} from "../../secondary/pdfGeneratorGateway/ScalingoPdfGeneratorGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
@@ -238,6 +243,26 @@ export const createGateways = async (
     return gatewayByProvider[provider]();
   };
 
+  const createPdfGeneratorGateway = (): PdfGeneratorGateway => {
+    const gatewayByOption: Record<
+      AppConfig["pdfGeneratorGateway"],
+      () => PdfGeneratorGateway
+    > = {
+      PUPPETEER: () => new PuppeteerPdfGeneratorGateway(uuidGenerator),
+      IN_MEMORY: () => new InMemoryPdfGeneratorGateway(),
+      SCALINGO: () =>
+        new ScalingoPdfGeneratorGateway(
+          createAxiosHttpClientForExternalAPIs(
+            makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
+          ),
+          config.pdfGenerator.apiKey,
+          uuidGenerator,
+        ),
+    };
+
+    return gatewayByOption[config.pdfGeneratorGateway]();
+  };
+
   return {
     addressApi: addressGateway,
     dashboardGateway: createDashboardGateway(config),
@@ -268,10 +293,7 @@ export const createGateways = async (
       config.passEmploiGateway === "HTTPS"
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
         : new InMemoryPassEmploiGateway(),
-    pdfGeneratorGateway:
-      config.pdfGeneratorGateway === "PUPPETEER"
-        ? new PuppeteerPdfGeneratorGateway(uuidGenerator)
-        : new InMemoryPdfGeneratorGateway(),
+    pdfGeneratorGateway: createPdfGeneratorGateway(),
     peConnectGateway,
     poleEmploiGateway,
     timeGateway,
