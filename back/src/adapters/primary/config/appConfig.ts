@@ -348,7 +348,7 @@ export class AppConfig {
   public get pdfGeneratorGateway() {
     return this.#throwIfNotInArray({
       variableName: "PDF_GENERATOR_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "PUPPETEER", "SCALINGO"],
+      authorizedValues: ["IN_MEMORY", "SCALINGO"],
     });
   }
 
