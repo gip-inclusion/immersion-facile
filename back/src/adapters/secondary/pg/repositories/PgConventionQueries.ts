@@ -7,8 +7,8 @@ import {
   ConventionScope,
   ConventionStatus,
   FindSimilarConventionsParams,
-  ListConventionsRequestDto,
   conventionReadSchema,
+  getLatestConventionsByFiltersQueries,
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
@@ -25,6 +25,7 @@ import {
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
+  getLatestConventionsByFilters: (filters: getLatestConventionsByFiltersQueries) => Promise<ConventionReadDto[]>;
 
   public async findSimilarConventions(
     params: FindSimilarConventionsParams,
@@ -133,19 +134,6 @@ export class PgConventionQueries implements ConventionQueries {
           .orderBy("conventions.date_start", "desc")
           .limit(params.limit)
           .execute(),
-      andThen(validateConventionReadResults),
-    );
-  }
-
-  public async getLatestConventions({
-    status,
-    agencyId,
-  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
-    return pipeWithValue(
-      createConventionReadQueryBuilder(this.transaction),
-      (b) => (status ? b.where("conventions.status", "=", status) : b),
-      (b) => (agencyId ? b.where("conventions.agency_id", "=", agencyId) : b),
-      (b) => b.orderBy("date_validation", "desc").limit(10).execute(),
       andThen(validateConventionReadResults),
     );
   }

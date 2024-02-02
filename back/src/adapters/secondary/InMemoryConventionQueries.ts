@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, isBefore } from "date-fns";
 import subDays from "date-fns/subDays";
 import { propEq } from "ramda";
 import {
@@ -7,9 +7,10 @@ import {
   ConventionReadDto,
   ConventionScope,
   FindSimilarConventionsParams,
-  ListConventionsRequestDto,
-  WithConventionIdLegacy,
+  getLatestConventionsByFiltersQueries,
+  SiretDto,
   validatedConventionStatuses,
+  WithConventionIdLegacy,
 } from "shared";
 import {
   ConventionQueries,
@@ -117,15 +118,35 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .map((convention) => this.#addAgencyDataToConvention(convention));
   }
 
-  public async getLatestConventions({
-    status,
-    agencyId,
-  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
-    logger.info("getAll");
-    return this.conventionRepository.conventions
-      .filter((dto) => !status || dto.status === status)
-      .filter((dto) => !agencyId || dto.agencyId === agencyId)
-      .map((dto) => this.#addAgencyDataToConvention(dto));
+  public async getLatestConventionsByFilters({
+    sirets,
+  }: getLatestConventionsByFiltersQueries): Promise<ConventionReadDto[]> {
+    const latestConventionsBySiret = this.conventionRepository.conventions
+      .filter((conventionDto) => sirets && sirets.includes(conventionDto.siret))
+      .filter((conventionDto) => !!conventionDto.dateValidation)
+      .map((conventionDto) => this.#addAgencyDataToConvention(conventionDto))
+      .reduce((acc: Record<SiretDto, ConventionReadDto>, conventionReadDto) => {
+        const dateFromCurrentConvention =
+          acc[conventionReadDto.siret]?.dateValidation;
+        const dateFromIncomingConvention = conventionReadDto.dateValidation;
+
+        if (!acc[conventionReadDto.siret])
+          acc[conventionReadDto.siret] = conventionReadDto;
+        else if (
+          dateFromCurrentConvention &&
+          dateFromIncomingConvention &&
+          isBefore(
+            new Date(dateFromCurrentConvention),
+            new Date(dateFromIncomingConvention),
+          )
+        ) {
+          acc[conventionReadDto.siret] = conventionReadDto;
+        }
+
+        return acc;
+      }, {});
+
+    return Object.values(latestConventionsBySiret);
   }
 
   #addAgencyDataToConvention = (

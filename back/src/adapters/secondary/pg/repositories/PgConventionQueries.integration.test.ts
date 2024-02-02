@@ -12,7 +12,6 @@ import {
   ConventionStatus,
   DATE_START,
   SiretDto,
-  expectArraysToEqualIgnoringOrder,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
@@ -249,73 +248,6 @@ describe("Pg implementation of ConventionQueries", () => {
       });
 
       expectToEqual(result, [cciConvention]);
-    });
-  });
-
-  describe("PG implementation of method getLatestUpdated", () => {
-    it("Gets all saved conventionAdminDtos", async () => {
-      // Prepare
-      const insertedConventionReadDtos = await Promise.all([
-        insertAgencyAndConvention({
-          conventionId: conventionIdA,
-          agencyId: conventionIdA,
-          agencyName: "agency A",
-          agencyDepartment: "75",
-          agencyKind: "autre",
-          agencySiret: "11112222000077",
-          agencyCounsellorEmails: [],
-          agencyValidatorEmails: ["validator@mail.com"],
-        }),
-        insertAgencyAndConvention({
-          conventionId: conventionIdB,
-          agencyId: conventionIdB,
-          agencyName: "agency B",
-          agencyDepartment: "76",
-          agencyKind: "cci",
-          agencySiret: "11112222000088",
-          agencyCounsellorEmails: [],
-          agencyValidatorEmails: ["validator@mail.com"],
-        }),
-      ]);
-      // Act
-      const resultAll = await conventionQueries.getLatestConventions({});
-
-      // Assert
-      expectArraysToEqualIgnoringOrder(resultAll, insertedConventionReadDtos);
-    });
-
-    it("Gets only convention of a given agency", async () => {
-      // Prepare
-      const insertedConventionReadDtos = await Promise.all([
-        insertAgencyAndConvention({
-          conventionId: conventionIdA,
-          agencyId: conventionIdA,
-          agencyName: "agency A",
-          agencyDepartment: "75",
-          agencyKind: "autre",
-          agencySiret: "11112222000099",
-          agencyCounsellorEmails: [],
-          agencyValidatorEmails: ["validator@mail.com"],
-        }),
-        insertAgencyAndConvention({
-          conventionId: conventionIdB,
-          agencyId: conventionIdB,
-          agencyName: "agency B",
-          agencyDepartment: "76",
-          agencyKind: "autre",
-          agencySiret: "11112222000000",
-          agencyCounsellorEmails: [],
-          agencyValidatorEmails: ["validator@mail.com"],
-        }),
-      ]);
-
-      // Act
-      const resultAll = await conventionQueries.getLatestConventions({
-        agencyId: conventionIdA,
-      });
-
-      // Assert
-      expect(resultAll).toEqual([insertedConventionReadDtos[0]]);
     });
   });
 
