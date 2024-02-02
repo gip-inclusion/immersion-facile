@@ -1,5 +1,5 @@
-import { createRouter, defineRoute, param } from "type-route";
 import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
+import { createRouter, defineRoute, param } from "type-route";
 import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
   appellationAndRomeDtoSerializer,

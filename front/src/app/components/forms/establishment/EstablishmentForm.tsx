@@ -1,23 +1,21 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import { match, P } from "ts-pattern";
-import { Route } from "type-route";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Loader } from "react-design-system";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
-  decodeMagicLinkJwtWithoutSignatureCheck,
   DotNestedKeys,
   EstablishmentJwtPayload,
-  expiredMagicLinkErrorMessage,
   FormEstablishmentDto,
+  decodeMagicLinkJwtWithoutSignatureCheck,
+  expiredMagicLinkErrorMessage,
   formEstablishmentSchema,
   noContactPerWeek,
 } from "shared";
-import { Loader } from "react-design-system";
 import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";
 import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
 import { DetailsSection } from "src/app/components/forms/establishment/sections/DetailsSection";
@@ -38,6 +36,8 @@ import {
   EstablishmentFeedback,
   establishmentSlice,
 } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { P, match } from "ts-pattern";
+import { Route } from "type-route";
 
 type RouteByMode = {
   create:
@@ -123,7 +123,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const debouncedFormValues = useDebounce(formValues);
 
   const isSearchable =
-    isNaN(formValues.maxContactsPerWeek) ||
+    Number.isNaN(formValues.maxContactsPerWeek) ||
     formValues.maxContactsPerWeek > noContactPerWeek;
 
   useInitialSiret(

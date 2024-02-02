@@ -1,5 +1,5 @@
-import React from "react";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
+import React from "react";
 import { weekdays } from "shared";
 
 type WeekdayDropdownProps = {

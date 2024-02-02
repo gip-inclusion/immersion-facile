@@ -1,6 +1,3 @@
-import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -10,8 +7,9 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { addYears } from "date-fns";
-import { match, P } from "ts-pattern";
-import { v4 as uuidV4 } from "uuid";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { useDispatch } from "react-redux";
 import {
   ApiConsumer,
   ApiConsumerJwt,
@@ -31,6 +29,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
+import { P, match } from "ts-pattern";
+import { v4 as uuidV4 } from "uuid";
 
 export const ApiConsumersSection = () => {
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);

@@ -1,5 +1,5 @@
-import React from "react";
 import { RadioButtonsProps } from "@codegouvfr/react-dsfr/RadioButtons";
+import React from "react";
 import errorSvg from "../../../../assets/img/error.svg";
 import successSvg from "../../../../assets/img/success.svg";
 

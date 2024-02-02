@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import { useStyles } from "tss-react/dsfr";
-import { AgencyPublicDisplayDto } from "shared";
+import React, { useEffect, useState } from "react";
 import { Loader } from "react-design-system";
+import { AgencyPublicDisplayDto } from "shared";
 import { makeSummarySections } from "src/app/components/forms/convention/ConventionSummarySection";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
@@ -11,6 +10,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { useStyles } from "tss-react/dsfr";
 
 export const ConventionSummary = () => {
   const convention = useAppSelector(conventionSelectors.convention);

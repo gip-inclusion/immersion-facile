@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { Loader } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";

@@ -1,14 +1,13 @@
 import { AxiosInstance } from "axios";
-import { from, map, Observable } from "rxjs";
-import { match } from "ts-pattern";
+import { Observable, from, map } from "rxjs";
 import {
   AbsoluteUrl,
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
   TechnicalRoutes,
-  uploadFileRoute,
   ValidateEmailStatus,
+  uploadFileRoute,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -16,6 +15,7 @@ import {
   otherwiseThrow,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
+import { match } from "ts-pattern";
 
 export class HttpTechnicalGateway implements TechnicalGateway {
   public getAllFeatureFlags$ = (): Observable<FeatureFlags> =>

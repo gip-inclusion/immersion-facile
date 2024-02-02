@@ -1,5 +1,3 @@
-import React from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import {
   Display,
@@ -8,9 +6,10 @@ import {
 import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
-import { makeStyles } from "tss-react/dsfr";
-import { domElementIds } from "shared";
+import React from "react";
 import { MaintenanceCallout } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { domElementIds } from "shared";
 import { commonContent } from "src/app/contents/commonContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -19,9 +18,10 @@ import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { makeStyles } from "tss-react/dsfr";
 
-import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
+import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 
 export const LayoutHeader = () => {
   const dispatch = useDispatch();

@@ -1,24 +1,24 @@
 import {
   BackOfficeJwt,
-  expectObjectsToMatch,
-  expectToEqual,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   SiretEstablishmentDto,
+  expectObjectsToMatch,
+  expectToEqual,
 } from "shared";
 import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
-  defaultFormEstablishmentValue,
   EstablishmentRequestedPayload,
-  establishmentSlice,
   EstablishmentState,
+  defaultFormEstablishmentValue,
+  establishmentSlice,
 } from "./establishment.slice";
 
 const establishmentFromSiretFetched: SiretEstablishmentDto = {
@@ -137,13 +137,13 @@ describe("Establishment", () => {
 
     it("fetches establishment on establishment creation (with params)", () => {
       expectStoreToMatchInitialState();
-      const testedQueryParams: EstablishmentRequestedPayload = {
+      const testedQueryParams = {
         siret: "12345678901234",
         fitForDisabledWorkers: true,
-      };
+      } satisfies EstablishmentRequestedPayload;
       const expectedFormEstablishment: FormEstablishmentDto = {
         ...defaultFormEstablishmentValue(),
-        siret: testedQueryParams.siret!,
+        siret: testedQueryParams.siret,
         fitForDisabledWorkers: testedQueryParams.fitForDisabledWorkers,
       };
       store.dispatch(

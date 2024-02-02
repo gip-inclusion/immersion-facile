@@ -1,11 +1,9 @@
-import { from, Observable } from "rxjs";
-import { match, P } from "ts-pattern";
+import { Observable, from } from "rxjs";
 import {
   AdminRoutes,
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
-  createApiConsumerParamsFromApiConsumer,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -15,6 +13,7 @@ import {
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserAndPassword,
+  createApiConsumerParamsFromApiConsumer,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -22,6 +21,7 @@ import {
   otherwiseThrow,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
+import { P, match } from "ts-pattern";
 
 export class HttpAdminGateway implements AdminGateway {
   constructor(private readonly httpClient: HttpClient<AdminRoutes>) {}

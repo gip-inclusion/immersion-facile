@@ -1,9 +1,9 @@
-import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { domElementIds } from "shared";
+import React, { useState } from "react";
 import { File } from "react-design-system";
+import { domElementIds } from "shared";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
@@ -46,9 +46,8 @@ export const UploadFileSection = () => {
             if (tempFile && tempFile.size > 1_000_000 * maxSize_Mo) {
               setError(`Le fichier ne peut pas faire plus de ${maxSize_Mo} Mo`);
               return;
-            } else {
-              setError(undefined);
             }
+            setError(undefined);
             if (!tempFile) return;
 
             setFile(tempFile);
@@ -58,7 +57,7 @@ export const UploadFileSection = () => {
           errorMessage={error}
           id={domElementIds.addAgency.uploadLogoInput}
         />
-        {file && file.type.startsWith("image/") && fileBase64 && (
+        {file?.type.startsWith("image/") && fileBase64 && (
           <div className={fr.cx("fr-col-3")}>
             <figure
               className={fr.cx("fr-content-media", "fr-m-0", "fr-mt-2w")}
@@ -109,6 +108,7 @@ export const UploadFileSection = () => {
               "fr-btn--icon-left",
               "fr-ml-1w",
             )}
+            type="button"
           >
             {copyButtonLabel}
           </button>

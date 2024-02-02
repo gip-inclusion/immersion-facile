@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { GetSiretInfoError, SiretDto, SiretEstablishmentDto } from "shared";
 import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 

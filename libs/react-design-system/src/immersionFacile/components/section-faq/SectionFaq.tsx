@@ -36,7 +36,7 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => {
           >
             {articles.map((article, index) => (
               <FaqCard
-                // eslint-disable-next-line react/no-array-index-key
+                // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
                 key={`section-faq-item-${index}`}
                 {...article}
                 index={index}

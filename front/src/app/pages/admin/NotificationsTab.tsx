@@ -1,10 +1,10 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { keys } from "ramda";
+import React, { ReactNode, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   EmailNotification,
   EmailVariables,

@@ -1,18 +1,18 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { fr } from "@codegouvfr/react-dsfr";
 import { ConventionReadDto } from "shared";
 import { HourIndicator } from "./HourIndicator";
 
 // ex: Formats 16.5 to 16h30
 export const formatHoursString = (hours: number) => {
-  if (isNaN(hours)) {
+  if (Number.isNaN(hours)) {
     return "Erreur de saisie";
   }
   const fullHours = Math.floor(hours);
   const minutes = Math.round((hours - fullHours) * 60);
   const minutesString = (minutes < 10 ? "0" : "") + minutes.toString();
-  return fullHours.toString() + "h" + minutesString;
+  return `${fullHours.toString()}h${minutesString}`;
 };
 
 type TotalWeeklyHoursIndicatorProps = {

@@ -1,6 +1,6 @@
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { ConventionDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";

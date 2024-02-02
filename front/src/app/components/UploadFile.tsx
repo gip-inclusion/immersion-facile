@@ -1,7 +1,7 @@
 import * as React from "react";
+import { File } from "react-design-system";
 import { AbsoluteUrl } from "shared";
 import { domElementIds } from "shared";
-import { File } from "react-design-system";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 interface UploadLogoProps {
@@ -30,9 +30,8 @@ export const UploadFile = ({
         if (file && file.size > 1_000_000 * maxSize_Mo) {
           setError(`Le fichier ne peut pas faire plus de ${maxSize_Mo} Mo`);
           return;
-        } else {
-          setError(undefined);
         }
+        setError(undefined);
         if (!file) return;
 
         const fileUrl =

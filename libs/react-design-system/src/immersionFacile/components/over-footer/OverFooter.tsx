@@ -21,7 +21,7 @@ export const OverFooter = ({ cols = [] }: OverFooterProps) => {
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           {cols.length > -1 &&
             cols.map((col, index) => (
-              // eslint-disable-next-line react/no-array-index-key
+              // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
               <OverFooterCol key={`col-${index}`} {...col} />
             ))}
         </div>

@@ -6,7 +6,7 @@ import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceReposi
 import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
-import { createStore, RootState } from "src/core-logic/storeConfig/store";
+import { RootState, createStore } from "src/core-logic/storeConfig/store";
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestAssessmentGateway } from "../adapters/AssessmentGateway/TestAssessmentGateway";
@@ -32,7 +32,7 @@ const createTestDependencies = () =>
     scheduler: new VirtualTimeScheduler(),
     searchGateway: new TestSearchGateway(),
     technicalGateway: new TestTechnicalGateway(),
-  } satisfies Dependencies);
+  }) satisfies Dependencies;
 
 export const createTestStore = (preloadedState?: Partial<RootState>) => {
   const dependencies = createTestDependencies();

@@ -1,11 +1,11 @@
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
-  partnersErroredConventionSlice,
   PartnersErroredConventionState,
+  partnersErroredConventionSlice,
 } from "./partnersErroredConvention.slice";
 
 describe("Agency info in store", () => {

@@ -1,23 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import RadioButtons, {
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { match, P } from "ts-pattern";
-import { v4 as uuidV4 } from "uuid";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { ErrorNotifications } from "react-design-system";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import {
   AgencyDto,
   AgencyKind,
   CreateAgencyDto,
-  createAgencySchema,
   DepartmentCode,
+  createAgencySchema,
   domElementIds,
   toDotNotation,
 } from "shared";
-import { ErrorNotifications } from "react-design-system";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import {
   AgencyFormCommonFields,
@@ -27,7 +26,6 @@ import {
   AgencySelector,
   departmentOptions,
 } from "src/app/components/forms/commons/AgencySelector";
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   formErrorsToFlatErrors,
@@ -35,6 +33,8 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { P, match } from "ts-pattern";
+import { v4 as uuidV4 } from "uuid";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";

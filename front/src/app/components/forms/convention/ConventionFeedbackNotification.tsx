@@ -1,13 +1,13 @@
-import React, { ReactNode } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { values } from "ramda";
-import { useStyles } from "tss-react/dsfr";
-import { filterNotFalsy, Signatories, Signatory, SignatoryRole } from "shared";
+import React, { ReactNode } from "react";
+import { Signatories, Signatory, SignatoryRole, filterNotFalsy } from "shared";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import {
   ConventionFeedbackKind,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";
+import { useStyles } from "tss-react/dsfr";
 
 type ConventionSubmitFeedbackNotificationProps = {
   submitFeedback: ConventionSubmitFeedback;
@@ -122,7 +122,7 @@ const InitialSubmitSuccessMessageBase = ({
       <p className={cx(fr.cx("fr-my-2w"), "fr-text")}>
         Si vous ne recevez rien, vous pouvez récupérer votre lien de signature
         en cliquant sur&nbsp;:&nbsp;
-        <a href={`https://tally.so/r/nWE4oN`}>
+        <a href={"https://tally.so/r/nWE4oN"}>
           Récupérer mon lien de signature
         </a>
         .

@@ -1,6 +1,6 @@
 import React from "react";
-import { ManagedErrorKind } from "shared";
 import { MainWrapper } from "react-design-system";
+import { ManagedErrorKind } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { ErrorPageContent } from "./ErrorPageContent";
 

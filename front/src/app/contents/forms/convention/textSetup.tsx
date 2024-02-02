@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { ConventionId, InternshipKind } from "shared";
 
 export const useConventionTexts = (internshipKind: InternshipKind) =>
@@ -90,9 +90,8 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
             Cette convention est établie en application des dispositions des
             articles L124-3-1, L332-3-1 et L332-3-2 du code de l’éducation et de
             l’article L.4153-1 du code du travail, offrant la possibilité:
-            <br />
-            ⦁ aux collégiens, à partir de la 4e ou aux jeunes des lycées de
-            réaliser des périodes d’observation en entreprise d’une durée
+            <br />⦁ aux collégiens, à partir de la 4e ou aux jeunes des lycées
+            de réaliser des périodes d’observation en entreprise d’une durée
             maximale d’une semaine durant les vacances scolaires;
             <br />⦁ aux étudiants de l’enseignement supérieur de réaliser des
             périodes d’observation en entreprise d’une durée maximale de 5

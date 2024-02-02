@@ -1,12 +1,12 @@
-import React from "react";
-import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import {
   RadioButtons,
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import { DotNestedKeys, emailSchema, FormEstablishmentDto } from "shared";
+import React from "react";
+import { UseFormRegisterReturn, useFormContext } from "react-hook-form";
+import { DotNestedKeys, FormEstablishmentDto, emailSchema } from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {

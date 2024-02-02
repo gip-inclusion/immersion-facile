@@ -1,12 +1,8 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import { useForm, useWatch } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
-import { useStyles } from "tss-react/dsfr";
-import { Route } from "type-route";
-import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
+import React, { useEffect, useMemo, useRef } from "react";
 import {
   Loader,
   MainWrapper,
@@ -14,6 +10,8 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
+import { useForm, useWatch } from "react-hook-form";
+import { GeoPositionDto, SearchSortedBy, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -23,12 +21,14 @@ import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
-  initialState,
   SearchPageParams,
   SearchStatus,
+  initialState,
 } from "src/core-logic/domain/search/search.slice";
-import Styles from "./SearchPage.styles";
+import { useStyles } from "tss-react/dsfr";
+import { Route } from "type-route";
 import "./SearchPage.scss";
+import Styles from "./SearchPage.styles";
 
 const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
   (distance) => ({

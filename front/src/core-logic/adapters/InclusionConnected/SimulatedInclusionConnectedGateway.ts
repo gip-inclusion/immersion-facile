@@ -1,4 +1,4 @@
-import { delay, Observable, of, Subject, throwError } from "rxjs";
+import { Observable, Subject, delay, of, throwError } from "rxjs";
 import {
   AbsoluteUrl,
   AgencyId,
@@ -23,7 +23,7 @@ export class SimulatedInclusionConnectedGateway
 {
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
-  constructor(private simulatedLatency: number = 0) {}
+  constructor(private simulatedLatency = 0) {}
 
   public getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return of(simulatedUserConnected);

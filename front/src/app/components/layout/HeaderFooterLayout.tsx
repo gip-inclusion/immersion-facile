@@ -23,7 +23,7 @@ type HeaderFooterLayoutProps = {
 
 export const HeaderFooterLayout = ({ children }: HeaderFooterLayoutProps) => (
   <>
-    <SkipLinks links={skipLinks}></SkipLinks>
+    <SkipLinks links={skipLinks} />
     <LayoutHeader />
     {children}
     <LayoutFooter />

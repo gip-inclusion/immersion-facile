@@ -1,0 +1,33 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "performance": {
+        "noAccumulatingSpread": { "level": "off" }
+      },
+      "suspicious": {
+        "noConfusingVoidType": { "level": "off" },
+        "noExplicitAny": { "level": "off" }
+      },
+      "complexity": {
+        "noForEach": { "level": "off" }
+      },
+      "correctness": {
+        "useExhaustiveDependencies": { "level": "warn" }
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": { "level": "off" }
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentWidth": 2,
+    "indentStyle": "space"
+  }
+}

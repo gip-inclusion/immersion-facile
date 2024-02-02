@@ -1,5 +1,4 @@
-import { from, Observable } from "rxjs";
-import { match, P } from "ts-pattern";
+import { Observable, from } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
   GroupSlug,
@@ -18,6 +17,7 @@ import {
   ContactErrorKind,
   SearchGateway,
 } from "src/core-logic/ports/SearchGateway";
+import { P, match } from "ts-pattern";
 
 export class HttpSearchGateway implements SearchGateway {
   constructor(private readonly httpClient: HttpClient<SearchRoutes>) {}

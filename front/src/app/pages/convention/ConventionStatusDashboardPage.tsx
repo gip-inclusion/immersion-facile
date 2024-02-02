@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Route } from "type-route";
+import React, { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useDispatch } from "react-redux";
 import { MetabaseView } from "src/app/components/MetabaseView";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { Route } from "type-route";
 
 export const ConventionStatusDashboardPage = ({
   route,

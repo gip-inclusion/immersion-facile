@@ -1,6 +1,3 @@
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
@@ -9,12 +6,15 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   AgencyKind,
   ApiConsumer,
+  ConventionScope,
   apiConsumerKinds,
   apiConsumerSchema,
-  ConventionScope,
   conventionScopeKeys,
 } from "shared";
 import { allAgencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
@@ -145,7 +145,7 @@ export const ApiConsumerForm = ({
                   options={conventionScopeKeys.map((scopeKey) => ({
                     label: scopeKey,
                     nativeInputProps: {
-                      name: register(`rights.convention.scope`).name,
+                      name: register("rights.convention.scope").name,
                       checked: keys(values.rights.convention.scope).includes(
                         scopeKey,
                       ),

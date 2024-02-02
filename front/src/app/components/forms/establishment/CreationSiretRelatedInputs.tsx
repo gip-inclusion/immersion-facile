@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import React, { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
+  FormEstablishmentDto,
   addressDtoToString,
   domElementIds,
-  FormEstablishmentDto,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";

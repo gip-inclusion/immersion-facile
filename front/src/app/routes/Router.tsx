@@ -1,7 +1,7 @@
 import React from "react";
-import { Route } from "type-route";
-import { AdminTab, adminTabsList } from "shared";
 import { PageHeader } from "react-design-system";
+import { AdminTab, adminTabsList } from "shared";
+import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { AgencyDashboardPage } from "src/app/pages/agencyDashboard/AgencyDashboardPage";
@@ -16,10 +16,10 @@ import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/E
 import { EstablishmentDashboardPage } from "src/app/pages/establishmentDashboard/EstablishmentDashboardPage";
 import { OpenApiDocPage } from "src/app/pages/open-api-doc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
-import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
+import { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
 import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";

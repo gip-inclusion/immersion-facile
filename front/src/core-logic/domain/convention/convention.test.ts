@@ -8,23 +8,23 @@ import {
   DashboardUrlAndName,
   EstablishmentRepresentative,
   EstablishmentTutor,
-  expectObjectsToMatch,
-  expectToEqual,
   ScheduleDtoBuilder,
   SignatoryRole,
+  expectObjectsToMatch,
+  expectToEqual,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
-  conventionSlice,
   ConventionState,
   ConventionSubmitFeedback,
-  initialConventionState,
   RenewConventionPayload,
+  conventionSlice,
+  initialConventionState,
 } from "./convention.slice";
 
 const conventionReadDtoRemainingProps = {

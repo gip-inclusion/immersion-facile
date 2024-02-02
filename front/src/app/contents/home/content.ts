@@ -1,6 +1,6 @@
 import { Dispatch } from "@reduxjs/toolkit";
-import { domElementIds } from "shared";
 import { FaqCardProps, HeroHeaderNavCard, Stat } from "react-design-system";
+import { domElementIds } from "shared";
 import type { UserType } from "src/app/pages/home/HomePage";
 import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -275,7 +275,8 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
     },
     {
       title: "A quoi sert une immersion professionnelle ?",
-      description: `Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...`,
+      description:
+        "Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
     },
     {
@@ -287,18 +288,21 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
   candidate: [
     {
       title: "Qui peut bénéficier d'une Immersion Professionnelle (PMSMP) ?",
-      description: `S’inscrivant dans une démarche préventive (bénéficiaire salarié en recherche d’emploi ou de réorientation professionnelle) et proactive (bénéficiaire privé d’emploi, inscrit ou non auprès de France Travail, anciennement Pôle emploi), les périodes...`,
+      description:
+        "S’inscrivant dans une démarche préventive (bénéficiaire salarié en recherche d’emploi ou de réorientation professionnelle) et proactive (bénéficiaire privé d’emploi, inscrit ou non auprès de France Travail, anciennement Pôle emploi), les périodes...",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-beneficier-dune-immersion-professionnelle-pmsmp-jz1af4/",
     },
     {
       title:
         "Je n'ai pas de structure d'accompagnement et je veux faire une immersion",
-      description: ` Pour faire une immersion et avoir une convention, il faut que vous soyez accompagné(e) par un organisme qui sera responsable de cette convention...`,
+      description:
+        " Pour faire une immersion et avoir une convention, il faut que vous soyez accompagné(e) par un organisme qui sera responsable de cette convention...",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/",
     },
     {
       title: "Quelles sont les obligations à respecter pour une immersion ?",
-      description: `Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...`,
+      description:
+        "Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
     },
   ],
@@ -312,12 +316,14 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
     {
       title:
         "Ma structure peut-elle accueillir des immersions professionnelles ?",
-      description: `Une immersion professionnelle (ou Période de mise en situation en milieu professionnel -PMSMP) peut se faire dans n’importe quel type d’établissement, y compris le secteur public ou associatif...`,
+      description:
+        "Une immersion professionnelle (ou Période de mise en situation en milieu professionnel -PMSMP) peut se faire dans n’importe quel type d’établissement, y compris le secteur public ou associatif...",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/ma-structure-peut-elle-accueillir-des-immersions-professionnelles-1ccin58/",
     },
     {
       title: "Quelles sont les obligations à respecter pour une immersion ?",
-      description: `Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...`,
+      description:
+        "Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
     },
   ],
@@ -325,7 +331,8 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
     {
       title:
         "Puis-je faire une demande de convention avec une entreprise non inscrite sur le site ?",
-      description: `La réponse en trois mots : oui, bien sûr. Les entreprises accueillantes sont des entreprises que nous avons contactées et qui se sont engagées à accueillir des immersions...`,
+      description:
+        "La réponse en trois mots : oui, bien sûr. Les entreprises accueillantes sont des entreprises que nous avons contactées et qui se sont engagées à accueillir des immersions...",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/puis-je-faire-une-demande-de-convention-avec-une-entreprise-non-inscrite-sur-le-site-f9z742/",
     },
     {

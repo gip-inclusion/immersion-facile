@@ -1,8 +1,8 @@
 import React from "react";
-import SwaggerUI from "swagger-ui-react";
-import { technicalRoutes } from "shared";
 import { MainWrapper } from "react-design-system";
+import { technicalRoutes } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 
 export const OpenApiDocPage = (): React.ReactElement => (

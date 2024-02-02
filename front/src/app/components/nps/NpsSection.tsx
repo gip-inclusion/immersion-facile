@@ -1,6 +1,6 @@
 import React from "react";
-import { ConventionReadDto, npsFormIds, Role } from "shared";
 import { NPSForm } from "react-design-system";
+import { ConventionReadDto, Role, npsFormIds } from "shared";
 
 type NpsSectionProps = {
   convention: ConventionReadDto;

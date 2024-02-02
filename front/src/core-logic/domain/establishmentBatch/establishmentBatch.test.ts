@@ -5,15 +5,15 @@ import {
   FormEstablishmentDtoBuilder,
 } from "shared";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { candidateEstablishmentMapper } from "./establishmentBatch.epics";
 import {
   AddFormEstablishmentBatchFeedback,
-  establishmentBatchSlice,
   FormEstablishmentDtoWithErrors,
+  establishmentBatchSlice,
 } from "./establishmentBatch.slice";
 
 const defaultEstablishment = FormEstablishmentDtoBuilder.valid().build();

@@ -5,8 +5,8 @@ import {
   ConventionReadDto,
   DateIntervalDto,
   DotNestedKeys,
-  prettyPrintSchedule,
   ScheduleDto,
+  prettyPrintSchedule,
   toDateString,
 } from "shared";
 import { FormConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -45,7 +45,7 @@ const prettyPrintScheduleAsJSX = (
     {prettyPrintSchedule(schedule, interval)
       .split("\n")
       .map((line, index) => (
-        // eslint-disable-next-line react/no-array-index-key
+        // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
         <li key={index}>{line}</li>
       ))}
   </ul>
@@ -205,11 +205,11 @@ const agencySummary = (
   (
     [
       [
-        fields["agencyId"].label,
+        fields.agencyId.label,
         `${agency.name} (${displayAddress(agency.address)})`,
       ],
       [
-        fields["agencyRefersTo"].label,
+        fields.agencyRefersTo.label,
         agency.refersToAgency &&
           `${agency.refersToAgency.name} (${displayAddress(
             agency.refersToAgency.address,
@@ -281,9 +281,9 @@ const establishmentSummary = (
 ) =>
   (
     [
-      [fields["businessName"].label, convention.businessName],
-      [fields["siret"].label, convention.siret],
-      [fields["immersionAddress"].label, convention.immersionAddress],
+      [fields.businessName.label, convention.businessName],
+      [fields.siret.label, convention.siret],
+      [fields.immersionAddress.label, convention.immersionAddress],
       [
         fields["establishmentTutor.firstName"].label,
         convention.establishmentTutor?.firstName,
@@ -309,8 +309,8 @@ const immersionConditionsSummary = (
 ) =>
   (
     [
-      [fields["dateStart"].label, toDateString(new Date(convention.dateStart))],
-      [fields["dateEnd"].label, toDateString(new Date(convention.dateEnd))],
+      [fields.dateStart.label, toDateString(new Date(convention.dateStart))],
+      [fields.dateEnd.label, toDateString(new Date(convention.dateEnd))],
       [
         "Emploi du temps",
         prettyPrintScheduleAsJSX(convention.schedule, {
@@ -319,25 +319,25 @@ const immersionConditionsSummary = (
         }),
       ],
       [
-        fields["individualProtection"].label,
+        fields.individualProtection.label,
         convention.individualProtection ? "✅" : "❌",
       ],
       [
-        fields["sanitaryPrevention"].label,
+        fields.sanitaryPrevention.label,
         convention.sanitaryPrevention ? "✅" : "❌",
       ],
       [
-        fields["sanitaryPreventionDescription"].label,
+        fields.sanitaryPreventionDescription.label,
         convention.sanitaryPreventionDescription,
       ],
-      [fields["immersionObjective"].label, convention.immersionObjective],
+      [fields.immersionObjective.label, convention.immersionObjective],
       [
-        fields["immersionAppellation"].label,
+        fields.immersionAppellation.label,
         convention.immersionAppellation.appellationLabel,
       ],
-      [fields["workConditions"].label, convention.workConditions],
-      [fields["immersionActivities"].label, convention.immersionActivities],
-      [fields["businessAdvantages"].label, convention.businessAdvantages],
-      [fields["immersionSkills"].label, convention.immersionSkills],
+      [fields.workConditions.label, convention.workConditions],
+      [fields.immersionActivities.label, convention.immersionActivities],
+      [fields.businessAdvantages.label, convention.businessAdvantages],
+      [fields.immersionSkills.label, convention.immersionSkills],
     ] satisfies ConventionSummaryRow[]
   ).filter(filterEmptyRows);

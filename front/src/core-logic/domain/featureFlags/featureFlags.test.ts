@@ -1,17 +1,17 @@
 import {
-  expectToEqual,
   FeatureFlags,
+  expectToEqual,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import {
-  featureFlagsSlice,
   FeatureFlagsState,
+  featureFlagsSlice,
 } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 

@@ -1,4 +1,4 @@
-import { delay, Observable, of } from "rxjs";
+import { Observable, delay, of } from "rxjs";
 import {
   BackOfficeJwt,
   EstablishmentJwt,
@@ -10,7 +10,7 @@ import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway"
 export class SimulatedEstablishmentGateway implements EstablishmentGateway {
   constructor(
     private establishments: FormEstablishmentDto[],
-    private delay: number = 250,
+    private delay = 250,
   ) {}
 
   public addFormEstablishment$(

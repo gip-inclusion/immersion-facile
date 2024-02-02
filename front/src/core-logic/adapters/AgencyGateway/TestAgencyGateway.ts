@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { firstValueFrom, from, Observable, Subject } from "rxjs";
+import { Observable, Subject, firstValueFrom, from } from "rxjs";
 import {
   AgencyDto,
   AgencyId,
@@ -10,10 +10,10 @@ import {
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
-  propEq,
-  propNotEq,
   UpdateAgencyStatusParams,
   WithAgencyId,
+  propEq,
+  propNotEq,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
@@ -63,7 +63,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public async getFilteredAgencies(
     _filter: ListAgenciesRequestDto,
   ): Promise<AgencyOption[]> {
-    throw new Error(`Not implemented`);
+    throw new Error("Not implemented");
   }
 
   public getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {

@@ -1,18 +1,18 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { addDays, differenceInDays } from "date-fns";
 import { uniq } from "ramda";
-import { useStyles } from "tss-react/dsfr";
+import React from "react";
 import {
-  arrayFromNumber,
   DateIntervalDto,
-  frenchDayMapping,
   InternshipKind,
-  maximumCalendarDayByInternshipKind,
-  removeAtIndex,
   SelectedDaysOfTheWeekDto,
   WeekdayNumber,
+  arrayFromNumber,
+  frenchDayMapping,
+  maximumCalendarDayByInternshipKind,
+  removeAtIndex,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
 import { DayCircle } from "./DayCircle";
 
 type WeekdayPickerProps = {
@@ -67,7 +67,7 @@ export const WeekdayPicker = ({
       >
         {availableWeekDays.map((dayName, index) => (
           <DayCircle
-            // eslint-disable-next-line react/no-array-index-key
+            // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
             key={dayName + index}
             name={dayName}
             disabled={isDayDisabled(index as WeekdayNumber, interval)}

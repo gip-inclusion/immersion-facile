@@ -1,18 +1,18 @@
-import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Route } from "type-route";
+import React from "react";
+import { Loader, MainWrapper } from "react-design-system";
 import {
   ConventionJwtPayload,
-  decodeMagicLinkJwtWithoutSignatureCheck,
   Role,
+  decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
-import { Loader, MainWrapper } from "react-design-system";
 import { AssessmentForm } from "src/app/components/forms/immersion-assessment/AssessmentForm";
 import { ImmersionDescription } from "src/app/components/forms/immersion-assessment/ImmersionDescription";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
+import { Route } from "type-route";
 
 type AssessmentRoute = Route<typeof routes.assessment>;
 

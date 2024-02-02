@@ -1,8 +1,8 @@
-import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { domElementIds, SearchResultDto } from "shared";
+import React, { useState } from "react";
+import { SearchResultDto, domElementIds } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { routes } from "src/app/routes/routes";
 
@@ -37,7 +37,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           {getSearchResultsForPage(currentPage).map((searchResult) => (
             <SearchResult
-              key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
+              key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
               establishment={searchResult}
               onButtonClick={() => {
                 const appellationCode =

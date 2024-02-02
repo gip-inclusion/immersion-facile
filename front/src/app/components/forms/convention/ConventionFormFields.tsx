@@ -1,25 +1,25 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { get, type SubmitHandler, useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ErrorNotifications } from "react-design-system";
+import { type SubmitHandler, get, useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
-  addressDtoToString,
   AgencyOption,
   ConventionReadDto,
   DepartmentCode,
-  domElementIds,
   FederatedIdentity,
   InternshipKind,
+  addressDtoToString,
+  domElementIds,
   isPeConnectIdentity,
   miniStageRestrictedDepartments,
   toDotNotation,
 } from "shared";
-import { ErrorNotifications } from "react-design-system";
 import {
   AgencySelector,
   departmentOptions,
@@ -39,16 +39,16 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  conventionSlice,
   NumberOfSteps,
+  conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { AddressAutocomplete } from "../autocomplete/AddressAutocomplete";
+import { ConventionFormMode } from "./ConventionForm";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
 import { ScheduleSection } from "./sections/schedule/ScheduleSection";
-import { ConventionFormMode } from "./ConventionForm";
 
 type ConventionFieldsProps = {
   onSubmit: SubmitHandler<ConventionReadDto>;
@@ -121,8 +121,10 @@ export const ConventionFormFields = ({
     (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
 
   const makeAccordionProps = (step: NumberOfSteps) => ({
-    ref: (element: HTMLDivElement) =>
-      (accordionsRef.current[step - 1] = element),
+    ref: (element: HTMLDivElement) => {
+      accordionsRef.current[step - 1] = element;
+      return element;
+    },
     onExpandedChange: async () => {
       await validateSteps();
       setTimeout(() => {
@@ -153,9 +155,7 @@ export const ConventionFormFields = ({
       success: { severity: "success", label: "Complet" },
       info: { severity: "info", label: "À compléter" },
     };
-    return stepsStatus && stepsStatus[step]
-      ? badgeData[stepsStatus[step]]
-      : badgeData.info;
+    return stepsStatus?.[step] ? badgeData[stepsStatus[step]] : badgeData.info;
   };
 
   const renderStatusBadge = (step: number) => (
@@ -289,7 +289,7 @@ export const ConventionFormFields = ({
         >
           <ScheduleSection />
           <AddressAutocomplete
-            {...formContents["immersionAddress"]}
+            {...formContents.immersionAddress}
             initialSearchTerm={
               conventionValues.immersionAddress ??
               establishmentInfos?.businessAddress

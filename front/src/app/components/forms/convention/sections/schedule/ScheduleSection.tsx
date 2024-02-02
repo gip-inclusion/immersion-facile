@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { addDays, differenceInDays } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import {
   ConventionReadDto,
   DateIntervalDto,
+  Weekday,
   isStringDate,
   maximumCalendarDayByInternshipKind,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
   toDateString,
-  Weekday,
 } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
@@ -152,12 +152,12 @@ export const ScheduleSection = () => {
         </>
       )}
       <Input
-        label={formContents["dateStart"].label}
-        hintText={formContents["dateStart"].hintText}
+        label={formContents.dateStart.label}
+        hintText={formContents.dateStart.hintText}
         nativeInputProps={{
           type: "date",
           name: register("dateStart").name,
-          id: formContents["dateStart"].id,
+          id: formContents.dateStart.id,
           value: dateStartInputValue,
           onChange: (event) => {
             const dateStart = event.target.value;
@@ -171,12 +171,12 @@ export const ScheduleSection = () => {
         {...getFieldError("dateStart")}
       />
       <Input
-        label={formContents["dateEnd"].label}
-        hintText={formContents["dateEnd"].hintText}
+        label={formContents.dateEnd.label}
+        hintText={formContents.dateEnd.hintText}
         nativeInputProps={{
           type: "date",
           name: register("dateEnd").name,
-          id: formContents["dateEnd"].id,
+          id: formContents.dateEnd.id,
           value: dateEndInputValue,
           onChange: (event) => {
             const dateEnd = event.target.value;

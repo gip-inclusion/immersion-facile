@@ -1,15 +1,15 @@
-import React from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
-import { useStyles } from "tss-react/dsfr";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { AgencyId, AgencyOption, propEq } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { useStyles } from "tss-react/dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
   const dispatch = useDispatch();

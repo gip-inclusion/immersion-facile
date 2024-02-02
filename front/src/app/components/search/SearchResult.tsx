@@ -1,18 +1,18 @@
-import React, { memo, useState } from "react";
-import LinesEllipsis from "react-lines-ellipsis";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { equals } from "ramda";
-import { useStyles } from "tss-react/dsfr";
+import React, { memo, useState } from "react";
+import LinesEllipsis from "react-lines-ellipsis";
 import {
+  SearchResultDto,
   addressDtoToString,
   frenchEstablishmentKinds,
   getMapsLink,
-  SearchResultDto,
   toAbsoluteUrl,
 } from "shared";
-import { SearchResultLabels } from "./SearchResultLabels";
+import { useStyles } from "tss-react/dsfr";
 import "./SearchResult.scss";
+import { SearchResultLabels } from "./SearchResultLabels";
 
 export type EnterpriseSearchResultProps = {
   establishment: SearchResultDto;
@@ -183,6 +183,7 @@ const SearchResultComponent = ({
                     <button
                       className={fr.cx("fr-tag", "fr-tag--sm", "fr-mt-1w")}
                       onClick={onAdditionalInformationClick}
+                      type="button"
                     >
                       {additionalInformationClamped
                         ? "Voir plus"

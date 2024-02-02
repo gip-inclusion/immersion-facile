@@ -1,5 +1,5 @@
-import React from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import { DayStatus } from "./utils/getDayStatus";
 
@@ -21,7 +21,7 @@ export const DayCircle = ({
       <div className={cx("schedule-picker__day-circle")}>
         <button
           type="button"
-          className={cx(`numberCircle`)}
+          className={cx("numberCircle")}
           style={{ backgroundColor: "#B8FEC9" }}
           onClick={onClick}
           disabled={disabled}

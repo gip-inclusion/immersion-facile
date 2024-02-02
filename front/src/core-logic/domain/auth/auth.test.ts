@@ -1,19 +1,19 @@
 import {
-  expectToEqual,
   FederatedIdentity,
   InclusionConnectedUser,
+  expectToEqual,
 } from "shared";
 import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
-  authSlice,
   FederatedIdentityWithUser,
+  authSlice,
 } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 

@@ -1,22 +1,34 @@
-import { expectToEqual, SearchResultDto } from "shared";
+import { SearchResultDto, expectToEqual } from "shared";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
+  SearchStatus,
   initialState,
   searchSlice,
-  SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 // prettier-ignore
-const formSearchResult1 = { siret: "form1", rome: "A", voluntaryToImmersion: true} as SearchResultDto
+const formSearchResult1 = {
+  siret: "form1",
+  rome: "A",
+  voluntaryToImmersion: true,
+} as SearchResultDto;
 // prettier-ignore
-const formSearchResult2 = { siret: "form2", rome: "A", voluntaryToImmersion: true} as SearchResultDto
+const formSearchResult2 = {
+  siret: "form2",
+  rome: "A",
+  voluntaryToImmersion: true,
+} as SearchResultDto;
 // prettier-ignore
-const lbbSearchResult = { siret: "lbb1", rome: "A", voluntaryToImmersion: false } as SearchResultDto
+const lbbSearchResult = {
+  siret: "lbb1",
+  rome: "A",
+  voluntaryToImmersion: false,
+} as SearchResultDto;
 
 const immersionOffer: SearchResultDto = {
   rome: "A1201",

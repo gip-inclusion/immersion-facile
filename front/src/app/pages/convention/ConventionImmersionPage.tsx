@@ -1,21 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import { match } from "ts-pattern";
-import { Route } from "type-route";
+import React, { useEffect, useMemo, useState } from "react";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import { useDispatch } from "react-redux";
 import {
   FederatedIdentityProvider,
   isPeConnectIdentity,
   loginPeConnect,
 } from "shared";
-import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import { InitiateConventionSection } from "src/app/components/InitiateConventionSection";
 import {
   ConventionForm,
   ConventionFormMode,
 } from "src/app/components/forms/convention/ConventionForm";
-import { InitiateConventionSection } from "src/app/components/InitiateConventionSection";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -27,6 +25,8 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { match } from "ts-pattern";
+import { Route } from "type-route";
 
 export type ConventionImmersionPageRoute = Route<
   typeof routes.conventionImmersion
@@ -197,6 +197,7 @@ const SharedConventionMessage = ({
       </Button>
 
       <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
+        {/* biome-ignore lint/a11y/useValidAnchor: This is a trusted source */}
         <a
           href={`/api/${loginPeConnect}`}
           onClick={() => {

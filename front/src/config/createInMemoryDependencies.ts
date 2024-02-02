@@ -10,8 +10,8 @@ import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/Establish
 import { SimulatedFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/SimulatedFormCompletionGateway";
 import { seedRomeDtos } from "src/core-logic/adapters/FormCompletionGateway/TestFormCompletionGateway";
 import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
-import { seedSearchResults } from "src/core-logic/adapters/SearchGateway/simulatedSearchData";
 import { SimulatedSearchGateway } from "src/core-logic/adapters/SearchGateway/SimulatedSearchGateway";
+import { seedSearchResults } from "src/core-logic/adapters/SearchGateway/simulatedSearchData";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 
 const SIMULATED_LATENCY_MS = 400;

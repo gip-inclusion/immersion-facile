@@ -1,9 +1,9 @@
 import {
   BusinessContactDto,
-  domElementIds,
   FormEstablishmentDto,
-  immersionFacileContactEmail,
   SiretDto,
+  domElementIds,
+  immersionFacileContactEmail,
 } from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";

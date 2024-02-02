@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { Route } from "type-route";
+import React, { useEffect, useState } from "react";
+import {
+  ConventionDocument,
+  ConventionRenewedInformations,
+  Loader,
+  MainWrapper,
+  NPSForm,
+} from "react-design-system";
+import { useDispatch } from "react-redux";
 import {
   ConventionId,
   ConventionReadDto,
@@ -14,13 +20,6 @@ import {
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
-import {
-  ConventionDocument,
-  ConventionRenewedInformations,
-  Loader,
-  MainWrapper,
-  NPSForm,
-} from "react-design-system";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -29,6 +28,7 @@ import { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
 import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
+import { Route } from "type-route";
 
 import logoIf from "/assets/img/logo-if.svg";
 import logoRf from "/assets/img/logo-rf.svg";
@@ -157,11 +157,11 @@ export const ConventionDocumentPage = ({
           jwt,
         );
       const downloadLink = document.createElement("a");
-      downloadLink.href = "data:application/pdf;base64," + pdfContent;
+      downloadLink.href = `data:application/pdf;base64,${pdfContent}`;
       downloadLink.download = `convention-immersion-${convention.id}.pdf`;
       downloadLink.click();
     } catch (e) {
-      alert(`Erreur lors de la génération du PDF >> voir la console.`);
+      alert("Erreur lors de la génération du PDF >> voir la console.");
       // eslint-disable-next-line no-console
       console.error(JSON.stringify(e));
     } finally {

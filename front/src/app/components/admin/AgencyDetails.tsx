@@ -36,7 +36,6 @@ const formatAgencyStatus = (status: AgencyStatus) => {
     case "from-api-PE":
       return "👩‍💼 API PE";
   }
-  return "⁉️ STATUT INDÉFINI";
 };
 
 export const AgencyDetails = () => {
@@ -66,7 +65,7 @@ export const AgencyDetails = () => {
           agency[field] && (
             <TextCell
               title={
-                /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
+                /* biome-ignore lint/style/noNonNullAssertion: temp fix */
                 agencyFieldToLabel[field]!
               }
               contents={buildContent(field)}

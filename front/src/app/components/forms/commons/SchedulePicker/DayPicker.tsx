@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import {
   DailyScheduleDto,
   DateIntervalDto,
@@ -27,7 +27,7 @@ export const DayPicker = ({
     <div className={fr.cx("fr-grid-row", "fr-mt-1w")}>
       {["L", "M", "M", "J", "V", "S", "D"].map((name) => (
         <DayCircle
-          key={"legend-" + name}
+          key={`legend-${name}`}
           name={name}
           dayStatus={"empty"}
           disabled={true}

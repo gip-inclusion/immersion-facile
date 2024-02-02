@@ -1,19 +1,19 @@
-import React, { Dispatch, SetStateAction } from "react";
-import { createPortal } from "react-dom";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import React, { Dispatch, SetStateAction } from "react";
+import { createPortal } from "react-dom";
+import { useFormContext } from "react-hook-form";
 import {
   ConventionDto,
   ConventionStatusWithJustification,
-  domElementIds,
-  getSignatoryProcessedData,
   InternshipKind,
-  isConventionRenewed,
   Role,
   Signatory,
   UpdateConventionStatusRequestDto,
+  domElementIds,
+  getSignatoryProcessedData,
+  isConventionRenewed,
 } from "shared";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

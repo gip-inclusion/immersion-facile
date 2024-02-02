@@ -1,12 +1,11 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { useStyles } from "tss-react/dsfr";
 import { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
 import { statsPageUrl } from "src/app/pages/StatsPage";
 import { ENV } from "src/config/environmentVariables";
+import { useStyles } from "tss-react/dsfr";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
   <a

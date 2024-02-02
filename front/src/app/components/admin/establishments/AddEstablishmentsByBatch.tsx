@@ -1,22 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Papa from "papaparse";
 import { keys, values } from "ramda";
-import { makeStyles } from "tss-react/dsfr";
+import React, { useEffect, useRef, useState } from "react";
+import { Loader } from "react-design-system";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
-  domElementIds,
   EstablishmentCSVRow,
   FormEstablishmentDto,
+  domElementIds,
 } from "shared";
-import { Loader } from "react-design-system";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
+import { makeStyles } from "tss-react/dsfr";
 
 type AddEstablishmentByBatchTabForm = {
   groupName: string;
@@ -317,7 +317,6 @@ export const AddEstablishmentsByBatch = () => {
                   <>
                     {establishment.formEstablishment && (
                       <tr
-                        // eslint-disable-next-line react/no-array-index-key
                         key={`${establishment.formEstablishment.siret}-${index}`}
                         className={cx({})}
                         style={{
@@ -331,7 +330,6 @@ export const AddEstablishmentsByBatch = () => {
                             <>
                               {establishment.formEstablishment && (
                                 <td
-                                  // eslint-disable-next-line react/no-array-index-key
                                   key={`${establishment.formEstablishment.siret}-value-${index}`}
                                   className={fr.cx("fr-text--xs")}
                                 >
@@ -345,7 +343,7 @@ export const AddEstablishmentsByBatch = () => {
                     )}
                     {establishment.formEstablishment === null && (
                       <tr
-                        // eslint-disable-next-line react/no-array-index-key
+                        // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
                         key={index}
                         className={cx({})}
                         style={{
@@ -355,7 +353,6 @@ export const AddEstablishmentsByBatch = () => {
                         }}
                       >
                         {establishment.zodErrors.map((error, index) => (
-                          // eslint-disable-next-line react/no-array-index-key
                           <td key={`${error.path}-${index}`}>
                             {error.path} : {error.message}
                           </td>

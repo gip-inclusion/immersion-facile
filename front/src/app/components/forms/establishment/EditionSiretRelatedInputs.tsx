@@ -1,6 +1,6 @@
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { addressDtoToString } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";

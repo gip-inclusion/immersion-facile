@@ -1,5 +1,4 @@
-import { from, Observable } from "rxjs";
-import { match, P } from "ts-pattern";
+import { Observable, from } from "rxjs";
 import { ConventionMagicLinkRoutes } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -10,6 +9,7 @@ import {
   AssessmentAndJwt,
   AssessmentGateway,
 } from "src/core-logic/ports/AssessmentGateway";
+import { P, match } from "ts-pattern";
 
 export class HttpAssessmentGateway implements AssessmentGateway {
   constructor(

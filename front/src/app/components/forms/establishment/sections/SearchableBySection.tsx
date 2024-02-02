@@ -1,15 +1,15 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import RadioButtons, {
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { equals } from "ramda";
+import React from "react";
+import { useFormContext } from "react-hook-form";
 import {
-  domElementIds,
   EstablishmentSearchableBy,
   FormEstablishmentDto,
+  domElementIds,
 } from "shared";
 import allUsersSvg from "../../../../../assets/img/all.svg";
 import jobSeekerSvg from "../../../../../assets/img/jobseeker.svg";

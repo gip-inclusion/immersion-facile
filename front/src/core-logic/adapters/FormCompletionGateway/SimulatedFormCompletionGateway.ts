@@ -1,16 +1,16 @@
-import { BehaviorSubject, delay, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject, delay, of } from "rxjs";
 import {
-  apiSirenNotAvailableSiret,
-  apiSirenUnexpectedError,
   AppellationMatchDto,
-  conflictErrorSiret,
   GetSiretInfo,
   RomeDto,
+  SiretDto,
+  SiretEstablishmentDto,
+  apiSirenNotAvailableSiret,
+  apiSirenUnexpectedError,
+  conflictErrorSiret,
   siretApiMissingEstablishmentMessage,
   siretApiUnavailableSiretErrorMessage,
   siretApiUnexpectedErrorErrorMessage,
-  SiretDto,
-  SiretEstablishmentDto,
   siretSchema,
   sleep,
   tooManiSirenRequestsSiretErrorMessage,

@@ -1,8 +1,7 @@
-import React, { ReactNode, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
-import { ConventionReadDto, isConventionRenewed, path } from "shared";
+import React, { ReactNode, useState } from "react";
 import { ConventionRenewedInformations } from "react-design-system";
+import { path, ConventionReadDto, isConventionRenewed } from "shared";
 import { sections } from "src/app/contents/admin/conventionValidation";
 import {
   ColField,
@@ -10,6 +9,7 @@ import {
   RowFields,
 } from "src/app/contents/admin/types";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
+import { useStyles } from "tss-react/dsfr";
 import type { ConventionValidationProps } from "./ConventionValidation";
 
 const cellStyles = {
@@ -41,6 +41,7 @@ export const ConventionValidationDetails = ({
             "fr-btn--icon-left",
             "fr-ml-1w",
           )}
+          type="button"
         >
           {copyButtonLabel}
         </button>
@@ -50,7 +51,7 @@ export const ConventionValidationDetails = ({
       )}
       {sections.map((list, index) => (
         <ConventionValidationSection
-          // eslint-disable-next-line react/no-array-index-key
+          // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
           key={index}
           convention={convention}
           list={list}
@@ -73,8 +74,8 @@ const ConventionValidationSection = ({
   const { cx } = useStyles();
   const [markedAsRead, setMarkedAsRead] = useState<boolean>(false);
   const buildContent = (field: ColField): ReactNode => {
-    let value;
-    if (field && field.key) {
+    let value: React.ReactNode;
+    if (field?.key) {
       value = path(field.key, convention) as string;
       if (field.getValue) {
         value = field.getValue(convention);
@@ -112,8 +113,8 @@ const ConventionValidationSection = ({
                   {buildContent(field)}
                 </td>
               ) : (
-                // eslint-disable-next-line react/no-array-index-key
-                <td key={index}></td>
+                // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
+                <td key={index} />
               ),
             )}
           </tr>
@@ -158,13 +159,12 @@ const ConventionValidationSection = ({
           <>
             <thead>
               <tr>
-                {list.cols &&
-                  list.cols?.map((col, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <th key={index} scope="col">
-                      {col}
-                    </th>
-                  ))}
+                {list.cols?.map((col, index) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
+                  <th key={index} scope="col">
+                    {col}
+                  </th>
+                ))}
                 {!list.cols &&
                   list.rowFields[0] &&
                   list.rowFields[0].fields.map((field) =>

@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 
 export type AgencyErrorTextProperties = {
   loadingError: boolean;
@@ -13,7 +13,7 @@ export const AgencyErrorText = ({
   error,
 }: AgencyErrorTextProperties): JSX.Element => (
   <p
-    id={`agency-code-{name}-error-desc-error`}
+    id={"agency-code-{name}-error-desc-error"}
     className={fr.cx("fr-error-text")}
   >
     {loadingError

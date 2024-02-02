@@ -4,22 +4,22 @@ import {
   AgencyId,
   AgencyRight,
   AuthenticatedUser,
-  expectToEqual,
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
+  expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import {
   IcUsersAdminFeedback,
-  icUsersAdminInitialState,
-  icUsersAdminSlice,
   IcUsersAdminState,
   NormalizedIcUserById,
+  icUsersAdminInitialState,
+  icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 

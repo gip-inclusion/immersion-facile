@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
@@ -7,15 +5,17 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import {
   ConventionDto,
   ConventionStatusWithJustification,
-  doesStatusNeedsJustification,
-  domElementIds,
   Role,
   Signatory,
-  signatoryTitleByRole,
   UpdateConventionStatusRequestDto,
+  doesStatusNeedsJustification,
+  domElementIds,
+  signatoryTitleByRole,
   updateConventionStatusRequestSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -50,12 +50,11 @@ export const JustificationModalContent = ({
 
   const getFieldError = makeFieldError(formState);
 
-  const onFormSubmit: SubmitHandler<
-    Partial<UpdateConventionStatusRequestDto>
-  > = (values) => {
-    onSubmit(updateConventionStatusRequestSchema.parse(values));
-    closeModal();
-  };
+  const onFormSubmit: SubmitHandler<Partial<UpdateConventionStatusRequestDto>> =
+    (values) => {
+      onSubmit(updateConventionStatusRequestSchema.parse(values));
+      closeModal();
+    };
 
   const conventionSignatories: Signatory[] = Object.values(
     convention.signatories,
@@ -70,7 +69,7 @@ export const JustificationModalContent = ({
             value: signatory.role,
           }
         : {
-            label: `Vous même`,
+            label: "Vous même",
             value: currentSignatoryRole,
           },
     );
@@ -81,7 +80,7 @@ export const JustificationModalContent = ({
       currentSignatoryRole === "counsellor"
         ? [
             {
-              label: `Vous même`,
+              label: "Vous même",
               value: currentSignatoryRole,
             },
           ]

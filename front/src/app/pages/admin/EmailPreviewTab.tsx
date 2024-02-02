@@ -1,21 +1,21 @@
-import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { keys } from "ramda";
-import { useStyles } from "tss-react/dsfr";
-import {
-  addressDtoToString,
-  domElementIds,
-  type EmailTemplatesByName,
-  emailTemplatesByName,
-  internshipKinds,
-} from "shared";
-import { ImmersionTextField } from "react-design-system";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
   cciCustomHtmlFooter,
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
+import { keys } from "ramda";
+import React, { useState } from "react";
+import { ImmersionTextField } from "react-design-system";
+import {
+  type EmailTemplatesByName,
+  addressDtoToString,
+  domElementIds,
+  emailTemplatesByName,
+  internshipKinds,
+} from "shared";
+import { useStyles } from "tss-react/dsfr";
 
 const defaultEmailPreviewUrl =
   "https://upload.wikimedia.org/wikipedia/en/9/9a/Trollface_non-free.png";
@@ -139,7 +139,7 @@ export const EmailPreviewTab = () => {
             <div
               className={cx("admin-tab__email-preview-wrapper")}
               dangerouslySetInnerHTML={{ __html: fakeContent.htmlContent }}
-            ></div>
+            />
           </section>
         </div>
       </div>
@@ -493,7 +493,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     conventionId: "CONVENTION_ID",
     signatoriesSummary: [
-      `- ✔️  - A signé le 19/03/2023 - BENEFICIARY_FIRSTNAME BENEFICIARY_LASTNAME, bénéficiaire`,
+      "- ✔️  - A signé le 19/03/2023 - BENEFICIARY_FIRSTNAME BENEFICIARY_LASTNAME, bénéficiaire",
       `- ❌ - N'a pas signé - BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME, employeur actuel du bénéficiaire`,
       `- ❌ - N'a pas signé - ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME, représentant l'entreprise BUSINESS_NAME`,
     ].join("\n"),
@@ -507,7 +507,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     conventionId: "CONVENTION_ID",
     signatoriesSummary: [
-      `- ✔️  - A signé le 19/03/2023 - BENEFICIARY_FIRSTNAME BENEFICIARY_LASTNAME, bénéficiaire`,
+      "- ✔️  - A signé le 19/03/2023 - BENEFICIARY_FIRSTNAME BENEFICIARY_LASTNAME, bénéficiaire",
       `- ❌ - N'a pas signé - BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME, employeur actuel du bénéficiaire`,
       `- ❌ - N'a pas signé - ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME, représentant l'entreprise BUSINESS_NAME`,
     ].join("\n"),

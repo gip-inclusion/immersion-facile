@@ -1,20 +1,20 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { match, P } from "ts-pattern";
-import { Route } from "type-route";
+import React, { useEffect } from "react";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import { useDispatch } from "react-redux";
 import {
-  allSignatoryRoles,
   ConventionJwtPayload,
+  SignatoryRole,
+  allSignatoryRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
   immersionFacileContactEmail,
   isSignatory,
-  SignatoryRole,
 } from "shared";
-import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { ConventionSummary } from "src/app/components/forms/convention/ConventionSummary";
+import { P, match } from "ts-pattern";
+import { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { commonContent } from "../../contents/commonContent";

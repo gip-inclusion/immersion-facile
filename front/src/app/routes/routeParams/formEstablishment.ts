@@ -1,13 +1,13 @@
-import { param, ValueSerializer } from "type-route";
 import {
   AppellationAndRomeDto,
   ContactMethod,
-  defaultMaxContactsPerWeek,
   Email,
   FormEstablishmentDto,
   FormEstablishmentSource,
+  defaultMaxContactsPerWeek,
 } from "shared";
 import { ENV } from "src/config/environmentVariables";
+import { ValueSerializer, param } from "type-route";
 
 export type FormEstablishmentParamsInUrl = Partial<{
   [K in FormEstablishmentKeysInUrl]: (typeof formEstablishmentParamsInUrl)[K]["~internal"]["valueSerializer"] extends ValueSerializer<

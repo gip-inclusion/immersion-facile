@@ -1,6 +1,6 @@
+import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
 import { Email, ValidateEmailReason, ValidateEmailStatus } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 

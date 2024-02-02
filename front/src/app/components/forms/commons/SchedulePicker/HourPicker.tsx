@@ -1,15 +1,15 @@
-import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { ErrorMessage } from "@hookform/error-message";
-import { useStyles } from "tss-react/dsfr";
+import React, { useState } from "react";
 import {
+  TimePeriodDto,
   domElementIds,
   removeAtIndex,
   replaceArrayElement,
-  TimePeriodDto,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
 
 type HourPickerProps = {
   name: string;
@@ -34,8 +34,8 @@ export const HourPicker = ({
       const last = newTimePeriods[newTimePeriods.length - 1];
       const endH = last.end.split(":").map(Number)[0];
       if (endH < 22) {
-        start = (endH + 1).toString() + ":00";
-        end = (endH + 2).toString() + ":00";
+        start = `${(endH + 1).toString()}:00`;
+        end = `${(endH + 2).toString()}:00`;
       }
     }
     newTimePeriods.push({ start, end });
@@ -120,7 +120,7 @@ const TimePeriod = ({
         <div className={cx("date-or-time-block")}>
           <Input
             label="Début"
-            id={name + index + "-start"}
+            id={`${name + index}-start`}
             nativeInputProps={{
               type: "time",
               value: startHour,
@@ -142,7 +142,7 @@ const TimePeriod = ({
         <div className={cx("date-or-time-block")}>
           <Input
             label="Fin"
-            id={name + index + "-end"}
+            id={`${name + index}-end`}
             nativeInputProps={{
               type: "time",
               value: endHour,

@@ -1,22 +1,20 @@
 import { addDays, startOfToday } from "date-fns";
-import { param, ValueSerializer } from "type-route";
-import { v4 as uuidV4 } from "uuid";
 import {
   AppellationAndRomeDto,
   AppellationCode,
-  appellationCodeSchema,
   AppellationDto,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
   ImmersionObjective,
   InternshipKind,
-  isBeneficiaryStudent,
   LevelOfEducation,
-  mergeObjectsExceptFalsyValues,
   PeConnectIdentity,
-  reasonableSchedule,
   ScheduleDto,
+  appellationCodeSchema,
+  isBeneficiaryStudent,
+  mergeObjectsExceptFalsyValues,
+  reasonableSchedule,
   toDateString,
 } from "shared";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
@@ -26,6 +24,8 @@ import { ConventionMiniStagePageRoute } from "src/app/pages/convention/Conventio
 import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
+import { ValueSerializer, param } from "type-route";
+import { v4 as uuidV4 } from "uuid";
 
 type ConventionRoutes =
   | ConventionMiniStagePageRoute
