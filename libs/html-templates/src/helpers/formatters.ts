@@ -1,5 +1,5 @@
 export const ignoreTabs = (str: string): string =>
-  str.replace(/\n  +/g, "\n").trim();
+  str.replace(/\n +/g, "\n").trim();
 
 export const wrapElements = (children: string) =>
   `

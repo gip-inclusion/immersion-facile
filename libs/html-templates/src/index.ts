@@ -1,6 +1,6 @@
-import { ignoreTabs } from "./helpers/formatters";
 import { configureGenerateHtmlFromTemplate } from "./configureGenerateHtmlFromTemplate";
 import { createTemplatesByName } from "./createTemplatesByName";
+import { ignoreTabs } from "./helpers/formatters";
 
 export { configureGenerateHtmlFromTemplate, createTemplatesByName, ignoreTabs };
 
