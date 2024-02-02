@@ -155,7 +155,6 @@ export const Footer = ({
             <ul className={fr.cx("fr-footer__bottom-list")}>
               {bottomLinks.map((link, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
-
                 <BottomLink key={index} link={link} />
               ))}
             </ul>
