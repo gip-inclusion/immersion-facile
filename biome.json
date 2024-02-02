@@ -16,7 +16,8 @@
         "noExplicitAny": { "level": "off" }
       },
       "complexity": {
-        "noForEach": { "level": "off" }
+        "noForEach": { "level": "off" },
+        "noUselessConstructor": { "level": "off" }
       },
       "correctness": {
         "useExhaustiveDependencies": { "level": "warn" }

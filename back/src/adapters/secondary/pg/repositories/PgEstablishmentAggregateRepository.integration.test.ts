@@ -240,13 +240,16 @@ describe("PgEstablishmentAggregateRepository", () => {
           createdAt: new Date(),
         });
 
-        sirets.forEach(async (siret) =>
-          insertImmersionOffer(client, {
-            romeCode: cartographeImmersionOffer.romeCode,
-            appellationCode: cartographeSearchMade.appellationCodes?.[0],
-            siret,
-            offerCreatedAt: new Date("2022-05-05"),
-          }),
+        await Promise.all(
+          sirets.map(async (siret) =>
+            insertImmersionOffer(client, {
+              romeCode: cartographeImmersionOffer.romeCode,
+              // biome-ignore lint/style/noNonNullAssertion:
+              appellationCode: cartographeSearchMade.appellationCodes![0],
+              siret,
+              offerCreatedAt: new Date("2022-05-05"),
+            }),
+          ),
         );
       });
 
@@ -503,12 +506,14 @@ describe("PgEstablishmentAggregateRepository", () => {
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
         siret: closeSiret,
-        appellationCode: cartographeSearchMade.appellationCodes?.[0],
+        // biome-ignore lint/style/noNonNullAssertion:
+        appellationCode: cartographeSearchMade.appellationCodes![0],
       });
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
         siret: farSiret,
-        appellationCode: cartographeSearchMade.appellationCodes?.[0],
+        // biome-ignore lint/style/noNonNullAssertion:
+        appellationCode: cartographeSearchMade.appellationCodes![0],
       });
       // Act
       const searchResult =
@@ -542,13 +547,15 @@ describe("PgEstablishmentAggregateRepository", () => {
       await Promise.all([
         insertImmersionOffer(client, {
           romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCodes?.[0],
+          // biome-ignore lint/style/noNonNullAssertion:
+          appellationCode: cartographeSearchMade.appellationCodes![0],
           siret: recentOfferSiret,
           offerCreatedAt: new Date("2022-05-05"),
         }),
         insertImmersionOffer(client, {
           romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCodes?.[0],
+          // biome-ignore lint/style/noNonNullAssertion:
+          appellationCode: cartographeSearchMade.appellationCodes![0],
           siret: oldOfferSiret,
           offerCreatedAt: new Date("2022-05-02"),
         }),

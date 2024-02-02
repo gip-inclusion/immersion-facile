@@ -72,7 +72,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await useCase.execute({ convention });
 
-      await expectSavedNotificationsAndEvents({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
@@ -126,7 +126,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await useCase.execute({ convention });
 
-      await expectSavedNotificationsAndEvents({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
@@ -202,7 +202,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await useCase.execute({ convention });
 
-      await expectSavedNotificationsAndEvents({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
@@ -245,7 +245,8 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              convention.signatories.beneficiaryRepresentative?.email,
+              // biome-ignore lint/style/noNonNullAssertion:
+              convention.signatories.beneficiaryRepresentative!.email,
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -258,15 +259,18 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               internshipKind: convention.internshipKind,
               justification,
               signatoryFirstName:
-                convention.signatories.beneficiaryRepresentative?.firstName,
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryRepresentative!.firstName,
               signatoryLastName:
-                convention.signatories.beneficiaryRepresentative?.lastName,
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryRepresentative!.lastName,
             },
           },
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              convention.signatories.beneficiaryCurrentEmployer?.email,
+              // biome-ignore lint/style/noNonNullAssertion:
+              convention.signatories.beneficiaryCurrentEmployer!.email,
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -279,9 +283,12 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               internshipKind: convention.internshipKind,
               justification,
               signatoryFirstName:
-                convention.signatories.beneficiaryCurrentEmployer?.firstName,
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryCurrentEmployer!.firstName,
+
               signatoryLastName:
-                convention.signatories.beneficiaryCurrentEmployer?.lastName,
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryCurrentEmployer!.lastName,
             },
           },
         ],

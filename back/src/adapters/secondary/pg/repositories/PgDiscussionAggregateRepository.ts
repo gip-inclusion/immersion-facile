@@ -32,8 +32,8 @@ export class PgDiscussionAggregateRepository
       .where("created_at", ">=", since)
       .executeTakeFirst();
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return parseInt(result?.count);
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    return parseInt(result!.count);
   }
 
   public async deleteOldMessages(endedSince: Date) {
