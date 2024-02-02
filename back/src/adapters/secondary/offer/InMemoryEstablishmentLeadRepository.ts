@@ -1,5 +1,8 @@
 import { SiretDto } from "shared";
-import { EstablishmentLead } from "../../../domain/offer/entities/EstablishmentLeadEntity";
+import {
+  EstablishmentLead,
+  EstablishmentLeadEventKind,
+} from "../../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadRepository } from "../../../domain/offer/ports/EstablishmentLeadRepository";
 
 export class InMemoryEstablishmentLeadRepository
@@ -22,6 +25,15 @@ export class InMemoryEstablishmentLeadRepository
     siret: SiretDto,
   ): Promise<EstablishmentLead | undefined> {
     return this.#establishmentLeads[siret];
+  }
+
+  public getSiretsByLastEventKind(
+    kind: EstablishmentLeadEventKind,
+  ): Promise<SiretDto[]> {
+    const sirets = Object.values(this.#establishmentLeads)
+      .filter(({ lastEventKind }) => lastEventKind === kind)
+      .map(({ siret }) => siret);
+    return Promise.resolve(sirets);
   }
 
   public async save(establishmentLead: EstablishmentLead): Promise<void> {

@@ -3,6 +3,7 @@ import { P, match } from "ts-pattern";
 import {
   EstablishmentLead,
   EstablishmentLeadEvent,
+  EstablishmentLeadEventKind,
 } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadRepository } from "../../../../domain/offer/ports/EstablishmentLeadRepository";
 import { KyselyDb } from "../kysely/kyselyUtils";
@@ -79,6 +80,26 @@ export class PgEstablishmentLeadRepository
     }, {} as EstablishmentLead);
   }
 
+  public async getSiretsByLastEventKind(
+    kind: EstablishmentLeadEventKind,
+  ): Promise<SiretDto[]> {
+    const result = await this.#transaction
+      .with("events", (qb) =>
+        qb
+          .selectFrom("establishment_lead_events")
+          .select(["siret", "kind", "occurred_at"])
+          .distinctOn("siret")
+          .orderBy("siret")
+          .orderBy("occurred_at", "desc"),
+      )
+      .selectFrom("events")
+      .select("siret")
+      .where("kind", "=", kind)
+      .execute();
+
+    return result.map(({ siret }) => siret);
+  }
+
   public async save(establishmentLead: EstablishmentLead): Promise<void> {
     await this.#transaction
       .deleteFrom("establishment_lead_events")
@@ -87,39 +108,28 @@ export class PgEstablishmentLeadRepository
 
     await this.#transaction
       .insertInto("establishment_lead_events")
-      .values(
-        establishmentLead.events.map(
-          mapEventToEstablishmentLead(establishmentLead.siret),
-        ),
-      )
+      .values(establishmentLead.events.map(toDBEntity(establishmentLead.siret)))
       .execute();
   }
 }
 
-const mapEventToEstablishmentLead =
-  (siret: SiretDto) => (event: EstablishmentLeadEvent) =>
-    match(event)
-      .with(
-        { kind: "to-be-reminded" },
-        ({ kind, occurredAt, conventionId }) => ({
-          siret,
-          kind,
-          occurred_at: occurredAt,
-          convention_id: conventionId,
-        }),
-      )
-      .with(
-        { kind: "reminder-sent" },
-        ({ kind, occurredAt, notification }) => ({
-          siret,
-          kind,
-          occurred_at: occurredAt,
-          notification_id: notification.id,
-          notification_kind: notification.kind,
-        }),
-      )
-      .otherwise(({ kind, occurredAt }) => ({
-        siret,
-        kind,
-        occurred_at: occurredAt,
-      }));
+const toDBEntity = (siret: SiretDto) => (event: EstablishmentLeadEvent) =>
+  match(event)
+    .with({ kind: "to-be-reminded" }, ({ kind, occurredAt, conventionId }) => ({
+      siret,
+      kind,
+      occurred_at: occurredAt,
+      convention_id: conventionId,
+    }))
+    .with({ kind: "reminder-sent" }, ({ kind, occurredAt, notification }) => ({
+      siret,
+      kind,
+      occurred_at: occurredAt,
+      notification_id: notification.id,
+      notification_kind: notification.kind,
+    }))
+    .otherwise(({ kind, occurredAt }) => ({
+      siret,
+      kind,
+      occurred_at: occurredAt,
+    }));
