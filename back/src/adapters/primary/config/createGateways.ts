@@ -39,7 +39,6 @@ import { createLbbRoutes } from "../../secondary/offer/laBonneBoite/LaBonneBoite
 import { HttpPassEmploiGateway } from "../../secondary/offer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
-import { PuppeteerPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/PuppeteerPdfGeneratorGateway";
 import {
   makeScalingoPdfGeneratorRoutes,
   ScalingoPdfGeneratorGateway,
@@ -248,7 +247,6 @@ export const createGateways = async (
       AppConfig["pdfGeneratorGateway"],
       () => PdfGeneratorGateway
     > = {
-      PUPPETEER: () => new PuppeteerPdfGeneratorGateway(uuidGenerator),
       IN_MEMORY: () => new InMemoryPdfGeneratorGateway(),
       SCALINGO: () =>
         new ScalingoPdfGeneratorGateway(
