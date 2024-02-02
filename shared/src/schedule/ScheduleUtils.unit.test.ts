@@ -1,6 +1,6 @@
-import { z, ZodError } from "zod";
-import { conventionSchema } from "../convention/convention.schema";
+import { ZodError, z } from "zod";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
+import { conventionSchema } from "../convention/convention.schema";
 import { expectToEqual } from "../test.helpers";
 import { localization } from "../zodUtils";
 import {
@@ -9,7 +9,7 @@ import {
   SelectedDaysOfTheWeekDto,
 } from "./Schedule.dto";
 import { dateTimeIsoStringSchema, scheduleSchema } from "./Schedule.schema";
-import { defaultInterval, ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
+import { ScheduleDtoBuilder, defaultInterval } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
   calculateScheduleTotalDurationInDays,

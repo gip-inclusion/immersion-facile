@@ -21,6 +21,7 @@
     "mark-establishments-as-searchable-when-max-contacts-allows": "ts-node src/adapters/primary/scripts/markEstablishmentsAsSearchableWhenMaxContactsAllows.ts",
     "migrate": "pnpm db:migrate",
     "prettier": "pnpm -w prettier:glob --write ./back/src",
+    "check": "pnpm -w check:glob ./back/src",
     "start-prod": "NODE_ENV=production node -r ts-node/register --max-old-space-size=1536 src/adapters/primary/scripts/startServer.ts",
     "start": "NODE_ENV=local node -r ts-node/register --max-old-space-size=1536 src/adapters/primary/scripts/startServer.ts",
     "test:all": "jest --runInBand --testRegex='^((?!manual).)*.test.ts$'",

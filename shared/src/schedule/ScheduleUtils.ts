@@ -91,7 +91,10 @@ const reasonableTimePeriods: TimePeriodsDto = [
 ];
 
 export const isValidInterval = (interval: DateIntervalDto): boolean =>
-  !(isNaN(interval.start.getTime()) || isNaN(interval.end.getTime()));
+  !(
+    Number.isNaN(interval.start.getTime()) ||
+    Number.isNaN(interval.end.getTime())
+  );
 
 export const reasonableSchedule = (
   interval: DateIntervalDto,
@@ -172,7 +175,7 @@ const isPeriodsOverlap = (
 
 // Generates a string in format: "(09:00 - 13:00)"
 const periodToHumanReadableString = (period: TimePeriodDto): string =>
-  "(" + period.start + " - " + period.end + ")";
+  `(${period.start} - ${period.end})`;
 
 export const calculateNumberOfWorkedDays = (
   complexSchedule: DailyScheduleDto[],
@@ -241,7 +244,7 @@ const toFrenchReadableDate = (isoStringDate: string): string =>
 const prettyPrintDaySchedule = (
   timePeriods: TimePeriodDto[] | null,
 ): string => {
-  if (!timePeriods || timePeriods.length == 0) {
+  if (!timePeriods || timePeriods.length === 0) {
     return "libre";
   }
   return timePeriods

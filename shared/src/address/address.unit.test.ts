@@ -1,6 +1,6 @@
 import {
-  captureAddressGroups,
   CaptureAddressGroupsResult,
+  captureAddressGroups,
   inferDepartmentCode,
 } from "../utils/address";
 

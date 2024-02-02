@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
-  allDashboardNames,
   DashboardUrlAndName,
   GetAdminDashboardParams,
   GetConventionMagicLinkDashboardParams,
+  allDashboardNames,
   simpleDashboardNames,
 } from "./dashboard.dto";
 

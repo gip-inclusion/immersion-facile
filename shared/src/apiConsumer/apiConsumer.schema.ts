@@ -10,13 +10,13 @@ import { localization, zStringMinLength1 } from "../zodUtils";
 import {
   ApiConsumer,
   ApiConsumerContact,
-  apiConsumerKinds,
-  authorizedCallbackHeaderKeys,
   CallbackHeaders,
   CreateApiConsumerParams,
   CreateApiConsumerRights,
   CreateWebhookSubscription,
   WebhookSubscription,
+  apiConsumerKinds,
+  authorizedCallbackHeaderKeys,
 } from "./ApiConsumer";
 
 const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({

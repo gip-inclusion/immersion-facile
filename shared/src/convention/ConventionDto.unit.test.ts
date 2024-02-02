@@ -1,6 +1,13 @@
 import { addDays, subDays, subYears } from "date-fns";
 import { keys } from "ramda";
-import { z, ZodError } from "zod";
+import { ZodError, z } from "zod";
+import {
+  CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
+  DailyScheduleDto,
+  DateIntervalDto,
+  Weekday,
+  toDateString,
+} from "..";
 import {
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
@@ -10,13 +17,7 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "../test.helpers";
-import {
-  CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
-  DailyScheduleDto,
-  DateIntervalDto,
-  toDateString,
-  Weekday,
-} from "..";
+import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
@@ -24,9 +25,9 @@ import {
   ConventionDto,
   ConventionInternshipKindSpecific,
   ConventionReadDto,
-  conventionStatuses,
   EstablishmentRepresentative,
   InternshipKind,
+  conventionStatuses,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
 import {
@@ -34,7 +35,6 @@ import {
   conventionReadSchema,
   conventionSchema,
 } from "./convention.schema";
-import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
 import { getConventionTooLongMessageAndPath } from "./conventionRefinements";
 
 const currentEmployer: BeneficiaryCurrentEmployer = {

@@ -3,10 +3,10 @@ import { AgencyId, AgencyKind } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import {
-  allSignatoryRoles,
   ModifierRole,
   Role,
   SignatoryRole,
+  allSignatoryRoles,
 } from "../role/role.dto";
 import {
   AppellationAndRomeDto,
@@ -212,20 +212,17 @@ type StudentProperties = {
   schoolPostcode: Postcode;
 };
 
-/* eslint-disable @typescript-eslint/ban-types */
-//prettier-ignore
 export type Beneficiary<T extends InternshipKind> =
   GenericSignatory<"beneficiary"> & {
-  emergencyContact?: string;
-  emergencyContactPhone?: string;
-  emergencyContactEmail?: Email;
-  federatedIdentity?: PeConnectIdentity;
-  financiaryHelp?: string;
-  birthdate: string; // Date iso string
-  isRqth?: boolean;
-}
-  & (T extends "mini-stage-cci" ? StudentProperties : {});
-/* eslint-enable @typescript-eslint/ban-types */
+    emergencyContact?: string;
+    emergencyContactPhone?: string;
+    emergencyContactEmail?: Email;
+    federatedIdentity?: PeConnectIdentity;
+    financiaryHelp?: string;
+    birthdate: string; // Date iso string
+    isRqth?: boolean;
+    // biome-ignore lint/complexity/noBannedTypes: we need {} here
+  } & (T extends "mini-stage-cci" ? StudentProperties : {});
 
 export type LevelOfEducation = (typeof levelsOfEducation)[number];
 
@@ -330,7 +327,9 @@ export type UpdateConventionStatusRequestDto =
   | UpdateConventionStatusWithJustification
   | UpdateConventionStatusWithValidator;
 // prettier-ignore
-const _isAssignable = (isValid: UpdateConventionStatusRequestDto): { status: ConventionStatus } => isValid;
+const _isAssignable = (
+  isValid: UpdateConventionStatusRequestDto,
+): { status: ConventionStatus } => isValid;
 
 export type GenerateMagicLinkRequestDto = {
   applicationId: ConventionId;

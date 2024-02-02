@@ -2,8 +2,8 @@ import { z } from "zod";
 import { emailSchema } from "./email.schema";
 import {
   ValidateEmailInput,
-  validateEmailReason,
   ValidateEmailStatus,
+  validateEmailReason,
 } from "./validateEmail.dto";
 
 export const validateEmailInputSchema: z.Schema<ValidateEmailInput> = z.object({

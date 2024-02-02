@@ -17,7 +17,7 @@ import {
 } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 
-const agencyWithIdForAdminUrl = `/admin/agencies/:agencyId` as const;
+const agencyWithIdForAdminUrl = "/admin/agencies/:agencyId" as const;
 
 export type AgencyRoutes = typeof agencyRoutes;
 export const agencyRoutes = defineRoutes({
@@ -50,7 +50,7 @@ export const agencyRoutes = defineRoutes({
   }),
   listAgenciesWithStatus: defineRoute({
     method: "get",
-    url: `/admin/agencies`,
+    url: "/admin/agencies",
     queryParamsSchema: withAgencyStatusSchema,
     ...withAuthorizationHeaders,
     responses: {
@@ -60,13 +60,13 @@ export const agencyRoutes = defineRoutes({
   }),
   getFilteredAgencies: defineRoute({
     method: "get",
-    url: `/agencies`,
+    url: "/agencies",
     queryParamsSchema: listAgenciesRequestSchema,
     responses: { 200: agenciesIdAndNameSchema },
   }),
   addAgency: defineRoute({
     method: "post",
-    url: `/agencies`,
+    url: "/agencies",
     requestBodySchema: createAgencySchema,
     responses: {
       200: expressEmptyResponseBody,

@@ -42,7 +42,9 @@ export const emailSchema: z.Schema<Email> = z
   )
   .pipe(
     //Temporary regex instead of email - waiting zod release
-    z.string().regex(temporaryEmailRegex),
+    z
+      .string()
+      .regex(temporaryEmailRegex),
   );
 
 export const emailPossiblyEmptySchema = emailSchema

@@ -15,7 +15,7 @@ export type SearchRoutes = typeof searchImmersionRoutes;
 export const searchImmersionRoutes = defineRoutes({
   getGroupBySlug: defineRoute({
     method: "get",
-    url: `/groups/:groupSlug`,
+    url: "/groups/:groupSlug",
     responses: {
       200: groupWithResultsSchema,
       404: httpErrorSchema,

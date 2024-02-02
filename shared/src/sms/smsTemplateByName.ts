@@ -29,11 +29,13 @@ export type TemplatedSms = ValueOf<{
 
 export type SmsVariables = KeysOfUnion<TemplatedSms["params"]>;
 
-const createSmsTemplates = (templatesByName: {
-  [K in keyof SmsParamsBySmsType]: {
-    createContent: (params: SmsParamsBySmsType[K]) => string;
-  };
-}) => templatesByName;
+const createSmsTemplates = (
+  templatesByName: {
+    [K in keyof SmsParamsBySmsType]: {
+      createContent: (params: SmsParamsBySmsType[K]) => string;
+    };
+  },
+) => templatesByName;
 
 export type SmsTemplateByName = typeof smsTemplatesByName;
 export const smsTemplatesByName = createSmsTemplates({

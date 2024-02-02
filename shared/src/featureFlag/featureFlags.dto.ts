@@ -58,8 +58,8 @@ const makeFeatureFlag =
     ...value: K extends "text"
       ? [FeatureFlagText["value"]]
       : K extends "textImageAndRedirect"
-      ? [FeatureFlagTextImageAndRedirect["value"]]
-      : []
+        ? [FeatureFlagTextImageAndRedirect["value"]]
+        : []
   ): Extract<FeatureFlag, { kind: K }> => {
     if (kind === "boolean")
       return { kind, isActive } as Extract<FeatureFlag, { kind: K }>;

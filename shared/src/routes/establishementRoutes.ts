@@ -34,7 +34,7 @@ export const establishmentRoutes = defineRoutes({
   }),
   getFormEstablishment: defineRoute({
     method: "get",
-    url: `/form-establishments/:siret`,
+    url: "/form-establishments/:siret",
     ...withAuthorizationHeaders,
     responses: {
       200: formEstablishmentSchema,
@@ -53,7 +53,7 @@ export const establishmentRoutes = defineRoutes({
   }),
   deleteEstablishment: defineRoute({
     method: "delete",
-    url: `/form-establishments/:siret`,
+    url: "/form-establishments/:siret",
     ...withAuthorizationHeaders,
     responses: {
       204: emptyObjectSchema,
@@ -64,7 +64,7 @@ export const establishmentRoutes = defineRoutes({
   }),
   unregisterEstablishmentLead: defineRoute({
     method: "post",
-    url: `/establishment-lead/unregister`,
+    url: "/establishment-lead/unregister",
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

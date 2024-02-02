@@ -4,9 +4,9 @@ import { zStringMinLength1 } from "../zodUtils";
 import {
   GetSiretInfo,
   GetSiretRequestDto,
-  numberEmployeesRanges,
   SiretDto,
   SiretEstablishmentDto,
+  numberEmployeesRanges,
   siretInfoErrors,
   siretRegex,
 } from "./siret";

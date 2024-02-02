@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { assessmentSchema } from "../assessment/assessment.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
@@ -7,7 +8,6 @@ import {
   legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/httpErrors.schema";
-import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
   conventionReadSchema,

@@ -1,5 +1,5 @@
 import { keys, mapObjIndexed, values } from "ramda";
-import { allSignatoryRoles, Role, SignatoryRole } from "../role/role.dto";
+import { Role, SignatoryRole, allSignatoryRoles } from "../role/role.dto";
 import { DotNestedKeys, ExtractFromExisting } from "../utils";
 import {
   ConventionDto,
