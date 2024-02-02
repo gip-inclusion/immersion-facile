@@ -95,11 +95,13 @@ describe("RenewConventionMagicLink use case", () => {
       ["beneficiary", validConvention.signatories.beneficiary.email],
       [
         "beneficiary-current-employer",
-        validConvention.signatories.beneficiaryCurrentEmployer?.email,
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        validConvention.signatories.beneficiaryCurrentEmployer!.email,
       ],
       [
         "beneficiary-representative",
-        validConvention.signatories.beneficiaryRepresentative?.email,
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        validConvention.signatories.beneficiaryRepresentative!.email,
       ],
       [
         "establishment-representative",

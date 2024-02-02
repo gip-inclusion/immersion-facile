@@ -69,7 +69,7 @@ export abstract class TransactionalUseCase<
 > {
   protected abstract inputSchema: z.ZodSchema<Input>;
 
-  protected constructor(private uowPerformer: UnitOfWorkPerformer) {}
+  public constructor(private uowPerformer: UnitOfWorkPerformer) {}
 
   protected abstract _execute(
     params: Input,

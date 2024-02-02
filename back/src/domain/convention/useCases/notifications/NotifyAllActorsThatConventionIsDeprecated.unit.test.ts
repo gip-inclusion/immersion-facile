@@ -117,8 +117,10 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative?.email,
-        beneficiaryCurrentEmployer?.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryRepresentative!.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryCurrentEmployer!.email,
         ...counsellorEmails,
         ...validatorEmails,
       ],
@@ -153,8 +155,10 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative?.email,
-        beneficiaryCurrentEmployer?.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryRepresentative!.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryCurrentEmployer!.email,
         ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
       ],
       deprecatedConventionWithDuplicatedEmails,

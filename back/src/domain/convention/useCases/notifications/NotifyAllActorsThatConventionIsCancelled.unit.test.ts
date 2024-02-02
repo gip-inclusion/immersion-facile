@@ -115,8 +115,10 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative?.email,
-        beneficiaryCurrentEmployer?.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryRepresentative!.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryCurrentEmployer!.email,
         ...counsellorEmails,
         ...agency.validatorEmails,
       ],
@@ -152,8 +154,10 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative?.email,
-        beneficiaryCurrentEmployer?.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryRepresentative!.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        beneficiaryCurrentEmployer!.email,
         ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
       ],
       cancelledConventionWithDuplicatedEmails,
