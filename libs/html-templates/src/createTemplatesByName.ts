@@ -24,6 +24,8 @@ export type HtmlTemplateEmailData<P> = {
 
 export const createTemplatesByName = <
   ParamsByEmailType extends { [K in string]: unknown } = never,
->(templatesByName: {
-  [K in keyof ParamsByEmailType]: HtmlTemplateEmailData<ParamsByEmailType[K]>;
-}) => templatesByName;
+>(
+  templatesByName: {
+    [K in keyof ParamsByEmailType]: HtmlTemplateEmailData<ParamsByEmailType[K]>;
+  },
+) => templatesByName;
