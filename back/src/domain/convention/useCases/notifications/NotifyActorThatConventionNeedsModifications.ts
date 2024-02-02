@@ -1,14 +1,16 @@
-import { match, P } from "ts-pattern";
 import {
   AgencyDto,
   ConventionDto,
   CreateConventionMagicLinkPayloadProperties,
-  frontRoutes,
   Role,
   TemplatedEmail,
+  frontRoutes,
 } from "shared";
+import { P, match } from "ts-pattern";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../../core/eventBus/eventPayload.dto";
 import { conventionRequiresModificationPayloadSchema } from "../../../core/eventBus/eventPayload.schema";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
@@ -17,8 +19,6 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyActorThatConventionNeedsModifications extends TransactionalUseCase<ConventionRequiresModificationPayload> {

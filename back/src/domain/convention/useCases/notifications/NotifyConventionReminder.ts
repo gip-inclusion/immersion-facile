@@ -8,15 +8,15 @@ import {
   type ConventionReadDto,
   type EstablishmentRepresentative,
   type ExtractFromExisting,
-  filterNotFalsy,
-  frontRoutes,
   type GenericActor,
-  isEstablishmentTutorIsEstablishmentRepresentative,
-  isSignatoryRole,
   type Phone,
   type Role,
   type TemplatedEmail,
   type TemplatedSms,
+  filterNotFalsy,
+  frontRoutes,
+  isEstablishmentTutorIsEstablishmentRepresentative,
+  isSignatoryRole,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -24,10 +24,12 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   ConventionReminderPayload,
-  conventionReminderPayloadSchema,
   ReminderKind,
+  conventionReminderPayloadSchema,
 } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
@@ -35,8 +37,6 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   missingAgencyMessage,
@@ -95,9 +95,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     { conventionId, reminderKind }: ConventionReminderPayload,
     uow: UnitOfWork,
   ) {
-    const conventionRead = await uow.conventionQueries.getConventionById(
-      conventionId,
-    );
+    const conventionRead =
+      await uow.conventionQueries.getConventionById(conventionId);
     if (!conventionRead)
       throw new NotFoundError(missingConventionMessage(conventionId));
 
@@ -173,14 +172,14 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             ({
               role: "counsellor",
               email,
-            } satisfies EmailWithRole),
+            }) satisfies EmailWithRole,
         ),
         ...agency.validatorEmails.map(
           (email) =>
             ({
               role: "validator",
               email,
-            } satisfies EmailWithRole),
+            }) satisfies EmailWithRole,
         ),
       ].map((emailWithRole) =>
         this.#sendAgencyReminderEmails(
@@ -406,15 +405,15 @@ const isValidMobilePhone = (phone: string): boolean =>
 
 function makeInternationalPhone(phone: string): Phone {
   if (phone.startsWith("0690") || phone.startsWith("0691"))
-    return "590" + phone.substring(1);
-  if (phone.startsWith("0694")) return "594" + phone.substring(1);
+    return `590${phone.substring(1)}`;
+  if (phone.startsWith("0694")) return `594${phone.substring(1)}`;
   if (phone.startsWith("0696") || phone.startsWith("0697"))
-    return "596" + phone.substring(1);
+    return `596${phone.substring(1)}`;
   if (
     phone.startsWith("0692") ||
     phone.startsWith("0693") ||
     phone.startsWith("0639")
   )
-    return "262" + phone.substring(1);
-  return "33" + phone.substring(1);
+    return `262${phone.substring(1)}`;
+  return `33${phone.substring(1)}`;
 }

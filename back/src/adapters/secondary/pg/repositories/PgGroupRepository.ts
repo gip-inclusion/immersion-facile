@@ -2,16 +2,16 @@ import {
   Group,
   GroupSlug,
   GroupWithResults,
-  groupWithResultsSchema,
   SiretDto,
+  groupWithResultsSchema,
 } from "shared";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { GroupRepository } from "../../../../domain/offer/ports/GroupRepository";
 import {
+  KyselyDb,
   executeKyselyRawSqlQuery,
   jsonBuildObject,
   jsonStripNulls,
-  KyselyDb,
 } from "../kysely/kyselyUtils";
 
 const buildAppellationsArray = `JSON_AGG(

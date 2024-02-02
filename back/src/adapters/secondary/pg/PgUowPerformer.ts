@@ -29,7 +29,7 @@ export class PgUowPerformer implements UnitOfWorkPerformer {
           ? logger.error({ error }, `Error in transaction: ${error.message}`)
           : logger.error(
               { unknownError: JSON.stringify(error) },
-              `Unknown Error in transaction`,
+              "Unknown Error in transaction",
             );
         throw error;
       });

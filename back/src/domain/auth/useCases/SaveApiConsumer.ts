@@ -7,17 +7,17 @@ import {
   ApiConsumerRights,
   BackOfficeDomainPayload,
   CreateApiConsumerParams,
-  createApiConsumerSchema,
   CreateWebhookSubscription,
+  createApiConsumerSchema,
 } from "shared";
 import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { GenerateApiConsumerJwt } from "../jwt";
 
 export const EXPIRATION_IN_YEARS = 2;

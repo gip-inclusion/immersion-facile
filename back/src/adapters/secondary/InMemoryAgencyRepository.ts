@@ -11,9 +11,9 @@ import {
   DepartmentCode,
   GeoPositionDto,
   GetAgenciesFilter as GetAgenciesFilters,
-  isTruthy,
   PartialAgencyDto,
   WithGeoPosition,
+  isTruthy,
 } from "shared";
 import {
   AgencyRepository,

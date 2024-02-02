@@ -3,14 +3,14 @@ import {
   BackOfficeJwtPayload,
   ConventionDtoBuilder,
   ConventionJwtPayload,
-  expectPromiseToFailWithError,
-  expectToEqual,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
+  expectPromiseToFailWithError,
+  expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   ForbiddenError,
@@ -35,7 +35,7 @@ describe("Get Convention", () => {
       it("When no auth payload provided", async () => {
         await expectPromiseToFailWithError(
           getConvention.execute({ conventionId: convention.id }),
-          new ForbiddenError(`No auth payload provided`),
+          new ForbiddenError("No auth payload provided"),
         );
       });
 

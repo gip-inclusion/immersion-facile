@@ -1,7 +1,7 @@
 import { ascend, prop, sort } from "ramda";
 import {
-  addressDtoToString,
   ContactEstablishmentEventPayload,
+  addressDtoToString,
   contactEstablishmentEventPayloadSchema,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -9,11 +9,11 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { createOpaqueEmail } from "../../entities/DiscussionAggregate";
 

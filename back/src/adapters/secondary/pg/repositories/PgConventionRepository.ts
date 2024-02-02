@@ -14,7 +14,7 @@ import {
 } from "shared";
 import { ConventionRepository } from "../../../../domain/convention/ports/ConventionRepository";
 import { ConflictError } from "../../../primary/helpers/httpErrors";
-import { falsyToNull, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, falsyToNull } from "../kysely/kyselyUtils";
 import { getReadConventionById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
@@ -89,14 +89,43 @@ export class PgConventionRepository implements ConventionRepository {
       );
 
     // prettier-ignore
-    const { signatories: { beneficiary, beneficiaryRepresentative, establishmentRepresentative,beneficiaryCurrentEmployer }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions, internshipKind,establishmentTutor,businessAdvantages, statusJustification , renewed} =
-        convention
+    const {
+      signatories: {
+        beneficiary,
+        beneficiaryRepresentative,
+        establishmentRepresentative,
+        beneficiaryCurrentEmployer,
+      },
+      id: conventionId,
+      status,
+      agencyId,
+      dateSubmission,
+      dateStart,
+      dateEnd,
+      dateValidation,
+      siret,
+      businessName,
+      schedule,
+      individualProtection,
+      sanitaryPrevention,
+      sanitaryPreventionDescription,
+      immersionAddress,
+      immersionObjective,
+      immersionAppellation,
+      immersionActivities,
+      immersionSkills,
+      workConditions,
+      internshipKind,
+      establishmentTutor,
+      businessAdvantages,
+      statusJustification,
+      renewed,
+    } = convention;
 
     // Insert signatories and remember their id
     const beneficiaryId = await this.#insertBeneficiary(beneficiary);
-    const establishmentTutorId = await this.#insertEstablishmentTutor(
-      establishmentTutor,
-    );
+    const establishmentTutorId =
+      await this.#insertEstablishmentTutor(establishmentTutor);
 
     const establishmentRepresentativeId =
       isEstablishmentTutorIsEstablishmentRepresentative(convention)
@@ -154,8 +183,15 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     // prettier-ignore
-    const { signatories: { beneficiary, beneficiaryRepresentative, beneficiaryCurrentEmployer }, id, establishmentTutor } =
-      convention
+    const {
+      signatories: {
+        beneficiary,
+        beneficiaryRepresentative,
+        beneficiaryCurrentEmployer,
+      },
+      id,
+      establishmentTutor,
+    } = convention;
 
     const establishment_tutor_id = await this.#updateEstablishmentTutor(
       id,
@@ -583,7 +619,7 @@ export class PgConventionRepository implements ConventionRepository {
   }
 }
 const missingReturningRowError = (): Error =>
-  new Error(`Missing rows on update return`);
+  new Error("Missing rows on update return");
 
 const getStudentFields = (
   beneficiary: Beneficiary<InternshipKind>,

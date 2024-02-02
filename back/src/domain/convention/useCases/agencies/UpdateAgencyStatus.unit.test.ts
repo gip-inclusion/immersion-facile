@@ -1,21 +1,21 @@
 import {
   AgencyDtoBuilder,
   BackOfficeJwtPayload,
-  expectPromiseToFailWithError,
   UpdateAgencyStatusParamsWithoutId,
+  expectPromiseToFailWithError,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
 import {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 

@@ -1,10 +1,10 @@
 import { subMonths } from "date-fns";
+import { SiretDto, castError } from "shared";
 import { z } from "zod";
-import { castError, SiretDto } from "shared";
 import { createLogger } from "../../../utils/logger";
+import { UseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { UseCase } from "../../core/UseCase";
 import { SuggestEditEstablishment } from "./SuggestEditEstablishment";
 
 const logger = createLogger(__filename);
@@ -39,7 +39,7 @@ export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
 
   protected async _execute() {
     logger.info(
-      `[triggerSuggestEditFormEstablishmentEvery6Months] Script started.`,
+      "[triggerSuggestEditFormEstablishmentEvery6Months] Script started.",
     );
     const since = subMonths(this.#timeGateway.now(), NB_MONTHS_BEFORE_SUGGEST);
 

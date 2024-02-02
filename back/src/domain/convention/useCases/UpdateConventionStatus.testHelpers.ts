@@ -2,21 +2,21 @@ import { values } from "ramda";
 import {
   AgencyDtoBuilder,
   AgencyRole,
-  allRoles,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionRelatedJwtPayload,
   ConventionStatus,
-  conventionStatuses,
-  createConventionMagicLinkPayload,
   Email,
-  expectPromiseToFailWithError,
-  expectToEqual,
   InclusionConnectedUser,
   Role,
-  splitCasesBetweenPassingAndFailing,
   UpdateConventionStatusRequestDto,
+  allRoles,
+  conventionStatuses,
+  createConventionMagicLinkPayload,
+  expectPromiseToFailWithError,
+  expectToEqual,
+  splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -24,13 +24,13 @@ import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent, NarrowEvent } from "../../core/eventBus/EventBus";
+import { NarrowEvent, makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
 import { DomainTopic } from "../../core/eventBus/events";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";

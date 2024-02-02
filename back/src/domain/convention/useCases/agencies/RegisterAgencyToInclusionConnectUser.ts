@@ -1,19 +1,19 @@
 import {
   AgencyId,
-  agencyIdsSchema,
   InclusionConnectDomainJwtPayload,
+  agencyIdsSchema,
 } from "shared";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
   AgencyId[],

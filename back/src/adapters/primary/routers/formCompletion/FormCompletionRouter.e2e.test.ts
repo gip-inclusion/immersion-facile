@@ -1,7 +1,7 @@
 import {
+  FormCompletionRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
-  FormCompletionRoutes,
   formCompletionRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";

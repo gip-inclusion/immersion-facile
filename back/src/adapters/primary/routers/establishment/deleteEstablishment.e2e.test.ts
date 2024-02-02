@@ -1,16 +1,16 @@
-import { SuperTest, Test } from "supertest";
 import {
+  EstablishmentRoutes,
+  FormEstablishmentDtoBuilder,
   currentJwtVersions,
   displayRouteName,
-  EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
   expiredMagicLinkErrorMessage,
-  FormEstablishmentDtoBuilder,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
@@ -21,7 +21,7 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
-describe(`Delete form establishment`, () => {
+describe("Delete form establishment", () => {
   const establishmentAggregate = new EstablishmentAggregateBuilder().build();
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(establishmentAggregate.establishment.siret)

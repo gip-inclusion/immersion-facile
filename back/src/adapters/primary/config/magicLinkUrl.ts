@@ -1,8 +1,8 @@
 import {
   AbsoluteUrl,
-  createConventionMagicLinkPayload,
   CreateConventionMagicLinkPayloadProperties,
   EstablishmentJwtPayload,
+  createConventionMagicLinkPayload,
   frontRoutes,
 } from "shared";
 import {

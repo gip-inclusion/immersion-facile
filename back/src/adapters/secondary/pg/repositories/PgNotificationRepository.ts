@@ -1,28 +1,28 @@
 import format from "pg-format";
 import { uniq } from "ramda";
 import {
-  castError,
   EmailNotification,
-  exhaustiveCheck,
   Notification,
   NotificationId,
   NotificationKind,
   NotificationsByKind,
   SmsNotification,
   TemplatedEmail,
+  castError,
+  exhaustiveCheck,
 } from "shared";
 import {
   EmailNotificationFilters,
   NotificationRepository,
 } from "../../../../domain/generic/notifications/ports/NotificationRepository";
 import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 const logger = createLogger(__filename);
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private transaction: KyselyDb,
-    private maxRetrievedNotifications: number = 30,
+    private maxRetrievedNotifications = 30,
   ) {}
 
   public async deleteAllEmailAttachements(): Promise<number> {
@@ -82,7 +82,7 @@ export class PgNotificationRepository implements NotificationRepository {
       LEFT JOIN notifications_email_recipients r ON id = r.notifications_email_id
       ${
         filterConditions.length > 0
-          ? "WHERE " + filterConditions.join(" AND ")
+          ? `WHERE ${filterConditions.join(" AND ")}`
           : ""
       }
       GROUP BY e.id
@@ -184,7 +184,16 @@ export class PgNotificationRepository implements NotificationRepository {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `,
       // prettier-ignore
-      [ id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params ],
+      [
+        id,
+        kind,
+        recipientPhone,
+        createdAt,
+        followedIds.conventionId,
+        followedIds.establishmentSiret,
+        followedIds.agencyId,
+        params,
+      ],
     );
   }
 
@@ -194,7 +203,8 @@ export class PgNotificationRepository implements NotificationRepository {
   }: EmailNotification) {
     if (!attachments || attachments.length === 0) return;
     if (attachments.length > 0) {
-      const query = `INSERT INTO notifications_email_attachments (notifications_email_id, attachment) VALUES %L`;
+      const query =
+        "INSERT INTO notifications_email_attachments (notifications_email_id, attachment) VALUES %L";
       const values = attachments.map((attachment) => [id, attachment]);
       await executeKyselyRawSqlQuery(
         this.transaction,
@@ -215,7 +225,8 @@ export class PgNotificationRepository implements NotificationRepository {
   ) {
     const values = recipientsByKind(id, recipientKind, templatedContent);
     if (values.length > 0) {
-      const query = `INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L`;
+      const query =
+        "INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L";
       await executeKyselyRawSqlQuery(
         this.transaction,
         format(query, values),
@@ -240,7 +251,19 @@ export class PgNotificationRepository implements NotificationRepository {
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
   `;
     // prettier-ignore
-    const values = [id, templatedContent.kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, templatedContent.params, templatedContent.replyTo?.name, templatedContent.replyTo?.email, templatedContent.sender?.email, templatedContent.sender?.name];
+    const values = [
+      id,
+      templatedContent.kind,
+      createdAt,
+      followedIds.conventionId,
+      followedIds.establishmentSiret,
+      followedIds.agencyId,
+      templatedContent.params,
+      templatedContent.replyTo?.name,
+      templatedContent.replyTo?.email,
+      templatedContent.sender?.email,
+      templatedContent.sender?.name,
+    ];
     await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
       (error) => {
         logger.error(

@@ -1,8 +1,8 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  expectToEqual,
   SubscriptionParams,
+  expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ApiConsumerBuilder } from "../../../adapters/secondary/InMemoryApiConsumerRepository";

@@ -1,21 +1,21 @@
 import {
   AgencyDtoBuilder,
-  allAgencyRoles,
   AuthenticatedUser,
   ConventionDtoBuilder,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUser,
+  allAgencyRoles,
   expectPromiseToFailWith,
   expectToEqual,
-  InclusionConnectedUser,
-  InclusionConnectJwtPayload,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../../../adapters/secondary/dashboardGateway/StubDashboardGateway";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 

@@ -1,8 +1,8 @@
 import {
-  expectPromiseToFailWith,
-  expectPromiseToFailWithError,
   TemplatedEmail,
   TemplatedSms,
+  expectPromiseToFailWith,
+  expectPromiseToFailWithError,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryNotificationRepository } from "../../../../adapters/secondary/InMemoryNotificationRepository";

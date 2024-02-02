@@ -1,15 +1,15 @@
 import { addDays } from "date-fns";
-import { z } from "zod";
 import {
-  castError,
   ConventionDto,
   ConventionId,
+  castError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
+import { z } from "zod";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 type SendBeneficiaryAssessmentEmailsOutput = {

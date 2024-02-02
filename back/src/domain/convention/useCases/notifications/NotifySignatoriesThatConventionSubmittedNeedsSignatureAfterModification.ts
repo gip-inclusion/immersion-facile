@@ -3,23 +3,23 @@ import {
   AgencyDto,
   ConventionDto,
   ConventionJwtPayload,
-  filterNotFalsy,
-  frontRoutes,
   Signatory,
   TemplatedEmail,
   WithConventionDto,
+  filterNotFalsy,
+  frontRoutes,
   withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { retrieveConventionWithAgency } from "../../entities/Convention";
 

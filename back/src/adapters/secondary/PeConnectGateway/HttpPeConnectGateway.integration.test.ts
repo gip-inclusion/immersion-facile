@@ -1,10 +1,10 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import {
-  expectObjectsToMatch,
-  expectPromiseToFailWithError,
   ManagedRedirectError,
   RawRedirectError,
+  expectObjectsToMatch,
+  expectPromiseToFailWithError,
   testManagedRedirectError,
   testRawRedirectError,
 } from "shared";
@@ -163,7 +163,7 @@ describe("HttpPeConnectGateway", () => {
         );
       });
 
-      it(`OK with user not jobseeker -> no advisors`, async () => {
+      it("OK with user not jobseeker -> no advisors", async () => {
         mock
           .onGet(routes.getUserInfo.url)
           .reply(200, peExternalUser)
@@ -239,7 +239,7 @@ describe("HttpPeConnectGateway", () => {
           ).toBeUndefined();
         });
 
-        it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
+        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -254,7 +254,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Network error -> RawRedirectError`, async () => {
+        it("Network error -> RawRedirectError", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -270,7 +270,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess`, async () => {
+        it("Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -285,7 +285,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Error 500 -> RawRedirectError`, async () => {
+        it("Error 500 -> RawRedirectError", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -363,7 +363,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
+        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .abortRequest()
@@ -380,7 +380,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Network error -> RawRedirectError`, async () => {
+        it("Network error -> RawRedirectError", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .networkError()
@@ -401,7 +401,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Error 401 -> ManagedRedirectError kind peConnectAdvisorForbiddenAccess`, async () => {
+        it("Error 401 -> ManagedRedirectError kind peConnectAdvisorForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(401)
@@ -421,7 +421,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Error 500 -> OK with no advisors`, async () => {
+        it("Error 500 -> OK with no advisors", async () => {
           mock
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
@@ -480,7 +480,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
+        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -497,7 +497,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Network error -> RawRedirectError`, async () => {
+        it("Network error -> RawRedirectError", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -515,7 +515,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess`, async () => {
+        it("Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -532,7 +532,7 @@ describe("HttpPeConnectGateway", () => {
           );
         });
 
-        it(`Error 500 -> RawRedirectError`, async () => {
+        it("Error 500 -> RawRedirectError", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])

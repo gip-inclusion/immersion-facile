@@ -26,7 +26,7 @@ SELECT a.id,
        a.status                                                                       AS "Statut",
        ${
          mode === "up"
-           ? `a.created_at`
+           ? "a.created_at"
            : `to_char(a.created_at, 'DD/MM/YYYY'::text)`
        }                                     AS "Date de création",
        a.street_number_and_address                                                    AS "Adresse",

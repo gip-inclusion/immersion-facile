@@ -1,25 +1,25 @@
-import { SuperTest, Test } from "supertest";
 import {
   AbsoluteUrl,
   BrevoInboundBody,
+  TechnicalRoutes,
+  ValidateEmailStatus,
   displayRouteName,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
-  TechnicalRoutes,
   technicalRoutes,
-  ValidateEmailStatus,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
 } from "../../../../domain/auth/jwt";
-import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { shortLinkNotFoundMessage } from "../../../../domain/core/ShortLink";
+import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { DiscussionAggregateBuilder } from "../../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -192,7 +192,7 @@ describe("technical router", () => {
     });
   });
 
-  describe(`/validate-email`, () => {
+  describe("/validate-email", () => {
     const candidateEmail = "enguerran.weiss@beta.gouv.fr";
     const expectedStatus: ValidateEmailStatus = {
       isValid: true,

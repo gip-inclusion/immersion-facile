@@ -44,7 +44,7 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumn(establishmentTableName, maxContactsPerWeekCol);
 
   pgm.addColumn(contactTableName, {
-    ["max_contact_per_week"]: { type: "int4", notNull: false },
+    max_contact_per_week: { type: "int4", notNull: false },
   });
 
   pgm.addColumn(formEstablishmentsTableName, {

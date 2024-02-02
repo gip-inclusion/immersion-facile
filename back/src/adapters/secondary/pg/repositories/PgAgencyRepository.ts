@@ -9,14 +9,14 @@ import {
   AgencyKind,
   AgencyKindFilter,
   AgencyPositionFilter,
-  agencySchema,
   AgencyStatus,
   DepartmentCode,
   Email,
-  filterNotFalsy,
   GeoPositionDto,
   GetAgenciesFilter,
   PartialAgencyDto,
+  agencySchema,
+  filterNotFalsy,
 } from "shared";
 import {
   AgencyRepository,
@@ -29,10 +29,10 @@ import {
   validateAndParseZodSchema,
 } from "../../../primary/helpers/httpErrors";
 import {
+  KyselyDb,
   cast,
   executeKyselyRawSqlQuery,
   jsonBuildObject,
-  KyselyDb,
 } from "../kysely/kyselyUtils";
 import { Database } from "../kysely/model/database";
 

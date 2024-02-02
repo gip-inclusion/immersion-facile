@@ -8,8 +8,8 @@ import {
   ConventionScope,
   FindSimilarConventionsParams,
   ListConventionsRequestDto,
-  validatedConventionStatuses,
   WithConventionIdLegacy,
+  validatedConventionStatuses,
 } from "shared";
 import {
   ConventionQueries,
@@ -19,9 +19,9 @@ import { missingAgencyMessage } from "../../domain/convention/useCases/notificat
 import { AssessmentEmailDomainTopic } from "../../domain/core/eventBus/events";
 import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../primary/helpers/httpErrors";
-import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
+import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 
 const logger = createLogger(__filename);
 
@@ -138,8 +138,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     if (!agency) throw new NotFoundError(missingAgencyMessage(convention));
 
     const referedAgency =
-      agency &&
-      agency.refersToAgencyId &&
+      agency?.refersToAgencyId &&
       this.agencyRepository.agencies.find(
         (agency) => agency.id === agency.refersToAgencyId,
       );

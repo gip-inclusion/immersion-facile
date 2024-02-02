@@ -1,14 +1,14 @@
 import {
-  allSignatoryRoles,
   ConventionDomainPayload,
   ConventionDto,
   ConventionStatus,
   InclusionConnectDomainJwtPayload,
   Role,
   SignatoryRole,
-  signConventionDtoWithRole,
   WithConventionId,
   WithConventionIdLegacy,
+  allSignatoryRoles,
+  signConventionDtoWithRole,
   withConventionIdSchema,
 } from "shared";
 import {
@@ -16,11 +16,11 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
 
 const logger = createLogger(__filename);
@@ -61,9 +61,8 @@ export class SignConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    const initialConvention = await uow.conventionRepository.getById(
-      conventionId,
-    );
+    const initialConvention =
+      await uow.conventionRepository.getById(conventionId);
     if (!initialConvention) throw new NotFoundError(conventionId);
 
     const role = await this.#getRole(jwtPayload, uow, initialConvention);

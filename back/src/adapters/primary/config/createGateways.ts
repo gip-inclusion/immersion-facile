@@ -14,6 +14,12 @@ import { NotificationGateway } from "../../../domain/generic/notifications/ports
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
+import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
+import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { makeInclusionConnectExternalRoutes } from "../../secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
+import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
+import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
+import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
@@ -27,9 +33,6 @@ import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGat
 import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
-import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
-import { makeInclusionConnectExternalRoutes } from "../../secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
-import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
 import { brevoNotificationGatewayRoutes } from "../../secondary/notificationGateway/BrevoNotificationGateway.routes";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
@@ -40,12 +43,9 @@ import { HttpPassEmploiGateway } from "../../secondary/offer/passEmploi/HttpPass
 import { InMemoryPassEmploiGateway } from "../../secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
 import {
-  makeScalingoPdfGeneratorRoutes,
   ScalingoPdfGeneratorGateway,
+  makeScalingoPdfGeneratorRoutes,
 } from "../../secondary/pdfGeneratorGateway/ScalingoPdfGeneratorGateway";
-import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
-import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRoutes";
@@ -98,7 +98,9 @@ const configureCreateAxiosHttpClientForExternalAPIs =
     );
 
 // prettier-ignore
-export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T>
+export type Gateways = ReturnType<typeof createGateways> extends Promise<
+  infer T
+>
   ? T
   : never;
 
@@ -176,7 +178,7 @@ export const createGateways = async (
           createAxiosHttpClientForExternalAPIs(emailableValidationRoutes),
           config.emailableApiKey,
         ),
-    }[config.emailValidationGateway]());
+    })[config.emailValidationGateway]();
 
   const addressGateway = {
     IN_MEMORY: () => new InMemoryAddressGateway(),
@@ -306,7 +308,7 @@ export const createGateways = async (
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
   switch (config.documentGateway) {
     case "S3":
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
       return new S3DocumentGateway(config.cellarS3Params!);
     case "NONE":
       return new NotImplementedDocumentGateway();

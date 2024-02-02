@@ -38,7 +38,7 @@ export class InMemoryInclusionConnectedUserRepository
     return this.authenticatedUsersRepository.users
       .filter((user) =>
         this.agencyRightsByUserId[user.id].some(
-          ({ role }) => role == agencyRole,
+          ({ role }) => role === agencyRole,
         ),
       )
       .map((user) => ({

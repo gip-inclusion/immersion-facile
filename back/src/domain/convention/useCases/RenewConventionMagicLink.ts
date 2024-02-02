@@ -1,14 +1,14 @@
-import { decode, TokenExpiredError } from "jsonwebtoken";
+import { TokenExpiredError, decode } from "jsonwebtoken";
 import {
   AgencyDto,
   ConventionDto,
   ConventionId,
   ConventionJwtPayload,
-  frontRoutes,
   InternshipKind,
   RenewMagicLinkRequestDto,
-  renewMagicLinkRequestSchema,
   Role,
+  frontRoutes,
+  renewMagicLinkRequestSchema,
   stringToMd5,
 } from "shared";
 import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
@@ -20,12 +20,12 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
+import { prepareMagicShortLinkMaker } from "../../core/ShortLink";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { prepareMagicShortLinkMaker } from "../../core/ShortLink";
-import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 

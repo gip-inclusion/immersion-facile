@@ -3,19 +3,19 @@ import { Point } from "geojson";
 import {
   AddressAndPosition,
   AddressDto,
-  calculateDurationInSecondsFrom,
   City,
   DepartmentName,
-  filterNotFalsy,
   GeoPositionDto,
-  getDepartmentCodeFromDepartmentNameOrCity,
   LookupSearchResult,
-  lookupSearchResultsSchema,
-  lookupStreetAddressQueryMinLength,
-  lookupStreetAddressSpecialCharsRegex,
   OpenCageGeoSearchKey,
   Postcode,
   StreetNumberAndAddress,
+  calculateDurationInSecondsFrom,
+  filterNotFalsy,
+  getDepartmentCodeFromDepartmentNameOrCity,
+  lookupSearchResultsSchema,
+  lookupStreetAddressQueryMinLength,
+  lookupStreetAddressSpecialCharsRegex,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";

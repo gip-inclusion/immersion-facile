@@ -27,9 +27,7 @@ export class InMemoryDeletedEstablishmentRepository
     return this.#deletedEstablishments;
   }
 
-  public set deletedEstablishments(
-    deletedEstablishments: DeletedEstablishementDto[],
-  ) {
+  public set deletedEstablishments(deletedEstablishments: DeletedEstablishementDto[]) {
     this.#deletedEstablishments = deletedEstablishments;
   }
 

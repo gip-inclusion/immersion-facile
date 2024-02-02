@@ -2,9 +2,9 @@ import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { createLogger } from "../../../utils/logger";
 import {
+  ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
-  ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
@@ -66,11 +66,11 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
 
 freeQuarantinedFormEstablishmentsWithCorrectSiret().then(
   () => {
-    logger.info(`Script finished success`);
+    logger.info("Script finished success");
     process.exit(0);
   },
   (error: any) => {
-    logger.error(error, `Script failed`);
+    logger.error(error, "Script failed");
     process.exit(1);
   },
 );

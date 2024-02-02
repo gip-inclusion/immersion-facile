@@ -5,9 +5,9 @@ import {
   AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
+  InclusionConnectedUser,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
-  InclusionConnectedUser,
 } from "shared";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";

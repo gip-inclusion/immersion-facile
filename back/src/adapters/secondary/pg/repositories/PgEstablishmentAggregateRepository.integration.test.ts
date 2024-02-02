@@ -2,12 +2,12 @@ import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
 import {
   AppellationAndRomeDto,
+  SearchResultDto,
+  SiretDto,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  SearchResultDto,
-  SiretDto,
 } from "shared";
 import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
@@ -26,16 +26,16 @@ import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
+  InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
+  PgEstablishmentRow,
   getAllEstablishmentImmersionContactsRows,
   getAllEstablishmentsRows,
   getAllImmersionContactsRows,
   getAllImmersionOfferRows,
   getEstablishmentsRowsBySiret,
   insertActiveEstablishmentAndOfferAndEventuallyContact,
-  InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
   insertEstablishment,
   insertImmersionOffer,
-  PgEstablishmentRow,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
 const cartographeImmersionOffer = new OfferEntityBuilder()
@@ -243,7 +243,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         sirets.forEach(async (siret) =>
           insertImmersionOffer(client, {
             romeCode: cartographeImmersionOffer.romeCode,
-            appellationCode: cartographeSearchMade.appellationCodes![0],
+            appellationCode: cartographeSearchMade.appellationCodes?.[0],
             siret,
             offerCreatedAt: new Date("2022-05-05"),
           }),
@@ -503,12 +503,12 @@ describe("PgEstablishmentAggregateRepository", () => {
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
         siret: closeSiret,
-        appellationCode: cartographeSearchMade.appellationCodes![0],
+        appellationCode: cartographeSearchMade.appellationCodes?.[0],
       });
       await insertImmersionOffer(client, {
         romeCode: cartographeImmersionOffer.romeCode,
         siret: farSiret,
-        appellationCode: cartographeSearchMade.appellationCodes![0],
+        appellationCode: cartographeSearchMade.appellationCodes?.[0],
       });
       // Act
       const searchResult =
@@ -542,13 +542,13 @@ describe("PgEstablishmentAggregateRepository", () => {
       await Promise.all([
         insertImmersionOffer(client, {
           romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCodes![0],
+          appellationCode: cartographeSearchMade.appellationCodes?.[0],
           siret: recentOfferSiret,
           offerCreatedAt: new Date("2022-05-05"),
         }),
         insertImmersionOffer(client, {
           romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeSearchMade.appellationCodes![0],
+          appellationCode: cartographeSearchMade.appellationCodes?.[0],
           siret: oldOfferSiret,
           offerCreatedAt: new Date("2022-05-02"),
         }),
@@ -1004,13 +1004,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         {
           romeCode: offers[0].romeCode,
           romeLabel: "Conduite d'engins agricoles et forestiers",
-          appellationCode: offers[0].appellationCode!.toString(),
+          appellationCode: offers[0].appellationCode?.toString(),
           appellationLabel: "Chauffeur / Chauffeuse de machines agricoles",
         },
         {
           romeCode: offers[1].romeCode,
           romeLabel: "Conduite d'engins agricoles et forestiers",
-          appellationCode: offers[1].appellationCode!.toString(),
+          appellationCode: offers[1].appellationCode?.toString(),
           appellationLabel: "Conducteur / Conductrice d'abatteuses",
         },
       ]);

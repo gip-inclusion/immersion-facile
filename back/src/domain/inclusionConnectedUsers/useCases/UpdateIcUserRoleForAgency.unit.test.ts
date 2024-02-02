@@ -3,16 +3,16 @@ import {
   AgencyRole,
   AuthenticatedUser,
   BackOfficeJwtPayload,
+  InclusionConnectedUser,
   expectPromiseToFailWith,
   expectToEqual,
-  InclusionConnectedUser,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   CreateNewEvent,
   makeCreateNewEvent,

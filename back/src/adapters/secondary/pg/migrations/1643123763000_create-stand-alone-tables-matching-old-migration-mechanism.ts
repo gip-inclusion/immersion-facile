@@ -85,7 +85,7 @@ const createRomeAndAppellationIndexesAndConstraints = (
   pgm.addConstraint("appellations_public_data", "fk_rome_code", {
     foreignKeys: {
       columns: "code_rome",
-      references: `romes_public_data(code_rome)`,
+      references: "romes_public_data(code_rome)",
     },
   });
 };

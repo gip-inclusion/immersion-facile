@@ -525,9 +525,7 @@ const lines: TableLine[] = [
   },
 ];
 
-const addLinesQuery = (
-  lines: TableLine[],
-) => `INSERT INTO public_department_region (department_code, department_name, region_name)
+const addLinesQuery = (lines: TableLine[]) => `INSERT INTO public_department_region (department_code, department_name, region_name)
 VALUES\n${lines.map(lineToInsertValue).join(",\n")};`;
 
 const lineToInsertValue = (line: TableLine) =>

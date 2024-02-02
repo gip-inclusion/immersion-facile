@@ -49,9 +49,7 @@ export class S3DocumentGateway implements DocumentGateway {
           }
 
           logger.info(
-            `File uploaded successfully in bucket ${
-              this.#bucketName
-            }, file id : ${file.id}, file name: ${file.name}`,
+            `File uploaded successfully in bucket ${this.#bucketName}, file id : ${file.id}, file name: ${file.name}`,
           );
           return resolve();
         },

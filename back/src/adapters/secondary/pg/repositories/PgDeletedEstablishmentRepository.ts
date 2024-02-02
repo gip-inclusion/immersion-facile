@@ -4,7 +4,7 @@ import {
   DeletedEstablishementDto,
   DeletedEstablishmentRepository,
 } from "../../../../domain/offer/ports/DeletedEstablishmentRepository";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export class PgDeletedEstablishmentRepository
   implements DeletedEstablishmentRepository

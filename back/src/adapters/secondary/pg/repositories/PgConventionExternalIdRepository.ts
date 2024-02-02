@@ -1,6 +1,6 @@
 import { ConventionExternalId, ConventionId } from "shared";
 import { ConventionExternalIdRepository } from "../../../../domain/convention/ports/ConventionExternalIdRepository";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export class PgConventionExternalIdRepository
   implements ConventionExternalIdRepository

@@ -1,6 +1,6 @@
-import { z } from "zod";
 import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import { LaBonneBoiteApiResultProps } from "./LaBonneBoiteCompanyDto";
 
 type HttpGetLaBonneBoiteCompanyParams = {

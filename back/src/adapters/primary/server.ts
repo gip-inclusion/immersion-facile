@@ -23,8 +23,8 @@ import { createApiKeyAuthRouterV2 } from "./routers/apiKeyAuthRouter/createApiKe
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/establishment/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
-import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
+import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
 import { createRootApiRouter } from "./routers/rootApi/createRootApiRouter";

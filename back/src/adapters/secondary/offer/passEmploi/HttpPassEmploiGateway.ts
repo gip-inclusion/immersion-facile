@@ -9,7 +9,10 @@ import { notifyAndThrowErrorDiscord } from "../../../../utils/notifyDiscord";
 const logger = createLogger(__filename);
 
 export class HttpPassEmploiGateway implements PassEmploiGateway {
-  constructor(private url: string, private key: string) {}
+  constructor(
+    private url: string,
+    private key: string,
+  ) {}
 
   public async notifyOnNewImmersionOfferCreatedFromForm(
     notificationParams: PassEmploiNotificationParams,

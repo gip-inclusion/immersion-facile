@@ -4,9 +4,9 @@ import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import {
+  PgShortLinkRepositoryDto,
   deleteShortLinkByIdQuery,
   getShortLinkByIdQuery,
-  PgShortLinkRepositoryDto,
 } from "./PgShortLinkHelpers";
 import { PgShortLinkRepository } from "./PgShortLinkRepository";
 
@@ -45,7 +45,7 @@ describe("PgShortLinkRepository", () => {
     );
 
     expect(rows.length === 1).toBeTruthy();
-    const expectedResult = rows.at(0)!;
+    const expectedResult = rows[0];
     expect(expectedResult.short_link_id).toEqual(testShortLinkId);
     expect(expectedResult.url).toEqual(originalUrl);
   });

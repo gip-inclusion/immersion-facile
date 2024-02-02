@@ -8,8 +8,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { isConventionInScope } from "../entities/Convention";
 
 export class GetConventionForApiConsumer extends TransactionalUseCase<
@@ -19,10 +19,6 @@ export class GetConventionForApiConsumer extends TransactionalUseCase<
 > {
   protected inputSchema = withConventionIdSchema;
 
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
-
   protected async _execute(
     { conventionId }: WithConventionId,
     uow: UnitOfWork,
@@ -30,9 +26,8 @@ export class GetConventionForApiConsumer extends TransactionalUseCase<
   ): Promise<ConventionReadDto> {
     if (!apiConsumer) throw new ForbiddenError("No api consumer provided");
 
-    const conventionRead = await uow.conventionQueries.getConventionById(
-      conventionId,
-    );
+    const conventionRead =
+      await uow.conventionQueries.getConventionById(conventionId);
 
     if (!conventionRead) throw noConventionFound(conventionId);
     if (isConventionInScope(conventionRead, apiConsumer)) return conventionRead;

@@ -69,9 +69,9 @@ export const captureAddressGroups = (fullAddressString: string) => {
   const captureAddressGroupsRegex =
     /(?<address>^.*)(?<postalCode>[0-9]{5}) (?<city>.+$)/u;
   const capture = captureAddressGroupsRegex.exec(fullAddressString);
-  const address = capture?.groups?.["address"];
-  const postalCode = capture?.groups?.["postalCode"];
-  const city = capture?.groups?.["city"];
+  const address = capture?.groups?.address;
+  const postalCode = capture?.groups?.postalCode;
+  const city = capture?.groups?.city;
 
   return {
     address: trim(address ?? "").replace(/,(?=[^,]*$)/, ""),

@@ -1,28 +1,28 @@
+import { renderContent } from "html-templates/src/components/email";
 import {
   BrevoEmailItem,
   BrevoInboundBody,
-  brevoInboundBodySchema,
   DiscussionId,
   ExchangeRole,
+  brevoInboundBodySchema,
   immersionFacileContactEmail,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { renderContent } from "html-templates/src/components/email";
 import {
   BadRequestError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 import {
+  ExchangeEntity,
   addExchangeToDiscussion,
   createOpaqueEmail,
-  ExchangeEntity,
 } from "../../entities/DiscussionAggregate";
 
 const defaultSubject = "Sans objet";
@@ -86,9 +86,8 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
   ): Promise<void> {
     const [discussionId, recipientKind] =
       this.#getDiscussionParamsFromEmail(item);
-    const discussion = await uow.discussionAggregateRepository.getById(
-      discussionId,
-    );
+    const discussion =
+      await uow.discussionAggregateRepository.getById(discussionId);
     if (!discussion)
       throw new NotFoundError(`Discussion ${discussionId} not found`);
 

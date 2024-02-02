@@ -1,13 +1,13 @@
 import {
   AbsoluteUrl,
+  WithSourcePage,
   allowedStartInclusionConnectLoginPages,
   expectToEqual,
   queryParamsAsString,
-  WithSourcePage,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
 
 const clientId = "my-client-id";

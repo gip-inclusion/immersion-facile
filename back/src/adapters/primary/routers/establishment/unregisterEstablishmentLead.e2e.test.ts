@@ -1,17 +1,17 @@
 import { subDays } from "date-fns";
-import { SuperTest, Test } from "supertest";
 import {
   ConventionDtoBuilder,
   ConventionJwt,
+  EstablishmentRoutes,
   createConventionMagicLinkPayload,
   displayRouteName,
-  EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expiredMagicLinkErrorMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { GenerateConventionJwt } from "../../../../domain/auth/jwt";
 import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";

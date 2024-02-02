@@ -1,16 +1,16 @@
 import {
   AgencyDtoBuilder,
   AuthenticatedUser,
-  expectPromiseToFailWith,
   InclusionConnectedUser,
+  expectPromiseToFailWith,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -91,15 +91,16 @@ describe("Notify icUser agency right rejected", () => {
       agencyId: agency.id,
       justification: "osef",
       userId: icUser.id,
-    }),
-      expectSavedNotificationsAndEvents({
-        emails: [
-          {
-            kind: "IC_USER_REGISTRATION_TO_AGENCY_REJECTED",
-            params: { agencyName: agency.name, justification: "osef" },
-            recipients: [icUser.email],
-          },
-        ],
-      });
+    });
+
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "IC_USER_REGISTRATION_TO_AGENCY_REJECTED",
+          params: { agencyName: agency.name, justification: "osef" },
+          recipients: [icUser.email],
+        },
+      ],
+    });
   });
 });

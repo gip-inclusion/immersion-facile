@@ -2,30 +2,30 @@ import {
   AgencyId,
   AgencyRole,
   AuthenticatedUserId,
-  backOfficeEmail,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
-  reviewedConventionStatuses,
   SignatoryRole,
-  stringToMd5,
   UpdateConventionStatusRequestDto,
+  WithConventionIdLegacy,
+  backOfficeEmail,
+  reviewedConventionStatuses,
+  stringToMd5,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
-  WithConventionIdLegacy,
 } from "shared";
 import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
 import { DomainTopic } from "../../core/eventBus/events";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import {
   conventionMissingMessage,
   throwIfTransitionNotAllowed,

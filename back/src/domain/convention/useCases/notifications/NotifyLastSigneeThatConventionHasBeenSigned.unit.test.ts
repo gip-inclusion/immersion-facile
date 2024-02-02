@@ -6,12 +6,12 @@ import {
   frontRoutes,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -19,9 +19,9 @@ import {
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
+  NotifyLastSigneeThatConventionHasBeenSigned,
   missingConventionMessage,
   noSignatoryMessage,
-  NotifyLastSigneeThatConventionHasBeenSigned,
 } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
@@ -86,6 +86,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           params: {
             internshipKind: signedConvention.internshipKind,
             conventionId: signedConvention.id,
+            // biome-ignore lint/style/noNonNullAssertion: <explanation>
             signedAt: signedConvention.signatories.beneficiary.signedAt!,
             conventionStatusLink,
             agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -115,6 +116,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           params: {
             internshipKind: signedConvention.internshipKind,
             signedAt:
+              // biome-ignore lint/style/noNonNullAssertion: <explanation>
               signedConvention.signatories.establishmentRepresentative
                 .signedAt!,
             conventionId: signedConvention.id,

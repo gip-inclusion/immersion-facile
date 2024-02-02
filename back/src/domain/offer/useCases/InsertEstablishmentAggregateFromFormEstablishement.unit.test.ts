@@ -1,24 +1,24 @@
 import {
   AppellationAndRomeDto,
-  expectToEqual,
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
   NafDto,
   NumberEmployeesRange,
   SiretEstablishmentDto,
+  expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
-  avenueChampsElyseesDto,
   InMemoryAddressGateway,
+  avenueChampsElyseesDto,
   rueGuillaumeTellDto,
 } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,

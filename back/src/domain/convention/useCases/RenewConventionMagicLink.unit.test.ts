@@ -4,33 +4,33 @@ import {
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
+  RenewMagicLinkRequestDto,
+  Role,
   createConventionMagicLinkPayload,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
-  RenewMagicLinkRequestDto,
-  Role,
 } from "shared";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { makeGenerateJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
-import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
+import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 
 const currentEmployer: BeneficiaryCurrentEmployer = {
   email: "currentEmployer@mail.com",
@@ -95,11 +95,11 @@ describe("RenewConventionMagicLink use case", () => {
       ["beneficiary", validConvention.signatories.beneficiary.email],
       [
         "beneficiary-current-employer",
-        validConvention.signatories.beneficiaryCurrentEmployer!.email,
+        validConvention.signatories.beneficiaryCurrentEmployer?.email,
       ],
       [
         "beneficiary-representative",
-        validConvention.signatories.beneficiaryRepresentative!.email,
+        validConvention.signatories.beneficiaryRepresentative?.email,
       ],
       [
         "establishment-representative",

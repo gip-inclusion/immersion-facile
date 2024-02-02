@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { AbsoluteUrl } from "shared";
+import { z } from "zod";
 import { BearerToken } from "../../../domain/peConnect/dto/BearerToken";
 import { PeConnectAdvisorsKind } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 

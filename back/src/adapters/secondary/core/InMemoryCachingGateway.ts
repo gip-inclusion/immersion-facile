@@ -9,7 +9,7 @@ export class InMemoryCachingGateway<T> {
   readonly #minimumCacheLifetime = 30;
 
   constructor(
-    private readonly timeGateway: TimeGateway = new RealTimeGateway(),
+    private readonly timeGateway: TimeGateway,
     private responseExpireInSecondsProp: keyof T,
   ) {}
 

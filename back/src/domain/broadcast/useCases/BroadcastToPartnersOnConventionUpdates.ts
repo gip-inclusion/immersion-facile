@@ -2,15 +2,15 @@ import { filter } from "ramda";
 import {
   ApiConsumer,
   ConventionReadDto,
+  WithConventionDto,
   isApiConsumerAllowed,
   pipeWithValue,
-  WithConventionDto,
   withConventionSchema,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { isConventionInScope } from "../../convention/entities/Convention";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { getReferedAgency } from "../entities/agency";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
 

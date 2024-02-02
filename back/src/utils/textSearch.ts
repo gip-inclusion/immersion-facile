@@ -1,4 +1,4 @@
-import { filterNotFalsy, MatchRangeDto } from "shared";
+import { MatchRangeDto, filterNotFalsy } from "shared";
 
 export const normalize = (s: string): string =>
   s
@@ -16,7 +16,7 @@ const findMatchRangesInternal = (
   const ranges: MatchRangeDto[] = [];
   for (
     let pos = str.indexOf(searchTerm);
-    pos != -1;
+    pos !== -1;
     pos = str.indexOf(searchTerm, pos + 1)
   ) {
     ranges.push({

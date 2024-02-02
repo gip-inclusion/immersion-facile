@@ -4,8 +4,8 @@ import { ConventionToSync } from "../../../../domain/convention/ports/Convention
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import {
-  conventionsToSyncTableName,
   PgConventionsToSyncRepository,
+  conventionsToSyncTableName,
 } from "./PgConventionsToSyncRepository";
 
 describe("PgConventionsToSyncRepository", () => {
@@ -72,7 +72,7 @@ describe("PgConventionsToSyncRepository", () => {
     },
   );
 
-  it(`save updated conventionToSync`, async () => {
+  it("save updated conventionToSync", async () => {
     const initialConventionToSync: ConventionToSync = conventionsToSync[0];
     await conventionsToSyncRepository.save(initialConventionToSync);
 

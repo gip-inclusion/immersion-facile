@@ -1,6 +1,6 @@
+import { ignoreTabs } from "html-templates";
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
-import { ignoreTabs } from "html-templates";
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
@@ -15,7 +15,7 @@ const sender = { name: "bob", email: "Machin@mail.com" };
 describe("SendingBlueHtmlNotificationGateway unit", () => {
   describe("sendEmail with skipEmailAllowList false", () => {
     let fakeHttpClient: HttpClient<BrevoNotificationGatewayRoutes>;
-    let allowListPredicate;
+    let allowListPredicate: (email: string) => boolean;
     let notificationGateway: BrevoNotificationGateway;
     let sentEmails: {
       headers: BrevoHeaders;
@@ -247,7 +247,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
 
   describe("sendEmail with skipEmailAllowList true", () => {
     let fakeHttpClient: HttpClient<BrevoNotificationGatewayRoutes>;
-    let allowListPredicate;
+    let allowListPredicate: (email: string) => boolean;
     let notificationGateway: BrevoNotificationGateway;
     let sentEmails: {
       headers: BrevoHeaders;

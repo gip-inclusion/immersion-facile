@@ -4,11 +4,11 @@ import { andThen } from "ramda";
 import {
   ConventionId,
   ConventionReadDto,
-  conventionReadSchema,
   ConventionScope,
   ConventionStatus,
   FindSimilarConventionsParams,
   ListConventionsRequestDto,
+  conventionReadSchema,
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
@@ -41,10 +41,22 @@ export class PgConventionQueries implements ConventionQueries {
     const pgResults = await createConventionReadQueryBuilder(this.transaction)
       .where("conventions.siret", "=", params.siret)
       .where("conventions.immersion_appellation", "=", +params.codeAppellation)
-      .where(sql`b.extra_fields ->> 'birthdate'`, "=", params.beneficiaryBirthdate)
-      .where("b.last_name", "=", params.beneficiaryLastName)      
-      .where("conventions.date_start","<=", addDays(dateStartToMatch, numberOfDaysTolerance))
-      .where("conventions.date_start",">=", subDays(dateStartToMatch, numberOfDaysTolerance))
+      .where(
+        sql`b.extra_fields ->> 'birthdate'`,
+        "=",
+        params.beneficiaryBirthdate,
+      )
+      .where("b.last_name", "=", params.beneficiaryLastName)
+      .where(
+        "conventions.date_start",
+        "<=",
+        addDays(dateStartToMatch, numberOfDaysTolerance),
+      )
+      .where(
+        "conventions.date_start",
+        ">=",
+        subDays(dateStartToMatch, numberOfDaysTolerance),
+      )
       .where("conventions.status", "not in", statusesToIgnore)
       .orderBy("conventions.date_start", "desc")
       .limit(20)
@@ -64,11 +76,15 @@ export class PgConventionQueries implements ConventionQueries {
       .where("conventions.date_end", ">=", subHours(dateEnd, 24))
       .where("conventions.date_end", "<", dateEnd)
       .where("conventions.status", "in", validatedConventionStatuses)
-      .where("conventions.id", "not in", sql`(
+      .where(
+        "conventions.id",
+        "not in",
+        sql`(
           SELECT (payload ->> 'id')::uuid
           FROM outbox
           WHERE topic = ${sendingTopic}
-        )`)
+        )`,
+      )
       .orderBy("conventions.date_start", "desc")
       .execute();
 

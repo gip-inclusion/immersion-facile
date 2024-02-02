@@ -5,8 +5,8 @@ import {
   withAgencyRoleSchema,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class GetInclusionConnectedUsers extends TransactionalUseCase<
   WithAgencyRole,
@@ -14,10 +14,6 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
   BackOfficeJwtPayload
 > {
   protected inputSchema = withAgencyRoleSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   protected async _execute(
     { agencyRole }: WithAgencyRole,

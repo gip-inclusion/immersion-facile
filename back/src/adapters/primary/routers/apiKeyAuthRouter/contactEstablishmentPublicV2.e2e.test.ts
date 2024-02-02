@@ -1,15 +1,15 @@
-import { SuperTest, Test } from "supertest";
 import { expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
+import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -231,7 +231,7 @@ describe("POST contact-establishment public V2 route", () => {
     );
 
     const { body, status } = await request
-      .post(`/v2/contact-establishment`)
+      .post("/v2/contact-establishment")
       .set(
         "Authorization",
         generateApiConsumerJwt({

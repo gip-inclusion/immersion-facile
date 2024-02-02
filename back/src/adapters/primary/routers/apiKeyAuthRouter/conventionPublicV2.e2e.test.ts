@@ -1,4 +1,3 @@
-import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -8,6 +7,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { ApiConsumerBuilder } from "../../../secondary/InMemoryApiConsumerRepository";

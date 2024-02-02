@@ -2,7 +2,7 @@ import { AbsoluteUrl, castError } from "shared";
 import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../../../domain/core/ports/ShortLinkRepository";
 import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 import {
   PgShortLinkRepositoryDto,
   pgShortLinkRepositorySchema,
@@ -16,10 +16,6 @@ export class PgShortLinkRepository
   extends PgShortLinkQuery
   implements ShortLinkRepository
 {
-  constructor(transaction: KyselyDb) {
-    super(transaction);
-  }
-
   public async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
     logger.info({ shortLinkId }, "pgShortLinkRepositorySaveTotal");
 

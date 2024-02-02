@@ -64,7 +64,7 @@ describe("PgUowPerformer", () => {
       .withSiret(someSiret)
       .build();
 
-    await uow.formEstablishmentRepository.create(formEstablishment)!;
+    await uow.formEstablishmentRepository.create(formEstablishment);
 
     const event = createNewEvent({
       topic: "FormEstablishmentAdded",

@@ -6,7 +6,7 @@ import {
 } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { SearchMadeRepository } from "../../../../domain/offer/ports/SearchMadeRepository";
 import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 const logger = createLogger(__filename);
 
@@ -57,7 +57,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     return executeKyselyRawSqlQuery(
       this.transaction,
       format(
-        `INSERT INTO searches_made__appellation_code(search_made_id, appellation_code) VALUES %L`,
+        "INSERT INTO searches_made__appellation_code(search_made_id, appellation_code) VALUES %L",
         appellationCodes.map((appellationCode) => [id, appellationCode]),
       ),
     );

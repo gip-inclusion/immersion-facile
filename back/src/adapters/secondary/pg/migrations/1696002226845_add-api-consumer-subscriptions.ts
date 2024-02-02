@@ -36,7 +36,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     },
   });
 
-  pgm.addConstraint(tableName, `fk_consumer_id`, {
+  pgm.addConstraint(tableName, "fk_consumer_id", {
     foreignKeys: {
       columns: "consumer_id",
       references: "api_consumers(id)",

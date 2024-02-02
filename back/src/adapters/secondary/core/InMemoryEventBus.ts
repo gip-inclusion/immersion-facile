@@ -32,7 +32,7 @@ export class InMemoryEventBus implements EventBus {
   constructor(
     private timeGateway: TimeGateway,
     private uowPerformer: UnitOfWorkPerformer,
-    private throwOnPublishFailure: boolean = false,
+    private throwOnPublishFailure = false,
   ) {
     this.subscriptions = {};
   }
@@ -65,9 +65,9 @@ export class InMemoryEventBus implements EventBus {
       this.subscriptions[domainTopic] = {};
     }
 
-    // prettier-ignore
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
+    const subscriptionsForTopic: SubscriptionsForTopic =
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      this.subscriptions[domainTopic]!;
 
     if (subscriptionsForTopic[subscriptionId]) {
       logger.warn(

@@ -35,11 +35,11 @@ export const isRetryableError = (
     error.response?.status &&
     QUOTA_EXEEDED_STATUSES.has(error.response?.status)
   ) {
-    logger.warn("Request quota exceeded: " + error);
+    logger.warn(`Request quota exceeded: ${error}`);
     return true;
   }
   if (error.code && TIMEOUT_CODES.has(error.code)) {
-    logger.warn("Request timed out: " + error);
+    logger.warn(`Request timed out: ${error}`);
     return true;
   }
 

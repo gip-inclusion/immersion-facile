@@ -1,4 +1,4 @@
-import { addressStringToDto, SearchResultDto, SiretDto } from "shared";
+import { SearchResultDto, SiretDto, addressStringToDto } from "shared";
 
 export type LaBonneBoiteApiResultProps = {
   address: string;
@@ -37,7 +37,7 @@ export class LaBonneBoiteCompanyDto {
       companyNaf.startsWith("9609") && ["A1503", "A1408"].includes(rome);
 
     const isNafRestaurationRapideWithRomeBoulangerie =
-      companyNaf == "5610C" && rome == "D1102";
+      companyNaf === "5610C" && rome === "D1102";
 
     const isRomeIgnoredForPublicAdministration =
       companyNaf.startsWith("8411") &&

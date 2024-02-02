@@ -1,11 +1,11 @@
 import {
   GetSiretRequestDto,
-  getSiretRequestSchema,
   SiretEstablishmentDto,
+  getSiretRequestSchema,
 } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { SiretGateway } from "../ports/SirenGateway";
 import { getSiretEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";
 

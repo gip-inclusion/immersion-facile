@@ -1,7 +1,7 @@
+import querystring from "querystring";
 import axios from "axios";
 import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
-import querystring from "querystring";
 import { AbsoluteUrl, castError } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -11,8 +11,8 @@ import {
   PoleEmploiGateway,
 } from "../../../domain/convention/ports/PoleEmploiGateway";
 import {
-  RetryableError,
   RetryStrategy,
+  RetryableError,
 } from "../../../domain/core/ports/RetryStrategy";
 import {
   createAxiosInstance,
@@ -23,7 +23,7 @@ import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { AccessTokenConfig } from "../../primary/config/appConfig";
 import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";
-import { getPeTestPrefix, PoleEmploiRoutes } from "./PoleEmploiRoutes";
+import { PoleEmploiRoutes, getPeTestPrefix } from "./PoleEmploiRoutes";
 
 const logger = createLogger(__filename);
 
@@ -66,9 +66,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         this.#limiter.schedule(() =>
           createAxiosInstance(logger)
             .post(
-              `${
-                this.#accessTokenConfig.peEnterpriseUrl
-              }/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+              `${this.#accessTokenConfig.peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
               querystring.stringify({
                 grant_type: "client_credentials",
                 client_id: this.#accessTokenConfig.clientId,

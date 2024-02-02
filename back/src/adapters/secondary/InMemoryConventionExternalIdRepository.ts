@@ -8,9 +8,10 @@ export class InMemoryConventionExternalIdRepository
 
   #nextExternalId: ConventionExternalId = "next-external-id-not-provided";
 
-  public set externalIdsByConventionId(
-    externalIdsByConventionId: Record<ConventionId, ConventionExternalId>,
-  ) {
+  public set externalIdsByConventionId(externalIdsByConventionId: Record<
+    ConventionId,
+    ConventionExternalId
+  >) {
     this.#externalIdsByConventionId = externalIdsByConventionId;
   }
 

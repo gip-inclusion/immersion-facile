@@ -27,7 +27,7 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../primary/helpers/httpErrors";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 
 const logger = createLogger(__filename);
@@ -316,7 +316,7 @@ export class PgEstablishmentAggregateRepository
   ): Promise<string[]> {
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
-      `SELECT siret FROM immersion_offers WHERE rome_code = $1`,
+      "SELECT siret FROM immersion_offers WHERE rome_code = $1",
       [rome],
     );
     return pgResult.rows.map((row) => row.siret);
@@ -325,7 +325,7 @@ export class PgEstablishmentAggregateRepository
   public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
-      `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);`,
+      "SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);",
       [siret],
     );
     return pgResult.rows[0].exists;
@@ -621,12 +621,35 @@ export class PgEstablishmentAggregateRepository
   ) {
     //prettier-ignore
     const establishmentFields = aggregates.map(({ establishment }) => [
-      establishment.siret, establishment.name, establishment.customizedName, establishment.website, establishment.additionalInformation,
-      establishment.address.streetNumberAndAddress, establishment.address.postcode, establishment.address.city, establishment.address.departmentCode, establishment.numberEmployeesRange,
-      establishment.nafDto.code, establishment.nafDto.nomenclature, establishment.sourceProvider, convertPositionToStGeography(establishment.position), establishment.position.lon,
-      establishment.position.lat, establishment.updatedAt ? establishment.updatedAt.toISOString() : null, establishment.isOpen, establishment.isSearchable, establishment.isCommited,
-      establishment.fitForDisabledWorkers, establishment.maxContactsPerWeek, establishment.lastInseeCheckDate ? establishment.lastInseeCheckDate.toISOString() : null, establishment.createdAt, establishment.nextAvailabilityDate ?? null,
-      establishment.searchableBy.students, establishment.searchableBy.jobSeekers
+      establishment.siret,
+      establishment.name,
+      establishment.customizedName,
+      establishment.website,
+      establishment.additionalInformation,
+      establishment.address.streetNumberAndAddress,
+      establishment.address.postcode,
+      establishment.address.city,
+      establishment.address.departmentCode,
+      establishment.numberEmployeesRange,
+      establishment.nafDto.code,
+      establishment.nafDto.nomenclature,
+      establishment.sourceProvider,
+      convertPositionToStGeography(establishment.position),
+      establishment.position.lon,
+      establishment.position.lat,
+      establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
+      establishment.isOpen,
+      establishment.isSearchable,
+      establishment.isCommited,
+      establishment.fitForDisabledWorkers,
+      establishment.maxContactsPerWeek,
+      establishment.lastInseeCheckDate
+        ? establishment.lastInseeCheckDate.toISOString()
+        : null,
+      establishment.createdAt,
+      establishment.nextAvailabilityDate ?? null,
+      establishment.searchableBy.students,
+      establishment.searchableBy.jobSeekers,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -917,7 +940,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
 
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
   // Only compare romeCode and appellationCode
-  a.appellationCode == b.appellationCode;
+  a.appellationCode === b.appellationCode;
 
 const objectsDeepEqual = <T>(a: T, b: T) =>
   equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here

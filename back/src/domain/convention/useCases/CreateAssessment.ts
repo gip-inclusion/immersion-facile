@@ -1,12 +1,12 @@
-import { AssessmentDto, assessmentSchema, ConventionJwtPayload } from "shared";
+import { AssessmentDto, ConventionJwtPayload, assessmentSchema } from "shared";
 import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import {
   AssessmentEntity,
   createAssessmentEntity,
@@ -61,9 +61,8 @@ const validateConventionAndCreateAssessmentEntity = async (
       `Did not found convention with id: ${conventionId}`,
     );
 
-  const assessment = await uow.assessmentRepository.getByConventionId(
-    conventionId,
-  );
+  const assessment =
+    await uow.assessmentRepository.getByConventionId(conventionId);
 
   if (assessment)
     throw new ConflictError(

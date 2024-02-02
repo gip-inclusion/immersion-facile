@@ -1,13 +1,13 @@
 import {
-  addressDtoToString,
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
+  addressDtoToString,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,

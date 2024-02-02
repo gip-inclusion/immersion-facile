@@ -2,9 +2,6 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
-import { InMemoryErrorRepository } from "../../secondary/core/InMemoryErrorRepository";
-import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
-import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryAssessmentRepository } from "../../secondary/InMemoryAssessmentRepository";
@@ -23,13 +20,16 @@ import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingO
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
+import { InMemoryErrorRepository } from "../../secondary/core/InMemoryErrorRepository";
+import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
+import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentLeadRepository } from "../../secondary/offer/InMemoryEstablishmentLeadRepository";
 import { InMemoryGroupRepository } from "../../secondary/offer/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/offer/InMemorySearchMadeRepository";
-import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
+import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgAgencyRepository } from "../../secondary/pg/repositories/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/repositories/PgApiConsumerRepository";
 import { PgAssessmentRepository } from "../../secondary/pg/repositories/PgAssessmentRepository";

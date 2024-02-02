@@ -1,15 +1,15 @@
 import {
   ApiConsumer,
   CreateWebhookSubscription,
+  WebhookSubscription,
   createWebhookSubscriptionSchema,
   eventToRightName,
-  WebhookSubscription,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { TransactionalUseCase } from "../../core/UseCase";
 
 export class SubscribeToWebhook extends TransactionalUseCase<
   CreateWebhookSubscription,

@@ -1,7 +1,7 @@
 import {
   ConventionId,
-  parseZodSchemaAndLogErrorOnParsingFailure,
   PeExternalId,
+  parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
 import {
   ConventionPoleEmploiUserAdvisorDto,
@@ -15,7 +15,7 @@ import {
 } from "../../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { conventionPoleEmploiUserAdvisorDtoSchema } from "../../../../domain/peConnect/port/PeConnect.schema";
 import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
 
@@ -40,7 +40,7 @@ export class PgConventionPoleEmploiAdvisorRepository
       [conventionId, peExternalId, CONVENTION_ID_DEFAULT_UUID],
     );
 
-    if (Number(pgResult.numAffectedRows) != 1)
+    if (Number(pgResult.numAffectedRows) !== 1)
       throw new Error(
         `Association between Convention and userAdvisor failed. rowCount: ${pgResult.rows.length}, conventionId: ${conventionId}, peExternalId: ${peExternalId}`,
       );

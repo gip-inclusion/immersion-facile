@@ -5,8 +5,8 @@ import {
 } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 const logger = createLogger(__filename);
 
@@ -15,10 +15,6 @@ export class AppellationSearch extends TransactionalUseCase<
   AppellationMatchDto[]
 > {
   protected inputSchema = zTrimmedString;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   public async _execute(
     searchText: string,

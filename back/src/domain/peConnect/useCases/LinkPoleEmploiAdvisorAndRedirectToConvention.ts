@@ -1,12 +1,12 @@
-import { z } from "zod";
 import {
   AbsoluteUrl,
   authFailed,
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   ConventionPeConnectFields,
@@ -41,9 +41,8 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     authorizationCode: string,
     uow: UnitOfWork,
   ): Promise<AbsoluteUrl> {
-    const accessToken = await this.#peConnectGateway.getAccessToken(
-      authorizationCode,
-    );
+    const accessToken =
+      await this.#peConnectGateway.getAccessToken(authorizationCode);
     return accessToken
       ? this.#onAccessToken(accessToken, uow)
       : this.#makeRedirectUrl({
@@ -59,9 +58,8 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
   }
 
   async #onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
-    const userAndAdvisors = await this.#peConnectGateway.getUserAndAdvisors(
-      accessToken,
-    );
+    const userAndAdvisors =
+      await this.#peConnectGateway.getUserAndAdvisors(accessToken);
     if (!userAndAdvisors)
       return this.#makeRedirectUrl({
         fedIdProvider: "peConnect",

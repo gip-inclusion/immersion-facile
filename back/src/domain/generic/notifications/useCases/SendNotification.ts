@@ -1,11 +1,11 @@
-import { z } from "zod";
 import { exhaustiveCheck } from "shared";
+import { z } from "zod";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { WithNotificationIdAndKind } from "../entities/Notification";
 import { NotificationGateway } from "../ports/NotificationGateway";
 

@@ -1,21 +1,21 @@
-import supertest from "supertest";
 import {
+  EstablishmentRoutes,
   addressDtoToString,
   createBackOfficeJwtPayload,
   createEstablishmentJwtPayload,
   displayRouteName,
-  EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expiredMagicLinkErrorMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import supertest from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domain/auth/jwt";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   EstablishmentAggregateBuilder,
@@ -97,6 +97,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         maxContactsPerWeek:
           establishmentAggregate.establishment.maxContactsPerWeek,
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         businessContact: establishmentAggregate.contact!,
         searchableBy: {
           jobSeekers: true,
@@ -149,6 +150,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         maxContactsPerWeek:
           establishmentAggregate.establishment.maxContactsPerWeek,
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         businessContact: establishmentAggregate.contact!,
         searchableBy: {
           jobSeekers: true,

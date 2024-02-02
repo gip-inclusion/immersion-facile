@@ -12,7 +12,7 @@ export const makeAdminAuthMiddleware = (
   const verifyJwt = makeVerifyJwtES256<"backOffice">(jwtPublicKey);
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
-      return res.status(401).json({ error: `You need to authenticate first` });
+      return res.status(401).json({ error: "You need to authenticate first" });
     }
     try {
       const payload = verifyJwt(req.headers.authorization);

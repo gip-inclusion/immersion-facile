@@ -5,8 +5,8 @@ import {
   siretAndAppellationSchema,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class GetSearchResultBySiretAndAppellationCode extends TransactionalUseCase<
   SiretAndAppellationDto,
@@ -14,10 +14,6 @@ export class GetSearchResultBySiretAndAppellationCode extends TransactionalUseCa
   ApiConsumer
 > {
   protected inputSchema = siretAndAppellationSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   public async _execute(
     siretAndAppellationDto: SiretAndAppellationDto,

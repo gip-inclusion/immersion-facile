@@ -2,11 +2,11 @@ import { Pool, PoolClient } from "pg";
 import {
   EmailAttachment,
   EmailNotification,
-  expectToEqual,
   Notification,
   SmsNotification,
   TemplatedEmail,
   TemplatedSms,
+  expectToEqual,
 } from "shared";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
@@ -323,7 +323,8 @@ describe("PgNotificationRepository", () => {
               ...emailNotification.templatedContent,
               attachments: [
                 {
-                  ...emailNotification.templatedContent.attachments![0]!,
+                  // biome-ignore lint/style/noNonNullAssertion:
+                  ...emailNotification.templatedContent.attachments![0],
                   content: "deleted-content",
                 },
               ],

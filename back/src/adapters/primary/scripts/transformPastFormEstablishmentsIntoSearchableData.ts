@@ -9,9 +9,9 @@ import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.routes";
 import {
+  ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
-  ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
@@ -135,11 +135,11 @@ transformPastFormEstablishmentsIntoSearchableData(
   config.pgImmersionDbUrl,
 ).then(
   () => {
-    logger.info(`Script finished success`);
+    logger.info("Script finished success");
     process.exit(0);
   },
   (error: any) => {
-    logger.error(error, `Script failed`);
+    logger.error(error, "Script failed");
     process.exit(1);
   },
 );

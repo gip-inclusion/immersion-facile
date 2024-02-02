@@ -31,5 +31,8 @@
     "enabled": true,
     "indentWidth": 2,
     "indentStyle": "space"
+  },
+  "files": {
+    "maxSize": 10485760
   }
 }

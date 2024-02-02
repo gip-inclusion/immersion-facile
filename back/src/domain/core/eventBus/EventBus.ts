@@ -15,7 +15,9 @@ export type NarrowEvent<
 > = Extract<E, { topic: T }>;
 
 // prettier-ignore
-export type EventCallback<T extends DomainTopic> = (e: NarrowEvent<T>) => Promise<void>;
+export type EventCallback<T extends DomainTopic> = (
+  e: NarrowEvent<T>,
+) => Promise<void>;
 
 export interface EventBus {
   publish: (event: DomainEvent) => Promise<void>;

@@ -1,7 +1,7 @@
 import { expectToEqual } from "shared";
 import {
-  convertSirenRawEstablishmentToSirenEstablishmentDto,
   InseeApiRawEstablishment,
+  convertSirenRawEstablishmentToSirenEstablishmentDto,
 } from "./InseeSiretGateway";
 
 const validEstablishment: InseeApiRawEstablishment = {
@@ -38,9 +38,10 @@ describe("convertSirenRawEstablishmentToSirenEstablishmentDto", () => {
   };
 
   it("marks an open establishment as open, regardless of the period count", async () => {
-    const response = await convertSirenRawEstablishmentToSirenEstablishmentDto(
-      closedEstablishment,
-    );
+    const response =
+      await convertSirenRawEstablishmentToSirenEstablishmentDto(
+        closedEstablishment,
+      );
 
     expectToEqual(response, {
       siret: "12345678901234",
@@ -53,9 +54,10 @@ describe("convertSirenRawEstablishmentToSirenEstablishmentDto", () => {
   });
 
   it("returns the parsed info when siret found", async () => {
-    const response = await convertSirenRawEstablishmentToSirenEstablishmentDto(
-      validEstablishment,
-    );
+    const response =
+      await convertSirenRawEstablishmentToSirenEstablishmentDto(
+        validEstablishment,
+      );
     expectToEqual(response, {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",

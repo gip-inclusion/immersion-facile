@@ -5,9 +5,9 @@ import {
   formEstablishmentSchema,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 
 export class EditFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,

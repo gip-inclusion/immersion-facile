@@ -1,9 +1,9 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
 import { getAddressAndPosition } from "../../../utils/address";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../ports/AddressGateway";
 import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 

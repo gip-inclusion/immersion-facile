@@ -56,7 +56,7 @@ createApp(appConfig).then(
     configureSentry(appConfig);
   },
   (error: any) => {
-    logger.error(error, `Server start failed`);
+    logger.error(error, "Server start failed");
     process.exit(1);
   },
 );

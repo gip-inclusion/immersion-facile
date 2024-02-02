@@ -3,11 +3,11 @@ import {
   icUserRoleForAgencyParamsSchema,
 } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<

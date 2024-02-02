@@ -1,9 +1,9 @@
 import {
   AddressRoutes,
+  LookupSearchResult,
   addressRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
-  LookupSearchResult,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -24,7 +24,7 @@ describe("address router", () => {
     addressGateway = gateways.addressApi;
   });
 
-  describe(`GET /address/lookupStreetAddress`, () => {
+  describe("GET /address/lookupStreetAddress", () => {
     it(`${displayRouteName(
       addressRoutes.lookupStreetAddress,
     )} 200 with lookup="${query8bdduportLookup}"`, async () => {
@@ -106,7 +106,7 @@ describe("address router", () => {
     );
   });
 
-  describe(`GET /address/lookup-location`, () => {
+  describe("GET /address/lookup-location", () => {
     const exampleQuery = "Saint-Emil";
     const expectedLookupSearchResults: LookupSearchResult[] = [
       {

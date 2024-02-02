@@ -11,10 +11,10 @@ import {
   ConventionReadDto,
   ConventionStatus,
   DATE_START,
+  SiretDto,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   reasonableSchedule,
-  SiretDto,
 } from "shared";
 import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
 import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";

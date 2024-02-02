@@ -1,12 +1,12 @@
 import axios from "axios";
 import { Logger } from "pino";
-import { ZodError } from "zod";
 import {
   HTTP_STATUS,
   parseZodSchemaAndLogErrorOnParsingFailure,
   queryParamsAsString,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import { ZodError } from "zod";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
@@ -160,7 +160,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     const externalPeUser = await this.#getUserInfo(headers);
     const isUserJobseeker = await this.#userIsJobseeker(
       headers,
-      externalPeUser && externalPeUser.idIdentiteExterne,
+      externalPeUser?.idIdentiteExterne,
     );
 
     return externalPeUser

@@ -28,9 +28,8 @@ describe("convertAdeEstablishmentToSirenEstablishmentDto", () => {
   };
 
   it("marks an open establishment as open, regardless of the period count", async () => {
-    const response = await convertAdeEstablishmentToSirenEstablishmentDto(
-      closedEstablishment,
-    );
+    const response =
+      await convertAdeEstablishmentToSirenEstablishmentDto(closedEstablishment);
     expectToEqual(response, {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",
@@ -42,9 +41,8 @@ describe("convertAdeEstablishmentToSirenEstablishmentDto", () => {
   });
 
   it("returns the parsed info when siret found", async () => {
-    const response = await convertAdeEstablishmentToSirenEstablishmentDto(
-      validEstablishment,
-    );
+    const response =
+      await convertAdeEstablishmentToSirenEstablishmentDto(validEstablishment);
     expectToEqual(response, {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",

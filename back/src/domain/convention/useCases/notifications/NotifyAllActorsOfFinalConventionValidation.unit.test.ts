@@ -5,27 +5,27 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   EmailNotification,
+  Role,
   expectToEqual,
   frontRoutes,
-  Role,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import {
-  makeSaveNotificationAndRelatedEvent,
   WithNotificationIdAndKind,
+  makeSaveNotificationAndRelatedEvent,
 } from "../../../generic/notifications/entities/Notification";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
@@ -105,22 +105,22 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           {
             role: "beneficiary",
             email: validConvention.signatories.beneficiary.email,
-            shortlinkId: `shortLinkId_0`,
+            shortlinkId: "shortLinkId_0",
           },
           {
             role: "establishment-representative",
             email: establishmentRepresentativeEmail,
-            shortlinkId: `shortLinkId_1`,
+            shortlinkId: "shortLinkId_1",
           },
           {
             role: "counsellor",
             email: counsellorEmail,
-            shortlinkId: `shortLinkId_5`,
+            shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
             email: validatorEmail,
-            shortlinkId: `shortLinkId_6`,
+            shortlinkId: "shortLinkId_6",
           },
         ];
 
@@ -184,27 +184,27 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           {
             role: "beneficiary",
             email: validConvention.signatories.beneficiary.email,
-            shortlinkId: `shortLinkId_0`,
+            shortlinkId: "shortLinkId_0",
           },
           {
             role: "establishment-representative",
             email: establishmentRepresentativeEmail,
-            shortlinkId: `shortLinkId_1`,
+            shortlinkId: "shortLinkId_1",
           },
           {
             role: "beneficiary-current-employer",
             email: beneficiaryCurrentEmployerEmail,
-            shortlinkId: `shortLinkId_3`,
+            shortlinkId: "shortLinkId_3",
           },
           {
             role: "counsellor",
             email: counsellorEmail,
-            shortlinkId: `shortLinkId_5`,
+            shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
             email: validatorEmail,
-            shortlinkId: `shortLinkId_6`,
+            shortlinkId: "shortLinkId_6",
           },
         ];
       const agency = new AgencyDtoBuilder(defaultAgency).build();
@@ -273,28 +273,28 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           {
             role: "beneficiary",
             email: validConvention.signatories.beneficiary.email,
-            shortlinkId: `shortLinkId_0`,
+            shortlinkId: "shortLinkId_0",
           },
           {
             role: "establishment-representative",
             email: establishmentRepresentativeEmail,
-            shortlinkId: `shortLinkId_1`,
+            shortlinkId: "shortLinkId_1",
           },
           {
             role: "beneficiary-representative",
             email: beneficiaryRepresentativeEmail,
-            shortlinkId: `shortLinkId_2`,
+            shortlinkId: "shortLinkId_2",
           },
 
           {
             role: "counsellor",
             email: counsellorEmail,
-            shortlinkId: `shortLinkId_5`,
+            shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
             email: validatorEmail,
-            shortlinkId: `shortLinkId_6`,
+            shortlinkId: "shortLinkId_6",
           },
         ];
       const agency = new AgencyDtoBuilder(defaultAgency).build();
@@ -363,27 +363,27 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           {
             role: "beneficiary",
             email: validConvention.signatories.beneficiary.email,
-            shortlinkId: `shortLinkId_0`,
+            shortlinkId: "shortLinkId_0",
           },
           {
             role: "establishment-representative",
             email: establishmentRepresentativeEmail,
-            shortlinkId: `shortLinkId_1`,
+            shortlinkId: "shortLinkId_1",
           },
           {
             role: "establishment-tutor",
             email: establishmentTutorEmail,
-            shortlinkId: `shortLinkId_2`,
+            shortlinkId: "shortLinkId_2",
           },
           {
             role: "counsellor",
             email: counsellorEmail,
-            shortlinkId: `shortLinkId_5`,
+            shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
             email: validatorEmail,
-            shortlinkId: `shortLinkId_6`,
+            shortlinkId: "shortLinkId_6",
           },
         ];
 
@@ -453,27 +453,27 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           {
             role: "beneficiary",
             email: validConvention.signatories.beneficiary.email,
-            shortlinkId: `shortLinkId_0`,
+            shortlinkId: "shortLinkId_0",
           },
           {
             role: "establishment-representative",
             email: establishmentRepresentativeEmail,
-            shortlinkId: `shortLinkId_1`,
+            shortlinkId: "shortLinkId_1",
           },
           {
             role: "counsellor",
             email: counsellorEmail,
-            shortlinkId: `shortLinkId_5`,
+            shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
             email: validatorEmail,
-            shortlinkId: `shortLinkId_6`,
+            shortlinkId: "shortLinkId_6",
           },
           {
             role: "validator",
             email: peAdvisorEmail,
-            shortlinkId: `shortLinkId_2`,
+            shortlinkId: "shortLinkId_2",
           },
         ];
       const userPeExternalId = "i-am-an-external-id";
@@ -553,22 +553,22 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           {
             role: "beneficiary",
             email: validConvention.signatories.beneficiary.email,
-            shortlinkId: `shortLinkId_0`,
+            shortlinkId: "shortLinkId_0",
           },
           {
             role: "establishment-representative",
             email: establishmentRepresentativeEmail,
-            shortlinkId: `shortLinkId_1`,
+            shortlinkId: "shortLinkId_1",
           },
           {
             role: "counsellor",
             email: counsellorEmail,
-            shortlinkId: `shortLinkId_5`,
+            shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
             email: validatorEmail,
-            shortlinkId: `shortLinkId_6`,
+            shortlinkId: "shortLinkId_6",
           },
         ];
       const userPeExternalId = "i-am-an-external-id";

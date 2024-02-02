@@ -1,7 +1,7 @@
 import subDays from "date-fns/subDays";
 import { z } from "zod";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
 export class MarkEstablishmentsAsSearchableScript extends UseCase<

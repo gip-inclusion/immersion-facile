@@ -1,18 +1,18 @@
 import { subDays } from "date-fns";
-import { z } from "zod";
 import {
-  castError,
   ConventionDto,
   ConventionId,
+  castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
 } from "shared";
+import { z } from "zod";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 const logger = createLogger(__filename);

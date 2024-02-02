@@ -2,17 +2,17 @@ import {
   ConventionId,
   ConventionReadDto,
   ConventionRelatedJwtPayload,
-  getIcUserRoleForAccessingConvention,
   InclusionConnectJwtPayload,
   WithConventionId,
+  getIcUserRoleForAccessingConvention,
   withConventionIdSchema,
 } from "shared";
 import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class GetConvention extends TransactionalUseCase<
   WithConventionId,
@@ -20,10 +20,6 @@ export class GetConvention extends TransactionalUseCase<
   ConventionRelatedJwtPayload
 > {
   protected inputSchema = withConventionIdSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   protected async _execute(
     { conventionId }: WithConventionId,
@@ -35,9 +31,8 @@ export class GetConvention extends TransactionalUseCase<
       conventionId,
     );
 
-    const convention = await uow.conventionQueries.getConventionById(
-      conventionId,
-    );
+    const convention =
+      await uow.conventionQueries.getConventionById(conventionId);
     if (!convention)
       throw new NotFoundError(`No convention found with id ${conventionId}`);
 
@@ -65,7 +60,7 @@ export class GetConvention extends TransactionalUseCase<
     authPayload: ConventionRelatedJwtPayload | undefined,
     conventionId: ConventionId,
   ): authPayload is InclusionConnectJwtPayload {
-    if (!authPayload) throw new ForbiddenError(`No auth payload provided`);
+    if (!authPayload) throw new ForbiddenError("No auth payload provided");
     if (!("role" in authPayload)) return true;
     if (authPayload.role === "backOffice") return false;
     if (authPayload.applicationId === conventionId) return false;

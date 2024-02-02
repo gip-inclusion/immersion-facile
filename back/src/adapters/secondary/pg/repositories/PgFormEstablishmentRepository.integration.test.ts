@@ -1,10 +1,10 @@
 import { Pool, PoolClient } from "pg";
 import {
+  FormEstablishmentDto,
+  FormEstablishmentDtoBuilder,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
-  FormEstablishmentDto,
-  FormEstablishmentDtoBuilder,
 } from "shared";
 import {
   formEstablishementUpdateFailedErrorMessage,

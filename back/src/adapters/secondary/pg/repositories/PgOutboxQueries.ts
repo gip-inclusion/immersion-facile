@@ -2,7 +2,7 @@ import { groupBy, map, prop, values } from "ramda";
 import { pipeWithValue } from "shared";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { OutboxQueries } from "../../../../domain/core/ports/OutboxQueries";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 import {
   StoredEventRow,
   storedEventRowsToDomainEvent,

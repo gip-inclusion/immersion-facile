@@ -83,7 +83,7 @@ describe("HttpLaBonneBoiteGateway", () => {
     ]);
   });
 
-  it(`Should support several of parallel calls, and queue the calls if over accepted rate`, async () => {
+  it("Should support several of parallel calls, and queue the calls if over accepted rate", async () => {
     const searches: LaBonneBoiteRequestParams[] = [
       {
         rome: boulangerRome,

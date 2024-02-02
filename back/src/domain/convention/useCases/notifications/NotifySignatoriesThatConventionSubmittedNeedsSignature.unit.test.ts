@@ -8,22 +8,22 @@ import {
 import { EmailNotification } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
-  expectEmailSignatoryConfirmationSignatureRequestMatchingConvention,
   InMemoryNotificationRepository,
+  expectEmailSignatoryConfirmationSignatureRequestMatchingConvention,
 } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import {
-  makeSaveNotificationAndRelatedEvent,
   WithNotificationIdAndKind,
+  makeSaveNotificationAndRelatedEvent,
 } from "../../../generic/notifications/entities/Notification";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./NotifySignatoriesThatConventionSubmittedNeedsSignature";
 
@@ -102,28 +102,36 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       }),
       [deterministicShortLinks[2]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
+        // biome-ignore lint/style/noNonNullAssertion:
         role: validConvention.signatories.establishmentRepresentative!.role,
+        // biome-ignore lint/style/noNonNullAssertion:
         email: validConvention.signatories.establishmentRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
       }),
       [deterministicShortLinks[3]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
+        // biome-ignore lint/style/noNonNullAssertion:
         role: validConvention.signatories.establishmentRepresentative!.role,
+        // biome-ignore lint/style/noNonNullAssertion:
         email: validConvention.signatories.establishmentRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionStatusDashboard,
       }),
       [deterministicShortLinks[4]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
+        // biome-ignore lint/style/noNonNullAssertion:
         role: validConvention.signatories.beneficiaryRepresentative!.role,
+        // biome-ignore lint/style/noNonNullAssertion:
         email: validConvention.signatories.beneficiaryRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
       }),
       [deterministicShortLinks[5]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
+        // biome-ignore lint/style/noNonNullAssertion:
         role: validConvention.signatories.beneficiaryRepresentative!.role,
+        // biome-ignore lint/style/noNonNullAssertion:
         email: validConvention.signatories.beneficiaryRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionStatusDashboard,
@@ -167,7 +175,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: emailNotifications[2].templatedContent,
       convention: validConvention,
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
       signatory: validConvention.signatories.beneficiaryRepresentative!,
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
       recipient: validConvention.signatories.beneficiaryRepresentative!.email,
       now: timeGateway.now(),
       agency,

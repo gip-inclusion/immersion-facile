@@ -5,8 +5,8 @@ import {
 } from "date-fns";
 import { RandomFn, SleepFn } from "shared";
 import {
-  RetryableError,
   RetryStrategy,
+  RetryableError,
 } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../../utils/logger";

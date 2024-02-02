@@ -1,11 +1,11 @@
 import {
-  clearSignaturesAndValidationDate,
   ConventionDto,
   ConventionId,
   ConventionRelatedJwtPayload,
   RenewConventionParams,
-  renewConventionParamsSchema,
   Role,
+  clearSignaturesAndValidationDate,
+  renewConventionParamsSchema,
 } from "shared";
 import {
   BadRequestError,
@@ -13,8 +13,8 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { AddConvention } from "./AddConvention";
 
 export class RenewConvention extends TransactionalUseCase<

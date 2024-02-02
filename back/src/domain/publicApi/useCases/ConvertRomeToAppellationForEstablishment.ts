@@ -1,17 +1,13 @@
 import { AppellationCode, SiretAndRomeDto, siretAndRomeSchema } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class ConvertRomeToAppellationForEstablishment extends TransactionalUseCase<
   SiretAndRomeDto,
   AppellationCode
 > {
   protected inputSchema = siretAndRomeSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   protected async _execute(
     { rome, siret }: SiretAndRomeDto,

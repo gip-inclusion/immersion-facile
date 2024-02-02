@@ -1,7 +1,7 @@
 import {
   AbsoluteUrl,
-  frontRoutes,
   GetInclusionConnectLogoutUrlQueryParams,
+  frontRoutes,
   getInclusionConnectLogoutUrlQueryParamsSchema,
   queryParamsAsString,
 } from "shared";

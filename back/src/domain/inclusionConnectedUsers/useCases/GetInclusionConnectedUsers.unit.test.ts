@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
   BackOfficeJwtPayload,
+  InclusionConnectedUser,
   expectPromiseToFailWith,
   expectToEqual,
-  InclusionConnectedUser,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";

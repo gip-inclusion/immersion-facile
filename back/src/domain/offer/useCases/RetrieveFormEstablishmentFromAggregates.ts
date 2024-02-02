@@ -1,17 +1,17 @@
 import {
-  addressDtoToString,
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
   SiretDto,
+  addressDtoToString,
   siretSchema,
 } from "shared";
 import {
   BadRequestError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
@@ -19,10 +19,6 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   EstablishmentJwtPayload | BackOfficeJwtPayload
 > {
   protected inputSchema = siretSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   protected async _execute(
     siret: SiretDto,

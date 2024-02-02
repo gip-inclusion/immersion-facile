@@ -1,4 +1,4 @@
-import { AbsoluteUrl, queryParamsAsString, WithSourcePage } from "shared";
+import { AbsoluteUrl, WithSourcePage, queryParamsAsString } from "shared";
 import { InclusionConnectConfig } from "../useCases/InitiateInclusionConnect";
 
 export const makeInclusionConnectRedirectUri = (

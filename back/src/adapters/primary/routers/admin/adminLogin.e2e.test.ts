@@ -1,8 +1,8 @@
 import {
   AdminRoutes,
-  adminRoutes,
   BackOfficeJwt,
   BackOfficeJwtPayload,
+  adminRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
   expectObjectsToMatch,

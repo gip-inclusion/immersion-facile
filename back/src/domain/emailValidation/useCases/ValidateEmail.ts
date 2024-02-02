@@ -1,7 +1,7 @@
 import {
   ValidateEmailInput,
-  validateEmailInputSchema,
   type ValidateEmailStatus,
+  validateEmailInputSchema,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";

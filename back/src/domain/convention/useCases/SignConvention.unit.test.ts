@@ -1,31 +1,31 @@
 import {
-  allRoles,
-  allSignatoryRoles,
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionStatus,
-  conventionStatuses,
   EstablishmentRepresentative,
-  expectPromiseToFailWithError,
-  expectToEqual,
   InclusionConnectedUser,
   Signatories,
+  allRoles,
+  allSignatoryRoles,
+  conventionStatuses,
+  expectPromiseToFailWithError,
+  expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { SignConvention } from "./SignConvention";

@@ -1,6 +1,6 @@
 import type { InsertObject } from "kysely";
 import { sql } from "kysely";
-import { ContactMethod, DiscussionId, pipeWithValue, SiretDto } from "shared";
+import { ContactMethod, DiscussionId, SiretDto, pipeWithValue } from "shared";
 import {
   DiscussionAggregate,
   ExchangeEntity,
@@ -10,9 +10,9 @@ import {
   HasDiscussionMatchingParams,
 } from "../../../../domain/offer/ports/DiscussionAggregateRepository";
 import {
+  KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
-  KyselyDb,
 } from "../kysely/kyselyUtils";
 import { Database } from "../kysely/model/database";
 
@@ -33,7 +33,7 @@ export class PgDiscussionAggregateRepository
       .executeTakeFirst();
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return parseInt(result!.count);
+    return parseInt(result?.count);
   }
 
   public async deleteOldMessages(endedSince: Date) {

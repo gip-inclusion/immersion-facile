@@ -1,6 +1,6 @@
 import {
-  displayRouteName,
   EstablishmentRoutes,
+  displayRouteName,
   establishmentRoutes,
   expectHttpResponseToEqual,
 } from "shared";

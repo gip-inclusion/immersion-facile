@@ -5,8 +5,8 @@ import {
   getDashboardParams,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { DashboardGateway } from "../port/DashboardGateway";
 
 export class GetDashboardUrl extends UseCase<
