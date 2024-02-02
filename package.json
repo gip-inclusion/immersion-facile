@@ -25,7 +25,7 @@
     "includecheck": "turbo run includecheck",
     "check": "turbo run check",
     "format:check": "turbo run format:check",
-    "fullcheck": "turbo run includecheck format:check lint typecheck test --concurrency=50%",
+    "fullcheck": "turbo run includecheck check typecheck test --concurrency=50%",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "test": "turbo run test",
