@@ -1,3 +1,4 @@
+import { expect } from "@jest/globals";
 import { partition } from "ramda";
 import type { HttpResponse, UnknownSharedRoute } from "shared-routes";
 import { EmailType, TemplatedEmail } from "./email/email";
@@ -10,14 +11,14 @@ export const expectPromiseToFailWith = async (
   promise: Promise<unknown>,
   errorMessage: string,
 ) => {
-  await expect(promise).rejects.toThrowError(new Error(errorMessage));
+  await expect(promise).rejects.toThrow(new Error(errorMessage));
 };
 
 export const expectPromiseToFailWithError = async <T extends Error>(
   promise: Promise<unknown>,
   expectedError: T,
 ) => {
-  await expect(promise).rejects.toThrowError(expectedError);
+  await expect(promise).rejects.toThrow(expectedError);
   await expect(promise).rejects.toBeInstanceOf(expectedError.constructor);
 };
 
@@ -77,7 +78,7 @@ export const expectHttpResponseToEqual = <
   expected: Omit<R, "headers"> & Partial<Pick<R, "headers">>,
 ) => {
   const { headers: expectedHeaders, ...expectedRest } = expected;
-  expect(rest).toEqual(expectedRest);
+  expect(rest).toEqual(expectedRest as any);
   expect(headers).toMatchObject(expectedHeaders ?? {});
 };
 
