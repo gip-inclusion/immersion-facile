@@ -1,5 +1,5 @@
+import { FrIconClassName, fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect, useState } from "react";
-import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { Link } from "type-route";
 import "./HeroHeader.scss";
@@ -74,7 +74,7 @@ export const HeroHeader = ({
                 `${componentName}__type-wrapper`,
               )}
             >
-              <span className={cx(`${componentName}__type-icon`, icon)}></span>
+              <span className={cx(`${componentName}__type-icon`, icon)} />
               <span className={cx(`${componentName}__type-label`)}>
                 {typeDisplayName}
               </span>
@@ -118,7 +118,7 @@ export const HeroHeader = ({
                   `${componentName}__pattern`,
                   `${componentName}__pattern--${index}`,
                 )}
-              ></div>
+              />
             ))}
           </div>
         )}
@@ -187,7 +187,7 @@ const NavCard = ({
           {overtitle}
         </span>
         {icon && (
-          <span className={cx(`${componentName}__nav-card-icon`, icon)}></span>
+          <span className={cx(`${componentName}__nav-card-icon`, icon)} />
         )}
         <h3 className={cx(`${componentName}__nav-card-title`)}>{title}</h3>
       </div>

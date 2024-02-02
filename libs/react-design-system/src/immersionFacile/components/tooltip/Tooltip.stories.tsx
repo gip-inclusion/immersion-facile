@@ -1,5 +1,5 @@
-import React from "react";
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import React from "react";
 import { Tooltip, TooltipProps } from "./Tooltip";
 
 const Component = Tooltip;
@@ -35,6 +35,7 @@ export const TooltipOnHover: Story = {
     type: "hover",
     description: "Lorem [...] elit ut.",
     elementToDescribe: (
+      // biome-ignore lint/a11y/useValidAnchor: <explanation>
       <a className="fr-link" href="#">
         {" "}
         Exemple

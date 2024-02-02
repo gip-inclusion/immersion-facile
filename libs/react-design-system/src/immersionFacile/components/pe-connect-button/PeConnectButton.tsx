@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./PeConnectButton.scss";
 
@@ -15,6 +15,7 @@ export const PeConnectButton = ({
   const { cx } = useStyles();
   return (
     <div className={cx(fr.cx("fr-my-2w"), "pe-connect")}>
+      {/* biome-ignore lint/a11y/useValidAnchor:  */}
       <a
         onClick={onClick}
         href={`/api/${peConnectEndpoint}`}

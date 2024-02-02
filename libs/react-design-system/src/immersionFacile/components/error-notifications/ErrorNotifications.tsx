@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 
 const componentName = "im-notification-errors";
@@ -22,7 +22,7 @@ const ErrorMessage = ({
 }) => (
   <>
     <strong className={`${componentName}__error-label`}>
-      {labels && labels[field] ? labels[field] : field}
+      {labels?.[field] ? labels[field] : field}
     </strong>{" "}
     :{" "}
     <span className={`${componentName}__error-message`}>

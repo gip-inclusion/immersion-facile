@@ -38,7 +38,11 @@ export const Tooltip = (props: TooltipProps) => {
       )}
       {props.type === "click" && (
         <span>
-          <button className="fr-btn--tooltip fr-btn" aria-describedby={id}>
+          <button
+            className="fr-btn--tooltip fr-btn"
+            aria-describedby={id}
+            type="button"
+          >
             Plus d'information ?
           </button>
           <span

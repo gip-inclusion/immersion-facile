@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./AutocompleteInput.css";
 

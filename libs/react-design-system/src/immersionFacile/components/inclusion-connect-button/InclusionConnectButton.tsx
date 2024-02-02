@@ -15,6 +15,7 @@ export const InclusionConnectButton = ({
 }: InclusionConnectButtonProps) => {
   const { cx } = useStyles();
   return (
+    // biome-ignore lint/a11y/useValidAnchor:
     <a
       onClick={onClick}
       href={`/api${inclusionConnectEndpoint}`}

@@ -1,5 +1,5 @@
-import React from "react";
 import { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import React from "react";
 import { LoginForm, LoginFormSectionProps } from "./LoginForm";
 
 const Component = LoginForm;

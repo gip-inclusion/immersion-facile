@@ -1,5 +1,5 @@
+import { type FrCxArg, fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { fr, type FrCxArg } from "@codegouvfr/react-dsfr";
 import { makeStyles } from "tss-react/dsfr";
 import Styles from "./MainWrapper.styles";
 
@@ -61,7 +61,7 @@ export const MainWrapper = ({
         {useBackground && (
           <div
             className={cx(Styles.customBackground, classes.customBackground)}
-          ></div>
+          />
         )}
       </main>
     </>

@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 
 export type OverFooterColProps = {
@@ -23,10 +23,7 @@ export const OverFooterCol = ({
   return (
     <div className={fr.cx("fr-col-12", "fr-col-md")}>
       <p className={fr.cx("fr-h6")}>
-        <span
-          aria-hidden="true"
-          className={cx(fr.cx("fr-mr-2v"), iconTitle)}
-        ></span>
+        <span aria-hidden="true" className={cx(fr.cx("fr-mr-2v"), iconTitle)} />
         {title}
       </p>
       <div>

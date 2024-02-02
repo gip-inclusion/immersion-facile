@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import classNames, { ArgumentArray } from "classnames";
+import React from "react";
 
 export type FileProperties = {
   accept?: string;
