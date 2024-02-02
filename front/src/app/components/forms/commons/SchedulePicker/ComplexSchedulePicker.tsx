@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { isSameDay } from "date-fns";
 import { clone } from "ramda";
-import { useStyles } from "tss-react/dsfr";
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import {
-  calculateNumberOfWorkedDays,
-  calculateTotalImmersionHoursFromComplexSchedule,
   ConventionDto,
   ConventionReadDto,
   ScheduleDto,
   TimePeriodsDto,
+  calculateNumberOfWorkedDays,
+  calculateTotalImmersionHoursFromComplexSchedule,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 

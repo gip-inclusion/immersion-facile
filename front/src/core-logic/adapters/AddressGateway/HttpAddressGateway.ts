@@ -1,5 +1,4 @@
-import { from, Observable } from "rxjs";
-import { match } from "ts-pattern";
+import { Observable, from } from "rxjs";
 import {
   AddressAndPosition,
   AddressRoutes,
@@ -9,6 +8,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
+import { match } from "ts-pattern";
 
 export class HttpAddressGateway implements AddressGateway {
   constructor(private readonly httpClient: HttpClient<AddressRoutes>) {}

@@ -1,4 +1,4 @@
-import { from, Observable } from "rxjs";
+import { Observable, from } from "rxjs";
 import {
   AddressAndPosition,
   LookupLocationInput,

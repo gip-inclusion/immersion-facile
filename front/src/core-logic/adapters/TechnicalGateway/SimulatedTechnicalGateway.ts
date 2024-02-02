@@ -4,8 +4,8 @@ import {
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
-  sleep,
   ValidateEmailStatus,
+  sleep,
 } from "shared";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
@@ -17,7 +17,7 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
   public htmlToPdf = (
     _htmlContent: string,
     _jwt: ConventionSupportedJwt,
-  ): Promise<string> => Promise.resolve(`YWJjZA==`);
+  ): Promise<string> => Promise.resolve("YWJjZA==");
 
   constructor(private simulatedLatencyMs: number | undefined = undefined) {}
 

@@ -1,19 +1,19 @@
 import React, { useEffect } from "react";
+import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { match, P } from "ts-pattern";
 import {
   ConventionJwtPayload,
-  decodeMagicLinkJwtWithoutSignatureCheck,
-  expiredMagicLinkErrorMessage,
   Role,
   WithConventionId,
+  decodeMagicLinkJwtWithoutSignatureCheck,
+  expiredMagicLinkErrorMessage,
 } from "shared";
-import { Loader } from "react-design-system";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { P, match } from "ts-pattern";
 import { NpsSection } from "../../nps/NpsSection";
 import {
   ConventionManageActions,

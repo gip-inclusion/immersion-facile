@@ -1,10 +1,10 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { conventionObjectiveOptions, ConventionReadDto } from "shared";
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import { ConventionReadDto, conventionObjectiveOptions } from "shared";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -31,9 +31,9 @@ export const ImmersionDetailsSection = () => {
   return (
     <>
       <RadioButtons
-        {...formContents["individualProtection"]}
-        legend={formContents["individualProtection"].label}
-        hintText={formContents["individualProtection"].hintText}
+        {...formContents.individualProtection}
+        legend={formContents.individualProtection.label}
+        hintText={formContents.individualProtection.hintText}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
@@ -67,9 +67,9 @@ export const ImmersionDetailsSection = () => {
       )}
 
       <RadioButtons
-        {...formContents["sanitaryPrevention"]}
-        legend={formContents["sanitaryPrevention"].label}
-        hintText={formContents["sanitaryPrevention"].hintText}
+        {...formContents.sanitaryPrevention}
+        legend={formContents.sanitaryPrevention.label}
+        hintText={formContents.sanitaryPrevention.hintText}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
@@ -91,10 +91,10 @@ export const ImmersionDetailsSection = () => {
       />
 
       <Input
-        label={formContents["sanitaryPreventionDescription"].label}
-        hintText={formContents["sanitaryPreventionDescription"].hintText}
+        label={formContents.sanitaryPreventionDescription.label}
+        hintText={formContents.sanitaryPreventionDescription.hintText}
         nativeInputProps={{
-          ...formContents["sanitaryPreventionDescription"],
+          ...formContents.sanitaryPreventionDescription,
           ...register("sanitaryPreventionDescription"),
         }}
       />
@@ -111,9 +111,9 @@ export const ImmersionDetailsSection = () => {
       )}
 
       <RadioButtons
-        {...formContents["immersionObjective"]}
-        legend={formContents["immersionObjective"].label}
-        hintText={formContents["immersionObjective"].hintText}
+        {...formContents.immersionObjective}
+        legend={formContents.immersionObjective.label}
+        hintText={formContents.immersionObjective.hintText}
         options={conventionObjectiveOptions
           .filter((option) =>
             values.internshipKind !== "mini-stage-cci"
@@ -132,33 +132,33 @@ export const ImmersionDetailsSection = () => {
       />
 
       <ConventionFormProfession
-        {...formContents["immersionAppellation"]}
+        {...formContents.immersionAppellation}
         initialFieldValue={values.immersionAppellation}
       />
       <Input
-        label={formContents["workConditions"].label}
-        hintText={formContents["workConditions"].hintText}
+        label={formContents.workConditions.label}
+        hintText={formContents.workConditions.hintText}
         textArea
         nativeTextAreaProps={{
-          ...formContents["workConditions"],
+          ...formContents.workConditions,
           ...register("workConditions"),
         }}
       />
       <Input
-        label={formContents["businessAdvantages"].label}
-        hintText={formContents["businessAdvantages"].hintText}
+        label={formContents.businessAdvantages.label}
+        hintText={formContents.businessAdvantages.hintText}
         textArea
         nativeTextAreaProps={{
-          ...formContents["businessAdvantages"],
+          ...formContents.businessAdvantages,
           ...register("businessAdvantages"),
         }}
       />
       <Input
-        label={formContents["immersionActivities"].label}
-        hintText={formContents["immersionActivities"].hintText}
+        label={formContents.immersionActivities.label}
+        hintText={formContents.immersionActivities.hintText}
         textArea
         nativeTextAreaProps={{
-          ...formContents["immersionActivities"],
+          ...formContents.immersionActivities,
           ...register("immersionActivities"),
         }}
       />
@@ -177,10 +177,10 @@ export const ImmersionDetailsSection = () => {
         />
       )}
       <Input
-        label={formContents["immersionSkills"].label}
-        hintText={formContents["immersionSkills"].hintText}
+        label={formContents.immersionSkills.label}
+        hintText={formContents.immersionSkills.hintText}
         nativeInputProps={{
-          ...formContents["immersionSkills"],
+          ...formContents.immersionSkills,
           ...register("immersionSkills"),
         }}
       />

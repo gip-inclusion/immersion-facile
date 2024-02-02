@@ -1,8 +1,8 @@
 import {
   AgencyDtoBuilder,
-  expectToEqual,
   InclusionConnectedUser,
   WithAgencyIds,
+  expectToEqual,
 } from "shared";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import {
@@ -10,11 +10,11 @@ import {
   inclusionConnectedSlice,
 } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { authSlice, FederatedIdentityWithUser } from "../auth/auth.slice";
+import { FederatedIdentityWithUser, authSlice } from "../auth/auth.slice";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 

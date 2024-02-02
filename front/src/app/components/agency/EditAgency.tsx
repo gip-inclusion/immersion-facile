@@ -1,10 +1,10 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
 import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
-import "src/assets/admin.css";
 
 export const EditAgency = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);

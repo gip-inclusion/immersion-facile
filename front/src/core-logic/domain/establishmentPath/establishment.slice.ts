@@ -1,10 +1,10 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   BackOfficeJwt,
-  defaultMaxContactsPerWeek,
   EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
+  defaultMaxContactsPerWeek,
 } from "shared";
 import { emptyAppellationAndRome } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback"; // type EstablishmentUiStatus =

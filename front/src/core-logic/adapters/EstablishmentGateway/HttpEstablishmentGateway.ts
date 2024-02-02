@@ -1,5 +1,4 @@
-import { from, Observable } from "rxjs";
-import { match, P } from "ts-pattern";
+import { Observable, from } from "rxjs";
 import {
   BackOfficeJwt,
   EstablishmentJwt,
@@ -9,6 +8,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
+import { P, match } from "ts-pattern";
 import { otherwiseThrow } from "../otherwiseThrow";
 
 export class HttpEstablishmentGateway implements EstablishmentGateway {

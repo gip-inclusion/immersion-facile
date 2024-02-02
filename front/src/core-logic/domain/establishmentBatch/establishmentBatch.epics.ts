@@ -1,15 +1,14 @@
 import { filter, map, switchMap } from "rxjs";
-import { z } from "zod";
 import {
   CSVBoolean,
+  FormEstablishmentDto,
+  FormEstablishmentSource,
   csvBooleanToBoolean,
   defaultMaxContactsPerWeek,
   establishmentAppellationsFromCSVToDto,
-  establishmentCopyEmailsFromCSVToDto,
   establishmentCSVRowSchema,
-  FormEstablishmentDto,
+  establishmentCopyEmailsFromCSVToDto,
   formEstablishmentSchema,
-  FormEstablishmentSource,
   isCSVCellEmptyString,
   noContactPerWeek,
 } from "shared";
@@ -18,9 +17,10 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+import { z } from "zod";
 import {
-  establishmentBatchSlice,
   FormEstablishmentDtoWithErrors,
+  establishmentBatchSlice,
 } from "./establishmentBatch.slice";
 
 type EstablishmentBatchAction = ActionOfSlice<typeof establishmentBatchSlice>;

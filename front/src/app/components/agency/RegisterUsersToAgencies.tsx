@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { match, P } from "ts-pattern";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { AuthenticatedUserId } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { P, match } from "ts-pattern";
 import { IcUserAgenciesToReview } from "./IcUserAgenciesToReview";
 
 export const RegisterUsersToAgencies = () => {

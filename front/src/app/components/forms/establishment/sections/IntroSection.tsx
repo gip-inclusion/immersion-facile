@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import React from "react";
 import { domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 import formIntroIllustration from "src/assets/img/form-establishment-intro.webp";

@@ -1,14 +1,14 @@
 import { expectToEqual } from "shared";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   assessmentErrorSelector,
   assessmentStatusSelector,
 } from "./assessment.selectors";
-import { assessmentSlice, AssessmentUIStatus } from "./assessment.slice";
+import { AssessmentUIStatus, assessmentSlice } from "./assessment.slice";
 
 describe("Immersion Assessment slice", () => {
   let store: ReduxStore;

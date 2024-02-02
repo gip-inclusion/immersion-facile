@@ -1,6 +1,5 @@
-import React from "react";
-import { useDispatch } from "react-redux";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import React from "react";
 import {
   FixedStamp,
   HeroHeader,
@@ -9,8 +8,9 @@ import {
   SectionStats,
   SectionTextEmbed,
 } from "react-design-system";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useDispatch } from "react-redux";
 import { SiretModalContent } from "src/app/components/SiretModalContent";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import {
   heroHeaderContent,
   heroHeaderNavCards,

@@ -1,8 +1,8 @@
+import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
+import * as Sentry from "@sentry/browser";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
-import * as Sentry from "@sentry/browser";
 import { App } from "src/app/App";
 import { store } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";

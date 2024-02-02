@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
-import { useStyles } from "tss-react/dsfr";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   AppellationAndRomeDto,
   AppellationMatchDto,
@@ -11,6 +10,7 @@ import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { useStyles } from "tss-react/dsfr";
 
 const romeSearchMatchToProposal = ({
   matchRanges,

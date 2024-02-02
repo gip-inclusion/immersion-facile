@@ -1,12 +1,12 @@
-import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import React from "react";
 import { AgencyDto } from "shared";
+import { MetabaseView } from "src/app/components/MetabaseView";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { ActivateAgency } from "src/app/components/agency/ActivateAgency";
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { EditAgency } from "src/app/components/agency/EditAgency";
 import { RegisterUsersToAgencies } from "src/app/components/agency/RegisterUsersToAgencies";
-import { MetabaseView } from "src/app/components/MetabaseView";
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";

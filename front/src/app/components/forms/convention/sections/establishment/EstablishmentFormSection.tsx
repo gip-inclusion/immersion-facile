@@ -1,9 +1,9 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { ConventionDto } from "shared";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";

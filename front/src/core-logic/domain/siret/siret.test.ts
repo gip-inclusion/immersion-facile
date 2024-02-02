@@ -5,12 +5,12 @@ import {
 } from "shared";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
-  siretSlice,
   SiretState,
+  siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 

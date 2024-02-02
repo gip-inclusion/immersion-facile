@@ -1,5 +1,5 @@
-import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import React from "react";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 

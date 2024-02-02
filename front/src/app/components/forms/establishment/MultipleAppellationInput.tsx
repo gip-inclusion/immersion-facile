@@ -1,12 +1,12 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { useStyles } from "tss-react/dsfr";
+import React from "react";
 import {
   AppellationAndRomeDto,
   domElementIds,
   emptyAppellationAndRome,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
 import { AppellationAutocomplete } from "../autocomplete/AppellationAutocomplete";
 
 type MultipleAppellationInputProps = {
@@ -48,7 +48,7 @@ export const MultipleAppellationInput = ({
               <div className={fr.cx("fr-col", "fr-mt-2w")}>
                 <AppellationAutocomplete
                   disabled={disabled}
-                  label={`Rechercher un métier *`}
+                  label={"Rechercher un métier *"}
                   initialValue={currentAppellations[index]}
                   onAppellationSelected={(selectedAppellation) => {
                     onAppellationAdd(selectedAppellation, index);
@@ -85,9 +85,9 @@ export const MultipleAppellationInput = ({
         Ajouter un métier
       </Button>
 
-      {error && error.length && (
+      {error?.length && (
         <div
-          id={name + "-error-description"}
+          id={`${name}-error-description`}
           className={fr.cx("fr-error-text")}
         >
           {typeof error === "string" ? error : "Indiquez au moins 1 métier."}

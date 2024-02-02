@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { createPortal } from "react-dom";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import React, { useState } from "react";
+import { createPortal } from "react-dom";
+import { useFormContext } from "react-hook-form";
 import { ConventionReadDto } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useCopyButton } from "src/app/hooks/useCopyButton";

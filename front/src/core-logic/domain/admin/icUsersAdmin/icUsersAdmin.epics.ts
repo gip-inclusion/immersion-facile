@@ -9,8 +9,8 @@ import {
   RejectIcUserRoleForAgencyParams,
 } from "shared";
 import {
-  icUsersAdminSlice,
   NormalizedIcUserById,
+  icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {

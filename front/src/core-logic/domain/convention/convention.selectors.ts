@@ -2,9 +2,9 @@ import { createSelector } from "@reduxjs/toolkit";
 import {
   ConventionDto,
   ConventionField,
-  getConventionFieldName,
   Signatory,
   SignatoryRole,
+  getConventionFieldName,
 } from "shared";
 import type { RootState } from "src/core-logic/storeConfig/store";
 

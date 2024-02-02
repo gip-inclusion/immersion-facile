@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { domElementIds, SearchResultDto } from "shared";
+import React, { useCallback, useEffect, useState } from "react";
 import { useStyleUtils } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { SearchResultDto, domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -74,14 +74,13 @@ export const SearchListResults = () => {
           {hasResults &&
             displayedResults.map((searchResult) => (
               <SearchResult
-                key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
+                key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
                 establishment={searchResult}
                 onButtonClick={() => {
                   const appellations = searchResult.appellations;
-                  const appellationCode =
-                    appellations && appellations.length
-                      ? appellations[0].appellationCode
-                      : null;
+                  const appellationCode = appellations?.length
+                    ? appellations[0].appellationCode
+                    : null;
                   if (appellationCode) {
                     routes
                       .searchResult({

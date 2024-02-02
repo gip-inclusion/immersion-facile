@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Route } from "type-route";
-import { inclusionConnectImmersionRoutes, queryParamsAsString } from "shared";
 import {
   InclusionConnectButton,
   LoginForm,
   MainWrapper,
 } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { inclusionConnectImmersionRoutes, queryParamsAsString } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { Route } from "type-route";
 
 type InclusionConnectPrivateRoute =
   | Route<typeof routes.agencyDashboard>

@@ -1,19 +1,19 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { makeStyles } from "tss-react/dsfr";
-import { Route } from "type-route";
-import { Group, GroupWithResults, SearchResultDto } from "shared";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Loader,
   MainWrapper,
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
+import { Group, GroupWithResults, SearchResultDto } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { makeStyles } from "tss-react/dsfr";
+import { Route } from "type-route";
 import { GroupListResults } from "./GroupListResults";
 
 type GroupPageProps = {
@@ -30,9 +30,8 @@ export const GroupPage = ({ route }: GroupPageProps) => {
 
   const getInitialGroupData = useCallback(async () => {
     setLoading(true);
-    const response = await outOfReduxDependencies.searchGateway.getGroupBySlug(
-      groupSlug,
-    );
+    const response =
+      await outOfReduxDependencies.searchGateway.getGroupBySlug(groupSlug);
     const { group, results } = response;
     setGroup(group);
     setInitialResults(results);

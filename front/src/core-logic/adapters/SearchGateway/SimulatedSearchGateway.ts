@@ -1,5 +1,5 @@
 import { filter as ramdaFilter } from "ramda";
-import { delay, map, Observable, of } from "rxjs";
+import { Observable, delay, map, of } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
   GroupSlug,

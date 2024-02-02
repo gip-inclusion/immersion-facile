@@ -1,13 +1,13 @@
-import React, { ReactNode } from "react";
-import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import { match } from "ts-pattern";
+import React, { ReactNode } from "react";
+import { ErrorNotifications } from "react-design-system";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   FeatureFlagName,
   FeatureFlagText,
@@ -16,7 +16,6 @@ import {
   featureFlagTextValueSchema,
   toDotNotation,
 } from "shared";
-import { ErrorNotifications } from "react-design-system";
 import {
   formTextFieldsLabels,
   formTextImageAndRedirectFieldsLabels,
@@ -27,6 +26,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import { match } from "ts-pattern";
 
 export const FeatureFlagsSection = () => {
   const dispatch = useDispatch();

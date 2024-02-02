@@ -1,9 +1,9 @@
-import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
+import React, { useState } from "react";
 import {
   ApiConsumer,
   ApiConsumerContact,
@@ -82,7 +82,7 @@ export const formatApiConsumerRights = (
   return (
     <ul>
       {apiConsumerNames.map((name, index) => (
-        // eslint-disable-next-line react/no-array-index-key
+        // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
         <li key={index}>
           <strong>{name}</strong>
           <ul className={fr.cx("fr-badge-group")}>

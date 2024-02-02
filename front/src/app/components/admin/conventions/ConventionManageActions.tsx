@@ -1,7 +1,3 @@
-import React, { useState } from "react";
-import { createPortal } from "react-dom";
-import { FormProvider, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
@@ -9,7 +5,11 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
-import { v4 as uuidV4 } from "uuid";
+import React, { useState } from "react";
+import { ErrorNotifications } from "react-design-system";
+import { createPortal } from "react-dom";
+import { FormProvider, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   BackOfficeJwt,
   ConventionDto,
@@ -18,19 +18,18 @@ import {
   ConventionStatus,
   ConventionSupportedJwt,
   DateIntervalDto,
+  InclusionConnectJwt,
+  RenewConventionParams,
+  Role,
+  UpdateConventionStatusRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
-  InclusionConnectJwt,
   isConventionRenewed,
   reasonableSchedule,
-  RenewConventionParams,
   renewConventionParamsSchema,
-  Role,
   statusTransitionConfigs,
   toDotNotation,
-  UpdateConventionStatusRequestDto,
 } from "shared";
-import { ErrorNotifications } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
@@ -46,10 +45,11 @@ import { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   ConventionFeedbackKind,
-  conventionSlice,
   ConventionSubmitFeedback,
+  conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { v4 as uuidV4 } from "uuid";
 import { ScheduleSection } from "../../forms/convention/sections/schedule/ScheduleSection";
 
 export type JwtKindProps =
@@ -193,7 +193,7 @@ export const ConventionManageActions = ({
             newStatus="ACCEPTED_BY_COUNSELLOR"
             convention={convention}
             onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
-            disabled={disabled || convention.status != "IN_REVIEW"}
+            disabled={disabled || convention.status !== "IN_REVIEW"}
             currentSignatoryRole={role}
             onCloseValidatorModalWithoutValidatorInfo={
               setValidatorWarningMessage
@@ -213,8 +213,8 @@ export const ConventionManageActions = ({
             onSubmit={createOnSubmitWithFeedbackKind("markedAsValidated")}
             disabled={
               disabled ||
-              (convention.status != "IN_REVIEW" &&
-                convention.status != "ACCEPTED_BY_COUNSELLOR")
+              (convention.status !== "IN_REVIEW" &&
+                convention.status !== "ACCEPTED_BY_COUNSELLOR")
             }
             currentSignatoryRole={role}
             onCloseValidatorModalWithoutValidatorInfo={
@@ -235,7 +235,7 @@ export const ConventionManageActions = ({
               convention={convention}
               onSubmit={createOnSubmitWithFeedbackKind("cancelled")}
               disabled={
-                disabled || convention.status != "ACCEPTED_BY_VALIDATOR"
+                disabled || convention.status !== "ACCEPTED_BY_VALIDATOR"
               }
               currentSignatoryRole={role}
             >

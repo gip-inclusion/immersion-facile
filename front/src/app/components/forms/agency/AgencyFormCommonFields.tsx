@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
+import React, { useEffect, useState } from "react";
+import { LinkHome } from "react-design-system";
+import { useFormContext } from "react-hook-form";
 import {
   AddressDto,
-  addressDtoToString,
   CreateAgencyDto,
+  addressDtoToString,
   domElementIds,
   emailSchema,
 } from "shared";
-import { LinkHome } from "react-design-system";
+import { UploadFile } from "src/app/components/UploadFile";
 import { agencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
-import { UploadFile } from "src/app/components/UploadFile";
 import {
   FormAgencyFieldsLabels,
   formAgencyFieldsLabels,

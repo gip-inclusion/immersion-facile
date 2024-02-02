@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
+import React from "react";
 import { domElementIds } from "shared";
 import { BusinessContact } from "../BusinessContact";
 import { Mode, OnStepChange, Step } from "../EstablishmentForm";

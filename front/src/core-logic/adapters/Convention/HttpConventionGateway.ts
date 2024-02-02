@@ -1,5 +1,4 @@
-import { from, Observable } from "rxjs";
-import { match, P } from "ts-pattern";
+import { Observable, from } from "rxjs";
 import {
   ConventionDto,
   ConventionId,
@@ -22,6 +21,7 @@ import {
 } from "src/core-logic/adapters/otherwiseThrow";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
+import { P, match } from "ts-pattern";
 
 export class HttpConventionGateway implements ConventionGateway {
   constructor(

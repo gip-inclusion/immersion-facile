@@ -1,6 +1,3 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
@@ -8,16 +5,18 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { keys } from "ramda";
-import { match } from "ts-pattern";
+import React from "react";
+import { ErrorNotifications } from "react-design-system";
+import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   AppellationAndRomeDto,
+  FormEstablishmentDto,
   domElementIds,
   emptyAppellationAndRome,
-  FormEstablishmentDto,
   removeAtIndex,
   toDotNotation,
 } from "shared";
-import { ErrorNotifications } from "react-design-system";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
@@ -31,6 +30,7 @@ import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { match } from "ts-pattern";
 import { Mode, OnStepChange, Step } from "../EstablishmentForm";
 import { MultipleAppellationInput } from "../MultipleAppellationInput";
 import { SearchResultPreview } from "../SearchResultPreview";
@@ -140,15 +140,15 @@ export const DetailsSection = ({
         .exhaustive()}
 
       <RadioButtons
-        {...formContents["isEngagedEnterprise"]}
-        legend={formContents["isEngagedEnterprise"].label}
+        {...formContents.isEngagedEnterprise}
+        legend={formContents.isEngagedEnterprise.label}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
             checked:
               Boolean(option.nativeInputProps.value) ===
-              formValues["isEngagedEnterprise"],
+              formValues.isEngagedEnterprise,
             onChange: () => {
               setValue(
                 "isEngagedEnterprise",
@@ -159,15 +159,15 @@ export const DetailsSection = ({
         }))}
       />
       <RadioButtons
-        {...formContents["fitForDisabledWorkers"]}
-        legend={formContents["fitForDisabledWorkers"].label}
+        {...formContents.fitForDisabledWorkers}
+        legend={formContents.fitForDisabledWorkers.label}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
             checked:
               Boolean(option.nativeInputProps.value) ===
-              formValues["fitForDisabledWorkers"],
+              formValues.fitForDisabledWorkers,
             onChange: () => {
               setValue(
                 "fitForDisabledWorkers",

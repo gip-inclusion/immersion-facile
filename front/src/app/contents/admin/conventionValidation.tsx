@@ -1,6 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { match, P } from "ts-pattern";
+import React from "react";
 import {
   ConventionReadDto,
   displayEmergencyContactInfos,
@@ -8,6 +7,7 @@ import {
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
+import { P, match } from "ts-pattern";
 import { ColField, FieldsAndTitle } from "./types";
 
 export const signToBooleanDisplay = (value: string | undefined) =>

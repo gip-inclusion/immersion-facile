@@ -1,8 +1,8 @@
 import {
   AgencyKind,
+  AllowedAgencyKindToAdd,
   agencyKindList,
   agencyKindToLabel,
-  AllowedAgencyKindToAdd,
 } from "shared";
 
 const allAgencyKindToLabel: Record<AgencyKind, string> = {

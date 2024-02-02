@@ -1,5 +1,3 @@
-import React, { useMemo } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
@@ -7,7 +5,8 @@ import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Route } from "type-route";
+import React, { useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import {
   AppellationCode,
   AppellationDto,
@@ -20,6 +19,7 @@ import { useContactEstablishmentError } from "src/app/components/search/useConta
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { Route } from "type-route";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {

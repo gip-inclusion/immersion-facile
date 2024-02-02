@@ -1,16 +1,16 @@
-import React from "react";
-import { useWatch } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { parseISO } from "date-fns";
+import React from "react";
+import { useWatch } from "react-hook-form";
 import {
-  calculateWeeklyHours,
   ConventionReadDto,
   InternshipKind,
   WeeklyImmersionTimetableDto,
+  calculateWeeklyHours,
 } from "shared";
-import { getDayStatus } from "./utils/getDayStatus";
 import { DayCircle } from "./DayCircle";
 import { HourIndicator } from "./HourIndicator";
+import { getDayStatus } from "./utils/getDayStatus";
 
 type WeeklyRowProperties = {
   weeklyCalendar: WeeklyImmersionTimetableDto;

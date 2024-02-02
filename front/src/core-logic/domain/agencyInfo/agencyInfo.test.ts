@@ -1,10 +1,10 @@
 import { AgencyDtoBuilder, AgencyPublicDisplayDto } from "shared";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { agencyInfoSlice, AgencyInfoState } from "./agencyInfo.slice";
+import { AgencyInfoState, agencyInfoSlice } from "./agencyInfo.slice";
 
 describe("Agency info in store", () => {
   let store: ReduxStore;

@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Card from "@codegouvfr/react-dsfr/Card";
+import React from "react";
 import { domElementIds, loginPeConnect } from "shared";
 import illustrationForm from "src/assets/img/fill-convention-form.svg";
 import illustrationHelp from "src/assets/img/fill-convention-help.svg";
@@ -15,6 +15,7 @@ export const InitiateConventionSection = ({
 }: InitiateConventionCardProps) => (
   <section>
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: Just a visual hack*/}
       <div
         className={fr.cx("fr-col-12", "fr-col-md-4")}
         onClick={onNotPeConnectButtonClick}

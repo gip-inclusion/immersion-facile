@@ -20,13 +20,9 @@ export const useSiretRelatedField = <K extends keyof SiretEstablishmentDto>(
   const { setValue } = useFormContext();
   useEffect(() => {
     if (establishmentInfos && !options?.disabled) {
-      setValue(
-        fieldNameToUpdate,
-        establishmentInfos && establishmentInfos[fieldFromInfo],
-        {
-          shouldValidate: true,
-        },
-      );
+      setValue(fieldNameToUpdate, establishmentInfos?.[fieldFromInfo], {
+        shouldValidate: true,
+      });
     }
   }, [
     establishmentInfos,

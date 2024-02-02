@@ -1,13 +1,13 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import React from "react";
+import { TextInputError } from "react-design-system";
+import { useFormContext } from "react-hook-form";
 import {
   AppellationAndRomeDto,
   ConventionReadDto,
   domElementIds,
 } from "shared";
-import { TextInputError } from "react-design-system";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 
 type ConventionFormProfessionProps = {

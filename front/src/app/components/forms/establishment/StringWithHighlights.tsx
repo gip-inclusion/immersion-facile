@@ -1,8 +1,8 @@
-import React, { Fragment } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React, { Fragment } from "react";
 import {
-  highlightStringsFromMatches,
   SliceOfString,
+  highlightStringsFromMatches,
 } from "src/app/utils/highlightStringsFromMatches";
 import { Proposal } from "./Proposal";
 
@@ -25,12 +25,12 @@ export const StringWithHighlights = ({
           );
           if (bolded)
             return (
-              // eslint-disable-next-line react/no-array-index-key
+              // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
               <span className={fr.cx("fr-text--bold")} key={index}>
                 {text}
               </span>
             );
-          // eslint-disable-next-line react/no-array-index-key
+          // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
           return <Fragment key={index}>{text}</Fragment>;
         },
       )}

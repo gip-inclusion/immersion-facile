@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { match, P } from "ts-pattern";
-import { Route } from "type-route";
+import React, { useEffect, useRef, useState } from "react";
+import { Loader, MainWrapper } from "react-design-system";
+import { useDispatch } from "react-redux";
 import {
   AppellationDto,
   ContactMethod,
@@ -14,7 +13,6 @@ import {
   makeNafClassInformationUrl,
   makeSiretDescriptionLink,
 } from "shared";
-import { Loader, MainWrapper } from "react-design-system";
 import { ContactByEmail } from "src/app/components/immersion-offer/ContactByEmail";
 import { ContactByPhone } from "src/app/components/immersion-offer/ContactByPhone";
 import { ContactInPerson } from "src/app/components/immersion-offer/ContactInPerson";
@@ -24,6 +22,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import { P, match } from "ts-pattern";
+import { Route } from "type-route";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {

@@ -17,7 +17,7 @@ export class TestTechnicalGateway implements TechnicalGateway {
   public htmlToPdf = (
     _htmlContent: string,
     _jwt: ConventionSupportedJwt,
-  ): Promise<string> => Promise.resolve(`YWJjZA==`);
+  ): Promise<string> => Promise.resolve("YWJjZA==");
 
   // eslint-disable-next-line @typescript-eslint/require-await
   public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {

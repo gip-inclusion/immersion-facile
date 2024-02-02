@@ -1,4 +1,4 @@
-import { immersionFacileContactEmail, ManagedErrorKind } from "shared";
+import { ManagedErrorKind, immersionFacileContactEmail } from "shared";
 import { routes } from "src/app/routes/routes";
 import { ErrorButton, HTTPFrontErrorContents } from "./types";
 
@@ -24,7 +24,7 @@ export const contentsMapper = (
     title:
       "La connexion à France Travail (anciennement Pôle emploi) Connect a été interrompue.",
     subtitle: "Veuillez réessayer.",
-    description: ``,
+    description: "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
   peConnectNoAuthorisation: {
@@ -33,7 +33,8 @@ export const contentsMapper = (
       "Vous n'avez pas accordé les autorisations nécessaires à Pôle Emploi Connect.",
     subtitle:
       "Vous avez refusé d'accorder les autorisations nécessaires sur l'interface Pôle Emploi Connect.",
-    description: `Vous pouvez nous accorder les autorisation nécessaires depuis le portail Pôle Emploi Connect.`,
+    description:
+      "Vous pouvez nous accorder les autorisation nécessaires depuis le portail Pôle Emploi Connect.",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
   peConnectNoValidAdvisor: {
@@ -41,7 +42,7 @@ export const contentsMapper = (
     title: "Impossible d'identifier votre conseiller référent",
     subtitle:
       "Les données retournées par France Travail (anciennement Pôle emploi) ne permettent pas d'identifier le conseiller référent qui vous est dédié.",
-    description: ``,
+    description: "",
     buttons: [
       redirectToConventionWithoutIdentityProvider(
         redirectToConventionWithoutIdentityProviderOnClick,
@@ -55,7 +56,7 @@ export const contentsMapper = (
       "Les données retournées par Pôle Emploi Connect ne permettent pas de vous identifier.",
     subtitle:
       "Les données retournées par France Travail (anciennement Pôle emploi) ne permettent pas de vous identifier.",
-    description: ``,
+    description: "",
     buttons: [
       redirectToConventionWithoutIdentityProvider(
         redirectToConventionWithoutIdentityProviderOnClick,
@@ -68,7 +69,7 @@ export const contentsMapper = (
     title: "Pôle Emploi Connect - Identifiants invalides",
     subtitle:
       "Le code d'autorisation retourné par France Travail (anciennement Pôle emploi) ne permet pas d'avoir accès aux droits nécessaires pour lier votre compte.",
-    description: ``,
+    description: "",
     buttons: [
       redirectToConventionWithoutIdentityProvider(
         redirectToConventionWithoutIdentityProviderOnClick,
@@ -119,8 +120,8 @@ export const contentsMapper = (
   httpUnknownClientError: {
     overtitle: httpClientErrorKind,
     title: "Erreur client inconnue",
-    subtitle: title ?? ``,
-    description: message ?? ``,
+    subtitle: title ?? "",
+    description: message ?? "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
   httpClientNotFoundError: {
@@ -136,16 +137,16 @@ export const contentsMapper = (
   httpClientInvalidToken: {
     overtitle: httpClientErrorKind,
     title: "Votre token n'est pas valide.",
-    subtitle: title ?? ``,
-    description: message ?? ``,
+    subtitle: title ?? "",
+    description: message ?? "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
   unknownError: {
     overtitle: "Erreur inconnue",
     title:
       "Une erreur inconnue est survenue. Excusez-nous pour la gène occasionnée.",
-    subtitle: title ?? ``,
-    description: message ?? ``,
+    subtitle: title ?? "",
+    description: message ?? "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
 });
@@ -171,4 +172,5 @@ const contactUsButtonContent: ErrorButton = {
 };
 const httpClientErrorKind = "Erreur Http Client";
 const peConnectErrorKind = "Erreur Pôle Emploi Connect";
-const peTechnicalTeamForwardDescription = `Nous travaillons activement à la résolution de ce problème avec le service technique France Travail (anciennement Pôle emploi).`;
+const peTechnicalTeamForwardDescription =
+  "Nous travaillons activement à la résolution de ce problème avec le service technique France Travail (anciennement Pôle emploi).";

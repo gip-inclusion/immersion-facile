@@ -1,42 +1,39 @@
-import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import {
-  FormProvider,
-  SubmitHandler,
-  useForm,
-  UseFormReturn,
-} from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { match } from "ts-pattern";
-import { useStyles } from "tss-react/dsfr";
-import { Route } from "type-route";
-import {
-  Beneficiary,
-  ConventionId,
-  ConventionJwtPayload,
-  ConventionReadDto,
-  conventionSchema,
-  decodeMagicLinkJwtWithoutSignatureCheck,
-  domElementIds,
-  hasBeneficiaryCurrentEmployer,
-  InternshipKind,
-  isBeneficiaryMinor,
-  isEstablishmentTutorIsEstablishmentRepresentative,
-  isPeConnectIdentity,
-  notJobSeeker,
-} from "shared";
+import React, { useEffect, useState } from "react";
 import {
   ConventionFormLayout,
   ConventionFormSidebar,
   Loader,
   SubmitConfirmationSection,
 } from "react-design-system";
+import { createPortal } from "react-dom";
+import {
+  FormProvider,
+  SubmitHandler,
+  UseFormReturn,
+  useForm,
+} from "react-hook-form";
+import { useDispatch } from "react-redux";
+import {
+  Beneficiary,
+  ConventionId,
+  ConventionJwtPayload,
+  ConventionReadDto,
+  InternshipKind,
+  conventionSchema,
+  decodeMagicLinkJwtWithoutSignatureCheck,
+  domElementIds,
+  hasBeneficiaryCurrentEmployer,
+  isBeneficiaryMinor,
+  isEstablishmentTutorIsEstablishmentRepresentative,
+  isPeConnectIdentity,
+  notJobSeeker,
+} from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {
@@ -64,9 +61,12 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  conventionSlice,
   ConventionSubmitFeedback,
+  conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
+import { match } from "ts-pattern";
+import { useStyles } from "tss-react/dsfr";
+import { Route } from "type-route";
 import { ConventionSummary } from "./ConventionSummary";
 import { ShareConventionLink } from "./ShareConventionLink";
 import { useUpdateConventionValuesInUrl } from "./useUpdateConventionValuesInUrl";

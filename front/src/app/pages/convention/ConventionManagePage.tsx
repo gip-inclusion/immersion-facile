@@ -1,15 +1,15 @@
 import React from "react";
-import { match } from "ts-pattern";
-import { Route } from "type-route";
+import { MainWrapper } from "react-design-system";
 import {
   ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
-import { MainWrapper } from "react-design-system";
 import { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { routes } from "src/app/routes/routes";
+import { match } from "ts-pattern";
+import { Route } from "type-route";
 import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 
 type ConventionManagePageProps = {
@@ -35,7 +35,7 @@ export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
         name: "manageConvention",
       },
       (route) =>
-        ({ jwt: route.params.jwt, kind: "convention" } satisfies JwtKindProps),
+        ({ jwt: route.params.jwt, kind: "convention" }) satisfies JwtKindProps,
     )
     .exhaustive();
 

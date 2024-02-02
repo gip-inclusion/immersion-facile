@@ -1,21 +1,21 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
 import {
-  calculateNumberOfWorkedDays,
-  calculateTotalImmersionHoursFromComplexSchedule,
-  calculateWeeklyHoursFromSchedule,
   ConventionDto,
   ConventionReadDto,
   DailyScheduleDto,
   DateIntervalDto,
-  regularTimePeriods,
   ScheduleDto,
   ScheduleDtoBuilder,
-  selectedDaysFromComplexSchedule,
   SelectedDaysOfTheWeekDto,
+  calculateNumberOfWorkedDays,
+  calculateTotalImmersionHoursFromComplexSchedule,
+  calculateWeeklyHoursFromSchedule,
+  regularTimePeriods,
+  selectedDaysFromComplexSchedule,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotalWeeklylHoursIndicator";
 import { WeekdayPicker } from "./WeekdayPicker";

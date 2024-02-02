@@ -1,7 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
-import { Route } from "type-route";
+import React from "react";
 import { AdminTab } from "shared";
 import { LayoutHeader } from "src/app/components/layout/LayoutHeader";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
@@ -13,6 +12,7 @@ import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
 import { isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
+import { Route } from "type-route";
 
 const rawAdminTabs: Array<
   TabsProps.Controlled["tabs"][number] & { content: React.ReactNode }

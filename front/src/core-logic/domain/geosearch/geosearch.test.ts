@@ -1,12 +1,12 @@
 import {
+  LookupSearchResult,
   expectArraysToEqual,
   expectObjectsToMatch,
   expectToEqual,
-  LookupSearchResult,
 } from "shared";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { GeoSearchFeedback, geosearchSlice } from "./geosearch.slice";

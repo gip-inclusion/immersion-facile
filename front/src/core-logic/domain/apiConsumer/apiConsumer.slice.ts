@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ApiConsumer, ApiConsumerJwt, BackOfficeJwt } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 

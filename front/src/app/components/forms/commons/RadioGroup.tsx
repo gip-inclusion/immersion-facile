@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { cleanStringToHTMLAttribute } from "shared";
 
 type ValueAndLabel<T> = {
@@ -44,27 +44,26 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
           )}
         </legend>
         <div className={fr.cx("fr-fieldset__content")}>
-          {options &&
-            options.map(({ value, label }) => {
-              const inputValue = getInputValue(value);
-              const optionId = makeOptionId(value, id);
+          {options?.map(({ value, label }) => {
+            const inputValue = getInputValue(value);
+            const optionId = makeOptionId(value, id);
 
-              return (
-                <div className={fr.cx("fr-radio-group")} key={optionId}>
-                  <input
-                    id={optionId}
-                    type="radio"
-                    disabled={disabled}
-                    value={inputValue}
-                    checked={isEqual(value, currentValue)}
-                    onChange={() => setCurrentValue(value)}
-                  />
-                  <label className={fr.cx("fr-label")} htmlFor={optionId}>
-                    {label ?? value}
-                  </label>
-                </div>
-              );
-            })}
+            return (
+              <div className={fr.cx("fr-radio-group")} key={optionId}>
+                <input
+                  id={optionId}
+                  type="radio"
+                  disabled={disabled}
+                  value={inputValue}
+                  checked={isEqual(value, currentValue)}
+                  onChange={() => setCurrentValue(value)}
+                />
+                <label className={fr.cx("fr-label")} htmlFor={optionId}>
+                  {label ?? value}
+                </label>
+              </div>
+            );
+          })}
         </div>
         {error && (
           <p id="radio-error-desc-error" className={fr.cx("fr-error-text")}>
@@ -81,7 +80,7 @@ const makeOptionId = (
   id: string,
 ): string => {
   let optionId = value.toString();
-  if (value instanceof Array) {
+  if (Array.isArray(value)) {
     optionId = value[0].toString();
   }
   return cleanStringToHTMLAttribute(`${id}${optionId}`);
@@ -90,13 +89,13 @@ const makeOptionId = (
 const getInputValue = (
   value: string | boolean | number | string[],
 ): string | number | string[] => {
-  if (value instanceof Array) return value[0].toString();
+  if (Array.isArray(value)) return value[0].toString();
   if (typeof value === "boolean") return value.toString();
   return value;
 };
 
 const isEqual = <T,>(a: T, b: T): boolean => {
-  if (a instanceof Array && b instanceof Array) {
+  if (Array.isArray(a) && Array.isArray(b)) {
     if (a[0] === undefined || b[0] === undefined) return false;
     return a[0] === b[0];
   }

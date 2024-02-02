@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/browser";
-import { catchError, merge, Observable, of } from "rxjs";
+import { Observable, catchError, merge, of } from "rxjs";
 
 export const catchEpicError =
   <

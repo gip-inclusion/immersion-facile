@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
-import { z } from "zod";
+import React, { useEffect, useState } from "react";
 import {
-  notEqual,
   OmitFromExistingKeys,
+  notEqual,
   validateMultipleEmailRegex,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
+import { z } from "zod";
 
 const componentName = "im-fillable-list";
 
@@ -198,6 +198,7 @@ const EmailsValuesSummary = ({
             key={value}
             aria-label={`Supprimer l'adresse email ${value}`}
             disabled={disabled}
+            type="button"
           >
             {value}
           </button>

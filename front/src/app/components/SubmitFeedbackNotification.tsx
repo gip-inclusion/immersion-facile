@@ -1,9 +1,9 @@
-import React, { ReactNode } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import React, { ReactNode } from "react";
 import {
-  isFeedbackError,
   SubmitFeedBack,
+  isFeedbackError,
 } from "src/core-logic/domain/SubmitFeedback";
 
 export type SubmitFeedbackProps<T extends string> = {

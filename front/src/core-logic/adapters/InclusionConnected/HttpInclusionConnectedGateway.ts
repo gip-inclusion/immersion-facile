@@ -1,5 +1,4 @@
-import { from, Observable } from "rxjs";
-import { match } from "ts-pattern";
+import { Observable, from } from "rxjs";
 import {
   AbsoluteUrl,
   AgencyId,
@@ -14,6 +13,7 @@ import {
   otherwiseThrow,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
+import { match } from "ts-pattern";
 
 export class HttpInclusionConnectedGateway
   implements InclusionConnectedGateway

@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Route } from "type-route";
 import { MainWrapper } from "react-design-system";
+import { useDispatch } from "react-redux";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { Route } from "type-route";
 
 export type ConventionCustomAgencyPageRoute = Route<
   typeof routes.conventionCustomAgency

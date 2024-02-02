@@ -1,9 +1,9 @@
 import React from "react";
-import { Route } from "type-route";
 import { MainWrapper } from "react-design-system";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
+import { Route } from "type-route";
 import { ErrorPage } from "../error/ErrorPage";
 
 export type ConventionImmersionForExternalsRoute = Route<

@@ -1,7 +1,7 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
+import React from "react";
 import { FormEstablishmentDto, SearchResultDto } from "shared";
+import { useStyles } from "tss-react/dsfr";
 import { SearchResult } from "../../search/SearchResult";
 
 const establishmentToSearchResultPreview = ({

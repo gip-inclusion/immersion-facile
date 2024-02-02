@@ -1,22 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys, uniqBy } from "ramda";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Loader } from "react-design-system";
+import { useFormContext, useWatch } from "react-hook-form";
 import {
   AgencyId,
   AgencyKind,
-  agencyKindToLabel,
   AgencyOption,
-  allAgencyKindsAllowedToAdd,
   AllowedAgencyKindToAdd,
   ConventionReadDto,
   CreateAgencyDto,
   DepartmentCode,
+  agencyKindToLabel,
+  allAgencyKindsAllowedToAdd,
   departmentNameToDepartmentCode,
   fitForDelegationAgencyKind,
   sortByPropertyCaseInsensitive,
 } from "shared";
-import { Loader } from "react-design-system";
 import { FormFieldAttributes } from "src/app/contents/forms/types";
 import { AgencyErrorText } from "../convention/sections/agency/AgencyErrorText";
 

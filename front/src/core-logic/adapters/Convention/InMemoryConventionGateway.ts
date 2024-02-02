@@ -1,4 +1,4 @@
-import { from, Observable, Subject } from "rxjs";
+import { Observable, Subject, from } from "rxjs";
 import {
   AgencyOption,
   ConventionDto,
@@ -12,8 +12,8 @@ import {
   InclusionConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
-  sleep,
   UpdateConventionStatusRequestDto,
+  sleep,
 } from "shared";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";

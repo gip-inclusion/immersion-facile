@@ -1,19 +1,19 @@
-import React from "react";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
-import { match, P } from "ts-pattern";
-import { Route } from "type-route";
-import { EstablishmentRole, InclusionConnectedUser } from "shared";
+import React from "react";
 import { Loader } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { EstablishmentRole, InclusionConnectedUser } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { P, match } from "ts-pattern";
+import { Route } from "type-route";
 
 type EstablishmentDashboardTab = {
   label: string;

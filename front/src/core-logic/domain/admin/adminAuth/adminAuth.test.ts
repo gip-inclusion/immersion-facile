@@ -1,14 +1,14 @@
 import { BackOfficeJwt } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import {
-  adminAuthSlice,
   AdminAuthState,
+  adminAuthSlice,
 } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 

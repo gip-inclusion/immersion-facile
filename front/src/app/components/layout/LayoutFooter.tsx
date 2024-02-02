@@ -1,8 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
-import { makeStyles, useStyles } from "tss-react/dsfr";
-import { domElementIds } from "shared";
+import React from "react";
 import {
   Footer,
   FooterStyles,
@@ -12,8 +10,10 @@ import {
   OverFooter,
   OverFooterCols,
 } from "react-design-system";
+import { domElementIds } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";
 import { routes } from "src/app/routes/routes";
+import { makeStyles, useStyles } from "tss-react/dsfr";
 import lesEntrepriseSengagent from "../../../assets/img/les-entreprises-s-engagent.svg";
 import franceTravailLogo from "../../../assets/img/logo-france-travail.svg";
 import plateformeInclusionLogoUrl from "../../../assets/img/plateforme-inclusion-logo.svg";
@@ -255,9 +255,7 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
       {
         label: (
           <>
-            <i
-              className={fr.cx("fr-icon-linkedin-box-fill", "fr-icon--sm")}
-            ></i>
+            <i className={fr.cx("fr-icon-linkedin-box-fill", "fr-icon--sm")} />
             Rejoignez-nous sur Linkedin
           </>
         ),

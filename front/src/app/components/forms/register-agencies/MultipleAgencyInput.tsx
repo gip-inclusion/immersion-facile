@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Autocomplete } from "@mui/material";
-import { useStyles } from "tss-react/dsfr";
+import React, { useEffect, useState } from "react";
 import { AgencyOption } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { useStyles } from "tss-react/dsfr";
 
 type MultipleAgencyInputProps = {
   name?: string;
@@ -91,9 +91,9 @@ export const MultipleAgencyInput = ({
         Ajouter un organisme
       </Button>
 
-      {error && error.length && (
+      {error?.length && (
         <div
-          id={name + "-error-description"}
+          id={`${name}-error-description`}
           className={fr.cx("fr-error-text")}
         >
           {typeof error === "string" ? error : "Indiquez au moins 1 métier."}

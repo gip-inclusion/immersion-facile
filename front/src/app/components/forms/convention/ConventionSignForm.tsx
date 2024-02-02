@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { mergeDeepRight } from "ramda";
+import React, { useState } from "react";
+import { ConventionRenewedInformations } from "react-design-system";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   ConventionDto,
   ConventionReadDto,
-  isConventionRenewed,
   UpdateConventionStatusRequestDto,
+  isConventionRenewed,
 } from "shared";
-import { ConventionRenewedInformations } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -20,8 +20,8 @@ import {
 } from "src/core-logic/domain/convention/convention.selectors";
 import {
   ConventionFeedbackKind,
-  conventionSlice,
   ConventionSubmitFeedback,
+  conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionSummary } from "./ConventionSummary";
 import { SignatureActions } from "./SignatureActions";
@@ -67,8 +67,7 @@ export const ConventionSignForm = ({
     const conditionsAccepted = !!signatory?.signedAt;
     const { setError } = methods;
     if (!conditionsAccepted) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      setError(signedAtFieldName! as keyof ConventionReadDto, {
+      setError(signedAtFieldName as keyof ConventionReadDto, {
         type: "required",
         message: "La signature est obligatoire",
       });
