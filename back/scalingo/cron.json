@@ -17,6 +17,10 @@
       "size": "M"
     },
     {
+      "command": "00 6 * * * pnpm back run trigger-establishment-leads-first-reminder",
+      "size": "M"
+    },
+    {
       "command": "15 07 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     },

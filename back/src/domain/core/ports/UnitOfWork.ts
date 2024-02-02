@@ -12,6 +12,7 @@ import { NotificationRepository } from "../../generic/notifications/ports/Notifi
 import { DeletedEstablishmentRepository } from "../../offer/ports/DeletedEstablishmentRepository";
 import { DiscussionAggregateRepository } from "../../offer/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../offer/ports/EstablishmentAggregateRepository";
+import { EstablishmentLeadQueries } from "../../offer/ports/EstablishmentLeadQueries";
 import { EstablishmentLeadRepository } from "../../offer/ports/EstablishmentLeadRepository";
 import { FormEstablishmentRepository } from "../../offer/ports/FormEstablishmentRepository";
 import { GroupRepository } from "../../offer/ports/GroupRepository";
@@ -52,6 +53,7 @@ export type UnitOfWork = {
   searchMadeRepository: SearchMadeRepository;
   shortLinkQuery: ShortLinkQuery;
   shortLinkRepository: ShortLinkRepository;
+  establishmentLeadQueries: EstablishmentLeadQueries;
 };
 
 export interface UnitOfWorkPerformer {
