@@ -17,7 +17,7 @@ describe("PgEstablishmentLeadRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM form_establishments");
+    await client.query("DELETE FROM establishment_lead_events");
     establishmentLeadRepository = new PgEstablishmentLeadRepository(
       makeKyselyDb(pool),
     );
@@ -58,6 +58,46 @@ describe("PgEstablishmentLeadRepository", () => {
       );
 
       expectToEqual(leadInDb, establishmentLead);
+    });
+  });
+
+  describe("getSiretsByLastEventKind", () => {
+    it("return one establishmentLead", async () => {
+      const now = new Date();
+      const establishmentLeadAccepted: EstablishmentLead = {
+        siret: "12345678901234",
+        lastEventKind: "registration-accepted",
+        events: [
+          {
+            conventionId: "45664444-1234-4000-4444-123456789013",
+            occurredAt: subDays(now, 2),
+            kind: "to-be-reminded",
+          },
+          {
+            occurredAt: now,
+            kind: "registration-accepted",
+          },
+        ],
+      };
+      const establishmentLeadToBeReminded: EstablishmentLead = {
+        siret: "12345678901235",
+        lastEventKind: "to-be-reminded",
+        events: [
+          {
+            conventionId: "45664444-1234-4000-4444-123456789012",
+            occurredAt: subDays(now, 2),
+            kind: "to-be-reminded",
+          },
+        ],
+      };
+      await establishmentLeadRepository.save(establishmentLeadAccepted);
+      await establishmentLeadRepository.save(establishmentLeadToBeReminded);
+
+      const result = await establishmentLeadRepository.getSiretsByLastEventKind(
+        "to-be-reminded",
+      );
+
+      expectToEqual(result, [establishmentLeadToBeReminded.siret]);
     });
   });
 });

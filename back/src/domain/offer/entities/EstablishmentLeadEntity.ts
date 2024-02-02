@@ -7,14 +7,15 @@ import {
   SiretDto,
 } from "shared";
 
-const establishmentLeadEventKind = [
+export const establishmentLeadEventKind = [
   "to-be-reminded",
   "reminder-sent",
   "registration-accepted",
   "registration-refused",
 ] as const;
 
-type EstablishmentLeadEventKind = (typeof establishmentLeadEventKind)[number];
+export type EstablishmentLeadEventKind =
+  (typeof establishmentLeadEventKind)[number];
 
 export type EstablishmentLeadEvent =
   | {
