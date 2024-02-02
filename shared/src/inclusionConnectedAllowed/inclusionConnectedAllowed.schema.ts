@@ -7,10 +7,10 @@ import { establishmentsRoles } from "../role/role.dto";
 import { zStringMinLength1, zTrimmedString } from "../zodUtils";
 import {
   AgencyRight,
-  allAgencyRoles,
   AuthenticatedUserId,
   GetInclusionConnectLogoutUrlQueryParams,
   InclusionConnectedUser,
+  allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
 
 export const agencyRoleSchema = z.enum(allAgencyRoles);

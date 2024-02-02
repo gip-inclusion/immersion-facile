@@ -1,5 +1,5 @@
 import { DepartmentCode } from "../address/address.dto";
-import { fromNafSubClassToNafClass, NafDto } from "../naf";
+import { NafDto, fromNafSubClassToNafClass } from "../naf";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export const makeAppellationInformationUrl = (

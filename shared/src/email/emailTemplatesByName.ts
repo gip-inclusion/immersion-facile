@@ -1,9 +1,9 @@
-import { createTemplatesByName, EmailButtonProps } from "html-templates";
+import { EmailButtonProps, createTemplatesByName } from "html-templates";
 import { ConventionId, InternshipKind } from "../convention/convention.dto";
 import { isStringDate, toDisplayedDate } from "../utils/date";
+import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
-import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { immersionFacileContactEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind: InternshipKind) =>
@@ -86,14 +86,14 @@ export const emailTemplatesByName =
           }
           Pour rappel, cette demande concerne : 
              - Le bénéficiaire ${beneficiaryName}${
-          beneficiaryRepresentativeName
-            ? `\n- ${beneficiaryRepresentativeName}`
-            : ""
-        }${
-          beneficiaryCurrentEmployerName
-            ? `\n- L'employeur actuel du bénéficiare ${beneficiaryCurrentEmployerName}`
-            : ""
-        }
+               beneficiaryRepresentativeName
+                 ? `\n- ${beneficiaryRepresentativeName}`
+                 : ""
+             }${
+               beneficiaryCurrentEmployerName
+                 ? `\n- L'employeur actuel du bénéficiare ${beneficiaryCurrentEmployerName}`
+                 : ""
+             }
              - L'entreprise ${businessName} représentée par ${establishmentRepresentativeName}
              - Le tuteur dans l'entreprise ${establishmentTutorName}
           
@@ -287,14 +287,14 @@ export const emailTemplatesByName =
           ? "la convention d'immersion professionnelle"
           : "la convention de mini stage "
       } le ${
-          isStringDate(signedAt)
-            ? toDisplayedDate({
-                date: new Date(signedAt),
-                withHours: true,
-                showGMT: true,
-              })
-            : "DATE INVALIDE"
-        }.
+        isStringDate(signedAt)
+          ? toDisplayedDate({
+              date: new Date(signedAt),
+              withHours: true,
+              showGMT: true,
+            })
+          : "DATE INVALIDE"
+      }.
       `,
         highlight: {
           content: `
@@ -389,9 +389,7 @@ export const emailTemplatesByName =
         content: `
       <strong>Une nouvelle demande ${
         internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-      } vous est envoyée${
-          validatorName ? ` par ${validatorName} ` : " "
-        }pour que vous l'examiniez.</strong>
+      } vous est envoyée${validatorName ? ` par ${validatorName} ` : " "}pour que vous l'examiniez.</strong>
 
       Elle concerne le bénéficiaire ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} 
 
@@ -638,16 +636,14 @@ export const emailTemplatesByName =
       Bonne nouvelle ! 
 
       La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${
-          isStringDate(beneficiaryBirthdate)
-            ? toDisplayedDate({ date: new Date(beneficiaryBirthdate) })
-            : "Date invalide"
-        }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée${
-          validatorName ? ` par ${validatorName} ` : " "
-        }et la convention est bien enregistrée. 
+        isStringDate(beneficiaryBirthdate)
+          ? toDisplayedDate({ date: new Date(beneficiaryBirthdate) })
+          : "Date invalide"
+      }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée${
+        validatorName ? ` par ${validatorName} ` : " "
+      }et la convention est bien enregistrée. 
       
-      ${
-        internshipKind === "immersion" ? "L'immersion" : "Le mini stage"
-      } peut donc démarrer aux dates convenues.       
+      ${internshipKind === "immersion" ? "L'immersion" : "Le mini stage"} peut donc démarrer aux dates convenues.       
       `,
         buttons: [
           {
@@ -855,14 +851,14 @@ export const emailTemplatesByName =
           ? "d'immersion professionnelle"
           : "de mini stage"
       } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${
-          isStringDate(dateStart)
-            ? toDisplayedDate({ date: new Date(dateStart), withHours: true })
-            : "DATE INVALIDE"
-        } au ${
-          isStringDate(dateEnd)
-            ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
-            : "DATE INVALIDE"
-        } a été annulée par ${agencyName}.
+        isStringDate(dateStart)
+          ? toDisplayedDate({ date: new Date(dateStart), withHours: true })
+          : "DATE INVALIDE"
+      } au ${
+        isStringDate(dateEnd)
+          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+          : "DATE INVALIDE"
+      } a été annulée par ${agencyName}.
       
       La demande a été annulée pour la raison suivante :
       
@@ -905,21 +901,21 @@ export const emailTemplatesByName =
           ? "d'immersion professionnelle"
           : "de mini stage"
       } de ${beneficiaryFirstName} ${beneficiaryLastName} pour réaliser ${
-          internshipKind === "immersion"
-            ? "une immersion professionnelle"
-            : "un mini stage"
-        } du ${
-          isStringDate(dateStart)
-            ? toDisplayedDate({
-                date: new Date(dateStart),
-                withHours: true,
-              })
-            : "DATE INVALIDE"
-        } au ${
-          isStringDate(dateEnd)
-            ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
-            : "DATE INVALIDE"
-        } dans l'entreprise ${businessName} est supprimée.
+        internshipKind === "immersion"
+          ? "une immersion professionnelle"
+          : "un mini stage"
+      } du ${
+        isStringDate(dateStart)
+          ? toDisplayedDate({
+              date: new Date(dateStart),
+              withHours: true,
+            })
+          : "DATE INVALIDE"
+      } au ${
+        isStringDate(dateEnd)
+          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+          : "DATE INVALIDE"
+      } dans l'entreprise ${businessName} est supprimée.
       
       Les raisons en sont: ${deprecationReason}.         
       
@@ -941,7 +937,7 @@ export const emailTemplatesByName =
         subject:
           internshipKind === "immersion"
             ? "Voici votre nouveau lien magique pour accéder à la demande d'immersion"
-            : `Mini Stage - Voici votre nouveau lien magique pour accéder à la demande de mini stage`,
+            : "Mini Stage - Voici votre nouveau lien magique pour accéder à la demande de mini stage",
         greetings: conventionId
           ? greetingsWithConventionId(conventionId)
           : "Bonjour ,",
@@ -1096,13 +1092,13 @@ export const emailTemplatesByName =
                 })
               : "DATE INVALIDE"
           } au ${
-          isStringDate(dateEnd)
-            ? toDisplayedDate({
-                date: new Date(dateEnd),
-                withHours: true,
-              })
-            : "DATE INVALIDE"
-        } : ${assessmentStatus === "FINISHED" ? "oui" : "non"}</li>
+            isStringDate(dateEnd)
+              ? toDisplayedDate({
+                  date: new Date(dateEnd),
+                  withHours: true,
+                })
+              : "DATE INVALIDE"
+          } : ${assessmentStatus === "FINISHED" ? "oui" : "non"}</li>
           <li>Retour de l'entreprise : ${establishmentFeedback}</li>
         </ul>
         La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email à l'adresse : ${agencyValidatorEmail}.`,
@@ -1114,10 +1110,10 @@ export const emailTemplatesByName =
       niceName: "Agence - Activée",
       tags: ["activation prescripteur"],
       createEmailVariables: ({ agencyLogoUrl, agencyName, ...rest }) => ({
-        subject: `Immersion Facilitée - Votre structure a été activée`,
+        subject: "Immersion Facilitée - Votre structure a été activée",
         greetings: "Bonjour,",
         content: `<strong>Votre structure ${
-          rest.refersToOtherAgency ? `d'accompagnement` : `prescriptrice`
+          rest.refersToOtherAgency ? `d'accompagnement` : "prescriptrice"
         } est activée sur Immersion facilitée !</strong> 
 
         Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: ${agencyName}.
@@ -1149,7 +1145,8 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       niceName: "Inclusion Connect - Changement de droit sur agence",
       tags: ["activation BO prescripteur"],
       createEmailVariables: ({ agencyName }) => ({
-        subject: `Immersion Facilitée - Activation de l’accès au back office de votre structure`,
+        subject:
+          "Immersion Facilitée - Activation de l’accès au back office de votre structure",
         greetings: "Bonjour,",
         content: `<strong>Vous pouvez désormais accéder au tableau de bord de votre structure: ${agencyName}.</strong>
 
@@ -1170,7 +1167,8 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       niceName: "Inclusion Connect - Rejet de rattachement a une agence",
       tags: ["rejet de rattachement a une agence"],
       createEmailVariables: ({ agencyName, justification }) => ({
-        subject: `Immersion Facilitée - Refus de la demande d’accès au tableau de bord`,
+        subject:
+          "Immersion Facilitée - Refus de la demande d’accès au tableau de bord",
         greetings: "Bonjour,",
         content: `<strong>Votre demande d’accès au tableau de bord a été rejetée.</strong>
 

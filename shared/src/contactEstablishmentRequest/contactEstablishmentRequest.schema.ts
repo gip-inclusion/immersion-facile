@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
-  conventionObjectiveOptions,
   ImmersionObjective,
+  conventionObjectiveOptions,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";

@@ -68,6 +68,6 @@ export type GetAdminDashboardParams =
     });
 
 export type GetConventionMagicLinkDashboardParams =
-  | GenericGetDashboardParams<"conventionStatus"> & {
-      conventionId: ConventionId;
-    };
+  GenericGetDashboardParams<"conventionStatus"> & {
+    conventionId: ConventionId;
+  };

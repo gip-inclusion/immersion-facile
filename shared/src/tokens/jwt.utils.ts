@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 import { decode } from "js-base64";
-import { currentJwtVersions, SiretDto } from "..";
+import { SiretDto, currentJwtVersions } from "..";
 import {
   BackOfficeJwtPayload,
   ConventionJwtPayload,

@@ -57,11 +57,11 @@ export const makeThrowIfNotOpenCageGeosearchKey =
     if (!value) throw new Error(`Expected ${variableName} to be Defined`);
     if (value.indexOf("oc_gs_") === 0) {
       return value as OpenCageGeoSearchKey;
-    } else {
-      throw new Error(
-        `Provided value ${value} for ${variableName} is not an OpenCage Data Geosearch key.`,
-      );
     }
+
+    throw new Error(
+      `Provided value ${value} for ${variableName} is not an OpenCage Data Geosearch key.`,
+    );
   };
 /*
  * Value should can only be a string,

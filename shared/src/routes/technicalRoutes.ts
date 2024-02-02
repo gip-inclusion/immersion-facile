@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import {
   validateEmailInputSchema,
   validateEmailResponseSchema,
@@ -29,19 +29,19 @@ export type TechnicalRoutes = typeof technicalRoutes;
 export const technicalRoutes = defineRoutes({
   htmlToPdf: defineRoute({
     method: "post",
-    url: `/auth/html-to-pdf`,
+    url: "/auth/html-to-pdf",
     ...withAuthorizationHeaders,
     requestBodySchema: htmlToPdfRequestSchema,
     responses: { 200: zStringMinLength1 },
   }),
   openApiSpec: defineRoute({
     method: "get",
-    url: `/open-api-spec`,
+    url: "/open-api-spec",
     responses: { 200: openApiSpecResponseSchema },
   }),
   shortLink: defineRoute({
     method: "get",
-    url: `/to/:shortLinkId`,
+    url: "/to/:shortLinkId",
     responses: {
       302: emptyObjectSchema,
       404: legacyHttpErrorSchema,
@@ -49,12 +49,12 @@ export const technicalRoutes = defineRoutes({
   }),
   featureFlags: defineRoute({
     method: "get",
-    url: `/feature-flags`,
+    url: "/feature-flags",
     responses: { 200: featureFlagsSchema },
   }),
   inboundEmailParsing: defineRoute({
     method: "post",
-    url: `/inbound-email-parsing`,
+    url: "/inbound-email-parsing",
     requestBodySchema: brevoInboundBodySchema,
     responses: {
       200: expressEmptyResponseBody,

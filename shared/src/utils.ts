@@ -98,12 +98,15 @@ export const splitInChunks = <T>(
   sizeOfChunk: number,
 ): Array<T[]> =>
   originalArray
-    .reduce((acc, element) => {
-      const [currentChunk = [], ...rest] = acc;
-      return currentChunk.length < sizeOfChunk
-        ? [[...currentChunk, element], ...rest]
-        : [[element], currentChunk, ...rest];
-    }, [] as Array<T[]>)
+    .reduce(
+      (acc, element) => {
+        const [currentChunk = [], ...rest] = acc;
+        return currentChunk.length < sizeOfChunk
+          ? [[...currentChunk, element], ...rest]
+          : [[element], currentChunk, ...rest];
+      },
+      [] as Array<T[]>,
+    )
     .reverse();
 
 export type ValueOf<T> = T[keyof T];

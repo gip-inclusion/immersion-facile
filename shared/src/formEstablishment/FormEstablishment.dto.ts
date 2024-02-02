@@ -9,7 +9,10 @@ import { includesTypeGuard } from "../typeGuard";
 import { DateTimeIsoString } from "../utils/date";
 
 // prettier-ignore
-export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
+export type ImmersionContactInEstablishmentId = Flavor<
+  string,
+  "ImmersionContactInEstablishmentId"
+>;
 
 const contactMethods = ["EMAIL", "PHONE", "IN_PERSON"] as const;
 export type ContactMethod = (typeof contactMethods)[number];

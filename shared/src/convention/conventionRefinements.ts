@@ -7,8 +7,8 @@ import {
   ConventionStatus,
   EstablishmentTutor,
   InternshipKind,
-  maximumCalendarDayByInternshipKind,
   Signatories,
+  maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
 
 type DatesInConvention = {

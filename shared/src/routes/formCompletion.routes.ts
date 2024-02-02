@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import { legacyHttpErrorSchema } from "../httpClient/httpErrors.schema";
 import { appellationSearchResponseSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import {
@@ -17,7 +17,7 @@ export const formCompletionRoutes = defineRoutes({
   }),
   getSiretInfo: defineRoute({
     method: "get",
-    url: `/siret/:siret`,
+    url: "/siret/:siret",
     responses: {
       200: getSiretInfoSchema,
       400: legacyHttpErrorSchema,
@@ -29,7 +29,7 @@ export const formCompletionRoutes = defineRoutes({
   }),
   getSiretInfoIfNotAlreadySaved: defineRoute({
     method: "get",
-    url: `/siret-if-not-saved/:siret`,
+    url: "/siret-if-not-saved/:siret",
     responses: {
       200: getSiretInfoSchema,
       400: legacyHttpErrorSchema,

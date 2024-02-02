@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import { withAgencyIdSchema } from "../agency/agency.schema";
 import {
   apiConsumerJwtSchema,
@@ -102,7 +102,7 @@ export const adminRoutes = defineRoutes({
   }),
   updateFeatureFlags: defineRoute({
     method: "post",
-    url: `/admin/feature-flags`,
+    url: "/admin/feature-flags",
     ...withAuthorizationHeaders,
     requestBodySchema: setFeatureFlagSchema,
     responses: {
@@ -112,7 +112,7 @@ export const adminRoutes = defineRoutes({
   }),
   saveApiConsumer: defineRoute({
     method: "post",
-    url: `/admin/api-consumers`,
+    url: "/admin/api-consumers",
     requestBodySchema: createApiConsumerSchema,
     ...withAuthorizationHeaders,
     responses: {
@@ -122,7 +122,7 @@ export const adminRoutes = defineRoutes({
   }),
   getAllApiConsumers: defineRoute({
     method: "get",
-    url: `/admin/api-consumers`,
+    url: "/admin/api-consumers",
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(apiConsumerSchema),

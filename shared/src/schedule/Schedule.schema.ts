@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dateRegExp, DateString, DateTimeIsoString } from "../utils/date";
+import { DateString, DateTimeIsoString, dateRegExp } from "../utils/date";
 import { localization, zStringMinLength1, zTimeString } from "../zodUtils";
 import {
   DailyScheduleDto,

@@ -14,6 +14,7 @@
     "serve": "vite preview --port 5001",
     "typecheck": "tsc --noEmit",
     "includecheck": "./check_includes.sh",
+    "check": "pnpm -w check:glob ./front/src",
     "prettier": "pnpm -w prettier:glob --write ./front/src",
     "format:check": "pnpm -w prettier:glob --check ./front/src",
     "lint": "pnpm -w lintconfig:glob ./front/src",

@@ -1,5 +1,5 @@
-import { AgencyId } from "../agency/agency.dto";
 import { Builder } from "../Builder";
+import { AgencyId } from "../agency/agency.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import {
@@ -22,9 +22,9 @@ import {
   EstablishmentTutor,
   ImmersionObjective,
   InternshipKind,
+  Renewed,
   isBeneficiary,
   isBeneficiaryStudent,
-  Renewed,
 } from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "a99eaca1-ee70-4c90-b3f4-668d492f7392";
@@ -356,7 +356,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withBeneficiarySignedAt(signedAt?: Date) {
     return this.withBeneficiary({
       ...this.dto.signatories.beneficiary,
-      signedAt: signedAt && signedAt.toISOString(),
+      signedAt: signedAt?.toISOString(),
     });
   }
 
@@ -450,7 +450,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withEstablishmentRepresentativeSignedAt(signedAt?: Date) {
     return this.withEstablishmentRepresentative({
       ...this.#establishmentRepresentative,
-      signedAt: signedAt && signedAt.toISOString(),
+      signedAt: signedAt?.toISOString(),
     });
   }
 
