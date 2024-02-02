@@ -1,7 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
   "organizeImports": {
-    "enabled": true
+    "enabled": true,
+    "ignore": ["back/src/adapters/secondary/pg/staticData"]
   },
   "linter": {
     "enabled": true,
