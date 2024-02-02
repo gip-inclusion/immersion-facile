@@ -13,7 +13,7 @@
     "prettier": "pnpm prettier:glob --write ./**/src/",
     "prettier:check": "pnpm prettier:glob --check ./**/src/",
     "prettier:glob": "prettier",
-    "check:glob": "biome check",
+    "check:glob": "biome check --log-level=error",
     "back": "pnpm --dir back",
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",

@@ -2,8 +2,8 @@ import { CombinedState } from "@reduxjs/toolkit";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
