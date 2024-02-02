@@ -3,7 +3,7 @@ import {
   OngoingOAuth,
 } from "../../../../domain/generic/OAuth/entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../../../../domain/generic/OAuth/ports/OngoingOAuthRepositiory";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 
 type PersistenceOngoingOAuth = {

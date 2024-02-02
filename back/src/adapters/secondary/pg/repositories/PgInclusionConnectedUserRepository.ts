@@ -6,7 +6,7 @@ import {
   WithAgencyRole,
 } from "shared";
 import { InclusionConnectedUserRepository } from "../../../../domain/dashboard/port/InclusionConnectedUserRepository";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export class PgInclusionConnectedUserRepository
   implements InclusionConnectedUserRepository
@@ -38,7 +38,7 @@ export class PgInclusionConnectedUserRepository
       await executeKyselyRawSqlQuery(
         this.transaction,
         format(
-          `INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L`,
+          "INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L",
           user.agencyRights.map(({ agency, role }) => [
             user.id,
             agency.id,

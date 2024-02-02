@@ -14,8 +14,8 @@ export const up = async (pgm: MigrationBuilder) => {
 };
 
 export const down = (pgm: MigrationBuilder) => {
-  pgm.sql(`TRUNCATE appellations_public_data CASCADE;`);
-  pgm.sql(`TRUNCATE romes_public_data CASCADE;`);
+  pgm.sql("TRUNCATE appellations_public_data CASCADE;");
+  pgm.sql("TRUNCATE romes_public_data CASCADE;");
 };
 
 const makeQueryArray = (filePath: string) => {
@@ -31,7 +31,7 @@ const buildInsertRomesPublicDataQuery = async () => {
   );
 
   return format(
-    `INSERT INTO romes_public_data (code_rome, libelle_rome) VALUES %L`,
+    "INSERT INTO romes_public_data (code_rome, libelle_rome) VALUES %L",
     arrayOfRomeData,
   );
 };
@@ -42,7 +42,7 @@ const buildInsertAppellationPublicDataQuery = async () => {
   );
 
   return format(
-    `INSERT INTO appellations_public_data (ogr_appellation, code_rome, libelle_appellation_long, libelle_appellation_court) VALUES %L`,
+    "INSERT INTO appellations_public_data (ogr_appellation, code_rome, libelle_appellation_long, libelle_appellation_court) VALUES %L",
     arrayOfAppellationData,
   );
 };

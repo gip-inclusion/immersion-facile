@@ -1,9 +1,9 @@
 import { WithConventionDto, withConventionSchema } from "shared";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { getAllConventionRecipientsEmail } from "../../entities/Convention";
 

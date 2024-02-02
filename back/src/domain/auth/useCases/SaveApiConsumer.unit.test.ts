@@ -2,24 +2,24 @@ import { addMilliseconds, addYears } from "date-fns";
 import {
   ApiConsumer,
   BackOfficeJwtPayload,
+  Role,
   createApiConsumerParamsFromApiConsumer,
   createBackOfficeJwtPayload,
   expectPromiseToFailWithError,
   expectToEqual,
-  Role,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { generateApiConsumerJwtTestFn } from "../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { SaveApiConsumer } from "./SaveApiConsumer";

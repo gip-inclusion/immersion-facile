@@ -26,7 +26,7 @@ const preferCapEmploiPredicate = (
 
 const onlyValidAdvisorsForImmersion = (
   advisor: PeConnectAdvisorDto,
-): advisor is PeConnectImmersionAdvisorDto => advisor.type != "INDEMNISATION";
+): advisor is PeConnectImmersionAdvisorDto => advisor.type !== "INDEMNISATION";
 
 const logger = createLogger(__filename);
 

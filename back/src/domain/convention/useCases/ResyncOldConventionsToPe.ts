@@ -1,10 +1,10 @@
+import { ConventionId } from "shared";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { ConventionId } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { PoleEmploiGateway } from "../ports/PoleEmploiGateway";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 
@@ -102,7 +102,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       const anError =
         error instanceof Error
           ? error
-          : new Error("Not an Error: " + JSON.stringify(error));
+          : new Error(`Not an Error: ${JSON.stringify(error)}`);
       await uow.conventionsToSyncRepository.save({
         id: conventionToSyncId,
         status: "ERROR",
@@ -117,9 +117,8 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
     uow: UnitOfWork,
     conventionToSyncId: ConventionId,
   ): Promise<void> {
-    const convention = await uow.conventionRepository.getById(
-      conventionToSyncId,
-    );
+    const convention =
+      await uow.conventionRepository.getById(conventionToSyncId);
     if (!convention)
       throw new NotFoundError(
         `Convention with id ${conventionToSyncId} missing in conventionRepository.`,

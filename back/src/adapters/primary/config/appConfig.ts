@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 import { trim } from "ramda";
 import {
   AbsoluteUrl,
+  ProcessEnv,
   filterNotFalsy,
   inclusionConnectImmersionRoutes,
   makeGetBooleanVariable,
@@ -9,7 +10,6 @@ import {
   makeThrowIfNotDefinedOrDefault,
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
-  ProcessEnv,
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
@@ -103,6 +103,7 @@ export class AppConfig {
         bucketName: this.#throwIfNotDefinedOrDefault("CELLAR_BUCKET"),
       };
     }
+    return undefined;
   }
 
   // Visible for testing.

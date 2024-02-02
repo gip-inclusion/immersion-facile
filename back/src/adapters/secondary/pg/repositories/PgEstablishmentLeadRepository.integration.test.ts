@@ -30,9 +30,8 @@ describe("PgEstablishmentLeadRepository", () => {
 
   describe("save & getBySiret", () => {
     it("Save EstablishmentLead", async () => {
-      const noResult = await establishmentLeadRepository.getBySiret(
-        "40400000000404",
-      );
+      const noResult =
+        await establishmentLeadRepository.getBySiret("40400000000404");
       expect(noResult).toBeUndefined();
 
       const now = new Date();

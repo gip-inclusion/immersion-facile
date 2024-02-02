@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { castError, SubscriptionParams } from "shared";
+import { SubscriptionParams, castError } from "shared";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscribersGateway,

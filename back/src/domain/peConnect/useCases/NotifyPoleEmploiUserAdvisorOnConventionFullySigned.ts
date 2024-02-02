@@ -1,8 +1,8 @@
-import { frontRoutes, WithConventionDto, withConventionSchema } from "shared";
+import { WithConventionDto, frontRoutes, withConventionSchema } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<WithConventionDto> {
@@ -42,7 +42,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
 
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
-    if (conventionPeAdvisor && conventionPeAdvisor.advisor && agency)
+    if (conventionPeAdvisor?.advisor && agency)
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {

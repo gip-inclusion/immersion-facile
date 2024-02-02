@@ -5,17 +5,17 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   ConventionRelatedJwtPayload,
-  expectPromiseToFailWithError,
-  expectToEqual,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
+  expectPromiseToFailWithError,
+  expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -23,9 +23,9 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { AddConvention } from "./AddConvention";
@@ -128,7 +128,10 @@ describe("RenewConvention", () => {
         payloadKind: "inclusionConnect",
         payload: inclusionConnectPayload,
       },
-    ] satisfies { payloadKind: string; payload: ConventionRelatedJwtPayload }[])(
+    ] satisfies {
+      payloadKind: string;
+      payload: ConventionRelatedJwtPayload;
+    }[])(
       "renews the convention with $payloadKind jwt payload",
       async ({ payload }) => {
         uow.conventionRepository.setConventions([existingValidatedConvention]);
@@ -187,7 +190,7 @@ describe("RenewConvention", () => {
           }),
         ),
         new ForbiddenError(
-          `This token is not allowed to renew this convention`,
+          "This token is not allowed to renew this convention",
         ),
       );
     });

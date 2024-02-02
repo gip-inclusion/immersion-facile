@@ -1,28 +1,28 @@
 import { addDays } from "date-fns";
 import {
-  addressStringToDto,
   ApiConsumer,
   AppellationAndRomeDto,
-  expectToEqual,
   SearchQueryParamsDto,
   SearchResultDto,
+  addressStringToDto,
+  expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
-  boulangerAssistantOffer,
-  boulangerOffer,
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
-  establishmentAggregateToSearchResultByRome,
   EstablishmentEntityBuilder,
-  secretariatOffer,
   TEST_POSITION,
+  boulangerAssistantOffer,
+  boulangerOffer,
+  establishmentAggregateToSearchResultByRome,
+  secretariatOffer,
 } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteGateway } from "../../../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "../../../adapters/secondary/offer/laBonneBoite/LaBonneBoiteCompanyDto";

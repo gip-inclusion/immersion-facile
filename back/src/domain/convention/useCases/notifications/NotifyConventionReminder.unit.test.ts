@@ -4,28 +4,28 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  conventionStatuses,
   EstablishmentRepresentative,
+  GenericActor,
+  Role,
+  TemplatedEmail,
+  conventionStatuses,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
-  GenericActor,
-  Role,
   splitCasesBetweenPassingAndFailing,
-  TemplatedEmail,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
 import {
   ForbiddenError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
@@ -33,13 +33,13 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
-import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
-  forbiddenUnsupportedStatusMessage,
   NotifyConventionReminder,
+  forbiddenUnsupportedStatusMessage,
   toSignatoriesSummary,
 } from "./NotifyConventionReminder";
 import {
@@ -550,17 +550,16 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           ],
           sms: [
             {
-              recipientPhone:
-                "33" + convention.signatories.beneficiary.phone.substring(1),
+              recipientPhone: `33${convention.signatories.beneficiary.phone.substring(
+                1,
+              )}`,
               kind,
               params: { shortLink: makeShortLinkUrl(config, shortLinkIds[2]) },
             },
             {
-              recipientPhone:
-                "33" +
-                convention.signatories.establishmentRepresentative.phone.substring(
-                  1,
-                ),
+              recipientPhone: `33${convention.signatories.establishmentRepresentative.phone.substring(
+                1,
+              )}`,
               kind,
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkIds[3]),
@@ -814,11 +813,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           ],
           sms: [
             {
-              recipientPhone:
-                "33" +
-                convention.signatories.establishmentRepresentative.phone.substring(
-                  1,
-                ),
+              recipientPhone: `33${convention.signatories.establishmentRepresentative.phone.substring(
+                1,
+              )}`,
               kind: type,
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkIds[2]),
@@ -868,7 +865,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         .build();
 
       const expected: string[] = [
-        `- ✔️  - A signé le 15/03/2023 - Jean Valjean, bénéficiaire`,
+        "- ✔️  - A signé le 15/03/2023 - Jean Valjean, bénéficiaire",
         `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
 
@@ -895,8 +892,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         .build();
 
       const expected: string[] = [
-        `- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire`,
-        `- ✔️  - A signé le 19/03/2023 - Révérent Balec, représentant légal du bénéficiaire`,
+        "- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire",
+        "- ✔️  - A signé le 19/03/2023 - Révérent Balec, représentant légal du bénéficiaire",
         `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
 
@@ -927,7 +924,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         .build();
 
       const expected: string[] = [
-        `- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire`,
+        "- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire",
         `- ❌ - N'a pas signé - Robert Thénardier, employeur actuel du bénéficiaire`,
         `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
@@ -948,7 +945,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       ["0692000001", "262692000001"], // Réunion
       ["0693000001", "262693000001"], // Réunion
     ])(
-      `Should send SMS with mobile phone %s`,
+      "Should send SMS with mobile phone %s",
       async (mobilePhone, internationalMobilePhone) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();

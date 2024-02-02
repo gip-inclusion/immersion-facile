@@ -4,7 +4,10 @@ import { z } from "zod";
 export abstract class HttpError extends Error {
   public abstract httpCode: number;
 
-  constructor(message?: any, public readonly issues?: string[]) {
+  constructor(
+    message?: any,
+    public readonly issues?: string[],
+  ) {
     super(message);
     Object.setPrototypeOf(this, HttpError.prototype);
   }
@@ -35,7 +38,7 @@ export class FeatureDisabledError extends HttpError {
   public httpCode = 424;
 
   constructor(disableService?: string) {
-    super(disableService + " is disabled");
+    super(`${disableService} is disabled`);
     Object.setPrototypeOf(this, FeatureDisabledError.prototype);
   }
 }

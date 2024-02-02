@@ -1,17 +1,17 @@
 import {
+  SubscriptionParams,
   expectPromiseToFailWithError,
   expectToEqual,
-  SubscriptionParams,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { ApiConsumerBuilder } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { SubscribeToWebhook } from "./SubscribeToWebhook";
 
 describe("SubscribeToWebhook", () => {

@@ -4,7 +4,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addConstraint("immersion_applications", "fk_agency_id", {
     foreignKeys: {
       columns: "agency_id",
-      references: `agencies(id)`,
+      references: "agencies(id)",
     },
   });
 }

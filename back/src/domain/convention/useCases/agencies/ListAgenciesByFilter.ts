@@ -1,25 +1,21 @@
 import {
-  activeAgencyStatuses,
   AgencyDto,
   AgencyOption,
   ListAgenciesRequestDto,
+  activeAgencyStatuses,
   listAgenciesRequestSchema,
 } from "shared";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class ListAgenciesByFilter extends TransactionalUseCase<
   ListAgenciesRequestDto,
   AgencyOption[]
 > {
   protected inputSchema = listAgenciesRequestSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   public async _execute(
     { departmentCode, nameIncludes, kind }: ListAgenciesRequestDto,

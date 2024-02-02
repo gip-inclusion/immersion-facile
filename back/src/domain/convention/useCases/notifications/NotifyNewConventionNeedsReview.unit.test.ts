@@ -7,12 +7,12 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";

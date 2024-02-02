@@ -2,8 +2,8 @@ import { Response } from "express";
 import {
   AbsoluteUrl,
   ManagedRedirectError,
-  queryParamsAsString,
   RawRedirectError,
+  queryParamsAsString,
 } from "shared";
 
 type RawRedirectErrorParams = {

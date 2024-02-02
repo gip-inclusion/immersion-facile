@@ -3,15 +3,11 @@ import {
   RomeDto,
   zTrimmedString,
 } from "shared";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
   protected inputSchema = zTrimmedString;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   public async _execute(
     searchText: string,

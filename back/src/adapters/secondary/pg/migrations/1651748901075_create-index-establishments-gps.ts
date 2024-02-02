@@ -2,7 +2,7 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   await pgm.sql(
-    `CREATE INDEX establishments_gps ON establishments USING GIST (geography(gps));`,
+    "CREATE INDEX establishments_gps ON establishments USING GIST (geography(gps));",
   );
 }
 

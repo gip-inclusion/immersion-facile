@@ -1,14 +1,14 @@
-import { z } from "zod";
 import {
   AbsoluteUrl,
-  absoluteUrlSchema,
   EmailAttachment,
-  emailAttachmentSchema,
-  emailSchema,
   Flavor,
   Phone,
+  absoluteUrlSchema,
+  emailAttachmentSchema,
+  emailSchema,
   smsRecipientPhoneSchema,
 } from "shared";
+import { z } from "zod";
 
 export type ApiKey = Flavor<string, "ApiKey">;
 const apiKeySchema = z.string().nonempty();

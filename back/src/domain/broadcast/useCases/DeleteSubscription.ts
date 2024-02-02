@@ -1,17 +1,17 @@
-import { z } from "zod";
 import {
   ApiConsumer,
+  SubscriptionEvent,
   findRightNameFromSubscriptionId,
   isApiConsumerAllowed,
-  SubscriptionEvent,
 } from "shared";
+import { z } from "zod";
 import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class DeleteSubscription extends TransactionalUseCase<
   string,
@@ -19,10 +19,6 @@ export class DeleteSubscription extends TransactionalUseCase<
   ApiConsumer
 > {
   protected inputSchema = z.string();
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   protected async _execute(
     subscriptionId: SubscriptionEvent,

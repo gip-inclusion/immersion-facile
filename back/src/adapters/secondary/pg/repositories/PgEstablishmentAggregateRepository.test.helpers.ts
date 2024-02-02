@@ -2,10 +2,10 @@ import { PoolClient } from "pg";
 import {
   AddressDto,
   ContactMethod,
-  defaultMaxContactsPerWeek,
   FormEstablishmentSource,
   GeoPositionDto,
   NumberEmployeesRange,
+  defaultMaxContactsPerWeek,
 } from "shared";
 import { EstablishmentAggregate } from "../../../../domain/offer/entities/EstablishmentEntity";
 import { rueGuillaumeTellDto } from "../../addressGateway/InMemoryAddressGateway";
@@ -83,7 +83,7 @@ const insertImmersionContact = async (
   );
 
   await client.query(
-    `INSERT INTO establishments__immersion_contacts (establishment_siret, contact_uuid) VALUES ($1, $2)`,
+    "INSERT INTO establishments__immersion_contacts (establishment_siret, contact_uuid) VALUES ($1, $2)",
     [props.siret_establishment, props.uuid],
   );
 };
@@ -125,11 +125,24 @@ export const insertEstablishment = async (
 
   //prettier-ignore
   await client.query(insertQuery, [
-    props.siret, addressDto.streetNumberAndAddress, addressDto.postcode, addressDto.city, addressDto.departmentCode,
-    props.numberEmployeesRange ?? null, props.nafCode ?? "8622B", props.sourceProvider ?? "api_labonneboite", props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null, 
-    props.isOpen ?? true, props.isSearchable ?? true, props.fitForDisabledWorkers, position.lon, position.lat,
-    props.maxContactsPerWeek ?? defaultMaxContactsPerWeek, props.createdAt.toISOString(),
-    props.searchableByStudents ?? false, props.searchableByJobSeekers ?? false
+    props.siret,
+    addressDto.streetNumberAndAddress,
+    addressDto.postcode,
+    addressDto.city,
+    addressDto.departmentCode,
+    props.numberEmployeesRange ?? null,
+    props.nafCode ?? "8622B",
+    props.sourceProvider ?? "api_labonneboite",
+    props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
+    props.isOpen ?? true,
+    props.isSearchable ?? true,
+    props.fitForDisabledWorkers,
+    position.lon,
+    position.lat,
+    props.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
+    props.createdAt.toISOString(),
+    props.searchableByStudents ?? false,
+    props.searchableByJobSeekers ?? false,
   ]);
 };
 
@@ -194,12 +207,12 @@ type PgEstablishmentImmersionContact = {
 export const getAllImmersionContactsRows = async (
   client: PoolClient,
 ): Promise<PgImmersionContact[]> =>
-  (await client.query(`SELECT * FROM immersion_contacts`)).rows;
+  (await client.query("SELECT * FROM immersion_contacts")).rows;
 
 export const getAllEstablishmentImmersionContactsRows = async (
   client: PoolClient,
 ): Promise<PgEstablishmentImmersionContact[]> =>
-  (await client.query(`SELECT * FROM establishments__immersion_contacts`)).rows;
+  (await client.query("SELECT * FROM establishments__immersion_contacts")).rows;
 
 export type PgEstablishmentRowWithGeo = PgEstablishmentRow & {
   longitude: number;

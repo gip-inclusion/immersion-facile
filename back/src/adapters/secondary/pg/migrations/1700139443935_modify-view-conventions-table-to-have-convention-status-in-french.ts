@@ -104,7 +104,7 @@ FROM conventions c
  LEFT JOIN actors br ON ((c.beneficiary_representative_id = br.id))
  ${
    mode === "up"
-     ? `LEFT JOIN convention_status_translations cst ON ((c.status = cst.status))`
+     ? "LEFT JOIN convention_status_translations cst ON ((c.status = cst.status))"
      : ""
  }
  LEFT JOIN actors bce ON ((c.beneficiary_current_employer_id = bce.id));`;

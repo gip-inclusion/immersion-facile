@@ -72,12 +72,12 @@ const viewEstablishments = (direction: "up" | "down") => {
   };
 
   const selectDistinctOrNot = {
-    up: `SELECT DISTINCT`,
-    down: `SELECT`,
+    up: "SELECT DISTINCT",
+    down: "SELECT",
   };
 
   const joinContactRequest = {
-    up: `LEFT JOIN count_contact_requests_by_siret count_rel ON ((count_rel.siret = e.siret)))`,
+    up: "LEFT JOIN count_contact_requests_by_siret count_rel ON ((count_rel.siret = e.siret)))",
     down: `LEFT JOIN count_contact_requests_by_siret count_rel ON ((count_rel."Siret" = e.siret)))`,
   };
 

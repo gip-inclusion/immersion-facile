@@ -1,21 +1,21 @@
-import supertest from "supertest";
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
+import supertest from "supertest";
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { Gateways } from "../adapters/primary/config/createGateways";
 import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
+import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryAddressGateway } from "../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import { CustomTimeGateway } from "../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/documentGateway/NotImplementedDocumentGateway";
 import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationGateway";
-import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import type { InMemoryNotificationGateway } from "../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../adapters/secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
-import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
@@ -50,7 +50,8 @@ export type InMemoryGateways = {
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
 // prettier-ignore
-const _isAssignable = (inMemoryRepos: InMemoryGateways): Gateways => inMemoryRepos;
+const _isAssignable = (inMemoryRepos: InMemoryGateways): Gateways =>
+  inMemoryRepos;
 
 export type TestAppAndDeps = {
   request: supertest.SuperTest<supertest.Test>;
@@ -124,7 +125,7 @@ export const buildTestApp = async (
   const request = supertest(app);
   const eventCrawler = rawEventCrawler as BasicEventCrawler;
 
-  /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   const inMemoryUow = uow!;
 
   await inMemoryUow.agencyRepository.insert(agency);

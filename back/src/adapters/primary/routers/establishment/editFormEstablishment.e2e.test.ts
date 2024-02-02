@@ -1,24 +1,24 @@
 import { subYears } from "date-fns";
-import supertest from "supertest";
 import {
+  EstablishmentRoutes,
+  FormEstablishmentDtoBuilder,
   createBackOfficeJwtPayload,
   createEstablishmentJwtPayload,
-  EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
   expiredMagicLinkErrorMessage,
-  FormEstablishmentDtoBuilder,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import supertest from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
   makeGenerateJwtES256,
 } from "../../../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import {
   TEST_OPEN_ESTABLISHMENT_1,
   TEST_OPEN_ESTABLISHMENT_2,
@@ -26,7 +26,7 @@ import {
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
-describe(`Edit form establishments`, () => {
+describe("Edit form establishments", () => {
   let httpClient: HttpClient<EstablishmentRoutes>;
   let appConfig: AppConfig;
   let gateways: InMemoryGateways;

@@ -1,7 +1,7 @@
 import {
-  addressDtoToString,
   ContactEstablishmentEventPayload,
   ContactMethod,
+  addressDtoToString,
   expectPromiseToFailWithError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -10,10 +10,10 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryRomeRepository } from "../../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   DiscussionAggregateBuilder,
   InMemoryDiscussionAggregateRepository,

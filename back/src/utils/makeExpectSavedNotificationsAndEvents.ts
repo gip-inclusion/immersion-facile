@@ -1,19 +1,19 @@
 import { partition } from "ramda";
 import {
-  exhaustiveCheck,
-  expectToEqual,
   TemplatedEmail,
   TemplatedSms,
+  exhaustiveCheck,
+  expectToEqual,
 } from "shared";
 import {
   EmailNotification,
   Notification,
   NotificationKind,
-  notificationKinds,
   SmsNotification,
+  notificationKinds,
 } from "shared";
-import { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
 import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
+import { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
 import { NotificationAddedEvent } from "../domain/core/eventBus/events";
 import { WithNotificationIdAndKind } from "../domain/generic/notifications/entities/Notification";
 
@@ -70,7 +70,9 @@ type ExpectedNotifications = {
 type ParamByKind = {
   [K in NotificationKind]: {
     // prettier-ignore
-    expectedTemplatedContent: Array<Extract<Notification, {kind: K;}>["templatedContent"]>;
+    expectedTemplatedContent: Array<
+      Extract<Notification, { kind: K }>["templatedContent"]
+    >;
     notificationsOfKind: Array<Extract<Notification, { kind: K }>>;
   };
 };

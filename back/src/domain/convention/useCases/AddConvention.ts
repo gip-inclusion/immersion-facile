@@ -1,13 +1,13 @@
 import {
   ConventionDto,
-  conventionSchema,
   ConventionStatus,
   WithConventionIdLegacy,
+  conventionSchema,
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 
@@ -38,8 +38,8 @@ export class AddConvention extends TransactionalUseCase<
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
     if (
-      convention.status != "DRAFT" &&
-      convention.status != minimalValidStatus
+      convention.status !== "DRAFT" &&
+      convention.status !== minimalValidStatus
     ) {
       throw new ForbiddenError();
     }

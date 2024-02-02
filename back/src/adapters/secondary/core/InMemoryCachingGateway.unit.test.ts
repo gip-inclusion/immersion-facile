@@ -1,7 +1,7 @@
 import minutesToSeconds from "date-fns/minutesToSeconds";
 import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
-import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 import { InMemoryCachingGateway } from "./InMemoryCachingGateway";
+import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 
 const testResponse1: GetAccessTokenResponse = {
   access_token: "token1",

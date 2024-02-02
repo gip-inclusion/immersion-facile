@@ -1,19 +1,19 @@
-import { z } from "zod";
 import {
   AbsoluteUrl,
   ConventionsEstablishmentDashboard,
   EstablishmentDashboards,
-  InclusionConnectedUser,
   InclusionConnectJwtPayload,
+  InclusionConnectedUser,
   WithDashboardUrls,
 } from "shared";
+import { z } from "zod";
 import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../../dashboard/port/DashboardGateway";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<

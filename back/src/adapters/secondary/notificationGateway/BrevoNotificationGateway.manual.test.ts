@@ -89,9 +89,8 @@ describe("BrevoNotificationGateway manual", () => {
   it("should retrieve attachment content correctly", async () => {
     const downloadToken =
       "eyJmb2xkZXIiOiIyMDIzMDcxMzEyMTcxNS45Mi40Mjg0MDQyMiIsImZpbGVuYW1lIjoiaWYtbG9nby1wZS1pby5wbmcifQ";
-    const content = await notificationGateway.getAttachmentContent(
-      downloadToken,
-    );
+    const content =
+      await notificationGateway.getAttachmentContent(downloadToken);
     expect(content.toString("base64")).toBe(ifLogoInBase64);
   });
 

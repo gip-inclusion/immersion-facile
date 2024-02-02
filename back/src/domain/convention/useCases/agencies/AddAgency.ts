@@ -2,17 +2,17 @@ import {
   AgencyDto,
   AgencyId,
   CreateAgencyDto,
-  createAgencySchema,
   Email,
+  createAgencySchema,
   invalidAgencySiretMessage,
 } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SiretGateway } from "../../../sirene/ports/SirenGateway";
 import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 import { referedAgencyMissingMessage } from "../../ports/AgencyRepository";

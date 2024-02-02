@@ -1,24 +1,24 @@
-import { SuperTest, Test } from "supertest";
 import {
+  EstablishmentRoutes,
+  FormEstablishmentDtoBuilder,
   defaultValidFormEstablishment,
   displayRouteName,
-  EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
-  FormEstablishmentDtoBuilder,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
+import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

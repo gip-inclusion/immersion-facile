@@ -2,15 +2,15 @@ import axios from "axios";
 import {
   AddressAndPosition,
   AddressDto,
-  expectPromiseToFailWithError,
-  expectToEqual,
   GeoPositionDto,
   LookupSearchResult,
+  expectPromiseToFailWithError,
+  expectToEqual,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { errorMessage, HttpAddressGateway } from "./HttpAddressGateway";
+import { HttpAddressGateway, errorMessage } from "./HttpAddressGateway";
 import { addressesExternalRoutes } from "./HttpAddressGateway.routes";
 
 const resultFromApiAddress = {

@@ -1,7 +1,7 @@
 import {
   GetSiretRequestDto,
-  getSiretRequestSchema,
   SiretEstablishmentDto,
+  getSiretRequestSchema,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { SiretGateway } from "../ports/SirenGateway";

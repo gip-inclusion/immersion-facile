@@ -1,17 +1,17 @@
 import {
   ConventionStatus,
   UpdateConventionRequestDto,
-  updateConventionRequestSchema,
   WithConventionIdLegacy,
+  updateConventionRequestSchema,
 } from "shared";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 
 export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,
@@ -45,7 +45,7 @@ export class UpdateConvention extends TransactionalUseCase<
       throw new NotFoundError(
         `Convention with id ${convention.id} was not found`,
       );
-    if (conventionFromRepo.status != "DRAFT") {
+    if (conventionFromRepo.status !== "DRAFT") {
       throw new BadRequestError(
         `Convention ${conventionFromRepo.id} cannot be modified as it has status ${conventionFromRepo.status}`,
       );

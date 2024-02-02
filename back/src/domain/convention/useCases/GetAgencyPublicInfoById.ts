@@ -1,22 +1,18 @@
 import {
   AgencyPublicDisplayDto,
-  toAgencyPublicDisplayDto,
   WithAgencyId,
+  toAgencyPublicDisplayDto,
   withAgencyIdSchema,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class GetAgencyPublicInfoById extends TransactionalUseCase<
   WithAgencyId,
   AgencyPublicDisplayDto
 > {
   protected inputSchema = withAgencyIdSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   public async _execute(
     { agencyId }: WithAgencyId,

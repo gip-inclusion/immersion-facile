@@ -1,14 +1,14 @@
 import {
   AbsoluteUrl,
   AgencyDto,
+  AuthenticateWithInclusionCodeConnectParams,
   AuthenticatedUser,
   AuthenticatedUserId,
   AuthenticatedUserQueryParams,
-  AuthenticateWithInclusionCodeConnectParams,
+  InclusionConnectedUser,
   authenticateWithInclusionCodeSchema,
   currentJwtVersions,
   frontRoutes,
-  InclusionConnectedUser,
   queryParamsAsString,
 } from "shared";
 import {
@@ -16,10 +16,10 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateInclusionConnectJwt } from "../../auth/jwt";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { makeInclusionConnectRedirectUri } from "../entities/inclusionConnectRedirectUrl";
@@ -91,9 +91,8 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
     if (isIcUserAlreadyHasValidRight(icUser, safirCode)) return;
 
-    const agency: AgencyDto | undefined = await uow.agencyRepository.getBySafir(
-      safirCode,
-    );
+    const agency: AgencyDto | undefined =
+      await uow.agencyRepository.getBySafir(safirCode);
     if (!agency) return;
 
     await uow.inclusionConnectedUserRepository.update({

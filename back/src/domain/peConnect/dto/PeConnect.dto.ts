@@ -2,9 +2,9 @@ import {
   Beneficiary,
   FederatedIdentityProvider,
   InternshipKind,
-  notJobSeeker,
   PeConnectToken,
   PeExternalId,
+  notJobSeeker,
 } from "shared";
 import { EntityFromDto } from "../../core/EntityFromDto";
 import { PeConnectImmersionAdvisorDto } from "./PeConnectAdvisor.dto";

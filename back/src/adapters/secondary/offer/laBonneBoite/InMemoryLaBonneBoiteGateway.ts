@@ -9,7 +9,7 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
   constructor(
     private _results: LaBonneBoiteCompanyDto[] = [],
     private _error: Error | null = null,
-    public nbOfCalls: number = 0,
+    public nbOfCalls = 0,
   ) {}
 
   public async searchCompanies(

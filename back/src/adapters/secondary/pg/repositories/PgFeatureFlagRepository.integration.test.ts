@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import {
-  expectToEqual,
   FeatureFlags,
+  expectToEqual,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";

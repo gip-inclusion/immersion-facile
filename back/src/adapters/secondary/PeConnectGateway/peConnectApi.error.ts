@@ -90,7 +90,7 @@ export const peConnectErrorStrategy = (
     [
       error.message === "Network Error",
       new RawRedirectError(
-        `Une erreur est survenue - Erreur réseau`,
+        "Une erreur est survenue - Erreur réseau",
         "Nous n’avons pas réussi à joindre pôle emploi connect.",
         error,
       ),

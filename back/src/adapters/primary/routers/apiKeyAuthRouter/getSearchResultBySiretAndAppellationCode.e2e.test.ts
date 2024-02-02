@@ -1,4 +1,3 @@
-import { SuperTest, Test } from "supertest";
 import {
   AppellationAndRomeDto,
   expectHttpResponseToEqual,
@@ -6,22 +5,23 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
+import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   ContactEntityBuilder,
-  defaultNafCode,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   TEST_POSITION,
   TEST_ROME_LABEL,
+  defaultNafCode,
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
@@ -38,7 +38,7 @@ const styliste: AppellationAndRomeDto = {
 };
 const immersionOfferSiret = "78000403200019";
 
-describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:siret/:appellationCode`, () => {
+describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:siret/:appellationCode", () => {
   let request: SuperTest<Test>;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
@@ -50,9 +50,8 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       .withRepositories("IN_MEMORY")
       .withAuthorizedApiKeyIds([authorizedUnJeuneUneSolutionApiConsumer.id])
       .build();
-    ({ request, inMemoryUow, generateApiConsumerJwt } = await buildTestApp(
-      config,
-    ));
+    ({ request, inMemoryUow, generateApiConsumerJwt } =
+      await buildTestApp(config));
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });

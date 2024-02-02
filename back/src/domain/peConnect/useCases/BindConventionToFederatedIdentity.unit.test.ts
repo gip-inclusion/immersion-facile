@@ -1,18 +1,18 @@
 import {
-  authFailed,
   ConventionDtoBuilder,
+  authFailed,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   CONVENTION_ID_DEFAULT_UUID,
   InMemoryConventionPoleEmploiAdvisorRepository,
 } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -56,11 +56,12 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     });
     await associatePeConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
-    }),
-      expect(
-        conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
-      ).toHaveLength(0);
-    await expectObjectsToMatch(outboxRepo.events, [expectedEvent]);
+    });
+
+    expect(
+      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+    ).toHaveLength(0);
+    expectObjectsToMatch(outboxRepo.events, [expectedEvent]);
   });
 
   it("authfailed", async () => {

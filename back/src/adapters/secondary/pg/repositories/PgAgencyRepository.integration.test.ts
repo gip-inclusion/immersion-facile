@@ -1,11 +1,11 @@
 import { Pool, PoolClient } from "pg";
 import {
-  activeAgencyStatuses,
   AgencyDto,
   AgencyDtoBuilder,
+  GeoPositionDto,
+  activeAgencyStatuses,
   expectPromiseToFailWithError,
   expectToEqual,
-  GeoPositionDto,
 } from "shared";
 import { someAgenciesMissingMessage } from "../../../../domain/convention/ports/AgencyRepository";
 import {
@@ -358,9 +358,8 @@ describe("PgAgencyRepository", () => {
     const agency1 = agency1builder.build();
 
     it("returns undefined for empty table", async () => {
-      const result = await agencyRepository.getAgencyWhereEmailMatches(
-        "notFound",
-      );
+      const result =
+        await agencyRepository.getAgencyWhereEmailMatches("notFound");
       expect(result).toBeUndefined();
     });
 

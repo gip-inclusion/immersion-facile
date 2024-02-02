@@ -70,7 +70,7 @@ export class InMemoryRomeRepository implements RomeRepository {
     romeCodeAppellation: AppellationCode,
   ): Promise<RomeCode | undefined> {
     return this.appellations.find(
-      ({ appellationCode }) => appellationCode == romeCodeAppellation,
+      ({ appellationCode }) => appellationCode === romeCodeAppellation,
     )?.romeCode;
   }
 

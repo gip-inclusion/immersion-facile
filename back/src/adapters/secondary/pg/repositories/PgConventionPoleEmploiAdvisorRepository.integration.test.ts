@@ -213,6 +213,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
           conventionId,
         );
 
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: poleEmploiFirstUserAdvisor.advisor,
         peExternalId: poleEmploiFirstUserAdvisor.user.peExternalId,
@@ -236,6 +237,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
           conventionId,
         );
 
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: undefined,
         peExternalId: poleEmploiFirstUserAdvisor.user.peExternalId,

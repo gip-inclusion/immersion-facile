@@ -1,7 +1,7 @@
 import { ConventionId } from "shared";
 import {
-  ConventionsToSyncRepository,
   ConventionToSync,
+  ConventionsToSyncRepository,
 } from "../../domain/convention/ports/ConventionsToSyncRepository";
 
 export class InMemoryConventionsToSyncRepository
@@ -25,9 +25,11 @@ export class InMemoryConventionsToSyncRepository
     const index = this.conventionsToSync.findIndex(
       (convention) => convention.id === conventionToSync.id,
     );
-    index === -1
-      ? this.conventionsToSync.push(conventionToSync)
-      : (this.conventionsToSync[index] = conventionToSync);
+    if (index === -1) {
+      this.conventionsToSync.push(conventionToSync);
+    } else {
+      this.conventionsToSync[index] = conventionToSync;
+    }
   }
 
   // for testing purpose

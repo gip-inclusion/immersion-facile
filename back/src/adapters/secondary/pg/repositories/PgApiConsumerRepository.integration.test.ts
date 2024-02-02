@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { ApiConsumer, expectToEqual, WebhookSubscription } from "shared";
+import { ApiConsumer, WebhookSubscription, expectToEqual } from "shared";
 import { UuidV4Generator } from "../../core/UuidGeneratorImplementations";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";

@@ -1,22 +1,22 @@
-import supertest from "supertest";
 import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  Signatories,
+  TemplatedEmail,
+  UpdateConventionStatusRequestDto,
+  VALID_EMAILS,
   conventionMagicLinkRoutes,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectToEqual,
-  Signatories,
   technicalRoutes,
-  TemplatedEmail,
   unauthenticatedConventionRoutes,
-  UpdateConventionStatusRequestDto,
-  VALID_EMAILS,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import supertest from "supertest";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
-import { buildTestApp, TestAppAndDeps } from "../../../../utils/buildTestApp";
+import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";

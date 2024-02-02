@@ -1,23 +1,23 @@
 import { uniqBy } from "ramda";
 import {
+  path,
   AddressDto,
   AppellationAndRomeDto,
   AppellationCode,
   Builder,
-  conflictErrorSiret,
   ContactMethod,
-  defaultMaxContactsPerWeek,
   EstablishmentSearchableBy,
   FormEstablishmentSource,
   GeoPositionDto,
   NafDto,
   NumberEmployeesRange,
-  path,
-  pathEq,
-  replaceArrayElement,
   RomeCode,
   SearchResultDto,
   SiretDto,
+  conflictErrorSiret,
+  defaultMaxContactsPerWeek,
+  pathEq,
+  replaceArrayElement,
 } from "shared";
 import { ContactEntity } from "../../../domain/offer/entities/ContactEntity";
 import {
@@ -27,10 +27,10 @@ import {
 import { OfferEntity } from "../../../domain/offer/entities/OfferEntity";
 import {
   EstablishmentAggregateRepository,
-  establishmentNotFoundErrorMessage,
   SearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
+  establishmentNotFoundErrorMessage,
 } from "../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
@@ -61,9 +61,7 @@ export class InMemoryEstablishmentAggregateRepository
     return this.#establishmentAggregates;
   }
 
-  public set establishmentAggregates(
-    establishmentAggregates: EstablishmentAggregate[],
-  ) {
+  public set establishmentAggregates(establishmentAggregates: EstablishmentAggregate[]) {
     this.#establishmentAggregates = establishmentAggregates;
   }
 

@@ -7,13 +7,13 @@ import {
 } from "shared";
 import { EmailNotification } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { expectNotifyConventionRejected } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyAllActorsThatConventionIsRejected } from "./NotifyAllActorsThatConventionIsRejected";
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
@@ -116,8 +116,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative!.email,
-        beneficiaryCurrentEmployer!.email,
+        beneficiaryRepresentative?.email,
+        beneficiaryCurrentEmployer?.email,
         ...counsellorEmails,
         ...agency.validatorEmails,
       ],
@@ -153,8 +153,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative!.email,
-        beneficiaryCurrentEmployer!.email,
+        beneficiaryRepresentative?.email,
+        beneficiaryCurrentEmployer?.email,
         ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
       ],
       rejectedConventionWithDuplicatedEmails,

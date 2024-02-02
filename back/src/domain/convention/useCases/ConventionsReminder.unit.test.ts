@@ -15,12 +15,12 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { ConventionsReminder } from "./ConventionsReminder";

@@ -1,11 +1,11 @@
-import { z } from "zod";
 import {
   AgencyDto,
   agencySchema,
   getCounsellorsAndValidatorsEmailsDeduplicated,
 } from "shared";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 type WithAgency = { agency: AgencyDto };

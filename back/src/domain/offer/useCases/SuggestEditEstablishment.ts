@@ -1,15 +1,15 @@
 import {
+  SiretDto,
   addressDtoToString,
   createEstablishmentJwtPayload,
   immersionFacileNoReplyEmailSender,
-  SiretDto,
   siretSchema,
 } from "shared";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {

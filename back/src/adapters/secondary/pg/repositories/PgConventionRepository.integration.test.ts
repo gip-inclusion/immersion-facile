@@ -374,7 +374,7 @@ describe("PgConventionRepository", () => {
       updatedConvention.id,
     );
     expectToEqual(
-      updatedConventionStored!.signatories.establishmentRepresentative,
+      updatedConventionStored?.signatories.establishmentRepresentative,
       updatedConvention.signatories.establishmentRepresentative,
     );
     await expectTutorAndRepToHaveSameId(updatedConvention.id);
@@ -390,7 +390,7 @@ describe("PgConventionRepository", () => {
       toDraftConvention.id,
     );
     expectToEqual(
-      toDraftConventionStored!.signatories.establishmentRepresentative,
+      toDraftConventionStored?.signatories.establishmentRepresentative,
       toDraftConvention.signatories.establishmentRepresentative,
     );
   });
@@ -821,9 +821,8 @@ describe("PgConventionRepository", () => {
         .build();
       await conventionRepository.save(convention);
 
-      const result = await conventionRepository.getIdsByEstablishmentTutorEmail(
-        email,
-      );
+      const result =
+        await conventionRepository.getIdsByEstablishmentTutorEmail(email);
 
       expectToEqual(result, [convention.id]);
     });
@@ -835,9 +834,8 @@ describe("PgConventionRepository", () => {
         .build();
       await conventionRepository.save(conventionWithoutEmail);
 
-      const result = await conventionRepository.getIdsByEstablishmentTutorEmail(
-        email,
-      );
+      const result =
+        await conventionRepository.getIdsByEstablishmentTutorEmail(email);
 
       expectToEqual(result, []);
     });

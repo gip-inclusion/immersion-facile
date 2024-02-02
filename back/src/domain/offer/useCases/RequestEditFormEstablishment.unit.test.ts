@@ -1,17 +1,17 @@
 import { addHours, addSeconds } from "date-fns";
 import {
   EstablishmentJwtPayload,
-  expectPromiseToFailWithError,
   TemplatedEmail,
+  expectPromiseToFailWithError,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,

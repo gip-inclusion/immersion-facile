@@ -1,28 +1,28 @@
-import { type SuperTest, type Test } from "supertest";
 import {
   AppellationCode,
-  expectHttpResponseToEqual,
-  expectToEqual,
   Group,
-  immersionOffersRoute,
-  searchImmersionRoutes,
   SearchResultDto,
   SearchRoutes,
   SiretDto,
+  expectHttpResponseToEqual,
+  expectToEqual,
+  immersionOffersRoute,
+  searchImmersionRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { type SuperTest, type Test } from "supertest";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { OfferEntity } from "../../../../domain/offer/entities/OfferEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { avenueChampsElyseesDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   ContactEntityBuilder,
-  defaultNafCode,
   EstablishmentAggregateBuilder,
-  establishmentAggregateToSearchResultByRome,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
+  defaultNafCode,
+  establishmentAggregateToSearchResultByRome,
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -364,7 +364,7 @@ describe("search-immersion route", () => {
       inMemoryUow = testAppAndDeps.inMemoryUow;
     });
 
-    it(`200 - route with mandatory params`, async () => {
+    it("200 - route with mandatory params", async () => {
       await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
         [establishmentAggregate],
       );
@@ -407,7 +407,7 @@ describe("search-immersion route", () => {
       });
     });
 
-    it(`400 - route without mandatory fields or invalid fields`, async () => {
+    it("400 - route without mandatory fields or invalid fields", async () => {
       const response = await request.get(
         makeImmersionOfferUrl("my-fake-siret", undefined),
       );
@@ -424,7 +424,7 @@ Route: GET /search-result`,
       });
     });
 
-    it(`404 - route with valid mandatory fields but offer not in repo`, async () => {
+    it("404 - route with valid mandatory fields but offer not in repo", async () => {
       const requestedOffer = {
         siret: establishmentAggregate.establishment.siret,
         appellationCode: establishmentAggregate.offers[0].appellationCode,
@@ -442,7 +442,7 @@ Route: GET /search-result`,
       });
     });
 
-    it(`404 - route with valid mandatory fields and siret in repo but appellation is not found for establishment`, async () => {
+    it("404 - route with valid mandatory fields and siret in repo but appellation is not found for establishment", async () => {
       await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
         [establishmentAggregate],
       );

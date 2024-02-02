@@ -1,7 +1,7 @@
 import {
+  SiretEstablishmentDto,
   expectPromiseToFailWithError,
   expectToEqual,
-  SiretEstablishmentDto,
 } from "shared";
 import {
   NotFoundError,

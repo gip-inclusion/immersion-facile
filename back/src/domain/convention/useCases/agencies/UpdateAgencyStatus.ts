@@ -8,12 +8,12 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<

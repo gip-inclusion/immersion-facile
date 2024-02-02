@@ -1,12 +1,12 @@
 import {
   AbsoluteUrl,
-  queryParamsAsString,
   WithSourcePage,
+  queryParamsAsString,
   withSourcePageSchema,
 } from "shared";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { makeInclusionConnectRedirectUri } from "../entities/inclusionConnectRedirectUrl";
 
 type InclusionConnectUrlParams = {

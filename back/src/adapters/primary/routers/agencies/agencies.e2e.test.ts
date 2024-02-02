@@ -2,9 +2,9 @@ import {
   AddressDto,
   AgencyDtoBuilder,
   AgencyRoutes,
-  agencyRoutes,
   BackOfficeJwt,
   CreateAgencyDto,
+  agencyRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -12,7 +12,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
@@ -25,7 +25,7 @@ const defaultAddress: AddressDto = {
   city: "Paris",
 };
 
-describe(`Agency routes`, () => {
+describe("Agency routes", () => {
   let httpClient: HttpClient<AgencyRoutes>;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -221,7 +221,7 @@ describe(`Agency routes`, () => {
         expectToEqual(inMemoryUow.agencyRepository.agencies, [
           {
             ...parisMissionLocaleParamsWithoutRefersToAgencyId,
-            questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
+            questionnaireUrl: parisMissionLocaleParams.questionnaireUrl,
             adminEmails: [],
             status: "needsReview",
             refersToAgencyId: null,

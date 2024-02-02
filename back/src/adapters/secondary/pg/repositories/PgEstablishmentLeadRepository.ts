@@ -1,5 +1,5 @@
-import { match, P } from "ts-pattern";
 import { SiretDto } from "shared";
+import { P, match } from "ts-pattern";
 import {
   EstablishmentLead,
   EstablishmentLeadEvent,

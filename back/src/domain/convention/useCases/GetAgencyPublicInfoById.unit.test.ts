@@ -5,8 +5,8 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";

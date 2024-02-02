@@ -8,7 +8,7 @@ const config = AppConfig.createFromEnv();
 createAppDependencies(config).then(
   (deps) => startCrawler(deps),
   (error: any) => {
-    logger.error(error, `Something went wrong in event crawler`);
+    logger.error(error, "Something went wrong in event crawler");
     process.exit(1);
   },
 );

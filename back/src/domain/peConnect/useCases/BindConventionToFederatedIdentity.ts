@@ -1,14 +1,14 @@
 import {
-  authFailed,
   ConventionDto,
-  isPeConnectIdentity,
   PeConnectIdentity,
   WithConventionDto,
+  authFailed,
+  isPeConnectIdentity,
   withConventionSchema,
 } from "shared";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
 
 export class BindConventionToFederatedIdentity extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;

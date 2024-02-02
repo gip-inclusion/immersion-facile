@@ -4,18 +4,18 @@ import {
   withConventionSchema,
 } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import {
-  conventionStatusToPoleEmploiStatus,
-  isBroadcastResponseOk,
   PoleEmploiConvention,
   PoleEmploiGateway,
+  conventionStatusToPoleEmploiStatus,
+  isBroadcastResponseOk,
 } from "../../ports/PoleEmploiGateway";
 
 const conventionObjectiveToObjectifDeImmersion: Record<
@@ -101,9 +101,10 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       signatureEntreprise: !!establishmentRepresentative.signedAt,
     };
 
-    const response = await this.poleEmploiGateway.notifyOnConventionUpdated(
-      poleEmploiConvention,
-    );
+    const response =
+      await this.poleEmploiGateway.notifyOnConventionUpdated(
+        poleEmploiConvention,
+      );
 
     if (this.options.resyncMode)
       await uow.conventionsToSyncRepository.save({

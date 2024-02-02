@@ -3,11 +3,11 @@ import { getAddressAndPosition } from "../../../utils/address";
 import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { AddressGateway } from "../ports/AddressGateway";
 import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
@@ -16,7 +16,9 @@ const logger = createLogger(__filename);
 
 // prettier-ignore
 const makeLog = (siret: string) => (message: string) =>
-  logger.info(`${new Date().toISOString()} - InsertEstablishmentAggregateFromForm - ${siret} - ${message}`);
+  logger.info(
+    `${new Date().toISOString()} - InsertEstablishmentAggregateFromForm - ${siret} - ${message}`,
+  );
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   WithFormEstablishmentDto,
@@ -69,7 +71,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     });
 
     log("Aggregate Ready");
-    log("About to save : " + JSON.stringify(establishmentAggregate, null, 2));
+    log(`About to save : ${JSON.stringify(establishmentAggregate, null, 2)}`);
 
     await uow.establishmentAggregateRepository
       .insertEstablishmentAggregates([establishmentAggregate])
@@ -87,7 +89,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       topic: "NewEstablishmentAggregateInsertedFromForm",
       payload: { establishmentAggregate },
     });
-    log("About to save event " + event.id);
+    log(`About to save event ${event.id}`);
     await uow.outboxRepository.save(event);
     log("Event saved");
   }

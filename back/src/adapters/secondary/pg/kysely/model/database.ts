@@ -125,10 +125,22 @@ interface SavedErrors {
 }
 
 // prettier-ignore
-type ConventionObjectiveType = "Confirmer un projet professionnel" | "Découvrir un métier ou un secteur d'activité" | "Initier une démarche de recrutement";
+type ConventionObjectiveType =
+  | "Confirmer un projet professionnel"
+  | "Découvrir un métier ou un secteur d'activité"
+  | "Initier une démarche de recrutement";
 
 // prettier-ignore
-type ConventionStatusType = "ACCEPTED_BY_COUNSELLOR" | "ACCEPTED_BY_VALIDATOR" | "CANCELLED" | "DEPRECATED" | "DRAFT" | "IN_REVIEW" | "PARTIALLY_SIGNED" | "READY_TO_SIGN" | "REJECTED";
+type ConventionStatusType =
+  | "ACCEPTED_BY_COUNSELLOR"
+  | "ACCEPTED_BY_VALIDATOR"
+  | "CANCELLED"
+  | "DEPRECATED"
+  | "DRAFT"
+  | "IN_REVIEW"
+  | "PARTIALLY_SIGNED"
+  | "READY_TO_SIGN"
+  | "REJECTED";
 
 interface ConventionExternalIds {
   convention_id: string | null;

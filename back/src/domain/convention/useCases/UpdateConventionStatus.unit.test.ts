@@ -10,9 +10,9 @@ import {
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { conventionMissingMessage } from "../entities/Convention";
 import { someAgenciesMissingMessage } from "../ports/AgencyRepository";

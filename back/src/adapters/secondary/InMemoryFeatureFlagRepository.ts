@@ -1,8 +1,8 @@
 import {
   FeatureFlags,
+  SetFeatureFlagParam,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
-  SetFeatureFlagParam,
 } from "shared";
 import { FeatureFlagRepository } from "../../domain/core/ports/FeatureFlagRepository";
 

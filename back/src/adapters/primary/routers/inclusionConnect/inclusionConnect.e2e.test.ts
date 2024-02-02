@@ -1,21 +1,21 @@
-import { SuperTest, Test } from "supertest";
 import {
   AbsoluteUrl,
+  InclusionConnectImmersionRoutes,
+  WithSourcePage,
   allowedStartInclusionConnectLoginPages,
   decodeJwtWithoutSignatureCheck,
   displayRouteName,
   expectHttpResponseToEqual,
   frontRoutes,
-  InclusionConnectImmersionRoutes,
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
-  WithSourcePage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { UuidGenerator } from "../../../../domain/core/ports/UuidGenerator";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("inclusion connection flow", () => {
   const clientId = "my-client-id";

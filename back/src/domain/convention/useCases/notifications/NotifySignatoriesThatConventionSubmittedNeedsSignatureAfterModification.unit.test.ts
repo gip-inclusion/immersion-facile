@@ -6,12 +6,12 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
@@ -19,8 +19,8 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
-import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
+import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { conventionMissingMessage } from "../../entities/Convention";
 import { missingAgencyMessage } from "./NotifyLastSigneeThatConventionHasBeenSigned";
@@ -245,7 +245,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              convention.signatories.beneficiaryRepresentative!.email,
+              convention.signatories.beneficiaryRepresentative?.email,
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -258,15 +258,15 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               internshipKind: convention.internshipKind,
               justification,
               signatoryFirstName:
-                convention.signatories.beneficiaryRepresentative!.firstName,
+                convention.signatories.beneficiaryRepresentative?.firstName,
               signatoryLastName:
-                convention.signatories.beneficiaryRepresentative!.lastName,
+                convention.signatories.beneficiaryRepresentative?.lastName,
             },
           },
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              convention.signatories.beneficiaryCurrentEmployer!.email,
+              convention.signatories.beneficiaryCurrentEmployer?.email,
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -279,9 +279,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               internshipKind: convention.internshipKind,
               justification,
               signatoryFirstName:
-                convention.signatories.beneficiaryCurrentEmployer!.firstName,
+                convention.signatories.beneficiaryCurrentEmployer?.firstName,
               signatoryLastName:
-                convention.signatories.beneficiaryCurrentEmployer!.lastName,
+                convention.signatories.beneficiaryCurrentEmployer?.lastName,
             },
           },
         ],

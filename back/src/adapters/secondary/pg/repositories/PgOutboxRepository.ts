@@ -1,5 +1,5 @@
 import { differenceWith } from "ramda";
-import { castError, DateString, propEq, replaceArrayElement } from "shared";
+import { DateString, castError, propEq, replaceArrayElement } from "shared";
 import type {
   DomainEvent,
   DomainTopic,
@@ -10,7 +10,7 @@ import type {
 import { OutboxRepository } from "../../../../domain/core/ports/OutboxRepository";
 import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export type StoredEventRow = {
   id: string;
@@ -30,9 +30,8 @@ export class PgOutboxRepository implements OutboxRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async save(event: DomainEvent): Promise<void> {
-    const eventInDb = await this.#storeEventInOutboxOrRecoverItIfAlreadyThere(
-      event,
-    );
+    const eventInDb =
+      await this.#storeEventInOutboxOrRecoverItIfAlreadyThere(event);
 
     const newPublications = differenceWith(
       (dbEvent, newEvent) => dbEvent.publishedAt === newEvent.publishedAt,

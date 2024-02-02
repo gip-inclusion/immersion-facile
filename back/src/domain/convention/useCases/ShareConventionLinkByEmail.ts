@@ -4,10 +4,10 @@ import {
   shareLinkByEmailSchema,
 } from "shared";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
-import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { makeShortLink } from "../../core/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareLinkByEmailDto> {

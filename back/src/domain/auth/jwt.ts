@@ -34,7 +34,11 @@ type JwtTokenMapping<
 type JwtMap =
   | JwtTokenMapping<"convention", ConventionJwt, ConventionJwtPayload>
   | JwtTokenMapping<"establishment", EstablishmentJwt, EstablishmentJwtPayload>
-  | JwtTokenMapping<"inclusionConnect", InclusionConnectJwt, InclusionConnectJwtPayload>
+  | JwtTokenMapping<
+      "inclusionConnect",
+      InclusionConnectJwt,
+      InclusionConnectJwtPayload
+    >
   | JwtTokenMapping<"backOffice", BackOfficeJwt, BackOfficeJwtPayload>
   | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>;
 

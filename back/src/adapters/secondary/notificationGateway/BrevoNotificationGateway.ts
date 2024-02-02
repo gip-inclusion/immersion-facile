@@ -1,20 +1,20 @@
 import Bottleneck from "bottleneck";
 import {
-  emailTemplatesByName,
-  NotificationId,
-  smsTemplatesByName,
-  type TemplatedEmail,
-  type TemplatedSms,
-} from "shared";
-import { HttpClient } from "shared-routes";
-import {
-  configureGenerateHtmlFromTemplate,
   GenerateHtmlOptions,
+  configureGenerateHtmlFromTemplate,
 } from "html-templates";
 import {
   cciCustomHtmlFooter,
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
+import {
+  NotificationId,
+  type TemplatedEmail,
+  type TemplatedSms,
+  emailTemplatesByName,
+  smsTemplatesByName,
+} from "shared";
+import { HttpClient } from "shared-routes";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import {
   counterSendTransactEmailError,

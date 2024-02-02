@@ -8,16 +8,16 @@ import {
   invalidAgencySiretMessage,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
 import {
   ConflictError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemorySiretGateway,
   TEST_OPEN_ESTABLISHMENT_1,
@@ -100,7 +100,7 @@ describe("AddAgency use case", () => {
           ...createParisMissionLocaleParams,
           adminEmails: [],
           status: "needsReview",
-          questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl!,
+          questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
           rejectionJustification: null,
           codeSafir: null,
         },
@@ -116,8 +116,7 @@ describe("AddAgency use case", () => {
           payload: {
             agency: {
               ...createParisMissionLocaleParams,
-              questionnaireUrl:
-                createParisMissionLocaleParams.questionnaireUrl!,
+              questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
               adminEmails: [],
               status: "needsReview",
               rejectionJustification: null,
@@ -152,7 +151,7 @@ describe("AddAgency use case", () => {
         ...createParisMissionLocaleParams,
         adminEmails: [],
         status: "needsReview",
-        questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl!,
+        questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
         codeSafir: null,
         rejectionJustification: null,
       };

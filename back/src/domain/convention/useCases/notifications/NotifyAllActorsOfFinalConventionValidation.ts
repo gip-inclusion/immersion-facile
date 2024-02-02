@@ -2,29 +2,29 @@ import { parseISO } from "date-fns";
 import { uniq } from "ramda";
 import {
   AgencyDto,
-  concatValidatorNames,
   ConventionDto,
   CreateConventionMagicLinkPayloadProperties,
-  displayEmergencyContactInfos,
   Email,
-  frontRoutes,
-  isUrlValid,
   Role,
   TemplatedEmail,
   WithConventionDto,
+  concatValidatorNames,
+  displayEmergencyContactInfos,
+  frontRoutes,
+  isUrlValid,
   withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 

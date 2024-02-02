@@ -4,7 +4,7 @@ import { MigrationBuilder } from "node-pg-migrate";
 const batchSize = 100;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  const getIdsResponse = await pgm.db.query(`SELECT id FROM conventions`);
+  const getIdsResponse = await pgm.db.query("SELECT id FROM conventions");
   const conventionIds: string[] = getIdsResponse.rows.map(({ id }) => id);
   for (let i = 0; i < conventionIds.length; i += batchSize) {
     const getSchedulesResponse = await pgm.db.query(
@@ -42,7 +42,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  const getIdsResponse = await pgm.db.query(`SELECT id FROM conventions`);
+  const getIdsResponse = await pgm.db.query("SELECT id FROM conventions");
   const conventionIds: string[] = getIdsResponse.rows.map(({ id }) => id);
   for (let i = 0; i < conventionIds.length; i += batchSize) {
     const getSchedulesResponse = await pgm.db.query(

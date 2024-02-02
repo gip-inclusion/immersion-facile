@@ -35,9 +35,8 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
 
   it("returns open establishments", async () => {
     // ETABLISSEMENT PUBLIC DU MUSEE DU LOUVRE (should be active)
-    const response = await siretGateway.getEstablishmentBySiret(
-      "18004623700012",
-    );
+    const response =
+      await siretGateway.getEstablishmentBySiret("18004623700012");
     expectToEqual(response, {
       businessAddress: "NUM 34 ET 36 34 QUAI FRANCOIS MITTERRAND 75001 PARIS 1",
       businessName: "ETABLISSEMENT PUBLIC DU MUSEE DU LOUVRE",
@@ -52,9 +51,8 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
   });
 
   it("returns non diffusible open establishments", async () => {
-    const response = await siretGateway.getEstablishmentBySiret(
-      "80327462000043",
-    );
+    const response =
+      await siretGateway.getEstablishmentBySiret("80327462000043");
     expectToEqual(response, {
       businessAddress: "127 RUE DE NANTES 85800 LE FENOUILLER",
       businessName: "LUCIE LEBOURDAIS",
@@ -69,9 +67,8 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
   });
 
   it("returns undefined when no establishment found", async () => {
-    const response = await siretGateway.getEstablishmentBySiret(
-      "00000000000000",
-    );
+    const response =
+      await siretGateway.getEstablishmentBySiret("00000000000000");
     expect(response).toBeUndefined();
   });
 
@@ -97,9 +94,8 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
 
   it("filters out closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
-    const response = await siretGateway.getEstablishmentBySiret(
-      "38961161700017",
-    );
+    const response =
+      await siretGateway.getEstablishmentBySiret("38961161700017");
     expectToEqual(response, undefined);
   });
 
@@ -132,9 +128,8 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
   });
 
   it("Should work also with an establishment with no nom_commercial", async () => {
-    const establishment = await siretGateway.getEstablishmentBySiret(
-      "83748116700026",
-    );
+    const establishment =
+      await siretGateway.getEstablishmentBySiret("83748116700026");
     expect(establishment?.businessName).toBe("P E CONSEIL");
   });
 });

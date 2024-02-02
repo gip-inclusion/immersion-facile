@@ -13,7 +13,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   if (ids_of_old_conventions.length > 0)
     await pgm.sql(
       format(
-        `INSERT INTO convention_external_ids (convention_id) VALUES %L`,
+        "INSERT INTO convention_external_ids (convention_id) VALUES %L",
         ids_of_old_conventions,
       ),
     );

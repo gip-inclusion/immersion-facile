@@ -23,9 +23,8 @@ describe("PgAuthenticatedUserRepository", () => {
   });
 
   it("returns undefined if no authenticated user are found", async () => {
-    const response = await pgAuthenticatedUserRepository.findByEmail(
-      "joe@mail.com",
-    );
+    const response =
+      await pgAuthenticatedUserRepository.findByEmail("joe@mail.com");
     expect(response).toBeUndefined();
   });
 
@@ -50,9 +49,8 @@ describe("PgAuthenticatedUserRepository", () => {
       firstName: "Johnny",
     };
     await pgAuthenticatedUserRepository.save(updatedUser);
-    const fetchedUpdatedUser = await pgAuthenticatedUserRepository.findByEmail(
-      email,
-    );
+    const fetchedUpdatedUser =
+      await pgAuthenticatedUserRepository.findByEmail(email);
     expectToEqual(fetchedUpdatedUser, updatedUser);
   });
 });

@@ -22,6 +22,19 @@ import { DeleteSubscription } from "../../../domain/broadcast/useCases/DeleteSub
 import { ListActiveSubscriptions } from "../../../domain/broadcast/useCases/ListActiveSubscriptions";
 import { SubscribeToWebhook } from "../../../domain/broadcast/useCases/SubscribeToWebhook";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
+import { CreateAssessment } from "../../../domain/convention/useCases/CreateAssessment";
+import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
+import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
+import { GetConventionForApiConsumer } from "../../../domain/convention/useCases/GetConventionForApiConsumer";
+import { GetConventionsForApiConsumer } from "../../../domain/convention/useCases/GetConventionsForApiConsumer";
+import { RenewConvention } from "../../../domain/convention/useCases/RenewConvention";
+import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
+import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
+import { SendEmailWhenAgencyIsRejected } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsRejected";
+import { ShareConventionLinkByEmail } from "../../../domain/convention/useCases/ShareConventionLinkByEmail";
+import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
+import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
+import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
 import { ListAgenciesByFilter } from "../../../domain/convention/useCases/agencies/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
@@ -30,16 +43,11 @@ import { UpdateAgency } from "../../../domain/convention/useCases/agencies/Updat
 import { UpdateAgencyReferingToUpdatedAgency } from "../../../domain/convention/useCases/agencies/UpdateAgencyReferingToUpdatedAgency";
 import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
-import { CreateAssessment } from "../../../domain/convention/useCases/CreateAssessment";
-import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
-import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
-import { GetConventionForApiConsumer } from "../../../domain/convention/useCases/GetConventionForApiConsumer";
-import { GetConventionsForApiConsumer } from "../../../domain/convention/useCases/GetConventionsForApiConsumer";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../../domain/convention/useCases/notifications/NotifyActorThatConventionNeedsModifications";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../../domain/convention/useCases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
-import { NotifyAllActorsThatConventionIsCancelled as NotifyAllActorsThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsCancelled";
+import { NotifyAllActorsThatConventionIsCancelled } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyAllActorsThatConventionIsRejected } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsRejected";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
@@ -51,20 +59,12 @@ import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../..
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../../domain/convention/useCases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyConventionSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyConventionSubmitted";
 import { MarkPartnersErroredConventionAsHandled } from "../../../domain/convention/useCases/partnersErroredConvention/MarkPartnersErroredConventionAsHandled";
-import { RenewConvention } from "../../../domain/convention/useCases/RenewConvention";
-import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
-import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
-import { SendEmailWhenAgencyIsRejected } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsRejected";
-import { ShareConventionLinkByEmail } from "../../../domain/convention/useCases/ShareConventionLinkByEmail";
-import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
-import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
-import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
+import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
-import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
@@ -86,20 +86,20 @@ import { AddFormEstablishment } from "../../../domain/offer/useCases/AddFormEsta
 import { AddFormEstablishmentBatch } from "../../../domain/offer/useCases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../../domain/offer/useCases/ContactEstablishment";
 import { DeleteEstablishment } from "../../../domain/offer/useCases/DeleteEstablishment";
-import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/offer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { EditFormEstablishment } from "../../../domain/offer/useCases/EditFormEstablishment";
 import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupBySlug";
 import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../../domain/offer/useCases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../../domain/offer/useCases/MarkEstablishmentLeadAsRegistrationRejected";
-import { NotifyConfirmationEstablishmentCreated } from "../../../domain/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
-import { NotifyContactRequest } from "../../../domain/offer/useCases/notifications/NotifyContactRequest";
-import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/offer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RequestEditFormEstablishment } from "../../../domain/offer/useCases/RequestEditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/offer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/offer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { AddExchangeToDiscussionAndTransferEmail } from "../../../domain/offer/useCases/discussions/AddExchangeToDiscussionAndTransferEmail";
+import { NotifyConfirmationEstablishmentCreated } from "../../../domain/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
+import { NotifyContactRequest } from "../../../domain/offer/useCases/notifications/NotifyContactRequest";
+import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/offer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/useCases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
@@ -556,7 +556,7 @@ export const createUseCases = (
             await uow.agencyRepository.getImmersionFacileAgencyId();
           if (!agencyId) {
             throw new NotFoundError(
-              `No agency found with kind immersion-facilitee`,
+              "No agency found with kind immersion-facilitee",
             );
           }
           return agencyId;
@@ -643,8 +643,8 @@ const instantiatedUseCasesFromClasses = <
   >
     ? InstantiatedUseCase<Input, Output, JwtPayload>
     : T[K] extends UseCase<infer Input2, infer Output2, infer JwtPayload2>
-    ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
-    : never;
+      ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
+      : never;
 } =>
   keys(useCases).reduce(
     (acc, useCaseKey) => ({

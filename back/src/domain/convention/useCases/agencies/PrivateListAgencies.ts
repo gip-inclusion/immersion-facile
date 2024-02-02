@@ -5,21 +5,17 @@ import {
   PrivateListAgenciesRequestDto,
   privateListAgenciesRequestSchema,
 } from "shared";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class PrivateListAgencies extends TransactionalUseCase<
   PrivateListAgenciesRequestDto,
   AgencyOption[]
 > {
   protected inputSchema = privateListAgenciesRequestSchema;
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   protected async _execute(
     { status }: PrivateListAgenciesRequestDto,

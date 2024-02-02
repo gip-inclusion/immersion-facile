@@ -9,9 +9,9 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import {
   DiscussionAggregateBuilder,
@@ -345,7 +345,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
           ]),
         ),
         new BadRequestError(
-          `Email does not have the right format email to : gerard@reply-dev.immersion-facile.beta.gouv.fr`,
+          "Email does not have the right format email to : gerard@reply-dev.immersion-facile.beta.gouv.fr",
         ),
       );
     });
@@ -355,7 +355,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         addExchangeToDiscussionAndTransferEmail.execute(
           createBrevoResponse([`iozeuroiu897654654_bob@${replyDomain}`]),
         ),
-        new BadRequestError(`Email does not have the right format kind : bob`),
+        new BadRequestError("Email does not have the right format kind : bob"),
       );
     });
 

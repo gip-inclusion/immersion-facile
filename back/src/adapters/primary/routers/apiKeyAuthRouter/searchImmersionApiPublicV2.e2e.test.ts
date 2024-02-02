@@ -1,23 +1,23 @@
-import { SuperTest, Test } from "supertest";
 import {
   AppellationAndRomeDto,
-  expectHttpResponseToEqual,
   SiretDto,
+  expectHttpResponseToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { avenueChampsElyseesDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
+import { avenueChampsElyseesDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
-  defaultNafCode,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
+  defaultNafCode,
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
@@ -163,7 +163,7 @@ describe("search route", () => {
 
         const responseWith2AppellationCodesProvided = await request
           .get(
-            `/v2/search?appellationCodes[]=11704&appellationCodes[]=11705&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+            "/v2/search?appellationCodes[]=11704&appellationCodes[]=11705&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes",
           )
           .set(
             "Authorization",
@@ -179,7 +179,7 @@ describe("search route", () => {
 
         const responseWith1AppellationCodeProvided = await request
           .get(
-            `/v2/search?appellationCodes[]=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
+            "/v2/search?appellationCodes[]=11704&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes",
           )
           .set(
             "Authorization",
@@ -197,7 +197,7 @@ describe("search route", () => {
       it("accept address with only city", async () => {
         const response = await request
           .get(
-            `/v2/search?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
+            "/v2/search?rome=A1000&distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon",
           )
           .set(
             "Authorization",
@@ -211,7 +211,7 @@ describe("search route", () => {
       it("with no specified appellation code", async () => {
         await request
           .get(
-            `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
+            "/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance",
           )
           .set(
             "Authorization",
@@ -225,7 +225,7 @@ describe("search route", () => {
       it("with filter voluntaryToImmersion", async () => {
         await request
           .get(
-            `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance`,
+            "/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true&sortedBy=distance",
           )
           .set(
             "Authorization",
@@ -335,7 +335,7 @@ describe("search route", () => {
         it("with filter establishmentSearchableBy defined to students", async () => {
           await request
             .get(
-              `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=students&sortedBy=distance`,
+              "/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=students&sortedBy=distance",
             )
             .set(
               "Authorization",
@@ -349,7 +349,7 @@ describe("search route", () => {
         it("with filter establishmentSearchableBy defined to jobSeekers", async () => {
           await request
             .get(
-              `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=jobSeekers&sortedBy=distance`,
+              "/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=jobSeekers&sortedBy=distance",
             )
             .set(
               "Authorization",
@@ -363,7 +363,7 @@ describe("search route", () => {
         it("with filter establishmentSearchableBy not defined", async () => {
           await request
             .get(
-              `/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
+              "/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&sortedBy=distance",
             )
             .set(
               "Authorization",

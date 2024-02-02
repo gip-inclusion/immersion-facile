@@ -1,7 +1,7 @@
 import { authFailed, expectToEqual, notJobSeeker } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { CONVENTION_ID_DEFAULT_UUID } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";

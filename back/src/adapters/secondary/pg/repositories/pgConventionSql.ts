@@ -4,20 +4,20 @@ import {
   AppellationLabel,
   ConventionId,
   ConventionReadDto,
-  conventionReadSchema,
   DateString,
   Email,
-  parseZodSchemaAndLogErrorOnParsingFailure,
   RomeCode,
   RomeLabel,
   ScheduleDto,
+  conventionReadSchema,
+  parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import {
+  KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
-  KyselyDb,
 } from "../kysely/kyselyUtils";
 
 export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
@@ -25,14 +25,34 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
   const builder = transaction
     .selectFrom("conventions")
     .leftJoin("actors as b", "b.id", "conventions.beneficiary_id")
-    .leftJoin("actors as br", "br.id", "conventions.beneficiary_representative_id")
-    .leftJoin("actors as bce", "bce.id", "conventions.beneficiary_current_employer_id")
-    .leftJoin("actors as er", "er.id", "conventions.establishment_representative_id")
+    .leftJoin(
+      "actors as br",
+      "br.id",
+      "conventions.beneficiary_representative_id",
+    )
+    .leftJoin(
+      "actors as bce",
+      "bce.id",
+      "conventions.beneficiary_current_employer_id",
+    )
+    .leftJoin(
+      "actors as er",
+      "er.id",
+      "conventions.establishment_representative_id",
+    )
     .leftJoin("actors as et", "et.id", "conventions.establishment_tutor_id")
     .leftJoin("partners_pe_connect as p", "p.convention_id", "conventions.id")
-    .leftJoin("view_appellations_dto as vad", "vad.appellation_code", "conventions.immersion_appellation")
+    .leftJoin(
+      "view_appellations_dto as vad",
+      "vad.appellation_code",
+      "conventions.immersion_appellation",
+    )
     .leftJoin("agencies", "agencies.id", "conventions.agency_id")
-    .leftJoin("agencies as referring_agencies", "agencies.refers_to_agency_id", "referring_agencies.id")
+    .leftJoin(
+      "agencies as referring_agencies",
+      "agencies.refers_to_agency_id",
+      "referring_agencies.id",
+    );
 
   return builder.select(({ ref, ...eb }) =>
     jsonStripNulls(

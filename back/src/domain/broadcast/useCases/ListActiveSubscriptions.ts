@@ -1,9 +1,9 @@
 import { keys } from "ramda";
-import { z } from "zod";
 import { ApiConsumer, WebhookSubscription } from "shared";
+import { z } from "zod";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 
 export class ListActiveSubscriptions extends TransactionalUseCase<
   void,
@@ -11,10 +11,6 @@ export class ListActiveSubscriptions extends TransactionalUseCase<
   ApiConsumer
 > {
   protected inputSchema = z.void();
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
 
   protected async _execute(
     _: void,

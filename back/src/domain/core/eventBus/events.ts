@@ -16,8 +16,8 @@ import {
   WithFormEstablishmentDto,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
-import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
+import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
 import { WithEstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
 import { ConventionRequiresModificationPayload } from "./eventPayload.dto";
@@ -72,7 +72,10 @@ export type DomainEvent =
   // UNHAPPY PATHS
   | GenericEvent<"ConventionRejected", WithConventionDto>
   | GenericEvent<"ConventionCancelled", WithConventionDto>
-  | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload>
+  | GenericEvent<
+      "ConventionRequiresModification",
+      ConventionRequiresModificationPayload
+    >
   | GenericEvent<"ConventionDeprecated", WithConventionDto>
 
   // MAGIC LINK RENEWAL
@@ -81,9 +84,15 @@ export type DomainEvent =
   // FORM ESTABLISHMENT RELATED
   | GenericEvent<"FormEstablishmentAdded", WithFormEstablishmentDto>
   | GenericEvent<"FormEstablishmentEdited", WithFormEstablishmentDto>
-  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload>
+  | GenericEvent<
+      "ContactRequestedByBeneficiary",
+      ContactEstablishmentEventPayload
+    >
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
-  | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate>
+  | GenericEvent<
+      "NewEstablishmentAggregateInsertedFromForm",
+      WithEstablishmentAggregate
+    >
 
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", WithAgencyDto>
@@ -101,14 +110,23 @@ export type DomainEvent =
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
-  | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>
-  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyIds: AgencyId[] }>
+  | GenericEvent<
+      "UserAuthenticatedSuccessfully",
+      { userId: string; provider: IdentityProvider }
+    >
+  | GenericEvent<
+      "AgencyRegisteredToInclusionConnectedUser",
+      { userId: AuthenticatedUserId; agencyIds: AgencyId[] }
+    >
   | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>
   | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams>
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string }>
   // ERRORED CONVENTION RELATED
-  | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId, userId: AuthenticatedUserId }>;
+  | GenericEvent<
+      "PartnerErroredConventionMarkedAsHandled",
+      { conventionId: ConventionId; userId: AuthenticatedUserId }
+    >;
 
 export type DomainTopic = DomainEvent["topic"];
 

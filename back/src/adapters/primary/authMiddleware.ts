@@ -3,13 +3,13 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
   ApiConsumerName,
-  backOfficeJwtPayloadSchema,
-  castError,
   ConventionJwtPayload,
-  currentJwtVersions,
-  expiredMagicLinkErrorMessage,
   ExtractFromExisting,
   PayloadKey,
+  backOfficeJwtPayloadSchema,
+  castError,
+  currentJwtVersions,
+  expiredMagicLinkErrorMessage,
 } from "shared";
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
@@ -21,7 +21,7 @@ import { AppConfig } from "./config/appConfig";
 const logger = createLogger(__filename);
 
 const convertRouteToLog = (originalUrl: string) =>
-  "/" + originalUrl.split("/")[1];
+  `/${originalUrl.split("/")[1]}`;
 
 type TotalCountProps = {
   consumerName?: ApiConsumerName;

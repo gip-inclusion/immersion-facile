@@ -1,22 +1,22 @@
 import {
-  addressDtoToString,
   AppellationAndRomeDto,
-  expectPromiseToFailWith,
-  expectToEqual,
   FormEstablishmentDtoBuilder,
   SiretDto,
+  addressDtoToString,
+  expectPromiseToFailWith,
+  expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemoryAddressGateway,
   rueGuillaumeTellDto,
 } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,

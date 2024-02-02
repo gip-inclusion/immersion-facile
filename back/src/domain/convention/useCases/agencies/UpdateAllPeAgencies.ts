@@ -1,17 +1,17 @@
-import { z } from "zod";
 import {
-  activeAgencyStatuses,
   AddressDto,
   AgencyDto,
   WithGeoPosition,
+  activeAgencyStatuses,
 } from "shared";
+import { z } from "zod";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { AppLogger } from "../../../core/ports/AppLogger";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../core/ports/UuidGenerator";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { AddressGateway } from "../../../offer/ports/AddressGateway";
 import {
   PeAgenciesReferential,

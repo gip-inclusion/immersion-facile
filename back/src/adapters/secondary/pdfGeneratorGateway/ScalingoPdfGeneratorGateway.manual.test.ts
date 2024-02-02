@@ -1,16 +1,16 @@
-import axios from "axios";
 import { existsSync } from "fs";
+import axios from "axios";
 import { arrayFromNumber } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../primary/config/appConfig";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
 import {
-  makeScalingoPdfGeneratorRoutes,
   ScalingoPdfGeneratorGateway,
+  makeScalingoPdfGeneratorRoutes,
 } from "./ScalingoPdfGeneratorGateway";
 
 describe("ScalingoPdfGeneratorGateway", () => {
-  it(`make 10 pdf simultaneously`, async () => {
+  it("make 10 pdf simultaneously", async () => {
     const config = AppConfig.createFromEnv();
 
     await Promise.all(

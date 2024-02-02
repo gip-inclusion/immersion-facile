@@ -2,18 +2,18 @@ import axios from "axios";
 import Bottleneck from "bottleneck";
 import { format, formatISO, secondsToMilliseconds } from "date-fns";
 import {
-  castError,
-  filterNotFalsy,
   NafDto,
   NumberEmployeesRange,
-  propEq,
-  queryParamsAsString,
   SiretDto,
   SiretEstablishmentDto,
+  castError,
+  filterNotFalsy,
+  propEq,
+  queryParamsAsString,
 } from "shared";
 import {
-  RetryableError,
   RetryStrategy,
+  RetryableError,
 } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
@@ -307,7 +307,23 @@ const getNumberEmployeesRange = ({
 
 // prettier-ignore
 // tefenCode is a French standard code for the number of employees in a company.
-type TefenCode = -1 | 0 | 1 | 2 | 3 | 11 | 12 | 21 | 22 | 31 | 32 | 41 | 42 | 51 | 52 | 53;
+type TefenCode =
+  | -1
+  | 0
+  | 1
+  | 2
+  | 3
+  | 11
+  | 12
+  | 21
+  | 22
+  | 31
+  | 32
+  | 41
+  | 42
+  | 51
+  | 52
+  | 53;
 
 const employeeRangeByTefenCode: Record<TefenCode, NumberEmployeesRange> = {
   [-1]: "",

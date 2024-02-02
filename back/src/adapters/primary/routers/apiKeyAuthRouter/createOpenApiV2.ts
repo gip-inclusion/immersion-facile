@@ -1,13 +1,13 @@
-import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 import {
   ConventionDtoBuilder,
   ConventionReadDto,
-  conventionReadSchema,
   CreateWebhookSubscription,
   SearchResultDto,
+  conventionReadSchema,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domain/broadcast/ports/SubscribersGateway";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
@@ -243,7 +243,8 @@ export const createOpenApiSpecV2 = (envType: string) =>
                     "Si ce paramètre n'est pas renseigné toutes les entreprises seront renvoyées",
                 },
               },
-              description: `Voulez-vous uniquement les entreprises référencées par immersion facilitée ?`,
+              description:
+                "Voulez-vous uniquement les entreprises référencées par immersion facilitée ?",
             },
           },
           responses: {

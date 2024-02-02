@@ -2,17 +2,17 @@ import { prop, propEq } from "ramda";
 import {
   ApiConsumer,
   AppellationCode,
-  searchParamsSchema,
   SearchQueryParamsDto,
   SearchResultDto,
   SiretDto,
+  searchParamsSchema,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { SearchMade } from "../entities/SearchMadeEntity";
 import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
 import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";

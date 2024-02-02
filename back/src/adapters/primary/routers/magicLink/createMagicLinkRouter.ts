@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { match, P } from "ts-pattern";
 import { conventionMagicLinkRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
+import { P, match } from "ts-pattern";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { UnauthorizedError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";

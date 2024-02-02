@@ -7,13 +7,13 @@ import {
 } from "shared";
 import { EmailNotification } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { expectNotifyConventionCancelled } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyAllActorsThatConventionIsCancelled } from "./NotifyAllActorsThatConventionIsCancelled";
 
@@ -115,8 +115,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative!.email,
-        beneficiaryCurrentEmployer!.email,
+        beneficiaryRepresentative?.email,
+        beneficiaryCurrentEmployer?.email,
         ...counsellorEmails,
         ...agency.validatorEmails,
       ],
@@ -152,8 +152,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        beneficiaryRepresentative!.email,
-        beneficiaryCurrentEmployer!.email,
+        beneficiaryRepresentative?.email,
+        beneficiaryCurrentEmployer?.email,
         ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
       ],
       cancelledConventionWithDuplicatedEmails,

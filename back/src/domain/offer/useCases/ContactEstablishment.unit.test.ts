@@ -8,8 +8,8 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -17,9 +17,9 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import {
   ContactEntityBuilder,
@@ -225,6 +225,7 @@ describe("ContactEstablishment", () => {
       establishmentAggregate,
     ]);
     const establishment = establishmentAggregate.establishment;
+    // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
     const establishmentContact = establishmentAggregate.contact!;
 
     const connectionDate = new Date("2022-01-01T12:00:00.000");
@@ -285,6 +286,7 @@ describe("ContactEstablishment", () => {
       establishmentAggregate,
     ]);
     const establishment = establishmentAggregate.establishment;
+    // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
     const establishmentContact = establishmentAggregate.contact!;
 
     const connectionDate = new Date("2022-01-10T12:00:00.000");
@@ -470,7 +472,7 @@ describe("ContactEstablishment", () => {
           contactMode: "PHONE",
         }),
         new NotFoundError(
-          `No contact found for establishment with siret: 11112222333344`,
+          "No contact found for establishment with siret: 11112222333344",
         ),
       );
     });
@@ -481,7 +483,7 @@ describe("ContactEstablishment", () => {
           ...validRequest,
           contactMode: "PHONE",
         }),
-        new NotFoundError(`No establishment found with siret: 11112222333344`),
+        new NotFoundError("No establishment found with siret: 11112222333344"),
       );
     });
 

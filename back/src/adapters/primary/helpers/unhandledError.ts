@@ -10,7 +10,7 @@ const _message = "Unhandled Error";
 
 export class UnhandledError extends Error {
   constructor(
-    public override readonly message: string = "Unhandled Error",
+    public override readonly message: string,
     public override readonly cause: Error,
   ) {
     super();

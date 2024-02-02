@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { ConventionStatus, conventionStatuses } from "shared";
+import { z } from "zod";
 import { GetConventionsByFiltersQueries } from "../../../../../../domain/convention/ports/ConventionQueries";
 
 export type GetConventionsByFiltersQueryParamsV2 = {

@@ -1,12 +1,12 @@
 import { Pool, PoolClient } from "pg";
 import {
   AppellationDto,
-  expectObjectInArrayToMatch,
-  expectObjectsToMatch,
-  expectToEqual,
   Group,
   GroupOptions,
   SearchResultDto,
+  expectObjectInArrayToMatch,
+  expectObjectsToMatch,
+  expectToEqual,
 } from "shared";
 import { EstablishmentEntity } from "../../../../domain/offer/entities/EstablishmentEntity";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";

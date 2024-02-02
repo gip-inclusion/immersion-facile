@@ -1,10 +1,10 @@
 import { AgencyDto, WithAgencyDto, withAgencySchema } from "shared";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class UpdateAgencyReferingToUpdatedAgency extends TransactionalUseCase<
   WithAgencyDto,

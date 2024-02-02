@@ -3,9 +3,9 @@ import { random, sleep } from "shared";
 import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import {
+  ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
-  ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
@@ -18,7 +18,7 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const main = async () => {
-  logger.info(`Executing pipeline: update-establishments-from-sirene`);
+  logger.info("Executing pipeline: update-establishments-from-sirene");
 
   const timeGateway = new RealTimeGateway();
 
@@ -49,7 +49,8 @@ const main = async () => {
       uowPerformer,
       siretGateway,
       new RealTimeGateway(),
-      config.updateEstablishmentFromInseeConfig.numberOfDaysAgoToCheckForInseeUpdates,
+      config.updateEstablishmentFromInseeConfig
+        .numberOfDaysAgoToCheckForInseeUpdates,
       config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerBatch,
       config.updateEstablishmentFromInseeConfig.maxEstablishmentsPerFullRun,
     );

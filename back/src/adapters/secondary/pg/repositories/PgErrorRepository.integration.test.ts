@@ -7,8 +7,8 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  broadcastToPeServiceName,
   SavedError,
+  broadcastToPeServiceName,
 } from "../../../../domain/core/ports/ErrorRepository";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
@@ -111,7 +111,7 @@ describe("PgErrorRepository", () => {
               params: pgSavedError.params ?? undefined,
               occurredAt: pgSavedError.occurred_at,
               handledByAgency: pgSavedError.handled_by_agency,
-            } satisfies SavedError),
+            }) satisfies SavedError,
         ),
         [
           { ...savedError1, handledByAgency: true },

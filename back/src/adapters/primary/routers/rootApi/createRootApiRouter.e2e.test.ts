@@ -1,5 +1,5 @@
-import { SuperTest, Test } from "supertest";
 import { expectToEqual } from "shared";
+import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("/", () => {

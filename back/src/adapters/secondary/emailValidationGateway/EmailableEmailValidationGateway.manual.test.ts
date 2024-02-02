@@ -50,9 +50,8 @@ describe("Emailable email validation gateway", () => {
     it.each(candidates)(
       "Candidate email '$candidateEmail' should match expected given status",
       async ({ candidateEmail, expectedStatus }) => {
-        const emailStatus = await emailableEmailValidationGateway.validateEmail(
-          candidateEmail,
-        );
+        const emailStatus =
+          await emailableEmailValidationGateway.validateEmail(candidateEmail);
         expect(emailStatus).toEqual(expectedStatus);
       },
       10000,

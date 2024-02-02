@@ -1,9 +1,9 @@
 import { ConventionId } from "shared";
 import {
-  ConventionsToSyncRepository,
   ConventionToSync,
+  ConventionsToSyncRepository,
 } from "../../../../domain/convention/ports/ConventionsToSyncRepository";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export const conventionsToSyncTableName = "conventions_to_sync_with_pe";
 
@@ -66,7 +66,7 @@ const pgResultToConventionToSync = (
     status: pgConventionToSync.status,
     processDate: pgConventionToSync.process_date ?? undefined,
     reason: pgConventionToSync.reason ?? undefined,
-  } as ConventionToSync);
+  }) as ConventionToSync;
 
 const isConventionToSyncAlreadyExists = async (
   transaction: KyselyDb,

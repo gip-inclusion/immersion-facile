@@ -1,25 +1,25 @@
-import { z } from "zod";
 import {
   ConventionId,
-  conventionIdSchema,
   InternshipKind,
+  conventionIdSchema,
   internshipKindSchema,
 } from "shared";
+import { z } from "zod";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 // prettier-ignore
-export type RenewMagicLinkPayload  = {
-  internshipKind:InternshipKind
-  emails:string[]
-  magicLink:string,
-  conventionStatusLink: string,
-  conventionId?: ConventionId,
-}
+export type RenewMagicLinkPayload = {
+  internshipKind: InternshipKind;
+  emails: string[];
+  magicLink: string;
+  conventionStatusLink: string;
+  conventionId?: ConventionId;
+};
 
 const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> = z.object({
   internshipKind: internshipKindSchema,

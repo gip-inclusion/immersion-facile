@@ -1,14 +1,14 @@
 import {
   ContactEstablishmentRequestDto,
+  SearchRoutes,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
   searchImmersionRoutes,
-  SearchRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import {
