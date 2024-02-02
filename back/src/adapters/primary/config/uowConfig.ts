@@ -12,6 +12,7 @@ import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQue
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
 import { InMemoryConventionsToSyncRepository } from "../../secondary/InMemoryConventionsToSyncRepository";
 import { InMemoryDeletedEstablishmentRepository } from "../../secondary/InMemoryDeletedEstablishmentRepository";
+import { InMemoryEstablishmentLeadQueries } from "../../secondary/InMemoryEstablishmentLeadQueries";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
@@ -63,20 +64,22 @@ export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
 export const createInMemoryUow = () => {
   const outboxRepository = new InMemoryOutboxRepository();
   const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
+  const agencyRepository = new InMemoryAgencyRepository();
   const conventionRepository = new InMemoryConventionRepository();
+  const conventionQueries = new InMemoryConventionQueries(
+    conventionRepository,
+    agencyRepository,
+    outboxRepository,
+  );
   const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
   const shortLinkRepository = new InMemoryShortLinkRepository();
-  const agencyRepository = new InMemoryAgencyRepository();
+  const establishmentLeadRepository = new InMemoryEstablishmentLeadRepository();
 
   return {
     agencyRepository,
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
     authenticatedUserRepository,
-    conventionQueries: new InMemoryConventionQueries(
-      conventionRepository,
-      agencyRepository,
-      outboxRepository,
-    ),
+    conventionQueries,
     conventionRepository,
     conventionPoleEmploiAdvisorRepository:
       new InMemoryConventionPoleEmploiAdvisorRepository(),
@@ -91,7 +94,11 @@ export const createInMemoryUow = () => {
     assessmentRepository: new InMemoryAssessmentRepository(),
     inclusionConnectedUserRepository:
       new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
-    establishmentLeadRepository: new InMemoryEstablishmentLeadRepository(),
+    establishmentLeadRepository,
+    establishmentLeadQueries: new InMemoryEstablishmentLeadQueries(
+      establishmentLeadRepository,
+      conventionQueries,
+    ),
     notificationRepository: new InMemoryNotificationRepository(),
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,

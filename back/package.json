@@ -33,6 +33,7 @@
     "transform-past-form-establishments-into-searchable-data": "ts-node src/adapters/primary/scripts/transformPastFormEstablishmentsIntoSearchableData.ts",
     "trigger-convention-reminder": "ts-node src/adapters/primary/scripts/triggerConventionReminder.ts",
     "trigger-delete-email-attachements": "ts-node src/adapters/primary/scripts/triggerDeleteEmailAttachements.ts",
+    "trigger-establishment-leads-first-reminder": "ts-node src/adapters/primary/scripts/triggerEstablishmentLeadFirstReminder.ts",
     "trigger-mark-old-convention-as-deprecated": "ts-node src/adapters/primary/scripts/triggerMarkOldConventionAsDeprecated.ts",
     "trigger-delete-old-discussion-messages": "ts-node src/adapters/primary/scripts/triggerDeleteOldDiscussionMessages",
     "trigger-refresh-materialized-views": "ts-node src/adapters/primary/scripts/triggerRefreshMaterializedViews.ts",
