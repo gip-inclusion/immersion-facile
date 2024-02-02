@@ -73,7 +73,6 @@
     "pino-http": "^6.6.0",
     "pino-pretty": "^7.5.4",
     "prom-client": "^14.0.1",
-    "puppeteer": "^21.3.3",
     "querystring": "^0.2.1",
     "ramda": "^0.28.0",
     "shared": "workspace:*",
