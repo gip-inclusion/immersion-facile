@@ -1,81 +1,47 @@
-import format from "pg-format";
+import { sql } from "kysely";
+import { InsertObjectOrList } from "kysely/dist/cjs/parser/insert-values-parser";
 import { keys, mapObjIndexed } from "ramda";
 import {
   ApiConsumer,
   ApiConsumerContact,
   ApiConsumerId,
-  ApiConsumerRightName,
   ApiConsumerRights,
   apiConsumerSchema,
   DateString,
+  Email,
   eventToRightName,
   WebhookSubscription,
 } from "shared";
 import { ApiConsumerRepository } from "../../../../domain/auth/ports/ApiConsumerRepository";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
-
-const jsonBuildQuery = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
-      'id', c.id,
-      'consumer', c.consumer,
-      'description', c.description,
-      'rights', c.rights,
-      'createdAt', date_to_iso(c.created_at),
-      'expirationDate', date_to_iso(c.expiration_date),
-      'contact', JSON_BUILD_OBJECT(
-        'firstName', c.contact_first_name,
-        'lastName', c.contact_last_name,
-        'job', c.contact_job,
-        'emails', c.contact_emails,
-        'phone', c.contact_phone
-      ),
-      'subscriptions', JSON_AGG(
-        JSON_BUILD_OBJECT(
-          'callbackUrl', s.callback_url,
-          'callbackHeaders', s.callback_headers,
-          'createdAt', date_to_iso(s.created_at),
-          'id', s.id,
-          'subscribedEvent', s.subscribed_event
-        )
-      ) FILTER (WHERE s.subscribed_event IS NOT NULL)
-    )) as raw_api_consumer
-    `;
+import {
+  cast,
+  jsonBuildObject,
+  jsonStripNulls,
+  KyselyDb,
+} from "../kysely/kyselyUtils";
+import { Database } from "../kysely/model/database";
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {
-  constructor(private transaction: KyselyDb) {}
+  #transaction: KyselyDb;
+
+  constructor(transaction: KyselyDb) {
+    this.#transaction = transaction;
+  }
 
   public async getAll(): Promise<ApiConsumer[]> {
-    const result = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `SELECT ${jsonBuildQuery}
-        FROM api_consumers c
-        LEFT JOIN api_consumers_subscriptions s on s.consumer_id = c.id
-        GROUP BY c.id`,
+    const results = await this.#pgApiConsumerQueryBuild().execute();
+
+    return results.map((result) =>
+      this.#rawPgToApiConsumer(result.raw_api_consumer),
     );
-    return result.rows.map((rawPg) => {
-      const pgApiConsumer =
-        "raw_api_consumer" in rawPg ? rawPg.raw_api_consumer : rawPg;
-      return this.#rawPgToApiConsumer(pgApiConsumer);
-    });
   }
 
   public async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
-    const result = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `SELECT ${jsonBuildQuery}
-      FROM api_consumers c
-      LEFT JOIN api_consumers_subscriptions s on s.consumer_id = c.id
-      WHERE c.id = $1
-      GROUP BY
-        c.id
-      `,
-      [id],
-    );
+    const result = await this.#pgApiConsumerQueryBuild()
+      .where("c.id", "=", id)
+      .executeTakeFirst();
 
-    const rawPg = result.rows[0];
-    if (!rawPg) return;
-    const pgApiConsumer =
-      "raw_api_consumer" in rawPg ? rawPg.raw_api_consumer : rawPg;
-    return this.#rawPgToApiConsumer(pgApiConsumer);
+    return result && this.#rawPgToApiConsumer(result.raw_api_consumer);
   }
 
   public async save(apiConsumer: ApiConsumer): Promise<void> {
@@ -84,82 +50,69 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
     await this.#insertSubscriptions(apiConsumer);
   }
 
-  #insertApiConsumer(apiConsumer: ApiConsumer) {
+  async #insertApiConsumer(apiConsumer: ApiConsumer) {
     const { rights, ...rest } = apiConsumer;
     const rightsWithoutSubscriptions = mapObjIndexed(
       ({ subscriptions, ...rest }) => rest,
       rights,
     );
-    return executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-      INSERT INTO api_consumers (
-        id, consumer, description, rights, created_at, 
-        expiration_date, contact_emails, contact_first_name, contact_last_name, contact_job, 
-        contact_phone
-      ) VALUES(
-        $1, $2, $3, $4, $5, 
-        $6, $7, $8, $9, $10,
-        $11 
-      ) 
-      ON CONFLICT (id) DO UPDATE 
-      SET (
-        id, consumer, description, rights, created_at, 
-        expiration_date, contact_emails, contact_first_name, contact_last_name, contact_job, 
-        contact_phone
-      ) = (
-        $1, $2, $3, $4, $5, 
-        $6, $7, $8, $9, $10,
-        $11 
-      )`,
-      //prettier-ignore
-      [
-        rest.id, rest.consumer, rest.description, JSON.stringify(rightsWithoutSubscriptions), rest.createdAt,
-        rest.expirationDate, rest.contact.emails, rest.contact.firstName, rest.contact.lastName, rest.contact.job,
-        rest.contact.phone,
-      ],
-    );
+
+    const values = {
+      id: rest.id,
+      consumer: rest.consumer,
+      description: rest.description ?? null,
+      rights: JSON.parse(JSON.stringify(rightsWithoutSubscriptions)),
+      created_at: rest.createdAt,
+      expiration_date: rest.expirationDate,
+      contact_emails: rest.contact.emails,
+      contact_first_name: rest.contact.firstName,
+      contact_last_name: rest.contact.lastName,
+      contact_job: rest.contact.job,
+      contact_phone: rest.contact.phone,
+    };
+
+    await this.#transaction
+      .insertInto("api_consumers")
+      .values(values)
+      .onConflict((oc) => oc.column("id").doUpdateSet(values))
+      .execute();
   }
 
-  #clearSubscriptionsOfConsumer(apiConsumerId: ApiConsumerId) {
-    return executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-    DELETE FROM api_consumers_subscriptions
-    WHERE consumer_id = $1
-    `,
-      [apiConsumerId],
-    );
+  async #clearSubscriptionsOfConsumer(apiConsumerId: ApiConsumerId) {
+    await this.#transaction
+      .deleteFrom("api_consumers_subscriptions")
+      .where("consumer_id", "=", apiConsumerId)
+      .execute();
   }
 
-  #insertSubscriptions(apiConsumer: ApiConsumer) {
+  async #insertSubscriptions(apiConsumer: ApiConsumer) {
     const subscriptions: WebhookSubscription[] = keys(
       apiConsumer.rights,
-    ).flatMap(
-      (apiConsumerRightName: ApiConsumerRightName) =>
-        apiConsumer.rights[apiConsumerRightName].subscriptions,
-    );
+    ).flatMap((rightName) => apiConsumer.rights[rightName].subscriptions);
 
-    if (subscriptions.length === 0) return;
-
-    return executeKyselyRawSqlQuery(
-      this.transaction,
-      format(
-        `
-    INSERT INTO api_consumers_subscriptions(
-            id, created_at, right_name, callback_url, callback_headers, consumer_id, subscribed_event
-      ) VALUES %L`,
-        subscriptions.map((subscription) => [
-          subscription.id,
-          subscription.createdAt,
-          eventToRightName(subscription.subscribedEvent),
-          subscription.callbackUrl,
-          subscription.callbackHeaders,
-          apiConsumer.id,
-          subscription.subscribedEvent,
-        ]),
-      ),
-    );
+    if (subscriptions.length > 0)
+      await this.#transaction
+        .insertInto("api_consumers_subscriptions")
+        .values(
+          subscriptions.map(
+            (subscription) =>
+              ({
+                id: subscription.id,
+                created_at: sql`${subscription.createdAt}`,
+                right_name: eventToRightName(subscription.subscribedEvent),
+                callback_url: subscription.callbackUrl,
+                callback_headers: JSON.parse(
+                  JSON.stringify(subscription.callbackHeaders),
+                ),
+                consumer_id: apiConsumer.id,
+                subscribed_event: subscription.subscribedEvent,
+              } satisfies InsertObjectOrList<
+                Database,
+                "api_consumers_subscriptions"
+              >),
+          ),
+        )
+        .execute();
   }
 
   #rawPgToApiConsumer({
@@ -180,6 +133,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
           {},
         ) as ApiConsumerRights,
       };
+
     const apiConsumer: ApiConsumer = {
       ...restWithEmptySubscription,
       rights: (subscriptions || []).reduce((acc, subscription) => {
@@ -196,7 +150,44 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
         };
       }, restWithEmptySubscription.rights),
     };
+
     return apiConsumerSchema.parse(apiConsumer);
+  }
+
+  #pgApiConsumerQueryBuild() {
+    return this.#transaction
+      .selectFrom("api_consumers as c")
+      .leftJoin("api_consumers_subscriptions as s", "s.consumer_id", "c.id")
+      .select((eb) =>
+        jsonStripNulls(
+          jsonBuildObject({
+            id: eb.ref("c.id"),
+            consumer: eb.ref("c.consumer"),
+            description: eb.ref("c.description"),
+            rights: cast<ApiConsumerRights>(eb.ref("c.rights")),
+            createdAt: sql<DateString>`date_to_iso(c.created_at)`,
+            expirationDate: sql<DateString>`date_to_iso(c.expiration_date)`,
+            contact: jsonBuildObject({
+              firstName: eb.ref("c.contact_first_name"),
+              lastName: eb.ref("c.contact_last_name"),
+              job: eb.ref("c.contact_job"),
+              emails: cast<Email[]>(eb.ref("c.contact_emails")),
+              phone: eb.ref("c.contact_phone"),
+            }),
+            subscriptions: sql<WebhookSubscription[]>`
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'callbackUrl', s.callback_url,
+                'callbackHeaders', s.callback_headers,
+                'createdAt', date_to_iso(s.created_at),
+                'id', s.id,
+                'subscribedEvent', s.subscribed_event
+              )
+            ) FILTER (WHERE s.subscribed_event IS NOT NULL)`,
+          }),
+        ).as("raw_api_consumer"),
+      )
+      .groupBy("c.id");
   }
 }
 

@@ -15,6 +15,8 @@ export interface Database {
   saved_errors: SavedErrors;
   view_appellations_dto: ViewAppellationsDto;
   establishment_lead_events: EstablishmentLeadEvents;
+  api_consumers: ApiConsumers;
+  api_consumers_subscriptions: ApiConsumersSubscriptions;
 }
 
 type JsonArray = JsonValue[];
@@ -231,4 +233,28 @@ interface EstablishmentLeadEvents {
   convention_id: string | null;
   notification_id: string | null;
   notification_kind: NotificationKind | null;
+}
+
+interface ApiConsumers {
+  id: string;
+  consumer: string;
+  description: string | null;
+  created_at: Timestamp;
+  expiration_date: Timestamp;
+  contact_emails: string[];
+  contact_first_name: string;
+  contact_last_name: string;
+  contact_job: string;
+  contact_phone: string;
+  rights: Generated<Json>;
+}
+
+interface ApiConsumersSubscriptions {
+  id: string;
+  created_at: Generated<Timestamp>;
+  right_name: string;
+  callback_url: string;
+  callback_headers: Json;
+  consumer_id: string;
+  subscribed_event: string;
 }
