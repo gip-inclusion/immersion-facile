@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React, { useEffect } from "react";
 import { useStyles } from "tss-react/dsfr";
 
 export type NPSFormProps = {
@@ -67,7 +67,7 @@ export const NPSForm = ({
   useEffect(() => {
     if (mode === "popup") {
       const script = document.createElement("script");
-      script.src = `https://tally.so/widgets/embed.js`;
+      script.src = "https://tally.so/widgets/embed.js";
       document.body.appendChild(script);
       (window as unknown as TallyWindow).TallyConfig = {
         formId,

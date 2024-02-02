@@ -6,6 +6,7 @@
   "scripts": {
     "format": "pnpm -w prettier:glob --write ./libs/react-design-system/src/",
     "format:check": "pnpm -w prettier:glob --check ./libs/react-design-system/src/",
+    "check": "pnpm -w check:glob ./libs/react-design-system/src",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

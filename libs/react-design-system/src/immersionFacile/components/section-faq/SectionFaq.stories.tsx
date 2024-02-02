@@ -29,12 +29,14 @@ export const Default: Story = {
     articles: [
       {
         title: "Un titre",
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed interdum vestibulum maximus. Nullam ut mollis odio. Curabitur non fermentum felis. Morbi eleifend velit eget faucibus porttitor. Nam iaculis varius semper....`,
+        description:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed interdum vestibulum maximus. Nullam ut mollis odio. Curabitur non fermentum felis. Morbi eleifend velit eget faucibus porttitor. Nam iaculis varius semper....",
         url: "https://faux-lien.fr/",
       },
       {
         title: "Un autre titre",
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed interdum vestibulum maximus. Nullam ut mollis odio. Curabitur non fermentum felis. Morbi eleifend velit eget faucibus porttitor. Nam iaculis varius semper....`,
+        description:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed interdum vestibulum maximus. Nullam ut mollis odio. Curabitur non fermentum felis. Morbi eleifend velit eget faucibus porttitor. Nam iaculis varius semper....",
         url: "https://faux-lien.fr/",
       },
     ],

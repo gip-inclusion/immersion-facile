@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import { Link } from "type-route";
 import Styles from "./FixedStamp.styles";
@@ -40,7 +40,7 @@ export const FixedStamp = ({
           <span
             className={cx(Styles.subtitle)}
             dangerouslySetInnerHTML={{ __html: subtitle }}
-          ></span>
+          />
         )}
       </div>
       {link && link.href !== "" && (

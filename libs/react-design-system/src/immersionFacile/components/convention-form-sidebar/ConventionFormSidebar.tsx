@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ConventionFormSidebar.styles";
 

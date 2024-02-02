@@ -1,6 +1,6 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./SectionAccordion.scss";
 

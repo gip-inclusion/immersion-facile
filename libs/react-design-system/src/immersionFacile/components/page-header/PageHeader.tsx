@@ -1,5 +1,5 @@
-import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./PageHeader.styles";
 
@@ -49,9 +49,9 @@ export const PageHeader = ({
         {children}
         {usePatterns && (
           <div className={cx(Styles.patterns)}>
-            <div className={cx(Styles.pattern, Styles.pattern0)}></div>
-            <div className={cx(Styles.pattern, Styles.pattern1)}></div>
-            <div className={cx(Styles.pattern, Styles.pattern2)}></div>
+            <div className={cx(Styles.pattern, Styles.pattern0)} />
+            <div className={cx(Styles.pattern, Styles.pattern1)} />
+            <div className={cx(Styles.pattern, Styles.pattern2)} />
           </div>
         )}
       </div>

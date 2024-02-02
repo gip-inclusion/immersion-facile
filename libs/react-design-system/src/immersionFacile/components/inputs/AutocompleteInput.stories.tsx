@@ -1,5 +1,5 @@
-import React from "react";
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import React from "react";
 import { AutocompleteInput, AutocompleteInputProps } from "./AutocompleteInput";
 
 const Component = AutocompleteInput;

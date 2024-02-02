@@ -13,6 +13,7 @@ export const LinkHome = ({
   onClick,
   href,
 }: LinkHomeProps): JSX.Element => (
+  // biome-ignore lint/a11y/useValidAnchor: <explanation>
   <a href={href} onClick={onClick} className={className}>
     {children}
   </a>
