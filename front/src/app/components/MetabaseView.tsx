@@ -28,7 +28,7 @@ export const MetabaseView = ({
 }) => {
   const { cx } = useStyles();
   const consent = useConsent();
-  if (!consent.finalityConsent?.metabase)
+  if (!consent.finalityConsent?.statistics)
     return (
       <>
         <p>
@@ -38,7 +38,7 @@ export const MetabaseView = ({
         <Button
           type="button"
           onClick={() => {
-            consent.assumeConsent("metabase");
+            consent.assumeConsent("statistics");
           }}
         >
           Autoriser les cookies d'affichage de données
