@@ -1,0 +1,14 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "@codegouvfr/react-dsfr finalityConsent statistics-support",
+          "value": "{\"statistics\":true,\"support\":true,\"isFullConsent\":true}"
+        }
+      ]
+    }
+  ]
+}
