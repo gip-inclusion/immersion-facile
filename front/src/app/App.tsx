@@ -35,6 +35,7 @@ export const App = () => {
         dispatch(rootAppSlice.actions.appResetRequested());
       }}
     >
+      <ConsentBannerAndConsentManagement />
       <Router />
       {ENV.crispWebSiteId && (
         <CrispChat
@@ -42,7 +43,6 @@ export const App = () => {
           userConsent={!!consent?.finalityConsent?.support}
         />
       )}
-      <ConsentBannerAndConsentManagement />
       <MatomoTagManager containerUrl="https://matomo.inclusion.beta.gouv.fr/js/container_gXlljpZ7.js" />
     </ErrorBoundary>
   );
