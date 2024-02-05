@@ -6,18 +6,18 @@ import {
   ApiConsumerContact,
   ApiConsumerId,
   ApiConsumerRights,
-  apiConsumerSchema,
   DateString,
   Email,
-  eventToRightName,
   WebhookSubscription,
+  apiConsumerSchema,
+  eventToRightName,
 } from "shared";
 import { ApiConsumerRepository } from "../../../../domain/auth/ports/ApiConsumerRepository";
 import {
+  KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
-  KyselyDb,
 } from "../kysely/kyselyUtils";
 import { Database } from "../kysely/model/database";
 
@@ -106,10 +106,10 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
                 ),
                 consumer_id: apiConsumer.id,
                 subscribed_event: subscription.subscribedEvent,
-              } satisfies InsertObjectOrList<
+              }) satisfies InsertObjectOrList<
                 Database,
                 "api_consumers_subscriptions"
-              >),
+              >,
           ),
         )
         .execute();
