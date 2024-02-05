@@ -8,19 +8,14 @@ export const {
 } = createConsentManagement({
   finalityDescription: () => ({
     statistics: {
-      title: "Statistiques",
+      title: "Mesure d'audience",
       description:
         "Nous utilisons des cookies pour mesurer l’audience de notre site et améliorer son contenu.",
     },
     support: {
-      title: "Support",
+      title: "Support et assistance utilisateur",
       description:
         "Nous utilisons des cookies pour vous proposer la fonctionnalité de contact par chat avec le support d'Immersion Facilitée.",
-    },
-    metabase: {
-      title: "Affichage de données",
-      description:
-        "Nous utilisons des cookies pour afficher des données sous forme de tableau de bord Metabase (état de convention, statistiques, tableau de bord prescripteur, tableau de bord entreprise).",
     },
   }),
   personalDataPolicyLinkProps: {

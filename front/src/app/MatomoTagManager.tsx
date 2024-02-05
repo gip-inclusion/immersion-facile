@@ -6,27 +6,32 @@ type MatomoTagManagerProps = {
 };
 
 export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
+  const consent = useConsent();
+  const _mtm = ((window as any)._mtm = (window as any)._mtm || []);
+  const _paq = ((window as any)._paq = (window as any)._paq || []);
   const appendMatomoScript = useCallback(() => {
-    const _mtm = ((window as any)._mtm = (window as any)._mtm || []);
+    _paq.push(["requireCookieConsent"]);
     _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
     // to debug, go to http://localhost:3000/?mtmPreviewMode=gXlljpZ7&mtmSetDebugFlag=1
-
     const script = document.createElement("script");
+    script.id = "matomo-tag-manager";
     script.async = true;
     script.src = containerUrl;
-
     document.getElementsByTagName("head")[0].appendChild(script);
-  }, [containerUrl]);
-  const consent = useConsent();
+  }, [containerUrl, _paq, _mtm]);
 
   useEffect(() => {
-    if (containerUrl && consent.finalityConsent?.statistics) {
+    const tagManagerScript = document.getElementById("matomo-tag-manager");
+    if (containerUrl && !tagManagerScript) {
       if ("complete" === document.readyState) appendMatomoScript();
       else {
         window.addEventListener("load", appendMatomoScript, !1);
       }
     }
-  }, [containerUrl, appendMatomoScript, consent]);
+    if (consent?.finalityConsent?.statistics) {
+      _paq.push(["rememberCookieConsentGiven"]);
+    }
+  }, [containerUrl, appendMatomoScript, consent, _paq]);
 
   return null;
 };
