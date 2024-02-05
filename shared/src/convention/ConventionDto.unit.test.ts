@@ -244,6 +244,8 @@ describe("conventionDtoSchema", () => {
         agencySiret: "00000000000000",
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       };
       expect(() =>
         conventionReadSchema.parse(validConventionRead),
@@ -258,6 +260,8 @@ describe("conventionDtoSchema", () => {
         agencySiret: "00000000000000",
         agencyDepartment: "90",
         agencyKind: "pole-emploi",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       };
       expectConventionInvalidWithIssueMessages(
         conventionReadSchema,

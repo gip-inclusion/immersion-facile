@@ -145,6 +145,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
       agencyDepartment: "75",
       agencyKind: "mission-locale",
       agencySiret: "22220000222200",
+      agencyCounsellorEmails: [],
+      agencyValidatorEmails: ["validator@mail.com"],
     };
   }
 }

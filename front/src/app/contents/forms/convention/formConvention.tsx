@@ -485,6 +485,14 @@ const establishmentRepresentativeSection = (
 });
 
 const fieldsToExclude = {
+  agencyCounsellorEmails: {
+    label: "",
+    id: "",
+  },
+  agencyValidatorEmails: {
+    label: "",
+    id: "",
+  },
   "agencyRefersTo.id": {
     label: "",
     id: "",
