@@ -148,6 +148,8 @@ describe("Convention routes", () => {
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
         status: 200,
       });
@@ -209,6 +211,8 @@ describe("Convention routes", () => {
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
+            agencyCounsellorEmails: agency.counsellorEmails,
+            agencyValidatorEmails: agency.validatorEmails,
           },
         ],
         status: 200,

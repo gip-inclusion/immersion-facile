@@ -143,6 +143,8 @@ describe("Get Convention for ApiConsumer", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyCounsellorEmails: agency.counsellorEmails,
+        agencyValidatorEmails: agency.validatorEmails,
       });
     });
 
@@ -162,6 +164,8 @@ describe("Get Convention for ApiConsumer", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyCounsellorEmails: agency.counsellorEmails,
+        agencyValidatorEmails: agency.validatorEmails,
       });
     });
   });

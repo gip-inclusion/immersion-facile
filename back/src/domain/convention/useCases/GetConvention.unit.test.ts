@@ -133,13 +133,14 @@ describe("Get Convention", () => {
           { conventionId: convention.id },
           jwtPayload,
         );
-
         expectToEqual(fetchedConvention, {
           ...convention,
           agencyName: agency.name,
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         });
       });
 
@@ -169,6 +170,8 @@ describe("Get Convention", () => {
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         });
       });
     });
@@ -193,6 +196,8 @@ describe("Get Convention", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyCounsellorEmails: agency.counsellorEmails,
+        agencyValidatorEmails: agency.validatorEmails,
       });
     });
 
@@ -215,6 +220,8 @@ describe("Get Convention", () => {
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencySiret: agency.agencySiret,
+        agencyCounsellorEmails: agency.counsellorEmails,
+        agencyValidatorEmails: agency.validatorEmails,
       });
     });
   });

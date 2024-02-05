@@ -103,6 +103,8 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
             agencyKind: agencyPoleEmploi.kind,
             agencySiret: agencyPoleEmploi.agencySiret,
+            agencyCounsellorEmails: agencyPoleEmploi.counsellorEmails,
+            agencyValidatorEmails: agencyPoleEmploi.validatorEmails,
           },
         ]);
       });
@@ -132,6 +134,8 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyPoleEmploi.address.departmentCode,
             agencyKind: agencyPoleEmploi.kind,
             agencySiret: agencyPoleEmploi.agencySiret,
+            agencyCounsellorEmails: agencyPoleEmploi.counsellorEmails,
+            agencyValidatorEmails: agencyPoleEmploi.validatorEmails,
           },
         ]);
       });
@@ -180,6 +184,8 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyDepartment: agencyMissionLocale.address.departmentCode,
             agencyKind: agencyMissionLocale.kind,
             agencySiret: agencyMissionLocale.agencySiret,
+            agencyCounsellorEmails: agencyMissionLocale.counsellorEmails,
+            agencyValidatorEmails: agencyMissionLocale.validatorEmails,
           },
         ]);
       });

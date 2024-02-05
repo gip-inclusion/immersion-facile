@@ -78,6 +78,8 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "autre",
         agencySiret: "11112222000033",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       });
 
       // Act
@@ -105,6 +107,8 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "autre",
         agencySiret: "11112222000033",
         withRefersToAgency: referringAgency,
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       });
 
       const result = await conventionQueries.getConventionById(conventionIdA);
@@ -124,6 +128,8 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
         agencySiret: "11112222000044",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
         conventionStartDate: new Date("2021-01-10").toISOString(),
         conventionStatus: "IN_REVIEW",
       });
@@ -134,6 +140,8 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "cci",
         agencySiret: "11112222000055",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
         conventionStartDate: new Date("2021-01-15").toISOString(),
         conventionStatus: "DRAFT",
       });
@@ -144,6 +152,8 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "mission-locale",
         agencySiret: "11112222000066",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
         conventionStartDate: new Date("2021-01-12").toISOString(),
         conventionStatus: "IN_REVIEW",
       });
@@ -253,6 +263,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: "75",
           agencyKind: "autre",
           agencySiret: "11112222000077",
+          agencyCounsellorEmails: [],
+          agencyValidatorEmails: ["validator@mail.com"],
         }),
         insertAgencyAndConvention({
           conventionId: conventionIdB,
@@ -261,6 +273,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: "76",
           agencyKind: "cci",
           agencySiret: "11112222000088",
+          agencyCounsellorEmails: [],
+          agencyValidatorEmails: ["validator@mail.com"],
         }),
       ]);
       // Act
@@ -280,6 +294,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: "75",
           agencyKind: "autre",
           agencySiret: "11112222000099",
+          agencyCounsellorEmails: [],
+          agencyValidatorEmails: ["validator@mail.com"],
         }),
         insertAgencyAndConvention({
           conventionId: conventionIdB,
@@ -288,6 +304,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: "76",
           agencyKind: "autre",
           agencySiret: "11112222000000",
+          agencyCounsellorEmails: [],
+          agencyValidatorEmails: ["validator@mail.com"],
         }),
       ]);
 
@@ -352,6 +370,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
       ]);
     });
@@ -372,6 +392,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
       ]);
     });
@@ -395,6 +417,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
         {
           ...conventionCancelledAndDateStart20230327,
@@ -402,6 +426,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
       ]);
     });
@@ -424,6 +450,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
       ]);
     });
@@ -453,6 +481,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyName: agency.name,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
       ]);
     });
@@ -693,6 +723,8 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
           agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
         },
       ]);
     });
@@ -705,6 +737,8 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment,
     agencyKind,
     agencySiret,
+    agencyCounsellorEmails,
+    agencyValidatorEmails,
     withRefersToAgency,
     conventionStartDate = DATE_START,
     conventionStatus = "DRAFT",
@@ -715,6 +749,8 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment: string;
     agencyKind: AgencyKind;
     agencySiret: SiretDto;
+    agencyCounsellorEmails: string[];
+    agencyValidatorEmails: string[];
     withRefersToAgency?: AgencyDto;
     conventionStartDate?: string;
     conventionStatus?: ConventionStatus;
@@ -799,6 +835,8 @@ describe("Pg implementation of ConventionQueries", () => {
         id: withRefersToAgency.id,
         name: withRefersToAgency.name,
       },
+      agencyCounsellorEmails,
+      agencyValidatorEmails,
     } satisfies ConventionReadDto;
   };
 });
