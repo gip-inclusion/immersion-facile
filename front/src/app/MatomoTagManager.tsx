@@ -7,7 +7,9 @@ type MatomoTagManagerProps = {
 
 export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
   const consent = useConsent();
+  // biome-ignore lint/suspicious/noAssignInExpressions: This is a Matomo script
   const _mtm = ((window as any)._mtm = (window as any)._mtm || []);
+  // biome-ignore lint/suspicious/noAssignInExpressions: This is a Matomo script
   const _paq = ((window as any)._paq = (window as any)._paq || []);
   const appendMatomoScript = useCallback(() => {
     _paq.push(["requireCookieConsent"]);
