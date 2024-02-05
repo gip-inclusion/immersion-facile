@@ -42,8 +42,7 @@
     "trigger-update-establishments-from-sirene": "ts-node src/adapters/primary/scripts/triggerUpdateEstablishmentsFromSireneApiScript.ts",
     "typecheck": "tsc --noEmit",
     "kysely-codegen": "kysely-codegen --dialect postgres",
-    "update-agencies-from-PE-referential": "ts-node src/adapters/primary/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts",
-    "postinstall": "node node_modules/puppeteer/install.mjs"
+    "update-agencies-from-PE-referential": "ts-node src/adapters/primary/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts"
   },
   "keywords": [],
   "author": "",
