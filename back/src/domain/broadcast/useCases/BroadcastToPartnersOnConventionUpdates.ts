@@ -52,6 +52,8 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
       agencyRefersTo: agency.refersToAgencyId
         ? await getReferedAgency(uow, agency.refersToAgencyId)
         : undefined,
+      agencyCounsellorEmails: agency.counsellorEmails,
+      agencyValidatorEmails: agency.validatorEmails,
     };
 
     const apiConsumers = pipeWithValue(

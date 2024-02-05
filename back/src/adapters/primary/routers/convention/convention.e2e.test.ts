@@ -321,6 +321,8 @@ describe("convention e2e", () => {
             agencyDepartment: peAgency.address.departmentCode,
             agencyKind: peAgency.kind,
             agencySiret: peAgency.agencySiret,
+            agencyCounsellorEmails: peAgency.counsellorEmails,
+            agencyValidatorEmails: peAgency.validatorEmails,
           },
         });
       },

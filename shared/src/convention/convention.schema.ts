@@ -351,6 +351,8 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       agencyDepartment: z.string(),
       agencyKind: agencyKindSchema,
       agencySiret: siretSchema,
+      agencyCounsellorEmails: z.array(emailSchema),
+      agencyValidatorEmails: z.array(emailSchema),
       agencyRefersTo: z
         .object({
           id: refersToAgencyIdSchema,
