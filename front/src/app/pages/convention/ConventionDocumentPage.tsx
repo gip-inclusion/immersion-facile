@@ -273,6 +273,12 @@ export const ConventionDocumentPage = ({
                   {agencyInfo.address.streetNumberAndAddress},{" "}
                   {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
                   qualité d' <strong>agence accompagnante.</strong>
+                  <ul>
+                    <li>
+                      <strong>Mail accompagnant : </strong>
+                      {convention.agencyCounsellorEmails[0]}
+                    </li>
+                  </ul>
                 </li>
                 <li>
                   <strong>{agencyInfo.refersToAgency.name}</strong> (
@@ -280,16 +286,36 @@ export const ConventionDocumentPage = ({
                   {agencyInfo.refersToAgency.address.postcode}{" "}
                   {agencyInfo.refersToAgency.address.city} {}) en qualité d'{" "}
                   <strong>agence prescriptrice.</strong>
+                  <ul>
+                    <li>
+                      <strong>Mail valideur : </strong>
+                      {convention.agencyValidatorEmails[0]}
+                    </li>
+                  </ul>
                 </li>
               </>
             )}
             {agencyIsLoaded && !agencyInfo.refersToAgency && (
-              <li>
-                <strong>{agencyInfo.name}</strong> (
-                {agencyInfo.address.streetNumberAndAddress},{" "}
-                {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
-                qualité d' <strong>agence accompagnante.</strong>
-              </li>
+              <>
+                <li>
+                  <strong>{agencyInfo.name}</strong> (
+                  {agencyInfo.address.streetNumberAndAddress},{" "}
+                  {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
+                  qualité d' <strong>agence prescriptrice.</strong>
+                  <ul>
+                    {convention.agencyCounsellorEmails.length > 0 && (
+                      <li>
+                        <strong>Mail conseiller de 1er niveau : </strong>
+                        {convention.agencyCounsellorEmails[0]}
+                      </li>
+                    )}
+                    <li>
+                      <strong>Mail valideur : </strong>
+                      {convention.agencyValidatorEmails[0]}
+                    </li>
+                  </ul>
+                </li>
+              </>
             )}
           </ul>
           <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
@@ -466,7 +492,7 @@ export const ConventionDocumentPage = ({
           <div className={fr.cx("fr-card", "fr-p-2w")}>
             <ul>
               <li>
-                ✔ Le bénéficiaire,{" "}
+                √ Le bénéficiaire,{" "}
                 <strong>
                   {beneficiary.firstName} {beneficiary.lastName}
                 </strong>{" "}
@@ -480,7 +506,7 @@ export const ConventionDocumentPage = ({
               </li>
               {beneficiaryRepresentative && (
                 <li>
-                  ✔ Le représentant légal du bénéficiaire,{" "}
+                  √ Le représentant légal du bénéficiaire,{" "}
                   <strong>
                     {beneficiaryRepresentative.firstName}{" "}
                     {beneficiaryRepresentative.lastName}
@@ -500,7 +526,7 @@ export const ConventionDocumentPage = ({
               )}
               {beneficiaryCurrentEmployer && (
                 <li>
-                  ✔ Le représentant de l'entreprise employant actuellement le
+                  √ Le représentant de l'entreprise employant actuellement le
                   bénéficiaire,{" "}
                   <strong>
                     {beneficiaryCurrentEmployer.firstName}{" "}
@@ -518,7 +544,7 @@ export const ConventionDocumentPage = ({
                 </li>
               )}
               <li>
-                ✔ Le représentant de l'entreprise d'accueil,{" "}
+                √ Le représentant de l'entreprise d'accueil,{" "}
                 <strong>
                   {establishmentRepresentative.firstName}{" "}
                   {establishmentRepresentative.lastName}
@@ -535,7 +561,7 @@ export const ConventionDocumentPage = ({
               </li>
               {!convention.agencyRefersTo && (
                 <li>
-                  ✔ L'agence prescriptrice{" "}
+                  √ L'agence prescriptrice{" "}
                   {internshipKind === "immersion"
                     ? "de l'immersion"
                     : "du mini-stage"}
@@ -551,7 +577,7 @@ export const ConventionDocumentPage = ({
               {convention.agencyRefersTo && (
                 <>
                   <li>
-                    ✔ L'agence prescriptrice{" "}
+                    √ L'agence prescriptrice{" "}
                     {internshipKind === "immersion"
                       ? "de l'immersion"
                       : "du mini-stage"}

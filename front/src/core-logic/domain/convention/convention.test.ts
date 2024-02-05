@@ -33,6 +33,8 @@ const conventionReadDtoRemainingProps = {
   agencyName: "some-agency-name",
   agencyKind: "pole-emploi" as const,
   agencySiret: "11112222000033",
+  agencyCounsellorEmails: [],
+  agencyValidatorEmails: ["validator@mail.com"],
 };
 
 describe("Convention slice", () => {
@@ -203,6 +205,8 @@ describe("Convention slice", () => {
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
         agencySiret: "11112222000033",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       };
       // tester l'état initiale
       expectConventionState({
@@ -251,6 +255,8 @@ describe("Convention slice", () => {
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
         agencySiret: "11112222000033",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       };
       expectConventionState({
         isLoading: false,
@@ -376,6 +382,8 @@ describe("Convention slice", () => {
             agencyDepartment: "75",
             agencyKind: "cci",
             agencySiret: "11112222000044",
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: ["validator@mail.com"],
           };
           expectConventionState({
             isLoading: false,
@@ -428,6 +436,8 @@ describe("Convention slice", () => {
             agencyDepartment: "75",
             agencyKind: "cci",
             agencySiret: "11112222000055",
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: ["validator@mail.com"],
           };
           expectConventionState({
             isLoading: false,
@@ -474,6 +484,8 @@ describe("Convention slice", () => {
             agencyDepartment: "75",
             agencyKind: "cci",
             agencySiret: "11112222000055",
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: ["validator@mail.com"],
           };
           expectConventionState({
             isLoading: false,
@@ -512,6 +524,8 @@ describe("Convention slice", () => {
             agencyDepartment: "75",
             agencyKind: "cci",
             agencySiret: "11112222000055",
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: ["validator@mail.com"],
           };
           expectConventionState({
             isLoading: false,
@@ -552,6 +566,8 @@ describe("Convention slice", () => {
             agencyDepartment: "75",
             agencyKind: "mission-locale",
             agencySiret: "11112222000055",
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: ["validator@mail.com"],
           };
           expectConventionState({
             isLoading: false,
@@ -600,6 +616,8 @@ describe("Convention slice", () => {
             agencyDepartment: "75",
             agencyKind: "mission-locale",
             agencySiret: "11112222000055",
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: ["validator@mail.com"],
           };
           expectConventionState({
             isLoading: false,
@@ -647,6 +665,8 @@ describe("Convention slice", () => {
         agencyDepartment: "75",
         agencyKind: "cap-emploi",
         agencySiret: "11112222000055",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       };
       ({ store, dependencies } = createTestStore({
         convention: {
@@ -692,6 +712,8 @@ describe("Convention slice", () => {
         agencyDepartment: "75",
         agencyKind: "conseil-departemental",
         agencySiret: "11112222000066",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: ["validator@mail.com"],
       };
 
       ({ store, dependencies } = createTestStore({
@@ -1028,6 +1050,8 @@ describe("Convention slice", () => {
       agencyDepartment: "75",
       agencyKind: "cci",
       agencySiret: "11112222000077",
+      agencyCounsellorEmails: [],
+      agencyValidatorEmails: ["validator@mail.com"],
     };
     ({ store } = createTestStore({
       convention: {
