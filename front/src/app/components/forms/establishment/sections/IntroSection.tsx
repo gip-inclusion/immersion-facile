@@ -20,8 +20,8 @@ export const IntroSection = ({
           <p>Bienvenue !</p>
           <p>
             Ce formulaire vous permet d’apparaître sur notre annuaire
-            d’entreprises destiné aux candidats. Ils pourront vous trouver et
-            vous contacter au rythme qui vous convient.
+            d’entreprises accueillantes. Ainsi, les candidats pourront vous
+            trouver et vous contacter au rythme qui vous convient.
           </p>
         </>
       )}
