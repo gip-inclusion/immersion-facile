@@ -1456,6 +1456,40 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         agencyLogoUrl,
       }),
     },
+
+    ESTABLISHMENT_LEAD_REMINDER: {
+      niceName: "Establishment Lead - Premier rappel d'inscription",
+      tags: ["relance inscription prospect"],
+      createEmailVariables: ({
+        businessName,
+        registrationLink,
+        rejectRegistrationLink,
+      }) => ({
+        subject:
+          "Votre Immersion s'est bien passée ? Accueillez d'autres candidats quand vous le voulez !",
+        greetings: "Bonjour,",
+        content: `
+        Nous sommes ravis que votre entreprise ${businessName} ait choisi l'immersion professionnelle pour faire découvrir votre métier et votre établissement.
+
+        Préparez dès maintenant l'accueil de votre prochain candidat en devenant entreprise accueillante sur le site Immersion Facilitée.
+
+        Être entreprise accueillante vous permet de gérer votre visibilité sur la plateforme pour recevoir des demandes d'immersion, à votre rythme, et en fonction de vos disponibilités.
+
+        Devenez entreprise accueillante dès aujourd'hui.`,
+        buttons: [
+          {
+            label: "S'inscrire en 2 minutes !",
+            url: registrationLink,
+          },
+          {
+            label: "Je ne souhaite pas devenir entreprise accueillante",
+            url: rejectRegistrationLink,
+          },
+        ],
+        subContent: `Bonne journée,
+      L'équipe Immersion Facilitée`,
+      }),
+    },
   });
 
 const greetingsWithConventionId = (

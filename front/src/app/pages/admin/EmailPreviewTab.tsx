@@ -345,6 +345,11 @@ export const defaultEmailValueByEmailKind: {
     businessName: "Machin CORP",
     siret: "12345678901234",
   },
+  ESTABLISHMENT_LEAD_REMINDER: {
+    businessName: "BUSINESS_NAME",
+    registrationLink: "REGISTRATION_LINK",
+    rejectRegistrationLink: "REJECT_REGISTRATION_LINK",
+  },
   FULL_PREVIEW_EMAIL: {
     internshipKind: "immersion",
     beneficiaryName: "BENEFICIARY_NAME",
