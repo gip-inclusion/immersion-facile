@@ -7,6 +7,7 @@ import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 import { ExtractFromExisting } from "../utils";
 
+export type CodeSafir = Flavor<string, "CodeSafir">;
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
 export const allAgencyStatuses = [
   "active",
@@ -34,7 +35,7 @@ export type CreateAgencyDto = {
 export type AgencyDtoSensitiveFields = {
   adminEmails: Email[];
   status: AgencyStatus;
-  codeSafir: string | null;
+  codeSafir: CodeSafir | null;
   rejectionJustification: string | null;
 };
 
