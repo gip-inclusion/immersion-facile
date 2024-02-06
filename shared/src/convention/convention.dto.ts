@@ -213,15 +213,15 @@ type StudentProperties = {
 };
 
 export type Beneficiary<T extends InternshipKind> =
-	GenericSignatory<"beneficiary"> & {
-		emergencyContact?: string;
-		emergencyContactPhone?: string;
-		emergencyContactEmail?: Email;
-		federatedIdentity?: PeConnectIdentity;
-		financiaryHelp?: string;
-		birthdate: string; // Date iso string
-		isRqth?: boolean;
-	// biome-ignore lint/complexity/noBannedTypes: we need {} here
+  GenericSignatory<"beneficiary"> & {
+    emergencyContact?: string;
+    emergencyContactPhone?: string;
+    emergencyContactEmail?: Email;
+    federatedIdentity?: PeConnectIdentity;
+    financiaryHelp?: string;
+    birthdate: string; // Date iso string
+    isRqth?: boolean;
+    // biome-ignore lint/complexity/noBannedTypes: we need {} here
   } & (T extends "mini-stage-cci" ? StudentProperties : {});
 
 export type LevelOfEducation = (typeof levelsOfEducation)[number];
@@ -330,7 +330,7 @@ export type UpdateConventionStatusRequestDto =
   | UpdateConventionStatusWithValidator;
 // prettier-ignore
 const _isAssignable = (
-	isValid: UpdateConventionStatusRequestDto,
+  isValid: UpdateConventionStatusRequestDto,
 ): { status: ConventionStatus } => isValid;
 
 export type GenerateMagicLinkRequestDto = {
