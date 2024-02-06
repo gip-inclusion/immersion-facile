@@ -80,7 +80,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       .optional(),
     website: zStringPossiblyEmpty,
     additionalInformation: zStringPossiblyEmpty,
-    businessAddress: addressWithPostalCodeSchema,
+    businessAddresses: z.array(addressWithPostalCodeSchema),
     isEngagedEnterprise: zBoolean.optional(),
     fitForDisabledWorkers: zBoolean.optional(),
     naf: nafSchema.optional(),

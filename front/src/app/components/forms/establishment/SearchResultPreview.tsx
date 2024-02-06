@@ -9,7 +9,7 @@ const establishmentToSearchResultPreview = ({
   naf,
   businessNameCustomized,
   businessName,
-  businessAddress,
+  businessAddresses,
   siret,
   website,
   fitForDisabledWorkers,
@@ -28,7 +28,7 @@ const establishmentToSearchResultPreview = ({
     lon: 0,
   },
   address: {
-    streetNumberAndAddress: businessAddress,
+    streetNumberAndAddress: businessAddresses[0] ?? "",
     city: "",
     departmentCode: "",
     postcode: "",
@@ -37,6 +37,7 @@ const establishmentToSearchResultPreview = ({
   website,
   fitForDisabledWorkers,
   additionalInformation,
+  locationId: "",
 });
 
 type SearchResultPreviewProps = {

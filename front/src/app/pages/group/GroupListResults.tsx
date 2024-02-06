@@ -48,6 +48,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                     .searchResult({
                       appellationCode,
                       siret: searchResult.siret,
+                      location: searchResult.locationId ?? undefined,
                     })
                     .push();
                 }

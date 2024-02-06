@@ -32,6 +32,7 @@ const validRequest: ContactEstablishmentRequestDto = {
   message: "message_to_send",
   immersionObjective: "Confirmer un projet professionnel",
   potentialBeneficiaryPhone: "0654783402",
+  locationId: "123",
 };
 
 describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersionRoutes.contactEstablishment.url} route`, () => {

@@ -43,7 +43,7 @@ export const defaultFormEstablishmentValue = (
   source: "immersion-facile",
   siret: siret || "",
   businessName: "",
-  businessAddress: "",
+  businessAddresses: [""],
   appellations: [emptyAppellationAndRome],
   businessContact: {
     firstName: "",

@@ -74,7 +74,7 @@ describe("Establishment", () => {
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
       siret: establishmentFromSiretFetched.siret,
       bName: establishmentFromSiretFetched.businessName,
-      bAddress: establishmentFromSiretFetched.businessAddress,
+      bAddresses: [establishmentFromSiretFetched.businessAddress],
     });
   });
 
@@ -288,7 +288,7 @@ describe("Establishment", () => {
       const editedEstablishment: FormEstablishmentDto = {
         ...formEstablishment,
         isEngagedEnterprise: !formEstablishment.isEngagedEnterprise,
-        businessAddress: "26 rue des castors, 75002 Paris",
+        businessAddresses: ["26 rue des castors, 75002 Paris"],
         businessNameCustomized: "My custom name",
       };
       store.dispatch(
@@ -326,7 +326,7 @@ describe("Establishment", () => {
       const editedEstablishment: FormEstablishmentDto = {
         ...formEstablishment,
         isEngagedEnterprise: !formEstablishment.isEngagedEnterprise,
-        businessAddress: "26 rue des castors, 75002 Paris",
+        businessAddresses: ["26 rue des castors, 75002 Paris"],
         businessNameCustomized: "My custom name",
       };
       store.dispatch(

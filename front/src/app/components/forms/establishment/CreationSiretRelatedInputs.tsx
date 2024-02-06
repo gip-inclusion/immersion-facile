@@ -50,7 +50,7 @@ export const CreationSiretRelatedInputs = () => {
       establishmentInfos ? establishmentInfos.businessName : "",
     );
     setValue(
-      "businessAddress",
+      "businessAddresses.0",
       establishmentInfos ? establishmentInfos.businessAddress : "",
     );
     setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
@@ -144,9 +144,9 @@ export const CreationSiretRelatedInputs = () => {
       />
       <AddressAutocomplete
         initialSearchTerm={establishmentInfos?.businessAddress}
-        {...formContents.businessAddress}
+        {...formContents.businessAddresses}
         setFormValue={({ address }) =>
-          setValue("businessAddress", addressDtoToString(address))
+          setValue("businessAddresses.0", addressDtoToString(address))
         }
         id={domElementIds.establishment.establishmentFormAddressAutocomplete}
         disabled={isFetchingSiret}

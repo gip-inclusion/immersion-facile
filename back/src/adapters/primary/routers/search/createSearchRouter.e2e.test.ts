@@ -22,7 +22,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   defaultNafCode,
-  establishmentAggregateToSearchResultByRome,
+  establishmentAggregateToSearchResultByRomeForFirstLocation,
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -72,10 +72,21 @@ describe("search-immersion route", () => {
           .withOffers([immersionOffer])
           .withEstablishment(
             new EstablishmentEntityBuilder()
-              .withPosition({
-                lat: 48.8531,
-                lon: 2.34999,
-              })
+              .withLocations([
+                {
+                  position: {
+                    lat: 48.8531,
+                    lon: 2.34999,
+                  },
+                  address: {
+                    streetNumberAndAddress: "30 avenue des champs Elysées",
+                    city: "Paris",
+                    postcode: "75017",
+                    departmentCode: "75",
+                  },
+                  id: "1",
+                },
+              ])
               .withWebsite("www.jobs.fr")
               .build(),
           )
@@ -100,7 +111,7 @@ describe("search-immersion route", () => {
         expectHttpResponseToEqual(result, {
           status: 200,
           body: [
-            establishmentAggregateToSearchResultByRome(
+            establishmentAggregateToSearchResultByRomeForFirstLocation(
               establishmentAgg,
               immersionOffer.romeCode,
               0,
@@ -150,7 +161,7 @@ describe("search-immersion route", () => {
       const toSearchImmersionResults = (
         params: { siret: SiretDto; offer: OfferEntity }[],
       ): SearchResultDto[] =>
-        params.map(({ siret, offer }) => ({
+        params.map(({ siret, offer }, index) => ({
           address: avenueChampsElyseesDto,
           naf: defaultNafCode,
           nafLabel: "NAFRev2",
@@ -171,6 +182,7 @@ describe("search-immersion route", () => {
           numberOfEmployeeRange: "10-19",
           distance_m: 0,
           position: { lat: 48.8531, lon: 2.34999 },
+          locationId: `${index}`,
         }));
 
       const offer1 = new OfferEntityBuilder()
@@ -192,10 +204,21 @@ describe("search-immersion route", () => {
               .withEstablishment(
                 new EstablishmentEntityBuilder()
                   .withSiret(siret1)
-                  .withPosition({
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  })
+                  .withLocations([
+                    {
+                      position: {
+                        lat: 48.8531,
+                        lon: 2.34999,
+                      },
+                      address: {
+                        streetNumberAndAddress: "24 rue des bouchers",
+                        city: "Strasbourg",
+                        postcode: "67000",
+                        departmentCode: "67",
+                      },
+                      id: "1",
+                    },
+                  ])
                   .withWebsite("www.jobs.fr")
                   .build(),
               )
@@ -206,10 +229,21 @@ describe("search-immersion route", () => {
               .withEstablishment(
                 new EstablishmentEntityBuilder()
                   .withSiret(siret2)
-                  .withPosition({
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  })
+                  .withLocations([
+                    {
+                      position: {
+                        lat: 48.8531,
+                        lon: 2.34999,
+                      },
+                      address: {
+                        streetNumberAndAddress: "24 rue des bouchers",
+                        city: "Strasbourg",
+                        postcode: "67000",
+                        departmentCode: "67",
+                      },
+                      id: "1",
+                    },
+                  ])
                   .withWebsite("www.jobs.fr")
                   .withSearchableBy({ students: true, jobSeekers: false })
                   .build(),
@@ -221,10 +255,21 @@ describe("search-immersion route", () => {
               .withEstablishment(
                 new EstablishmentEntityBuilder()
                   .withSiret(siret3)
-                  .withPosition({
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  })
+                  .withLocations([
+                    {
+                      position: {
+                        lat: 48.8531,
+                        lon: 2.34999,
+                      },
+                      address: {
+                        streetNumberAndAddress: "24 rue des bouchers",
+                        city: "Strasbourg",
+                        postcode: "67000",
+                        departmentCode: "67",
+                      },
+                      id: "1",
+                    },
+                  ])
                   .withWebsite("www.jobs.fr")
                   .withSearchableBy({ students: false, jobSeekers: true })
                   .build(),

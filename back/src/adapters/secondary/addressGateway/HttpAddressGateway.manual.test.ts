@@ -3,6 +3,7 @@ import {
   AddressAndPosition,
   AddressDto,
   GeoPositionDto,
+  Location,
   LookupSearchResult,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -58,7 +59,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
   describe("lookupStreetAddress, postcode is now mandatory", () => {
     describe("Right paths", () => {
-      it.each<{ candidateQuery: string; expectedResult: AddressAndPosition }>([
+      it.each<{ candidateQuery: string; expectedResult: Location }>([
         {
           candidateQuery: "111 Meinglazou 29260 Lesneven",
           expectedResult: {
@@ -72,6 +73,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 48.5787522,
               lon: -4.2966868,
             },
+            id: "123",
           },
         },
         {
@@ -89,6 +91,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 48.671259,
               lon: 5.891857,
             },
+            id: "123",
           },
         },
         {
@@ -104,6 +107,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 43.664522,
               lon: 7.1494273,
             },
+            id: "123",
           },
         },
         {
@@ -119,6 +123,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: -20.887292,
               lon: 55.455501,
             },
+            id: "123",
           },
         },
         {
@@ -134,6 +139,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 45.771767625,
               lon: 4.92455044791667,
             },
+            id: "123",
           },
         },
         {
@@ -149,6 +155,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 48.8523073360927,
               lon: 2.27125068377483,
             },
+            id: "123",
           },
         },
         {
@@ -164,6 +171,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 48.8695,
               lon: 2.308483,
             },
+            id: "123",
           },
         },
         {
@@ -179,6 +187,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 43.2130358,
               lon: 2.3491069,
             },
+            id: "123",
           },
         },
         {
@@ -194,6 +203,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 48.596289,
               lon: 6.489476,
             },
+            id: "123",
           },
         },
         {
@@ -209,6 +219,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 48.01562,
               lon: 6.600757,
             },
+            id: "123",
           },
         },
         {
@@ -224,6 +235,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lat: 18.06481835,
               lon: -63.049171129033,
             },
+            id: "123",
           },
         },
       ])(

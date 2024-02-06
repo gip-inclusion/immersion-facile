@@ -36,7 +36,7 @@ export const AdminSiretRelatedInputs = () => {
       <AddressAutocomplete
         initialSearchTerm={""}
         disabled={true}
-        {...formContents.businessAddress}
+        {...formContents.businessAddresses}
         setFormValue={() => undefined}
       />
     </>

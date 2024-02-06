@@ -63,9 +63,14 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         this.siretGateway,
         formEstablishment.siret,
       ),
-      addressAndPosition: await getAddressAndPosition(
-        this.addressAPI,
-        formEstablishment,
+      addressesAndPosition: await Promise.all(
+        formEstablishment.businessAddresses.map(async (address) =>
+          getAddressAndPosition(
+            this.addressAPI,
+            formEstablishment.siret,
+            address,
+          ),
+        ),
       ),
       formEstablishment,
     });

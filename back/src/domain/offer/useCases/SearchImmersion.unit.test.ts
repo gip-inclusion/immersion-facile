@@ -18,10 +18,10 @@ import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
-  TEST_POSITION,
+  TEST_LOCATION,
   boulangerAssistantOffer,
   boulangerOffer,
-  establishmentAggregateToSearchResultByRome,
+  establishmentAggregateToSearchResultByRomeForFirstLocation,
   secretariatOffer,
 } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteGateway } from "../../../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
@@ -40,13 +40,7 @@ const establishment = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
       .withSiret("78000403200019")
-      .withPosition(TEST_POSITION)
-      .withAddress({
-        streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
-        postcode: "75001",
-        city: "Paris",
-        departmentCode: "75",
-      })
+      .withLocations([TEST_LOCATION])
       .withNafDto({
         code: "naf code",
         nomenclature: "naf nomenclature",
@@ -63,13 +57,7 @@ const establishmentAcceptingOnlyStudent = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
       .withSiret("12345677123456")
-      .withPosition(TEST_POSITION)
-      .withAddress({
-        streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
-        postcode: "75001",
-        city: "Paris",
-        departmentCode: "75",
-      })
+      .withLocations([TEST_LOCATION])
       .withNafDto({
         code: "naf code",
         nomenclature: "naf nomenclature",
@@ -87,13 +75,7 @@ const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
       .withSiret("12345678901234")
-      .withPosition(TEST_POSITION)
-      .withAddress({
-        streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
-        postcode: "75001",
-        city: "Paris",
-        departmentCode: "75",
-      })
+      .withLocations([TEST_LOCATION])
       .withNafDto({
         code: "naf code",
         nomenclature: "naf nomenclature",
@@ -155,12 +137,12 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersionUseCase.execute(searchInMetzParams);
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         boulangerOffer.romeCode,
         606885,
@@ -196,12 +178,12 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         boulangerOffer.romeCode,
         606885,
@@ -238,7 +220,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
@@ -272,12 +254,12 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         boulangerOffer.romeCode,
         606885,
@@ -397,7 +379,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
@@ -482,7 +464,7 @@ describe("SearchImmersionUseCase", () => {
     });
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
@@ -518,22 +500,22 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersionUseCase.execute(searchParams);
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         boulangerOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyStudent,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyStudent,
         boulangerOffer.romeCode,
         606885,
@@ -570,22 +552,22 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersionUseCase.execute(searchParams);
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         boulangerOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyJobSeeker,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyJobSeeker,
         boulangerOffer.romeCode,
         606885,
@@ -621,32 +603,32 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersionUseCase.execute(searchParams);
 
     expectToEqual(response, [
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishment,
         boulangerOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyStudent,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyStudent,
         boulangerOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyJobSeeker,
         secretariatOffer.romeCode,
         606885,
       ),
-      establishmentAggregateToSearchResultByRome(
+      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyJobSeeker,
         boulangerOffer.romeCode,
         606885,
@@ -862,7 +844,7 @@ describe("SearchImmersionUseCase", () => {
         );
 
         expectToEqual(authenticatedResponse, [
-          establishmentAggregateToSearchResultByRome(
+          establishmentAggregateToSearchResultByRomeForFirstLocation(
             establishment,
             secretariatOffer.romeCode,
             606885,
@@ -884,7 +866,7 @@ describe("SearchImmersionUseCase", () => {
         });
 
         expectToEqual(unauthenticatedResponse, [
-          establishmentAggregateToSearchResultByRome(
+          establishmentAggregateToSearchResultByRomeForFirstLocation(
             establishment,
             secretariatOffer.romeCode,
             606885,
@@ -959,4 +941,5 @@ const lbbToSearchResult = (lbb: LaBonneBoiteCompanyDto): SearchResultDto => ({
   urlOfPartner: "",
   voluntaryToImmersion: false,
   website: "",
+  locationId: null,
 });

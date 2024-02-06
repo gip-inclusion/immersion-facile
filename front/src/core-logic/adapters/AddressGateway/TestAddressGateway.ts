@@ -1,5 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import { AddressAndPosition, LookupSearchResult } from "shared";
+import { Location, LookupSearchResult } from "shared";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export class TestAddressGateway implements AddressGateway {
@@ -9,7 +9,7 @@ export class TestAddressGateway implements AddressGateway {
     return this.lookupLocationResults$;
   }
 
-  public lookupStreetAddress(): Promise<AddressAndPosition[]> {
+  public lookupStreetAddress(): Promise<Location[]> {
     throw new Error("Method not implemented.");
   }
 }

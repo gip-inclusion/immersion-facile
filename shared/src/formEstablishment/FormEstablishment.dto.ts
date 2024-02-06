@@ -49,7 +49,7 @@ export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
 export type FormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
-  businessAddress: string;
+  businessAddresses: string[];
   businessContact: BusinessContactDto;
   businessName: string;
   businessNameCustomized?: string;

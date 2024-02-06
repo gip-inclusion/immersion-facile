@@ -19,6 +19,7 @@ import {
 } from "shared";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
+import { MultipleAddressInput } from "src/app/components/forms/establishment/MultipleAddressInput";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
@@ -129,12 +130,12 @@ export const DetailsSection = ({
         .with("create", () => <CreationSiretRelatedInputs />)
         .with("edit", () => (
           <EditionSiretRelatedInputs
-            businessAddress={formValues.businessAddress}
+            businessAddress={formValues.businessAddresses[0]}
           />
         ))
         .with("admin", () => (
           <EditionSiretRelatedInputs
-            businessAddress={formValues.businessAddress}
+            businessAddress={formValues.businessAddresses[0]}
           />
         ))
         .exhaustive()}
@@ -218,6 +219,22 @@ export const DetailsSection = ({
         currentAppellations={formValues.appellations}
         error={errors?.appellations?.message}
       />
+      <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
+        Les lieux où vous proposez une immersion :
+      </h2>
+      <p className={fr.cx("fr-hint-text")}>
+        Par défaut, vous apparaîtrez dans les résultats de recherche liés à l’adresse de votre établissement.
+        Vous pouvez ajouter d’autres adresses si vous proposez des immersions ailleurs.
+        Par exemple : votre société est située à Dijon (adresse liée à votre SIRET) mais vous proposez une immersion dans votre antenne de Nantes.
+      </p>
+      <MultipleAddressInput
+          name="businessAddress"
+          currentAddresses={[]}
+          onAddressAdded={() => {}}
+          onAddressDeleted={() => {}}
+          id="TODO"
+      />
+
       {keys(errors).length === 0 && keys(touchedFields).length > 0 && (
         <SearchResultPreview establishment={formValues} />
       )}

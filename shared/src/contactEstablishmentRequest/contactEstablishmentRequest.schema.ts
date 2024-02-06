@@ -11,6 +11,7 @@ import {
   zEnumValidation,
   zStringPossiblyEmpty,
   zTrimmedString,
+  zUuidLike,
 } from "../zodUtils";
 import {
   ContactEstablishmentByMailDto,
@@ -26,6 +27,7 @@ const commonFields = {
   potentialBeneficiaryFirstName: zTrimmedString,
   potentialBeneficiaryLastName: zTrimmedString,
   potentialBeneficiaryEmail: emailSchema,
+  locationId: zUuidLike,
 };
 
 export const preferEmailContactSchema = z.literal("EMAIL");

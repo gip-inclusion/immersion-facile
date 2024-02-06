@@ -7,6 +7,7 @@ import {
   zStringCanBeEmpty,
   zStringMinLength1,
   zStringPossiblyEmpty,
+  zUuidLike,
 } from "../zodUtils";
 import { SearchResultDto } from "./SearchResult.dto";
 
@@ -39,6 +40,7 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
       appellationCode: appellationCodeSchema,
     }),
   ),
+  locationId: zUuidLike,
 });
 
 export const searchResultsSchema = z.array(searchResultSchema);

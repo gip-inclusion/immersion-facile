@@ -2,6 +2,7 @@ import {
   AddressDto,
   AppellationDto,
   GeoPositionDto,
+  LocationId,
   RomeCode,
   SearchResultDto,
   SiretDto,
@@ -24,6 +25,7 @@ export type SearchImmersionResultPublicV2 = {
   numberOfEmployeeRange?: string;
   website?: string;
   additionalInformation?: string;
+  locationId: LocationId | null;
 };
 
 export const domainToSearchImmersionResultPublicV2 = (

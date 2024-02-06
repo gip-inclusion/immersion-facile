@@ -1183,7 +1183,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       tags: ["confirmation enregistrement entreprise"],
       createEmailVariables: ({
         businessName,
-        businessAddress,
+        businessAddresses,
         contactFirstName,
         contactLastName,
       }) => ({
@@ -1192,10 +1192,14 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         content: `
       <strong>Félicitations !</strong>
 
-      Vous venez d'enregistrer votre établissement ${businessName} (${businessAddress}) pour accueillir des immersions professionnelles.      
+      Vous venez d'enregistrer votre établissement ${businessName} (${
+        businessAddresses[0]
+      }) pour accueillir des immersions professionnelles.      
 
-      ${contactFirstName} ${contactLastName} recevra bien les demandes d'immersion.      
-
+      ${contactFirstName} ${contactLastName} recevra bien les demandes d'immersion.
+      
+      Votre entreprise sera visible sur notre moteur de recherche sur les lieux d'immersion suivants :      
+      ${businessAddresses.map((address) => `• ${address}\n`).join("")}
       Pour ces demandes, il n'est pas utile de demander un CV. Il s'agit seulement de passer quelques jours ensemble pour une découverte réciproque. 
 
       Si vous avez des projets de recrutement et si, grâce à une immersion, vous retenez un profil qui vous convient, un conseiller emploi vous proposera, si nécessaire,  un plan de formation sur mesure. 
@@ -1217,12 +1221,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       createEmailVariables: ({
         editFrontUrl,
         businessName,
-        businessAddress,
+        businessAddresses,
       }) => ({
         subject:
           "Mettez à jour votre fiche entreprise sur le site Immersion Facilitée",
         greetings: "Bonjour,",
-        content: `Votre entreprise: ${businessName} (${businessAddress}) est inscrite dans l'annuaire des entreprises accueillantes d'Immersion Facilitée depuis au moins 6 mois. Merci !
+        content: `Votre entreprise: ${businessName} (${businessAddresses[0]}) est inscrite dans l'annuaire des entreprises accueillantes d'Immersion Facilitée depuis au moins 6 mois. Merci !
 
       Vous pouvez mettre à jour, si vous le souhaitez, les informations saisies au moment du référencement.
       
@@ -1257,13 +1261,13 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       createEmailVariables: ({
         editFrontUrl,
         businessName,
-        businessAddress,
+        businessAddresses,
       }) => ({
         subject:
           "Immersion Facilitée - Modification de la fiche de votre entreprise",
         greetings: "Bonjour,",
         content: `
-      Vous avez demandé à modifier les informations concernant votre entreprise: ${businessName} (${businessAddress}). 
+      Vous avez demandé à modifier les informations concernant votre entreprise: ${businessName} (${businessAddresses[0]}). 
 
       Vous pouvez ajouter ou supprimer des métiers, modifier l'adresse de l'entreprise,  les coordonnées du référent “Immersion” dans votre entreprise ou le mode de contact souhaité, etc.  
       `,
@@ -1277,12 +1281,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     ESTABLISHMENT_DELETED: {
       niceName: "Établissement - Supprimé",
       tags: ["suppression entreprise"],
-      createEmailVariables: ({ businessAddress, businessName, siret }) => ({
+      createEmailVariables: ({ businessAddresses, businessName, siret }) => ({
         subject:
           "Votre entreprise a été supprimée de la liste des entreprises accueillantes d'Immersion Facilitée",
         greetings: "Bonjour,",
         content: `
-        Suite à votre demande de suppression de votre établissement (SIRET ${siret} - ${businessName} - ${businessAddress}), nous vous confirmons que ce dernier a été supprimé définitivement de la liste des entreprises accueillantes exposées sur Immersion Facilitée.
+        Suite à votre demande de suppression de votre établissement (SIRET ${siret} - ${businessName} - ${businessAddresses[0]}), nous vous confirmons que ce dernier a été supprimé définitivement de la liste des entreprises accueillantes exposées sur Immersion Facilitée.
         `,
         subContent: `Bien cordialement,
         l'équipe d'Immersion Facilitée`,

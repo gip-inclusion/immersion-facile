@@ -1,6 +1,6 @@
 import { Observable, from } from "rxjs";
 import {
-  AddressAndPosition,
+  Location,
   LookupLocationInput,
   LookupSearchResult,
   sleep,
@@ -16,9 +16,7 @@ export class InMemoryAddressGateway implements AddressGateway {
     return from(this.#lookupLocation(query));
   }
 
-  public async lookupStreetAddress(
-    lookup: string,
-  ): Promise<AddressAndPosition[]> {
+  public async lookupStreetAddress(lookup: string): Promise<Location[]> {
     //eslint-disable-next-line no-console
     console.log("InMemoryApiAddresseGateway.lookupStreetAddress", lookup);
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
@@ -28,6 +26,7 @@ export class InMemoryAddressGateway implements AddressGateway {
 
     return [
       {
+        id: "1",
         address: {
           streetNumberAndAddress: "60 Rue des Lombards",
           postcode: "75001",
@@ -37,6 +36,7 @@ export class InMemoryAddressGateway implements AddressGateway {
         position: { lat: 45, lon: 2 },
       },
       {
+        id: "2",
         address: {
           streetNumberAndAddress: "81 Bd Gouvion-Saint-Cyr",
           postcode: "75017",
@@ -46,6 +46,7 @@ export class InMemoryAddressGateway implements AddressGateway {
         position: { lat: 45.1, lon: 2.1 },
       },
       {
+        id: "3",
         address: {
           streetNumberAndAddress: "71 Bd Saint-Michel",
           postcode: "75005",
@@ -55,6 +56,7 @@ export class InMemoryAddressGateway implements AddressGateway {
         position: { lat: 46, lon: 2.5 },
       },
       {
+        id: "4",
         address: {
           streetNumberAndAddress: "5 Rue de la Huchette",
           postcode: "75005",

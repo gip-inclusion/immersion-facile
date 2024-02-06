@@ -41,6 +41,7 @@ const validRequest: ContactEstablishmentRequestDto = {
   potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
   potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
+  locationId: "123",
 };
 
 const appellationAndRome: AppellationAndRomeDto = {
@@ -243,7 +244,7 @@ describe("ContactEstablishment", () => {
         appellationCode: "12898",
         siret: validEmailRequest.siret,
         businessName: "Company inside repository",
-        address: establishment.address,
+        address: establishment.locations[0].address,
         potentialBeneficiary: {
           firstName: validEmailRequest.potentialBeneficiaryFirstName,
           lastName: validEmailRequest.potentialBeneficiaryLastName,
@@ -300,7 +301,7 @@ describe("ContactEstablishment", () => {
         appellationCode: appellationAndRome.appellationCode,
         siret,
         businessName: "Entreprise 1",
-        address: establishment.address,
+        address: establishment.locations[0].address,
         immersionObjective: "Confirmer un projet professionnel",
         potentialBeneficiary: {
           firstName: "Antoine",
@@ -335,7 +336,7 @@ describe("ContactEstablishment", () => {
         createdAt: discussion1Date,
         siret,
         businessName: "Entreprise 2",
-        address: establishment.address,
+        address: establishment.locations[0].address,
         potentialBeneficiary: {
           firstName: "Antoine",
           lastName: "Tourasse",
@@ -377,6 +378,7 @@ describe("ContactEstablishment", () => {
       message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
       immersionObjective: "Confirmer un projet professionnel",
       potentialBeneficiaryPhone: "0654783402",
+      locationId: establishment.locations[0].id,
     };
     await contactEstablishment.execute(secondContactRequestDto);
 

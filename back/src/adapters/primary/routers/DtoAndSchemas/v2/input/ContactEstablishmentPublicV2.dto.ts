@@ -3,6 +3,7 @@ import {
   ContactEstablishmentRequestDto,
   ContactMethod,
   ImmersionObjective,
+  LocationId,
   SiretDto,
 } from "shared";
 
@@ -13,6 +14,7 @@ type ContactInformationPublicV2<T extends ContactMethod> = {
   potentialBeneficiaryLastName: string;
   potentialBeneficiaryEmail: string;
   contactMode: T;
+  locationId: LocationId;
 };
 
 type ContactEstablishmentByMailPublicV2Dto =

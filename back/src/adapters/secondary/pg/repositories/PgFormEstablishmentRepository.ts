@@ -34,7 +34,7 @@ export class PgFormEstablishmentRepository
       .insertInto("form_establishments")
       .values({
         additional_information: formEstablishment.additionalInformation,
-        business_address: formEstablishment.businessAddress,
+        business_addresses: JSON.stringify(formEstablishment.businessAddresses),
         business_contact: sql`CAST(${JSON.stringify(
           formEstablishment.businessContact,
         )} AS JSONB)`,
@@ -106,7 +106,7 @@ export class PgFormEstablishmentRepository
       .updateTable("form_establishments")
       .set({
         additional_information: formEstablishment.additionalInformation ?? null, // TO DISCUSS : was missing on not kysely legacy update query
-        business_address: formEstablishment.businessAddress,
+        business_addresses: JSON.stringify(formEstablishment.businessAddresses),
         business_contact: sql`CAST(${JSON.stringify(
           formEstablishment.businessContact,
         )} AS JSONB)`,
@@ -141,7 +141,7 @@ export class PgFormEstablishmentRepository
         jsonBuildObject({
           additionalInformation: db.ref("additional_information"),
           appellations: db.ref("professions"),
-          businessAddress: db.ref("business_address"),
+          businessAddresses: db.ref("business_addresses"),
           businessContact: db.ref("business_contact"),
           businessName: db.ref("business_name"),
           businessNameCustomized: db.ref("business_name_customized"),

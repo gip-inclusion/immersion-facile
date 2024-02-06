@@ -133,6 +133,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       appellationCode: param.query.ofType(appellationStringSerializer),
       siret: param.query.string,
+      location: param.query.optional.string,
       contactFirstName: param.query.optional.string,
       contactLastName: param.query.optional.string,
       contactEmail: param.query.optional.string,

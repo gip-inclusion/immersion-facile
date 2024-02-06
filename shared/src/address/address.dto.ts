@@ -29,10 +29,15 @@ export type AddressDto = {
   city: City;
 };
 
-export type AddressAndPosition = {
+export type LocationId = Flavor<string, "AddressId">;
+
+export type Location = {
+  id: LocationId;
   position: GeoPositionDto;
   address: AddressDto;
 };
+
+export type AddressAndPosition = Omit<Location, "id">;
 
 export const departmentNameToDepartmentCode: Record<
   DepartmentName,

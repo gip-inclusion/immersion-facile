@@ -73,7 +73,9 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
         params: {
           editFrontUrl,
           businessName: establishment.customizedName ?? establishment.name,
-          businessAddress: addressDtoToString(establishment.address),
+          businessAddresses: establishment.locations.map((addressAndPosition) =>
+            addressDtoToString(addressAndPosition.address),
+          ),
         },
       },
       followedIds: {

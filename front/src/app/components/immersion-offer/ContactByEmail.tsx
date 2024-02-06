@@ -70,6 +70,7 @@ export const ContactByEmail = ({
       immersionObjective: null,
       potentialBeneficiaryResumeLink: "",
       potentialBeneficiaryPhone: route.params.contactPhone ?? "",
+      locationId: route.params.location ?? "",
     }),
     [appellations, route.params],
   );

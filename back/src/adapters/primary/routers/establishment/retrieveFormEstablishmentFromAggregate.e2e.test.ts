@@ -29,7 +29,16 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     .withEstablishment(
       new EstablishmentEntityBuilder()
         .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-        .withAddress(rueSaintHonoreDto)
+        .withLocations([
+          {
+            address: rueSaintHonoreDto,
+            position: {
+              lat: 48.867,
+              lon: 2.333,
+            },
+            id: "123",
+          },
+        ])
         .build(),
     )
     .build();
@@ -83,8 +92,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         additionalInformation:
           establishmentAggregate.establishment.additionalInformation,
         businessName: establishmentAggregate.establishment.name,
-        businessAddress: addressDtoToString(
-          establishmentAggregate.establishment.address,
+        businessAddresses: establishmentAggregate.establishment.locations.map(
+          (addressAndPosition) =>
+            addressDtoToString(addressAndPosition.address),
         ),
         naf: establishmentAggregate.establishment?.nafDto,
         appellations: [
@@ -136,9 +146,11 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         additionalInformation:
           establishmentAggregate.establishment.additionalInformation,
         businessName: establishmentAggregate.establishment.name,
-        businessAddress: addressDtoToString(
-          establishmentAggregate.establishment.address,
-        ),
+        businessAddresses: [
+          addressDtoToString(
+            establishmentAggregate.establishment.locations[0].address,
+          ),
+        ],
         naf: establishmentAggregate.establishment?.nafDto,
         appellations: [
           {

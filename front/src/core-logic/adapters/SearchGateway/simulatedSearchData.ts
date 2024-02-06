@@ -38,6 +38,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "2000-4999",
     contactMode: "PHONE",
+    locationId: "123",
   },
   {
     rome: "G1204",
@@ -67,6 +68,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       departmentCode: "29",
     },
     numberOfEmployeeRange: "+10000",
+    locationId: "123",
   },
   {
     rome: "D1211",
@@ -96,6 +98,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       departmentCode: "77",
     },
     numberOfEmployeeRange: "+10000",
+    locationId: "123",
   },
   {
     rome: "D1211",
@@ -125,6 +128,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       departmentCode: "71",
     },
     numberOfEmployeeRange: "+10000",
+    locationId: "123",
   },
   {
     rome: "D1211",
@@ -154,6 +158,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       departmentCode: "44",
     },
     numberOfEmployeeRange: "+10000",
+    locationId: "123",
   },
   {
     rome: "D1505",
@@ -183,6 +188,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       departmentCode: "44",
     },
     numberOfEmployeeRange: "+10000",
+    locationId: "123",
   },
   {
     rome: "D1211",
@@ -213,6 +219,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "+10000",
     contactMode: "PHONE",
+    locationId: "123",
   },
   {
     rome: "D1211",
@@ -243,6 +250,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       departmentCode: "91",
     },
     numberOfEmployeeRange: "+10000",
+    locationId: "123",
   },
   {
     rome: "N1103",
@@ -284,6 +292,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       departmentCode: "68",
     },
     numberOfEmployeeRange: "2000-4999",
+    locationId: "123",
   },
 ];
 
@@ -332,6 +341,7 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation:
       "Afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza, afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza",
     distance_m: 7984654,
+    locationId: "123",
   },
   {
     rome: "A0001",
@@ -351,6 +361,7 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation:
       "Un texte super long qui donne des tonnes d'informations complémentaires sur l'immersion, les métiers proposés, tout ça... ",
     distance_m: 7000,
+    locationId: "123",
   },
   {
     rome: "A0003",
@@ -378,6 +389,7 @@ export const seedSearchResults: SearchResultDto[] = [
      Bisous.
      L'entreprise cool avec une description sur plusieurs lignes.`,
     distance_m: 500,
+    locationId: "123",
   },
   {
     rome: "A0002",
@@ -402,6 +414,7 @@ export const seedSearchResults: SearchResultDto[] = [
     ],
     nafLabel: "",
     distance_m: 100,
+    locationId: "123",
   },
   {
     rome: "A0003",
@@ -416,6 +429,7 @@ export const seedSearchResults: SearchResultDto[] = [
     appellations: [],
     nafLabel: "",
     website: "https://www.example.com",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -440,6 +454,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -468,6 +483,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "Test avec description courte",
     numberOfEmployeeRange: "20-49",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -493,6 +509,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -521,6 +538,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -548,6 +566,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
+    locationId: "123",
   },
   {
     naf: "5610C",
@@ -573,6 +592,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -597,6 +617,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -625,6 +646,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -653,6 +675,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -677,6 +700,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -704,6 +728,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -732,6 +757,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -760,6 +786,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -788,6 +815,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
+    locationId: null,
   },
   {
     naf: "1071C",
@@ -812,6 +840,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -839,6 +868,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "4724Z",
@@ -864,6 +894,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -889,6 +920,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -914,6 +946,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -941,6 +974,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -968,6 +1002,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -993,6 +1028,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1018,6 +1054,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1043,6 +1080,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1067,6 +1105,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1091,6 +1130,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1116,6 +1156,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1144,6 +1185,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1172,6 +1214,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1196,6 +1239,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1223,6 +1267,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1251,6 +1296,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1275,6 +1321,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1304,6 +1351,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1331,6 +1379,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1359,6 +1408,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1383,6 +1433,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "100-199",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1408,6 +1459,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1433,6 +1485,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "5610C",
@@ -1458,6 +1511,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1486,6 +1540,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1511,6 +1566,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1536,6 +1592,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1561,6 +1618,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1585,6 +1643,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1613,6 +1672,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1641,6 +1701,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1666,6 +1727,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1693,6 +1755,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "4724Z",
@@ -1718,6 +1781,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1745,6 +1809,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1773,6 +1838,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1801,6 +1867,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "4724Z",
@@ -1826,6 +1893,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1851,6 +1919,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1878,6 +1947,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1905,6 +1975,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -1933,6 +2004,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
   {
     naf: "5610A",
@@ -1960,6 +2032,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
+    locationId: "123",
   },
   {
     naf: "4724Z",
@@ -1989,6 +2062,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
+    locationId: "123",
   },
   {
     naf: "1071C",
@@ -2013,6 +2087,7 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
+    locationId: "123",
   },
   {
     naf: "6820B",
@@ -2041,5 +2116,6 @@ export const seedSearchResults: SearchResultDto[] = [
     voluntaryToImmersion: true,
     additionalInformation: "",
     numberOfEmployeeRange: "",
+    locationId: "123",
   },
 ];

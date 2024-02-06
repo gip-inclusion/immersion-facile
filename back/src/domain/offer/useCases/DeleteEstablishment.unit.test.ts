@@ -179,9 +179,11 @@ describe("Delete Establishment", () => {
             params: {
               businessName: establishmentAggregate.establishment.name,
               siret: establishmentAggregate.establishment.siret,
-              businessAddress: addressDtoToString(
-                establishmentAggregate.establishment.address,
-              ),
+              businessAddresses:
+                establishmentAggregate.establishment.locations.map(
+                  (addressAndPosition) =>
+                    addressDtoToString(addressAndPosition.address),
+                ),
             },
             cc: contact.copyEmails,
           },

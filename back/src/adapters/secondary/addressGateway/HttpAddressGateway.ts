@@ -6,6 +6,7 @@ import {
   City,
   DepartmentName,
   GeoPositionDto,
+  Location,
   LookupSearchResult,
   OpenCageGeoSearchKey,
   Postcode,

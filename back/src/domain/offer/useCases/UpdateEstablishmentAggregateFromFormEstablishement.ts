@@ -52,9 +52,14 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
         numberEmployeesRange:
           initialEstablishmentAggregate.establishment.numberEmployeesRange,
       },
-      addressAndPosition: await getAddressAndPosition(
-        this.#addressGateway,
-        formEstablishment,
+      addressesAndPosition: await Promise.all(
+        formEstablishment.businessAddresses.map(async (address) =>
+          getAddressAndPosition(
+            this.#addressGateway,
+            formEstablishment.siret,
+            address,
+          ),
+        ),
       ),
       formEstablishment,
     });

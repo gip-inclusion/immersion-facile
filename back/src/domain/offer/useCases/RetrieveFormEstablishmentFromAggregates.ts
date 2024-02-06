@@ -61,8 +61,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       businessName: establishmentAggregate.establishment.name,
       businessNameCustomized:
         establishmentAggregate.establishment.customizedName,
-      businessAddress: addressDtoToString(
-        establishmentAggregate.establishment.address,
+      businessAddresses: establishmentAggregate.establishment.locations.map(
+        (addressAndPosition) => addressDtoToString(addressAndPosition.address),
       ),
       isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
       fitForDisabledWorkers:

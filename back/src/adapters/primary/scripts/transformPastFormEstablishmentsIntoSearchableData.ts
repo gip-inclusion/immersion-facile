@@ -94,7 +94,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       businessNameCustomized: row.business_name_customized,
       website: row.website,
       additionalInformation: row.additional_information,
-      businessAddress: row.business_address,
+      businessAddresses: row.business_addresses, // No type on row, not sure what I'm doing
       naf: row.naf,
       appellations: row.professions,
       businessContact: row.business_contact,

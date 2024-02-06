@@ -26,6 +26,7 @@ export const stubSearchResult: SearchResultDto = {
   },
   contactMode: "EMAIL",
   numberOfEmployeeRange: "10-19",
+  locationId: "123",
 };
 
 /* eslint-disable @typescript-eslint/require-await */

@@ -19,7 +19,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-  TEST_POSITION,
+  TEST_LOCATION,
   TEST_ROME_LABEL,
   defaultNafCode,
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
@@ -70,9 +70,8 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withSiret(immersionOfferSiret)
-              .withPosition(TEST_POSITION)
+              .withLocations([TEST_LOCATION])
               .withNumberOfEmployeeRange("10-19")
-              .withAddress(rueSaintHonoreDto)
               .build(),
           )
           .withContact(
@@ -114,13 +113,13 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       .get(`/v2/search/${immersionOfferSiret}/${styliste.appellationCode}`)
       .set("Authorization", authToken);
 
-    expect(response.body).toEqual({
+    expectToEqual(response.body, {
       rome: styliste.romeCode,
       naf: defaultNafCode,
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: true,
-      position: TEST_POSITION,
+      locationId: TEST_LOCATION.id,
       numberOfEmployeeRange: "10-19",
       address: rueSaintHonoreDto,
       contactMode: "EMAIL",
@@ -134,6 +133,10 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       nafLabel: "NAFRev2",
       additionalInformation: "",
       website: "www.jobs.fr",
+      position: {
+        lat: 48.866,
+        lon: 2.333,
+      },
     } satisfies SearchImmersionResultPublicV2);
     expect(response.status).toBe(200);
   });
