@@ -275,7 +275,7 @@ export const ConventionDocumentPage = ({
                   qualité d' <strong>agence accompagnante.</strong>
                   <ul>
                     <li>
-                      <strong>Mail accompagnant : </strong>
+                      <strong>Email de l'agence accompagnante : </strong>
                       {convention.agencyCounsellorEmails[0]}
                     </li>
                   </ul>
@@ -288,7 +288,7 @@ export const ConventionDocumentPage = ({
                   <strong>agence prescriptrice.</strong>
                   <ul>
                     <li>
-                      <strong>Mail valideur : </strong>
+                      <strong>Email du valideur : </strong>
                       {convention.agencyValidatorEmails[0]}
                     </li>
                   </ul>
@@ -305,12 +305,12 @@ export const ConventionDocumentPage = ({
                   <ul>
                     {convention.agencyCounsellorEmails.length > 0 && (
                       <li>
-                        <strong>Mail conseiller de 1er niveau : </strong>
+                        <strong>Email du conseiller de 1er niveau : </strong>
                         {convention.agencyCounsellorEmails[0]}
                       </li>
                     )}
                     <li>
-                      <strong>Mail valideur : </strong>
+                      <strong>Email du valideur : </strong>
                       {convention.agencyValidatorEmails[0]}
                     </li>
                   </ul>
