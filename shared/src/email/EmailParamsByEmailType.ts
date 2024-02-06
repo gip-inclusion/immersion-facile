@@ -167,6 +167,11 @@ export type EmailParamsByEmailType = {
     siret: SiretDto;
     businessAddress: string;
   };
+  ESTABLISHMENT_LEAD_REMINDER: {
+    businessName: string;
+    registrationLink: string;
+    rejectRegistrationLink: string;
+  };
   FULL_PREVIEW_EMAIL: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryName: string;
