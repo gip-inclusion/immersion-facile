@@ -40,9 +40,9 @@ export const EditionSiretRelatedInputs = ({
       />
       <AddressAutocomplete
         initialSearchTerm={businessAddress}
-        {...formContents.businessAddress}
+        {...formContents.businessAddresses}
         setFormValue={({ address }) =>
-          setValue("businessAddress", addressDtoToString(address))
+          setValue("businessAddresses.0", addressDtoToString(address))
         }
       />
     </>

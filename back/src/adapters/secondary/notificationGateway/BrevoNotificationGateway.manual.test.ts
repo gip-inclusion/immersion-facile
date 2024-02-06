@@ -99,7 +99,7 @@ describe("BrevoNotificationGateway manual", () => {
       kind: "EDIT_FORM_ESTABLISHMENT_LINK",
       recipients: ["recette@immersion-facile.beta.gouv.fr"],
       params: {
-        businessAddress: "1 rue de la paix",
+        businessAddresses: ["1 rue de la paix"],
         businessName: "Super Corp",
         editFrontUrl: "www.google.com",
       },

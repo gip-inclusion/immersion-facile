@@ -114,7 +114,7 @@ describe("PgFormEstablishmentRepository", () => {
       const minimalFormEstablishment: FormEstablishmentDto = {
         siret: formEstablishment.siret,
         appellations: formEstablishment.appellations,
-        businessAddress: formEstablishment.businessAddress,
+        businessAddresses: formEstablishment.businessAddresses,
         businessContact: formEstablishment.businessContact,
         businessName: formEstablishment.businessName,
         maxContactsPerWeek: formEstablishment.maxContactsPerWeek,

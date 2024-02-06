@@ -88,6 +88,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         siret: contactRequest.siret,
         appellationCode: contactRequest.appellationCode,
         potentialBeneficiaryEmail: contactRequest.potentialBeneficiaryEmail,
+        addressId: contactRequest.locationId,
         since: subDays(
           now,
           this.#minimumNumberOfDaysBetweenSimilarContactRequests,
@@ -155,6 +156,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     establishment: EstablishmentEntity;
     now: Date;
   }): DiscussionAggregate {
+    const matchingAddress = establishment.locations.find(
+      (address) => address.id === contactRequest.locationId,
+    );
+    if (!matchingAddress) {
+      throw new NotFoundError(
+        `Address with id ${contactRequest.locationId} not found for establishment with siret ${establishment.siret}`,
+      );
+    }
     return {
       id: this.#uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
@@ -165,7 +174,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         contactRequest.contactMode === "EMAIL"
           ? contactRequest.immersionObjective
           : null,
-      address: establishment.address,
+      address: matchingAddress.address,
       potentialBeneficiary: {
         firstName: contactRequest.potentialBeneficiaryFirstName,
         lastName: contactRequest.potentialBeneficiaryLastName,

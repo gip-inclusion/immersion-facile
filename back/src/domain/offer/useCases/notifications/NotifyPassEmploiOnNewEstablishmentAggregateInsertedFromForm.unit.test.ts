@@ -37,7 +37,18 @@ describe("Notify pass-emploi", () => {
       .withEstablishment(
         new EstablishmentEntityBuilder()
           .withSiret(siret)
-          .withPosition(position)
+          .withLocations([
+            {
+              position,
+              address: {
+                streetNumberAndAddress: "24 rue des bouchers",
+                city: "Strasbourg",
+                postcode: "67000",
+                departmentCode: "67",
+              },
+              id: "1",
+            },
+          ])
           .build(),
       )
       .withOffers([

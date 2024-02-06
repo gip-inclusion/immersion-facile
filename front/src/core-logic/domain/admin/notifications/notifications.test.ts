@@ -37,7 +37,7 @@ describe("notifications slice", () => {
             recipients: ["bob@mail.com"],
             params: {
               editFrontUrl: "my-url",
-              businessAddress: "24 rue des boucher 67000 strasbourg",
+              businessAddresses: ["24 rue des boucher 67000 strasbourg"],
               businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
             },
           },

@@ -213,7 +213,7 @@ interface ViewAppellationsDto {
 
 interface PgFormEstablishments {
   additional_information: Generated<string | null>;
-  business_address: string;
+  business_addresses: Json;
   business_contact: Generated<Json>;
   business_name_customized: string | null;
   business_name: string;

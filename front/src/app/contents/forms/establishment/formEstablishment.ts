@@ -42,7 +42,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Nom sous lequel vous souhaitez apparaitre dans les résultats de recherche",
     placeholder: "Ex : Nom de mon enseigne (optionnel)",
   },
-  businessAddress: {
+  businessAddresses: {
     label: "Vérifiez l'adresse de votre établissement",
     required: true,
     id: domElementIds.establishment.businessAddress,

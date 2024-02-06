@@ -323,7 +323,7 @@ export const defaultEmailValueByEmailKind: {
   },
   EDIT_FORM_ESTABLISHMENT_LINK: {
     editFrontUrl: "EDIT_FRONT_URL",
-    businessAddress: "BUSINESS_ADDRESS",
+    businessAddresses: ["BUSINESS_ADDRESS_1"],
     businessName: "BUSINESS_NAME",
   },
   ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
@@ -336,12 +336,14 @@ export const defaultEmailValueByEmailKind: {
     internshipKind: "immersion",
   },
   ESTABLISHMENT_DELETED: {
-    businessAddress: addressDtoToString({
-      city: "CHOUCHEN-VILLE",
-      departmentCode: "666",
-      postcode: "66600",
-      streetNumberAndAddress: "666 boulevard des porcs",
-    }),
+    businessAddresses: [
+      addressDtoToString({
+        city: "CHOUCHEN-VILLE",
+        departmentCode: "666",
+        postcode: "66600",
+        streetNumberAndAddress: "666 boulevard des porcs",
+      }),
+    ],
     businessName: "Machin CORP",
     siret: "12345678901234",
   },
@@ -443,7 +445,7 @@ export const defaultEmailValueByEmailKind: {
     contactFirstName: "CONTACT_FIRST_NAME",
     contactLastName: "CONTACT_LAST_NAME",
     businessName: "BUSINESS_NAME",
-    businessAddress: "BUSINESS_ADDRESS",
+    businessAddresses: ["BUSINESS_ADDRESS_1", "BUSINESS_ADDRESS_2"],
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     advisorFirstName: "ADVISOR_FIRST_NAME",
@@ -528,7 +530,7 @@ export const defaultEmailValueByEmailKind: {
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     editFrontUrl: "EDIT_FRONT_URL",
-    businessAddress: "BUSINESS_ADDRESS",
+    businessAddresses: ["BUSINESS_ADDRESS_1"],
     businessName: "BUSINESS_NAME",
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {

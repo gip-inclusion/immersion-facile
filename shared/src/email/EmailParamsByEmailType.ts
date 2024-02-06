@@ -160,12 +160,12 @@ export type EmailParamsByEmailType = {
   EDIT_FORM_ESTABLISHMENT_LINK: {
     editFrontUrl: string;
     businessName: string;
-    businessAddress: string;
+    businessAddresses: string[];
   };
   ESTABLISHMENT_DELETED: {
     businessName: string;
     siret: SiretDto;
-    businessAddress: string;
+    businessAddresses: string[];
   };
   ESTABLISHMENT_LEAD_REMINDER: {
     businessName: string;
@@ -249,7 +249,7 @@ export type EmailParamsByEmailType = {
     contactFirstName: string;
     contactLastName: string;
     businessName: string;
-    businessAddress: string;
+    businessAddresses: string[];
   };
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     advisorFirstName: string;
@@ -327,7 +327,7 @@ export type EmailParamsByEmailType = {
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     editFrontUrl: string;
     businessName: string;
-    businessAddress: string;
+    businessAddresses: string[];
   };
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     agencyAssessmentDocumentLink: string | undefined;

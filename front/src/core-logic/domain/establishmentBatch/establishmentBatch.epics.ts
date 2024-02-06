@@ -71,7 +71,7 @@ export const candidateEstablishmentMapper = (
   try {
     const establishmentRow = establishmentCSVRowSchema.parse(csvRow);
     mappedEstablishment = {
-      businessAddress: establishmentRow.businessAddress,
+      businessAddresses: [establishmentRow.businessAddress],
       businessName: establishmentRow.businessName,
       siret: establishmentRow.siret,
       businessNameCustomized: establishmentRow.businessNameCustomized,

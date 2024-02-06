@@ -81,9 +81,11 @@ export class DeleteEstablishment extends TransactionalUseCase<
           recipients: [establishmentAggregate.contact.email],
           cc: establishmentAggregate.contact.copyEmails,
           params: {
-            businessAddress: addressDtoToString(
-              establishmentAggregate.establishment.address,
-            ),
+            businessAddresses:
+              establishmentAggregate.establishment.locations.map(
+                (addressAndPosition) =>
+                  addressDtoToString(addressAndPosition.address),
+              ),
             businessName: establishmentAggregate.establishment.name,
             siret: establishmentAggregate.establishment.siret,
           },

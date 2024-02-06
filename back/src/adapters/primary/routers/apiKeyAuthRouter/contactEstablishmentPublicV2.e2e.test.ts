@@ -15,7 +15,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-  TEST_POSITION,
+  TEST_LOCATION,
 } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
@@ -34,6 +34,7 @@ const contactEstablishment: ContactEstablishmentPublicV2Dto = {
   potentialBeneficiaryLastName: "Doe",
   immersionObjective: "Confirmer un projet professionnel",
   potentialBeneficiaryPhone: "0654334567",
+  locationId: "123",
 };
 
 describe("POST contact-establishment public V2 route", () => {
@@ -134,9 +135,8 @@ describe("POST contact-establishment public V2 route", () => {
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withSiret(contactEstablishment.siret)
-              .withPosition(TEST_POSITION)
+              .withLocations([TEST_LOCATION])
               .withNumberOfEmployeeRange("10-19")
-              .withAddress(rueSaintHonoreDto)
               .build(),
           )
           .withContact(
@@ -175,9 +175,8 @@ describe("POST contact-establishment public V2 route", () => {
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withSiret(contactEstablishment.siret)
-              .withPosition(TEST_POSITION)
+              .withLocations([TEST_LOCATION])
               .withNumberOfEmployeeRange("10-19")
-              .withAddress(rueSaintHonoreDto)
               .build(),
           )
           .withContact(
@@ -213,9 +212,8 @@ describe("POST contact-establishment public V2 route", () => {
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withSiret(contactEstablishment.siret)
-              .withPosition(TEST_POSITION)
+              .withLocations([TEST_LOCATION])
               .withNumberOfEmployeeRange("10-19")
-              .withAddress(rueSaintHonoreDto)
               .build(),
           )
           .withContact(

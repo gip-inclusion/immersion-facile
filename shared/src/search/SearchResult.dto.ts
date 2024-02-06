@@ -1,4 +1,4 @@
-import { AddressDto } from "../address/address.dto";
+import { AddressDto, LocationId } from "../address/address.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import {
@@ -18,6 +18,7 @@ export type SearchResultDto = {
   customizedName?: string;
   voluntaryToImmersion: boolean;
   fitForDisabledWorkers?: boolean;
+  locationId: LocationId | null;
   position: GeoPositionDto;
   address: AddressDto;
   contactMode?: ContactMethod;

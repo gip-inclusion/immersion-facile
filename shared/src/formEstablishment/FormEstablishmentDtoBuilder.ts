@@ -14,7 +14,7 @@ import {
 
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
-  businessAddress: "1 Rue du Moulin, 12345 Quelque Part",
+  businessAddresses: ["1 Rue du Moulin, 12345 Quelque Part"],
   businessContact: {
     email: "amil@mail.com",
     firstName: "Esteban",
@@ -60,7 +60,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
 
 const emptyFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
-  businessAddress: "",
+  businessAddresses: [""],
   naf: { code: "", nomenclature: "" },
   businessContact: {
     contactMethod: "EMAIL",
@@ -115,8 +115,8 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withBusinessAddress(businessAddress: string) {
-    return new FormEstablishmentDtoBuilder({ ...this.#dto, businessAddress });
+  public withBusinessAddresses(businessAddresses: string[]) {
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, businessAddresses });
   }
 
   public withBusinessContact(businessContact: BusinessContactDto) {
@@ -167,7 +167,7 @@ export class FormEstablishmentDtoBuilder
 const FormEstablishmentToEstablishmentCsvRow = (
   establishment: FormEstablishmentDto,
 ): EstablishmentCSVRow => ({
-  businessAddress: establishment.businessAddress,
+  businessAddress: establishment.businessAddresses[0],
   businessContact_email: establishment.businessContact.email,
   businessContact_firstName: establishment.businessContact.firstName,
   businessContact_lastName: establishment.businessContact.lastName,

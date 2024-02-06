@@ -62,6 +62,7 @@ const immersionOffer: SearchResultDto = {
   website: "https://www.earl-de-la-ferme.fr",
   additionalInformation: "Ferme bio",
   urlOfPartner: "https://www.emploi-store.fr/portail/accueil",
+  locationId: "123",
 };
 
 describe("search epic", () => {

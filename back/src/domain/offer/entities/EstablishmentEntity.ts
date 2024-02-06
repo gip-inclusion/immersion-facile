@@ -4,6 +4,7 @@ import {
   EstablishmentSearchableBy,
   FormEstablishmentSource,
   GeoPositionDto,
+  Location,
   NafDto,
   NumberEmployeesRange,
   SiretDto,
@@ -19,10 +20,9 @@ export type EstablishmentEntity = {
   siret: SiretDto;
   name: string;
   customizedName?: string;
-  address: AddressDto;
+  locations: Location[];
   voluntaryToImmersion: boolean;
   sourceProvider: SourceProvider;
-  position: GeoPositionDto;
   nafDto: NafDto;
   numberEmployeesRange: NumberEmployeesRange;
   createdAt: Date;

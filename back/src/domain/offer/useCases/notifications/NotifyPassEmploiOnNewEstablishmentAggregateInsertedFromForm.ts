@@ -24,7 +24,7 @@ export class NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm extends
       immersions: establishmentAggregate.offers.map(({ romeCode }) => ({
         rome: romeCode,
         siret: establishmentAggregate.establishment.siret,
-        location: establishmentAggregate.establishment.position,
+        location: establishmentAggregate.establishment.locations[0].position,
       })),
     };
     await this.passEmploiGateway.notifyOnNewImmersionOfferCreatedFromForm(

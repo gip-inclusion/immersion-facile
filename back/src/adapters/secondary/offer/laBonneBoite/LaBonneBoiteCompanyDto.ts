@@ -93,6 +93,7 @@ export class LaBonneBoiteCompanyDto {
       urlOfPartner: this.props.url,
       voluntaryToImmersion: false,
       website: "",
+      locationId: null,
     };
   }
 }

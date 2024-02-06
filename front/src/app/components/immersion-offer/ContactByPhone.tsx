@@ -36,6 +36,7 @@ export const ContactByPhone = ({
     potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
     potentialBeneficiaryLastName: route.params.contactLastName ?? "",
     potentialBeneficiaryEmail: route.params.contactEmail ?? "",
+    locationId: route.params.location ?? "",
   };
 
   const appellationListOfOptions = appellations.map((appellation) => ({

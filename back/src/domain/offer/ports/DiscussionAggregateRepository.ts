@@ -1,4 +1,10 @@
-import { AppellationCode, DiscussionId, Email, SiretDto } from "shared";
+import {
+  AppellationCode,
+  DiscussionId,
+  Email,
+  LocationId,
+  SiretDto,
+} from "shared";
 import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 
 export type HasDiscussionMatchingParams = {
@@ -7,6 +13,7 @@ export type HasDiscussionMatchingParams = {
   potentialBeneficiaryEmail: Email;
   establishmentRepresentativeEmail: Email;
   since: Date;
+  addressId: LocationId;
 };
 
 export interface DiscussionAggregateRepository {

@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
 import {
   AppellationAndRomeDto,
+  Location,
   SearchResultDto,
   SiretDto,
   expectArraysToEqualIgnoringOrder,
@@ -391,6 +392,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           },
           siret: "78000403200029",
           voluntaryToImmersion: true,
+          locationId: "123",
         },
       ]);
     });
@@ -635,7 +637,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       const searchResults =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: {
-            ...aggregate.establishment.position,
+            ...aggregate.establishment.locations[0].position,
             appellationCodes: [aggregate.offers[0].appellationCode],
             distanceKm: 0,
             sortedBy: "date",
@@ -683,11 +685,11 @@ describe("PgEstablishmentAggregateRepository", () => {
           name: establishmentToInsert.name,
           customized_name: establishmentToInsert.customizedName ?? null,
           is_commited: establishmentToInsert.isCommited ?? null,
-          street_number_and_address:
-            establishmentToInsert.address.streetNumberAndAddress,
-          post_code: establishmentToInsert.address.postcode,
-          city: establishmentToInsert.address.city,
-          department_code: establishmentToInsert.address.departmentCode,
+          // street_number_and_address:
+          //   establishmentToInsert.address.streetNumberAndAddress,
+          // post_code: establishmentToInsert.address.postcode,
+          // city: establishmentToInsert.address.city,
+          // department_code: establishmentToInsert.address.departmentCode,
           number_employees: establishmentToInsert.numberEmployeesRange,
           naf_code: establishmentToInsert.nafDto.code,
           naf_nomenclature: establishmentToInsert.nafDto.nomenclature,
@@ -962,7 +964,13 @@ describe("PgEstablishmentAggregateRepository", () => {
     const siretInTable = "12345678901234";
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siretInTable)
-      .withAddress(rueGuillaumeTellDto)
+      .withLocations([
+        {
+          address: rueGuillaumeTellDto,
+          position: { lon: 2, lat: 48 },
+          id: "123",
+        },
+      ])
       .build();
     const contact = new ContactEntityBuilder()
       .withEmail("toto@gmail.com")
@@ -1044,7 +1052,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withSiret(siret)
         .withCustomizedName("La boulangerie de Lucie")
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
-        .withAddress(rueJacquardDto)
+        .withLocations([
+          {
+            address: rueJacquardDto,
+            position: { lon: 2, lat: 48 },
+            id: "123",
+          },
+        ])
         .withSearchableBy({
           students: false,
           jobSeekers: false,
@@ -1062,6 +1076,11 @@ describe("PgEstablishmentAggregateRepository", () => {
       const contact = new ContactEntityBuilder()
         .withGeneratedContactId()
         .build();
+      const location: Location = {
+        address: rueJacquardDto,
+        position: { lon: 2, lat: 48 },
+        id: "123",
+      };
 
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
@@ -1096,11 +1115,12 @@ describe("PgEstablishmentAggregateRepository", () => {
         additionalInformation: establishment.additionalInformation,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
         fitForDisabledWorkers: establishment.fitForDisabledWorkers,
-        position: establishment.position,
-        address: establishment.address,
+        position: location.position,
+        address: location.address,
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         contactMode: contact.contactMethod,
         distance_m: undefined,
+        locationId: location.id,
       });
     });
   });
@@ -1129,4 +1149,5 @@ const toSearchResults = (sirets: SiretDto[]): SearchResultDto[] =>
       departmentCode: "75",
     },
     voluntaryToImmersion: true,
+    locationId: "123",
   }));

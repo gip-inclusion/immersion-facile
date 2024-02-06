@@ -112,7 +112,7 @@ describe("Update Establishment aggregate from form data", () => {
     const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
       .withAppellations([updatedAppelation])
-      .withBusinessAddress(addressDtoToString(rueGuillaumeTellDto))
+      .withBusinessAddresses([addressDtoToString(rueGuillaumeTellDto)])
       .withBusinessContact(updatedContact)
       .withNextAvailabilityDate(nextAvailabilityDate)
       .build();
@@ -130,7 +130,13 @@ describe("Update Establishment aggregate from form data", () => {
         new EstablishmentAggregateBuilder(previousAggregate)
           .withEstablishment(
             new EstablishmentEntityBuilder(previousAggregate.establishment)
-              .withAddress(rueGuillaumeTellDto)
+              .withLocations([
+                {
+                  address: rueGuillaumeTellDto,
+                  position: { lon: 1, lat: 2 },
+                  id: "123",
+                },
+              ])
               .withCreatedAt(timeGateway.now())
               .withCustomizedName(
                 updatedFormEstablishment.businessNameCustomized,
@@ -141,7 +147,13 @@ describe("Update Establishment aggregate from form data", () => {
               .withIsCommited(updatedFormEstablishment.isEngagedEnterprise)
               .withIsOpen(true)
               .withName(updatedFormEstablishment.businessName)
-              .withPosition({ lon: 1, lat: 2 })
+              .withLocations([
+                {
+                  position: { lon: 1, lat: 2 },
+                  address: rueGuillaumeTellDto,
+                  id: "123",
+                },
+              ])
               .withUpdatedAt(timeGateway.now())
               .withWebsite(updatedFormEstablishment.website)
               .withNextAvailabilityDate(nextAvailabilityDate)

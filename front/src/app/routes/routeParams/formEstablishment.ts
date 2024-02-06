@@ -17,6 +17,11 @@ export type FormEstablishmentParamsInUrl = Partial<{
     : never;
 }>;
 
+const stringsArraySerializer: ValueSerializer<string[]> = {
+  parse: (raw) => JSON.parse(raw),
+  stringify: (stringsArray) => JSON.stringify(stringsArray),
+};
+
 const appellationsDtoSerializer: ValueSerializer<AppellationAndRomeDto[]> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (appellationsDto) => JSON.stringify(appellationsDto),
@@ -32,7 +37,7 @@ export const formEstablishmentParamsInUrl = {
   siret: param.query.optional.string,
   bName: param.query.optional.string,
   bNameCustomized: param.query.optional.string,
-  bAddress: param.query.optional.string,
+  bAddresses: param.query.optional.ofType(stringsArraySerializer),
   isEngagedEnterprise: param.query.optional.boolean,
   fitForDisabledWorkers: param.query.optional.boolean,
   maxContactsPerWeek: param.query.optional.number,
@@ -62,7 +67,7 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
   siret: params.siret ?? "",
   businessName: params.bName ?? "",
   businessNameCustomized: params.bNameCustomized,
-  businessAddress: params.bAddress ?? "",
+  businessAddresses: params.bAddresses ?? [],
   isEngagedEnterprise: Boolean(params.isEngagedEnterprise),
   fitForDisabledWorkers: Boolean(params.fitForDisabledWorkers),
   maxContactsPerWeek: params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
@@ -95,7 +100,7 @@ export const formEstablishmentDtoToFormEstablishmentQueryParams = (
   siret: formEstablishmentDto.siret,
   bName: formEstablishmentDto.businessName,
   bNameCustomized: formEstablishmentDto.businessNameCustomized,
-  bAddress: formEstablishmentDto.businessAddress,
+  bAddresses: formEstablishmentDto.businessAddresses,
   isEngagedEnterprise: formEstablishmentDto.isEngagedEnterprise,
   fitForDisabledWorkers: formEstablishmentDto.fitForDisabledWorkers,
   maxContactsPerWeek:
@@ -126,7 +131,7 @@ export const createInitialFormValues = (
       businessName: "My business name, replaced by result from API",
       businessNameCustomized:
         "My Customized Business name, not replaced by API",
-      businessAddress: "My business address, replaced by result from API",
+      businessAddresses: ["My business address, replaced by result from API"],
       isEngagedEnterprise: true,
       maxContactsPerWeek: defaultMaxContactsPerWeek,
       appellations: [

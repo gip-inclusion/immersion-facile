@@ -9,6 +9,7 @@ import {
   EstablishmentSearchableBy,
   FormEstablishmentSource,
   GeoPositionDto,
+  Location,
   NafDto,
   NumberEmployeesRange,
   RomeCode,
@@ -40,7 +41,11 @@ import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 export const TEST_ROME_LABEL = "test_rome_label";
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
 export const TEST_APPELLATION_CODE = "12345";
-export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
+export const TEST_LOCATION: Location = {
+  id: "test_location_id",
+  address: avenueChampsElyseesDto,
+  position: { lat: 43.8666, lon: 8.3333 },
+};
 
 export class InMemoryEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
@@ -101,10 +106,12 @@ export class InMemoryEstablishmentAggregateRepository
     );
     if (!offer) return;
     const { isSearchable, ...rest } =
-      buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
-        establishmentAgg: aggregate,
-        searchedAppellationCode: offer.appellationCode,
-      });
+      buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation(
+        {
+          establishmentAgg: aggregate,
+          searchedAppellationCode: offer.appellationCode,
+        },
+      );
     return rest;
   }
 
@@ -183,14 +190,16 @@ export class InMemoryEstablishmentAggregateRepository
               appellationCodes.includes(offer.appellationCode),
           )
           .map((offer) =>
-            buildSearchImmersionResultDtoForOneEstablishmentAndOneRome({
-              establishmentAgg: aggregate,
-              searchedAppellationCode: offer.appellationCode,
-              position: {
-                lat,
-                lon,
+            buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation(
+              {
+                establishmentAgg: aggregate,
+                searchedAppellationCode: offer.appellationCode,
+                position: {
+                  lat,
+                  lon,
+                },
               },
-            }),
+            ),
           ),
       )
       .slice(0, maxResults);
@@ -233,54 +242,57 @@ export class InMemoryEstablishmentAggregateRepository
   }
 }
 
-const buildSearchImmersionResultDtoForOneEstablishmentAndOneRome = ({
-  establishmentAgg,
-  searchedAppellationCode,
-  position,
-}: {
-  establishmentAgg: EstablishmentAggregate;
-  searchedAppellationCode: AppellationCode;
-  position?: GeoPositionDto;
-}): SearchImmersionResult => {
-  const romeCode =
-    establishmentAgg.offers.find(
-      (offer) => offer.appellationCode === searchedAppellationCode,
-    )?.romeCode ?? "no-offer-matched";
+const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation =
+  ({
+    establishmentAgg,
+    searchedAppellationCode,
+    position,
+  }: {
+    establishmentAgg: EstablishmentAggregate;
+    searchedAppellationCode: AppellationCode;
+    position?: GeoPositionDto;
+  }): SearchImmersionResult => {
+    const romeCode =
+      establishmentAgg.offers.find(
+        (offer) => offer.appellationCode === searchedAppellationCode,
+      )?.romeCode ?? "no-offer-matched";
 
-  return {
-    address: establishmentAgg.establishment.address,
-    naf: establishmentAgg.establishment.nafDto.code,
-    nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
-    name: establishmentAgg.establishment.name,
-    customizedName: establishmentAgg.establishment.customizedName,
-    rome: romeCode,
-    romeLabel: TEST_ROME_LABEL,
-    appellations: establishmentAgg.offers
-      .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
-      .map((immersionOffer) => ({
-        appellationLabel: immersionOffer.appellationLabel,
-        appellationCode: immersionOffer.appellationCode,
-      })),
-    siret: establishmentAgg.establishment.siret,
-    voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
-    contactMode: establishmentAgg.contact?.contactMethod,
-    numberOfEmployeeRange: establishmentAgg.establishment.numberEmployeesRange,
-    website: establishmentAgg.establishment?.website,
-    additionalInformation:
-      establishmentAgg.establishment?.additionalInformation,
-    distance_m: position
-      ? distanceBetweenCoordinatesInMeters(
-          establishmentAgg.establishment.position.lat,
-          establishmentAgg.establishment.position.lon,
-          position.lat,
-          position.lon,
-        )
-      : undefined,
-    position: establishmentAgg.establishment.position,
-    isSearchable: establishmentAgg.establishment.isSearchable,
-    nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
+    return {
+      address: establishmentAgg.establishment.locations[0].address,
+      naf: establishmentAgg.establishment.nafDto.code,
+      nafLabel: establishmentAgg.establishment.nafDto.nomenclature,
+      name: establishmentAgg.establishment.name,
+      customizedName: establishmentAgg.establishment.customizedName,
+      rome: romeCode,
+      romeLabel: TEST_ROME_LABEL,
+      appellations: establishmentAgg.offers
+        .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
+        .map((immersionOffer) => ({
+          appellationLabel: immersionOffer.appellationLabel,
+          appellationCode: immersionOffer.appellationCode,
+        })),
+      siret: establishmentAgg.establishment.siret,
+      voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
+      contactMode: establishmentAgg.contact?.contactMethod,
+      numberOfEmployeeRange:
+        establishmentAgg.establishment.numberEmployeesRange,
+      website: establishmentAgg.establishment?.website,
+      additionalInformation:
+        establishmentAgg.establishment?.additionalInformation,
+      distance_m: position
+        ? distanceBetweenCoordinatesInMeters(
+            establishmentAgg.establishment.locations[0].position.lat,
+            establishmentAgg.establishment.locations[0].position.lon,
+            position.lat,
+            position.lon,
+          )
+        : undefined,
+      position: establishmentAgg.establishment.locations[0].position,
+      isSearchable: establishmentAgg.establishment.isSearchable,
+      nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
+      locationId: establishmentAgg.establishment.locations[0].id,
+    };
   };
-};
 
 const validContactEntityV2: ContactEntity = {
   id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
@@ -325,7 +337,13 @@ export const defaultNafCode = "7820Z";
 const validEstablishmentEntityV2: EstablishmentEntity = {
   siret: "78000403200019",
   name: "Company inside repository",
-  address: avenueChampsElyseesDto,
+  locations: [
+    {
+      id: "test_location_id",
+      address: avenueChampsElyseesDto,
+      position: { lat: 43.8666, lon: 8.3333 },
+    },
+  ],
   website: "www.jobs.fr",
   additionalInformation: "",
   customizedName: undefined,
@@ -333,10 +351,6 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   createdAt: new Date(),
   sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
-  position: {
-    lat: 48.866667, // Paris lat/lon
-    lon: 2.333333,
-  },
   nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
   updatedAt: new Date("2022-01-05T12:00:00.000"),
@@ -365,10 +379,6 @@ export class EstablishmentEntityBuilder
       ...this.entity,
       additionalInformation,
     });
-  }
-
-  public withAddress(address: AddressDto) {
-    return new EstablishmentEntityBuilder({ ...this.entity, address });
   }
 
   public withCreatedAt(createdAt: Date) {
@@ -443,8 +453,8 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  public withPosition(position: GeoPositionDto) {
-    return new EstablishmentEntityBuilder({ ...this.entity, position });
+  public withLocations(locations: Location[]) {
+    return new EstablishmentEntityBuilder({ ...this.entity, locations });
   }
 
   public withSearchableBy(searchableBy: EstablishmentSearchableBy) {
@@ -626,7 +636,7 @@ export class EstablishmentAggregateBuilder
   }
 }
 
-export const establishmentAggregateToSearchResultByRome = (
+export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
   establishmentAggregate: EstablishmentAggregate,
   romeCode: RomeCode,
   distance_m?: number,
@@ -642,8 +652,9 @@ export const establishmentAggregateToSearchResultByRome = (
     establishmentAggregate.establishment.voluntaryToImmersion,
   additionalInformation:
     establishmentAggregate.establishment.additionalInformation,
-  position: establishmentAggregate.establishment.position,
-  address: establishmentAggregate.establishment.address,
+  position: establishmentAggregate.establishment.locations[0].position,
+  address: establishmentAggregate.establishment.locations[0].address,
+  locationId: establishmentAggregate.establishment.locations[0].id,
   contactMode: establishmentAggregate.contact?.contactMethod,
   distance_m,
   romeLabel: TEST_ROME_LABEL,

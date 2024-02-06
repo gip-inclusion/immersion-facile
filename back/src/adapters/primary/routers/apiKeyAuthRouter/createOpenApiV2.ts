@@ -26,6 +26,7 @@ const contactByEmailExample: ContactEstablishmentPublicV2Dto = {
   message: "Mon message",
   potentialBeneficiaryPhone: "0123456789",
   immersionObjective: "Découvrir un métier ou un secteur d'activité",
+  locationId: "123",
 };
 
 const contactByPhoneExample: ContactEstablishmentPublicV2Dto = {
@@ -35,6 +36,7 @@ const contactByPhoneExample: ContactEstablishmentPublicV2Dto = {
   appellationCode: "11573",
   siret: "12345678912345",
   contactMode: "PHONE",
+  locationId: "123",
 };
 
 const contactInPersonExample: ContactEstablishmentPublicV2Dto = {
@@ -44,6 +46,7 @@ const contactInPersonExample: ContactEstablishmentPublicV2Dto = {
   appellationCode: "11573",
   siret: "12345678912345",
   contactMode: "IN_PERSON",
+  locationId: "123",
 };
 
 const searchImmersionResult: SearchResultDto = {
@@ -82,6 +85,7 @@ const searchImmersionResult: SearchResultDto = {
   siret: "11110000222200",
   voluntaryToImmersion: true,
   website: "www.masuperboite.com",
+  locationId: "123",
 };
 
 const withAuthorizationHeader = {

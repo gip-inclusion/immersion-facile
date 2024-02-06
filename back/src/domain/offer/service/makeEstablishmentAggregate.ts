@@ -1,8 +1,4 @@
-import {
-  AddressAndPosition,
-  FormEstablishmentDto,
-  noContactPerWeek,
-} from "shared";
+import { FormEstablishmentDto, Location, noContactPerWeek } from "shared";
 import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -15,16 +11,16 @@ export const makeEstablishmentAggregate = ({
   timeGateway,
   formEstablishment,
   nafAndNumberOfEmployee,
-  addressAndPosition,
+  addressesAndPosition,
 }: {
   uuidGenerator: UuidGenerator;
   timeGateway: TimeGateway;
   formEstablishment: FormEstablishmentDto;
-  addressAndPosition: AddressAndPosition;
+  addressesAndPosition: Location[];
   nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
 }): EstablishmentAggregate => ({
   establishment: {
-    ...addressAndPosition,
+    locations: addressesAndPosition,
     additionalInformation: formEstablishment.additionalInformation,
     createdAt: timeGateway.now(),
     customizedName: formEstablishment.businessNameCustomized,

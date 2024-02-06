@@ -1,3 +1,4 @@
+import { AddressDto, LocationId } from "../address/address.dto";
 import { ImmersionObjective } from "../convention/convention.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
@@ -11,6 +12,7 @@ export type ContactInformations<T extends ContactMethod> = {
   potentialBeneficiaryLastName: string;
   potentialBeneficiaryEmail: string;
   contactMode: T;
+  locationId: LocationId;
 };
 
 export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {

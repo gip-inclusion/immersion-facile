@@ -96,7 +96,7 @@ describe("PgScriptsQueries", () => {
           recipients: ["joe@mail.com"],
           params: {
             editFrontUrl: "http://edit-front.com",
-            businessAddress: "24 rue des boucher 67000 strasbourg",
+            businessAddresses: ["24 rue des boucher 67000 strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },
@@ -122,7 +122,7 @@ describe("PgScriptsQueries", () => {
           recipients: ["jack@mail.com"],
           params: {
             editFrontUrl: "http://edit-jack-front.com",
-            businessAddress: "24 rue des boucher 67000 strasbourg",
+            businessAddresses: ["24 rue des boucher 67000 strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },

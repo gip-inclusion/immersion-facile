@@ -3,6 +3,7 @@ import {
   AppellationDto,
   Group,
   GroupOptions,
+  Location,
   SearchResultDto,
   expectObjectInArrayToMatch,
   expectObjectsToMatch,
@@ -164,17 +165,19 @@ describe("PgEstablishmentGroupRepository", () => {
       rome,
       romeLabel,
       appellations,
+      location,
     }: {
       establishment: EstablishmentEntity;
       appellations: AppellationDto[];
       rome: string;
       romeLabel: string;
+      location: Location;
     }): SearchResultDto => ({
       appellations,
       romeLabel,
       rome,
       additionalInformation: establishment.additionalInformation,
-      address: establishment.address,
+      address: location.address,
       contactMode: "EMAIL",
       customizedName: establishment.customizedName,
       distance_m: 0,
@@ -183,10 +186,11 @@ describe("PgEstablishmentGroupRepository", () => {
       nafLabel: "Activités des agences de travail temporaire", // matches default naf code : 7820Z
       name: establishment.name,
       numberOfEmployeeRange: establishment.numberEmployeesRange,
-      position: establishment.position,
+      position: location.position,
       siret: establishment.siret,
       voluntaryToImmersion: establishment.voluntaryToImmersion,
       website: establishment.website,
+      locationId: location.id,
     });
 
     expectToEqual(groupWithResults, {
@@ -202,6 +206,7 @@ describe("PgEstablishmentGroupRepository", () => {
               appellationCode: "11564",
             },
           ],
+          location: establishment1.locations[0],
         }),
         createSearchResult({
           establishment: establishment1,
@@ -217,6 +222,7 @@ describe("PgEstablishmentGroupRepository", () => {
               appellationCode: "11574",
             },
           ],
+          location: establishment1.locations[0],
         }),
         createSearchResult({
           establishment: establishment2,
@@ -228,6 +234,7 @@ describe("PgEstablishmentGroupRepository", () => {
               appellationCode: "20540",
             },
           ],
+          location: establishment2.locations[0],
         }),
       ],
     });

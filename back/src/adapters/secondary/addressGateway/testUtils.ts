@@ -1,7 +1,10 @@
-import { AddressAndPosition } from "shared";
+import { Location } from "shared";
+import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
+
+const uuidV4Generator = new UuidV4Generator();
 
 export const query8bdduportLookup = "8+bd+du+port";
-export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
+export const expected8bdduportAddressAndPositions: Location[] = [
   {
     address: {
       city: "Amiens",
@@ -13,6 +16,7 @@ export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
       lat: 49.897442,
       lon: 2.290084,
     },
+    id: uuidV4Generator.new(),
   },
   {
     address: {
@@ -25,6 +29,7 @@ export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
       lat: 49.0317,
       lon: 2.062794,
     },
+    id: uuidV4Generator.new(),
   },
   {
     address: {
@@ -37,6 +42,7 @@ export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
       lat: 43.425225,
       lon: 3.605884,
     },
+    id: uuidV4Generator.new(),
   },
   {
     address: {
@@ -49,6 +55,7 @@ export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
       lat: 42.79091,
       lon: 3.036731,
     },
+    id: uuidV4Generator.new(),
   },
   {
     address: {
@@ -61,5 +68,6 @@ export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
       lat: 47.258811,
       lon: -2.340983,
     },
+    id: uuidV4Generator.new(),
   },
 ];

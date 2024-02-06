@@ -136,7 +136,13 @@ describe("Insert Establishment aggregate from form data", () => {
               .withIsCommited(false)
               .withName(formEstablishment.businessName)
               .withNumberOfEmployeeRange(numberEmployeesRanges)
-              .withPosition(fakePosition)
+              .withLocations([
+                {
+                  position: fakePosition,
+                  address: fakeAddress,
+                  id: "123",
+                },
+              ])
               .withWebsite(formEstablishment.website)
               .withNextAvailabilityDate(nextAvailabilityDate)
               .build(),
@@ -238,7 +244,13 @@ describe("Insert Establishment aggregate from form data", () => {
     // Establishment matches update from form
     const partialExpectedEstablishment: Partial<EstablishmentEntity> = {
       siret,
-      address: rueGuillaumeTellDto,
+      locations: [
+        {
+          id: "123",
+          position: { lat: 1, lon: 1 },
+          address: rueGuillaumeTellDto,
+        },
+      ],
       isOpen: true,
       name: formEstablishment.businessName,
     };

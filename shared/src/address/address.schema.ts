@@ -5,6 +5,7 @@ import {
   AddressAndPosition,
   AddressDto,
   DepartmentCode,
+  Location,
   LookupSearchResult,
   WithLookupAddressQueryParams,
   WithLookupLocationInputQueryParams,

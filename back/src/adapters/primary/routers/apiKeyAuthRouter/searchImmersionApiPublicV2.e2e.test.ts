@@ -120,10 +120,16 @@ describe("search route", () => {
               .withOffers([offer1, offer2])
               .withEstablishment(
                 new EstablishmentEntityBuilder()
-                  .withPosition({
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  })
+                  .withLocations([
+                    {
+                      position: {
+                        lat: 48.8531,
+                        lon: 2.34999,
+                      },
+                      address: avenueChampsElyseesDto,
+                      id: "123",
+                    },
+                  ])
                   .withWebsite("www.jobs.fr")
                   .build(),
               )
@@ -158,6 +164,7 @@ describe("search route", () => {
             numberOfEmployeeRange: "10-19",
             distance_m: 0,
             position: { lat: 48.8531, lon: 2.34999 },
+            locationId: "123",
           },
         ];
 
@@ -269,6 +276,7 @@ describe("search route", () => {
             numberOfEmployeeRange: "10-19",
             distance_m: 0,
             position: { lat: 48.8531, lon: 2.34999 },
+            locationId: "123",
           }));
 
         const offer1 = new OfferEntityBuilder()
@@ -290,10 +298,16 @@ describe("search route", () => {
                 .withEstablishment(
                   new EstablishmentEntityBuilder()
                     .withSiret(siret1)
-                    .withPosition({
-                      lat: 48.8531,
-                      lon: 2.34999,
-                    })
+                    .withLocations([
+                      {
+                        position: {
+                          lat: 48.8531,
+                          lon: 2.34999,
+                        },
+                        address: avenueChampsElyseesDto,
+                        id: "123",
+                      },
+                    ])
                     .withWebsite("www.jobs.fr")
                     .build(),
                 )
@@ -304,10 +318,16 @@ describe("search route", () => {
                 .withEstablishment(
                   new EstablishmentEntityBuilder()
                     .withSiret(siret2)
-                    .withPosition({
-                      lat: 48.8531,
-                      lon: 2.34999,
-                    })
+                    .withLocations([
+                      {
+                        position: {
+                          lat: 48.8531,
+                          lon: 2.34999,
+                        },
+                        address: avenueChampsElyseesDto,
+                        id: "123",
+                      },
+                    ])
                     .withWebsite("www.jobs.fr")
                     .withSearchableBy({ students: true, jobSeekers: false })
                     .build(),
@@ -319,10 +339,16 @@ describe("search route", () => {
                 .withEstablishment(
                   new EstablishmentEntityBuilder()
                     .withSiret(siret3)
-                    .withPosition({
-                      lat: 48.8531,
-                      lon: 2.34999,
-                    })
+                    .withLocations([
+                      {
+                        position: {
+                          lat: 48.8531,
+                          lon: 2.34999,
+                        },
+                        address: avenueChampsElyseesDto,
+                        id: "123",
+                      },
+                    ])
                     .withWebsite("www.jobs.fr")
                     .withSearchableBy({ students: false, jobSeekers: true })
                     .build(),
