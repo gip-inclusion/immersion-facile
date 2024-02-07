@@ -132,6 +132,21 @@ describe("Siret validation and fetching", () => {
     });
   });
 
+  describe("Clearing siret info", () => {
+    it("clears siret info", () => {
+      setStoreWithInitialSiretState({
+        currentSiret: "10002000300040",
+        error: "Establishment with this siret is already in our DB",
+        establishment: { siret: "yolo" } as SiretEstablishmentDto,
+      });
+      store.dispatch(siretSlice.actions.siretInfoClearRequested());
+      expectCurrentSiretToBe("");
+      expectEstablishmentToEqual(null);
+      expectSiretErrorToBe(null);
+      expectIsSearchingToBe(false);
+    });
+  });
+
   const dispatchSiretModified = (siret: string) =>
     store.dispatch(siretSlice.actions.siretModified(siret));
 

@@ -54,11 +54,19 @@ export const useSiretFetcher = ({
 
   useEffect(() => {
     if (shouldFetchEvenIfAlreadySaved !== storeShouldFetchEvenIfAlreadySaved)
+      // TODO: what should shouldFetchEvenIfAlreadySaved do?
       dispatch(
         siretSlice.actions.setShouldFetchEvenIfAlreadySaved(
           shouldFetchEvenIfAlreadySaved,
         ),
       );
+    return () => {
+      if (
+        shouldFetchEvenIfAlreadySaved === storeShouldFetchEvenIfAlreadySaved
+      ) {
+        dispatch(siretSlice.actions.siretInfoClearRequested());
+      }
+    };
   }, [
     storeShouldFetchEvenIfAlreadySaved,
     shouldFetchEvenIfAlreadySaved,
@@ -92,7 +100,9 @@ export const useExistingSiret = (siret?: SiretDto | null) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (siret) dispatch(siretSlice.actions.siretModified(siret));
+    if (siret) {
+      dispatch(siretSlice.actions.siretModified(siret));
+    }
   }, [siret, dispatch]);
 };
 
