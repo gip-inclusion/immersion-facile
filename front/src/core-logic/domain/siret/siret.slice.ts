@@ -61,6 +61,7 @@ export const siretSlice = createSlice({
       state.isSearching = false;
       state.error = action.payload;
     },
+    siretInfoClearRequested: () => initialState,
   },
 });
 
