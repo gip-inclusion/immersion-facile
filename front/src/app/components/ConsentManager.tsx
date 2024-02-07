@@ -19,7 +19,7 @@ export const {
     },
   }),
   personalDataPolicyLinkProps: {
-    href: "/politique-de-confidentialite",
+    href: "/pages/politique-de-confidentialite",
   },
   consentCallback: (arg) => {
     // eslint-disable-next-line no-console
