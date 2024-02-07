@@ -75,7 +75,7 @@ export const SearchableBySection = ({
     <section className={fr.cx("fr-mb-4w")}>
       <RadioButtons
         legend={
-          "Êtes-vous disponible actuellement pour recevoir des personnes en immersion ?"
+          "Quelle catégorie de public souhaitez-vous recevoir en immersion ?"
         }
         name="searchableBy"
         id={domElementIds.establishment.searchableBy}
