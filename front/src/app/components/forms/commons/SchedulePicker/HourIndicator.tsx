@@ -4,6 +4,7 @@ import {
   CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   CCI_WEEKLY_MAX_PERMITTED_HOURS,
+  IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS,
   InternshipKind,
 } from "shared";
 import { formatHoursString } from "./TotalWeeklylHoursIndicator";
@@ -19,11 +20,7 @@ export const HourIndicator = ({
   birthdate,
   internshipKind,
 }: HourIndicatorProperties) => {
-  const maxAllowedHours =
-    internshipKind === "mini-stage-cci" &&
-    addYears(new Date(birthdate), CCI_WEEKLY_LIMITED_SCHEDULE_AGE) > new Date()
-      ? CCI_WEEKLY_LIMITED_SCHEDULE_HOURS
-      : CCI_WEEKLY_MAX_PERMITTED_HOURS;
+  const maxAllowedHours = getMaxAllowedHours(internshipKind, birthdate);
   return (
     <span
       className={`${
@@ -33,4 +30,16 @@ export const HourIndicator = ({
       {formatHoursString(hours)}
     </span>
   );
+};
+
+const getMaxAllowedHours = (
+  internshipKind: InternshipKind,
+  birthdate: string,
+) => {
+  if (internshipKind === "immersion")
+    return IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS;
+  return addYears(new Date(birthdate), CCI_WEEKLY_LIMITED_SCHEDULE_AGE) >
+    new Date()
+    ? CCI_WEEKLY_LIMITED_SCHEDULE_HOURS
+    : CCI_WEEKLY_MAX_PERMITTED_HOURS;
 };
