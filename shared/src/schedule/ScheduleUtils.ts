@@ -10,6 +10,7 @@ import {
   subDays,
 } from "date-fns";
 import { clone, prop, uniq } from "ramda";
+import { IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS } from "../convention/convention.dto";
 import { arrayFromNumber } from "../utils";
 import { DateString } from "../utils/date";
 import {
@@ -32,8 +33,6 @@ export type DailyImmersionTimetableDto = {
 export type WeeklyImmersionTimetableDto = DailyImmersionTimetableDto[];
 
 type ImmersionTimeTable = WeeklyImmersionTimetableDto[];
-
-export const maxPermittedHoursPerWeek = 48;
 
 type UniversalDayMappingToFrenchCalendar = {
   universalDay: WeekdayNumber;
@@ -187,8 +186,8 @@ export const validateSchedule = (
 ): string | undefined => {
   const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule, interval);
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
-    if (totalHours > maxPermittedHoursPerWeek)
-      return `Veuillez saisir moins de ${maxPermittedHoursPerWeek}h pour la semaine ${
+    if (totalHours > IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS)
+      return `Veuillez saisir moins de ${IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS}h pour la semaine ${
         totalHoursIndex + 1
       }.`;
   }
