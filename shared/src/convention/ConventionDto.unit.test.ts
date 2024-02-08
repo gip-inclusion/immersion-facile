@@ -580,6 +580,78 @@ describe("conventionDtoSchema", () => {
       );
     });
 
+    it("when max hours per week is exceeded", () => {
+      const complexSchedule: DailyScheduleDto[] = [
+        {
+          date: "2024-02-05T00:00:00.000Z",
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "18:00" },
+          ],
+        },
+        {
+          date: "2024-02-06T00:00:00.000Z",
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "18:00" },
+          ],
+        },
+        {
+          date: "2024-02-07T00:00:00.000Z",
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "18:00" },
+          ],
+        },
+        {
+          date: "2024-02-08T00:00:00.000Z",
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "18:00" },
+          ],
+        },
+        {
+          date: "2024-02-09T00:00:00.000Z",
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "18:00" },
+          ],
+        },
+        {
+          date: "2024-02-10T00:00:00.000Z",
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "18:00" },
+          ],
+        },
+        {
+          date: "2024-02-11T00:00:00.000Z",
+          timePeriods: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "18:00" },
+          ],
+        },
+      ];
+      const convention = new ConventionDtoBuilder()
+        .withInternshipKind("immersion")
+        .withDateStart(new Date("2024-02-05").toISOString())
+        .withDateEnd(addDays(new Date("2024-02-05"), 7).toISOString())
+        .withSchedule(
+          (_interval: DateIntervalDto, _excludedDays?: Weekday[]) => ({
+            totalHours:
+              calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
+            isSimple: false,
+            complexSchedule,
+            workedDays: calculateNumberOfWorkedDays(complexSchedule),
+          }),
+        )
+        .build();
+
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "Veuillez saisir moins de 48h pour la semaine 1.",
+      ]);
+    });
+
     describe("CCI specific, minor under 15yo", () => {
       it("max week hours depends on beneficiary age", () => {
         const dateStart = new Date("2021-01-04").toISOString();
