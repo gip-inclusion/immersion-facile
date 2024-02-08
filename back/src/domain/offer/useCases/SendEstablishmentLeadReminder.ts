@@ -1,21 +1,24 @@
-import {z} from "zod";
 import {
   AbsoluteUrl,
-  castError,
   ConventionId,
   ConventionReadDto,
+  SiretDto,
+  castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
-  SiretDto
 } from "shared";
-import {AppConfig} from "../../../adapters/primary/config/appConfig";
-import {CreateNewEvent} from "../../core/eventBus/EventBus";
-import {ShortLinkIdGeneratorGateway} from "../../core/ports/ShortLinkIdGeneratorGateway";
-import {UnitOfWork, UnitOfWorkPerformer} from "../../core/ports/UnitOfWork";
-import {makeShortLink} from "../../core/ShortLink";
-import {TransactionalUseCase} from "../../core/UseCase";
-import {SaveNotificationAndRelatedEvent} from "../../generic/notifications/entities/Notification";
-import {EstablishmentLeadEventKind, establishmentLeadEventKind,} from "../entities/EstablishmentLeadEntity";
+import { z } from "zod";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import { makeShortLink } from "../../core/ShortLink";
+import { TransactionalUseCase } from "../../core/UseCase";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
+import {
+  EstablishmentLeadEventKind,
+  establishmentLeadEventKind,
+} from "../entities/EstablishmentLeadEntity";
 
 type SendEstablishmentLeadReminderOutput = {
   errors?: Record<SiretDto, Error>;
@@ -45,8 +48,8 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     config: AppConfig,
     // timeGateway: TimeGateway,
-    ) {
-    super(uowPerformer)
+  ) {
+    super(uowPerformer);
     this.#createNewEvent = createNewEvent;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
@@ -62,19 +65,19 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
       await uow.establishmentLeadQueries.getLastConventionsByLastEventKind(
         "to-be-reminded",
       );
-      
-      const errors: Record<ConventionId, Error> = {};
-      await Promise.all(
-        conventions.map(async (convention) => {
-          await this.#sendOneEmailWithEstablishmentLeadReminder(
-            uow,
-            this.#config,
-            convention,
-          ).catch((error) => {
-            errors[convention.id] = castError(error);
-          });
-        }),
-      );
+
+    const errors: Record<ConventionId, Error> = {};
+    await Promise.all(
+      conventions.map(async (convention) => {
+        await this.#sendOneEmailWithEstablishmentLeadReminder(
+          uow,
+          this.#config,
+          convention,
+        ).catch((error) => {
+          errors[convention.id] = castError(error);
+        });
+      }),
+    );
 
     return Promise.resolve({
       establishmentsReminded: conventions.map(({ siret }) => siret),
@@ -91,8 +94,8 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
       uow,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       config: this.#config,
-      longLink: generateAddEstablishmentFormLink({config,convention})
-    })
+      longLink: generateAddEstablishmentFormLink({ config, convention }),
+    });
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
@@ -103,7 +106,7 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
         params: {
           businessName: convention.businessName,
           registrationLink,
-          rejectRegistrationLink: '',
+          rejectRegistrationLink: "",
         },
       },
       followedIds: {
@@ -119,7 +122,10 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
       }),
     );
   }
-
 }
 
-const generateAddEstablishmentFormLink = ({config, convention}: { config: AppConfig, convention: ConventionReadDto }): AbsoluteUrl => `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?siret=${convention.siret}&bName=${convention.businessName}&bAdress=${convention.immersionAddress}&bcLastName=${convention.establishmentTutor.lastName}&bcFirstName=${convention.establishmentTutor.firstName}&bcPhone=${convention.establishmentTutor.phone}&bcEmail=${convention.establishmentTutor.email}`
+const generateAddEstablishmentFormLink = ({
+  config,
+  convention,
+}: { config: AppConfig; convention: ConventionReadDto }): AbsoluteUrl =>
+  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?siret=${convention.siret}&bName=${convention.businessName}&bAdress=${convention.immersionAddress}&bcLastName=${convention.establishmentTutor.lastName}&bcFirstName=${convention.establishmentTutor.firstName}&bcPhone=${convention.establishmentTutor.phone}&bcEmail=${convention.establishmentTutor.email}`;

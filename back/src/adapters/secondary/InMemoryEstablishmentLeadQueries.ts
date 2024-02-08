@@ -17,6 +17,6 @@ export class InMemoryEstablishmentLeadQueries
   ): Promise<ConventionReadDto[]> {
     const sirets =
       await this.establishmentLeadRepository.getSiretsByLastEventKind(kind);
-    return this.conventionQueries.getLatestConventionsByFilters({ sirets });
+    return this.conventionQueries.getLatestConventionBySirets(sirets);
   }
 }

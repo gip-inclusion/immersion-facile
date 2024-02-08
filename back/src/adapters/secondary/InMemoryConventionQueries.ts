@@ -7,10 +7,9 @@ import {
   ConventionReadDto,
   ConventionScope,
   FindSimilarConventionsParams,
-  getLatestConventionsByFiltersQueries,
   SiretDto,
-  validatedConventionStatuses,
   WithConventionIdLegacy,
+  validatedConventionStatuses,
 } from "shared";
 import {
   ConventionQueries,
@@ -118,11 +117,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .map((convention) => this.#addAgencyDataToConvention(convention));
   }
 
-  public async getLatestConventionsByFilters({
-    sirets,
-  }: getLatestConventionsByFiltersQueries): Promise<ConventionReadDto[]> {
+  public async getLatestConventionBySirets(
+    sirets: SiretDto[],
+  ): Promise<ConventionReadDto[]> {
     const latestConventionsBySiret = this.conventionRepository.conventions
-      .filter((conventionDto) => sirets && sirets.includes(conventionDto.siret))
+      .filter((conventionDto) => sirets?.includes(conventionDto.siret))
       .filter((conventionDto) => !!conventionDto.dateValidation)
       .map((conventionDto) => this.#addAgencyDataToConvention(conventionDto))
       .reduce((acc: Record<SiretDto, ConventionReadDto>, conventionReadDto) => {

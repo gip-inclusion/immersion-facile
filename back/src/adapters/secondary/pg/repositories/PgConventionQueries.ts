@@ -7,8 +7,8 @@ import {
   ConventionScope,
   ConventionStatus,
   FindSimilarConventionsParams,
+  SiretDto,
   conventionReadSchema,
-  getLatestConventionsByFiltersQueries,
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
@@ -25,7 +25,26 @@ import {
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
-  getLatestConventionsByFilters: (filters: getLatestConventionsByFiltersQueries) => Promise<ConventionReadDto[]>;
+
+  public async getLatestConventionBySirets(
+    sirets: SiretDto[],
+  ): Promise<ConventionReadDto[]> {
+    return pipeWithValue(
+      createConventionReadQueryBuilder(this.transaction),
+      (builder) =>
+        builder.select(
+          sql<string>`row_number() OVER (PARTITION BY conventions.siret ORDER BY conventions.date_validation DESC)`.as(
+            "rn",
+          ),
+        ),
+      (builder) =>
+        builder
+          .where("conventions.siret", "in", sirets)
+          .execute()
+          .then((results) => results.filter((result) => result.rn === "1")),
+      andThen(validateConventionReadResults),
+    );
+  }
 
   public async findSimilarConventions(
     params: FindSimilarConventionsParams,

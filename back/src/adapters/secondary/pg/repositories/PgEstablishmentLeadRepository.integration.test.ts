@@ -93,9 +93,10 @@ describe("PgEstablishmentLeadRepository", () => {
       await establishmentLeadRepository.save(establishmentLeadAccepted);
       await establishmentLeadRepository.save(establishmentLeadToBeReminded);
 
-      const result = await establishmentLeadRepository.getSiretsByLastEventKind(
-        "to-be-reminded",
-      );
+      const result =
+        await establishmentLeadRepository.getSiretsByLastEventKind(
+          "to-be-reminded",
+        );
 
       expectToEqual(result, [establishmentLeadToBeReminded.siret]);
     });
