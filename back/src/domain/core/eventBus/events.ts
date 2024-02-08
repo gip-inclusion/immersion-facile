@@ -15,12 +15,12 @@ import {
   WithConventionIdLegacy,
   WithFormEstablishmentDto,
 } from "shared";
-import {RenewMagicLinkPayload} from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
-import {WithNotificationIdAndKind} from "../../generic/notifications/entities/Notification";
-import {IdentityProvider} from "../../generic/OAuth/entities/OngoingOAuth";
-import {WithEstablishmentAggregate} from "../../offer/entities/EstablishmentEntity";
-import {ConventionReminderPayload} from "../eventsPayloads/ConventionReminderPayload";
-import {ConventionRequiresModificationPayload} from "./eventPayload.dto";
+import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
+import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
+import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
+import { WithEstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
+import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
+import { ConventionRequiresModificationPayload } from "./eventPayload.dto";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 

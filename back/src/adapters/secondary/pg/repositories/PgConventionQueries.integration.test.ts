@@ -251,6 +251,89 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
+  describe("Pg implementation of methode getLatestConventionBySirets", () => {
+    const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
+    const siret1 = "12345678901234";
+    const siret2 = "76543211234567";
+    const agency = AgencyDtoBuilder.create().withId(agencyId).build();
+    const latestConventionForSiret1 = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
+      .withDateValidation(new Date("2023-04-05").toISOString())
+      .withSchedule(reasonableSchedule)
+      .withSiret(siret1)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withAgencyId(agencyId)
+      .build();
+
+    const oldestConventionForSiret1 = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
+      .withDateValidation(new Date("2023-02-05").toISOString())
+      .withSchedule(reasonableSchedule)
+      .withSiret(siret1)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withAgencyId(agencyId)
+      .build();
+
+    const latestConventionForSiret2 = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa03")
+      .withDateValidation(new Date("2023-05-06").toISOString())
+      .withSchedule(reasonableSchedule)
+      .withSiret(siret2)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withAgencyId(agencyId)
+      .build();
+
+    const oldestConventionForSiret2 = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa04")
+      .withDateValidation(new Date("2023-01-04").toISOString())
+      .withSchedule(reasonableSchedule)
+      .withSiret(siret2)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withAgencyId(agencyId)
+      .build();
+
+    beforeEach(async () => {
+      await agencyRepo.insert(agency);
+
+      await Promise.all(
+        [
+          latestConventionForSiret1,
+          oldestConventionForSiret1,
+          oldestConventionForSiret2,
+          latestConventionForSiret2,
+        ].map((params) => conventionRepository.save(params)),
+      );
+    });
+
+    it("return the last validated convention for each siret", async () => {
+      const result = await conventionQueries.getLatestConventionBySirets([
+        siret1,
+        siret2,
+      ]);
+
+      expectToEqual(result, [
+        {
+          ...latestConventionForSiret1,
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        },
+        {
+          ...latestConventionForSiret2,
+          agencyDepartment: agency.address.departmentCode,
+          agencyName: agency.name,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        },
+      ]);
+    });
+  });
+
   describe("PG implementation of method getConventionsByFilters", () => {
     const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
     const agency = AgencyDtoBuilder.create().withId(agencyId).build();

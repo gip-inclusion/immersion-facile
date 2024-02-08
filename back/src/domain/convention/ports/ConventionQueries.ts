@@ -4,7 +4,6 @@ import {
   ConventionScope,
   ConventionStatus,
   FindSimilarConventionsParams,
-  getLatestConventionsByFiltersQueries,
   SiretDto,
 } from "shared";
 import { AssessmentEmailDomainTopic } from "../../core/eventBus/events";
@@ -18,8 +17,8 @@ export type GetConventionsByFiltersQueries = {
 };
 
 export interface ConventionQueries {
-  getLatestConventionsByFilters: (
-    filters: getLatestConventionsByFiltersQueries,
+  getLatestConventionBySirets: (
+    sirets: SiretDto[],
   ) => Promise<ConventionReadDto[]>;
   getConventionById: (
     id: ConventionId,

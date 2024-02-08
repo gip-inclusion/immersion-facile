@@ -1,22 +1,28 @@
-import {subDays} from "date-fns";
-import {AgencyDtoBuilder, ConventionDtoBuilder, expectObjectInArrayToMatch, expectToEqual} from "shared";
-import {AppConfig} from "../../../adapters/primary/config/appConfig";
-import {createInMemoryUow, InMemoryUnitOfWork,} from "../../../adapters/primary/config/uowConfig";
-import {CustomTimeGateway} from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import {UuidV4Generator} from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import {InMemoryUowPerformer} from "../../../adapters/secondary/InMemoryUowPerformer";
+import { subDays } from "date-fns";
 import {
-  DeterministShortLinkIdGeneratorGateway
-} from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import {AppConfigBuilder} from "../../../utils/AppConfigBuilder";
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  expectObjectInArrayToMatch,
+  expectToEqual,
+} from "shared";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationsAndEvents";
-import {makeCreateNewEvent} from "../../core/eventBus/EventBus";
-import {makeSaveNotificationAndRelatedEvent} from "../../generic/notifications/entities/Notification";
-import {EstablishmentLead} from "../entities/EstablishmentLeadEntity";
-import {SendEstablishmentLeadReminder} from "./SendEstablishmentLeadReminder";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
+import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
+import { SendEstablishmentLeadReminder } from "./SendEstablishmentLeadReminder";
 
 const now = new Date();
 const establishmentLeadAccepted: EstablishmentLead = {
@@ -65,10 +71,7 @@ describe("SendEstablishmentLeadReminder", () => {
     );
     sendEstablishmentLeadReminder = new SendEstablishmentLeadReminder(
       new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        timeGateway,
-      ),
+      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       makeCreateNewEvent({
         timeGateway,
         uuidGenerator: new UuidV4Generator(),
@@ -91,19 +94,24 @@ describe("SendEstablishmentLeadReminder", () => {
     ];
     uow.agencyRepository.setAgencies([agency]);
     uow.conventionRepository.setConventions([convention]);
-    shortLinkIdGeneratorGateway.addMoreShortLinkIds(["addEstablishmentFormShortLink"]);
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds([
+      "addEstablishmentFormShortLink",
+    ]);
     // const expectedAddEstablishmentFormUrl = "http://localhost/establishment?siret=12345678901235&bName=Beta.gouv.fr&bAdress=169 boulevard de la villette, 75010 Paris&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com"
 
-    const result = await sendEstablishmentLeadReminder.execute(
-      "to-be-reminded",
-    );
+    const result =
+      await sendEstablishmentLeadReminder.execute("to-be-reminded");
 
     expectToEqual(result, {
       establishmentsReminded: [establishmentLeadToBeReminded.siret],
       errors: {},
     });
 
-    expect(await uow.shortLinkRepository.getById("addEstablishmentFormShortLink")).toBe("http://localhost/establishment?siret=12345678901235&bName=Beta.gouv.fr&bAdress=169 boulevard de la villette, 75010 Paris&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com");
+    expect(
+      await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
+    ).toBe(
+      "http://localhost/establishment?siret=12345678901235&bName=Beta.gouv.fr&bAdress=169 boulevard de la villette, 75010 Paris&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com",
+    );
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -111,10 +119,13 @@ describe("SendEstablishmentLeadReminder", () => {
           kind: "ESTABLISHMENT_LEAD_REMINDER",
           params: {
             businessName: convention.businessName,
-            registrationLink: "http://localhost/api/to/addEstablishmentFormShortLink",
-            rejectRegistrationLink: '',
+            registrationLink:
+              "http://localhost/api/to/addEstablishmentFormShortLink",
+            rejectRegistrationLink: "",
           },
-          recipients: [convention.signatories.establishmentRepresentative.email],
+          recipients: [
+            convention.signatories.establishmentRepresentative.email,
+          ],
           sender: {
             email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
             name: "Immersion Facilitée",

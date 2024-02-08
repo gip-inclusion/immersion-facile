@@ -291,10 +291,6 @@ export type UpdateConventionRequestDto = {
   convention: ConventionDto;
 };
 
-export type getLatestConventionsByFiltersQueries = {
-  sirets: SiretDto[];
-};
-
 export type UpdateConventionStatusWithValidator = {
   status: ConventionStatusWithValidator;
   conventionId: ConventionId;
