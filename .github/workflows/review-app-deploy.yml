@@ -65,6 +65,8 @@ jobs:
       - name: Deactivate front review app autodeploy
         run: |
           scalingo --app if-dev-front-pr${{ inputs.pull_request_id }} integration-link-update --no-auto-deploy
+      - name: Wait for the postgresql to be ready
+        run: sleep 60
       - name: Remove sslmode from $SCALINGO_POSTGRESQL_URL
         run: |
           current_db_url=$(scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env | grep 'SCALINGO_POSTGRESQL_URL=' | cut -d '=' -f2-)
