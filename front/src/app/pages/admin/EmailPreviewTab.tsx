@@ -347,8 +347,8 @@ export const defaultEmailValueByEmailKind: {
   },
   ESTABLISHMENT_LEAD_REMINDER: {
     businessName: "BUSINESS_NAME",
-    registrationLink: "REGISTRATION_LINK",
-    rejectRegistrationLink: "REJECT_REGISTRATION_LINK",
+    registerEstablishmentShortLink: "REGISTRATION_LINK",
+    unsubscribeToEmailShortLink: "REJECT_REGISTRATION_LINK",
   },
   FULL_PREVIEW_EMAIL: {
     internshipKind: "immersion",

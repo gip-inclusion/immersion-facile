@@ -169,8 +169,8 @@ export type EmailParamsByEmailType = {
   };
   ESTABLISHMENT_LEAD_REMINDER: {
     businessName: string;
-    registrationLink: string;
-    rejectRegistrationLink: string;
+    registerEstablishmentShortLink: string;
+    unsubscribeToEmailShortLink: string;
   };
   FULL_PREVIEW_EMAIL: {
     agencyLogoUrl: AbsoluteUrl | undefined;
