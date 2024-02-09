@@ -62,6 +62,15 @@ describe("PgEstablishmentLeadRepository", () => {
   });
 
   describe("getSiretsByLastEventKind", () => {
+    it("returns empty array when no data matches", async () => {
+      const result =
+        await establishmentLeadRepository.getSiretsByLastEventKind(
+          "to-be-reminded",
+        );
+
+      expectToEqual(result, []);
+    });
+
     it("return one establishmentLead", async () => {
       const now = new Date();
       const establishmentLeadAccepted: EstablishmentLead = {
