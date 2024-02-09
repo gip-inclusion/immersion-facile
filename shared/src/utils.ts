@@ -188,3 +188,7 @@ export const isUrlValid = (url: string | undefined) => {
 
 export const castError = (error: unknown): Error =>
   error instanceof Error ? error : new Error(JSON.stringify(error));
+
+type Filter = <T>(predicate: (element: T) => boolean) => (array: T[]) => T[];
+
+export const filter: Filter = (predicate) => (array) => array.filter(predicate);

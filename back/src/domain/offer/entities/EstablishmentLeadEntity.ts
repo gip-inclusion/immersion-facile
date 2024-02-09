@@ -41,3 +41,7 @@ export type EstablishmentLead = {
   lastEventKind: EstablishmentLeadEventKind;
   events: EstablishmentLeadEvent[];
 };
+
+export const isSiretsListFilled = (
+  sirets: SiretDto[],
+): sirets is [SiretDto, ...SiretDto[]] => sirets.length > 0;
