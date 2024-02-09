@@ -15,6 +15,7 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -22,9 +23,9 @@ import {
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
-import { SendEstablishmentLeadReminder } from "./SendEstablishmentLeadReminder";
+import { SendEstablishmentLeadReminderScript } from "./SendEstablishmentLeadReminderScript";
 
-const now = new Date();
+const now = new Date("2021-05-15T08:00:00.000Z");
 const establishmentLeadAccepted: EstablishmentLead = {
   siret: "12345678901234",
   lastEventKind: "registration-accepted",
@@ -58,7 +59,7 @@ describe("SendEstablishmentLeadReminder", () => {
     .build();
   const timeGateway = new CustomTimeGateway(new Date());
   let uow: InMemoryUnitOfWork;
-  let sendEstablishmentLeadReminder: SendEstablishmentLeadReminder;
+  let sendEstablishmentLeadReminder: SendEstablishmentLeadReminderScript;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
@@ -69,7 +70,7 @@ describe("SendEstablishmentLeadReminder", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    sendEstablishmentLeadReminder = new SendEstablishmentLeadReminder(
+    sendEstablishmentLeadReminder = new SendEstablishmentLeadReminderScript(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       makeCreateNewEvent({
@@ -78,6 +79,8 @@ describe("SendEstablishmentLeadReminder", () => {
       }),
       shortLinkIdGeneratorGateway,
       config,
+      fakeGenerateMagicLinkUrlFn,
+      timeGateway,
     );
   });
 
@@ -96,7 +99,10 @@ describe("SendEstablishmentLeadReminder", () => {
     uow.conventionRepository.setConventions([convention]);
     shortLinkIdGeneratorGateway.addMoreShortLinkIds([
       "addEstablishmentFormShortLink",
+      "addUnsubscribeToEmailShortLink",
     ]);
+
+    timeGateway.setNextDates([now, now]);
     // const expectedAddEstablishmentFormUrl = "http://localhost/establishment?siret=12345678901235&bName=Beta.gouv.fr&bAdress=169 boulevard de la villette, 75010 Paris&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com"
 
     const result =
@@ -113,15 +119,22 @@ describe("SendEstablishmentLeadReminder", () => {
       "http://localhost/establishment?siret=12345678901235&bName=Beta.gouv.fr&bAdress=169 boulevard de la villette, 75010 Paris&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com",
     );
 
+    expect(
+      await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
+    ).toBe(
+      "http://fake-magic-link/etablissement/refus-referencement/a99eaca1-ee70-4c90-b3f4-668d492f7392/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
+    );
+
     expectSavedNotificationsAndEvents({
       emails: [
         {
           kind: "ESTABLISHMENT_LEAD_REMINDER",
           params: {
             businessName: convention.businessName,
-            registrationLink:
+            registerEstablishmentShortLink:
               "http://localhost/api/to/addEstablishmentFormShortLink",
-            rejectRegistrationLink: "",
+            unsubscribeToEmailShortLink:
+              "http://localhost/api/to/addUnsubscribeToEmailShortLink",
           },
           recipients: [
             convention.signatories.establishmentRepresentative.email,

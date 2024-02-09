@@ -9,10 +9,12 @@ import {
 } from "shared";
 import { z } from "zod";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { makeShortLink } from "../../core/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import {
@@ -25,7 +27,7 @@ type SendEstablishmentLeadReminderOutput = {
   establishmentsReminded: SiretDto[];
 };
 
-export class SendEstablishmentLeadReminder extends TransactionalUseCase<
+export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
   EstablishmentLeadEventKind,
   SendEstablishmentLeadReminderOutput
 > {
@@ -35,11 +37,13 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
 
   readonly #createNewEvent: CreateNewEvent;
 
-  // readonly #timeGateway: TimeGateway;
+  readonly #timeGateway: TimeGateway;
 
   readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
 
   readonly #config: AppConfig;
+
+  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -47,14 +51,16 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
     createNewEvent: CreateNewEvent,
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     config: AppConfig,
-    // timeGateway: TimeGateway,
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
     this.#createNewEvent = createNewEvent;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
     this.#config = config;
-    // this.#timeGateway = timeGateway;
+    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
@@ -79,10 +85,10 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
       }),
     );
 
-    return Promise.resolve({
+    return {
       establishmentsReminded: conventions.map(({ siret }) => siret),
-      errors: {},
-    });
+      errors,
+    };
   }
 
   async #sendOneEmailWithEstablishmentLeadReminder(
@@ -90,11 +96,26 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
     config: AppConfig,
     convention: ConventionReadDto,
   ) {
-    const registrationLink = await makeShortLink({
+    const registerEstablishmentShortLink = await makeShortLink({
       uow,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       config: this.#config,
       longLink: generateAddEstablishmentFormLink({ config, convention }),
+    });
+
+    const unsubscribeToEmailLink = this.#generateConventionMagicLinkUrl({
+      id: convention.id,
+      email: convention.signatories.establishmentRepresentative.email,
+      role: "establishment-representative",
+      targetRoute: frontRoutes.unregisterEstablishmentLead,
+      now: this.#timeGateway.now(),
+    });
+
+    const unsubscribeToEmailShortLink = await makeShortLink({
+      uow,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
+      config: this.#config,
+      longLink: unsubscribeToEmailLink,
     });
 
     await this.#saveNotificationAndRelatedEvent(uow, {
@@ -105,8 +126,8 @@ export class SendEstablishmentLeadReminder extends TransactionalUseCase<
         sender: immersionFacileNoReplyEmailSender,
         params: {
           businessName: convention.businessName,
-          registrationLink,
-          rejectRegistrationLink: "",
+          registerEstablishmentShortLink,
+          unsubscribeToEmailShortLink,
         },
       },
       followedIds: {

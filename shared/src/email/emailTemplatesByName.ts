@@ -1462,8 +1462,8 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       tags: ["relance inscription prospect"],
       createEmailVariables: ({
         businessName,
-        registrationLink,
-        rejectRegistrationLink,
+        registerEstablishmentShortLink,
+        unsubscribeToEmailShortLink,
       }) => ({
         subject:
           "Votre Immersion s'est bien passée ? Accueillez d'autres candidats quand vous le voulez !",
@@ -1479,11 +1479,11 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         buttons: [
           {
             label: "S'inscrire en 2 minutes !",
-            url: registrationLink,
+            url: registerEstablishmentShortLink,
           },
           {
             label: "Je ne souhaite pas devenir entreprise accueillante",
-            url: rejectRegistrationLink,
+            url: unsubscribeToEmailShortLink,
           },
         ],
         subContent: `Bonne journée,
