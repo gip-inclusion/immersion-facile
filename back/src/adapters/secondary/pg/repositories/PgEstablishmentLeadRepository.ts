@@ -83,19 +83,10 @@ export class PgEstablishmentLeadRepository
   public async getSiretsByLastEventKind(
     kind: EstablishmentLeadEventKind,
   ): Promise<SiretDto[]> {
-    const result = await this.#transaction
-      .with("events", (qb) =>
-        qb
-          .selectFrom("establishment_lead_events")
-          .select(["siret", "kind", "occurred_at"])
-          .distinctOn("siret")
-          .orderBy("siret")
-          .orderBy("occurred_at", "desc"),
-      )
-      .selectFrom("events")
-      .select("siret")
-      .where("kind", "=", kind)
-      .execute();
+    const result = await getEstablishmentLeadSiretsByLastEventKindBuilder(
+      this.#transaction,
+      kind,
+    ).execute();
 
     return result.map(({ siret }) => siret);
   }
@@ -133,3 +124,23 @@ const toDBEntity = (siret: SiretDto) => (event: EstablishmentLeadEvent) =>
       kind,
       occurred_at: occurredAt,
     }));
+
+export const getEstablishmentLeadSiretsByLastEventKindBuilder = (
+  transaction: KyselyDb,
+  kind: EstablishmentLeadEventKind,
+) => {
+  const builder = transaction
+    .with("events", (qb) =>
+      qb
+        .selectFrom("establishment_lead_events")
+        .select(["siret", "kind", "occurred_at"])
+        .distinctOn("siret")
+        .orderBy("siret")
+        .orderBy("occurred_at", "desc"),
+    )
+    .selectFrom("events")
+    .select("siret")
+    .where("kind", "=", kind);
+
+  return builder;
+};
