@@ -305,6 +305,14 @@ describe("Pg implementation of ConventionQueries", () => {
       );
     });
 
+    it("returns empty array when no data matches", async () => {
+      const result = await conventionQueries.getLatestConventionBySirets([
+        "112345678909876",
+      ]);
+
+      expectToEqual(result, []);
+    });
+
     it("return the last validated convention for each siret", async () => {
       const result = await conventionQueries.getLatestConventionBySirets([
         siret1,
