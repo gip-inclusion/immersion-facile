@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { testConfig } from "../custom.config";
 
 export const expectElementToBeVisible = async (

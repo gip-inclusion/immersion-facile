@@ -138,7 +138,7 @@ test.describe("Convention creation and modification workflow", () => {
       await signConvention(page, signatoriesMagicLinks[2]);
     });
 
-    test(`signs convention for signatory 4`, async ({ page }) => {
+    test("signs convention for signatory 4", async ({ page }) => {
       await signConvention(page, signatoriesMagicLinks[3]);
       await page.waitForTimeout(testConfig.timeForEventCrawler);
     });

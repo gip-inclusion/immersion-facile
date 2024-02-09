@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker/locale/fr";
-import { expect, Page, test } from "@playwright/test";
+import { Page, expect, test } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../../custom.config";
 import { connectToAdmin, goToAdminTab } from "../../utils/admin";
@@ -195,7 +195,7 @@ test.describe("Establishment creation and modification workflow", () => {
     await page.click(
       `#${domElementIds.admin.manageEstablishment.searchButton}`,
     );
-    await expect(page.url()).toContain(`pilotage-etablissement-admin`);
+    await expect(page.url()).toContain("pilotage-etablissement-admin");
     await page.click(
       `#${domElementIds.admin.manageEstablishment.submitDeleteButton}`,
     );

@@ -35,7 +35,7 @@ export default ({ randomSeed, testHost }: VUConfig) => {
   const res = immersionFacileApi.searchImmersion(req);
 
   check(res, {
-    "http status 200": (r) => r.status == 200,
+    "http status 200": (r) => r.status === 200,
   });
 
   sleep(1);
