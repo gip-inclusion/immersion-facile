@@ -1,6 +1,6 @@
 import { addDays, subDays, subHours } from "date-fns";
 import { sql } from "kysely";
-import { andThen } from "ramda";
+import { andThen, filter } from "ramda";
 import {
   ConventionId,
   ConventionReadDto,
@@ -21,27 +21,20 @@ import { KyselyDb } from "../kysely/kyselyUtils";
 import {
   createConventionReadQueryBuilder,
   getReadConventionById,
+  makeGetLastConventionWithSiretInList,
 } from "./pgConventionSql";
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
 
   public async getLatestConventionBySirets(
-    sirets: SiretDto[],
+    sirets: [SiretDto, ...SiretDto[]],
   ): Promise<ConventionReadDto[]> {
     return pipeWithValue(
       createConventionReadQueryBuilder(this.transaction),
-      (builder) =>
-        builder.select(
-          sql<string>`row_number() OVER (PARTITION BY conventions.siret ORDER BY conventions.date_validation DESC)`.as(
-            "rn",
-          ),
-        ),
-      (builder) =>
-        builder
-          .where("conventions.siret", "in", sirets)
-          .execute()
-          .then((results) => results.filter((result) => result.rn === "1")),
+      makeGetLastConventionWithSiretInList(sirets),
+      (builder) => builder.execute(),
+      andThen((results) => results.filter((result) => result.rn === "1")),
       andThen(validateConventionReadResults),
     );
   }
@@ -199,7 +192,7 @@ const addFiltersToBuilder =
     );
   };
 
-const validateConventionReadResults = (
+export const validateConventionReadResults = (
   pgResults: { dto: unknown }[],
 ): ConventionReadDto[] =>
   pgResults.map((pgResult) => conventionReadSchema.parse(pgResult.dto));

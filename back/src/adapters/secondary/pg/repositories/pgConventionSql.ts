@@ -9,6 +9,7 @@ import {
   RomeCode,
   RomeLabel,
   ScheduleDto,
+  SiretDto,
   conventionReadSchema,
   parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
@@ -245,3 +246,14 @@ export const getReadConventionById = async (
     )
   );
 };
+
+export const makeGetLastConventionWithSiretInList =
+  (sirets: [SiretDto, ...SiretDto[]]) =>
+  (builder: Awaited<ReturnType<typeof createConventionReadQueryBuilder>>) =>
+    builder
+      .select(
+        sql<string>`row_number() OVER (PARTITION BY conventions.siret ORDER BY conventions.date_validation DESC)`.as(
+          "rn",
+        ),
+      )
+      .where("conventions.siret", "in", sirets);

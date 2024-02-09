@@ -18,7 +18,7 @@ export type GetConventionsByFiltersQueries = {
 
 export interface ConventionQueries {
   getLatestConventionBySirets: (
-    sirets: SiretDto[],
+    sirets: [SiretDto, ...SiretDto[]],
   ) => Promise<ConventionReadDto[]>;
   getConventionById: (
     id: ConventionId,
