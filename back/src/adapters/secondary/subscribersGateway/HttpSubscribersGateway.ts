@@ -36,6 +36,8 @@ export class HttpSubscribersGateway implements SubscribersGateway {
           title: "Partner subscription notified successfully",
           callbackUrl,
           status: response.status,
+          conventionId: payload.convention.id,
+          conventionStatus: payload.convention.status,
         });
       })
       .catch((err) => {
@@ -43,6 +45,8 @@ export class HttpSubscribersGateway implements SubscribersGateway {
         const errorContext = {
           title: "Partner subscription errored",
           callbackUrl,
+          conventionId: payload.convention.id,
+          conventionStatus: payload.convention.status,
           ...(axios.isAxiosError(error)
             ? {
                 status: error.response?.status,
