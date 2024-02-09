@@ -23,6 +23,11 @@ describe("PgFormEstablishmentRepository", () => {
     .withSource("lesentreprises-sengagent")
     .withSiret("88888888888888")
     .withMaxContactsPerWeek(8)
+    .withBusinessAddresses([
+      "1 rue de la paix, 75001 Paris",
+      "45 rue des oligarques, 75008 Paris",
+      "12 rue de la liberté, 75011 Paris",
+    ])
     .build();
 
   let pool: Pool;

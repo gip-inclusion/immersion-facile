@@ -314,6 +314,7 @@ export const domElementIds = {
     maxContactsPerWeek: "establishment-maxContactPerWeek",
     addAppellationButton:
       "im-form-create-establishment__add-appellation-button",
+    addAddressButton: "im-form-create-establishment__add-address-button",
     errorSiretAlreadyExistButton:
       "im-form-create-establishment__edit-establishment-button",
     startAddEstablishmentButton: "im-form-create-establishment__start-button",

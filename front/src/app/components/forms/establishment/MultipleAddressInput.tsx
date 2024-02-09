@@ -13,7 +13,7 @@ import { useStyles } from "tss-react/dsfr";
 type MultipleAddressInputProps = {
   name: string;
   label?: string;
-  currentAddresses: AddressDto[];
+  currentAddresses: string[];
   onAddressAdded: (address: AddressDto, index: number) => void;
   onAddressDeleted: (index: number) => void;
   error?: string;
@@ -32,7 +32,7 @@ export const MultipleAddressInput = ({
   disabled = false,
 }: MultipleAddressInputProps) => {
   const { cx } = useStyles();
-
+  console.log(currentAddresses);
   return (
     <div
       className={cx(fr.cx("fr-input-group"), "im-multiple-address-input")}
@@ -40,56 +40,56 @@ export const MultipleAddressInput = ({
     >
       <>
         {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
-        {currentAddresses.map(
-          (address, index) => (
-            <div
-              className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-              key={`${address.streetNumberAndAddress}-${address.postcode}`}
-            >
-              <div className={fr.cx("fr-col", "fr-mt-2w")}>
-                <AddressAutocomplete
-                  disabled={disabled}
-                  label={"Rechercher un métier *"}
-                  initialSearchTerm={
-                    "TODO"
-                  }
-                  setFormValue={({ address }) => {
-                    onAddressAdded(address, index);
-                  }}
-                />
-              </div>
-              <Button
-                type="button"
-                iconId="fr-icon-delete-bin-line"
-                title="Suppression"
+        {currentAddresses.map((address, index) => (
+          <div
+            className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
+            key={address}
+          >
+            <div className={fr.cx("fr-col", "fr-mt-2w")}>
+              <AddressAutocomplete
                 disabled={disabled}
-                onClick={() => {
-                  onAddressDeleted(index);
+                label={"Rechercher un métier *"}
+                initialSearchTerm={currentAddresses[index]}
+                useFirstAddressOnInitialSearchTerm={false}
+                setFormValue={({ address }) => {
+                  onAddressAdded(address, index);
                 }}
               />
             </div>
-          ),
-        )}
+            <Button
+              type="button"
+              iconId="fr-icon-delete-bin-line"
+              title="Suppression"
+              disabled={disabled}
+              onClick={() => {
+                onAddressDeleted(index);
+              }}
+            />
+          </div>
+        ))}
       </>
 
       <Button
         className={fr.cx("fr-my-4v")}
         type="button"
         iconId="fr-icon-add-line"
-        title="Ajouter un métier"
-        id={domElementIds.establishment.addAppellationButton}
+        title="Ajouter un lieu d'immersion"
+        id={domElementIds.establishment.addAddressButton}
         priority="secondary"
         onClick={() => {
-          onAddressAdded({
-            city: "",
-            postcode: "",
-            streetNumberAndAddress: "",
-            departmentCode: "",
-          }, currentAddresses.length)
+          onAddressAdded(
+            {
+              city: "",
+              postcode: "",
+              streetNumberAndAddress: "",
+              departmentCode: "",
+            },
+            currentAddresses.length,
+          );
         }}
         disabled={disabled}
       >
-        Ajouter un métier
+        Ajouter un lieu d'immersion
       </Button>
 
       {error?.length && (
@@ -97,7 +97,9 @@ export const MultipleAddressInput = ({
           id={`${name}-error-description`}
           className={fr.cx("fr-error-text")}
         >
-          {typeof error === "string" ? error : "Indiquez au moins 1 métier."}
+          {typeof error === "string"
+            ? error
+            : "Indiquez au moins un lieu d'immersion."}
         </div>
       )}
     </div>
