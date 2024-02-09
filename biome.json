@@ -2,7 +2,17 @@
   "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
   "organizeImports": {
     "enabled": true,
-    "ignore": ["back/src/adapters/secondary/pg/staticData"]
+    "ignore": [
+      "back/src/adapters/secondary/pg/staticData",
+      "node_modules",
+      "front/public",
+      "front/dev-dist",
+      "front/scalingo",
+      "front/dist",
+      "*.js",
+      "*.tar.gz",
+      ".vscode"
+    ]
   },
   "linter": {
     "enabled": true,
@@ -24,15 +34,36 @@
       "security": {
         "noDangerouslySetInnerHtml": { "level": "off" }
       }
-    }
+    },
+    "ignore": [
+      "node_modules",
+      "front/public",
+      "front/dev-dist",
+      "front/scalingo",
+      "front/dist",
+      "*.js",
+      "*.tar.gz",
+      ".vscode"
+    ]
   },
   "formatter": {
     "lineWidth": 80,
     "enabled": true,
     "indentWidth": 2,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "ignore": [
+      "node_modules",
+      "front/public",
+      "front/dev-dist",
+      "front/scalingo",
+      "front/dist",
+      "*.js",
+      "*.tar.gz",
+      ".vscode"
+    ]
   },
   "files": {
-    "maxSize": 10485760
+    "maxSize": 10485760,
+    "ignoreUnknown": true
   }
 }

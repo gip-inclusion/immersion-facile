@@ -1,5 +1,5 @@
-import { expect, Page, test } from "@playwright/test";
-import { addressRoutes, AgencyId, domElementIds, frontRoutes } from "shared";
+import { Page, expect, test } from "@playwright/test";
+import { AgencyId, addressRoutes, domElementIds, frontRoutes } from "shared";
 import { connectToAdmin, goToAdminTab } from "../../utils/admin";
 import { fillAutocomplete } from "../../utils/utils";
 
@@ -24,14 +24,14 @@ test.describe("Agency workflow", () => {
     if (!agencyAddedId) throw new Error("agencyAddedId is null");
     await connectToAdmin(page);
     await goToAdminTab(page, "agencies");
-    await page.locator(`#admin-agency-to-review-id`).click();
-    await page.locator(`#admin-agency-to-review-id`).fill(agencyAddedId);
+    await page.locator("#admin-agency-to-review-id").click();
+    await page.locator("#admin-agency-to-review-id").fill(agencyAddedId);
 
     await expect(
-      await page.locator(`#admin-agency-to-review-submit`),
+      await page.locator("#admin-agency-to-review-submit"),
     ).toBeEnabled();
 
-    await page.locator(`#admin-agency-to-review-submit`).click();
+    await page.locator("#admin-agency-to-review-submit").click();
 
     await page.locator("#admin-agency-to-review-reject-button").click();
 

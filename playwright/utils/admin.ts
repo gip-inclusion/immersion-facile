@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import { AdminTab, adminTabsList, domElementIds, frontRoutes } from "shared";
 
 const adminUser = process.env.ADMIN_USER ?? "admin";

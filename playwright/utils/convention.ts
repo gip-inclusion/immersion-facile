@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { expect, Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { addBusinessDays, format } from "date-fns";
 import {
   domElementIds,
