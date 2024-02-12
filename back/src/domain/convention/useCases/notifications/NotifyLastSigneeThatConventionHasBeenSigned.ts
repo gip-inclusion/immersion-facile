@@ -111,7 +111,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     return signatoryEmailsOrderedBySignedAt.at(-1);
   }
 
-  #onRepositoryConvention(
+  async #onRepositoryConvention(
     uow: UnitOfWork,
     convention: ConventionDto,
     agency: AgencyDto,
@@ -119,8 +119,8 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     const lastSigneeEmail = this.#lastSigneeEmail(
       Object.values(convention.signatories),
     );
-    if (lastSigneeEmail)
-      return this.#saveNotificationAndRelatedEvent(uow, {
+    if (lastSigneeEmail) {
+      await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: this.#emailToSend(
           convention,
@@ -133,6 +133,8 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
           establishmentSiret: convention.siret,
         },
       });
+      return;
+    }
     throw new Error(noSignatoryMessage(convention));
   }
 }

@@ -333,7 +333,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             },
           };
 
-    return this.#saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       followedIds: {
         conventionId: convention.id,
@@ -342,6 +342,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       },
       templatedContent: templatedEmail,
     });
+
+    return;
   }
 }
 

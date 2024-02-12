@@ -96,6 +96,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
     config: AppConfig,
     convention: ConventionReadDto,
   ) {
+    const now = this.#timeGateway.now();
     const registerEstablishmentShortLink = await makeShortLink({
       uow,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
@@ -108,7 +109,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
       email: convention.signatories.establishmentRepresentative.email,
       role: "establishment-representative",
       targetRoute: frontRoutes.unregisterEstablishmentLead,
-      now: this.#timeGateway.now(),
+      now,
     });
 
     const unsubscribeToEmailShortLink = await makeShortLink({
@@ -118,7 +119,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
       longLink: unsubscribeToEmailLink,
     });
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    const notification = await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "ESTABLISHMENT_LEAD_REMINDER",
@@ -136,6 +137,24 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
       },
     });
 
+    const establishmentLead = await uow.establishmentLeadRepository.getBySiret(
+      convention.siret,
+    );
+
+    if (establishmentLead) {
+      await uow.establishmentLeadRepository.save({
+        ...establishmentLead,
+        events: [
+          ...establishmentLead.events,
+          {
+            kind: "reminder-sent",
+            occurredAt: now,
+            notification: { kind: notification.kind, id: notification.id },
+          },
+        ],
+      });
+    }
+
     await uow.outboxRepository.save(
       this.#createNewEvent({
         topic: "SendEstablishmentLeadReminder",
@@ -149,4 +168,4 @@ const generateAddEstablishmentFormLink = ({
   config,
   convention,
 }: { config: AppConfig; convention: ConventionReadDto }): AbsoluteUrl =>
-  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?siret=${convention.siret}&bName=${convention.businessName}&bAdress=${convention.immersionAddress}&bcLastName=${convention.establishmentTutor.lastName}&bcFirstName=${convention.establishmentTutor.firstName}&bcPhone=${convention.establishmentTutor.phone}&bcEmail=${convention.establishmentTutor.email}`;
+  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?siret=${convention.siret}&bcLastName=${convention.signatories.establishmentRepresentative.lastName}&bcFirstName=${convention.signatories.establishmentRepresentative.firstName}&bcPhone=${convention.signatories.establishmentRepresentative.phone}&bcEmail=${convention.signatories.establishmentRepresentative.email}`;

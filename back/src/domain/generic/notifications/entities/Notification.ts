@@ -33,7 +33,7 @@ export const makeSaveNotificationAndRelatedEvent =
     uow: UnitOfWork,
     notificationContent: NotificationContent &
       Pick<Notification, "followedIds">,
-  ): Promise<void> => {
+  ): Promise<Notification> => {
     const now = timeGateway.now().toISOString();
 
     const notification: Notification = {
@@ -55,4 +55,6 @@ export const makeSaveNotificationAndRelatedEvent =
       uow.notificationRepository.save(notification),
       uow.outboxRepository.save(event),
     ]);
+
+    return notification;
   };

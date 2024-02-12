@@ -1,3 +1,4 @@
+import { descend, prop, sortBy, sortWith } from "ramda";
 import { SiretDto } from "shared";
 import {
   EstablishmentLead,
@@ -24,7 +25,13 @@ export class InMemoryEstablishmentLeadRepository
   public async getBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentLead | undefined> {
-    return this.#establishmentLeads[siret];
+    const establishmentLead = this.#establishmentLeads[siret];
+
+    if (!establishmentLead) return;
+
+    const sortedEvents = sortBy(prop("occurredAt"))(establishmentLead?.events);
+    const lastEventKind = sortedEvents[sortedEvents.length - 1].kind;
+    return { ...establishmentLead, lastEventKind };
   }
 
   public getSiretsByLastEventKind(

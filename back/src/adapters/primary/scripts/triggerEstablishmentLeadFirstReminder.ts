@@ -8,13 +8,11 @@ import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
-import {
-  NanoIdShortLinkIdGeneratorGateway
-} from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -37,8 +35,7 @@ const triggerEstablishmentLeadFirstReminder = async () => {
     uuidGenerator,
     timeGateway,
   );
-  const shortLinkIdGeneratorGateway =
-    new NanoIdShortLinkIdGeneratorGateway();
+  const shortLinkIdGeneratorGateway = new NanoIdShortLinkIdGeneratorGateway();
 
   const sendEstablishmentLeadReminderScript =
     new SendEstablishmentLeadReminderScript(
