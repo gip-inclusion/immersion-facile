@@ -21,12 +21,19 @@ import {
   establishmentSlice,
 } from "./establishment.slice";
 
-const establishmentFromSiretFetched: SiretEstablishmentDto = {
+const establishmentWithoutAddressFromSiretFetched: SiretEstablishmentDto = {
   siret: "11110000111100",
   businessName: "Existing open business on Sirene Corp.",
   businessAddress: "",
   isOpen: true,
   numberEmployeesRange: "",
+};
+const establishmentWithAddressFromSiretFetched: SiretEstablishmentDto = {
+  siret: "11110000111100",
+  businessName: "Existing open business on Sirene Corp.",
+  businessAddress: "102 rue du fake, 75001 Paris",
+  isOpen: true,
+  numberEmployeesRange: "10-19",
 };
 
 const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
@@ -59,7 +66,7 @@ describe("Establishment", () => {
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered(null);
   });
 
-  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION'", () => {
+  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION' without address provided", () => {
     ({ store, dependencies } = createTestStore({
       establishment: {
         isLoading: false,
@@ -69,12 +76,30 @@ describe("Establishment", () => {
     }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
     dependencies.formCompletionGateway.siretInfo$.next(
-      establishmentFromSiretFetched,
+      establishmentWithoutAddressFromSiretFetched,
     );
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
-      siret: establishmentFromSiretFetched.siret,
-      bName: establishmentFromSiretFetched.businessName,
-      bAddresses: [establishmentFromSiretFetched.businessAddress],
+      siret: establishmentWithoutAddressFromSiretFetched.siret,
+      bName: establishmentWithoutAddressFromSiretFetched.businessName,
+    });
+  });
+
+  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION' with address provided", () => {
+    ({ store, dependencies } = createTestStore({
+      establishment: {
+        isLoading: false,
+        feedback: { kind: "readyForLinkRequestOrRedirection" },
+        formEstablishment: defaultFormEstablishmentValue(),
+      },
+    }));
+    store.dispatch(siretSlice.actions.siretModified("10002000300040"));
+    dependencies.formCompletionGateway.siretInfo$.next(
+      establishmentWithAddressFromSiretFetched,
+    );
+    expectNavigationToEstablishmentFormPageToHaveBeenTriggered({
+      siret: establishmentWithAddressFromSiretFetched.siret,
+      bName: establishmentWithAddressFromSiretFetched.businessName,
+      bAddresses: [establishmentWithAddressFromSiretFetched.businessAddress],
     });
   });
 
@@ -288,7 +313,12 @@ describe("Establishment", () => {
       const editedEstablishment: FormEstablishmentDto = {
         ...formEstablishment,
         isEngagedEnterprise: !formEstablishment.isEngagedEnterprise,
-        businessAddresses: ["26 rue des castors, 75002 Paris"],
+        businessAddresses: [
+          {
+            id: "11111111-2222-4444-1111-1111111111111111",
+            rawAddress: "26 rue des castors, 75002 Paris",
+          },
+        ],
         businessNameCustomized: "My custom name",
       };
       store.dispatch(
@@ -326,7 +356,12 @@ describe("Establishment", () => {
       const editedEstablishment: FormEstablishmentDto = {
         ...formEstablishment,
         isEngagedEnterprise: !formEstablishment.isEngagedEnterprise,
-        businessAddresses: ["26 rue des castors, 75002 Paris"],
+        businessAddresses: [
+          {
+            id: "11111111-2222-4444-1111-111111111111",
+            rawAddress: "26 rue des castors, 75002 Paris",
+          },
+        ],
         businessNameCustomized: "My custom name",
       };
       store.dispatch(

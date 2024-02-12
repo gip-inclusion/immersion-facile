@@ -1,9 +1,7 @@
 import {
-  AddressDto,
   DateTimeIsoString,
   EstablishmentSearchableBy,
   FormEstablishmentSource,
-  GeoPositionDto,
   Location,
   NafDto,
   NumberEmployeesRange,

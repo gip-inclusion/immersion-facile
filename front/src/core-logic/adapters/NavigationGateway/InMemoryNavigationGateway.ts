@@ -14,9 +14,9 @@ export class InMemoryNavigationGateway implements NavigationGateway {
   }
 
   public navigateToEstablishmentForm(
-    formEstablishment: FormEstablishmentParamsInUrl,
+    formEstablishmentParams: FormEstablishmentParamsInUrl,
   ): void {
-    this.navigatedToEstablishmentForm = formEstablishment;
+    this.navigatedToEstablishmentForm = formEstablishmentParams;
   }
 
   public get wentToUrls(): AbsoluteUrl[] {

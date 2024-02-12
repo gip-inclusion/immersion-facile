@@ -1,5 +1,5 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
-import { getAddressAndPosition } from "../../../utils/address";
+import { rawAddressToLocation } from "../../../utils/address";
 import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
@@ -64,12 +64,13 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         formEstablishment.siret,
       ),
       addressesAndPosition: await Promise.all(
-        formEstablishment.businessAddresses.map(async (address) =>
-          getAddressAndPosition(
-            this.addressAPI,
-            formEstablishment.siret,
-            address,
-          ),
+        formEstablishment.businessAddresses.map(
+          async (formEstablishmentAddress) =>
+            rawAddressToLocation(
+              this.addressAPI,
+              formEstablishment.siret,
+              formEstablishmentAddress,
+            ),
         ),
       ),
       formEstablishment,

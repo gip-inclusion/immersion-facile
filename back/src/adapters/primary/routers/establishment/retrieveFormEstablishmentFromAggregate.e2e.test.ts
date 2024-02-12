@@ -93,8 +93,10 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           establishmentAggregate.establishment.additionalInformation,
         businessName: establishmentAggregate.establishment.name,
         businessAddresses: establishmentAggregate.establishment.locations.map(
-          (addressAndPosition) =>
-            addressDtoToString(addressAndPosition.address),
+          (location) => ({
+            rawAddress: addressDtoToString(location.address),
+            id: location.id,
+          }),
         ),
         naf: establishmentAggregate.establishment?.nafDto,
         appellations: [
@@ -147,9 +149,12 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           establishmentAggregate.establishment.additionalInformation,
         businessName: establishmentAggregate.establishment.name,
         businessAddresses: [
-          addressDtoToString(
-            establishmentAggregate.establishment.locations[0].address,
-          ),
+          {
+            id: establishmentAggregate.establishment.locations[0].id,
+            rawAddress: addressDtoToString(
+              establishmentAggregate.establishment.locations[0].address,
+            ),
+          },
         ],
         naf: establishmentAggregate.establishment?.nafDto,
         appellations: [

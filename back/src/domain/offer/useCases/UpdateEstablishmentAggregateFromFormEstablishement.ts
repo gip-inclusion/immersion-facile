@@ -1,5 +1,5 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
-import { getAddressAndPosition } from "../../../utils/address";
+import { rawAddressToLocation } from "../../../utils/address";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -54,7 +54,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       },
       addressesAndPosition: await Promise.all(
         formEstablishment.businessAddresses.map(async (address) =>
-          getAddressAndPosition(
+          rawAddressToLocation(
             this.#addressGateway,
             formEstablishment.siret,
             address,

@@ -36,6 +36,11 @@ import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggre
 const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
 const fakeAddress = avenueChampsElyseesDto;
+const fakeLocation = {
+  position: fakePosition,
+  address: fakeAddress,
+  id: "11111111-2222-4444-3333-111111111111",
+};
 const fakeBusinessContact = new ContactEntityBuilder().build();
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 const numberEmployeesRanges: NumberEmployeesRange = "6-9";
@@ -114,6 +119,12 @@ describe("Insert Establishment aggregate from form data", () => {
       .withAppellations(professions)
       .withBusinessContact(fakeBusinessContact)
       .withNextAvailabilityDate(nextAvailabilityDate)
+      .withBusinessAddresses([
+        {
+          id: fakeLocation.id,
+          rawAddress: "102 rue du fake, 75001 Paris",
+        },
+      ])
       .build();
 
     prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
@@ -136,13 +147,7 @@ describe("Insert Establishment aggregate from form data", () => {
               .withIsCommited(false)
               .withName(formEstablishment.businessName)
               .withNumberOfEmployeeRange(numberEmployeesRanges)
-              .withLocations([
-                {
-                  position: fakePosition,
-                  address: fakeAddress,
-                  id: "123",
-                },
-              ])
+              .withLocations([fakeLocation])
               .withWebsite(formEstablishment.website)
               .withNextAvailabilityDate(nextAvailabilityDate)
               .build(),
@@ -208,6 +213,12 @@ describe("Insert Establishment aggregate from form data", () => {
     const newRomeCode = "A1101";
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
+      .withBusinessAddresses([
+        {
+          rawAddress: "102 rue du fake, 75001 Paris",
+          id: fakeLocation.id,
+        },
+      ])
       .withAppellations([
         {
           romeLabel: "Boulangerie",
@@ -246,7 +257,7 @@ describe("Insert Establishment aggregate from form data", () => {
       siret,
       locations: [
         {
-          id: "123",
+          id: fakeLocation.id,
           position: { lat: 1, lon: 1 },
           address: rueGuillaumeTellDto,
         },

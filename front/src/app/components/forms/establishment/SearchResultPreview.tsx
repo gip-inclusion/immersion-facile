@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
 import { FormEstablishmentDto, SearchResultDto } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { SearchResult } from "../../search/SearchResult";
@@ -28,7 +27,7 @@ const establishmentToSearchResultPreview = ({
     lon: 0,
   },
   address: {
-    streetNumberAndAddress: businessAddresses[0] ?? "",
+    streetNumberAndAddress: businessAddresses[0].rawAddress ?? "",
     city: "",
     departmentCode: "",
     postcode: "",

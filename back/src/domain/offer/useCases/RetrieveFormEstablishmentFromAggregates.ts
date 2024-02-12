@@ -11,7 +11,7 @@ import {
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/ports/UnitOfWork";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
@@ -62,7 +62,10 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       businessNameCustomized:
         establishmentAggregate.establishment.customizedName,
       businessAddresses: establishmentAggregate.establishment.locations.map(
-        (addressAndPosition) => addressDtoToString(addressAndPosition.address),
+        (location) => ({
+          id: location.id,
+          rawAddress: addressDtoToString(location.address),
+        }),
       ),
       isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
       fitForDisabledWorkers:

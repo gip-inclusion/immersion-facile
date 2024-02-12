@@ -1,3 +1,4 @@
+import { LocationId } from "../address/address.dto";
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { Email } from "../email/email.dto";
 import type { GroupName } from "../group/group.dto";
@@ -44,12 +45,17 @@ export type EstablishmentSearchableBy = {
   jobSeekers: boolean;
 };
 
+export type FormEstablishmentAddress = {
+  id: LocationId;
+  rawAddress: string;
+};
+
 export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
 
 export type FormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
-  businessAddresses: string[];
+  businessAddresses: FormEstablishmentAddress[];
   businessContact: BusinessContactDto;
   businessName: string;
   businessNameCustomized?: string;

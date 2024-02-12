@@ -4,11 +4,12 @@ import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { keys, replace } from "ramda";
-import React, { useEffect } from "react";
+import { keys } from "ramda";
 import { ErrorNotifications } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import { v4 as uuidV4 } from "uuid";
+
 import {
   AppellationAndRomeDto,
   FormEstablishmentDto,
@@ -32,8 +33,6 @@ import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
-import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { match } from "ts-pattern";
 import { Mode, OnStepChange, Step } from "../EstablishmentForm";
 import { MultipleAppellationInput } from "../MultipleAppellationInput";
@@ -133,12 +132,12 @@ export const DetailsSection = ({
         .with("create", () => <CreationSiretRelatedInputs />)
         .with("edit", () => (
           <EditionSiretRelatedInputs
-            businessAddress={formValues.businessAddresses[0]}
+            businessAddress={formValues.businessAddresses[0].rawAddress}
           />
         ))
         .with("admin", () => (
           <EditionSiretRelatedInputs
-            businessAddress={formValues.businessAddresses[0]}
+            businessAddress={formValues.businessAddresses[0].rawAddress}
           />
         ))
         .exhaustive()}
@@ -237,14 +236,22 @@ export const DetailsSection = ({
         currentAddresses={formValues.businessAddresses}
         onAddressAdded={(address, index) => {
           const currentAddresses = formValues.businessAddresses;
-          currentAddresses[index] = addressDtoToString(address);
+          currentAddresses[index] = {
+            id: uuidV4(),
+            rawAddress: addressDtoToString(address),
+          };
           setValue("businessAddresses", currentAddresses);
         }}
         onAddressDeleted={(index) => {
           const addresses = formValues.businessAddresses;
           const newAddresses =
             index === 0 && addresses.length === 1
-              ? [""]
+              ? [
+                  {
+                    id: "",
+                    rawAddress: "",
+                  },
+                ]
               : removeAtIndex(addresses, index);
           setValue("businessAddresses", newAddresses);
         }}

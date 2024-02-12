@@ -17,6 +17,7 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+import { v4 as uuidV4 } from "uuid";
 import { z } from "zod";
 import {
   FormEstablishmentDtoWithErrors,
@@ -71,7 +72,12 @@ export const candidateEstablishmentMapper = (
   try {
     const establishmentRow = establishmentCSVRowSchema.parse(csvRow);
     mappedEstablishment = {
-      businessAddresses: [establishmentRow.businessAddress],
+      businessAddresses: [
+        {
+          id: uuidV4(),
+          rawAddress: establishmentRow.businessAddress,
+        },
+      ],
       businessName: establishmentRow.businessName,
       siret: establishmentRow.siret,
       businessNameCustomized: establishmentRow.businessNameCustomized,

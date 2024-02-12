@@ -50,7 +50,9 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
               businessName: validEstablishment.businessName,
               contactFirstName: validEstablishment.businessContact.firstName,
               contactLastName: validEstablishment.businessContact.lastName,
-              businessAddresses: validEstablishment.businessAddresses,
+              businessAddresses: validEstablishment.businessAddresses.map(
+                ({ rawAddress }) => rawAddress,
+              ),
             },
             cc: validEstablishment.businessContact.copyEmails,
           },

@@ -4,6 +4,7 @@ import { SiretDto } from "../siret/siret";
 import {
   BusinessContactDto,
   EstablishmentCSVRow,
+  FormEstablishmentAddress,
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
@@ -12,9 +13,14 @@ import {
   noContactPerWeek,
 } from "./FormEstablishment.schema";
 
+export const defaultFormEstablishmentAddress = {
+  id: "364efc5a-db4f-452c-8d20-95c6a23f21fe",
+  rawAddress: "1 Rue du Moulin, 12345 Quelque Part",
+};
+
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
-  businessAddresses: ["1 Rue du Moulin, 12345 Quelque Part"],
+  businessAddresses: [defaultFormEstablishmentAddress],
   businessContact: {
     email: "amil@mail.com",
     firstName: "Esteban",
@@ -60,7 +66,12 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
 
 const emptyFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
-  businessAddresses: [""],
+  businessAddresses: [
+    {
+      id: "",
+      rawAddress: "",
+    },
+  ],
   naf: { code: "", nomenclature: "" },
   businessContact: {
     contactMethod: "EMAIL",
@@ -105,7 +116,7 @@ export class FormEstablishmentDtoBuilder
   }
 
   public buildCsvRow(): EstablishmentCSVRow {
-    return FormEstablishmentToEstablishmentCsvRow(this.#dto);
+    return formEstablishmentToEstablishmentCsvRow(this.#dto);
   }
 
   public withAppellations(appellations: AppellationAndRomeDto[]) {
@@ -115,7 +126,7 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withBusinessAddresses(businessAddresses: string[]) {
+  public withBusinessAddresses(businessAddresses: FormEstablishmentAddress[]) {
     return new FormEstablishmentDtoBuilder({ ...this.#dto, businessAddresses });
   }
 
@@ -164,10 +175,10 @@ export class FormEstablishmentDtoBuilder
   }
 }
 
-const FormEstablishmentToEstablishmentCsvRow = (
+const formEstablishmentToEstablishmentCsvRow = (
   establishment: FormEstablishmentDto,
 ): EstablishmentCSVRow => ({
-  businessAddress: establishment.businessAddresses[0],
+  businessAddress: establishment.businessAddresses[0].rawAddress,
   businessContact_email: establishment.businessContact.email,
   businessContact_firstName: establishment.businessContact.firstName,
   businessContact_lastName: establishment.businessContact.lastName,

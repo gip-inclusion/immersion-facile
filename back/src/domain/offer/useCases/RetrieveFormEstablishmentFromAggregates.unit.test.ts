@@ -100,9 +100,10 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       source: "immersion-facile",
       businessName: establishment.name,
       businessNameCustomized: establishment.customizedName,
-      businessAddresses: establishment.locations.map((addressAndPosition) =>
-        addressDtoToString(addressAndPosition.address),
-      ),
+      businessAddresses: establishment.locations.map((location) => ({
+        rawAddress: addressDtoToString(location.address),
+        id: location.id,
+      })),
       isEngagedEnterprise: establishment.isCommited,
       naf: establishment.nafDto,
       appellations: [
@@ -150,9 +151,10 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       source: "immersion-facile",
       businessName: establishment.name,
       businessNameCustomized: establishment.customizedName,
-      businessAddresses: establishment.locations.map((addressAndPosition) =>
-        addressDtoToString(addressAndPosition.address),
-      ),
+      businessAddresses: establishment.locations.map((location) => ({
+        rawAddress: addressDtoToString(location.address),
+        id: location.id,
+      })),
       isEngagedEnterprise: establishment.isCommited,
       naf: establishment.nafDto,
       appellations: [
