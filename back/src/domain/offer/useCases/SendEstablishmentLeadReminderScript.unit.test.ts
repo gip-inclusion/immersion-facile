@@ -116,7 +116,7 @@ describe("SendEstablishmentLeadReminder", () => {
     expect(
       await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
     ).toBe(
-      "http://localhost/establishment?siret=12345678901235&bName=Beta.gouv.fr&bAdress=169 boulevard de la villette, 75010 Paris&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com",
+      "http://localhost/establishment?siret=12345678901235&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com",
     );
 
     expect(
@@ -158,5 +158,10 @@ describe("SendEstablishmentLeadReminder", () => {
         },
       },
     ]);
+
+    expect(
+      (await uow.establishmentLeadRepository.getBySiret(convention.siret))
+        ?.lastEventKind,
+    ).toBe("reminder-sent");
   });
 });
