@@ -1,6 +1,7 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
 const establishmentsTableName = "establishments";
+const formEstablishmentsTableName = "form_establishments";
 const establishmentsLocationsTableName = `${establishmentsTableName}_locations`;
 const joinTableName = `${establishmentsTableName}__${establishmentsLocationsTableName}`;
 
@@ -84,6 +85,16 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     INSERT INTO ${joinTableName} (establishment_siret, location_id)
     SELECT temp_siret, id
     FROM ${establishmentsLocationsTableName}
+  `);
+
+  pgm.sql(`
+    UPDATE ${formEstablishmentsTableName}
+    SET business_addresses = jsonb_build_array(jsonb_build_object(
+      'id', jt.location_id,
+      'rawAddress', (business_addresses -> 0 ->> 'rawAddress')
+    ))
+    FROM ${joinTableName} as jt
+    WHERE ${formEstablishmentsTableName}.siret = jt.establishment_siret
   `);
 
   // drop old columns

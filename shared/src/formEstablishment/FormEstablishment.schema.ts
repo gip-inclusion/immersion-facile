@@ -14,6 +14,7 @@ import {
   zStringMinLength1,
   zStringPossiblyEmpty,
   zTrimmedString,
+  zUuidLike,
 } from "../zodUtils";
 import {
   BusinessContactDto,
@@ -80,7 +81,14 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       .optional(),
     website: zStringPossiblyEmpty,
     additionalInformation: zStringPossiblyEmpty,
-    businessAddresses: z.array(addressWithPostalCodeSchema),
+    businessAddresses: z
+      .array(
+        z.object({
+          id: zUuidLike,
+          rawAddress: addressWithPostalCodeSchema,
+        }),
+      )
+      .min(1),
     isEngagedEnterprise: zBoolean.optional(),
     fitForDisabledWorkers: zBoolean.optional(),
     naf: nafSchema.optional(),

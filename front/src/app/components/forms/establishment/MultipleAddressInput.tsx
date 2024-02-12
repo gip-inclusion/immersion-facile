@@ -1,19 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import React from "react";
-import {
-  AddressDto,
-  addressDtoToString,
-  domElementIds,
-  emptyAppellationAndRome,
-} from "shared";
+import { AddressDto, FormEstablishmentAddress, domElementIds } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { useStyles } from "tss-react/dsfr";
 
 type MultipleAddressInputProps = {
   name: string;
   label?: string;
-  currentAddresses: string[];
+  currentAddresses: FormEstablishmentAddress[];
   onAddressAdded: (address: AddressDto, index: number) => void;
   onAddressDeleted: (index: number) => void;
   error?: string;
@@ -43,13 +37,13 @@ export const MultipleAddressInput = ({
         {currentAddresses.map((address, index) => (
           <div
             className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-            key={address}
+            key={address.id}
           >
             <div className={fr.cx("fr-col", "fr-mt-2w")}>
               <AddressAutocomplete
                 disabled={disabled}
                 label={"Rechercher un métier *"}
-                initialSearchTerm={currentAddresses[index]}
+                initialSearchTerm={currentAddresses[index].rawAddress}
                 useFirstAddressOnInitialSearchTerm={false}
                 setFormValue={({ address }) => {
                   onAddressAdded(address, index);

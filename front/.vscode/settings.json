@@ -10,4 +10,7 @@
     "titleBar.inactiveForeground": "#cccccc"
   },
   "typescript.preferences.importModuleSpecifier": "non-relative",
+  "jest.runMode": {
+    "type": "watch"
+  },
 }

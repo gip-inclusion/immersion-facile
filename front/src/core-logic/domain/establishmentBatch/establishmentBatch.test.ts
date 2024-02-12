@@ -2,6 +2,7 @@ import {
   EstablishmentBatchReport,
   EstablishmentCSVRow,
   FormEstablishmentBatchDto,
+  FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
 import {
@@ -105,9 +106,31 @@ describe("Establishment batch", () => {
     expect(store.getState().establishmentBatch.feedback).toEqual(feedback);
 
   const expectCandidateEstablishmentsToEqual = (
-    candidateEstablishment: FormEstablishmentDtoWithErrors[],
-  ) =>
-    expect(store.getState().establishmentBatch.candidateEstablishments).toEqual(
-      candidateEstablishment,
-    );
+    expectedCandidateEstablishments: FormEstablishmentDtoWithErrors[],
+  ) => {
+    const { candidateEstablishments } = store.getState().establishmentBatch;
+
+    const actual = ignoreLocationIds(candidateEstablishments);
+    const expected = ignoreLocationIds(expectedCandidateEstablishments);
+
+    expect(actual).toEqual(expected);
+  };
 });
+
+const ignoreLocationIds = (
+  candidateEstablishments: FormEstablishmentDtoWithErrors[],
+): FormEstablishmentDto[] =>
+  candidateEstablishments
+    .filter(({ formEstablishment }) => !!formEstablishment)
+    .map(({ formEstablishment }) => {
+      // biome-ignore lint/style/noNonNullAssertion: we just filtered out the nulls
+      const { businessAddresses, ...rest } = formEstablishment!;
+
+      return {
+        ...rest,
+        businessAddresses: businessAddresses.map(({ rawAddress }) => ({
+          id: "irrelevant",
+          rawAddress,
+        })),
+      };
+    });

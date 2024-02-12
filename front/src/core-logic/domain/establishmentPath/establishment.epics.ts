@@ -1,5 +1,5 @@
 import { filter, map, of, switchMap, tap } from "rxjs";
-import { JwtDto } from "shared";
+import { JwtDto, SiretEstablishmentDto } from "shared";
 import {
   defaultFormEstablishmentValue,
   establishmentSlice,
@@ -47,15 +47,18 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
         "readyForLinkRequestOrRedirection",
     ),
     tap((action) => {
-      if (action.payload && typeof action.payload === "object") {
+      const payload = action.payload;
+      if (payload && typeof payload === "object") {
+        const siret: keyof SiretEstablishmentDto = "siret";
+        const businessAddress: keyof SiretEstablishmentDto = "businessAddress";
+        const businessName: keyof SiretEstablishmentDto = "businessName";
         return navigationGateway.navigateToEstablishmentForm({
-          siret: "siret" in action.payload ? action.payload.siret : "",
-          ...("businessName" in action.payload && {
-            bName: action.payload.businessName,
-          }),
-          ...("businessAddress" in action.payload && {
-            bAddress: action.payload.businessAddress,
-          }),
+          siret: siret in payload ? payload[siret] : "",
+          bName: businessName in payload ? payload[businessName] : undefined,
+          bAddresses:
+            businessAddress in payload && payload[businessAddress]
+              ? [payload[businessAddress]]
+              : undefined,
         });
       }
     }),

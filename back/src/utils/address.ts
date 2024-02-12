@@ -1,25 +1,25 @@
-import { AddressAndPosition, Location, SiretDto } from "shared";
+import { FormEstablishmentAddress, Location, SiretDto } from "shared";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { AddressGateway } from "../domain/offer/ports/AddressGateway";
 
-const uuidV4Generator = new UuidV4Generator();
-
-export const getAddressAndPosition = async (
+export const rawAddressToLocation = async (
   addressGateway: AddressGateway,
-  businessAddress: string,
   businessSiret: SiretDto,
+  formEstablishementAddress: FormEstablishmentAddress,
 ): Promise<Location> => {
   const positionAndAddress = (
-    await addressGateway.lookupStreetAddress(businessAddress)
+    await addressGateway.lookupStreetAddress(
+      formEstablishementAddress.rawAddress,
+    )
   ).at(0);
 
   if (!positionAndAddress)
     throw new Error(
-      `Cannot find the address ${businessAddress} in API for establishment with siret ${businessSiret}`,
+      `Cannot find the address ${formEstablishementAddress.rawAddress} in API for establishment with siret ${businessSiret}`,
     );
 
   return {
     ...positionAndAddress,
-    id: uuidV4Generator.new(),
+    id: formEstablishementAddress.id,
   };
 };

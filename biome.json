@@ -19,20 +19,21 @@
     "rules": {
       "recommended": true,
       "performance": {
-        "noAccumulatingSpread": { "level": "off" }
+        "noAccumulatingSpread": "off"
       },
       "suspicious": {
-        "noConfusingVoidType": { "level": "off" },
-        "noExplicitAny": { "level": "off" }
+        "noConfusingVoidType":  "off",
+        "noExplicitAny": "off"
       },
       "complexity": {
-        "noForEach": { "level": "off" }
+        "noForEach": "off"
       },
       "correctness": {
-        "useExhaustiveDependencies": { "level": "warn" }
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "warn"
       },
       "security": {
-        "noDangerouslySetInnerHtml": { "level": "off" }
+        "noDangerouslySetInnerHtml": "off"
       }
     },
     "ignore": [

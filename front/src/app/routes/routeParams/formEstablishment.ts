@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { ENV } from "src/config/environmentVariables";
 import { ValueSerializer, param } from "type-route";
+import { v4 as uuidV4 } from "uuid";
 
 export type FormEstablishmentParamsInUrl = Partial<{
   [K in FormEstablishmentKeysInUrl]: (typeof formEstablishmentParamsInUrl)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
@@ -17,7 +18,7 @@ export type FormEstablishmentParamsInUrl = Partial<{
     : never;
 }>;
 
-const stringsArraySerializer: ValueSerializer<string[]> = {
+const formEstablishmentAddressArraySerializer: ValueSerializer<string[]> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (stringsArray) => JSON.stringify(stringsArray),
 };
@@ -37,7 +38,9 @@ export const formEstablishmentParamsInUrl = {
   siret: param.query.optional.string,
   bName: param.query.optional.string,
   bNameCustomized: param.query.optional.string,
-  bAddresses: param.query.optional.ofType(stringsArraySerializer),
+  bAddresses: param.query.optional.ofType(
+    formEstablishmentAddressArraySerializer,
+  ),
   isEngagedEnterprise: param.query.optional.boolean,
   fitForDisabledWorkers: param.query.optional.boolean,
   maxContactsPerWeek: param.query.optional.number,
@@ -67,7 +70,11 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
   siret: params.siret ?? "",
   businessName: params.bName ?? "",
   businessNameCustomized: params.bNameCustomized,
-  businessAddresses: params.bAddresses ?? [],
+  businessAddresses:
+    params.bAddresses?.map((rawAddress) => ({
+      id: uuidV4(),
+      rawAddress,
+    })) ?? [],
   isEngagedEnterprise: Boolean(params.isEngagedEnterprise),
   fitForDisabledWorkers: Boolean(params.fitForDisabledWorkers),
   maxContactsPerWeek: params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
@@ -100,7 +107,9 @@ export const formEstablishmentDtoToFormEstablishmentQueryParams = (
   siret: formEstablishmentDto.siret,
   bName: formEstablishmentDto.businessName,
   bNameCustomized: formEstablishmentDto.businessNameCustomized,
-  bAddresses: formEstablishmentDto.businessAddresses,
+  bAddresses: formEstablishmentDto.businessAddresses.map(
+    ({ rawAddress }) => rawAddress,
+  ),
   isEngagedEnterprise: formEstablishmentDto.isEngagedEnterprise,
   fitForDisabledWorkers: formEstablishmentDto.fitForDisabledWorkers,
   maxContactsPerWeek:
@@ -131,7 +140,12 @@ export const createInitialFormValues = (
       businessName: "My business name, replaced by result from API",
       businessNameCustomized:
         "My Customized Business name, not replaced by API",
-      businessAddresses: ["My business address, replaced by result from API"],
+      businessAddresses: [
+        {
+          id: uuidV4(),
+          rawAddress: "My business address, replaced by result from API",
+        },
+      ],
       isEngagedEnterprise: true,
       maxContactsPerWeek: defaultMaxContactsPerWeek,
       appellations: [

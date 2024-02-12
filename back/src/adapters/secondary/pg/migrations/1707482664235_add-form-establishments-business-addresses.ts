@@ -14,7 +14,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   // copy old data to new column
   pgm.sql(`
     UPDATE ${tableName}
-    SET ${newColumnName} = jsonb_build_array(${oldColumnName});
+    SET ${newColumnName} = jsonb_build_array(jsonb_build_object(
+      'id', '11111111-2222-4444-1111-111111111111',
+      'rawAddress', ${oldColumnName}
+    ));
   `);
 
   pgm.alterColumn(tableName, newColumnName, {
@@ -35,7 +38,7 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   // copy new data to old column
   pgm.sql(`
     UPDATE ${tableName}
-    SET ${oldColumnName} = ${newColumnName}->>0;
+    SET ${oldColumnName} = ${newColumnName} -> 0 ->> 'rawAddress';
   `);
   pgm.alterColumn(tableName, oldColumnName, {
     notNull: true,

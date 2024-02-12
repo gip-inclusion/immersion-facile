@@ -24,9 +24,18 @@ describe("PgFormEstablishmentRepository", () => {
     .withSiret("88888888888888")
     .withMaxContactsPerWeek(8)
     .withBusinessAddresses([
-      "1 rue de la paix, 75001 Paris",
-      "45 rue des oligarques, 75008 Paris",
-      "12 rue de la liberté, 75011 Paris",
+      {
+        id: "364efc5a-db4f-452c-8d20-95c6a23f21fe",
+        rawAddress: "1 rue de la paix, 75001 Paris",
+      },
+      {
+        id: "22d4aaed-c79a-4f9d-b65f-3e232f7cb8cd",
+        rawAddress: "45 rue des oligarques, 75008 Paris",
+      },
+      {
+        id: "11111111-1111-4444-1111-111111111111",
+        rawAddress: "12 rue de la liberté, 75011 Paris",
+      },
     ])
     .build();
 

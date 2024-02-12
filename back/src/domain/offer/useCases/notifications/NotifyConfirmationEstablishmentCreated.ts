@@ -33,7 +33,9 @@ export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase
           contactFirstName: formEstablishment.businessContact.firstName,
           contactLastName: formEstablishment.businessContact.lastName,
           businessName: formEstablishment.businessName,
-          businessAddresses: formEstablishment.businessAddresses,
+          businessAddresses: formEstablishment.businessAddresses.map(
+            ({ rawAddress }) => rawAddress,
+          ),
         },
       },
       followedIds: {

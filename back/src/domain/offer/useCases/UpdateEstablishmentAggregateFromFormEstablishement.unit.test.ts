@@ -1,6 +1,7 @@
 import {
   AppellationAndRomeDto,
   FormEstablishmentDtoBuilder,
+  LocationId,
   SiretDto,
   addressDtoToString,
   expectPromiseToFailWith,
@@ -62,6 +63,7 @@ describe("Update Establishment aggregate from form data", () => {
     // Prepare : insert an establishment aggregate from LBB with siret
 
     const siret: SiretDto = "12345678911234";
+    const locationId: LocationId = "364efc5a-db4f-452c-8d20-95c6a23f21fe";
 
     siretGateway.setSirenEstablishment({
       siret,
@@ -112,7 +114,12 @@ describe("Update Establishment aggregate from form data", () => {
     const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
       .withAppellations([updatedAppelation])
-      .withBusinessAddresses([addressDtoToString(rueGuillaumeTellDto)])
+      .withBusinessAddresses([
+        {
+          id: locationId,
+          rawAddress: addressDtoToString(rueGuillaumeTellDto),
+        },
+      ])
       .withBusinessContact(updatedContact)
       .withNextAvailabilityDate(nextAvailabilityDate)
       .build();
@@ -130,13 +137,7 @@ describe("Update Establishment aggregate from form data", () => {
         new EstablishmentAggregateBuilder(previousAggregate)
           .withEstablishment(
             new EstablishmentEntityBuilder(previousAggregate.establishment)
-              .withLocations([
-                {
-                  address: rueGuillaumeTellDto,
-                  position: { lon: 1, lat: 2 },
-                  id: "123",
-                },
-              ])
+
               .withCreatedAt(timeGateway.now())
               .withCustomizedName(
                 updatedFormEstablishment.businessNameCustomized,
@@ -149,9 +150,9 @@ describe("Update Establishment aggregate from form data", () => {
               .withName(updatedFormEstablishment.businessName)
               .withLocations([
                 {
-                  position: { lon: 1, lat: 2 },
                   address: rueGuillaumeTellDto,
-                  id: "123",
+                  position: { lon: 1, lat: 2 },
+                  id: locationId,
                 },
               ])
               .withUpdatedAt(timeGateway.now())

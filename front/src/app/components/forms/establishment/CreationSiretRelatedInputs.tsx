@@ -5,6 +5,8 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import { v4 as uuidV4 } from "uuid";
+
 import {
   FormEstablishmentDto,
   addressDtoToString,
@@ -51,7 +53,15 @@ export const CreationSiretRelatedInputs = () => {
     );
     setValue(
       "businessAddresses.0",
-      establishmentInfos ? establishmentInfos.businessAddress : "",
+      establishmentInfos
+        ? {
+            rawAddress: establishmentInfos.businessAddress,
+            id: uuidV4(),
+          }
+        : {
+            id: "",
+            rawAddress: "",
+          },
     );
     setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
   }, [establishmentInfos]);
@@ -146,7 +156,10 @@ export const CreationSiretRelatedInputs = () => {
         initialSearchTerm={establishmentInfos?.businessAddress}
         {...formContents.businessAddresses}
         setFormValue={({ address }) =>
-          setValue("businessAddresses.0", addressDtoToString(address))
+          setValue("businessAddresses.0", {
+            id: uuidV4(),
+            rawAddress: addressDtoToString(address),
+          })
         }
         id={domElementIds.establishment.establishmentFormAddressAutocomplete}
         disabled={isFetchingSiret}
