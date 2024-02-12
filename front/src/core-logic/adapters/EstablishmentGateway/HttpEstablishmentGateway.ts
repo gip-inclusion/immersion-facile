@@ -1,6 +1,7 @@
 import { Observable, from } from "rxjs";
 import {
   BackOfficeJwt,
+  ConventionJwt,
   EstablishmentJwt,
   EstablishmentRoutes,
   FormEstablishmentDto,
@@ -124,6 +125,28 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
               /* void */
             })
             .with({ status: P.union(400, 401, 403, 409) }, ({ body }) => {
+              throw new Error(JSON.stringify(body));
+            })
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+  public rejectEstablishmentLeadRegistration$(
+    jwt: ConventionJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .unregisterEstablishmentLead({
+          headers: {
+            authorization: jwt,
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => {
+              /* void */
+            })
+            .with({ status: P.union(400, 401, 403, 404) }, ({ body }) => {
               throw new Error(JSON.stringify(body));
             })
             .otherwise(otherwiseThrow),
