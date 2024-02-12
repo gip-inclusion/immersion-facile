@@ -18,6 +18,8 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentEpics } from "src/core-logic/domain/assessment/assessment.epics";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { establishmentLeadEpics } from "src/core-logic/domain/establishmentLead/establishmentLead.epics";
+import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
@@ -65,6 +67,7 @@ const allEpics: any[] = [
   ...icUsersAdminEpics,
   ...apiConsumerEpics,
   ...partnersErroredConventionEpics,
+  ...establishmentLeadEpics,
 ];
 
 const appReducer = combineReducers({
@@ -81,6 +84,7 @@ const appReducer = combineReducers({
   [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
+  [establishmentLeadSlice.name]: establishmentLeadSlice.reducer,
   admin: combineReducers({
     [agencyAdminSlice.name]: agencyAdminSlice.reducer,
     [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,
