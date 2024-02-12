@@ -1,6 +1,7 @@
 import { Observable, Subject } from "rxjs";
 import {
   BackOfficeJwt,
+  ConventionJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
@@ -17,6 +18,8 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
   public establishmentModificationResponse$ = new Subject<void>();
 
   public formEstablishment$ = new Subject<FormEstablishmentDto>();
+
+  public unregisterEstablishmentLeadResponse$ = new Subject<void>();
 
   public addFormEstablishment$(
     _formEstablishment: FormEstablishmentDto,
@@ -47,5 +50,11 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
     _jwt: EstablishmentJwt | BackOfficeJwt,
   ): Observable<void> {
     return this.editFormEstablishmentResult$;
+  }
+
+  public rejectEstablishmentLeadRegistration$(
+    _jwt: ConventionJwt,
+  ): Observable<void> {
+    return this.unregisterEstablishmentLeadResponse$;
   }
 }

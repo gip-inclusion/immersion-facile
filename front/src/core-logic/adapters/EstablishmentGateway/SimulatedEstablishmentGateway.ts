@@ -1,11 +1,14 @@
-import { Observable, delay, of } from "rxjs";
+import { Observable, delay, of, throwError } from "rxjs";
 import {
   BackOfficeJwt,
+  ConventionJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
 } from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
+
+const failedJwt: ConventionJwt = "failedJwt";
 
 export class SimulatedEstablishmentGateway implements EstablishmentGateway {
   constructor(
@@ -55,5 +58,14 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
         : currentEstablishment,
     );
     return of(undefined).pipe(delay(this.delay));
+  }
+
+  public rejectEstablishmentLeadRegistration$(
+    jwt: ConventionJwt,
+  ): Observable<void> {
+    console.log("rejectEstablishmentLeadRegistration", jwt);
+    return jwt === failedJwt
+      ? throwError(new Error("Failed Jwt"))
+      : of(undefined).pipe(delay(this.delay));
   }
 }
