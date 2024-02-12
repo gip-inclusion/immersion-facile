@@ -1,7 +1,6 @@
 import { uniqBy } from "ramda";
 import {
   path,
-  AddressDto,
   AppellationAndRomeDto,
   AppellationCode,
   Builder,
@@ -105,7 +104,7 @@ export class InMemoryEstablishmentAggregateRepository
       (offer) => offer.appellationCode === appellationCode,
     );
     if (!offer) return;
-    const { isSearchable, ...rest } =
+    const { isSearchable: _, ...rest } =
       buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation(
         {
           establishmentAgg: aggregate,
@@ -156,12 +155,10 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async insertEstablishmentAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
+  public async insertEstablishmentAggregate(aggregate: EstablishmentAggregate) {
     this.#establishmentAggregates = [
       ...this.#establishmentAggregates,
-      ...aggregates,
+      ...[aggregate],
     ];
   }
 

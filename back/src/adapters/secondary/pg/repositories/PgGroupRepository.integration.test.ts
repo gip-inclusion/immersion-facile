@@ -147,10 +147,12 @@ describe("PgEstablishmentGroupRepository", () => {
       .build();
 
     await pgEstablishmentGroupRepository.save(carrefourGroupEntity);
-    await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+    await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate1,
+    );
+    await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate2,
-    ]);
+    );
 
     const { establishment: establishment1 } = establishmentAggregate1;
     const { establishment: establishment2 } = establishmentAggregate2;

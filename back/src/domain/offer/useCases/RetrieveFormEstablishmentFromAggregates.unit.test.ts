@@ -81,13 +81,13 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       .withAppellationCode("11987")
       .build();
 
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
         .withOffers([offer])
         .build(),
-    ]);
+    );
     // Act
     const retrievedForm = await useCase.execute(
       establishmentJwtPayload.siret,
@@ -135,13 +135,13 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       .withAppellationCode("11987")
       .build();
 
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
         .withOffers([offer])
         .build(),
-    ]);
+    );
     // Act
     const retrievedForm = await useCase.execute(siret, backOfficeJwtPayload);
 

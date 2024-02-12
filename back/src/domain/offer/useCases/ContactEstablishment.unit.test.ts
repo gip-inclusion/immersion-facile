@@ -108,9 +108,9 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid EMAIL contact request", async () => {
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregateWithEmailContact.build(),
-    ]);
+    );
 
     const discussionId = "discussion_id";
     const eventId = "contact_event_id";
@@ -135,7 +135,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid PHONE contact request", async () => {
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -148,7 +148,7 @@ describe("ContactEstablishment", () => {
         )
         .withOffers([immersionOffer])
         .build(),
-    ]);
+    );
 
     const discussionId = "discussion_id";
     const eventId = "contact_event_id";
@@ -177,7 +177,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid IN_PERSON contact requests", async () => {
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -190,7 +190,7 @@ describe("ContactEstablishment", () => {
         )
         .withOffers([immersionOffer])
         .build(),
-    ]);
+    );
 
     const discussionId = "discussion_id";
     const eventId = "contact_event_id";
@@ -222,9 +222,9 @@ describe("ContactEstablishment", () => {
     // Prepare
     const establishmentAggregate =
       establishmentAggregateWithEmailContact.build();
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate,
-    ]);
+    );
     const establishment = establishmentAggregate.establishment;
     // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
     const establishmentContact = establishmentAggregate.contact!;
@@ -283,9 +283,9 @@ describe("ContactEstablishment", () => {
       .withMaxContactsPerWeek(2)
       .withOffers([immersionOffer])
       .build();
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate,
-    ]);
+    );
     const establishment = establishmentAggregate.establishment;
     // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
     const establishmentContact = establishmentAggregate.contact!;
@@ -398,9 +398,9 @@ describe("ContactEstablishment", () => {
       const establishmentAggregate = establishmentAggregateWithEmailContact
         .withEstablishmentSiret(validEmailRequest.siret)
         .build();
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         establishmentAggregate,
-      ]);
+      );
 
       const contactDate = new Date("2022-01-01T12:00:00.000Z");
       timeGateway.setNextDate(contactDate);
@@ -431,7 +431,7 @@ describe("ContactEstablishment", () => {
     });
 
     it("throws BadRequestError for contact mode mismatch", async () => {
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -444,7 +444,7 @@ describe("ContactEstablishment", () => {
           )
           .withOffers([immersionOffer])
           .build(),
-      ]);
+      );
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
@@ -458,7 +458,7 @@ describe("ContactEstablishment", () => {
     });
 
     it("throws NotFoundError without contact id", async () => {
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -466,7 +466,7 @@ describe("ContactEstablishment", () => {
           .withoutContact() // no contact
           .withOffers([immersionOffer])
           .build(),
-      ]);
+      );
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
@@ -490,7 +490,7 @@ describe("ContactEstablishment", () => {
     });
 
     it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder().withSiret(siret).build(),
@@ -505,7 +505,7 @@ describe("ContactEstablishment", () => {
             new OfferEntityBuilder().withAppellationCode("wrong").build(),
           ])
           .build(),
-      ]);
+      );
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
@@ -525,9 +525,9 @@ describe("ContactEstablishment", () => {
         .withEstablishmentNextAvailabilityDate(addHours(timeGateway.now(), 1))
         .withOffers([immersionOffer])
         .build();
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         establishmentAggregate,
-      ]);
+      );
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({

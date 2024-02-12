@@ -114,27 +114,25 @@ describe("search route", () => {
           .build();
 
         // Prepare
-        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-          [
-            new EstablishmentAggregateBuilder()
-              .withOffers([offer1, offer2])
-              .withEstablishment(
-                new EstablishmentEntityBuilder()
-                  .withLocations([
-                    {
-                      position: {
-                        lat: 48.8531,
-                        lon: 2.34999,
-                      },
-                      address: avenueChampsElyseesDto,
-                      id: "123",
+        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+          new EstablishmentAggregateBuilder()
+            .withOffers([offer1, offer2])
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withLocations([
+                  {
+                    position: {
+                      lat: 48.8531,
+                      lon: 2.34999,
                     },
-                  ])
-                  .withWebsite("www.jobs.fr")
-                  .build(),
-              )
-              .build(),
-          ],
+                    address: avenueChampsElyseesDto,
+                    id: "123",
+                  },
+                ])
+                .withWebsite("www.jobs.fr")
+                .build(),
+            )
+            .build(),
         );
 
         // Act and assert
@@ -290,7 +288,7 @@ describe("search route", () => {
           .build();
 
         beforeEach(async () => {
-          await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+          inMemoryUow.establishmentAggregateRepository.establishmentAggregates =
             [
               new EstablishmentAggregateBuilder()
                 .withEstablishmentSiret(siret1)
@@ -354,8 +352,7 @@ describe("search route", () => {
                     .build(),
                 )
                 .build(),
-            ],
-          );
+            ];
         });
 
         it("with filter establishmentSearchableBy defined to students", async () => {

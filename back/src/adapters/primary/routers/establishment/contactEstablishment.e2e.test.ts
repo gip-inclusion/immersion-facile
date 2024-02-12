@@ -69,14 +69,12 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
       },
     ];
 
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(establishment)
-          .withContact(contact)
-          .withOffers([immersionOffer])
-          .build(),
-      ],
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(establishment)
+        .withContact(contact)
+        .withOffers([immersionOffer])
+        .build(),
     );
 
     const result = await sharedRequest.contactEstablishment({

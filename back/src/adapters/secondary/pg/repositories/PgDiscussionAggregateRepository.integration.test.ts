@@ -237,13 +237,13 @@ describe("PgDiscussionAggregateRepository", () => {
     const siret = "11112222333344";
     const since = new Date("2023-03-05");
 
-    await establishmentAggregateRepo.insertEstablishmentAggregates([
+    await establishmentAggregateRepo.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siret)
         .withContactId("12345678-1111-2222-3333-444444444444")
         .withOffers([offer])
         .build(),
-    ]);
+    );
 
     const discussionAggregate1 = new DiscussionAggregateBuilder()
       .withSiret(siret)
@@ -281,13 +281,13 @@ describe("PgDiscussionAggregateRepository", () => {
     const siret = "12212222333344";
     const since = new Date("2023-03-05");
 
-    await establishmentAggregateRepo.insertEstablishmentAggregates([
+    await establishmentAggregateRepo.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siret)
         .withContactId("12345678-1111-2222-3333-444444444455")
         .withOffers([offer])
         .build(),
-    ]);
+    );
 
     const discussionAggregate1 = new DiscussionAggregateBuilder()
       .withSiret(siret)

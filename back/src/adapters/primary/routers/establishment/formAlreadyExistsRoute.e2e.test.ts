@@ -35,14 +35,12 @@ describe("route to check if a form's siret already exists", () => {
   });
 
   it("Returns true if the siret exists", async () => {
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder().withSiret(siret).build(),
-          )
-          .build(),
-      ],
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
+        )
+        .build(),
     );
 
     const response = await httpClient.isSiretAlreadySaved({

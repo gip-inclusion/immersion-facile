@@ -9,7 +9,6 @@ import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
-import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -129,29 +128,27 @@ describe("POST contact-establishment public V2 route", () => {
 
   it("rejects invalid requests with mismatching contact Mode with error code 400", async () => {
     const testEstablishmentContactMethod = "PHONE";
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withSiret(contactEstablishment.siret)
-              .withLocations([TEST_LOCATION])
-              .withNumberOfEmployeeRange("10-19")
-              .build(),
-          )
-          .withContact(
-            new ContactEntityBuilder()
-              .withContactMethod(testEstablishmentContactMethod)
-              .build(),
-          )
-          .withOffers([
-            new OfferEntityBuilder()
-              .withAppellationCode(contactEstablishment.appellationCode)
-              .build(),
-          ])
-          .build(),
-      ],
-    );
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(contactEstablishment.siret)
+            .withLocations([TEST_LOCATION])
+            .withNumberOfEmployeeRange("10-19")
+            .build(),
+        )
+        .withContact(
+          new ContactEntityBuilder()
+            .withContactMethod(testEstablishmentContactMethod)
+            .build(),
+        )
+        .withOffers([
+          new OfferEntityBuilder()
+            .withAppellationCode(contactEstablishment.appellationCode)
+            .build(),
+        ])
+        .build(),
+    ];
 
     const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
@@ -169,27 +166,25 @@ describe("POST contact-establishment public V2 route", () => {
 
   it("rejects invalid requests with mismatching appellation Code with error code 400", async () => {
     const testEstablishmentAppellationCode = "11704";
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withSiret(contactEstablishment.siret)
-              .withLocations([TEST_LOCATION])
-              .withNumberOfEmployeeRange("10-19")
-              .build(),
-          )
-          .withContact(
-            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-          )
-          .withOffers([
-            new OfferEntityBuilder()
-              .withAppellationCode(testEstablishmentAppellationCode)
-              .build(),
-          ])
-          .build(),
-      ],
-    );
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(contactEstablishment.siret)
+            .withLocations([TEST_LOCATION])
+            .withNumberOfEmployeeRange("10-19")
+            .build(),
+        )
+        .withContact(
+          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
+        )
+        .withOffers([
+          new OfferEntityBuilder()
+            .withAppellationCode(testEstablishmentAppellationCode)
+            .build(),
+        ])
+        .build(),
+    ];
 
     const { body, status } = await sharedRequest.contactEstablishment({
       headers: {
@@ -206,27 +201,25 @@ describe("POST contact-establishment public V2 route", () => {
   });
 
   it("contacts the establishment when everything goes right", async () => {
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withSiret(contactEstablishment.siret)
-              .withLocations([TEST_LOCATION])
-              .withNumberOfEmployeeRange("10-19")
-              .build(),
-          )
-          .withContact(
-            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-          )
-          .withOffers([
-            new OfferEntityBuilder()
-              .withAppellationCode(contactEstablishment.appellationCode)
-              .build(),
-          ])
-          .build(),
-      ],
-    );
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(contactEstablishment.siret)
+            .withLocations([TEST_LOCATION])
+            .withNumberOfEmployeeRange("10-19")
+            .build(),
+        )
+        .withContact(
+          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
+        )
+        .withOffers([
+          new OfferEntityBuilder()
+            .withAppellationCode(contactEstablishment.appellationCode)
+            .build(),
+        ])
+        .build(),
+    ];
 
     const { body, status } = await request
       .post("/v2/contact-establishment")

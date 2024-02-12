@@ -5,12 +5,14 @@ import {
   NafDto,
   NumberEmployeesRange,
   SiretEstablishmentDto,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemoryAddressGateway,
@@ -30,7 +32,6 @@ import {
   TEST_OPEN_ESTABLISHMENT_1,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 const fakeSiret = "90040893100013";
@@ -186,7 +187,7 @@ describe("Insert Establishment aggregate from form data", () => {
     expect(establishmentAggregate.establishment.numberEmployeesRange).toBe("0");
   });
 
-  it("Removes (and replaces) establishment and offers with same siret if exists", async () => {
+  it("Throws if establishment and offers with same siret already exists", async () => {
     const siret = "12345678911234";
     // Prepare : insert an establishment aggregate from LBB with siret
     const previousContact = new ContactEntityBuilder()
@@ -197,7 +198,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withName("Previous name")
       .build();
 
-    const previousAggregate = new EstablishmentAggregateBuilder()
+    const aggregateInRepo = new EstablishmentAggregateBuilder()
       .withEstablishment(previousEstablishment)
       .withOffers([
         new OfferEntityBuilder().build(),
@@ -207,7 +208,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .build();
 
     uow.establishmentAggregateRepository.establishmentAggregates = [
-      previousAggregate,
+      aggregateInRepo,
     ];
 
     const newRomeCode = "A1101";
@@ -243,47 +244,15 @@ describe("Insert Establishment aggregate from form data", () => {
       },
     ]);
 
-    // Act : execute use-case with same siret
-    await useCase.execute({ formEstablishment });
+    await expectPromiseToFailWithError(
+      useCase.execute({ formEstablishment }),
+      new ConflictError(`Establishment with siret ${siret} already exists`),
+    );
 
-    // Assert
-    // One aggregate only
-    expect(
+    expectToEqual(
       uow.establishmentAggregateRepository.establishmentAggregates,
-    ).toHaveLength(1);
-
-    // Establishment matches update from form
-    const partialExpectedEstablishment: Partial<EstablishmentEntity> = {
-      siret,
-      locations: [
-        {
-          id: fakeLocation.id,
-          position: { lat: 1, lon: 1 },
-          address: rueGuillaumeTellDto,
-        },
-      ],
-      isOpen: true,
-      name: formEstablishment.businessName,
-    };
-    expect(
-      uow.establishmentAggregateRepository.establishmentAggregates[0]
-        .establishment,
-    ).toMatchObject(partialExpectedEstablishment);
-
-    // Offers match update from form
-    expect(
-      uow.establishmentAggregateRepository.establishmentAggregates[0].offers,
-    ).toHaveLength(1);
-    expect(
-      uow.establishmentAggregateRepository.establishmentAggregates[0].offers[0]
-        .romeCode,
-    ).toEqual(newRomeCode);
-
-    // Contact match update from form
-    expect(
-      uow.establishmentAggregateRepository.establishmentAggregates[0].contact
-        ?.email,
-    ).toBe("new.contact@gmail.com");
+      [aggregateInRepo],
+    );
   });
 
   it("Publishes an event with the new establishment aggregate as payload", async () => {
