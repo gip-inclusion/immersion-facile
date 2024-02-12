@@ -43,6 +43,8 @@ export class MarkEstablishmentLeadAsRegistrationRejected extends TransactionalUs
         `No establishment lead were found with siret ${convention.siret}`,
       );
 
+    if (establishmentLead.lastEventKind === "registration-refused") return;
+
     const { siret, events } = establishmentLead;
     const updatedEstablishmentLead: EstablishmentLead = {
       siret,
