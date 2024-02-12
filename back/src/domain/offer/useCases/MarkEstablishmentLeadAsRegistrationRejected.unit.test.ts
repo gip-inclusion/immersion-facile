@@ -95,4 +95,40 @@ describe("MarkEstablishmentLeadAsRegistrationRejected", () => {
       },
     ]);
   });
+
+  it("doesn't update establishmentLead's kind when last event king is already registration rejected", async () => {
+    const alreadySavedLead: EstablishmentLead = {
+      siret: convention.siret,
+      lastEventKind: "registration-refused",
+      events: [
+        {
+          conventionId: convention.id,
+          kind: "to-be-reminded",
+          occurredAt: subDays(new Date(), 2),
+        },
+        {
+          kind: "reminder-sent",
+          occurredAt: subDays(new Date(), 1),
+          notification: { id: "my-fake-notification-id", kind: "email" },
+        },
+        {
+          kind: "registration-refused",
+          occurredAt: new Date(),
+        },
+      ],
+    };
+
+    uow.conventionRepository.setConventions([convention]);
+    uow.establishmentLeadRepository.establishmentLeads = [alreadySavedLead];
+
+    await usecase.execute(undefined, conventionJwt);
+
+    expectToEqual(uow.establishmentLeadRepository.establishmentLeads, [
+      {
+        ...alreadySavedLead,
+        lastEventKind: "registration-refused",
+        events: [...alreadySavedLead.events],
+      },
+    ]);
+  });
 });
