@@ -108,6 +108,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     (params) => `/etablissement/${params.consumer}`,
   ),
+  unregisterEstablishmentLead: defineRoute(
+    {
+      jwt: param.query.string,
+    },
+    () => `/${frontRoutes.unregisterEstablishmentLead}`,
+  ),
   group: defineRoute(
     { groupSlug: param.path.string },
     (params) => `/${frontRoutes.group}/${params.groupSlug}`,

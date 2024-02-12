@@ -31,6 +31,7 @@ export const frontRoutes = {
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
   search: "recherche",
   standard: "pages",
+  unregisterEstablishmentLead: "etablissement/refus-referencement",
 };
 
 export const contactEstablishmentRoute = "contact-establishment";
