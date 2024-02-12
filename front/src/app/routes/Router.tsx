@@ -13,6 +13,7 @@ import { ConventionStatusDashboardPage } from "src/app/pages/convention/Conventi
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
+import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { EstablishmentDashboardPage } from "src/app/pages/establishmentDashboard/EstablishmentDashboardPage";
 import { OpenApiDocPage } from "src/app/pages/open-api-doc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
@@ -124,6 +125,9 @@ const getPageByRouteName: {
       <ErrorPage type="httpClientNotFoundError" />
     ),
   stats: () => <StatsPage />,
+  unregisterEstablishmentLead: (route) => (
+    <EstablishmentLeadRegistrationRejectedPage route={route} />
+  ),
 };
 
 export const Router = () => {
