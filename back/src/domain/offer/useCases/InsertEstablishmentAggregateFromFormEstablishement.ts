@@ -1,4 +1,5 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { rawAddressToLocation } from "../../../utils/address";
 import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
@@ -44,16 +45,16 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     const log = makeLog(formEstablishment.siret);
 
     log("Start");
-    // Remove existing aggregate that could have been inserted by another process (eg. La Bonne Boite)
+
     const establishment =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         formEstablishment.siret,
       );
+
     if (establishment) {
-      await uow.establishmentAggregateRepository.delete(
-        formEstablishment.siret,
+      throw new ConflictError(
+        `Establishment with siret ${formEstablishment.siret} already exists`,
       );
-      log("Cleared existing Aggregate");
     }
 
     const establishmentAggregate = await makeEstablishmentAggregate({
@@ -80,7 +81,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     log(`About to save : ${JSON.stringify(establishmentAggregate, null, 2)}`);
 
     await uow.establishmentAggregateRepository
-      .insertEstablishmentAggregates([establishmentAggregate])
+      .insertEstablishmentAggregate(establishmentAggregate)
       .catch((err) => {
         notifyAndThrowErrorDiscord(
           new Error(

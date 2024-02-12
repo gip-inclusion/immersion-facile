@@ -53,7 +53,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   async #insertApiConsumer(apiConsumer: ApiConsumer) {
     const { rights, ...rest } = apiConsumer;
     const rightsWithoutSubscriptions = mapObjIndexed(
-      ({ subscriptions, ...rest }) => rest,
+      ({ subscriptions: _, ...rest }) => rest,
       rights,
     );
 

@@ -19,6 +19,12 @@ export interface Database {
   api_consumers_subscriptions: ApiConsumersSubscriptions;
   authenticated_users: AuthenticatedUsers;
   ongoing_oauths: OngoingOauths;
+  establishments: Establishments;
+  establishments_locations: EstablishmentsLocations;
+  establishments__establishments_locations: EstablishmentsEstablishmentsLocations;
+  establishments__immersion_contacts: EstablishmentsImmersionContacts;
+  immersion_contacts: ImmersionContacts;
+  immersion_offers: ImmersionOffers;
 }
 
 type JsonArray = JsonValue[];
@@ -292,4 +298,70 @@ interface OngoingOauths {
   access_token: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
+}
+export interface Establishments {
+  siret: string;
+  name: string | null;
+  legacy_address: string | null;
+  number_employees: string | null;
+  naf_code: string | null;
+  is_open: Generated<boolean>;
+  created_at: Timestamp;
+  update_date: Timestamp | null;
+  customized_name: string | null;
+  is_commited: boolean | null;
+  naf_nomenclature: string | null;
+  source_provider: string;
+  is_searchable: Generated<boolean>;
+  website: Generated<string | null>;
+  additional_information: Generated<string>;
+  fit_for_disabled_workers: Generated<boolean | null>;
+  max_contacts_per_week: number;
+  last_insee_check_date: Timestamp | null;
+  next_availability_date: Timestamp | null;
+  searchable_by_students: boolean;
+  searchable_by_job_seekers: boolean;
+}
+
+export interface EstablishmentsEstablishmentsLocations {
+  establishment_siret: string;
+  location_id: string;
+}
+
+export interface EstablishmentsImmersionContacts {
+  establishment_siret: string;
+  contact_uuid: string;
+}
+
+export interface EstablishmentsLocations {
+  id: string;
+  post_code: string;
+  city: string;
+  street_number_and_address: string;
+  department_code: string;
+  lat: number;
+  lon: number;
+  position: string;
+}
+
+export interface ImmersionOffers {
+  rome_code: string;
+  siret: string;
+  created_at: Generated<Timestamp>;
+  update_date: Generated<Timestamp>;
+  score: Generated<number | null>;
+  appellation_code: number;
+}
+
+export type ContactMode = "EMAIL" | "IN_PERSON" | "PHONE";
+
+export interface ImmersionContacts {
+  uuid: string;
+  lastname: string;
+  firstname: string;
+  email: string;
+  job: string;
+  phone: string | null;
+  contact_mode: ContactMode;
+  copy_emails: Generated<Json>;
 }

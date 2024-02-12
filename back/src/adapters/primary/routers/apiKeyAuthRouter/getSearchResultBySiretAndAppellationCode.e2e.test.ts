@@ -64,28 +64,26 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       unauthorizedApiConsumer,
       authorizedUnJeuneUneSolutionApiConsumer,
     ];
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withSiret(immersionOfferSiret)
-              .withLocations([TEST_LOCATION])
-              .withNumberOfEmployeeRange("10-19")
-              .build(),
-          )
-          .withContact(
-            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-          )
-          .withOffers([
-            new OfferEntityBuilder()
-              .withRomeCode(styliste.romeCode)
-              .withAppellationCode(styliste.appellationCode)
-              .withAppellationLabel(styliste.appellationLabel)
-              .build(),
-          ])
-          .build(),
-      ],
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(immersionOfferSiret)
+            .withLocations([TEST_LOCATION])
+            .withNumberOfEmployeeRange("10-19")
+            .build(),
+        )
+        .withContact(
+          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
+        )
+        .withOffers([
+          new OfferEntityBuilder()
+            .withRomeCode(styliste.romeCode)
+            .withAppellationCode(styliste.appellationCode)
+            .withAppellationLabel(styliste.appellationLabel)
+            .build(),
+        ])
+        .build(),
     );
   });
 

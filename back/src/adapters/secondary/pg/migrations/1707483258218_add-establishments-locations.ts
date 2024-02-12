@@ -56,6 +56,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       type: "VARCHAR(14)",
       notNull: true,
       references: "establishments",
+      onDelete: "CASCADE",
     },
     location_id: {
       type: "UUID",
@@ -104,6 +105,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     "street_number_and_address",
     "department_code",
     "gps",
+    "lat",
+    "lon",
   ]);
   pgm.dropColumn(establishmentsLocationsTableName, "temp_siret");
   createSDRView(pgm, "up");
@@ -142,6 +145,14 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
       type: "GEOGRAPHY(POINT)",
       notNull: false,
     },
+    lat: {
+      type: "DOUBLE PRECISION",
+      notNull: false,
+    },
+    lon: {
+      type: "DOUBLE PRECISION",
+      notNull: false,
+    },
   });
 
   // update establishments from establishments_locations old columns based on the join table
@@ -151,7 +162,9 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
       city = el.city,
       street_number_and_address = el.street_number_and_address,
       department_code = el.department_code,
-      gps = el.position
+      gps = el.position,
+      lat = el.lat,
+      lon = el.lon
     FROM ${establishmentsLocationsTableName} el, ${joinTableName}
     WHERE ${establishmentsTableName}.siret = ${joinTableName}.establishment_siret
       AND el.id = ${joinTableName}.location_id
@@ -171,6 +184,12 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     notNull: true,
   });
   pgm.alterColumn(establishmentsTableName, "gps", {
+    notNull: true,
+  });
+  pgm.alterColumn(establishmentsTableName, "lat", {
+    notNull: true,
+  });
+  pgm.alterColumn(establishmentsTableName, "lon", {
     notNull: true,
   });
 

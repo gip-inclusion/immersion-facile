@@ -64,8 +64,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
   )} 200 Retrieves form establishment from aggregates when exists and authenticated with establishment jwt`, async () => {
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [establishmentAggregate],
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      establishmentAggregate,
     );
 
     const response = await httpClient.getFormEstablishment({
@@ -123,8 +123,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
   )} 200 Retrieves form establishment from aggregates when exists and authenticated with backoffice jwt`, async () => {
-    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
-      [establishmentAggregate],
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      establishmentAggregate,
     );
 
     const response = await httpClient.getFormEstablishment({

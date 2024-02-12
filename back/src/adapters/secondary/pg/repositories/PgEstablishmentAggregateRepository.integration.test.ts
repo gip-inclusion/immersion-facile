@@ -72,6 +72,7 @@ describe("PgEstablishmentAggregateRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_contacts");
     await client.query("DELETE FROM discussions");
+    await client.query("DELETE FROM establishments_locations CASCADE");
     await client.query("DELETE FROM establishments");
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
@@ -630,9 +631,9 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withEstablishmentNextAvailabilityDate(new Date())
         .build();
 
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         aggregate,
-      ]);
+      );
 
       const searchResults =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
@@ -658,13 +659,6 @@ describe("PgEstablishmentAggregateRepository", () => {
     const siret2 = "22222222222222";
 
     describe("create new establishments", () => {
-      it("does nothing if empty list given", async () => {
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates(
-          [],
-        );
-        expect(await getAllEstablishmentsRows(client)).toHaveLength(0);
-      });
-
       it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
         // Prepare
         const establishmentToInsert = new EstablishmentEntityBuilder()
@@ -673,11 +667,11 @@ describe("PgEstablishmentAggregateRepository", () => {
           .build();
 
         // Act;
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
             .withEstablishment(establishmentToInsert)
             .build(),
-        ]);
+        );
 
         // Assert
         const expectedEstablishmentRow: Partial<PgEstablishmentRow> = {
@@ -707,17 +701,19 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("adds one new row per establishment in `establishments` table when multiple establishments are given", async () => {
         // Act
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
             .withOffers([new OfferEntityBuilder().build()])
             .build(),
+        );
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret2)
             .withOffers([new OfferEntityBuilder().build()])
             .withGeneratedContactId()
             .build(),
-        ]);
+        );
         // Assert
         const establishmentsRows = await getAllEstablishmentsRows(client);
         expect(establishmentsRows).toHaveLength(2);
@@ -736,12 +732,12 @@ describe("PgEstablishmentAggregateRepository", () => {
           .build();
 
         // Act
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
             .withContact(contact)
             .build(),
-        ]);
+        );
 
         // Assert
         expectToEqual(await getAllImmersionContactsRows(client), [
@@ -784,9 +780,9 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build();
 
         // Act
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregateToInsert,
-        ]);
+        );
 
         // Assert
 
@@ -843,16 +839,18 @@ describe("PgEstablishmentAggregateRepository", () => {
       const romeCode = "A1101";
       const siretWithRomeCodeOffer = "11111111111111";
       const siretWithoutRomeCodeOffer = "22222222222222";
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siretWithRomeCodeOffer)
           .withOffers([new OfferEntityBuilder().withRomeCode(romeCode).build()])
           .build(),
+      );
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siretWithoutRomeCodeOffer)
           .withContactId("12233432-1111-2222-3333-123456789123")
           .build(),
-      ]);
+      );
 
       // Act
       const actualSiretOfEstablishmentsWithRomeCode =
@@ -886,9 +884,9 @@ describe("PgEstablishmentAggregateRepository", () => {
         })
         .build();
 
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         establishmentAggregate,
-      ]);
+      );
       expectToEqual(
         await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
           establishmentAggregate.establishment.siret,
@@ -995,9 +993,9 @@ describe("PgEstablishmentAggregateRepository", () => {
           jobSeekers: false,
         })
         .build();
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         aggregate,
-      ]);
+      );
     });
 
     it("returns an empty list if no establishment found with this siret", async () => {
@@ -1082,13 +1080,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         id: "123",
       };
 
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishment(establishment)
           .withOffers([boulangerOffer1, boulangerOffer2, otherOffer])
           .withContact(contact)
           .build(),
-      ]);
+      );
 
       // Act
       const actualSearchResultDto =

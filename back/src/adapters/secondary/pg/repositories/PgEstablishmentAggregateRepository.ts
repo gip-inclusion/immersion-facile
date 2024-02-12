@@ -1,9 +1,9 @@
+import { sql } from "kysely";
 import format from "pg-format";
 import { equals, keys } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
-  GeoPositionDto,
   RomeCode,
   SearchResultDto,
   SearchSortedBy,
@@ -138,13 +138,13 @@ export class PgEstablishmentAggregateRepository
                 'website', e.website, 
                 'additionalInformation', e.additional_information, 
                 'address', JSON_BUILD_OBJECT(
-                  'streetNumberAndAddress', e.street_number_and_address, 
-                  'postcode', e.post_code,
-                  'city', e.city,
-                  'departmentCode', e.department_code
+                  'streetNumberAndAddress', loc.street_number_and_address, 
+                  'postcode', loc.post_code,
+                  'city', loc.city,
+                  'departmentCode', loc.department_code
                 ),  
                 'sourceProvider', e.source_provider, 
-                'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+                'position', JSON_BUILD_OBJECT('lon', loc.lon, 'lat', loc.lat), 
                 'nafDto', JSON_BUILD_OBJECT(
                   'code', e.naf_code, 
                   'nomenclature', e.naf_nomenclature
@@ -185,7 +185,8 @@ export class PgEstablishmentAggregateRepository
           LEFT JOIN establishments AS e ON e.siret = io.siret 
           LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret 
           LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid;
-        
+          LEFT JOIN establishments__establishments_locations eel ON establishments.siret = eel.establishment_siret
+          LEFT JOIN establishments_locations loc ON loc.id = eel.location_id
         `,
         [siret],
       )
@@ -243,6 +244,7 @@ export class PgEstablishmentAggregateRepository
     siret: SiretDto,
     appellationCode: AppellationCode,
   ): Promise<SearchResultDto | undefined> {
+    console.log("1. getSearchImmersionResultDtoBySiretAndAppellationCode");
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
@@ -256,7 +258,7 @@ export class PgEstablishmentAggregateRepository
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
     if (!immersionSearchResultDto) return;
-    const { isSearchable, ...rest } = immersionSearchResultDto;
+    const { isSearchable: _, ...rest } = immersionSearchResultDto;
     return rest;
   }
 
@@ -331,22 +333,14 @@ export class PgEstablishmentAggregateRepository
     return pgResult.rows[0].exists;
   }
 
-  public async insertEstablishmentAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    await this.#upsertEstablishmentsFromAggregates(aggregates);
-    await this.#insertContactsFromAggregates(aggregates);
+  public async insertEstablishmentAggregate(aggregate: EstablishmentAggregate) {
+    await this.#insertEstablishmentFromAggregate(aggregate);
+    await this.#insertContactFromAggregate(aggregate);
     await this.createImmersionOffersToEstablishments(
-      aggregates.reduce<OfferWithSiret[]>(
-        (offersWithSiret, aggregate) => [
-          ...offersWithSiret,
-          ...aggregate.offers.map((immersionOffer) => ({
-            siret: aggregate.establishment.siret,
-            ...immersionOffer,
-          })),
-        ],
-        [],
-      ),
+      aggregate.offers.map((immersionOffer) => ({
+        siret: aggregate.establishment.siret,
+        ...immersionOffer,
+      })),
     );
   }
 
@@ -385,6 +379,7 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
+    console.log("2. searchImmersionResults");
     const romeCodes =
       searchMade.romeCode ??
       (await this.#getRomeCodeFromAppellationCode(searchMade.appellationCodes));
@@ -397,24 +392,35 @@ export class PgEstablishmentAggregateRepository
       : "";
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
-      `WITH active_establishments_within_area AS 
-        (SELECT siret, fit_for_disabled_workers, gps
-         FROM establishments 
-         WHERE is_open 
-         ${andSearchableByFilter}
-         AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
+      `WITH active_establishments_within_area AS (
+          SELECT siret, fit_for_disabled_workers, loc.*
+          FROM establishments 
+            LEFT JOIN establishments__establishments_locations eel ON establishments.siret = eel.establishment_siret
+            LEFT JOIN establishments_locations loc ON loc.id = eel.location_id
+          WHERE is_open 
+          ${andSearchableByFilter}
+            AND ST_DWithin(loc.position, ST_GeographyFromText($1), $2)
+        ),
         matching_offers AS (
           SELECT 
-            aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+            aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,
             ${buildAppellationsArray} AS appellations,
             MAX(created_at) AS max_created_at, 
-            fit_for_disabled_workers
+            fit_for_disabled_workers,
+            aewa.position,
+            aewa.lat,
+            aewa.lon,
+            aewa.city,
+            aewa.street_number_and_address,
+            aewa.department_code,
+            aewa.post_code
           FROM active_establishments_within_area aewa 
             LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
             LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
             LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
             ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
-            GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
+            GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
+              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code)
           )
         SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
         LIMIT $3`,
@@ -466,7 +472,7 @@ export class PgEstablishmentAggregateRepository
 
     // Create contact if it does'not exist
     if (!existingAggregate.contact) {
-      await this.#insertContactsFromAggregates([updatedAggregate]);
+      await this.#insertContactFromAggregate(updatedAggregate);
     } else {
       // Update contact if it has changed
       await this.#updateContactFromAggregates(
@@ -511,59 +517,85 @@ export class PgEstablishmentAggregateRepository
     establishment: EstablishmentEntity,
     updatedAt: Date,
   ): Promise<void> {
-    const updateQuery = `
-      UPDATE establishments
-        SET 
-          update_date = %1$L,
-          is_open = %2$L,
-          naf_code = %3$L,
-          naf_nomenclature=%4$L,
-          number_employees=%5$L,
-          street_number_and_address=%6$L,
-          post_code=%7$L,
-          city=%8$L,
-          department_code=%9$L,
-          gps=ST_GeographyFromText(%10$L),
-          lon=%11$L,
-          lat=%12$L,
-          name=%13$L,
-          customized_name=%14$L,
-          is_searchable=%15$L,
-          is_commited=%16$L,
-          website=%17$L,
-          additional_information=%18$L,
-          fit_for_disabled_workers=%19$L,
-          max_contacts_per_week=%20$L,
-          next_availability_date=%21$L
-        WHERE siret=%22$L;`;
-    const queryArgs = [
-      updatedAt.toISOString(),
-      establishment.isOpen,
-      establishment.nafDto?.code,
-      establishment.nafDto?.nomenclature,
-      establishment.numberEmployeesRange,
-      // establishment.address?.streetNumberAndAddress,
-      // establishment.address?.postcode,
-      // establishment.address?.city,
-      // establishment.address?.departmentCode,
-      // establishment.position
-      //   ? `POINT(${establishment.position.lon} ${establishment.position.lat})`
-      //   : undefined,
-      // establishment.position?.lon,
-      // establishment.position?.lat,
-      establishment.name,
-      establishment.customizedName,
-      establishment.isSearchable,
-      establishment.isCommited,
-      establishment.website,
-      establishment.additionalInformation,
-      establishment.fitForDisabledWorkers,
-      establishment.maxContactsPerWeek,
-      establishment.nextAvailabilityDate,
-      establishment.siret,
-    ];
-    const formatedQuery = format(updateQuery, ...queryArgs);
-    await executeKyselyRawSqlQuery(this.transaction, formatedQuery);
+    const existingSiret = await this.transaction
+      .selectFrom("establishments")
+      .select(["siret"])
+      .where("siret", "=", establishment.siret)
+      .executeTakeFirst();
+
+    if (existingSiret) {
+      await this.transaction
+        .updateTable("establishments")
+        .set({
+          siret: establishment.siret,
+          name: establishment.name,
+          customized_name: establishment.customizedName,
+          website: establishment.website,
+          additional_information: establishment.additionalInformation,
+          number_employees: establishment.numberEmployeesRange,
+          naf_code: establishment.nafDto.code,
+          naf_nomenclature: establishment.nafDto.nomenclature,
+          source_provider: establishment.sourceProvider,
+          update_date: updatedAt,
+          is_open: establishment.isOpen,
+          is_searchable: establishment.isSearchable,
+          is_commited: establishment.isCommited,
+          fit_for_disabled_workers: establishment.fitForDisabledWorkers,
+          max_contacts_per_week: establishment.maxContactsPerWeek,
+          last_insee_check_date: establishment.lastInseeCheckDate,
+          created_at: establishment.createdAt,
+          next_availability_date: establishment.nextAvailabilityDate,
+          searchable_by_students: establishment.searchableBy.students,
+          searchable_by_job_seekers: establishment.searchableBy.jobSeekers,
+        })
+        .where("siret", "=", establishment.siret)
+        .execute();
+
+      await this.transaction
+        .with("eel", (qb) =>
+          qb
+            .selectFrom("establishments__establishments_locations")
+            .selectAll()
+            .where("establishment_siret", "=", establishment.siret),
+        )
+        .deleteFrom("establishments_locations")
+        .using("eel")
+        .where("eel.establishment_siret", "=", establishment.siret)
+        .execute();
+
+      await this.transaction
+        .deleteFrom("establishments__establishments_locations")
+        .where("establishment_siret", "=", establishment.siret)
+        .execute();
+
+      await this.transaction
+        .insertInto("establishments_locations")
+        .values(
+          establishment.locations.map(({ address, id, position }) => ({
+            id,
+            city: address.city,
+            department_code: address.departmentCode,
+            post_code: address.postcode,
+            street_number_and_address: address.streetNumberAndAddress,
+            lat: position.lat,
+            lon: position.lon,
+            position: sql`ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`,
+          })),
+        )
+        .execute();
+
+      await this.transaction
+        .insertInto("establishments__establishments_locations")
+        .values(
+          establishment.locations.map(({ id }) => ({
+            establishment_siret: establishment.siret,
+            location_id: id,
+          })),
+        )
+        .execute();
+
+      this.transaction.updateTable("establishments").where("siret", "=", "");
+    }
   }
 
   async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
@@ -616,108 +648,211 @@ export class PgEstablishmentAggregateRepository
     );
   }
 
-  async #upsertEstablishmentsFromAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    //prettier-ignore
-    const establishmentFields = aggregates.map(({ establishment }) => [
-      establishment.siret,
-      establishment.name,
-      establishment.customizedName,
-      establishment.website,
-      establishment.additionalInformation,
-      // establishment.address.streetNumberAndAddress,
-      // establishment.address.postcode,
-      // establishment.address.city,
-      // establishment.address.departmentCode,
-      establishment.numberEmployeesRange,
-      establishment.nafDto.code,
-      establishment.nafDto.nomenclature,
-      establishment.sourceProvider,
-      // convertPositionToStGeography(establishment.position),
-      // establishment.position.lon,
-      // establishment.position.lat,
-      establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
-      establishment.isOpen,
-      establishment.isSearchable,
-      establishment.isCommited,
-      establishment.fitForDisabledWorkers,
-      establishment.maxContactsPerWeek,
-      establishment.lastInseeCheckDate
-        ? establishment.lastInseeCheckDate.toISOString()
-        : null,
-      establishment.createdAt,
-      establishment.nextAvailabilityDate ?? null,
-      establishment.searchableBy.students,
-      establishment.searchableBy.jobSeekers,
-    ]);
+  async #insertEstablishmentFromAggregate(aggregate: EstablishmentAggregate) {
+    await this.transaction
+      .insertInto("establishments")
+      .values({
+        siret: aggregate.establishment.siret,
+        name: aggregate.establishment.name,
+        customized_name: aggregate.establishment.customizedName,
+        website: aggregate.establishment.website,
+        additional_information: aggregate.establishment.additionalInformation,
+        number_employees: aggregate.establishment.numberEmployeesRange,
+        naf_code: aggregate.establishment.nafDto.code,
+        naf_nomenclature: aggregate.establishment.nafDto.nomenclature,
+        source_provider: aggregate.establishment.sourceProvider,
+        update_date: aggregate.establishment.updatedAt,
+        is_open: aggregate.establishment.isOpen,
+        is_searchable: aggregate.establishment.isSearchable,
+        is_commited: aggregate.establishment.isCommited,
+        fit_for_disabled_workers: aggregate.establishment.fitForDisabledWorkers,
+        max_contacts_per_week: aggregate.establishment.maxContactsPerWeek,
+        last_insee_check_date: aggregate.establishment.lastInseeCheckDate,
+        created_at: aggregate.establishment.createdAt,
+        next_availability_date: aggregate.establishment.nextAvailabilityDate,
+        searchable_by_students: aggregate.establishment.searchableBy.students,
+        searchable_by_job_seekers:
+          aggregate.establishment.searchableBy.jobSeekers,
+      })
+      .execute();
 
-    if (establishmentFields.length === 0) return;
+    await this.transaction
+      .insertInto("establishments_locations")
+      .values(
+        aggregate.establishment.locations.map(({ address, id, position }) => ({
+          id,
+          city: address.city,
+          department_code: address.departmentCode,
+          post_code: address.postcode,
+          street_number_and_address: address.streetNumberAndAddress,
+          lat: position.lat,
+          lon: position.lon,
+          position: sql`ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`,
+        })),
+      )
+      .execute();
 
-    try {
-      const query = fixStGeographyEscapingInQuery(
-        format(
-          `
-        INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, 
-          street_number_and_address, post_code, city, department_code, number_employees, 
-          naf_code, naf_nomenclature, source_provider, gps, lon, 
-          lat, update_date, is_open, is_searchable, is_commited, 
-          fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at , next_availability_date, 
-          searchable_by_students, searchable_by_job_seekers
-        ) VALUES %L
-        ON CONFLICT
-          ON CONSTRAINT establishments_pkey
-            DO UPDATE
-              SET
-                name=EXCLUDED.name,
-                street_number_and_address=EXCLUDED.street_number_and_address,
-                post_code=EXCLUDED.post_code,
-                city=EXCLUDED.city,
-                department_code=EXCLUDED.department_code,
-                number_employees=EXCLUDED.number_employees,
-                naf_code=EXCLUDED.naf_code,
-                fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
-                max_contacts_per_week=EXCLUDED.max_contacts_per_week,
-                searchable_by_students=EXCLUDED.searchable_by_students,
-                searchable_by_job_seekers=EXCLUDED.searchable_by_job_seekers
-              `,
-          establishmentFields,
-        ),
-      );
+    await this.transaction
+      .insertInto("establishments__establishments_locations")
+      .values(
+        aggregate.establishment.locations.map(({ id }) => ({
+          establishment_siret: aggregate.establishment.siret,
+          location_id: id,
+        })),
+      )
+      .execute();
 
-      await executeKyselyRawSqlQuery(this.transaction, query);
-    } catch (e: any) {
-      logger.error(e, "Error inserting establishments");
-      throw e;
-    }
+    if (!aggregate.contact) throw new Error("Contact is required");
+
+    await this.transaction
+      .insertInto("immersion_contacts")
+      .values({
+        uuid: aggregate.contact.id,
+        lastname: aggregate.contact.lastName,
+        firstname: aggregate.contact.firstName,
+        email: aggregate.contact.email,
+        job: aggregate.contact.job,
+        phone: aggregate.contact.phone,
+        contact_mode: aggregate.contact.contactMethod,
+        copy_emails: JSON.parse(JSON.stringify(aggregate.contact.copyEmails)),
+      })
+      .execute();
+
+    await this.transaction
+      .insertInto("establishments__immersion_contacts")
+      .values({
+        establishment_siret: aggregate.establishment.siret,
+        contact_uuid: aggregate.contact.id,
+      });
   }
 
-  async #insertContactsFromAggregates(aggregates: EstablishmentAggregate[]) {
-    const aggregatesWithContact = aggregates.filter(
-      (establishment): establishment is Required<EstablishmentAggregate> =>
-        !!establishment.contact,
-    );
+  // async #upsertEstablishmentsFromAggregates(
+  //   aggregates: EstablishmentAggregate[],
+  // ) {
+  //   const result = await executeKyselyRawSqlQuery(
+  //     this.transaction,
+  //     `
+  //   SELECT siret FROM establishments WHERE siret IN ($1)
+  //   `,
+  //     [aggregates.map(({ establishment }) => establishment.siret).join(", ")],
+  //   );
 
-    if (aggregatesWithContact.length === 0) return;
+  //   const existingSiret = await this.transaction
+  //     .selectFrom("establishments")
+  //     .where(
+  //       "siret",
+  //       "in",
+  //       aggregates.map(({ establishment }) => establishment.siret),
+  //     );
 
-    const contactFields = aggregatesWithContact.map((aggregate) => {
-      const contact = aggregate.contact;
-      return [
-        contact.id,
-        contact.lastName,
-        contact.firstName,
-        contact.email,
-        contact.job,
-        contact.phone,
-        contact.contactMethod,
-        JSON.stringify(contact.copyEmails),
-      ];
-    });
+  //   console.log("RESULT : ", result.rows.length === 0);
+  //   if (result.rows.length === 0) {
+  //     const query = `
+  //     INSERT INTO establishments (
+  //       siret, name, customized_name, website, additional_information,
+  //       street_number_and_address, post_code, city, department_code, number_employees,
+  //       naf_code, naf_nomenclature, source_provider, gps, lon,
+  //       lat, update_date, is_open, is_searchable, is_commited,
+  //       fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at , next_availability_date,
+  //       searchable_by_students, searchable_by_job_seekers
+  //     ) VALUES %L
+  //     `;
+  //   } else {
+  //     // update
+  //   }
 
-    const establishmentContactFields = aggregatesWithContact.map(
-      ({ establishment, contact }) => [establishment.siret, contact.id],
-    );
+  //   //prettier-ignore
+  //   const establishmentFields = aggregates.map(({ establishment }) => [
+  //     establishment.siret,
+  //     establishment.name,
+  //     establishment.customizedName,
+  //     establishment.website,
+  //     establishment.additionalInformation,
+  //     // establishment.address.streetNumberAndAddress,
+  //     // establishment.address.postcode,
+  //     // establishment.address.city,
+  //     // establishment.address.departmentCode,
+  //     establishment.numberEmployeesRange,
+  //     establishment.nafDto.code,
+  //     establishment.nafDto.nomenclature,
+  //     establishment.sourceProvider,
+  //     // convertPositionToStGeography(establishment.position),
+  //     // establishment.position.lon,
+  //     // establishment.position.lat,
+  //     establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
+  //     establishment.isOpen,
+  //     establishment.isSearchable,
+  //     establishment.isCommited,
+  //     establishment.fitForDisabledWorkers,
+  //     establishment.maxContactsPerWeek,
+  //     establishment.lastInseeCheckDate
+  //       ? establishment.lastInseeCheckDate.toISOString()
+  //       : null,
+  //     establishment.createdAt,
+  //     establishment.nextAvailabilityDate ?? null,
+  //     establishment.searchableBy.students,
+  //     establishment.searchableBy.jobSeekers,
+  //   ]);
+
+  //   if (establishmentFields.length === 0) return;
+
+  //   try {
+  //     const query = fixStGeographyEscapingInQuery(
+  //       format(
+  //         `
+  //       INSERT INTO establishments (
+  //         siret, name, customized_name, website, additional_information,
+  //         street_number_and_address, post_code, city, department_code, number_employees,
+  //         naf_code, naf_nomenclature, source_provider, gps, lon,
+  //         lat, update_date, is_open, is_searchable, is_commited,
+  //         fit_for_disabled_workers, max_contacts_per_week, last_insee_check_date, created_at , next_availability_date,
+  //         searchable_by_students, searchable_by_job_seekers
+  //       ) VALUES %L
+  //       ON CONFLICT
+  //         ON CONSTRAINT establishments_pkey
+  //           DO UPDATE
+  //             SET
+  //               name=EXCLUDED.name,
+  //               street_number_and_address=EXCLUDED.street_number_and_address,
+  //               post_code=EXCLUDED.post_code,
+  //               city=EXCLUDED.city,
+  //               department_code=EXCLUDED.department_code,
+  //               number_employees=EXCLUDED.number_employees,
+  //               naf_code=EXCLUDED.naf_code,
+  //               fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
+  //               max_contacts_per_week=EXCLUDED.max_contacts_per_week,
+  //               searchable_by_students=EXCLUDED.searchable_by_students,
+  //               searchable_by_job_seekers=EXCLUDED.searchable_by_job_seekers
+  //             `,
+  //         establishmentFields,
+  //       ),
+  //     );
+
+  //     await executeKyselyRawSqlQuery(this.transaction, query);
+  //   } catch (e: any) {
+  //     logger.error(e, "Error inserting establishments");
+  //     throw e;
+  //   }
+  // }
+
+  async #insertContactFromAggregate(aggregate: EstablishmentAggregate) {
+    const contact = aggregate.contact;
+    if (!contact) return;
+    const contactFields = [
+      contact.id,
+      contact.lastName,
+      contact.firstName,
+      contact.email,
+      contact.job,
+      contact.phone,
+      contact.contactMethod,
+      JSON.stringify(contact.copyEmails),
+    ];
+
+    const establishmentContactFields = [
+      aggregate.establishment.siret,
+      contact.id,
+    ];
 
     try {
       const insertContactsQuery = format(
@@ -878,16 +1013,16 @@ export class PgEstablishmentAggregateRepository
   }
 }
 
-const convertPositionToStGeography = ({ lat, lon }: GeoPositionDto) =>
-  `ST_GeographyFromText('POINT(${lon} ${lat})')`;
+// const convertPositionToStGeography = ({ lat, lon }: GeoPositionDto) =>
+//   `ST_GeographyFromText('POINT(${lon} ${lat})')`;
 
-const reStGeographyFromText =
-  /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
+// const reStGeographyFromText =
+//   /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
 
 // Remove any repeated single quotes ('') inside ST_GeographyFromText.
 // TODO : find a better way than that : This is due to the Literal formatting that turns all simple quote into double quote.
-const fixStGeographyEscapingInQuery = (query: string) =>
-  query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
+// const fixStGeographyEscapingInQuery = (query: string) =>
+//   query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
 
 const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
   switch (sortedBy) {
@@ -918,15 +1053,17 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
           'additionalInformation', e.additional_information, 
           'customizedName', e.customized_name, 
           'fitForDisabledWorkers', e.fit_for_disabled_workers,
-          'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+          'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat), 
           'romeLabel', io.rome_label,
           'appellations',  io.appellations,
           'naf', e.naf_code,
           'nafLabel', public_naf_classes_2008.class_label,
-          'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
-                                        'postcode', e.post_code,
-                                        'city', e.city,
-                                        'departmentCode', e.department_code),
+          'address', JSON_BUILD_OBJECT(
+            'streetNumberAndAddress', street_number_and_address, 
+            'postcode', post_code,
+            'city', city,
+            'departmentCode', department_code
+            ),
           'contactMode', ic.contact_mode,
           'numberOfEmployeeRange', e.number_employees 
         ) 

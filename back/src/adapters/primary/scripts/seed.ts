@@ -156,10 +156,12 @@ const establishmentAggregateSeed = async (
     )
     .build();
 
-  await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+  await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
     franceMerguez,
+  );
+  await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
     decathlon,
-  ]);
+  );
 
   await uow.groupRepository.save({
     slug: "decathlon",

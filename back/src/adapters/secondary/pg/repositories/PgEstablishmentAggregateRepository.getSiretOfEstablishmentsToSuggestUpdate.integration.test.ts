@@ -135,13 +135,19 @@ describe("PgScriptsQueries", () => {
         .withContactId("99999999-9999-4000-9999-999999999999")
         .build();
 
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
-        establishmentToUpdate,
-        eventWithNotificationSavedButLongAgo,
-        eventWithRecentNotificationSaved,
-        establishmentWithLinkSentEvent,
-        recentlyUpdatedEstablishment,
-      ]);
+      await Promise.all(
+        [
+          establishmentToUpdate,
+          eventWithNotificationSavedButLongAgo,
+          eventWithRecentNotificationSaved,
+          establishmentWithLinkSentEvent,
+          recentlyUpdatedEstablishment,
+        ].map((aggregate) =>
+          pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+            aggregate,
+          ),
+        ),
+      );
 
       // Act
       const sirets =

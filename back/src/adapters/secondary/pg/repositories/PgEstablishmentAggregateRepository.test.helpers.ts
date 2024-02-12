@@ -109,7 +109,8 @@ export const insertEstablishment = async (
 ) => {
   const defaultPosition = { lon: 12.2, lat: 2.1 };
   const position = props.position ?? defaultPosition;
-  const insertQuery = `
+
+  const insertEstablishmentQuery = `
   INSERT INTO establishments (
     siret, name, street_number_and_address, post_code, city,
     department_code, number_employees, naf_code, source_provider, update_date, 
@@ -121,10 +122,19 @@ export const insertEstablishment = async (
     $6, $7, $8, $9, $10,
     $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15, $16, $17, $18
   )`;
+
+  const insertLocationsQuery = `
+    INSERT INTO establishments_locations (
+      street_number_and_address, post_code, city, department_code, lat, lon, position
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6
+    )
+  `;
+
   const addressDto = props.address ?? rueGuillaumeTellDto;
 
   //prettier-ignore
-  await client.query(insertQuery, [
+  await client.query(insertEstablishmentQuery, [
     props.siret,
     addressDto.streetNumberAndAddress,
     addressDto.postcode,
