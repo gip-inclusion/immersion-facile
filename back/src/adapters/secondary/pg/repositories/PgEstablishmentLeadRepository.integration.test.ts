@@ -64,14 +64,14 @@ describe("PgEstablishmentLeadRepository", () => {
   describe("getSiretsByLastEventKind", () => {
     it("returns empty array when no data matches", async () => {
       const result =
-        await establishmentLeadRepository.getSiretsByLastEventKind(
+        await establishmentLeadRepository.getSiretsByUniqLastEventKind(
           "to-be-reminded",
         );
 
       expectToEqual(result, []);
     });
 
-    it("return one establishmentLead", async () => {
+    it("return one establishmentLead with kind to-be-reminded", async () => {
       const now = new Date();
       const establishmentLeadAccepted: EstablishmentLead = {
         siret: "12345678901234",
@@ -103,8 +103,67 @@ describe("PgEstablishmentLeadRepository", () => {
       await establishmentLeadRepository.save(establishmentLeadToBeReminded);
 
       const result =
-        await establishmentLeadRepository.getSiretsByLastEventKind(
+        await establishmentLeadRepository.getSiretsByUniqLastEventKind(
           "to-be-reminded",
+        );
+
+      expectToEqual(result, [establishmentLeadToBeReminded.siret]);
+    });
+
+    it("return one establishmentLead with kind reminder-sent", async () => {
+      const now = new Date();
+      const establishmentLeadToBeReminded: EstablishmentLead = {
+        siret: "12345678901235",
+        lastEventKind: "to-be-reminded",
+        events: [
+          {
+            conventionId: "45664444-1234-4000-4444-123456789012",
+            occurredAt: subDays(now, 2),
+            kind: "to-be-reminded",
+          },
+          {
+            occurredAt: subDays(now, 1),
+            kind: "reminder-sent",
+            notification: {
+              id: "33333331-3333-4c90-3333-333333333333",
+              kind: "email",
+            },
+          },
+        ],
+      };
+      const establishmentLeadAlreadyReminded: EstablishmentLead = {
+        siret: "33345678901233",
+        lastEventKind: "reminder-sent",
+        events: [
+          {
+            conventionId: "55664444-1234-4000-4444-123456789012",
+            occurredAt: subDays(now, 5),
+            kind: "to-be-reminded",
+          },
+          {
+            occurredAt: subDays(now, 3),
+            kind: "reminder-sent",
+            notification: {
+              id: "33333332-3333-4c90-3333-333333333333",
+              kind: "email",
+            },
+          },
+          {
+            occurredAt: subDays(now, 2),
+            kind: "reminder-sent",
+            notification: {
+              id: "33333333-3333-4c90-3333-333333333333",
+              kind: "email",
+            },
+          },
+        ],
+      };
+      await establishmentLeadRepository.save(establishmentLeadToBeReminded);
+      await establishmentLeadRepository.save(establishmentLeadAlreadyReminded);
+
+      const result =
+        await establishmentLeadRepository.getSiretsByUniqLastEventKind(
+          "reminder-sent",
         );
 
       expectToEqual(result, [establishmentLeadToBeReminded.siret]);

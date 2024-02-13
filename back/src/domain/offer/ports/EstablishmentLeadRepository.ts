@@ -7,7 +7,7 @@ import {
 export interface EstablishmentLeadRepository {
   save(establishmentLead: EstablishmentLead): Promise<void>;
   getBySiret(siret: SiretDto): Promise<EstablishmentLead | undefined>;
-  getSiretsByLastEventKind(
+  getSiretsByUniqLastEventKind(
     kind: EstablishmentLeadEventKind,
   ): Promise<SiretDto[]>;
 }

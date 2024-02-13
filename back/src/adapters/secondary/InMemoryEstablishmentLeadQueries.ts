@@ -1,4 +1,4 @@
-import { ConventionReadDto, SiretDto } from "shared";
+import { ConventionReadDto } from "shared";
 import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
 import {
   EstablishmentLeadEventKind,
@@ -15,11 +15,11 @@ export class InMemoryEstablishmentLeadQueries
     private readonly conventionQueries: ConventionQueries,
   ) {}
 
-  public async getLastConventionsByLastEventKind(
+  public async getLastConventionsByUniqLastEventKind(
     kind: EstablishmentLeadEventKind,
   ): Promise<ConventionReadDto[]> {
     const sirets =
-      await this.establishmentLeadRepository.getSiretsByLastEventKind(kind);
+      await this.establishmentLeadRepository.getSiretsByUniqLastEventKind(kind);
     return isSiretsListFilled(sirets)
       ? this.conventionQueries.getLatestConventionBySirets(sirets)
       : [];

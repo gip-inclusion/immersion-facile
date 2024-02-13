@@ -1,9 +1,13 @@
 import { Pool } from "pg";
 import { keys } from "ramda";
+import { SiretDto } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
-import { SendEstablishmentLeadReminderScript } from "../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
+import {
+  SendEstablishmentLeadReminderOutput,
+  SendEstablishmentLeadReminderScript,
+} from "../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
@@ -17,7 +21,7 @@ import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const triggerEstablishmentLeadFirstReminder = async () => {
+const triggerEstablishmentLeadReminders = async () => {
   logger.info("Starting to send Emails to establishment leads");
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
@@ -51,31 +55,51 @@ const triggerEstablishmentLeadFirstReminder = async () => {
       timeGateway,
     );
 
-  return sendEstablishmentLeadReminderScript.execute("to-be-reminded");
+  const firstReminderResult =
+    await sendEstablishmentLeadReminderScript.execute("to-be-reminded");
+
+  const secondReminderResult =
+    await sendEstablishmentLeadReminderScript.execute("reminder-sent");
+
+  return { firstReminderResult, secondReminderResult };
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
   "sendEstablishmentLeadFirstReminderScript",
   config,
-  triggerEstablishmentLeadFirstReminder,
-  ({ establishmentsReminded, errors = {} }) => {
-    const failures = keys(errors);
-    const numberOfFailures = failures.length;
-    const numberOfSuccess = establishmentsReminded.length - numberOfFailures;
-
-    const errorsAsString = failures
-      .map(
-        (conventionId) =>
-          `For immersion ids ${conventionId} : ${errors[conventionId]} `,
-      )
-      .join("\n");
-
-    return [
-      `Total of establismentLead reminded : ${numberOfSuccess}`,
-      `Number of failures : ${numberOfFailures}`,
-      ...(numberOfFailures > 0 ? [`Failures : ${errorsAsString}`] : []),
-    ].join("\n");
-  },
+  triggerEstablishmentLeadReminders,
+  ({ firstReminderResult, secondReminderResult }) =>
+    [
+      "First reminder:",
+      ...reminderReport(firstReminderResult),
+      "---",
+      "Second reminder:",
+      ...reminderReport(secondReminderResult),
+    ].join("\n"),
   logger,
 );
+
+const reminderReport = ({
+  establishmentsReminded,
+  errors,
+}: SendEstablishmentLeadReminderOutput) => {
+  const failures = keys(errors);
+  const numberOfFailures = failures.length;
+
+  return [
+    `Total of establishmentLead reminded : ${
+      establishmentsReminded.length - numberOfFailures
+    }`,
+    `Number of failures : ${numberOfFailures}`,
+    ...(numberOfFailures > 0 ? [`Failures : ${errorsAsString(errors)}`] : []),
+  ].join("\n");
+};
+
+const errorsAsString = (errors: Record<SiretDto, Error> = {}): string => {
+  const sirets = keys(errors);
+
+  return sirets
+    .map((siret) => `For siret ${siret} : ${errors[siret]} `)
+    .join("\n");
+};

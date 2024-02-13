@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { SiretDto } from "shared";
 import { P, match } from "ts-pattern";
 import {
@@ -80,10 +81,10 @@ export class PgEstablishmentLeadRepository
     }, {} as EstablishmentLead);
   }
 
-  public async getSiretsByLastEventKind(
+  public async getSiretsByUniqLastEventKind(
     kind: EstablishmentLeadEventKind,
   ): Promise<SiretDto[]> {
-    const result = await getEstablishmentLeadSiretsByLastEventKindBuilder(
+    const result = await getEstablishmentLeadSiretsByUniqLastEventKindBuilder(
       this.#transaction,
       kind,
     ).execute();
@@ -125,7 +126,7 @@ const toDBEntity = (siret: SiretDto) => (event: EstablishmentLeadEvent) =>
       occurred_at: occurredAt,
     }));
 
-export const getEstablishmentLeadSiretsByLastEventKindBuilder = (
+export const getEstablishmentLeadSiretsByUniqLastEventKindBuilder = (
   transaction: KyselyDb,
   kind: EstablishmentLeadEventKind,
 ) => {
@@ -138,9 +139,16 @@ export const getEstablishmentLeadSiretsByLastEventKindBuilder = (
         .orderBy("siret")
         .orderBy("occurred_at", "desc"),
     )
-    .selectFrom("events")
+    .selectFrom("establishment_lead_events")
     .select("siret")
-    .where("kind", "=", kind);
+    .where(
+      "siret",
+      "in",
+      sql`(SELECT siret from events where "kind" = ${kind})`,
+    )
+    .where("kind", "=", kind)
+    .groupBy("siret")
+    .having((eb) => eb.fn.count("siret"), "=", 1);
 
   return builder;
 };

@@ -22,7 +22,7 @@ import {
   establishmentLeadEventKind,
 } from "../entities/EstablishmentLeadEntity";
 
-type SendEstablishmentLeadReminderOutput = {
+export type SendEstablishmentLeadReminderOutput = {
   errors?: Record<SiretDto, Error>;
   establishmentsReminded: SiretDto[];
 };
@@ -64,12 +64,12 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
   }
 
   protected async _execute(
-    _kind: EstablishmentLeadEventKind,
+    kind: EstablishmentLeadEventKind,
     uow: UnitOfWork,
   ): Promise<SendEstablishmentLeadReminderOutput> {
     const conventions =
-      await uow.establishmentLeadQueries.getLastConventionsByLastEventKind(
-        "to-be-reminded",
+      await uow.establishmentLeadQueries.getLastConventionsByUniqLastEventKind(
+        kind,
       );
 
     const errors: Record<ConventionId, Error> = {};
