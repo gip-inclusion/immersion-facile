@@ -131,26 +131,4 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
         ),
     );
   }
-  public rejectEstablishmentLeadRegistration$(
-    jwt: ConventionJwt,
-  ): Observable<void> {
-    return from(
-      this.httpClient
-        .unregisterEstablishmentLead({
-          headers: {
-            authorization: jwt,
-          },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, () => {
-              /* void */
-            })
-            .with({ status: P.union(400, 401, 403, 404) }, ({ body }) => {
-              throw new Error(JSON.stringify(body));
-            })
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
 }

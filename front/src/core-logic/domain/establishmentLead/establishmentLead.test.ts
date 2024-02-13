@@ -52,13 +52,13 @@ describe("EstablishmentLead slice", () => {
   };
 
   const feedGatewayWithUnregisterError = (error: Error) => {
-    dependencies.establishmentGateway.unregisterEstablishmentLeadResponse$.error(
+    dependencies.establishmentLeadGateway.unregisterEstablishmentLeadResponse$.error(
       error,
     );
   };
 
   const feedGatewayWithUnregisterSuccess = () => {
-    dependencies.establishmentGateway.unregisterEstablishmentLeadResponse$.next(
+    dependencies.establishmentLeadGateway.unregisterEstablishmentLeadResponse$.next(
       undefined,
     );
   };

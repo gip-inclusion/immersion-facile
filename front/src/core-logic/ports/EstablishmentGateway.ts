@@ -1,7 +1,6 @@
 import { Observable } from "rxjs";
 import {
   BackOfficeJwt,
-  ConventionJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
@@ -19,5 +18,4 @@ export interface EstablishmentGateway {
     establishment: FormEstablishmentDto,
     jwt: EstablishmentJwt | BackOfficeJwt,
   ): Observable<void>;
-  rejectEstablishmentLeadRegistration$(jwt: ConventionJwt): Observable<void>;
 }

@@ -76,6 +76,7 @@ export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/addressRoutes";
 export * from "./routes/agencyRoutes";
 export * from "./routes/establishementRoutes";
+export * from "./routes/establishmentLeadRoutes";
 export * from "./routes/formCompletion.routes";
 export * from "./routes/routes";
 export * from "./routes/routeUtils";

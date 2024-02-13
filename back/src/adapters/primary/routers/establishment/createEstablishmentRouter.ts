@@ -75,18 +75,6 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
         ),
       ),
   );
-
-  establishmentSharedRouter.unregisterEstablishmentLead(
-    deps.conventionMagicLinkAuthMiddleware,
-    async (req, res) =>
-      sendHttpResponse(req, res.status(200), () =>
-        deps.useCases.markEstablishmentLeadAsRegistrationRejected.execute(
-          undefined,
-          req.payloads?.convention,
-        ),
-      ),
-  );
-
   return establishmentRouter;
 };
 
