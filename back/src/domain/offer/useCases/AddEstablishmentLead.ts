@@ -28,7 +28,12 @@ export class AddEstablishmentLead extends TransactionalUseCase<WithConventionDto
     const alreadyExistingLead =
       await uow.establishmentLeadRepository.getBySiret(convention.siret);
 
-    if (alreadyExistingLead) return;
+    const existingEstablishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        convention.siret,
+      );
+
+    if (alreadyExistingLead || existingEstablishment) return;
 
     const establishmentLead: EstablishmentLead = {
       siret: convention.siret,
