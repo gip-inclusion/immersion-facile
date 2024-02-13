@@ -163,6 +163,8 @@ const Email = ({ email }: { email: EmailNotification }) => (
               "assessmentCreationLink",
               "magicLink",
               "conventionSignShortlink",
+              "unsubscribeToEmailShortLink",
+              "registerEstablishmentShortLink",
             ];
 
             return (
