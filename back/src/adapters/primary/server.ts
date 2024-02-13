@@ -22,6 +22,7 @@ import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouterV2 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/establishment/createEstablishmentRouter";
+import { createEstablishmentLeadRouter } from "./routers/establishmentLead/createEstablishmentLeadRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
@@ -88,6 +89,7 @@ export const createApp = async (
   app.use(createInclusionConnectRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));
+  app.use(createEstablishmentLeadRouter(deps));
 
   if (config.nodeEnv !== "production") startCrawler(deps);
 

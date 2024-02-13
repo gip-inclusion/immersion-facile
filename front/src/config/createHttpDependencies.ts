@@ -4,6 +4,7 @@ import {
   adminRoutes,
   agencyRoutes,
   conventionMagicLinkRoutes,
+  establishmentLeadRoutes,
   establishmentRoutes,
   formCompletionRoutes,
   inclusionConnectedAllowedRoutes,
@@ -20,6 +21,7 @@ import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAge
 import { HttpAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
+import { HttpEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/HttpEstablishmentLeadGateway";
 import { HttpFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/HttpFormCompletionGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
 import { HttpSearchGateway } from "src/core-logic/adapters/SearchGateway/HttpSearchGateway";
@@ -52,6 +54,9 @@ export const createHttpDependencies = (): Dependencies => {
     ),
     establishmentGateway: new HttpEstablishmentGateway(
       createAxiosSharedClient(establishmentRoutes, axiosOnSlashApi),
+    ),
+    establishmentLeadGateway: new HttpEstablishmentLeadGateway(
+      createAxiosSharedClient(establishmentLeadRoutes, axiosOnSlashApi),
     ),
     formCompletionGateway: new HttpFormCompletionGateway(
       createAxiosSharedClient(formCompletionRoutes, axiosOnSlashApi),

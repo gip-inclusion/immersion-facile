@@ -7,6 +7,7 @@ import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InM
 import { SimulatedAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedAssessmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
+import { SimulatedEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/SimulatedEstablishmentLeadGateway";
 import { SimulatedFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/SimulatedFormCompletionGateway";
 import { seedRomeDtos } from "src/core-logic/adapters/FormCompletionGateway/TestFormCompletionGateway";
 import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
@@ -27,6 +28,7 @@ export const createInMemoryDependencies = (): Dependencies => ({
       .withFitForDisabledWorkers(false)
       .build(),
   ]),
+  establishmentLeadGateway: new SimulatedEstablishmentLeadGateway(),
   assessmentGateway: new SimulatedAssessmentGateway(),
   searchGateway: new SimulatedSearchGateway(
     seedSearchResults,

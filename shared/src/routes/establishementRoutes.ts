@@ -62,16 +62,4 @@ export const establishmentRoutes = defineRoutes({
       404: legacyHttpErrorSchema,
     },
   }),
-  unregisterEstablishmentLead: defineRoute({
-    method: "post",
-    url: "/establishment-lead/unregister",
-    ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
-      400: httpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
-      403: renewMagicLinkResponseSchema,
-      404: httpErrorSchema,
-    },
-  }),
 });

@@ -11,7 +11,7 @@ type EstablishmentLeadAction = ActionOfSlice<typeof establishmentLeadSlice>;
 const createEstablishmentLeadEpic: AppEpic<EstablishmentLeadAction> = (
   action$,
   _,
-  { establishmentGateway },
+  { establishmentLeadGateway },
 ) =>
   action$.pipe(
     filter(
@@ -19,7 +19,9 @@ const createEstablishmentLeadEpic: AppEpic<EstablishmentLeadAction> = (
         .match,
     ),
     switchMap((action) =>
-      establishmentGateway.rejectEstablishmentLeadRegistration$(action.payload),
+      establishmentLeadGateway.rejectEstablishmentLeadRegistration$(
+        action.payload,
+      ),
     ),
     map((_result) =>
       establishmentLeadSlice.actions.unsubscribeEstablishmentLeadSucceeded(),

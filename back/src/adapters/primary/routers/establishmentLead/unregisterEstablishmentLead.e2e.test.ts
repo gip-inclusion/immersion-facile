@@ -2,10 +2,10 @@ import { subDays } from "date-fns";
 import {
   ConventionDtoBuilder,
   ConventionJwt,
-  EstablishmentRoutes,
+  EstablishmentLeadRoutes,
   createConventionMagicLinkPayload,
   displayRouteName,
-  establishmentRoutes,
+  establishmentLeadRoutes,
   expectHttpResponseToEqual,
   expiredMagicLinkErrorMessage,
 } from "shared";
@@ -42,14 +42,14 @@ const alreadySavedLead: EstablishmentLead = {
 
 describe("Unregister establishment lead", () => {
   let request: SuperTest<Test>;
-  let httpClient: HttpClient<EstablishmentRoutes>;
+  let httpClient: HttpClient<EstablishmentLeadRoutes>;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateConventionJwt: GenerateConventionJwt;
   let conventionJwt: ConventionJwt;
 
   beforeEach(async () => {
     ({ request, inMemoryUow, generateConventionJwt } = await buildTestApp());
-    httpClient = createSupertestSharedClient(establishmentRoutes, request);
+    httpClient = createSupertestSharedClient(establishmentLeadRoutes, request);
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
       unauthorizedApiConsumer,
@@ -71,7 +71,7 @@ describe("Unregister establishment lead", () => {
   });
 
   describe(`${displayRouteName(
-    establishmentRoutes.unregisterEstablishmentLead,
+    establishmentLeadRoutes.unregisterEstablishmentLead,
   )}`, () => {
     it("200 - Success", async () => {
       const response = await httpClient.unregisterEstablishmentLead({
@@ -86,7 +86,7 @@ describe("Unregister establishment lead", () => {
     });
 
     it(`${displayRouteName(
-      establishmentRoutes.unregisterEstablishmentLead,
+      establishmentLeadRoutes.unregisterEstablishmentLead,
     )} 400 - Unauthenticated`, async () => {
       const response = await httpClient.unregisterEstablishmentLead({
         headers: {} as any,
@@ -119,7 +119,7 @@ describe("Unregister establishment lead", () => {
     });
 
     it(`${displayRouteName(
-      establishmentRoutes.unregisterEstablishmentLead,
+      establishmentLeadRoutes.unregisterEstablishmentLead,
     )} 403 - Jwt expired`, async () => {
       const response = await httpClient.unregisterEstablishmentLead({
         headers: {
