@@ -34,11 +34,15 @@ export class InMemoryEstablishmentLeadRepository
     return { ...establishmentLead, lastEventKind };
   }
 
-  public getSiretsByLastEventKind(
+  public getSiretsByUniqLastEventKind(
     kind: EstablishmentLeadEventKind,
   ): Promise<SiretDto[]> {
     const sirets = Object.values(this.#establishmentLeads)
-      .filter(({ lastEventKind }) => lastEventKind === kind)
+      .filter(
+        ({ lastEventKind, events }) =>
+          lastEventKind === kind &&
+          events.filter((event) => event.kind === kind).length === 1,
+      )
       .map(({ siret }) => siret);
     return Promise.resolve(sirets);
   }

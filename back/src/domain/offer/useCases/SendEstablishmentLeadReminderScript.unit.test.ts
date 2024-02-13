@@ -41,6 +41,7 @@ const establishmentLeadAccepted: EstablishmentLead = {
     },
   ],
 };
+
 const establishmentLeadToBeReminded: EstablishmentLead = {
   siret: "12345678901235",
   lastEventKind: "to-be-reminded",
@@ -49,6 +50,45 @@ const establishmentLeadToBeReminded: EstablishmentLead = {
       conventionId: "45664444-1234-4000-4444-123456789012",
       occurredAt: subDays(now, 2),
       kind: "to-be-reminded",
+    },
+  ],
+};
+
+const establishmentLeadWithOneReminderSent: EstablishmentLead = {
+  siret: "12345678901236",
+  lastEventKind: "reminder-sent",
+  events: [
+    {
+      conventionId: "45664444-1234-4000-4444-123456789012",
+      occurredAt: subDays(now, 8),
+      kind: "to-be-reminded",
+    },
+    {
+      kind: "reminder-sent",
+      occurredAt: subDays(now, 7),
+      notification: { id: "first-notification-id", kind: "email" },
+    },
+  ],
+};
+
+const establishmentLeadWithTwoRemindersSent: EstablishmentLead = {
+  siret: "12345678901237",
+  lastEventKind: "reminder-sent",
+  events: [
+    {
+      conventionId: "45664444-1234-4000-4444-123456789013",
+      occurredAt: subDays(now, 15),
+      kind: "to-be-reminded",
+    },
+    {
+      kind: "reminder-sent",
+      occurredAt: subDays(now, 14),
+      notification: { id: "first-notification-id", kind: "email" },
+    },
+    {
+      kind: "reminder-sent",
+      occurredAt: subDays(now, 7),
+      notification: { id: "second-notification-id", kind: "email" },
     },
   ],
 };
@@ -84,84 +124,176 @@ describe("SendEstablishmentLeadReminder", () => {
     );
   });
 
-  it("Send emails to establishment lead with lastEventKind = 'to-be-reminded", async () => {
-    const agency = new AgencyDtoBuilder().build();
-    const convention = new ConventionDtoBuilder()
-      .withSiret(establishmentLeadToBeReminded.siret)
-      .withDateValidation(subDays(now, 2).toISOString())
-      .withAgencyId(agency.id)
-      .build();
-    uow.establishmentLeadRepository.establishmentLeads = [
-      establishmentLeadAccepted,
-      establishmentLeadToBeReminded,
-    ];
-    uow.agencyRepository.setAgencies([agency]);
-    uow.conventionRepository.setConventions([convention]);
-    shortLinkIdGeneratorGateway.addMoreShortLinkIds([
-      "addEstablishmentFormShortLink",
-      "addUnsubscribeToEmailShortLink",
-    ]);
+  describe("Send first reminder", () => {
+    it("Send emails to establishment lead when lastEventKind = 'to-be-reminded", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const convention = new ConventionDtoBuilder()
+        .withSiret(establishmentLeadToBeReminded.siret)
+        .withDateValidation(subDays(now, 2).toISOString())
+        .withAgencyId(agency.id)
+        .build();
+      uow.establishmentLeadRepository.establishmentLeads = [
+        establishmentLeadAccepted,
+        establishmentLeadToBeReminded,
+      ];
+      uow.agencyRepository.setAgencies([agency]);
+      uow.conventionRepository.setConventions([convention]);
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([
+        "addEstablishmentFormShortLink",
+        "addUnsubscribeToEmailShortLink",
+      ]);
+      timeGateway.setNextDates([now, now]);
 
-    timeGateway.setNextDates([now, now]);
-    // const expectedAddEstablishmentFormUrl = "http://localhost/establishment?siret=12345678901235&bName=Beta.gouv.fr&bAdress=169 boulevard de la villette, 75010 Paris&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com"
+      const result =
+        await sendEstablishmentLeadReminder.execute("to-be-reminded");
 
-    const result =
-      await sendEstablishmentLeadReminder.execute("to-be-reminded");
+      expectToEqual(result, {
+        establishmentsReminded: [establishmentLeadToBeReminded.siret],
+        errors: {},
+      });
 
-    expectToEqual(result, {
-      establishmentsReminded: [establishmentLeadToBeReminded.siret],
-      errors: {},
-    });
+      expect(
+        await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
+      ).toBe(
+        "http://localhost/establishment?siret=12345678901235&bcLastName=Idol&bcFirstName=Billy&bcPhone=0602010203&bcEmail=establishment@example.com",
+      );
 
-    expect(
-      await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
-    ).toBe(
-      "http://localhost/establishment?siret=12345678901235&bcLastName=Prost&bcFirstName=Alain&bcPhone=0601010101&bcEmail=establishment@example.com",
-    );
+      expect(
+        await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
+      ).toBe(
+        "http://fake-magic-link/etablissement/refus-referencement/a99eaca1-ee70-4c90-b3f4-668d492f7392/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
+      );
 
-    expect(
-      await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
-    ).toBe(
-      "http://fake-magic-link/etablissement/refus-referencement/a99eaca1-ee70-4c90-b3f4-668d492f7392/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
-    );
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_LEAD_REMINDER",
+            params: {
+              businessName: convention.businessName,
+              registerEstablishmentShortLink:
+                "http://localhost/api/to/addEstablishmentFormShortLink",
+              unsubscribeToEmailShortLink:
+                "http://localhost/api/to/addUnsubscribeToEmailShortLink",
+            },
+            recipients: [
+              convention.signatories.establishmentRepresentative.email,
+            ],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        ],
+      });
 
-    expectSavedNotificationsAndEvents({
-      emails: [
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
         {
-          kind: "ESTABLISHMENT_LEAD_REMINDER",
-          params: {
-            businessName: convention.businessName,
-            registerEstablishmentShortLink:
-              "http://localhost/api/to/addEstablishmentFormShortLink",
-            unsubscribeToEmailShortLink:
-              "http://localhost/api/to/addUnsubscribeToEmailShortLink",
-          },
-          recipients: [
-            convention.signatories.establishmentRepresentative.email,
-          ],
-          sender: {
-            email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-            name: "Immersion Facilitée",
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "SendEstablishmentLeadReminder",
+          payload: {
+            id: convention.id,
           },
         },
-      ],
+      ]);
+
+      expect(
+        (await uow.establishmentLeadRepository.getBySiret(convention.siret))
+          ?.lastEventKind,
+      ).toBe("reminder-sent");
     });
+  });
 
-    expectObjectInArrayToMatch(uow.outboxRepository.events, [
-      {
-        topic: "NotificationAdded",
-      },
-      {
-        topic: "SendEstablishmentLeadReminder",
-        payload: {
-          id: convention.id,
+  describe("Send second reminder", () => {
+    it("Send emails to establishment lead when lastEventKind ='reminder-sent' and only one reminder event sent 7 day ago", async () => {
+      const agency = new AgencyDtoBuilder().build();
+
+      const convention1 = new ConventionDtoBuilder()
+        .withId("45664444-1234-4000-4444-123456789012")
+        .withSiret(establishmentLeadWithOneReminderSent.siret)
+        .withDateValidation(subDays(now, 2).toISOString())
+        .withAgencyId(agency.id)
+        .build();
+
+      const convention2 = new ConventionDtoBuilder()
+        .withId("45664444-1234-4000-4444-123456789013")
+        .withSiret(establishmentLeadWithTwoRemindersSent.siret)
+        .withDateValidation(subDays(now, 2).toISOString())
+        .withAgencyId(agency.id)
+        .build();
+
+      uow.establishmentLeadRepository.establishmentLeads = [
+        establishmentLeadWithOneReminderSent,
+        establishmentLeadWithTwoRemindersSent,
+      ];
+
+      uow.agencyRepository.setAgencies([agency]);
+      uow.conventionRepository.setConventions([convention1, convention2]);
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([
+        "addEstablishmentFormShortLink",
+        "addUnsubscribeToEmailShortLink",
+      ]);
+      timeGateway.setNextDates([now, now]);
+
+      const result =
+        await sendEstablishmentLeadReminder.execute("reminder-sent");
+
+      expectToEqual(result, {
+        establishmentsReminded: [establishmentLeadWithOneReminderSent.siret],
+        errors: {},
+      });
+
+      expect(
+        await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
+      ).toBe(
+        "http://localhost/establishment?siret=12345678901236&bcLastName=Idol&bcFirstName=Billy&bcPhone=0602010203&bcEmail=establishment@example.com",
+      );
+
+      expect(
+        await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
+      ).toBe(
+        "http://fake-magic-link/etablissement/refus-referencement/45664444-1234-4000-4444-123456789012/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_LEAD_REMINDER",
+            params: {
+              businessName: convention1.businessName,
+              registerEstablishmentShortLink:
+                "http://localhost/api/to/addEstablishmentFormShortLink",
+              unsubscribeToEmailShortLink:
+                "http://localhost/api/to/addUnsubscribeToEmailShortLink",
+            },
+            recipients: [
+              convention1.signatories.establishmentRepresentative.email,
+            ],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        ],
+      });
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "NotificationAdded",
         },
-      },
-    ]);
+        {
+          topic: "SendEstablishmentLeadReminder",
+          payload: {
+            id: convention1.id,
+          },
+        },
+      ]);
 
-    expect(
-      (await uow.establishmentLeadRepository.getBySiret(convention.siret))
-        ?.lastEventKind,
-    ).toBe("reminder-sent");
+      expect(
+        (await uow.establishmentLeadRepository.getBySiret(convention1.siret))
+          ?.lastEventKind,
+      ).toBe("reminder-sent");
+    });
   });
 });

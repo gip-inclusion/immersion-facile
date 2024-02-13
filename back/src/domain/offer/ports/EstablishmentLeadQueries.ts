@@ -2,7 +2,7 @@ import { ConventionReadDto } from "shared";
 import { EstablishmentLeadEventKind } from "../entities/EstablishmentLeadEntity";
 
 export interface EstablishmentLeadQueries {
-  getLastConventionsByLastEventKind(
+  getLastConventionsByUniqLastEventKind(
     kind: EstablishmentLeadEventKind,
   ): Promise<ConventionReadDto[]>;
 }
