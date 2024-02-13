@@ -12,7 +12,9 @@ import {
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentLeadRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentLeadRepository";
+import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { AddEstablishmentLead } from "./AddEstablishmentLead";
 
@@ -46,7 +48,7 @@ describe("Add EstablishmentLead", () => {
     );
   });
 
-  it("do nothing if it already exists", async () => {
+  it("do nothing if establishmentLead already exists", async () => {
     const convention: ConventionDto = new ConventionDtoBuilder()
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .build();
@@ -79,6 +81,27 @@ describe("Add EstablishmentLead", () => {
     expectToEqual(
       await establishmentLeadRepository.getBySiret(siret),
       alreadySavedLead,
+    );
+  });
+
+  it("do nothing if establishment already exists", async () => {
+    const convention: ConventionDto = new ConventionDtoBuilder()
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .build();
+    const siret = convention.siret;
+
+    const establishmentAggregate: EstablishmentAggregate =
+      new EstablishmentAggregateBuilder().withEstablishmentSiret(siret).build();
+
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+      establishmentAggregate,
+    ]);
+
+    await addEstablishmentLead.execute({ convention });
+
+    expectToEqual(
+      await establishmentLeadRepository.getBySiret(siret),
+      undefined,
     );
   });
 
