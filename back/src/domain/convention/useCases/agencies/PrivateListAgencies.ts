@@ -6,10 +6,7 @@ import {
   privateListAgenciesRequestSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import {
-  UnitOfWork,
-  UnitOfWorkPerformer,
-} from "../../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../../core/ports/UnitOfWork";
 
 export class PrivateListAgencies extends TransactionalUseCase<
   PrivateListAgenciesRequestDto,

@@ -123,7 +123,7 @@ export const insertEstablishment = async (
     $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15, $16, $17, $18
   )`;
 
-  const insertLocationsQuery = `
+  const _insertLocationsQuery = `
     INSERT INTO establishments_locations (
       street_number_and_address, post_code, city, department_code, lat, lon, position
     ) VALUES (

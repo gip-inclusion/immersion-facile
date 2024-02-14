@@ -134,7 +134,7 @@ export class InMemoryEventBus implements EventBus {
     if (wasMaxNumberOfErrorsReached) {
       const message = "Failed too many times, event will be Quarantined";
       logger.error({ event }, message);
-      const { payload, publications, ...restEvent } = event;
+      const { payload: _, publications, ...restEvent } = event;
       notifyObjectDiscord({
         event: {
           ...restEvent,

@@ -39,7 +39,7 @@ export class InMemoryGroupRepository implements GroupRepository {
   ): Promise<GroupWithResults | undefined> {
     const groupEntity = this.#groupsBySlug[slug];
     if (!groupEntity) return;
-    const { sirets, ...group } = groupEntity;
+    const { sirets: _, ...group } = groupEntity;
     return { group, results: [stubSearchResult] };
   }
 

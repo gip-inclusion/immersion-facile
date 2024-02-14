@@ -52,7 +52,7 @@ export class InMemoryInclusionConnectedUserRepository
     inclusionConnectedUsers: InclusionConnectedUser[],
   ) {
     this.authenticatedUsersRepository.users = inclusionConnectedUsers.map(
-      ({ agencyRights, ...user }) => user,
+      ({ agencyRights: _, ...user }) => user,
     );
     this.agencyRightsByUserId = inclusionConnectedUsers.reduce(
       (acc, icUser) => ({

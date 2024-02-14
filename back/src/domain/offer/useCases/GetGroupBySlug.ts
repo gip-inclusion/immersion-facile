@@ -1,7 +1,7 @@
 import { GroupWithResults, WithGroupSlug, withGroupSlugSchema } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/ports/UnitOfWork";
 
 export class GetOffersByGroupSlug extends TransactionalUseCase<
   WithGroupSlug,

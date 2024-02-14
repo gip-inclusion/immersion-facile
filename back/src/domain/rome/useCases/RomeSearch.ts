@@ -4,7 +4,7 @@ import {
   zTrimmedString,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/ports/UnitOfWork";
 
 export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
   protected inputSchema = zTrimmedString;

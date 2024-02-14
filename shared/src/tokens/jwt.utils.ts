@@ -44,6 +44,7 @@ export const createConventionMagicLinkPayload = ({
   email,
   now,
   sub,
+  // biome-ignore lint/correctness/noUnusedVariables: it is used in other param
   durationDays = 31,
   iat = Math.round(now.getTime() / 1000),
   exp = iat + durationDays * 24 * 3600,
@@ -69,6 +70,7 @@ type CreateEstablishmentJwtPayloadProperties = {
 
 export const createEstablishmentJwtPayload = ({
   siret,
+  // biome-ignore lint/correctness/noUnusedVariables: it is used in other param
   durationDays,
   now,
   iat = Math.round(now.getTime() / 1000),

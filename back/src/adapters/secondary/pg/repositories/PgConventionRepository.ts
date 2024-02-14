@@ -47,12 +47,12 @@ export class PgConventionRepository implements ConventionRepository {
     const readDto = await getReadConventionById(this.transaction, conventionId);
     if (!readDto) return;
     const {
-      agencyName,
-      agencyDepartment,
-      agencyKind,
-      agencySiret,
-      agencyCounsellorEmails,
-      agencyValidatorEmails,
+      agencyName: _1,
+      agencyDepartment: _2,
+      agencyKind: _3,
+      agencySiret: _4,
+      agencyCounsellorEmails: _5,
+      agencyValidatorEmails: _6,
       ...dto
     } = readDto;
     return dto;

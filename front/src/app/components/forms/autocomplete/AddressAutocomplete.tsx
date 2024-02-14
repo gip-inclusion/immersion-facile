@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
 import { AutocompleteInput } from "react-design-system";
-import { AddressAndPosition, Location, addressDtoToString } from "shared";
+import { AddressAndPosition, addressDtoToString } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useStyles } from "tss-react/dsfr";
 import { getAddressesFromApi } from "./getAddressesFromApi";

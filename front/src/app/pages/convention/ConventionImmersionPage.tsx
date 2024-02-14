@@ -39,7 +39,12 @@ interface ConventionImmersionPageProps {
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
 ) => {
-  const { fedId, fedIdProvider, jwt, ...partialConvention } = routeParams;
+  const {
+    fedId: _1,
+    fedIdProvider: _2,
+    jwt: _3,
+    ...partialConvention
+  } = routeParams;
   if (keys(partialConvention).length) {
     outOfReduxDependencies.deviceRepository.set(
       "partialConventionInUrl",
@@ -110,7 +115,7 @@ export const ConventionImmersionPage = ({
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const { jwt, ...routeParamsWithoutJwt } = route.params;
+  const { jwt: _, ...routeParamsWithoutJwt } = route.params;
   const isSharedConvention = useMemo(
     () => keys(routeParamsWithoutJwt).length > 0,
     [routeParamsWithoutJwt],

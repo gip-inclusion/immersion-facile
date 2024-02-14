@@ -171,23 +171,6 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   });
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockedUser: PeConnectUserDto = {
-  isJobseeker: true,
-  firstName: "John",
-  lastName: "Doe",
-  peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
-  email: "john.doe@gmail.com",
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockedValidAdvisor: PeConnectAdvisorDto = {
-  email: "elsa.oldenburg@pole-emploi.net",
-  firstName: "Elsa",
-  lastName: "Oldenburg",
-  type: "CAPEMPLOI",
-};
-
 const peJobseekerUser: PeConnectUserDto = {
   isJobseeker: true,
   firstName: "John",

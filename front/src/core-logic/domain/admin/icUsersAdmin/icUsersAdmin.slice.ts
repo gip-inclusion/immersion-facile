@@ -110,7 +110,7 @@ export const icUsersAdminSlice = createSlice({
     ) => {
       const { userId, agencyId } = action.payload;
 
-      const { [agencyId]: agency, ...agenciesFiltered } =
+      const { [agencyId]: _agency, ...agenciesFiltered } =
         state.icUsersNeedingReview[userId].agencyRights;
 
       state.isUpdatingIcUserAgency = false;

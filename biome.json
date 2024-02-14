@@ -22,7 +22,7 @@
         "noAccumulatingSpread": "off"
       },
       "suspicious": {
-        "noConfusingVoidType":  "off",
+        "noConfusingVoidType": "off",
         "noExplicitAny": "off"
       },
       "complexity": {
