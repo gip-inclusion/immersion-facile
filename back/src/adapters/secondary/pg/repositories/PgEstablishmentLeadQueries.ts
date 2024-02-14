@@ -2,6 +2,7 @@ import { andThen } from "ramda";
 import { ConventionReadDto, filter, pipeWithValue } from "shared";
 import { isSiretsListFilled } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadQueries } from "../../../../domain/offer/ports/EstablishmentLeadQueries";
+import { EstablishmentLeadReminderParams } from "../../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
 import { KyselyDb } from "../kysely/kyselyUtils";
 import { validateConventionReadResults } from "./PgConventionQueries";
 import { getEstablishmentLeadSiretsByUniqLastEventKindBuilder } from "./PgEstablishmentLeadRepository";
@@ -14,16 +15,12 @@ export class PgEstablishmentLeadQueries implements EstablishmentLeadQueries {
   constructor(private transaction: KyselyDb) {}
 
   public async getLastConventionsByUniqLastEventKind(
-    kind:
-      | "to-be-reminded"
-      | "reminder-sent"
-      | "registration-accepted"
-      | "registration-refused",
+    params: EstablishmentLeadReminderParams,
   ): Promise<ConventionReadDto[]> {
     const withSiretList =
       await getEstablishmentLeadSiretsByUniqLastEventKindBuilder(
         this.transaction,
-        kind,
+        params,
       ).execute();
 
     const sirets = withSiretList.map(({ siret }) => siret);

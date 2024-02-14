@@ -64,9 +64,9 @@ describe("PgEstablishmentLeadRepository", () => {
   describe("getSiretsByLastEventKind", () => {
     it("returns empty array when no data matches", async () => {
       const result =
-        await establishmentLeadRepository.getSiretsByUniqLastEventKind(
-          "to-be-reminded",
-        );
+        await establishmentLeadRepository.getSiretsByUniqLastEventKind({
+          kind: "to-be-reminded",
+        });
 
       expectToEqual(result, []);
     });
@@ -103,14 +103,14 @@ describe("PgEstablishmentLeadRepository", () => {
       await establishmentLeadRepository.save(establishmentLeadToBeReminded);
 
       const result =
-        await establishmentLeadRepository.getSiretsByUniqLastEventKind(
-          "to-be-reminded",
-        );
+        await establishmentLeadRepository.getSiretsByUniqLastEventKind({
+          kind: "to-be-reminded",
+        });
 
       expectToEqual(result, [establishmentLeadToBeReminded.siret]);
     });
 
-    it("return one establishmentLead with kind reminder-sent", async () => {
+    it("return one establishmentLead with only one reminder-sent event that happens 7 days ago", async () => {
       const now = new Date();
       const establishmentLeadToBeReminded: EstablishmentLead = {
         siret: "12345678901235",
@@ -118,6 +118,26 @@ describe("PgEstablishmentLeadRepository", () => {
         events: [
           {
             conventionId: "45664444-1234-4000-4444-123456789012",
+            occurredAt: subDays(now, 8),
+            kind: "to-be-reminded",
+          },
+          {
+            occurredAt: subDays(now, 7),
+            kind: "reminder-sent",
+            notification: {
+              id: "33333331-3333-4c90-3333-333333333333",
+              kind: "email",
+            },
+          },
+        ],
+      };
+
+      const establishmentLeadToBeRemindedLater: EstablishmentLead = {
+        siret: "12345678901234",
+        lastEventKind: "to-be-reminded",
+        events: [
+          {
+            conventionId: "45664444-1234-4000-4444-123456789013",
             occurredAt: subDays(now, 2),
             kind: "to-be-reminded",
           },
@@ -131,12 +151,13 @@ describe("PgEstablishmentLeadRepository", () => {
           },
         ],
       };
+
       const establishmentLeadAlreadyReminded: EstablishmentLead = {
         siret: "33345678901233",
         lastEventKind: "reminder-sent",
         events: [
           {
-            conventionId: "55664444-1234-4000-4444-123456789012",
+            conventionId: "55664444-1234-4000-4444-123456789011",
             occurredAt: subDays(now, 5),
             kind: "to-be-reminded",
           },
@@ -160,11 +181,15 @@ describe("PgEstablishmentLeadRepository", () => {
       };
       await establishmentLeadRepository.save(establishmentLeadToBeReminded);
       await establishmentLeadRepository.save(establishmentLeadAlreadyReminded);
+      await establishmentLeadRepository.save(
+        establishmentLeadToBeRemindedLater,
+      );
 
       const result =
-        await establishmentLeadRepository.getSiretsByUniqLastEventKind(
-          "reminder-sent",
-        );
+        await establishmentLeadRepository.getSiretsByUniqLastEventKind({
+          kind: "reminder-sent",
+          beforeDate: subDays(now, 7),
+        });
 
       expectToEqual(result, [establishmentLeadToBeReminded.siret]);
     });

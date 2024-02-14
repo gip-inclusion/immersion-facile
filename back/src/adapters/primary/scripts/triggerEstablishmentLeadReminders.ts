@@ -1,3 +1,4 @@
+import { subDays } from "date-fns";
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { SiretDto } from "shared";
@@ -55,11 +56,15 @@ const triggerEstablishmentLeadReminders = async () => {
       timeGateway,
     );
 
-  const firstReminderResult =
-    await sendEstablishmentLeadReminderScript.execute("to-be-reminded");
+  const firstReminderResult = await sendEstablishmentLeadReminderScript.execute(
+    { kind: "to-be-reminded" },
+  );
 
   const secondReminderResult =
-    await sendEstablishmentLeadReminderScript.execute("reminder-sent");
+    await sendEstablishmentLeadReminderScript.execute({
+      kind: "reminder-sent",
+      beforeDate: subDays(timeGateway.now(), 7),
+    });
 
   return { firstReminderResult, secondReminderResult };
 };

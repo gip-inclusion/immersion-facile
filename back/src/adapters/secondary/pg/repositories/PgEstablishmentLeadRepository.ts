@@ -7,6 +7,7 @@ import {
   EstablishmentLeadEventKind,
 } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadRepository } from "../../../../domain/offer/ports/EstablishmentLeadRepository";
+import { EstablishmentLeadReminderParams } from "../../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
 import { KyselyDb } from "../kysely/kyselyUtils";
 
 export class PgEstablishmentLeadRepository
@@ -82,11 +83,11 @@ export class PgEstablishmentLeadRepository
   }
 
   public async getSiretsByUniqLastEventKind(
-    kind: EstablishmentLeadEventKind,
+    params: EstablishmentLeadReminderParams,
   ): Promise<SiretDto[]> {
     const result = await getEstablishmentLeadSiretsByUniqLastEventKindBuilder(
       this.#transaction,
-      kind,
+      params,
     ).execute();
 
     return result.map(({ siret }) => siret);
@@ -128,10 +129,10 @@ const toDBEntity = (siret: SiretDto) => (event: EstablishmentLeadEvent) =>
 
 export const getEstablishmentLeadSiretsByUniqLastEventKindBuilder = (
   transaction: KyselyDb,
-  kind: EstablishmentLeadEventKind,
+  { kind, beforeDate }: EstablishmentLeadReminderParams,
 ) => {
-  const builder = transaction
-    .with("events", (qb) =>
+  let builder = transaction
+    .with("last_events_by_siret", (qb) =>
       qb
         .selectFrom("establishment_lead_events")
         .select(["siret", "kind", "occurred_at"])
@@ -139,16 +140,30 @@ export const getEstablishmentLeadSiretsByUniqLastEventKindBuilder = (
         .orderBy("siret")
         .orderBy("occurred_at", "desc"),
     )
-    .selectFrom("establishment_lead_events")
+    .with("events_with_kind_that_happens_last_and_once", (qb) =>
+      qb
+        .selectFrom("establishment_lead_events")
+        .select("siret")
+        .where(
+          "siret",
+          "in",
+          sql`(SELECT siret from last_events_by_siret where "kind" = ${kind})`,
+        )
+        .where("kind", "=", kind)
+        .groupBy("siret")
+        .having((eb) => eb.fn.count("siret"), "=", 1),
+    )
+    .selectFrom("last_events_by_siret")
     .select("siret")
     .where(
       "siret",
       "in",
-      sql`(SELECT siret from events where "kind" = ${kind})`,
-    )
-    .where("kind", "=", kind)
-    .groupBy("siret")
-    .having((eb) => eb.fn.count("siret"), "=", 1);
+      sql`(SELECT siret from events_with_kind_that_happens_last_and_once)`,
+    );
+
+  if (beforeDate) {
+    builder = builder.where("occurred_at", "<=", beforeDate);
+  }
 
   return builder;
 };

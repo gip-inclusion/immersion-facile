@@ -1,4 +1,4 @@
-import { subDays } from "date-fns";
+import { subDays, subHours } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -54,7 +54,7 @@ const establishmentLeadToBeReminded: EstablishmentLead = {
   ],
 };
 
-const establishmentLeadWithOneReminderSent: EstablishmentLead = {
+const establishmentLeadWithOneReminderSentSevenDaysAgo: EstablishmentLead = {
   siret: "12345678901236",
   lastEventKind: "reminder-sent",
   events: [
@@ -65,7 +65,23 @@ const establishmentLeadWithOneReminderSent: EstablishmentLead = {
     },
     {
       kind: "reminder-sent",
-      occurredAt: subDays(now, 7),
+      occurredAt: subDays(subHours(now, 2), 7),
+      notification: { id: "first-notification-id", kind: "email" },
+    },
+  ],
+};
+const establishmentLeadWithOneReminderSentYesterday: EstablishmentLead = {
+  siret: "12345678901230",
+  lastEventKind: "reminder-sent",
+  events: [
+    {
+      conventionId: "45664444-1234-4000-4444-123456789014",
+      occurredAt: subDays(now, 8),
+      kind: "to-be-reminded",
+    },
+    {
+      kind: "reminder-sent",
+      occurredAt: subDays(now, 1),
       notification: { id: "first-notification-id", kind: "email" },
     },
   ],
@@ -144,8 +160,9 @@ describe("SendEstablishmentLeadReminder", () => {
       ]);
       timeGateway.setNextDates([now, now]);
 
-      const result =
-        await sendEstablishmentLeadReminder.execute("to-be-reminded");
+      const result = await sendEstablishmentLeadReminder.execute({
+        kind: "to-be-reminded",
+      });
 
       expectToEqual(result, {
         establishmentsReminded: [establishmentLeadToBeReminded.siret],
@@ -161,7 +178,7 @@ describe("SendEstablishmentLeadReminder", () => {
       expect(
         await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
       ).toBe(
-        "http://fake-magic-link/etablissement/refus-referencement/a99eaca1-ee70-4c90-b3f4-668d492f7392/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
+        "http://fake-magic-link/desinscription-prospect/a99eaca1-ee70-4c90-b3f4-668d492f7392/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
       );
 
       expectSavedNotificationsAndEvents({
@@ -211,7 +228,7 @@ describe("SendEstablishmentLeadReminder", () => {
 
       const convention1 = new ConventionDtoBuilder()
         .withId("45664444-1234-4000-4444-123456789012")
-        .withSiret(establishmentLeadWithOneReminderSent.siret)
+        .withSiret(establishmentLeadWithOneReminderSentSevenDaysAgo.siret)
         .withDateValidation(subDays(now, 2).toISOString())
         .withAgencyId(agency.id)
         .build();
@@ -223,24 +240,40 @@ describe("SendEstablishmentLeadReminder", () => {
         .withAgencyId(agency.id)
         .build();
 
+      const convention3 = new ConventionDtoBuilder()
+        .withId("45664444-1234-4000-4444-123456789014")
+        .withSiret(establishmentLeadWithOneReminderSentYesterday.siret)
+        .withDateValidation(subDays(now, 2).toISOString())
+        .withAgencyId(agency.id)
+        .build();
+
       uow.establishmentLeadRepository.establishmentLeads = [
-        establishmentLeadWithOneReminderSent,
+        establishmentLeadWithOneReminderSentSevenDaysAgo,
         establishmentLeadWithTwoRemindersSent,
+        establishmentLeadWithOneReminderSentYesterday,
       ];
 
       uow.agencyRepository.setAgencies([agency]);
-      uow.conventionRepository.setConventions([convention1, convention2]);
+      uow.conventionRepository.setConventions([
+        convention1,
+        convention2,
+        convention3,
+      ]);
       shortLinkIdGeneratorGateway.addMoreShortLinkIds([
         "addEstablishmentFormShortLink",
         "addUnsubscribeToEmailShortLink",
       ]);
       timeGateway.setNextDates([now, now]);
 
-      const result =
-        await sendEstablishmentLeadReminder.execute("reminder-sent");
+      const result = await sendEstablishmentLeadReminder.execute({
+        kind: "reminder-sent",
+        beforeDate: subDays(now, 7),
+      });
 
       expectToEqual(result, {
-        establishmentsReminded: [establishmentLeadWithOneReminderSent.siret],
+        establishmentsReminded: [
+          establishmentLeadWithOneReminderSentSevenDaysAgo.siret,
+        ],
         errors: {},
       });
 
@@ -253,7 +286,7 @@ describe("SendEstablishmentLeadReminder", () => {
       expect(
         await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
       ).toBe(
-        "http://fake-magic-link/etablissement/refus-referencement/45664444-1234-4000-4444-123456789012/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
+        "http://fake-magic-link/desinscription-prospect/45664444-1234-4000-4444-123456789012/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
       );
 
       expectSavedNotificationsAndEvents({

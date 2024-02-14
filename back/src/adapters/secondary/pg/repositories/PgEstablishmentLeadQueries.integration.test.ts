@@ -102,9 +102,9 @@ describe("PgEstablishmentLeadQueries", () => {
   describe("getLastConventionsByLastEventKind", () => {
     it("returns empty array when no data matches", async () => {
       const result =
-        await establishmentLeadQueries.getLastConventionsByUniqLastEventKind(
-          "to-be-reminded",
-        );
+        await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+          kind: "to-be-reminded",
+        });
       expectToEqual(result, []);
     });
 
@@ -118,9 +118,9 @@ describe("PgEstablishmentLeadQueries", () => {
       ]);
 
       const result =
-        await establishmentLeadQueries.getLastConventionsByUniqLastEventKind(
-          "to-be-reminded",
-        );
+        await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+          kind: "to-be-reminded",
+        });
       expectToEqual(result, [
         {
           ...convention1,
