@@ -53,6 +53,12 @@ const defaultAppellations: AppellationAndRomeDto[] = [
     romeCode: "N4301",
     romeLabel: "Conduite sur rails",
   },
+  {
+    romeCode: "B1805",
+    appellationLabel: "Styliste",
+    appellationCode: "19540",
+    romeLabel: "Stylisme",
+  },
 ];
 
 const appellationDtoToRomeDto = ({

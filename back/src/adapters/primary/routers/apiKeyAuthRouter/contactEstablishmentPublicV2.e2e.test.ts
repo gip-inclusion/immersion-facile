@@ -15,7 +15,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   TEST_LOCATION,
-} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../secondary/offer/EstablishmentBuilders";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
@@ -33,7 +33,7 @@ const contactEstablishment: ContactEstablishmentPublicV2Dto = {
   potentialBeneficiaryLastName: "Doe",
   immersionObjective: "Confirmer un projet professionnel",
   potentialBeneficiaryPhone: "0654334567",
-  locationId: "123",
+  locationId: TEST_LOCATION.id,
 };
 
 describe("POST contact-establishment public V2 route", () => {

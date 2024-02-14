@@ -5,10 +5,6 @@ import {
   httpErrorSchema,
   legacyHttpErrorSchema,
 } from "../httpClient/httpErrors.schema";
-import {
-  contactEstablishmentRoute,
-  immersionOffersRoute,
-} from "../routes/routes";
 import { siretAndAppellationSchema } from "../siretAndAppellation/SiretAndAppellation.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import { searchQueryParamsSchema } from "./SearchQueryParams.schema";
@@ -26,7 +22,7 @@ export const searchImmersionRoutes = defineRoutes({
   }),
   search: defineRoute({
     method: "get",
-    url: `/${immersionOffersRoute}`,
+    url: "/immersion-offers",
     queryParamsSchema: searchQueryParamsSchema,
     responses: {
       200: searchResultsSchema,
@@ -35,7 +31,7 @@ export const searchImmersionRoutes = defineRoutes({
   }),
   contactEstablishment: defineRoute({
     method: "post",
-    url: `/${contactEstablishmentRoute}`,
+    url: "/contact-establishment",
     requestBodySchema: contactEstablishmentRequestSchema,
     responses: {
       201: expressEmptyResponseBody,
@@ -51,7 +47,7 @@ export const searchImmersionRoutes = defineRoutes({
     responses: {
       200: searchResultSchema,
       400: httpErrorSchema,
-      404: httpErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
 });

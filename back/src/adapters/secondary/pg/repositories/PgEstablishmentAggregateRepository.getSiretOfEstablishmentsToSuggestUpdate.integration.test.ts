@@ -2,7 +2,7 @@ import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
-import { EstablishmentAggregateBuilder } from "../../offer/InMemoryEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../offer/EstablishmentBuilders";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";

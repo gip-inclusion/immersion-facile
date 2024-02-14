@@ -18,7 +18,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../secondary/offer/EstablishmentBuilders";
 import { AppConfig } from "../config/appConfig";
 import { createAppDependencies } from "../config/createAppDependencies";
 

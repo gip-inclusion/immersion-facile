@@ -21,9 +21,9 @@ import {
   TEST_LOCATION,
   boulangerAssistantOffer,
   boulangerOffer,
-  establishmentAggregateToSearchResultByRomeForFirstLocation,
   secretariatOffer,
-} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../adapters/secondary/offer/EstablishmentBuilders";
+import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteGateway } from "../../../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "../../../adapters/secondary/offer/laBonneBoite/LaBonneBoiteCompanyDto";
 import { LaBonneBoiteCompanyDtoBuilder } from "../../../adapters/secondary/offer/laBonneBoite/LaBonneBoiteCompanyDtoBuilder";

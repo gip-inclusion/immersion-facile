@@ -36,7 +36,6 @@ export const frontRoutes = {
 
 export const contactEstablishmentRoute = "contact-establishment";
 
-export const immersionOffersRoute = "immersion-offers";
 export const loginPeConnect = "login-pe-connect";
 export const peConnect = "pe-connect";
 

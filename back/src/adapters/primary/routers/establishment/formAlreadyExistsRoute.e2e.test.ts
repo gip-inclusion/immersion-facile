@@ -10,7 +10,7 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
-} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../secondary/offer/EstablishmentBuilders";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("route to check if a form's siret already exists", () => {

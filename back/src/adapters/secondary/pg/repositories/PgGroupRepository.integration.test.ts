@@ -14,7 +14,7 @@ import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
-} from "../../offer/InMemoryEstablishmentAggregateRepository";
+} from "../../offer/EstablishmentBuilders";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";

@@ -10,7 +10,7 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
-} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../secondary/offer/EstablishmentBuilders";
 
 describe("Route to generate an establishment edition link", () => {
   const siret = "11111111111111";

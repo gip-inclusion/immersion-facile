@@ -20,7 +20,7 @@ import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAdd
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
-} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../secondary/offer/EstablishmentBuilders";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
