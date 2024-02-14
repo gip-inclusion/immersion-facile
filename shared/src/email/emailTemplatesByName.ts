@@ -1481,13 +1481,10 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             label: "S'inscrire en 2 minutes !",
             url: registerEstablishmentShortLink,
           },
-          {
-            label: "Je ne souhaite pas devenir entreprise accueillante",
-            url: unsubscribeToEmailShortLink,
-          },
         ],
         subContent: `Bonne journée,
       L'équipe Immersion Facilitée`,
+        legals: `<a href=${unsubscribeToEmailShortLink}>Je ne souhaite pas devenir entreprise accueillante</a>`,
       }),
     },
   });
