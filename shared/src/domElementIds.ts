@@ -280,7 +280,7 @@ export const domElementIds = {
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
   },
 
-  unregisterEstablishmentLead: {},
+  unsubscribeEstablishmentLead: {},
 
   establishment: {
     establishmentFormAddressAutocomplete:
