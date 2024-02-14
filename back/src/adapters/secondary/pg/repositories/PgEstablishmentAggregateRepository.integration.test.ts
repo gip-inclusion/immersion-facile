@@ -113,29 +113,30 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     describe("if parameter `maxResults` is given", () => {
       it("returns at most `maxResults` establishments", async () => {
-        const establishmentsAndOffers: InsertActiveEstablishmentAndOfferAndEventuallyContactProps[] =
-          [
-            {
-              siret: "78000403200029",
-              rome: "A1101",
-              establishmentPosition: searchedPosition, // Position matching
-              appellationCode: "11987",
-              createdAt: new Date(),
-            },
-            {
-              siret: "79000403200029",
-              rome: "A1201",
-              establishmentPosition: searchedPosition, // Position matching
-              appellationCode: "12755",
-              createdAt: new Date(),
-            },
-          ];
+        const establishmentsAndOffers = [
+          {
+            siret: "78000403200029",
+            rome: "A1101",
+            establishmentPosition: searchedPosition, // Position matching
+            appellationCode: "11987",
+            createdAt: new Date(),
+          },
+          {
+            siret: "79000403200029",
+            rome: "A1201",
+            establishmentPosition: searchedPosition, // Position matching
+            appellationCode: "12755",
+            createdAt: new Date(),
+          },
+        ] satisfies InsertActiveEstablishmentAndOfferAndEventuallyContactProps[];
+
         // Prepare
         await Promise.all(
-          establishmentsAndOffers.map((establishmentsAndOffer) =>
+          establishmentsAndOffers.map((establishmentsAndOffer, index) =>
             insertActiveEstablishmentAndOfferAndEventuallyContact(
-              client,
+              pgEstablishmentAggregateRepository,
               establishmentsAndOffer,
+              index,
             ),
           ),
         );
@@ -156,13 +157,17 @@ describe("PgEstablishmentAggregateRepository", () => {
       it("returns all establishments within geographical area", async () => {
         // Prepare
         /// Two establishments located inside geographical area
-        await insertActiveEstablishmentAndOfferAndEventuallyContact(client, {
-          siret: "78000403200029",
-          rome: "A1101",
-          appellationCode: "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
-          establishmentPosition: searchedPosition,
-          createdAt: new Date(),
-        });
+        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+          pgEstablishmentAggregateRepository,
+          {
+            siret: "78000403200029",
+            rome: "A1101",
+            appellationCode: "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
+            establishmentPosition: searchedPosition,
+            createdAt: new Date(),
+          },
+          0,
+        );
         await insertImmersionOffer(client, {
           siret: "78000403200029",
           romeCode: "A1101", // Same rome and establishment as offer
@@ -171,14 +176,15 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         /// Establishment oustide geographical are
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          client,
+          pgEstablishmentAggregateRepository,
           {
             siret: "99000403200029",
             rome: "A1101",
             establishmentPosition: farFromSearchedPosition,
             appellationCode: "12862",
             createdAt: new Date(),
-          }, // Position not matching
+          },
+          1,
         );
 
         // Act
@@ -216,41 +222,42 @@ describe("PgEstablishmentAggregateRepository", () => {
       const siret2 = "12345677654321";
       const siret3 = "09876543211234";
 
-      const sirets = [siret1, siret2, siret3];
-
       beforeEach(async () => {
-        await insertEstablishment(client, {
-          siret: siret1,
-          position: searchedPosition,
-          // no need to provide searchableByStudents, searchableByJobSeekers, it should default to true
-          createdAt: new Date(),
-        });
-
-        await insertEstablishment(client, {
-          siret: siret2,
-          position: searchedPosition,
-          searchableByStudents: true,
-          searchableByJobSeekers: false,
-          createdAt: new Date(),
-        });
-
-        await insertEstablishment(client, {
-          siret: siret3,
-          position: searchedPosition,
-          searchableByStudents: false,
-          searchableByJobSeekers: true,
-          createdAt: new Date(),
-        });
-
         await Promise.all(
-          sirets.map(async (siret) =>
-            insertImmersionOffer(client, {
-              romeCode: cartographeImmersionOffer.romeCode,
-              // biome-ignore lint/style/noNonNullAssertion:
-              appellationCode: cartographeSearchMade.appellationCodes![0],
-              siret,
-              offerCreatedAt: new Date("2022-05-05"),
-            }),
+          [
+            {
+              siret: siret1,
+              establishmentPosition: searchedPosition,
+              // no need to provide searchableByStudents, searchableByJobSeekers, it should default to true
+              createdAt: new Date(),
+            },
+            {
+              siret: siret2,
+              establishmentPosition: searchedPosition,
+              searchableByStudents: true,
+              searchableByJobSeekers: false,
+              createdAt: new Date(),
+            },
+            {
+              siret: siret3,
+              establishmentPosition: searchedPosition,
+              searchableByStudents: false,
+              searchableByJobSeekers: true,
+              createdAt: new Date(),
+            },
+          ].map((params, index) =>
+            insertActiveEstablishmentAndOfferAndEventuallyContact(
+              pgEstablishmentAggregateRepository,
+              {
+                ...params,
+
+                rome: cartographeImmersionOffer.romeCode,
+                // biome-ignore lint/style/noNonNullAssertion:
+                appellationCode: cartographeSearchMade.appellationCodes![0],
+                offerCreatedAt: new Date("2022-05-05"),
+              },
+              index,
+            ),
           ),
         );
       });
@@ -406,19 +413,22 @@ describe("PgEstablishmentAggregateRepository", () => {
       const matchingNaf = "8622B";
       const matchingNumberOfEmployeeRange = "1-2";
       const matchingNafLabel = "Activité des médecins spécialistes";
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(client, {
-        siret: siretMatchingToSearch,
-        rome: cartographeImmersionOffer.romeCode,
-        establishmentPosition: searchedPosition,
-        appellationCode: cartographeImmersionOffer.appellationCode,
-        offerContactUid: undefined,
-        sourceProvider: "immersion-facile",
-        address: matchingEstablishmentAddress,
-        nafCode: matchingNaf,
-        numberEmployeesRange: matchingNumberOfEmployeeRange,
-        fitForDisabledWorkers: true,
-        createdAt: new Date(),
-      });
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        pgEstablishmentAggregateRepository,
+        {
+          siret: siretMatchingToSearch,
+          rome: cartographeImmersionOffer.romeCode,
+          establishmentPosition: searchedPosition,
+          appellationCode: cartographeImmersionOffer.appellationCode,
+          offerContactUid: undefined,
+          sourceProvider: "immersion-facile",
+          address: matchingEstablishmentAddress,
+          nafCode: matchingNaf,
+          numberEmployeesRange: matchingNumberOfEmployeeRange,
+          fitForDisabledWorkers: true,
+          createdAt: new Date(),
+        },
+      );
 
       await insertImmersionOffer(client, {
         siret: siretMatchingToSearch,
@@ -427,22 +437,28 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
 
       /// Establishment with offer inside geographical area but an other rome
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(client, {
-        siret: "88000403200029",
-        establishmentPosition: searchedPosition,
-        rome: notMatchingRome,
-        appellationCode: "19540",
-        createdAt: new Date(),
-      });
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        pgEstablishmentAggregateRepository,
+        {
+          siret: "88000403200029",
+          establishmentPosition: searchedPosition,
+          rome: notMatchingRome,
+          appellationCode: "19540",
+          createdAt: new Date(),
+        },
+      );
 
       // Establishment with offer with searched rome but oustide geographical area
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(client, {
-        siret: "99000403200029",
-        establishmentPosition: farFromSearchedPosition,
-        rome: analysteEnGeomatiqueImmersionOffer.romeCode,
-        appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
-        createdAt: new Date(),
-      });
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        pgEstablishmentAggregateRepository,
+        {
+          siret: "99000403200029",
+          establishmentPosition: farFromSearchedPosition,
+          rome: analysteEnGeomatiqueImmersionOffer.romeCode,
+          appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
+          createdAt: new Date(),
+        },
+      );
 
       // Act
       const searchResult: SearchResultDto[] =
@@ -703,7 +719,18 @@ describe("PgEstablishmentAggregateRepository", () => {
         // Act
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret(siret1)
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(siret1)
+                .withLocations([
+                  {
+                    id: "22222222-ee70-4c90-b3f4-668d492f7395",
+                    position: { lat: 49, lon: 6 },
+                    address: rueGuillaumeTellDto,
+                  },
+                ])
+                .build(),
+            )
             .withOffers([new OfferEntityBuilder().build()])
             .build(),
         );

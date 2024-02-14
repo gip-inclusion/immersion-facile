@@ -8,7 +8,14 @@ import {
   defaultMaxContactsPerWeek,
 } from "shared";
 import { EstablishmentAggregate } from "../../../../domain/offer/entities/EstablishmentEntity";
+import { EstablishmentAggregateRepository } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { rueGuillaumeTellDto } from "../../addressGateway/InMemoryAddressGateway";
+import {
+  defaultLocation,
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+  OfferEntityBuilder,
+} from "../../offer/EstablishmentBuilders";
 
 type PgImmersionOfferRow = {
   rome_code: string;
@@ -253,11 +260,15 @@ export type InsertActiveEstablishmentAndOfferAndEventuallyContactProps = {
   numberEmployeesRange?: NumberEmployeesRange;
   offerCreatedAt?: Date;
   fitForDisabledWorkers?: boolean;
+  searchableByStudents?: boolean;
+  searchableByJobSeekers?: boolean;
 };
 
 export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
-  client: PoolClient,
+  establishmentAggregateRepository: EstablishmentAggregateRepository,
   {
+    searchableByStudents,
+    searchableByJobSeekers,
     siret,
     rome,
     establishmentPosition,
@@ -271,28 +282,43 @@ export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
     offerCreatedAt,
     fitForDisabledWorkers,
   }: InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
+  index = 0,
 ) => {
-  await insertEstablishment(client, {
-    siret,
-    isOpen: true,
-    position: establishmentPosition,
-    sourceProvider,
-    createdAt,
-    address,
-    nafCode,
-    numberEmployeesRange,
-    fitForDisabledWorkers,
-  });
-  if (offerContactUid) {
-    await insertImmersionContact(client, {
-      uuid: offerContactUid,
-      siret_establishment: siret,
-    });
-  }
-  await insertImmersionOffer(client, {
-    siret,
-    romeCode: rome,
-    appellationCode,
-    offerCreatedAt,
-  });
+  const establishment = new EstablishmentEntityBuilder()
+    .withSiret(siret)
+    .withLocations([
+      {
+        id: `11111111-1111-4444-1111-11111111000${index}`,
+        address: address ?? defaultLocation.address,
+        position: establishmentPosition,
+      },
+    ])
+    .withSearchableBy({
+      jobSeekers: searchableByJobSeekers ?? false,
+      students: searchableByStudents ?? false,
+    })
+    .withCreatedAt(createdAt)
+    .withNumberOfEmployeeRange(numberEmployeesRange ?? "6-9")
+    .withNafDto({ code: nafCode ?? "8622B", nomenclature: "8622B" })
+    .withSourceProvider(sourceProvider)
+    .withFitForDisabledWorkers(fitForDisabledWorkers)
+    .build();
+
+  const aggregate = new EstablishmentAggregateBuilder()
+    .withEstablishment(establishment)
+    .withContactId(
+      offerContactUid ?? `22222222-2222-4444-2222-22222222000${index}`,
+    )
+    .withOffers([
+      new OfferEntityBuilder()
+        .withRomeCode(rome)
+        .withAppellationCode(appellationCode)
+        .withCreatedAt(offerCreatedAt ?? new Date())
+        .build(),
+    ])
+    .build();
+
+  await establishmentAggregateRepository.insertEstablishmentAggregate(
+    aggregate,
+  );
 };
