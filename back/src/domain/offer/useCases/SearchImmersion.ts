@@ -116,7 +116,7 @@ export class SearchImmersion extends TransactionalUseCase<
     results: SearchImmersionResult[],
   ): SearchResultDto[] {
     histogramSearchImmersionStoredCount.observe(results.length);
-    return results.map(({ isSearchable, ...rest }) => rest);
+    return results.map(({ isSearchable: _, ...rest }) => rest);
   }
 
   async #searchOnLbb(

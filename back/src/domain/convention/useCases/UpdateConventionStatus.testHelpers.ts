@@ -282,8 +282,8 @@ const makeTestAcceptsStatusUpdate =
     const {
       beneficiarySignedAt,
       establishmentRepresentativeSignedAt,
-      signatories,
-      internshipKind,
+      signatories: _1,
+      internshipKind: _2,
       ...restOfUpdatedFields
     } = updatedFields;
 

@@ -214,7 +214,7 @@ describe("Agency routes", () => {
         });
 
         const {
-          refersToAgencyId,
+          refersToAgencyId: _,
           ...parisMissionLocaleParamsWithoutRefersToAgencyId
         } = parisMissionLocaleParams;
 

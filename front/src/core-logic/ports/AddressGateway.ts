@@ -1,7 +1,6 @@
 import { Observable } from "rxjs";
 import {
   AddressAndPosition,
-  Location,
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,

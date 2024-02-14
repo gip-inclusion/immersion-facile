@@ -2,7 +2,6 @@ import { Observable, from } from "rxjs";
 import {
   AddressAndPosition,
   AddressRoutes,
-  Location,
   LookupLocationInput,
   LookupSearchResult,
 } from "shared";

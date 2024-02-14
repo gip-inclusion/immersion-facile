@@ -1,5 +1,5 @@
 import React from "react";
-import { AddressAndPosition, Location } from "shared";
+import { AddressAndPosition } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 export const getAddressesFromApi = async (

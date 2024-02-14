@@ -3,7 +3,7 @@ import { ApiConsumer, WebhookSubscription } from "shared";
 import { z } from "zod";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/ports/UnitOfWork";
 
 export class ListActiveSubscriptions extends TransactionalUseCase<
   void,

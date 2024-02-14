@@ -1,4 +1,4 @@
-import { AddressDto, LocationId } from "../address/address.dto";
+import { LocationId } from "../address/address.dto";
 import { ImmersionObjective } from "../convention/convention.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";

@@ -33,7 +33,7 @@ import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 import { Mode, OnStepChange, Step } from "../EstablishmentForm";
 import { MultipleAppellationInput } from "../MultipleAppellationInput";
 import { SearchResultPreview } from "../SearchResultPreview";
@@ -70,7 +70,7 @@ export const DetailsSection = ({
 
   const onClickEstablishmentDeleteButton = () => {
     const confirmed = confirm(
-      `⚠️ Etes-vous sûr de vouloir supprimer cet établissement ? ⚠️
+      `! Etes-vous sûr de vouloir supprimer cet établissement ? !
                 (cette opération est irréversible 💀)`,
     );
     if (confirmed && adminJwt)
@@ -130,16 +130,7 @@ export const DetailsSection = ({
       </h2>
       {match(mode)
         .with("create", () => <CreationSiretRelatedInputs />)
-        .with("edit", () => (
-          <EditionSiretRelatedInputs
-            businessAddress={formValues.businessAddresses[0].rawAddress}
-          />
-        ))
-        .with("admin", () => (
-          <EditionSiretRelatedInputs
-            businessAddress={formValues.businessAddresses[0].rawAddress}
-          />
-        ))
+        .with(P.union("admin", "edit"), () => <EditionSiretRelatedInputs />)
         .exhaustive()}
 
       <RadioButtons

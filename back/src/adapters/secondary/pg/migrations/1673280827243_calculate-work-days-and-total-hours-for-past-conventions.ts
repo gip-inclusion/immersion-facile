@@ -54,6 +54,7 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
       getSchedulesResponse.rows;
 
     idAndSchedules.forEach((idAndSchedule) => {
+      // biome-ignore lint/correctness/noUnusedVariables: <explanation>
       const { totalHours, workedDays, ...rest } = idAndSchedule.schedule;
       idAndSchedule.schedule = {
         ...rest,

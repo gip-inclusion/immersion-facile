@@ -38,9 +38,9 @@ const icUsersNeedingReview = createSelector(
       )
       .map(
         ({
-          agencyRights,
-          agencyDashboardUrl,
-          establishmentDashboards,
+          agencyRights: _1,
+          agencyDashboardUrl: _2,
+          establishmentDashboards: _3,
           ...user
         }) => user,
       ),

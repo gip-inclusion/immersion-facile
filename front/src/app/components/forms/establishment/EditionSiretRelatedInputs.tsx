@@ -4,16 +4,11 @@ import { useFormContext } from "react-hook-form";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 
-type EditionSiretRelatedInputsProps = {
-  businessAddress: string;
-};
-
-export const EditionSiretRelatedInputs = ({
-  businessAddress,
-}: EditionSiretRelatedInputsProps) => {
+export const EditionSiretRelatedInputs = () => {
   const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { register } = useFormContext();
+
   return (
     <>
       <Input
