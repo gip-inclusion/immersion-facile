@@ -21,7 +21,6 @@ export interface Database {
   ongoing_oauths: OngoingOauths;
   establishments: Establishments;
   establishments_locations: EstablishmentsLocations;
-  establishments__establishments_locations: EstablishmentsEstablishmentsLocations;
   establishments__immersion_contacts: EstablishmentsImmersionContacts;
   immersion_contacts: ImmersionContacts;
   immersion_offers: ImmersionOffers;
@@ -323,11 +322,6 @@ export interface Establishments {
   searchable_by_job_seekers: boolean;
 }
 
-export interface EstablishmentsEstablishmentsLocations {
-  establishment_siret: string;
-  location_id: string;
-}
-
 export interface EstablishmentsImmersionContacts {
   establishment_siret: string;
   contact_uuid: string;
@@ -335,6 +329,7 @@ export interface EstablishmentsImmersionContacts {
 
 export interface EstablishmentsLocations {
   id: string;
+  establishment_siret: string;
   post_code: string;
   city: string;
   street_number_and_address: string;

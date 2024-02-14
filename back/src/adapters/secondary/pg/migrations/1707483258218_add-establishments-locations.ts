@@ -3,7 +3,6 @@ import { MigrationBuilder } from "node-pg-migrate";
 const establishmentsTableName = "establishments";
 const formEstablishmentsTableName = "form_establishments";
 const establishmentsLocationsTableName = `${establishmentsTableName}_locations`;
-const joinTableName = `${establishmentsTableName}__${establishmentsLocationsTableName}`;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.dropMaterializedView("view_establishments_with_aggregated_offers");
@@ -16,6 +15,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     id: {
       type: "UUID",
       primaryKey: true,
+    },
+    establishment_siret: {
+      type: "CHAR(14)",
+      notNull: true,
+      references: "establishments",
+      onDelete: "CASCADE",
     },
     post_code: {
       type: "TEXT",
@@ -42,60 +47,29 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       notNull: true,
     },
     position: {
-      type: "GEOGRAPHY(POINT)",
+      type: "geography",
       notNull: true,
-    },
-    temp_siret: {
-      type: "VARCHAR(14)",
-      notNull: true,
-      references: establishmentsTableName,
     },
   });
-  pgm.createTable(joinTableName, {
-    establishment_siret: {
-      type: "VARCHAR(14)",
-      notNull: true,
-      references: "establishments",
-      onDelete: "CASCADE",
-    },
-    location_id: {
-      type: "UUID",
-      notNull: true,
-      references: establishmentsLocationsTableName,
-    },
-  });
-
-  // add constraints to make sure the join table is unique
-  pgm.addConstraint(joinTableName, "unique_establishment_siret_location_id", {
-    unique: ["establishment_siret", "location_id"],
-  });
-  pgm.addIndex(joinTableName, "establishment_siret");
-  pgm.addIndex(joinTableName, "location_id");
 
   // enable uuid_generate_v4 extension
   pgm.sql('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
 
   // populate establishments_locations from establishments old columns, set lat and lon from gps col
   pgm.sql(`
-    INSERT INTO ${establishmentsLocationsTableName} (id, post_code, city, street_number_and_address, department_code, lat, lon, position, temp_siret)
-    SELECT uuid_generate_v4(), post_code, city, street_number_and_address, department_code, lat, lon, gps, siret
+    INSERT INTO ${establishmentsLocationsTableName} (id, establishment_siret, post_code, city, street_number_and_address, department_code, lat, lon, position)
+    SELECT uuid_generate_v4(), siret, post_code, city, street_number_and_address, department_code, lat, lon, gps
     FROM ${establishmentsTableName}
-  `);
-  // populate join table
-  pgm.sql(`
-    INSERT INTO ${joinTableName} (establishment_siret, location_id)
-    SELECT temp_siret, id
-    FROM ${establishmentsLocationsTableName}
   `);
 
   pgm.sql(`
     UPDATE ${formEstablishmentsTableName}
     SET business_addresses = jsonb_build_array(jsonb_build_object(
-      'id', jt.location_id,
+      'id', loc.id,
       'rawAddress', (business_addresses -> 0 ->> 'rawAddress')
     ))
-    FROM ${joinTableName} as jt
-    WHERE ${formEstablishmentsTableName}.siret = jt.establishment_siret
+    FROM ${establishmentsLocationsTableName} as loc
+    WHERE ${formEstablishmentsTableName}.siret = loc.establishment_siret
   `);
 
   // drop old columns
@@ -108,7 +82,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     "lat",
     "lon",
   ]);
-  pgm.dropColumn(establishmentsLocationsTableName, "temp_siret");
+
   createSDRView(pgm, "up");
   createEstablishmentsView(pgm, "up");
   createEstablishmentsWithAggredatedOffersView(pgm);
@@ -142,7 +116,7 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
       notNull: false,
     },
     gps: {
-      type: "GEOGRAPHY(POINT)",
+      type: "geography",
       notNull: false,
     },
     lat: {
@@ -158,16 +132,15 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   // update establishments from establishments_locations old columns based on the join table
   pgm.sql(`
     UPDATE ${establishmentsTableName}
-    SET post_code = el.post_code,
-      city = el.city,
-      street_number_and_address = el.street_number_and_address,
-      department_code = el.department_code,
-      gps = el.position,
-      lat = el.lat,
-      lon = el.lon
-    FROM ${establishmentsLocationsTableName} el, ${joinTableName}
-    WHERE ${establishmentsTableName}.siret = ${joinTableName}.establishment_siret
-      AND el.id = ${joinTableName}.location_id
+    SET post_code = loc.post_code,
+      city = loc.city,
+      street_number_and_address = loc.street_number_and_address,
+      department_code = loc.department_code,
+      gps = loc.position,
+      lat = loc.lat,
+      lon = loc.lon
+    FROM ${establishmentsLocationsTableName} loc
+    WHERE ${establishmentsTableName}.siret = loc.establishment_siret
   `);
 
   // add not null constraints
@@ -194,7 +167,6 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   });
 
   // drop new columns
-  pgm.dropTable(joinTableName);
   pgm.dropTable(establishmentsLocationsTableName);
   createSDRView(pgm, "down");
   createEstablishmentsView(pgm, "down");
@@ -220,8 +192,7 @@ const createSDRView = (pgm: MigrationBuilder, direction: "up" | "down") => {
         pdr.department_name,
         pdr.region_name
       FROM establishments e
-      LEFT JOIN ${joinTableName} el ON ((el.establishment_siret = e.siret))
-      LEFT JOIN ${establishmentsLocationsTableName} loc ON ((loc.id = el.location_id))
+      LEFT JOIN ${establishmentsLocationsTableName} loc ON ((loc.establishment_siret = e.siret))
       LEFT JOIN public_department_region pdr ON ((pdr.department_code = loc.department_code));
     `);
   }
@@ -356,8 +327,7 @@ const createEstablishmentsView = (
       LEFT JOIN public_naf_classes_2008 pnc ON (((pnc.class_id)::text = regexp_replace((e.naf_code)::text, '(\d\d)(\d\d)(\w)'::text, '\\1.\\2'::text))))
       LEFT JOIN count_contact_requests_by_siret count_rel ON ((count_rel.siret = e.siret)))
       LEFT JOIN count_conventions_by_siret count_conv ON ((count_conv.siret = e.siret))
-      LEFT JOIN establishments__establishments_locations eel ON ((eel.establishment_siret = e.siret))
-      LEFT JOIN establishments_locations loc ON ((loc.id = eel.location_id))
+      LEFT JOIN establishments_locations loc ON ((loc.establishment_siret = e.siret))
       )
       `);
   }
@@ -474,9 +444,9 @@ const createOffersFromFormEstablishmentsView = (
     vad.appellation_label,
     io.siret,
     e.post_code
-   FROM ((immersion_offers io
-     LEFT JOIN establishments e ON ((io.siret = e.siret)))
-     LEFT JOIN view_appellations_dto vad ON ((io.appellation_code = vad.appellation_code)))
+   FROM immersion_offers io
+     LEFT JOIN establishments e ON io.siret = e.siret
+     LEFT JOIN view_appellations_dto vad ON io.appellation_code = vad.appellation_code
   ORDER BY ROW(io.update_date, e.name);
   `);
   } else {
@@ -488,12 +458,11 @@ const createOffersFromFormEstablishmentsView = (
     vad.appellation_label,
     io.siret,
     loc.post_code
-   FROM ((immersion_offers io
-     LEFT JOIN establishments e ON ((io.siret = e.siret)))
-     LEFT JOIN view_appellations_dto vad ON ((io.appellation_code = vad.appellation_code))
-      LEFT JOIN establishments__establishments_locations eel ON ((eel.establishment_siret = e.siret))
-      LEFT JOIN establishments_locations loc ON ((loc.id = eel.location_id))
-     )
-  ORDER BY ROW(io.update_date, e.name);`);
+  FROM immersion_offers io
+     LEFT JOIN establishments e ON io.siret = e.siret
+     LEFT JOIN view_appellations_dto vad ON io.appellation_code = vad.appellation_code
+     LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
+  ORDER BY ROW(io.update_date, e.name);
+  `);
   }
 };
