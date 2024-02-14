@@ -13,16 +13,15 @@ import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
-import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   TEST_LOCATION,
-  TEST_ROME_LABEL,
   defaultNafCode,
-} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../secondary/offer/EstablishmentBuilders";
+import { TEST_ROME_LABEL } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
@@ -119,7 +118,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       voluntaryToImmersion: true,
       locationId: TEST_LOCATION.id,
       numberOfEmployeeRange: "10-19",
-      address: rueSaintHonoreDto,
+      address: TEST_LOCATION.address,
       contactMode: "EMAIL",
       romeLabel: TEST_ROME_LABEL,
       appellations: [
@@ -132,8 +131,8 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       additionalInformation: "",
       website: "www.jobs.fr",
       position: {
-        lat: 48.866,
-        lon: 2.333,
+        lat: TEST_LOCATION.position.lat,
+        lon: TEST_LOCATION.position.lon,
       },
     } satisfies SearchImmersionResultPublicV2);
     expect(response.status).toBe(200);

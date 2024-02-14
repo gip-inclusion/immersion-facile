@@ -14,7 +14,7 @@ import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
-} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -55,7 +55,7 @@ const setMethodGetContactEmailFromSiret = (
                   lat: 48.584614,
                   lon: 7.750712,
                 },
-                id: "1",
+                id: "11111111-1111-4444-1111-111111111111",
               },
             ])
             .build(),
@@ -126,7 +126,7 @@ describe("SuggestEditEstablishment", () => {
           params: {
             editFrontUrl:
               "www.immersion-facile.fr/edit?jwt=jwtOfSiret[12345678912345]",
-            businessAddresses: ["24 rue des bouchers, 67000 Strasbourg"],
+            businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },

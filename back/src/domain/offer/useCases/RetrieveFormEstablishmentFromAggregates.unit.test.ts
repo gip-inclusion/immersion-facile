@@ -19,7 +19,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import { RetrieveFormEstablishmentFromAggregates } from "../useCases/RetrieveFormEstablishmentFromAggregates";
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {

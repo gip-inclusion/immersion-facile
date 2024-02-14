@@ -3,11 +3,11 @@ import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
 import { DiscussionAggregate } from "../../../../domain/offer/entities/DiscussionAggregate";
 import { HasDiscussionMatchingParams } from "../../../../domain/offer/ports/DiscussionAggregateRepository";
-import { DiscussionAggregateBuilder } from "../../offer/InMemoryDiscussionAggregateRepository";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
-} from "../../offer/InMemoryEstablishmentAggregateRepository";
+} from "../../offer/EstablishmentBuilders";
+import { DiscussionAggregateBuilder } from "../../offer/InMemoryDiscussionAggregateRepository";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";

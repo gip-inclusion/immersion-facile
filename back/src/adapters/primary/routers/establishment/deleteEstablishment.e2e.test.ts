@@ -18,7 +18,7 @@ import {
 import { establishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/FormEstablishmentRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../../secondary/offer/EstablishmentBuilders";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Delete form establishment", () => {

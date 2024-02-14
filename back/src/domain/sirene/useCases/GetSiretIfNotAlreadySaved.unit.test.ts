@@ -2,10 +2,8 @@ import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  EstablishmentAggregateBuilder,
-  InMemoryEstablishmentAggregateRepository,
-} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/EstablishmentBuilders";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,

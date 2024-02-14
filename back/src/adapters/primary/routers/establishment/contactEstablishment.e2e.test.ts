@@ -16,11 +16,13 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../secondary/offer/EstablishmentBuilders";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const siret = "11112222333344";
 const contactId = "theContactId";
+
+const establishment = new EstablishmentEntityBuilder().withSiret(siret).build();
 
 const validRequest: ContactEstablishmentRequestDto = {
   appellationCode: "19540",
@@ -32,7 +34,7 @@ const validRequest: ContactEstablishmentRequestDto = {
   message: "message_to_send",
   immersionObjective: "Confirmer un projet professionnel",
   potentialBeneficiaryPhone: "0654783402",
-  locationId: "123",
+  locationId: establishment.locations[0].id,
 };
 
 describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersionRoutes.contactEstablishment.url} route`, () => {
@@ -51,9 +53,6 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
   });
 
   it("sends email for valid request and save the discussion", async () => {
-    const establishment = new EstablishmentEntityBuilder()
-      .withSiret(siret)
-      .build();
     const contact = new ContactEntityBuilder()
       .withId(contactId)
       .withContactMethod("EMAIL")

@@ -3,6 +3,7 @@ import subDays from "date-fns/subDays";
 import {
   AppellationAndRomeDto,
   ContactEstablishmentRequestDto,
+  Location,
   expectArraysToEqual,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -20,19 +21,33 @@ import {
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../adapters/secondary/offer/EstablishmentBuilders";
+import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { ContactEstablishment } from "./ContactEstablishment";
 
 const siret = "11112222333344";
 const contactId = "theContactId";
+
+const location: Location = {
+  id: "11111111-1111-4444-1111-111111111111",
+  address: {
+    streetNumberAndAddress: "24 rue des bouchers",
+    city: "Strasbourg",
+    postcode: "67000",
+    departmentCode: "67",
+  },
+  position: {
+    lat: 48.584614,
+    lon: 7.750712,
+  },
+};
 
 const validRequest: ContactEstablishmentRequestDto = {
   appellationCode: "12898",
@@ -41,7 +56,7 @@ const validRequest: ContactEstablishmentRequestDto = {
   potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
   potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
-  locationId: "123",
+  locationId: location.id,
 };
 
 const appellationAndRome: AppellationAndRomeDto = {
@@ -68,7 +83,10 @@ const validEmailRequest: ContactEstablishmentRequestDto = {
 const establishmentAggregateWithEmailContact =
   new EstablishmentAggregateBuilder()
     .withEstablishment(
-      new EstablishmentEntityBuilder().withSiret(siret).build(),
+      new EstablishmentEntityBuilder()
+        .withSiret(siret)
+        .withLocations([location])
+        .build(),
     )
     .withContact(
       new ContactEntityBuilder()
@@ -138,7 +156,10 @@ describe("ContactEstablishment", () => {
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityBuilder().withSiret(siret).build(),
+          new EstablishmentEntityBuilder()
+            .withSiret(siret)
+            .withLocations([location])
+            .build(),
         )
         .withContact(
           new ContactEntityBuilder()
@@ -180,7 +201,10 @@ describe("ContactEstablishment", () => {
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityBuilder().withSiret(siret).build(),
+          new EstablishmentEntityBuilder()
+            .withSiret(siret)
+            .withLocations([location])
+            .build(),
         )
         .withContact(
           new ContactEntityBuilder()

@@ -1,40 +1,30 @@
 import {
-  AppellationCode,
   Group,
   SearchResultDto,
   SearchRoutes,
   SiretDto,
   expectHttpResponseToEqual,
-  expectToEqual,
-  immersionOffersRoute,
   searchImmersionRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { type SuperTest, type Test } from "supertest";
 import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import { OfferEntity } from "../../../../domain/offer/entities/OfferEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { avenueChampsElyseesDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
+  defaultLocation,
   defaultNafCode,
-  establishmentAggregateToSearchResultByRomeForFirstLocation,
-} from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../secondary/offer/EstablishmentBuilders";
+import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
-const makeImmersionOfferUrl = (
-  siret: SiretDto | undefined,
-  appellationCode: AppellationCode | undefined,
-): string =>
-  `${searchImmersionRoutes.getSearchResult.url}?siret=${siret}&appellationCode=${appellationCode}`;
-
 const immersionOffer = new OfferEntityBuilder().build();
-const establishmentAggregate = new EstablishmentAggregateBuilder()
+const establishmentAggregate1 = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder().withSiret("11112222333344").build(),
   )
@@ -47,58 +37,61 @@ const establishmentAggregate = new EstablishmentAggregateBuilder()
   .withOffers([immersionOffer])
   .build();
 
+const establishmentAggregate2 = new EstablishmentAggregateBuilder()
+  .withOffers([immersionOffer])
+  .withEstablishment(
+    new EstablishmentEntityBuilder()
+      .withLocations([
+        {
+          position: {
+            lat: 48.8531,
+            lon: 2.34999,
+          },
+          address: {
+            streetNumberAndAddress: "30 avenue des champs Elysées",
+            city: "Paris",
+            postcode: "75017",
+            departmentCode: "75",
+          },
+          id: "1",
+        },
+      ])
+      .withWebsite("www.jobs.fr")
+      .build(),
+  )
+  .build();
+
 describe("search-immersion route", () => {
   let inMemoryUow: InMemoryUnitOfWork;
-  let sharedRequest: HttpClient<SearchRoutes>;
+  let httpClient: HttpClient<SearchRoutes>;
 
   beforeEach(async () => {
     const testAppAndDeps = await buildTestApp();
     inMemoryUow = testAppAndDeps.inMemoryUow;
-    sharedRequest = createSupertestSharedClient(
+    httpClient = createSupertestSharedClient(
       searchImmersionRoutes,
       testAppAndDeps.request,
     );
   });
 
-  describe(`from front - /${immersionOffersRoute}`, () => {
+  describe("from front - /immersion-offers", () => {
     describe("accepts valid requests", () => {
       it("with given appellationCode and position", async () => {
         const immersionOffer = new OfferEntityBuilder()
-          .withRomeCode("D1202")
-          .withAppellationCode("12694")
-          .withAppellationLabel("Coiffeur / Coiffeuse mixte")
-          .build();
-        const establishmentAgg = new EstablishmentAggregateBuilder()
-          .withOffers([immersionOffer])
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withLocations([
-                {
-                  position: {
-                    lat: 48.8531,
-                    lon: 2.34999,
-                  },
-                  address: {
-                    streetNumberAndAddress: "30 avenue des champs Elysées",
-                    city: "Paris",
-                    postcode: "75017",
-                    departmentCode: "75",
-                  },
-                  id: "1",
-                },
-              ])
-              .withWebsite("www.jobs.fr")
-              .build(),
+          .withRomeCode(establishmentAggregate2.offers[0].romeCode)
+          .withAppellationCode(
+            establishmentAggregate2.offers[0].appellationCode,
           )
+          .withAppellationLabel("Coiffeur / Coiffeuse mixte")
           .build();
 
         // Prepare
         await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
-          establishmentAgg,
+          establishmentAggregate2,
         );
 
         // Act and assert
-        const result = await sharedRequest.search({
+        const result = await httpClient.search({
           queryParams: {
             appellationCodes: [immersionOffer.appellationCode],
             distanceKm: 30,
@@ -112,7 +105,7 @@ describe("search-immersion route", () => {
           status: 200,
           body: [
             establishmentAggregateToSearchResultByRomeForFirstLocation(
-              establishmentAgg,
+              establishmentAggregate2,
               immersionOffer.romeCode,
               0,
             ),
@@ -121,7 +114,7 @@ describe("search-immersion route", () => {
       });
 
       it("with no specified appellationCode", async () => {
-        const result = await sharedRequest.search({
+        const result = await httpClient.search({
           queryParams: {
             distanceKm: 30,
             longitude: 2.34999,
@@ -136,7 +129,7 @@ describe("search-immersion route", () => {
       });
 
       it("with filter voluntaryToImmersion", async () => {
-        const result = await sharedRequest.search({
+        const result = await httpClient.search({
           queryParams: {
             distanceKm: 30,
             longitude: 2.34999,
@@ -161,8 +154,7 @@ describe("search-immersion route", () => {
       const toSearchImmersionResults = (
         params: { siret: SiretDto; offer: OfferEntity }[],
       ): SearchResultDto[] =>
-        params.map(({ siret, offer }, index) => ({
-          address: avenueChampsElyseesDto,
+        params.map(({ siret, offer }) => ({
           naf: defaultNafCode,
           nafLabel: "NAFRev2",
           name: "Company inside repository",
@@ -181,8 +173,9 @@ describe("search-immersion route", () => {
           contactMode: "EMAIL",
           numberOfEmployeeRange: "10-19",
           distance_m: 0,
-          position: { lat: 48.8531, lon: 2.34999 },
-          locationId: `${index}`,
+          address: defaultLocation.address,
+          position: defaultLocation.position,
+          locationId: defaultLocation.id,
         }));
 
       const offer1 = new OfferEntityBuilder()
@@ -203,21 +196,6 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret1)
-                .withLocations([
-                  {
-                    position: {
-                      lat: 48.8531,
-                      lon: 2.34999,
-                    },
-                    address: {
-                      streetNumberAndAddress: "24 rue des bouchers",
-                      city: "Strasbourg",
-                      postcode: "67000",
-                      departmentCode: "67",
-                    },
-                    id: "1",
-                  },
-                ])
                 .withWebsite("www.jobs.fr")
                 .build(),
             )
@@ -228,21 +206,6 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret2)
-                .withLocations([
-                  {
-                    position: {
-                      lat: 48.8531,
-                      lon: 2.34999,
-                    },
-                    address: {
-                      streetNumberAndAddress: "24 rue des bouchers",
-                      city: "Strasbourg",
-                      postcode: "67000",
-                      departmentCode: "67",
-                    },
-                    id: "1",
-                  },
-                ])
                 .withWebsite("www.jobs.fr")
                 .withSearchableBy({ students: true, jobSeekers: false })
                 .build(),
@@ -254,21 +217,6 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret3)
-                .withLocations([
-                  {
-                    position: {
-                      lat: 48.8531,
-                      lon: 2.34999,
-                    },
-                    address: {
-                      streetNumberAndAddress: "24 rue des bouchers",
-                      city: "Strasbourg",
-                      postcode: "67000",
-                      departmentCode: "67",
-                    },
-                    id: "1",
-                  },
-                ])
                 .withWebsite("www.jobs.fr")
                 .withSearchableBy({ students: false, jobSeekers: true })
                 .build(),
@@ -278,16 +226,17 @@ describe("search-immersion route", () => {
       });
 
       it("with filter establishmentSearchableBy defined to students", async () => {
-        const result = await sharedRequest.search({
+        const result = await httpClient.search({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
-            longitude: 2.34999,
-            latitude: 48.8531,
+            longitude: defaultLocation.position.lon,
+            latitude: defaultLocation.position.lat,
             sortedBy: "distance",
             establishmentSearchableBy: "students",
           },
         });
+
         expectHttpResponseToEqual(result, {
           status: 200,
           body: toSearchImmersionResults([
@@ -298,12 +247,12 @@ describe("search-immersion route", () => {
       });
 
       it("with filter establishmentSearchableBy defined to jobSeekers", async () => {
-        const result = await sharedRequest.search({
+        const result = await httpClient.search({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
-            longitude: 2.34999,
-            latitude: 48.8531,
+            longitude: defaultLocation.position.lon,
+            latitude: defaultLocation.position.lat,
             sortedBy: "distance",
             establishmentSearchableBy: "jobSeekers",
           },
@@ -319,12 +268,12 @@ describe("search-immersion route", () => {
       });
 
       it("with filter establishmentSearchableBy not defined", async () => {
-        const result = await sharedRequest.search({
+        const result = await httpClient.search({
           queryParams: {
             appellationCodes: [offer1.appellationCode, offer2.appellationCode],
             distanceKm: 30,
-            longitude: 2.34999,
-            latitude: 48.8531,
+            longitude: defaultLocation.position.lon,
+            latitude: defaultLocation.position.lat,
             sortedBy: "distance",
           },
         });
@@ -341,7 +290,7 @@ describe("search-immersion route", () => {
     });
 
     it("rejects invalid requests with error code 400", async () => {
-      const result = await sharedRequest.search({
+      const result = await httpClient.search({
         queryParams: {
           distanceKm: 30,
           longitude: 2.34999,
@@ -382,7 +331,7 @@ describe("search-immersion route", () => {
       };
 
       inMemoryUow.groupRepository.groupEntities = [groupEntity];
-      const result = await sharedRequest.getGroupBySlug({
+      const result = await httpClient.getGroupBySlug({
         urlParams: {
           groupSlug: groupEntity.slug,
         },
@@ -398,113 +347,128 @@ describe("search-immersion route", () => {
   });
 
   describe(`${searchImmersionRoutes.getSearchResult.method} ${searchImmersionRoutes.getSearchResult.url}`, () => {
-    let request: SuperTest<Test>;
     let inMemoryUow: InMemoryUnitOfWork;
 
     beforeEach(async () => {
       const testAppAndDeps = await buildTestApp();
-      request = testAppAndDeps.request;
+      const request = testAppAndDeps.request;
+      httpClient = createSupertestSharedClient(searchImmersionRoutes, request);
       inMemoryUow = testAppAndDeps.inMemoryUow;
     });
 
     it("200 - route with mandatory params", async () => {
       inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
-        establishmentAggregate,
+        establishmentAggregate2,
+        establishmentAggregate1,
       ];
-      const response = await request.get(
-        makeImmersionOfferUrl(
-          establishmentAggregate.establishment.siret,
-          establishmentAggregate.offers[0].appellationCode,
-        ),
-      );
 
-      expect(response.status).toBe(200);
-      expectToEqual(response.body, {
-        additionalInformation: "",
-        address: {
-          city: "Paris",
-          departmentCode: "75",
-          postcode: "75017",
-          streetNumberAndAddress: "30 avenue des champs Elysées",
+      const response = await httpClient.getSearchResult({
+        queryParams: {
+          siret: establishmentAggregate1.establishment.siret,
+          appellationCode: establishmentAggregate1.offers[0].appellationCode,
         },
-        appellations: [
-          {
-            appellationCode: "19540",
-            appellationLabel: "Styliste",
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          additionalInformation: "",
+          address: {
+            city: "Paris",
+            departmentCode: "75",
+            postcode: "75017",
+            streetNumberAndAddress: "30 avenue des champs Elysées",
           },
-        ],
-        contactMode: "EMAIL",
-        naf: "7820Z",
-        nafLabel: "NAFRev2",
-        name: "Company inside repository",
-        numberOfEmployeeRange: "10-19",
-        position: {
-          lat: 48.866667,
-          lon: 2.333333,
+          appellations: [
+            {
+              appellationCode: "19540",
+              appellationLabel: "Styliste",
+            },
+          ],
+          contactMode: "EMAIL",
+          naf: "7820Z",
+          nafLabel: "NAFRev2",
+          name: "Company inside repository",
+          numberOfEmployeeRange: "10-19",
+          position: {
+            lat: 48.866667,
+            lon: 2.333333,
+          },
+          rome: "B1805",
+          romeLabel: "test_rome_label",
+          siret: "11112222333344",
+          voluntaryToImmersion: true,
+          website: "www.jobs.fr",
+          locationId: defaultLocation.id,
         },
-        rome: "B1805",
-        romeLabel: "test_rome_label",
-        siret: "11112222333344",
-        voluntaryToImmersion: true,
-        website: "www.jobs.fr",
       });
     });
 
     it("400 - route without mandatory fields or invalid fields", async () => {
-      const response = await request.get(
-        makeImmersionOfferUrl("my-fake-siret", undefined),
-      );
+      const response = await httpClient.getSearchResult({
+        queryParams: {
+          siret: "my-fake-siret",
+          appellationCode: "",
+        },
+      });
 
-      expect(response.status).toBe(400);
-      expectToEqual(response.body, {
-        issues: [
-          "appellationCode : Code appellation incorrect",
-          "siret : SIRET doit être composé de 14 chiffres",
-        ],
-        message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.
-Route: GET /search-result`,
+      expectHttpResponseToEqual(response, {
         status: 400,
+        body: {
+          issues: [
+            "appellationCode : Code appellation incorrect",
+            "siret : SIRET doit être composé de 14 chiffres",
+          ],
+          message: `Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /search-result`,
+          status: 400,
+        },
       });
     });
 
     it("404 - route with valid mandatory fields but offer not in repo", async () => {
       const requestedOffer = {
-        siret: establishmentAggregate.establishment.siret,
-        appellationCode: establishmentAggregate.offers[0].appellationCode,
+        siret: establishmentAggregate1.establishment.siret,
+        appellationCode: establishmentAggregate1.offers[0].appellationCode,
       };
-      const response = await request.get(
-        makeImmersionOfferUrl(
-          requestedOffer.siret,
-          requestedOffer.appellationCode,
-        ),
-      );
 
-      expect(response.status).toBe(404);
-      expectToEqual(response.body, {
-        errors: `No offer found for siret ${requestedOffer.siret} and appellation code ${requestedOffer.appellationCode}`,
+      const response = await httpClient.getSearchResult({
+        queryParams: {
+          siret: requestedOffer.siret,
+          appellationCode: requestedOffer.appellationCode,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          errors: `No offer found for siret ${requestedOffer.siret} and appellation code ${requestedOffer.appellationCode}`,
+        },
       });
     });
 
     it("404 - route with valid mandatory fields and siret in repo but appellation is not found for establishment", async () => {
       inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
-        establishmentAggregate,
+        establishmentAggregate2,
+        establishmentAggregate1,
       ];
       const appellationCodeNotFoundForEstablishment = "54321";
       const requestedOffer = {
-        siret: establishmentAggregate.establishment.siret,
+        siret: establishmentAggregate1.establishment.siret,
         appellationCode: appellationCodeNotFoundForEstablishment,
       };
 
-      const response = await request.get(
-        makeImmersionOfferUrl(
-          requestedOffer.siret,
-          requestedOffer.appellationCode,
-        ),
-      );
+      const response = await httpClient.getSearchResult({
+        queryParams: {
+          siret: requestedOffer.siret,
+          appellationCode: requestedOffer.appellationCode,
+        },
+      });
 
-      expect(response.status).toBe(404);
-      expectToEqual(response.body, {
-        errors: `No offer found for siret ${requestedOffer.siret} and appellation code ${requestedOffer.appellationCode}`,
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          errors: `No offer found for siret ${requestedOffer.siret} and appellation code ${requestedOffer.appellationCode}`,
+        },
       });
     });
   });

@@ -23,7 +23,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 

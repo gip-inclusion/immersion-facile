@@ -15,13 +15,13 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
+  TEST_APPELLATION_CODE,
+  TEST_APPELLATION_LABEL,
+} from "../../../../adapters/secondary/offer/EstablishmentBuilders";
+import {
   DiscussionAggregateBuilder,
   InMemoryDiscussionAggregateRepository,
 } from "../../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
-import {
-  TEST_APPELLATION_CODE,
-  TEST_APPELLATION_LABEL,
-} from "../../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,

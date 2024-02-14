@@ -22,7 +22,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../offer/InMemoryEstablishmentAggregateRepository";
+} from "../../offer/EstablishmentBuilders";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";

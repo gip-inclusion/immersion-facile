@@ -4,7 +4,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../../adapters/secondary/offer/EstablishmentBuilders";
 import { InMemoryPassEmploiGateway } from "../../../../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";

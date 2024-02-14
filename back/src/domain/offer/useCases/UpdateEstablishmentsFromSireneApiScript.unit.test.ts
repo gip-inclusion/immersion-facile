@@ -9,7 +9,7 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
-} from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
 

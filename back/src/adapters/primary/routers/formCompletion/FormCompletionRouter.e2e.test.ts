@@ -7,7 +7,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { EstablishmentAggregateBuilder } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../../secondary/offer/EstablishmentBuilders";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
