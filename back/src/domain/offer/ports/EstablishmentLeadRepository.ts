@@ -3,11 +3,12 @@ import {
   EstablishmentLead,
   EstablishmentLeadEventKind,
 } from "../entities/EstablishmentLeadEntity";
+import { EstablishmentLeadReminderParams } from "../useCases/SendEstablishmentLeadReminderScript";
 
 export interface EstablishmentLeadRepository {
   save(establishmentLead: EstablishmentLead): Promise<void>;
   getBySiret(siret: SiretDto): Promise<EstablishmentLead | undefined>;
   getSiretsByUniqLastEventKind(
-    kind: EstablishmentLeadEventKind,
+    params: EstablishmentLeadReminderParams,
   ): Promise<SiretDto[]>;
 }

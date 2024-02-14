@@ -27,11 +27,19 @@ export type SendEstablishmentLeadReminderOutput = {
   establishmentsReminded: SiretDto[];
 };
 
+export type EstablishmentLeadReminderParams = {
+  kind: EstablishmentLeadEventKind;
+  beforeDate?: Date;
+};
+
 export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
-  EstablishmentLeadEventKind,
+  EstablishmentLeadReminderParams,
   SendEstablishmentLeadReminderOutput
 > {
-  protected inputSchema = z.enum(establishmentLeadEventKind);
+  protected inputSchema = z.object({
+    kind: z.enum(establishmentLeadEventKind),
+    beforeDate: z.date().optional(),
+  });
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -64,13 +72,14 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
   }
 
   protected async _execute(
-    kind: EstablishmentLeadEventKind,
+    { kind, beforeDate }: EstablishmentLeadReminderParams,
     uow: UnitOfWork,
   ): Promise<SendEstablishmentLeadReminderOutput> {
     const conventions =
-      await uow.establishmentLeadQueries.getLastConventionsByUniqLastEventKind(
+      await uow.establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
         kind,
-      );
+        beforeDate,
+      });
 
     const errors: Record<ConventionId, Error> = {};
     await Promise.all(
@@ -108,7 +117,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
       id: convention.id,
       email: convention.signatories.establishmentRepresentative.email,
       role: "establishment-representative",
-      targetRoute: frontRoutes.unregisterEstablishmentLead,
+      targetRoute: frontRoutes.unsubscribeEstablishmentLead,
       now,
     });
 

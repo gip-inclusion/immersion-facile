@@ -5,6 +5,7 @@ import {
   EstablishmentLeadEventKind,
 } from "../../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadRepository } from "../../../domain/offer/ports/EstablishmentLeadRepository";
+import { EstablishmentLeadReminderParams } from "../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
 
 export class InMemoryEstablishmentLeadRepository
   implements EstablishmentLeadRepository
@@ -34,16 +35,29 @@ export class InMemoryEstablishmentLeadRepository
     return { ...establishmentLead, lastEventKind };
   }
 
-  public getSiretsByUniqLastEventKind(
-    kind: EstablishmentLeadEventKind,
-  ): Promise<SiretDto[]> {
+  public getSiretsByUniqLastEventKind({
+    kind,
+    beforeDate,
+  }: EstablishmentLeadReminderParams): Promise<SiretDto[]> {
     const sirets = Object.values(this.#establishmentLeads)
       .filter(
         ({ lastEventKind, events }) =>
           lastEventKind === kind &&
           events.filter((event) => event.kind === kind).length === 1,
       )
-      .map(({ siret }) => siret);
+      .filter(({ events }) => {
+        return beforeDate
+          ? events.filter(
+              (event) => event.kind === kind && event.occurredAt <= beforeDate,
+            ).length > 0
+          : true;
+      })
+      .map(({ siret, events }) => {
+        console.log("beforeDate", beforeDate);
+        console.log("events", events);
+        return siret;
+      });
+    console.log("sirets", sirets);
     return Promise.resolve(sirets);
   }
 

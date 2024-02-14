@@ -1,8 +1,8 @@
 import { ConventionReadDto } from "shared";
-import { EstablishmentLeadEventKind } from "../entities/EstablishmentLeadEntity";
+import { EstablishmentLeadReminderParams } from "../useCases/SendEstablishmentLeadReminderScript";
 
 export interface EstablishmentLeadQueries {
   getLastConventionsByUniqLastEventKind(
-    kind: EstablishmentLeadEventKind,
+    params: EstablishmentLeadReminderParams,
   ): Promise<ConventionReadDto[]>;
 }

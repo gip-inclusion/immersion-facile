@@ -5,6 +5,7 @@ import {
   isSiretsListFilled,
 } from "../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadQueries } from "../../domain/offer/ports/EstablishmentLeadQueries";
+import { EstablishmentLeadReminderParams } from "../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
 import { InMemoryEstablishmentLeadRepository } from "./offer/InMemoryEstablishmentLeadRepository";
 
 export class InMemoryEstablishmentLeadQueries
@@ -16,10 +17,12 @@ export class InMemoryEstablishmentLeadQueries
   ) {}
 
   public async getLastConventionsByUniqLastEventKind(
-    kind: EstablishmentLeadEventKind,
+    params: EstablishmentLeadReminderParams,
   ): Promise<ConventionReadDto[]> {
     const sirets =
-      await this.establishmentLeadRepository.getSiretsByUniqLastEventKind(kind);
+      await this.establishmentLeadRepository.getSiretsByUniqLastEventKind(
+        params,
+      );
     return isSiretsListFilled(sirets)
       ? this.conventionQueries.getLatestConventionBySirets(sirets)
       : [];
