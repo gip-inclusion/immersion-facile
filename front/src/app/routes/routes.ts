@@ -112,7 +112,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       jwt: param.query.string,
     },
-    () => `/${frontRoutes.unregisterEstablishmentLead}`,
+    () => `/${frontRoutes.unsubscribeEstablishmentLead}`,
   ),
   group: defineRoute(
     { groupSlug: param.path.string },
