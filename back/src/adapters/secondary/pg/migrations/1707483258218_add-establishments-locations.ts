@@ -52,6 +52,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     },
   });
 
+  pgm.addIndex(establishmentsLocationsTableName, "establishment_siret");
+
   // enable uuid_generate_v4 extension
   pgm.sql('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
 
