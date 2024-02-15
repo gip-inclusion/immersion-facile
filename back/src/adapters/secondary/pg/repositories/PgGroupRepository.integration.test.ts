@@ -14,6 +14,7 @@ import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
+  defaultLocation,
 } from "../../offer/EstablishmentBuilders";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
@@ -71,6 +72,7 @@ describe("PgEstablishmentGroupRepository", () => {
     await db.deleteFrom("groups").execute();
     await client.query("DELETE FROM immersion_contacts");
     await db.deleteFrom("discussions").execute();
+    await client.query("DELETE FROM establishments_locations");
     await client.query("DELETE FROM establishments");
   });
 
@@ -137,12 +139,29 @@ describe("PgEstablishmentGroupRepository", () => {
     const establishmentAggregate1 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(carrefourGroupEntity.sirets[0])
       .withContactId("11111111-1111-4444-1111-111111111111")
+      .withLocationId("aaaaaaaa-aaaa-4444-bbbb-bbbbbbbbbbbb")
       .withOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
       .build();
 
     const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(carrefourGroupEntity.sirets[1])
       .withContactId("22222222-2222-4444-2222-222222222222")
+      .withLocations([
+        defaultLocation,
+        {
+          id: "bbbbbbbb-bbbb-4444-bbbb-bbbbbbbbbbbb",
+          position: {
+            lat: 48.8566,
+            lon: 2.3522,
+          },
+          address: {
+            streetNumberAndAddress: "1 rue de la paix",
+            postcode: "75002",
+            city: "Paris",
+            departmentCode: "75",
+          },
+        },
+      ])
       .withOffers([offerVendeurEnAlimentationGenerale])
       .build();
 
@@ -237,6 +256,18 @@ describe("PgEstablishmentGroupRepository", () => {
             },
           ],
           location: establishment2.locations[0],
+        }),
+        createSearchResult({
+          establishment: establishment2,
+          rome: "D1106",
+          romeLabel: "Vente en alimentation",
+          appellations: [
+            {
+              appellationLabel: "Vendeur / Vendeuse en alimentation générale",
+              appellationCode: "20540",
+            },
+          ],
+          location: establishment2.locations[1],
         }),
       ],
     });
