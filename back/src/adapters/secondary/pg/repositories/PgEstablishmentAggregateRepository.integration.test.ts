@@ -1,12 +1,12 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { prop, sortBy } from "ramda";
 import {
   AppellationAndRomeDto,
   Location,
   SearchResultDto,
-  SiretDto,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
+  expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -22,21 +22,19 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
+  defaultLocation,
 } from "../../offer/EstablishmentBuilders";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
-  InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
-  PgEstablishmentRow,
+  InsertEstablishmentAggregateProps,
   getAllEstablishmentImmersionContactsRows,
   getAllEstablishmentsRows,
   getAllImmersionContactsRows,
   getAllImmersionOfferRows,
   getEstablishmentsRowsBySiret,
-  insertActiveEstablishmentAndOfferAndEventuallyContact,
-  insertEstablishment,
-  insertImmersionOffer,
+  insertEstablishmentAggregate,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
 const cartographeImmersionOffer = new OfferEntityBuilder()
@@ -59,29 +57,27 @@ const hydrographeAppellationAndRome: AppellationAndRomeDto = {
 
 describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
-  let transaction: KyselyDb;
+  let kyselyDb: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
-    transaction = makeKyselyDb(pool);
+    kyselyDb = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_contacts");
-    await client.query("DELETE FROM discussions");
-    await client.query("DELETE FROM establishments_locations CASCADE");
-    await client.query("DELETE FROM establishments");
+    await kyselyDb.deleteFrom("immersion_contacts").execute();
+    await kyselyDb.deleteFrom("immersion_offers").execute();
+    await kyselyDb.deleteFrom("discussions").execute();
+    await kyselyDb.deleteFrom("establishments_locations").execute();
+    await kyselyDb.deleteFrom("establishments").execute();
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      transaction,
+      kyselyDb,
     );
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
@@ -116,24 +112,26 @@ describe("PgEstablishmentAggregateRepository", () => {
         const establishmentsAndOffers = [
           {
             siret: "78000403200029",
-            rome: "A1101",
+            romeAndAppellationCodes: [
+              { romeCode: "A1101", appellationCode: "11987" },
+            ],
             establishmentPosition: searchedPosition, // Position matching
-            appellationCode: "11987",
             createdAt: new Date(),
           },
           {
             siret: "79000403200029",
-            rome: "A1201",
+            romeAndAppellationCodes: [
+              { romeCode: "A1101", appellationCode: "11987" },
+            ],
             establishmentPosition: searchedPosition, // Position matching
-            appellationCode: "12755",
             createdAt: new Date(),
           },
-        ] satisfies InsertActiveEstablishmentAndOfferAndEventuallyContactProps[];
+        ] satisfies InsertEstablishmentAggregateProps[];
 
         // Prepare
         await Promise.all(
           establishmentsAndOffers.map((establishmentsAndOffer, index) =>
-            insertActiveEstablishmentAndOfferAndEventuallyContact(
+            insertEstablishmentAggregate(
               pgEstablishmentAggregateRepository,
               establishmentsAndOffer,
               index,
@@ -157,31 +155,38 @@ describe("PgEstablishmentAggregateRepository", () => {
       it("returns all establishments within geographical area", async () => {
         // Prepare
         /// Two establishments located inside geographical area
-        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        await insertEstablishmentAggregate(
           pgEstablishmentAggregateRepository,
           {
             siret: "78000403200029",
-            rome: "A1101",
-            appellationCode: "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
+            romeAndAppellationCodes: [
+              {
+                romeCode: "A1101",
+                appellationCode: "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
+              },
+              {
+                romeCode: "A1101", // Same rome and establishment as offer
+                appellationCode: "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
+              },
+            ],
             establishmentPosition: searchedPosition,
             createdAt: new Date(),
           },
           0,
         );
-        await insertImmersionOffer(client, {
-          siret: "78000403200029",
-          romeCode: "A1101", // Same rome and establishment as offer
-          appellationCode: "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
-        });
 
         /// Establishment oustide geographical are
-        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        await insertEstablishmentAggregate(
           pgEstablishmentAggregateRepository,
           {
             siret: "99000403200029",
-            rome: "A1101",
+            romeAndAppellationCodes: [
+              {
+                romeCode: "A1101",
+                appellationCode: "12862",
+              },
+            ],
             establishmentPosition: farFromSearchedPosition,
-            appellationCode: "12862",
             createdAt: new Date(),
           },
           1,
@@ -246,14 +251,17 @@ describe("PgEstablishmentAggregateRepository", () => {
               createdAt: new Date(),
             },
           ].map((params, index) =>
-            insertActiveEstablishmentAndOfferAndEventuallyContact(
+            insertEstablishmentAggregate(
               pgEstablishmentAggregateRepository,
               {
                 ...params,
-
-                rome: cartographeImmersionOffer.romeCode,
-                // biome-ignore lint/style/noNonNullAssertion:
-                appellationCode: cartographeSearchMade.appellationCodes![0],
+                romeAndAppellationCodes: [
+                  {
+                    romeCode: cartographeImmersionOffer.romeCode,
+                    // biome-ignore lint/style/noNonNullAssertion:
+                    appellationCode: cartographeSearchMade.appellationCodes![0],
+                  },
+                ],
                 offerCreatedAt: new Date("2022-05-05"),
               },
               index,
@@ -272,8 +280,8 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
 
         expectArraysToEqualIgnoringOrder(
-          searchResultsOnlyForStudents,
-          toSearchResults([siret2, siret1]),
+          searchResultsOnlyForStudents.map(({ siret }) => siret),
+          [siret2, siret1],
         );
       });
 
@@ -287,8 +295,8 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
 
         expectArraysToEqualIgnoringOrder(
-          searchResultsOnlyForStudents,
-          toSearchResults([siret3, siret1]),
+          searchResultsOnlyForStudents.map(({ siret }) => siret),
+          [siret1, siret3],
         );
       });
 
@@ -299,8 +307,8 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
 
         expectArraysToEqualIgnoringOrder(
-          searchResultsOnlyForStudents,
-          toSearchResults([siret2, siret1, siret3]),
+          searchResultsOnlyForStudents.map(({ siret }) => siret),
+          [siret2, siret1, siret3],
         );
       });
     });
@@ -309,22 +317,21 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Prepare : establishment in geographical area but not active
       const notActiveSiret = "78000403200029";
 
-      await insertEstablishment(client, {
+      await insertEstablishmentAggregate(pgEstablishmentAggregateRepository, {
         siret: notActiveSiret,
-        isOpen: false,
-        position: searchedPosition,
+        establishmentPosition: searchedPosition,
+        romeAndAppellationCodes: [
+          {
+            romeCode: cartographeImmersionOffer.romeCode,
+            appellationCode: cartographeImmersionOffer.appellationCode,
+          },
+          {
+            romeCode: hydrographeAppellationAndRome.romeCode,
+            appellationCode: hydrographeAppellationAndRome.appellationCode,
+          },
+        ],
         createdAt: new Date(),
-      });
-      await insertImmersionOffer(client, {
-        romeCode: cartographeImmersionOffer.romeCode,
-        appellationCode: hydrographeAppellationAndRome.appellationCode, // Appellation
-        siret: notActiveSiret,
-      });
-
-      await insertImmersionOffer(client, {
-        romeCode: cartographeImmersionOffer.romeCode,
-        appellationCode: cartographeImmersionOffer.appellationCode, // Appellation
-        siret: notActiveSiret,
+        isOpen: false,
       });
 
       // Act
@@ -336,29 +343,26 @@ describe("PgEstablishmentAggregateRepository", () => {
       expect(searchWithNoRomeResult).toHaveLength(0);
     });
 
-    it("provide also searchable establishments", async () => {
+    it("provide also non searchable establishments (so that usecase can prevent LBB results to be shown)", async () => {
       // Prepare : establishment in geographical area but not active
       const notSearchableSiret = "78000403200029";
 
-      await insertEstablishment(client, {
+      await insertEstablishmentAggregate(pgEstablishmentAggregateRepository, {
         siret: notSearchableSiret,
+        establishmentPosition: searchedPosition,
         isSearchable: false,
-        position: searchedPosition,
         createdAt: new Date(),
+        romeAndAppellationCodes: [
+          {
+            romeCode: cartographeImmersionOffer.romeCode,
+            appellationCode: cartographeImmersionOffer.appellationCode,
+          },
+          {
+            romeCode: hydrographeAppellationAndRome.romeCode,
+            appellationCode: hydrographeAppellationAndRome.appellationCode,
+          },
+        ],
       });
-
-      await Promise.all([
-        insertImmersionOffer(client, {
-          siret: notSearchableSiret,
-          romeCode: hydrographeAppellationAndRome.romeCode,
-          appellationCode: hydrographeAppellationAndRome.appellationCode, // Appellation
-        }),
-        insertImmersionOffer(client, {
-          siret: notSearchableSiret,
-          romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeImmersionOffer.appellationCode,
-        }),
-      ]);
 
       // Act
       const searchWithNoRomeResult =
@@ -367,42 +371,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         });
 
       // Assert
-      expectToEqual(searchWithNoRomeResult, [
-        {
-          address: {
-            city: "Paris",
-            streetNumberAndAddress: "7 rue guillaume tell",
-            postcode: "75017",
-            departmentCode: "75",
-          },
-          additionalInformation: "",
-          website: "",
-          distance_m: 0,
-          appellations: [
-            {
-              appellationCode: cartographeImmersionOffer.appellationCode,
-              appellationLabel: cartographeImmersionOffer.appellationLabel,
-            },
-            {
-              appellationCode: hydrographeAppellationAndRome.appellationCode,
-              appellationLabel: hydrographeAppellationAndRome.appellationLabel,
-            },
-          ],
-          isSearchable: false,
-          naf: "8622B",
-          nafLabel: "Activité des médecins spécialistes",
-          name: "",
-          rome: cartographeImmersionOffer.romeCode,
-          romeLabel: "Information géographique",
-          position: {
-            lat: 49,
-            lon: 6,
-          },
-          siret: "78000403200029",
-          voluntaryToImmersion: true,
-          locationId: "123",
-        },
-      ]);
+      expectToEqual(
+        searchWithNoRomeResult.map(({ siret }) => siret),
+        [notSearchableSiret],
+      );
     });
 
     it("returns one search DTO by establishment, with offers matching rome and geographical area", async () => {
@@ -412,14 +384,25 @@ describe("PgEstablishmentAggregateRepository", () => {
       const matchingEstablishmentAddress = rueBitcheDto;
       const matchingNaf = "8622B";
       const matchingNumberOfEmployeeRange = "1-2";
+      const locationId = "22222222-ee70-4c90-b3f4-668d492f7395";
       const matchingNafLabel = "Activité des médecins spécialistes";
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+      await insertEstablishmentAggregate(
         pgEstablishmentAggregateRepository,
         {
           siret: siretMatchingToSearch,
-          rome: cartographeImmersionOffer.romeCode,
+          locationId,
+          romeAndAppellationCodes: [
+            {
+              romeCode: cartographeImmersionOffer.romeCode,
+              appellationCode: cartographeImmersionOffer.appellationCode,
+            },
+            {
+              romeCode: analysteEnGeomatiqueImmersionOffer.romeCode,
+              appellationCode:
+                analysteEnGeomatiqueImmersionOffer.appellationCode,
+            },
+          ],
           establishmentPosition: searchedPosition,
-          appellationCode: cartographeImmersionOffer.appellationCode,
           offerContactUid: undefined,
           sourceProvider: "immersion-facile",
           address: matchingEstablishmentAddress,
@@ -428,74 +411,86 @@ describe("PgEstablishmentAggregateRepository", () => {
           fitForDisabledWorkers: true,
           createdAt: new Date(),
         },
+        0,
       );
 
-      await insertImmersionOffer(client, {
-        siret: siretMatchingToSearch,
-        romeCode: analysteEnGeomatiqueImmersionOffer.romeCode,
-        appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
-      });
-
       /// Establishment with offer inside geographical area but an other rome
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+      await insertEstablishmentAggregate(
         pgEstablishmentAggregateRepository,
         {
           siret: "88000403200029",
           establishmentPosition: searchedPosition,
-          rome: notMatchingRome,
-          appellationCode: "19540",
+          romeAndAppellationCodes: [
+            {
+              romeCode: notMatchingRome,
+              appellationCode: "19540",
+            },
+          ],
           createdAt: new Date(),
         },
+        1,
       );
 
       // Establishment with offer with searched rome but oustide geographical area
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+      await insertEstablishmentAggregate(
         pgEstablishmentAggregateRepository,
         {
           siret: "99000403200029",
           establishmentPosition: farFromSearchedPosition,
-          rome: analysteEnGeomatiqueImmersionOffer.romeCode,
-          appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
+          romeAndAppellationCodes: [
+            {
+              romeCode: analysteEnGeomatiqueImmersionOffer.romeCode,
+              appellationCode:
+                analysteEnGeomatiqueImmersionOffer.appellationCode,
+            },
+          ],
           createdAt: new Date(),
         },
+        2,
       );
 
       // Act
-      const searchResult: SearchResultDto[] =
+      const searchImmersionResults =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: cartographeSearchMade,
         });
 
       // Assert : one match and defined contact details
-      expect(searchResult).toHaveLength(1);
+      expect(searchImmersionResults).toHaveLength(1);
 
-      const expectedResult: Partial<SearchResultDto> = {
-        rome: cartographeImmersionOffer.romeCode,
-        romeLabel: "Information géographique",
-        appellations: [
-          {
-            appellationLabel:
-              analysteEnGeomatiqueImmersionOffer.appellationLabel,
-            appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
-          },
-          {
-            appellationLabel: cartographeImmersionOffer.appellationLabel,
-            appellationCode: cartographeImmersionOffer.appellationCode,
-          },
-        ],
-        siret: siretMatchingToSearch,
-        distance_m: 0,
-        voluntaryToImmersion: true,
-        contactMode: undefined,
-        address: matchingEstablishmentAddress,
-        numberOfEmployeeRange: "1-2",
-        naf: matchingNaf,
-        nafLabel: matchingNafLabel,
-        position: searchedPosition,
-        fitForDisabledWorkers: true,
-      };
-
-      expect(searchResult).toMatchObject([expectedResult]);
+      expectToEqual(searchImmersionResults, [
+        {
+          name: "Company inside repository",
+          siret: siretMatchingToSearch,
+          isSearchable: true,
+          locationId: locationId,
+          rome: cartographeImmersionOffer.romeCode,
+          romeLabel: "Information géographique",
+          appellations: [
+            {
+              appellationLabel:
+                analysteEnGeomatiqueImmersionOffer.appellationLabel,
+              appellationCode:
+                analysteEnGeomatiqueImmersionOffer.appellationCode,
+            },
+            {
+              appellationLabel: cartographeImmersionOffer.appellationLabel,
+              appellationCode: cartographeImmersionOffer.appellationCode,
+            },
+          ],
+          distance_m: 0,
+          voluntaryToImmersion: true,
+          contactMode: "EMAIL",
+          address: matchingEstablishmentAddress,
+          numberOfEmployeeRange: "1-2",
+          naf: matchingNaf,
+          nafLabel: matchingNafLabel,
+          position: searchedPosition,
+          fitForDisabledWorkers: true,
+          website: "",
+          additionalInformation: "",
+        },
+      ]);
 
       const searchResultsWithOverriddenRomeCode: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
@@ -509,31 +504,41 @@ describe("PgEstablishmentAggregateRepository", () => {
       const closeSiret = "99000403200029";
       const farSiret = "11000403200029";
 
-      await insertEstablishment(client, {
-        siret: closeSiret,
-        position: searchedPosition,
-        createdAt: new Date(),
-      });
-      await insertEstablishment(client, {
-        siret: farSiret,
-        position: {
-          lon: searchedPosition.lon + 0.01,
-          lat: searchedPosition.lat + 0.01,
+      await insertEstablishmentAggregate(
+        pgEstablishmentAggregateRepository,
+        {
+          siret: closeSiret,
+          establishmentPosition: searchedPosition,
+          createdAt: new Date(),
+          romeAndAppellationCodes: [
+            {
+              romeCode: cartographeImmersionOffer.romeCode,
+              appellationCode: cartographeImmersionOffer.appellationCode,
+            },
+          ],
         },
-        createdAt: new Date(),
-      });
-      await insertImmersionOffer(client, {
-        romeCode: cartographeImmersionOffer.romeCode,
-        siret: closeSiret,
-        // biome-ignore lint/style/noNonNullAssertion:
-        appellationCode: cartographeSearchMade.appellationCodes![0],
-      });
-      await insertImmersionOffer(client, {
-        romeCode: cartographeImmersionOffer.romeCode,
-        siret: farSiret,
-        // biome-ignore lint/style/noNonNullAssertion:
-        appellationCode: cartographeSearchMade.appellationCodes![0],
-      });
+        0,
+      );
+
+      await insertEstablishmentAggregate(
+        pgEstablishmentAggregateRepository,
+        {
+          siret: farSiret,
+          establishmentPosition: {
+            lon: searchedPosition.lon + 0.01,
+            lat: searchedPosition.lat + 0.01,
+          },
+          createdAt: new Date(),
+          romeAndAppellationCodes: [
+            {
+              romeCode: cartographeImmersionOffer.romeCode,
+              appellationCode: cartographeImmersionOffer.appellationCode,
+            },
+          ],
+        },
+        1,
+      );
+
       // Act
       const searchResult =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
@@ -550,35 +555,32 @@ describe("PgEstablishmentAggregateRepository", () => {
       const recentOfferSiret = "99000403200029";
       const oldOfferSiret = "11000403200029";
 
-      await Promise.all([
-        insertEstablishment(client, {
-          siret: recentOfferSiret,
-          position: searchedPosition,
-          createdAt: new Date(),
-        }),
-        insertEstablishment(client, {
-          siret: oldOfferSiret,
-          position: searchedPosition,
-          createdAt: new Date(),
-        }),
-      ]);
-
-      await Promise.all([
-        insertImmersionOffer(client, {
-          romeCode: cartographeImmersionOffer.romeCode,
-          // biome-ignore lint/style/noNonNullAssertion:
-          appellationCode: cartographeSearchMade.appellationCodes![0],
-          siret: recentOfferSiret,
-          offerCreatedAt: new Date("2022-05-05"),
-        }),
-        insertImmersionOffer(client, {
-          romeCode: cartographeImmersionOffer.romeCode,
-          // biome-ignore lint/style/noNonNullAssertion:
-          appellationCode: cartographeSearchMade.appellationCodes![0],
-          siret: oldOfferSiret,
-          offerCreatedAt: new Date("2022-05-02"),
-        }),
-      ]);
+      await Promise.all(
+        [
+          { siret: recentOfferSiret, offerCreatedAt: new Date("2022-05-05") },
+          {
+            siret: oldOfferSiret,
+            offerCreatedAt: new Date("2022-05-02"),
+          },
+        ].map((params, index) =>
+          insertEstablishmentAggregate(
+            pgEstablishmentAggregateRepository,
+            {
+              siret: params.siret,
+              establishmentPosition: searchedPosition,
+              createdAt: new Date(),
+              romeAndAppellationCodes: [
+                {
+                  romeCode: cartographeImmersionOffer.romeCode,
+                  appellationCode: cartographeImmersionOffer.appellationCode,
+                },
+              ],
+              offerCreatedAt: params.offerCreatedAt,
+            },
+            index,
+          ),
+        ),
+      );
 
       // Act
       const searchResult =
@@ -596,33 +598,39 @@ describe("PgEstablishmentAggregateRepository", () => {
       const establishmentSiret1 = "99000403200029";
       const establishmentSiret2 = "11000403200029";
 
-      await Promise.all([
-        insertEstablishment(client, {
-          siret: establishmentSiret1,
-          position: searchedPosition,
-          createdAt: new Date(),
-        }),
-        insertEstablishment(client, {
-          siret: establishmentSiret2,
-          position: searchedPosition,
-          createdAt: new Date(),
-        }),
-      ]);
-
-      await Promise.all([
-        insertImmersionOffer(client, {
-          romeCode: cartographeImmersionOffer.romeCode,
-          appellationCode: cartographeImmersionOffer.appellationCode,
-          siret: establishmentSiret1,
-          offerCreatedAt: new Date("2022-05-05"),
-        }),
-        insertImmersionOffer(client, {
-          romeCode: analysteEnGeomatiqueImmersionOffer.romeCode,
-          appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
-          siret: establishmentSiret2,
-          offerCreatedAt: new Date("2022-05-02"),
-        }),
-      ]);
+      await Promise.all(
+        [
+          {
+            siret: establishmentSiret1,
+            appellationCode: cartographeImmersionOffer.appellationCode,
+            romeCode: cartographeImmersionOffer.romeCode,
+            offerCreatedAt: new Date("2022-05-05"),
+          },
+          {
+            siret: establishmentSiret2,
+            appellationCode: analysteEnGeomatiqueImmersionOffer.appellationCode,
+            romeCode: analysteEnGeomatiqueImmersionOffer.romeCode,
+            offerCreatedAt: new Date("2022-05-02"),
+          },
+        ].map((params, index) =>
+          insertEstablishmentAggregate(
+            pgEstablishmentAggregateRepository,
+            {
+              siret: params.siret,
+              romeAndAppellationCodes: [
+                {
+                  romeCode: params.romeCode,
+                  appellationCode: params.appellationCode,
+                },
+              ],
+              offerCreatedAt: params.offerCreatedAt,
+              createdAt: new Date(),
+              establishmentPosition: searchedPosition,
+            },
+            index,
+          ),
+        ),
+      );
 
       // Act
       const searchResult =
@@ -688,9 +696,11 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withEstablishment(establishmentToInsert)
             .build(),
         );
-
         // Assert
-        const expectedEstablishmentRow: Partial<PgEstablishmentRow> = {
+        const actualEstablishmentRows =
+          await getAllEstablishmentsRows(kyselyDb);
+        expect(actualEstablishmentRows).toHaveLength(1);
+        expectObjectsToMatch(actualEstablishmentRows[0], {
           siret: establishmentToInsert.siret,
           name: establishmentToInsert.name,
           customized_name: establishmentToInsert.customizedName ?? null,
@@ -707,12 +717,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           is_open: establishmentToInsert.isOpen,
           max_contacts_per_week: establishmentToInsert.maxContactsPerWeek,
           last_insee_check_date: establishmentToInsert.lastInseeCheckDate,
-        };
-        const actualEstablishmentRows = await getAllEstablishmentsRows(client);
-        expect(actualEstablishmentRows).toHaveLength(1);
-        expect(actualEstablishmentRows[0]).toMatchObject(
-          expectedEstablishmentRow,
-        );
+        });
       });
 
       it("adds one new row per establishment in `establishments` table when multiple establishments are given", async () => {
@@ -742,7 +747,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
         );
         // Assert
-        const establishmentsRows = await getAllEstablishmentsRows(client);
+        const establishmentsRows = await getAllEstablishmentsRows(kyselyDb);
         expect(establishmentsRows).toHaveLength(2);
         expect(establishmentsRows.map((row) => row.siret)).toEqual([
           siret1,
@@ -767,7 +772,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         // Assert
-        expectToEqual(await getAllImmersionContactsRows(client), [
+        expectToEqual(await getAllImmersionContactsRows(kyselyDb), [
           {
             uuid: contact.id,
             email: contact.email,
@@ -776,15 +781,18 @@ describe("PgEstablishmentAggregateRepository", () => {
             firstname: contact.firstName,
             job: contact.job,
             contact_mode: "EMAIL",
-            copy_emails: contact.copyEmails,
+            copy_emails: contact.copyEmails as any,
           },
         ]);
-        expectToEqual(await getAllEstablishmentImmersionContactsRows(client), [
-          {
-            contact_uuid: contact.id,
-            establishment_siret: siret1,
-          },
-        ]);
+        expectToEqual(
+          await getAllEstablishmentImmersionContactsRows(kyselyDb),
+          [
+            {
+              contact_uuid: contact.id,
+              establishment_siret: siret1,
+            },
+          ],
+        );
       });
 
       it("adds as many row as immersion offers in table `immersion_offers`, each referencing the establishment siret and the contact uuid", async () => {
@@ -813,20 +821,18 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         // Assert
 
-        expectToEqual(await getAllImmersionOfferRows(client), [
+        expectToEqual(await getAllImmersionOfferRows(kyselyDb), [
           {
             rome_code: offer1.romeCode,
             score: offer1.score,
             siret: siret1,
             appellation_code: parseInt(offer1.appellationCode),
-            rome_nomenclature: undefined,
           },
           {
             rome_code: offer2.romeCode,
             score: offer2.score,
             siret: siret1,
             appellation_code: parseInt(offer2.appellationCode),
-            rome_nomenclature: undefined,
           },
         ]);
       });
@@ -847,10 +853,10 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     it("returns true if an establishment from form with given siret exists", async () => {
       // Prepare
-      await insertEstablishment(client, {
+      await insertEstablishmentAggregate(pgEstablishmentAggregateRepository, {
         siret,
-        createdAt: new Date(),
       });
+
       // Act and assert
       expect(
         await pgEstablishmentAggregateRepository.hasEstablishmentWithSiret(
@@ -864,19 +870,36 @@ describe("PgEstablishmentAggregateRepository", () => {
     it("Returns a list of establishment sirets that have an offer with given rome", async () => {
       // Prepare
       const romeCode = "A1101";
-      const siretWithRomeCodeOffer = "11111111111111";
-      const siretWithoutRomeCodeOffer = "22222222222222";
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-        new EstablishmentAggregateBuilder()
-          .withEstablishmentSiret(siretWithRomeCodeOffer)
-          .withOffers([new OfferEntityBuilder().withRomeCode(romeCode).build()])
-          .build(),
-      );
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-        new EstablishmentAggregateBuilder()
-          .withEstablishmentSiret(siretWithoutRomeCodeOffer)
-          .withContactId("12233432-1111-2222-3333-123456789123")
-          .build(),
+      const siretWithRomeCodeOfferMatching = "11111111111111";
+      const siretWithoutRomeCodeOfferMatching = "22222222222222";
+
+      await Promise.all(
+        [
+          {
+            siret: siretWithRomeCodeOfferMatching,
+            romeCode,
+            appellationCode: "19540",
+          },
+          {
+            siret: siretWithoutRomeCodeOfferMatching,
+            romeCode: "A1201",
+            appellationCode: "19541",
+          },
+        ].map((params, index) =>
+          insertEstablishmentAggregate(
+            pgEstablishmentAggregateRepository,
+            {
+              siret: params.siret,
+              romeAndAppellationCodes: [
+                {
+                  romeCode: params.romeCode,
+                  appellationCode: params.appellationCode,
+                },
+              ],
+            },
+            index,
+          ),
+        ),
       );
 
       // Act
@@ -886,7 +909,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       // Assert
       expect(actualSiretOfEstablishmentsWithRomeCode).toEqual([
-        siretWithRomeCodeOffer,
+        siretWithRomeCodeOfferMatching,
       ]);
     });
   });
@@ -925,10 +948,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         establishmentAggregate.establishment.siret,
       );
 
-      expectToEqual(await getAllImmersionOfferRows(client), []);
-      expectToEqual(await getAllImmersionContactsRows(client), []);
-      expectToEqual(await getAllEstablishmentImmersionContactsRows(client), []);
-      expectToEqual(await getAllEstablishmentsRows(client), []);
+      expectToEqual(await getAllImmersionOfferRows(kyselyDb), []);
+      expectToEqual(await getAllImmersionContactsRows(kyselyDb), []);
+      expectToEqual(
+        await getAllEstablishmentImmersionContactsRows(kyselyDb),
+        [],
+      );
+      expectToEqual(await getAllEstablishmentsRows(kyselyDb), []);
       expectToEqual(
         await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
           establishmentAggregate.establishment.siret,
@@ -943,43 +969,44 @@ describe("PgEstablishmentAggregateRepository", () => {
       const siretToKeep = "22222222222222";
 
       await Promise.all(
-        [siretToRemove, siretToKeep].map((siret) =>
-          insertEstablishment(client, {
-            siret,
-            createdAt: new Date(),
-          }),
+        [
+          {
+            siret: siretToKeep,
+            romeAndAppellationsCodes: [
+              { romeCode: "A1405", appellationCode: "17044" },
+            ],
+          },
+          {
+            siret: siretToRemove,
+            romeAndAppellationsCodes: [
+              { romeCode: "A1401", appellationCode: "10806" },
+              { romeCode: "A1405", appellationCode: "12112" },
+            ],
+          },
+        ].map((params, index) =>
+          insertEstablishmentAggregate(
+            pgEstablishmentAggregateRepository,
+            {
+              siret: params.siret,
+              romeAndAppellationCodes: params.romeAndAppellationsCodes,
+            },
+            index,
+          ),
         ),
       );
-      await Promise.all([
-        insertImmersionOffer(client, {
-          romeCode: "A1401",
-          appellationCode: "10806",
-          siret: siretToRemove,
-        }),
-        insertImmersionOffer(client, {
-          romeCode: "A1405",
-          appellationCode: "12112",
-          siret: siretToRemove,
-        }),
-        insertImmersionOffer(client, {
-          romeCode: "A1405",
-          appellationCode: "17044",
-          siret: siretToKeep,
-        }),
-      ]);
 
       // Act
       await pgEstablishmentAggregateRepository.delete(siretToRemove);
       // Assert
       //   Establishment has been removed
       expect(
-        await getEstablishmentsRowsBySiret(client, siretToRemove),
+        await getEstablishmentsRowsBySiret(kyselyDb, siretToRemove),
       ).toBeUndefined();
       expect(
-        await getEstablishmentsRowsBySiret(client, siretToKeep),
+        await getEstablishmentsRowsBySiret(kyselyDb, siretToKeep),
       ).toBeDefined();
       //   Offers of this establishment have been removed
-      const immersionOfferRows = await getAllImmersionOfferRows(client);
+      const immersionOfferRows = await getAllImmersionOfferRows(kyselyDb);
       expect(immersionOfferRows).toHaveLength(1);
       expect(immersionOfferRows[0].siret).toEqual(siretToKeep);
     });
@@ -989,13 +1016,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     const siretInTable = "12345678901234";
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siretInTable)
-      .withLocations([
-        {
-          address: rueGuillaumeTellDto,
-          position: { lon: 2, lat: 48 },
-          id: "123",
-        },
-      ])
+      .withLocations([defaultLocation])
       .build();
     const contact = new ContactEntityBuilder()
       .withEmail("toto@gmail.com")
@@ -1073,17 +1094,17 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Prepare
       const siret = "12345678901234";
       const boulangerRome = "D1102";
+      const extraLocation: Location = {
+        address: rueJacquardDto,
+        position: { lon: 2, lat: 48 },
+        id: "55555555-5555-4444-5555-555555555555",
+      };
+
       const establishment = new EstablishmentEntityBuilder()
         .withSiret(siret)
         .withCustomizedName("La boulangerie de Lucie")
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
-        .withLocations([
-          {
-            address: rueJacquardDto,
-            position: { lon: 2, lat: 48 },
-            id: "123",
-          },
-        ])
+        .withLocations([defaultLocation, extraLocation])
         .withSearchableBy({
           students: false,
           jobSeekers: false,
@@ -1101,11 +1122,6 @@ describe("PgEstablishmentAggregateRepository", () => {
       const contact = new ContactEntityBuilder()
         .withGeneratedContactId()
         .build();
-      const location: Location = {
-        address: rueJacquardDto,
-        position: { lon: 2, lat: 48 },
-        id: "123",
-      };
 
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
@@ -1140,39 +1156,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         additionalInformation: establishment.additionalInformation,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
         fitForDisabledWorkers: establishment.fitForDisabledWorkers,
-        position: location.position,
-        address: location.address,
+        position: extraLocation.position,
+        address: extraLocation.address,
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         contactMode: contact.contactMethod,
         distance_m: undefined,
-        locationId: location.id,
+        locationId: extraLocation.id,
       });
     });
   });
 });
-
-const toSearchResults = (sirets: SiretDto[]): SearchResultDto[] =>
-  sirets.map((siret) => ({
-    rome: "M1808",
-    siret,
-    distance_m: 0,
-    isSearchable: true,
-    name: "",
-    website: "",
-    additionalInformation: "",
-    position: { lon: 6, lat: 49 },
-    romeLabel: "Information géographique",
-    appellations: [
-      { appellationCode: "11704", appellationLabel: "Cartographe" },
-    ],
-    naf: "8622B",
-    nafLabel: "Activité des médecins spécialistes",
-    address: {
-      streetNumberAndAddress: "7 rue guillaume tell",
-      postcode: "75017",
-      city: "Paris",
-      departmentCode: "75",
-    },
-    voluntaryToImmersion: true,
-    locationId: "123",
-  }));

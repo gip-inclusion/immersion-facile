@@ -75,7 +75,8 @@ export class PgGroupRepository implements GroupRepository {
             'departmentCode', loc.department_code
          ),
         'contactMode', ic.contact_mode,
-        'numberOfEmployeeRange', e.number_employees 
+        'numberOfEmployeeRange', e.number_employees,
+        'locationId', loc.id
       )) as search_result_dto
       FROM "groups__sirets"
       LEFT JOIN "groups" g ON g.slug = groups__sirets.group_slug
@@ -86,10 +87,9 @@ export class PgGroupRepository implements GroupRepository {
       LEFT JOIN "public_appellations_data" ap ON ap.ogr_appellation = io.appellation_code
       LEFT JOIN "public_romes_data" r ON io.rome_code = r.code_rome
       LEFT JOIN "public_naf_classes_2008" ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT JOIN establishments__establishments_locations eel ON establishments.siret = eel.establishment_siret
-      LEFT JOIN establishments_locations loc ON loc.id = eel.location_id
+      LEFT JOIN establishments_locations loc ON e.siret = loc.establishment_siret
       WHERE groups__sirets.group_slug = $1 AND e.is_open AND e.is_searchable
-      GROUP BY(e.siret, io.rome_code, r.libelle_rome, public_naf_classes_2008.class_label, ic.contact_mode)
+      GROUP BY(e.siret, io.rome_code, r.libelle_rome, public_naf_classes_2008.class_label, ic.contact_mode, loc.lon, loc.lat, loc.street_number_and_address, loc.post_code, loc.city, loc.department_code, loc.id)
     `,
       [slug],
     );

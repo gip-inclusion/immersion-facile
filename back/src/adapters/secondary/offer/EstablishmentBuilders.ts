@@ -78,18 +78,7 @@ export const defaultLocation: Location = {
 const validEstablishmentEntityV2: EstablishmentEntity = {
   siret: "78000403200019",
   name: "Company inside repository",
-  locations: [
-    {
-      id: "aaaaaaaa-aaaa-4444-aaaa-aaaaaaaaaaaa",
-      address: avenueChampsElyseesDto,
-      position: {
-        lat: 48.866667, // Paris lat/lon
-        lon: 2.333333,
-      },
-    },
-  ],
-  website: "www.jobs.fr",
-  additionalInformation: "",
+  locations: [defaultLocation],
   customizedName: undefined,
   isCommited: undefined,
   createdAt: new Date(),
@@ -105,6 +94,9 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
     jobSeekers: true,
     students: true,
   },
+  additionalInformation: "",
+  website: "",
+  fitForDisabledWorkers: false,
 };
 
 export class EstablishmentEntityBuilder
@@ -201,6 +193,13 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, locations });
   }
 
+  public withLocationId(locationId: string) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      locations: [{ ...defaultLocation, id: locationId }],
+    });
+  }
+
   public withSearchableBy(searchableBy: EstablishmentSearchableBy) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
@@ -254,6 +253,28 @@ export class EstablishmentAggregateBuilder
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact: new ContactEntityBuilder().withId(id).build(),
+    });
+  }
+
+  public withLocationId(locationId: string) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withLocationId(locationId)
+        .build(),
+    });
+  }
+
+  public withLocations(locations: Location[]) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withLocations(locations)
+        .build(),
     });
   }
 

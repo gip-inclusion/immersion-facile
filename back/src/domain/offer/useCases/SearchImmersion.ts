@@ -103,7 +103,7 @@ export class SearchImmersion extends TransactionalUseCase<
       .filter(isEstablishmentNotDeleted(isDeletedBySiret));
 
     return [...searchResultsInRepo, ...lbbAllowedResults]
-      .filter(isSiretIsNotInNotSeachableResults(repositorySearchResults))
+      .filter(isSiretIsNotInNotSearchableResults(repositorySearchResults))
       .filter(
         isSearchResultAvailable(
           repositorySearchResults,
@@ -171,7 +171,7 @@ const isSiretAlreadyInStoredResults =
   <T extends { siret: SiretDto }>({ siret }: T) =>
     !searchImmersionQueryResults.map(prop("siret")).includes(siret);
 
-const isSiretIsNotInNotSeachableResults =
+const isSiretIsNotInNotSearchableResults =
   (searchImmersionQueryResults: SearchImmersionResult[]) =>
   <T extends { siret: SiretDto }>({ siret }: T) =>
     !searchImmersionQueryResults

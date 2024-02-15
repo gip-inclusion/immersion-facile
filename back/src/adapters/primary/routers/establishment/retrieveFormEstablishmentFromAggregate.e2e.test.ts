@@ -115,6 +115,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           jobSeekers: true,
           students: true,
         },
+        fitForDisabledWorkers: false,
       },
       status: 200,
     });
@@ -173,6 +174,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           jobSeekers: true,
           students: true,
         },
+        fitForDisabledWorkers: false,
       },
       status: 200,
     });

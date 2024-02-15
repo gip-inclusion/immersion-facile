@@ -129,7 +129,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       ],
       nafLabel: "NAFRev2",
       additionalInformation: "",
-      website: "www.jobs.fr",
+      website: "",
       position: {
         lat: TEST_LOCATION.position.lat,
         lon: TEST_LOCATION.position.lon,

@@ -1,41 +1,27 @@
 import { PoolClient } from "pg";
 import {
   AddressDto,
-  ContactMethod,
   FormEstablishmentSource,
   GeoPositionDto,
   NumberEmployeesRange,
-  defaultMaxContactsPerWeek,
 } from "shared";
-import { EstablishmentAggregate } from "../../../../domain/offer/entities/EstablishmentEntity";
 import { EstablishmentAggregateRepository } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
-import { rueGuillaumeTellDto } from "../../addressGateway/InMemoryAddressGateway";
 import {
-  defaultLocation,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
+  defaultLocation,
 } from "../../offer/EstablishmentBuilders";
+import { KyselyDb } from "../kysely/kyselyUtils";
 
-type PgImmersionOfferRow = {
-  rome_code: string;
-  rome_nomenclature: number | undefined;
-  //created_at: Date;
-  //update_date: Date;
-  appellation_code: number;
-  siret: string;
-  score: number;
-};
-
-export const getAllImmersionOfferRows = async (
-  client: PoolClient,
-): Promise<PgImmersionOfferRow[]> =>
-  client
-    .query<PgImmersionOfferRow>("SELECT * FROM immersion_offers")
-    .then(({ rows }) =>
+export const getAllImmersionOfferRows = async (kyselyDb: KyselyDb) =>
+  kyselyDb
+    .selectFrom("immersion_offers")
+    .selectAll()
+    .execute()
+    .then((rows) =>
       rows.map((row) => ({
         rome_code: row.rome_code,
-        rome_nomenclature: row.rome_nomenclature,
         appellation_code: row.appellation_code,
         siret: row.siret,
         score: row.score,
@@ -67,123 +53,13 @@ export const insertImmersionOffer = async (
   ]);
 };
 
-const insertImmersionContact = async (
-  client: PoolClient,
-  props: {
-    uuid: string;
-    lastName?: string;
-    email?: string;
-    siret_establishment: string;
-  },
-): Promise<void> => {
-  await client.query(
-    `
-  INSERT INTO immersion_contacts (
-  uuid, lastname, firstname, job, email, phone, contact_mode
-) VALUES
- ($1, $2, '', '', $3, '', 'EMAIL');`,
-    [
-      props.uuid,
-      props.lastName ?? "Jacques",
-      props.email ?? "jacques@gmail.com",
-    ],
-  );
-
-  await client.query(
-    "INSERT INTO establishments__immersion_contacts (establishment_siret, contact_uuid) VALUES ($1, $2)",
-    [props.siret_establishment, props.uuid],
-  );
-};
-
-export const insertEstablishment = async (
-  client: PoolClient,
-  props: {
-    siret: string;
-    createdAt: Date;
-    updatedAt?: Date;
-    isOpen?: boolean;
-    isSearchable?: boolean;
-    nafCode?: string;
-    numberEmployeesRange?: NumberEmployeesRange;
-    address?: AddressDto;
-    sourceProvider?: FormEstablishmentSource;
-    position?: GeoPositionDto;
-    fitForDisabledWorkers?: boolean;
-    maxContactsPerWeek?: number;
-    searchableByStudents?: boolean;
-    searchableByJobSeekers?: boolean;
-  },
-) => {
-  const defaultPosition = { lon: 12.2, lat: 2.1 };
-  const position = props.position ?? defaultPosition;
-
-  const insertEstablishmentQuery = `
-  INSERT INTO establishments (
-    siret, name, street_number_and_address, post_code, city,
-    department_code, number_employees, naf_code, source_provider, update_date, 
-    is_open, is_searchable, fit_for_disabled_workers, gps, lon, 
-    lat, max_contacts_per_week, created_at,
-    searchable_by_students, searchable_by_job_seekers
-  ) VALUES (
-    $1, '', $2, $3, $4, $5,
-    $6, $7, $8, $9, $10,
-    $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14, $15, $16, $17, $18
-  )`;
-
-  const _insertLocationsQuery = `
-    INSERT INTO establishments_locations (
-      street_number_and_address, post_code, city, department_code, lat, lon, position
-    ) VALUES (
-      $1, $2, $3, $4, $5, $6
-    )
-  `;
-
-  const addressDto = props.address ?? rueGuillaumeTellDto;
-
-  //prettier-ignore
-  await client.query(insertEstablishmentQuery, [
-    props.siret,
-    addressDto.streetNumberAndAddress,
-    addressDto.postcode,
-    addressDto.city,
-    addressDto.departmentCode,
-    props.numberEmployeesRange ?? null,
-    props.nafCode ?? "8622B",
-    props.sourceProvider ?? "api_labonneboite",
-    props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
-    props.isOpen ?? true,
-    props.isSearchable ?? true,
-    props.fitForDisabledWorkers,
-    position.lon,
-    position.lat,
-    props.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
-    props.createdAt.toISOString(),
-    props.searchableByStudents ?? false,
-    props.searchableByJobSeekers ?? false,
-  ]);
-};
-
-export const expectAggregateEqual = (
-  actual: EstablishmentAggregate,
-  expected: EstablishmentAggregate,
-) => {
-  expect(JSON.parse(JSON.stringify(actual))).toEqual(
-    JSON.parse(JSON.stringify(expected)),
-  ); // parse and stringify to avoid comparing no key vs. undefined key (Does not work with clone() from ramda)
-};
-
 export type PgEstablishmentRow = {
   siret: string;
-  name: string;
+  name: string | null;
   customized_name?: string | null;
-  street_number_and_address: string;
-  post_code: string;
-  department_code: string;
-  city: string;
-  number_employees: string;
+  number_employees: string | null;
   naf_code: string;
   naf_nomenclature: string;
-  gps: string;
   update_date?: Date;
   is_open: boolean;
   is_commited?: boolean | null;
@@ -192,69 +68,40 @@ export type PgEstablishmentRow = {
   last_insee_check_date?: Date;
 };
 
-export const getAllEstablishmentsRows = async (
-  client: PoolClient,
-): Promise<PgEstablishmentRow[]> =>
-  client.query("SELECT * FROM establishments").then((res) => res.rows);
+export const getAllEstablishmentsRows = async (kyselyDb: KyselyDb) =>
+  kyselyDb.selectFrom("establishments").selectAll().execute();
 
 export const getEstablishmentsRowsBySiret = async (
-  client: PoolClient,
+  kyselyDb: KyselyDb,
   siret: string,
-): Promise<PgEstablishmentRow | undefined> =>
-  client
-    .query("SELECT * FROM establishments WHERE siret=$1", [siret])
-    .then((res) => res.rows[0]);
+) =>
+  kyselyDb
+    .selectFrom("establishments")
+    .selectAll()
+    .where("siret", "=", siret)
+    .executeTakeFirst();
 
-type PgImmersionContact = {
-  uuid: string;
-  lastname: string;
-  firstname: string;
-  job: string;
-  email: string;
-  phone: string;
-  contact_mode: ContactMethod;
-  copy_emails: string[];
-};
-
-type PgEstablishmentImmersionContact = {
-  contact_uuid: string;
-  establishment_siret: string;
-};
-
-export const getAllImmersionContactsRows = async (
-  client: PoolClient,
-): Promise<PgImmersionContact[]> =>
-  (await client.query("SELECT * FROM immersion_contacts")).rows;
+export const getAllImmersionContactsRows = async (kyselyDb: KyselyDb) =>
+  kyselyDb.selectFrom("immersion_contacts").selectAll().execute();
 
 export const getAllEstablishmentImmersionContactsRows = async (
-  client: PoolClient,
-): Promise<PgEstablishmentImmersionContact[]> =>
-  (await client.query("SELECT * FROM establishments__immersion_contacts")).rows;
+  kyselyDb: KyselyDb,
+) =>
+  kyselyDb
+    .selectFrom("establishments__immersion_contacts")
+    .selectAll()
+    .execute();
 
-export type PgEstablishmentRowWithGeo = PgEstablishmentRow & {
-  longitude: number;
-  latitude: number;
-};
-
-export const retrieveEstablishmentWithSiret = async (
-  client: PoolClient,
-  siret: string,
-): Promise<PgEstablishmentRowWithGeo | undefined> => {
-  const pgResult = await client.query(
-    `SELECT *, ST_X(gps::geometry) AS longitude, ST_Y(gps::geometry) AS latitude 
-     FROM establishments WHERE siret='${siret}' LIMIT 1;`,
-  );
-  return pgResult.rows[0] ?? (pgResult.rows[0] as PgEstablishmentRowWithGeo);
-};
-
-export type InsertActiveEstablishmentAndOfferAndEventuallyContactProps = {
+export type InsertEstablishmentAggregateProps = {
   siret: string;
-  rome: string;
-  establishmentPosition: GeoPositionDto;
-  appellationCode: string;
+  romeAndAppellationCodes?: { romeCode: string; appellationCode: string }[];
+  establishmentPosition?: GeoPositionDto;
   offerContactUid?: string;
   sourceProvider?: FormEstablishmentSource;
-  createdAt: Date;
+  createdAt?: Date;
+  locationId?: string;
+  isOpen?: boolean;
+  isSearchable?: boolean;
   address?: AddressDto;
   nafCode?: string;
   numberEmployeesRange?: NumberEmployeesRange;
@@ -264,31 +111,39 @@ export type InsertActiveEstablishmentAndOfferAndEventuallyContactProps = {
   searchableByJobSeekers?: boolean;
 };
 
-export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
+export const insertEstablishmentAggregate = async (
   establishmentAggregateRepository: EstablishmentAggregateRepository,
   {
     searchableByStudents,
     searchableByJobSeekers,
     siret,
-    rome,
-    establishmentPosition,
-    appellationCode,
+    establishmentPosition = defaultLocation.position,
+    romeAndAppellationCodes = [
+      {
+        romeCode: "A1413",
+        appellationCode: "140927", // "Cuviste"
+      },
+    ],
     offerContactUid,
     sourceProvider = "immersion-facile",
+    isOpen = true,
+    isSearchable = true,
+    locationId,
     address,
     nafCode,
     numberEmployeesRange,
-    createdAt,
+    createdAt = new Date(),
     offerCreatedAt,
     fitForDisabledWorkers,
-  }: InsertActiveEstablishmentAndOfferAndEventuallyContactProps,
+  }: InsertEstablishmentAggregateProps,
   index = 0,
 ) => {
   const establishment = new EstablishmentEntityBuilder()
     .withSiret(siret)
+    .withIsOpen(isOpen)
     .withLocations([
       {
-        id: `11111111-1111-4444-1111-11111111000${index}`,
+        id: locationId ?? `11111111-1111-4444-1111-11111111000${index}`,
         address: address ?? defaultLocation.address,
         position: establishmentPosition,
       },
@@ -302,6 +157,7 @@ export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
     .withNafDto({ code: nafCode ?? "8622B", nomenclature: "8622B" })
     .withSourceProvider(sourceProvider)
     .withFitForDisabledWorkers(fitForDisabledWorkers)
+    .withIsSearchable(isSearchable)
     .build();
 
   const aggregate = new EstablishmentAggregateBuilder()
@@ -309,13 +165,15 @@ export const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
     .withContactId(
       offerContactUid ?? `22222222-2222-4444-2222-22222222000${index}`,
     )
-    .withOffers([
-      new OfferEntityBuilder()
-        .withRomeCode(rome)
-        .withAppellationCode(appellationCode)
-        .withCreatedAt(offerCreatedAt ?? new Date())
-        .build(),
-    ])
+    .withOffers(
+      romeAndAppellationCodes.map(({ romeCode, appellationCode }) =>
+        new OfferEntityBuilder()
+          .withRomeCode(romeCode)
+          .withAppellationCode(appellationCode)
+          .withCreatedAt(offerCreatedAt ?? new Date())
+          .build(),
+      ),
+    )
     .build();
 
   await establishmentAggregateRepository.insertEstablishmentAggregate(

@@ -20,7 +20,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../../../adapters/secondary/offer/EstablishmentBuilders";
-import { RetrieveFormEstablishmentFromAggregates } from "../useCases/RetrieveFormEstablishmentFromAggregates";
+import { RetrieveFormEstablishmentFromAggregates } from "./RetrieveFormEstablishmentFromAggregates";
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
   const siret = "12345678901234";
@@ -122,6 +122,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         jobSeekers: true,
         students: true,
       },
+      fitForDisabledWorkers: false,
     });
   });
 
@@ -173,6 +174,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         jobSeekers: true,
         students: true,
       },
+      fitForDisabledWorkers: false,
     });
   });
 });

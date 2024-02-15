@@ -25,6 +25,7 @@ describe("PgScriptsQueries", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_contacts");
+    await client.query("DELETE FROM establishments_locations");
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM outbox_failures");
     await client.query("DELETE FROM outbox_publications");
@@ -51,6 +52,7 @@ describe("PgScriptsQueries", () => {
         .withEstablishmentSiret("11110000111100")
         .withEstablishmentUpdatedAt(toUpdateDate)
         .withContactId("11111111-1111-4000-1111-111111111111")
+        .withLocationId("aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa")
         .build();
 
       // <<<<<----------- this is the legacy behavior, we keep it until we reach the 6 months.
@@ -60,6 +62,7 @@ describe("PgScriptsQueries", () => {
         .withEstablishmentSiret("22220000222200")
         .withEstablishmentUpdatedAt(toUpdateDate)
         .withContactId("22222222-2222-4000-2222-222222222222")
+        .withLocationId("aaaaaaaa-aaaa-4000-bbbb-bbbbbbbbbbbb")
         .build();
 
       await pgOutboxRepository.save({
@@ -108,6 +111,7 @@ describe("PgScriptsQueries", () => {
           .withEstablishmentSiret("44440000444400")
           .withEstablishmentUpdatedAt(toUpdateDate)
           .withContactId("44444444-4444-4000-4444-444444444444")
+          .withLocationId("aaaaaaaa-aaaa-4000-cccc-cccccccccccc")
           .build();
 
       await pgNotificationRepository.save({
@@ -133,6 +137,7 @@ describe("PgScriptsQueries", () => {
         .withEstablishmentSiret("99990000999900")
         .withEstablishmentUpdatedAt(addDays(before, 1))
         .withContactId("99999999-9999-4000-9999-999999999999")
+        .withLocationId("aaaaaaaa-aaaa-4000-dddd-dddddddddddd")
         .build();
 
       await Promise.all(
@@ -148,6 +153,8 @@ describe("PgScriptsQueries", () => {
           ),
         ),
       );
+
+      console.log("PRepared data");
 
       // Act
       const sirets =

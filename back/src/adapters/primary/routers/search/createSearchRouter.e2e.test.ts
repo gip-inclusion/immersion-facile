@@ -398,7 +398,7 @@ describe("search-immersion route", () => {
           romeLabel: "test_rome_label",
           siret: "11112222333344",
           voluntaryToImmersion: true,
-          website: "www.jobs.fr",
+          website: "",
           locationId: defaultLocation.id,
         },
       });

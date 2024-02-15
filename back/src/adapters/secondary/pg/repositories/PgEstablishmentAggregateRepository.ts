@@ -1,4 +1,4 @@
-import { CompiledQuery, sql } from "kysely";
+import { sql } from "kysely";
 import format from "pg-format";
 import { equals, keys } from "ramda";
 import {
@@ -127,8 +127,9 @@ export class PgEstablishmentAggregateRepository
             siret = $1 
           GROUP BY 
             siret
-        ) 
-        SELECT 
+        ),
+        ${withEstablishmentAggregateSubQuery}
+         SELECT 
           JSON_STRIP_NULLS(
             JSON_BUILD_OBJECT(
               'establishment', JSON_BUILD_OBJECT(
@@ -136,15 +137,9 @@ export class PgEstablishmentAggregateRepository
                 'name', e.name, 
                 'customizedName', e.customized_name, 
                 'website', e.website, 
-                'additionalInformation', e.additional_information, 
-                'address', JSON_BUILD_OBJECT(
-                  'streetNumberAndAddress', loc.street_number_and_address, 
-                  'postcode', loc.post_code,
-                  'city', loc.city,
-                  'departmentCode', loc.department_code
-                ),  
-                'sourceProvider', e.source_provider, 
-                'position', JSON_BUILD_OBJECT('lon', loc.lon, 'lat', loc.lat), 
+                'additionalInformation', e.additional_information,
+                'locations', ela.locations,  
+                'sourceProvider', e.source_provider,  
                 'nafDto', JSON_BUILD_OBJECT(
                   'code', e.naf_code, 
                   'nomenclature', e.naf_nomenclature
@@ -185,7 +180,7 @@ export class PgEstablishmentAggregateRepository
           LEFT JOIN establishments AS e ON e.siret = io.siret 
           LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret 
           LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid
-          LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
+          LEFT JOIN establishment_locations_agg AS ela ON e.siret = ela.establishment_siret
         `,
         [siret],
       )
@@ -243,7 +238,6 @@ export class PgEstablishmentAggregateRepository
     siret: SiretDto,
     appellationCode: AppellationCode,
   ): Promise<SearchResultDto | undefined> {
-    console.log("1. getSearchImmersionResultDtoBySiretAndAppellationCode");
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
@@ -252,7 +246,8 @@ export class PgEstablishmentAggregateRepository
         LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
         LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
         WHERE io.siret = $1 AND io.appellation_code = $2
-        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
+        GROUP BY (siret, io.rome_code, prd.libelle_rome)
+        `,
         [siret, appellationCode],
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
@@ -379,7 +374,6 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
-    console.log("2. searchImmersionResults");
     const romeCodes =
       searchMade.romeCode ??
       (await this.#getRomeCodeFromAppellationCode(searchMade.appellationCodes));
@@ -412,14 +406,15 @@ export class PgEstablishmentAggregateRepository
             aewa.city,
             aewa.street_number_and_address,
             aewa.department_code,
-            aewa.post_code
+            aewa.post_code,
+            aewa.id as location_id
           FROM active_establishments_within_area aewa 
             LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
             LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
             LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
             ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
             GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
-              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code)
+              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id)
           )
         SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
         LIMIT $3`,
@@ -588,6 +583,7 @@ export class PgEstablishmentAggregateRepository
   ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
+
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
       makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -612,6 +608,7 @@ export class PgEstablishmentAggregateRepository
         voluntaryToImmersion: true,
         isSearchable: row.search_immersion_result.isSearchable,
         nextAvailabilityDate: row.search_immersion_result.nextAvailabilityDate,
+        locationId: row.search_immersion_result.locationId,
       }),
     );
   }
@@ -867,7 +864,8 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
 ) => `
       WITH unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ), 
-           match_immersion_offer AS (${selectedOffersSubQuery})
+           match_immersion_offer AS (${selectedOffersSubQuery}),
+          ${withEstablishmentAggregateSubQuery}
       SELECT 
       row_number,
       JSON_STRIP_NULLS(
@@ -882,19 +880,20 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
           'additionalInformation', e.additional_information, 
           'customizedName', e.customized_name, 
           'fitForDisabledWorkers', e.fit_for_disabled_workers,
-          'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat), 
+          'position', JSON_BUILD_OBJECT('lon', loc.lon, 'lat', loc.lat), 
           'romeLabel', io.rome_label,
           'appellations',  io.appellations,
           'naf', e.naf_code,
           'nafLabel', public_naf_classes_2008.class_label,
           'address', JSON_BUILD_OBJECT(
-            'streetNumberAndAddress', street_number_and_address, 
-            'postcode', post_code,
-            'city', city,
-            'departmentCode', department_code
+            'streetNumberAndAddress', loc.street_number_and_address, 
+            'postcode', loc.post_code,
+            'city', loc.city,
+            'departmentCode', loc.department_code
             ),
+          'locationId', loc.id,
           'contactMode', ic.contact_mode,
-          'numberOfEmployeeRange', e.number_employees 
+          'numberOfEmployeeRange', e.number_employees
         ) 
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 
@@ -902,7 +901,8 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
       LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
-      ORDER BY row_number ASC; `;
+      LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = e.siret
+      ORDER BY row_number ASC, loc.id ASC; `;
 
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
   // Only compare romeCode and appellationCode
@@ -946,3 +946,23 @@ const reStGeographyFromText =
 // TODO : find a better way than that : This is due to the Literal formatting that turns all simple quote into double quote.
 const fixStGeographyEscapingInQuery = (query: string) =>
   query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
+
+const withEstablishmentAggregateSubQuery = `establishment_locations_agg AS (
+            SELECT
+                establishment_siret,
+                JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                                'id', id,
+                                'position', JSON_BUILD_OBJECT('lon', lon, 'lat', lat),
+                                'address', JSON_BUILD_OBJECT(
+                                    'streetNumberAndAddress', street_number_and_address,
+                                    'postcode', post_code,
+                                    'city', city,
+                                    'departmentCode', department_code
+                               )
+                        )
+                ) AS locations
+            FROM establishments_locations
+            GROUP BY
+                establishment_siret
+                )`;
