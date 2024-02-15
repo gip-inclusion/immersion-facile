@@ -143,17 +143,33 @@ describe("SendEstablishmentLeadReminder", () => {
   describe("Send first reminder", () => {
     it("Send emails to establishment lead when lastEventKind = 'to-be-reminded", async () => {
       const agency = new AgencyDtoBuilder().build();
-      const convention = new ConventionDtoBuilder()
+      const newestConvention = new ConventionDtoBuilder()
+        .withId("11111111-ee70-4c90-b3f4-668d492f7395")
         .withSiret(establishmentLeadToBeReminded.siret)
         .withDateValidation(subDays(now, 2).toISOString())
         .withAgencyId(agency.id)
+        .withEstablishmentRepresentativeEmail(
+          "newestConvention.establishment@email.fr",
+        )
+        .build();
+      const oldestConvention = new ConventionDtoBuilder()
+        .withId("22222222-ee70-4c90-b3f4-668d492f7395")
+        .withSiret(establishmentLeadToBeReminded.siret)
+        .withDateValidation(subDays(now, 10).toISOString())
+        .withAgencyId(agency.id)
+        .withEstablishmentRepresentativeEmail(
+          "oldestConvention.establishment@email.fr",
+        )
         .build();
       uow.establishmentLeadRepository.establishmentLeads = [
         establishmentLeadAccepted,
         establishmentLeadToBeReminded,
       ];
       uow.agencyRepository.setAgencies([agency]);
-      uow.conventionRepository.setConventions([convention]);
+      uow.conventionRepository.setConventions([
+        oldestConvention,
+        newestConvention,
+      ]);
       shortLinkIdGeneratorGateway.addMoreShortLinkIds([
         "addEstablishmentFormShortLink",
         "addUnsubscribeToEmailShortLink",
@@ -172,13 +188,13 @@ describe("SendEstablishmentLeadReminder", () => {
       expect(
         await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
       ).toBe(
-        "http://localhost/establishment?siret=12345678901235&bcLastName=Idol&bcFirstName=Billy&bcPhone=0602010203&bcEmail=establishment@example.com",
+        "http://localhost/establishment?siret=12345678901235&bcLastName=Idol&bcFirstName=Billy&bcPhone=0602010203&bcEmail=newestConvention.establishment@email.fr",
       );
 
       expect(
         await uow.shortLinkRepository.getById("addUnsubscribeToEmailShortLink"),
       ).toBe(
-        "http://fake-magic-link/desinscription-prospect/a99eaca1-ee70-4c90-b3f4-668d492f7392/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com",
+        "http://fake-magic-link/desinscription-prospect/11111111-ee70-4c90-b3f4-668d492f7395/establishment-representative/2021-05-15T08:00:00.000Z/newestConvention.establishment@email.fr",
       );
 
       expectSavedNotificationsAndEvents({
@@ -186,14 +202,14 @@ describe("SendEstablishmentLeadReminder", () => {
           {
             kind: "ESTABLISHMENT_LEAD_REMINDER",
             params: {
-              businessName: convention.businessName,
+              businessName: newestConvention.businessName,
               registerEstablishmentShortLink:
                 "http://localhost/api/to/addEstablishmentFormShortLink",
               unsubscribeToEmailShortLink:
                 "http://localhost/api/to/addUnsubscribeToEmailShortLink",
             },
             recipients: [
-              convention.signatories.establishmentRepresentative.email,
+              newestConvention.signatories.establishmentRepresentative.email,
             ],
             sender: {
               email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
@@ -210,14 +226,17 @@ describe("SendEstablishmentLeadReminder", () => {
         {
           topic: "SendEstablishmentLeadReminder",
           payload: {
-            id: convention.id,
+            id: newestConvention.id,
           },
         },
       ]);
 
       expect(
-        (await uow.establishmentLeadRepository.getBySiret(convention.siret))
-          ?.lastEventKind,
+        (
+          await uow.establishmentLeadRepository.getBySiret(
+            newestConvention.siret,
+          )
+        )?.lastEventKind,
       ).toBe("reminder-sent");
     });
   });
