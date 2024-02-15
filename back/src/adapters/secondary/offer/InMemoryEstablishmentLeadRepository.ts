@@ -52,12 +52,9 @@ export class InMemoryEstablishmentLeadRepository
             ).length > 0
           : true;
       })
-      .map(({ siret, events }) => {
-        console.log("beforeDate", beforeDate);
-        console.log("events", events);
+      .map(({ siret }) => {
         return siret;
       });
-    console.log("sirets", sirets);
     return Promise.resolve(sirets);
   }
 
