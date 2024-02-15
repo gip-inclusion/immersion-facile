@@ -23,13 +23,13 @@ const useStyles = makeStyles({ name: "GroupPage" });
 
 export const GroupPage = ({ route }: GroupPageProps) => {
   const { groupSlug } = route.params;
+  const [error, setError] = useState<Error | null>(null);
   const [initialResults, setInitialResults] = useState<SearchResultDto[]>([]);
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [group, setGroup] = useState<Group | null>(null);
 
   const getInitialGroupData = useCallback(async () => {
-    setLoading(true);
     const response =
       await outOfReduxDependencies.searchGateway.getGroupBySlug(groupSlug);
     const { group, results } = response;
@@ -39,10 +39,15 @@ export const GroupPage = ({ route }: GroupPageProps) => {
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    getInitialGroupData().finally(() => {
-      setLoading(false);
-    });
+    getInitialGroupData()
+      .catch(setError) // can't throw here, react-error-boundary do not catch errors in async code https://github.com/bvaughn/react-error-boundary/issues/116#issuecomment-1478172983
+      .finally(() => {
+        setLoading(false);
+      });
   }, [getInitialGroupData]);
+
+  if (error)
+    throw new Error(`Nous n'avons pas trouvé le groupe: '${groupSlug}'`);
 
   return (
     <HeaderFooterLayout>

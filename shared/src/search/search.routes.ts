@@ -1,7 +1,10 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
 import { groupWithResultsSchema } from "../group/group.schema";
-import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import {
+  httpErrorSchema,
+  legacyHttpErrorSchema,
+} from "../httpClient/httpErrors.schema";
 import {
   contactEstablishmentRoute,
   immersionOffersRoute,
@@ -18,7 +21,7 @@ export const searchImmersionRoutes = defineRoutes({
     url: "/groups/:groupSlug",
     responses: {
       200: groupWithResultsSchema,
-      404: httpErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
   search: defineRoute({
