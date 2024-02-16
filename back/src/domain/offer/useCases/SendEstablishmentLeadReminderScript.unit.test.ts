@@ -224,7 +224,7 @@ describe("SendEstablishmentLeadReminder", () => {
           topic: "NotificationAdded",
         },
         {
-          topic: "SendEstablishmentLeadReminder",
+          topic: "EstablishmentLeadReminderSent",
           payload: {
             id: newestConvention.id,
           },
@@ -335,7 +335,7 @@ describe("SendEstablishmentLeadReminder", () => {
           topic: "NotificationAdded",
         },
         {
-          topic: "SendEstablishmentLeadReminder",
+          topic: "EstablishmentLeadReminderSent",
           payload: {
             id: convention1.id,
           },
