@@ -45,6 +45,7 @@ export const MultipleAddressInput = ({
                 label={"Rechercher un lieu *"}
                 initialSearchTerm={currentAddresses[index].rawAddress}
                 useFirstAddressOnInitialSearchTerm={false}
+                id={`${id}-${index}`}
                 setFormValue={({ address }) => {
                   onAddressAdded(address, index);
                 }}

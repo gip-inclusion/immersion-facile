@@ -45,7 +45,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   businessAddresses: {
     label: "Vérifiez l'adresse de votre établissement",
     required: true,
-    id: domElementIds.establishment.businessAddress,
+    id: domElementIds.establishment.businessAddresses,
     placeholder: "Ex : 26 rue du labrador, 37000 Tours",
   },
   "businessContact.lastName": {

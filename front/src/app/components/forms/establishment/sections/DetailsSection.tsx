@@ -246,7 +246,7 @@ export const DetailsSection = ({
               : removeAtIndex(addresses, index);
           setValue("businessAddresses", newAddresses);
         }}
-        id="TODO"
+        id={domElementIds.establishment.businessAddresses}
       />
 
       {keys(errors).length === 0 && keys(touchedFields).length > 0 && (

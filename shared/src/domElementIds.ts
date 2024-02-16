@@ -296,7 +296,7 @@ export const domElementIds = {
     siret: "establishment-siret",
     businessName: "establishment-businessName",
     businessNameCustomized: "establishment-businessNameCustomized",
-    businessAddress: "establishment-businessAddress",
+    businessAddresses: "establishment-businessAddress",
     businessContact: {
       lastName: "establishment-businessContact-lastName",
       firstName: "establishment-businessContact-firstName",

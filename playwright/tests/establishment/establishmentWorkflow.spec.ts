@@ -3,6 +3,7 @@ import { Page, expect, test } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../../custom.config";
 import { connectToAdmin, goToAdminTab } from "../../utils/admin";
+import { fillAutocomplete } from "../../utils/utils";
 
 const providedSiret = "41433740200039";
 
@@ -83,6 +84,18 @@ test.describe("Establishment creation and modification workflow", () => {
       )
       .first()
       .click();
+
+    await expect(
+      page.locator(`#${domElementIds.establishment.businessAddresses}-0`),
+    ).toHaveValue("Avenue des Grands Crus 26600 Tain-l'Hermitage");
+
+    await page.click(`#${domElementIds.establishment.addAddressButton}`);
+
+    await fillAutocomplete({
+      page,
+      locator: `#${domElementIds.establishment.businessAddresses}-1`,
+      value: "28 rue du moulin",
+    });
 
     await page.click(
       `#${domElementIds.establishment.submitCreateEstablishmentButton}`,
@@ -173,11 +186,11 @@ test.describe("Establishment creation and modification workflow", () => {
       .getByRole("option", { name: "Tain-l'Hermitage, Valence," })
       .click();
     await page.getByRole("button", { name: "Rechercher" }).click();
-    await expect(
-      page.locator(
-        `.im-search-result[data-establishment-siret="${providedSiret}"]`,
-      ),
-    ).toBeVisible();
+    const resultsSelector = `.im-search-result[data-establishment-siret="${providedSiret}"]`;
+    await page.waitForSelector(resultsSelector);
+    const results = await page.locator(resultsSelector);
+    await expect(await results.all()).toHaveLength(1);
+    await expect(results.first()).toBeVisible();
   });
 
   test("deletes an establishment", async ({ page }) => {
