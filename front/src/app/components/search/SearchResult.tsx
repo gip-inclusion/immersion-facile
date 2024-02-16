@@ -1,8 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { equals } from "ramda";
-import React, { memo, useState } from "react";
-import LinesEllipsis from "react-lines-ellipsis";
+import React, { memo } from "react";
 import {
   SearchResultDto,
   addressDtoToString,
@@ -64,37 +63,10 @@ const SearchResultComponent = ({
   const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
     establishmentRawName;
 
-  const [additionalInformationClamped, setAdditionalInformationClamped] =
-    useState<boolean>(true);
-
-  const [additionalInformationIsTooLong, setAdditionalInformationIsTooLong] =
-    useState<boolean>(false);
-
-  const [
-    shouldUpdateAdditionalInformationState,
-    setShouldUpdateAdditionalInformationState,
-  ] = useState<boolean>(true);
-
   const establismentName = [
     establismentNameFirstLetter.toLocaleUpperCase(),
     establismentNameOtherLetters.join("").toLocaleLowerCase(),
   ].join("");
-
-  const onAdditionalInformationClick = () => {
-    setAdditionalInformationClamped((prevValue) => !prevValue);
-  };
-
-  const onAdditionalInformationReflow = (additionalInformationDisplayState: {
-    clamped: boolean;
-    text: string;
-  }) => {
-    if (shouldUpdateAdditionalInformationState) {
-      setAdditionalInformationIsTooLong(
-        additionalInformationDisplayState.clamped,
-      );
-      setShouldUpdateAdditionalInformationState(false);
-    }
-  };
 
   return (
     <div className={fr.cx("fr-col-12", "fr-col-md-6", layout)}>
@@ -171,25 +143,10 @@ const SearchResultComponent = ({
                 </li>
               )}
               {additionalInformation && (
-                <li>
-                  <LinesEllipsis
-                    text={additionalInformation}
-                    maxLine={additionalInformationClamped ? 2 : 10}
-                    basedOn="letters"
-                    ellipsis={"..."}
-                    onReflow={onAdditionalInformationReflow}
-                  />
-                  {additionalInformationIsTooLong && (
-                    <button
-                      className={fr.cx("fr-tag", "fr-tag--sm", "fr-mt-1w")}
-                      onClick={onAdditionalInformationClick}
-                      type="button"
-                    >
-                      {additionalInformationClamped
-                        ? "Voir plus"
-                        : "Voir moins"}
-                    </button>
-                  )}
+                <li title={additionalInformation}>
+                  {additionalInformation.length > 100
+                    ? `${additionalInformation.substring(0, 100)}...`
+                    : additionalInformation}
                 </li>
               )}
             </ul>
