@@ -82,7 +82,11 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
     (query: string) => {
       setDisplayedResults(
         results.filter((displayedResult: SearchResultDto) =>
-          JSON.stringify(Object.values(displayedResult))
+          `${displayedResult.additionalInformation}
+            ${displayedResult.customizedName}
+            ${displayedResult.name}
+            ${displayedResult.address.city}
+            ${displayedResult.nafLabel} `
             .toLowerCase()
             .includes(query.toLowerCase()),
         ),
