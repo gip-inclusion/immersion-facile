@@ -98,7 +98,7 @@ const getUseCasesByTopics = (
     useCases.notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
   ],
   // Establishment lead related
-  SendEstablishmentLeadReminder: [],
+  EstablishmentLeadReminderSent: [],
 
   // Search related
   ContactRequestedByBeneficiary: [useCases.notifyContactRequest],

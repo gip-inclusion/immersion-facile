@@ -95,7 +95,7 @@ export type DomainEvent =
     >
 
   // ESTABLISHMENT LEAD RELATED
-  | GenericEvent<"SendEstablishmentLeadReminder", WithConventionIdLegacy>
+  | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
 
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", WithAgencyDto>

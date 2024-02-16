@@ -166,7 +166,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
 
     await uow.outboxRepository.save(
       this.#createNewEvent({
-        topic: "SendEstablishmentLeadReminder",
+        topic: "EstablishmentLeadReminderSent",
         payload: { id: convention.id },
       }),
     );
