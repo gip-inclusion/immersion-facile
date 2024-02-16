@@ -32,7 +32,7 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     agencyRights: z.array(agencyRightSchema),
     agencyDashboardUrl: absoluteUrlSchema.optional(),
     erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
-
+    externalId: zStringMinLength1,
     establishmentDashboards: z.object({
       conventions: z
         .object({

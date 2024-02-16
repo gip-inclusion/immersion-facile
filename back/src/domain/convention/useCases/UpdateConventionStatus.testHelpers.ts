@@ -66,6 +66,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     id: "icUserWithRoleToReview",
     lastName: "ToReview",
     establishmentDashboards: {},
+    externalId: "icUserWithRoleToReview-external-id",
   },
   icUserWithRoleCounsellor: {
     agencyRights: [
@@ -79,6 +80,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     id: "icUserWithRoleCounsellor",
     lastName: "Consellor",
     establishmentDashboards: {},
+    externalId: "icUserWithRoleCounsellor-external-id",
   },
   icUserWithRoleValidator: {
     agencyRights: [
@@ -92,6 +94,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     id: "icUserWithRoleValidator",
     lastName: "Validator",
     establishmentDashboards: {},
+    externalId: "icUserWithRoleValidator-external-id",
   },
 
   icUserWithRoleAgencyOwner: {
@@ -106,6 +109,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     id: "icUserWithRoleAgencyOwner",
     lastName: "Owner",
     establishmentDashboards: {},
+    externalId: "icUserWithRoleAgencyOwner-external-id",
   },
   icUserWithRoleEstablishmentRepresentative: {
     agencyRights: [],
@@ -114,6 +118,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     id: "icUserWithRoleEstablishmentRepresentative",
     lastName: "Owner",
     establishmentDashboards: {},
+    externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
   },
 };
 

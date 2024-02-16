@@ -34,7 +34,7 @@ const inclusionConnectBaseUri: AbsoluteUrl =
 describe("AuthenticateWithInclusionCode use case", () => {
   const defaultExpectedIcIdTokenPayload: InclusionConnectIdTokenPayload = {
     nonce: "nounce",
-    sub: "my-user-id",
+    sub: "my-user-external-id",
     given_name: "John",
     family_name: "Doe",
     email: "john.doe@inclusion.com",
@@ -89,6 +89,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             firstName: defaultExpectedIcIdTokenPayload.given_name,
             lastName: defaultExpectedIcIdTokenPayload.family_name,
             email: defaultExpectedIcIdTokenPayload.email,
+            externalId: defaultExpectedIcIdTokenPayload.sub,
           },
         ]);
       });
@@ -148,6 +149,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             email: alreadyExistingUser.email,
             firstName: alreadyExistingUser.firstName,
             lastName: alreadyExistingUser.lastName,
+            externalId: alreadyExistingUser.externalId,
           },
         ]);
 
@@ -160,9 +162,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
         expectToEqual(uow.authenticatedUserRepository.users, [
           {
             id: alreadyExistingUser.id,
-            email: alreadyExistingUser.email,
+            email: defaultExpectedIcIdTokenPayload.email,
             firstName: defaultExpectedIcIdTokenPayload.given_name,
             lastName: defaultExpectedIcIdTokenPayload.family_name,
+            externalId: alreadyExistingUser.externalId,
           },
         ]);
       });
@@ -214,6 +217,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             firstName: peSpecificIcIdTokenPayload.given_name,
             lastName: peSpecificIcIdTokenPayload.family_name,
             id: userId,
+            externalId: peSpecificIcIdTokenPayload.sub,
           },
         ]);
 
@@ -235,6 +239,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             firstName: peSpecificIcIdTokenPayload.given_name,
             lastName: peSpecificIcIdTokenPayload.family_name,
             id: userId,
+            externalId: peSpecificIcIdTokenPayload.sub,
             agencyRights: [{ agency, role: "agencyOwner" }],
             establishmentDashboards: {},
           },
@@ -254,6 +259,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             firstName: peSpecificIcIdTokenPayload.given_name,
             lastName: peSpecificIcIdTokenPayload.family_name,
             id: userId,
+            externalId: peSpecificIcIdTokenPayload.sub,
           },
         ]);
 
@@ -274,6 +280,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             email: peSpecificIcIdTokenPayload.email,
             firstName: peSpecificIcIdTokenPayload.given_name,
             lastName: peSpecificIcIdTokenPayload.family_name,
+            externalId: peSpecificIcIdTokenPayload.sub,
             id: userId,
             agencyRights: [{ agency, role: "toReview" }],
             establishmentDashboards: {},
@@ -294,6 +301,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             firstName: peSpecificIcIdTokenPayload.given_name,
             lastName: peSpecificIcIdTokenPayload.family_name,
             id: userId,
+            externalId: peSpecificIcIdTokenPayload.sub,
           },
         ]);
 
@@ -321,6 +329,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             firstName: peSpecificIcIdTokenPayload.given_name,
             lastName: peSpecificIcIdTokenPayload.family_name,
             id: userId,
+            externalId: peSpecificIcIdTokenPayload.sub,
           },
         ]);
 
@@ -402,9 +411,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
   const addAlreadyExistingAuthenticatedUserInRepo = () => {
     const alreadyExistingUser: AuthenticatedUser = {
       id: "already-existing-id",
-      email: defaultExpectedIcIdTokenPayload.email,
+      email: "johnny-d@gmail.com",
       firstName: "Johnny",
       lastName: "Doe Existing",
+      externalId: defaultExpectedIcIdTokenPayload.sub,
     };
     uow.authenticatedUserRepository.users = [alreadyExistingUser];
     return { alreadyExistingUser };

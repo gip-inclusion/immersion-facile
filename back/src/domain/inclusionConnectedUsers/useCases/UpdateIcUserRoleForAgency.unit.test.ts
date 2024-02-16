@@ -24,6 +24,7 @@ const user: AuthenticatedUser = {
   email: "john@mail.com",
   firstName: "John",
   lastName: "Lennon",
+  externalId: "john-external-id",
 };
 
 describe("GetInclusionConnectedUsers", () => {

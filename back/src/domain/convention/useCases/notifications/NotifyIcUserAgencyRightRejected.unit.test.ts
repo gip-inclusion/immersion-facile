@@ -1,16 +1,16 @@
 import {
   AgencyDtoBuilder,
   AuthenticatedUser,
-  InclusionConnectedUser,
   expectPromiseToFailWith,
+  InclusionConnectedUser,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
   createInMemoryUow,
+  InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -25,6 +25,7 @@ const user: AuthenticatedUser = {
   email: "john@mail.com",
   firstName: "John",
   lastName: "Lennon",
+  externalId: "john-external-id",
 };
 
 const icUser: InclusionConnectedUser = {

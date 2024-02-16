@@ -1,37 +1,37 @@
 import { addYears } from "date-fns";
+import { ZodError } from "zod";
 import {
   AdminRoutes,
+  adminRoutes,
   AgencyDtoBuilder,
   AgencyRole,
   ApiConsumer,
   ApiConsumerJwt,
   BackOfficeJwt,
-  FeatureFlags,
-  InclusionConnectedUser,
-  SetFeatureFlagParam,
-  adminRoutes,
   createApiConsumerParamsFromApiConsumer,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
+  FeatureFlags,
+  InclusionConnectedUser,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  SetFeatureFlagParam,
   technicalRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { ZodError } from "zod";
 import {
   GenerateApiConsumerJwt,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
 import { EXPIRATION_IN_YEARS } from "../../../../domain/auth/useCases/SaveApiConsumer";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import { buildTestApp,InMemoryGateways } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
+import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
@@ -392,6 +392,7 @@ describe("Admin router", () => {
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
         establishmentDashboards: {},
+        externalId: "john-external-id",
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -447,6 +448,7 @@ describe("Admin router", () => {
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
         establishmentDashboards: {},
+        externalId: "john-external-id",
       };
 
       const updatedRole: AgencyRole = "counsellor";
@@ -480,6 +482,7 @@ describe("Admin router", () => {
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
         establishmentDashboards: {},
+        externalId: "john-external-id",
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([

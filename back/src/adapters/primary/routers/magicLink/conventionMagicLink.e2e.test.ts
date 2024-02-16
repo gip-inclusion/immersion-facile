@@ -1,16 +1,16 @@
 import { addDays } from "date-fns";
+import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
+  conventionMagicLinkRoutes,
+  expectToEqual,
   InclusionConnectedUser,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
-  conventionMagicLinkRoutes,
-  expectToEqual,
 } from "shared";
-import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
@@ -301,6 +301,7 @@ describe("Magic link router", () => {
         lastName: "Doe",
         agencyRights: [{ role: "validator", agency }],
         establishmentDashboards: {},
+        externalId: "john-external-id",
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -422,6 +423,7 @@ describe("Magic link router", () => {
         firstName: "",
         lastName: "",
         id: "1",
+        externalId: "john-external-id",
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -456,6 +458,7 @@ describe("Magic link router", () => {
         firstName: "",
         lastName: "",
         id: "1",
+        externalId: "my-external-id",
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([

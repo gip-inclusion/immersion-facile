@@ -1,16 +1,16 @@
 import {
   AgencyDtoBuilder,
+  expectPromiseToFailWith,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
-  expectPromiseToFailWith,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
   createInMemoryUow,
+  InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -98,6 +98,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
         },
       ],
       establishmentDashboards: {},
+      externalId: "jean-external-id",
     };
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 
@@ -134,6 +135,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
         },
       ],
       establishmentDashboards: {},
+      externalId: "jean-external-id",
     };
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 

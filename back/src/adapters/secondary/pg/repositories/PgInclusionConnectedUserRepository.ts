@@ -103,7 +103,8 @@ export class PgInclusionConnectedUserRepository
             CASE 
               WHEN ${agencyRightsJsonAgg} = '[null]' THEN '[]' 
               ELSE ${agencyRightsJsonAgg} 
-            END 
+            END ,
+         'externalId', authenticated_users.external_id
         ) as inclusion_user
       FROM authenticated_users
       LEFT JOIN users__agencies ON authenticated_users.id = users__agencies.user_id

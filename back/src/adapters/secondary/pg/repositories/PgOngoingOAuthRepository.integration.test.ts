@@ -30,7 +30,7 @@ describe("PgOngoingOAuthRepository", () => {
     await pool.end();
   });
 
-  it("saves an ongoing OAuth, than gets it from its states, than updates it", async () => {
+  it("saves an ongoing OAuth, then gets it from its states, then updates it", async () => {
     const state = "11111111-1111-1111-1111-111111111111";
     const provider = "inclusionConnect";
     const ongoingOAuth: OngoingOAuth = {
@@ -38,6 +38,14 @@ describe("PgOngoingOAuthRepository", () => {
       nonce: "123",
       provider,
     };
+    const authenticatedUser: AuthenticatedUser = {
+      id: "22222222-2222-2222-2222-222222222222",
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@mail.com",
+      externalId: "john-external-id",
+    };
+    await pgAuthenticatedUserRepository.save(authenticatedUser);
     await pgOngoingOAuthRepository.save(ongoingOAuth);
 
     const fetched = await pgOngoingOAuthRepository.findByState(state, provider);
@@ -46,17 +54,11 @@ describe("PgOngoingOAuthRepository", () => {
     const response = await client.query("SELECT * FROM ongoing_oauths");
     expect(response.rows).toHaveLength(1);
 
-    const authenticatedUser: AuthenticatedUser = {
-      id: "add5c20e-6dd2-45af-affe-927358005251",
-      email: "john@mail.fr",
-      firstName: "John",
-      lastName: "Doe",
-    };
     await pgAuthenticatedUserRepository.save(authenticatedUser);
     const updatedOngoingOAuth: OngoingOAuth = {
       ...ongoingOAuth,
       userId: authenticatedUser.id,
-      externalId: "my-external-id",
+      externalId: authenticatedUser.externalId,
       accessToken: "some-token",
     };
     await pgOngoingOAuthRepository.save(updatedOngoingOAuth);

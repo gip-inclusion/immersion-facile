@@ -1,19 +1,19 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  InclusionConnectDomainJwtPayload,
-  InclusionConnectedUser,
   expectPromiseToFailWith,
   expectToEqual,
+  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
   createInMemoryUow,
+  InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -42,6 +42,7 @@ describe("mark partners errored convention as handled", () => {
     lastName: "Doe",
     agencyRights: [],
     establishmentDashboards: {},
+    externalId: "icUserWithoutRight-external-id",
   };
 
   const icUserWithAgencyRights: InclusionConnectedUser = {
@@ -51,6 +52,7 @@ describe("mark partners errored convention as handled", () => {
     lastName: "Doe",
     agencyRights: [{ role: "validator", agency }],
     establishmentDashboards: {},
+    externalId: "icUserWithAgencyRights-external-id",
   };
 
   const convention = new ConventionDtoBuilder()

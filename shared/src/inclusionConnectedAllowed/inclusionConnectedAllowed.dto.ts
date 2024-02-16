@@ -25,6 +25,7 @@ export type AuthenticatedUser = {
   email: Email;
   firstName: string;
   lastName: string;
+  externalId: string;
 };
 
 type WithAgencyRights = {

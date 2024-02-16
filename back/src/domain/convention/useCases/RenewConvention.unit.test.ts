@@ -5,17 +5,17 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   ConventionRelatedJwtPayload,
+  expectPromiseToFailWithError,
+  expectToEqual,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
-  expectPromiseToFailWithError,
-  expectToEqual,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
   createInMemoryUow,
+  InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -23,9 +23,9 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { AddConvention } from "./AddConvention";
@@ -84,6 +84,7 @@ describe("RenewConvention", () => {
     lastName: "Doe",
     agencyRights: [{ role: "validator", agency }],
     establishmentDashboards: {},
+    externalId: "my-user-external-id"
   };
   const inclusionConnectPayload: InclusionConnectDomainJwtPayload = {
     userId: inclusionConnectedUser.id,
