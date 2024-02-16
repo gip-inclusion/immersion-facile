@@ -3,6 +3,7 @@ import { renewMagicLinkResponseSchema } from "../convention/convention.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
+  legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
@@ -14,11 +15,11 @@ export const establishmentLeadRoutes = defineRoutes({
     url: "/establishment-lead/unregister",
     ...withAuthorizationHeaders,
     responses: {
-      200: expressEmptyResponseBody,
+      201: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
       403: renewMagicLinkResponseSchema,
-      404: httpErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
 });

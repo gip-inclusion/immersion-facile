@@ -26,7 +26,7 @@ export class HttpEstablishmentLeadGateway implements EstablishmentLeadGateway {
         })
         .then((response) =>
           match(response)
-            .with({ status: 200 }, () => {
+            .with({ status: 201 }, () => {
               /* void */
             })
             .with({ status: P.union(400, 401, 403, 404) }, ({ body }) => {

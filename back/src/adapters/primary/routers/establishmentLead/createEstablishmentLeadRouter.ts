@@ -15,7 +15,7 @@ export const createEstablishmentLeadRouter = (deps: AppDependencies) => {
   establishmentLeadSharedRouter.unregisterEstablishmentLead(
     deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
-      sendHttpResponse(req, res.status(200), () =>
+      sendHttpResponse(req, res.status(201), () =>
         deps.useCases.markEstablishmentLeadAsRegistrationRejected.execute(
           undefined,
           req.payloads?.convention,
