@@ -333,7 +333,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   availableForImmersion={availableForImmersion}
                 />
                 <h2>{steps[2].title}</h2>
-                <BusinessContactSection
+                <SearchableBySection
                   mode={mode}
                   onStepChange={onStepChange}
                   currentStep={currentStep}
