@@ -7,12 +7,6 @@ export class InMemoryAuthenticatedUserRepository
 {
   #usersById: Record<string, AuthenticatedUser> = {};
 
-  public async findByEmail(
-    email: string,
-  ): Promise<AuthenticatedUser | undefined> {
-    return this.users.find((user) => user.email === email);
-  }
-
   public async findByExternalId(
     externalId: string,
   ): Promise<AuthenticatedUser | undefined> {

@@ -1,6 +1,6 @@
 import { AuthenticatedUser } from "shared";
 import { AuthenticatedUserRepository } from "../../../../domain/generic/OAuth/ports/AuthenticatedUserRepositiory";
-import { executeKyselyRawSqlQuery, KyselyDb } from "../kysely/kyselyUtils";
+import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 type PersistenceAuthenticatedUser = {
   id: string;
@@ -14,20 +14,6 @@ export class PgAuthenticatedUserRepository
   implements AuthenticatedUserRepository
 {
   constructor(private transaction: KyselyDb) {}
-
-  public async findByEmail(
-    email: string,
-  ): Promise<AuthenticatedUser | undefined> {
-    const response =
-      await executeKyselyRawSqlQuery<PersistenceAuthenticatedUser>(
-        this.transaction,
-        `
-      SELECT * FROM authenticated_users WHERE email = $1
-      `,
-        [email],
-      );
-    return toAuthenticatedUser(response.rows[0]);
-  }
 
   public async findByExternalId(
     externalId: string,
