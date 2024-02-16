@@ -32,6 +32,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     email: "john@mail.com",
     firstName: "John",
     lastName: "Doe",
+    externalId: "john-external-id",
   };
 
   let getInclusionConnectedUser: GetInclusionConnectedUser;

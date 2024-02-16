@@ -3,14 +3,14 @@ import {
   BackOfficeJwtPayload,
   ConventionDtoBuilder,
   ConventionJwtPayload,
-  InclusionConnectDomainJwtPayload,
-  InclusionConnectedUser,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
   createInMemoryUow,
+  InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   ForbiddenError,
@@ -63,6 +63,7 @@ describe("Get Convention", () => {
           lastName: "Doe",
           agencyRights: [{ role: "toReview", agency }],
           establishmentDashboards: {},
+          externalId: "john-external-id",
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
         uow.agencyRepository.setAgencies([agency]);
@@ -123,6 +124,7 @@ describe("Get Convention", () => {
           lastName: "Doe",
           agencyRights: [{ role: "validator", agency }],
           establishmentDashboards: {},
+          externalId: "john-external-id",
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
         const jwtPayload: InclusionConnectDomainJwtPayload = {
@@ -152,6 +154,7 @@ describe("Get Convention", () => {
           lastName: "Doe",
           agencyRights: [],
           establishmentDashboards: {},
+          externalId: "john-external-id",
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
 

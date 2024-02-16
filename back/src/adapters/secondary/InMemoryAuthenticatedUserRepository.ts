@@ -13,6 +13,12 @@ export class InMemoryAuthenticatedUserRepository
     return this.users.find((user) => user.email === email);
   }
 
+  public async findByExternalId(
+    externalId: string,
+  ): Promise<AuthenticatedUser | undefined> {
+    return this.users.find((user) => user.externalId === externalId);
+  }
+
   public async save(user: AuthenticatedUser): Promise<void> {
     this.#usersById[user.id] = user;
   }

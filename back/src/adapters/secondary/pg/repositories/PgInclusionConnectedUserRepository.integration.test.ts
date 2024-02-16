@@ -5,9 +5,9 @@ import {
   AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
-  InclusionConnectedUser,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
+  InclusionConnectedUser,
 } from "shared";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
@@ -19,6 +19,7 @@ const authenticatedUser1: AuthenticatedUser = {
   firstName: "John",
   lastName: "Doe",
   email: "john.doe@mail.com",
+  externalId: "john-external-id",
 };
 
 const authenticatedUser2: AuthenticatedUser = {
@@ -26,6 +27,7 @@ const authenticatedUser2: AuthenticatedUser = {
   firstName: "Jane",
   lastName: "Doe",
   email: "jane.doe@mail.com",
+  externalId: "jane-external-id",
 };
 
 const agency1 = new AgencyDtoBuilder()
@@ -256,12 +258,13 @@ describe("PgInclusionConnectedUserRepository", () => {
     email,
     firstName,
     lastName,
+    externalId,
   }: AuthenticatedUser) =>
     client.query(
       `
-      INSERT INTO authenticated_users(id, email, first_name, last_name) VALUES ($1, $2, $3, $4 )
+      INSERT INTO authenticated_users(id, email, first_name, last_name, external_id) VALUES ($1, $2, $3, $4, $5 )
       `,
-      [id, email, firstName, lastName],
+      [id, email, firstName, lastName, externalId],
     );
 
   const insertAgencyRegistrationToUser = async ({

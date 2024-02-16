@@ -124,7 +124,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       throw new ForbiddenError("Nonce mismatch");
 
     const existingAuthenticatedUser =
-      await uow.authenticatedUserRepository.findByEmail(icIdTokenPayload.email);
+      await uow.authenticatedUserRepository.findByExternalId(icIdTokenPayload.sub);
 
     const newOrUpdatedAuthenticatedUser: AuthenticatedUser = {
       ...this.#makeAuthenticatedUser(
@@ -132,7 +132,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         icIdTokenPayload,
       ),
       ...(existingAuthenticatedUser && {
-        email: existingAuthenticatedUser.email,
         id: existingAuthenticatedUser.id,
       }),
     };
@@ -193,6 +192,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       firstName: jwtPayload.given_name,
       lastName: jwtPayload.family_name,
       email: jwtPayload.email,
+      externalId: jwtPayload.sub,
     };
   }
 }

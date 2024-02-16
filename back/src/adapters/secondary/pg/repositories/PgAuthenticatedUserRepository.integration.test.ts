@@ -30,13 +30,14 @@ describe("PgAuthenticatedUserRepository", () => {
     expect(response).toBeUndefined();
   });
 
-  it("saves an authenticated user, than finds it from email, than updates it", async () => {
+  it("saves an authenticated user, than finds it from external_id, then updates it", async () => {
     const email = "joe@mail.com";
     const user: AuthenticatedUser = {
       email,
       lastName: "Doe",
       firstName: "John",
       id: "11111111-1111-1111-1111-111111111111",
+      externalId: 'my-external-id',
     };
 
     await pgAuthenticatedUserRepository.save(user);
@@ -49,10 +50,37 @@ describe("PgAuthenticatedUserRepository", () => {
       email,
       lastName: "Dodo",
       firstName: "Johnny",
+      externalId: 'my-external-id',
     };
     await pgAuthenticatedUserRepository.save(updatedUser);
     const fetchedUpdatedUser =
       await pgAuthenticatedUserRepository.findByEmail(email);
     expectToEqual(fetchedUpdatedUser, updatedUser);
   });
+
+  describe("findByExternalId", () => {
+    it("returns an authenticated_user", async () => {
+      const user: AuthenticatedUser = {
+        email: "joe@mail.com",
+        lastName: "Doe",
+        firstName: "John",
+        id: "11111111-1111-1111-1111-111111111111",
+        externalId: 'my-external-id',
+      };
+
+      await pgAuthenticatedUserRepository.save(user);
+
+      const response =
+        await pgAuthenticatedUserRepository.findByExternalId(user.externalId);
+
+      expectToEqual(response, user);
+    });
+
+    it("returns undefined when authenticated_user not found", async () => {
+      const response =
+        await pgAuthenticatedUserRepository.findByExternalId("an-external-id");
+
+      expect(response).toBeUndefined();
+    });
+  })
 });

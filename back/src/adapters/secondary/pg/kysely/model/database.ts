@@ -17,6 +17,7 @@ export interface Database {
   establishment_lead_events: EstablishmentLeadEvents;
   api_consumers: ApiConsumers;
   api_consumers_subscriptions: ApiConsumersSubscriptions;
+  authenticated_users: AuthenticatedUsers;
 }
 
 type JsonArray = JsonValue[];
@@ -269,4 +270,14 @@ interface ApiConsumersSubscriptions {
   callback_headers: Json;
   consumer_id: string;
   subscribed_event: string;
+}
+
+interface AuthenticatedUsers {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp>;
+  external_id: string | null;
 }

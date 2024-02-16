@@ -1,19 +1,19 @@
+import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
-  ConventionDtoBuilder,
-  InclusionConnectedAllowedRoutes,
   allowedStartInclusionConnectLoginPages,
+  ConventionDtoBuilder,
   currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
   frontRoutes,
+  InclusionConnectedAllowedRoutes,
   inclusionConnectedAllowedRoutes,
 } from "shared";
 import { InclusionConnectedUser } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
 import { GenerateInclusionConnectJwt } from "../../../../domain/auth/jwt";
 import { broadcastToPeServiceName } from "../../../../domain/core/ports/ErrorRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
@@ -30,6 +30,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     lastName: "Doe",
     agencyRights: [],
     establishmentDashboards: {},
+    externalId: "joe-external-id",
   };
   const inclusionConnectedUserWithRights: InclusionConnectedUser = {
     ...inclusionConnectedUserWithoutRights,
@@ -255,6 +256,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         lastName: "Doe",
         agencyRights: [{ agency, role: "validator" }],
         establishmentDashboards: {},
+        externalId: "joe-external-id",
       };
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)

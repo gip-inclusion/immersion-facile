@@ -1,31 +1,31 @@
 import {
+  allRoles,
+  allSignatoryRoles,
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionStatus,
-  EstablishmentRepresentative,
-  InclusionConnectedUser,
-  Signatories,
-  allRoles,
-  allSignatoryRoles,
   conventionStatuses,
+  EstablishmentRepresentative,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUser,
+  Signatories,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
   createInMemoryUow,
+  InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { SignConvention } from "./SignConvention";
@@ -127,6 +127,7 @@ describe("Sign convention", () => {
           firstName: "Billy",
           lastName: "Idol",
           id: "id",
+          externalId: "billy-external-id",
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           icUser,
@@ -231,6 +232,7 @@ describe("Sign convention", () => {
           firstName: "Billy",
           lastName: "Idol",
           id: "id",
+          externalId: "billy-external-id",
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           icUser,
