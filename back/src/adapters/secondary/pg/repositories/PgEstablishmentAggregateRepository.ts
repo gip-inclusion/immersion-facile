@@ -555,7 +555,7 @@ export class PgEstablishmentAggregateRepository
           street_number_and_address: address.streetNumberAndAddress,
           lat: position.lat,
           lon: position.lon,
-          position: sql`ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`,
+          position: sql`ST_MakePoint(${position.lon}, ${position.lat})`,
         })),
       )
       .execute();
