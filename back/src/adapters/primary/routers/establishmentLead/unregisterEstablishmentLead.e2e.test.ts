@@ -81,13 +81,13 @@ describe("Unregister establishment lead", () => {
 
       expectHttpResponseToEqual(response, {
         body: "",
-        status: 200,
+        status: 201,
       });
     });
 
     it(`${displayRouteName(
       establishmentLeadRoutes.unregisterEstablishmentLead,
-    )} 400 - Unauthenticated`, async () => {
+    )} 400 - Bad Request`, async () => {
       const response = await httpClient.unregisterEstablishmentLead({
         headers: {} as any,
         body: {},
@@ -141,6 +141,30 @@ describe("Unregister establishment lead", () => {
           needsNewMagicLink: true,
         },
         status: 403,
+      });
+    });
+
+    it(`${displayRouteName(
+      establishmentLeadRoutes.unregisterEstablishmentLead,
+    )} 404 - Convention not found`, async () => {
+      const response = await httpClient.unregisterEstablishmentLead({
+        headers: {
+          authorization: generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: "no-convention",
+              role: "establishment-representative",
+              email: "",
+              now: new Date(),
+            }),
+          ),
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors: "No convention were found with id no-convention",
+        },
+        status: 404,
       });
     });
   });
