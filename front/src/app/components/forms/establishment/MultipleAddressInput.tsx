@@ -42,7 +42,7 @@ export const MultipleAddressInput = ({
             <div className={fr.cx("fr-col", "fr-mt-2w")}>
               <AddressAutocomplete
                 disabled={disabled}
-                label={"Rechercher un métier *"}
+                label={"Rechercher un lieu *"}
                 initialSearchTerm={currentAddresses[index].rawAddress}
                 useFirstAddressOnInitialSearchTerm={false}
                 setFormValue={({ address }) => {

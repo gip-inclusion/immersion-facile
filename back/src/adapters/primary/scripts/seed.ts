@@ -117,6 +117,28 @@ const establishmentAggregateSeed = async (
   const franceMerguez = new EstablishmentAggregateBuilder()
     .withEstablishment(
       new EstablishmentEntityBuilder()
+        .withLocations([
+          {
+            id: "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01",
+            address: {
+              city: "Villetaneuse",
+              postcode: "93430",
+              streetNumberAndAddress: "6 RUE RAYMOND BROSSE",
+              departmentCode: "93",
+            },
+            position: { lat: 48.956, lon: 2.345 },
+          },
+          {
+            id: "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02",
+            address: {
+              city: "Paris",
+              postcode: "75001",
+              streetNumberAndAddress: "1 rue de Rivoli",
+              departmentCode: "75",
+            },
+            position: { lat: 48.8566, lon: 2.3522 },
+          },
+        ])
         .withSiret("34493368400021")
         .withName("France Merguez Distribution")
         .build(),

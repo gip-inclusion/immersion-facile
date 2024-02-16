@@ -705,11 +705,6 @@ describe("PgEstablishmentAggregateRepository", () => {
           name: establishmentToInsert.name,
           customized_name: establishmentToInsert.customizedName ?? null,
           is_commited: establishmentToInsert.isCommited ?? null,
-          // street_number_and_address:
-          //   establishmentToInsert.address.streetNumberAndAddress,
-          // post_code: establishmentToInsert.address.postcode,
-          // city: establishmentToInsert.address.city,
-          // department_code: establishmentToInsert.address.departmentCode,
           number_employees: establishmentToInsert.numberEmployeesRange,
           naf_code: establishmentToInsert.nafDto.code,
           naf_nomenclature: establishmentToInsert.nafDto.nomenclature,
@@ -836,6 +831,46 @@ describe("PgEstablishmentAggregateRepository", () => {
           },
         ]);
       });
+    });
+  });
+
+  describe("updateEstablishmentAggregate", () => {
+    it("updates the establishment values", async () => {
+      // Prepare
+      const originalEstablishmentAggregate =
+        new EstablishmentAggregateBuilder().build();
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        originalEstablishmentAggregate,
+      );
+      const updatedAt = new Date();
+      const updatedAggregate = new EstablishmentAggregateBuilder()
+        .withLocations([
+          {
+            id: "22222222-ee70-4c90-b3f4-668d492f7395",
+            position: { lat: 49, lon: 6 },
+            address: rueJacquardDto,
+          },
+          {
+            id: "22222222-ee70-4c90-b3f4-668d492f7396",
+            position: { lat: 49, lon: 6 },
+            address: rueBitcheDto,
+          },
+        ])
+        .withMaxContactsPerWeek(7)
+        .withEstablishmentUpdatedAt(updatedAt)
+        .build();
+
+      await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
+        updatedAggregate,
+        updatedAt,
+      );
+
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          updatedAggregate.establishment.siret,
+        ),
+        updatedAggregate,
+      );
     });
   });
 
