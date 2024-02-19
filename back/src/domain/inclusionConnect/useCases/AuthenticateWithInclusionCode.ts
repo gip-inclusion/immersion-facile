@@ -124,7 +124,9 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       throw new ForbiddenError("Nonce mismatch");
 
     const existingAuthenticatedUser =
-      await uow.authenticatedUserRepository.findByExternalId(icIdTokenPayload.sub);
+      await uow.authenticatedUserRepository.findByExternalId(
+        icIdTokenPayload.sub,
+      );
 
     const newOrUpdatedAuthenticatedUser: AuthenticatedUser = {
       ...this.#makeAuthenticatedUser(

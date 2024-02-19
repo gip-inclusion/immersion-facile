@@ -35,6 +35,7 @@ describe("InclusionConnected", () => {
       },
     ],
     establishmentDashboards: {},
+    externalId: "fake-user-external-id",
   };
 
   const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {

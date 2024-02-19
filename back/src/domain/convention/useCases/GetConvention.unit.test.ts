@@ -3,14 +3,14 @@ import {
   BackOfficeJwtPayload,
   ConventionDtoBuilder,
   ConventionJwtPayload,
-  expectPromiseToFailWithError,
-  expectToEqual,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
+  expectPromiseToFailWithError,
+  expectToEqual,
 } from "shared";
 import {
-  createInMemoryUow,
   InMemoryUnitOfWork,
+  createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import {
   ForbiddenError,

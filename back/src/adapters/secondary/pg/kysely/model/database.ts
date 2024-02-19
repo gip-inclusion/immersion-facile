@@ -279,5 +279,5 @@ interface AuthenticatedUsers {
   last_name: string;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
-  external_id: string | null;
+  external_id: string;
 }
