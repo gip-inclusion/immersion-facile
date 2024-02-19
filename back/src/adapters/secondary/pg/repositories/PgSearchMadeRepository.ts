@@ -1,4 +1,5 @@
 import format from "pg-format";
+import { uniq } from "ramda";
 import { AppellationCode } from "shared";
 import {
   SearchMadeEntity,
@@ -54,11 +55,13 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     id: SearchMadeId,
     appellationCodes: AppellationCode[],
   ) {
+    const uniqAppellationCodes = uniq(appellationCodes);
+
     return executeKyselyRawSqlQuery(
       this.transaction,
       format(
         "INSERT INTO searches_made__appellation_code(search_made_id, appellation_code) VALUES %L",
-        appellationCodes.map((appellationCode) => [id, appellationCode]),
+        uniqAppellationCodes.map((appellationCode) => [id, appellationCode]),
       ),
     );
   }
