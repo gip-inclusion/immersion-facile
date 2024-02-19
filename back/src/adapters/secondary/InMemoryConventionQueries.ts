@@ -121,26 +121,30 @@ export class InMemoryConventionQueries implements ConventionQueries {
     sirets: SiretDto[],
   ): Promise<ConventionReadDto[]> {
     const latestConventionsBySiret = this.conventionRepository.conventions
-      .filter((conventionDto) => sirets?.includes(conventionDto.siret))
-      .filter((conventionDto) => !!conventionDto.dateValidation)
+      .filter(
+        (conventionDto) =>
+          sirets?.includes(conventionDto.siret) &&
+          !!conventionDto.dateValidation,
+      )
       .map((conventionDto) => this.#addAgencyDataToConvention(conventionDto))
       .reduce((acc: Record<SiretDto, ConventionReadDto>, conventionReadDto) => {
         const dateFromCurrentConvention =
           acc[conventionReadDto.siret]?.dateValidation;
         const dateFromIncomingConvention = conventionReadDto.dateValidation;
 
-        if (!acc[conventionReadDto.siret])
-          acc[conventionReadDto.siret] = conventionReadDto;
-        else if (
-          dateFromCurrentConvention &&
-          dateFromIncomingConvention &&
-          isBefore(
-            new Date(dateFromCurrentConvention),
-            new Date(dateFromIncomingConvention),
-          )
-        ) {
-          acc[conventionReadDto.siret] = conventionReadDto;
-        }
+        if (
+          !acc[conventionReadDto.siret] ||
+          (dateFromCurrentConvention &&
+            dateFromIncomingConvention &&
+            isBefore(
+              new Date(dateFromCurrentConvention),
+              new Date(dateFromIncomingConvention),
+            ))
+        )
+          return {
+            ...acc,
+            [conventionReadDto.siret]: conventionReadDto,
+          };
 
         return acc;
       }, {});
