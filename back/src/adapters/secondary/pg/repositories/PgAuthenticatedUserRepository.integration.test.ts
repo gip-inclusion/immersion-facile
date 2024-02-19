@@ -15,8 +15,10 @@ describe("PgAuthenticatedUserRepository", () => {
     pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(
       makeKyselyDb(pool),
     );
+    await client.query("DELETE FROM ongoing_oauths");
     await client.query("DELETE FROM authenticated_users");
   });
+
   afterAll(async () => {
     client.release();
     await pool.end();
