@@ -15,6 +15,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { createLogger } from "../../../utils/logger";
 import { GenerateInclusionConnectJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -27,6 +28,8 @@ import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
 import { InclusionConnectConfig } from "./InitiateInclusionConnect";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
+
+const logger = createLogger(__filename);
 
 export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   AuthenticateWithInclusionCodeConnectParams,
@@ -136,6 +139,11 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         id: existingAuthenticatedUser.id,
       }),
     };
+
+    logger.info(`Usecase AuthenticateWithInclusionCode: 
+      AuthenticatedUser id: ${newOrUpdatedAuthenticatedUser.id}
+      OngoingOAuth externalId: ${icIdTokenPayload.sub}
+    `);
 
     const ongoingOAuth: OngoingOAuth = {
       ...existingOngoingOAuth,
