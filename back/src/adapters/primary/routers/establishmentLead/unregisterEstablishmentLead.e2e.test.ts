@@ -73,15 +73,15 @@ describe("Unregister establishment lead", () => {
   describe(`${displayRouteName(
     establishmentLeadRoutes.unregisterEstablishmentLead,
   )}`, () => {
-    it("200 - Success", async () => {
+    it("204 - Success", async () => {
       const response = await httpClient.unregisterEstablishmentLead({
         headers: { authorization: conventionJwt },
         body: {},
       });
 
       expectHttpResponseToEqual(response, {
-        body: "",
-        status: 201,
+        body: {},
+        status: 204,
       });
     });
 
