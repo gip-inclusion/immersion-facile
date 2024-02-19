@@ -23,7 +23,7 @@ const createEstablishmentLeadEpic: AppEpic<EstablishmentLeadAction> = (
         action.payload,
       ),
     ),
-    map((_result) =>
+    map(() =>
       establishmentLeadSlice.actions.unsubscribeEstablishmentLeadSucceeded(),
     ),
     catchEpicError((error) =>
