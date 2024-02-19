@@ -1,16 +1,16 @@
 import { addDays } from "date-fns";
-import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
-  conventionMagicLinkRoutes,
-  expectToEqual,
   InclusionConnectedUser,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
+  conventionMagicLinkRoutes,
+  expectToEqual,
 } from "shared";
+import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,

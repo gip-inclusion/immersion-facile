@@ -48,6 +48,7 @@ const authUser1: AuthenticatedUser = {
   email: "user-email",
   firstName: "user-first-name",
   lastName: "user-last-name",
+  externalId: "fake-user-external-id-1",
 };
 
 const user2Id = "user-id-2";
@@ -56,6 +57,7 @@ const authUser2: AuthenticatedUser = {
   email: "user-email-2",
   firstName: "user-first-name-2",
   lastName: "user-last-name-2",
+  externalId: "fake-user-external-id-2",
 };
 
 const testUserSet: NormalizedIcUserById = {

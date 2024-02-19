@@ -1,19 +1,19 @@
-import { SuperTest, Test } from "supertest";
 import {
   AgencyDtoBuilder,
-  allowedStartInclusionConnectLoginPages,
   ConventionDtoBuilder,
+  InclusionConnectedAllowedRoutes,
+  allowedStartInclusionConnectLoginPages,
   currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
   frontRoutes,
-  InclusionConnectedAllowedRoutes,
   inclusionConnectedAllowedRoutes,
 } from "shared";
 import { InclusionConnectedUser } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { SuperTest, Test } from "supertest";
 import { GenerateInclusionConnectJwt } from "../../../../domain/auth/jwt";
 import { broadcastToPeServiceName } from "../../../../domain/core/ports/ErrorRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";

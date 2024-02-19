@@ -1,10 +1,13 @@
-import { match } from "ts-pattern";
 import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionMagicLinkRoutes,
+  InclusionConnectedUser,
+  TechnicalRoutes,
+  UnauthenticatedConventionRoutes,
+  WithAuthorizationHeader,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   currentJwtVersions,
@@ -15,16 +18,13 @@ import {
   expectToEqual,
   expiredMagicLinkErrorMessage,
   frontRoutes,
-  InclusionConnectedUser,
   stringToMd5,
-  TechnicalRoutes,
   technicalRoutes,
-  UnauthenticatedConventionRoutes,
   unauthenticatedConventionRoutes,
-  WithAuthorizationHeader,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { match } from "ts-pattern";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
@@ -34,7 +34,7 @@ import {
 } from "../../../../domain/auth/jwt";
 import { conventionMissingMessage } from "../../../../domain/convention/entities/Convention";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { buildTestApp, InMemoryGateways } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";

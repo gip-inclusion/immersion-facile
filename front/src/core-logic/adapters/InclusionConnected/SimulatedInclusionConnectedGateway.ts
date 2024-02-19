@@ -14,6 +14,7 @@ const simulatedUserConnected: InclusionConnectedUser = {
   id: "fake-user-id",
   agencyRights: [],
   establishmentDashboards: {},
+  externalId: "fake-user-external-id",
 };
 
 export const nonExisitingAgencyId: AgencyId = "not-found-agency-id";

@@ -91,6 +91,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         lastName: "Bon",
         agencyRights: simulatedAgencyDtos,
         establishmentDashboards: {},
+        externalId: "fake-user-external-id-1",
       },
       {
         id: "fake-user-id-2",
@@ -99,6 +100,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         lastName: "Sanfamille",
         agencyRights: [],
         establishmentDashboards: {},
+        externalId: "fake-user-external-id-2",
       },
       {
         id: "user-in-error",
@@ -115,6 +117,7 @@ export class SimulatedAdminGateway implements AdminGateway {
           },
         ],
         establishmentDashboards: {},
+        externalId: "fake-user-in-error-external-id",
       },
     ] satisfies InclusionConnectedUser[]);
   }
