@@ -1,7 +1,9 @@
-import { descend, prop, sortBy, sortWith } from "ramda";
+import { be } from "date-fns/locale";
+import { prop, sortBy, sortWith } from "ramda";
 import { SiretDto } from "shared";
 import {
   EstablishmentLead,
+  EstablishmentLeadEvent,
   EstablishmentLeadEventKind,
 } from "../../../domain/offer/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadRepository } from "../../../domain/offer/ports/EstablishmentLeadRepository";
@@ -35,30 +37,35 @@ export class InMemoryEstablishmentLeadRepository
     return { ...establishmentLead, lastEventKind };
   }
 
-  public getSiretsByUniqLastEventKind({
+  public async getSiretsByUniqLastEventKind({
     kind,
     beforeDate,
   }: EstablishmentLeadReminderParams): Promise<SiretDto[]> {
-    const sirets = Object.values(this.#establishmentLeads)
-      .filter(
-        ({ lastEventKind, events }) =>
-          lastEventKind === kind &&
-          events.filter((event) => event.kind === kind).length === 1,
-      )
-      .filter(({ events }) => {
-        return beforeDate
-          ? events.filter(
-              (event) => event.kind === kind && event.occurredAt <= beforeDate,
-            ).length > 0
-          : true;
+    return Object.values(this.#establishmentLeads)
+      .filter(({ lastEventKind, events }) => {
+        const lastEvent = events
+          .sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime())
+          .at(-1);
+        if (lastEvent === undefined) return false;
+
+        const shouldKeep =
+          lastEvent.kind === kind &&
+          isEventOfThisKindUniq(lastEventKind, events);
+
+        if (!shouldKeep) return false;
+
+        if (!beforeDate) return true;
+        return lastEvent.occurredAt <= beforeDate;
       })
-      .map(({ siret }) => {
-        return siret;
-      });
-    return Promise.resolve(sirets);
+      .map(({ siret }) => siret);
   }
 
   public async save(establishmentLead: EstablishmentLead): Promise<void> {
     this.#establishmentLeads[establishmentLead.siret] = establishmentLead;
   }
 }
+
+const isEventOfThisKindUniq = (
+  kind: EstablishmentLeadEventKind,
+  events: EstablishmentLeadEvent[],
+) => events.filter((event) => event.kind === kind).length === 1;
