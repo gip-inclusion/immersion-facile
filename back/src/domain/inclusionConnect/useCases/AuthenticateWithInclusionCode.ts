@@ -15,6 +15,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { GenerateInclusionConnectJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -144,6 +145,13 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       externalId: icIdTokenPayload.sub,
       accessToken,
     };
+
+    if (!newOrUpdatedAuthenticatedUser.externalId) {
+      notifyDiscord(
+        `Usecase AuthenticateWithInclusionCode. No ongoing_oauths found for externalId:
+          ${newOrUpdatedAuthenticatedUser.id}`,
+      );
+    }
 
     await Promise.all([
       uow.ongoingOAuthRepository.save(ongoingOAuth),
