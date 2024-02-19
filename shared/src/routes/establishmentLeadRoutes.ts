@@ -6,7 +6,7 @@ import {
   legacyHttpErrorSchema,
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/httpErrors.schema";
-import { expressEmptyResponseBody } from "../zodUtils";
+import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
 export type EstablishmentLeadRoutes = typeof establishmentLeadRoutes;
 export const establishmentLeadRoutes = defineRoutes({
@@ -15,7 +15,7 @@ export const establishmentLeadRoutes = defineRoutes({
     url: "/establishment-lead/unregister",
     ...withAuthorizationHeaders,
     responses: {
-      201: expressEmptyResponseBody,
+      204: emptyObjectSchema,
       400: httpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
       403: renewMagicLinkResponseSchema,
