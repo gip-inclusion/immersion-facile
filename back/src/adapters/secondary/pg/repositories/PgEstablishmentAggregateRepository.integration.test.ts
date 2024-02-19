@@ -55,6 +55,74 @@ const hydrographeAppellationAndRome: AppellationAndRomeDto = {
   romeCode: "M1808",
 };
 
+const cuvisteOffer = new OfferEntityBuilder()
+  .withAppellationCode("140927")
+  .withAppellationLabel("Cuviste")
+  .withRomeCode("A1413")
+  .build();
+
+const artisteCirqueOffer = new OfferEntityBuilder()
+  .withAppellationCode("11155")
+  .withAppellationLabel("Artiste de cirque")
+  .withRomeCode("L1204")
+  .build();
+
+const groomChevauxOffer = new OfferEntityBuilder()
+  .withAppellationCode("140928")
+  .withAppellationLabel("Groom chevaux")
+  .withRomeCode("A1501")
+  .build();
+
+const bassompierreSaintesLocation = {
+  id: "22222222-ee70-4c90-b3f4-668d492f7395",
+  address: {
+    city: "Saintes",
+    postcode: "17100",
+    streetNumberAndAddress: "8 Place bassompierre",
+    departmentCode: "17",
+  },
+  position: {
+    lat: 45.7424192,
+    lon: -0.6293045,
+  },
+};
+
+const portHubleChaniersLocation = {
+  id: "22222222-ee70-4c90-b3f4-668d492f7396",
+  address: {
+    city: "Chaniers",
+    postcode: "17610",
+    streetNumberAndAddress: "Le Port Hublé, 2 Chem. des Métrelles",
+    departmentCode: "17",
+  },
+  position: {
+    lat: 45.7285766,
+    lon: -0.5878595,
+  },
+};
+
+const tourDeLaChaineLaRochelleLocation = {
+  id: "33333333-ee70-4c90-b3f4-668d492f7354",
+  address: {
+    streetNumberAndAddress: "Tour de la chaîne",
+    postcode: "17000",
+    city: "La Rochelle",
+    departmentCode: "17",
+  },
+  position: {
+    lat: 46.1556411,
+    lon: -1.153885,
+  },
+};
+const veauxLocation = {
+  id: "33333333-ee70-4c90-b3f4-668d492f7395",
+  address: rueJacquardDto,
+  position: {
+    lat: 45.7636093,
+    lon: 4.9209047,
+  },
+};
+
 describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let kyselyDb: KyselyDb;
@@ -219,6 +287,96 @@ describe("PgEstablishmentAggregateRepository", () => {
         expect(sortBy(prop("rome"), searchResult)).toMatchObject(
           expectedResult,
         );
+      });
+      it("returns only offers with locations within geographical area without rome code given", async () => {
+        const establishmentAggregate1 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("78000403200029")
+          .withContactId("11111111-1111-4444-1111-111111110001")
+          .withOffers([cuvisteOffer, artisteCirqueOffer])
+          .withLocations([
+            bassompierreSaintesLocation,
+            // outside geographical area
+            veauxLocation,
+          ])
+          .build();
+
+        const establishmentAggregate2 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("78000403200030")
+          .withContactId("11111111-1111-4444-1111-111111110002")
+          .withOffers([
+            cartographeImmersionOffer,
+            cuvisteOffer,
+            groomChevauxOffer,
+          ])
+          .withLocations([
+            portHubleChaniersLocation,
+            tourDeLaChaineLaRochelleLocation,
+          ])
+          .build();
+
+        // Prepare
+        /// Two establishments located inside geographical area
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentAggregate1,
+        );
+
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentAggregate2,
+        );
+
+        // Act
+        const searchResults: SearchResultDto[] =
+          await pgEstablishmentAggregateRepository.searchImmersionResults({
+            searchMade: {
+              distanceKm: 100,
+              // Center of Saintes
+              lat: 45.7461575,
+              lon: -0.728166,
+            },
+          });
+        const readableResults = searchResults.map(toReadableSearchResult);
+        expectArraysToEqualIgnoringOrder(readableResults, [
+          {
+            address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
+            rome: "A1501",
+            distance_m: 52,
+          },
+          {
+            address: "Tour de la chaîne 17000 La Rochelle",
+            rome: "A1413",
+            distance_m: 10,
+          },
+          {
+            address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
+            rome: "A1413",
+            distance_m: 10,
+          },
+          {
+            address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
+            rome: "M1808",
+            distance_m: 10,
+          },
+          {
+            address: "8 Place bassompierre 17100 Saintes",
+            rome: "L1204",
+            distance_m: 10,
+          },
+          {
+            address: "Tour de la chaîne 17000 La Rochelle",
+            rome: "A1501",
+            distance_m: 10,
+          },
+          {
+            address: "8 Place bassompierre 17100 Saintes",
+            rome: "A1413",
+            distance_m: 10,
+          },
+          {
+            address: "Tour de la chaîne 17000 La Rochelle",
+            rome: "M1808",
+            distance_m: 10,
+          },
+        ]);
       });
     });
 
@@ -497,6 +655,119 @@ describe("PgEstablishmentAggregateRepository", () => {
           searchMade: { ...cartographeSearchMade, romeCode: "A1010" },
         });
       expectToEqual(searchResultsWithOverriddenRomeCode, []);
+    });
+
+    it("returns offers for geographical area with rome given for establishment aggregate with multiple locations", async () => {
+      const establishmentAggregate1 = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("78000403200029")
+        .withContactId("11111111-1111-4444-1111-111111110001")
+        .withOffers([cuvisteOffer, artisteCirqueOffer])
+        .withLocations([
+          bassompierreSaintesLocation,
+          // outside geographical area
+          veauxLocation,
+        ])
+        .build();
+      const establishmentAggregate2 = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("78000403200030")
+        .withContactId("11111111-1111-4444-1111-111111110002")
+        .withOffers([
+          cartographeImmersionOffer,
+          cuvisteOffer,
+          groomChevauxOffer,
+        ])
+        .withLocations([
+          portHubleChaniersLocation,
+          // outside geographical area (52km)
+          tourDeLaChaineLaRochelleLocation,
+        ])
+        .build();
+
+      // Prepare
+      /// Two establishments located inside geographical area
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate1,
+      );
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate2,
+      );
+
+      // Act
+      const searchResults: SearchResultDto[] =
+        await pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            distanceKm: 50,
+            // Center of Saintes
+            lat: 45.7461575,
+            lon: -0.728166,
+            romeCode: "A1413",
+          },
+        });
+      const readableResults = searchResults.map(toReadableSearchResult);
+      expectArraysToEqualIgnoringOrder(readableResults, [
+        {
+          address: "8 Place bassompierre 17100 Saintes",
+          rome: "A1413",
+          distance_m: 0,
+        },
+        {
+          address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
+          rome: "A1413",
+          distance_m: 10,
+        },
+      ]);
+    });
+
+    it("returns empty array for offers of establishment with multiple locations without matching rome code", async () => {
+      const establishmentAggregate1 = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("78000403200029")
+        .withContactId("11111111-1111-4444-1111-111111110001")
+        .withOffers([cuvisteOffer, artisteCirqueOffer])
+        .withLocations([
+          bassompierreSaintesLocation,
+          // outside geographical area
+          veauxLocation,
+        ])
+        .build();
+      const establishmentAggregate2 = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("78000403200030")
+        .withContactId("11111111-1111-4444-1111-111111110002")
+        .withOffers([
+          cartographeImmersionOffer,
+          cuvisteOffer,
+          groomChevauxOffer,
+        ])
+        .withLocations([
+          portHubleChaniersLocation,
+          // outside geographical area (52km)
+          tourDeLaChaineLaRochelleLocation,
+        ])
+        .build();
+
+      // Prepare
+      /// Two establishments located inside geographical area
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate1,
+      );
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate2,
+      );
+
+      // Act
+      const searchResults: SearchResultDto[] =
+        await pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            distanceKm: 100,
+            // Center of Saintes
+            lat: 45.7461575,
+            lon: -0.728166,
+            romeCode: "H2206",
+          },
+        });
+      const readableResults = searchResults.map(toReadableSearchResult);
+      expectArraysToEqualIgnoringOrder(readableResults, []);
     });
 
     it("if sorted=distance, returns closest establishments in first", async () => {
@@ -1113,7 +1384,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("getSearchImmersionResultDtoBySiretAndAppellation", () => {
+  describe("getSearchImmersionResultDtoBySiretAndAppellationCode", () => {
     it("Returns undefined when no matching establishment or appellation code", async () => {
       const siretNotInTable = "11111111111111";
 
@@ -1200,4 +1471,14 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
     });
   });
+});
+
+const toReadableSearchResult = ({
+  address,
+  rome,
+  distance_m,
+}: SearchResultDto) => ({
+  address: `${address?.streetNumberAndAddress} ${address?.postcode} ${address?.city}`,
+  rome,
+  distance_m,
 });
