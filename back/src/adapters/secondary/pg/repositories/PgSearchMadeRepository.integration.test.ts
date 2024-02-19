@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import { uniq } from "ramda";
 import { AppellationCode } from "shared";
 import { SearchMadeEntity } from "../../../../domain/offer/entities/SearchMadeEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
@@ -16,6 +17,7 @@ describe("PgSearchesMadeRepository", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM searches_made__appellation_code");
     await client.query("DELETE FROM searches_made");
     pgSearchesMadeRepository = new PgSearchMadeRepository(makeKyselyDb(pool));
   });
@@ -25,10 +27,10 @@ describe("PgSearchesMadeRepository", () => {
     await pool.end();
   });
 
-  it("Insert search", async () => {
+  it("Remove duplicated appellationCodes then insert search", async () => {
     const searchMade: SearchMadeEntity = {
       id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
-      appellationCodes: ["19365"],
+      appellationCodes: ["19365", "19365"],
       distanceKm: 30,
       lat: 48.119146,
       lon: 4.17602,
@@ -40,7 +42,11 @@ describe("PgSearchesMadeRepository", () => {
     };
     await pgSearchesMadeRepository.insertSearchMade(searchMade);
     const retrievedSearchMade = await getSearchMadeById(searchMade.id);
-    expect(retrievedSearchMade).toEqual(searchMade);
+
+    expect(retrievedSearchMade).toEqual({
+      ...searchMade,
+      appellationCodes: uniq(searchMade.appellationCodes ?? []),
+    });
   });
 
   const getSearchMadeById = async (
