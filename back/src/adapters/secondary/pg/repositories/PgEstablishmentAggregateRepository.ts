@@ -241,12 +241,13 @@ export class PgEstablishmentAggregateRepository
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number
+        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number, loc.*, loc.id AS location_id
         FROM immersion_offers AS io
         LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
         LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+        LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
         WHERE io.siret = $1 AND io.appellation_code = $2
-        GROUP BY (siret, io.rome_code, prd.libelle_rome)
+        GROUP BY (siret, io.rome_code, prd.libelle_rome, location_id)
         `,
         [siret, appellationCode],
       );
@@ -880,18 +881,18 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
           'additionalInformation', e.additional_information, 
           'customizedName', e.customized_name, 
           'fitForDisabledWorkers', e.fit_for_disabled_workers,
-          'position', JSON_BUILD_OBJECT('lon', loc.lon, 'lat', loc.lat), 
           'romeLabel', io.rome_label,
           'appellations',  io.appellations,
           'naf', e.naf_code,
           'nafLabel', public_naf_classes_2008.class_label,
           'address', JSON_BUILD_OBJECT(
-            'streetNumberAndAddress', loc.street_number_and_address, 
-            'postcode', loc.post_code,
-            'city', loc.city,
-            'departmentCode', loc.department_code
+            'streetNumberAndAddress', io.street_number_and_address, 
+            'postcode', io.post_code,
+            'city', io.city,
+            'departmentCode', io.department_code
             ),
-          'locationId', loc.id,
+          'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat), 
+          'locationId', io.location_id,
           'contactMode', ic.contact_mode,
           'numberOfEmployeeRange', e.number_employees
         ) 
@@ -901,8 +902,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
       LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
-      LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = e.siret
-      ORDER BY row_number ASC, loc.id ASC; `;
+      ORDER BY row_number ASC, io.location_id ASC; `;
 
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
   // Only compare romeCode and appellationCode
