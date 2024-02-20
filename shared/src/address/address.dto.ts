@@ -140,6 +140,7 @@ export const departmentNameToDepartmentCode: Record<
   "La Réunion": "974",
   Mayotte: "976",
   "Saint-Martin": "971",
+  "Saint-Pierre-et-Miquelon": "975",
 };
 
 export const getDepartmentCodeFromDepartmentNameOrCity: Record<
