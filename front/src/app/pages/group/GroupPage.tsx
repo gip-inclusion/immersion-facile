@@ -81,15 +81,21 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
   const filterResults = useCallback(
     (query: string) => {
       setDisplayedResults(
-        results.filter((displayedResult: SearchResultDto) =>
-          `${displayedResult.additionalInformation}
-            ${displayedResult.customizedName}
-            ${displayedResult.name}
-            ${displayedResult.address.city}
-            ${displayedResult.nafLabel} `
+        results.filter((displayedResult: SearchResultDto) => {
+          const appellationLabels = displayedResult.appellations
+            .map(({ appellationLabel }) => appellationLabel)
+            .join(" ");
+
+          return `${appellationLabels}
+              ${displayedResult.romeLabel}
+              ${displayedResult.additionalInformation}
+              ${displayedResult.customizedName}
+              ${displayedResult.name}
+              ${displayedResult.address.city}
+              ${displayedResult.nafLabel}`
             .toLowerCase()
-            .includes(query.toLowerCase()),
-        ),
+            .includes(query.toLowerCase());
+        }),
       );
     },
     [results],
