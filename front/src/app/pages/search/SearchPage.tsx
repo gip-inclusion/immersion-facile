@@ -96,13 +96,10 @@ export const SearchPage = ({
     name: ["latitude", "longitude"],
   });
 
-  const availableForInitialSearchRequest = useMemo(
-    () =>
-      searchStatus === initialSearchSliceState.searchStatus &&
-      lat !== 0 &&
-      lon !== 0,
-    [searchStatus, initialSearchSliceState.searchStatus, lat, lon],
-  );
+  const availableForInitialSearchRequest =
+    searchStatus === initialSearchSliceState.searchStatus &&
+    lat !== 0 &&
+    lon !== 0;
 
   const getSearchResultsSummary = (resultsNumber: number) => {
     const plural = resultsNumber > 1 ? "s" : "";
@@ -117,7 +114,12 @@ export const SearchPage = ({
     if (availableForInitialSearchRequest) {
       searchUseCase(filterFormValues(formValues));
     }
-  }, [availableForInitialSearchRequest, formValues, searchUseCase]);
+  }, [
+    availableForInitialSearchRequest,
+    searchUseCase,
+    filterFormValues,
+    formValues,
+  ]);
 
   return (
     <HeaderFooterLayout>
