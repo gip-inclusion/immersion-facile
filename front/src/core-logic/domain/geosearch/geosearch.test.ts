@@ -20,10 +20,19 @@ describe("Geosearch epic", () => {
   });
 
   it("should update the searched query and reset the state", () => {
+    const query = "foi";
+    store.dispatch(geosearchSlice.actions.queryHasChanged(query));
+    dependencies.scheduler.flush();
+    expectLoadingToBe(true);
+    expectQueryToBe(query);
+  });
+
+  it("shouldn't update the searched query if threshold is not reached", () => {
     const query = "fo";
     store.dispatch(geosearchSlice.actions.queryHasChanged(query));
-    expectQueryToBe(query);
+    dependencies.scheduler.flush();
     expectLoadingToBe(false);
+    expectQueryToBe("");
   });
 
   it("should trigger a new request to the gateway when query > threshold", () => {

@@ -66,15 +66,35 @@ export const AddressAutocomplete = ({
     [debounceSearchTerm],
   );
 
-  const noOptionText =
-    isSearching || !debounceSearchTerm ? "..." : "Aucune adresse trouvée.";
+  const noOptionText = ({
+    isSearching,
+    debounceSearchTerm,
+    searchTerm,
+  }: {
+    isSearching: boolean;
+    debounceSearchTerm: string;
+    searchTerm: string;
+  }) => {
+    if (!searchTerm) return "Saisissez une adresse";
+    if (searchTerm.length < 3) return "Saisissez au moins 3 caractères";
+    if (isSearching || searchTerm !== debounceSearchTerm) return "...";
+    return "Aucune adresse trouvée";
+  };
   return (
     <div className={fr.cx("fr-input-group")}>
       <Autocomplete
         loading={isSearching}
         loadingText="Recherche d'adresse en cours... 🔎"
         disablePortal
-        noOptionsText={searchTerm ? noOptionText : "Saisissez une adresse."}
+        noOptionsText={
+          searchTerm
+            ? noOptionText({
+                isSearching,
+                debounceSearchTerm,
+                searchTerm,
+              })
+            : "Saisissez une adresse."
+        }
         options={options}
         value={selectedOption}
         id={id}

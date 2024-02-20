@@ -26,15 +26,15 @@ export const geosearchSlice = createSlice({
   name: "geosearch",
   initialState,
   reducers: {
-    queryHasChanged: (state, action: PayloadAction<LookupLocationInput>) => {
-      state.query = action.payload;
+    queryHasChanged: (state, _action: PayloadAction<LookupLocationInput>) => {
       state.suggestions = [];
       state.value = null;
     },
     suggestionsHaveBeenRequested: (
       state,
-      _action: PayloadAction<LookupLocationInput>,
+      action: PayloadAction<LookupLocationInput>,
     ) => {
+      state.query = action.payload;
       state.isLoading = true;
     },
     suggestionsSuccessfullyFetched: (

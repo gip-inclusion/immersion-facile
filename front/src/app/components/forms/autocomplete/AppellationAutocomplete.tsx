@@ -77,6 +77,7 @@ export const AppellationAutocomplete = ({
     }
   }, [initialOption, selectedOption]);
   useEffect(() => {
+    console.log(debounceSearchTerm, searchTerm, isSearching, options);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       const sanitizedTerm = debounceSearchTerm.trim();
@@ -112,8 +113,21 @@ export const AppellationAutocomplete = ({
     })();
   }, [debounceSearchTerm]);
 
-  const noOptionText =
-    isSearching || !debounceSearchTerm ? "..." : "Aucun métier trouvé";
+  const noOptionText = ({
+    isSearching,
+    debounceSearchTerm,
+    searchTerm,
+  }: {
+    isSearching: boolean;
+    debounceSearchTerm: string;
+    searchTerm: string;
+  }) => {
+    if (!searchTerm) return "Saisissez un métier";
+    if (searchTerm.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH)
+      return "Saisissez au moins 3 caractères";
+    if (isSearching || searchTerm !== debounceSearchTerm) return "...";
+    return "Aucun métier trouvé";
+  };
   return (
     <>
       <Autocomplete
@@ -124,7 +138,15 @@ export const AppellationAutocomplete = ({
         value={selectedOption}
         defaultValue={initialOption}
         inputValue={inputHasChanged ? searchTerm : initialOption?.description}
-        noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
+        noOptionsText={
+          searchTerm
+            ? noOptionText({
+                isSearching,
+                debounceSearchTerm,
+                searchTerm,
+              })
+            : "Saisissez un métier"
+        }
         getOptionLabel={(option: Option | undefined) =>
           option
             ? option.value.appellationLabel
@@ -168,6 +190,7 @@ export const AppellationAutocomplete = ({
               )}
               <input
                 {...params.inputProps}
+                value={searchTerm}
                 id={id}
                 className={fr.cx("fr-input")}
                 placeholder={placeholder ?? "Ex: boulanger, styliste, etc."}
