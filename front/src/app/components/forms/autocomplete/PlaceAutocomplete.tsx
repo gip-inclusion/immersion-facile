@@ -37,19 +37,34 @@ export const PlaceAutocomplete = ({
 }: PlaceAutocompleteProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const isSearching: boolean = useAppSelector(geosearchSelectors.isLoading);
   const searchSuggestions = useAppSelector(geosearchSelectors.suggestions);
   const selectedPlace = useAppSelector(geosearchSelectors.value);
   const inputValue = useAppSelector(geosearchSelectors.query);
-  const noOptionText = isSearching ? "..." : "Aucun lieu trouvé 😥";
+  const noOptionText = ({
+    isSearching,
+    debounceSearchTerm,
+    searchTerm,
+  }: {
+    isSearching: boolean;
+    debounceSearchTerm: string;
+    searchTerm: string;
+  }) => {
+    if (!searchTerm) return "Saisissez le nom d'une ville";
+    if (searchTerm.length < 3) return "Saisissez au moins 3 caractères";
+    if (isSearching || searchTerm !== debounceSearchTerm)
+      return "Recherche de ville en cours... 🔎";
+    return "Aucun lieu trouvé";
+  };
   const [inputHasChanged, setInputHasChanged] = useState(false);
   const getInputValue = () => {
     const isInitialRendering =
-      !inputValue && !selectedPlace && !inputHasChanged;
+      !searchTerm && !selectedPlace && !inputHasChanged;
     const isPlaceSelected = !inputHasChanged && selectedPlace;
     if (isInitialRendering) return initialInputValue;
     if (isPlaceSelected) return selectedPlace.label;
-    return inputValue;
+    return searchTerm;
   };
   return (
     <div className={fr.cx("fr-input-group")}>
@@ -57,9 +72,11 @@ export const PlaceAutocomplete = ({
         loading={isSearching}
         loadingText="Recherche de ville en cours... 🔎"
         disablePortal
-        noOptionsText={
-          inputValue ? noOptionText : "Saisissez un lieu ou une ville ⌨️"
-        }
+        noOptionsText={noOptionText({
+          isSearching,
+          debounceSearchTerm: inputValue,
+          searchTerm,
+        })}
         inputValue={getInputValue()}
         options={searchSuggestions}
         value={selectedPlace}
@@ -80,6 +97,7 @@ export const PlaceAutocomplete = ({
           },
         }}
         onInputChange={(_, newInputValue, reason) => {
+          setSearchTerm(newInputValue);
           if (reason === "input") {
             if (newInputValue === "") onInputClear();
             if (inputValue !== newInputValue) {
