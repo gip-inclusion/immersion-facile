@@ -18,6 +18,7 @@ export interface Database {
   api_consumers: ApiConsumers;
   api_consumers_subscriptions: ApiConsumersSubscriptions;
   authenticated_users: AuthenticatedUsers;
+  ongoing_oauths: OngoingOauths;
 }
 
 type JsonArray = JsonValue[];
@@ -280,4 +281,15 @@ interface AuthenticatedUsers {
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
   external_id: string;
+}
+
+interface OngoingOauths {
+  state: string;
+  nonce: string;
+  provider: string;
+  user_id: string | null;
+  external_id: string | null;
+  access_token: string | null;
+  created_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp>;
 }
