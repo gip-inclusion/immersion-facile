@@ -17,6 +17,7 @@ import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFor
 import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryNotificationRepository } from "../../secondary/InMemoryNotificationRepository";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
+import { InMemoryOngoingOauthQueries } from "../../secondary/InMemoryOngoingOauthQueries";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
@@ -49,6 +50,7 @@ import { PgFormEstablishmentRepository } from "../../secondary/pg/repositories/P
 import { PgGroupRepository } from "../../secondary/pg/repositories/PgGroupRepository";
 import { PgInclusionConnectedUserRepository } from "../../secondary/pg/repositories/PgInclusionConnectedUserRepository";
 import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNotificationRepository";
+import { PgOngoingOAuthQueries } from "../../secondary/pg/repositories/PgOngoingOAuthQueries";
 import { PgOngoingOAuthRepository } from "../../secondary/pg/repositories/PgOngoingOAuthRepository";
 import { PgOutboxQueries } from "../../secondary/pg/repositories/PgOutboxQueries";
 import { PgOutboxRepository } from "../../secondary/pg/repositories/PgOutboxRepository";
@@ -67,6 +69,7 @@ export const createInMemoryUow = () => {
   const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
   const shortLinkRepository = new InMemoryShortLinkRepository();
   const agencyRepository = new InMemoryAgencyRepository();
+  const ongoingOAuthRepository = new InMemoryOngoingOAuthRepository();
 
   return {
     agencyRepository,
@@ -93,7 +96,11 @@ export const createInMemoryUow = () => {
       new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
     establishmentLeadRepository: new InMemoryEstablishmentLeadRepository(),
     notificationRepository: new InMemoryNotificationRepository(),
-    ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
+    ongoingOAuthRepository,
+    ongoingOAuthQueries: new InMemoryOngoingOauthQueries(
+      authenticatedUserRepository,
+      ongoingOAuthRepository,
+    ),
     outboxRepository,
     outboxQueries,
     romeRepository: new InMemoryRomeRepository(),
@@ -109,10 +116,15 @@ export const createInMemoryUow = () => {
 
 export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);
+  const ongoingOAuthRepository = new PgOngoingOAuthRepository(transaction);
+  const authenticatedUserRepository = new PgAuthenticatedUserRepository(
+    transaction,
+  );
+
   return {
     agencyRepository: new PgAgencyRepository(transaction),
     apiConsumerRepository: new PgApiConsumerRepository(transaction),
-    authenticatedUserRepository: new PgAuthenticatedUserRepository(transaction),
+    authenticatedUserRepository,
     conventionPoleEmploiAdvisorRepository:
       new PgConventionPoleEmploiAdvisorRepository(transaction),
     conventionExternalIdRepository: new PgConventionExternalIdRepository(
@@ -140,7 +152,12 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
       transaction,
     ),
     notificationRepository: new PgNotificationRepository(transaction),
-    ongoingOAuthRepository: new PgOngoingOAuthRepository(transaction),
+    ongoingOAuthRepository,
+    ongoingOAuthQueries: new PgOngoingOAuthQueries(
+      transaction,
+      ongoingOAuthRepository,
+      authenticatedUserRepository,
+    ),
     outboxQueries: new PgOutboxQueries(transaction),
     outboxRepository: new PgOutboxRepository(transaction),
     romeRepository: new PgRomeRepository(transaction),

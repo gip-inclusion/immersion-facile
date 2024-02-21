@@ -57,6 +57,7 @@ describe("PgInclusionConnectedUserRepository", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM ongoing_oauths");
     await client.query("DELETE FROM authenticated_users");
     await client.query("DELETE FROM users__agencies");
     await client.query("DELETE FROM conventions");

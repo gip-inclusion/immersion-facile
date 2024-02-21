@@ -7,6 +7,7 @@ import { ConventionRepository } from "../../convention/ports/ConventionRepositor
 import { ConventionsToSyncRepository } from "../../convention/ports/ConventionsToSyncRepository";
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
+import { OngoingOAuthQueries } from "../../generic/OAuth/ports/OngoingOAuthQueries";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
 import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 import { DeletedEstablishmentRepository } from "../../offer/ports/DeletedEstablishmentRepository";
@@ -46,6 +47,7 @@ export type UnitOfWork = {
   inclusionConnectedUserRepository: InclusionConnectedUserRepository;
   notificationRepository: NotificationRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;
+  ongoingOAuthQueries: OngoingOAuthQueries;
   outboxQueries: OutboxQueries;
   outboxRepository: OutboxRepository;
   romeRepository: RomeRepository;
