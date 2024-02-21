@@ -152,11 +152,8 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
           ${newOrUpdatedAuthenticatedUser.id}`,
       );
     }
-
-    await Promise.all([
-      uow.ongoingOAuthRepository.save(ongoingOAuth),
-      uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser),
-    ]);
+    await uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser);
+    await uow.ongoingOAuthRepository.save(ongoingOAuth);
 
     if (icIdTokenPayload.structure_pe)
       await this.#onStructurePe(
