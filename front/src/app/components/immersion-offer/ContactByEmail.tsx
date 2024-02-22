@@ -107,7 +107,7 @@ export const ContactByEmail = ({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onFormValid)}>
+      <form onSubmit={handleSubmit(onFormValid, (error) => console.log(error))}>
         <>
           <p>
             Cette entreprise a choisi d'être contactée par mail. Veuillez

@@ -32,7 +32,7 @@ export const createSearchRouter = (deps: AppDependencies) => {
 
   expressSharedRouter.getSearchResult(async (req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.getSearchResultBySiretAndAppellationCode.execute(req.query),
+      deps.useCases.getSearchResultBySearchQuery.execute(req.query),
     ),
   );
 

@@ -70,7 +70,7 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getSearchImmersionResultDtoBySiretAndAppellationCode(
+  public async getSearchImmersionResultDtoBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
   ): Promise<SearchResultDto | undefined> {

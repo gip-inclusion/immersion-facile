@@ -34,8 +34,6 @@ export const frontRoutes = {
   unsubscribeEstablishmentLead: "desinscription-prospect",
 };
 
-export const contactEstablishmentRoute = "contact-establishment";
-
 export const loginPeConnect = "login-pe-connect";
 export const peConnect = "pe-connect";
 

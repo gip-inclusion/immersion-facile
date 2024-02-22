@@ -88,7 +88,7 @@ import { ContactEstablishment } from "../../../domain/offer/useCases/ContactEsta
 import { DeleteEstablishment } from "../../../domain/offer/useCases/DeleteEstablishment";
 import { EditFormEstablishment } from "../../../domain/offer/useCases/EditFormEstablishment";
 import { GetOffersByGroupSlug } from "../../../domain/offer/useCases/GetGroupBySlug";
-import { GetSearchResultBySiretAndAppellationCode } from "../../../domain/offer/useCases/GetSearchResultBySiretAndAppellationCode";
+import { GetSearchResultBySearchQuery } from "../../../domain/offer/useCases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../../domain/offer/useCases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../../domain/offer/useCases/MarkEstablishmentLeadAsRegistrationRejected";
@@ -296,8 +296,9 @@ export const createUseCases = (
         gateways.timeGateway,
       ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
-      getSearchResultBySiretAndAppellationCode:
-        new GetSearchResultBySiretAndAppellationCode(uowPerformer),
+      getSearchResultBySearchQuery: new GetSearchResultBySearchQuery(
+        uowPerformer,
+      ),
 
       addFormEstablishment,
 

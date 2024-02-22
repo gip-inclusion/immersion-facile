@@ -67,11 +67,13 @@ export const SearchResultPage = () => {
   >(null);
 
   useEffect(() => {
-    "appellationCode" in route.params
+    const params = route.params;
+    "appellationCode" in params && "location" in params && params.location
       ? dispatch(
           searchSlice.actions.fetchSearchResultRequested({
-            siret: route.params.siret,
-            appellationCode: route.params.appellationCode,
+            siret: params.siret,
+            appellationCode: params.appellationCode,
+            locationId: params.location,
           }),
         )
       : setShouldShowError(true);

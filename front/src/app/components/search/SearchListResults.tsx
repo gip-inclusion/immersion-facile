@@ -81,11 +81,12 @@ export const SearchListResults = () => {
                   const appellationCode = appellations?.length
                     ? appellations[0].appellationCode
                     : null;
-                  if (appellationCode) {
+                  if (appellationCode && searchResult.locationId) {
                     routes
                       .searchResult({
                         siret: searchResult.siret,
                         appellationCode,
+                        location: searchResult.locationId,
                       })
                       .push();
                     return;

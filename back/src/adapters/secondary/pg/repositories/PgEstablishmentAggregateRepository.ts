@@ -4,6 +4,7 @@ import { equals, keys } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
+  LocationId,
   RomeCode,
   SearchResultDto,
   SearchSortedBy,
@@ -234,9 +235,10 @@ export class PgEstablishmentAggregateRepository
     }));
   }
 
-  public async getSearchImmersionResultDtoBySiretAndAppellationCode(
+  public async getSearchImmersionResultDtoBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
+    locationId: LocationId,
   ): Promise<SearchResultDto | undefined> {
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -246,10 +248,10 @@ export class PgEstablishmentAggregateRepository
         LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
         LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
         LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
-        WHERE io.siret = $1 AND io.appellation_code = $2
+        WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
         GROUP BY (siret, io.rome_code, prd.libelle_rome, location_id)
         `,
-        [siret, appellationCode],
+        [siret, appellationCode, locationId],
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
     if (!immersionSearchResultDto) return;

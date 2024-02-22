@@ -4,11 +4,11 @@ import {
   OmitFromExistingKeys,
   SearchQueryParamsDto,
   SearchResultDto,
-  SiretAndAppellationDto,
+  SearchResultQuery,
 } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
-export type SearchResultPayload = SiretAndAppellationDto | SearchResultDto;
+export type SearchResultPayload = SearchResultQuery | SearchResultDto;
 
 export type SearchParams = OmitFromExistingKeys<
   SearchQueryParamsDto,

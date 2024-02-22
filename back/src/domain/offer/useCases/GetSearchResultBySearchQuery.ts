@@ -1,30 +1,31 @@
 import {
   ApiConsumer,
   SearchResultDto,
-  SiretAndAppellationDto,
-  siretAndAppellationSchema,
+  SearchResultQuery,
+  searchResultQuerySchema,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/ports/UnitOfWork";
 
-export class GetSearchResultBySiretAndAppellationCode extends TransactionalUseCase<
-  SiretAndAppellationDto,
+export class GetSearchResultBySearchQuery extends TransactionalUseCase<
+  SearchResultQuery,
   SearchResultDto,
   ApiConsumer
 > {
-  protected inputSchema = siretAndAppellationSchema;
+  protected inputSchema = searchResultQuerySchema;
 
   public async _execute(
-    siretAndAppellationDto: SiretAndAppellationDto,
+    siretAndAppellationDto: SearchResultQuery,
     uow: UnitOfWork,
   ): Promise<SearchResultDto> {
-    const { siret, appellationCode } = siretAndAppellationDto;
+    const { siret, appellationCode, locationId } = siretAndAppellationDto;
 
     const searchImmersionResultDto =
-      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndAppellationCode(
+      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
         siret,
         appellationCode,
+        locationId,
       );
     if (!searchImmersionResultDto) {
       throw new NotFoundError(

@@ -1,4 +1,4 @@
-import { SearchResultDto, expectToEqual } from "shared";
+import { LocationId, SearchResultDto, expectToEqual } from "shared";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchStatus,
@@ -29,6 +29,8 @@ const lbbSearchResult = {
   rome: "A",
   voluntaryToImmersion: false,
 } as SearchResultDto;
+
+const locationId: LocationId = "123";
 
 const immersionOffer: SearchResultDto = {
   rome: "A1201",
@@ -62,7 +64,7 @@ const immersionOffer: SearchResultDto = {
   website: "https://www.earl-de-la-ferme.fr",
   additionalInformation: "Ferme bio",
   urlOfPartner: "https://www.emploi-store.fr/portail/accueil",
-  locationId: "123",
+  locationId,
 };
 
 describe("search epic", () => {
@@ -148,6 +150,7 @@ describe("search epic", () => {
       searchSlice.actions.fetchSearchResultRequested({
         appellationCode: immersionOffer.appellations[0].appellationCode,
         siret: immersionOffer.siret,
+        locationId: locationId,
       }),
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
@@ -173,6 +176,7 @@ describe("search epic", () => {
       searchSlice.actions.fetchSearchResultRequested({
         appellationCode: immersionOffer.appellations[0].appellationCode,
         siret: immersionOffer.siret,
+        locationId: locationId,
       }),
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
@@ -196,6 +200,7 @@ describe("search epic", () => {
       searchSlice.actions.fetchSearchResultRequested({
         appellationCode: immersionOffer.appellations[0].appellationCode,
         siret: immersionOffer.siret,
+        locationId: locationId,
       }),
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);

@@ -1,7 +1,6 @@
 import { Observable, delay, of } from "rxjs";
 import {
   BackOfficeJwt,
-  ConventionJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,

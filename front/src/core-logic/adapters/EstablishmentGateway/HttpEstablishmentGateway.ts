@@ -1,7 +1,6 @@
 import { Observable, from } from "rxjs";
 import {
   BackOfficeJwt,
-  ConventionJwt,
   EstablishmentJwt,
   EstablishmentRoutes,
   FormEstablishmentDto,
