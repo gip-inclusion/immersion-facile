@@ -143,6 +143,9 @@ export const emptyObjectSchema: z.Schema<Record<string, never>> = z
 
 export const expressEmptyResponseBody = z.void().or(z.literal(""));
 
+export const expressEmptyResponseBodyOrEmptyObject =
+  expressEmptyResponseBody.or(z.object({}).strict());
+
 export const zEnumValidation = <T extends string>(
   values: readonly [T, ...T[]],
   errorMessage: string,
