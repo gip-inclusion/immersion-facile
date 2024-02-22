@@ -51,7 +51,7 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default">
-        {establishmentLeadUnsubcriptionStatus === "Success" && (
+        {establishmentLeadUnsubcriptionStatus === "success" && (
           <Alert
             className={fr.cx("fr-mb-6w")}
             severity="success"

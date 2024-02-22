@@ -1,4 +1,4 @@
-import { filter, map, switchMap } from "rxjs";
+import { exhaustMap, filter, map } from "rxjs";
 import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -18,10 +18,8 @@ const createEstablishmentLeadEpic: AppEpic<EstablishmentLeadAction> = (
       establishmentLeadSlice.actions.unsubscribeEstablishmentLeadRequested
         .match,
     ),
-    switchMap((action) =>
-      establishmentLeadGateway.rejectEstablishmentLeadRegistration$(
-        action.payload,
-      ),
+    exhaustMap(({ payload }) =>
+      establishmentLeadGateway.rejectEstablishmentLeadRegistration$(payload),
     ),
     map(() =>
       establishmentLeadSlice.actions.unsubscribeEstablishmentLeadSucceeded(),

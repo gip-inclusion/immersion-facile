@@ -8,8 +8,6 @@ import {
 } from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
-const failedJwt: ConventionJwt = "failedJwt";
-
 export class SimulatedEstablishmentGateway implements EstablishmentGateway {
   constructor(
     private establishments: FormEstablishmentDto[],

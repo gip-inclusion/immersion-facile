@@ -1,7 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ConventionJwt } from "shared";
 
-export type EstablishmentLeadUIStatus = "Idle" | "Loading" | "Success";
+export type EstablishmentLeadUIStatus =
+  | "idle"
+  | "loading"
+  | "success"
+  | "errored";
 
 export type EstablishmentLeadState = {
   status: EstablishmentLeadUIStatus;
@@ -9,7 +13,7 @@ export type EstablishmentLeadState = {
 };
 
 const initialState: EstablishmentLeadState = {
-  status: "Idle",
+  status: "idle",
   error: null,
 };
 
@@ -21,16 +25,16 @@ export const establishmentLeadSlice = createSlice({
       state,
       _action: PayloadAction<ConventionJwt>,
     ) => {
-      state.status = "Loading";
+      state.status = "loading";
     },
     unsubscribeEstablishmentLeadSucceeded: (state) => {
-      state.status = "Success";
+      state.status = "success";
     },
     unsubscribeEstablishmentLeadFailed: (
       state,
       action: PayloadAction<string>,
     ) => {
-      state.status = "Idle";
+      state.status = "errored";
       state.error = action.payload;
     },
   },
