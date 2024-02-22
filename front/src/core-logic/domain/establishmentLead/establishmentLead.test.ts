@@ -3,7 +3,10 @@ import {
   establishmentLeadErrorSelector,
   establishmentLeadStatus,
 } from "src/core-logic/domain/establishmentLead/establishmentLead.selectors";
-import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
+import {
+  EstablishmentLeadUIStatus,
+  establishmentLeadSlice,
+} from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
 import {
   TestDependencies,
   createTestStore,
@@ -21,26 +24,26 @@ describe("EstablishmentLead slice", () => {
   });
 
   it("unsubscription requested - success", () => {
-    expectToEqual(establishmentLeadStatus(store.getState()), "Idle");
+    expectEstablishmentLeadStatusToBe("idle");
 
     store.dispatch(
       establishmentLeadSlice.actions.unsubscribeEstablishmentLeadRequested(jwt),
     );
-    expectToEqual(establishmentLeadStatus(store.getState()), "Loading");
+    expectEstablishmentLeadStatusToBe("loading");
     feedGatewayWithUnregisterSuccess();
-    expectToEqual(establishmentLeadStatus(store.getState()), "Success");
+    expectEstablishmentLeadStatusToBe("success");
   });
 
   it("unsubscription requested - failed", () => {
     const backendError: Error = new Error("Backend Error");
-    expectToEqual(establishmentLeadStatus(store.getState()), "Idle");
+    expectEstablishmentLeadStatusToBe("idle");
 
     store.dispatch(
       establishmentLeadSlice.actions.unsubscribeEstablishmentLeadRequested(jwt),
     );
-    expectToEqual(establishmentLeadStatus(store.getState()), "Loading");
+    expectEstablishmentLeadStatusToBe("loading");
     feedGatewayWithUnregisterError(backendError);
-    expectToEqual(establishmentLeadStatus(store.getState()), "Idle");
+    expectEstablishmentLeadStatusToBe("errored");
     expectErrorToBe(backendError.message);
   });
 
@@ -49,6 +52,12 @@ describe("EstablishmentLead slice", () => {
       establishmentLeadErrorSelector(store.getState()),
       expectedErrorMessage,
     );
+  };
+
+  const expectEstablishmentLeadStatusToBe = (
+    expectedStatus: EstablishmentLeadUIStatus,
+  ) => {
+    expect(establishmentLeadStatus(store.getState())).toBe(expectedStatus);
   };
 
   const feedGatewayWithUnregisterError = (error: Error) => {
