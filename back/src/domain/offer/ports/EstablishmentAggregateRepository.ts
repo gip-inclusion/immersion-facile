@@ -2,6 +2,7 @@ import {
   AppellationAndRomeDto,
   AppellationCode,
   DateTimeIsoString,
+  LocationId,
   SearchResultDto,
   SiretDto,
 } from "shared";
@@ -53,9 +54,10 @@ export interface EstablishmentAggregateRepository {
     siret: string,
   ): Promise<AppellationAndRomeDto[]>;
 
-  getSearchImmersionResultDtoBySiretAndAppellationCode(
+  getSearchImmersionResultDtoBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
+    locationId: LocationId,
   ): Promise<SearchResultDto | undefined>;
 
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;

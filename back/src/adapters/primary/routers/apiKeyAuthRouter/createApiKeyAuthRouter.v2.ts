@@ -6,6 +6,7 @@ import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
   ForbiddenError,
+  NotFoundError,
   validateAndParseZodSchemaV2,
 } from "../../helpers/httpErrors";
 import { sendHttpResponseForApiV2 } from "../../helpers/sendHttpResponse";
@@ -76,9 +77,26 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           })
         )
           throw new ForbiddenError();
+        const locationId = await deps.uowPerformer.perform(async (uow) => {
+          const aggregate =
+            await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+              req.params.siret,
+            );
+          if (aggregate) {
+            return aggregate.establishment.locations[0].id;
+          }
+        });
+        if (!locationId) {
+          throw new NotFoundError(
+            `No offer found for siret ${req.params.siret} and appellation code ${req.params.appellationCode}`,
+          );
+        }
         return domainToSearchImmersionResultPublicV2(
-          await deps.useCases.getSearchResultBySiretAndAppellationCode.execute(
-            req.params,
+          await deps.useCases.getSearchResultBySearchQuery.execute(
+            {
+              ...req.params,
+              locationId,
+            },
             req.apiConsumer,
           ),
         );

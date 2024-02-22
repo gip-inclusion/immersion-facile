@@ -3,6 +3,7 @@ import { prop, sortBy } from "ramda";
 import {
   AppellationAndRomeDto,
   Location,
+  RomeCode,
   SearchResultDto,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
@@ -335,46 +336,49 @@ describe("PgEstablishmentAggregateRepository", () => {
             },
           });
         const readableResults = searchResults.map(toReadableSearchResult);
-        expectArraysToEqualIgnoringOrder(readableResults, [
+
+        expect(readableResults.length).toBe(8);
+
+        expectArraysToEqualIgnoringOrderAndRoundDistance(readableResults, [
           {
             address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
             rome: "A1501",
-            distance_m: 52,
+            distance_m: 11_093,
           },
           {
             address: "Tour de la chaîne 17000 La Rochelle",
             rome: "A1413",
-            distance_m: 10,
+            distance_m: 56_222,
           },
           {
             address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
             rome: "A1413",
-            distance_m: 10,
+            distance_m: 11_093,
           },
           {
             address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
             rome: "M1808",
-            distance_m: 10,
+            distance_m: 11_093,
           },
           {
             address: "8 Place bassompierre 17100 Saintes",
             rome: "L1204",
-            distance_m: 10,
+            distance_m: 7_705,
           },
           {
             address: "Tour de la chaîne 17000 La Rochelle",
             rome: "A1501",
-            distance_m: 10,
+            distance_m: 56_223,
           },
           {
             address: "8 Place bassompierre 17100 Saintes",
             rome: "A1413",
-            distance_m: 10,
+            distance_m: 7_705,
           },
           {
             address: "Tour de la chaîne 17000 La Rochelle",
             rome: "M1808",
-            distance_m: 10,
+            distance_m: 56_223,
           },
         ]);
       });
@@ -705,16 +709,16 @@ describe("PgEstablishmentAggregateRepository", () => {
           },
         });
       const readableResults = searchResults.map(toReadableSearchResult);
-      expectArraysToEqualIgnoringOrder(readableResults, [
+      expectArraysToEqualIgnoringOrderAndRoundDistance(readableResults, [
         {
           address: "8 Place bassompierre 17100 Saintes",
           rome: "A1413",
-          distance_m: 0,
+          distance_m: 7_705,
         },
         {
           address: "Le Port Hublé, 2 Chem. des Métrelles 17610 Chaniers",
           rome: "A1413",
-          distance_m: 10,
+          distance_m: 11_093,
         },
       ]);
     });
@@ -1384,19 +1388,73 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
   });
 
-  describe("getSearchImmersionResultDtoBySiretAndAppellationCode", () => {
+  describe("getSearchImmersionResultDtoBySearchQuery", () => {
     it("Returns undefined when no matching establishment or appellation code", async () => {
       const siretNotInTable = "11111111111111";
 
       expect(
-        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndAppellationCode(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
           siretNotInTable,
           "14012",
+          "55555555-5555-4444-5555-555555555555",
         ),
       ).toBeUndefined();
     });
 
-    it("Returns reconstructed SearchImmersionResultDto for given siret and appellationCode", async () => {
+    it("Returns undefined SearchImmersionResultDto for given siret, appellationCode and wrong location id", async () => {
+      // Prepare
+      const siret = "12345678901234";
+      const boulangerRome = "D1102";
+      const extraLocation: Location = {
+        address: rueJacquardDto,
+        position: { lon: 2, lat: 48 },
+        id: "55555555-5555-4444-5555-555555555555",
+      };
+      const wrongLocationId = "55555555-5555-4444-5555-555555555666";
+
+      const establishment = new EstablishmentEntityBuilder()
+        .withSiret(siret)
+        .withCustomizedName("La boulangerie de Lucie")
+        .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
+        .withLocations([defaultLocation, extraLocation])
+        .withSearchableBy({
+          students: false,
+          jobSeekers: false,
+        })
+        .build();
+      const boulangerOffer1 = new OfferEntityBuilder()
+        .withRomeCode(boulangerRome)
+        .withAppellationCode("10868") // Aide-boulanger / Aide-boulangère
+        .build();
+      const boulangerOffer2 = new OfferEntityBuilder()
+        .withRomeCode(boulangerRome)
+        .withAppellationCode("12006") // Chef boulanger / boulangère
+        .build();
+      const otherOffer = new OfferEntityBuilder().withRomeCode("H2102").build();
+      const contact = new ContactEntityBuilder()
+        .withGeneratedContactId()
+        .build();
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(establishment)
+          .withOffers([boulangerOffer1, boulangerOffer2, otherOffer])
+          .withContact(contact)
+          .build(),
+      );
+
+      // Act
+      const actualSearchResultDto =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          siret,
+          "12006",
+          wrongLocationId,
+        );
+      // Assert
+      expectToEqual(actualSearchResultDto, undefined);
+    });
+
+    it("Returns reconstructed SearchImmersionResultDto for given siret, appellationCode and location id", async () => {
       // Prepare
       const siret = "12345678901234";
       const boulangerRome = "D1102";
@@ -1439,9 +1497,10 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       // Act
       const actualSearchResultDto =
-        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndAppellationCode(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
           siret,
           "12006",
+          "55555555-5555-4444-5555-555555555555",
         );
       // Assert
       expectToEqual(actualSearchResultDto, {
@@ -1482,3 +1541,23 @@ const toReadableSearchResult = ({
   rome,
   distance_m,
 });
+
+const expectArraysToEqualIgnoringOrderAndRoundDistance = (
+  actual: TestResult[],
+  expected: TestResult[],
+) => {
+  const roundDistance = (result: TestResult) => ({
+    ...result,
+    distance_m: result.distance_m && Math.floor(result.distance_m / 100),
+  });
+  const formattedActual = actual.map(roundDistance);
+  const formattedExpected = expected.map(roundDistance);
+  expect(formattedActual).toHaveLength(formattedExpected.length);
+  expect(formattedActual).toEqual(expect.arrayContaining(formattedExpected));
+};
+
+type TestResult = {
+  address: string;
+  rome: RomeCode;
+  distance_m: number | undefined;
+};

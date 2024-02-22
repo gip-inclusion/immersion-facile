@@ -5,8 +5,8 @@ import {
   GroupWithResults,
   SearchQueryParamsDto,
   SearchResultDto,
+  SearchResultQuery,
   SearchRoutes,
-  SiretAndAppellationDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -59,7 +59,7 @@ export class HttpSearchGateway implements SearchGateway {
   }
 
   public getSearchResult$(
-    params: SiretAndAppellationDto,
+    params: SearchResultQuery,
   ): Observable<SearchResultDto> {
     return from(
       this.httpClient

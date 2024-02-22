@@ -366,6 +366,7 @@ describe("search-immersion route", () => {
         queryParams: {
           siret: establishmentAggregate1.establishment.siret,
           appellationCode: establishmentAggregate1.offers[0].appellationCode,
+          locationId: defaultLocation.id,
         },
       });
 
@@ -409,6 +410,7 @@ describe("search-immersion route", () => {
         queryParams: {
           siret: "my-fake-siret",
           appellationCode: "",
+          locationId: defaultLocation.id,
         },
       });
 
@@ -435,6 +437,7 @@ describe("search-immersion route", () => {
         queryParams: {
           siret: requestedOffer.siret,
           appellationCode: requestedOffer.appellationCode,
+          locationId: defaultLocation.id,
         },
       });
 
@@ -461,6 +464,7 @@ describe("search-immersion route", () => {
         queryParams: {
           siret: requestedOffer.siret,
           appellationCode: requestedOffer.appellationCode,
+          locationId: defaultLocation.id,
         },
       });
 

@@ -12,7 +12,7 @@ import {
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import { InMemoryEstablishmentLeadRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentLeadRepository";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
@@ -93,9 +93,9 @@ describe("Add EstablishmentLead", () => {
     const establishmentAggregate: EstablishmentAggregate =
       new EstablishmentAggregateBuilder().withEstablishmentSiret(siret).build();
 
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregates([
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate,
-    ]);
+    );
 
     await addEstablishmentLead.execute({ convention });
 
