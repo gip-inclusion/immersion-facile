@@ -150,6 +150,12 @@ export const isConventionRenewed = (
   return renewedKey in convention;
 };
 
+export const isConventionValidated = (convention: ConventionDto) =>
+  convention.status === "ACCEPTED_BY_VALIDATOR";
+
+export const isAllowedRole = (allowedRoles: Role[], candidateRole: Role) =>
+  allowedRoles.includes(candidateRole);
+
 const processedDataBySignatoryRole: Record<
   SignatoryRole,
   {
