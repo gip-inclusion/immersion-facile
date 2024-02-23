@@ -24,7 +24,9 @@ import {
   UpdateConventionStatusRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  isAllowedRole,
   isConventionRenewed,
+  isConventionValidated,
   reasonableSchedule,
   renewConventionParamsSchema,
   statusTransitionConfigs,
@@ -243,17 +245,6 @@ export const ConventionManageActions = ({
                 ? t.verification.conventionAlreadyCancelled
                 : t.verification.markAsCancelled}
             </VerificationActionButton>
-            {!isConventionRenewed(convention) && (
-              <Button
-                iconId="fr-icon-file-add-line"
-                className={fr.cx("fr-m-1w")}
-                priority="secondary"
-                disabled={feedback.kind === "renewed"}
-                onClick={() => renewModal.open()}
-              >
-                Renouveler la convention
-              </Button>
-            )}
 
             <Button
               iconId="fr-icon-file-pdf-line"
@@ -277,6 +268,19 @@ export const ConventionManageActions = ({
             </Button>
           </>
         )}
+        {isConventionValidated(convention) &&
+          !isConventionRenewed(convention) &&
+          isAllowedRole(["counsellor", "validator"], role) && (
+            <Button
+              iconId="fr-icon-file-add-line"
+              className={fr.cx("fr-m-1w")}
+              priority="secondary"
+              disabled={feedback.kind === "renewed"}
+              onClick={() => renewModal.open()}
+            >
+              Renouveler la convention
+            </Button>
+          )}
         {shouldShowSignatureAction && (
           <SignButton
             disabled={disabled}
