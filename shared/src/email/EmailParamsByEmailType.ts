@@ -332,7 +332,7 @@ export type EmailParamsByEmailType = {
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     agencyAssessmentDocumentLink: string | undefined;
     agencyLogoUrl: AbsoluteUrl | undefined;
-    agencyValidatorEmail: string;
+    agencyReferentEmail: string;
     beneficiaryBirthdate: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
