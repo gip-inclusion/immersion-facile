@@ -534,7 +534,7 @@ export const defaultEmailValueByEmailKind: {
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
-    agencyValidatorEmail: "AGENCY_VALIDATOR_EMAIL",
+    agencyReferentEmail: "AGENCY_VALIDATOR_EMAIL",
     beneficiaryBirthdate: "BENEFICIARY_BIRTHDATE",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
