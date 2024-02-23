@@ -53,7 +53,8 @@ describe("SaveApiConsumer", () => {
   describe("Right paths", () => {
     it("Adds a new api consumer if not existing", async () => {
       const today = new Date("2023-09-22");
-      timeGateway.setNextDates([today, addMilliseconds(today, 10)]);
+      const justAfterToday = addMilliseconds(today, 1);
+      timeGateway.setNextDates([today, justAfterToday]);
       const result = await saveApiConsumer.execute(
         createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
@@ -71,13 +72,12 @@ describe("SaveApiConsumer", () => {
         {
           ...authorizedUnJeuneUneSolutionApiConsumer,
           createdAt: today.toISOString(),
-          expirationDate: addYears(today, 2).toISOString(),
         },
       ]);
       expectToEqual(uow.outboxRepository.events, [
         {
           id: uuidGenerator.new(),
-          occurredAt: addMilliseconds(today, 10).toISOString(),
+          occurredAt: justAfterToday.toISOString(),
           topic: "ApiConsumerSaved",
           payload: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
           publications: [],
@@ -89,7 +89,7 @@ describe("SaveApiConsumer", () => {
 
     it("Updates an existing api consumer, except subscriptions", async () => {
       const today = new Date("2023-09-22");
-      timeGateway.setNextDates([today, addMilliseconds(today, 10)]);
+      timeGateway.setNextDates([today]);
       const authorizedApiConsumerWithSubscription: ApiConsumer = {
         ...authorizedUnJeuneUneSolutionApiConsumer,
         rights: {
@@ -119,7 +119,7 @@ describe("SaveApiConsumer", () => {
         ...authorizedApiConsumerWithSubscription,
         description: "ma nouvelle description",
         createdAt: today.toISOString(),
-        expirationDate: addYears(today, 2).toISOString(),
+        expirationDate: addYears(today, 3).toISOString(),
         rights: {
           ...authorizedApiConsumerWithSubscription.rights,
           convention: {
@@ -150,13 +150,13 @@ describe("SaveApiConsumer", () => {
           ...authorizedApiConsumerWithSubscription,
           description: "ma nouvelle description",
           createdAt: today.toISOString(),
-          expirationDate: addYears(today, 2).toISOString(),
+          expirationDate: addYears(today, 3).toISOString(),
         },
       ]);
       expectToEqual(uow.outboxRepository.events, [
         {
           id: uuidGenerator.new(),
-          occurredAt: addMilliseconds(today, 10).toISOString(),
+          occurredAt: today.toISOString(),
           topic: "ApiConsumerSaved",
           payload: { consumerId: authorizedApiConsumerWithSubscription.id },
           publications: [],

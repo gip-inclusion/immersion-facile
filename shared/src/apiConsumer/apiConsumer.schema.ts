@@ -11,10 +11,10 @@ import {
   ApiConsumer,
   ApiConsumerContact,
   CallbackHeaders,
-  CreateApiConsumerParams,
-  CreateApiConsumerRights,
   CreateWebhookSubscription,
   WebhookSubscription,
+  WriteApiConsumerParams,
+  WriteApiConsumerRights,
   apiConsumerKinds,
   authorizedCallbackHeaderKeys,
 } from "./ApiConsumer";
@@ -92,32 +92,32 @@ const conventionRightSchema = conventionRightCommonSchema.and(
   }),
 );
 
-const createApiConsumerRightsSchema: z.Schema<CreateApiConsumerRights> =
-  z.object({
+const writeApiConsumerRightsSchema: z.Schema<WriteApiConsumerRights> = z.object(
+  {
     searchEstablishment: createSearchEstablishmentRightSchema,
     convention: createConventionRightSchema,
-  });
+  },
+);
 
 const apiConsumerRightsSchema: z.Schema<ApiConsumer["rights"]> = z.object({
   searchEstablishment: searchEstablishmentRightSchema,
   convention: conventionRightSchema,
 });
 
-export const createApiConsumerSchema: z.Schema<CreateApiConsumerParams> =
-  z.object({
-    id: z.string().uuid(localization.invalidUuid),
-    consumer: zStringMinLength1,
-    contact: apiConsumerContactSchema,
-    rights: createApiConsumerRightsSchema,
-    description: z.string().optional(),
-  });
-
-export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
+const commonApiConsumerShape = {
   id: z.string().uuid(localization.invalidUuid),
   consumer: zStringMinLength1,
   contact: apiConsumerContactSchema,
-  rights: apiConsumerRightsSchema,
-  createdAt: zStringMinLength1.regex(dateRegExp),
-  expirationDate: zStringMinLength1.regex(dateRegExp),
+  rights: writeApiConsumerRightsSchema,
   description: z.string().optional(),
+  expirationDate: zStringMinLength1.regex(dateRegExp),
+};
+
+export const writeApiConsumerSchema: z.Schema<WriteApiConsumerParams> =
+  z.object(commonApiConsumerShape);
+
+export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
+  ...commonApiConsumerShape,
+  createdAt: zStringMinLength1.regex(dateRegExp),
+  rights: apiConsumerRightsSchema,
 });
