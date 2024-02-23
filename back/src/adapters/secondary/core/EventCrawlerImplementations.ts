@@ -1,5 +1,5 @@
 import { splitEvery } from "ramda";
-import { calculateDurationInSecondsFrom } from "shared";
+import { calculateDurationInSecondsFrom, promiseAllByBatch } from "shared";
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
 import {
@@ -63,12 +63,9 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   async #publishEvents(events: DomainEvent[]) {
-    const eventGroups = splitEvery(maxEventsProcessedInParallel, events);
-    for (const eventGroup of eventGroups) {
-      await Promise.all(
-        eventGroup.map((event) => this.eventBus.publish(event)),
-      );
-    }
+    await promiseAllByBatch(maxEventsProcessedInParallel, events, (event) =>
+      this.eventBus.publish(event),
+    );
   }
 
   async #retrieveEvents(
@@ -123,6 +120,7 @@ export class RealEventCrawler
     // setInterval(async () => {
     //   await this.processNewEvents();
     // }, this.crawlingPeriodMs);
+
     const processNewEvents = () =>
       setTimeout(() => {
         this.processNewEvents()
