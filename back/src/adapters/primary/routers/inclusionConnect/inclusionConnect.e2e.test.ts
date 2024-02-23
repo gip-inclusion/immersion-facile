@@ -127,5 +127,16 @@ describe("inclusion connection flow", () => {
         ).toBe("string");
       },
     );
+
+    it(`${displayRouteName(
+      inclusionConnectImmersionRoutes.afterLoginRedirection,
+    )} should link the agency if a code safir matches an agency`, async () => {
+      throw new Error("Test not implemented, do it");
+
+      //   prepare agency
+      // call afterLoginRedirection with a structure_pe
+      // trigger crawler
+      // assert connection is made between user an agency
+    });
   });
 });

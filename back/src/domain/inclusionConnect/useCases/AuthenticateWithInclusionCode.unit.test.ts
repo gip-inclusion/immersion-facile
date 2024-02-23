@@ -31,19 +31,19 @@ const scope = "openid profile email";
 const inclusionConnectBaseUri: AbsoluteUrl =
   "http://fake-inclusion-connect-uri.com";
 
-describe("AuthenticateWithInclusionCode use case", () => {
-  const defaultExpectedIcIdTokenPayload: InclusionConnectIdTokenPayload = {
-    nonce: "nounce",
-    sub: "my-user-external-id",
-    given_name: "John",
-    family_name: "Doe",
-    email: "john.doe@inclusion.com",
-  };
+const defaultExpectedIcIdTokenPayload: InclusionConnectIdTokenPayload = {
+  nonce: "nounce",
+  sub: "my-user-external-id",
+  given_name: "John",
+  family_name: "Doe",
+  email: "john.doe@inclusion.com",
+};
 
+describe("AuthenticateWithInclusionCode use case", () => {
   let uow: InMemoryUnitOfWork;
   let inclusionConnectGateway: InMemoryInclusionConnectGateway;
   let uuidGenerator: TestUuidGenerator;
-  let useCase: AuthenticateWithInclusionCode;
+  let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -51,7 +51,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
     const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
     const immersionRedirectUri: AbsoluteUrl = `${immersionBaseUri}/my-redirection`;
-    useCase = new AuthenticateWithInclusionCode(
+    authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
         timeGateway: new CustomTimeGateway(),
@@ -77,7 +77,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const { initialOngoingOAuth, userId } =
           makeSuccessfulAuthenticationConditions();
 
-        await useCase.execute({
+        await authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
           page: "agencyDashboard",
@@ -98,7 +98,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const { accessToken, initialOngoingOAuth, userId } =
           makeSuccessfulAuthenticationConditions();
 
-        await useCase.execute({
+        await authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
           page: "agencyDashboard",
@@ -118,7 +118,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const { initialOngoingOAuth, userId } =
           makeSuccessfulAuthenticationConditions();
 
-        await useCase.execute({
+        await authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
           page: "agencyDashboard",
@@ -153,7 +153,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           },
         ]);
 
-        await useCase.execute({
+        await authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
           page: "agencyDashboard",
@@ -178,7 +178,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           const { initialOngoingOAuth } =
             makeSuccessfulAuthenticationConditions();
 
-          const redirectedUrl = await useCase.execute({
+          const redirectedUrl = await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
             state: initialOngoingOAuth.state,
             page,
@@ -190,161 +190,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
         },
       );
     });
-
-    describe("handle PE structure", () => {
-      const agency = new AgencyDtoBuilder().withCodeSafir("546546645").build();
-
-      const peSpecificIcIdTokenPayload: InclusionConnectIdTokenPayload = {
-        ...defaultExpectedIcIdTokenPayload,
-        structure_pe: agency.codeSafir ?? undefined,
-      };
-
-      it("add agency right to IC user when Pe structure code is provided by IC and user has no rights on agency", async () => {
-        const { initialOngoingOAuth, userId } =
-          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
-
-        uow.agencyRepository.setAgencies([agency]);
-
-        await useCase.execute({
-          code: "my-inclusion-code",
-          state: initialOngoingOAuth.state,
-          page: "agencyDashboard",
-        });
-
-        expectToEqual(uow.authenticatedUserRepository.users, [
-          {
-            email: peSpecificIcIdTokenPayload.email,
-            firstName: peSpecificIcIdTokenPayload.given_name,
-            lastName: peSpecificIcIdTokenPayload.family_name,
-            id: userId,
-            externalId: peSpecificIcIdTokenPayload.sub,
-          },
-        ]);
-
-        expectToEqual(
-          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
-          {
-            [userId]: [{ agency, role: "validator" }],
-          },
-        );
-      });
-
-      it("don't add agency right to IC user when Pe structure code is provided by IC and user already has rights on agency", async () => {
-        const { initialOngoingOAuth, userId } =
-          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
-
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-          {
-            email: peSpecificIcIdTokenPayload.email,
-            firstName: peSpecificIcIdTokenPayload.given_name,
-            lastName: peSpecificIcIdTokenPayload.family_name,
-            id: userId,
-            externalId: peSpecificIcIdTokenPayload.sub,
-            agencyRights: [{ agency, role: "agencyOwner" }],
-            establishmentDashboards: {},
-          },
-        ]);
-
-        uow.agencyRepository.setAgencies([agency]);
-
-        await useCase.execute({
-          code: "my-inclusion-code",
-          state: initialOngoingOAuth.state,
-          page: "agencyDashboard",
-        });
-
-        expectToEqual(uow.authenticatedUserRepository.users, [
-          {
-            email: peSpecificIcIdTokenPayload.email,
-            firstName: peSpecificIcIdTokenPayload.given_name,
-            lastName: peSpecificIcIdTokenPayload.family_name,
-            id: userId,
-            externalId: peSpecificIcIdTokenPayload.sub,
-          },
-        ]);
-
-        expectToEqual(
-          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
-          {
-            [userId]: [{ agency, role: "agencyOwner" }],
-          },
-        );
-      });
-
-      it("replace agency right to IC user when Pe structure code is provided by IC and user already has rights on agency and current right is toReview", async () => {
-        const { initialOngoingOAuth, userId } =
-          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
-
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-          {
-            email: peSpecificIcIdTokenPayload.email,
-            firstName: peSpecificIcIdTokenPayload.given_name,
-            lastName: peSpecificIcIdTokenPayload.family_name,
-            externalId: peSpecificIcIdTokenPayload.sub,
-            id: userId,
-            agencyRights: [{ agency, role: "toReview" }],
-            establishmentDashboards: {},
-          },
-        ]);
-
-        uow.agencyRepository.setAgencies([agency]);
-
-        await useCase.execute({
-          code: "my-inclusion-code",
-          state: initialOngoingOAuth.state,
-          page: "agencyDashboard",
-        });
-
-        expectToEqual(uow.authenticatedUserRepository.users, [
-          {
-            email: peSpecificIcIdTokenPayload.email,
-            firstName: peSpecificIcIdTokenPayload.given_name,
-            lastName: peSpecificIcIdTokenPayload.family_name,
-            id: userId,
-            externalId: peSpecificIcIdTokenPayload.sub,
-          },
-        ]);
-
-        expectToEqual(
-          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
-          {
-            [userId]: [{ agency, role: "validator" }],
-          },
-        );
-      });
-
-      it("don't add agency right to IC user when Pe structure code is provided by IC and there is not agency with same Pe structure code", async () => {
-        const { initialOngoingOAuth, userId } =
-          makeSuccessfulAuthenticationConditions(peSpecificIcIdTokenPayload);
-
-        await useCase.execute({
-          code: "my-inclusion-code",
-          state: initialOngoingOAuth.state,
-          page: "agencyDashboard",
-        });
-
-        expectToEqual(uow.authenticatedUserRepository.users, [
-          {
-            email: peSpecificIcIdTokenPayload.email,
-            firstName: peSpecificIcIdTokenPayload.given_name,
-            lastName: peSpecificIcIdTokenPayload.family_name,
-            id: userId,
-            externalId: peSpecificIcIdTokenPayload.sub,
-          },
-        ]);
-
-        expectToEqual(
-          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
-          {},
-        );
-      });
-    });
   });
 
   describe("wrong paths", () => {
     it("rejects the connection if no state match the provided one in DB", async () => {
       await expectPromiseToFailWithError(
-        useCase.execute({
+        authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
           state: "my-state",
           page: "agencyDashboard",
@@ -371,7 +222,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       });
 
       await expectPromiseToFailWithError(
-        useCase.execute({
+        authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
           state: "my-state",
           page: "agencyDashboard",

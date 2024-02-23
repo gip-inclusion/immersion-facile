@@ -57,6 +57,12 @@ export type NotificationAddedEvent = GenericEvent<
   WithNotificationIdAndKind
 >;
 
+export type UserAuthenticatedPayload = {
+  userId: string;
+  provider: IdentityProvider;
+  codeSafir?: string;
+};
+
 // prettier-ignore
 export type DomainEvent =
   | NotificationAddedEvent
@@ -114,10 +120,7 @@ export type DomainEvent =
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
-  | GenericEvent<
-      "UserAuthenticatedSuccessfully",
-      { userId: string; provider: IdentityProvider }
-    >
+  | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload>
   | GenericEvent<
       "AgencyRegisteredToInclusionConnectedUser",
       { userId: AuthenticatedUserId; agencyIds: AgencyId[] }

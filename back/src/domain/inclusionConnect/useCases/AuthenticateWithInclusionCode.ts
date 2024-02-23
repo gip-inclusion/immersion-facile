@@ -81,32 +81,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
   }
 
-  async #onStructurePe(
-    userId: AuthenticatedUserId,
-    safirCode: string,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    const icUser = await uow.inclusionConnectedUserRepository.getById(userId);
-    if (!icUser)
-      throw new NotFoundError(`Inclusion Connect user '${userId}' not found.`);
-
-    if (isIcUserAlreadyHasValidRight(icUser, safirCode)) return;
-
-    const agency: AgencyDto | undefined =
-      await uow.agencyRepository.getBySafir(safirCode);
-    if (!agency) return;
-
-    await uow.inclusionConnectedUserRepository.update({
-      ...icUser,
-      agencyRights: [
-        ...icUser.agencyRights.filter(
-          (agencyRight) => agencyRight.agency.codeSafir !== safirCode,
-        ),
-        { agency, role: "validator" },
-      ],
-    });
-  }
-
   async #onOngoingOAuth(
     params: AuthenticateWithInclusionCodeConnectParams,
     uow: UnitOfWork,
@@ -152,15 +126,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
           ${newOrUpdatedAuthenticatedUser.id}`,
       );
     }
+
+    // DON'T do promise all here, we want to save the user first
     await uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser);
     await uow.ongoingOAuthRepository.save(ongoingOAuth);
-
-    if (icIdTokenPayload.structure_pe)
-      await this.#onStructurePe(
-        newOrUpdatedAuthenticatedUser.id,
-        icIdTokenPayload.structure_pe,
-        uow,
-      );
 
     await uow.outboxRepository.save(
       this.#createNewEvent({
@@ -203,10 +172,3 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     };
   }
 }
-const isIcUserAlreadyHasValidRight = (
-  icUser: InclusionConnectedUser,
-  codeSafir: string,
-) =>
-  icUser.agencyRights.some(
-    ({ agency, role }) => agency.codeSafir === codeSafir && role !== "toReview",
-  );

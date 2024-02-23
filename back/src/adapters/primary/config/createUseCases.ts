@@ -79,6 +79,7 @@ import { GetInclusionConnectLogoutUrl } from "../../../domain/inclusionConnect/u
 import { InitiateInclusionConnect } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { GetInclusionConnectedUser } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUser";
 import { GetInclusionConnectedUsers } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUsers";
+import { LinkFranceTravailUsersToTheirAgencies } from "../../../domain/inclusionConnectedUsers/useCases/LinkFranceTravailUsersToTheirAgencies";
 import { RejectIcUserForAgency } from "../../../domain/inclusionConnectedUsers/useCases/RejectIcUserForAgency";
 import { UpdateIcUserRoleForAgency } from "../../../domain/inclusionConnectedUsers/useCases/UpdateIcUserRoleForAgency";
 import { AddEstablishmentLead } from "../../../domain/offer/useCases/AddEstablishmentLead";
@@ -207,6 +208,8 @@ export const createUseCases = (
         config.immersionFacileBaseUrl,
         config.inclusionConnectConfig,
       ),
+      linkFranceTravailUsersToTheirAgencies:
+        new LinkFranceTravailUsersToTheirAgencies(uowPerformer),
       inclusionConnectLogout: new GetInclusionConnectLogoutUrl(
         config.immersionFacileBaseUrl,
         config.inclusionConnectConfig,

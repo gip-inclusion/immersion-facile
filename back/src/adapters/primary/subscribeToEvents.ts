@@ -118,7 +118,9 @@ const getUseCasesByTopics = (
   EmailWithLinkToCreateAssessmentSent: [],
   BeneficiaryAssessmentEmailSent: [],
 
-  UserAuthenticatedSuccessfully: [],
+  UserAuthenticatedSuccessfully: [
+    useCases.linkFranceTravailUsersToTheirAgencies,
+  ],
   IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
   IcUserAgencyRightRejected: [useCases.notifyIcUserAgencyRightRejected],
   //Api Consumer related:
