@@ -138,6 +138,7 @@ export const createGateways = async (
           config.peApiUrl,
           config.poleEmploiAccessTokenConfig,
           noRetries,
+          config.envType === "dev",
         )
       : new InMemoryPoleEmploiGateway();
 
