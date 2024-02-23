@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Loader,
   MainWrapper,
@@ -97,6 +97,7 @@ export const SearchPage = ({
   });
 
   const availableForInitialSearchRequest =
+    keys(routeParams).length &&
     searchStatus === initialSearchSliceState.searchStatus &&
     lat !== 0 &&
     lon !== 0;
