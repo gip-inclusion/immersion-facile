@@ -31,6 +31,7 @@ import {
   formErrorsToFlatErrors,
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { P, match } from "ts-pattern";
@@ -44,68 +45,10 @@ export const AddAgencyForm = () => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
     boolean | undefined
   >(undefined);
-
-  const refersToOtherAgencyOptions: RadioButtonsProps["options"] = [
-    {
-      label: "Prescripteur",
-      nativeInputProps: {
-        onClick: () => {
-          setRefersToOtherAgency(false);
-        },
-      },
-    },
-    {
-      label: "Structure d'accompagnement",
-      nativeInputProps: {
-        onClick: () => setRefersToOtherAgency(true),
-      },
-    },
-  ];
-
-  return (
-    <>
-      <RadioButtons
-        id={domElementIds.addAgency.agencyRefersToInput}
-        legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
-        options={refersToOtherAgencyOptions}
-      />
-      {match(refersToOtherAgency)
-        .with(P.boolean, (refersToOtherAgency) => (
-          <AgencyForm refersToOtherAgency={refersToOtherAgency} />
-        ))
-        .with(undefined, () => null)
-        .exhaustive()}
-    </>
-  );
-};
-
-type AgencyFormProps = {
-  refersToOtherAgency: boolean;
-};
-
-const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
-  const { getFormErrors, getFormFields } = getFormContents(
-    formAgencyFieldsLabels,
-  );
-  const { refersToAgencyId: refersToAgencyIdField } = getFormFields();
-  const formInitialValues = useMemo(
-    () => ({
-      ...initialValues(uuidV4()),
-      validatorEmails: refersToOtherAgency ? ["temp@temp.com"] : [],
-    }),
-    [refersToOtherAgency],
-  );
-  const methods = useForm<CreateAgencyInitialValues>({
-    resolver: zodResolver(createAgencySchema),
-    mode: "onTouched",
-    defaultValues: formInitialValues,
-  });
-
-  const { handleSubmit, formState, reset } = methods;
-
+  useScrollToTop(submitFeedback.kind === "agencyAdded");
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");
     return outOfReduxDependencies.agencyGateway
@@ -124,6 +67,81 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
         setSubmitFeedback({ kind: "errored", errorMessage: e.message });
       });
   };
+
+  const refersToOtherAgencyOptions: RadioButtonsProps["options"] = [
+    {
+      label: "Prescripteur",
+      nativeInputProps: {
+        onClick: () => {
+          setRefersToOtherAgency(false);
+        },
+      },
+    },
+    {
+      label: "Structure d'accompagnement",
+      nativeInputProps: {
+        onClick: () => setRefersToOtherAgency(true),
+      },
+    },
+  ];
+  if (submitFeedback.kind === "agencyAdded") {
+    return (
+      <SubmitFeedbackNotification
+        submitFeedback={submitFeedback}
+        messageByKind={agencySubmitMessageByKind}
+      />
+    );
+  }
+  return (
+    <>
+      <RadioButtons
+        id={domElementIds.addAgency.agencyRefersToInput}
+        legend={"Êtes-vous un prescripteur ou une structure d'accompagnement ?"}
+        options={refersToOtherAgencyOptions}
+      />
+      {match(refersToOtherAgency)
+        .with(P.boolean, (refersToOtherAgency) => (
+          <AgencyForm
+            refersToOtherAgency={refersToOtherAgency}
+            submitFeedback={submitFeedback}
+            onFormValid={onFormValid}
+          />
+        ))
+        .with(undefined, () => null)
+        .exhaustive()}
+    </>
+  );
+};
+
+type AgencyFormProps = {
+  refersToOtherAgency: boolean;
+  submitFeedback: AgencySubmitFeedback;
+  onFormValid: SubmitHandler<CreateAgencyInitialValues>;
+};
+
+const AgencyForm = ({
+  refersToOtherAgency,
+  submitFeedback,
+  onFormValid,
+}: AgencyFormProps) => {
+  const { getFormErrors, getFormFields } = getFormContents(
+    formAgencyFieldsLabels,
+  );
+  const { refersToAgencyId: refersToAgencyIdField } = getFormFields();
+  const formInitialValues = useMemo(
+    () => ({
+      ...initialValues(uuidV4()),
+      validatorEmails: refersToOtherAgency ? ["temp@temp.com"] : [],
+    }),
+    [refersToOtherAgency],
+  );
+  const methods = useForm<CreateAgencyInitialValues>({
+    resolver: zodResolver(createAgencySchema),
+    mode: "onTouched",
+    defaultValues: formInitialValues,
+  });
+
+  const { handleSubmit, formState, reset } = methods;
 
   const agenciesRetrieverMemoized = useCallback(
     (departmentCode: DepartmentCode) =>
@@ -202,7 +220,7 @@ const AgencyForm = ({ refersToOtherAgency }: AgencyFormProps) => {
         <div className={fr.cx("fr-mt-4w")}>
           <Button
             type="submit"
-            disabled={formState.isSubmitting || submitFeedback.kind !== "idle"}
+            disabled={formState.isSubmitting}
             nativeButtonProps={{
               id: domElementIds.addAgency.submitButton,
             }}

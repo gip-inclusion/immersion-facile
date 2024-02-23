@@ -131,6 +131,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       ? route.params.siret
       : "",
   );
+  useScrollToTop(feedback.kind === "submitSuccess" || currentStep);
 
   const redirectToErrorOnFeedback = useCallback(
     (feedback: EstablishmentFeedback, jwt: string) => {
@@ -148,8 +149,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     },
     [],
   );
-
-  useScrollToTop(currentStep);
 
   useEffect(() => {
     match({ route: currentRoute.current, adminJwt })
