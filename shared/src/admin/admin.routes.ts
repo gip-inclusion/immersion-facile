@@ -4,7 +4,7 @@ import { withAgencyIdSchema } from "../agency/agency.schema";
 import {
   apiConsumerJwtSchema,
   apiConsumerSchema,
-  createApiConsumerSchema,
+  writeApiConsumerSchema,
 } from "../apiConsumer/apiConsumer.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { setFeatureFlagSchema } from "../featureFlag/featureFlags.schema";
@@ -113,7 +113,7 @@ export const adminRoutes = defineRoutes({
   saveApiConsumer: defineRoute({
     method: "post",
     url: "/admin/api-consumers",
-    requestBodySchema: createApiConsumerSchema,
+    requestBodySchema: writeApiConsumerSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: apiConsumerJwtSchema.or(expressEmptyResponseBody),

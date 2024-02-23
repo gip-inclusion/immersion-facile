@@ -1,4 +1,3 @@
-import { addYears } from "date-fns";
 import { keys } from "ramda";
 import {
   ApiConsumer,
@@ -6,9 +5,9 @@ import {
   ApiConsumerRight,
   ApiConsumerRights,
   BackOfficeDomainPayload,
-  CreateApiConsumerParams,
   CreateWebhookSubscription,
-  createApiConsumerSchema,
+  WriteApiConsumerParams,
+  writeApiConsumerSchema,
 } from "shared";
 import {
   ForbiddenError,
@@ -23,11 +22,11 @@ import { GenerateApiConsumerJwt } from "../jwt";
 export const EXPIRATION_IN_YEARS = 2;
 
 export class SaveApiConsumer extends TransactionalUseCase<
-  CreateApiConsumerParams,
+  WriteApiConsumerParams,
   ApiConsumerJwt | undefined,
   BackOfficeDomainPayload
 > {
-  protected inputSchema = createApiConsumerSchema;
+  protected inputSchema = writeApiConsumerSchema;
 
   #createNewEvent: CreateNewEvent;
 
@@ -48,7 +47,7 @@ export class SaveApiConsumer extends TransactionalUseCase<
   }
 
   protected async _execute(
-    input: CreateApiConsumerParams,
+    input: WriteApiConsumerParams,
     uow: UnitOfWork,
     payload?: BackOfficeDomainPayload,
   ): Promise<ApiConsumerJwt | undefined> {
@@ -86,7 +85,7 @@ export class SaveApiConsumer extends TransactionalUseCase<
   }
 
   #buildApiConsumerWithoutSubscription(
-    input: CreateApiConsumerParams,
+    input: WriteApiConsumerParams,
     existingApiConsumer: ApiConsumer | undefined,
   ): ApiConsumer {
     const rights = keys(input.rights).reduce((acc, rightName) => {
@@ -105,21 +104,10 @@ export class SaveApiConsumer extends TransactionalUseCase<
       };
     }, {} as ApiConsumerRights);
 
-    const now = this.#timeGateway.now();
-
-    const additionInfos = existingApiConsumer
-      ? {
-          createdAt: existingApiConsumer.createdAt,
-          expirationDate: existingApiConsumer.expirationDate,
-        }
-      : {
-          createdAt: now.toISOString(),
-          expirationDate: addYears(now, EXPIRATION_IN_YEARS).toISOString(),
-        };
-
     return {
       ...input,
-      ...additionInfos,
+      createdAt:
+        existingApiConsumer?.createdAt ?? this.#timeGateway.now().toISOString(),
       rights,
     };
   }

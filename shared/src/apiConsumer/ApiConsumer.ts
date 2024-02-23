@@ -45,7 +45,7 @@ export type GenericApiConsumerRights<S extends CreateWebhookSubscription> = {
   convention: ApiConsumerRight<ConventionScope, S>;
 };
 
-export type CreateApiConsumerRights =
+export type WriteApiConsumerRights =
   GenericApiConsumerRights<CreateWebhookSubscription>;
 
 export type ApiConsumerRights = GenericApiConsumerRights<WebhookSubscription>;
@@ -58,12 +58,13 @@ export type ConventionScope = Either<
   { agencyIds: AgencyId[] }
 >;
 
-export type CreateApiConsumerParams = {
+export type WriteApiConsumerParams = {
   id: ApiConsumerId;
   consumer: ApiConsumerName;
   contact: ApiConsumerContact;
   description?: string;
-  rights: CreateApiConsumerRights;
+  rights: WriteApiConsumerRights;
+  expirationDate: DateString;
 };
 
 export type ApiConsumerContact = {
@@ -123,17 +124,16 @@ export type WebhookSubscription = CreateWebhookSubscription & {
 };
 
 export type ApiConsumer = ReplaceTypeAtKey<
-  CreateApiConsumerParams,
+  WriteApiConsumerParams,
   "rights",
   ApiConsumerRights
 > & {
   createdAt: DateString;
-  expirationDate: DateString;
 };
 
 export const createApiConsumerParamsFromApiConsumer = (
   apiConsumer: ApiConsumer,
-): CreateApiConsumerParams => ({
+): WriteApiConsumerParams => ({
   id: apiConsumer.id,
   rights: {
     convention: {
@@ -150,6 +150,7 @@ export const createApiConsumerParamsFromApiConsumer = (
   consumer: apiConsumer.consumer,
   contact: apiConsumer.contact,
   description: apiConsumer.description,
+  expirationDate: apiConsumer.expirationDate,
 });
 
 export const findRightNameFromSubscriptionId = (

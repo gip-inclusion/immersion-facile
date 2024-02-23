@@ -1,4 +1,3 @@
-import { addYears } from "date-fns";
 import {
   AdminRoutes,
   AgencyDtoBuilder,
@@ -26,7 +25,6 @@ import {
   GenerateApiConsumerJwt,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
-import { EXPIRATION_IN_YEARS } from "../../../../domain/auth/useCases/SaveApiConsumer";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
@@ -564,7 +562,6 @@ describe("Admin router", () => {
         {
           ...authorizedUnJeuneUneSolutionApiConsumer,
           createdAt: now.toISOString(),
-          expirationDate: addYears(now, EXPIRATION_IN_YEARS).toISOString(),
         },
       ]);
     });
