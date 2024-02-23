@@ -4,6 +4,7 @@ import {
   ConventionId,
   ConventionStatus,
   castError,
+  promiseAllByBatch,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -100,14 +101,13 @@ export class ConventionsReminder extends TransactionalUseCase<
       ),
     ];
 
-    const results: { id: ConventionId; error?: Error }[] = await Promise.all(
-      events.map(({ event, id }) =>
-        uow.outboxRepository
+    const results: { id: ConventionId; error?: Error }[] =
+      await promiseAllByBatch(100, events, ({ event, id }) => {
+        return uow.outboxRepository
           .save(event)
           .then(() => ({ id }))
-          .catch((error) => ({ id, error: castError(error) })),
-      ),
-    );
+          .catch((error) => ({ id, error: castError(error) }));
+      });
 
     return {
       success: results.filter(
