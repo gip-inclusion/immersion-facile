@@ -37,6 +37,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   });
 
   #peTestPrefix: "test" | "";
+  #isDev: boolean;
 
   readonly #httpClient: HttpClient<PoleEmploiRoutes>;
 
@@ -52,12 +53,14 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     peApiUrl: AbsoluteUrl,
     accessTokenConfig: AccessTokenConfig,
     retryStrategy: RetryStrategy,
+    isDev = false,
   ) {
     this.#peTestPrefix = getPeTestPrefix(peApiUrl);
     this.#accessTokenConfig = accessTokenConfig;
     this.#caching = caching;
     this.#httpClient = httpClient;
     this.#retryStrategy = retryStrategy;
+    this.#isDev = isDev;
   }
 
   public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
@@ -104,6 +107,14 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         originalId: poleEmploiConvention.originalId,
       },
     });
+
+    if (this.#isDev) {
+      return {
+        status: 200,
+        message: "this is a fake response for dev mode",
+      };
+    }
+
     return this.#postPoleEmploiConvention(poleEmploiConvention)
       .then((response) => {
         logger.info({
