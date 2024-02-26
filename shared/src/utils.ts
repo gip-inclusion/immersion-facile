@@ -1,6 +1,6 @@
 // TODO: find the standard for gouv.fr phone verification
 
-import { pipe, prop, sortBy, splitEvery, toLower, values } from "ramda";
+import { pipe, prop, sortBy, toLower, values } from "ramda";
 import { Flavor } from "./typeFlavors";
 
 export const phoneRegExp = /^\+?[0-9]+$/;
@@ -192,17 +192,3 @@ export const castError = (error: unknown): Error =>
 type Filter = <T>(predicate: (element: T) => boolean) => (array: T[]) => T[];
 
 export const filter: Filter = (predicate) => (array) => array.filter(predicate);
-
-export const promiseAllByBatch = async <T, R>(
-  batchSize: number,
-  elements: T[],
-  cb: (element: T) => Promise<R>,
-): Promise<R[]> => {
-  const batches = splitEvery(batchSize, elements);
-  const results: R[] = [];
-  for (const batch of batches) {
-    const batchResults = await Promise.all(batch.map(cb));
-    results.push(...batchResults);
-  }
-  return results;
-};
