@@ -2,6 +2,7 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
+import { InMemoryAgencyGroupRepository } from "../../secondary/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryAssessmentRepository } from "../../secondary/InMemoryAssessmentRepository";
@@ -78,6 +79,7 @@ export const createInMemoryUow = () => {
 
   return {
     agencyRepository,
+    agencyGroupRepository: new InMemoryAgencyGroupRepository(),
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
     authenticatedUserRepository,
     conventionQueries,

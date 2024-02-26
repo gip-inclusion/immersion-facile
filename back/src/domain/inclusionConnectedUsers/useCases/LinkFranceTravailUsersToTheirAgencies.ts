@@ -1,4 +1,10 @@
-import { AgencyDto, InclusionConnectedUser } from "shared";
+import { partition } from "ramda";
+import {
+  AgencyDto,
+  AgencyGroup,
+  AgencyRight,
+  InclusionConnectedUser,
+} from "shared";
 import { z } from "zod";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -28,17 +34,49 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
 
     const agency: AgencyDto | undefined =
       await uow.agencyRepository.getBySafir(codeSafir);
-    if (!agency) return;
+    if (agency) {
+      await uow.inclusionConnectedUserRepository.update({
+        ...icUser,
+        agencyRights: [
+          ...icUser.agencyRights.filter(
+            (agencyRight) => agencyRight.agency.codeSafir !== codeSafir,
+          ),
+          { agency, role: "validator" },
+        ],
+      });
+      return;
+    }
+    const agencyGroup: AgencyGroup | undefined =
+      await uow.agencyGroupRepository.getByCodeSafir(codeSafir);
 
-    await uow.inclusionConnectedUserRepository.update({
-      ...icUser,
-      agencyRights: [
-        ...icUser.agencyRights.filter(
-          (agencyRight) => agencyRight.agency.codeSafir !== codeSafir,
-        ),
-        { agency, role: "validator" },
-      ],
-    });
+    if (agencyGroup) {
+      const agencies = await uow.agencyRepository.getByIds(
+        agencyGroup.agencyIds,
+      );
+
+      const [agencyRightsWithConflicts, agencyRightsWithoutConflicts] =
+        partition(
+          ({ agency }) => agencyGroup.agencyIds.includes(agency.id),
+          icUser.agencyRights,
+        );
+
+      await uow.inclusionConnectedUserRepository.update({
+        ...icUser,
+        agencyRights: [
+          ...agencyRightsWithoutConflicts,
+          ...agencies.map((agency): AgencyRight => {
+            const existingAgencyRight = agencyRightsWithConflicts.find(
+              (agencyRight) => agencyRight.agency.id === agency.id,
+            );
+            if (existingAgencyRight && existingAgencyRight.role !== "toReview")
+              return existingAgencyRight;
+
+            return { agency, role: "validator" };
+          }),
+        ],
+      });
+      return;
+    }
   }
 }
 
