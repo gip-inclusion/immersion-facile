@@ -4,6 +4,8 @@ import { AbsoluteUrl, ConventionId } from "shared";
 export interface Database {
   actors: Actors;
   agencies: Agencies;
+  agency_groups: AgencyGroups;
+  agency_groups__agencies: AgencyGroupsAgencies;
   convention_external_ids: ConventionExternalIds;
   conventions: Conventions;
   discussions: Discussions;
@@ -359,4 +361,25 @@ export interface ImmersionContacts {
   phone: string | null;
   contact_mode: ContactMode;
   copy_emails: Generated<Json>;
+}
+
+export type AgencyGroupKind = "france-travail";
+
+export type AgencyGroupScope = "direction-régionale" | "direction-territoriale";
+
+export interface AgencyGroups {
+  id: Generated<number>;
+  siret: string;
+  name: string;
+  email: string | null;
+  cc_emails: Json | null;
+  departments: Json;
+  kind: AgencyGroupKind;
+  scope: AgencyGroupScope;
+  code_safir: string;
+}
+
+export interface AgencyGroupsAgencies {
+  agency_group_id: number;
+  agency_id: string;
 }
