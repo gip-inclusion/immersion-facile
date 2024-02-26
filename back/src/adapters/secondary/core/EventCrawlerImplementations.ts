@@ -21,20 +21,25 @@ export class BasicEventCrawler implements EventCrawler {
   ) {}
 
   public async processNewEvents(): Promise<void> {
-    const startDate = new Date();
+    const getEventsStartDate = new Date();
     const events = await this.#retrieveEvents("unpublished");
-    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+    const getEventsDurationInSeconds =
+      calculateDurationInSecondsFrom(getEventsStartDate);
+
+    const processStartDate = new Date();
+    await this.#publishEvents(events);
+    const processEventsDurationInSeconds =
+      calculateDurationInSecondsFrom(processStartDate);
 
     if (events.length) {
       logger.info({
-        durationInSeconds,
+        getEventsDurationInSeconds,
+        processEventsDurationInSeconds,
         typeOfEvents: "unpublished",
         numberOfEvent: events.length,
         events: eventsToDebugInfo(events),
       });
     }
-
-    await this.#publishEvents(events);
   }
 
   public async retryFailedEvents(): Promise<void> {
