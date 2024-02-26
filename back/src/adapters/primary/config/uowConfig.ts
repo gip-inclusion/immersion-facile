@@ -32,6 +32,7 @@ import { InMemoryGroupRepository } from "../../secondary/offer/InMemoryGroupRepo
 import { InMemorySearchMadeRepository } from "../../secondary/offer/InMemorySearchMadeRepository";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
+import { PgAgencyGroupRepository } from "../../secondary/pg/repositories/PgAgencyGroupRepository";
 import { PgAgencyRepository } from "../../secondary/pg/repositories/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/repositories/PgApiConsumerRepository";
 import { PgAssessmentRepository } from "../../secondary/pg/repositories/PgAssessmentRepository";
@@ -121,6 +122,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);
   return {
     agencyRepository: new PgAgencyRepository(transaction),
+    agencyGroupRepository: new PgAgencyGroupRepository(transaction),
     apiConsumerRepository: new PgApiConsumerRepository(transaction),
     authenticatedUserRepository: new PgAuthenticatedUserRepository(transaction),
     conventionPoleEmploiAdvisorRepository:
