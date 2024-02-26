@@ -1,3 +1,4 @@
+import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom, promiseAllByBatch } from "shared";
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
@@ -7,10 +8,7 @@ import {
 } from "../../../domain/core/eventBus/events";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
-import {
-  notifyDiscord,
-  notifyObjectDiscord,
-} from "../../../utils/notifyDiscord";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
@@ -118,35 +116,26 @@ export class RealEventCrawler
       "RealEventCrawler.startCrawler: processing events at regular intervals",
     );
 
-    const processNewEvents = () => {
+    // old version :
+    // setInterval(async () => {
+    //   await this.processNewEvents();
+    // }, this.crawlingPeriodMs);
+
+    const processNewEvents = () =>
       setTimeout(() => {
-        // Wrapping `this.processNewEvents()` in a Promise that rejects if it takes longer than 2 minutes
-        const processWithTimeout = new Promise((resolve, reject) => {
-          const maxExecutionTime = 120_000; // 2 minutes in ms
-          const maxExecutionDurationTimeout = setTimeout(() => {
-            const message = "Crawler execution loop timed out after 2 minutes";
-            notifyDiscord(message);
-            reject(new Error(message));
-          }, maxExecutionTime);
-
-          this.processNewEvents()
-            .then(resolve)
-            .catch(reject)
-            .finally(() => clearTimeout(maxExecutionDurationTimeout));
-        });
-
-        processWithTimeout
+        this.processNewEvents()
           .catch((error) => {
-            logger.error(
-              { error },
-              "RealEventCrawler.processNewEvents failed or timed out",
-            );
+            logger.error({ error }, "RealEventCrawler.processNewEvents failed");
           })
           .finally(() => processNewEvents());
       }, this.crawlingPeriodMs);
-    };
 
     processNewEvents();
+
+    // old version :
+    // setInterval(async () => {
+    //   await this.retryFailedEvents();
+    // }, retryErrorsPeriodMs);
 
     const retryFailedEvents = () =>
       setTimeout(() => {
