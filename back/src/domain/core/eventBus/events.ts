@@ -37,6 +37,7 @@ export type EventPublication = {
 export type EventStatus =
   | "never-published"
   | "to-republish"
+  | "in-process"
   | "published"
   | "failed-but-will-retry"
   | "failed-to-many-times";

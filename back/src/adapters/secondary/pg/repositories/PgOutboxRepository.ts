@@ -1,3 +1,4 @@
+import format from "pg-format";
 import { differenceWith } from "ramda";
 import { DateString, castError, propEq, replaceArrayElement } from "shared";
 import type {
@@ -28,6 +29,19 @@ const logger = createLogger(__filename);
 
 export class PgOutboxRepository implements OutboxRepository {
   constructor(private transaction: KyselyDb) {}
+
+  public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {
+    const query = format(
+      `
+        UPDATE outbox
+        SET status = 'in-process'
+        WHERE id IN %L
+    `,
+      [events.map((event) => event.id)],
+    );
+
+    await executeKyselyRawSqlQuery(this.transaction, query);
+  }
 
   public async save(event: DomainEvent): Promise<void> {
     const eventInDb =
