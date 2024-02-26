@@ -20,4 +20,13 @@ export class InMemoryOutboxRepository implements OutboxRepository {
       "save",
     );
   }
+
+  public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {
+    events.forEach((event) => {
+      this._events[event.id] = {
+        ...event,
+        status: "in-process",
+      };
+    });
+  }
 }
