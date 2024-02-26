@@ -8,7 +8,7 @@ import { UnitOfWork } from "../../core/ports/UnitOfWork";
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
   userId: z.string(),
   provider: z.literal("inclusionConnect"),
-  codeSafir: z.string().optional(),
+  codeSafir: z.string().or(z.null()),
 });
 
 export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<UserAuthenticatedPayload> {

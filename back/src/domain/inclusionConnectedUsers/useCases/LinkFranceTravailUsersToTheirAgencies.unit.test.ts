@@ -39,6 +39,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
         provider: "inclusionConnect",
+        codeSafir: null,
       });
 
       expectToEqual(uow.authenticatedUserRepository.users, [defaultUser]);

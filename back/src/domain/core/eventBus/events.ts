@@ -60,7 +60,7 @@ export type NotificationAddedEvent = GenericEvent<
 export type UserAuthenticatedPayload = {
   userId: string;
   provider: IdentityProvider;
-  codeSafir?: string;
+  codeSafir: string | null;
 };
 
 // prettier-ignore

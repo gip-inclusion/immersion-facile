@@ -11,10 +11,7 @@ import {
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { GenerateInclusionConnectJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -137,6 +134,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         payload: {
           userId: newOrUpdatedAuthenticatedUser.id,
           provider: ongoingOAuth.provider,
+          codeSafir: icIdTokenPayload.structure_pe ?? null,
         },
       }),
     );
