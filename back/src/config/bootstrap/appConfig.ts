@@ -60,6 +60,14 @@ export class AppConfig {
     });
   }
 
+  public get appellationsGateway() {
+    return this.#throwIfNotInArray({
+      variableName: "APPELLATIONS_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "DIAGORIENTE"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
   // https://adresse.data.gouv.fr/
   public get apiJwtPrivateKey() {
     return this.#throwIfNotDefinedOrDefault("API_JWT_PRIVATE_KEY");

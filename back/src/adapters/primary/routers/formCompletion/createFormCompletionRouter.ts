@@ -14,7 +14,10 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
 
   formCompletionRouter.appellation((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.appellationSearch.execute(req.query.searchText),
+      deps.useCases.appellationSearch.execute({
+        searchText: req.query.searchText,
+        fetchAppellationsFromNaturalLanguage: false,
+      }),
     ),
   );
 

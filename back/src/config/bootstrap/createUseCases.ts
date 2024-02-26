@@ -373,7 +373,10 @@ export const createUseCases = (
       ),
 
       // romes
-      appellationSearch: new AppellationSearch(uowPerformer),
+      appellationSearch: new AppellationSearch(
+        uowPerformer,
+        gateways.appellationsGateway,
+      ),
       romeSearch: new RomeSearch(uowPerformer),
 
       // email validation

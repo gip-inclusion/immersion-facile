@@ -3,6 +3,8 @@ import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import { DiagorienteAppellationsGateway } from "../../adapters/secondary/appellationsGateway/DiagorienteAppellationsGateway";
+import { InMemoryAppellationsGateway } from "../../adapters/secondary/appellationsGateway/InMemoryAppellationsGateway";
 import { HttpPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/PoleEmploiRoutes";
@@ -181,6 +183,11 @@ export const createGateways = async (
         ),
     })[config.emailValidationGateway]();
 
+  const appellationsGateway = {
+    IN_MEMORY: () => new InMemoryAppellationsGateway(),
+    DIAGORIENTE: () => new DiagorienteAppellationsGateway(),
+  }[config.appellationsGateway]();
+
   const addressGateway = {
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
@@ -266,6 +273,7 @@ export const createGateways = async (
 
   return {
     addressApi: addressGateway,
+    appellationsGateway,
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
     notification: createNotificationGateway(config, timeGateway),
