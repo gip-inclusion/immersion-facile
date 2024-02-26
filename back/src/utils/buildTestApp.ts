@@ -1,5 +1,6 @@
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import supertest from "supertest";
+import { InMemoryAppellationsGateway } from "../adapters/secondary/appellationsGateway/InMemoryAppellationsGateway";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { Gateways } from "../config/bootstrap/createGateways";
 import { createApp } from "../config/bootstrap/server";
@@ -46,6 +47,7 @@ export type InMemoryGateways = {
   emailValidationGateway: InMemoryEmailValidationGateway;
   shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
   subscribersGateway: InMemorySubscribersGateway;
+  appellationsGateway: InMemoryAppellationsGateway;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
@@ -81,6 +83,7 @@ export const buildTestApp = async (
 
   const appConfig = new AppConfigBuilder({
     ADDRESS_API_GATEWAY: "IN_MEMORY",
+    APPELLATIONS_GATEWAY: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     DOMAIN: "my-domain",
     NOTIFICATION_GATEWAY: "IN_MEMORY",
