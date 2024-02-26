@@ -1,4 +1,5 @@
 import { ApiConsumerRepository } from "../../auth/ports/ApiConsumerRepository";
+import { AgencyGroupRepository } from "../../convention/ports/AgencyGroupRepository";
 import { AgencyRepository } from "../../convention/ports/AgencyRepository";
 import { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import { ConventionExternalIdRepository } from "../../convention/ports/ConventionExternalIdRepository";
@@ -28,6 +29,7 @@ import { ShortLinkRepository } from "./ShortLinkRepository";
 
 export type UnitOfWork = {
   agencyRepository: AgencyRepository;
+  agencyGroupRepository: AgencyGroupRepository;
   apiConsumerRepository: ApiConsumerRepository;
   authenticatedUserRepository: AuthenticatedUserRepository;
   conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
