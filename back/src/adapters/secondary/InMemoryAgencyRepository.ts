@@ -181,8 +181,12 @@ const testAgencies: AgencyDto[] = [
   },
 ];
 
+type AgencyById = Partial<{
+  [id: string]: AgencyDto;
+}>;
+
 export class InMemoryAgencyRepository implements AgencyRepository {
-  #agencies: Partial<{ [id: string]: AgencyDto }> = {};
+  #agencies: AgencyById = {};
 
   constructor(agencyList: AgencyDto[] = testAgencies) {
     agencyList.forEach((agency) => {
@@ -193,6 +197,16 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   // test purpose only
   public get agencies(): AgencyDto[] {
     return values(this.#agencies).filter(isTruthy);
+  }
+
+  public set agencies(agencies: AgencyDto[]) {
+    this.#agencies = agencies.reduce(
+      (acc, agency) => ({
+        ...acc,
+        [agency.id]: agency,
+      }),
+      {} as AgencyById,
+    );
   }
 
   public async alreadyHasActiveAgencyWithSameAddressAndKind({

@@ -130,6 +130,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             payload: {
               provider: "inclusionConnect",
               userId,
+              codeSafir: null,
             },
           },
         ]);
