@@ -34,7 +34,11 @@ export const ConventionDocument = ({
     <section className={cx(componentName)}>
       <div className={cx(`${componentName}__tools`)}>
         {customActions}
-        <Button onClick={window.print} type="button">
+        <Button
+          onClick={window.print}
+          type="button"
+          id={"im-convention-document__print-button"}
+        >
           Imprimer la convention
         </Button>
       </div>

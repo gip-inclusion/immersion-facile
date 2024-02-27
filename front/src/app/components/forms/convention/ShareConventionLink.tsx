@@ -6,7 +6,7 @@ import Snackbar from "@mui/material/Snackbar";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto } from "shared";
+import { ConventionReadDto, domElementIds } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { ShareForm } from "./ShareForm";
@@ -42,6 +42,9 @@ export const ShareConventionLink = () => {
         onClick={() => {
           openShareLinkModal();
           setIsModalOpened(true);
+        }}
+        nativeButtonProps={{
+          id: domElementIds.conventionImmersionRoute.shareButton,
         }}
         priority="secondary"
       >
