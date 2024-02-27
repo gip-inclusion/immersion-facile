@@ -8,11 +8,11 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { avenueChampsElyseesDto } from "../../../../domain/core/address/adapters/InMemoryAddressGateway";
-import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
-} from "../../../secondary/InMemoryApiConsumerRepository";
+} from "../../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

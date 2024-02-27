@@ -14,7 +14,6 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../../domain/auth/jwt";
-import { SaveApiConsumer } from "../../../domain/auth/useCases/SaveApiConsumer";
 import { BroadcastToPartnersOnConventionUpdates } from "../../../domain/broadcast/useCases/BroadcastToPartnersOnConventionUpdates";
 import { DeleteSubscription } from "../../../domain/broadcast/useCases/DeleteSubscription";
 import { ListActiveSubscriptions } from "../../../domain/broadcast/useCases/ListActiveSubscriptions";
@@ -60,7 +59,8 @@ import { MarkPartnersErroredConventionAsHandled } from "../../../domain/conventi
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { LookupLocation } from "../../../domain/core/address/use-cases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/core/address/use-cases/LookupStreetAddress";
-import { ValidateEmail } from "../../../domain/core/email-validation/useCases/ValidateEmail";
+import { SaveApiConsumer } from "../../../domain/core/api-consumer/use-cases/SaveApiConsumer";
+import { ValidateEmail } from "../../../domain/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
 import { SendNotification } from "../../../domain/core/notifications/useCases/SendNotification";

@@ -7,12 +7,12 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
-import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   authorizedSubscriptionApiConsumer,
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
-} from "../../../secondary/InMemoryApiConsumerRepository";
+} from "../../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import {
   PublicApiV2WebhooksRoutes,

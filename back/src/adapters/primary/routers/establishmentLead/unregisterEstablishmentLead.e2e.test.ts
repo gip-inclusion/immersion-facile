@@ -13,13 +13,13 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { GenerateConventionJwt } from "../../../../domain/auth/jwt";
-import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
-import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
   unauthorizedApiConsumer,
-} from "../../../secondary/InMemoryApiConsumerRepository";
+} from "../../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const convention = new ConventionDtoBuilder().build();
