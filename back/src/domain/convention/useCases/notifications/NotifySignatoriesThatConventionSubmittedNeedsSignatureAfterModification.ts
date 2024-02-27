@@ -15,11 +15,11 @@ import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/con
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
-import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { retrieveConventionWithAgency } from "../../entities/Convention";
 

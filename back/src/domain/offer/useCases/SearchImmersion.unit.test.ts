@@ -12,7 +12,6 @@ import {
   createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   ContactEntityBuilder,
@@ -27,6 +26,7 @@ import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../.
 import { InMemoryLaBonneBoiteGateway } from "../../../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "../../../adapters/secondary/offer/laBonneBoite/LaBonneBoiteCompanyDto";
 import { LaBonneBoiteCompanyDtoBuilder } from "../../../adapters/secondary/offer/laBonneBoite/LaBonneBoiteCompanyDtoBuilder";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { SearchImmersion } from "./SearchImmersion";
 
 const secretariatAppellationAndRome: AppellationAndRomeDto = {

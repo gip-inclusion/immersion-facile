@@ -4,13 +4,13 @@ import { keys } from "ramda";
 import { SiretDto } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import {
   SendEstablishmentLeadReminderOutput,
   SendEstablishmentLeadReminderScript,
 } from "../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
 import { createLogger } from "../../../utils/logger";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AppConfig } from "../config/appConfig";

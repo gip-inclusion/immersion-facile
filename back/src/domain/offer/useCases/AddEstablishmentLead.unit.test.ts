@@ -11,9 +11,9 @@ import {
 } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import { InMemoryEstablishmentLeadRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentLeadRepository";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { AddEstablishmentLead } from "./AddEstablishmentLead";

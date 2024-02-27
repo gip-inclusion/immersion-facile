@@ -1,12 +1,12 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
 

@@ -16,7 +16,6 @@ import {
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   InMemorySiretGateway,
@@ -26,6 +25,7 @@ import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/eventBus/EventBus";
+import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { referedAgencyMissingMessage } from "../../ports/AgencyRepository";
 import { AddAgency } from "./AddAgency";
 

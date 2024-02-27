@@ -1,9 +1,9 @@
 import { prop } from "ramda";
 import { DateString, TemplatedEmail, TemplatedSms } from "shared";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
+import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
 import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { createLogger } from "../../../utils/logger";
-import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 
 const logger = createLogger(__filename);
 export const sendSmsErrorPhoneNumber = "0699999999";

@@ -11,8 +11,8 @@ import {
 } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryPoleEmploiGateway } from "../../../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   PoleEmploiConvention,
   conventionStatusToPoleEmploiStatus,

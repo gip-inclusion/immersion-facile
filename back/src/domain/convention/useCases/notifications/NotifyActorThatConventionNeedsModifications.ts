@@ -14,11 +14,11 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../../core/eventBus/eventPayload.dto";
 import { conventionRequiresModificationPayloadSchema } from "../../../core/eventBus/eventPayload.schema";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
-import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyActorThatConventionNeedsModifications extends TransactionalUseCase<ConventionRequiresModificationPayload> {

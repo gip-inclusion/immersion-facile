@@ -62,9 +62,9 @@ import { LookupLocation } from "../../../domain/core/address/use-cases/LookupLoc
 import { LookupStreetAddress } from "../../../domain/core/address/use-cases/LookupStreetAddress";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
+import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";

@@ -1,7 +1,7 @@
 import { cpus } from "os";
 import { Logger } from "pino";
 import { cpuUsage, memoryUsage } from "process";
-import { TimeGateway } from "../domain/core/ports/TimeGateway";
+import { TimeGateway } from "../domain/core/time-gateway/ports/TimeGateway";
 
 export const startSamplingEventLoopLag = (
   eventLoopLagSamples: number[],

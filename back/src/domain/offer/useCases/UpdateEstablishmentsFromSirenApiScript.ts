@@ -3,8 +3,8 @@ import { keys } from "ramda";
 import { SiretDto, SiretEstablishmentDto } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import {
   UpdateEstablishmentsWithInseeDataParams,

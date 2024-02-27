@@ -6,7 +6,7 @@ import {
 } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { UseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/ports/TimeGateway";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { DashboardGateway } from "../port/DashboardGateway";
 
 export class GetDashboardUrl extends UseCase<

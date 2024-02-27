@@ -1,10 +1,10 @@
 import { Pool } from "pg";
 import { SiretDto } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { SuggestEditEstablishment } from "../../../domain/offer/useCases/SuggestEditEstablishment";
 import { SuggestEditEstablishmentsScript } from "../../../domain/offer/useCases/SuggestEditEstablishmentsScript";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";

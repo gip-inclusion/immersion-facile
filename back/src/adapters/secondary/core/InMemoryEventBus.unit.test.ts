@@ -9,11 +9,11 @@ import type {
   DomainTopic,
   EventFailure,
 } from "../../../domain/core/eventBus/events";
+import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
 import { createInMemoryUow } from "../../primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../InMemoryUowPerformer";
 import { InMemoryEventBus } from "./InMemoryEventBus";
 import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
-import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 
 const domainEvt: DomainEvent = {
   id: "anId",

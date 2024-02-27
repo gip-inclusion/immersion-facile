@@ -5,10 +5,10 @@ import {
   PoleEmploiConvention,
 } from "../../../domain/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { createPeAxiosSharedClient } from "../../primary/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";
-import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
 
 const config = AppConfig.createFromEnv();

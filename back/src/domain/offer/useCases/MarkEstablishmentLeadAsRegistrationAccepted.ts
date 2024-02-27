@@ -1,7 +1,7 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 
 export class MarkEstablishmentLeadAsRegistrationAccepted extends TransactionalUseCase<WithFormEstablishmentDto> {

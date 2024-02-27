@@ -1,10 +1,10 @@
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { SendBeneficiariesPdfAssessmentsEmails } from "../../../domain/offer/useCases/SendBeneficiariesPdfAssessmentsEmails";
 import { createLogger } from "../../../utils/logger";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";

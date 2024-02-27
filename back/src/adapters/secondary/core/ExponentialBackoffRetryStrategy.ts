@@ -8,7 +8,7 @@ import {
   RetryStrategy,
   RetryableError,
 } from "../../../domain/core/ports/RetryStrategy";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../../utils/logger";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);

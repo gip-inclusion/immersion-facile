@@ -3,8 +3,8 @@ import { match } from "ts-pattern";
 import { z } from "zod";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { PoleEmploiGateway } from "../ports/PoleEmploiGateway";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 

@@ -1,4 +1,4 @@
-import { TimeGateway } from "../../../../domain/core/ports/TimeGateway";
+import { TimeGateway } from "../ports/TimeGateway";
 
 export class RealTimeGateway implements TimeGateway {
   public now() {

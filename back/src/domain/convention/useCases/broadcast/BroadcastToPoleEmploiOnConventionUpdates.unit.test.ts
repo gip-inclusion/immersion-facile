@@ -8,9 +8,9 @@ import {
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
+import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 
 const prepareUseCase = async () => {

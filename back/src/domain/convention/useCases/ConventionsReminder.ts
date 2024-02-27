@@ -10,8 +10,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { ReminderKind } from "../../core/eventsPayloads/ConventionReminderPayload";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 
 const agencyStatuses: ConventionStatus[] = ["IN_REVIEW"];
 const signatoryStatuses: ConventionStatus[] = [

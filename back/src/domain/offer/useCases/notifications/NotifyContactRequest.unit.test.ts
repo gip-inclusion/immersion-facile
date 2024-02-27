@@ -12,7 +12,6 @@ import {
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { InMemoryRomeRepository } from "../../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   TEST_APPELLATION_CODE,
@@ -26,6 +25,7 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
