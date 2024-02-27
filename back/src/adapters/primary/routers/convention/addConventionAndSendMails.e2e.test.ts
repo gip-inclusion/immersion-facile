@@ -17,10 +17,10 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
 import { InMemoryOutboxRepository } from "../../../../domain/core/events/adapters/InMemoryOutboxRepository";
 import { DomainEvent } from "../../../../domain/core/events/events";
+import { InMemoryNotificationGateway } from "../../../../domain/core/notifications/adapters/InMemoryNotificationGateway";
 import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { InMemoryNotificationGateway } from "../../../secondary/notificationGateway/InMemoryNotificationGateway";
 
 const validatorEmail = "validator@mail.com";
 const beneficiarySubmitDate = new Date();

@@ -15,14 +15,14 @@ import {
   smsTemplatesByName,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
+import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
   counterSendTransactEmailError,
   counterSendTransactEmailSuccess,
   counterSendTransactEmailTotal,
-} from "../../../utils/counters";
-import { createLogger } from "../../../utils/logger";
-import { BadRequestError } from "../../primary/helpers/httpErrors";
+} from "../../../../utils/counters";
+import { createLogger } from "../../../../utils/logger";
+import { NotificationGateway } from "../ports/NotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {
   ApiKey,

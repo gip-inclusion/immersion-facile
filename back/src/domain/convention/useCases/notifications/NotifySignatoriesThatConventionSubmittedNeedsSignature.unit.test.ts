@@ -16,15 +16,15 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
+import {
+  WithNotificationIdAndKind,
+  makeSaveNotificationAndRelatedEvent,
+} from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { InMemoryShortLinkQuery } from "../../../core/short-link/adapters/short-link-query/InMemoryShortLinkQuery";
 import { ShortLinkId } from "../../../core/short-link/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
-  WithNotificationIdAndKind,
-  makeSaveNotificationAndRelatedEvent,
-} from "../../../generic/notifications/entities/Notification";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./NotifySignatoriesThatConventionSubmittedNeedsSignature";
 
 describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {

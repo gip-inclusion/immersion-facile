@@ -2,9 +2,9 @@ import { AgencyDtoBuilder } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeExpectSavedNotificationsAndEvents } from "../../../utils/makeExpectSavedNotificationsAndEvents";
+import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { SendEmailWhenAgencyIsActivated } from "./SendEmailWhenAgencyIsActivated";
 
 describe("SendEmailWhenAgencyIsActivated", () => {

@@ -10,7 +10,6 @@ import {
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import {
   DiscussionAggregateBuilder,
   InMemoryDiscussionAggregateRepository,
@@ -19,9 +18,10 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+import { InMemoryNotificationGateway } from "../../../core/notifications/adapters/InMemoryNotificationGateway";
+import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { AddExchangeToDiscussionAndTransferEmail } from "./AddExchangeToDiscussionAndTransferEmail";
 
 const domain = "my-domain.com";

@@ -13,6 +13,7 @@ import {
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -20,7 +21,6 @@ import {
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { retrieveConventionWithAgency } from "../../entities/Convention";
 
 export const NO_JUSTIFICATION = "Aucune justification trouvée.";

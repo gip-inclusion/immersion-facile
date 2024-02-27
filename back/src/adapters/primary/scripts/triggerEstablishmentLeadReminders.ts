@@ -4,10 +4,10 @@ import { keys } from "ramda";
 import { SiretDto } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../../domain/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import {
   SendEstablishmentLeadReminderOutput,
   SendEstablishmentLeadReminderScript,

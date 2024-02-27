@@ -8,9 +8,9 @@ import {
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
   protected inputSchema = siretSchema;

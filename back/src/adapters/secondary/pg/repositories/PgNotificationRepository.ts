@@ -14,7 +14,7 @@ import {
 import {
   EmailNotificationFilters,
   NotificationRepository,
-} from "../../../../domain/generic/notifications/ports/NotificationRepository";
+} from "../../../../domain/core/notifications/ports/NotificationRepository";
 import { createLogger } from "../../../../utils/logger";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 

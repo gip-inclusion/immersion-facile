@@ -13,12 +13,12 @@ import {
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 import {
   ExchangeEntity,
   addExchangeToDiscussion,

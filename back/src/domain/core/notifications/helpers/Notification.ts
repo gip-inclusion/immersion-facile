@@ -7,10 +7,10 @@ import {
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../../core/ports/UnitOfWork";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { UuidGenerator } from "../../../core/uuid-generator/ports/UuidGenerator";
+} from "../../events/ports/EventBus";
+import { UnitOfWork } from "../../ports/UnitOfWork";
+import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 
 export type WithNotificationIdAndKind = {
   id: NotificationId;
