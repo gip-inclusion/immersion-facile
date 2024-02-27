@@ -1,17 +1,20 @@
 import format from "pg-format";
 import { differenceWith } from "ramda";
 import { DateString, castError, propEq, replaceArrayElement } from "shared";
+import {
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
+import { createLogger } from "../../../../utils/logger";
 import type {
   DomainEvent,
   DomainTopic,
   EventFailure,
   EventPublication,
   EventStatus,
-} from "../../../../domain/core/eventBus/events";
-import { OutboxRepository } from "../../../../domain/core/ports/OutboxRepository";
-import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
-import { createLogger } from "../../../../utils/logger";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+} from "../events";
+import { OutboxRepository } from "../ports/OutboxRepository";
 
 export type StoredEventRow = {
   id: string;

@@ -13,8 +13,8 @@ import {
   notificationKinds,
 } from "shared";
 import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
-import { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
-import { NotificationAddedEvent } from "../domain/core/eventBus/events";
+import { InMemoryOutboxRepository } from "../domain/core/events/adapters/InMemoryOutboxRepository";
+import { NotificationAddedEvent } from "../domain/core/events/events";
 import { WithNotificationIdAndKind } from "../domain/generic/notifications/entities/Notification";
 
 export type ExpectSavedNotificationsAndEvents = ReturnType<

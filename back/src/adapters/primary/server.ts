@@ -9,7 +9,7 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../domain/auth/jwt";
-import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
+import { EventCrawler } from "../../domain/core/events/ports/EventCrawler";
 import { UuidGenerator } from "../../domain/core/uuid-generator/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";

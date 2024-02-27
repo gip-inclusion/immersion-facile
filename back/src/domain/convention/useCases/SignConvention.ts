@@ -17,8 +17,8 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { DomainTopic } from "../../core/eventBus/events";
+import { DomainTopic } from "../../core/events/events";
+import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";

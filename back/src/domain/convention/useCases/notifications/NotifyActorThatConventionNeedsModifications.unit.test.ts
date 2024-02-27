@@ -24,7 +24,7 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
-import { ConventionRequiresModificationPayload } from "../../../core/eventBus/eventPayload.dto";
+import { ConventionRequiresModificationPayload } from "../../../core/events/eventPayload.dto";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

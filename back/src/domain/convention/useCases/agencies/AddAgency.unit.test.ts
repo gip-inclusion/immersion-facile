@@ -23,7 +23,7 @@ import {
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../../core/eventBus/EventBus";
+} from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { referedAgencyMissingMessage } from "../../ports/AgencyRepository";

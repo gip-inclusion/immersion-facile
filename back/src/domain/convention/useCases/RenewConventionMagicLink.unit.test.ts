@@ -25,7 +25,7 @@ import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/second
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { makeGenerateJwtES256 } from "../../auth/jwt";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { someAgenciesMissingMessage } from "../ports/AgencyRepository";

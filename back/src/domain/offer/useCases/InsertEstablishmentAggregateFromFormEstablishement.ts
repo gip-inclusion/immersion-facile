@@ -6,7 +6,7 @@ import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";

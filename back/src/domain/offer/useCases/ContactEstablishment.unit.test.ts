@@ -26,7 +26,7 @@ import {
   OfferEntityBuilder,
 } from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

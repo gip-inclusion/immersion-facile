@@ -7,7 +7,7 @@ import {
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../../core/eventBus/EventBus";
+} from "../../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../../core/uuid-generator/ports/UuidGenerator";

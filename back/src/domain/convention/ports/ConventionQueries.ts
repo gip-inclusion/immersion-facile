@@ -6,7 +6,7 @@ import {
   FindSimilarConventionsParams,
   SiretDto,
 } from "shared";
-import { AssessmentEmailDomainTopic } from "../../core/eventBus/events";
+import { AssessmentEmailDomainTopic } from "../../core/events/events";
 
 export type GetConventionsByFiltersQueries = {
   startDateGreater?: Date;

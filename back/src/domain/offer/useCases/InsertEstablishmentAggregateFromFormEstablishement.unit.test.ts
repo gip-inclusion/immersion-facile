@@ -29,7 +29,7 @@ import {
   avenueChampsElyseesDto,
   rueGuillaumeTellDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";

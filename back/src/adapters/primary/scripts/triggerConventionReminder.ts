@@ -1,6 +1,6 @@
 import { filterNotFalsy } from "shared";
 import { ConventionsReminder } from "../../../domain/convention/useCases/ConventionsReminder";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../../utils/logger";

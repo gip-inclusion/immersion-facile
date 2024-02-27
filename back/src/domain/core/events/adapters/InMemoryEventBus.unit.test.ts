@@ -3,15 +3,11 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { EventBus } from "../../../domain/core/eventBus/EventBus";
-import type {
-  DomainEvent,
-  DomainTopic,
-  EventFailure,
-} from "../../../domain/core/eventBus/events";
-import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
-import { createInMemoryUow } from "../../primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../InMemoryUowPerformer";
+import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
+import type { DomainEvent, DomainTopic, EventFailure } from "../events";
+import { EventBus } from "../ports/EventBus";
 import { InMemoryEventBus } from "./InMemoryEventBus";
 import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 

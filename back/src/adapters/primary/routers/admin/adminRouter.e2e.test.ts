@@ -25,11 +25,11 @@ import {
   GenerateApiConsumerJwt,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
+import { BasicEventCrawler } from "../../../../domain/core/events/adapters/EventCrawlerImplementations";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../secondary/InMemoryApiConsumerRepository";
-import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

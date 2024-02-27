@@ -8,7 +8,7 @@ import {
   makeKyselyDb,
 } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/ports/UnitOfWork";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

@@ -7,8 +7,8 @@ import {
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../domain/auth/jwt";
+import { InMemoryEventBus } from "../../../domain/core/events/adapters/InMemoryEventBus";
 import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
   makeConsumerMiddleware,

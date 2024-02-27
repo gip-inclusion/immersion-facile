@@ -6,7 +6,6 @@ import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
 import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/documentGateway/NotImplementedDocumentGateway";
 import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationGateway";
@@ -26,6 +25,7 @@ import {
   GenerateInclusionConnectJwt,
 } from "../domain/auth/jwt";
 import { InMemoryAddressGateway } from "../domain/core/address/adapters/InMemoryAddressGateway";
+import { BasicEventCrawler } from "../domain/core/events/adapters/EventCrawlerImplementations";
 import { CustomTimeGateway } from "../domain/core/time-gateway/adapters/CustomTimeGateway";
 import { UuidGenerator } from "../domain/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";

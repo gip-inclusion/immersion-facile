@@ -1,13 +1,13 @@
 import { DateString } from "shared";
-import { TimeGateway } from "../time-gateway/ports/TimeGateway";
-import { UuidGenerator } from "../uuid-generator/ports/UuidGenerator";
+import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type {
   DomainEvent,
   DomainTopic,
   EventPublication,
   EventStatus,
   SubscriptionId,
-} from "./events";
+} from "../events";
 
 export type NarrowEvent<
   T extends DomainTopic,

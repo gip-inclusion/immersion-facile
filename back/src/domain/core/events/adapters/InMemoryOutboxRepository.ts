@@ -1,7 +1,7 @@
 import { values } from "ramda";
-import { DomainEvent } from "../../../domain/core/eventBus/events";
-import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { createLogger } from "../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
+import { DomainEvent } from "../events";
+import { OutboxRepository } from "../ports/OutboxRepository";
 
 const logger = createLogger(__filename);
 

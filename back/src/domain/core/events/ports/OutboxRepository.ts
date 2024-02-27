@@ -1,4 +1,4 @@
-import { DomainEvent } from "../eventBus/events";
+import { DomainEvent } from "../events";
 
 export interface OutboxRepository {
   save: (event: DomainEvent) => Promise<void>;
