@@ -263,6 +263,7 @@ export const ConventionManageActions = ({
                   })
                   .push();
               }}
+              id={domElementIds.manageConvention.openDocumentButton}
             >
               Voir la convention
             </Button>
@@ -277,6 +278,7 @@ export const ConventionManageActions = ({
               priority="secondary"
               disabled={feedback.kind === "renewed"}
               onClick={() => renewModal.open()}
+              id={domElementIds.manageConvention.openRenewModalButton}
             >
               Renouveler la convention
             </Button>
@@ -395,7 +397,9 @@ export const RenewConventionForm = ({
           errors={toDotNotation(formErrorsToFlatErrors(errors))}
           visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
-        <Button>Renouveler la convention</Button>
+        <Button id={domElementIds.manageConvention.submitRenewModalButton}>
+          Renouveler la convention
+        </Button>
       </form>
     </FormProvider>
   );

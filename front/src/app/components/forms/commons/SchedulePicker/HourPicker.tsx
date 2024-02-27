@@ -165,7 +165,10 @@ const TimePeriod = ({
           <Button
             type="button"
             iconId="fr-icon-delete-bin-line"
-            title="Supprimer"
+            title="Supprimer la tranche horaire"
+            nativeButtonProps={{
+              id: domElementIds.conventionImmersionRoute.deleteHoursButton,
+            }}
             onClick={() => remove(index)}
           />
         )}

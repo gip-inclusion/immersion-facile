@@ -253,6 +253,8 @@ export const domElementIds = {
       phone:
         "im-convention-form__signatories-establishmentRepresentative-phone",
     },
+    shareButton: "im-convention-form__share-button",
+    deleteHoursButton: "im-convention-form__delete-hours-button",
   },
 
   manageConvention: {
@@ -280,6 +282,10 @@ export const domElementIds = {
     renewModal: "im-renew-modal",
     openSignModalButton: "im-convention-validation__open-sign-modal-button",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
+    submitRenewModalButton:
+      "im-convention-validation__submit-renew-modal-button",
+    openRenewModalButton: "im-convention-validation__open-renew-modal-button",
+    openDocumentButton: "im-convention-validation__open-document-button",
   },
 
   unsubscribeEstablishmentLead: {},
