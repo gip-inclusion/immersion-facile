@@ -19,6 +19,8 @@ describe("PgAgencyGroupRepository", () => {
 
     await transaction.deleteFrom("agency_groups__agencies").execute();
     await transaction.deleteFrom("agency_groups").execute();
+    await transaction.deleteFrom("conventions").execute();
+    await transaction.deleteFrom("agencies").execute();
 
     pgAgencyGroupRepository = new PgAgencyGroupRepository(transaction);
     pgAgencyRepository = new PgAgencyRepository(transaction);
