@@ -10,7 +10,7 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import {
   InMemoryNotificationGateway,
   sendSmsErrorPhoneNumber,
-} from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+} from "../adapters/InMemoryNotificationGateway";
 import { SendNotification } from "./SendNotification";
 
 const someDate = new Date("2023-01-01").toISOString();

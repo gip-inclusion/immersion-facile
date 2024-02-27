@@ -11,12 +11,12 @@ import {
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export const missingConventionMessage = (conventionId: ConventionId) =>
   `Missing convention ${conventionId} on convention repository.`;

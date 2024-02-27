@@ -9,10 +9,10 @@ import {
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
-import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   protected inputSchema = siretSchema;

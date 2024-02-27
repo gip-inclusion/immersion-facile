@@ -17,8 +17,8 @@ import {
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
-import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
 import { WithEstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
+import { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import {
   ConventionReminderPayload,
   ConventionRequiresModificationPayload,

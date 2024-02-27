@@ -1,12 +1,9 @@
 import { exhaustiveCheck } from "shared";
 import { z } from "zod";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import {
-  UnitOfWork,
-  UnitOfWorkPerformer,
-} from "../../../core/ports/UnitOfWork";
-import { WithNotificationIdAndKind } from "../entities/Notification";
+import { TransactionalUseCase } from "../../UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../ports/UnitOfWork";
+import { WithNotificationIdAndKind } from "../helpers/Notification";
 import { NotificationGateway } from "../ports/NotificationGateway";
 
 const withNotificationIdAndKind: z.Schema<WithNotificationIdAndKind> = z.object(

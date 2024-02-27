@@ -30,6 +30,7 @@ import {
   ReminderKind,
 } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
+import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -37,7 +38,6 @@ import {
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   missingAgencyMessage,
   missingConventionMessage,

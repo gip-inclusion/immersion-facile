@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../../primary/config/appConfig";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import { brevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 

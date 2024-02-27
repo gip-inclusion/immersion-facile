@@ -15,7 +15,7 @@ import {
 import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryOutboxRepository } from "../domain/core/events/adapters/InMemoryOutboxRepository";
 import { NotificationAddedEvent } from "../domain/core/events/events";
-import { WithNotificationIdAndKind } from "../domain/generic/notifications/entities/Notification";
+import { WithNotificationIdAndKind } from "../domain/core/notifications/helpers/Notification";
 
 export type ExpectSavedNotificationsAndEvents = ReturnType<
   typeof makeExpectSavedNotificationsAndEvents

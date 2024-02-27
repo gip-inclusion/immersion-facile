@@ -9,7 +9,6 @@ import { ConventionsToSyncRepository } from "../../convention/ports/ConventionsT
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
-import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 import { DeletedEstablishmentRepository } from "../../offer/ports/DeletedEstablishmentRepository";
 import { DiscussionAggregateRepository } from "../../offer/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../offer/ports/EstablishmentAggregateRepository";
@@ -22,6 +21,7 @@ import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/Conv
 import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { OutboxQueries } from "../events/ports/OutboxQueries";
 import { OutboxRepository } from "../events/ports/OutboxRepository";
+import { NotificationRepository } from "../notifications/ports/NotificationRepository";
 import { ShortLinkQuery } from "../short-link/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../short-link/ports/ShortLinkRepository";
 import { ErrorRepository } from "./ErrorRepository";

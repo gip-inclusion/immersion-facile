@@ -7,6 +7,10 @@ import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmp
 import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domain/core/address/adapters/InMemoryAddressGateway";
+import { BrevoNotificationGateway } from "../../../domain/core/notifications/adapters/BrevoNotificationGateway";
+import { brevoNotificationGatewayRoutes } from "../../../domain/core/notifications/adapters/BrevoNotificationGateway.routes";
+import { InMemoryNotificationGateway } from "../../../domain/core/notifications/adapters/InMemoryNotificationGateway";
+import { NotificationGateway } from "../../../domain/core/notifications/ports/NotificationGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../domain/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../../domain/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
@@ -17,7 +21,6 @@ import { UuidGenerator } from "../../../domain/core/uuid-generator/ports/UuidGen
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { PdfGeneratorGateway } from "../../../domain/generic/htmlToPdf/PdfGeneratorGateway";
-import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
@@ -35,9 +38,6 @@ import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGat
 import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
-import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
-import { brevoNotificationGatewayRoutes } from "../../secondary/notificationGateway/BrevoNotificationGateway.routes";
-import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
 import { HttpLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/HttpLaBonneBoiteGateway";
 import { InMemoryLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { createLbbRoutes } from "../../secondary/offer/laBonneBoite/LaBonneBoite.routes";

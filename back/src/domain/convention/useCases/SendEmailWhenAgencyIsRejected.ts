@@ -1,8 +1,8 @@
 import { AgencyDto, agencySchema } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 type WithAgency = { agency: AgencyDto };
 

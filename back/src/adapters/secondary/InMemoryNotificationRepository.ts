@@ -13,12 +13,12 @@ import {
   displayEmergencyContactInfos,
   expectToEqual,
 } from "shared";
-import { makeShortLinkUrl } from "../../domain/core/short-link/ShortLink";
-import { ShortLinkId } from "../../domain/core/short-link/ports/ShortLinkQuery";
 import {
   EmailNotificationFilters,
   NotificationRepository,
-} from "../../domain/generic/notifications/ports/NotificationRepository";
+} from "../../domain/core/notifications/ports/NotificationRepository";
+import { makeShortLinkUrl } from "../../domain/core/short-link/ShortLink";
+import { ShortLinkId } from "../../domain/core/short-link/ports/ShortLinkQuery";
 import { AppConfig } from "../primary/config/appConfig";
 
 export class InMemoryNotificationRepository implements NotificationRepository {

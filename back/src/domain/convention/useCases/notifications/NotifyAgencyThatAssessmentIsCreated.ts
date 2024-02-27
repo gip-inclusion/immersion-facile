@@ -1,11 +1,11 @@
 import { WithAssessmentDto, withAssessmentSchema } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<WithAssessmentDto> {
   protected inputSchema = withAssessmentSchema;

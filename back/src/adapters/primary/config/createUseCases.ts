@@ -61,6 +61,8 @@ import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { LookupLocation } from "../../../domain/core/address/use-cases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/core/address/use-cases/LookupStreetAddress";
 import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
+import { SendNotification } from "../../../domain/core/notifications/useCases/SendNotification";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { ShortLinkId } from "../../../domain/core/short-link/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
@@ -72,8 +74,6 @@ import { AdminLogin } from "../../../domain/generic/authentication/useCases/Admi
 import { SetFeatureFlag } from "../../../domain/generic/featureFlag/SetFeatureFlag";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
 import { HtmlToPdf } from "../../../domain/generic/htmlToPdf/HtmlToPdf";
-import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
-import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
 import { AuthenticateWithInclusionCode } from "../../../domain/inclusionConnect/useCases/AuthenticateWithInclusionCode";
 import { GetInclusionConnectLogoutUrl } from "../../../domain/inclusionConnect/useCases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
