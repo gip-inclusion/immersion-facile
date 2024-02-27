@@ -19,7 +19,6 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -30,6 +29,7 @@ import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/In
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { ContactEstablishment } from "./ContactEstablishment";
 
 const siret = "11112222333344";

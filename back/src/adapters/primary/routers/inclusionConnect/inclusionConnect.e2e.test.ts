@@ -15,7 +15,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
-import { UuidGenerator } from "../../../../domain/core/ports/UuidGenerator";
+import { UuidGenerator } from "../../../../domain/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";

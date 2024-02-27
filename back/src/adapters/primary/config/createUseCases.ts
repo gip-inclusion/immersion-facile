@@ -63,8 +63,8 @@ import { LookupStreetAddress } from "../../../domain/core/address/use-cases/Look
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
-import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../../domain/core/uuid-generator/ports/UuidGenerator";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";

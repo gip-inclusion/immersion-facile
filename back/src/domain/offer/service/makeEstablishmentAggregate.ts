@@ -1,7 +1,7 @@
 import { FormEstablishmentDto, Location, noContactPerWeek } from "shared";
 import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 
 const offerFromFormScore = 10;

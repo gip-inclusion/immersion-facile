@@ -10,8 +10,8 @@ import {
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { ApiConsumerBuilder } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SubscribeToWebhook } from "./SubscribeToWebhook";
 
 describe("SubscribeToWebhook", () => {

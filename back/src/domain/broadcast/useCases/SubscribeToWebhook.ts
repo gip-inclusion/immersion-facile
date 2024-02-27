@@ -8,8 +8,8 @@ import {
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 
 export class SubscribeToWebhook extends TransactionalUseCase<
   CreateWebhookSubscription,

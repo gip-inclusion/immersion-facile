@@ -8,10 +8,10 @@ import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAd
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domain/core/address/adapters/InMemoryAddressGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
 import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../../domain/core/uuid-generator/ports/UuidGenerator";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { PdfGeneratorGateway } from "../../../domain/generic/htmlToPdf/PdfGeneratorGateway";

@@ -4,12 +4,12 @@ import {
   createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/eventBus/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateAgencyReferingToUpdatedAgency } from "./UpdateAgencyReferingToUpdatedAgency";
 
 describe("UpdateAgencyReferingToUpdatedAgency", () => {

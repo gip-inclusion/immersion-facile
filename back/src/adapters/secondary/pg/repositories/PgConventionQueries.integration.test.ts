@@ -17,7 +17,7 @@ import {
 } from "shared";
 import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
 import { RealTimeGateway } from "../../../../domain/core/time-gateway/adapters/RealTimeGateway";
-import { UuidV4Generator } from "../../core/UuidGeneratorImplementations";
+import { UuidV4Generator } from "../../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";

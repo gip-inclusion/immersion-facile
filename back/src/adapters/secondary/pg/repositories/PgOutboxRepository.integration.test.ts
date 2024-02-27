@@ -6,7 +6,7 @@ import {
   DomainTopic,
 } from "../../../../domain/core/eventBus/events";
 import { CustomTimeGateway } from "../../../../domain/core/time-gateway/adapters/CustomTimeGateway";
-import { TestUuidGenerator } from "../../core/UuidGeneratorImplementations";
+import { TestUuidGenerator } from "../../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";

@@ -15,7 +15,6 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -23,6 +22,7 @@ import {
 } from "../../../utils/makeExpectSavedNotificationsAndEvents";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { ContactEntity } from "../entities/ContactEntity";
 import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";

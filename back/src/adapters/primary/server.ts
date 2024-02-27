@@ -10,7 +10,7 @@ import {
   GenerateInclusionConnectJwt,
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
-import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
+import { UuidGenerator } from "../../domain/core/uuid-generator/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";

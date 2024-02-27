@@ -21,13 +21,13 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { makeGenerateJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";

@@ -6,6 +6,7 @@ import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAd
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
+import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
@@ -14,7 +15,6 @@ import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { getTestPgPool } from "../../secondary/pg/pgUtils";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";

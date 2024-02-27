@@ -17,12 +17,12 @@ import {
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,

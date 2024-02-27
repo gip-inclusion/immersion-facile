@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { UseCase } from "../../../core/UseCase";
-import { UuidGenerator } from "../../../core/ports/UuidGenerator";
+import { UuidGenerator } from "../../../core/uuid-generator/ports/UuidGenerator";
 import type { StoredFile } from "../entity/StoredFile";
 import { DocumentGateway } from "../port/DocumentGateway";
 

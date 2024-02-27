@@ -9,7 +9,7 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { ApiConsumerBuilder } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { DeleteSubscription } from "./DeleteSubscription";
 
 describe("DeleteSubscription", () => {
