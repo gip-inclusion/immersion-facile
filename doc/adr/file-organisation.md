@@ -7,7 +7,7 @@ Cette ADR a pour but de décrire l'organisation des fichiers dans le projet que 
 			|-- db
 			|   |-- migrations
 			|   |-- static-data
-			|   |-- kysely-utils            
+			|   |-- kysely-utils
 		|-- domains
 			|-- core
 			|	|-- event-bus
@@ -28,7 +28,7 @@ Cette ADR a pour but de décrire l'organisation des fichiers dans le projet que 
 			|   	|-- helpers
 			|   	|-- use-cases
 			|   		|-- AddConvention.ts
-			|   		|-- AddConvention.unit.test.ts	
+			|   		|-- AddConvention.unit.test.ts
 			|-- establishment
 			|	|-- adapters
 			|	|-- domain
@@ -45,3 +45,12 @@ Cette arbo nous parait bien mais il faut tester en vrai pour constater quelles s
 Nous allons partir sur une convention de nommage des dossiers en kebab-case.
 
 Apprové à l'unanimité (4 votants) le 27/02/2024 (absence de Benjamin).
+
+Discuté après la réunion :
+
+Qu'est-ce qui fait que quelque chose va dans core, ou à la racine des domains ?
+
+<!-- propositon : -->
+
+On met à la racine de Domaine ce qui pourrait constituer un micro-service à part entière.
+On met dans core ce qui est partagé par plusieurs domaines.
