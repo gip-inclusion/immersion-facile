@@ -10,6 +10,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
+import { BasicEventCrawler } from "../../../../domain/core/events/adapters/EventCrawlerImplementations";
 import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
@@ -18,7 +19,6 @@ import {
   outdatedApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
-import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

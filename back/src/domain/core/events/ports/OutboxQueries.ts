@@ -1,4 +1,4 @@
-import { DomainEvent } from "../eventBus/events";
+import { DomainEvent } from "../events";
 
 export interface OutboxQueries {
   getAllUnpublishedEvents: () => Promise<DomainEvent[]>;

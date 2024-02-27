@@ -11,16 +11,16 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { DomainEvent } from "../../core/events/events";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../core/eventBus/EventBus";
-import { DomainEvent } from "../../core/eventBus/events";
+} from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AddConvention } from "./AddConvention";

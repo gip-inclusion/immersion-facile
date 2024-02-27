@@ -1,14 +1,11 @@
 import { Pool, PoolClient } from "pg";
 import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
-import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
-import {
-  DomainEvent,
-  DomainTopic,
-} from "../../../../domain/core/eventBus/events";
-import { CustomTimeGateway } from "../../../../domain/core/time-gateway/adapters/CustomTimeGateway";
-import { TestUuidGenerator } from "../../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
+import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { DomainEvent, DomainTopic } from "../events";
+import { makeCreateNewEvent } from "../ports/EventBus";
 import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";
 
 describe("PgOutboxRepository", () => {

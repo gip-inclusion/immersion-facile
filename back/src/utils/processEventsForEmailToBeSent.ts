@@ -1,4 +1,4 @@
-import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
+import { BasicEventCrawler } from "../domain/core/events/adapters/EventCrawlerImplementations";
 
 export const processEventsForEmailToBeSent = async (
   eventCrawler: BasicEventCrawler,

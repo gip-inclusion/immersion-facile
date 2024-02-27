@@ -12,7 +12,7 @@ import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { makeShortLink } from "../../core/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";

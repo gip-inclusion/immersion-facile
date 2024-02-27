@@ -15,11 +15,11 @@ import {
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
-import { DomainEvent } from "../../../../domain/core/eventBus/events";
+import { InMemoryOutboxRepository } from "../../../../domain/core/events/adapters/InMemoryOutboxRepository";
+import { DomainEvent } from "../../../../domain/core/events/events";
 import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryNotificationGateway } from "../../../secondary/notificationGateway/InMemoryNotificationGateway";
 
 const validatorEmail = "validator@mail.com";

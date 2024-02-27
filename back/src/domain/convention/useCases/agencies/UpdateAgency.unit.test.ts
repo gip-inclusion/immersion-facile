@@ -15,8 +15,8 @@ import {
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
+import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateAgency } from "./UpdateAgency";

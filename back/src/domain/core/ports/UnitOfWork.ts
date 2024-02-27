@@ -20,10 +20,10 @@ import { GroupRepository } from "../../offer/ports/GroupRepository";
 import { SearchMadeRepository } from "../../offer/ports/SearchMadeRepository";
 import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
+import { OutboxQueries } from "../events/ports/OutboxQueries";
+import { OutboxRepository } from "../events/ports/OutboxRepository";
 import { ErrorRepository } from "./ErrorRepository";
 import { FeatureFlagRepository } from "./FeatureFlagRepository";
-import { OutboxQueries } from "./OutboxQueries";
-import { OutboxRepository } from "./OutboxRepository";
 import { ShortLinkQuery } from "./ShortLinkQuery";
 import { ShortLinkRepository } from "./ShortLinkRepository";
 

@@ -7,9 +7,9 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { DomainEvent } from "../../core/eventBus/events";
-import { ReminderKind } from "../../core/eventsPayloads/ConventionReminderPayload";
+import { ReminderKind } from "../../core/events/eventPayload.dto";
+import { DomainEvent } from "../../core/events/events";
+import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 

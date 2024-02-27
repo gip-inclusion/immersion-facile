@@ -29,8 +29,8 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   ConventionReminderPayload,
   ReminderKind,
-  conventionReminderPayloadSchema,
-} from "../../../core/eventsPayloads/ConventionReminderPayload";
+} from "../../../core/events/eventPayload.dto";
+import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import {
   UnitOfWork,
@@ -399,7 +399,7 @@ const establishmentSummary = (
 
 const signStatus = (signAt: string | undefined): string =>
   signAt
-    ? `✔️  - A signé le ${format(new Date(signAt), "dd/MM/yyyy")}`
+    ? `√  - A signé le ${format(new Date(signAt), "dd/MM/yyyy")}`
     : `❌ - N'a pas signé`;
 
 const isValidMobilePhone = (phone: string): boolean =>

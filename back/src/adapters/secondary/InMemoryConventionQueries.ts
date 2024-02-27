@@ -16,12 +16,12 @@ import {
   GetConventionsByFiltersQueries,
 } from "../../domain/convention/ports/ConventionQueries";
 import { missingAgencyMessage } from "../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
-import { AssessmentEmailDomainTopic } from "../../domain/core/eventBus/events";
+import { InMemoryOutboxRepository } from "../../domain/core/events/adapters/InMemoryOutboxRepository";
+import { AssessmentEmailDomainTopic } from "../../domain/core/events/events";
 import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../primary/helpers/httpErrors";
 import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
-import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 
 const logger = createLogger(__filename);
 

@@ -1,3 +1,7 @@
+import { InMemoryOutboxQueries } from "../../../domain/core/events/adapters/InMemoryOutboxQueries";
+import { InMemoryOutboxRepository } from "../../../domain/core/events/adapters/InMemoryOutboxRepository";
+import { PgOutboxQueries } from "../../../domain/core/events/adapters/PgOutboxQueries";
+import { PgOutboxRepository } from "../../../domain/core/events/adapters/PgOutboxRepository";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -23,8 +27,6 @@ import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { InMemoryErrorRepository } from "../../secondary/core/InMemoryErrorRepository";
-import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
-import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentLeadRepository } from "../../secondary/offer/InMemoryEstablishmentLeadRepository";
@@ -54,8 +56,6 @@ import { PgGroupRepository } from "../../secondary/pg/repositories/PgGroupReposi
 import { PgInclusionConnectedUserRepository } from "../../secondary/pg/repositories/PgInclusionConnectedUserRepository";
 import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNotificationRepository";
 import { PgOngoingOAuthRepository } from "../../secondary/pg/repositories/PgOngoingOAuthRepository";
-import { PgOutboxQueries } from "../../secondary/pg/repositories/PgOutboxQueries";
-import { PgOutboxRepository } from "../../secondary/pg/repositories/PgOutboxRepository";
 import { PgRomeRepository } from "../../secondary/pg/repositories/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/repositories/PgSearchMadeRepository";
 import { PgShortLinkRepository } from "../../secondary/pg/repositories/PgShortLinkRepository";

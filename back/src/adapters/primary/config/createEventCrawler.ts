@@ -1,10 +1,10 @@
-import { EventBus } from "../../../domain/core/eventBus/EventBus";
-import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
-import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import {
   BasicEventCrawler,
   RealEventCrawler,
-} from "../../secondary/core/EventCrawlerImplementations";
+} from "../../../domain/core/events/adapters/EventCrawlerImplementations";
+import { EventBus } from "../../../domain/core/events/ports/EventBus";
+import { EventCrawler } from "../../../domain/core/events/ports/EventCrawler";
+import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { AppConfig } from "./appConfig";
 
 export const createEventCrawler = (

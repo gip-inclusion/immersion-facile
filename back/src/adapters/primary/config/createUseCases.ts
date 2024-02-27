@@ -60,7 +60,7 @@ import { MarkPartnersErroredConventionAsHandled } from "../../../domain/conventi
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { LookupLocation } from "../../../domain/core/address/use-cases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/core/address/use-cases/LookupStreetAddress";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";

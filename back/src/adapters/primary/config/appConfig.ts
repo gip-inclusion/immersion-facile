@@ -11,7 +11,7 @@ import {
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
 } from "shared";
-import { DomainTopic } from "../../../domain/core/eventBus/events";
+import { DomainTopic } from "../../../domain/core/events/events";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { S3Params } from "../../secondary/documentGateway/S3DocumentGateway";
 import { EmailableApiKey } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.dto";

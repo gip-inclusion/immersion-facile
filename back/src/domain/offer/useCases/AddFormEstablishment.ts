@@ -1,7 +1,7 @@
 import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";

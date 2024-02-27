@@ -11,9 +11,9 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { BasicEventCrawler } from "../../../../domain/core/events/adapters/EventCrawlerImplementations";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const conventionId = "my-Convention-id";

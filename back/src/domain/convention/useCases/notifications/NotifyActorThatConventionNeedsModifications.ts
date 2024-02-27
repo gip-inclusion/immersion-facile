@@ -11,8 +11,8 @@ import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { ConventionRequiresModificationPayload } from "../../../core/eventBus/eventPayload.dto";
-import { conventionRequiresModificationPayloadSchema } from "../../../core/eventBus/eventPayload.schema";
+import { ConventionRequiresModificationPayload } from "../../../core/events/eventPayload.dto";
+import { conventionRequiresModificationPayloadSchema } from "../../../core/events/eventPayload.schema";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import {
   UnitOfWork,

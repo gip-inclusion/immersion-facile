@@ -1,14 +1,11 @@
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
-import { EventBus } from "../../../domain/core/eventBus/EventBus";
-import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
-import {
-  DomainEvent,
-  eventsToDebugInfo,
-} from "../../../domain/core/eventBus/events";
-import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
-import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { createLogger } from "../../../../utils/logger";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
+import { UnitOfWorkPerformer } from "../../ports/UnitOfWork";
+import { DomainEvent, eventsToDebugInfo } from "../events";
+import { EventBus } from "../ports/EventBus";
+import { EventCrawler } from "../ports/EventCrawler";
 
 const logger = createLogger(__filename);
 

@@ -26,11 +26,14 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { NarrowEvent, makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
-import { DomainTopic } from "../../core/eventBus/events";
+import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
+import { DomainTopic } from "../../core/events/events";
+import {
+  NarrowEvent,
+  makeCreateNewEvent,
+} from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";

@@ -19,8 +19,10 @@ import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/D
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { WithNotificationIdAndKind } from "../../generic/notifications/entities/Notification";
 import { WithEstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
-import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
-import { ConventionRequiresModificationPayload } from "./eventPayload.dto";
+import {
+  ConventionReminderPayload,
+  ConventionRequiresModificationPayload,
+} from "./eventPayload.dto";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 

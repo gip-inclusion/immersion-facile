@@ -2,12 +2,12 @@ import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
+import { PgOutboxRepository } from "../../../../domain/core/events/adapters/PgOutboxRepository";
 import { EstablishmentAggregateBuilder } from "../../offer/EstablishmentBuilders";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgNotificationRepository } from "./PgNotificationRepository";
-import { PgOutboxRepository } from "./PgOutboxRepository";
 
 describe("PgScriptsQueries", () => {
   let pool: Pool;

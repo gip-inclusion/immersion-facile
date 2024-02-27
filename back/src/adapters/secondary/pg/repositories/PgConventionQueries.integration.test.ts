@@ -15,7 +15,8 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
-import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
+import { PgOutboxRepository } from "../../../../domain/core/events/adapters/PgOutboxRepository";
+import { makeCreateNewEvent } from "../../../../domain/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { UuidV4Generator } from "../../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
@@ -23,7 +24,6 @@ import { getTestPgPool } from "../pgUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
-import { PgOutboxRepository } from "./PgOutboxRepository";
 
 const conventionIdA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
 const conventionIdB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";

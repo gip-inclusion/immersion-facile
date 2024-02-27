@@ -2,25 +2,22 @@ import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
 import { DateString } from "shared";
 import {
-  EventBus,
-  EventCallback,
-} from "../../../domain/core/eventBus/EventBus";
+  counterPublishedEventsError,
+  counterPublishedEventsSuccess,
+  counterPublishedEventsTotal,
+} from "../../../../utils/counters";
+import { createLogger } from "../../../../utils/logger";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
+import { UnitOfWorkPerformer } from "../../ports/UnitOfWork";
+import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import {
   DomainEvent,
   DomainTopic,
   EventFailure,
   EventPublication,
   SubscriptionId,
-} from "../../../domain/core/eventBus/events";
-import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
-import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
-import {
-  counterPublishedEventsError,
-  counterPublishedEventsSuccess,
-  counterPublishedEventsTotal,
-} from "../../../utils/counters";
-import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+} from "../events";
+import { EventBus, EventCallback } from "../ports/EventBus";
 
 const logger = createLogger(__filename);
 

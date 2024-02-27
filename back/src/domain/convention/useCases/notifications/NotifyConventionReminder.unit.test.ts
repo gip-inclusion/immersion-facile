@@ -32,7 +32,7 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
-import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
+import { ReminderKind } from "../../../core/events/eventPayload.dto";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -865,7 +865,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         .build();
 
       const expected: string[] = [
-        "- ✔️  - A signé le 15/03/2023 - Jean Valjean, bénéficiaire",
+        "- √  - A signé le 15/03/2023 - Jean Valjean, bénéficiaire",
         `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
 
@@ -892,8 +892,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         .build();
 
       const expected: string[] = [
-        "- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire",
-        "- ✔️  - A signé le 19/03/2023 - Révérent Balec, représentant légal du bénéficiaire",
+        "- √  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire",
+        "- √  - A signé le 19/03/2023 - Révérent Balec, représentant légal du bénéficiaire",
         `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
 
@@ -924,7 +924,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         .build();
 
       const expected: string[] = [
-        "- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire",
+        "- √  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire",
         `- ❌ - N'a pas signé - Robert Thénardier, employeur actuel du bénéficiaire`,
         `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];

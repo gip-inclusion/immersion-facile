@@ -8,8 +8,10 @@ import {
 import { z } from "zod";
 import {
   AgencyActorRequestModificationPayload,
+  ConventionReminderPayload,
   ConventionRequiresModificationPayload,
   SignatoryRequestModificationPayload,
+  reminderKinds,
 } from "./eventPayload.dto";
 
 const agencyActorRequestConventionModificationPayloadSchema: z.Schema<AgencyActorRequestModificationPayload> =
@@ -34,3 +36,9 @@ export const conventionRequiresModificationPayloadSchema: z.Schema<ConventionReq
     agencyActorRequestConventionModificationPayloadSchema,
     signatoryRequestConventionModificationPayloadSchema,
   ]);
+
+export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload> =
+  z.object({
+    reminderKind: z.enum(reminderKinds),
+    conventionId: z.string(),
+  });
