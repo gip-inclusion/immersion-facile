@@ -121,7 +121,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       );
     }
 
-    // DON'T do promise all here, we want to save the user first
     await uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser);
     await uow.ongoingOAuthRepository.save(ongoingOAuth);
 
