@@ -16,7 +16,6 @@ import {
   createInMemoryUow,
 } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -28,7 +27,8 @@ import {
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { ConventionRequiresModificationPayload } from "../../../core/eventBus/eventPayload.dto";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
-import { TimeGateway } from "../../../core/ports/TimeGateway";
+import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyActorThatConventionNeedsModifications } from "./NotifyActorThatConventionNeedsModifications";
 

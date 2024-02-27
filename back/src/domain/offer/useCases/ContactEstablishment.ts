@@ -12,9 +12,9 @@ import {
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { ContactEntity } from "../entities/ContactEntity";
 import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 import {

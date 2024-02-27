@@ -12,8 +12,8 @@ import {
   EventPublication,
   SubscriptionId,
 } from "../../../domain/core/eventBus/events";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
+import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
 import {
   counterPublishedEventsError,
   counterPublishedEventsSuccess,

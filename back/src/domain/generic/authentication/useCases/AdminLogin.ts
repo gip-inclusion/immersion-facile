@@ -3,7 +3,7 @@ import { BackOfficeJwt, UserAndPassword, userAndPasswordSchema } from "shared";
 import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
 import { GenerateBackOfficeJwt } from "../../../auth/jwt";
 import { UseCase } from "../../../core/UseCase";
-import { TimeGateway } from "../../../core/ports/TimeGateway";
+import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 
 export class AdminLogin extends UseCase<UserAndPassword, BackOfficeJwt> {
   protected inputSchema = userAndPasswordSchema;

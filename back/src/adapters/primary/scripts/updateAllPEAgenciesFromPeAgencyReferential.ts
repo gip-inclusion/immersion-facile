@@ -6,9 +6,9 @@ import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/agencie
 import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";

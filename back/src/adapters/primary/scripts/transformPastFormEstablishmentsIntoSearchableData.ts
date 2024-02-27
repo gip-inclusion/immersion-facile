@@ -5,6 +5,7 @@ import { createAxiosSharedClient } from "shared-routes/axios";
 import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
@@ -13,7 +14,6 @@ import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { getTestPgPool } from "../../secondary/pg/pgUtils";

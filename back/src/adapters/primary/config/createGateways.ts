@@ -8,8 +8,10 @@ import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAd
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domain/core/address/adapters/InMemoryAddressGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
+import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
+import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { PdfGeneratorGateway } from "../../../domain/generic/htmlToPdf/PdfGeneratorGateway";
@@ -24,8 +26,6 @@ import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeCon
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/documentGateway/NotImplementedDocumentGateway";

@@ -32,11 +32,11 @@ import {
   conventionReminderPayloadSchema,
 } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
-import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   missingAgencyMessage,

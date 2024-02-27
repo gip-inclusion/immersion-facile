@@ -24,8 +24,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
 import { DomainTopic } from "../../core/eventBus/events";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import {
   conventionMissingMessage,
   throwIfTransitionNotAllowed,

@@ -28,11 +28,11 @@ import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemo
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { NarrowEvent, makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { ConventionRequiresModificationPayload } from "../../core/eventBus/eventPayload.dto";
 import { DomainTopic } from "../../core/eventBus/events";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 
 const allInclusionConnectedTestUsers = [

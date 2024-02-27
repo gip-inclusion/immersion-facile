@@ -16,9 +16,9 @@ import { InMemoryAuthenticatedUserRepository } from "../../../../adapters/second
 import { InMemoryInclusionConnectedUserRepository } from "../../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { someAgenciesMissingMessage } from "../../ports/AgencyRepository";
 import { RegisterAgencyToInclusionConnectUser } from "./RegisterAgencyToInclusionConnectUser";
 

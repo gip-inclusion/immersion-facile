@@ -18,10 +18,10 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { generateApiConsumerJwtTestFn } from "../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { SaveApiConsumer } from "./SaveApiConsumer";
 
 describe("SaveApiConsumer", () => {

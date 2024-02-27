@@ -16,7 +16,7 @@ import {
   reasonableSchedule,
 } from "shared";
 import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
-import { RealTimeGateway } from "../../core/TimeGateway/RealTimeGateway";
+import { RealTimeGateway } from "../../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { UuidV4Generator } from "../../core/UuidGeneratorImplementations";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";

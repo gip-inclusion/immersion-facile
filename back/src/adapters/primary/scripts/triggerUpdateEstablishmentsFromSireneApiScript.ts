@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
+import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import {
@@ -7,7 +8,6 @@ import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";

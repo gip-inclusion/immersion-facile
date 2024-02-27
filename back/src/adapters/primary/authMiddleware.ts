@@ -13,7 +13,7 @@ import {
 } from "shared";
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
-import { TimeGateway } from "../../domain/core/ports/TimeGateway";
+import { TimeGateway } from "../../domain/core/time-gateway/ports/TimeGateway";
 import { apiKeyAuthMiddlewareRequestsTotal } from "../../utils/counters";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";

@@ -15,11 +15,11 @@ import {
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { formEstablishementUpdateFailedErrorMessage } from "../ports/FormEstablishmentRepository";
 import { EditFormEstablishment } from "./EditFormEstablishment";
 
