@@ -2,11 +2,11 @@ import {
   AbsoluteUrl,
   CreateConventionMagicLinkPayloadProperties,
 } from "shared";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../adapters/primary/config/magicLinkUrl";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
+import { UnitOfWork } from "../ports/UnitOfWork";
 import { ShortLinkIdGeneratorGateway } from "./ports/ShortLinkIdGeneratorGateway";
 import { ShortLinkId } from "./ports/ShortLinkQuery";
-import { UnitOfWork } from "./ports/UnitOfWork";
 
 export const makeShortLinkUrl = (
   config: AppConfig,

@@ -1,5 +1,5 @@
-import { ShortLinkIdGeneratorGateway } from "../../../domain/core/ports/ShortLinkIdGeneratorGateway";
-import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
+import { ShortLinkIdGeneratorGateway } from "../../ports/ShortLinkIdGeneratorGateway";
+import { ShortLinkId } from "../../ports/ShortLinkQuery";
 
 export class DeterministShortLinkIdGeneratorGateway
   implements ShortLinkIdGeneratorGateway

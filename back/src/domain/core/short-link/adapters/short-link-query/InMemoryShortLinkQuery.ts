@@ -1,10 +1,7 @@
 import { AbsoluteUrl } from "shared";
-import { shortLinkNotFoundMessage } from "../../domain/core/ShortLink";
-import {
-  ShortLinkId,
-  ShortLinkQuery,
-} from "../../domain/core/ports/ShortLinkQuery";
-import { NotFoundError } from "../primary/helpers/httpErrors";
+import { NotFoundError } from "../../../../../adapters/primary/helpers/httpErrors";
+import { shortLinkNotFoundMessage } from "../../ShortLink";
+import { ShortLinkId, ShortLinkQuery } from "../../ports/ShortLinkQuery";
 
 export class InMemoryShortLinkQuery implements ShortLinkQuery {
   protected shortLinks: Partial<Record<ShortLinkId, AbsoluteUrl>> = {};

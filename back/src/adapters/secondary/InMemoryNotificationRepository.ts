@@ -13,8 +13,8 @@ import {
   displayEmergencyContactInfos,
   expectToEqual,
 } from "shared";
-import { makeShortLinkUrl } from "../../domain/core/ShortLink";
-import { ShortLinkId } from "../../domain/core/ports/ShortLinkQuery";
+import { makeShortLinkUrl } from "../../domain/core/short-link/ShortLink";
+import { ShortLinkId } from "../../domain/core/short-link/ports/ShortLinkQuery";
 import {
   EmailNotificationFilters,
   NotificationRepository,

@@ -1,14 +1,14 @@
 import { AbsoluteUrl, castError } from "shared";
-import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
-import { ShortLinkRepository } from "../../../../domain/core/ports/ShortLinkRepository";
-import { createLogger } from "../../../../utils/logger";
-import { executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+import { executeKyselyRawSqlQuery } from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { createLogger } from "../../../../../utils/logger";
+import { ShortLinkId } from "../../ports/ShortLinkQuery";
+import { ShortLinkRepository } from "../../ports/ShortLinkRepository";
 import {
   PgShortLinkRepositoryDto,
   pgShortLinkRepositorySchema,
   pgShortLinkRepositoryStructure,
-} from "./PgShortLinkHelpers";
-import { PgShortLinkQuery } from "./PgShortLinkQuery";
+} from "../PgShortLinkHelpers";
+import { PgShortLinkQuery } from "../short-link-query/PgShortLinkQuery";
 
 const logger = createLogger(__filename);
 

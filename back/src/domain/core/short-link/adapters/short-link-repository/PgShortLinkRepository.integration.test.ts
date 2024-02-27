@@ -1,13 +1,16 @@
 import { Pool, PoolClient } from "pg";
 import { AbsoluteUrl, expectPromiseToFailWithError } from "shared";
-import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
-import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+import { ShortLinkId } from "../../ports/ShortLinkQuery";
 import {
   PgShortLinkRepositoryDto,
   deleteShortLinkByIdQuery,
   getShortLinkByIdQuery,
-} from "./PgShortLinkHelpers";
+} from "../PgShortLinkHelpers";
 import { PgShortLinkRepository } from "./PgShortLinkRepository";
 
 describe("PgShortLinkRepository", () => {

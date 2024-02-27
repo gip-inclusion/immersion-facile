@@ -12,13 +12,13 @@ import {
   InMemoryNotificationRepository,
   expectEmailSignatoryConfirmationSignatureRequestMatchingConvention,
 } from "../../../../adapters/secondary/InMemoryNotificationRepository";
-import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
-import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { InMemoryShortLinkQuery } from "../../../core/short-link/adapters/short-link-query/InMemoryShortLinkQuery";
+import { ShortLinkId } from "../../../core/short-link/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {

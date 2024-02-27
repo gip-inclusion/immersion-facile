@@ -24,18 +24,18 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
-import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   ConventionReminderPayload,
   ReminderKind,
 } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
-import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
