@@ -1,5 +1,5 @@
 import { Location, WithLookupAddressQueryParams } from "shared";
-import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
+import { InMemoryAddressGateway } from "../adapters/InMemoryAddressGateway";
 import { LookupStreetAddress } from "./LookupStreetAddress";
 
 describe("Lookup Street Address", () => {

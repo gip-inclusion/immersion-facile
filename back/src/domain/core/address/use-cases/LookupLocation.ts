@@ -4,8 +4,8 @@ import {
   WithLookupLocationInputQueryParams,
   withLookupLocationInputQueryParamsSchema,
 } from "shared";
-import { UseCase } from "../../core/UseCase";
-import { AddressGateway } from "../../offer/ports/AddressGateway";
+import { UseCase } from "../../UseCase";
+import { AddressGateway } from "../ports/AddressGateway";
 
 export class LookupLocation extends UseCase<
   WithLookupLocationInputQueryParams,

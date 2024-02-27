@@ -7,12 +7,12 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { avenueChampsElyseesDto } from "../../../../domain/core/address/adapters/InMemoryAddressGateway";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../secondary/InMemoryApiConsumerRepository";
-import { avenueChampsElyseesDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

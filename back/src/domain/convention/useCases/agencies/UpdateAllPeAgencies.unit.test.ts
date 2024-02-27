@@ -2,10 +2,10 @@ import { AddressDto, AgencyDto, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryAddressGateway } from "../../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../../adapters/secondary/core/ConsoleAppLogger";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryPeAgenciesReferential } from "../../../../adapters/secondary/offer/peAgenciesReferential/InMemoryPeAgenciesReferential";
+import { InMemoryAddressGateway } from "../../../core/address/adapters/InMemoryAddressGateway";
 import { PeAgencyFromReferenciel } from "../../../offer/ports/PeAgenciesReferential";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
 

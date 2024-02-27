@@ -7,12 +7,12 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { buildTestApp } from "../../../../utils/buildTestApp";
-import { InMemoryAddressGateway } from "../../../secondary/addressGateway/InMemoryAddressGateway";
+import { InMemoryAddressGateway } from "../../../../domain/core/address/adapters/InMemoryAddressGateway";
 import {
   expected8bdduportAddressAndPositions,
   query8bdduportLookup,
-} from "../../../secondary/addressGateway/testUtils";
+} from "../../../../domain/core/address/adapters/testUtils";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("address router", () => {
   let httpClient: HttpClient<AddressRoutes>;

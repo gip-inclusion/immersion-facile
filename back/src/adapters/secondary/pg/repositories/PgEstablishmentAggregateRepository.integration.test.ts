@@ -11,13 +11,13 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
-import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import {
   rueBitcheDto,
   rueGuillaumeTellDto,
   rueJacquardDto,
-} from "../../addressGateway/InMemoryAddressGateway";
+} from "../../../../domain/core/address/adapters/InMemoryAddressGateway";
+import { SearchMade } from "../../../../domain/offer/entities/SearchMadeEntity";
+import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,

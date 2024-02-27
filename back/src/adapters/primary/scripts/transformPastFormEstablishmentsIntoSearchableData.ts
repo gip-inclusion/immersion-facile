@@ -2,12 +2,12 @@ import axios from "axios";
 import { Pool } from "pg";
 import { FormEstablishmentDto, random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAddressGateway";
+import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
-import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
-import { addressesExternalRoutes } from "../../secondary/addressGateway/HttpAddressGateway.routes";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,

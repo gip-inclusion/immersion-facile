@@ -14,11 +14,6 @@ import {
 } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  InMemoryAddressGateway,
-  avenueChampsElyseesDto,
-  rueGuillaumeTellDto,
-} from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
@@ -31,6 +26,11 @@ import {
   InMemorySiretGateway,
   TEST_OPEN_ESTABLISHMENT_1,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import {
+  InMemoryAddressGateway,
+  avenueChampsElyseesDto,
+  rueGuillaumeTellDto,
+} from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
