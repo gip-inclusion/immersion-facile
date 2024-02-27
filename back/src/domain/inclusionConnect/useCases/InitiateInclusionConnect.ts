@@ -6,7 +6,7 @@ import {
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
+import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { makeInclusionConnectRedirectUri } from "../entities/inclusionConnectRedirectUrl";
 
 type InclusionConnectUrlParams = {

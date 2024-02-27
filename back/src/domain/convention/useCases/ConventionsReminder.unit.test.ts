@@ -19,10 +19,10 @@ import {
   createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { ConventionsReminder } from "./ConventionsReminder";
 
 describe("ConventionReminder use case", () => {

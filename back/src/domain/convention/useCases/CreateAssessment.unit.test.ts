@@ -20,9 +20,9 @@ import { InMemoryAssessmentRepository } from "../../../adapters/secondary/InMemo
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { CreateAssessment } from "./CreateAssessment";
 

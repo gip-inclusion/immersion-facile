@@ -3,8 +3,8 @@ import { rawAddressToLocation } from "../../../utils/address";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<

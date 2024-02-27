@@ -3,8 +3,8 @@ import { FormEstablishmentDtoBuilder } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
 import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createPgUow } from "../../primary/config/uowConfig";
-import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "./PgUowPerformer";
 import { getTestPgPool } from "./pgUtils";
 

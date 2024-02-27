@@ -8,7 +8,6 @@ import {
   createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -19,6 +18,7 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationsAndEvents";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { SuggestEditEstablishment } from "./SuggestEditEstablishment";

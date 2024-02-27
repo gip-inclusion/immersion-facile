@@ -12,7 +12,6 @@ import {
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
@@ -23,6 +22,7 @@ import {
 } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AddConvention } from "./AddConvention";
 
 describe("Add Convention", () => {

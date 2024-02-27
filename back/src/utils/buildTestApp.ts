@@ -26,8 +26,8 @@ import {
   GenerateInclusionConnectJwt,
 } from "../domain/auth/jwt";
 import { InMemoryAddressGateway } from "../domain/core/address/adapters/InMemoryAddressGateway";
-import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { CustomTimeGateway } from "../domain/core/time-gateway/adapters/CustomTimeGateway";
+import { UuidGenerator } from "../domain/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {

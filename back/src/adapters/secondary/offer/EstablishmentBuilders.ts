@@ -10,13 +10,13 @@ import {
   defaultMaxContactsPerWeek,
 } from "shared";
 import { avenueChampsElyseesDto } from "../../../domain/core/address/adapters/InMemoryAddressGateway";
+import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { ContactEntity } from "../../../domain/offer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../../../domain/offer/entities/EstablishmentEntity";
 import { OfferEntity } from "../../../domain/offer/entities/OfferEntity";
-import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
 export const TEST_APPELLATION_CODE = "12345";

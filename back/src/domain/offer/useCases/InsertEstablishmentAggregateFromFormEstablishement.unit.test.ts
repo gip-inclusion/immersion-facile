@@ -14,7 +14,6 @@ import {
 } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -32,6 +31,7 @@ import {
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 const fakeSiret = "90040893100013";

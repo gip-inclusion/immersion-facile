@@ -14,7 +14,6 @@ import {
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryGroupRepository } from "../../../adapters/secondary/offer/InMemoryGroupRepository";
 import {
   InMemorySiretGateway,
@@ -23,6 +22,7 @@ import {
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
 

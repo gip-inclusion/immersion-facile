@@ -14,7 +14,7 @@ import { GenerateInclusionConnectJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
+import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { makeInclusionConnectRedirectUri } from "../entities/inclusionConnectRedirectUrl";

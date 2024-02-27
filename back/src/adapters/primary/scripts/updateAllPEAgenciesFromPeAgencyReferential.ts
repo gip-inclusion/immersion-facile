@@ -7,9 +7,9 @@ import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAd
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
+import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { AppConfig } from "../config/appConfig";

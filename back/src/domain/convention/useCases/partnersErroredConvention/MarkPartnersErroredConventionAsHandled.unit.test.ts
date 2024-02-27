@@ -12,13 +12,13 @@ import {
 } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/eventBus/EventBus";
 import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { MarkPartnersErroredConventionAsHandled } from "./MarkPartnersErroredConventionAsHandled";
 
 describe("mark partners errored convention as handled", () => {

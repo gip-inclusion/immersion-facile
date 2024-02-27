@@ -9,8 +9,8 @@ import {
   makeCreateNewEvent,
 } from "../../../core/eventBus/EventBus";
 import { UnitOfWork } from "../../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../../core/ports/UuidGenerator";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../../core/uuid-generator/ports/UuidGenerator";
 
 export type WithNotificationIdAndKind = {
   id: NotificationId;

@@ -8,8 +8,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 
