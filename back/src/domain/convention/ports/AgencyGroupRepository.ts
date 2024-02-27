@@ -1,4 +1,4 @@
-import { AgencyDto, AgencyGroup, AgencyGroupScope, CodeSafir } from "shared";
+import { AgencyGroup, CodeSafir } from "shared";
 
 export interface AgencyGroupRepository {
   getByCodeSafir(codeSafir: CodeSafir): Promise<AgencyGroup | undefined>;

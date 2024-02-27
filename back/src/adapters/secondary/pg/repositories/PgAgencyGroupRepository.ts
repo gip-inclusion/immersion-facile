@@ -1,19 +1,6 @@
-import { sql } from "kysely";
-import { AgencyGroup, AgencyId, CodeSafir, DepartmentCode } from "shared";
+import { AgencyGroup, CodeSafir, DepartmentCode } from "shared";
 import { AgencyGroupRepository } from "../../../../domain/convention/ports/AgencyGroupRepository";
 import { KyselyDb, cast, jsonBuildObject } from "../kysely/kyselyUtils";
-
-const someAgencyGroup: AgencyGroup = {
-  siret: "123456789",
-  codeSafir: "123456",
-  name: "Some agency group",
-  email: "yolo@mail.com",
-  kind: "france-travail",
-  agencyIds: ["123", "456"],
-  scope: "direction-régionale",
-  departments: ["75", "92"],
-  ccEmails: [],
-};
 
 export class PgAgencyGroupRepository implements AgencyGroupRepository {
   #transaction: KyselyDb;
