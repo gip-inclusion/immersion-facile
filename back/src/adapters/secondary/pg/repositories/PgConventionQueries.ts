@@ -1,6 +1,6 @@
 import { addDays, subDays, subHours } from "date-fns";
 import { sql } from "kysely";
-import { andThen, filter } from "ramda";
+import { andThen } from "ramda";
 import {
   ConventionId,
   ConventionReadDto,

@@ -1,8 +1,5 @@
 import { SiretDto } from "shared";
-import {
-  EstablishmentLead,
-  EstablishmentLeadEventKind,
-} from "../entities/EstablishmentLeadEntity";
+import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { EstablishmentLeadReminderParams } from "../useCases/SendEstablishmentLeadReminderScript";
 
 export interface EstablishmentLeadRepository {

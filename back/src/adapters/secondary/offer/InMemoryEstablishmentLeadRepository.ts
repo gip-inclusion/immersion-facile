@@ -1,5 +1,4 @@
-import { be } from "date-fns/locale";
-import { prop, sortBy, sortWith } from "ramda";
+import { prop, sortBy } from "ramda";
 import { SiretDto } from "shared";
 import {
   EstablishmentLead,

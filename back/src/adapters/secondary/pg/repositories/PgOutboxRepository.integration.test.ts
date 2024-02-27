@@ -1,10 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import {
-  ConventionDtoBuilder,
-  expectArraysToEqual,
-  expectArraysToEqualIgnoringOrder,
-  expectArraysToMatch,
-} from "shared";
+import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
 import { makeCreateNewEvent } from "../../../../domain/core/eventBus/EventBus";
 import {
   DomainEvent,
