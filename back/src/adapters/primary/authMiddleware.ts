@@ -12,7 +12,7 @@ import {
   expiredMagicLinkErrorMessage,
 } from "shared";
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
-import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
+import { GetApiConsumerById } from "../../domain/core/api-consumer/ports/ApiConsumerRepository";
 import { TimeGateway } from "../../domain/core/time-gateway/ports/TimeGateway";
 import { apiKeyAuthMiddlewareRequestsTotal } from "../../utils/counters";
 import { createLogger } from "../../utils/logger";

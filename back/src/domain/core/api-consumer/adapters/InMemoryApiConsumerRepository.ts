@@ -1,8 +1,8 @@
 import { addYears, subYears } from "date-fns";
 import { values } from "ramda";
 import { ApiConsumer, ApiConsumerId, ApiConsumerRights, Builder } from "shared";
-import { ApiConsumerRepository } from "../../domain/auth/ports/ApiConsumerRepository";
-import { UuidV4Generator } from "../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
 
 const uuidGenerator = new UuidV4Generator();
 

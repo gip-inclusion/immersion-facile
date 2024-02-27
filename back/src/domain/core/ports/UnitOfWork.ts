@@ -1,4 +1,3 @@
-import { ApiConsumerRepository } from "../../auth/ports/ApiConsumerRepository";
 import { AgencyGroupRepository } from "../../convention/ports/AgencyGroupRepository";
 import { AgencyRepository } from "../../convention/ports/AgencyRepository";
 import { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
@@ -19,6 +18,7 @@ import { GroupRepository } from "../../offer/ports/GroupRepository";
 import { SearchMadeRepository } from "../../offer/ports/SearchMadeRepository";
 import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
+import { ApiConsumerRepository } from "../api-consumer/ports/ApiConsumerRepository";
 import { OutboxQueries } from "../events/ports/OutboxQueries";
 import { OutboxRepository } from "../events/ports/OutboxRepository";
 import { NotificationRepository } from "../notifications/ports/NotificationRepository";

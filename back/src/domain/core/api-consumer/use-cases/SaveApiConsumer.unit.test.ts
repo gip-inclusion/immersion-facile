@@ -11,17 +11,17 @@ import {
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../../adapters/primary/config/uowConfig";
+} from "../../../../adapters/primary/config/uowConfig";
 import {
   ForbiddenError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../adapters/secondary/InMemoryApiConsumerRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { generateApiConsumerJwtTestFn } from "../../../utils/jwtTestHelper";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
+import { makeCreateNewEvent } from "../../events/ports/EventBus";
+import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { authorizedUnJeuneUneSolutionApiConsumer } from "../adapters/InMemoryApiConsumerRepository";
 import { SaveApiConsumer } from "./SaveApiConsumer";
 
 describe("SaveApiConsumer", () => {

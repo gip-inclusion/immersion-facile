@@ -12,12 +12,12 @@ import {
 import {
   ForbiddenError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { GenerateApiConsumerJwt } from "../jwt";
+} from "../../../../adapters/primary/helpers/httpErrors";
+import { GenerateApiConsumerJwt } from "../../../auth/jwt";
+import { TransactionalUseCase } from "../../UseCase";
+import { CreateNewEvent } from "../../events/ports/EventBus";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../ports/UnitOfWork";
+import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 
 export const EXPIRATION_IN_YEARS = 2;
 

@@ -1,3 +1,5 @@
+import { InMemoryApiConsumerRepository } from "../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { PgApiConsumerRepository } from "../../../domain/core/api-consumer/adapters/PgApiConsumerRepository";
 import { InMemoryOutboxQueries } from "../../../domain/core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../domain/core/events/adapters/InMemoryOutboxRepository";
 import { PgOutboxQueries } from "../../../domain/core/events/adapters/PgOutboxQueries";
@@ -10,7 +12,6 @@ import { InMemoryShortLinkRepository } from "../../../domain/core/short-link/ada
 import { PgShortLinkRepository } from "../../../domain/core/short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { InMemoryAgencyGroupRepository } from "../../secondary/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
-import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryAssessmentRepository } from "../../secondary/InMemoryAssessmentRepository";
 import { InMemoryAuthenticatedUserRepository } from "../../secondary/InMemoryAuthenticatedUserRepository";
 import { InMemoryConventionExternalIdRepository } from "../../secondary/InMemoryConventionExternalIdRepository";
@@ -37,7 +38,6 @@ import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { KyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgAgencyGroupRepository } from "../../secondary/pg/repositories/PgAgencyGroupRepository";
 import { PgAgencyRepository } from "../../secondary/pg/repositories/PgAgencyRepository";
-import { PgApiConsumerRepository } from "../../secondary/pg/repositories/PgApiConsumerRepository";
 import { PgAssessmentRepository } from "../../secondary/pg/repositories/PgAssessmentRepository";
 import { PgAuthenticatedUserRepository } from "../../secondary/pg/repositories/PgAuthenticatedUserRepository";
 import { PgConventionExternalIdRepository } from "../../secondary/pg/repositories/PgConventionExternalIdRepository";

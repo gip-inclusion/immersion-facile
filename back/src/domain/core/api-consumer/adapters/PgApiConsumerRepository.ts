@@ -12,14 +12,14 @@ import {
   apiConsumerSchema,
   eventToRightName,
 } from "shared";
-import { ApiConsumerRepository } from "../../../../domain/auth/ports/ApiConsumerRepository";
 import {
   KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
-} from "../kysely/kyselyUtils";
-import { Database } from "../kysely/model/database";
+} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { Database } from "../../../../adapters/secondary/pg/kysely/model/database";
+import { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {
   #transaction: KyselyDb;
