@@ -16,8 +16,8 @@ import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
 } from "../../../../domain/auth/jwt";
-import { shortLinkNotFoundMessage } from "../../../../domain/core/ShortLink";
-import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
+import { shortLinkNotFoundMessage } from "../../../../domain/core/short-link/ShortLink";
+import { ShortLinkId } from "../../../../domain/core/short-link/ports/ShortLinkQuery";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { DiscussionAggregateBuilder } from "../../../secondary/offer/InMemoryDiscussionAggregateRepository";

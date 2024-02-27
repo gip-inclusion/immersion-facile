@@ -6,6 +6,8 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
+import { InMemoryShortLinkRepository } from "../../../domain/core/short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
+import { PgShortLinkRepository } from "../../../domain/core/short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { InMemoryAgencyGroupRepository } from "../../secondary/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
@@ -24,7 +26,6 @@ import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemo
 import { InMemoryNotificationRepository } from "../../secondary/InMemoryNotificationRepository";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
-import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { InMemoryErrorRepository } from "../../secondary/core/InMemoryErrorRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/offer/InMemoryDiscussionAggregateRepository";
@@ -58,7 +59,6 @@ import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNoti
 import { PgOngoingOAuthRepository } from "../../secondary/pg/repositories/PgOngoingOAuthRepository";
 import { PgRomeRepository } from "../../secondary/pg/repositories/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/repositories/PgSearchMadeRepository";
-import { PgShortLinkRepository } from "../../secondary/pg/repositories/PgShortLinkRepository";
 import { AppConfig } from "./appConfig";
 import { GetPgPoolFn } from "./createGateways";
 

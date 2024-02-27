@@ -4,18 +4,18 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+import { makeKyselyDb } from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+import { ShortLinkId } from "../../ports/ShortLinkQuery";
 import {
   deleteShortLinkByIdQuery,
   insertShortLinkQuery,
-} from "./PgShortLinkHelpers";
+} from "../PgShortLinkHelpers";
+import { PgShortLinkRepository } from "../short-link-repository/PgShortLinkRepository";
 import {
   PgShortLinkQuery,
   shortLinkIdNotFoundErrorMessage,
 } from "./PgShortLinkQuery";
-import { PgShortLinkRepository } from "./PgShortLinkRepository";
 
 describe("PgShortLinkQuery", () => {
   let pool: Pool;

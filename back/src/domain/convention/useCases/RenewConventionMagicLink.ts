@@ -20,11 +20,11 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
-import { prepareMagicShortLinkMaker } from "../../core/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
+import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 
 const logger = createLogger(__filename);

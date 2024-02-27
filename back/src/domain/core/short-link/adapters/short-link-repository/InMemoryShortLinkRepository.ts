@@ -1,7 +1,7 @@
 import { AbsoluteUrl } from "shared";
-import { ShortLinkId } from "../../domain/core/ports/ShortLinkQuery";
-import { ShortLinkRepository } from "../../domain/core/ports/ShortLinkRepository";
-import { InMemoryShortLinkQuery } from "./InMemoryShortLinkQuery";
+import { ShortLinkId } from "../../ports/ShortLinkQuery";
+import { ShortLinkRepository } from "../../ports/ShortLinkRepository";
+import { InMemoryShortLinkQuery } from "../short-link-query/InMemoryShortLinkQuery";
 
 export class InMemoryShortLinkRepository
   extends InMemoryShortLinkQuery

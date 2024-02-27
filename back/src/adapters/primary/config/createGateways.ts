@@ -8,6 +8,8 @@ import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAd
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domain/core/address/adapters/InMemoryAddressGateway";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../domain/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { NanoIdShortLinkIdGeneratorGateway } from "../../../domain/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
 import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
@@ -49,8 +51,6 @@ import {
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRoutes";
-import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
 import { annuaireDesEntreprisesSiretRoutes } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.routes";
 import { InMemorySiretGateway } from "../../secondary/siret/InMemorySiretGateway";

@@ -14,7 +14,6 @@ import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonne
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../adapters/secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
-import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemorySubscribersGateway } from "../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
 import {
@@ -26,6 +25,7 @@ import {
 } from "../domain/auth/jwt";
 import { InMemoryAddressGateway } from "../domain/core/address/adapters/InMemoryAddressGateway";
 import { BasicEventCrawler } from "../domain/core/events/adapters/EventCrawlerImplementations";
+import { DeterministShortLinkIdGeneratorGateway } from "../domain/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../domain/core/time-gateway/adapters/CustomTimeGateway";
 import { UuidGenerator } from "../domain/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";

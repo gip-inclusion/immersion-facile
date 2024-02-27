@@ -22,10 +22,10 @@ import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/Conv
 import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { OutboxQueries } from "../events/ports/OutboxQueries";
 import { OutboxRepository } from "../events/ports/OutboxRepository";
+import { ShortLinkQuery } from "../short-link/ports/ShortLinkQuery";
+import { ShortLinkRepository } from "../short-link/ports/ShortLinkRepository";
 import { ErrorRepository } from "./ErrorRepository";
 import { FeatureFlagRepository } from "./FeatureFlagRepository";
-import { ShortLinkQuery } from "./ShortLinkQuery";
-import { ShortLinkRepository } from "./ShortLinkRepository";
 
 export type UnitOfWork = {
   agencyRepository: AgencyRepository;

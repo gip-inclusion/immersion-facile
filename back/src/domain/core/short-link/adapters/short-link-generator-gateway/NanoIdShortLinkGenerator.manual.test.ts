@@ -1,4 +1,4 @@
-import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
+import { ShortLinkId } from "../../ports/ShortLinkQuery";
 import { NanoIdShortLinkIdGeneratorGateway } from "./NanoIdShortLinkIdGeneratorGateway";
 
 describe("shortLinkGenerator manual test", () => {
