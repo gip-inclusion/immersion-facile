@@ -1,5 +1,5 @@
 import { ValidateEmailStatus } from "shared";
-import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
+import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 
 export class InMemoryEmailValidationGateway implements EmailValidationGetaway {
   #emailValidationStatus: ValidateEmailStatus | undefined;

@@ -60,6 +60,7 @@ import { MarkPartnersErroredConventionAsHandled } from "../../../domain/conventi
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { LookupLocation } from "../../../domain/core/address/use-cases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/core/address/use-cases/LookupStreetAddress";
+import { ValidateEmail } from "../../../domain/core/email-validation/useCases/ValidateEmail";
 import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
 import { SendNotification } from "../../../domain/core/notifications/useCases/SendNotification";
@@ -69,7 +70,6 @@ import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway
 import { UuidGenerator } from "../../../domain/core/uuid-generator/ports/UuidGenerator";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
-import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { SetFeatureFlag } from "../../../domain/generic/featureFlag/SetFeatureFlag";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
