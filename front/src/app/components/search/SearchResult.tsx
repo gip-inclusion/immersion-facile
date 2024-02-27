@@ -5,6 +5,7 @@ import React, { memo } from "react";
 import {
   SearchResultDto,
   addressDtoToString,
+  domElementIds,
   frenchEstablishmentKinds,
   getMapsLink,
   toAbsoluteUrl,
@@ -160,6 +161,11 @@ const SearchResultComponent = ({
             <Button
               size="small"
               type="button"
+              nativeButtonProps={{
+                id: voluntaryToImmersion
+                  ? `${domElementIds.search.lbbSearchResultButton}-${establishment.siret}`
+                  : `${domElementIds.search.searchResultButton}-${establishment.siret}`,
+              }}
               iconId="fr-icon-mail-fill"
               disabled={preview}
               onClick={

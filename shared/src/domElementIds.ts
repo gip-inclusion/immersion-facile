@@ -127,6 +127,8 @@ export const domElementIds = {
       "im-contact-establishment__contact-email-cancel-button",
     contactByPhoneButton: "im-contact-establishment__contact-phone-button",
     contactInPersonButton: "im-contact-establishment__contact-in-person-button",
+    lbbSearchResultButton: "im-search-result__lbb-contact-button",
+    searchResultButton: "im-search-result__contact-button",
   },
 
   addAgency: {
