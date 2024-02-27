@@ -1,16 +1,10 @@
 import { subDays } from "date-fns";
-import { Pool, PoolClient } from "pg";
-import {
-  AgencyDtoBuilder,
-  ConventionDto,
-  ConventionDtoBuilder,
-  expectToEqual,
-} from "shared";
+import { Pool } from "pg";
+import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
 import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";
-import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgEstablishmentLeadQueries } from "./PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";
@@ -73,7 +67,6 @@ describe("PgEstablishmentLeadQueries", () => {
   let pool: Pool;
   let establishmentLeadQueries: PgEstablishmentLeadQueries;
   let establishmentLeadRepository: PgEstablishmentLeadRepository;
-  let conventionQueries: PgConventionQueries;
   let conventionRepository: PgConventionRepository;
   let agencyRepo: PgAgencyRepository;
   let kyselyDb: KyselyDb;
@@ -91,7 +84,6 @@ describe("PgEstablishmentLeadQueries", () => {
     establishmentLeadQueries = new PgEstablishmentLeadQueries(kyselyDb);
     establishmentLeadRepository = new PgEstablishmentLeadRepository(kyselyDb);
     agencyRepo = new PgAgencyRepository(kyselyDb);
-    conventionQueries = new PgConventionQueries(kyselyDb);
     conventionRepository = new PgConventionRepository(kyselyDb);
   });
 
