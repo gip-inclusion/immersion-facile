@@ -7,7 +7,7 @@ import {
 import { z } from "zod";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { AddressGateway } from "../../../core/address/ports/AddressGateway";
-import { AppLogger } from "../../../core/ports/AppLogger";
+import { AppLogger } from "../../../core/app-logger/ports/AppLogger";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,

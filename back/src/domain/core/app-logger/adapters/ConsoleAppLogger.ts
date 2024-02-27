@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { AppLogger } from "../../../domain/core/ports/AppLogger";
+import { AppLogger } from "../ports/AppLogger";
 
 export class ConsoleAppLogger implements AppLogger {
   public debug(...messages: unknown[]): void {
