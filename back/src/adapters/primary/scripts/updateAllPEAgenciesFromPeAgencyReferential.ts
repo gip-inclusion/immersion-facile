@@ -5,10 +5,10 @@ import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmp
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/agencies/UpdateAllPeAgencies";
 import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
+import { ConsoleAppLogger } from "../../../domain/core/app-logger/adapters/ConsoleAppLogger";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
 import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
