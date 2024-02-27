@@ -5,12 +5,12 @@ import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
-import { AddressGateway } from "../ports/AddressGateway";
 import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 
 const logger = createLogger(__filename);

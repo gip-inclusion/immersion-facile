@@ -12,10 +12,6 @@ import {
   createInMemoryUow,
 } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  InMemoryAddressGateway,
-  rueGuillaumeTellDto,
-} from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
@@ -25,6 +21,10 @@ import {
   OfferEntityBuilder,
 } from "../../../adapters/secondary/offer/EstablishmentBuilders";
 import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import {
+  InMemoryAddressGateway,
+  rueGuillaumeTellDto,
+} from "../../core/address/adapters/InMemoryAddressGateway";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 
 describe("Update Establishment aggregate from form data", () => {

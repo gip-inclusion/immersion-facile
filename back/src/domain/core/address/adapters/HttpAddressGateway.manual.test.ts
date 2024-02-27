@@ -9,8 +9,8 @@ import {
   expectToEqual,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";
-import { AppConfig } from "../../primary/config/appConfig";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { AddressGateway } from "../ports/AddressGateway";
 import { HttpAddressGateway, errorMessage } from "./HttpAddressGateway";
 import { addressesExternalRoutes } from "./HttpAddressGateway.routes";
 

@@ -9,13 +9,13 @@ import {
   RomeCode,
   defaultMaxContactsPerWeek,
 } from "shared";
+import { avenueChampsElyseesDto } from "../../../domain/core/address/adapters/InMemoryAddressGateway";
 import { ContactEntity } from "../../../domain/offer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../../../domain/offer/entities/EstablishmentEntity";
 import { OfferEntity } from "../../../domain/offer/entities/OfferEntity";
-import { avenueChampsElyseesDto } from "../addressGateway/InMemoryAddressGateway";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
@@ -160,6 +160,17 @@ export class EstablishmentEntityBuilder
     });
   }
 
+  public withLocationId(locationId: string) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      locations: [{ ...defaultLocation, id: locationId }],
+    });
+  }
+
+  public withLocations(locations: Location[]) {
+    return new EstablishmentEntityBuilder({ ...this.entity, locations });
+  }
+
   public withMaxContactsPerWeek(maxContactsPerWeek: number) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
@@ -186,17 +197,6 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({
       ...this.entity,
       numberEmployeesRange,
-    });
-  }
-
-  public withLocations(locations: Location[]) {
-    return new EstablishmentEntityBuilder({ ...this.entity, locations });
-  }
-
-  public withLocationId(locationId: string) {
-    return new EstablishmentEntityBuilder({
-      ...this.entity,
-      locations: [{ ...defaultLocation, id: locationId }],
     });
   }
 
@@ -253,28 +253,6 @@ export class EstablishmentAggregateBuilder
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact: new ContactEntityBuilder().withId(id).build(),
-    });
-  }
-
-  public withLocationId(locationId: string) {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      establishment: new EstablishmentEntityBuilder(
-        this.aggregate.establishment,
-      )
-        .withLocationId(locationId)
-        .build(),
-    });
-  }
-
-  public withLocations(locations: Location[]) {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      establishment: new EstablishmentEntityBuilder(
-        this.aggregate.establishment,
-      )
-        .withLocations(locations)
-        .build(),
     });
   }
 
@@ -360,6 +338,28 @@ export class EstablishmentAggregateBuilder
         this.aggregate.establishment,
       )
         .withIsSearchable(isSearchable)
+        .build(),
+    });
+  }
+
+  public withLocationId(locationId: string) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withLocationId(locationId)
+        .build(),
+    });
+  }
+
+  public withLocations(locations: Location[]) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withLocations(locations)
         .build(),
     });
   }

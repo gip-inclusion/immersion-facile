@@ -15,8 +15,8 @@ import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domain/auth/jwt";
+import { rueSaintHonoreDto } from "../../../../domain/core/address/adapters/InMemoryAddressGateway";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
-import { rueSaintHonoreDto } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

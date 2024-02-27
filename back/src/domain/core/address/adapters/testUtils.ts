@@ -1,5 +1,5 @@
 import { Location } from "shared";
-import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 
 const uuidV4Generator = new UuidV4Generator();
 

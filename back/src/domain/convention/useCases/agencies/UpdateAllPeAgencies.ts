@@ -6,13 +6,13 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { AddressGateway } from "../../../core/address/ports/AddressGateway";
 import { AppLogger } from "../../../core/ports/AppLogger";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../core/ports/UuidGenerator";
-import { AddressGateway } from "../../../offer/ports/AddressGateway";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,

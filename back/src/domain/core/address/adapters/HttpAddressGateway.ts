@@ -18,8 +18,8 @@ import {
   lookupStreetAddressSpecialCharsRegex,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { AddressGateway } from "../../../domain/offer/ports/AddressGateway";
-import { createLogger } from "../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
+import { AddressGateway } from "../ports/AddressGateway";
 import {
   OpenCageDataAddressComponents,
   OpenCageDataProperties,
