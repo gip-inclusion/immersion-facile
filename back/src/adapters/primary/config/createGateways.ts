@@ -7,6 +7,9 @@ import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmp
 import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domain/core/address/adapters/InMemoryAddressGateway";
+import { EmailableEmailValidationGateway } from "../../../domain/core/email-validation/adapters/EmailableEmailValidationGateway";
+import { emailableValidationRoutes } from "../../../domain/core/email-validation/adapters/EmailableEmailValidationGateway.routes";
+import { InMemoryEmailValidationGateway } from "../../../domain/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import { BrevoNotificationGateway } from "../../../domain/core/notifications/adapters/BrevoNotificationGateway";
 import { brevoNotificationGatewayRoutes } from "../../../domain/core/notifications/adapters/BrevoNotificationGateway.routes";
 import { InMemoryNotificationGateway } from "../../../domain/core/notifications/adapters/InMemoryNotificationGateway";
@@ -35,9 +38,6 @@ import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/Metab
 import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/documentGateway/NotImplementedDocumentGateway";
 import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGateway";
-import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
-import { emailableValidationRoutes } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.routes";
-import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { HttpLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/HttpLaBonneBoiteGateway";
 import { InMemoryLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { createLbbRoutes } from "../../secondary/offer/laBonneBoite/LaBonneBoite.routes";

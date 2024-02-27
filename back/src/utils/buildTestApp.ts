@@ -8,7 +8,6 @@ import { InMemoryInclusionConnectGateway } from "../adapters/secondary/Inclusion
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/documentGateway/NotImplementedDocumentGateway";
-import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPdfGeneratorGateway } from "../adapters/secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
@@ -23,6 +22,7 @@ import {
   GenerateInclusionConnectJwt,
 } from "../domain/auth/jwt";
 import { InMemoryAddressGateway } from "../domain/core/address/adapters/InMemoryAddressGateway";
+import { InMemoryEmailValidationGateway } from "../domain/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import { BasicEventCrawler } from "../domain/core/events/adapters/EventCrawlerImplementations";
 import type { InMemoryNotificationGateway } from "../domain/core/notifications/adapters/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../domain/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";

@@ -1,8 +1,8 @@
 import Bottleneck from "bottleneck";
 import { ValidateEmailStatus } from "shared";
 import { HttpClient } from "shared-routes";
-import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
-import { createLogger } from "../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
+import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 import {
   EmailableApiKey,
   EmailableEmailValidationStatus,

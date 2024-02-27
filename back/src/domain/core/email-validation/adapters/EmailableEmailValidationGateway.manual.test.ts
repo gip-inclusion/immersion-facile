@@ -1,8 +1,8 @@
 import axios from "axios";
 import { ValidateEmailStatus } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
-import { AppConfig } from "../../primary/config/appConfig";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 import { EmailableEmailValidationGateway } from "./EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "./EmailableEmailValidationGateway.routes";
 

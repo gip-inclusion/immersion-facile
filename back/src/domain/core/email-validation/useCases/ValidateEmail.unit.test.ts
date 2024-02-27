@@ -3,7 +3,7 @@ import {
   ValidateEmailStatus,
   expectPromiseToFail,
 } from "shared";
-import { InMemoryEmailValidationGateway } from "../../../adapters/secondary/emailValidationGateway/InMemoryEmailValidationGateway";
+import { InMemoryEmailValidationGateway } from "../adapters/InMemoryEmailValidationGateway";
 import { ValidateEmail } from "./ValidateEmail";
 
 describe("Email validation status", () => {
