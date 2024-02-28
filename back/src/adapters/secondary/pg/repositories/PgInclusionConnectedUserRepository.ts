@@ -5,7 +5,7 @@ import {
   InclusionConnectedUser,
   WithAgencyRole,
 } from "shared";
-import { InclusionConnectedUserRepository } from "../../../../domains/dashboard/port/InclusionConnectedUserRepository";
+import { InclusionConnectedUserRepository } from "../../../../domains/core/dashboard/port/InclusionConnectedUserRepository";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export class PgInclusionConnectedUserRepository

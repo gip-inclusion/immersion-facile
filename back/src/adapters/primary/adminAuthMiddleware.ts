@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { makeVerifyJwtES256 } from "../../domains/auth/jwt";
+import { makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 

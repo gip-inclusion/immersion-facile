@@ -6,7 +6,6 @@ import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
 import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/documentGateway/NotImplementedDocumentGateway";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
@@ -14,16 +13,17 @@ import { InMemoryPdfGeneratorGateway } from "../adapters/secondary/pdfGeneratorG
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemorySubscribersGateway } from "../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
+import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
+import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
+import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
+import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
 import {
   GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
-} from "../domains/auth/jwt";
-import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
-import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
-import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
+} from "../domains/core/jwt";
 import type { InMemoryNotificationGateway } from "../domains/core/notifications/adapters/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";

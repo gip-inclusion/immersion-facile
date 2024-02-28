@@ -7,6 +7,9 @@ import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEm
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domains/core/address/adapters/InMemoryAddressGateway";
+import { MetabaseDashboardGateway } from "../../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
+import { StubDashboardGateway } from "../../../domains/core/dashboard/adapters/StubDashboardGateway";
+import { DashboardGateway } from "../../../domains/core/dashboard/port/DashboardGateway";
 import { EmailableEmailValidationGateway } from "../../../domains/core/email-validation/adapters/EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "../../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
@@ -21,7 +24,6 @@ import { CustomTimeGateway } from "../../../domains/core/time-gateway/adapters/C
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../../domains/core/uuid-generator/ports/UuidGenerator";
-import { DashboardGateway } from "../../../domains/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domains/generic/fileManagement/port/DocumentGateway";
 import { PdfGeneratorGateway } from "../../../domains/generic/htmlToPdf/PdfGeneratorGateway";
 import { InclusionConnectGateway } from "../../../domains/inclusionConnect/port/InclusionConnectGateway";
@@ -34,8 +36,6 @@ import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeCon
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
-import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/documentGateway/NotImplementedDocumentGateway";
 import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGateway";
 import { HttpLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/HttpLaBonneBoiteGateway";

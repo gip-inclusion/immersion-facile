@@ -6,8 +6,8 @@ import {
   siretSchema,
 } from "shared";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";

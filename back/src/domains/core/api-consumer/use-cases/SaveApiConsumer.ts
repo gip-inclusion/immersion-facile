@@ -13,9 +13,9 @@ import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../../../adapters/primary/helpers/httpErrors";
-import { GenerateApiConsumerJwt } from "../../../auth/jwt";
 import { TransactionalUseCase } from "../../UseCase";
 import { CreateNewEvent } from "../../events/ports/EventBus";
+import { GenerateApiConsumerJwt } from "../../jwt";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../ports/UnitOfWork";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 

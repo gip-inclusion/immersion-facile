@@ -1,6 +1,6 @@
 import { SetFeatureFlagParam, setFeatureFlagSchema } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../UseCase";
+import { UnitOfWork } from "../../ports/UnitOfWork";
 
 export class SetFeatureFlag extends TransactionalUseCase<SetFeatureFlagParam> {
   protected inputSchema = setFeatureFlagSchema;

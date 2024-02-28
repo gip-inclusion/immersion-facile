@@ -2,14 +2,14 @@ import bodyParser from "body-parser";
 import express, { Express } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
+import { EventCrawler } from "../../domains/core/events/ports/EventCrawler";
 import {
   GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
-} from "../../domains/auth/jwt";
-import { EventCrawler } from "../../domains/core/events/ports/EventCrawler";
+} from "../../domains/core/jwt";
 import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";

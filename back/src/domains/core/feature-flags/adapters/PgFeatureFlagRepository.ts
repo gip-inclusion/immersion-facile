@@ -1,7 +1,10 @@
 import { keys } from "ramda";
 import { FeatureFlags, SetFeatureFlagParam, hasFeatureFlagValue } from "shared";
-import { FeatureFlagRepository } from "../../../../domains/core/ports/FeatureFlagRepository";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+import {
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 
 const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
   raw.reduce(

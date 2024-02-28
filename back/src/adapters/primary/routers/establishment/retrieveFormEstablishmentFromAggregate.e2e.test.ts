@@ -11,11 +11,11 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
+import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
-} from "../../../../domains/auth/jwt";
-import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
+} from "../../../../domains/core/jwt";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,

@@ -1,4 +1,5 @@
 import { AbsoluteUrl, frontRoutes } from "shared";
+import { InMemoryEventBus } from "../../../domains/core/events/adapters/InMemoryEventBus";
 import {
   GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
@@ -6,8 +7,7 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
-} from "../../../domains/auth/jwt";
-import { InMemoryEventBus } from "../../../domains/core/events/adapters/InMemoryEventBus";
+} from "../../../domains/core/jwt";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {

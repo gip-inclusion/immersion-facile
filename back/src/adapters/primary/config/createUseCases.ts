@@ -7,13 +7,6 @@ import {
   SiretDto,
   sleep,
 } from "shared";
-import {
-  GenerateApiConsumerJwt,
-  GenerateBackOfficeJwt,
-  GenerateConventionJwt,
-  GenerateEditFormEstablishmentJwt,
-  GenerateInclusionConnectJwt,
-} from "../../../domains/auth/jwt";
 import { BroadcastToPartnersOnConventionUpdates } from "../../../domains/broadcast/useCases/BroadcastToPartnersOnConventionUpdates";
 import { DeleteSubscription } from "../../../domains/broadcast/useCases/DeleteSubscription";
 import { ListActiveSubscriptions } from "../../../domains/broadcast/useCases/ListActiveSubscriptions";
@@ -60,18 +53,25 @@ import { TransactionalUseCase, UseCase } from "../../../domains/core/UseCase";
 import { LookupLocation } from "../../../domains/core/address/use-cases/LookupLocation";
 import { LookupStreetAddress } from "../../../domains/core/address/use-cases/LookupStreetAddress";
 import { SaveApiConsumer } from "../../../domains/core/api-consumer/use-cases/SaveApiConsumer";
+import { DashboardGateway } from "../../../domains/core/dashboard/port/DashboardGateway";
+import { GetDashboardUrl } from "../../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../../domains/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { SetFeatureFlag } from "../../../domains/core/feature-flags/use-cases/SetFeatureFlag";
+import {
+  GenerateApiConsumerJwt,
+  GenerateBackOfficeJwt,
+  GenerateConventionJwt,
+  GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
+} from "../../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { SendNotification } from "../../../domains/core/notifications/useCases/SendNotification";
 import { UnitOfWorkPerformer } from "../../../domains/core/ports/UnitOfWork";
 import { ShortLinkId } from "../../../domains/core/short-link/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../../domains/core/uuid-generator/ports/UuidGenerator";
-import { DashboardGateway } from "../../../domains/dashboard/port/DashboardGateway";
-import { GetDashboardUrl } from "../../../domains/dashboard/useCases/GetDashboardUrl";
 import { AdminLogin } from "../../../domains/generic/authentication/useCases/AdminLogin";
-import { SetFeatureFlag } from "../../../domains/generic/featureFlag/SetFeatureFlag";
 import { UploadFile } from "../../../domains/generic/fileManagement/useCases/UploadFile";
 import { HtmlToPdf } from "../../../domains/generic/htmlToPdf/HtmlToPdf";
 import { AuthenticateWithInclusionCode } from "../../../domains/inclusionConnect/useCases/AuthenticateWithInclusionCode";

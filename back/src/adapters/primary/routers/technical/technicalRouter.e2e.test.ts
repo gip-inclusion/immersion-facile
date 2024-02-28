@@ -15,7 +15,7 @@ import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
-} from "../../../../domains/auth/jwt";
+} from "../../../../domains/core/jwt";
 import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
 import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
