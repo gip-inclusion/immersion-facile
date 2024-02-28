@@ -15,9 +15,9 @@ import {
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
-import { InMemoryOutboxRepository } from "../../../../domain/core/events/adapters/InMemoryOutboxRepository";
-import { DomainEvent } from "../../../../domain/core/events/events";
-import { InMemoryNotificationGateway } from "../../../../domain/core/notifications/adapters/InMemoryNotificationGateway";
+import { InMemoryOutboxRepository } from "../../../../domains/core/events/adapters/InMemoryOutboxRepository";
+import { DomainEvent } from "../../../../domains/core/events/events";
+import { InMemoryNotificationGateway } from "../../../../domains/core/notifications/adapters/InMemoryNotificationGateway";
 import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";

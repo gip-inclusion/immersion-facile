@@ -6,7 +6,7 @@ import {
   ConventionId,
   DashboardName,
 } from "shared";
-import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
+import { DashboardGateway } from "../../../domains/dashboard/port/DashboardGateway";
 
 type DashboardKind = "dashboard" | "question";
 

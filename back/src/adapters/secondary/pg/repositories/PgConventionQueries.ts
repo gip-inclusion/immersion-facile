@@ -15,8 +15,8 @@ import {
 import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
-} from "../../../../domain/convention/ports/ConventionQueries";
-import { AssessmentEmailDomainTopic } from "../../../../domain/core/events/events";
+} from "../../../../domains/convention/ports/ConventionQueries";
+import { AssessmentEmailDomainTopic } from "../../../../domains/core/events/events";
 import { KyselyDb } from "../kysely/kyselyUtils";
 import {
   createConventionReadQueryBuilder,

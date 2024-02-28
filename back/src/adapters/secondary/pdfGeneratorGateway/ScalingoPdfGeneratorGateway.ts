@@ -1,8 +1,8 @@
 import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { UuidGenerator } from "../../../domain/core/uuid-generator/ports/UuidGenerator";
-import { PdfGeneratorGateway } from "../../../domain/generic/htmlToPdf/PdfGeneratorGateway";
+import { UuidGenerator } from "../../../domains/core/uuid-generator/ports/UuidGenerator";
+import { PdfGeneratorGateway } from "../../../domains/generic/htmlToPdf/PdfGeneratorGateway";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);

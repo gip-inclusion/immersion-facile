@@ -2,7 +2,7 @@ import { ConventionId } from "shared";
 import {
   ConventionToSync,
   ConventionsToSyncRepository,
-} from "../../domain/convention/ports/ConventionsToSyncRepository";
+} from "../../domains/convention/ports/ConventionsToSyncRepository";
 
 export class InMemoryConventionsToSyncRepository
   implements ConventionsToSyncRepository

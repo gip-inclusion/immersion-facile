@@ -6,9 +6,9 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
-} from "../../../domain/auth/jwt";
-import { InMemoryEventBus } from "../../../domain/core/events/adapters/InMemoryEventBus";
-import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../../domains/auth/jwt";
+import { InMemoryEventBus } from "../../../domains/core/events/adapters/InMemoryEventBus";
+import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
   makeConsumerMiddleware,

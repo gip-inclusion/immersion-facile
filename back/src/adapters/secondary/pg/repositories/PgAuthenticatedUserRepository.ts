@@ -1,5 +1,5 @@
 import { AuthenticatedUser } from "shared";
-import { AuthenticatedUserRepository } from "../../../../domain/generic/OAuth/ports/AuthenticatedUserRepositiory";
+import { AuthenticatedUserRepository } from "../../../../domains/generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 type PersistenceAuthenticatedUser = {

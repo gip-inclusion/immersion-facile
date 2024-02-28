@@ -15,7 +15,7 @@ import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
-} from "../../../../domain/auth/jwt";
+} from "../../../../domains/auth/jwt";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

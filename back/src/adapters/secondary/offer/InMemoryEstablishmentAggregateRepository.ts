@@ -11,14 +11,14 @@ import {
   pathEq,
   replaceArrayElement,
 } from "shared";
-import { EstablishmentAggregate } from "../../../domain/offer/entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../../../domains/offer/entities/EstablishmentEntity";
 import {
   EstablishmentAggregateRepository,
   SearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
   establishmentNotFoundErrorMessage,
-} from "../../../domain/offer/ports/EstablishmentAggregateRepository";
+} from "../../../domains/offer/ports/EstablishmentAggregateRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
 

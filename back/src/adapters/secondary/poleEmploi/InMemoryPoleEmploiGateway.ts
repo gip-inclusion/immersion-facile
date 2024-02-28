@@ -3,7 +3,7 @@ import {
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
-} from "../../../domain/convention/ports/PoleEmploiGateway";
+} from "../../../domains/convention/ports/PoleEmploiGateway";
 
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
   #nextResponse: PoleEmploiBroadcastResponse = { status: 200 };

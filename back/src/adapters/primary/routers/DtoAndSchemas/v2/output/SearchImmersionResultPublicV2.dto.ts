@@ -7,7 +7,7 @@ import {
   SearchResultDto,
   SiretDto,
 } from "shared";
-import { ContactMethod } from "../../../../../../domain/offer/entities/ContactEntity";
+import { ContactMethod } from "../../../../../../domains/offer/entities/ContactEntity";
 
 export type SearchImmersionResultPublicV2 = {
   rome: RomeCode;

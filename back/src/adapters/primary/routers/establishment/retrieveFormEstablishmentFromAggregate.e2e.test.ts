@@ -14,8 +14,8 @@ import supertest from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
-} from "../../../../domain/auth/jwt";
-import { rueSaintHonoreDto } from "../../../../domain/core/address/adapters/InMemoryAddressGateway";
+} from "../../../../domains/auth/jwt";
+import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,

@@ -5,7 +5,7 @@ import {
   GeoPositionDto,
   NumberEmployeesRange,
 } from "shared";
-import { EstablishmentAggregateRepository } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
+import { EstablishmentAggregateRepository } from "../../../../domains/offer/ports/EstablishmentAggregateRepository";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

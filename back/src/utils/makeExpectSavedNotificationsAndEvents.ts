@@ -13,9 +13,9 @@ import {
   notificationKinds,
 } from "shared";
 import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
-import { InMemoryOutboxRepository } from "../domain/core/events/adapters/InMemoryOutboxRepository";
-import { NotificationAddedEvent } from "../domain/core/events/events";
-import { WithNotificationIdAndKind } from "../domain/core/notifications/helpers/Notification";
+import { InMemoryOutboxRepository } from "../domains/core/events/adapters/InMemoryOutboxRepository";
+import { NotificationAddedEvent } from "../domains/core/events/events";
+import { WithNotificationIdAndKind } from "../domains/core/notifications/helpers/Notification";
 
 export type ExpectSavedNotificationsAndEvents = ReturnType<
   typeof makeExpectSavedNotificationsAndEvents

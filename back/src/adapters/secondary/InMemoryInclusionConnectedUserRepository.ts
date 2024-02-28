@@ -4,7 +4,7 @@ import {
   InclusionConnectedUser,
   WithAgencyRole,
 } from "shared";
-import { InclusionConnectedUserRepository } from "../../domain/dashboard/port/InclusionConnectedUserRepository";
+import { InclusionConnectedUserRepository } from "../../domains/dashboard/port/InclusionConnectedUserRepository";
 import { InMemoryAuthenticatedUserRepository } from "./InMemoryAuthenticatedUserRepository";
 
 type AgencyRightsByUserId = Record<AuthenticatedUserId, AgencyRight[]>;

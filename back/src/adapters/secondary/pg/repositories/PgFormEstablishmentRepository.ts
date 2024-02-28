@@ -10,7 +10,7 @@ import {
   FormEstablishmentRepository,
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,
-} from "../../../../domain/offer/ports/FormEstablishmentRepository";
+} from "../../../../domains/offer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../../../utils/logger";
 import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import {

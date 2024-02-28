@@ -2,16 +2,16 @@ import { subDays } from "date-fns";
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { SiretDto } from "shared";
-import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
-import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
-import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
-import { NanoIdShortLinkIdGeneratorGateway } from "../../../domain/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
-import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { makeGenerateJwtES256 } from "../../../domains/auth/jwt";
+import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
+import { NanoIdShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   SendEstablishmentLeadReminderOutput,
   SendEstablishmentLeadReminderScript,
-} from "../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
+} from "../../../domains/offer/useCases/SendEstablishmentLeadReminderScript";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";

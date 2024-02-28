@@ -12,11 +12,11 @@ import {
   DiscussionEstablishmentContact,
   DiscussionPotentialBeneficiary,
   ExchangeEntity,
-} from "../../../domain/offer/entities/DiscussionAggregate";
+} from "../../../domains/offer/entities/DiscussionAggregate";
 import {
   DiscussionAggregateRepository,
   HasDiscussionMatchingParams,
-} from "../../../domain/offer/ports/DiscussionAggregateRepository";
+} from "../../../domains/offer/ports/DiscussionAggregateRepository";
 
 type DiscussionsById = Record<DiscussionId, DiscussionAggregate>;
 

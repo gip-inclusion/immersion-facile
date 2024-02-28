@@ -1,11 +1,11 @@
 import { Pool } from "pg";
 import { keys } from "ramda";
-import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
-import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
-import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
-import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendEmailsWithAssessmentCreationLink } from "../../../domain/offer/useCases/SendEmailsWithAssessmentCreationLink";
+import { makeGenerateJwtES256 } from "../../../domains/auth/jwt";
+import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { SendEmailsWithAssessmentCreationLink } from "../../../domains/offer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";

@@ -7,13 +7,13 @@ import {
   ConventionPoleEmploiUserAdvisorDto,
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
-} from "../../../../domain/peConnect/dto/PeConnect.dto";
-import { isPeAdvisorImmersionKind } from "../../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+} from "../../../../domains/peConnect/dto/PeConnect.dto";
+import { isPeAdvisorImmersionKind } from "../../../../domains/peConnect/dto/PeConnectAdvisor.dto";
 import {
   ConventionAndPeExternalIds,
   ConventionPoleEmploiAdvisorRepository,
-} from "../../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
-import { conventionPoleEmploiUserAdvisorDtoSchema } from "../../../../domain/peConnect/port/PeConnect.schema";
+} from "../../../../domains/peConnect/port/ConventionPoleEmploiAdvisorRepository";
+import { conventionPoleEmploiUserAdvisorDtoSchema } from "../../../../domains/peConnect/port/PeConnect.schema";
 import { createLogger } from "../../../../utils/logger";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 

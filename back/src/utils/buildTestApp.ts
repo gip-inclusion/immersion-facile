@@ -20,14 +20,14 @@ import {
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
-} from "../domain/auth/jwt";
-import { InMemoryAddressGateway } from "../domain/core/address/adapters/InMemoryAddressGateway";
-import { InMemoryEmailValidationGateway } from "../domain/core/email-validation/adapters/InMemoryEmailValidationGateway";
-import { BasicEventCrawler } from "../domain/core/events/adapters/EventCrawlerImplementations";
-import type { InMemoryNotificationGateway } from "../domain/core/notifications/adapters/InMemoryNotificationGateway";
-import { DeterministShortLinkIdGeneratorGateway } from "../domain/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
-import { CustomTimeGateway } from "../domain/core/time-gateway/adapters/CustomTimeGateway";
-import { UuidGenerator } from "../domain/core/uuid-generator/ports/UuidGenerator";
+} from "../domains/auth/jwt";
+import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
+import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
+import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
+import type { InMemoryNotificationGateway } from "../domains/core/notifications/adapters/InMemoryNotificationGateway";
+import { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";
+import { UuidGenerator } from "../domains/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {

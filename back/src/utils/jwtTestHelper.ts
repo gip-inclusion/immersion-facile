@@ -3,7 +3,7 @@ import {
   filterNotFalsy,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
-import { GenerateApiConsumerJwt } from "../domain/auth/jwt";
+import { GenerateApiConsumerJwt } from "../domains/auth/jwt";
 
 export const generateApiConsumerJwtTestFn: GenerateApiConsumerJwt = ({ id }) =>
   `FAKE-API-CONSUMER-JWT-${id}`;

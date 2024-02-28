@@ -4,9 +4,9 @@ import { P, match } from "ts-pattern";
 import {
   EstablishmentLead,
   EstablishmentLeadEvent,
-} from "../../../../domain/offer/entities/EstablishmentLeadEntity";
-import { EstablishmentLeadRepository } from "../../../../domain/offer/ports/EstablishmentLeadRepository";
-import { EstablishmentLeadReminderParams } from "../../../../domain/offer/useCases/SendEstablishmentLeadReminderScript";
+} from "../../../../domains/offer/entities/EstablishmentLeadEntity";
+import { EstablishmentLeadRepository } from "../../../../domains/offer/ports/EstablishmentLeadRepository";
+import { EstablishmentLeadReminderParams } from "../../../../domains/offer/useCases/SendEstablishmentLeadReminderScript";
 import { KyselyDb } from "../kysely/kyselyUtils";
 
 export class PgEstablishmentLeadRepository

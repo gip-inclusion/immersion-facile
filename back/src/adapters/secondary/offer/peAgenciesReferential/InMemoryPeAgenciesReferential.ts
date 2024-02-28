@@ -1,7 +1,7 @@
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
-} from "../../../../domain/offer/ports/PeAgenciesReferential";
+} from "../../../../domains/offer/ports/PeAgenciesReferential";
 
 export class InMemoryPeAgenciesReferential implements PeAgenciesReferential {
   #peAgencies: PeAgencyFromReferenciel[] = [];

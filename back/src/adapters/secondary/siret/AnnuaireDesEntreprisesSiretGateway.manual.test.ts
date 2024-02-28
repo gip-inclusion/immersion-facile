@@ -1,8 +1,8 @@
 import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
+import { noRetries } from "../../../domains/core/ports/RetryStrategy";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import {
   AnnuaireDesEntreprisesSiretGateway,

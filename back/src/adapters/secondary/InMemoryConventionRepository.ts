@@ -1,6 +1,6 @@
 import { values } from "ramda";
 import { ConventionDto, ConventionId, Email } from "shared";
-import { ConventionRepository } from "../../domain/convention/ports/ConventionRepository";
+import { ConventionRepository } from "../../domains/convention/ports/ConventionRepository";
 import { createLogger } from "../../utils/logger";
 import { ConflictError } from "../primary/helpers/httpErrors";
 

@@ -1,11 +1,11 @@
 import Bottleneck from "bottleneck";
 import { SearchResultDto } from "shared";
 import { HttpClient } from "shared-routes";
-import { PoleEmploiGateway } from "../../../../domain/convention/ports/PoleEmploiGateway";
+import { PoleEmploiGateway } from "../../../../domains/convention/ports/PoleEmploiGateway";
 import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
-} from "../../../../domain/offer/ports/LaBonneBoiteGateway";
+} from "../../../../domains/offer/ports/LaBonneBoiteGateway";
 import { createLogger } from "../../../../utils/logger";
 import { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
 import {

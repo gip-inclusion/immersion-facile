@@ -1,5 +1,5 @@
 import { FormEstablishmentAddress, Location, SiretDto } from "shared";
-import { AddressGateway } from "../domain/core/address/ports/AddressGateway";
+import { AddressGateway } from "../domains/core/address/ports/AddressGateway";
 
 export const rawAddressToLocation = async (
   addressGateway: AddressGateway,

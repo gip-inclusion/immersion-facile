@@ -1,5 +1,5 @@
 import { AgencyGroup, CodeSafir, DepartmentCode } from "shared";
-import { AgencyGroupRepository } from "../../../../domain/convention/ports/AgencyGroupRepository";
+import { AgencyGroupRepository } from "../../../../domains/convention/ports/AgencyGroupRepository";
 import { KyselyDb, cast, jsonBuildObject } from "../kysely/kyselyUtils";
 
 export class PgAgencyGroupRepository implements AgencyGroupRepository {

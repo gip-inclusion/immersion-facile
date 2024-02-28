@@ -1,10 +1,10 @@
 import type { AxiosInstance } from "axios";
 import { AbsoluteUrl } from "shared";
-import { PoleEmploiGateway } from "../../../../domain/convention/ports/PoleEmploiGateway";
+import { PoleEmploiGateway } from "../../../../domains/convention/ports/PoleEmploiGateway";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
-} from "../../../../domain/offer/ports/PeAgenciesReferential";
+} from "../../../../domains/offer/ports/PeAgenciesReferential";
 import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 

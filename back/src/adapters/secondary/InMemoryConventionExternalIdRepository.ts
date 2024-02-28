@@ -1,5 +1,5 @@
 import { ConventionExternalId, ConventionId } from "shared";
-import { ConventionExternalIdRepository } from "../../domain/convention/ports/ConventionExternalIdRepository";
+import { ConventionExternalIdRepository } from "../../domains/convention/ports/ConventionExternalIdRepository";
 
 export class InMemoryConventionExternalIdRepository
   implements ConventionExternalIdRepository

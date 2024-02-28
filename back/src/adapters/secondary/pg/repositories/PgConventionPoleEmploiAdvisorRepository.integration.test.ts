@@ -7,9 +7,9 @@ import {
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
-} from "../../../../domain/peConnect/dto/PeConnect.dto";
-import { PeConnectImmersionAdvisorDto } from "../../../../domain/peConnect/dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../../../domain/peConnect/dto/PeConnectUser.dto";
+} from "../../../../domains/peConnect/dto/PeConnect.dto";
+import { PeConnectImmersionAdvisorDto } from "../../../../domains/peConnect/dto/PeConnectAdvisor.dto";
+import { PeConnectUserDto } from "../../../../domains/peConnect/dto/PeConnectUser.dto";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";

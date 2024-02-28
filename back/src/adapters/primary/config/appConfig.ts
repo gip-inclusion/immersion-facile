@@ -11,9 +11,9 @@ import {
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
 } from "shared";
-import { EmailableApiKey } from "../../../domain/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
-import { DomainTopic } from "../../../domain/core/events/events";
-import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
+import { EmailableApiKey } from "../../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
+import { DomainTopic } from "../../../domains/core/events/events";
+import { InclusionConnectConfig } from "../../../domains/inclusionConnect/useCases/InitiateInclusionConnect";
 import { S3Params } from "../../secondary/documentGateway/S3DocumentGateway";
 
 export type AccessTokenConfig = {

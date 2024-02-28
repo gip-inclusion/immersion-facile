@@ -14,10 +14,10 @@ import {
 import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
-} from "../../domain/convention/ports/ConventionQueries";
-import { missingAgencyMessage } from "../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
-import { InMemoryOutboxRepository } from "../../domain/core/events/adapters/InMemoryOutboxRepository";
-import { AssessmentEmailDomainTopic } from "../../domain/core/events/events";
+} from "../../domains/convention/ports/ConventionQueries";
+import { missingAgencyMessage } from "../../domains/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
+import { InMemoryOutboxRepository } from "../../domains/core/events/adapters/InMemoryOutboxRepository";
+import { AssessmentEmailDomainTopic } from "../../domains/core/events/events";
 import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../primary/helpers/httpErrors";
 import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";

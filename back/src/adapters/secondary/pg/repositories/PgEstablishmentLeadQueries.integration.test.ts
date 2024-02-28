@@ -1,7 +1,7 @@
 import { subDays } from "date-fns";
 import { Pool } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
-import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
+import { EstablishmentLead } from "../../../../domains/offer/entities/EstablishmentLeadEntity";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgAgencyRepository } from "./PgAgencyRepository";

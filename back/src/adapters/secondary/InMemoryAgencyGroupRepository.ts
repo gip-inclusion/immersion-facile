@@ -1,6 +1,6 @@
 import { values } from "ramda";
 import { AgencyGroup, CodeSafir } from "shared";
-import { AgencyGroupRepository } from "../../domain/convention/ports/AgencyGroupRepository";
+import { AgencyGroupRepository } from "../../domains/convention/ports/AgencyGroupRepository";
 
 const testAgencyGroups: AgencyGroup[] = [
   {

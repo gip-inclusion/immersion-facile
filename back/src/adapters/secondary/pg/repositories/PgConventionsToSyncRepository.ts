@@ -2,7 +2,7 @@ import { ConventionId } from "shared";
 import {
   ConventionToSync,
   ConventionsToSyncRepository,
-} from "../../../../domain/convention/ports/ConventionsToSyncRepository";
+} from "../../../../domains/convention/ports/ConventionsToSyncRepository";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export const conventionsToSyncTableName = "conventions_to_sync_with_pe";

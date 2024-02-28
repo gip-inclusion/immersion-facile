@@ -6,7 +6,7 @@ import {
   SiretEstablishmentDto,
   tooManySirenRequestsSiret,
 } from "shared";
-import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
+import { SiretGateway } from "../../../domains/sirene/ports/SirenGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   TooManyRequestApiError,

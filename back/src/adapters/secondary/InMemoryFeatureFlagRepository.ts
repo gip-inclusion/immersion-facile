@@ -4,7 +4,7 @@ import {
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
-import { FeatureFlagRepository } from "../../domain/core/ports/FeatureFlagRepository";
+import { FeatureFlagRepository } from "../../domains/core/ports/FeatureFlagRepository";
 
 const defaultFlags: FeatureFlags = {
   enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {

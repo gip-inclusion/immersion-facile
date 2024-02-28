@@ -7,11 +7,11 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { InMemoryAddressGateway } from "../../../../domain/core/address/adapters/InMemoryAddressGateway";
+import { InMemoryAddressGateway } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
 import {
   expected8bdduportAddressAndPositions,
   query8bdduportLookup,
-} from "../../../../domain/core/address/adapters/testUtils";
+} from "../../../../domains/core/address/adapters/testUtils";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("address router", () => {
