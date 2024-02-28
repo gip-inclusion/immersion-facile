@@ -192,6 +192,12 @@ describe("PgOutboxRepository", () => {
   });
 
   describe("markEventsAsInProcess", () => {
+    it("works even if there is no events to mark", async () => {
+      await outboxRepository.markEventsAsInProcess([]);
+      const storedEventRows = await getAllEventsStored();
+      expect(storedEventRows).toEqual([]);
+    });
+
     it("marks events as in-process", async () => {
       const convention = new ConventionDtoBuilder().build();
       uuidGenerator.setNextUuids([
