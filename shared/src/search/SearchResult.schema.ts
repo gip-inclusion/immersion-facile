@@ -40,7 +40,8 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
       appellationCode: appellationCodeSchema,
     }),
   ),
-  locationId: zUuidLike,
+  // locationId: zUuidLike,
+  locationId: zUuidLike.or(z.null()),
 });
 
 export const searchResultsSchema = z.array(searchResultSchema);
