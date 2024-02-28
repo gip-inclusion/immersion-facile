@@ -23,7 +23,7 @@ import { OutboxQueries } from "../../events/ports/OutboxQueries";
 import { OutboxRepository } from "../../events/ports/OutboxRepository";
 import { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
 import { NotificationRepository } from "../../notifications/ports/NotificationRepository";
-import { ErrorRepository } from "../../ports/ErrorRepository";
+import { SavedErrorRepository } from "../../saved-errors/ports/SavedErrorRepository";
 import { ShortLinkQuery } from "../../short-link/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../short-link/ports/ShortLinkRepository";
 
@@ -39,7 +39,7 @@ export type UnitOfWork = {
   conventionsToSyncRepository: ConventionsToSyncRepository;
   deletedEstablishmentRepository: DeletedEstablishmentRepository;
   discussionAggregateRepository: DiscussionAggregateRepository;
-  errorRepository: ErrorRepository;
+  errorRepository: SavedErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   establishmentLeadRepository: EstablishmentLeadRepository;
   groupRepository: GroupRepository;

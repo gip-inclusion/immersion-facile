@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEmploiGateway";
 import { ResyncOldConventionsToPe } from "../../../domains/convention/useCases/ResyncOldConventionsToPe";
-import { noRetries } from "../../../domains/core/ports/RetryStrategy";
+import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { createLogger } from "../../../utils/logger";

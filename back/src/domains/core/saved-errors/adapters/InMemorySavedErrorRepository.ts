@@ -1,12 +1,12 @@
 import { ConventionId } from "shared";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
-  ErrorRepository,
   SavedError,
+  SavedErrorRepository,
   broadcastToPeServiceName,
-} from "../../../domains/core/ports/ErrorRepository";
-import { NotFoundError } from "../../primary/helpers/httpErrors";
+} from "../ports/SavedErrorRepository";
 
-export class InMemoryErrorRepository implements ErrorRepository {
+export class InMemorySavedErrorRepository implements SavedErrorRepository {
   // for testing purposes
   #savedErrors: SavedError[] = [];
 

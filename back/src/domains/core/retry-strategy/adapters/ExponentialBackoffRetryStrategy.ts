@@ -4,12 +4,9 @@ import {
   secondsToMilliseconds,
 } from "date-fns";
 import { RandomFn, SleepFn } from "shared";
-import {
-  RetryStrategy,
-  RetryableError,
-} from "../../../domains/core/ports/RetryStrategy";
-import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
-import { createLogger } from "../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
+import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { RetryStrategy, RetryableError } from "../ports/RetryStrategy";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);
 export const defaultRetryDeadlineMs = minutesToMilliseconds(5);

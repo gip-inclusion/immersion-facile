@@ -26,7 +26,7 @@ import {
   makeScalingoPdfGeneratorRoutes,
 } from "../../../domains/core/pdf-generation/adapters/ScalingoPdfGeneratorGateway";
 import { PdfGeneratorGateway } from "../../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
-import { noRetries } from "../../../domains/core/ports/RetryStrategy";
+import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../domains/core/time-gateway/adapters/CustomTimeGateway";

@@ -14,7 +14,7 @@ import {
 import {
   RetryStrategy,
   RetryableError,
-} from "../../../domains/core/ports/RetryStrategy";
+} from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
 import { SiretGateway } from "../../../domains/sirene/ports/SirenGateway";
 import {

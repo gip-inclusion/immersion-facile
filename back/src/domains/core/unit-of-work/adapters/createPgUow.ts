@@ -10,7 +10,6 @@ import { PgConventionRepository } from "../../../../adapters/secondary/pg/reposi
 import { PgConventionsToSyncRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionsToSyncRepository";
 import { PgDeletedEstablishmentRepository } from "../../../../adapters/secondary/pg/repositories/PgDeletedEstablishmentRepository";
 import { PgDiscussionAggregateRepository } from "../../../../adapters/secondary/pg/repositories/PgDiscussionAggregateRepository";
-import { PgErrorRepository } from "../../../../adapters/secondary/pg/repositories/PgErrorRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../adapters/secondary/pg/repositories/PgEstablishmentAggregateRepository";
 import { PgEstablishmentLeadQueries } from "../../../../adapters/secondary/pg/repositories/PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "../../../../adapters/secondary/pg/repositories/PgEstablishmentLeadRepository";
@@ -25,6 +24,7 @@ import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsum
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
+import { PgSavedErrorRepository } from "../../saved-errors/adapters/PgSavedErrorRepository";
 import { PgShortLinkRepository } from "../../short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { UnitOfWork } from "../ports/UnitOfWork";
 
@@ -49,7 +49,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     discussionAggregateRepository: new PgDiscussionAggregateRepository(
       transaction,
     ),
-    errorRepository: new PgErrorRepository(transaction),
+    errorRepository: new PgSavedErrorRepository(transaction),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       transaction,
     ),

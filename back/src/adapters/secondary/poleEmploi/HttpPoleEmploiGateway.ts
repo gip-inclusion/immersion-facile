@@ -13,7 +13,7 @@ import {
 import {
   RetryStrategy,
   RetryableError,
-} from "../../../domains/core/ports/RetryStrategy";
+} from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import {
   createAxiosInstance,
   isRetryableError,
