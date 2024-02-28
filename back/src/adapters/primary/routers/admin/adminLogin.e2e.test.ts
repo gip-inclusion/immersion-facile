@@ -9,7 +9,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { makeVerifyJwtES256 } from "../../../../domains/auth/jwt";
+import { makeVerifyJwtES256 } from "../../../../domains/core/jwt";
 import { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { buildTestApp } from "../../../../utils/buildTestApp";

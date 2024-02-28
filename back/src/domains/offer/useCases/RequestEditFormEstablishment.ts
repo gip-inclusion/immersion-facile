@@ -7,8 +7,8 @@ import {
   siretSchema,
 } from "shared";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

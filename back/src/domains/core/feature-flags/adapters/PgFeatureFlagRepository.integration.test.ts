@@ -5,9 +5,9 @@ import {
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
-import { FeatureFlagRepository } from "../../../../domains/core/ports/FeatureFlagRepository";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
+import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
 describe("PG getFeatureFlags", () => {

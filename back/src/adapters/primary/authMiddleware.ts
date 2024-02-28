@@ -11,8 +11,8 @@ import {
   currentJwtVersions,
   expiredMagicLinkErrorMessage,
 } from "shared";
-import { JwtKind, makeVerifyJwtES256 } from "../../domains/auth/jwt";
 import { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
+import { JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { apiKeyAuthMiddlewareRequestsTotal } from "../../utils/counters";
 import { createLogger } from "../../utils/logger";

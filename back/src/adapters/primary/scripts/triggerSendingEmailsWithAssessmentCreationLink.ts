@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { keys } from "ramda";
-import { makeGenerateJwtES256 } from "../../../domains/auth/jwt";
 import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { makeGenerateJwtES256 } from "../../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";

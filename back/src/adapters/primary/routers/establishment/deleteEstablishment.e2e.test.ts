@@ -14,7 +14,7 @@ import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
-} from "../../../../domains/auth/jwt";
+} from "../../../../domains/core/jwt";
 import { establishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/FormEstablishmentRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";

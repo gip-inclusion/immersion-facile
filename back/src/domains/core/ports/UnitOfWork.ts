@@ -5,7 +5,6 @@ import { ConventionExternalIdRepository } from "../../convention/ports/Conventio
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { ConventionsToSyncRepository } from "../../convention/ports/ConventionsToSyncRepository";
-import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
 import { DeletedEstablishmentRepository } from "../../offer/ports/DeletedEstablishmentRepository";
@@ -19,13 +18,14 @@ import { SearchMadeRepository } from "../../offer/ports/SearchMadeRepository";
 import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { ApiConsumerRepository } from "../api-consumer/ports/ApiConsumerRepository";
+import { InclusionConnectedUserRepository } from "../dashboard/port/InclusionConnectedUserRepository";
 import { OutboxQueries } from "../events/ports/OutboxQueries";
 import { OutboxRepository } from "../events/ports/OutboxRepository";
+import { FeatureFlagRepository } from "../feature-flags/ports/FeatureFlagRepository";
 import { NotificationRepository } from "../notifications/ports/NotificationRepository";
 import { ShortLinkQuery } from "../short-link/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../short-link/ports/ShortLinkRepository";
 import { ErrorRepository } from "./ErrorRepository";
-import { FeatureFlagRepository } from "./FeatureFlagRepository";
 
 export type UnitOfWork = {
   agencyRepository: AgencyRepository;

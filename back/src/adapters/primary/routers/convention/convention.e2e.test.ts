@@ -25,15 +25,15 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
+import { conventionMissingMessage } from "../../../../domains/convention/entities/Convention";
+import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
-} from "../../../../domains/auth/jwt";
-import { conventionMissingMessage } from "../../../../domains/convention/entities/Convention";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+} from "../../../../domains/core/jwt";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";

@@ -4,6 +4,8 @@ import { InMemoryOutboxQueries } from "../../../domains/core/events/adapters/InM
 import { InMemoryOutboxRepository } from "../../../domains/core/events/adapters/InMemoryOutboxRepository";
 import { PgOutboxQueries } from "../../../domains/core/events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../../domains/core/events/adapters/PgOutboxRepository";
+import { InMemoryFeatureFlagRepository } from "../../../domains/core/feature-flags/adapters/InMemoryFeatureFlagRepository";
+import { PgFeatureFlagRepository } from "../../../domains/core/feature-flags/adapters/PgFeatureFlagRepository";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -21,7 +23,6 @@ import { InMemoryConventionRepository } from "../../secondary/InMemoryConvention
 import { InMemoryConventionsToSyncRepository } from "../../secondary/InMemoryConventionsToSyncRepository";
 import { InMemoryDeletedEstablishmentRepository } from "../../secondary/InMemoryDeletedEstablishmentRepository";
 import { InMemoryEstablishmentLeadQueries } from "../../secondary/InMemoryEstablishmentLeadQueries";
-import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryNotificationRepository } from "../../secondary/InMemoryNotificationRepository";
@@ -51,7 +52,6 @@ import { PgErrorRepository } from "../../secondary/pg/repositories/PgErrorReposi
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/repositories/PgEstablishmentAggregateRepository";
 import { PgEstablishmentLeadQueries } from "../../secondary/pg/repositories/PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "../../secondary/pg/repositories/PgEstablishmentLeadRepository";
-import { PgFeatureFlagRepository } from "../../secondary/pg/repositories/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/repositories/PgFormEstablishmentRepository";
 import { PgGroupRepository } from "../../secondary/pg/repositories/PgGroupRepository";
 import { PgInclusionConnectedUserRepository } from "../../secondary/pg/repositories/PgInclusionConnectedUserRepository";
