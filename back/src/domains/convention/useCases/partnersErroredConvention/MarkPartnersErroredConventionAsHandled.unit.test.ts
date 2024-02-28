@@ -11,7 +11,7 @@ import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/events/ports/EventBus";
-import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
+import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/SavedErrorRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

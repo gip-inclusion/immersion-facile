@@ -11,7 +11,7 @@ import {
   peParisAgencyId,
   reasonableSchedule,
 } from "shared";
-import { SavedError } from "../../../domains/core/ports/ErrorRepository";
+import { SavedError } from "../../../domains/core/saved-errors/ports/SavedErrorRepository";
 import { UnitOfWork } from "../../../domains/core/unit-of-work/ports/UnitOfWork";
 import {
   ContactEntityBuilder,

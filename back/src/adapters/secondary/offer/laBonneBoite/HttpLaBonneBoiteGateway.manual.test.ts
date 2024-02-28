@@ -2,7 +2,7 @@ import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { GetAccessTokenResponse } from "../../../../domains/convention/ports/PoleEmploiGateway";
-import { noRetries } from "../../../../domains/core/ports/RetryStrategy";
+import { noRetries } from "../../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { LaBonneBoiteRequestParams } from "../../../../domains/offer/ports/LaBonneBoiteGateway";
 import { AppConfig } from "../../../primary/config/appConfig";

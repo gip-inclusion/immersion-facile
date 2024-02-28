@@ -6,7 +6,7 @@ import { UpdateAllPeAgencies } from "../../../domains/convention/useCases/agenci
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { ConsoleAppLogger } from "../../../domains/core/app-logger/adapters/ConsoleAppLogger";
-import { noRetries } from "../../../domains/core/ports/RetryStrategy";
+import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";

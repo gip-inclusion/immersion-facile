@@ -1,5 +1,5 @@
 import { GetAccessTokenResponse } from "../../../../domains/convention/ports/PoleEmploiGateway";
-import { noRetries } from "../../../../domains/core/ports/RetryStrategy";
+import { noRetries } from "../../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { AppConfig } from "../../../primary/config/appConfig";
 import { createPeAxiosSharedClient } from "../../../primary/helpers/createAxiosSharedClients";

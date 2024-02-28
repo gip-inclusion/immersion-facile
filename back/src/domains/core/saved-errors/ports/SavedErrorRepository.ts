@@ -9,7 +9,8 @@ export type SavedError = {
 };
 export const broadcastToPeServiceName =
   "PoleEmploiGateway.notifyOnConventionUpdated";
-export interface ErrorRepository {
+
+export interface SavedErrorRepository {
   save: (savedError: SavedError) => Promise<void>;
   markPartnersErroredConventionAsHandled: (id: ConventionId) => Promise<void>;
 }

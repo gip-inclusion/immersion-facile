@@ -1,14 +1,14 @@
 import { sql } from "kysely";
 import { ConventionId } from "shared";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { KyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
 import {
-  ErrorRepository,
   SavedError,
+  SavedErrorRepository,
   broadcastToPeServiceName,
-} from "../../../../domains/core/ports/ErrorRepository";
-import { NotFoundError } from "../../../primary/helpers/httpErrors";
-import { KyselyDb } from "../kysely/kyselyUtils";
+} from "../ports/SavedErrorRepository";
 
-export class PgErrorRepository implements ErrorRepository {
+export class PgSavedErrorRepository implements SavedErrorRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async markPartnersErroredConventionAsHandled(

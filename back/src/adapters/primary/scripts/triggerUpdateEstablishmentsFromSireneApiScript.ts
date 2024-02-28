@@ -1,14 +1,14 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
-import { UpdateEstablishmentsFromSirenApiScript } from "../../../domains/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
-import { createLogger } from "../../../utils/logger";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
-} from "../../secondary/core/ExponentialBackoffRetryStrategy";
+} from "../../../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { UpdateEstablishmentsFromSirenApiScript } from "../../../domains/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
+import { createLogger } from "../../../utils/logger";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";

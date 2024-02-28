@@ -14,7 +14,6 @@ import { InMemoryInclusionConnectedUserRepository } from "../../../../adapters/s
 import { InMemoryNotificationRepository } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryOngoingOAuthRepository } from "../../../../adapters/secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../../../adapters/secondary/InMemoryRomeRepository";
-import { InMemoryErrorRepository } from "../../../../adapters/secondary/core/InMemoryErrorRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentLeadRepository } from "../../../../adapters/secondary/offer/InMemoryEstablishmentLeadRepository";
@@ -24,6 +23,7 @@ import { InMemoryApiConsumerRepository } from "../../api-consumer/adapters/InMem
 import { InMemoryOutboxQueries } from "../../events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRepository";
 import { InMemoryFeatureFlagRepository } from "../../feature-flags/adapters/InMemoryFeatureFlagRepository";
+import { InMemorySavedErrorRepository } from "../../saved-errors/adapters/InMemorySavedErrorRepository";
 import { InMemoryShortLinkRepository } from "../../short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
 import { UnitOfWork } from "../ports/UnitOfWork";
 
@@ -55,7 +55,7 @@ export const createInMemoryUow = () => {
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
     groupRepository: new InMemoryGroupRepository(),
-    errorRepository: new InMemoryErrorRepository(),
+    errorRepository: new InMemorySavedErrorRepository(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     assessmentRepository: new InMemoryAssessmentRepository(),

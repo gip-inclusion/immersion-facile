@@ -6,15 +6,15 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { Database } from "../../../../adapters/secondary/pg/kysely/model/database";
+import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
 import {
   SavedError,
   broadcastToPeServiceName,
-} from "../../../../domains/core/ports/ErrorRepository";
-import { NotFoundError } from "../../../primary/helpers/httpErrors";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { Database } from "../kysely/model/database";
-import { getTestPgPool } from "../pgUtils";
-import { PgErrorRepository } from "./PgErrorRepository";
+} from "../ports/SavedErrorRepository";
+import { PgSavedErrorRepository } from "./PgSavedErrorRepository";
 
 const makeSavedError = (
   serviceName: string,
@@ -30,7 +30,7 @@ const makeSavedError = (
 
 describe("PgErrorRepository", () => {
   let pool: Pool;
-  let pgErrorRepository: PgErrorRepository;
+  let pgErrorRepository: PgSavedErrorRepository;
   let kyselyDb: Kysely<Database>;
 
   beforeAll(() => {
@@ -39,7 +39,7 @@ describe("PgErrorRepository", () => {
 
   beforeEach(async () => {
     kyselyDb = makeKyselyDb(pool);
-    pgErrorRepository = new PgErrorRepository(kyselyDb);
+    pgErrorRepository = new PgSavedErrorRepository(kyselyDb);
     await kyselyDb.deleteFrom("saved_errors").execute();
   });
 

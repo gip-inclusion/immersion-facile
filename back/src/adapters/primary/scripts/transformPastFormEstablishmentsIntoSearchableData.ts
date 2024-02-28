@@ -5,6 +5,11 @@ import { createAxiosSharedClient } from "shared-routes/axios";
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import {
+  ExponentialBackoffRetryStrategy,
+  defaultMaxBackoffPeriodMs,
+  defaultRetryDeadlineMs,
+} from "../../../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { PgUowPerformer } from "../../../domains/core/unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../domains/core/unit-of-work/adapters/createPgUow";
@@ -12,11 +17,6 @@ import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/U
 import { InsertEstablishmentAggregateFromForm } from "../../../domains/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
-import {
-  ExponentialBackoffRetryStrategy,
-  defaultMaxBackoffPeriodMs,
-  defaultRetryDeadlineMs,
-} from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { getTestPgPool } from "../../secondary/pg/pgUtils";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
