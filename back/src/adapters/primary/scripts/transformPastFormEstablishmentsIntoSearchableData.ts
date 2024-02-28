@@ -2,12 +2,12 @@ import axios from "axios";
 import { Pool } from "pg";
 import { FormEstablishmentDto, random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { HttpAddressGateway } from "../../../domain/core/address/adapters/HttpAddressGateway";
-import { addressesExternalRoutes } from "../../../domain/core/address/adapters/HttpAddressGateway.routes";
-import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
-import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InsertEstablishmentAggregateFromForm } from "../../../domain/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
+import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
+import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
+import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { InsertEstablishmentAggregateFromForm } from "../../../domains/offer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import {

@@ -9,11 +9,11 @@ import {
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
-} from "../../../domain/convention/ports/PoleEmploiGateway";
+} from "../../../domains/convention/ports/PoleEmploiGateway";
 import {
   RetryStrategy,
   RetryableError,
-} from "../../../domain/core/ports/RetryStrategy";
+} from "../../../domains/core/ports/RetryStrategy";
 import {
   createAxiosInstance,
   isRetryableError,

@@ -4,11 +4,11 @@ import { ContactMethod, DiscussionId, SiretDto, pipeWithValue } from "shared";
 import {
   DiscussionAggregate,
   ExchangeEntity,
-} from "../../../../domain/offer/entities/DiscussionAggregate";
+} from "../../../../domains/offer/entities/DiscussionAggregate";
 import {
   DiscussionAggregateRepository,
   HasDiscussionMatchingParams,
-} from "../../../../domain/offer/ports/DiscussionAggregateRepository";
+} from "../../../../domains/offer/ports/DiscussionAggregateRepository";
 import {
   KyselyDb,
   jsonBuildObject,

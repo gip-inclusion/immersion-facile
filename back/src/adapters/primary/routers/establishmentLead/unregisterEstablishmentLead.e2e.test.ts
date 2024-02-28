@@ -12,13 +12,13 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
-import { GenerateConventionJwt } from "../../../../domain/auth/jwt";
+import { GenerateConventionJwt } from "../../../../domains/auth/jwt";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
   unauthorizedApiConsumer,
-} from "../../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
+} from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { EstablishmentLead } from "../../../../domains/offer/entities/EstablishmentLeadEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 

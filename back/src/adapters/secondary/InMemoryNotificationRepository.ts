@@ -16,9 +16,9 @@ import {
 import {
   EmailNotificationFilters,
   NotificationRepository,
-} from "../../domain/core/notifications/ports/NotificationRepository";
-import { makeShortLinkUrl } from "../../domain/core/short-link/ShortLink";
-import { ShortLinkId } from "../../domain/core/short-link/ports/ShortLinkQuery";
+} from "../../domains/core/notifications/ports/NotificationRepository";
+import { makeShortLinkUrl } from "../../domains/core/short-link/ShortLink";
+import { ShortLinkId } from "../../domains/core/short-link/ports/ShortLinkQuery";
 import { AppConfig } from "../primary/config/appConfig";
 
 export class InMemoryNotificationRepository implements NotificationRepository {

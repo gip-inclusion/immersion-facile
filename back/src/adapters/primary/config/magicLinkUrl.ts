@@ -8,7 +8,7 @@ import {
 import {
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
-} from "../../../domain/auth/jwt";
+} from "../../../domains/auth/jwt";
 import { AppConfig } from "./appConfig";
 
 export const makeGenerateEditFormEstablishmentUrl =

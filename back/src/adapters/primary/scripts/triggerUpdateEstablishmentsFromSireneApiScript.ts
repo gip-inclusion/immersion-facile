@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
-import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { UpdateEstablishmentsFromSirenApiScript } from "../../../domains/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import {
   ExponentialBackoffRetryStrategy,

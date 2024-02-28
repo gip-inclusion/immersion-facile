@@ -7,8 +7,8 @@ import { RandomFn, SleepFn } from "shared";
 import {
   RetryStrategy,
   RetryableError,
-} from "../../../domain/core/ports/RetryStrategy";
-import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
+} from "../../../domains/core/ports/RetryStrategy";
+import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../../utils/logger";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);

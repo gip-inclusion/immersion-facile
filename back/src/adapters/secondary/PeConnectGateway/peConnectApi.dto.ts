@@ -1,7 +1,7 @@
 import { AbsoluteUrl } from "shared";
 import { z } from "zod";
-import { BearerToken } from "../../../domain/peConnect/dto/BearerToken";
-import { PeConnectAdvisorsKind } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { BearerToken } from "../../../domains/peConnect/dto/BearerToken";
+import { PeConnectAdvisorsKind } from "../../../domains/peConnect/dto/PeConnectAdvisor.dto";
 
 export type ExternalAccessToken = {
   access_token: string;

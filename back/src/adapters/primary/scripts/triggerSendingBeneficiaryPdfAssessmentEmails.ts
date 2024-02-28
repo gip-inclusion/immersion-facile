@@ -1,10 +1,10 @@
 import { Pool } from "pg";
 import { keys } from "ramda";
-import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
-import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
-import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendBeneficiariesPdfAssessmentsEmails } from "../../../domain/offer/useCases/SendBeneficiariesPdfAssessmentsEmails";
+import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { SendBeneficiariesPdfAssessmentsEmails } from "../../../domains/offer/useCases/SendBeneficiariesPdfAssessmentsEmails";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";

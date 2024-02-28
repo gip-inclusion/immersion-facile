@@ -9,7 +9,7 @@ import {
 import {
   SavedError,
   broadcastToPeServiceName,
-} from "../../../../domain/core/ports/ErrorRepository";
+} from "../../../../domains/core/ports/ErrorRepository";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { Database } from "../kysely/model/database";

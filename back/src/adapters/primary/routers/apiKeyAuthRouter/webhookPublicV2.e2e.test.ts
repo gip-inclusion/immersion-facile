@@ -6,12 +6,12 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
-import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+import { GenerateApiConsumerJwt } from "../../../../domains/auth/jwt";
 import {
   authorizedSubscriptionApiConsumer,
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
-} from "../../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+} from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import {

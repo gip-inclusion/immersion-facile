@@ -14,9 +14,9 @@ import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
   unauthorizedApiConsumer,
-} from "../../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { BasicEventCrawler } from "../../../../domain/core/events/adapters/EventCrawlerImplementations";
-import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
+} from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import { EstablishmentLead } from "../../../../domains/offer/entities/EstablishmentLeadEntity";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";

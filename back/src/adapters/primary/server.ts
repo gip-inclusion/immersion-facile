@@ -8,9 +8,9 @@ import {
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
-} from "../../domain/auth/jwt";
-import { EventCrawler } from "../../domain/core/events/ports/EventCrawler";
-import { UuidGenerator } from "../../domain/core/uuid-generator/ports/UuidGenerator";
+} from "../../domains/auth/jwt";
+import { EventCrawler } from "../../domains/core/events/ports/EventCrawler";
+import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";

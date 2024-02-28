@@ -9,8 +9,8 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { EstablishmentEntity } from "../../../../domain/offer/entities/EstablishmentEntity";
-import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
+import { EstablishmentEntity } from "../../../../domains/offer/entities/EstablishmentEntity";
+import { GroupEntity } from "../../../../domains/offer/entities/GroupEntity";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,

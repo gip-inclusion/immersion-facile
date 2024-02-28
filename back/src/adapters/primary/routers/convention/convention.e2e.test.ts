@@ -31,9 +31,9 @@ import {
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
-} from "../../../../domain/auth/jwt";
-import { conventionMissingMessage } from "../../../../domain/convention/entities/Convention";
-import { BasicEventCrawler } from "../../../../domain/core/events/adapters/EventCrawlerImplementations";
+} from "../../../../domains/auth/jwt";
+import { conventionMissingMessage } from "../../../../domains/convention/entities/Convention";
+import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";

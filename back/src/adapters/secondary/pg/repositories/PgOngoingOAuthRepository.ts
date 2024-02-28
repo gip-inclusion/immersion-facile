@@ -1,8 +1,8 @@
 import {
   IdentityProvider,
   OngoingOAuth,
-} from "../../../../domain/generic/OAuth/entities/OngoingOAuth";
-import { OngoingOAuthRepository } from "../../../../domain/generic/OAuth/ports/OngoingOAuthRepositiory";
+} from "../../../../domains/generic/OAuth/entities/OngoingOAuth";
+import { OngoingOAuthRepository } from "../../../../domains/generic/OAuth/ports/OngoingOAuthRepositiory";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 import { optional } from "../pgUtils";
 

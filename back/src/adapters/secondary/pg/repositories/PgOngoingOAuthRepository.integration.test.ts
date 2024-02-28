@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { AuthenticatedUser, expectToEqual } from "shared";
-import { OngoingOAuth } from "../../../../domain/generic/OAuth/entities/OngoingOAuth";
+import { OngoingOAuth } from "../../../../domains/generic/OAuth/entities/OngoingOAuth";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";

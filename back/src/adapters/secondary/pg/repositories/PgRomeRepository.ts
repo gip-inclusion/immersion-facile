@@ -6,7 +6,7 @@ import {
   RomeLabel,
   castError,
 } from "shared";
-import { RomeRepository } from "../../../../domain/rome/ports/RomeRepository";
+import { RomeRepository } from "../../../../domains/rome/ports/RomeRepository";
 import { createLogger } from "../../../../utils/logger";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 

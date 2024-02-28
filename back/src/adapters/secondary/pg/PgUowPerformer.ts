@@ -3,7 +3,7 @@ import { Pool } from "pg";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
-} from "../../../domain/core/ports/UnitOfWork";
+} from "../../../domains/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
 import { KyselyDb, makeKyselyDb } from "./kysely/kyselyUtils";
 import { Database } from "./kysely/model/database";

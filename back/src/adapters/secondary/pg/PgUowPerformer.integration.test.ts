@@ -1,9 +1,9 @@
 import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "shared";
-import { makeCreateNewEvent } from "../../../domain/core/events/ports/EventBus";
-import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
-import { CustomTimeGateway } from "../../../domain/core/time-gateway/adapters/CustomTimeGateway";
-import { TestUuidGenerator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { UnitOfWork } from "../../../domains/core/ports/UnitOfWork";
+import { CustomTimeGateway } from "../../../domains/core/time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createPgUow } from "../../primary/config/uowConfig";
 import { PgUowPerformer } from "./PgUowPerformer";
 import { getTestPgPool } from "./pgUtils";

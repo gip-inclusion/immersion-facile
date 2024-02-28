@@ -21,7 +21,7 @@ import {
 import {
   AgencyRepository,
   someAgenciesMissingMessage,
-} from "../../../../domain/convention/ports/AgencyRepository";
+} from "../../../../domains/convention/ports/AgencyRepository";
 import { createLogger } from "../../../../utils/logger";
 import {
   ConflictError,

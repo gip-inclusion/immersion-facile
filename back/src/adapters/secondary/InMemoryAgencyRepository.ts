@@ -18,7 +18,7 @@ import {
 import {
   AgencyRepository,
   someAgenciesMissingMessage,
-} from "../../domain/convention/ports/AgencyRepository";
+} from "../../domains/convention/ports/AgencyRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 import { NotFoundError } from "../primary/helpers/httpErrors";
 

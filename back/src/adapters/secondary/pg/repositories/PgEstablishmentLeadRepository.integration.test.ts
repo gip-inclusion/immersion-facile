@@ -1,7 +1,7 @@
 import { subDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
-import { EstablishmentLead } from "../../../../domain/offer/entities/EstablishmentLeadEntity";
+import { EstablishmentLead } from "../../../../domains/offer/entities/EstablishmentLeadEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";

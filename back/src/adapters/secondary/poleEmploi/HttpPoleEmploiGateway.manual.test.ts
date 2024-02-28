@@ -3,9 +3,9 @@ import {
   GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
-} from "../../../domain/convention/ports/PoleEmploiGateway";
-import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
+} from "../../../domains/convention/ports/PoleEmploiGateway";
+import { noRetries } from "../../../domains/core/ports/RetryStrategy";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { createPeAxiosSharedClient } from "../../primary/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";

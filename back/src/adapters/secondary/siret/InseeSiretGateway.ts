@@ -14,9 +14,9 @@ import {
 import {
   RetryStrategy,
   RetryableError,
-} from "../../../domain/core/ports/RetryStrategy";
-import { TimeGateway } from "../../../domain/core/time-gateway/ports/TimeGateway";
-import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
+} from "../../../domains/core/ports/RetryStrategy";
+import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
+import { SiretGateway } from "../../../domains/sirene/ports/SirenGateway";
 import {
   createAxiosInstance,
   isRetryableError,

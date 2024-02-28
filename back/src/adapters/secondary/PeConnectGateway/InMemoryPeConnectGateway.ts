@@ -1,7 +1,7 @@
-import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
-import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
-import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
+import { AccessTokenDto } from "../../../domains/peConnect/dto/AccessToken.dto";
+import { PeConnectAdvisorDto } from "../../../domains/peConnect/dto/PeConnectAdvisor.dto";
+import { PeConnectUserDto } from "../../../domains/peConnect/dto/PeConnectUser.dto";
+import { PeConnectGateway } from "../../../domains/peConnect/port/PeConnectGateway";
 
 export class InMemoryPeConnectGateway implements PeConnectGateway {
   #accessToken: AccessTokenDto | undefined = undefined;

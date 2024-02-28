@@ -14,9 +14,9 @@ import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
-} from "../../../../domain/auth/jwt";
-import { establishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/EstablishmentAggregateRepository";
-import { formEstablishmentNotFoundErrorMessage } from "../../../../domain/offer/ports/FormEstablishmentRepository";
+} from "../../../../domains/auth/jwt";
+import { establishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/EstablishmentAggregateRepository";
+import { formEstablishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/FormEstablishmentRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../secondary/offer/EstablishmentBuilders";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";

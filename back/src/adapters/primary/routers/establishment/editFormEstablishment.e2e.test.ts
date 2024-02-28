@@ -16,7 +16,7 @@ import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
   makeGenerateJwtES256,
-} from "../../../../domain/auth/jwt";
+} from "../../../../domains/auth/jwt";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import {

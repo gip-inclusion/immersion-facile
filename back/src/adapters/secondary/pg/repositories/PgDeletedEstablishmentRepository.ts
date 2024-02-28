@@ -3,7 +3,7 @@ import { SiretDto } from "shared";
 import {
   DeletedEstablishementDto,
   DeletedEstablishmentRepository,
-} from "../../../../domain/offer/ports/DeletedEstablishmentRepository";
+} from "../../../../domains/offer/ports/DeletedEstablishmentRepository";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 
 export class PgDeletedEstablishmentRepository

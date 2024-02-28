@@ -8,8 +8,8 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { GroupEntity } from "../../../../domain/offer/entities/GroupEntity";
-import { OfferEntity } from "../../../../domain/offer/entities/OfferEntity";
+import { GroupEntity } from "../../../../domains/offer/entities/GroupEntity";
+import { OfferEntity } from "../../../../domains/offer/entities/OfferEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   ContactEntityBuilder,

@@ -1,11 +1,11 @@
 import { Pool } from "pg";
 import { SiretDto } from "shared";
-import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
-import { makeSaveNotificationAndRelatedEvent } from "../../../domain/core/notifications/helpers/Notification";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
-import { UuidV4Generator } from "../../../domain/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SuggestEditEstablishment } from "../../../domain/offer/useCases/SuggestEditEstablishment";
-import { SuggestEditEstablishmentsScript } from "../../../domain/offer/useCases/SuggestEditEstablishmentsScript";
+import { makeGenerateJwtES256 } from "../../../domains/auth/jwt";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { SuggestEditEstablishment } from "../../../domains/offer/useCases/SuggestEditEstablishment";
+import { SuggestEditEstablishmentsScript } from "../../../domains/offer/useCases/SuggestEditEstablishmentsScript";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";

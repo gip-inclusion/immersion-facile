@@ -1,8 +1,8 @@
 import { Pool } from "pg";
-import { GetAccessTokenResponse } from "../../../domain/convention/ports/PoleEmploiGateway";
-import { ResyncOldConventionsToPe } from "../../../domain/convention/useCases/ResyncOldConventionsToPe";
-import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
+import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEmploiGateway";
+import { ResyncOldConventionsToPe } from "../../../domains/convention/useCases/ResyncOldConventionsToPe";
+import { noRetries } from "../../../domains/core/ports/RetryStrategy";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createLogger } from "../../../utils/logger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";

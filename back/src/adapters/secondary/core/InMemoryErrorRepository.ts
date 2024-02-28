@@ -3,7 +3,7 @@ import {
   ErrorRepository,
   SavedError,
   broadcastToPeServiceName,
-} from "../../../domain/core/ports/ErrorRepository";
+} from "../../../domains/core/ports/ErrorRepository";
 import { NotFoundError } from "../../primary/helpers/httpErrors";
 
 export class InMemoryErrorRepository implements ErrorRepository {

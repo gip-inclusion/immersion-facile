@@ -5,7 +5,7 @@ import {
   AuthenticatedUserId,
   ConventionId,
 } from "shared";
-import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
+import { DashboardGateway } from "../../../domains/dashboard/port/DashboardGateway";
 
 export class StubDashboardGateway implements DashboardGateway {
   public getAgencyUserUrl(agencyIds: AgencyId[]): AbsoluteUrl {

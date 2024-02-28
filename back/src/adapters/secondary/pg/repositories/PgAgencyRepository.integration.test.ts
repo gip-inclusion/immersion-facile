@@ -7,7 +7,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { someAgenciesMissingMessage } from "../../../../domain/convention/ports/AgencyRepository";
+import { someAgenciesMissingMessage } from "../../../../domains/convention/ports/AgencyRepository";
 import {
   ConflictError,
   NotFoundError,

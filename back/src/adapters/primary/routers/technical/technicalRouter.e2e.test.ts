@@ -15,9 +15,9 @@ import { SuperTest, Test } from "supertest";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
-} from "../../../../domain/auth/jwt";
-import { shortLinkNotFoundMessage } from "../../../../domain/core/short-link/ShortLink";
-import { ShortLinkId } from "../../../../domain/core/short-link/ports/ShortLinkQuery";
+} from "../../../../domains/auth/jwt";
+import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
+import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { DiscussionAggregateBuilder } from "../../../secondary/offer/InMemoryDiscussionAggregateRepository";

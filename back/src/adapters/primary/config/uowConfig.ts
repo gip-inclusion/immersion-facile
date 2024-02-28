@@ -1,15 +1,15 @@
-import { InMemoryApiConsumerRepository } from "../../../domain/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { PgApiConsumerRepository } from "../../../domain/core/api-consumer/adapters/PgApiConsumerRepository";
-import { InMemoryOutboxQueries } from "../../../domain/core/events/adapters/InMemoryOutboxQueries";
-import { InMemoryOutboxRepository } from "../../../domain/core/events/adapters/InMemoryOutboxRepository";
-import { PgOutboxQueries } from "../../../domain/core/events/adapters/PgOutboxQueries";
-import { PgOutboxRepository } from "../../../domain/core/events/adapters/PgOutboxRepository";
+import { InMemoryApiConsumerRepository } from "../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { PgApiConsumerRepository } from "../../../domains/core/api-consumer/adapters/PgApiConsumerRepository";
+import { InMemoryOutboxQueries } from "../../../domains/core/events/adapters/InMemoryOutboxQueries";
+import { InMemoryOutboxRepository } from "../../../domains/core/events/adapters/InMemoryOutboxRepository";
+import { PgOutboxQueries } from "../../../domains/core/events/adapters/PgOutboxQueries";
+import { PgOutboxRepository } from "../../../domains/core/events/adapters/PgOutboxRepository";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
-} from "../../../domain/core/ports/UnitOfWork";
-import { InMemoryShortLinkRepository } from "../../../domain/core/short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
-import { PgShortLinkRepository } from "../../../domain/core/short-link/adapters/short-link-repository/PgShortLinkRepository";
+} from "../../../domains/core/ports/UnitOfWork";
+import { InMemoryShortLinkRepository } from "../../../domains/core/short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
+import { PgShortLinkRepository } from "../../../domains/core/short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { InMemoryAgencyGroupRepository } from "../../secondary/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryAssessmentRepository } from "../../secondary/InMemoryAssessmentRepository";

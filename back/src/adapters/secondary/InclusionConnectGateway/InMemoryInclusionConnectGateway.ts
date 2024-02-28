@@ -2,7 +2,7 @@ import {
   GetAccessTokenParams,
   GetAccessTokenResult,
   InclusionConnectGateway,
-} from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
+} from "../../../domains/inclusionConnect/port/InclusionConnectGateway";
 
 export class InMemoryInclusionConnectGateway
   implements InclusionConnectGateway

@@ -5,7 +5,7 @@ import {
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
-import { FeatureFlagRepository } from "../../../../domain/core/ports/FeatureFlagRepository";
+import { FeatureFlagRepository } from "../../../../domains/core/ports/FeatureFlagRepository";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";

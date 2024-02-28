@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
-import { RealTimeGateway } from "../../../domain/core/time-gateway/adapters/RealTimeGateway";
+import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   ExponentialBackoffRetryStrategy,
