@@ -4,13 +4,13 @@ import {
   SubscriptionParams,
   expectToEqual,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   CallbackParams,
   InMemorySubscribersGateway,
 } from "../../../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { BroadcastToPartnersOnConventionUpdates } from "./BroadcastToPartnersOnConventionUpdates";
 
 describe("Broadcast to partners on updated convention", () => {

@@ -1,11 +1,11 @@
 import { expectArraysToEqual } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../../../../adapters/secondary/offer/EstablishmentBuilders";
 import { InMemoryPassEmploiGateway } from "../../../../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
+import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 

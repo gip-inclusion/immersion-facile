@@ -4,7 +4,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
-import { UnitOfWork } from "../ports/UnitOfWork";
+import { UnitOfWork } from "../unit-of-work/ports/UnitOfWork";
 import { ShortLinkIdGeneratorGateway } from "./ports/ShortLinkIdGeneratorGateway";
 import { ShortLinkId } from "./ports/ShortLinkQuery";
 

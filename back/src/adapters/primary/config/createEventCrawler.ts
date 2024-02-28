@@ -4,7 +4,7 @@ import {
 } from "../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { EventBus } from "../../../domains/core/events/ports/EventBus";
 import { EventCrawler } from "../../../domains/core/events/ports/EventCrawler";
-import { UnitOfWorkPerformer } from "../../../domains/core/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { AppConfig } from "./appConfig";
 
 export const createEventCrawler = (

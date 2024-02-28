@@ -5,11 +5,11 @@ import {
   InclusionConnectedUser,
   expectToEqual,
 } from "shared";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { LinkFranceTravailUsersToTheirAgencies } from "./LinkFranceTravailUsersToTheirAgencies";
 
 const codeSafir = "546546645";

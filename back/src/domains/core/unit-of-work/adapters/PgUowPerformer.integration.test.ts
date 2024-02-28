@@ -1,12 +1,12 @@
 import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "shared";
-import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
-import { UnitOfWork } from "../../../domains/core/ports/UnitOfWork";
-import { CustomTimeGateway } from "../../../domains/core/time-gateway/adapters/CustomTimeGateway";
-import { TestUuidGenerator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { createPgUow } from "../../primary/config/uowConfig";
+import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
+import { makeCreateNewEvent } from "../../events/ports/EventBus";
+import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
+import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { UnitOfWork } from "../ports/UnitOfWork";
 import { PgUowPerformer } from "./PgUowPerformer";
-import { getTestPgPool } from "./pgUtils";
+import { createPgUow } from "./createPgUow";
 
 const someSiret = "12345678901234";
 

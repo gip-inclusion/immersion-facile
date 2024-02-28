@@ -12,7 +12,7 @@ import {
   reasonableSchedule,
 } from "shared";
 import { SavedError } from "../../../domains/core/ports/ErrorRepository";
-import { UnitOfWork } from "../../../domains/core/ports/UnitOfWork";
+import { UnitOfWork } from "../../../domains/core/unit-of-work/ports/UnitOfWork";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,

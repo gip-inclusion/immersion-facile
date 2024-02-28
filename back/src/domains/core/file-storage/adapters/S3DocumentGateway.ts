@@ -1,7 +1,7 @@
 import * as AWS from "aws-sdk";
-import { StoredFile } from "../../../domains/generic/fileManagement/entity/StoredFile";
-import { DocumentGateway } from "../../../domains/generic/fileManagement/port/DocumentGateway";
-import { createLogger } from "../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
+import { StoredFile } from "../entity/StoredFile";
+import { DocumentGateway } from "../port/DocumentGateway";
 
 const logger = createLogger(__filename);
 

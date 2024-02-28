@@ -5,13 +5,11 @@ import {
   expectPromiseToFailWithError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { InMemoryRomeRepository } from "../../../../adapters/secondary/InMemoryRomeRepository";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import {
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
@@ -26,6 +24,8 @@ import {
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 

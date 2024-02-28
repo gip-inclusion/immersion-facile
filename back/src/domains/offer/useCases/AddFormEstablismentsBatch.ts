@@ -8,7 +8,7 @@ import {
   splitInChunks,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { GroupEntity } from "../entities/GroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 

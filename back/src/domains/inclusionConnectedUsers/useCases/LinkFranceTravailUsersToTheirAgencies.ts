@@ -9,7 +9,7 @@ import { z } from "zod";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UserAuthenticatedPayload } from "../../core/events/events";
-import { UnitOfWork } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
   userId: z.string(),

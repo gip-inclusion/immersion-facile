@@ -8,14 +8,14 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../adapters/primary/config/uowConfig";
-import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetConventionForApiConsumer } from "./GetConventionForApiConsumer";
 
 const agencyIdInScope = "agency-id-in-scope";

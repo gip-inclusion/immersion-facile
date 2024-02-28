@@ -58,6 +58,7 @@ import { GetDashboardUrl } from "../../../domains/core/dashboard/useCases/GetDas
 import { ValidateEmail } from "../../../domains/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
 import { SetFeatureFlag } from "../../../domains/core/feature-flags/use-cases/SetFeatureFlag";
+import { UploadFile } from "../../../domains/core/file-storage/useCases/UploadFile";
 import {
   GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
@@ -67,13 +68,12 @@ import {
 } from "../../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { SendNotification } from "../../../domains/core/notifications/useCases/SendNotification";
-import { UnitOfWorkPerformer } from "../../../domains/core/ports/UnitOfWork";
+import { HtmlToPdf } from "../../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { ShortLinkId } from "../../../domains/core/short-link/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
+import { UnitOfWorkPerformer } from "../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AdminLogin } from "../../../domains/generic/authentication/useCases/AdminLogin";
-import { UploadFile } from "../../../domains/generic/fileManagement/useCases/UploadFile";
-import { HtmlToPdf } from "../../../domains/generic/htmlToPdf/HtmlToPdf";
 import { AuthenticateWithInclusionCode } from "../../../domains/inclusionConnect/useCases/AuthenticateWithInclusionCode";
 import { GetInclusionConnectLogoutUrl } from "../../../domains/inclusionConnect/useCases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../../domains/inclusionConnect/useCases/InitiateInclusionConnect";

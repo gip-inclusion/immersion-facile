@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { GroupEntity } from "../../../../domains/offer/entities/GroupEntity";
 import { OfferEntity } from "../../../../domains/offer/entities/OfferEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
@@ -21,7 +22,6 @@ import {
 } from "../../../secondary/offer/EstablishmentBuilders";
 import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const immersionOffer = new OfferEntityBuilder().build();
 const establishmentAggregate1 = new EstablishmentAggregateBuilder()

@@ -9,17 +9,17 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../../adapters/primary/config/uowConfig";
-import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../adapters/InMemoryApiConsumerRepository";
 import { SaveApiConsumer } from "./SaveApiConsumer";

@@ -9,10 +9,8 @@ import {
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
-import {
-  UnitOfWork,
-  UnitOfWorkPerformer,
-} from "../../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { SiretGateway } from "../../../sirene/ports/SirenGateway";
 import { throwConflictErrorOnSimilarAgencyFound } from "../../entities/Agency";
 import { referedAgencyMissingMessage } from "../../ports/AgencyRepository";

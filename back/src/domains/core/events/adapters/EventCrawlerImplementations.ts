@@ -2,7 +2,7 @@ import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
-import { UnitOfWorkPerformer } from "../../ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { DomainEvent, eventsToDebugInfo } from "../events";
 import { EventBus } from "../ports/EventBus";
 import { EventCrawler } from "../ports/EventCrawler";

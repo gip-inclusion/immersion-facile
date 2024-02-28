@@ -12,8 +12,8 @@ import {
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import {
   PublicApiV2WebhooksRoutes,
   publicApiV2WebhooksRoutes,

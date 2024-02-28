@@ -16,13 +16,13 @@ import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../../../secondary/offer/EstablishmentBuilders";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   const establishmentAggregate = new EstablishmentAggregateBuilder()

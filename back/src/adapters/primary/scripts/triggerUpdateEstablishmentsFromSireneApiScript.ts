@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UpdateEstablishmentsFromSirenApiScript } from "../../../domains/offer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import {
@@ -10,7 +11,6 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
-import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

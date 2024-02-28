@@ -4,12 +4,12 @@ import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus"
 import { makeGenerateJwtES256 } from "../../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domains/offer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
-import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

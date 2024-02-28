@@ -3,11 +3,11 @@ import { keys } from "ramda";
 import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SendBeneficiariesPdfAssessmentsEmails } from "../../../domains/offer/useCases/SendBeneficiariesPdfAssessmentsEmails";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
-import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

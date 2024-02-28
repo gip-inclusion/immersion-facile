@@ -3,11 +3,11 @@ import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEm
 import { ResyncOldConventionsToPe } from "../../../domains/convention/useCases/ResyncOldConventionsToPe";
 import { noRetries } from "../../../domains/core/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { createLogger } from "../../../utils/logger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { AppConfig } from "../config/appConfig";
-import { createUowPerformer } from "../config/uowConfig";
 import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 

@@ -16,9 +16,9 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToPeServiceName } from "../../../../domains/core/ports/ErrorRepository";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { Gateways } from "../../config/createGateways";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("InclusionConnectedAllowedRoutes", () => {
   const userId = "123";

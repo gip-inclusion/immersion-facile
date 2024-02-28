@@ -2,7 +2,8 @@ import { exhaustiveCheck } from "shared";
 import { z } from "zod";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../ports/UnitOfWork";
+import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { WithNotificationIdAndKind } from "../helpers/Notification";
 import { NotificationGateway } from "../ports/NotificationGateway";
 

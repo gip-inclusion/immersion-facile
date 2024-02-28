@@ -11,7 +11,7 @@ import {
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export class DeleteSubscription extends TransactionalUseCase<
   string,

@@ -8,8 +8,8 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe(`${adminRoutes.getLastNotifications.url} route`, () => {
   let adminToken: BackOfficeJwt;

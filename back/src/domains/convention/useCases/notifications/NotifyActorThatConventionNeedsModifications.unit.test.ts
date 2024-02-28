@@ -11,11 +11,6 @@ import {
   frontRoutes,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
@@ -29,6 +24,11 @@ import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link
 import { ShortLinkId } from "../../../core/short-link/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyActorThatConventionNeedsModifications } from "./NotifyActorThatConventionNeedsModifications";
 

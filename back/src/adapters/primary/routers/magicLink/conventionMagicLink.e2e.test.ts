@@ -16,8 +16,8 @@ import {
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const payloadMeta = {
   exp: new Date().getTime() / 1000 + 1000,

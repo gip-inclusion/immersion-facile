@@ -6,11 +6,11 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { broadcastToPeServiceName } from "../../../core/ports/ErrorRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 
 const prepareUseCase = async () => {

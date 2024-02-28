@@ -1,6 +1,6 @@
 import { AddressDto, AgencyDtoBuilder, expectToEqual } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { ListAgenciesByFilter, toAgencyOption } from "./ListAgenciesByFilter";
 
 const parisAddress: AddressDto = {

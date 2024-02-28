@@ -3,13 +3,13 @@ import { SiretDto } from "shared";
 import { makeGenerateJwtES256 } from "../../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { PgUowPerformer } from "../../../domains/core/unit-of-work/adapters/PgUowPerformer";
+import { createPgUow } from "../../../domains/core/unit-of-work/adapters/createPgUow";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SuggestEditEstablishment } from "../../../domains/offer/useCases/SuggestEditEstablishment";
 import { SuggestEditEstablishmentsScript } from "../../../domains/offer/useCases/SuggestEditEstablishmentsScript";
-import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
-import { createPgUow } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const config = AppConfig.createFromEnv();

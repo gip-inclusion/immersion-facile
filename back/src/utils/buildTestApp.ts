@@ -2,14 +2,11 @@ import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import supertest from "supertest";
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { Gateways } from "../adapters/primary/config/createGateways";
-import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
 import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { NotImplementedDocumentGateway } from "../adapters/secondary/documentGateway/NotImplementedDocumentGateway";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
-import { InMemoryPdfGeneratorGateway } from "../adapters/secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemorySubscribersGateway } from "../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
@@ -17,6 +14,7 @@ import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemor
 import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
+import { NotImplementedDocumentGateway } from "../domains/core/file-storage/adapters/NotImplementedDocumentGateway";
 import {
   GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
@@ -25,8 +23,10 @@ import {
   GenerateInclusionConnectJwt,
 } from "../domains/core/jwt";
 import type { InMemoryNotificationGateway } from "../domains/core/notifications/adapters/InMemoryNotificationGateway";
+import { InMemoryPdfGeneratorGateway } from "../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUnitOfWork } from "../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../domains/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 

@@ -27,11 +27,11 @@ import {
   GenerateApiConsumerJwt,
   makeVerifyJwtES256,
 } from "../../../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { AppConfig } from "../../config/appConfig";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Admin router", () => {
   const now = new Date();
