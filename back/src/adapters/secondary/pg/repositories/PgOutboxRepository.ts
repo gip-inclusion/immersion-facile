@@ -31,6 +31,7 @@ export class PgOutboxRepository implements OutboxRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {
+    if (!events.length) return;
     const query = format(
       `
         UPDATE outbox
