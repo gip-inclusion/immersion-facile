@@ -31,13 +31,11 @@ import {
 } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import {
-  UnitOfWork,
-  UnitOfWorkPerformer,
-} from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
   missingAgencyMessage,
   missingConventionMessage,

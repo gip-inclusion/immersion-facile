@@ -15,11 +15,11 @@ import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { establishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/FormEstablishmentRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../secondary/offer/EstablishmentBuilders";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Delete form establishment", () => {
   const establishmentAggregate = new EstablishmentAggregateBuilder().build();

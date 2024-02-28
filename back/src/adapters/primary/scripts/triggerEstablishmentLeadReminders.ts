@@ -7,6 +7,7 @@ import { makeGenerateJwtES256 } from "../../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   SendEstablishmentLeadReminderOutput,
@@ -15,7 +16,6 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
-import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

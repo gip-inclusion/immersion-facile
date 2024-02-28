@@ -4,8 +4,8 @@ import {
   expectToEqual,
 } from "shared";
 import { ZodError } from "zod";
-import { UnauthorizedError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryPdfGeneratorGateway } from "../../../adapters/secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
+import { UnauthorizedError } from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryPdfGeneratorGateway } from "../adapters/InMemoryPdfGeneratorGateway";
 import { HtmlToPdf } from "./HtmlToPdf";
 
 const jwtPayload: ConventionJwtPayload = {

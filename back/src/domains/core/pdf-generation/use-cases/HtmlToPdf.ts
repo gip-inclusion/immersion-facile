@@ -3,9 +3,9 @@ import {
   ConventionRelatedJwtPayload,
   zStringMinLength1,
 } from "shared";
-import { UnauthorizedError } from "../../../adapters/primary/helpers/httpErrors";
-import { UseCase } from "../../core/UseCase";
-import { PdfGeneratorGateway } from "./PdfGeneratorGateway";
+import { UnauthorizedError } from "../../../../adapters/primary/helpers/httpErrors";
+import { UseCase } from "../../UseCase";
+import { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 
 export class HtmlToPdf extends UseCase<string, string, ConventionJwtPayload> {
   protected inputSchema = zStringMinLength1;

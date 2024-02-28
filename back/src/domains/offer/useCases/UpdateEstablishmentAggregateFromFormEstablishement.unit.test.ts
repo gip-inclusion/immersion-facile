@@ -8,11 +8,6 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -24,6 +19,11 @@ import {
   rueGuillaumeTellDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 

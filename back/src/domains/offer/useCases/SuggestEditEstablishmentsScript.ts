@@ -3,8 +3,8 @@ import { SiretDto, castError } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
-import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { SuggestEditEstablishment } from "./SuggestEditEstablishment";
 
 const logger = createLogger(__filename);

@@ -1,12 +1,13 @@
 import { Kysely } from "kysely";
 import { Pool } from "pg";
 import {
-  UnitOfWork,
-  UnitOfWorkPerformer,
-} from "../../../domains/core/ports/UnitOfWork";
-import { createLogger } from "../../../utils/logger";
-import { KyselyDb, makeKyselyDb } from "./kysely/kyselyUtils";
-import { Database } from "./kysely/model/database";
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { Database } from "../../../../adapters/secondary/pg/kysely/model/database";
+import { createLogger } from "../../../../utils/logger";
+import { UnitOfWork } from "../ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
 
 const logger = createLogger(__filename);
 

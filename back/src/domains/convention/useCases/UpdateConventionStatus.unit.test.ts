@@ -8,11 +8,11 @@ import {
   expectToEqual,
   validSignatoryRoles,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { conventionMissingMessage } from "../entities/Convention";
 import { someAgenciesMissingMessage } from "../ports/AgencyRepository";

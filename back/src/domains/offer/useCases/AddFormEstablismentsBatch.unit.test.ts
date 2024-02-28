@@ -7,12 +7,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../adapters/primary/config/uowConfig";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryGroupRepository } from "../../../adapters/secondary/offer/InMemoryGroupRepository";
 import {
   InMemorySiretGateway,
@@ -22,6 +17,11 @@ import {
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";

@@ -10,12 +10,7 @@ import {
   frontRoutes,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../../adapters/primary/config/uowConfig";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../adapters/secondary/InMemoryNotificationRepository";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
@@ -26,6 +21,11 @@ import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link
 import { InMemoryShortLinkQuery } from "../../../core/short-link/adapters/short-link-query/InMemoryShortLinkQuery";
 import { ShortLinkId } from "../../../core/short-link/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";

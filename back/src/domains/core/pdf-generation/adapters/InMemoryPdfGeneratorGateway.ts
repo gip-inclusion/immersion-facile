@@ -1,4 +1,4 @@
-import { PdfGeneratorGateway } from "../../../domains/generic/htmlToPdf/PdfGeneratorGateway";
+import { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 
 export class InMemoryPdfGeneratorGateway implements PdfGeneratorGateway {
   public async make(htmlContent: string): Promise<string> {

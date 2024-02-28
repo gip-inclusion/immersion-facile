@@ -7,15 +7,15 @@ import {
   expectPromiseToFailWith,
   expectToEqual,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateIcUserRoleForAgency } from "./UpdateIcUserRoleForAgency";
 

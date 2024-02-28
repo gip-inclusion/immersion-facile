@@ -3,7 +3,7 @@ import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import { technicalRoutes, uploadFileRoute } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import { UploadFileInput } from "../../../../domains/generic/fileManagement/useCases/UploadFile";
+import { UploadFileInput } from "../../../../domains/core/file-storage/useCases/UploadFile";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";

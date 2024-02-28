@@ -4,9 +4,9 @@ import {
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
 } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryNotificationRepository } from "../../../../adapters/secondary/InMemoryNotificationRepository";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
 import {
   InMemoryNotificationGateway,
   sendSmsErrorPhoneNumber,

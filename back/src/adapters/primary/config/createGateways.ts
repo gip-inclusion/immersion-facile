@@ -13,10 +13,19 @@ import { DashboardGateway } from "../../../domains/core/dashboard/port/Dashboard
 import { EmailableEmailValidationGateway } from "../../../domains/core/email-validation/adapters/EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "../../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
+import { NotImplementedDocumentGateway } from "../../../domains/core/file-storage/adapters/NotImplementedDocumentGateway";
+import { S3DocumentGateway } from "../../../domains/core/file-storage/adapters/S3DocumentGateway";
+import { DocumentGateway } from "../../../domains/core/file-storage/port/DocumentGateway";
 import { BrevoNotificationGateway } from "../../../domains/core/notifications/adapters/BrevoNotificationGateway";
 import { brevoNotificationGatewayRoutes } from "../../../domains/core/notifications/adapters/BrevoNotificationGateway.routes";
 import { InMemoryNotificationGateway } from "../../../domains/core/notifications/adapters/InMemoryNotificationGateway";
 import { NotificationGateway } from "../../../domains/core/notifications/ports/NotificationGateway";
+import { InMemoryPdfGeneratorGateway } from "../../../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
+import {
+  ScalingoPdfGeneratorGateway,
+  makeScalingoPdfGeneratorRoutes,
+} from "../../../domains/core/pdf-generation/adapters/ScalingoPdfGeneratorGateway";
+import { PdfGeneratorGateway } from "../../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
 import { noRetries } from "../../../domains/core/ports/RetryStrategy";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
@@ -24,8 +33,6 @@ import { CustomTimeGateway } from "../../../domains/core/time-gateway/adapters/C
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../../domains/core/uuid-generator/ports/UuidGenerator";
-import { DocumentGateway } from "../../../domains/generic/fileManagement/port/DocumentGateway";
-import { PdfGeneratorGateway } from "../../../domains/generic/htmlToPdf/PdfGeneratorGateway";
 import { InclusionConnectGateway } from "../../../domains/inclusionConnect/port/InclusionConnectGateway";
 import { PeConnectGateway } from "../../../domains/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
@@ -36,18 +43,11 @@ import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeCon
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalRoutes } from "../../secondary/PeConnectGateway/peConnectApi.routes";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { NotImplementedDocumentGateway } from "../../secondary/documentGateway/NotImplementedDocumentGateway";
-import { S3DocumentGateway } from "../../secondary/documentGateway/S3DocumentGateway";
 import { HttpLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/HttpLaBonneBoiteGateway";
 import { InMemoryLaBonneBoiteGateway } from "../../secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { createLbbRoutes } from "../../secondary/offer/laBonneBoite/LaBonneBoite.routes";
 import { HttpPassEmploiGateway } from "../../secondary/offer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/offer/passEmploi/InMemoryPassEmploiGateway";
-import { InMemoryPdfGeneratorGateway } from "../../secondary/pdfGeneratorGateway/InMemoryPdfGeneratorGateway";
-import {
-  ScalingoPdfGeneratorGateway,
-  makeScalingoPdfGeneratorRoutes,
-} from "../../secondary/pdfGeneratorGateway/ScalingoPdfGeneratorGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../secondary/poleEmploi/PoleEmploiRoutes";

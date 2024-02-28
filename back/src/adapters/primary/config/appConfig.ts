@@ -13,8 +13,8 @@ import {
 } from "shared";
 import { EmailableApiKey } from "../../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import { DomainTopic } from "../../../domains/core/events/events";
+import { S3Params } from "../../../domains/core/file-storage/adapters/S3DocumentGateway";
 import { InclusionConnectConfig } from "../../../domains/inclusionConnect/useCases/InitiateInclusionConnect";
-import { S3Params } from "../../secondary/documentGateway/S3DocumentGateway";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;

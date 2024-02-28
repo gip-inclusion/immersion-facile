@@ -10,8 +10,9 @@ import {
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { SearchMade } from "../entities/SearchMadeEntity";
 import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";

@@ -10,8 +10,8 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { ApiConsumerBuilder } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import {
   PublicApiV2ConventionRoutes,
   publicApiV2ConventionRoutes,

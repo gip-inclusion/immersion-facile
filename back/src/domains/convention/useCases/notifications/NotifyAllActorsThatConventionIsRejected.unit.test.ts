@@ -6,14 +6,14 @@ import {
   ConventionDtoBuilder,
 } from "shared";
 import { EmailNotification } from "shared";
+import { expectNotifyConventionRejected } from "../../../../adapters/secondary/InMemoryNotificationRepository";
+import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../../../adapters/primary/config/uowConfig";
-import { expectNotifyConventionRejected } from "../../../../adapters/secondary/InMemoryNotificationRepository";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsThatConventionIsRejected } from "./NotifyAllActorsThatConventionIsRejected";
 const beneficiaryRepresentative: BeneficiaryRepresentative = {

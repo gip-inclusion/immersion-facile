@@ -1,7 +1,5 @@
-import {
-  UnitOfWork,
-  UnitOfWorkPerformer,
-} from "../../domains/core/ports/UnitOfWork";
+import { UnitOfWork } from "../ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
 
 export class InMemoryUowPerformer implements UnitOfWorkPerformer {
   constructor(private uow: UnitOfWork) {}

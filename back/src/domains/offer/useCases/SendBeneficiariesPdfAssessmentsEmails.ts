@@ -9,8 +9,9 @@ import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 type SendBeneficiaryAssessmentEmailsOutput = {
   errors?: Record<ConventionId, Error>;

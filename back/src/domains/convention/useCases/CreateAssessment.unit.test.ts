@@ -9,7 +9,6 @@ import {
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ConflictError,
@@ -18,10 +17,11 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryAssessmentRepository } from "../../../adapters/secondary/InMemoryAssessmentRepository";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { CreateAssessment } from "./CreateAssessment";

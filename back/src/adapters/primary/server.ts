@@ -10,12 +10,12 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";
 import { Gateways } from "./config/createGateways";
-import { InMemoryUnitOfWork } from "./config/uowConfig";
 import { createAddressRouter } from "./routers/address/createAddressRouter";
 import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";

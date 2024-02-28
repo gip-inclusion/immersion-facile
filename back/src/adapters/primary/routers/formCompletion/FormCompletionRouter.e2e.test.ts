@@ -6,10 +6,10 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../secondary/offer/EstablishmentBuilders";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("formCompletion Routes", () => {
   let httpClient: HttpClient<FormCompletionRoutes>;

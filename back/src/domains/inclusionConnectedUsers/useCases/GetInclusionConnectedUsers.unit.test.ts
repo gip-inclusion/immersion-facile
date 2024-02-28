@@ -5,9 +5,9 @@ import {
   expectPromiseToFailWith,
   expectToEqual,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetInclusionConnectedUsers } from "./GetInclusionConnectedUsers";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();

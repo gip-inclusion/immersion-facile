@@ -18,11 +18,11 @@ import {
 } from "../../../../domains/core/jwt";
 import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
 import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { DiscussionAggregateBuilder } from "../../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { AppConfig } from "../../config/appConfig";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const discussionId = "my-discussion-id";
 const domain = "immersion-facile.beta.gouv.fr";

@@ -10,7 +10,8 @@ import {
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../utils/logger";
-import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
+import { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
 
 const logger = createLogger(__filename);
 

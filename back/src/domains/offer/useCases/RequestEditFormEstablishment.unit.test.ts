@@ -4,12 +4,7 @@ import {
   TemplatedEmail,
   expectPromiseToFailWithError,
 } from "shared";
-import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -21,6 +16,11 @@ import {
 } from "../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "./RequestEditFormEstablishment";

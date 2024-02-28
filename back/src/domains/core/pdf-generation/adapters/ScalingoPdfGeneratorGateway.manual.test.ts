@@ -2,8 +2,8 @@ import { existsSync } from "fs";
 import axios from "axios";
 import { arrayFromNumber } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { TestUuidGenerator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { AppConfig } from "../../primary/config/appConfig";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   ScalingoPdfGeneratorGateway,
   makeScalingoPdfGeneratorRoutes,

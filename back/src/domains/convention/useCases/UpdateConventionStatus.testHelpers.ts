@@ -18,14 +18,12 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ForbiddenError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
@@ -35,6 +33,8 @@ import {
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 

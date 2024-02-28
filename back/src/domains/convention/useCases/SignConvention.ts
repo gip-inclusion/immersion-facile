@@ -19,8 +19,9 @@ import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DomainTopic } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
 
 const logger = createLogger(__filename);

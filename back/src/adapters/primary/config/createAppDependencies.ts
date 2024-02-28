@@ -8,6 +8,7 @@ import {
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../domains/core/jwt";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
@@ -22,7 +23,6 @@ import { AppConfig } from "./appConfig";
 import { createEventCrawler } from "./createEventCrawler";
 import { createGateways, createGetPgPoolFn } from "./createGateways";
 import { createUseCases } from "./createUseCases";
-import { createUowPerformer } from "./uowConfig";
 
 const uuidGenerator = new UuidV4Generator();
 

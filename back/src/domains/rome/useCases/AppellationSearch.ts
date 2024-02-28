@@ -6,7 +6,7 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 const logger = createLogger(__filename);
 

@@ -2,8 +2,9 @@ import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 

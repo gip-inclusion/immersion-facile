@@ -5,17 +5,17 @@ import {
   expectPromiseToFailWithError,
 } from "shared";
 import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../../adapters/primary/config/uowConfig";
-import {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
 } from "../../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 

@@ -8,12 +8,12 @@ import { addressesExternalRoutes } from "../../../domains/core/address/adapters/
 import { ConsoleAppLogger } from "../../../domains/core/app-logger/adapters/ConsoleAppLogger";
 import { noRetries } from "../../../domains/core/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { AppConfig } from "../config/appConfig";
-import { createUowPerformer } from "../config/uowConfig";
 import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 
 const updateAllPeAgenciesScript = async () => {

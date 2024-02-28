@@ -10,7 +10,8 @@ import {
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { isConventionInScope } from "../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getReferedAgency } from "../entities/agency";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
 

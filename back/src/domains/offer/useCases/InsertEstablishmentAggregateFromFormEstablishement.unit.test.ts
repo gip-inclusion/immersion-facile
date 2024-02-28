@@ -8,12 +8,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -31,6 +26,11 @@ import {
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 

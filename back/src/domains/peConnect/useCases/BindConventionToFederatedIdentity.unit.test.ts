@@ -4,18 +4,18 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   CONVENTION_ID_DEFAULT_UUID,
   InMemoryConventionPoleEmploiAdvisorRepository,
 } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";

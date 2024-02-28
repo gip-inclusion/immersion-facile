@@ -8,8 +8,8 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import type { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const conventionId = "my-Convention-id";
 const beneficiaryEmail = "joe@lebenef.fr";

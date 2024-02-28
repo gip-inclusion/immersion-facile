@@ -13,10 +13,11 @@ import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { makeShortLink } from "../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
   EstablishmentLeadEventKind,
   establishmentLeadEventKind,

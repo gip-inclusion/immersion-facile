@@ -16,8 +16,9 @@ import {
 import { TransactionalUseCase } from "../../UseCase";
 import { CreateNewEvent } from "../../events/ports/EventBus";
 import { GenerateApiConsumerJwt } from "../../jwt";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../ports/UnitOfWork";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 
 export const EXPIRATION_IN_YEARS = 2;
 

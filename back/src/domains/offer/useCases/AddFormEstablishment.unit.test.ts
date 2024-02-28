@@ -4,14 +4,12 @@ import {
   defaultValidFormEstablishment,
   expectPromiseToFailWithError,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ConflictError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
@@ -20,6 +18,8 @@ import {
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 

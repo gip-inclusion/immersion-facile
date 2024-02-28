@@ -8,8 +8,8 @@ import {
 } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
 import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
-import { UnitOfWorkPerformer } from "../../ports/UnitOfWork";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import {
   DomainEvent,
   DomainTopic,

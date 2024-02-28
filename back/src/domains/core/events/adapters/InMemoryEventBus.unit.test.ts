@@ -3,9 +3,9 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
 import type { DomainEvent, DomainTopic, EventFailure } from "../events";
 import { EventBus } from "../ports/EventBus";
 import { InMemoryEventBus } from "./InMemoryEventBus";

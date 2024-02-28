@@ -7,6 +7,7 @@ import {
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
@@ -16,7 +17,6 @@ import {
   OfferEntityBuilder,
   TEST_LOCATION,
 } from "../../../secondary/offer/EstablishmentBuilders";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
   PublicApiV2SearchEstablishmentRoutes,
