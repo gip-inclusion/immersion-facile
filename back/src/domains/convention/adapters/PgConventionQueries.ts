@@ -12,7 +12,7 @@ import {
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
-import { KyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { AssessmentEmailDomainTopic } from "../../core/events/events";
 import {
   ConventionQueries,

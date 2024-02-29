@@ -2,7 +2,7 @@ import { AuthenticatedUser } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../../../config/pg/kysely/kyselyUtils";
 import { AuthenticatedUserRepository } from "../port/AuthenticatedUserRepositiory";
 
 type PersistenceAuthenticatedUser = {

@@ -3,8 +3,8 @@ import { AbsoluteUrl, expectObjectsToMatch, expectToEqual } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
-} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+} from "../../../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";

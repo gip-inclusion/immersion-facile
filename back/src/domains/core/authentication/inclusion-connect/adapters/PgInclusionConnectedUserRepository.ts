@@ -8,7 +8,7 @@ import {
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../../../config/pg/kysely/kyselyUtils";
 import { InclusionConnectedUserRepository } from "../../../dashboard/port/InclusionConnectedUserRepository";
 
 export class PgInclusionConnectedUserRepository

@@ -17,8 +17,8 @@ import {
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { optional } from "../../../adapters/secondary/pg/pgUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
+import { optional } from "../../../config/pg/pgUtils";
 import { createLogger } from "../../../utils/logger";
 import { ContactEntity } from "../entities/ContactEntity";
 import {

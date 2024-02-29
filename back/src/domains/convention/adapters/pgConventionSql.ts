@@ -18,7 +18,7 @@ import {
   cast,
   jsonBuildObject,
   jsonStripNulls,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 
 export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {

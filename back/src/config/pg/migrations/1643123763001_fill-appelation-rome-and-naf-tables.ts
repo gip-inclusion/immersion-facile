@@ -27,7 +27,7 @@ const makeQueryArray = (filePath: string) => {
 
 const buildInsertRomesPublicDataQuery = async () => {
   const arrayOfRomeData = makeQueryArray(
-    `${__dirname}/../staticData/romes_public.csv`,
+    `${__dirname}/../static-data/romes_public.csv`,
   );
 
   return format(
@@ -38,7 +38,7 @@ const buildInsertRomesPublicDataQuery = async () => {
 
 const buildInsertAppellationPublicDataQuery = async () => {
   const arrayOfAppellationData = makeQueryArray(
-    `${__dirname}/../staticData/appellations_public.csv`,
+    `${__dirname}/../static-data/appellations_public.csv`,
   );
 
   return format(

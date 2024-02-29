@@ -1,7 +1,7 @@
 import { expectToEqual } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { createPeAxiosSharedClient } from "../../../../adapters/primary/helpers/createAxiosSharedClients";
-import { InMemoryCachingGateway } from "../../../../adapters/secondary/core/InMemoryCachingGateway";
+import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import {

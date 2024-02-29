@@ -5,7 +5,6 @@ import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl, castError } from "shared";
 import { HttpClient } from "shared-routes";
 import { AccessTokenConfig } from "../../../../adapters/primary/config/appConfig";
-import { InMemoryCachingGateway } from "../../../../adapters/secondary/core/InMemoryCachingGateway";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -13,6 +12,7 @@ import {
 } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
+import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   RetryStrategy,
   RetryableError,

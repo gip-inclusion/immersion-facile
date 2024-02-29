@@ -4,7 +4,7 @@ import { AppellationCode } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import { SearchMadeEntity, SearchMadeId } from "../entities/SearchMadeEntity";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";

@@ -3,8 +3,8 @@ import { AbsoluteUrl, expectPromiseToFailWithError } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
-} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+} from "../../../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { ShortLinkId } from "../../ports/ShortLinkQuery";
 import {
   PgShortLinkRepositoryDto,

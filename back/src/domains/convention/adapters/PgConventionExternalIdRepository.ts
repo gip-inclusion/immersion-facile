@@ -2,7 +2,7 @@ import { ConventionExternalId, ConventionId } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionExternalIdRepository } from "../ports/ConventionExternalIdRepository";
 
 export class PgConventionExternalIdRepository

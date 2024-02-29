@@ -1,5 +1,5 @@
 import { AbsoluteUrl, castError } from "shared";
-import { executeKyselyRawSqlQuery } from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { executeKyselyRawSqlQuery } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
 import { ShortLinkId } from "../../ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../ports/ShortLinkRepository";

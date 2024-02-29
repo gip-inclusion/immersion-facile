@@ -1,11 +1,11 @@
 import axios, { AxiosInstance } from "axios";
 import { SubscriptionParams, castError } from "shared";
+import { createLogger } from "../../../../utils/logger";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscribersGateway,
-} from "../../../domains/core/api-consumer/ports/SubscribersGateway";
-import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+} from "../ports/SubscribersGateway";
 
 const logger = createLogger(__filename);
 

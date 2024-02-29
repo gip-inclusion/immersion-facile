@@ -3,8 +3,8 @@ import { AuthenticatedUser, expectToEqual } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
-} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+} from "../../../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";

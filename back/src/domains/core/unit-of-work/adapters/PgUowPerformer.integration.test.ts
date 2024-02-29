@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "shared";
-import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
+import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";

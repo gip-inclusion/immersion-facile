@@ -8,14 +8,14 @@ import {
   BadRequestError,
   ConflictError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { InMemoryRomeRepository } from "../../core/rome/adapters/InMemoryRomeRepository";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
   TEST_OPEN_ESTABLISHMENT_1,
-} from "../../../adapters/secondary/siret/InMemorySiretGateway";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
-import { InMemoryRomeRepository } from "../../core/rome/adapters/InMemoryRomeRepository";
+} from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";

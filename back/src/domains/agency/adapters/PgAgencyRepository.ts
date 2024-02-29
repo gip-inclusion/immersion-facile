@@ -28,8 +28,8 @@ import {
   cast,
   executeKyselyRawSqlQuery,
   jsonBuildObject,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { Database } from "../../../adapters/secondary/pg/kysely/model/database";
+} from "../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import {
   AgencyRepository,

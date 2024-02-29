@@ -11,23 +11,23 @@ import {
   propEq,
   queryParamsAsString,
 } from "shared";
+import { AxiosConfig } from "../../../../adapters/primary/config/appConfig";
 import {
-  RetryStrategy,
-  RetryableError,
-} from "../../../domains/core/retry-strategy/ports/RetryStrategy";
-import { SiretGateway } from "../../../domains/core/sirene/ports/SirenGateway";
-import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
+  TooManyRequestApiError,
+  UnavailableApiError,
+} from "../../../../adapters/primary/helpers/httpErrors";
 import {
   createAxiosInstance,
   isRetryableError,
   logAxiosError,
-} from "../../../utils/axiosUtils";
-import { createLogger } from "../../../utils/logger";
-import { AxiosConfig } from "../../primary/config/appConfig";
+} from "../../../../utils/axiosUtils";
+import { createLogger } from "../../../../utils/logger";
 import {
-  TooManyRequestApiError,
-  UnavailableApiError,
-} from "../../primary/helpers/httpErrors";
+  RetryStrategy,
+  RetryableError,
+} from "../../retry-strategy/ports/RetryStrategy";
+import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { SiretGateway } from "../ports/SirenGateway";
 
 const logger = createLogger(__filename);
 

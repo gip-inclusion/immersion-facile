@@ -12,11 +12,8 @@ import {
   expectToEqual,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  KyselyDb,
-  makeKyselyDb,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
   rueBitcheDto,
   rueGuillaumeTellDto,

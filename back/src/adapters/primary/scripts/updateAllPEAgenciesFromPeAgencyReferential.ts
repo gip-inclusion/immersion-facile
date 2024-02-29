@@ -8,11 +8,11 @@ import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEm
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { ConsoleAppLogger } from "../../../domains/core/app-logger/adapters/ConsoleAppLogger";
+import { InMemoryCachingGateway } from "../../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { AppConfig } from "../config/appConfig";
 import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 

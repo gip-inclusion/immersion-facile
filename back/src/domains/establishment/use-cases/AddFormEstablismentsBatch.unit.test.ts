@@ -7,13 +7,13 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
   InMemorySiretGateway,
   TEST_OPEN_ESTABLISHMENT_1,
   TEST_OPEN_ESTABLISHMENT_2,
-} from "../../../adapters/secondary/siret/InMemorySiretGateway";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+} from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

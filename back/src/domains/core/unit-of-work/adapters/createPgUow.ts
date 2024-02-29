@@ -1,4 +1,4 @@
-import { KyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { PgAgencyGroupRepository } from "../../../agency/adapters/PgAgencyGroupRepository";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgAssessmentRepository } from "../../../convention/adapters/PgAssessmentRepository";

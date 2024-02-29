@@ -17,13 +17,13 @@ import {
   GenerateEditFormEstablishmentJwt,
   makeGenerateJwtES256,
 } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import {
   TEST_OPEN_ESTABLISHMENT_1,
   TEST_OPEN_ESTABLISHMENT_2,
-} from "../../../secondary/siret/InMemorySiretGateway";
+} from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { AppConfig } from "../../config/appConfig";
 
 describe("Edit form establishments", () => {

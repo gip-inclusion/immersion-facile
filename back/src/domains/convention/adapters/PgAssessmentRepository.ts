@@ -2,7 +2,7 @@ import { AssessmentStatus, ConventionId, assessmentSchema } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { AssessmentRepository } from "../ports/AssessmentRepository";
 

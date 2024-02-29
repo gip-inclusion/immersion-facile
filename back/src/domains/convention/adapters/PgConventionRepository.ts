@@ -13,10 +13,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  KyselyDb,
-  falsyToNull,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { KyselyDb, falsyToNull } from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
 

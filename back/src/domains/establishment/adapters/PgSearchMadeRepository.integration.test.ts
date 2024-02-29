@@ -1,11 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { uniq } from "ramda";
 import { AppellationCode } from "shared";
-import { makeKyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import {
-  getTestPgPool,
-  optional,
-} from "../../../adapters/secondary/pg/pgUtils";
+import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool, optional } from "../../../config/pg/pgUtils";
 import { SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 

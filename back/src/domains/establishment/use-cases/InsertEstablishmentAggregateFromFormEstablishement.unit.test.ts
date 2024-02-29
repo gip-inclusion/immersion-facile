@@ -10,15 +10,15 @@ import {
 } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import {
-  InMemorySiretGateway,
-  TEST_OPEN_ESTABLISHMENT_1,
-} from "../../../adapters/secondary/siret/InMemorySiretGateway";
-import {
   InMemoryAddressGateway,
   avenueChampsElyseesDto,
   rueGuillaumeTellDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import {
+  InMemorySiretGateway,
+  TEST_OPEN_ESTABLISHMENT_1,
+} from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

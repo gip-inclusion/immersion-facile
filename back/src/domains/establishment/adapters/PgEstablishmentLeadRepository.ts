@@ -1,7 +1,7 @@
 import { sql } from "kysely";
 import { SiretDto } from "shared";
 import { P, match } from "ts-pattern";
-import { KyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import {
   EstablishmentLead,
   EstablishmentLeadEvent,

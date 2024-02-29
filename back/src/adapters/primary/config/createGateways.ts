@@ -10,6 +10,8 @@ import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEm
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domains/core/address/adapters/InMemoryAddressGateway";
+import { HttpSubscribersGateway } from "../../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
+import { InMemorySubscribersGateway } from "../../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
 import { HttpInclusionConnectGateway } from "../../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/HttpInclusionConnectGateway";
 import { InMemoryInclusionConnectGateway } from "../../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { makeInclusionConnectExternalRoutes } from "../../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/inclusionConnectExternalRoutes";
@@ -18,6 +20,7 @@ import { HttpPeConnectGateway } from "../../../domains/core/authentication/pe-co
 import { InMemoryPeConnectGateway } from "../../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalRoutes } from "../../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
 import { PeConnectGateway } from "../../../domains/core/authentication/pe-connect/port/PeConnectGateway";
+import { InMemoryCachingGateway } from "../../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { MetabaseDashboardGateway } from "../../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../../domains/core/dashboard/adapters/StubDashboardGateway";
 import { DashboardGateway } from "../../../domains/core/dashboard/port/DashboardGateway";
@@ -40,6 +43,10 @@ import { PdfGeneratorGateway } from "../../../domains/core/pdf-generation/ports/
 import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
+import { AnnuaireDesEntreprisesSiretGateway } from "../../../domains/core/sirene/adapters/AnnuaireDesEntreprisesSiretGateway";
+import { annuaireDesEntreprisesSiretRoutes } from "../../../domains/core/sirene/adapters/AnnuaireDesEntreprisesSiretGateway.routes";
+import { InMemorySiretGateway } from "../../../domains/core/sirene/adapters/InMemorySiretGateway";
+import { InseeSiretGateway } from "../../../domains/core/sirene/adapters/InseeSiretGateway";
 import { CustomTimeGateway } from "../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
@@ -50,13 +57,6 @@ import { createLbbRoutes } from "../../../domains/establishment/adapters/la-bonn
 import { HttpPassEmploiGateway } from "../../../domains/establishment/adapters/pass-emploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
 import { createLogger } from "../../../utils/logger";
-import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
-import { annuaireDesEntreprisesSiretRoutes } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.routes";
-import { InMemorySiretGateway } from "../../secondary/siret/InMemorySiretGateway";
-import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
-import { HttpSubscribersGateway } from "../../secondary/subscribersGateway/HttpSubscribersGateway";
-import { InMemorySubscribersGateway } from "../../secondary/subscribersGateway/InMemorySubscribersGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);

@@ -14,11 +14,8 @@ import {
   reasonableSchedule,
 } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  KyselyDb,
-  makeKyselyDb,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 

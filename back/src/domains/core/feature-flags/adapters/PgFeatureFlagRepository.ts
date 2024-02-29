@@ -3,7 +3,7 @@ import { FeatureFlags, SetFeatureFlagParam, hasFeatureFlagValue } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 
 const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>

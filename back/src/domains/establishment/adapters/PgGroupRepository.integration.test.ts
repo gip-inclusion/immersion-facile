@@ -9,11 +9,8 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import {
-  KyselyDb,
-  makeKyselyDb,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { GroupEntity } from "../entities/GroupEntity";
 import {
