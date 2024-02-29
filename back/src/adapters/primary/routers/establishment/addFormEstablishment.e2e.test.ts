@@ -17,7 +17,7 @@ import {
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentLead } from "../../../../domains/offer/entities/EstablishmentLeadEntity";
+import { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";

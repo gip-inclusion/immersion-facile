@@ -3,7 +3,7 @@ import {
   FormEstablishmentRepository,
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,
-} from "../../domains/offer/ports/FormEstablishmentRepository";
+} from "../../domains/establishment/ports/FormEstablishmentRepository";
 import { createLogger } from "../../utils/logger";
 import { ConflictError, NotFoundError } from "../primary/helpers/httpErrors";
 

@@ -5,7 +5,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notif
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendBeneficiariesPdfAssessmentsEmails } from "../../../domains/offer/useCases/SendBeneficiariesPdfAssessmentsEmails";
+import { SendBeneficiariesPdfAssessmentsEmails } from "../../../domains/establishment/useCases/SendBeneficiariesPdfAssessmentsEmails";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";

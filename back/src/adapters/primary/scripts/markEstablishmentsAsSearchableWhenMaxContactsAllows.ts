@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { MarkEstablishmentsAsSearchableScript } from "../../../domains/offer/useCases/MarkEstablishmentsAsSearchableScript";
+import { MarkEstablishmentsAsSearchableScript } from "../../../domains/establishment/useCases/MarkEstablishmentsAsSearchableScript";
 import { makeKyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/repositories/PgEstablishmentAggregateRepository";
 import { AppConfig } from "../config/appConfig";

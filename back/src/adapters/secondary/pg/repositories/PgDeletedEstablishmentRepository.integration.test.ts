@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
-import { DeletedEstablishementDto } from "../../../../domains/offer/ports/DeletedEstablishmentRepository";
+import { DeletedEstablishementDto } from "../../../../domains/establishment/ports/DeletedEstablishmentRepository";
 import { EstablishmentAggregateBuilder } from "../../offer/EstablishmentBuilders";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";

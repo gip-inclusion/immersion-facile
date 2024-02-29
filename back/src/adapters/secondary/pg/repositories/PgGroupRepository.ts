@@ -5,8 +5,8 @@ import {
   SiretDto,
   groupWithResultsSchema,
 } from "shared";
-import { GroupEntity } from "../../../../domains/offer/entities/GroupEntity";
-import { GroupRepository } from "../../../../domains/offer/ports/GroupRepository";
+import { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
+import { GroupRepository } from "../../../../domains/establishment/ports/GroupRepository";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,

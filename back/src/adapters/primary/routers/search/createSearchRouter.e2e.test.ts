@@ -9,8 +9,8 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { GroupEntity } from "../../../../domains/offer/entities/GroupEntity";
-import { OfferEntity } from "../../../../domains/offer/entities/OfferEntity";
+import { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
+import { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   ContactEntityBuilder,

@@ -4,8 +4,8 @@ import { AppellationCode } from "shared";
 import {
   SearchMadeEntity,
   SearchMadeId,
-} from "../../../../domains/offer/entities/SearchMadeEntity";
-import { SearchMadeRepository } from "../../../../domains/offer/ports/SearchMadeRepository";
+} from "../../../../domains/establishment/entities/SearchMadeEntity";
+import { SearchMadeRepository } from "../../../../domains/establishment/ports/SearchMadeRepository";
 import { createLogger } from "../../../../utils/logger";
 import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
 

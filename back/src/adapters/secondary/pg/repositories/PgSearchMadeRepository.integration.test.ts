@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { uniq } from "ramda";
 import { AppellationCode } from "shared";
-import { SearchMadeEntity } from "../../../../domains/offer/entities/SearchMadeEntity";
+import { SearchMadeEntity } from "../../../../domains/establishment/entities/SearchMadeEntity";
 import { makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool, optional } from "../pgUtils";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";

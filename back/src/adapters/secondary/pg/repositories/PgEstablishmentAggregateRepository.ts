@@ -10,19 +10,19 @@ import {
   SearchSortedBy,
   SiretDto,
 } from "shared";
-import { ContactEntity } from "../../../../domains/offer/entities/ContactEntity";
+import { ContactEntity } from "../../../../domains/establishment/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-} from "../../../../domains/offer/entities/EstablishmentEntity";
-import { OfferEntity } from "../../../../domains/offer/entities/OfferEntity";
-import { SearchMade } from "../../../../domains/offer/entities/SearchMadeEntity";
+} from "../../../../domains/establishment/entities/EstablishmentEntity";
+import { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
+import { SearchMade } from "../../../../domains/establishment/entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
-} from "../../../../domains/offer/ports/EstablishmentAggregateRepository";
+} from "../../../../domains/establishment/ports/EstablishmentAggregateRepository";
 import { createLogger } from "../../../../utils/logger";
 import {
   BadRequestError,

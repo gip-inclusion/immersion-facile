@@ -9,7 +9,7 @@ import {
 import {
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,
-} from "../../../../domains/offer/ports/FormEstablishmentRepository";
+} from "../../../../domains/establishment/ports/FormEstablishmentRepository";
 import {
   ConflictError,
   NotFoundError,

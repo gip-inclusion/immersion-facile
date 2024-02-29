@@ -1,7 +1,7 @@
 import {
   PassEmploiGateway,
   PassEmploiNotificationParams,
-} from "../../../../domains/offer/ports/PassEmploiGateway";
+} from "../../../../domains/establishment/ports/PassEmploiGateway";
 import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../../utils/notifyDiscord";
